@@ -192,7 +192,7 @@ fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&s
         .env("RUBYOPT", rubyopt.trim())
         .env("LOWRAIL", mode)
         .env("LOWRAIL_OUTCOMES", &out)
-        .env("LOWRAIL_STATS", "1")
+        .env("LOWRAIL_STATS", "") // counts on; hits come via LOWRAIL_OUTCOMES, no extra stats file
         .envs(extra_env.iter().copied())
         .status()
         .map_err(|e| format!("running {}: {e}", cmd.join(" ")))?;
