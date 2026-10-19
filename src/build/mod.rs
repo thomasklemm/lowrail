@@ -146,6 +146,18 @@ pub fn build(app: &Path, env: &str) -> Result<String, String> {
     if !status.success() {
         return Err("lowrail-compile failed".into());
     }
+    let preload_status = Command::new("bundle")
+        .args(["exec", "ruby"])
+        .arg(facts::gem_dir().join("exe/lowrail-preload-build"))
+        .arg(&dir)
+        .current_dir(app)
+        .env("RAILS_ENV", env)
+        .env("LOWRAIL", "0")
+        .status()
+        .map_err(|e| format!("preload plan facts: {e}"))?;
+    if !preload_status.success() {
+        return Err(format!("preload plan facts failed ({preload_status})"));
+    }
     Ok(summary(&ledger, &units, templates.len(), files.len(), &dir))
 }
 

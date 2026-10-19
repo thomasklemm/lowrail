@@ -1,0 +1,158 @@
+# frozen_string_literal: true
+
+require_relative "test_helper"
+
+class PreloadPlansTest < Minitest::Test
+  include LowrailTest
+
+  # Real Rails/SQLite, through the public Preloader interface. No mocks of
+  # loader internals: the same asymmetric workload must agree on both paths.
+  SCENARIO = <<~'RUBY'
+    gem "activerecord", "~> 8.1.4"
+    require "active_record"
+    require "lowrail"
+    require "lowrail/manifest"
+    require "lowrail/preload_build"
+    module Rails
+      def self.version = ActiveRecord::VERSION::STRING
+    end
+    ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+    ActiveRecord::Schema.define do
+      create_table(:writers) { |t| t.string :name }
+      create_table(:posts) { |t| t.integer :writer_id; t.integer :alternate_id; t.string :title }
+      create_table(:notes) { |t| t.integer :post_id; t.string :body }
+    end
+    class Writer < ActiveRecord::Base
+      has_many :posts, inverse_of: :writer
+      has_many :other_posts, class_name: "Post", foreign_key: :writer_id
+      has_many :notes, through: :posts
+      has_many :filtered, -> { where(title: Thread.current[:title]) }, class_name: "Post"
+      has_many :dependent_posts, ->(writer) { where(title: writer.name) }, class_name: "Post"
+    end
+    class Post < ActiveRecord::Base
+      belongs_to :writer, inverse_of: :posts
+      has_many :notes, inverse_of: :post
+    end
+    class Note < ActiveRecord::Base
+      belongs_to :post, inverse_of: :notes
+    end
+    a = Writer.create!(name: "A")
+    b = Writer.create!(name: "B")
+    x = a.posts.create!(title: "first", alternate_id: b.id)
+    y = a.posts.create!(title: "second")
+    z = b.posts.create!(title: "third", alternate_id: a.id)
+    x.notes.create!(body: "x1"); x.notes.create!(body: "x2"); z.notes.create!(body: "z1")
+    dir = Dir.pwd
+    File.write("manifest.json", JSON.generate({format: 1, ruby_description: RUBY_DESCRIPTION,
+      compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 7, facts: []}]}))
+    File.write("ledger.json", "[]")
+    Lowrail::PreloadBuild.run(dir)
+    Lowrail::PreloadBuild.run(dir) # idempotent and never collides with unit 7
+    Lowrail.boot(root: dir)
+    Lowrail.setup(root: dir, dir: dir) if ENV["LOWRAIL"] == "1"
+    Lowrail::PreloadPlans.activate if ENV["LOWRAIL"] == "1"
+    result = { "unit_ids" => JSON.parse(File.read("manifest.json"))["units"].map { _1["id"] } }
+    preload = ->(rows, spec, **opts) { ActiveRecord::Associations::Preloader.new(records: rows, associations: spec, **opts).call }
+    signature = ->(rows) { rows.map { |r| [r.name, r.association(:posts).loaded?, r.posts.map { |p| [p.title, p.association(:notes).loaded?, p.notes.map(&:body), p.writer.equal?(r)] }] } }
+    rows = [Writer.find(b.id), Writer.find(a.id), Writer.find(a.id)]
+    result["root_loaders"] = preload.call(rows, { posts: :notes }).size
+    result["nested"] = signature.call(rows)
+    # Already loaded associations and unsaved collection targets survive.
+    rows = [Writer.find(a.id), Writer.find(b.id)]
+    rows.first.posts.load
+    rows.last.posts.build(title: "unsaved")
+    preload.call(rows, :posts)
+    result["loaded_unsaved"] = rows.map { _1.posts.map(&:title) }
+    # A subsequent preload must see a new row: the cache holds no data.
+    a.posts.create!(title: "new")
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :posts)
+    result["fresh"] = rows.first.posts.map(&:title)
+    rows = [Writer.find(a.id), Writer.find(b.id)]
+    queries = []
+    subscription = ActiveSupport::Notifications.subscribe("sql.active_record") { |*args| queries << args.last[:sql] if args.last[:sql].start_with?("SELECT") }
+    preload.call(rows, [:posts, :other_posts])
+    ActiveSupport::Notifications.unsubscribe(subscription)
+    result["grouped_queries"] = queries.size
+    result["aliases"] = rows.map { [_1.posts.map(&:title), _1.other_posts.map(&:title)] }
+    Post.where(title: "second").scoping do
+      rows = [Writer.find(a.id)]
+      preload.call(rows, :posts)
+      result["current_scope"] = rows.first.posts.map(&:title)
+    end
+    Thread.current[:title] = "second"
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :filtered)
+    result["dynamic"] = rows.first.filtered.map(&:title)
+    Thread.current[:title] = "new"
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :filtered)
+    result["dynamic_next"] = rows.first.filtered.map(&:title)
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :notes)
+    result["through"] = rows.first.notes.map(&:body)
+    # An initialized preloader must recheck guards before it loads anything.
+    rows = [Writer.find(a.id)]
+    pending = ActiveRecord::Associations::Preloader.new(records: rows, associations: :posts)
+    Post.define_singleton_method(:scope_for_association) { |*| where(title: "second") }
+    pending.call
+    result["method_change"] = rows.first.posts.map(&:title)
+    Post.singleton_class.remove_method(:scope_for_association)
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :posts)
+    result["restored"] = rows.first.posts.map(&:title)
+    change = Module.new { define_method(:scope_for_association) { |*| where(title: "first") } }
+    Post.singleton_class.prepend(change)
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :posts)
+    result["module_change"] = rows.first.posts.map(&:title)
+    change.remove_method(:scope_for_association)
+    Post.reset_column_information
+    rows = [Writer.find(b.id)]
+    preload.call(rows, :posts)
+    result["schema_reset"] = rows.first.posts.map(&:title)
+    Post.send(:default_scope, -> { where(title: "second") })
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :posts)
+    result["default_scope"] = rows.first.posts.map(&:title)
+    Post.default_scopes = []
+    Writer.has_many :posts, class_name: "Post", foreign_key: :alternate_id
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :posts)
+    result["reflection_change"] = rows.first.posts.map(&:title)
+    result["hits"] = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {}
+    puts JSON.generate(result)
+  RUBY
+
+  def test_plans_keep_rails_results_and_invalidate
+    realpath_tmpdir do |dir|
+      File.write(File.join(dir, "scenario.rb"), SCENARIO)
+      runs = [ ["0", nil], ["1", nil], ["1", ""] ].map do |mode, units|
+        out, err, status = ruby(File.join(dir, "scenario.rb"), setup: false, chdir: dir,
+          env: { "RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL" => mode, "LOWRAIL_UNITS" => units,
+            "LOWRAIL_STATS" => File.join(dir, "stats-#{mode}") })
+        skip "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
+        assert status.success?, "#{err}\n#{out}"
+        JSON.parse(out.lines.last)
+      end
+      off, on, disabled = runs
+      assert_operator on.delete("hits").fetch("8", 0), :>=, 6
+      assert_empty off.delete("hits")
+      assert_empty disabled.delete("hits")
+      assert_equal off, on
+      assert_equal off, disabled
+      assert_equal [7, 8], on["unit_ids"]
+      assert_equal 1, on["root_loaders"]
+      assert_equal ["third", "unsaved"], on["loaded_unsaved"].last
+      assert_equal ["first", "second", "new"], on["fresh"]
+      assert_equal 1, on["grouped_queries"]
+      assert_equal ["first", "second", "new"], on["current_scope"]
+      %w[dynamic method_change default_scope].each { assert_equal ["second"], on[_1], _1 }
+      assert_equal ["new"], on["dynamic_next"]
+      assert_equal ["first"], on["module_change"]
+      assert_equal ["third"], on["schema_reset"]
+      assert_equal ["third"], on["reflection_change"]
+      assert_equal ["x1", "x2"], on["through"]
+    end
+  end
+end

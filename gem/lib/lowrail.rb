@@ -95,6 +95,10 @@ module Lowrail
         require_relative "lowrail/templates"
         Templates.install(manifest.templates)
       end
+      if manifest.units.any? { _1["pass"] == "active_record/preload_plans" }
+        require_relative "lowrail/preload_plans"
+        PreloadPlans.install(manifest)
+      end
       true
     end
 

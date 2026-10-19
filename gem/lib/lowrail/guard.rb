@@ -122,7 +122,9 @@ module Lowrail
         name = fact.fetch("method").to_sym
         singleton = fact["singleton"]
         holds_on?(singleton ? mod.singleton_class : mod, name, fact) &&
-          descendants_agree?(mod, name, singleton) &&
+          # Runtime plans instantiate a specific class and guard that class,
+          # rather than specializing a method inherited by arbitrary children.
+          (fact["exact"] || descendants_agree?(mod, name, singleton)) &&
           (singleton || no_instance_override?(mod, name))
       rescue NameError => e # constant or method gone: the fact does not hold
         Lowrail.debug("fact #{fact["receiver"]}#{fact["singleton"] ? "." : "#"}#{fact["method"]}: #{e.class}: #{e.message}")
