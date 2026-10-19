@@ -223,12 +223,21 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
                 .iter()
                 .filter(|(class, _)| class == &record.name)
             {
-                if let Some(sig) = model.methods.get_mut(&key(&record.name, name, false)) {
-                    sig.return_type = Type::new(
-                        "String?",
-                        Source::Inference,
-                        format!("{}.enum {name}", record.name),
-                    );
+                let members = std::iter::once(name).chain(
+                    record
+                        .attribute_aliases
+                        .iter()
+                        .filter(|(_, original)| *original == name)
+                        .map(|(alias, _)| alias),
+                );
+                for member in members {
+                    if let Some(sig) = model.methods.get_mut(&key(&record.name, member, false)) {
+                        sig.return_type = Type::new(
+                            "String?",
+                            Source::Inference,
+                            format!("{}.enum {name}", record.name),
+                        );
+                    }
                 }
             }
             for (_, name) in index

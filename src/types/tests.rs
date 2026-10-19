@@ -81,7 +81,8 @@ fn prism_fixpoint_overrides_and_unsupported_control_flow() {
     methods.push(json!({"name":"published", "singleton":true, "owner":"#<Class:Article>", "source_location":"/rails/named.rb:1", "iseq_kind":"block"}));
     let facts: Facts = serde_json::from_value(json!({"app_root":dir,
         "models":[{"name":"Article", "columns":[{"name":"title", "type":"string"},
-            {"name":"status", "type":"integer"}, {"name":"external", "type":"string"}]}],
+            {"name":"status", "type":"integer"}, {"name":"external", "type":"string"}],
+            "attribute_aliases":{"state":"status"}}],
         "modules":[{"name":"Article", "ancestors":["Override","Article"], "const_source_location":format!("{}:1",file.display()), "methods":methods},
             {"name":"Override", "methods":[{"name":"title", "source_location":format!("{}:12",file.display())},
                 {"name":"external", "owner":"Override", "iseq_kind":"cfunc"}]}]
@@ -100,6 +101,10 @@ fn prism_fixpoint_overrides_and_unsupported_control_flow() {
     );
     assert_eq!(
         model.lookup("Article#status").unwrap().return_type.name,
+        "String?"
+    );
+    assert_eq!(
+        model.lookup("Article#state").unwrap().return_type.name,
         "String?"
     );
     assert_eq!(
