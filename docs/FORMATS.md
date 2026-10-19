@@ -115,26 +115,77 @@ Written by `lowrail build` (via `gem/exe/lowrail-compile`).
   "format": 1,
   "ruby_description": "...",
   "compile_option": "<sha256 of sorted RubyVM::InstructionSequence.compile_option>",
-  "files": {"/abs/app/models/article.rb": {"iseq": "iseq/<sha>.bin", "source_sha256": "..."}},
+  "rails_env": "test",                                  // units apply only in this env
+  "files": {"/abs/app/helpers/rooms_helper.rb": {"iseq": "iseq/<sha>.bin", "source_sha256": "..."}},
+  "templates": {"/abs/app/views/articles/_article.html.erb": {
+    "source_sha256": "...", "code": "<lowered compiled ERB code>", "units": [0, 1]}},
   "units": [{
-    "id": 0, "file": "/abs/app/models/article.rb", "method": "Article#summary", "pass": "...",
-    "facts": [{"receiver": "Article", "method": "title", "singleton": false,
-               "owner": "Article::GeneratedAttributeMethods",
-               "source_location": "/abs/...:123", "visibility": "public"}]
+    "id": 1, "kind": "template", "file": "/abs/app/views/articles/_article.html.erb",
+    "pass": "route/path", "sites": 3,
+    "facts": [
+      {"receiver": "@self", "method": "article_path", "owner": null,
+       "source_location": "/abs/gems/actionpack-8.1.4/lib/action_dispatch/routing/route_set.rb:334",
+       "visibility": "public",
+       "route": {"name": "article", "spec": "/articles/:id(.:format)", "parts": ["id"],
+                 "defaults": "{controller: \"articles\", action: \"show\"}"}},
+      {"receiver": "ActionDispatch::Http::URL", "method": "path_for", "singleton": true,
+       "owner": "#<Class:ActionDispatch::Http::URL>", "source_location": "/abs/...:169", "visibility": "public"}
+    ]
   }]
 }
 ```
 
+Units: `kind` is `"template"` (code served through the template seam,
+`file` is the template identifier) or `"file"` (a Ruby file served through
+`load_iseq`); `pass` names the lowering pass (`view/link_to`, `route/path`);
+`sites` counts lowered call sites. Unit ids are unique across passes.
+
+Facts: a method fact holds when `receiver#method` (or `receiver.method` with
+`"singleton": true`) resolves to that owner, source location and visibility
+(`owner: null` = an anonymous module, matched by source location).
+`"receiver": "@self"` means the class of `self` at the call site: lowered
+code calls `::Lowrail.ok?(id, self.class)` and the facts are checked per
+class, cached until a hook resets the unit (`"@view"` from earlier builds is
+read the same way). A fact with `"route"` additionally requires the method to
+be owned by `Rails.application.routes.named_routes.path_helpers_module` and
+the named route to still have that path spec, required parts and
+`defaults.inspect`, with no requirements and no glob.
+
 ## build input for lowrail-compile — `units.json`
 
 ```json
-{"out": "/abs/app/.lowrail", "files": [{"path": "/abs/app/models/article.rb",
-  "lowered": "/abs/app/.lowrail/src/<sha>.rb"}], "units": [ ...as in manifest... ]}
+{"out": "/abs/app/.lowrail", "rails_env": "test",
+ "files": [{"path": "/abs/app/models/article.rb",
+            "lowered": "/abs/app/.lowrail/src/app__models__article.rb",
+            "original": "/abs/app/.lowrail/src/app__models__article.rb.orig"}],
+ "templates": { ...as in manifest... },
+ "units": [ ...as in manifest... ]}
 ```
 
 `lowrail-compile` compiles each lowered source with
 `RubyVM::InstructionSequence.compile(src, path, path, 1)` (path = original
-absolute path), writes binaries, then atomically writes `manifest.json`.
+absolute path), writes binaries, then atomically writes `manifest.json`. A
+file is skipped (and its units dropped) when its current SHA-256 differs from
+`source_sha256` or, if given instead, from the SHA-256 of the `original` copy
+the pass lowered. `templates` and `rails_env` are copied to the manifest;
+template units need no compiled file.
+
+## ledger.json — every site a pass looked at
+
+Written by `lowrail build`. One entry per (file, line, helper, outcome):
+
+```json
+[{"template": "/abs/app/views/articles/_article.html.erb", "line": 13, "pass": "route/path",
+  "helper": "edit_article_path", "outcome": "lowered", "copies": 2},
+ {"file": "/abs/app/models/webhook.rb", "line": 45, "pass": "route/path",
+  "helper": "message_path", "outcome": "Webhook#message_path is defined by Webhook, not the route set"}]
+```
+
+`template` or `file` names where the site is; `outcome` is `"lowered"` or
+the reason it was not. `copies` > 1 when the same call occurs several times
+in the code a pass saw (a route helper inside a lowered `link_to` appears in
+both its fast path and its fallback). Denylisted units appear as
+`{"line": 0, "helper": "*", "outcome": "denylisted by verify --bisect"}`.
 
 ## verify outcomes — `outcomes-<mode>.json`
 
