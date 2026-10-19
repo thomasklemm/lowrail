@@ -133,7 +133,9 @@ module Lowrail
       # route set defined for that route (its path helper module, compared by
       # identity, since it is anonymous), and the route must still have the
       # path, required parts and defaults the build specialized, with no
-      # requirements and no glob (the shape OptimizedUrlHelper handles).
+      # requirements and no glob (the shape OptimizedUrlHelper handles). Glob
+      # segments are read from the spec (`*name`): production apps free the
+      # route AST after boot, so Route#glob? raises there.
       # Redrawing routes redefines the helpers, which resets the unit, so this
       # is re-checked after every reload.
       def route_holds?(klass, name, route)
@@ -144,7 +146,7 @@ module Lowrail
         r.path.spec.to_s == route.fetch("spec") &&
           r.required_parts.map(&:to_s) == route.fetch("parts") &&
           r.defaults.inspect == route.fetch("defaults") &&
-          r.path.requirements.empty? && !r.glob?
+          r.path.requirements.empty? && !r.path.spec.to_s.include?("*")
       end
 
       def holds_on?(klass, name, fact)

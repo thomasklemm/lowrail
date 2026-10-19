@@ -113,6 +113,9 @@ pub struct Cache {
     info: HashMap<String, Info>,
     prepared: HashMap<String, Result<Prepared, String>>,
     rails_deps: Option<Result<Vec<Dep>, String>>,
+    /// (class, helper) → None when the helper resolves to the route set's
+    /// method in that class, else why not.
+    resolves: HashMap<(String, String), Option<String>>,
 }
 
 pub fn lower(original: &str, mode: &Mode, unit: usize, oracle: &mut dyn Oracle, cache: &mut Cache) -> Lowered {
@@ -129,7 +132,7 @@ pub fn lower(original: &str, mode: &Mode, unit: usize, oracle: &mut dyn Oracle, 
     }
     let template = matches!(mode, Mode::Template { .. });
     let mut found = Vec::new();
-    collect(&result.node(), template, &mut found);
+    collect(&result.node(), code, template, &mut found);
 
     let mut out = Lowered::default();
     let mut edits: Vec<(usize, usize, String)> = Vec::new();
@@ -262,6 +265,9 @@ struct Candidate {
     /// `name` without arguments or parentheses: could be a local variable in
     /// a template whose locals Prism cannot see.
     vcall: bool,
+    /// The class whose instance method contains the call, when the innermost
+    /// enclosing body is a `class` (not a module, where self can be anything).
+    class_name: Option<String>,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -272,21 +278,49 @@ enum Ctx {
     Singleton,
 }
 
-fn collect(node: &Node, template: bool, out: &mut Vec<Candidate>) {
+fn collect(node: &Node, code: &str, template: bool, out: &mut Vec<Candidate>) {
     struct V<'a> {
         out: &'a mut Vec<Candidate>,
+        code: &'a str,
         ctx: Vec<Ctx>,
+        /// Enclosing class/module names (None for a module) for class_name.
+        names: Vec<(String, bool)>,
+    }
+    impl V<'_> {
+        fn class_name(&self) -> Option<String> {
+            let (_, is_class) = self.names.last()?;
+            if !is_class {
+                return None;
+            }
+            let mut full = String::new();
+            for (n, _) in &self.names {
+                if let Some(abs) = n.strip_prefix("::") {
+                    full = abs.to_string();
+                } else if full.is_empty() {
+                    full = n.clone();
+                } else {
+                    full = format!("{full}::{n}");
+                }
+            }
+            Some(full)
+        }
     }
     impl<'pr> ruby_prism::Visit<'pr> for V<'_> {
         fn visit_class_node(&mut self, node: &ruby_prism::ClassNode<'pr>) {
+            let l = node.constant_path().location();
+            self.names.push((self.code[l.start_offset()..l.end_offset()].to_string(), true));
             self.ctx.push(Ctx::Body);
             ruby_prism::visit_class_node(self, node);
             self.ctx.pop();
+            self.names.pop();
         }
         fn visit_module_node(&mut self, node: &ruby_prism::ModuleNode<'pr>) {
+            let l = node.constant_path().location();
+            self.names.push((self.code[l.start_offset()..l.end_offset()].to_string(), false));
             self.ctx.push(Ctx::Body);
             ruby_prism::visit_module_node(self, node);
             self.ctx.pop();
+            self.names.pop();
         }
         fn visit_singleton_class_node(&mut self, node: &ruby_prism::SingletonClassNode<'pr>) {
             self.ctx.push(Ctx::Singleton);
@@ -315,12 +349,13 @@ fn collect(node: &Node, template: bool, out: &mut Vec<Candidate>) {
                     has_block: node.block().is_some(),
                     args: arg_ranges(node),
                     vcall: node.is_variable_call(),
+                    class_name: self.class_name(),
                 });
             }
             ruby_prism::visit_call_node(self, node);
         }
     }
-    let mut v = V { out, ctx: vec![if template { Ctx::Instance } else { Ctx::Body }] };
+    let mut v = V { out, code, ctx: vec![if template { Ctx::Instance } else { Ctx::Body }], names: vec![] };
     ruby_prism::Visit::visit(&mut v, node);
 }
 
@@ -356,6 +391,11 @@ fn plan(code: &str, c: &Candidate, info: &Info, nested: bool, oracle: &mut dyn O
     if c.has_block {
         return Err("block given".into());
     }
+    if let Some(class) = &c.class_name {
+        if let Some(why) = resolves_in(oracle, cache, class, &c.name) {
+            return Err(why);
+        }
+    }
     let args = c.args.clone()?;
     if args.len() != info.parts.len() {
         return Err(format!(
@@ -374,6 +414,28 @@ fn plan(code: &str, c: &Candidate, info: &Info, nested: bool, oracle: &mut dyn O
         }
     }
     prepare(oracle, cache, &c.name, info)
+}
+
+/// In a known class, the helper must be the route set's method; otherwise
+/// the runtime guard would only ever fall back (e.g. a model's own private
+/// `message_path`).
+fn resolves_in(oracle: &mut dyn Oracle, cache: &mut Cache, class: &str, helper: &str) -> Option<String> {
+    let key = (class.to_string(), helper.to_string());
+    if let Some(r) = cache.resolves.get(&key) {
+        return r.clone();
+    }
+    let code = format!(
+        "begin; k = ::Object.const_get({}); o = k.instance_method(:{helper}).owner; o.equal?(::Rails.application.routes.named_routes.path_helpers_module) ? \"route\" : \"#{{k.name}}#{helper} is defined by #{{o.name || o.inspect}}, not the route set\"; rescue NameError => e; \"#{{e.class}}: #{{e.message[0, 120]}}\"; end",
+        ruby_str(class)
+    );
+    let r = match oracle.eval_string(&code) {
+        Ok((s, _)) if s == "route" => None,
+        Ok((s, _)) if s.starts_with("NameError: uninitialized constant") => None, // cannot tell; the runtime guard decides
+        Ok((s, _)) => Some(s),
+        Err(e) => Some(format!("oracle: {e}")),
+    };
+    cache.resolves.insert(key, r.clone());
+    r
 }
 
 /// Template split and probes, once per helper.
@@ -542,6 +604,9 @@ mod tests {
             if code.starts_with("k = ") {
                 return s(r#"["Some::Owner", "/gems/x.rb:1", "public"]"#.into());
             }
+            if code.starts_with("begin; k = ::Object.const_get(") {
+                return s(if code.contains("\"Webhook\"") { "Webhook#message_path is defined by Webhook, not the route set".into() } else { "route".into() });
+            }
             Err(format!("unexpected {code}"))
         }
     }
@@ -611,6 +676,14 @@ mod tests {
         assert_eq!(out.code, code);
         assert_eq!(out.sites[0].outcome, "probe mismatch: view, args nil: differs");
         assert!(out.deps.is_empty());
+    }
+
+    #[test]
+    fn known_class_must_resolve_to_the_route() {
+        let code = "class Webhook < ApplicationRecord\n  def payload = article_path(self)\nend\nmodule Helper\n  def x = article_path(@a)\nend\n";
+        let out = lower(code, &Mode::RubyFile, 0, &mut Fake::default(), &mut Cache::default());
+        let outcomes: Vec<_> = out.sites.iter().map(|s| s.outcome.as_str()).collect();
+        assert_eq!(outcomes, vec!["Webhook#message_path is defined by Webhook, not the route set", "lowered"]);
     }
 
     #[test]

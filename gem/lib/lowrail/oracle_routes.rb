@@ -48,7 +48,7 @@ module Lowrail
           parts: route.required_parts.map(&:to_s),
           defaults: route.defaults.inspect,
           option_defaults: (route.defaults.keys & OPTION_KEYS).map(&:to_s),
-          optimized: route.path.requirements.empty? && !route.glob?,
+          optimized: route.path.requirements.empty? && !route.path.spec.to_s.include?("*"),
           owner_ok: kind == "path" ? !!owner_ok : nil,
           source_location: meth&.source_location&.join(":"),
           visibility: visibility(view.class, helper)
