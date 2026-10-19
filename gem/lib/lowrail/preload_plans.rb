@@ -17,6 +17,10 @@ module Lowrail
         @plans = {}
         @edges = {}
         @lock = Mutex.new
+        if defined?(ActiveSupport) && ActiveSupport.respond_to?(:on_load)
+          ActiveSupport.on_load(:after_initialize) { Lowrail::PreloadPlans.activate }
+          return
+        end
         # ActiveSupport is not loaded yet when setup runs through RUBYOPT.
         # TracePoint is removed at the first Rails boot, not on the hot path.
         @boot = TracePoint.new(:end) do |tp|
@@ -56,7 +60,12 @@ module Lowrail
           p = @plans[key]
           # Rebuild on structural change, but only against recorded boot facts.
           @plans.delete(key) if p && !p.valid?
-          @plans[key] ||= build(key.last, root)
+          return @plans[key] if @plans[key]
+          # Includes specs can be constructed dynamically. Bound retained plan
+          # structures; a full cache simply uses Rails, never evicts app data.
+          return if @plans.size >= 256
+          built = build(key.last, root)
+          @plans[key] = built if built
         end
       rescue StandardError => e
         Lowrail.debug("preload plan declined: #{e.class}: #{e.message}")
@@ -83,13 +92,13 @@ module Lowrail
       def normalize(spec)
         case spec
         when Symbol then spec
-        when String then spec.to_sym
+        when String then spec.dup.freeze
         when Array
           a = spec.map { normalize(_1) }
           a.freeze if a.all?
         when Hash
           a = spec.map { |k, v| [normalize(k), v.nil? ? [] : normalize(v)] }
-          a.to_h.freeze if a.all? { |k, v| Symbol === k && v }
+          a.to_h.freeze if a.all? { |k, v| (Symbol === k || String === k) && v }
         when nil then [].freeze
         end
       end
@@ -99,7 +108,7 @@ module Lowrail
         visit = lambda do |children, owner, parent|
           Array.wrap(children).flat_map do |a|
             Array(a).map do |name, child|
-              r = owner._reflect_on_association(name)
+              r = owner._reflect_on_association(name.to_sym)
               return nil unless r
               label = "#{owner.name}##{r.name}"
               expected = @facts["edges"][label] or return nil
@@ -116,7 +125,7 @@ module Lowrail
           end
         end
         roots = visit.call(spec, root, nil)
-        roots && Plan.new(roots, nodes)
+        roots && Plan.new(roots, nodes, spec)
       end
     end
 
@@ -132,7 +141,10 @@ module Lowrail
         end
         @columns = [owner.columns_hash, target.columns_hash]
         @types = [owner.attribute_types, target.attribute_types]
-        @model_facts = [owner, target].map { |k| [k.table_name.dup, k.primary_key, k.connection_specification_name, k.polymorphic_name] }
+        @model_facts = Marshal.load(Marshal.dump([owner, target].map { |k|
+          [k.table_name, k.primary_key, k.connection_specification_name, k.polymorphic_name, k.inheritance_column]
+        }))
+        @keys = [reflection.join_primary_key, reflection.join_foreign_key, reflection.type]
         @options = Marshal.load(Marshal.dump(PreloadFacts.value(reflection.options)))
         @scope_proc = reflection.scope
         @scope_name = PreloadFacts.scope_name(reflection)&.dup
@@ -145,38 +157,54 @@ module Lowrail
 
       def valid?
         owner._reflect_on_association(reflection.name).equal?(reflection) &&
+          reflection.klass.equal?(target) && [reflection.join_primary_key, reflection.join_foreign_key, reflection.type] == @keys &&
           owner.columns_hash.equal?(@columns[0]) && target.columns_hash.equal?(@columns[1]) &&
           owner.attribute_types.equal?(@types[0]) && target.attribute_types.equal?(@types[1]) &&
           target.default_scopes.empty? && !target.current_scope &&
           reflection.scope.equal?(@scope_proc) && PreloadFacts.scope_name(reflection) == @scope_name &&
           PreloadFacts.value(reflection.options) == @options &&
           [owner, target].each_with_index.all? { |k, i|
-            [k.table_name, k.primary_key, k.connection_specification_name, k.polymorphic_name] == @model_facts[i]
+            [k.table_name, k.primary_key, k.connection_specification_name, k.polymorphic_name, k.inheritance_column] == @model_facts[i]
           }
+      rescue StandardError
+        false
       end
 
       def loader(records)
         l = ActiveRecord::Associations::Preloader::Association.new(target, records, reflection, nil, reflection_scope, true)
-        l.instance_variable_set(:@scope, scope)
+        # Association#scope is public on the returned loader. Do not expose a
+        # cached prototype that a caller could mutate or load with row data.
+        l.instance_variable_set(:@scope, scope.spawn)
         l
       end
     end
 
     class Plan
-      def initialize(roots, nodes)
+      attr_reader :spec
+
+      def initialize(roots, nodes, spec)
         @roots, @nodes = roots, nodes
+        @spec = spec
         # Rails Batch postpones loaders whose table appears later in a tree.
-        # Compute that schedule and query equivalence classes once, not once
-        # per request. No through/STI/dynamic-scope nodes enter this schedule.
+        # A branch's own runnable class is excluded, even if it recurs below.
+        # Decline inter-branch dependencies: empty owner sets can change that
+        # schedule at runtime. Independent frontiers have fixed query groups.
         pending = roots.dup
         @steps = []
         until pending.empty?
-          future = pending.flat_map { descendants(_1).map { |n| n.edge.target.table_name } }
-          ready = pending.reject { future.include?(_1.edge.target.table_name) }
-          ready = pending if ready.empty?
-          groups = ready.group_by { |n| [n.edge.query, n.edge.target] }.values
+          future = pending.flat_map { |node|
+            (descendants(node).map { _1.edge.target }.uniq - [node.edge.target]).map(&:table_name)
+          }
+          if pending.size > 1 && pending.any? { future.include?(_1.edge.target.table_name) }
+            Lowrail.debug("preload plan declined: data-dependent inter-branch schedule")
+            # Retain only this structural decline, with the same edge guards.
+            # Do not rediscover an unsupported schedule on every request.
+            @steps = nil
+            return
+          end
+          groups = pending.group_by { |n| [n.edge.query, n.edge.target] }.values
           @steps << groups
-          pending = (pending - ready) + ready.flat_map(&:children)
+          pending = pending.flat_map(&:children)
         end
       end
 
@@ -187,6 +215,7 @@ module Lowrail
       def valid? = @nodes.all? { _1.edge.valid? }
 
       def call(records)
+        return unless @steps
         loaders = {}.compare_by_identity
         @steps.each do |groups|
           groups.each do |nodes|
@@ -225,7 +254,7 @@ module Lowrail
       def branches
         if @lowrail_plan && !@tree
           @tree = ActiveRecord::Associations::Preloader::Branch.new(parent: nil, association: nil,
-            children: associations, associate_by_default: associate_by_default, scope: scope)
+            children: @lowrail_plan.spec, associate_by_default: associate_by_default, scope: scope)
           @tree.preloaded_records = records
         end
         super

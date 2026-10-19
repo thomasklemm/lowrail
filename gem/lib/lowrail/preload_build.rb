@@ -17,9 +17,15 @@ module Lowrail
       manifest["units"].reject! { _1["pass"] == "active_record/preload_plans" }
       ledger.reject! { _1["pass"] == "active_record/preload_plans" }
       denied = JSON.parse(File.read(File.join(dir, "denylist.json"))) if File.file?(File.join(dir, "denylist.json"))
-      return if Array(denied).any? { _1["pass"] == "active_record/preload_plans" }
+      if Array(denied).any? { _1["pass"] == "active_record/preload_plans" }
+        ledger << { "pass" => "active_record/preload_plans", "outcome" => "denylisted by verify --bisect" }
+        Lowrail.write_json(path, manifest)
+        Lowrail.write_json(ledger_path, ledger)
+        return
+      end
       models, edges, facts = {}, {}, []
-      ActiveRecord::Base.descendants.sort_by { _1.name.to_s }.each do |klass|
+      classes = defined?(ActiveRecord::Base) ? ActiveRecord::Base.descendants : []
+      classes.sort_by { _1.name.to_s }.each do |klass|
         next if klass.abstract_class? || !klass.name || !klass.table_exists?
         klass.reflect_on_all_associations.each do |r|
           label = "#{klass.name}##{r.name}"
@@ -28,13 +34,13 @@ module Lowrail
           next if reason
           [klass, r.klass].each do |k|
             models[k.name] ||= PreloadFacts.model(k)
-            %i[scope_for_association unscoped arel_table predicate_builder polymorphic_name].each do |name|
+            PreloadFacts::SCOPE_METHODS.each do |name|
               facts << PreloadFacts.method_fact(k, name, singleton: true)
             end
             # Relations are model-specific generated classes; a CollectionProxy
             # override is irrelevant, an override on this relation is not.
-            %i[where where! merge! values_for_queries].each do |name|
-              facts << PreloadFacts.method_fact(k.all.class, name)
+            PreloadFacts::RELATION_METHODS.each do |name|
+              facts << PreloadFacts.method_fact(k.unscoped.class, name)
             end
           end
           %i[klass join_scopes join_primary_key join_foreign_key scope type collection?].each do |name|

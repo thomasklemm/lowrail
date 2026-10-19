@@ -4,12 +4,16 @@ module Lowrail
   # The inputs to a preload plan, not rows or query results. Shared by the
   # booted build helper and the runtime; deliberately separate from app facts.
   module PreloadFacts
+    SCOPE_METHODS = %i[scope_for_association relation default_scoped build_default_scope
+      unscoped arel_table predicate_builder polymorphic_name table_name primary_key].freeze
+    RELATION_METHODS = %i[initialize initialize_copy spawn where where! merge! values_for_queries].freeze
     module_function
 
     def model(klass)
       { "table" => klass.table_name, "primary_key" => klass.primary_key,
         "connection" => klass.connection_specification_name,
         "polymorphic_name" => klass.polymorphic_name,
+        "inheritance_column" => klass.inheritance_column,
         "columns" => klass.columns_hash.map { |name, c|
           [name, c.sql_type, c.type.to_s, c.limit, c.precision, c.scale, c.null,
            klass.type_for_attribute(name).class.name]
@@ -72,6 +76,15 @@ module Lowrail
       k = r.klass
       return "abstract target" if k.abstract_class?
       return "default scope" unless k.default_scopes.empty?
+      # An app can override these constructors to inject request state without
+      # declaring any association/default scope. Such code is not certified.
+      framework = Gem.loaded_specs.fetch("activerecord").full_gem_path + "/"
+      return "custom scope constructor" unless SCOPE_METHODS.all? { |name|
+        k.method(name).source_location&.first&.start_with?(framework)
+      }
+      return "custom relation constructor" unless RELATION_METHODS.all? { |name|
+        k.unscoped.class.instance_method(name).source_location&.first&.start_with?(framework)
+      }
       # STI can introduce a different target/reflection partway through a tree.
       return "STI target" if k.columns_hash.key?(k.inheritance_column)
       return "deprecated association" if r.options[:deprecated]

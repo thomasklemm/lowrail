@@ -25,9 +25,11 @@ class PreloadPlansTest < Minitest::Test
     class Writer < ActiveRecord::Base
       has_many :posts, inverse_of: :writer
       has_many :other_posts, class_name: "Post", foreign_key: :writer_id
+      has_many :peers, class_name: "Writer", foreign_key: :id, inverse_of: false
       has_many :notes, through: :posts
       has_many :filtered, -> { where(title: Thread.current[:title]) }, class_name: "Post"
       has_many :dependent_posts, ->(writer) { where(title: writer.name) }, class_name: "Post"
+      has_many :custom_posts, class_name: "CustomPost", foreign_key: :writer_id
     end
     class Post < ActiveRecord::Base
       belongs_to :writer, inverse_of: :posts
@@ -35,6 +37,10 @@ class PreloadPlansTest < Minitest::Test
     end
     class Note < ActiveRecord::Base
       belongs_to :post, inverse_of: :notes
+    end
+    class CustomPost < ActiveRecord::Base
+      self.table_name = "posts"
+      def self.scope_for_association(*) = super.where(title: Thread.current[:title])
     end
     a = Writer.create!(name: "A")
     b = Writer.create!(name: "B")
@@ -48,6 +54,11 @@ class PreloadPlansTest < Minitest::Test
     File.write("ledger.json", "[]")
     Lowrail::PreloadBuild.run(dir)
     Lowrail::PreloadBuild.run(dir) # idempotent and never collides with unit 7
+    if ENV["STALE_PRELOAD_SOURCE"]
+      data = JSON.parse(File.read("manifest.json"))
+      data["units"].last["preload_facts"]["sources"].transform_values! { "stale" }
+      File.write("manifest.json", JSON.generate(data))
+    end
     Lowrail.boot(root: dir)
     Lowrail.setup(root: dir, dir: dir) if ENV["LOWRAIL"] == "1"
     Lowrail::PreloadPlans.activate if ENV["LOWRAIL"] == "1"
@@ -57,6 +68,9 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(b.id), Writer.find(a.id), Writer.find(a.id)]
     result["root_loaders"] = preload.call(rows, { posts: :notes }).size
     result["nested"] = signature.call(rows)
+    rows = [Writer.find(a.id)]
+    preload.call(rows, { "posts" => :notes, posts: :writer })
+    result["distinct_spec_keys"] = rows.first.posts.map { [_1.association(:notes).loaded?, _1.association(:writer).loaded?] }
     # Already loaded associations and unsaved collection targets survive.
     rows = [Writer.find(a.id), Writer.find(b.id)]
     rows.first.posts.load
@@ -68,6 +82,13 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(a.id)]
     preload.call(rows, :posts)
     result["fresh"] = rows.first.posts.map(&:title)
+    # The returned Rails loader exposes #scope. Loading or mutating that
+    # per-call relation must never expose or change a cached prototype.
+    returned = preload.call([Writer.find(a.id)], :posts)
+    returned.first.scope.where!(title: "first").load
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :posts)
+    result["private_scope"] = rows.first.posts.map(&:title)
     rows = [Writer.find(a.id), Writer.find(b.id)]
     queries = []
     subscription = ActiveSupport::Notifications.subscribe("sql.active_record") { |*args| queries << args.last[:sql] if args.last[:sql].start_with?("SELECT") }
@@ -75,6 +96,14 @@ class PreloadPlansTest < Minitest::Test
     ActiveSupport::Notifications.unsubscribe(subscription)
     result["grouped_queries"] = queries.size
     result["aliases"] = rows.map { [_1.posts.map(&:title), _1.other_posts.map(&:title)] }
+    # Repeating a class inside its own branch must not postpone that branch
+    # behind unrelated tables. SQL order is observable by after_find hooks.
+    rows = [Writer.find(a.id)]
+    queries = []
+    subscription = ActiveSupport::Notifications.subscribe("sql.active_record") { |*args| queries << args.last[:sql][/FROM "(\w+)"/, 1] if args.last[:sql].start_with?("SELECT") }
+    preload.call(rows, { peers: :peers, posts: nil })
+    ActiveSupport::Notifications.unsubscribe(subscription)
+    result["scheduling_queries"] = queries
     Post.where(title: "second").scoping do
       rows = [Writer.find(a.id)]
       preload.call(rows, :posts)
@@ -84,19 +113,26 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(a.id)]
     preload.call(rows, :filtered)
     result["dynamic"] = rows.first.filtered.map(&:title)
+    preload.call(rows, :custom_posts)
+    result["custom_constructor"] = rows.first.custom_posts.map(&:title)
     Thread.current[:title] = "new"
     rows = [Writer.find(a.id)]
     preload.call(rows, :filtered)
     result["dynamic_next"] = rows.first.filtered.map(&:title)
+    preload.call(rows, :custom_posts)
+    result["custom_constructor_next"] = rows.first.custom_posts.map(&:title)
     rows = [Writer.find(a.id)]
     preload.call(rows, :notes)
     result["through"] = rows.first.notes.map(&:body)
     # An initialized preloader must recheck guards before it loads anything.
     rows = [Writer.find(a.id)]
-    pending = ActiveRecord::Associations::Preloader.new(records: rows, associations: :posts)
+    spec = { posts: :notes }
+    pending = ActiveRecord::Associations::Preloader.new(records: rows, associations: spec)
+    spec[:posts] = :writer
     Post.define_singleton_method(:scope_for_association) { |*| where(title: "second") }
     pending.call
     result["method_change"] = rows.first.posts.map(&:title)
+    result["snapshot_spec"] = rows.first.posts.map { _1.association(:notes).loaded? }
     Post.singleton_class.remove_method(:scope_for_association)
     rows = [Writer.find(a.id)]
     preload.call(rows, :posts)
@@ -127,27 +163,36 @@ class PreloadPlansTest < Minitest::Test
   def test_plans_keep_rails_results_and_invalidate
     realpath_tmpdir do |dir|
       File.write(File.join(dir, "scenario.rb"), SCENARIO)
-      runs = [ ["0", nil], ["1", nil], ["1", ""] ].map do |mode, units|
+      runs = [["0", nil, nil], ["1", nil, nil], ["1", "", nil], ["1", nil, "1"]].map do |mode, units, stale|
         out, err, status = ruby(File.join(dir, "scenario.rb"), setup: false, chdir: dir,
           env: { "RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL" => mode, "LOWRAIL_UNITS" => units,
+            "STALE_PRELOAD_SOURCE" => stale,
             "LOWRAIL_STATS" => File.join(dir, "stats-#{mode}") })
         skip "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
         assert status.success?, "#{err}\n#{out}"
         JSON.parse(out.lines.last)
       end
-      off, on, disabled = runs
+      off, on, disabled, stale = runs
       assert_operator on.delete("hits").fetch("8", 0), :>=, 6
       assert_empty off.delete("hits")
       assert_empty disabled.delete("hits")
+      assert_empty stale.delete("hits")
       assert_equal off, on
       assert_equal off, disabled
+      assert_equal off, stale
       assert_equal [7, 8], on["unit_ids"]
       assert_equal 1, on["root_loaders"]
+      assert_equal [[true, true], [true, true]], on["distinct_spec_keys"]
+      assert_equal [true], on["snapshot_spec"]
       assert_equal ["third", "unsaved"], on["loaded_unsaved"].last
       assert_equal ["first", "second", "new"], on["fresh"]
+      assert_equal ["first", "second", "new"], on["private_scope"]
       assert_equal 1, on["grouped_queries"]
+      assert_equal %w[writers posts writers], on["scheduling_queries"]
       assert_equal ["first", "second", "new"], on["current_scope"]
       %w[dynamic method_change default_scope].each { assert_equal ["second"], on[_1], _1 }
+      assert_equal ["second"], on["custom_constructor"]
+      assert_equal ["new"], on["custom_constructor_next"]
       assert_equal ["new"], on["dynamic_next"]
       assert_equal ["first"], on["module_change"]
       assert_equal ["third"], on["schema_reset"]
