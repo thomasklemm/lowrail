@@ -1,30 +1,44 @@
-//! Lowrail CLI. Only `parse` exists so far: it checks that every given Ruby
-//! file parses with Prism, as a smoke test of the toolchain.
+//! Lowrail CLI. See docs/PLAN.md for the pipeline and docs/FORMATS.md for
+//! the files each step reads and writes.
+
+mod build;
+mod facts;
+mod lower;
+mod verify;
 
 use std::process::ExitCode;
 
+const USAGE: &str = "usage: lowrail <command> [args]
+  parse FILE...        check that files parse with Prism
+  facts APP            boot APP, write APP/.lowrail/facts.json, print a summary
+  build APP            lower APP using its facts, write ISeqs + manifest
+  verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes";
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    match args.split_first() {
-        Some((cmd, files)) if cmd == "parse" => parse(files),
-        _ => {
-            eprintln!("usage: lowrail parse FILE...\n(planned: facts, profile, build, verify, mcp, bench — see docs/PLAN.md)");
-            ExitCode::from(2)
+    let result = match args.split_first() {
+        Some((cmd, rest)) => match cmd.as_str() {
+            "parse" => parse(rest),
+            "facts" => facts::cli(rest),
+            "build" => build::cli(rest),
+            "verify" => verify::cli(rest),
+            _ => Err(USAGE.to_string()),
+        },
+        None => Err(USAGE.to_string()),
+    };
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(msg) => {
+            eprintln!("{msg}");
+            ExitCode::FAILURE
         }
     }
 }
 
-fn parse(files: &[String]) -> ExitCode {
+fn parse(files: &[String]) -> Result<(), String> {
     let mut failed = 0;
     for path in files {
-        let source = match std::fs::read(path) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("{path}: {e}");
-                failed += 1;
-                continue;
-            }
-        };
+        let source = std::fs::read(path).map_err(|e| format!("{path}: {e}"))?;
         let result = ruby_prism::parse(&source);
         let errors: Vec<_> = result.errors().collect();
         if !errors.is_empty() {
@@ -35,5 +49,5 @@ fn parse(files: &[String]) -> ExitCode {
         }
     }
     println!("{} files, {} with parse errors", files.len(), failed);
-    if failed == 0 { ExitCode::SUCCESS } else { ExitCode::FAILURE }
+    if failed == 0 { Ok(()) } else { Err("parse errors".into()) }
 }
