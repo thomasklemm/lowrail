@@ -63,6 +63,12 @@ module Lowrail
       # A forked child starts counting from zero, so hits made before the
       # fork (e.g. while a test parent boots) are not counted once per worker.
       # Guard states are kept: they are still valid in the child.
+      # Counts a guard decision made outside #check (template view guards).
+      def count(id, ok)
+        array = ok ? HITS : MISSES
+        array[id] = (array[id] || 0) + 1
+      end
+
       def reset_counts!
         HITS.clear
         MISSES.clear

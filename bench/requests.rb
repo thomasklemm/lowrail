@@ -37,6 +37,14 @@ def call(session, verb, path, headers)
   res
 end
 
+if (dump = ENV["BENCH_DUMP"]) # first response body per route, for on/off diffs
+  require "fileutils"
+  FileUtils.mkdir_p(dump)
+  routes.each do |verb, path|
+    File.write(File.join(dump, "#{verb}#{path.tr("/", "_")}.html"), call(session, verb, path, headers).body)
+  end
+end
+
 routes.each { |verb, path| 200.times { call(session, verb, path, headers) } } # warm up (YJIT)
 
 results = routes.map do |verb, path|

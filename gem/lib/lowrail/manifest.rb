@@ -85,7 +85,7 @@ module Lowrail
   # names its ISeq binary and the SHA-256 of the source it was lowered from.
   # Units are the guarded specializations, each with the facts it assumes.
   class Manifest
-    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :units, :units_by_method
+    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method
 
     def self.load(path, dir = File.dirname(path))
       new(MiniJSON.parse(File.read(path, encoding: Encoding::UTF_8)), dir)
@@ -97,6 +97,12 @@ module Lowrail
       @ruby_description = data.fetch("ruby_description")
       @compile_option = data.fetch("compile_option")
       @files = data.fetch("files")
+      # Lowered template code by template identifier (see lowrail/templates.rb).
+      @templates = data.fetch("templates", {})
+      # Builds partially evaluate with one environment's config; another
+      # environment's process must not use them (checked in Guard.validate,
+      # because RAILS_ENV is often set only after setup).
+      @rails_env = data["rails_env"]
       @units = data.fetch("units")
       # Symbol keys: the method_added hooks look up every defined name, and a
       # Symbol lookup does not allocate.

@@ -31,8 +31,10 @@ pub struct Dep {
     /// "@view" for the view class the template renders in, else a constant.
     pub receiver: String,
     pub method: String,
-    pub owner: String,
+    /// None for an anonymous module (the route set's helper module).
+    pub owner: Option<String>,
     pub source_location: Option<String>,
+    pub visibility: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -126,15 +128,16 @@ pub fn lower_template(original: &str, locals: &[String], unit: usize, oracle: &m
 
 fn resolve(oracle: &mut dyn Oracle, receiver: &str, method: &str) -> Result<Dep, String> {
     let code = format!(
-        "m = ({receiver}).instance_method(:{method}); [m.owner.name || m.owner.inspect, m.source_location&.join(\":\")].to_s"
+        "k = ({receiver}); m = k.instance_method(:{method}); v = k.public_method_defined?(:{method}) ? \"public\" : k.protected_method_defined?(:{method}) ? \"protected\" : \"private\"; JSON.generate([m.owner.name, m.source_location&.join(\":\"), v])"
     );
     let (s, _) = oracle.eval_string(&code)?;
     let parsed: Vec<Option<String>> = serde_json::from_str(&s).map_err(|e| format!("{e}: {s}"))?;
     Ok(Dep {
         receiver: receiver.into(),
         method: method.into(),
-        owner: parsed.first().cloned().flatten().unwrap_or_default(),
+        owner: parsed.first().cloned().flatten(),
         source_location: parsed.get(1).cloned().flatten(),
+        visibility: parsed.get(2).cloned().flatten().unwrap_or_else(|| "public".into()),
     })
 }
 
@@ -427,8 +430,8 @@ mod tests {
             if code.contains("url_for(r) ==") {
                 return s("true", false);
             }
-            if code.starts_with("m = ") {
-                return s("[\"ActionView::Helpers::UrlHelper\", \"/gems/url_helper.rb:1\"]", false);
+            if code.starts_with("k = ") {
+                return s("[\"ActionView::Helpers::UrlHelper\", \"/gems/url_helper.rb:1\", \"public\"]", false);
             }
             if let Some(rest) = code.strip_prefix("link_to(") {
                 let esc = |x: &str| x.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;").replace('\'', "&#39;");

@@ -49,9 +49,10 @@ module Lowrail
 
       def installed? = !@manifest.nil?
 
-      def validate(id)
+      def validate(id, view: nil)
         unit = @units[id] or return false
-        unit.fetch("facts").all? { |fact| holds?(fact) }
+        return false unless env_ok?
+        unit.fetch("facts").all? { |fact| holds?(fact, view) }
       rescue StandardError => e
         Lowrail.debug("unit #{id}: guard validation raised #{e.class}: #{e.message}")
         false
@@ -60,7 +61,7 @@ module Lowrail
       # Hot at boot: called for every method definition in the process.
       def reset_method(name)
         ids = @names[name] or return
-        ids.each { |id| @state[id] = nil }
+        ids.each { |id| @state[id] = nil; V[id] = nil }
       end
 
       # A module was included/prepended/extended: every tracked name it (or
@@ -93,7 +94,20 @@ module Lowrail
 
       private
 
-      def holds?(fact)
+      def env_ok?
+        return @env_ok unless @env_ok.nil?
+        want = @manifest.rails_env or return (@env_ok = true)
+        have = defined?(::Rails) && ::Rails.respond_to?(:env) ? ::Rails.env.to_s : (ENV["RAILS_ENV"] || ENV["RACK_ENV"])
+        return false if have.nil? # not decided yet; ask again later
+        @env_ok = (have == want).tap { |ok| Lowrail.debug("manifest built for #{want}, running #{have}") unless ok }
+      end
+
+      def holds?(fact, view = nil)
+        if fact.fetch("receiver") == "@view"
+          return false unless view
+          name = fact.fetch("method").to_sym
+          return holds_on?(view, name, fact) && no_instance_override?(view, name)
+        end
         mod = Object.const_get(fact.fetch("receiver"))
         name = fact.fetch("method").to_sym
         singleton = fact["singleton"]
@@ -109,7 +123,11 @@ module Lowrail
         meth = klass.instance_method(name)
         return false unless meth.source_location&.then { "#{_1[0]}:#{_1[1]}" } == fact["source_location"]
         return false unless visibility_of(klass, name) == fact.fetch("visibility")
-        owner_name(meth.owner) == fact.fetch("owner") || same_definition?(meth, fact.fetch("owner"), name)
+        owner = fact.fetch("owner")
+        # nil owner = anonymous module (e.g. a route set's helper module),
+        # identified by the source location alone.
+        return owner_name(meth.owner).nil? if owner.nil?
+        owner_name(meth.owner) == owner || same_definition?(meth, owner, name)
       end
 
       # Same labels as the facts dumper (lowrail/facts.rb#mod_label), read

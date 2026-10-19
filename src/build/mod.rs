@@ -58,7 +58,7 @@ pub fn build(app: &Path, env: &str) -> Result<String, String> {
         let facts: Vec<Value> = lowered
             .deps
             .iter()
-            .map(|d| json!({"receiver": d.receiver, "method": d.method, "owner": d.owner, "source_location": d.source_location}))
+            .map(|d| json!({"receiver": d.receiver, "method": d.method, "owner": d.owner, "source_location": d.source_location, "visibility": d.visibility}))
             .collect();
         units.push(json!({"id": unit, "kind": "template", "file": t.identifier, "pass": "view/link_to", "sites": lowered.lowered_count(), "facts": facts}));
         templates.insert(t.identifier.clone(), json!({"source_sha256": t.source_sha256, "code": lowered.code, "unit": unit}));

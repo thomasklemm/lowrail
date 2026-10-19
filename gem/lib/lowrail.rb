@@ -36,6 +36,10 @@ module Lowrail
   # lowrail/stats.rb for why that is the chosen design).
   G = []
 
+  # Template units run in many view classes (one per controller); their
+  # facts are checked per class: V[id] = {view_class => true/false}.
+  V = []
+
   class << self
     attr_reader :manifest, :root
 
@@ -84,6 +88,10 @@ module Lowrail
       @manifest = manifest
       Guard.install(manifest, defined?(Stats) && Stats.enabled? ? Stats::STATE : G)
       Loader.install(manifest)
+      unless manifest.templates.empty?
+        require_relative "lowrail/templates"
+        Templates.install(manifest.templates)
+      end
       true
     end
 
@@ -93,6 +101,16 @@ module Lowrail
       state = G[id]
       return state unless state.nil?
       G[id] = Guard.validate(id)
+    end
+
+    # Called from lowered template code with the view's class. Facts whose
+    # receiver is "@view" are checked against that class.
+    def view_ok?(id, klass)
+      cache = (V[id] ||= {}.compare_by_identity)
+      s = cache[klass]
+      s = cache[klass] = Guard.validate(id, view: klass) if s.nil?
+      Stats.count(id, s) if defined?(Stats) && Stats.enabled?
+      s
     end
 
     # Atomic JSON write (tmp + rename). Only used at exit and in build tools,
