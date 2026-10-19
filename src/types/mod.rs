@@ -164,7 +164,11 @@ impl TypeModel {
                 }
             }
             for assoc in &model.associations {
-                let target = assoc.class_name.as_deref().unwrap_or("untyped");
+                let target = if assoc.options["polymorphic"] == true {
+                    "untyped"
+                } else {
+                    assoc.class_name.as_deref().unwrap_or("untyped")
+                };
                 // Validation of presence is not a guarantee on an unsaved record.
                 let ty = match assoc.macro_.as_str() {
                     "has_many" | "has_and_belongs_to_many" => {
@@ -184,9 +188,9 @@ impl TypeModel {
                     ),
                 );
             }
-            for name in [
-                "all", "where", "order", "limit", "joins", "includes", "none", "unscoped",
-            ] {
+            // `where()` returns WhereChain and `unscoped {}` returns the
+            // block's value; neither has an unconditional relation return.
+            for name in ["all", "order", "limit", "joins", "includes", "none"] {
                 out.insert(
                     &model.name,
                     name,
@@ -298,13 +302,14 @@ impl TypeModel {
 
 fn scalar(ty: Option<&str>) -> &'static str {
     match ty {
-        Some("string" | "text" | "binary" | "enum") => "String",
+        Some("string" | "text" | "binary" | "uuid" | "enum") => "String",
         Some("integer" | "bigint") => "Integer",
         Some("float") => "Float",
         Some("decimal") => "BigDecimal",
         Some("boolean") => "bool",
         Some("date") => "Date",
-        Some("datetime" | "timestamp" | "time") => "Time",
+        // The dump does not pin time-zone-aware attribute configuration.
+        Some("datetime" | "timestamp" | "time") => "(Time | ActiveSupport::TimeWithZone)",
         Some("json" | "jsonb") => "untyped",
         _ => "untyped",
     }

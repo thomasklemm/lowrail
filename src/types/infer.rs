@@ -276,6 +276,23 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
                 sig.return_type =
                     Type::new("untyped", Source::BootFact, format!("custom body of {id}"));
                 bodies.insert(id, body);
+            } else {
+                let generated = method.owner.ends_with("::GeneratedAttributeMethods")
+                    || method.owner.ends_with("::GeneratedAssociationMethods");
+                let query = sig.singleton && method.owner.starts_with("ActiveRecord::");
+                let scope = sig.singleton
+                    && method.owner == format!("#<Class:{}>", sig.receiver)
+                    && sig.return_type.provenance.iter().any(|p| {
+                        p.detail == format!("booted scope {}.{}", sig.receiver, sig.method)
+                    });
+                if !generated && !query && !scope {
+                    sig.return_type = Type::new(
+                        "untyped",
+                        Source::BootFact,
+                        format!("unmodeled boot owner {} for {id}", method.owner),
+                    );
+                    bodies.remove(&id);
+                }
             }
         } else if !sig.singleton
             && sig.receiver != "Lowrail::RouteHelpers"
@@ -321,7 +338,15 @@ fn evaluate(
     match expr {
         Expr::Unknown => None,
         Expr::Literal(name) => Some(Type::new(*name, Source::Inference, "Ruby literal")),
-        Expr::Self_ => Some(Type::new(receiver, Source::Inference, "self")),
+        Expr::Self_ => Some(Type::new(
+            if singleton {
+                format!("singleton({receiver})")
+            } else {
+                receiver.into()
+            },
+            Source::Inference,
+            "self",
+        )),
         Expr::Read(name) => locals.get(name).cloned(),
         Expr::Write(name, value) => {
             let ty = evaluate(value, model, receiver, singleton, locals)?;

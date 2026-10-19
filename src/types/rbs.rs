@@ -113,6 +113,6 @@ pub(super) fn write(model: &TypeModel, facts: &Facts, out: &Path) -> Result<(), 
     std::fs::write(out.join("app.rbs"), app).map_err(|e| e.to_string())?;
     // Minimal declarations for standalone validation, not a replacement for
     // Rails signatures. Keep this separate when using a Rails RBS collection.
-    std::fs::write(out.join("lowrail_support.rbs"), "# Omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nmodule ActiveRecord\n  class Relation[Elem]\n  end\n  module Associations\n    class CollectionProxy[Elem] < Relation[Elem]\n    end\n  end\nend\n").map_err(|e| e.to_string())?;
+    std::fs::write(out.join("lowrail_support.rbs"), "# Omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\nmodule ActiveRecord\n  class Relation[Elem]\n  end\n  module Associations\n    class CollectionProxy[Elem] < Relation[Elem]\n    end\n  end\nend\n").map_err(|e| e.to_string())?;
     Ok(())
 }
