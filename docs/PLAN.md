@@ -220,3 +220,38 @@ are tracked over time.
 - **M4 — Performance passes** in the order M0's data suggests, each with a
   benchmark.
 - Later: LSP, Spinel.
+
+## 9. Strategy after M0 (2026-10-20)
+
+Inputs: M0 on real-blog, Campfire and ARGOS (`docs/m0/`), and Roundhouse's
+`futamura` and `fractal` targets, which specialize Rails *inside* Rails:
+
+- In-Rails specialization has a ceiling. Futamura's query-chain
+  specialization was a null result (Campfire 4.83 → 4.61 ms); planning
+  preload work once was a real one (room chain 4.78 → 3.82 ms, `Account.first`
+  167 → 98 µs); on Lobsters both together gave 1.02× per pass. Keeping real
+  Active Record objects caps gains at roughly 2×.
+- Whole-route replacement (serving an eligible GET route from fully lowered
+  Ruby inside a `Ruby::Box`) gave 2.3–4.7× per route, but enabling
+  `RUBY_BOX=1` slowed every Rails route by ~19 %, so the app gained 1.17×.
+
+Decisions:
+
+1. **Lowrail stays "all apps, all gems, Ruby 4.0+".** Box-based route
+   replacement is an optional later mode for Ruby 4.1+, not the base design.
+2. **Passes are chosen by measured cost**, in this order:
+   a. per-request work on boot-fixed inputs, memoized under a guard on its
+      inputs (ARGOS asset-version digest 12.8 % self; Campfire importmap/CSP
+      URL work 34.8 % inclusive on cached pages);
+   b. Active Record plans computed once (preload trees, association scopes,
+      attribute/type dispatch), following futamura's measured preload win;
+   c. view and route helpers (small per call, many calls).
+3. **Two guard styles, picked per pass.** Per-call-site guards
+   (`(guard) ? fast : original`, ~2.3 ns under YJIT) for expression-level
+   rewrites; whole-method variants selected at load time (fractal's model:
+   a normal `def` per variant, own ISeq and JIT profile, reinstalled when a
+   guard fails) for method-level rewrites.
+4. **See everything that gets built.** Beyond `eager_load!`: force lazy
+   generation (schema, attribute methods, templates, routes, I18n), capture
+   generated code with `TracePoint(:script_compiled)`, and record a test run
+   (definitions after boot, observed types) as a third fact source.
