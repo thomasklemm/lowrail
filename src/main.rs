@@ -4,6 +4,7 @@
 mod build;
 mod facts;
 mod lower;
+mod mcp;
 mod types;
 mod verify;
 
@@ -14,6 +15,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   facts APP            boot APP, write APP/.lowrail/facts.json, print a summary
   build APP            lower APP using its facts, write ISeqs + manifest
   types APP [--rbs DIR] derive types from boot facts, optionally write RBS
+  mcp APP              serve read-only type/fact tools over stdio
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes";
 
 fn main() -> ExitCode {
@@ -24,6 +26,7 @@ fn main() -> ExitCode {
             "facts" => facts::cli(rest),
             "build" => build::cli(rest),
             "types" => types::cli(rest),
+            "mcp" => mcp::cli(rest),
             "verify" => verify::cli(rest),
             _ => Err(USAGE.to_string()),
         },
