@@ -4,6 +4,7 @@
 mod build;
 mod facts;
 mod lower;
+mod types;
 mod verify;
 
 use std::process::ExitCode;
@@ -12,6 +13,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   parse FILE...        check that files parse with Prism
   facts APP            boot APP, write APP/.lowrail/facts.json, print a summary
   build APP            lower APP using its facts, write ISeqs + manifest
+  types APP [--rbs DIR] derive types from boot facts, optionally write RBS
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes";
 
 fn main() -> ExitCode {
@@ -21,6 +23,7 @@ fn main() -> ExitCode {
             "parse" => parse(rest),
             "facts" => facts::cli(rest),
             "build" => build::cli(rest),
+            "types" => types::cli(rest),
             "verify" => verify::cli(rest),
             _ => Err(USAGE.to_string()),
         },
