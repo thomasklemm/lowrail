@@ -1,0 +1,14 @@
+[package]
+name = "lowrail"
+version = "0.0.1"
+edition = "2024"
+license = "MIT"
+description = "Guarded, boot-fact specialization of Rails apps delivered as ISeqs"
+publish = false
+
+[dependencies]
+ruby-prism = "1.9.0"
+# Same pin as Roundhouse; move to a release once one includes it.
+rubydex = { git = "https://github.com/Shopify/rubydex", rev = "d8ff47595223571588ae40cb748f43cef6a9dfaf" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
