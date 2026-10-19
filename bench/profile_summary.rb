@@ -14,8 +14,10 @@ frames = prof.fetch("frames")
 raw = prof.fetch("raw")
 
 def area(file, app_root)
-  return "app" if app_root && file.start_with?(app_root) && !file.include?("/vendor/")
   return "erb(app)" if file.include?("/app/views/")
+  return "app" if app_root && file.start_with?(app_root) && !file.include?("/vendor/")
+  # Git-sourced Rails has one bundler checkout, not one gem path per component.
+  return Regexp.last_match(1) if file =~ %r{/rails-[^/]+/(action[a-z]+|active[a-z]+|railties)/lib/}
   return Regexp.last_match(1) if file =~ %r{/gems/([a-z_\-]+?)-\d[^/]*/}
   return "ruby-stdlib" if file.include?("/lib/ruby/4") || file.include?("/lib/ruby/3")
   file.empty? ? "(native)" : "other"
@@ -38,7 +40,8 @@ self_by_area = Hash.new(0)
 total_by_area = Hash.new(0)
 # A C function has no line; charge its self time to the Ruby frame that
 # called it, so "Hash#fetch" inside ActionView counts as actionview.
-ruby_frame = ->(f) { f["line"].to_i > 0 }
+# Compiled ERB can have sampled lines without a method-definition line.
+ruby_frame = ->(f) { f["line"].to_i > 0 || f["lines"]&.any? }
 stacks.each do |stack, count|
   self_by_frame[stack.last] += count
   caller_id = stack.reverse.find { ruby_frame.(frames.fetch(_1.to_s)) }
@@ -55,7 +58,7 @@ self_by_area.keys.union(total_by_area.keys).sort_by { -self_by_area[_1] }.each d
 end
 label = lambda do |id|
   f = frames.fetch(id.to_s)
-  ruby_frame.(f) ? "#{f["name"]} (#{area(f["file"].to_s, app_root)}:#{f["line"]})" : "#{f["name"]} (C)"
+  ruby_frame.(f) ? "#{f["name"]} (#{area(f["file"].to_s, app_root)}:#{f["line"] || "generated"})" : "#{f["name"]} (C)"
 end
 puts "\ntop #{top} frames by self:"
 self_by_frame.sort_by { -_2 }.first(top).each { |id, n| puts "  #{pct.(n)}  #{label.(id)}" }

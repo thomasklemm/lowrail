@@ -13,9 +13,16 @@ case "$name" in
     repo=https://github.com/rubys/roundhouse
     sub=fixtures/real-blog ;;
   campfire)
-    rev=${CAMPFIRE_REV:-main}
+    # main on 2026-10-19; its lockfile pins Rails 8.2.0.alpha.
+    rev=af4dd9fd599c65e0e0fc1f614ee469f70156ddf5
     repo=https://github.com/basecamp/once-campfire
-    sub=. ;;
+    sub=.
+    if ! command -v ruby >/dev/null || [ "$(ruby -e 'print RUBY_VERSION')" != 4.0.7 ]; then
+      mise=$(command -v mise || true)
+      mise=${mise:-$HOME/.local/bin/mise}
+      "$mise" install ruby@4.0.7
+      export PATH="$("$mise" where ruby@4.0.7)/bin:$PATH"
+    fi ;;
   *) echo "unknown corpus app: $name" >&2; exit 2 ;;
 esac
 if [ ! -d "$dest" ]; then
@@ -34,5 +41,18 @@ if [ ! -d "$dest" ]; then
   rm -rf "$tmp"
   echo "$repo@$rev:$sub" > "$dest/.lowrail-corpus-source"
 fi
-(cd "$dest" && bundle install --quiet)
+if [ "$name" = campfire ]; then
+  [ "$(git -C "$dest" rev-parse HEAD)" = "$rev" ] || {
+    echo "Campfire checkout is not the pinned revision; use a new DIRNAME" >&2
+    exit 1
+  }
+  (
+    cd "$dest"
+    BUNDLE_FROZEN=true bundle install --quiet
+    RAILS_ENV=test bundle exec rails db:prepare
+    RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec rails db:prepare assets:precompile
+  )
+else
+  (cd "$dest" && bundle install --quiet)
+fi
 echo "$dest"

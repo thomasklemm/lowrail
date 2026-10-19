@@ -9,6 +9,9 @@
 # Env: BENCH_SECONDS (default 5 per route), BENCH_PROFILE=out.json (stackprof
 # raw, wall mode), BENCH_JSON=out.json (results). Not part of the app bundle:
 # stackprof is put on the load path directly.
+# BENCH_HEADERS is a JSON object of Rack headers, e.g.
+# '{"HTTP_COOKIE":"session_token=...","HTTP_ACCEPT":"application/json"}'.
+# Headers apply to every route; use separate runs for different identities.
 
 stackprof = Gem::Specification.find_by_name("stackprof")
 $LOAD_PATH.unshift(*stackprof.full_require_paths)
@@ -26,14 +29,15 @@ abort "usage: requests.rb VERB:PATH ..." if routes.empty?
 seconds = Float(ENV.fetch("BENCH_SECONDS", "5"))
 app = Rails.application
 session = Rack::MockRequest.new(app)
+headers = { "HTTP_HOST" => "localhost", "HTTPS" => "on" }.merge(JSON.parse(ENV.fetch("BENCH_HEADERS", "{}")))
 
-def call(session, verb, path)
-  res = session.request(verb, path, "HTTP_HOST" => "localhost", "HTTPS" => "on")
-  raise "#{verb} #{path} -> #{res.status}" unless res.status < 400
+def call(session, verb, path, headers)
+  res = session.request(verb, path, headers)
+  raise "#{verb} #{path} -> #{res.status}" unless (200..299).cover?(res.status)
   res
 end
 
-routes.each { |verb, path| 200.times { call(session, verb, path) } } # warm up (YJIT)
+routes.each { |verb, path| 200.times { call(session, verb, path, headers) } } # warm up (YJIT)
 
 results = routes.map do |verb, path|
   GC.start
@@ -42,7 +46,7 @@ results = routes.map do |verb, path|
   t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   deadline = t0 + seconds
   while Process.clock_gettime(Process::CLOCK_MONOTONIC) < deadline
-    call(session, verb, path)
+    call(session, verb, path, headers)
     n += 1
   end
   elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0
@@ -57,7 +61,7 @@ puts "YJIT: #{defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?}  #{RUBY_DESCRIPTI
 if (out = ENV["BENCH_PROFILE"])
   require "stackprof"
   profile = StackProf.run(mode: :wall, raw: true, interval: 100) do
-    routes.each { |verb, path| (results.find { _1[:route] == "#{verb} #{path}" }[:requests] / seconds * 2).to_i.times { call(session, verb, path) } }
+    routes.each { |verb, path| (results.find { _1[:route] == "#{verb} #{path}" }[:requests] / seconds * 2).to_i.times { call(session, verb, path, headers) } }
   end
   File.write(out, JSON.generate(profile))
   puts "profile: #{out}"
