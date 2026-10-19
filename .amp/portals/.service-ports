@@ -1,0 +1,5 @@
+{
+  "servicePorts": {
+    "campfire-redis": 31925
+  }
+}

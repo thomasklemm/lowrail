@@ -39,11 +39,23 @@ pub fn build(app: &Path, env: &str) -> Result<String, String> {
     let mut oracle = RubyOracle::start(app, env)?;
     let probe = oracle_info(&mut oracle)?;
 
+    // Units `lowrail verify --bisect` found to change outcomes stay unlowered.
+    let denied: Vec<(String, String)> = std::fs::read_to_string(dir.join("denylist.json"))
+        .ok()
+        .and_then(|s| serde_json::from_str::<Vec<Value>>(&s).ok())
+        .unwrap_or_default()
+        .iter()
+        .map(|d| (d["file"].as_str().unwrap_or("").to_string(), d["pass"].as_str().unwrap_or("").to_string()))
+        .collect();
     let mut templates = BTreeMap::new();
     let mut units = Vec::new();
     let mut ledger = Vec::new();
     for t in &facts.templates {
         if t.handler != "ActionView::Template::Handlers::ERB" {
+            continue;
+        }
+        if denied.iter().any(|(f, p)| f == &t.identifier && p == "view/link_to") {
+            ledger.push(json!({"template": t.identifier, "line": 0, "helper": "*", "outcome": "denylisted by verify --bisect"}));
             continue;
         }
         let locals = partial_locals(t.virtual_path.as_deref().unwrap_or(""));

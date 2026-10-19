@@ -51,7 +51,7 @@ module Lowrail
 
       def validate(id, view: nil)
         unit = @units[id] or return false
-        return false unless env_ok?
+        return false unless env_ok? && enabled_unit?(id)
         unit.fetch("facts").all? { |fact| holds?(fact, view) }
       rescue StandardError => e
         Lowrail.debug("unit #{id}: guard validation raised #{e.class}: #{e.message}")
@@ -93,6 +93,13 @@ module Lowrail
       end
 
       private
+
+      # LOWRAIL_UNITS="0,3,7" restricts lowering to those units (used by
+      # `lowrail verify --bisect`); LOWRAIL_UNITS="" enables none.
+      def enabled_unit?(id)
+        list = ENV["LOWRAIL_UNITS"] or return true
+        (@enabled_units ||= list.split(",").map { Integer(_1) }).include?(id)
+      end
 
       def env_ok?
         return @env_ok unless @env_ok.nil?

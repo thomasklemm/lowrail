@@ -12,10 +12,12 @@ use serde_json::Value;
 
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
+    let mut bisect = false;
     let mut cmd: Vec<String> = vec!["bin/rails".into(), "test".into()];
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
+            "--bisect" => bisect = true,
             "--" => {
                 cmd = it.by_ref().cloned().collect();
                 break;
@@ -24,11 +26,19 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail verify APP [-- TEST COMMAND...]")?;
+    let app = app.ok_or("usage: lowrail verify APP [--bisect] [-- TEST COMMAND...]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
     let report = verify(&app, &cmd)?;
     println!("{}", report.render());
-    if report.identical() { Ok(()) } else { Err("outcomes differ".into()) }
+    if report.identical() {
+        return Ok(());
+    }
+    if bisect {
+        let culprits = bisect_units(&app, &cmd, &report.off)?;
+        println!("culprit units: {culprits:?}");
+        write_denylist(&app, &culprits, &report.differences())?;
+    }
+    Err("outcomes differ".into())
 }
 
 #[derive(Debug, Default)]
@@ -105,7 +115,64 @@ pub fn verify(app: &Path, cmd: &[String]) -> Result<Report, String> {
     Ok(Report { off, on })
 }
 
+/// Finds the units whose lowering changes outcomes: splits the unit set and
+/// reruns the suite with only one half enabled (LOWRAIL_UNITS), recursing
+/// into halves that still differ. A set whose halves are each clean is
+/// reported whole (the units only fail together).
+fn bisect_units(app: &Path, cmd: &[String], off: &Run) -> Result<Vec<Vec<u64>>, String> {
+    let manifest: Value = serde_json::from_str(
+        &std::fs::read_to_string(app.join(".lowrail/manifest.json")).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    let ids: Vec<u64> = manifest["units"].as_array().into_iter().flatten().filter_map(|u| u["id"].as_u64()).collect();
+    let dir = app.join(".lowrail/verify");
+    let mut found = Vec::new();
+    let mut runs = 0;
+    let mut differs = |set: &[u64]| -> Result<bool, String> {
+        runs += 1;
+        let list = set.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(",");
+        let on = run_with(app, cmd, &dir, "1", &[("LOWRAIL_UNITS", &list)])?;
+        let r = Report { off: Run { tests: off.tests.clone(), exit_ok: off.exit_ok, ..Default::default() }, on };
+        eprintln!("bisect: units [{list}] → {}", if r.identical() { "identical" } else { "differs" });
+        Ok(!r.identical())
+    };
+    let mut stack = vec![ids];
+    while let Some(set) = stack.pop() {
+        if set.len() == 1 {
+            found.push(set);
+            continue;
+        }
+        let (a, b) = set.split_at(set.len() / 2);
+        let (da, db) = (differs(a)?, differs(b)?);
+        if da { stack.push(a.to_vec()); }
+        if db { stack.push(b.to_vec()); }
+        if !da && !db { found.push(set); }
+    }
+    Ok(found)
+}
+
+fn write_denylist(app: &Path, culprits: &[Vec<u64>], evidence: &[String]) -> Result<(), String> {
+    let path = app.join(".lowrail/denylist.json");
+    let manifest: Value = serde_json::from_str(&std::fs::read_to_string(app.join(".lowrail/manifest.json")).map_err(|e| e.to_string())?)
+        .map_err(|e| e.to_string())?;
+    let mut list: Vec<Value> = std::fs::read_to_string(&path).ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or_default();
+    for set in culprits {
+        for id in set {
+            if let Some(u) = manifest["units"].as_array().into_iter().flatten().find(|u| u["id"].as_u64() == Some(*id)) {
+                list.push(serde_json::json!({"file": u["file"], "pass": u["pass"], "evidence": evidence.iter().take(5).collect::<Vec<_>>()}));
+            }
+        }
+    }
+    std::fs::write(&path, serde_json::to_string_pretty(&list).unwrap()).map_err(|e| e.to_string())?;
+    println!("denylist: {}", path.display());
+    Ok(())
+}
+
 fn run(app: &Path, cmd: &[String], dir: &Path, mode: &str) -> Result<Run, String> {
+    run_with(app, cmd, dir, mode, &[])
+}
+
+fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&str, &str)]) -> Result<Run, String> {
     let out = dir.join(format!("outcomes-{mode}.json"));
     for entry in std::fs::read_dir(dir).map_err(|e| e.to_string())?.flatten() {
         if entry.file_name().to_string_lossy().starts_with(&format!("outcomes-{mode}.json")) {
@@ -126,6 +193,7 @@ fn run(app: &Path, cmd: &[String], dir: &Path, mode: &str) -> Result<Run, String
         .env("LOWRAIL", mode)
         .env("LOWRAIL_OUTCOMES", &out)
         .env("LOWRAIL_STATS", "1")
+        .envs(extra_env.iter().copied())
         .status()
         .map_err(|e| format!("running {}: {e}", cmd.join(" ")))?;
     let mut run = Run { seconds: started.elapsed().as_secs_f64(), exit_ok: status.success(), ..Default::default() };

@@ -22,8 +22,11 @@ live in the linked docs; numbers come from executed runs, dated.
   (including stubs on single objects), per-view-class checks, env check,
   stats, Minitest outcome reporter across forked workers. Setup loads no
   default gems, so apps pinning `json` still boot.
-- **`lowrail verify`**: suite with `LOWRAIL=0` and `1`, per-test outcomes and
-  fast-path hits.
+- **`lowrail verify [--bisect]`**: suite with `LOWRAIL=0` and `1`, per-test
+  outcomes and fast-path hits. `--bisect` reruns with unit subsets
+  (`LOWRAIL_UNITS`) and writes `.lowrail/denylist.json`, which `build`
+  honors. Checked with a fault injected into one real-blog unit: found in 4
+  reruns, the rebuild skips that template.
 - **Types and MCP** (first iteration, other thread): boot-first types with
   provenance, RBS generation, stdio MCP server. See `docs/types.md`.
 
@@ -61,4 +64,3 @@ live in the linked docs; numbers come from executed runs, dated.
 - Guarded memo for per-request work on boot-fixed inputs (ARGOS: Inertia
   asset-version digest 12.8 % self per request).
 - Active Record attribute/reflection dispatch (ARGOS, Campfire uncached).
-- Bisection of verify differences to a unit, and a per-app denylist.
