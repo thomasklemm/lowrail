@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Boots the Rails app in the current directory the way its tests do and
+# writes boot facts (docs/FORMATS.md, facts.json). Run inside the app:
+#
+#   bundle exec ruby /abs/path/to/gem/exe/lowrail-facts OUT.json
+#
+# The app's Gemfile is never touched: Lowrail's files are required by
+# absolute path.
+
+out = ARGV[0] or abort "usage: lowrail-facts OUT.json"
+out = File.expand_path(out)
+ENV["RAILS_ENV"] ||= "test"
+
+clock = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+t0 = clock.call
+require File.expand_path("config/environment", Dir.pwd)
+t1 = clock.call
+eager_error = nil
+begin
+  Rails.application.eager_load!
+rescue Exception => e # rubocop:disable Lint/RescueException
+  raise if e.is_a?(Interrupt) || e.is_a?(SystemExit)
+  eager_error = e
+end
+t2 = clock.call
+
+require File.expand_path("../lib/lowrail/facts", __dir__)
+require "fileutils"
+FileUtils.mkdir_p(File.dirname(out))
+Lowrail::Facts.record("eager_load!", eager_error) if eager_error
+facts = Lowrail::Facts.dump(out, app_root: Rails.root.to_s,
+  timings: {boot_seconds: (t1 - t0).round(3), eager_load_seconds: (t2 - t1).round(3)})
+warn "lowrail-facts: #{facts["modules"].size} modules, #{facts["module_stats"]["methods"]} methods, " \
+  "#{facts["errors"].size} errors -> #{out}"

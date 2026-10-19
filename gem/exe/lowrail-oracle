@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Build-time oracle: boots the app and evaluates expressions in a real view
+# context, so lowering passes can partially evaluate helpers with Rails' own
+# code instead of re-implementing escaping and tag rules.
+#
+# Run inside the app: bundle exec ruby /abs/gem/exe/lowrail-oracle
+# Protocol: one JSON request per line on stdin, one JSON response per line:
+#   {"id": 1, "code": "link_to(\"Show\", \"LRH0Q\", class: \"x\")"}
+#   {"id": 1, "ok": true, "value": "<a ...>", "class": "ActiveSupport::SafeBuffer", "html_safe": true}
+# Code runs with `self` = a view context of ApplicationController (or the
+# controller named in "controller").
+
+ENV["RAILS_ENV"] ||= "test"
+require File.expand_path("config/environment", Dir.pwd)
+require "json"
+Rails.application.eager_load!
+
+$stdout.sync = true
+views = Hash.new do |h, name|
+  controller = Object.const_get(name).new
+  request = ActionDispatch::TestRequest.create
+  controller.set_request!(request)
+  controller.set_response!(controller.class.make_response!(request))
+  h[name] = controller.view_context
+end
+
+$stdout.puts JSON.generate({ ready: true, rails_env: Rails.env, rails: Rails.version, ruby: RUBY_DESCRIPTION })
+$stdin.each_line do |line|
+  req = JSON.parse(line)
+  begin
+    view = views[req.fetch("controller", "ApplicationController")]
+    value = view.instance_eval(req.fetch("code"), "(lowrail-oracle)", 1)
+    $stdout.puts JSON.generate({ id: req["id"], ok: true, value: value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(Numeric) || value == true || value == false || value.nil? ? value : value.inspect,
+                                 class: value.class.name, html_safe: value.respond_to?(:html_safe?) && value.html_safe? })
+  rescue Exception => e # rubocop:disable Lint/RescueException
+    $stdout.puts JSON.generate({ id: req["id"], ok: false, error: "#{e.class}: #{e.message.lines.first&.chomp}" })
+  end
+end
