@@ -33,6 +33,9 @@ module Lowrail
     BLOCK_LABEL = /\A(?:rescue in |ensure in )*block(?: \(\d+ levels\))? in /
 
     class << self
+      # ISeq => ScriptCapture::Script map used by method_entry ("script").
+      attr_writer :script_index
+
       # Writes facts.json to +io_or_path+ (an IO or a file path; a path is
       # written atomically). Returns the facts hash.
       def dump(io_or_path, app_root: nil, timings: {}, generated_dir: nil)
@@ -127,8 +130,7 @@ module Lowrail
           stats["methods"] += entry["methods"].size
           list << entry
         end
-        synthetic = synthetic_modules
-        (synthetic + anonymous_ancestors(named, synthetic.map(&:last))).each do |name, mod|
+        synthetic_names(named).each do |name, mod|
           entry = guard("module #{name}") { module_entry(mod, name) }
           next unless entry
           entry["synthetic"] = true
@@ -137,6 +139,13 @@ module Lowrail
         end
         list.sort_by! { |m| [m["name"], m["kind"], m["const_source_location"].to_s] }
         [list, stats]
+      end
+
+      # [[name, module]] for every anonymous module dumped under a synthetic
+      # name. +named+: [[name, module]] of the named modules.
+      def synthetic_names(named)
+        synthetic = synthetic_modules
+        synthetic + anonymous_ancestors(named, synthetic.map(&:last))
       end
 
       # Anonymous modules included into named ones hold generated methods

@@ -12,90 +12,11 @@ class MaterializeTest < Minitest::Test
 
   EXE = File.join(GEM_ROOT, "exe", "lowrail-facts")
 
-  FILES = {
-    "config/environment.rb" => <<~'RUBY',
-      require "logger"
-      require "rails"
-      require "active_record/railtie"
-      require "action_controller/railtie"
-      require "action_view/railtie"
-      require "bcrypt"
-
-      class FixtureApp < Rails::Application
-        config.root = File.expand_path("..", __dir__)
-        config.eager_load = false
-        config.logger = Logger.new(nil)
-        config.secret_key_base = "x" * 64
-        config.active_support.deprecation = :silence
-      end
-      Rails.application.initialize!
-      ActiveRecord::Schema.verbose = false
-      ActiveRecord::Schema.define do
-        create_table(:widgets) do |t|
-          t.string :name
-          t.integer :status
-          t.text :settings
-          t.string :email
-          t.string :password_digest
-        end
-      end
-    RUBY
-    "config/database.yml" => <<~'YAML',
-      test:
-        adapter: sqlite3
-        database: ":memory:"
-        pool: 1
-    YAML
-    "config/routes.rb" => <<~'RUBY',
-      Rails.application.routes.draw do
-        resources :widgets, only: %i[index show]
-      end
-    RUBY
-    "app/models/application_record.rb" => <<~'RUBY',
-      class ApplicationRecord < ActiveRecord::Base
-        primary_abstract_class
-      end
-    RUBY
-    "app/models/widget.rb" => <<~'RUBY',
-      class Widget < ApplicationRecord
-        enum :status, {draft: 0, live: 1}
-        normalizes :email, with: ->(e) { e.strip.downcase }
-        store :settings, accessors: [:color], coder: JSON
-        has_secure_password
-        alias_attribute :title, :name
-        scope :named, -> { where.not(name: nil) }
-
-        def self.cheapest = order(:id).first
-
-        def label = "#{name} (#{status})"
-      end
-    RUBY
-    "app/controllers/application_controller.rb" => <<~'RUBY',
-      class ApplicationController < ActionController::Base
-      end
-    RUBY
-    "app/controllers/widgets_controller.rb" => <<~'RUBY',
-      class WidgetsController < ApplicationController
-        def index = @widgets = Widget.all
-        def show = @widget = Widget.find(params[:id])
-      end
-    RUBY
-    "app/views/widgets/index.html.erb" => <<~'ERB',
-      <% @widgets.each do |w| %><%= link_to w.label, widget_path(w) %><% end %>
-    ERB
-    "app/views/widgets/_row.html.erb" => <<~'ERB',
-      <%# locals: (widget:) -%>
-      <p><%= widget.name %></p>
-    ERB
-  }.freeze
 
   def self.facts
     @facts ||= begin
       dir = File.realpath(Dir.mktmpdir("lowrail-mat"))
-      FILES.each do |rel, src|
-        FileUtils.mkdir_p(File.dirname(File.join(dir, rel)))
-        File.write(File.join(dir, rel), src)
-      end
+      LowrailTest.write_rails_app(dir)
       out = File.join(dir, ".lowrail", "facts.json")
       _, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "test"), RUBY, EXE, out, chdir: dir)
       status.success? ? [dir, JSON.parse(File.read(out))] : [dir, err]
@@ -103,14 +24,9 @@ class MaterializeTest < Minitest::Test
   end
 
   def setup
-    skip "Rails or sqlite3 not installed" unless rails_installed?
+    skip "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     @dir, @f = self.class.facts
     assert_kind_of Hash, @f, "lowrail-facts failed:\n#{@f}"
-  end
-
-  def rails_installed?
-    _, _, st = Open3.capture3(CLEAN_ENV, RUBY, "-e", 'require "rails"; require "sqlite3"; require "bcrypt"')
-    st.success?
   end
 
   def step(name) = @f["materialize"].find { |s| s["step"] == name }
