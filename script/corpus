@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Fetch a pinned corpus app into .corpus/<name> (not checked in) and install
-# its bundle. Usage: script/corpus real-blog|campfire
+# its bundle. Usage: script/corpus real-blog|campfire [DIRNAME]
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 name=${1:?app name}
-dest="$root/.corpus/$name"
+dest="$root/.corpus/${2:-$name}"
 mkdir -p "$root/.corpus"
 case "$name" in
   real-blog)
