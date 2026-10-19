@@ -87,3 +87,35 @@ class MaterializeTest < Minitest::Test
     assert_includes File.read(File.join(@dir, ".lowrail", "generated", "#{script["sha256"]}.rb")), "def name;"
   end
 end
+
+# Integration: materialize on the corpus apps (skipped when absent).
+# Campfire runs Rails 8.2, whose template container moved to
+# ActionView::LookupContext.view_context_class.
+class MaterializeCorpusTest < Minitest::Test
+  include LowrailTest
+
+  def facts_for(app)
+    root = File.expand_path("../../.corpus/#{app}", __dir__)
+    skip "no #{root} (see script/corpus)" unless File.exist?(File.join(root, "Gemfile.lock"))
+    Dir.mktmpdir do |dir|
+      out = File.join(dir, "facts.json")
+      run = -> { system("bundle", "exec", "ruby", MaterializeTest::EXE, out, "--no-census", chdir: root, err: File::NULL) }
+      ok = defined?(Bundler) ? Bundler.with_unbundled_env(&run) : run.call
+      assert ok, "lowrail-facts failed in #{root}"
+      f = JSON.parse(File.read(out))
+      [f, Dir.children(File.join(dir, "generated")).size]
+    end
+  end
+
+  def check(f, sidecar_files)
+    assert_empty f["errors"].reject { |e| e["kind"] == "skipped" }
+    assert_operator f["compiled_templates"].count { |t| t["in_app"] }, :>, 5
+    assert(f["modules"].any? { |m| m["synthetic"] && m["name"].end_with?(".view_context_class") && !m["methods"].empty? })
+    assert_equal sidecar_files, f["generated_scripts"].map { |s| s["sha256"] }.uniq.size
+    assert_operator f["modules"].sum { |m| m["methods"].count { |x| x["script"] } }, :>, 1000
+  end
+
+  def test_real_blog = check(*facts_for("real-blog-r4"))
+
+  def test_campfire = check(*facts_for("campfire"))
+end

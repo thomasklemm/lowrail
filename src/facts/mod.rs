@@ -360,3 +360,53 @@ fn counts(items: impl Iterator<Item = String>) -> String {
     let parts: Vec<String> = v.into_iter().map(|(k, n)| format!("{k} {n}")).collect();
     format!("[{}]", parts.join(", "))
 }
+
+#[cfg(test)]
+mod corpus_tests {
+    use super::*;
+    use crate::facts::generated::Form;
+
+    /// Boots real-blog (skipped when the corpus or its Ruby is missing),
+    /// then links generated methods to the exact def in their script.
+    #[test]
+    fn real_blog_generated_methods_link_to_their_def() {
+        let app = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(".corpus/real-blog-r4");
+        if !app.join("Gemfile.lock").exists() {
+            eprintln!("skipped: no {}", app.display());
+            return;
+        }
+        let ok = Command::new("bundle")
+            .args(["exec", "ruby", "-e", "exit(RUBY_VERSION >= '4.0' ? 0 : 1)"])
+            .current_dir(&app)
+            .output()
+            .is_ok_and(|o| o.status.success());
+        if !ok {
+            eprintln!("skipped: bundle exec ruby (4.0+) not available in {}", app.display());
+            return;
+        }
+        let dir = std::env::temp_dir().join(format!("lowrail-corpus-{}", std::process::id()));
+        let out = dir.join("facts.json");
+        dump_with(&app, &out, &["--no-census"]).unwrap();
+        let facts = load(&out).unwrap();
+        assert!(facts.materialize.iter().any(|s| s.step == "templates"));
+        assert!(facts.generated_scripts.len() > 500, "{}", facts.generated_scripts.len());
+
+        let mut c = Classifier::new(&facts).with_generated_dir(generated_dir(&out));
+        let attrs = facts
+            .modules
+            .iter()
+            .find(|m| m.name == "Article::GeneratedAttributeMethods")
+            .unwrap();
+        let title = attrs.methods.iter().find(|m| m.name == "title").unwrap();
+        let g = c.generated(title).expect("title links to its generated script");
+        assert_eq!(g.form, Form::Def);
+        assert!(g.source.starts_with("def title;") && g.source.contains("_read_attribute('title')"), "{}", g.source);
+
+        let origins = c.app_relevant();
+        let templates = origins.iter().filter(|o| matches!(o.origin, Origin::Template { .. })).count();
+        assert!(templates >= 10, "{templates} template methods");
+        let linked = origins.iter().filter(|o| o.generated.is_some()).count();
+        assert!(linked > 250, "{linked} app-relevant methods with a generated body");
+        std::fs::remove_dir_all(&dir).ok();
+    }
+}

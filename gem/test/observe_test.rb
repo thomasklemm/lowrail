@@ -105,3 +105,31 @@ class ObserveTest < Minitest::Test
     assert_nil types("WidgetTest", "test_label")
   end
 end
+
+# Integration: observe real-blog's own suite (skipped when absent).
+class ObserveCorpusTest < Minitest::Test
+  include LowrailTest
+
+  APP = File.expand_path("../../.corpus/real-blog-r4", __dir__)
+
+  def test_real_blog_suite
+    skip "no #{APP} (see script/corpus)" unless File.exist?(File.join(APP, "Gemfile.lock"))
+    Dir.mktmpdir do |dir|
+      obs = File.join(dir, "observe")
+      env = CLEAN_ENV.merge("RUBYOPT" => "-I#{GEM_LIB} -rlowrail/observe", "LOWRAIL" => "0", "PARALLEL_WORKERS" => "1",
+                            "LOWRAIL_OBSERVE" => obs, "LOWRAIL_OBSERVE_ROOT" => APP)
+      run = -> { Open3.capture3(env, "bin/rails", "test", chdir: APP) }
+      out, err, status = defined?(Bundler) ? Bundler.with_unbundled_env(&run) : run.call
+      assert status.success?, err + out
+      assert_match(/0 failures, 0 errors/, out)
+      files = Dir[File.join(obs, "observed-*.json")]
+      assert_equal 1, files.size
+      o = JSON.parse(File.read(files.first))
+      assert_operator o["defined_after_boot"].size, :>, 1000
+      show = o["types"].find { |t| t["module"] == "ArticlesController" && t["name"] == "show" }
+      refute_nil show, o["types"].map { |t| t.values_at("module", "name") }.inspect
+      assert_equal({"ArticlesController" => show["calls"]}, show["self"])
+      assert(o["generated_scripts"].any? { |s| s["phase"] == "test" && s["path"].end_with?(".html.erb") })
+    end
+  end
+end
