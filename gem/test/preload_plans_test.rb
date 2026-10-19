@@ -93,6 +93,17 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(a.id)]
     preload.call(rows, :posts)
     result["private_scope"] = rows.first.posts.map(&:title)
+    rows = [Writer.find(a.id)]
+    inspected = ActiveRecord::Associations::Preloader.new(records: rows, associations: :posts)
+    inspected.loaders.first.scope.where!(title: "second")
+    inspected.call
+    result["inspected_scope"] = rows.first.posts.map(&:title)
+    rows = [Writer.find(a.id)]
+    repeated = ActiveRecord::Associations::Preloader.new(records: rows, associations: :posts)
+    first = repeated.call
+    rows.first.association(:posts).reset
+    again = repeated.call
+    result["repeat_call"] = [first.zip(again).all? { |x, y| x.equal?(y) }, rows.first.association(:posts).loaded?]
     rows = [Writer.find(a.id), Writer.find(b.id)]
     queries = []
     subscription = ActiveSupport::Notifications.subscribe("sql.active_record") { |*args| queries << args.last[:sql] if args.last[:sql].start_with?("SELECT") }
@@ -204,6 +215,8 @@ class PreloadPlansTest < Minitest::Test
       assert_equal ["third", "unsaved"], on["loaded_unsaved"].last
       assert_equal ["first", "second", "new"], on["fresh"]
       assert_equal ["first", "second", "new"], on["private_scope"]
+      assert_equal ["second"], on["inspected_scope"]
+      assert_equal [true, false], on["repeat_call"]
       assert_equal 1, on["grouped_queries"]
       assert_equal %w[writers posts writers], on["scheduling_queries"]
       assert_equal ["first", "second", "new"], on["current_scope"]

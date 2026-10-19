@@ -250,7 +250,7 @@ module Lowrail
       end
 
       def call
-        if @lowrail_plan && PreloadPlans.guard_ok? && @lowrail_plan.valid? && (result = @lowrail_plan.call(records))
+        if @lowrail_plan && PreloadPlans.guard_ok? && @lowrail_plan.valid? && (result = @lowrail_loaders || @lowrail_plan.call(records))
           return @lowrail_loaders = result
         end
         super
@@ -261,6 +261,8 @@ module Lowrail
           @tree = ActiveRecord::Associations::Preloader::Branch.new(parent: nil, association: nil,
             children: @lowrail_plan.spec, associate_by_default: associate_by_default, scope: scope)
           @tree.preloaded_records = records
+          # A caller preparing loaders before #call owns that Rails tree.
+          @lowrail_plan = nil unless @lowrail_loaders
         end
         super
       end
