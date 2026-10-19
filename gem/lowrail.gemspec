@@ -8,6 +8,6 @@ Gem::Specification.new do |spec|
   spec.summary = "Guarded, boot-fact specialization of Rails apps delivered as ISeqs"
   spec.authors = ["Thomas Klemm"]
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.3"
+  spec.required_ruby_version = ">= 4.0"
   spec.files = Dir["lib/**/*.rb"]
 end

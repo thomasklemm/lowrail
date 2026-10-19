@@ -4,55 +4,108 @@
 # step specialized, and keeps every specialized method behind a guard that
 # falls back to the original body whenever a recorded boot fact stops holding.
 #
-# Load it from config/boot.rb *after* bootsnap:
+# Load it without touching the app, through RUBYOPT:
 #
-#   require "bootsnap/setup"
+#   RUBYOPT="-I<gem>/lib -rlowrail/setup" bin/rails test
+#
+# or from config/boot.rb (before or after bootsnap, both orders work):
+#
 #   require "lowrail/setup"
 #
-# LOWRAIL=0 disables it entirely; with no manifest it is a no-op.
+# LOWRAIL=0 disables lowering entirely; with no (or an incompatible) manifest
+# it is a no-op. In RAILS_ENV/RACK_ENV=development it is off unless LOWRAIL=1.
+#
+# Boot-time constraint: this file and everything loaded at setup must not
+# require default gems (json, digest, strscan, ...). Under RUBYOPT we run
+# before bundler/setup, and activating e.g. the default json 2.9.1 would make
+# Bundler refuse a lockfile that pins json 3.1.0. The manifest is therefore
+# parsed by Lowrail::MiniJSON, and digest is required lazily on the first
+# lookup of a lowered file (which happens after Bundler has set up).
 module Lowrail
   VERSION = "0.0.1"
   FORMAT = 1
 
   # Guard states, indexed by unit id. nil = not yet validated, true = facts
-  # hold, false = facts failed. Lowered code reads this array directly; the
-  # array object never changes, so constant caches stay warm.
+  # hold, false = facts failed. Lowered code reads this array directly:
+  #
+  #   if ::Lowrail::G[17] || ::Lowrail.check(17) then <fast> else <original> end
+  #
+  # The array object never changes, so constant caches stay warm. With stats
+  # on (LOWRAIL_STATS / LOWRAIL_OUTCOMES), G stays all-nil and the real states
+  # live in Stats::STATE, so every call goes through the counting check (see
+  # lowrail/stats.rb for why that is the chosen design).
   G = []
 
   class << self
     attr_reader :manifest, :root
 
     def enabled?
-      ENV["LOWRAIL"] != "0"
+      flag = ENV["LOWRAIL"]
+      return false if flag == "0"
+      return true if flag == "1"
+      env = ENV["RAILS_ENV"] || ENV["RACK_ENV"]
+      env != "development"
+    end
+
+    # Entry point used by lowrail/setup: stats and the Minitest reporter are
+    # independent of whether lowering is active (verify needs outcomes for
+    # LOWRAIL=0 runs too).
+    def boot(root: Dir.pwd)
+      if ENV["LOWRAIL_STATS"] || ENV["LOWRAIL_OUTCOMES"]
+        require_relative "lowrail/stats"
+        Stats.enable!
+      end
+      if ENV["LOWRAIL_OUTCOMES"]
+        require_relative "lowrail/minitest"
+        Lowrail::Minitest.install(ENV["LOWRAIL_OUTCOMES"])
+      end
+      setup(root: root)
+    rescue StandardError, ScriptError => e
+      # Never break an app: any failure here leaves plain Ruby running.
+      warn "[lowrail] setup failed (#{e.class}: #{e.message}); running without Lowrail" if ENV["LOWRAIL_DEBUG"]
+      false
     end
 
     def setup(root: Dir.pwd, dir: File.join(root, ".lowrail"))
       return false unless enabled?
       path = File.join(dir, "manifest.json")
-      return false unless File.exist?(path)
+      return false unless File.file?(path)
 
-      require "json"
       require_relative "lowrail/manifest"
       require_relative "lowrail/guard"
       require_relative "lowrail/loader"
-      require_relative "lowrail/stats" if ENV["LOWRAIL_STATS"]
 
-      @root = root
-      @manifest = Manifest.load(path, dir)
-      unless @manifest.compatible?
-        warn "[lowrail] manifest built for #{@manifest.ruby_description}; running #{RUBY_DESCRIPTION}. Falling back to plain Ruby." if ENV["LOWRAIL_DEBUG"]
+      manifest = Manifest.load(path, dir)
+      unless manifest.compatible?
+        debug "manifest built for #{manifest.ruby_description} (format #{manifest.format}); running #{RUBY_DESCRIPTION}. Falling back to plain Ruby."
         return false
       end
-      Guard.install(@manifest)
-      Loader.install(@manifest)
+      @root = root
+      @manifest = manifest
+      Guard.install(manifest, defined?(Stats) && Stats.enabled? ? Stats::STATE : G)
+      Loader.install(manifest)
       true
     end
 
-    # Called from lowered code when G[id] is not true.
+    # Called from lowered code when G[id] is not true. Replaced by a counting
+    # version when stats are enabled.
     def check(id)
       state = G[id]
       return state unless state.nil?
       G[id] = Guard.validate(id)
+    end
+
+    # Atomic JSON write (tmp + rename). Only used at exit and in build tools,
+    # when requiring the json gem is safe (Bundler, if any, set up long ago).
+    def write_json(path, data)
+      require "json"
+      tmp = "#{path}.tmp.#{Process.pid}"
+      File.write(tmp, JSON.pretty_generate(data) + "\n")
+      File.rename(tmp, path)
+    end
+
+    def debug(msg)
+      warn "[lowrail] #{msg}" if ENV["LOWRAIL_DEBUG"]
     end
   end
 end

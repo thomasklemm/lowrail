@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Compiles lowered sources to ISeq binaries and writes manifest.json.
+# Usage: lowrail-compile UNITS_JSON   (format: docs/FORMATS.md)
+require_relative "../lib/lowrail/compiler"
+
+exit Lowrail::Compiler.run(ARGV)
