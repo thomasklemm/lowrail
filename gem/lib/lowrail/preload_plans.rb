@@ -58,6 +58,9 @@ module Lowrail
         return unless key.last
         @lock.synchronize do
           p = @plans[key]
+          # A structural scheduling decline can always stay on Rails, even
+          # after facts change. It is not a specialization to revalidate.
+          return if p == false
           # Rebuild on structural change, but only against recorded boot facts.
           @plans.delete(key) if p && !p.valid?
           return @plans[key] if @plans[key]
@@ -65,7 +68,8 @@ module Lowrail
           # structures; a full cache simply uses Rails, never evicts app data.
           return if @plans.size >= 256
           built = build(key.last, root)
-          @plans[key] = built if built
+          @plans[key] = built unless built.nil?
+          built || nil
         end
       rescue StandardError => e
         Lowrail.debug("preload plan declined: #{e.class}: #{e.message}")
@@ -125,7 +129,10 @@ module Lowrail
           end
         end
         roots = visit.call(spec, root, nil)
-        roots && Plan.new(roots, nodes, spec)
+        if roots
+          plan = Plan.new(roots, nodes, spec)
+          plan.valid? ? plan : false
+        end
       end
     end
 
@@ -197,8 +204,7 @@ module Lowrail
           }
           if pending.size > 1 && pending.any? { future.include?(_1.edge.target.table_name) }
             Lowrail.debug("preload plan declined: data-dependent inter-branch schedule")
-            # Retain only this structural decline, with the same edge guards.
-            # Do not rediscover an unsupported schedule on every request.
+            # Only a fallback marker, not these edges, will be cached.
             @steps = nil
             return
           end
@@ -212,10 +218,9 @@ module Lowrail
         node.children.flat_map { [_1] + descendants(_1) }
       end
 
-      def valid? = @nodes.all? { _1.edge.valid? }
+      def valid? = @steps && @nodes.all? { _1.edge.valid? }
 
       def call(records)
-        return unless @steps
         loaders = {}.compare_by_identity
         @steps.each do |groups|
           groups.each do |nodes|

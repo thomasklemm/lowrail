@@ -79,6 +79,7 @@ module Lowrail
       # An app can override these constructors to inject request state without
       # declaring any association/default scope. Such code is not certified.
       framework = Gem.loaded_specs.fetch("activerecord").full_gem_path + "/"
+      return "custom reflection scope constructor" unless r.method(:join_scopes).source_location&.first&.start_with?(framework)
       return "custom scope constructor" unless SCOPE_METHODS.all? { |name|
         k.method(name).source_location&.first&.start_with?(framework)
       }

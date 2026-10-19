@@ -30,6 +30,7 @@ class PreloadPlansTest < Minitest::Test
       has_many :filtered, -> { where(title: Thread.current[:title]) }, class_name: "Post"
       has_many :dependent_posts, ->(writer) { where(title: writer.name) }, class_name: "Post"
       has_many :custom_posts, class_name: "CustomPost", foreign_key: :writer_id
+      has_many :reflection_posts, class_name: "Post", foreign_key: :writer_id
     end
     class Post < ActiveRecord::Base
       belongs_to :writer, inverse_of: :posts
@@ -41,6 +42,9 @@ class PreloadPlansTest < Minitest::Test
     class CustomPost < ActiveRecord::Base
       self.table_name = "posts"
       def self.scope_for_association(*) = super.where(title: Thread.current[:title])
+    end
+    Writer.reflect_on_association(:reflection_posts).define_singleton_method(:join_scopes) do |*args|
+      super(*args) + [klass.where(title: Thread.current[:title])]
     end
     a = Writer.create!(name: "A")
     b = Writer.create!(name: "B")
@@ -104,6 +108,15 @@ class PreloadPlansTest < Minitest::Test
     preload.call(rows, { peers: :peers, posts: nil })
     ActiveSupport::Notifications.unsubscribe(subscription)
     result["scheduling_queries"] = queries
+    empty = Writer.create!(name: "empty")
+    # Cross-branch table dependencies use Rails, including repeated calls and
+    # branches pruned by absent rows. Only a fallback marker may be retained.
+    result["dependent_schedule"] = 2.times.map do
+      rows = [Writer.find(empty.id), Writer.find(a.id)]
+      preload.call(rows, { peers: :posts, posts: :writer })
+      rows.map { |r| [r.peers.map { |p| [p.name, p.association(:posts).loaded?, p.posts.map(&:title)] },
+        r.posts.map { |p| [p.title, p.association(:writer).loaded?, p.writer.name] }] }
+    end
     Post.where(title: "second").scoping do
       rows = [Writer.find(a.id)]
       preload.call(rows, :posts)
@@ -115,12 +128,16 @@ class PreloadPlansTest < Minitest::Test
     result["dynamic"] = rows.first.filtered.map(&:title)
     preload.call(rows, :custom_posts)
     result["custom_constructor"] = rows.first.custom_posts.map(&:title)
+    preload.call(rows, :reflection_posts)
+    result["reflection_constructor"] = rows.first.reflection_posts.map(&:title)
     Thread.current[:title] = "new"
     rows = [Writer.find(a.id)]
     preload.call(rows, :filtered)
     result["dynamic_next"] = rows.first.filtered.map(&:title)
     preload.call(rows, :custom_posts)
     result["custom_constructor_next"] = rows.first.custom_posts.map(&:title)
+    preload.call(rows, :reflection_posts)
+    result["reflection_constructor_next"] = rows.first.reflection_posts.map(&:title)
     rows = [Writer.find(a.id)]
     preload.call(rows, :notes)
     result["through"] = rows.first.notes.map(&:body)
@@ -193,6 +210,8 @@ class PreloadPlansTest < Minitest::Test
       %w[dynamic method_change default_scope].each { assert_equal ["second"], on[_1], _1 }
       assert_equal ["second"], on["custom_constructor"]
       assert_equal ["new"], on["custom_constructor_next"]
+      assert_equal ["second"], on["reflection_constructor"]
+      assert_equal ["new"], on["reflection_constructor_next"]
       assert_equal ["new"], on["dynamic_next"]
       assert_equal ["first"], on["module_change"]
       assert_equal ["third"], on["schema_reset"]
