@@ -36,8 +36,10 @@ module Lowrail
   # lowrail/stats.rb for why that is the chosen design).
   G = []
 
-  # Template units run in many view classes (one per controller); their
-  # facts are checked per class: V[id] = {view_class => true/false}.
+  # Units whose code runs with different classes of `self` (templates run in
+  # one view class per controller, helpers and concerns are mixed into many
+  # classes) have facts with receiver "@self"; they are checked per class:
+  # V[id] = {klass => true/false}.
   V = []
 
   class << self
@@ -88,6 +90,7 @@ module Lowrail
       @manifest = manifest
       Guard.install(manifest, defined?(Stats) && Stats.enabled? ? Stats::STATE : G)
       Loader.install(manifest)
+      require_relative "lowrail/routes"
       unless manifest.templates.empty?
         require_relative "lowrail/templates"
         Templates.install(manifest.templates)
@@ -103,15 +106,17 @@ module Lowrail
       G[id] = Guard.validate(id)
     end
 
-    # Called from lowered template code with the view's class. Facts whose
-    # receiver is "@view" are checked against that class.
-    def view_ok?(id, klass)
+    # Called from lowered code as `::Lowrail.ok?(id, self.class)`. Facts whose
+    # receiver is "@self" (or "@view", the name used by earlier builds) are
+    # checked against that class, once per class until a hook resets the unit.
+    def ok?(id, klass)
       cache = (V[id] ||= {}.compare_by_identity)
       s = cache[klass]
-      s = cache[klass] = Guard.validate(id, view: klass) if s.nil?
+      s = cache[klass] = Guard.validate(id, klass: klass) if s.nil?
       Stats.count(id, s) if defined?(Stats) && Stats.enabled?
       s
     end
+    alias view_ok? ok?
 
     # Atomic JSON write (tmp + rename). Only used at exit and in build tools,
     # when requiring the json gem is safe (Bundler, if any, set up long ago).

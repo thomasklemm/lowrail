@@ -25,7 +25,10 @@ module Lowrail
   #
   # A file that fails (missing, unreadable, syntax error, source changed since
   # lowering) is skipped with a warning and its units are dropped; this never
-  # fails the build.
+  # fails the build. "Source changed" compares against "source_sha256" or,
+  # when the input names one, the SHA-256 of the "original" copy the lowering
+  # pass read. "templates" and "rails_env" are passed through to the manifest
+  # (template units need no compiled file).
   module Compiler
     class << self
       def run(argv, err: $stderr)
@@ -43,14 +46,17 @@ module Lowrail
         files = {}
         Array(input["files"]).each do |entry|
           path = entry.fetch("path")
-          compiled = compile_file(path, entry.fetch("lowered"), entry["source_sha256"], iseq_dir)
+          expected = entry["source_sha256"] || (entry["original"] && Digest::SHA256.file(entry["original"]).hexdigest)
+          compiled = compile_file(path, entry.fetch("lowered"), expected, iseq_dir)
           files[path] = compiled
         rescue StandardError, ScriptError => e
           err.puts "[lowrail] skipping #{path}: #{e.class}: #{e.message.lines.first&.chomp}"
         end
 
+        templates = input["templates"] || {}
         units = Array(input["units"]).select do |unit|
           next true if files.key?(unit["file"])
+          next true if unit["kind"] == "template" && templates.key?(unit["file"])
           err.puts "[lowrail] dropping unit #{unit["id"]} (#{unit["method"]}): #{unit["file"]} not compiled"
           false
         end
@@ -62,6 +68,8 @@ module Lowrail
           "files" => files,
           "units" => units
         }
+        manifest["rails_env"] = input["rails_env"] if input["rails_env"]
+        manifest["templates"] = templates unless templates.empty?
         Lowrail.write_json(File.join(out, "manifest.json"), manifest)
         manifest
       end

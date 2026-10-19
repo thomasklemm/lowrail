@@ -49,10 +49,10 @@ module Lowrail
 
       def installed? = !@manifest.nil?
 
-      def validate(id, view: nil)
+      def validate(id, klass: nil)
         unit = @units[id] or return false
         return false unless env_ok? && enabled_unit?(id)
-        unit.fetch("facts").all? { |fact| holds?(fact, view) }
+        unit.fetch("facts").all? { |fact| holds?(fact, klass) }
       rescue StandardError => e
         Lowrail.debug("unit #{id}: guard validation raised #{e.class}: #{e.message}")
         false
@@ -109,11 +109,14 @@ module Lowrail
         @env_ok = (have == want).tap { |ok| Lowrail.debug("manifest built for #{want}, running #{have}") unless ok }
       end
 
-      def holds?(fact, view = nil)
-        if fact.fetch("receiver") == "@view"
-          return false unless view
+      SELF_RECEIVERS = ["@self", "@view"].freeze
+
+      def holds?(fact, klass = nil)
+        if SELF_RECEIVERS.include?(fact.fetch("receiver"))
+          return false unless klass
           name = fact.fetch("method").to_sym
-          return holds_on?(view, name, fact) && no_instance_override?(view, name)
+          return holds_on?(klass, name, fact) && no_instance_override?(klass, name) &&
+                 (fact["route"].nil? || route_holds?(klass, name, fact["route"]))
         end
         mod = Object.const_get(fact.fetch("receiver"))
         name = fact.fetch("method").to_sym
@@ -124,6 +127,24 @@ module Lowrail
       rescue NameError => e # constant or method gone: the fact does not hold
         Lowrail.debug("fact #{fact["receiver"]}#{fact["singleton"] ? "." : "#"}#{fact["method"]}: #{e.class}: #{e.message}")
         false
+      end
+
+      # A named-route helper: klass#name must be the method the application's
+      # route set defined for that route (its path helper module, compared by
+      # identity, since it is anonymous), and the route must still have the
+      # path, required parts and defaults the build specialized, with no
+      # requirements and no glob (the shape OptimizedUrlHelper handles).
+      # Redrawing routes redefines the helpers, which resets the unit, so this
+      # is re-checked after every reload.
+      def route_holds?(klass, name, route)
+        return false unless defined?(::Rails) && ::Rails.respond_to?(:application) && (app = ::Rails.application)
+        named = app.routes.named_routes
+        return false unless klass.instance_method(name).owner.equal?(named.path_helpers_module)
+        r = named.get(route.fetch("name")) or return false
+        r.path.spec.to_s == route.fetch("spec") &&
+          r.required_parts.map(&:to_s) == route.fetch("parts") &&
+          r.defaults.inspect == route.fetch("defaults") &&
+          r.path.requirements.empty? && !r.glob?
       end
 
       def holds_on?(klass, name, fact)

@@ -9,7 +9,7 @@
 //! exactly HTML attribute or content escaping, and replaces the call with
 //!
 //! ```ruby
-//! ((::Lowrail.view_ok?(U, self.class) && <type checks>) ? (<inline>) : (<original call>))
+//! ((::Lowrail.ok?(U, self.class) && <type checks>) ? (<inline>) : (<original call>))
 //! ```
 //!
 //! The replacement keeps the original text verbatim in the fallback branch and
@@ -28,13 +28,29 @@ const SAMPLE_CONTENT: &str = "&lt;&amp;&quot;&#39;&gt;x";
 /// A method the specialized code assumes resolves as it did at build time.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, PartialOrd, Ord)]
 pub struct Dep {
-    /// "@view" for the view class the template renders in, else a constant.
+    /// "@self" for the class of `self` at the call site (checked per class at
+    /// runtime), else a constant.
     pub receiver: String,
     pub method: String,
+    /// True for `Receiver.method` (a method of the singleton class).
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub singleton: bool,
     /// None for an anonymous module (the route set's helper module).
     pub owner: Option<String>,
     pub source_location: Option<String>,
     pub visibility: String,
+    /// For a named-route helper: the route it was specialized for.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub route: Option<RouteFact>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, PartialOrd, Ord)]
+pub struct RouteFact {
+    pub name: String,
+    pub spec: String,
+    pub parts: Vec<String>,
+    /// `route.defaults.inspect`.
+    pub defaults: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -103,7 +119,7 @@ pub fn lower_template(original: &str, locals: &[String], unit: usize, oracle: &m
         names.dedup();
         for m in names {
             match resolve(oracle, "self.class", &m) {
-                Ok(dep) => out.deps.push(Dep { receiver: "@view".into(), ..dep }),
+                Ok(dep) => out.deps.push(Dep { receiver: "@self".into(), ..dep }),
                 Err(e) => {
                     // A dependency we cannot pin down means no lowering at all.
                     out.sites.iter_mut().filter(|s| s.outcome == "lowered").for_each(|s| s.outcome = format!("unresolved dependency {m}: {e}"));
@@ -126,18 +142,23 @@ pub fn lower_template(original: &str, locals: &[String], unit: usize, oracle: &m
     out
 }
 
-fn resolve(oracle: &mut dyn Oracle, receiver: &str, method: &str) -> Result<Dep, String> {
+/// Resolves `receiver#method` (an expression evaluating to a module) in the
+/// oracle. Owner labels follow the facts dumper: a singleton class owner is
+/// `#<Class:Name>`, an anonymous module is None.
+pub fn resolve(oracle: &mut dyn Oracle, receiver: &str, method: &str) -> Result<Dep, String> {
     let code = format!(
-        "k = ({receiver}); m = k.instance_method(:{method}); v = k.public_method_defined?(:{method}) ? \"public\" : k.protected_method_defined?(:{method}) ? \"protected\" : \"private\"; JSON.generate([m.owner.name, m.source_location&.join(\":\"), v])"
+        "k = ({receiver}); m = k.instance_method(:{method}); o = m.owner; l = o.name || (o.singleton_class? && Module === o.attached_object && o.attached_object.name ? \"#<Class:#{{o.attached_object.name}}>\" : nil); v = k.public_method_defined?(:{method}) ? \"public\" : k.protected_method_defined?(:{method}) ? \"protected\" : \"private\"; JSON.generate([l, m.source_location&.join(\":\"), v])"
     );
     let (s, _) = oracle.eval_string(&code)?;
     let parsed: Vec<Option<String>> = serde_json::from_str(&s).map_err(|e| format!("{e}: {s}"))?;
     Ok(Dep {
         receiver: receiver.into(),
         method: method.into(),
+        singleton: false,
         owner: parsed.first().cloned().flatten(),
         source_location: parsed.get(1).cloned().flatten(),
         visibility: parsed.get(2).cloned().flatten().unwrap_or_else(|| "public".into()),
+        route: None,
     })
 }
 
@@ -175,11 +196,11 @@ fn collect_appended_calls<'pr>(node: &Node<'pr>, out: &mut Vec<ruby_prism::CallN
     ruby_prism::Visit::visit(&mut v, node);
 }
 
-fn name_of(call: &ruby_prism::CallNode) -> String {
+pub(super) fn name_of(call: &ruby_prism::CallNode) -> String {
     String::from_utf8_lossy(call.name().as_slice()).into_owned()
 }
 
-fn text<'a>(code: &'a str, node: &Node) -> &'a str {
+pub(super) fn text<'a>(code: &'a str, node: &Node) -> &'a str {
     let l = node.location();
     &code[l.start_offset()..l.end_offset()]
 }
@@ -240,7 +261,7 @@ fn class_hint(var: &str) -> String {
     }).collect()
 }
 
-fn ruby_str(s: &str) -> String {
+pub fn ruby_str(s: &str) -> String {
     let mut out = String::from("\"");
     for ch in s.chars() {
         match ch {
@@ -406,7 +427,7 @@ fn lower_link_to(code: &str, call: &ruby_prism::CallNode, unit: usize, oracle: &
     if inline.contains('\n') {
         return Err("link_to: specialized code would span lines".into());
     }
-    let mut guard = format!("::Lowrail.view_ok?({unit}, self.class)");
+    let mut guard = format!("::Lowrail.ok?({unit}, self.class)");
     for c in cond {
         guard.push_str(&format!(" && {c}"));
     }
@@ -450,10 +471,10 @@ mod tests {
         let out = lower_template(code, &["article".into()], 3, &mut Fake);
         assert_eq!(out.lowered_count(), 1, "{:?}", out.sites);
         assert_eq!(out.code.matches('\n').count(), code.matches('\n').count());
-        assert!(out.code.contains("::Lowrail.view_ok?(3, self.class) && defined?(article) == \"local-variable\" && article.instance_of?(::Article) && article.persisted?"));
+        assert!(out.code.contains("::Lowrail.ok?(3, self.class) && defined?(article) == \"local-variable\" && article.instance_of?(::Article) && article.persisted?"));
         assert!(out.code.contains(r##"__lru = article_path(article); "<a class=\"a&amp;b\" href=\"#{::Lowrail::Html.attr(__lru)}\">Show</a>".html_safe"##), "{}", out.code);
         assert!(out.code.contains(": (link_to \"Show\", article, class: \"a&b\"))"));
-        assert!(out.deps.iter().any(|d| d.method == "article_path" && d.receiver == "@view"));
+        assert!(out.deps.iter().any(|d| d.method == "article_path" && d.receiver == "@self"));
     }
 
     #[test]

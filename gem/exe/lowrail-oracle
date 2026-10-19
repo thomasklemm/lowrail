@@ -10,15 +10,18 @@
 #   {"id": 1, "code": "link_to(\"Show\", \"LRH0Q\", class: \"x\")"}
 #   {"id": 1, "ok": true, "value": "<a ...>", "class": "ActiveSupport::SafeBuffer", "html_safe": true}
 # Code runs with `self` = a view context of ApplicationController (or the
-# controller named in "controller").
+# controller named in "controller"). Lowrail::OracleRoutes (route-helper
+# pass) is loaded.
 
 ENV["RAILS_ENV"] ||= "test"
 require File.expand_path("config/environment", Dir.pwd)
 require "json"
 Rails.application.eager_load!
 
+require_relative "../lib/lowrail/oracle_routes"
+
 $stdout.sync = true
-views = Hash.new do |h, name|
+LOWRAIL_VIEWS = views = Hash.new do |h, name|
   controller = Object.const_get(name).new
   request = ActionDispatch::TestRequest.create
   controller.set_request!(request)
