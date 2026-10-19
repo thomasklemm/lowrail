@@ -10,6 +10,7 @@
 //!   named after the app-level macro when the boot facts reveal it
 //!   (association reader → `has_many`), else after the enclosing gem method.
 
+use super::generated::{self, Generated, GeneratedDef};
 use super::schema::{Facts, Method, Module, split_location};
 use ruby_prism::Visit;
 use std::collections::HashMap;
@@ -38,6 +39,8 @@ pub enum Origin {
         site: String,
         gem: Option<String>,
     },
+    /// A compiled template method (ActionView::Template#compile).
+    Template { file: String },
     /// Source could not be read or nothing matches at that line.
     Unresolved { reason: String },
 }
@@ -49,6 +52,7 @@ impl Origin {
             Origin::Def { .. } => "def",
             Origin::GeneratedInApp { .. } => "generated in app source",
             Origin::GeneratedInGem { .. } => "generated in gem",
+            Origin::Template { .. } => "template",
             Origin::Unresolved { .. } => "unresolved",
         }
     }
@@ -60,6 +64,9 @@ pub struct MethodOrigin<'f> {
     pub module: &'f Module,
     pub method: &'f Method,
     pub origin: Origin,
+    /// The generated body, when the method was compiled from an eval'd
+    /// script and the classifier has the generated sources.
+    pub generated: Option<GeneratedDef>,
 }
 
 /// What Prism sees in one file, by 1-based line.
@@ -71,6 +78,10 @@ pub struct SourceIndex {
     calls: HashMap<u32, Vec<(String, bool)>>,
     /// (first line, last line, qualified name) of every def, outer first.
     def_ranges: Vec<(u32, u32, String)>,
+    /// Byte span of every def by first line and name.
+    def_spans: HashMap<(u32, String), (usize, usize)>,
+    /// Byte span of the outermost call starting on a line.
+    call_spans: HashMap<u32, (usize, usize)>,
 }
 
 impl SourceIndex {
@@ -102,6 +113,16 @@ impl SourceIndex {
             .find(|(_, recv_less)| *recv_less)
             .or(calls.first())
             .map(|(n, _)| n.as_str())
+    }
+
+    /// Byte span of `def name` starting on `line`.
+    pub fn def_span(&self, line: u32, name: &str) -> Option<(usize, usize)> {
+        self.def_spans.get(&(line, name.to_string())).copied()
+    }
+
+    /// Byte span of the outermost call starting on `line`.
+    pub fn call_span(&self, line: u32) -> Option<(usize, usize)> {
+        self.call_spans.get(&line).copied()
     }
 
     /// Innermost def containing `line`, as `Nesting#name` / `Nesting.name`.
@@ -172,6 +193,7 @@ pub struct Classifier<'f> {
     facts: &'f Facts,
     app_root: PathBuf,
     cache: HashMap<String, Option<SourceIndex>>,
+    generated: Generated<'f>,
 }
 
 impl<'f> Classifier<'f> {
@@ -180,7 +202,20 @@ impl<'f> Classifier<'f> {
             facts,
             app_root: PathBuf::from(&facts.app_root),
             cache: HashMap::new(),
+            generated: Generated::new(facts, PathBuf::new()),
         }
+    }
+
+    /// Reads generated script sources from `dir` (`generated/` next to
+    /// facts.json) to attach generated bodies.
+    pub fn with_generated_dir(mut self, dir: impl AsRef<Path>) -> Self {
+        self.generated = Generated::new(self.facts, dir);
+        self
+    }
+
+    /// The generated body of a method, if any.
+    pub fn generated(&mut self, method: &Method) -> Option<GeneratedDef> {
+        self.generated.link(method)
     }
 
     /// Is `path` app source (under the app root, but not vendored)?
@@ -204,7 +239,16 @@ impl<'f> Classifier<'f> {
         if defined_here(module) {
             return true;
         }
+        // "Room._enum_methods_module", "Room.ancestors[3]": as app-owned as Room.
         let mut name = module.name.as_str();
+        if module.synthetic
+            && let Some((owner, _)) = name.split_once('.')
+        {
+            if by_name.get(owner).is_some_and(|m| defined_here(m)) {
+                return true;
+            }
+            name = owner;
+        }
         while let Some((outer, _)) = name.rsplit_once("::") {
             if by_name.get(outer).is_some_and(|m| defined_here(m)) {
                 return true;
@@ -231,10 +275,12 @@ impl<'f> Classifier<'f> {
                     .is_some_and(|(p, _)| self.in_app(p));
                 if app_mod || app_src {
                     let origin = self.classify(module, method);
+                    let generated = self.generated.link(method);
                     out.push(MethodOrigin {
                         module,
                         method,
                         origin,
+                        generated,
                     });
                 }
             }
@@ -243,6 +289,13 @@ impl<'f> Classifier<'f> {
     }
 
     pub fn classify(&mut self, module: &Module, method: &Method) -> Origin {
+        if let Some(script) = self.generated.script_of(method)
+            && generated::is_template(script)
+        {
+            return Origin::Template {
+                file: script.path.clone(),
+            };
+        }
         let Some(loc) = method.source_location.as_deref() else {
             return Origin::NoSource {
                 iseq_kind: method.iseq_kind.clone(),
@@ -507,6 +560,10 @@ impl<'pr> Visit<'pr> for Indexer {
             "#"
         };
         let qualified = format!("{}{sep}{name}", self.nesting.join("::"));
+        self.index
+            .def_spans
+            .entry((first, name.clone()))
+            .or_insert((loc.start_offset(), loc.end_offset()));
         self.index.defs.entry(first).or_default().push(name);
         self.index.def_ranges.push((first, last, qualified));
         ruby_prism::visit_def_node(self, node);
@@ -516,6 +573,10 @@ impl<'pr> Visit<'pr> for Indexer {
         let name = String::from_utf8_lossy(node.name().as_slice()).into_owned();
         let recv_less = node.receiver().is_none();
         let start = self.lines.line(node.location().start_offset());
+        self.index
+            .call_spans
+            .entry(start)
+            .or_insert((node.location().start_offset(), node.location().end_offset()));
         let msg = node
             .message_loc()
             .map(|l| self.lines.line(l.start_offset()))

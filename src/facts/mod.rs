@@ -1,6 +1,7 @@
 //! Boot facts: run `gem/exe/lowrail-facts` inside an app, load the
 //! `facts.json` it writes, and summarize it. See docs/FORMATS.md.
 
+pub mod generated;
 pub mod origin;
 pub mod schema;
 
@@ -11,11 +12,15 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-const USAGE: &str = "usage: lowrail facts APP [--out PATH] [--no-boot] [--origins]
-  boots APP (bundle exec, RAILS_ENV=test, eager_load!), writes
-  APP/.lowrail/facts.json (or PATH) and prints a summary;
+const USAGE: &str = "usage: lowrail facts APP [--out PATH] [--no-boot] [--origins] [--show MOD#METH]...
+                         [--no-materialize] [--no-capture]
+  boots APP (bundle exec, RAILS_ENV=test), materializes its lazily generated
+  surface (docs/PLAN.md 9.4), captures generated scripts into
+  APP/.lowrail/generated/, writes APP/.lowrail/facts.json (or PATH) and
+  prints a summary;
   --no-boot summarizes an existing facts file;
-  --origins also lists every app-relevant method with its origin";
+  --origins also lists every app-relevant method with its origin;
+  --show prints a method's origin and generated body (Mod#m, Mod.m)";
 
 pub fn load(path: impl AsRef<Path>) -> Result<Facts, String> {
     let path = path.as_ref();
@@ -39,11 +44,18 @@ pub fn gem_dir() -> PathBuf {
 
 /// Boots `app` and writes its facts to `out`.
 pub fn dump(app: &Path, out: &Path) -> Result<(), String> {
+    dump_with(app, out, &[])
+}
+
+/// Boots `app` and writes its facts to `out`, passing `flags` to
+/// lowrail-facts (`--no-materialize`, `--no-capture`, `--no-census`).
+pub fn dump_with(app: &Path, out: &Path, flags: &[&str]) -> Result<(), String> {
     let exe = gem_dir().join("exe/lowrail-facts");
     let status = Command::new("bundle")
         .args(["exec", "ruby"])
         .arg(&exe)
         .arg(out)
+        .args(flags)
         .current_dir(app)
         .status()
         .map_err(|e| format!("bundle exec ruby {}: {e}", exe.display()))?;
@@ -62,12 +74,17 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let mut out = None;
     let mut boot = true;
     let mut list_origins = false;
+    let mut show = Vec::new();
+    let mut flags = Vec::new();
     let mut it = args.iter();
     while let Some(arg) = it.next() {
         match arg.as_str() {
             "--out" => out = Some(PathBuf::from(it.next().ok_or(USAGE)?)),
             "--no-boot" => boot = false,
             "--origins" => list_origins = true,
+            "--show" => show.push(it.next().ok_or(USAGE)?.clone()),
+            "--no-materialize" => flags.push("--no-materialize"),
+            "--no-capture" => flags.push("--no-capture"),
             s if !s.starts_with('-') && app.is_none() => app = Some(PathBuf::from(s)),
             _ => return Err(USAGE.into()),
         }
@@ -88,18 +105,84 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         if let Some(dir) = out.parent() {
             std::fs::create_dir_all(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
         }
-        dump(&app, &out)?;
+        dump_with(&app, &out, &flags)?;
     }
     let facts = load(&out)?;
     let size = std::fs::metadata(&out).map(|m| m.len()).unwrap_or(0);
     print!("{}", summary(&facts, &out, size));
+    let gen_dir = generated_dir(&out);
     if list_origins {
-        for o in Classifier::new(&facts).app_relevant() {
+        for o in Classifier::new(&facts).with_generated_dir(&gen_dir).app_relevant() {
             let sep = if o.method.singleton { "." } else { "#" };
-            println!("{}{sep}{}\t{:?}", o.module.name, o.method.name, o.origin);
+            let body = o
+                .generated
+                .as_ref()
+                .map(|g| format!("\tgenerated {}.rb:{} ({:?})", &g.script.sha256[..12], g.line, g.form))
+                .unwrap_or_default();
+            println!("{}{sep}{}\t{:?}{body}", o.module.name, o.method.name, o.origin);
         }
     }
+    for spec in &show {
+        print!("{}", show_method(&facts, &gen_dir, spec)?);
+    }
     Ok(())
+}
+
+/// `generated/` next to a facts file.
+pub fn generated_dir(facts_path: &Path) -> PathBuf {
+    facts_path
+        .parent()
+        .unwrap_or(Path::new("."))
+        .join("generated")
+}
+
+/// Origin and generated body of `Mod#meth` / `Mod.meth`.
+pub fn show_method(facts: &Facts, gen_dir: &Path, spec: &str) -> Result<String, String> {
+    use std::fmt::Write;
+    let (module, name, singleton) = match spec.rfind(['#', '.']) {
+        Some(i) => (&spec[..i], &spec[i + 1..], spec.as_bytes()[i] == b'.'),
+        None => return Err(format!("--show {spec}: expected Mod#meth or Mod.meth")),
+    };
+    let m = facts
+        .modules
+        .iter()
+        .find(|m| m.name == module)
+        .ok_or_else(|| format!("{spec}: no module {module}"))?;
+    let meth = m
+        .methods
+        .iter()
+        .find(|x| x.name == name && x.singleton == singleton)
+        .ok_or_else(|| format!("{spec}: no such method"))?;
+    let mut c = Classifier::new(facts).with_generated_dir(gen_dir);
+    let mut s = String::new();
+    let _ = writeln!(s, "{spec}  owner {}  source {}", meth.owner, meth.source_location.as_deref().unwrap_or("-"));
+    let _ = writeln!(s, "  origin: {:?}", c.classify(m, meth));
+    match c.generated(meth) {
+        Some(g) => {
+            let sc = &g.script;
+            let _ = writeln!(
+                s,
+                "  generated: {} line {} ({:?}, {:?}); {} into {} at {}:{} from {} ({})",
+                g.file.display(),
+                g.line,
+                g.form,
+                g.via,
+                sc.kind,
+                sc.module.as_deref().unwrap_or("?"),
+                sc.path,
+                sc.lineno,
+                sc.caller.as_deref().unwrap_or("?"),
+                sc.caller_label.as_deref().unwrap_or("?"),
+            );
+            for line in g.source.lines() {
+                let _ = writeln!(s, "  | {line}");
+            }
+        }
+        None => {
+            let _ = writeln!(s, "  generated: -");
+        }
+    }
+    Ok(s)
 }
 
 /// Human-readable summary: counts, timings, and origins of app methods.
@@ -178,13 +261,58 @@ pub fn summary(facts: &Facts, path: &Path, size: u64) -> String {
                 .map(|t| t.handler.rsplit("::").next().unwrap_or("").to_string())
         )
     );
+    if !facts.materialize.is_empty() {
+        let _ = writeln!(w, "materialize (step: seconds, +modules, +methods, +generated scripts):");
+        if let Some(c) = &facts.census_boot {
+            let _ = writeln!(
+                w,
+                "  {:<22} {:>6} {:>7} {:>8} {:>6}",
+                "after boot", "", c.modules, c.methods, c.scripts
+            );
+        }
+        for st in &facts.materialize {
+            let n = |x: Option<i64>| x.map_or("-".into(), |v| format!("+{v}"));
+            let _ = writeln!(
+                w,
+                "  {:<22} {:>5.2}s {:>7} {:>8} {:>6}{}{}",
+                st.step,
+                st.seconds,
+                n(st.modules),
+                n(st.methods),
+                n(st.scripts),
+                if st.errors > 0 { format!("  {} errors", st.errors) } else { String::new() },
+                st.note.as_deref().map(|n| format!("  ({n})")).unwrap_or_default()
+            );
+        }
+    }
+    if let Some(g) = &facts.generated_stats {
+        let tagged = methods().filter(|m| m.script.is_some()).count();
+        let _ = writeln!(
+            w,
+            "generated scripts: {} distinct ({} compilations, {:.1} MB, hook {:.3}s) {}; methods compiled from one: {tagged}",
+            g.scripts,
+            g.compilations,
+            g.bytes as f64 / 1e6,
+            g.hook_seconds,
+            counts(facts.generated_scripts.iter().map(|s| s.phase.split(':').next().unwrap_or("").to_string())),
+        );
+    }
     for e in facts.errors.iter().filter(|e| e.kind != "skipped").take(10) {
         let _ = writeln!(w, "  error: {}: {}", e.r#where, e.error);
     }
 
-    let mut classifier = Classifier::new(facts);
+    let mut classifier = Classifier::new(facts).with_generated_dir(generated_dir(path));
     let origins = classifier.app_relevant();
     let _ = writeln!(w, "origins of app-relevant methods: {}", origins.len());
+    let linked: Vec<_> = origins.iter().filter_map(|o| o.generated.as_ref()).collect();
+    if !linked.is_empty() || facts.generated_stats.is_some() {
+        let _ = writeln!(
+            w,
+            "  with generated body: {} {}",
+            linked.len(),
+            counts(linked.iter().map(|g| format!("{:?}", g.form).to_lowercase()))
+        );
+    }
     let mut by_cat: BTreeMap<&str, Vec<&MethodOrigin>> = BTreeMap::new();
     for o in &origins {
         by_cat.entry(o.origin.category()).or_default().push(o);

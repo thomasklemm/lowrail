@@ -116,7 +116,7 @@ class FactsTest < Minitest::Test
   def test_anonymous_modules_are_counted_not_listed
     assert_operator facts["module_stats"]["anonymous"], :>=, 2
     refute(facts["modules"].any? { |m| m["name"].include?("#<") })
-    assert_equal facts["modules"].size, facts["module_stats"]["named"]
+    assert_equal facts["modules"].count { |m| !m["synthetic"] }, facts["module_stats"]["named"]
     assert_equal facts["modules"].sum { |m| m["methods"].size }, facts["module_stats"]["methods"]
   end
 
@@ -179,7 +179,7 @@ class FactsRealBlogTest < Minitest::Test
     assert(@f["routes"].any? { |r| r.values_at("verb", "path", "name") == ["GET", "/articles(.:format)", "articles"] })
     assert(@f["routes"].any? { |r| r["app"] == "ActionCable::Server::Base" })
     assert_empty @f["errors"].reject { |e| e["kind"] == "skipped" }
-    assert_equal %w[boot_seconds dump_seconds eager_load_seconds], @f["timings"].keys
+    assert_equal %w[boot_seconds dump_seconds eager_load_seconds materialize_seconds], @f["timings"].keys
   end
 
   def test_templates

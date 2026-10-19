@@ -175,6 +175,7 @@ fn origin_json(origin: Origin) -> Value {
             site,
             gem,
         } => json!({"generator":generator,"site":site,"gem":gem}),
+        Origin::Template { file } => json!({"file":file}),
         Origin::Unresolved { reason } => json!({"reason":reason}),
     };
     value["category"] = json!(category);

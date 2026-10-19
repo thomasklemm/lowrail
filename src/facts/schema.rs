@@ -23,6 +23,74 @@ pub struct Facts {
     pub modules: Vec<Module>,
     pub errors: Vec<FactError>,
     pub timings: BTreeMap<String, f64>,
+    /// Materialize steps run before the dump, in order (PLAN 9.4).
+    pub materialize: Vec<MaterializeStep>,
+    /// Module/method/script counts right after boot, before materializing.
+    pub census_boot: Option<Census>,
+    /// Templates compiled by the materialize step.
+    pub compiled_templates: Vec<CompiledTemplate>,
+    /// Index of eval'd scripts; sources in `generated/<sha256>.rb` next to
+    /// facts.json.
+    pub generated_scripts: Vec<GeneratedScript>,
+    pub generated_stats: Option<GeneratedStats>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct MaterializeStep {
+    pub step: String,
+    pub seconds: f64,
+    pub modules: Option<i64>,
+    pub methods: Option<i64>,
+    pub scripts: Option<i64>,
+    pub errors: usize,
+    pub note: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Census {
+    pub modules: i64,
+    pub methods: i64,
+    pub scripts: i64,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CompiledTemplate {
+    pub identifier: String,
+    pub method: String,
+    pub in_app: Option<bool>,
+}
+
+/// One distinct eval compilation site (docs/FORMATS.md).
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct GeneratedScript {
+    pub sha256: String,
+    pub bytes: usize,
+    pub lines: u32,
+    /// The ISeq path: the file passed to eval, or "(eval at FILE:LINE)".
+    pub path: String,
+    /// The line passed to eval: script line 1 is reported as this line.
+    pub lineno: i64,
+    /// class_eval | module_eval | instance_eval | eval | ...
+    pub kind: String,
+    pub module: Option<String>,
+    pub module_anonymous: bool,
+    pub caller: Option<String>,
+    pub caller_label: Option<String>,
+    pub phase: String,
+    pub count: usize,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct GeneratedStats {
+    pub scripts: usize,
+    pub compilations: usize,
+    pub bytes: usize,
+    pub hook_seconds: f64,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -54,6 +122,10 @@ pub struct Module {
     pub singleton_ancestors: Vec<String>,
     pub const_source_location: Option<String>,
     pub methods: Vec<Method>,
+    /// An anonymous module dumped under a descriptive name (compiled
+    /// template container, route helper modules).
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub synthetic: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -70,6 +142,10 @@ pub struct Method {
     /// Set when the method is an alias (`alias_method`, `alias`).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_name: Option<String>,
+    /// sha256 of the generated script whose compilation defined this
+    /// method's body (ISeq identity), if any.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub script: Option<String>,
 }
 
 impl Method {

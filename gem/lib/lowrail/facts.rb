@@ -35,9 +35,9 @@ module Lowrail
     class << self
       # Writes facts.json to +io_or_path+ (an IO or a file path; a path is
       # written atomically). Returns the facts hash.
-      def dump(io_or_path, app_root: nil, timings: {})
+      def dump(io_or_path, app_root: nil, timings: {}, generated_dir: nil)
         started = clock
-        facts = collect(app_root: app_root)
+        facts = collect(app_root: app_root, generated_dir: generated_dir)
         facts["timings"] = timings.transform_keys(&:to_s).merge("dump_seconds" => (clock - started).round(3)).sort.to_h
         json = JSON.generate(facts)
         if io_or_path.respond_to?(:write)
@@ -52,7 +52,11 @@ module Lowrail
 
       # Builds the facts hash (without timings).
       # Errors recorded before the call (e.g. by the executable) are kept.
-      def collect(app_root: nil)
+      #
+      # With Lowrail::ScriptCapture running, generated scripts are written to
+      # +generated_dir+ (default: none written, index only) and methods
+      # compiled inside one carry its digest ("script").
+      def collect(app_root: nil, generated_dir: nil)
         @errors ||= []
         out = {}
         out["format"] = FORMAT
@@ -69,11 +73,27 @@ module Lowrail
         out["routes"] = guard("routes") { routes } || []
         # Modules before templates: compiling templates autoloads handler
         # code (Erubi, Jbuilder, ...) that the boot itself did not load.
+        @script_index = capture? ? ScriptCapture.iseq_index : nil
         mods, stats = modules
         out["template_config"] = guard("template_config") { template_config }
         out["templates"] = guard("templates") { templates(out["app_root"]) } || []
         out["module_stats"] = stats
         out["modules"] = mods
+        if defined?(Materialize) && Materialize.results
+          out["materialize"] = Materialize.results
+          out["census_boot"] = Materialize.baseline if Materialize.baseline
+          out["compiled_templates"] = Materialize.compiled_templates.sort_by { |t| t["identifier"] }
+        end
+        if capture?
+          out["generated_scripts"] = guard("generated_scripts") { generated_scripts(generated_dir) } || []
+          out["generated_stats"] = {
+            "scripts" => ScriptCapture.count,
+            "compilations" => ScriptCapture.compilations,
+            "bytes" => ScriptCapture.compiled_bytes,
+            "hook_seconds" => ScriptCapture.hook_seconds.round(3),
+          }
+        end
+        @script_index = nil
         out["errors"] = @errors.sort_by { |e| [e["where"], e["error"]] }
         @errors = nil
         out
@@ -84,6 +104,7 @@ module Lowrail
       def modules
         stats = {"named" => 0, "anonymous" => 0, "anonymous_rooted" => 0, "singleton_classes" => 0, "methods" => 0}
         list = []
+        named = []
         # Snapshot first: the walk creates singleton classes.
         ObjectSpace.each_object(Module).to_a.each do |mod|
           if MOD_SINGLETON_P.bind_call(mod)
@@ -100,13 +121,79 @@ module Lowrail
             next
           end
           stats["named"] += 1
+          named << [name, mod]
           entry = guard("module #{name}") { module_entry(mod, name) }
           next unless entry
           stats["methods"] += entry["methods"].size
           list << entry
         end
+        synthetic = synthetic_modules
+        (synthetic + anonymous_ancestors(named, synthetic.map(&:last))).each do |name, mod|
+          entry = guard("module #{name}") { module_entry(mod, name) }
+          next unless entry
+          entry["synthetic"] = true
+          stats["methods"] += entry["methods"].size
+          list << entry
+        end
         list.sort_by! { |m| [m["name"], m["kind"], m["const_source_location"].to_s] }
         [list, stats]
+      end
+
+      # Anonymous modules included into named ones hold generated methods
+      # (enum methods, store accessors, has_secure_password's
+      # InstanceMethodsOnActivation, Rails' own builders). Each is listed
+      # once, under the first named module (by name) that includes it:
+      # "Widget._enum_methods_module" for known Active Record holders, else
+      # "Widget.ancestors[3]".
+      KNOWN_HOLDERS = %i[_enum_methods_module _store_accessors_module].freeze
+
+      def anonymous_ancestors(named, already = [])
+        seen = {}.compare_by_identity
+        already.each { |m| seen[m] = true }
+        out = []
+        named.sort_by!(&:first).each do |name, mod|
+          ancestors = guard("#{name} ancestors") { MOD_ANCESTORS.bind_call(mod) } || []
+          holders = nil
+          ancestors.each_with_index do |anc, i|
+            next if seen.key?(anc) || MOD_NAME.bind_call(anc).is_a?(String) || MOD_SINGLETON_P.bind_call(anc)
+            seen[anc] = true
+            holders ||= known_holders(mod)
+            label = holders.find { |_, h| h.equal?(anc) }&.first
+            out << [label ? "#{name}.#{label}" : "#{name}.ancestors[#{i}]", anc]
+          end
+        end
+        out
+      end
+
+      def known_holders(mod)
+        return [] unless defined?(::ActiveRecord::Base) && KERNEL_IS_A.bind_call(mod, Class) && mod < ::ActiveRecord::Base
+        KNOWN_HOLDERS.filter_map do |h|
+          ivar = :"@#{h}"
+          [h.to_s, mod.instance_variable_get(ivar)] if mod.instance_variable_defined?(ivar)
+        end
+      rescue Exception # rubocop:disable Lint/RescueException
+        []
+      end
+
+      # Anonymous modules that hold app-relevant generated methods, under
+      # descriptive names: compiled templates and route helpers.
+      def synthetic_modules
+        out = []
+        if defined?(::ActionView::LookupContext)
+          require_relative "materialize"
+          guard("synthetic view_context_class") do
+            container = Materialize.view_container
+            out << container if container
+          end
+        end
+        if defined?(::Rails.application) && ::Rails.application
+          guard("synthetic route helper modules") do
+            named = ::Rails.application.routes.named_routes
+            out << ["Rails.application.routes.named_routes.path_helpers_module", named.path_helpers_module]
+            out << ["Rails.application.routes.named_routes.url_helpers_module", named.url_helpers_module]
+          end
+        end
+        out.reject { |_, mod| MOD_NAME.bind_call(mod).is_a?(String) }
       end
 
       def module_entry(mod, name)
@@ -138,6 +225,7 @@ module Lowrail
       def method_entry(mod, meth, visibility, singleton)
         um = MOD_INSTANCE_METHOD.bind_call(mod, meth)
         loc = um.source_location
+        iseq = RubyVM::InstructionSequence.of(um)
         entry = {
           "name" => str(meth),
           "singleton" => singleton,
@@ -145,16 +233,18 @@ module Lowrail
           "owner" => mod_label(um.owner),
           "source_location" => loc ? "#{str(loc[0])}:#{loc[1]}" : nil,
           "parameters" => um.parameters.map { |p| p.map { |x| str(x) } },
-          "iseq_kind" => iseq_kind(um, loc),
+          "iseq_kind" => iseq_kind(um, loc, iseq),
         }
         orig = um.original_name
         entry["original_name"] = str(orig) if orig != meth
+        if iseq && @script_index && (script = @script_index[iseq])
+          entry["script"] = ScriptCapture.digest(script)
+        end
         entry
       end
 
       # method | block (define_method) | eval | cfunc | attr_reader | attr_writer | none
-      def iseq_kind(um, loc)
-        iseq = RubyVM::InstructionSequence.of(um)
+      def iseq_kind(um, loc, iseq = RubyVM::InstructionSequence.of(um))
         if iseq.nil?
           return "cfunc" if loc.nil?
           params = um.parameters
@@ -393,6 +483,24 @@ module Lowrail
           "code" => str(code),
           "strict_locals" => strict&.to_s,
         }
+      end
+
+      # -- generated scripts ----------------------------------------------
+
+      def capture?
+        defined?(ScriptCapture) && ScriptCapture.started?
+      end
+
+      def generated_scripts(dir)
+        label = ->(mod) { mod_label(mod) }
+        entries =
+          if dir
+            ScriptCapture.write(dir, label: label)
+          else
+            ScriptCapture.list.map { |s| ScriptCapture.entry(s, ScriptCapture.digest(s), label) }
+          end
+        entries.each { |e| e.transform_values! { |v| v.is_a?(String) ? str(v) : v } }
+        entries.sort_by { |e| [e["path"], e["lineno"], e["sha256"], e["module"].to_s, e["caller"].to_s] }
       end
 
       # -- helpers --------------------------------------------------------

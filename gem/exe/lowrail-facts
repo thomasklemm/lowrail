@@ -1,36 +1,56 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Boots the Rails app in the current directory the way its tests do and
-# writes boot facts (docs/FORMATS.md, facts.json). Run inside the app:
+# Boots the Rails app in the current directory the way its tests do,
+# materializes its lazily generated surface, and writes boot facts
+# (docs/FORMATS.md, facts.json). Run inside the app:
 #
-#   bundle exec ruby /abs/path/to/gem/exe/lowrail-facts OUT.json
+#   bundle exec ruby /abs/path/to/gem/exe/lowrail-facts OUT.json [options]
 #
+#   --no-materialize   only eager_load! (the pre-9.4 behavior)
+#   --no-capture       do not record generated scripts
+#   --no-census        skip the per-step method census (faster)
+#
+# Generated scripts are written next to OUT.json, in generated/<sha256>.rb.
 # The app's Gemfile is never touched: Lowrail's files are required by
 # absolute path.
 
-out = ARGV[0] or abort "usage: lowrail-facts OUT.json"
+args = ARGV.dup
+materialize = !args.delete("--no-materialize")
+capture = !args.delete("--no-capture")
+census = !args.delete("--no-census")
+out = args.shift or abort "usage: lowrail-facts OUT.json [--no-materialize] [--no-capture] [--no-census]"
+abort "lowrail-facts: unexpected arguments #{args.join(" ")}" unless args.empty?
 out = File.expand_path(out)
 ENV["RAILS_ENV"] ||= "test"
 
 clock = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+# Installed before the app boots: config/boot, Bootsnap and every
+# framework file evaluate code while config/environment loads.
+if capture
+  require File.expand_path("../lib/lowrail/script_capture", __dir__)
+  Lowrail::ScriptCapture.start(phase: "boot")
+end
 t0 = clock.call
 require File.expand_path("config/environment", Dir.pwd)
 t1 = clock.call
-eager_error = nil
-begin
-  Rails.application.eager_load!
-rescue Exception => e # rubocop:disable Lint/RescueException
-  raise if e.is_a?(Interrupt) || e.is_a?(SystemExit)
-  eager_error = e
-end
-t2 = clock.call
 
 require File.expand_path("../lib/lowrail/facts", __dir__)
+require File.expand_path("../lib/lowrail/materialize", __dir__)
 require "fileutils"
+record = ->(where, err) { Lowrail::Facts.record(where, err) }
+steps = materialize ? Lowrail::Materialize::STEPS : %w[eager_load]
+Lowrail::Materialize.run(steps: steps, app_root: Rails.root.to_s, measure: census, record: record,
+  before_step: ->(step) { Lowrail::ScriptCapture.phase = "materialize:#{step}" if capture })
+t2 = clock.call
+Lowrail::ScriptCapture.phase = "dump" if capture
+
 FileUtils.mkdir_p(File.dirname(out))
-Lowrail::Facts.record("eager_load!", eager_error) if eager_error
-facts = Lowrail::Facts.dump(out, app_root: Rails.root.to_s,
-  timings: {boot_seconds: (t1 - t0).round(3), eager_load_seconds: (t2 - t1).round(3)})
+timings = {boot_seconds: (t1 - t0).round(3), materialize_seconds: (t2 - t1).round(3)}
+first = Lowrail::Materialize.results.first
+timings[:eager_load_seconds] = first["seconds"] if first
+facts = Lowrail::Facts.dump(out, app_root: Rails.root.to_s, timings: timings,
+  generated_dir: capture ? File.join(File.dirname(out), "generated") : nil)
 warn "lowrail-facts: #{facts["modules"].size} modules, #{facts["module_stats"]["methods"]} methods, " \
-  "#{facts["errors"].size} errors -> #{out}"
+  "#{facts["errors"].size} errors" \
+  "#{capture ? ", #{facts["generated_scripts"].size} generated scripts" : ""} -> #{out}"
