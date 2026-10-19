@@ -57,3 +57,30 @@ Caveat: real-blog is a scaffold. Campfire and ARGOS (Inertia: JSON props, no
 server-side ERB for pages) will shift the balance toward controllers,
 serialization and Active Record; M0 is repeated there before choosing M4's
 order.
+
+## Helper micro-benchmarks (same setup, view context of a booted controller)
+
+| Call | µs |
+|---|---:|
+| `link_to "Show", article, class: …` | 6.56 |
+| same HTML built inline (escape + `article_path`) | 2.61 |
+| `article_path(article)` | 2.04 |
+| `polymorphic_path(article)` | 3.32 |
+| `dom_id(article)` / inline `"article_#{id}"` | 0.72 / 0.14 |
+| `pluralize(3, "comment")` (I18n + inflector) | 6.36 |
+| `truncate(body, length: 100)` | 1.11 |
+| `button_to "Destroy", article, method: :delete, …` | 27.71 |
+| `form_authenticity_token(form_options: …)` (per-form HMAC) | 11.84 |
+| `article.comments.size` (COUNT query) | 26.30 |
+
+Per article in the index partial, helpers cost ≈ 60 µs, of which roughly
+half is specializable (route helpers, `link_to`/`tag` building, `dom_id`,
+`pluralize` under a locale/inflection fact). The CSRF HMAC must stay per
+request, and the COUNT query is a data-access question (preload / counter
+cache), not a lowering one.
+
+**Estimate:** helper and route-helper specialization alone gives on the
+order of 10–25 % on real-blog's HTML routes, not multiples. Larger gains
+need specializing the per-request framework path itself (middleware chain,
+instrumentation, callbacks, session/cookie handling), which is where the
+boot facts matter most. Both are measured, not assumed, as passes land.
