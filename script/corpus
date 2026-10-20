@@ -6,12 +6,11 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 name=${1:?app name}
 dest="$root/.corpus/${2:-$name}"
 mkdir -p "$root/.corpus"
-if ! command -v ruby >/dev/null || [ "$(ruby -e 'print RUBY_VERSION')" != 4.0.7 ]; then
-  mise=$(command -v mise || true)
-  mise=${mise:-$HOME/.local/bin/mise}
-  "$mise" install ruby@4.0.7
-  export PATH="$("$mise" where ruby@4.0.7)/bin:$PATH"
-fi
+ruby_version=4.0.7
+mise=$(command -v mise || true)
+mise=${mise:-$HOME/.local/bin/mise}
+"$mise" install "ruby@$ruby_version"
+export PATH="$("$mise" where "ruby@$ruby_version")/bin:$PATH"
 case "$name" in
   real-blog)
     # rubys/roundhouse fixtures/real-blog, Rails 8.1.4
@@ -35,6 +34,25 @@ case "$name" in
   react-starter-kit)
     rev=f8081935e9bda68f8ef1ec53dc7eed19c819ee68
     repo=https://github.com/inertia-rails/react-starter-kit
+    sub=. ;;
+  casa)
+    # Rails 8.1.4 dependency-only overlays; see docs/compat.md.
+    rev=b584d2e6e6ebffe382f34c2ec202d20384d035ca
+    repo=https://github.com/rubyforgood/casa
+    sub=. ;;
+  writebook)
+    rev=be1f8fcf1b0fc8064011c2d29d75133885b182e2
+    repo=https://github.com/basecamp/writebook
+    sub=. ;;
+  fizzy)
+    # Last selected public historical pin; newer snapshots need private gems.
+    rev=6f1d200316ec3bae91d32c557d88647300807ee9
+    repo=https://github.com/basecamp/fizzy
+    sub=. ;;
+  codetriage)
+    # Use a fresh schema-only database; development seeds break test fixtures.
+    rev=d1868f8634e97a111a7fca49d58cc776d206007e
+    repo=https://github.com/codetriage/codetriage
     sub=. ;;
   *) echo "unknown corpus app: $name" >&2; exit 2 ;;
 esac
@@ -61,7 +79,35 @@ if [ "$name" != real-blog ]; then
   }
   (
     cd "$dest"
+    patch="$root/fixtures/corpus/$name.patch"
+    if [ -f "$patch" ]; then
+      if git apply --check "$patch" 2>/dev/null; then
+        git apply "$patch"
+      elif ! git apply --reverse --check "$patch" 2>/dev/null; then
+        echo "$name dependency metadata differs; use a new DIRNAME" >&2
+        exit 1
+      fi
+    fi
     BUNDLE_FROZEN=true bundle install --quiet
+    case "$name" in
+      casa)
+        node_version=24.22.0
+        "$mise" install "node@$node_version"
+        export PATH="$("$mise" where "node@$node_version")/bin:$PATH"
+        npm ci --no-audit --no-fund
+        npm run build
+        npm run build:css ;;
+      codetriage)
+        [ -f config/database.yml ] || cp config/database.ci.yml config/database.yml ;;
+    esac
+    case "$name" in
+      casa|codetriage|writebook|fizzy)
+        # Upstream CI loads the schema, not development seeds (which send
+        # mail/geocode). Only load it on a new disposable test database.
+        RAILS_ENV=test bundle exec rails db:create db:test:prepare
+        RAILS_ENV=test bundle exec rails assets:precompile
+        exit 0 ;;
+    esac
     RAILS_ENV=test bundle exec rails db:prepare
     case "$name" in
       pingcrm|redprints-cfp) bun install --frozen-lockfile ;;
