@@ -45,7 +45,52 @@ if (dump = ENV["BENCH_DUMP"]) # first response body per route, for on/off diffs
   end
 end
 
-routes.each { |verb, path| 200.times { call(session, verb, path, headers) } } # warm up (YJIT)
+routes.each { |verb, path| Integer(ENV.fetch("BENCH_WARMUP", "200")).times { call(session, verb, path, headers) } }
+
+# A controller drives separate, already-warm processes in short alternating
+# blocks. Boot, profiles, pipe IO and explicit GC are outside every sample.
+# See request_pairs.rb. The ordinary one-shot interface below is unchanged.
+if ENV["BENCH_PIPE"]
+  abort "pipe mode needs exactly one route" unless routes.one?
+  verb, path = routes.first
+  reply = ->(data) { puts "LOWRAIL_BENCH #{JSON.generate(data)}"; $stdout.flush }
+  reply.call(ready: true, pid: Process.pid, ruby: RUBY_DESCRIPTION,
+    yjit: RubyVM::YJIT.enabled?, units: defined?(Lowrail) && Lowrail.manifest&.units&.size)
+  STDIN.each_line do |line|
+    command = JSON.parse(line)
+    n = Integer(command.fetch("requests"))
+    raise "positive request count required" unless n.positive?
+    if (mode = command["profile"])
+      require "stackprof"
+      profile = StackProf.run(mode: mode.to_sym, raw: true, interval: mode == "object" ? 1 : 1000) do
+        n.times { call(session, verb, path, headers) }
+      end
+      File.write(command.fetch("output"), JSON.generate(profile))
+      reply.call(profile: mode, requests: n)
+    elsif command["trace"]
+      counts = Hash.new(0)
+      names = Hash.new(0)
+      trace = TracePoint.new(:call) do |tp|
+        next unless tp.path.start_with?(File.expand_path("../gem/lib/", __dir__))
+        counts["#{tp.defined_class}##{tp.method_id}"] += 1
+        names[tp.binding.local_variable_get(:name)] += 1 if tp.method_id == :reset_method
+      end
+      trace.enable { n.times { call(session, verb, path, headers) } }
+      reply.call(requests: n, calls: counts, reset_names: names)
+    else
+      GC.start
+      alloc0 = GC.stat(:total_allocated_objects)
+      cpu0 = Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID)
+      wall0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      n.times { call(session, verb, path, headers) }
+      wall = Process.clock_gettime(Process::CLOCK_MONOTONIC) - wall0
+      cpu = Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID) - cpu0
+      alloc = GC.stat(:total_allocated_objects) - alloc0
+      reply.call(requests: n, wall_us: wall * 1e6 / n, cpu_us: cpu * 1e6 / n, allocations: alloc.fdiv(n))
+    end
+  end
+  exit
+end
 
 results = routes.map do |verb, path|
   GC.start
