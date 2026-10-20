@@ -52,6 +52,35 @@ class MemoTest < Minitest::Test
       url.replace("/assets/other.js")
       raise "mutable key" unless joined(base, url).path == "/assets/other.js"
       raise "old key poisoned" unless joined(base, "../assets/first.js?x=2#fragment").path == "/assets/first.js"
+      # Force the thread turns possible before/after the intrinsic returns.
+      %i[before after].product(%i[bytes encoding]).each do |turn, change|
+        saved = "/during-#{turn}-#{change}"
+        input = saved.dup
+        other = change == :bytes ? "/replacement-#{turn}" : saved.dup.force_encoding(Encoding::US_ASCII)
+        expected = outcome { URI.join(base, saved) }
+        ready, done = Queue.new, Queue.new
+        worker = Thread.new { ready.pop; input.replace(other); done << true }
+        actual = outcome do
+          Lowrail::Memo.join(0, URI, base, input) do |r,b,u|
+            if turn == :before
+              ready << true
+              done.pop
+            end
+            value = r.join(b,u)
+            if turn == :after
+              ready << true
+              done.pop
+            end
+            value
+          end
+        end
+        worker.join
+        raise "changed during URI computation: #{turn}/#{change}" unless actual == expected
+        2.times do
+          raise "old URI key poisoned" unless outcome { joined(base, saved) } == expected
+          raise "new URI key poisoned" unless outcome { joined(base, other) } == outcome { URI.join(base, other) }
+        end
+      end
       cases = ["", "?q=x y", "#f", "//cdn.test:99/assets/x", "https://cdn.test/root/x", "http:opaque",
         "a/../../b", "/%ff", "mailto:x@y", "has space", "\xFF".b, nil, URI("/relative")]
       bases = ["https://a.test/a/../b/", "http://u:p@[::1]:8080/root/", "https://a.test".b]
@@ -264,6 +293,32 @@ class MemoTest < Minitest::Test
       raise "shared return" unless hashed(input) == expected && !hashed(input).frozen?
       input.replace("different")
       raise "mutable key" unless hashed(input) == Digest::SHA256.base64digest(input)
+      %i[before after].each do |turn|
+        saved = "during-#{turn}"
+        input = saved.dup
+        other = "replacement-#{turn}"
+        expected_digest = Digest::SHA256.base64digest(saved)
+        ready, done = Queue.new, Queue.new
+        worker = Thread.new { ready.pop; input.replace(other); done << true }
+        actual = Lowrail::Memo.digest(0, Digest::SHA256, input) do |r,s|
+          if turn == :before
+            ready << true
+            done.pop
+          end
+          value = r.base64digest(s)
+          if turn == :after
+            ready << true
+            done.pop
+          end
+          value
+        end
+        worker.join
+        raise "changed during digest computation: #{turn}" unless actual == expected_digest
+        2.times do
+          raise "old digest key poisoned" unless hashed(saved) == expected_digest
+          raise "new digest key poisoned" unless hashed(other) == Digest::SHA256.base64digest(other)
+        end
+      end
       ["\xFF\0".b, "abc".b, "abc".encode("UTF-16LE"), ""].each do |s|
         2.times do
           actual = hashed(s)

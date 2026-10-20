@@ -70,20 +70,22 @@ module Lowrail
       return yield(receiver, base, relative) unless NATIVE_TIMEOUT && TIMEOUT.call.nil?
       memo = prepared(id)
       return yield(receiver, base, relative) unless memo && receiver.equal?(memo[:uri]) && constants_hold?(memo) &&
-        plain_string?(base) && plain_string?(relative) && base.ascii_only? && relative.ascii_only? &&
-        /\Ahttps?:\/\//i.match?(base) && !/\A(?!https?:)[a-z][a-z0-9+.-]*:/i.match?(relative)
+        plain_string?(base) && plain_string?(relative)
+      base_snapshot, relative_snapshot = base.dup.freeze, relative.dup.freeze
+      return yield(receiver, base, relative) unless base_snapshot.ascii_only? && relative_snapshot.ascii_only? &&
+        /\Ahttps?:\/\//i.match?(base_snapshot) && !/\A(?!https?:)[a-z][a-z0-9+.-]*:/i.match?(relative_snapshot)
       # Encoding is part of the key: Ruby string equality alone equates ASCII
       # strings in several encodings, but URI component encodings are observable.
-      key = [base, base.encoding, relative, relative.encoding]
+      key = [base_snapshot, base_snapshot.encoding, relative_snapshot, relative_snapshot.encoding]
       if (value = memo[:values][key])
         result = copy(value)
         Stats.count(id, true) if defined?(Stats) && Stats.enabled?
         return result
       end
-      result = yield(receiver, base, relative) # original lexical dispatch; exceptions outside rescue
+      result = yield(receiver, base_snapshot, relative_snapshot) # original lexical dispatch; exceptions outside rescue
       if memo[:values].size < LIMIT && [URI::HTTP, URI::HTTPS].include?(result.class) &&
           IVARS.bind_call(result).all? { |v| x = IVGET.bind_call(result, v); x.nil? || x.instance_of?(String) || x.instance_of?(Integer) }
-        memo[:values][[base.dup.freeze, base.encoding, relative.dup.freeze, relative.encoding]] = copy(result)
+        memo[:values][key] = copy(result)
       end
       result
     end
@@ -92,14 +94,17 @@ module Lowrail
       return yield(receiver, string) unless Ractor.main?
       memo = prepared(id)
       return yield(receiver, string) unless memo && constants_hold?(memo) && receiver.equal?(memo[:constants][1]) && plain_string?(string)
-      key = [string, string.encoding]
+      # Lookup, computation and insertion must see identical bytes/encoding,
+      # even if another thread mutates the caller's input at a Ruby return.
+      input = string.dup.freeze
+      key = [input, input.encoding]
       if (value = memo[:values][key])
         result = value.dup
         Stats.count(id, true) if defined?(Stats) && Stats.enabled?
         return result
       end
-      result = yield(receiver, string)
-      memo[:values][[string.dup.freeze, string.encoding]] = result.dup.freeze if memo[:values].size < LIMIT
+      result = yield(receiver, input)
+      memo[:values][key] = result.dup.freeze if memo[:values].size < LIMIT
       result
     end
 
