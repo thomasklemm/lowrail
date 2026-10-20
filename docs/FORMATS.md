@@ -286,6 +286,9 @@ selected compiler's options at `storage_to_output`; an opaque compiler whose
 recipe cannot be observed is not trusted. The original ISeq fingerprint
 additionally detects source transforms and bytecode hijacks. It alone would
 not detect option changes that affect only newly introduced lowered code.
+Registered require-hooks hijacks therefore cannot borrow the selected
+Bootsnap compiler's recipe: their warm cached bytecode runs unchanged when
+the actual compilation policy is no longer observable.
 
 The top-level `compile_option` remains build-process metadata, not a file
 delivery guard. Older format-1 file entries lacking the per-file contract

@@ -147,6 +147,44 @@ class LoaderTest < Minitest::Test
     end
   end
 
+  def test_cached_hijacks_do_not_inherit_bootsnap_compiler_options
+    skip "require-hooks/bootsnap not installed" if REQUIRE_HOOKS_VERSIONS.empty? || BOOTSNAP_VERSIONS.empty?
+    REQUIRE_HOOKS_VERSIONS.product(BOOTSNAP_VERSIONS).each do |rh, bs|
+      realpath_tmpdir do |dir|
+        frozen_app(dir)
+        # The original ISeq cannot reveal freezing options, but the lowered
+        # source introduces a string. A recipe mismatch must still decline it.
+        File.write(File.join(dir, "app.rb"), "VALUE = 1\n")
+        File.write(File.join(dir, ".lowrail/src/app.rb"), "VALUE = 'lowered'.frozen?\n")
+        env = { "RUBYOPT" => "-I#{GEM_LIB}", "RH" => rh, "BS" => bs,
+                "ORDER" => "bootsnap", "RAILS_ENV" => "test" }
+        _, err, status = ruby(COMPILE, File.join(dir, "units.json"), chdir: dir, setup: false, env: env)
+        assert status.success?, err
+        assert_match(/compiled 1 file/, err)
+        code = <<~'RUBY'
+          require "json"
+          require_relative "config/policy"
+          gem "require-hooks", ENV.fetch("RH")
+          require "require-hooks/setup"
+          RequireHooks.hijack_load(patterns: [File.join(Dir.pwd, "app.rb")]) do |path, source|
+            previous = RubyVM::InstructionSequence.compile_option
+            RubyVM::InstructionSequence.compile_option = {frozen_string_literal: true}
+            RubyVM::InstructionSequence.compile_file(path)
+          ensure
+            RubyVM::InstructionSequence.compile_option = previous
+          end
+          require "lowrail/setup"
+          require_relative "app"
+          puts JSON.generate(VALUE)
+        RUBY
+        %w[1 1 0].each do |mode|
+          assert_equal 1, ruby_json(code, chdir: dir, setup: false, env: env.merge("LOWRAIL" => mode)),
+                       "require-hooks #{rh}, bootsnap #{bs}, LOWRAIL=#{mode}: hijack policy must survive cold/warm caches"
+        end
+      end
+    end
+  end
+
   def test_source_transforms_are_not_bypassed
     skip "freezolite/require-hooks not installed" if REQUIRE_HOOKS_VERSIONS.empty? || Gem::Specification.find_all_by_name("freezolite").empty?
     realpath_tmpdir do |dir|

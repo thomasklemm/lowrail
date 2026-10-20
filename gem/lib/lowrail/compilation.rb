@@ -127,6 +127,13 @@ module Lowrail
       def storage_to_output(...)
         defaults = RubyVM::InstructionSequence.compile_option
         iseq = super
+        return iseq unless iseq && Compilation.tracked?(iseq.absolute_path)
+        # A require-hooks hijack can compile with a different recipe from
+        # Bootsnap's selected compiler. Warm caches do not reveal that call;
+        # the binary alone cannot prove options unused by the original code.
+        if defined?(::RequireHooks::Bootsnap) && ::RequireHooks.context_for(iseq.absolute_path).hijack?
+          return iseq
+        end
         # Unknown custom compilers must provide their real compiler call;
         # inherited cache code does not prove how they compiled the source.
         cache = ::Bootsnap::CompileCache::ISeq

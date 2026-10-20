@@ -36,6 +36,13 @@ loaded lazily, but its nested requires preserve the active compile defaults.
 Lowrail never substitutes before Bootsnap serializes: its cache contains
 originals, safe for subsequent `LOWRAIL=0` processes or changed builds.
 
+A require-hooks bytecode hijack can use options unrelated to Bootsnap's
+selected compiler. Its warm cached binary does not prove that recipe, even
+when its bytes match the original (options may affect only strings introduced
+by lowering). Lowrail therefore never borrows Bootsnap's options for a path
+with a registered hijack. Observable direct compiler calls remain guarded;
+opaque cached hijacks retain their original bytecode.
+
 This favors correctness over boot speed: the original ISeq must still be
 compiled or read from the app's cache and fingerprinted. No boot-time or
 application-speed improvement is claimed here.
@@ -81,26 +88,32 @@ gem's detection.
 
 ## Executed regression matrix
 
-`gem/test/loader_test.rb` uses a tiny app with frozen literals, an excluded
-nested require, and a `frozen_string_literal: false` file. Every active run
-asserts that the lowered file was served exactly once and the fast path ran;
-two active runs and an off run check cold/warm cache safety and baseline
-literal behavior.
+The Freezolite matrix in `gem/test/loader_test.rb` uses a tiny app with frozen
+literals, an excluded nested require, and a `frozen_string_literal: false`
+file. Every active run asserts that the lowered file was served exactly once
+and the fast path ran; two active runs and an off run check cold/warm cache
+safety and baseline literal behavior.
 
 - MRI 4.0.7: Freezolite 0.7.0; require-hooks 0.4.0 and 0.5.1; no Bootsnap
   (both orders), and Bootsnap 1.18.6, 1.24.6, 1.26.0 (all six permutations).
-- MRI 3.4.11: Freezolite 0.7.0, require-hooks 0.5.1, Bootsnap 1.26.0;
-  both orders without Bootsnap and all six permutations with it.
+- MRI 3.4.11: Freezolite 0.7.0, require-hooks 0.5.1, Bootsnap 1.18.6 and
+  1.26.0; both orders without Bootsnap and all six permutations with each.
 - Selected Bootsnap frozen-literal compiler with Lowrail before/after it;
   removing the policy refuses the old artifact.
 - Changed options after a successful load; options affecting only strings
   introduced by lowering; changed runtime source transforms; build-time
   rejection of transformed source; corrupt/missing/old artifacts; actual
   Coverage counters; no default-gem activation during setup.
+- Cached require-hooks hijacks with their own temporary compiler options:
+  cold, warm and off runs preserve the original result for every installed
+  require-hooks/Bootsnap pair above, including when original ISeq bytes alone
+  cannot detect the recipe mismatch.
 
 The two new loader-policy regression cases fail on pre-fix main (two
-failures); the full gem suite passes with the fix. Reproduce with the repo's
-mise Ruby and installed app dependencies:
+failures). The cached-hijack regression also fails without its follow-up
+guard (the warm run incorrectly serves lowered code); the full gem suite
+passes with both fixes. Reproduce with the repo's mise Ruby and installed
+app dependencies:
 
 ```sh
 gem install freezolite require-hooks bootsnap --no-document
