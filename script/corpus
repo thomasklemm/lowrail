@@ -68,6 +68,9 @@ if [ "$name" != real-blog ]; then
       react-starter-kit) npm ci --no-audit --no-fund ;;
     esac
     RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec rails db:prepare assets:precompile
+    if [ "$name" = react-starter-kit ]; then
+      RAILS_ENV=production npx vite build --ssr
+    fi
   )
 else
   (cd "$dest" && bundle install --quiet)
