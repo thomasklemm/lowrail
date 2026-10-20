@@ -55,7 +55,7 @@ module RequestPairs
   # Do not bootstrap hundreds of blocks from one process as if they were
   # hundreds of independent boots. Keep failed controls, never retry to green.
   def self.experiment(app, out, route)
-    return run(app, out, route) if ENV["BENCH_COUNTER"] == "callgrind"
+    return run(app, out, route) if %w[callgrind gc].include?(ENV["BENCH_COUNTER"])
     count = Integer(ENV.fetch("BENCH_COHORTS", "5"))
     return run(app, out, route) if count == 1
     raise "at least 5 independent cohorts required" if count < 5
@@ -86,8 +86,9 @@ module RequestPairs
     FileUtils.mkdir_p(out, mode: 0o700)
     seed = Integer(ENV.fetch("BENCH_SEED", "41231"))
     counter = ENV["BENCH_COUNTER"] == "callgrind"
-    rounds = Integer(ENV.fetch("BENCH_ROUNDS", counter ? "3" : "8"))
-    raise "too few rounds" if rounds < (counter ? 3 : 8)
+    diagnostic = ENV["BENCH_COUNTER"] == "gc"
+    rounds = Integer(ENV.fetch("BENCH_ROUNDS", counter || diagnostic ? "3" : "8"))
+    raise "too few rounds" if rounds < (counter || diagnostic ? 3 : 8)
     workers = {}
     environments = {}
     samples = []
@@ -128,16 +129,18 @@ module RequestPairs
           "LOWRAIL_UNITS" => layer == "disabled" ? "" : nil,
           "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil,
           "RUBYOPT" => build_root ? "-I#{lib} -rlowrail/setup" : nil,
-          "BENCH_PIPE" => counter ? nil : "1", "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter ? "50" : "400"),
+          "BENCH_PIPE" => counter || diagnostic ? nil : "1",
+          "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter || diagnostic ? "50" : "400"),
           "BENCH_JSON" => nil, "BENCH_PROFILE" => nil, "BENCH_DUMP" => nil }
         environments[layer] = env
-        next if counter
+        next if counter || diagnostic
         stdin, stdout, wait = Open3.popen2e(env, RbConfig.ruby, "--yjit", File.join(__dir__, "requests.rb"), route, chdir: app)
         workers[layer] = { stdin: stdin, stdout: stdout, wait: wait, log: File.open(File.join(out, "#{layer}.log"), "w") }
         metadata[:workers][layer] = receive(workers.fetch(layer))
         warn "warm #{File.basename(app)} #{layer}"
       end
       return instructions(environments, app, out, route, metadata) if counter
+      return diagnostics(environments, app, out, route, metadata) if diagnostic
       # One fixed request count for every layer, calibrated to baseline CPU
       # time. CPU time is primary; wall time exposes scheduling/IO delays.
       calibration = command(workers.fetch("off_a"), requests: 100)
@@ -244,6 +247,38 @@ module RequestPairs
     File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary))
     puts JSON.pretty_generate(summary)
     summary.fetch(:aa).fetch(:pass)
+  end
+
+  def self.diagnostics(environments, app, out, route, metadata)
+    jit = ENV.fetch("BENCH_JIT", "0") == "1"
+    metadata.merge!(counter: "gc", yjit: jit, samples: [])
+    rng = Random.new(metadata.fetch(:seed))
+    metadata.fetch(:rounds).times do |round|
+      row = {}
+      environments.keys.product(%w[window memory]).shuffle(random: rng).each do |layer, mode|
+        label = "#{round}-#{layer}-#{mode}"
+        env = environments.fetch(layer).merge("BENCH_GC_MODE" => mode, "BENCH_HEAP_DUMP" => nil)
+        if ENV["BENCH_HEAP_DUMPS"] == "1" && round.zero? && mode == "memory" && %w[off_a default].include?(layer)
+          env["BENCH_HEAP_DUMP"] = File.join(out, "#{label}.heap.jsonl")
+        end
+        log = File.join(out, "#{label}.log")
+        ok = system(env, RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "gc_requests.rb"),
+          route, chdir: app, out: log, err: [:child, :out])
+        raise "GC diagnostic failed: #{label}; inspect logs" unless ok
+        lines = File.readlines(log)
+        worker = JSON.parse(lines.find { _1.start_with?("LOWRAIL_BENCH ") }.to_s.delete_prefix("LOWRAIL_BENCH "))
+        raise "unexpected JIT mode" unless worker.fetch("yjit") == jit
+        metadata.fetch(:workers)[label] = worker
+        (row[layer] ||= {})[mode] = lines.filter_map do |line|
+          JSON.parse(line.delete_prefix("LOWRAIL_MEMORY ")) if line.start_with?("LOWRAIL_MEMORY ")
+        end
+      end
+      metadata.fetch(:samples) << row
+      File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata))
+      warn "GC/memory diagnostic round #{round + 1}/#{metadata.fetch(:rounds)}"
+    end
+    # Diagnosis, not an instruction or latency comparison/control verdict.
+    true
   end
 
   def self.receive(worker)

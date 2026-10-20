@@ -2,8 +2,23 @@
 
 require "minitest/autorun"
 require_relative "request_pairs"
+require_relative "gc_requests"
 
 class RequestPairsTest < Minitest::Test
+  def test_memory_attribution_deduplicates_containers_without_following_weak_references
+    text = "x" * 512
+    array = [text, text]
+    array << array
+    key, value = Object.new, "y" * 8192
+    weak = ObjectSpace::WeakMap.new
+    weak[key] = value
+    root = { "data" => array, :weak => weak }
+    result = RequestMemory.containers([root, array])
+    assert_equal({ "Hash" => 1, "Array" => 1, "String" => 2, "ObjectSpace::WeakMap" => 1 }, result[:objects])
+    assert_equal [root, root.keys.first, array, text, weak].sum { ObjectSpace.memsize_of(_1) }, result[:bytes]
+    assert_same value, weak[key]
+  end
+
   def test_paired_bootstrap_removes_round_drift_but_not_a_real_effect
     rounds = 24.times.map do |i|
       value = 1000.0 + 50 * i

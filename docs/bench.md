@@ -139,6 +139,50 @@ instructions/request are available. Callgrind supplies the software counts
 above; do not divide whole-process perf totals (including boot/warmup) by
 timed requests.
 
+## GC and retained-memory diagnosis
+
+```sh
+BENCH_COUNTER=gc BENCH_HEAP_DUMPS=1 mise exec -- ruby bench/request_pairs.rb \
+  .corpus/real-blog /tmp/blog-memory GET:/articles
+# Same headers/cache/AR-build/old-runtime options as above. BENCH_JIT=1 also
+# permits a separate native YJIT diagnosis; default is interpreter, 3 rounds.
+```
+
+This runs the same layers in independent **diagnostic** workers, not the
+instruction/time workers: enumeration and its reports would perturb those
+heaps. For each layer/round, one worker boots, warms 50 requests, full-GCs,
+and records `GC.stat` before/after 200 requests. Both stat hashes are populated
+before that GC; endpoint observation does not allocate a new Hash in the
+window. The output keeps absolute endpoints and differences, including
+minor/major collections, marking/sweeping time, live slots, old objects and
+total allocated objects. No GC is suppressed and no collector cost subtracted.
+
+A second worker records boot and post-warmup full-GC snapshots:
+`ObjectSpace.memsize_of_all`, `count_objects_size`, `count_imemo_objects`,
+live Ruby `InstructionSequence` wrappers, and Lowrail's manifest/facts/template
+containers, class caches and weak-map storage. Within each attribution, shared
+and cyclic containers count once; sections overlap and must **not** be summed.
+Weak referents, classes and arbitrary object edges are not traversed. This is
+bounded ownership evidence, not a dominator/retained-size analysis of the heap.
+
+On Ruby 4.0.7, `memsize_of_all` excludes internal objects, including **all
+IMEMOs**, whereas `count_objects_size` includes them. Thus the former is not
+the total retained heap. Both are size hints, not RSS; typed native allocations
+may be incomplete. ISeq Ruby wrappers are not all VM ISeqs: use
+`imemo_counts.imemo_iseq` for the latter. Also, `count_objects_size` counts an
+ISeq body's bytes on both its native IMEMO and its Ruby wrapper when one exists.
+For native ISeq bytes, sum only heap-dump `IMEMO/imemo_type=iseq` records, not
+the `DATA/struct=T_IMEMO/iseq` duplicates. See Ruby's
+[size walker](https://github.com/ruby/ruby/blob/v4.0.7/ext/objspace/objspace.c#L59-L69),
+[unfiltered category walker](https://github.com/ruby/ruby/blob/v4.0.7/ext/objspace/objspace.c#L179-L184)
+and [wrapper size](https://github.com/ruby/ruby/blob/v4.0.7/iseq.c#L1545-L1548).
+
+Optional full heap dumps are emitted only for round-zero off/default memory
+workers, after their snapshots. **They can contain credentials and response
+data: keep them private, never commit or publish them.** Raw stat/snapshot
+results live in `samples.json`; these diagnostics are not latency samples and
+do not claim an A/A instruction-control verdict.
+
 ## Profiles and safe reductions
 
 The production manifests are held fixed across runtime changes (11 default
@@ -153,10 +197,18 @@ These fixes change runtime delivery/counting, not lowering decisions:
   invalidation semantics. Counting is prepended only by `Stats.enable!`,
   removing `defined?(Stats)`/`Stats.enabled?` from normal calls. Three YJIT
   Callgrind micro runs (1.5 million cached checks each) measured about
-  **1,294.537 → 662.488 instructions/check (−48.824%)**, with less than
-  0.001 instruction/check spread within each version. This is a guard micro,
+  **1,294.967 → 662.956 instructions/check (−48.805%)**, with less than
+  0.02 instruction/check spread within each version. This is a guard micro,
   **not a 49% request speedup**. Late activation, both aliases, two classes,
   invalidation and restoration are regression-tested.
+
+`bench/guard_cost.rb` keeps the micro reproducible. Select the old/new library
+with Ruby's `-I`; it reports actual YJIT state. For the instruction micro,
+set `GUARD_REQUESTS=100000` and `BENCH_CALLGRIND_EXTENSION` to the shared library
+produced by the request counter, then run under the same Callgrind flags.
+Divide the client-dump `summary: Ir` by the reported 1,500,000 checks. The tiny
+fixed clock/loop seam is included in both versions; emulated CPU time is not
+a native time result.
 
 Across 100 warmed native requests per layer, tracing found **no definition
 hooks, invalidations, file-loader calls or template compilation**. There is
