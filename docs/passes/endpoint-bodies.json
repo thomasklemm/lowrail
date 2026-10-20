@@ -1,0 +1,2437 @@
+{
+  "schema_version": 1,
+  "study": "Guarded body-installed endpoint pricing",
+  "verdict": "guarded endpoint: stopped; requires a sealed contract or a VM epoch",
+  "scope": "Ten internal-method checks followed by unchanged original body; no accelerated implementation or complete certificate",
+  "protocol": "c9d2397",
+  "corpus": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+  "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+  "seed": 41231,
+  "rounds": 6,
+  "iterations": 200,
+  "heap_slots": [
+    1000000,
+    250000,
+    100000,
+    20000,
+    10000
+  ],
+  "requested_yjit": false,
+  "actual_yjit": [
+    false
+  ],
+  "sources": {
+    "bench/experiments/endpoint_bodies.rb": "d8eb742ab59343070bcfc63688c6abb18d88514bcf4cbcadabfe3048d6b0f11d",
+    "$REPO/bench/heap_windows.rb": "8998440ce9236fe1aea7b37dda42036c0096629f24e71c5c46dc5aa7dd79fc20",
+    "$REPO/bench/request_pairs.rb": "3e12fa680a43e5740e32f3acc3bfe70c9ead76842b8d66fdac2a9e0c6a452fb0",
+    "$REPO/gem/lib/lowrail/ar_guard.rb": "516c2617c9595ec8749253f89494d7866789c82709f804ab35e34b8b0a5d4068",
+    "$REPO/gem/lib/lowrail/ar_instantiate.rb": "736dc40f3302e8564eb72d459a9f2be2804c1c67eaed19dfbdd52c022d05c90a",
+    "$REPO/gem/lib/lowrail/ar_instantiate_build.rb": "f726732acf8fbc18d9f8c94529f5b841c94dc7c924da5635de4a866ae226b356",
+    "$REPO/gem/lib/lowrail/ar_plan_build.rb": "e87421da59bcefb63b414a8e9c7adcc27c47a3c0aa03551f182fe5d02ddbb47a",
+    "$REPO/gem/lib/lowrail/ar_plan_facts.rb": "dfd04d08ab7e74a7ed7b30fcf53ff2bc6001d3ade6b85644ca12c372ead47d9a",
+    "$REPO/gem/lib/lowrail/ar_plan_sites.rb": "0bf7051d9af853c832c69426623ccb920490c3c05b136738c84457601c7d2dcb",
+    "$REPO/gem/lib/lowrail/ar_plans.rb": "aa4ade7557aac4a877bd2900e1cabd99fd636476d11d7d079db2257c36c98441",
+    "$REPO/gem/lib/lowrail/ar_shadow.rb": "6d95adb126d88f62c74bc9c5858bdffe2d41a017ae19e030f9b375b277afb422",
+    "$REPO/gem/lib/lowrail/compilation.rb": "117a290092cb72f21f074737c40a2859300a369b62b08bf57e24ac94c816b98a",
+    "$REPO/gem/lib/lowrail/compiler.rb": "85a5ae4f078ac7ccf26de6f0bc1b4ae69bc45e88ccaee2a2ddca7ea8d90f8f4c",
+    "$REPO/gem/lib/lowrail/digest_memo.rb": "52fc24f70cbfb2943f8dec2b6bff7e487506c558e789fde0168e862358cc2946",
+    "$REPO/gem/lib/lowrail/digest_memo_build.rb": "473cb2383546b0f674d9e3bae970603230dbc8289768fe0d11ec85eec9ede2fa",
+    "$REPO/gem/lib/lowrail/endpoint.rb": "8d1e1ac967326f6ba40ba988a797bc5868106a10d860d4a9acb13430ff367821",
+    "$REPO/gem/lib/lowrail/endpoint_build.rb": "f879fc7ea70028062daea277b2235703a8b91e71151b8f68edc90e85e3fc2063",
+    "$REPO/gem/lib/lowrail/facts.rb": "77b2e93b27f2eb7d75a900900d8da428c3febe8d179df5a17ecf6d7a92ca9d2a",
+    "$REPO/gem/lib/lowrail/guard.rb": "d80db22d9c6daae330101b8055503b96382219a72f488ab72afe2ab05b364a60",
+    "$REPO/gem/lib/lowrail/inertia_config.rb": "b0c0b3927b01876d9298c3e6b2f8bae77abf55ab984b4962934d8c99d208b2a1",
+    "$REPO/gem/lib/lowrail/inertia_config_build.rb": "d4ac21ee498700ec426c96b7d7efceacf5cea9b627ee484278a6a9827d9af3bd",
+    "$REPO/gem/lib/lowrail/loader.rb": "0b88d589c155aa2ccea7f5dc5f26c155f0575a88ac1408b707748afd4ed1f115",
+    "$REPO/gem/lib/lowrail/manifest.rb": "45dabea68c2267506592f17f2f5b1c2cf6e907e308c72ba3603572081d5aaf2c",
+    "$REPO/gem/lib/lowrail/materialize.rb": "1c5e0f460103b3e5b3c3b5455f7cc67135fd18068505bb4041a522e47f75a2ed",
+    "$REPO/gem/lib/lowrail/memo.rb": "e850c6c0bfaf78850d588907b2c4f5ab76a73b65aeefcf85a585bf211b9dfb16",
+    "$REPO/gem/lib/lowrail/memo_facts.rb": "413607d2f942e4886737daeb6b40f96da93df5811a24144222511835817f0352",
+    "$REPO/gem/lib/lowrail/minitest.rb": "b95986c53a5a31f54caf1315c1254715c405698be7f431a77318ade13a09a9b4",
+    "$REPO/gem/lib/lowrail/observe.rb": "f68517aff2883532382262904447c62e5f7d731f9bdd1660ef593ea2fa9d036a",
+    "$REPO/gem/lib/lowrail/oracle_routes.rb": "3e5543c327ea86c306f288df386e98efc14d7741541ed6e7d2caea252b354802",
+    "$REPO/gem/lib/lowrail/passes.rb": "e81b364538c4860418f6b1d0d368fa16b5491225b3dfa7880da305c60e26ba2c",
+    "$REPO/gem/lib/lowrail/preload_build.rb": "5d562d1c33884481c73ca3f0fd89f33d776dfa01fbdc3267880a24e6e2021b28",
+    "$REPO/gem/lib/lowrail/preload_facts.rb": "9abfb8d8312f8774454d15c8553b689caf89602f03545689e7fd2a3259437532",
+    "$REPO/gem/lib/lowrail/preload_plans.rb": "5ba8bd6ca011d68ae077a87c172b952e91a2cc7a62b81b7102eeff28e0072b77",
+    "$REPO/gem/lib/lowrail/routes.rb": "4c5b749e77209c7a306d6c716e4d37dfe14d53e80847b7a0f9ad714eb54c0f85",
+    "$REPO/gem/lib/lowrail/rspec.rb": "790c1fcedb5df0834909632d69e8e48cbd0769d6576efc1c6b3287ae07a31422",
+    "$REPO/gem/lib/lowrail/script_capture.rb": "f85cb757942ca80cfdce8f43a6933d0837f4d214c4d72a46007fdfc1b821a54d",
+    "$REPO/gem/lib/lowrail/setup.rb": "83180b9cbbf6e2538c0a4c2f11155ae49392f64e87625dd608911dee19df5c6f",
+    "$REPO/gem/lib/lowrail/sql_trace.rb": "c8e5c3636aca52c45389a6df13b1cf6078d29c1a186b000cc8c2aba82ae7316f",
+    "$REPO/gem/lib/lowrail/stats.rb": "cdc78ed35415d55e6a32ffaa5f2c5aba5809f8b4608fa00f3452db85df464e95",
+    "$REPO/gem/lib/lowrail/templates.rb": "ce0b4e9a505aa282f131291329e7a552a11cc0fa5fda692d152e3686da08279e",
+    "$REPO/gem/lib/lowrail.rb": "f78d212a96ab1c533c4ca1090ad8b91693bf4bcfa2199230f5f650b7a86e7fed"
+  },
+  "contract": {
+    "off": {
+      "metadata": {
+        "owner": "BodyFixture::Child",
+        "name": "value",
+        "original_name": "value",
+        "source_location": [
+          "$OUT/fixture.rb",
+          7
+        ],
+        "parameters": [
+          [
+            "opt",
+            "x"
+          ],
+          [
+            "rest",
+            "rest"
+          ],
+          [
+            "key",
+            "flag"
+          ],
+          [
+            "keyrest",
+            "kw"
+          ],
+          [
+            "block",
+            "block"
+          ]
+        ],
+        "arity": -1,
+        "super_owner": "BodyFixture::Base",
+        "repeated_bound_equal": true,
+        "repeated_unbound_equal": true,
+        "alias_equal": true,
+        "bound_unbound_equal": true,
+        "rebound_equal": true,
+        "private": true,
+        "result": [
+          27,
+          [
+            7
+          ],
+          11,
+          {
+            "more": 13
+          }
+        ],
+        "block_values": [
+          2
+        ],
+        "exception_frames": [
+          [
+            9,
+            "BodyFixture::Child#value",
+            "value"
+          ]
+        ]
+      },
+      "mutation": {
+        "active": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "next": "changed",
+        "alias": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "saved": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "rebound": [
+          19,
+          [],
+          3,
+          {}
+        ]
+      },
+      "reload": {
+        "old_handle_survives": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "old_equal_reloaded": false,
+        "replaced_equal_reloaded": false
+      },
+      "trace": [
+        [
+          "line",
+          1,
+          null
+        ],
+        [
+          "c_call",
+          1,
+          "const_added"
+        ],
+        [
+          "line",
+          2,
+          null
+        ],
+        [
+          "c_call",
+          2,
+          "const_defined?"
+        ],
+        [
+          "c_call",
+          2,
+          "initialize"
+        ],
+        [
+          "c_call",
+          2,
+          "const_added"
+        ],
+        [
+          "line",
+          3,
+          null
+        ],
+        [
+          "c_call",
+          3,
+          "const_added"
+        ],
+        [
+          "c_call",
+          3,
+          "inherited"
+        ],
+        [
+          "line",
+          4,
+          null
+        ],
+        [
+          "c_call",
+          4,
+          "method_added"
+        ],
+        [
+          "line",
+          6,
+          null
+        ],
+        [
+          "c_call",
+          6,
+          "const_added"
+        ],
+        [
+          "c_call",
+          6,
+          "inherited"
+        ],
+        [
+          "line",
+          7,
+          null
+        ],
+        [
+          "c_call",
+          7,
+          "method_added"
+        ],
+        [
+          "line",
+          13,
+          null
+        ],
+        [
+          "c_call",
+          13,
+          "method_added"
+        ],
+        [
+          "line",
+          14,
+          null
+        ],
+        [
+          "c_call",
+          14,
+          "private"
+        ],
+        [
+          "line",
+          15,
+          null
+        ],
+        [
+          "c_call",
+          15,
+          "method_added"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "caller_locations"
+        ],
+        [
+          "c_call",
+          18,
+          "map"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          19,
+          null
+        ],
+        [
+          "c_call",
+          19,
+          "caller_locations"
+        ],
+        [
+          "c_call",
+          19,
+          "map"
+        ],
+        [
+          "line",
+          19,
+          null
+        ],
+        [
+          "c_call",
+          19,
+          "path"
+        ],
+        [
+          "c_call",
+          19,
+          "lineno"
+        ],
+        [
+          "c_call",
+          19,
+          "label"
+        ],
+        [
+          "call",
+          7,
+          "value"
+        ],
+        [
+          "line",
+          8,
+          "value"
+        ],
+        [
+          "line",
+          9,
+          "value"
+        ],
+        [
+          "c_call",
+          9,
+          "=="
+        ],
+        [
+          "c_call",
+          9,
+          "=="
+        ],
+        [
+          "line",
+          10,
+          "value"
+        ],
+        [
+          "line",
+          11,
+          "value"
+        ],
+        [
+          "call",
+          4,
+          "value"
+        ],
+        [
+          "c_call",
+          4,
+          "+"
+        ]
+      ],
+      "load_stack": [
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "Kernel#require"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "block (2 levels) in <main>"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "TracePoint#enable"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "block in <main>"
+        ],
+        [
+          "$RUBY/lib/ruby/4.0.0/tmpdir.rb",
+          105,
+          "Dir.mktmpdir"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          85,
+          "<main>"
+        ]
+      ],
+      "load_frame": [
+        [
+          "$OUT/fixture.rb",
+          19,
+          "<top (required)>"
+        ]
+      ],
+      "iseq_sha256": "37ca375862d4f7d3026867ee45b69d077750848ff1edc28c856930d00a0e12bc",
+      "served": 0
+    },
+    "original": {
+      "metadata": {
+        "owner": "BodyFixture::Child",
+        "name": "value",
+        "original_name": "value",
+        "source_location": [
+          "$OUT/fixture.rb",
+          7
+        ],
+        "parameters": [
+          [
+            "opt",
+            "x"
+          ],
+          [
+            "rest",
+            "rest"
+          ],
+          [
+            "key",
+            "flag"
+          ],
+          [
+            "keyrest",
+            "kw"
+          ],
+          [
+            "block",
+            "block"
+          ]
+        ],
+        "arity": -1,
+        "super_owner": "BodyFixture::Base",
+        "repeated_bound_equal": true,
+        "repeated_unbound_equal": true,
+        "alias_equal": true,
+        "bound_unbound_equal": true,
+        "rebound_equal": true,
+        "private": true,
+        "result": [
+          27,
+          [
+            7
+          ],
+          11,
+          {
+            "more": 13
+          }
+        ],
+        "block_values": [
+          2
+        ],
+        "exception_frames": [
+          [
+            9,
+            "BodyFixture::Child#value",
+            "value"
+          ]
+        ]
+      },
+      "mutation": {
+        "active": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "next": "changed",
+        "alias": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "saved": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "rebound": [
+          19,
+          [],
+          3,
+          {}
+        ]
+      },
+      "reload": {
+        "old_handle_survives": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "old_equal_reloaded": false,
+        "replaced_equal_reloaded": false
+      },
+      "trace": [
+        [
+          "line",
+          1,
+          null
+        ],
+        [
+          "c_call",
+          1,
+          "const_added"
+        ],
+        [
+          "line",
+          2,
+          null
+        ],
+        [
+          "c_call",
+          2,
+          "const_defined?"
+        ],
+        [
+          "c_call",
+          2,
+          "initialize"
+        ],
+        [
+          "c_call",
+          2,
+          "const_added"
+        ],
+        [
+          "line",
+          3,
+          null
+        ],
+        [
+          "c_call",
+          3,
+          "const_added"
+        ],
+        [
+          "c_call",
+          3,
+          "inherited"
+        ],
+        [
+          "line",
+          4,
+          null
+        ],
+        [
+          "line",
+          6,
+          null
+        ],
+        [
+          "c_call",
+          6,
+          "const_added"
+        ],
+        [
+          "c_call",
+          6,
+          "inherited"
+        ],
+        [
+          "line",
+          7,
+          null
+        ],
+        [
+          "line",
+          13,
+          null
+        ],
+        [
+          "line",
+          14,
+          null
+        ],
+        [
+          "c_call",
+          14,
+          "private"
+        ],
+        [
+          "line",
+          15,
+          null
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "caller_locations"
+        ],
+        [
+          "c_call",
+          18,
+          "map"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          19,
+          null
+        ],
+        [
+          "c_call",
+          19,
+          "caller_locations"
+        ],
+        [
+          "c_call",
+          19,
+          "map"
+        ],
+        [
+          "line",
+          19,
+          null
+        ],
+        [
+          "c_call",
+          19,
+          "path"
+        ],
+        [
+          "c_call",
+          19,
+          "lineno"
+        ],
+        [
+          "c_call",
+          19,
+          "label"
+        ],
+        [
+          "call",
+          7,
+          "value"
+        ],
+        [
+          "line",
+          8,
+          "value"
+        ],
+        [
+          "line",
+          9,
+          "value"
+        ],
+        [
+          "c_call",
+          9,
+          "=="
+        ],
+        [
+          "c_call",
+          9,
+          "=="
+        ],
+        [
+          "line",
+          10,
+          "value"
+        ],
+        [
+          "line",
+          11,
+          "value"
+        ],
+        [
+          "call",
+          4,
+          "value"
+        ],
+        [
+          "c_call",
+          4,
+          "+"
+        ]
+      ],
+      "load_stack": [
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "Kernel#require"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "block (2 levels) in <main>"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "TracePoint#enable"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "block in <main>"
+        ],
+        [
+          "$RUBY/lib/ruby/4.0.0/tmpdir.rb",
+          105,
+          "Dir.mktmpdir"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          85,
+          "<main>"
+        ]
+      ],
+      "load_frame": [
+        [
+          "$OUT/fixture.rb",
+          19,
+          "<compiled>"
+        ]
+      ],
+      "iseq_sha256": "37ca375862d4f7d3026867ee45b69d077750848ff1edc28c856930d00a0e12bc",
+      "served": 1
+    },
+    "edited": {
+      "metadata": {
+        "owner": "BodyFixture::Child",
+        "name": "value",
+        "original_name": "value",
+        "source_location": [
+          "$OUT/fixture.rb",
+          7
+        ],
+        "parameters": [
+          [
+            "opt",
+            "x"
+          ],
+          [
+            "rest",
+            "rest"
+          ],
+          [
+            "key",
+            "flag"
+          ],
+          [
+            "keyrest",
+            "kw"
+          ],
+          [
+            "block",
+            "block"
+          ]
+        ],
+        "arity": -1,
+        "super_owner": "BodyFixture::Base",
+        "repeated_bound_equal": true,
+        "repeated_unbound_equal": true,
+        "alias_equal": true,
+        "bound_unbound_equal": true,
+        "rebound_equal": true,
+        "private": true,
+        "result": [
+          27,
+          [
+            7
+          ],
+          11,
+          {
+            "more": 13
+          }
+        ],
+        "block_values": [
+          2
+        ],
+        "exception_frames": [
+          [
+            9,
+            "BodyFixture::Child#value",
+            "value"
+          ]
+        ]
+      },
+      "mutation": {
+        "active": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "next": "changed",
+        "alias": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "saved": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "rebound": [
+          19,
+          [],
+          3,
+          {}
+        ]
+      },
+      "reload": {
+        "old_handle_survives": [
+          19,
+          [],
+          3,
+          {}
+        ],
+        "old_equal_reloaded": false,
+        "replaced_equal_reloaded": false
+      },
+      "trace": [
+        [
+          "line",
+          1,
+          null
+        ],
+        [
+          "c_call",
+          1,
+          "const_added"
+        ],
+        [
+          "line",
+          2,
+          null
+        ],
+        [
+          "c_call",
+          2,
+          "const_defined?"
+        ],
+        [
+          "c_call",
+          2,
+          "initialize"
+        ],
+        [
+          "c_call",
+          2,
+          "const_added"
+        ],
+        [
+          "line",
+          3,
+          null
+        ],
+        [
+          "c_call",
+          3,
+          "const_added"
+        ],
+        [
+          "c_call",
+          3,
+          "inherited"
+        ],
+        [
+          "line",
+          4,
+          null
+        ],
+        [
+          "line",
+          6,
+          null
+        ],
+        [
+          "c_call",
+          6,
+          "const_added"
+        ],
+        [
+          "c_call",
+          6,
+          "inherited"
+        ],
+        [
+          "line",
+          7,
+          null
+        ],
+        [
+          "line",
+          13,
+          null
+        ],
+        [
+          "line",
+          14,
+          null
+        ],
+        [
+          "c_call",
+          14,
+          "private"
+        ],
+        [
+          "line",
+          15,
+          null
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "caller_locations"
+        ],
+        [
+          "c_call",
+          18,
+          "map"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          18,
+          null
+        ],
+        [
+          "c_call",
+          18,
+          "path"
+        ],
+        [
+          "c_call",
+          18,
+          "lineno"
+        ],
+        [
+          "c_call",
+          18,
+          "label"
+        ],
+        [
+          "line",
+          19,
+          null
+        ],
+        [
+          "c_call",
+          19,
+          "caller_locations"
+        ],
+        [
+          "c_call",
+          19,
+          "map"
+        ],
+        [
+          "line",
+          19,
+          null
+        ],
+        [
+          "c_call",
+          19,
+          "path"
+        ],
+        [
+          "c_call",
+          19,
+          "lineno"
+        ],
+        [
+          "c_call",
+          19,
+          "label"
+        ],
+        [
+          "call",
+          7,
+          "value"
+        ],
+        [
+          "line",
+          7,
+          "value"
+        ],
+        [
+          "c_call",
+          7,
+          "equal?"
+        ],
+        [
+          "line",
+          8,
+          "value"
+        ],
+        [
+          "line",
+          9,
+          "value"
+        ],
+        [
+          "c_call",
+          9,
+          "=="
+        ],
+        [
+          "c_call",
+          9,
+          "=="
+        ],
+        [
+          "line",
+          10,
+          "value"
+        ],
+        [
+          "line",
+          11,
+          "value"
+        ],
+        [
+          "call",
+          4,
+          "value"
+        ],
+        [
+          "c_call",
+          4,
+          "+"
+        ]
+      ],
+      "load_stack": [
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "Kernel#require"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "block (2 levels) in <main>"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "TracePoint#enable"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          91,
+          "block in <main>"
+        ],
+        [
+          "$RUBY/lib/ruby/4.0.0/tmpdir.rb",
+          105,
+          "Dir.mktmpdir"
+        ],
+        [
+          "$REPO/bench/experiments/endpoint_bodies.rb",
+          85,
+          "<main>"
+        ]
+      ],
+      "load_frame": [
+        [
+          "$OUT/fixture.rb",
+          19,
+          "<compiled>"
+        ]
+      ],
+      "iseq_sha256": "e40044dbc6a9c7efa0a587814d22f4a0e5686576c98d88995570dab772f48fc0",
+      "served": 1
+    }
+  },
+  "workers": {
+    "0-off_a": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "0-original": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "0-guards": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "383658eea99971051169e7e2a49c0b95139b890224caaf3976500a86f7baa0f3"
+    },
+    "0-off_b": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "1-off_a": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "1-guards": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "383658eea99971051169e7e2a49c0b95139b890224caaf3976500a86f7baa0f3"
+    },
+    "1-off_b": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "1-original": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "2-off_b": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "2-original": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "2-guards": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "383658eea99971051169e7e2a49c0b95139b890224caaf3976500a86f7baa0f3"
+    },
+    "2-off_a": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "3-off_a": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "3-guards": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "383658eea99971051169e7e2a49c0b95139b890224caaf3976500a86f7baa0f3"
+    },
+    "3-off_b": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "3-original": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "4-off_b": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "4-original": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "4-off_a": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "4-guards": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "383658eea99971051169e7e2a49c0b95139b890224caaf3976500a86f7baa0f3"
+    },
+    "5-off_b": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "5-guards": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "383658eea99971051169e7e2a49c0b95139b890224caaf3976500a86f7baa0f3"
+    },
+    "5-original": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 1,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    },
+    "5-off_a": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "links": 2,
+      "facts_per_link": 10,
+      "served": 0,
+      "source_sha256": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "iseq_sha256": "774124325b99962c8c676fc6a47d1a01656c7cc2d21895bce0be2bf57e5cf6f9"
+    }
+  },
+  "samples": [
+    {
+      "off_a": {
+        "instructions_total": 89713.315,
+        "instructions_no_gc": 89795.07,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "original": {
+        "instructions_total": 92207.71,
+        "instructions_no_gc": 92287.44,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "guards": {
+        "instructions_total": 186683.77,
+        "instructions_no_gc": 186762.965,
+        "allocations": 34.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 89774.445,
+        "instructions_no_gc": 89857.195,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "off_a": {
+        "instructions_total": 89765.155,
+        "instructions_no_gc": 89684.95,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "guards": {
+        "instructions_total": 186754.945,
+        "instructions_no_gc": 186674.915,
+        "allocations": 34.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 89834.98,
+        "instructions_no_gc": 89751.855,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "original": {
+        "instructions_total": 92299.415,
+        "instructions_no_gc": 92219.775,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "off_b": {
+        "instructions_total": 89682.89,
+        "instructions_no_gc": 89764.97,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "original": {
+        "instructions_total": 92233.245,
+        "instructions_no_gc": 92312.63,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "guards": {
+        "instructions_total": 186792.525,
+        "instructions_no_gc": 186872.115,
+        "allocations": 34.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 89694.35,
+        "instructions_no_gc": 89776.165,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "off_a": {
+        "instructions_total": 89744.385,
+        "instructions_no_gc": 89660.305,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "guards": {
+        "instructions_total": 186759.765,
+        "instructions_no_gc": 186678.66,
+        "allocations": 34.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 89744.47,
+        "instructions_no_gc": 89661.765,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "original": {
+        "instructions_total": 92307.115,
+        "instructions_no_gc": 92227.005,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "off_b": {
+        "instructions_total": 89895.08,
+        "instructions_no_gc": 89975.42,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "original": {
+        "instructions_total": 92269.245,
+        "instructions_no_gc": 92349.04,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 89706.41,
+        "instructions_no_gc": 89789.11,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "guards": {
+        "instructions_total": 186676.265,
+        "instructions_no_gc": 186756.23,
+        "allocations": 34.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "off_b": {
+        "instructions_total": 89812.14,
+        "instructions_no_gc": 89729.255,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "guards": {
+        "instructions_total": 186790.81,
+        "instructions_no_gc": 186708.715,
+        "allocations": 34.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "original": {
+        "instructions_total": 92289.12,
+        "instructions_no_gc": 92205.155,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 89770.565,
+        "instructions_no_gc": 89685.68,
+        "allocations": 14.0,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    }
+  ],
+  "summary": {
+    "layers": {
+      "off_a": {
+        "instructions_total": {
+          "value": {
+            "median": 89728.85,
+            "ci95": [
+              89700.38,
+              89767.86
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 89730.92249999999,
+            "ci95": [
+              89672.6275,
+              89792.09
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 14.0,
+            "ci95": [
+              14.0,
+              14.0
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "original": {
+        "instructions_total": {
+          "value": {
+            "median": 92279.1825,
+            "ci95": [
+              92220.47750000001,
+              92303.265
+            ]
+          },
+          "delta_pct": {
+            "median": 2.8269094013382956,
+            "ci95": [
+              2.7929766192416827,
+              2.8562510696894083
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 92257.2225,
+            "ci95": [
+              92212.465,
+              92330.83499999999
+            ]
+          },
+          "delta_pct": {
+            "median": 2.8258436244264384,
+            "ci95": [
+              2.792423912706521,
+              2.8568705563292496
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 14.0,
+            "ci95": [
+              14.0,
+              14.0
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "guards": {
+        "instructions_total": {
+          "value": {
+            "median": 186757.355,
+            "ci95": [
+              186680.01750000002,
+              186791.66749999998
+            ]
+          },
+          "delta_pct": {
+            "median": 108.09308188615026,
+            "ci95": [
+              108.06208049209087,
+              108.17819975132531
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 186732.4725,
+            "ci95": [
+              186676.7875,
+              186817.53999999998
+            ]
+          },
+          "delta_pct": {
+            "median": 108.1492841895018,
+            "ci95": [
+              107.99114665216338,
+              108.19388748637846
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 34.0,
+            "ci95": [
+              34.0,
+              34.0
+            ]
+          },
+          "delta_pct": {
+            "median": 142.85714285714283,
+            "ci95": [
+              142.85714285714283,
+              142.85714285714283
+            ]
+          }
+        }
+      },
+      "off_b": {
+        "instructions_total": {
+          "value": {
+            "median": 89793.29250000001,
+            "ci95": [
+              89713.68,
+              89865.03
+            ]
+          },
+          "delta_pct": {
+            "median": 0.05722589009737877,
+            "ci95": [
+              -0.00634100553149608,
+              0.14405286335353873
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 89758.4125,
+            "ci95": [
+              89695.51000000001,
+              89916.3075
+            ]
+          },
+          "delta_pct": {
+            "median": 0.05888583226798527,
+            "ci95": [
+              -0.005420766955488432,
+              0.14104867694517687
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 14.0,
+            "ci95": [
+              14.0,
+              14.0
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      }
+    },
+    "aa": {
+      "pass": true,
+      "metrics": {
+        "instructions_total": true,
+        "instructions_no_gc": true
+      },
+      "tolerance_pct": 0.5
+    },
+    "gc": {
+      "off_a": {
+        "minor_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "off_b": {
+        "minor_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "original": {
+        "minor_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "guards": {
+        "minor_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "heap_capacity": {
+      "0": {
+        "min": 1000446,
+        "max": 1000466,
+        "matched": true
+      },
+      "1": {
+        "min": 250415,
+        "max": 250436,
+        "matched": true
+      },
+      "2": {
+        "min": 100148,
+        "max": 100156,
+        "matched": true
+      },
+      "3": {
+        "min": 20174,
+        "max": 20179,
+        "matched": true
+      },
+      "4": {
+        "min": 10076,
+        "max": 10079,
+        "matched": true
+      }
+    },
+    "heap_matched": true,
+    "jit": {
+      "requested_yjit": false,
+      "actual_yjit": [
+        false
+      ],
+      "pass": true,
+      "workers": {
+        "0-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-original": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-guards": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-guards": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-original": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-original": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-guards": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-guards": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-original": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-original": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-guards": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-guards": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-original": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        }
+      }
+    }
+  },
+  "budget": {
+    "accepted": true,
+    "prices": {
+      "instructions_total": {
+        "original_two_links": {
+          "median": 89728.85,
+          "ci95": [
+            89700.38,
+            89767.86
+          ]
+        },
+        "original_delivery_increment": {
+          "median": 2536.577499999992,
+          "ci95": [
+            2506.4749999999985,
+            2562.782500000001
+          ]
+        },
+        "internal_guard_floor": {
+          "median": 94465.795,
+          "ci95": [
+            94429.83500000002,
+            94530.485
+          ]
+        },
+        "guards_minus_entire_links": {
+          "median": 4719.695000000007,
+          "ci95": [
+            4695.492500000015,
+            4813.837499999987
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "original_two_links": {
+          "median": 89730.92249999999,
+          "ci95": [
+            89672.6275,
+            89792.09
+          ]
+        },
+        "original_delivery_increment": {
+          "median": 2535.645000000004,
+          "ci95": [
+            2505.9225000000006,
+            2563.3150000000023
+          ]
+        },
+        "internal_guard_floor": {
+          "median": 94465.3325,
+          "ci95": [
+            94429.42250000002,
+            94531.52249999999
+          ]
+        },
+        "guards_minus_entire_links": {
+          "median": 4776.755000000005,
+          "ci95": [
+            4649.267500000002,
+            4804.615000000005
+          ]
+        }
+      }
+    },
+    "caveat": "Checks plus unchanged body, not an accelerated implementation or complete certificate. Ten internal-method facts only; omits holders, primitives, mutable tables and repeated boundaries."
+  }
+}

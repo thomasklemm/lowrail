@@ -153,6 +153,211 @@ Raw worker logs and counters stay private in
 before measurement on a relative worker path; it was fixed, not retried after
 a failed A/A control. The historical slice and its gates below are unchanged.
 
+## Body-installed alternative: design and measurement only
+
+Deliver an ordinary `def` in its **original file and lexical container** through
+the existing Compiler/Loader seam, before that file is first required. Do not
+prepend a wrapper, alias the old implementation, use `define_method`, change
+parameters, or reinstall an already exposed method. VM dispatch then owns the
+outer method's receiver, visibility, alias/super resolution and redefinition;
+an already-entered body continues while the next ordinary call sees a new def.
+This does **not** authorize removing any dispatch inside that body.
+
+First check the observable delivery contract in fresh off/original-ISeq/edited-
+ISeq processes: owner, name/original_name, source location, parameters/arity,
+super/alias/bound and unbound handles, backtraces and late/mid-call redefinition.
+Compare repeated-handle equality within each process, not unrelated object IDs
+across processes. Also expose top-level frame labels, line/C-call traces and
+ISeq differences rather than silently treating them as equal. Every observed
+difference is a refusal boundary; an unchanged-text reload is the control for
+the separate question of preserving an **already existing** UnboundMethod.
+
+Internal-fact inventory for a possible full-anchor expansion:
+
+| Work | Facts if removed; cheapest exact strategy |
+|---|---|
+| Outer `link_to` dispatch | None inside an already-entered body. Keep block handling/argument shape and the unchanged fallback body. |
+| Option conversion and remote/method handling | Effective `convert_options_to_data_attributes` and `link_to_remote_options?`; fresh Hash/stringification/deletion/iteration and key/value conversions in original order. Preserve live calls or check actual receivers at use; a boot hook epoch alone is insufficient. |
+| `url_target` / `url_for` | Effective helpers and actual model predicates/conversions after their arguments. Leave named routes, polymorphic routing and `to_param` live in this first target: then no route-set/default-URL certificate is needed in `link_to`. Inlining them would add route/config/mount/current-request facts, captured formatter identity and post-conversion continuations. |
+| `content_tag`, name validation, builder acquisition | Effective helpers at each use. Normal dispatch to a body-installed callee is free of an identity residual; copying that callee into its caller is not. A live call or block ends the region. |
+| Builder formatting and attributes | Actual builder's `content_tag_string`, `tag_options`, `tag_option`; live `TAG_TYPES`/`PRE_CONTENT_STRINGS` contents, escaping/encoding/safety/coercion and primitive method facts for operations removed. Constant identity alone does not detect Hash mutation. |
+| Locale/config/subscribers | No new certificate when these operations remain live; keep real render/controller events. Do not charge or claim a global epoch for state this body does not specialize. |
+
+Price captured `Module#public_instance_method` for public facts and captured
+`instance_method` plus visibility predicate for private facts. Acquire holders
+and expected methods outside timing to give this design an optimistic budget.
+For the full-anchor budget, dropping the outer `link_to` check still leaves
+the remote-option helper and the other nine internal facts. Primitive/table/
+value checks and repeated post-call checks are additional, not free.
+
+One finite six-round `c9d2397` interpreter micro will compare the two actual
+show links with Lowrail off, an unchanged original-file ISeq delivery control,
+and a body-installed **guard-cost specimen**. That specimen inserts only the
+optimistic internal checks and then runs the unchanged original body: it never
+authorizes a shortcut, caches HTML, or replays a request. Subtract the original-
+delivery arm to price guards; compare that guard cost with the *entire* off
+operation as a deliberately generous budget for a future full-anchor body.
+If guards alone lose, stop without constructing an accelerated implementation.
+If they fit, this is only headroom, not a positive net-saving certificate:
+actual residual work, local continuations and all mutation/observable gates
+would still have to fit. No quarantine or default changes are permitted here.
+
+### Body-delivery contract and finite cost result
+
+**Decision: guarded endpoint: stopped; requires a sealed contract or a VM
+epoch.** Installing the outer body avoids its caller-side identity check, but
+the measured internal checks alone still exceed the entire original two-link
+operation. Ruby-level fact-guard endpoint work ends here: no accelerated
+runtime, generator or whole-request result follows. This is not an impossibility
+proof for every body transformation, nor does it change the independent sealed
+contract. Neither sealing nor an epoch alone covers every omitted fact below.
+
+`bench/experiments/endpoint_bodies.rb` delivers an ordinary `def` through the
+actual Compiler/Manifest/Loader before the original file's first require.
+The Rails arm observes the real app compiler in a separate boot; it does not
+substitute a guessed original-ISeq fingerprint. Untimed probes verify actual
+delivery and the installed method body. No quarantined pass name or artifact
+is used. The guard-cost arm executes its checks and then the **unchanged**
+original body regardless of their result; a false check cannot authorize
+anything. This is not a shortcut or a completed equivalence implementation.
+
+Fresh off/unchanged-delivery/edited-delivery fixture processes establish:
+
+| Observable | Executed result / refusal boundary |
+|---|---|
+| Owner, name/original name, source path and def line | Identical with original lexical container and line-preserving insertion. |
+| Parameters, arity, public/private status | Identical, including positional/rest/keyword-rest/block arguments. |
+| `super`, aliases, repeated bound/unbound lookup, bind/unbind equality | Same relational results within each process; no cross-process object-ID comparison. |
+| Redefinition during a call | Active frame, alias and saved bound/unbound handles finish the old body; next ordinary send sees the new body, identically in all three arms. |
+| Already exposed UnboundMethod versus reloaded method | Not equal after even an unchanged-source reload; saved handle still works. **Refuse late installation**, not merely late alias creation. Cold delivery does not preserve a pre-existing method entry. |
+| Exception frame from the unchanged method body | Same file, line, method label and base label. Not a claim that expanding callees preserves their exception/caller frames. |
+| Top-level frame | Off is `<top (required)>`; both delivered arms are `<compiled>`. **Refuse top-level label/backtrace introspection**; ordinary method-frame equality does not fix this. |
+| TracePoint line/C-call stream, method ISeq | Delivery changes the trace; edited body adds its own line/C-call events and has a different ISeq. The unchanged method's ISeq matches off. **Refuse instruction/AST/trace-sensitive consumers** rather than normalize the difference. |
+
+The fixture's require-caller stack itself is identical; the top-level label
+above is captured inside the loaded file. These are finite positive/negative
+probes, not a general detector proving an app never inspects a stack or ISeq.
+Consequently transparent delivery for every Ruby observer is **not** established.
+
+The one finite cost cohort has four arms (independent off A/B, original ISeq,
+guard-cost ISeq), six randomized fresh-process rounds, seed **41231**, Ruby
+**4.0.7**, Rails **8.1.4**, interpreter Callgrind, five standard heap floors,
+N=0/200 operation windows and the shared **c9d2397** observer-warmup protocol.
+Operation workers retain the real captured view/builder; they do not issue a
+settling request that replaces that context. Both links' bytes, encoding and
+HTML safety agree in every worker. All original/guard workers confirm one
+actual file delivery; off confirms none. The original and off `link_to` method
+ISeq hashes agree; the guard arm differs.
+
+| Two actual show links; Ir/operation, paired nominal 95% CI | Total | GC-excluded |
+|---|---:|---:|
+| Off original links | 89,729 [89,700, 89,768] | 89,731 [89,673, 89,792] |
+| Unchanged-ISeq delivery minus off | +2,537 [+2,506, +2,563] | +2,536 [+2,506, +2,563] |
+| Internal guard-cost increment over unchanged delivery | 94,466 [94,430, 94,530] | 94,465 [94,429, 94,532] |
+| Guard cost minus **all** off link work | **+4,720 [+4,695, +4,814]** | **+4,777 [+4,649, +4,805]** |
+
+Actual complete arm costs are **89,729 off / 92,279 unchanged delivery /
+186,757 checks + original body**. Allocations are **14 / 14 / 34** objects per
+two links. The +2,537-Ir unchanged-delivery increment is retained and
+**unattributed**, not called the cost of the loader or edited bytecode: the
+method ISeq is identical and no loader runs during these operation windows.
+It is subtracted before pricing guards, making the rejection generous.
+
+Total and GC-excluded A/A pass: **+0.057% [−0.006, +0.144]** and
+**+0.059% [−0.005, +0.141]**; actual five-pool capacities and all 24 workers'
+interpreter-state gates pass. This is an accepted instruction-cost comparison,
+**not a native YJIT speed or request-saving claim**. The cheapest measured
+public identity/visibility lookup is captured `Module#public_instance_method`
+with captured `UnboundMethod#==`; private facts add the captured private
+predicate. This is not proof of a globally cheapest possible guard. Ten
+internal facts still omit holder acquisition, primitive/value/mutable-table
+facts and rechecks after live boundaries. Nor may this entry check list be
+used as authorization across any of those boundaries. No remaining cost is
+treated as free in an accelerated implementation, since none was built.
+
+Reproduce (new directory, production blog with article 1/assets prepared):
+
+```sh
+BENCH_JOBS=2 mise exec -- ruby bench/experiments/endpoint_bodies.rb \
+  .corpus/real-blog-r4 /tmp/NEW-endpoint-body-budget
+# Optional third argument: contract-only (no instruction cohort).
+```
+
+Portable evidence: [endpoint-bodies.json](endpoint-bodies.json); private raw
+windows/counters/contract logs: `/tmp/endpoint-body-budget-v1/`. Two early
+contract/worker setup failures were diagnosed before this cohort (Ruby keyword
+Hash syntax; guessed compiler fingerprint), not failed A/A controls retried.
+Targeted checks: benchmark contract **10/70**, compiler **3/38**, loader
+**7/548** runs/assertions, all zero failures/errors/skips. Quarantine/default
+and endpoint runtime/generator files remain unchanged.
+
+### Final fact classification: sealed contract, VM epoch, residuals
+
+Analysis only, coordinated with the
+[sealed owner](https://ampcode.com/threads/T-01a15abc-a586-71fa-a60f-965ab3fc387e)
+and [VM-epoch owner](https://ampcode.com/threads/T-01a15ac4-d389-72f9-81f9-f1fcb7018e97).
+Their reported boundaries below are **not completed endpoint certificates**.
+`SEAL001` is a no-post-seal method/constant/visibility/ancestor-mutation
+contract, including singleton/refinement/native equivalents; its TracePoint
+detector is incomplete. Zero observations is not proof. `SEAL005` covers
+runtime config/route/resolver mutation in concept, but its current watcher
+does not cover arbitrary tables or ivars. The other relevant IDs are
+`SEAL002` request-dependent URL defaults, `SEAL003` custom `to_param` needing
+a purity certificate, `SEAL004` subscriber-set mutation, `SEAL006` unresolved
+dynamic dispatch, and `SEAL007` undeclared template locals. None is a general
+value/purity/receiver or observational-equivalence certificate.
+
+The proposed Ruby 4.0.7 VM patch uses an atomic saturated global generation,
+bumped at method-table/cache/entry changes, visibility, include/prepend,
+singleton creation and constant set/clear/autoload, read by a direct C
+`RubyVM.mutation_epoch`. It covers structural changes to a **previously
+certified actual holder**, not future-receiver provenance or heap writes.
+At this handoff its exact-method probe matrix and read/branch Ir are still
+pending; no numeric epoch-cost claim is available. Active lexical refinements
+need a separate certificate; universal refinement/Box coverage is not proven.
+
+In the table **M** means method identity/visibility on a certified holder:
+sealed contract `SEAL001`, or a boot baseline plus an unchanged structural VM
+epoch at **each** post-application-code boundary. Neither admits an entry-only
+snapshot. Without either mechanism, the measured ten-fact Ruby check list is
+94,466 Ir/two links, about **4,723 Ir/fact-use on average** (20 uses); that is
+an accounting estimate, not ten independently measured or equal prices.
+**R** means actual-receiver/provenance certification still required. Under a
+satisfied seal there is no per-call **structural** guard; under the VM design
+one shared epoch check may replace several structural lookups in an uninterrupted
+section, but its measured cost is unknown, not zero.
+
+| Fact | (a) Sealed contract / current gap | (b) Structural VM epoch | (c) Residual and interpreter Ir estimate |
+|---|---|---|---|
+| View `convert_options_to_data_attributes` (private) | `SEAL001`, baseline implementation required | M, on actual view holder | M + R; Ruby reflection average ≈4,723/use if not covered. Hash/conversion effects below remain. |
+| View `link_to_remote_options?` (private) | `SEAL001` | M | M + R; ≈4,723/use average, not certification of its Hash input. |
+| View `url_target` (private) | `SEAL001` | M | M + R; ≈4,723/use average; model predicates/coercions stay live. |
+| View `url_for` (public) | `SEAL001`; URL-default behavior is also `SEAL002`, not proven by method sealing | M, not request/default values | M + R; ≈4,723/use average; retain live routing/config reads unless separately certified. |
+| View `content_tag` (public) | `SEAL001` | M | M + R; ≈4,723/use average; block capture remains an effect boundary. |
+| View `ensure_valid_html5_tag_name` (private) | `SEAL001` | M | M + R; ≈4,723/use average; actual name/Regexp semantics still need proof or live call. |
+| View `tag_builder` (private) | `SEAL001` protects method, **not `@tag_builder`** | M, not ivar contents | M + R; ≈4,723/use average; retain actual returned builder, never substitute a remembered one. |
+| Builder `content_tag_string` (public) | `SEAL001` on certified actual builder | M, not that this is the certified builder | M + R; ≈4,723/use average; table/value facts below remain. |
+| Builder `tag_options` (public) | `SEAL001` on certified actual builder | M | M + R; ≈4,723/use average; input iteration and conversions remain live. |
+| Builder `tag_option` (private) | `SEAL001` on certified actual builder | M | M + R; ≈4,723/use average; escaping/array/hash/value dispatch remains live. |
+| View/builder holder, singleton class and ancestor chain | `SEAL001` forbids structural changes; **future receiver / ivar replacement GAP**, no rule certifies it | Structural change yes; replacement `@tag_builder`/future receiver no | R at every acquisition after live code. One cached-class K comparison costs ≈425 Ir as a **proxy only**; effective singleton-holder acquisition/complete provenance is unpriced. |
+| Core/helper primitives: Hash `stringify_keys`, `delete`, `[]`, `[]=`, `each_pair`; String/Regexp/safety/encoding and ERB escaping methods | `SEAL001` only on certified method/instance targets; no primitive semantic/purity certificate | Method mutation yes, assuming actual holder/lexical baseline; per-value state no | Keep live dispatch (0 **extra specialization-check** Ir, original work retained), or add M + R for each removed call; ≈4.7k/fact-use is only a reflection proxy, not a primitive measurement. |
+| Constant bindings, including tag tables and helper/model modules | `SEAL001`; direct constant/uncached-autoload detector gaps remain | Set/clear/autoload intended coverage, probe matrix pending | Boot identities still required. Simple direct constant-identity check ≈311 Ir/binding from speculation micro if retained; no claim it detects in-place mutation. |
+| Stock Rails 8.1.4 `TAG_TYPES` contents | Source constructs and **freezes** the Hash; certify that actual object/immutable keys and Symbol values at boot, plus `SEAL001` for binding/Hash methods | Binding/method changes only, sufficient for that frozen-content fact once proven | No repeated content snapshot for the certified stock frozen object. A replacement mutable Hash is a new heap-fact gap, not permission from a matching epoch. |
+| `PRE_CONTENT_STRINGS` contents and default Proc; replacement mutable tag/config tables | `SEAL005` concept; **current table watcher GAP** | **No**, in-place Hash/default/value writes do not bump structural epoch | Read live at original point and preserve default Proc invocation/once-only effects (0 extra check, original work retained), or exact independent contents/default/value certificate. Full cost unpriced; ≈2,081 Ir for a simple two-key config snapshot is only a prior micro proxy, not this table's certificate. |
+| Input class/shape/key order/value, HTML safety, encoding and frozen state | **GAP**; no SEAL rule asserts these request facts | **No**, heap/value facts | Per-use value certificate or live operation. ≈425 Ir for one class K comparison is a lower-scope proxy only; complete check unpriced and cannot be replaced by `Class === value` alone. |
+| `to_param`, model predicates, blocks and arbitrary coercion callbacks | `SEAL003` is only a custom-`to_param` purity requirement/hint; `SEAL006` flags unresolved sends, neither proves general purity | Detects structural mutation caused by callback, not callback effects/heap writes | Keep live once; checkpoint after callback and continue with computed arguments. 0 extra guard for a call left live; epoch checkpoint cost pending, reflection M costs above if used instead. Never replay action/helper/conversion. |
+| Request-dependent config/default URLs, route/resolver state | `SEAL002`/`SEAL005`; legitimate request-dependent values are not fixed by sealing | Definition/binding changes only, not nested config state | Remain live in this link-only design; 0 extra specialization check, unchanged original cost. Any removal needs a separate value plan/snapshot, unpriced. |
+| Subscribers, template locals, lexical refinements | `SEAL004`/`SEAL007` address first two only; `SEAL001` refinement contract is not a proven detector | Not subscriber/locals/heap state; active refinements require lexical baseline | Keep events/real locals/call boundaries; refuse unsupported lexical scope rather than price an invented universal check. |
+| `<compiled>` frame, trace events, edited ISeq identity and reload-handle inequality | **Observational-equivalence GAP**, explicitly not promised by sealing | **No**, mutation generation cannot restore these observations | Refusal, not a per-request guard or an Ir saving. No zero-cost equivalence claim. |
+
+The 425/311/2,081-Ir proxies are the published interpreter micros in
+[speculation.md](speculation.md#fixed-heap-guard-micro-costs); they are deliberately
+not added into a fabricated endpoint budget. Unknown residuals remain
+**unpriced**, and any future sealed/VM pilot still needs its own complete
+mutation/value/observable matrix and ≤ off measurement. Ownership of this
+document passes to the sealed thread after this result is published; this
+thread will not continue guarded endpoint implementation.
+
 ## What is generated, and what stays live
 
 The runtime builder runs in an off, booted application. It obtains Rails'
