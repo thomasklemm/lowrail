@@ -73,8 +73,12 @@ class ARInstantiateTest < Minitest::Test
     File.write("manifest.json", JSON.generate({format: 1, ruby_description: RUBY_DESCRIPTION,
       compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 4, facts: []}]}))
     File.write("ledger.json", "[]")
-    Lowrail::ARInstantiateBuild.run(Dir.pwd)
-    Lowrail::ARInstantiateBuild.run(Dir.pwd)
+    built = Lowrail::ARInstantiateBuild.build
+    built[:units].each_with_index { |unit, i| unit["id"] = 5 + i }
+    data = JSON.parse(File.read("manifest.json"))
+    data["units"].concat(built[:units])
+    File.write("manifest.json", JSON.generate(data))
+    File.write("ledger.json", JSON.generate(built[:ledger]))
     manifest = JSON.parse(File.read("manifest.json"))
     raise "unit collision" unless manifest["units"].map { _1["id"] }.uniq.size == manifest["units"].size
     if defined?(ActiveRecord::ModelSchema::SchemaContext)

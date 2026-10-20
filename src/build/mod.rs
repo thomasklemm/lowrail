@@ -4,6 +4,8 @@
 //! under app/ (lowered sources compiled by `gem/exe/lowrail-compile` and
 //! served through load_iseq). Every site a pass looked at is in ledger.json.
 
+mod runtime;
+
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -33,41 +35,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     }
     let app = app.ok_or("usage: lowrail build APP [--env test|production] [--passes default,+name,-name] [--preload-plans] [--memo] [--ar-instantiate] [--ar-plans] [--digest-memo]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
-    build(&app, &env, &passes)?;
-    if passes.contains("active_record/instantiate") {
-        let status = Command::new("bundle")
-            .args(["exec", "ruby"])
-            .arg(facts::gem_dir().join("exe/lowrail-ar-instantiate-build"))
-            .arg(app.join(".lowrail"))
-            .current_dir(&app)
-            .env_remove("RUBYOPT")
-            .env("RAILS_ENV", &env)
-            .env("LOWRAIL", "0")
-            .status()
-            .map_err(|e| format!("AR instantiate facts: {e}"))?;
-        if !status.success() {
-            return Err(format!("AR instantiate facts failed ({status})"));
-        }
-    }
-    if passes.contains("active_record/ar_plans") {
-        let status = Command::new("bundle")
-            .args(["exec", "ruby"])
-            .arg(facts::gem_dir().join("exe/lowrail-ar-build"))
-            .arg(app.join(".lowrail"))
-            .current_dir(&app)
-            .env_remove("RUBYOPT")
-            .env("RAILS_ENV", &env)
-            .env("LOWRAIL", "0")
-            .status()
-            .map_err(|e| format!("AR plan facts: {e}"))?;
-        if !status.success() {
-            return Err(format!("AR plan facts failed ({status})"));
-        }
-    }
-    let dir = app.join(".lowrail");
-    let manifest: Value = serde_json::from_slice(&std::fs::read(dir.join("manifest.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-    let ledger: Vec<Value> = serde_json::from_slice(&std::fs::read(dir.join("ledger.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-    println!("{}", summary(&ledger, manifest["units"].as_array().unwrap(), manifest["templates"].as_object().map_or(0, |t| t.len()), manifest["files"].as_object().map_or(0, |f| f.len()), &dir));
+    println!("{}", build(&app, &env, &passes)?);
     Ok(())
 }
 
@@ -85,14 +53,11 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
 
     // Units `lowrail verify --bisect` found to change outcomes stay unlowered
     // (denylist entries name a file and a pass).
-    let denied: Vec<(String, String)> = std::fs::read_to_string(dir.join("denylist.json"))
+    let denied: Vec<Value> = std::fs::read_to_string(dir.join("denylist.json"))
         .ok()
-        .and_then(|s| serde_json::from_str::<Vec<Value>>(&s).ok())
-        .unwrap_or_default()
-        .iter()
-        .map(|d| (d["file"].as_str().unwrap_or("").to_string(), d["pass"].as_str().unwrap_or("").to_string()))
-        .collect();
-    let is_denied = |file: &str, pass: &str| denied.iter().any(|(f, p)| f == file && p == pass);
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .unwrap_or_default();
+    let is_denied = |file: &str, pass: &str| denied.iter().any(|d| d["file"] == file && d["pass"] == pass);
 
     let mut templates = BTreeMap::new();
     let mut units: Vec<Value> = Vec::new();
@@ -181,6 +146,16 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
     }
     drop(oracle);
 
+    for output in runtime::run(app, env, passes, &denied)? {
+        let sources = runtime::merge(&mut units, &mut ledger, output)?;
+        for (index, source) in sources.into_iter().enumerate() {
+            let dest = src_dir.join(format!("runtime__{index}.rb"));
+            let original = dest.with_extension("rb.orig");
+            std::fs::write(&dest, source.code).map_err(|e| e.to_string())?;
+            std::fs::write(&original, source.original).map_err(|e| e.to_string())?;
+            files.push(json!({"path": source.path, "lowered": dest, "original": original}));
+        }
+    }
     let input = json!({
         "out": dir,
         "rails_env": env,
@@ -191,24 +166,6 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
     let input_path = dir.join("units.json");
     write_atomic(&input_path, &serde_json::to_string_pretty(&input).unwrap())?;
     write_atomic(&dir.join("ledger.json"), &serde_json::to_string_pretty(&ledger).unwrap())?;
-    if passes.contains("digest/file_memo") {
-        let status = Command::new("bundle")
-            .args(["exec", "ruby"])
-            .arg(facts::gem_dir().join("exe/lowrail-digest-build"))
-            .arg(&input_path)
-            .current_dir(app)
-            .env_remove("RUBYOPT")
-            .env("RAILS_ENV", env)
-            .status()
-            .map_err(|e| format!("digest memo facts: {e}"))?;
-        if !status.success() {
-            return Err(format!("digest memo facts failed ({status})"));
-        }
-        let input: Value = serde_json::from_str(&std::fs::read_to_string(&input_path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        files = input["files"].as_array().unwrap().clone();
-        units = input["units"].as_array().unwrap().clone();
-        ledger = serde_json::from_str(&std::fs::read_to_string(dir.join("ledger.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-    }
     let status = Command::new("bundle")
         .args(["exec", "ruby"])
         .arg(facts::gem_dir().join("exe/lowrail-compile"))
@@ -220,22 +177,8 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
     if !status.success() {
         return Err("lowrail-compile failed".into());
     }
-    if !passes.contains("active_record/preload_plans") {
-        return Ok(summary(&ledger, &units, templates.len(), files.len(), &dir));
-    }
-    let preload_status = Command::new("bundle")
-        .args(["exec", "ruby"])
-        .arg(facts::gem_dir().join("exe/lowrail-preload-build"))
-        .arg(&dir)
-        .current_dir(app)
-        .env("RAILS_ENV", env)
-        .env("LOWRAIL", "0")
-        .status()
-        .map_err(|e| format!("preload plan facts: {e}"))?;
-    if !preload_status.success() {
-        return Err(format!("preload plan facts failed ({preload_status})"));
-    }
-    Ok(summary(&ledger, &units, templates.len(), files.len(), &dir))
+    let manifest: Value = serde_json::from_slice(&std::fs::read(dir.join("manifest.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    Ok(summary(&ledger, manifest["units"].as_array().unwrap(), templates.len(), manifest["files"].as_object().map_or(0, |f| f.len()), &dir))
 }
 
 fn summary(ledger: &[Value], units: &[Value], templates: usize, files: usize, dir: &Path) -> String {

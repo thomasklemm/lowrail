@@ -56,12 +56,8 @@ module Lowrail
 
     module_function
 
-    def run(input_path)
-      input = JSON.parse(File.read(input_path))
-      ledger_path = File.join(input.fetch("out"), "ledger.json")
-      ledger = JSON.parse(File.read(ledger_path))
-      denied_path = File.join(input.fetch("out"), "denylist.json")
-      denied = File.file?(denied_path) ? JSON.parse(File.read(denied_path)) : []
+    def build(denied: [])
+      units, ledger, files = [], [], []
       targets = TARGETS.flat_map do |name, methods|
         mod = Object.const_get(name)
         methods.filter_map { |method| [mod, mod.instance_method(method)] if mod.method_defined?(method) || mod.private_method_defined?(method) }
@@ -94,26 +90,25 @@ module Lowrail
           ledger << {"file" => path, "pass" => PASS, "outcome" => reason}
           next
         end
-        id = (input["units"].map { _1.fetch("id") }.max || -1) + 1
-        lowered = original.b
-        calls.sort_by { -_1.first.location.start_offset }.each do |node, algorithm, argument|
-          replacement = "::Lowrail::DigestMemo.hexdigest(#{id}, #{algorithm}, #{argument})"
-          lowered[node.location.start_offset, node.location.length] = replacement.b
+        # Numeric parts refer to this result's local unit index. Rust assigns
+        # the final id; never substitute tokens in arbitrary app source text.
+        parts, offset = [], 0
+        calls.sort_by { _1.first.location.start_offset }.each do |node, algorithm, argument|
+          parts << original.b.byteslice(offset...node.location.start_offset).force_encoding(Encoding::UTF_8)
+          parts.concat(["::Lowrail::DigestMemo.hexdigest(", units.size, ", #{algorithm}, #{argument})"])
+          offset = node.location.end_offset
           ledger << {"file" => path, "line" => node.location.start_line, "pass" => PASS, "outcome" => "lowered"}
         end
-        lowered.force_encoding(Encoding::UTF_8)
+        parts << original.b.byteslice(offset..).force_encoding(Encoding::UTF_8)
+        lowered = parts.map { Integer === _1 ? "0" : _1 }.join
         raise "digest lowering changed source lines" unless lowered.count("\n") == original.count("\n") && Prism.parse(lowered).success?
-        dest = File.join(input.fetch("out"), "src", "digest__#{id}.rb")
-        File.write(dest, lowered)
-        File.write("#{dest}.orig", original)
-        input["files"] << {"path" => path, "lowered" => dest, "original" => "#{dest}.orig"}
-        input["units"] << {"id" => id, "kind" => "file", "file" => path, "pass" => PASS,
+        files << {path: path, original: original, parts: parts}
+        units << {"kind" => "file", "file" => path, "pass" => PASS,
           "sites" => calls.size, "facts" => facts, "digest_memo" => {"sources" => sources,
             "algorithms" => calls.map { _1[1].delete_prefix("::") }.uniq}}
       end
-      Lowrail.write_json(input_path, input)
-      Lowrail.write_json(ledger_path, ledger)
       warn "[lowrail] digest/file_memo: #{ledger.count { _1["pass"] == PASS && _1["outcome"] == "lowered" }} sites"
+      {units: units, ledger: ledger, files: files}
     end
 
     def certify(algorithms)

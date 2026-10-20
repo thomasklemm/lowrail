@@ -54,6 +54,7 @@ module Lowrail
 
         templates = input["templates"] || {}
         units = Array(input["units"]).select do |unit|
+          next true if unit["kind"] == "runtime"
           next true if files.key?(unit["file"])
           next true if unit["kind"] == "template" && templates.key?(unit["file"])
           err.puts "[lowrail] dropping unit #{unit["id"]} (#{unit["method"]}): #{unit["file"]} not compiled"

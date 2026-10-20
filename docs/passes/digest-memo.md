@@ -23,8 +23,9 @@ unverändert. Insbesondere macht der Pass den bestehenden mtime/size-Cache
 von vite_ruby nicht strenger oder schwächer: Nur sein tatsächlich erreichter
 SHA1-Dateiaufruf wird spezialisiert.
 
-`gem/exe/lowrail-digest-build` erweitert `units.json` vor dem normalen
-Compiler. Gem-Dateien bekommen eigene Units, Ledger-Einträge, Source-Hashes
+`gem/exe/lowrail-runtime-build` führt den Digest-Builder zusammen mit allen
+gewählten Runtime-Buildern in einem App-Boot aus. Rust schreibt das gemeinsame
+`units.json` vor dem normalen Compiler. Gem-Dateien bekommen eigene Units, Ledger-Einträge, Source-Hashes
 und Compiler-Fingerprints. Environment-Guard, `LOWRAIL=0`, `LOWRAIL_UNITS`,
 `verify --bisect` und die Bisection-Denylist gelten unverändert. Der eigene
 Install-Block folgt dem Memo-Block; Capture-/Observe-Hooks werden nicht

@@ -93,8 +93,12 @@ class PreloadPlansTest < Minitest::Test
     File.write("manifest.json", JSON.generate({format: 1, ruby_description: RUBY_DESCRIPTION,
       compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 7, facts: []}]}))
     File.write("ledger.json", "[]")
-    Lowrail::PreloadBuild.run(dir)
-    Lowrail::PreloadBuild.run(dir) # idempotent and never collides with unit 7
+    built = Lowrail::PreloadBuild.build
+    built[:units].each_with_index { |unit, i| unit["id"] = 8 + i }
+    data = JSON.parse(File.read("manifest.json"))
+    data["units"].concat(built[:units])
+    File.write("manifest.json", JSON.generate(data))
+    File.write("ledger.json", JSON.generate(built[:ledger]))
     if ENV["STALE_PRELOAD_SOURCE"]
       data = JSON.parse(File.read("manifest.json"))
       data["units"].last["preload_facts"]["sources"].transform_values! { "stale" }

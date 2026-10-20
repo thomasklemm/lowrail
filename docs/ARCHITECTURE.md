@@ -30,7 +30,12 @@ PLAN.md stays the "why"; this file is the "how a pass plugs in".
  verify (outcomes + SQL traces, bisect) and bench (layered, A/A controlled)
 ```
 
-## 2. Today: two pass kinds, wired by hand
+## 2. Before migration: two pass kinds, wired by hand
+
+Steps 1–2 now use `src/passes.rs` and `exe/lowrail-runtime-build`.
+The four old per-pass build executables below were internal drivers; no
+benchmark calls them. They have been removed and the pass notes updated.
+The table and pain points record the pre-migration design.
 
 | Pass | Kind | Built by | Guard style | Default | Result so far |
 |---|---|---|---|---|---|

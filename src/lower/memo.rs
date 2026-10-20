@@ -17,9 +17,6 @@ pub struct Lowered {
 pub enum Intrinsic { UriJoin, Sha256 }
 
 impl Intrinsic {
-    pub fn pass(self) -> &'static str {
-        match self { Self::UriJoin => "memo/uri_join", Self::Sha256 => "memo/sha256" }
-    }
     fn spec(self) -> (&'static str, &'static str, usize, &'static str, &'static str) {
         match self {
             Self::UriJoin => ("URI", "join", 2, "join", "build"),

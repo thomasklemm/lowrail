@@ -11,16 +11,11 @@ module Lowrail
   module ARPlanBuild
     module_function
 
-    def run(dir)
-      path = File.join(dir, "manifest.json")
-      ledger_path = File.join(dir, "ledger.json")
-      manifest = JSON.parse(File.read(path))
-      ledger = JSON.parse(File.read(ledger_path))
-      manifest["units"].reject! { _1["pass"] == "active_record/ar_plans" }
-      ledger.reject! { %w[active_record/ar_plans active_record/ar_plans_survey].include?(_1["pass"]) }
+    def build(denied: [])
+      units, ledger = [], []
       ledger.concat(ARPlanSites.inventory(Rails.root.to_s)) if Rails.respond_to?(:root)
       models, edges, facts, originals = {}, {}, [], []
-      denied = File.file?(File.join(dir, "denylist.json")) && JSON.parse(File.read(File.join(dir, "denylist.json"))).any? { _1["pass"] == "active_record/ar_plans" }
+      denied = denied.any? { _1["pass"] == "active_record/ar_plans" }
       ActiveRecord::Base.descendants.sort_by { _1.name.to_s }.each do |owner|
         next if !owner.name || owner.abstract_class? || !owner.table_exists?
         owner.reflect_on_all_associations.each do |reflection|
@@ -108,16 +103,14 @@ module Lowrail
           files.concat([__FILE__, ARPlanFacts.method(:scope_info).source_location.first,
             ARPlans.method(:tag).source_location.first, PreloadFacts.method(:scope).source_location.first])
           edges.each_value { files << _1.fetch("reflection").fetch("scope").first }
-          id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
-          manifest["units"] << { "id" => id, "kind" => "runtime", "file" => "active_record/ar_plans",
+          units << { "kind" => "runtime", "file" => "active_record/ar_plans",
             "pass" => "active_record/ar_plans", "facts" => facts.uniq,
             "ar_plans" => { "edges" => edges, "models" => models, "originals" => originals,
               "rails_version" => Rails.version, "sources" => files.uniq.to_h { [_1, Digest::SHA256.file(_1).hexdigest] } } }
         end
       end
-      Lowrail.write_json(path, manifest)
-      Lowrail.write_json(ledger_path, ledger)
       warn "[lowrail] AR plans: #{edges.size} eligible scoped readers, #{ledger.count { _1["pass"] == "active_record/ar_plans" } - edges.size} refused"
+      {units: units, ledger: ledger}
     end
   end
 end

@@ -52,7 +52,11 @@ class ARPlansTest < Minitest::Test
       "files" => {}, "units" => [] }
     Lowrail.write_json(File.join(dir, "manifest.json"), data)
     Lowrail.write_json(File.join(dir, "ledger.json"), [])
-    Lowrail::ARPlanBuild.run(dir)
+    built = Lowrail::ARPlanBuild.build
+    built[:units].each_with_index { |unit, i| unit["id"] = i }
+    data["units"] = built[:units]
+    Lowrail.write_json(File.join(dir, "manifest.json"), data)
+    Lowrail.write_json(File.join(dir, "ledger.json"), built[:ledger])
     manifest = Lowrail::Manifest.load(File.join(dir, "manifest.json"))
     raise File.read(File.join(dir, "ledger.json")) if manifest.units.empty?
     Lowrail::Stats.enable!
@@ -129,8 +133,7 @@ class ARPlansTest < Minitest::Test
     if ENV.fetch("CHANGE") == "adapter"
       # A rebuilt manifest must not certify a boot-time replacement quoter
       # merely because its definition is stable.
-      Lowrail::ARPlanBuild.run(dir)
-      result["rebuilt_units"] = Lowrail::Manifest.load(File.join(dir, "manifest.json")).units.size
+      result["rebuilt_units"] = Lowrail::ARPlanBuild.build[:units].size
     end
     result["ledger"] = ledger.map { [_1["method"], _1["outcome"]] }
     result["events"] = events

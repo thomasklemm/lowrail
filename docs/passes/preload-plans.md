@@ -16,10 +16,10 @@ method lookup chain. Unsupported inputs or invalid facts call `super`.
 The prepend is visible in `ancestors`; unlike a source splice, this pass
 does not promise an unchanged method owner for Preloader itself.
 
-`lowrail build APP --preload-plans [--env production]` runs `lowrail-preload-build` after
-ordinary template/Ruby compilation. The helper boots the real app in that
-environment and augments the **same manifest and ledger**. One runtime unit
-gets `max(existing unit ids) + 1`; rebuilding is idempotent. There is no
+`lowrail build APP --preload-plans [--env production]` selects the preload
+builder in `lowrail-runtime-build`, sharing one app boot with the other
+selected runtime passes. Rust merges the returned units and ledger before
+compilation, assigning ids after the source units; rebuilding is idempotent. There is no
 activation without a compatible manifest. `LOWRAIL=0`, `LOWRAIL_UNITS`,
 environment guards, verify bisection and the per-app denylist all apply.
 

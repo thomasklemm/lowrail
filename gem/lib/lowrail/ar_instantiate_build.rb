@@ -17,15 +17,9 @@ module Lowrail
     }.freeze
     module_function
 
-    def run(dir)
-      manifest_path = File.join(dir, "manifest.json")
-      ledger_path = File.join(dir, "ledger.json")
-      manifest = JSON.parse(File.read(manifest_path))
-      ledger = JSON.parse(File.read(ledger_path))
+    def build(denied: [])
+      units, ledger = [], []
       pass = ARInstantiate::PASS
-      manifest.fetch("units").reject! { _1["pass"] == pass }
-      ledger.reject! { _1["pass"] == pass }
-      denied = File.file?(File.join(dir, "denylist.json")) ? JSON.parse(File.read(File.join(dir, "denylist.json"))) : []
       ActiveRecord::Base.descendants.sort_by { _1.name.to_s }.each do |klass|
         next if klass.abstract_class? || !klass.name || !klass.table_exists?
         reason = nil
@@ -68,7 +62,6 @@ module Lowrail
         end
         dependencies.each { |mod, name, singleton| facts << PreloadFacts.method_fact(mod, name, singleton: singleton) }
         # Include the replaced name so include/prepend/extend resets this unit.
-        id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
         facts << { "receiver" => klass.name, "method" => "_load_from_sql", "singleton" => true,
           "owner" => "#<Class:#{klass.name}>", "source_location" => "lowrail:ar_instantiate:#{klass.name}:2",
           "visibility" => "public", "exact" => true }
@@ -76,7 +69,7 @@ module Lowrail
         # remain live. Alpha's builder construction also needs the facts above.
         sources.concat([__FILE__, ARInstantiate.method(:source).source_location.first,
           File.expand_path("ar_guard.rb", __dir__)])
-        manifest["units"] << { "id" => id, "kind" => "runtime", "file" => klass.name,
+        units << { "kind" => "runtime", "file" => klass.name,
           "pass" => pass, "facts" => facts,
           "ar_instantiate" => { "model" => klass.name, "rails_version" => Rails.version,
             "original" => ARInstantiate.original_fact(original),
@@ -84,9 +77,8 @@ module Lowrail
       rescue StandardError => e
         ledger << { "file" => klass.name, "pass" => pass, "outcome" => "declined: #{e.class}" }
       end
-      Lowrail.write_json(manifest_path, manifest)
-      Lowrail.write_json(ledger_path, ledger)
-      warn "[lowrail] AR instantiate: #{manifest['units'].count { _1['pass'] == pass }} model variants"
+      warn "[lowrail] AR instantiate: #{units.size} model variants"
+      {units: units, ledger: ledger}
     end
 
     # 8.1 memoizes the builder itself. Alpha reconstructs it on each lookup,

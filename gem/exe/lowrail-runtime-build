@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Private build protocol: one request on stdin, one result per selected pass
+# on stdout. Builders read the booted app but never write build artifacts.
+require "json"
+request = JSON.parse($stdin.read)
+output = $stdout.dup
+$stdout.reopen($stderr) # App initializers/loggers must not corrupt the JSON.
+ENV["LOWRAIL"] = "0"
+ENV["RAILS_ENV"] ||= "test"
+require File.expand_path("config/environment", Dir.pwd)
+Rails.application.eager_load!
+require_relative "../lib/lowrail"
+results = request.fetch("builders").map do |builder|
+  require_relative "../lib/lowrail/#{builder.fetch("file")}"
+  Lowrail.const_get(builder.fetch("module"), false).build(denied: request.fetch("denied"))
+end
+output.puts(JSON.generate(results))

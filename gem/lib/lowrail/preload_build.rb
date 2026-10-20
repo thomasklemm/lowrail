@@ -9,15 +9,9 @@ module Lowrail
   module PreloadBuild
     module_function
 
-    def run(dir)
-      path = File.join(dir, "manifest.json")
-      manifest = JSON.parse(File.read(path))
-      ledger_path = File.join(dir, "ledger.json")
-      ledger = JSON.parse(File.read(ledger_path))
-      manifest["units"].reject! { _1["pass"] == "active_record/preload_plans" }
-      ledger.reject! { _1["pass"] == "active_record/preload_plans" }
-      denied = JSON.parse(File.read(File.join(dir, "denylist.json"))) if File.file?(File.join(dir, "denylist.json"))
-      reason = "denylisted by verify --bisect" if Array(denied).any? { _1["pass"] == "active_record/preload_plans" }
+    def build(denied: [])
+      units, ledger = [], []
+      reason = "denylisted by verify --bisect" if denied.any? { _1["pass"] == "active_record/preload_plans" }
       if defined?(ActiveRecord::Associations::Preloader)
         preloader = ActiveRecord::Associations::Preloader
         framework = Gem.loaded_specs.fetch("activerecord").full_gem_path + "/"
@@ -33,9 +27,7 @@ module Lowrail
       end
       if reason
         ledger << { "pass" => "active_record/preload_plans", "outcome" => reason }
-        Lowrail.write_json(path, manifest)
-        Lowrail.write_json(ledger_path, ledger)
-        return
+        return {units: units, ledger: ledger}
       end
       models, edges, types, facts = {}, {}, {}, []
       classes = defined?(ActiveRecord::Base) ? ActiveRecord::Base.descendants : []
@@ -89,16 +81,14 @@ module Lowrail
         files.concat(types.values.flat_map(&:values).flatten(1).map(&:first))
         files << PreloadFacts.method(:decline).source_location.first
         edges.each_value { |e| files << e["scope"].first if e["scope"] }
-        id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
-        manifest["units"] << { "id" => id, "kind" => "runtime", "file" => "active_record/preload_plans",
+        units << { "kind" => "runtime", "file" => "active_record/preload_plans",
           "pass" => "active_record/preload_plans", "facts" => facts.uniq,
           "preload_facts" => { "models" => models, "edges" => edges,
             "originals" => originals, "types" => types,
             "rails_version" => Rails.version, "sources" => files.uniq.to_h { [_1, Digest::SHA256.file(_1).hexdigest] } } }
       end
-      Lowrail.write_json(path, manifest)
-      Lowrail.write_json(ledger_path, ledger)
       warn "[lowrail] preload plans: #{edges.size} eligible associations, #{ledger.count { _1["pass"] == "active_record/preload_plans" } - edges.size} declined"
+      {units: units, ledger: ledger}
     end
   end
 end
