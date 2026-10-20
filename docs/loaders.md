@@ -1,7 +1,10 @@
 # Loader composition and compile options
 
-Checked 2026-10-20 on MRI 4.0.7 and 3.4.11. Lowrail preserves the app's
-compiler policy; it does **not** enable frozen string literals for the app.
+Checked 2026-10-20 on MRI 4.0.7 (3.4.11 results below are historical;
+Ruby 3.4 is no longer targeted). Lowrail preserves per-file compiler policy;
+it does **not** enable frozen string literals for the app. This is narrower
+than preserving loader selection: the strict load census rejects the
+require-hooks/Bootsnap ordering described below.
 
 ## Why the process-wide fingerprint was insufficient
 
@@ -77,14 +80,58 @@ Tests build with the app's own loader order and compare against that exact
 baseline, including mutable literals when Freezolite is hidden. Lowrail must
 not silently repair that order and change application behavior. To enable
 Freezolite's policy, applications should follow its documented order:
-Bootsnap first, Freezolite after. Lowrail's placement is independent of that.
+Bootsnap first, Freezolite after. Lowrail's placement preserves the tested
+literal results, but is **not independent of loader selection**.
 
-require-hooks detects Bootsnap by the top `load_iseq.source_location`.
-Lowrail in front can cause selection of its plain ISeq mode instead of the
-Bootsnap adapter. Its around callbacks and per-file compilation still work,
-and `super` can still reach Bootsnap. Cache/transform behavior remains
-conservative; Lowrail does not falsify method introspection to influence the
-gem's detection.
+### Unresolved: require-hooks adapter selection
+
+In both [0.4.0](https://github.com/ruby-next/require-hooks/blob/v0.4.0/lib/require-hooks/setup.rb)
+and [0.5.1](https://github.com/ruby-next/require-hooks/blob/v0.5.1/lib/require-hooks/setup.rb),
+`REQUIRE_HOOKS_MODE` explicitly selects an adapter when set. Otherwise MRI's
+automatic check is exactly:
+
+```ruby
+RubyVM::InstructionSequence.respond_to?(:load_iseq) &&
+  (load_iseq = RubyVM::InstructionSequence.method(:load_iseq)) &&
+  load_iseq.source_location[0].include?("/bootsnap/")
+```
+
+True selects `require-hooks/mode/bootsnap`; false selects `mode/load_iseq`.
+Without MRI it uses the Kernel patch. Neither `defined?(Bootsnap)` nor the
+method owner decides this. Lowrail's prepended method has a Lowrail source
+location, so its presence changes the answer.
+
+A fresh-process probe on Ruby 4.0.7, Bootsnap 1.26.0 and **each** require-hooks
+version confirms the following. B = Bootsnap, H = require-hooks, L = Lowrail;
+the off run keeps B/H order and disables L.
+
+| Installation order | Off adapter | On adapter |
+|---|---|---|
+| L, B, H or B, L, H | Bootsnap | plain ISeq (**difference**) |
+| B, H, L | Bootsnap | Bootsnap |
+| L, H, B; H, L, B; H, B, L | plain ISeq | plain ISeq |
+| L, H or H, L, without Bootsnap | plain ISeq | plain ISeq |
+
+All 32 off/on processes returned the expected original/lowered fixture
+result; that does not certify unchanged loading. Redprints' real suite also
+has identical outcomes/SQL but the census rejects reproducible adapter and
+load-order differences, including with no active units. This is a **Lowrail
+delivery/setup problem**, not a Freezolite/app failure or random test noise.
+
+Installing only after H preserves the choice in that order, but a generic
+delay until Rails initialization misses earlier file delivery and does not
+fix `Compilation::Capture#load_iseq` during build. Prepending another wrapper
+or chaining with `super` still changes the top method's source location.
+Using only Bootsnap's deserialization seam does not cover native MRI require
+without Bootsnap, cold compilation, or require-hooks' eval/empty-ISeq path;
+substituting before serialization would contaminate the app's original cache.
+No cheap, general, exact replacement has been established for these seams.
+Keep the strict verify refusal rather than change gem mode, falsify
+introspection, or weaken delivery fingerprints. This is not an automatic
+runtime artifact refusal: the existing delivery implementation remains, and
+this ordering has **no strict compatibility claim**. Invariant 7 takes
+precedence over the earlier acceptance of adapter changes. See
+[compatibility results](compat.md) and [DECISIONS](DECISIONS.md).
 
 ## Executed regression matrix
 
