@@ -49,7 +49,7 @@ class RailsSuiteReportTest < Minitest::Test
       report = RailsSuiteReport.compare("#{dir}/0", "#{dir}/1")
       assert_equal [17, 17], report.fetch("observations")
       assert_equal({}, report.fetch("differences"))
-      assert_operator JSON.parse(File.read("#{dir}/1")).fetch("unit_hits").values.sum, :>, 0
+      assert_empty JSON.parse(File.read("#{dir}/1")).fetch("unit_hits"), "L3 test process must not activate sealed-only AR candidates"
     end
   end
 

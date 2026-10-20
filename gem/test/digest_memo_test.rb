@@ -5,7 +5,7 @@ require_relative "test_helper"
 class DigestMemoTest < Minitest::Test
   include LowrailTest
 
-  def test_public_lazy_version_fixture_is_opt_in_and_differentially_identical
+  def test_public_lazy_version_fixture_is_sealed_only_and_test_mode_stays_original
     root = File.expand_path("..", GEM_ROOT)
     binary = File.join(root, "target/release/lowrail")
     skip "build the Rust CLI to run the digest fixture" unless File.executable?(binary)
@@ -24,6 +24,9 @@ class DigestMemoTest < Minitest::Test
       manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
       refute manifest["units"].any? { _1["pass"] == "digest/file_memo" }
       out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--passes", "default,+digest_memo")
+      refute status.success?, "guarded selection must refuse"
+      assert_match(/--sealed/, err)
+      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--sealed", "--env", "production")
       assert status.success?, "#{err}\n#{out}"
       out, err, status = Open3.capture3(CLEAN_ENV, binary, "verify", dir, "--bisect", "--", RUBY, "bin/rails", "test", "--seed", "1729")
       assert status.success?, "#{err}\n#{out}"
@@ -31,12 +34,10 @@ class DigestMemoTest < Minitest::Test
       assert_match(/LOWRAIL=1: 7 tests, 7 pass, 0 fail, 0 error, 0 skip/, out)
       assert_match(/outcomes: identical per test/, out)
       report = JSON.parse(File.read(File.join(dir, ".lowrail/verify/outcomes-1.json")))
-      assert_equal 2, report.fetch("unit_hits").size
-      assert report.fetch("unit_hits").values.all?(&:positive?)
+      assert_empty report.fetch("unit_hits"), "test-mode sealed artifact must stay original-only"
       assert_empty report.fetch("unit_fallbacks")
 
-      # Pass isolation disables the specialization, not the runtime entry
-      # referenced by delivered source (including calls during app boot).
+      # Test-mode refusal also applies when bisection selects no real unit.
       out, err, status = Open3.capture3(CLEAN_ENV.merge("LOWRAIL_UNITS" => "999999"),
         binary, "verify", dir, "--", RUBY, "bin/rails", "test", "--seed", "1729")
       assert status.success?, "#{err}\n#{out}"
@@ -44,11 +45,14 @@ class DigestMemoTest < Minitest::Test
       report = JSON.parse(File.read(File.join(dir, ".lowrail/verify/outcomes-1.json")))
       assert_empty report.fetch("unit_hits")
 
-      result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "test", "LOWRAIL" => "1", "LOWRAIL_STATS" => File.join(dir, "guard-stats")})
+      result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL_SEALED" => "1", "LOWRAIL" => "1", "LOWRAIL_STATS" => File.join(dir, "guard-stats")})
         require_relative "config/environment"
+        FileUtils.mkdir_p(File.dirname(RailsVite.config.manifest_path))
+        File.write(RailsVite.config.manifest_path, '{"audit":"production file bytes"}')
         manifest = RailsVite::Manifest.new(RailsVite.config.manifest_path)
         expected = manifest.digest
         2.times { raise "unstable digest" unless manifest.digest == expected }
+        raise "no public production hits" unless Lowrail::Stats.unit_hits.values.sum.positive?
         Digest::MD5.class_eval do
           define_method(:initialize_copy) { |_| raise "custom clone" }
           private :initialize_copy
@@ -115,6 +119,17 @@ class DigestMemoTest < Minitest::Test
       assert result.fetch("recovered")
       assert_equal 6, result.fetch("fallbacks")
 
+      # An accepted source artifact still references its runtime when all
+      # units are isolated away. Exercise production delivery, not refusal.
+      result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL_SEALED" => "1", "LOWRAIL" => "1", "LOWRAIL_UNITS" => "999999", "LOWRAIL_STATS" => ""})
+        require_relative "config/environment"
+        expected = Digest::MD5.file(RailsVite.config.manifest_path).hexdigest
+        raise "isolated source differs" unless RailsVite::Manifest.new(RailsVite.config.manifest_path).digest == expected
+        puts JSON.generate(loaded: !!defined?(Lowrail::DigestMemo), hits: Lowrail::Stats.unit_hits)
+      RUBY
+      assert result.fetch("loaded")
+      assert_empty result.fetch("hits")
+
       # A same-line `using` must not escape detection: a global method fact
       # cannot certify dispatch through a lexical refinement.
       FileUtils.mkdir_p(File.join(dir, "config/initializers"))
@@ -137,7 +152,7 @@ class DigestMemoTest < Minitest::Test
           end
         end
       RUBY
-      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--passes", "default,+digest_memo")
+      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--sealed", "--env", "production")
       assert status.success?, "#{err}\n#{out}"
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
       assert ledger.any? { _1["pass"] == "digest/file_memo" && _1["outcome"] == "refused" && _1["reason"] == "refinements" && _1["detail"] == "refined gem source" }

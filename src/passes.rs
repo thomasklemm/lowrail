@@ -28,12 +28,12 @@ pub struct Pass {
 pub const REGISTRY: &[Pass] = &[
     Pass { name: "view/link_to", kind: Kind::Source, default: false, sealed_only: false, builder: Builder::View, alias: "link_to" },
     Pass { name: "route/path", kind: Kind::Source, default: false, sealed_only: false, builder: Builder::Route, alias: "path" },
-    Pass { name: "memo/uri_join", kind: Kind::Source, default: false, sealed_only: false, builder: Builder::Memo(Intrinsic::UriJoin), alias: "uri_join" },
-    Pass { name: "memo/sha256", kind: Kind::Source, default: false, sealed_only: false, builder: Builder::Memo(Intrinsic::Sha256), alias: "sha256" },
-    Pass { name: "digest/file_memo", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "digest_memo_build", module: "DigestMemoBuild" }, alias: "digest_memo" },
-    Pass { name: "active_record/preload_plans", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "preload_build", module: "PreloadBuild" }, alias: "preload_plans" },
-    Pass { name: "active_record/instantiate", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "ar_instantiate_build", module: "ARInstantiateBuild" }, alias: "ar_instantiate" },
-    Pass { name: "active_record/ar_plans", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "ar_plan_build", module: "ARPlanBuild" }, alias: "ar_plans" },
+    Pass { name: "memo/uri_join", kind: Kind::Source, default: false, sealed_only: true, builder: Builder::Memo(Intrinsic::UriJoin), alias: "uri_join" },
+    Pass { name: "memo/sha256", kind: Kind::Source, default: false, sealed_only: true, builder: Builder::Memo(Intrinsic::Sha256), alias: "sha256" },
+    Pass { name: "digest/file_memo", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "digest_memo_build", module: "DigestMemoBuild" }, alias: "digest_memo" },
+    Pass { name: "active_record/preload_plans", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "preload_build", module: "PreloadBuild" }, alias: "preload_plans" },
+    Pass { name: "active_record/instantiate", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "ar_instantiate_build", module: "ARInstantiateBuild" }, alias: "ar_instantiate" },
+    Pass { name: "active_record/ar_plans", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "ar_plan_build", module: "ARPlanBuild" }, alias: "ar_plans" },
     Pass { name: "inertia/config_bind", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "inertia_config_build", module: "InertiaConfigBuild" }, alias: "inertia_config" },
     Pass { name: "inertia/props", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "inertia_props_build", module: "InertiaPropsBuild" }, alias: "props" },
     Pass { name: "endpoint/action", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "endpoint_build", module: "EndpointBuild" }, alias: "endpoint" },
@@ -44,6 +44,8 @@ pub fn quarantine_reason(name: &str) -> Option<&'static str> {
     match name {
         "view/link_to" | "route/path" => Some("quarantined: source arms lack exact receiver certificates and continuation after app-defined argument/conversion code"),
         "inertia/config_bind" => Some("quarantined: sealed-only; suppressed Hash.method_added permits Hash#extract! replacement while cached facts remain true (SEAL001)"),
+        "memo/sha256" | "memo/uri_join" | "digest/file_memo" => Some("quarantined: sealed-only; suppressed singleton_method_added permits cached digest/URI dependencies to change (SEAL001)"),
+        "active_record/preload_plans" | "active_record/instantiate" | "active_record/ar_plans" => Some("quarantined: sealed-only; suppressed method callbacks bypass both cached facts and AR epochs (SEAL001)"),
         _ => None,
     }
 }
@@ -109,11 +111,11 @@ mod tests {
     fn selection_defaults_aliases_groups_and_last_modifier_wins() {
         let names = |s: Selection| s.iter().map(|p| p.name).collect::<Vec<_>>();
         assert!(names(Selection::parse("default").unwrap()).is_empty());
-        assert_eq!(names(Selection::parse("default,+ar_instantiate,-view/link_to,+memo,-memo/sha256").unwrap()),
-            ["memo/uri_join", "active_record/instantiate"]);
-        assert!(names(Selection::parse("default,-path,+digest/file_memo,-digest_memo").unwrap()).is_empty());
+        assert_eq!(names(Selection::parse("default,+props,-view/link_to,+endpoint,-props").unwrap()),
+            ["endpoint/action"]);
+        assert!(names(Selection::parse("default,-path,-digest_memo").unwrap()).is_empty());
         let mut aliases = Selection::default();
-        for name in ["memo", "preload_plans", "ar_instantiate", "ar_plans", "digest_memo", "props", "endpoint"] { aliases.set(name, true).unwrap(); }
+        for name in ["props", "endpoint"] { aliases.set(name, true).unwrap(); }
         let available = REGISTRY.iter().filter(|p| quarantine_reason(p.name).is_none() && !p.sealed_only).map(|p| p.name).collect::<Vec<_>>();
         assert_eq!(names(aliases), available);
         assert_eq!(names(Selection::parse("all-opt-in").unwrap()), available);
@@ -129,8 +131,15 @@ mod tests {
         for name in ["view/link_to", "link_to", "route/path", "path"] {
             assert!(Selection::parse(&format!("default,+{name}")).err().unwrap().contains("quarantined"));
         }
-        assert!(Selection::parse("all-opt-in,+sealed_link_to").err().unwrap().contains("--sealed"));
-        assert!(Selection::parse("default,+inertia_config").err().unwrap().contains("--sealed"));
-        assert_eq!(Selection::sealed().iter().map(|p| p.name).collect::<Vec<_>>(), ["inertia/config_bind", "sealed/link_to"]);
+        for pass in REGISTRY.iter().filter(|p| p.sealed_only) {
+            for name in [pass.name, pass.alias] {
+                assert!(Selection::parse(&format!("default,+{name}")).err().unwrap().contains("--sealed"));
+                assert!(Selection::parse(&format!("all-opt-in,+{name}")).is_err());
+            }
+        }
+        assert!(Selection::parse("default,+memo").is_err());
+        assert_eq!(Selection::sealed().iter().map(|p| p.name).collect::<Vec<_>>(),
+            ["memo/uri_join", "memo/sha256", "digest/file_memo", "active_record/preload_plans",
+             "active_record/instantiate", "active_record/ar_plans", "inertia/config_bind", "sealed/link_to"]);
     }
 }

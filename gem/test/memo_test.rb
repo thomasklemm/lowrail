@@ -6,6 +6,9 @@ class MemoTest < Minitest::Test
   include LowrailTest
 
   PRELUDE = <<~'RUBY'
+    # Isolated runtime-unit fixture, explicitly accepting the production tier.
+    ENV["RAILS_ENV"] = "production"
+    ENV["LOWRAIL_SEALED"] = "1"
     require "json"
     require "lowrail"
     require "lowrail/manifest"
@@ -19,7 +22,8 @@ class MemoTest < Minitest::Test
     unit = { "id" => 0, "kind" => "file", "file" => "/memo.rb", "pass" => "memo/uri_join",
       "facts" => cert.fetch("facts"), "memo" => cert }
     manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
-      "compile_option" => "", "files" => {}, "units" => [unit] }, "/tmp")
+      "compile_option" => "", "files" => {}, "units" => [unit],
+      "tier" => "sealed-v1", "rails_env" => "production" }, "/tmp")
     Lowrail::Guard.install(manifest, Lowrail::Stats::STATE)
     Lowrail::Passes::Memo.install(manifest.units)
     def joined(base, relative)

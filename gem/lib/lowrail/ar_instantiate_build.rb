@@ -20,6 +20,9 @@ module Lowrail
     def build(denied: [])
       units, ledger = [], []
       pass = ARInstantiate::PASS
+      unless defined?(ActiveRecord::Base)
+        return {units: units, ledger: [{"pass" => pass, "outcome" => "refused", "reason" => "framework_absent"}]}
+      end
       ActiveRecord::Base.descendants.sort_by { _1.name.to_s }.each do |klass|
         next if klass.abstract_class? || !klass.name || !klass.table_exists?
         reason = nil

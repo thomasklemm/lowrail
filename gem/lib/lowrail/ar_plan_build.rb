@@ -13,6 +13,9 @@ module Lowrail
 
     def build(denied: [])
       units, ledger = [], []
+      unless defined?(ActiveRecord::Base)
+        return {units: units, ledger: [{"pass" => "active_record/ar_plans", "outcome" => "refused", "reason" => "framework_absent"}]}
+      end
       ledger.concat(ARPlanSites.inventory(Rails.root.to_s)) if Rails.respond_to?(:root)
       models, edges, facts, originals = {}, {}, [], []
       denied = denied.any? { _1["pass"] == "active_record/ar_plans" }

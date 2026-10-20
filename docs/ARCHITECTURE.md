@@ -108,7 +108,7 @@ compared run to run.
 ### Build orchestration
 
 ```
-lowrail build APP [--env E] [--passes default,+ar_instantiate,-view/link_to]
+lowrail build APP [--env E] [--passes default,+props,+endpoint]
   1. facts (one boot, cached)
   2. source passes in Rust, in declared order (link_to before route/path)
   3. one Ruby process: boot the app once, run every selected runtime pass's
@@ -125,10 +125,17 @@ units, preserving the original installation order. The two `memo/*` passes
 share one installer. Existing file paths and `Lowrail::<Name>` constants stay
 available, so generated Ruby and source-fact owners do not change.
 
-The opt-in `inertia/config_bind` pass uses `Passes::InertiaConfig` directly.
+The sealed-only `inertia/config_bind` pass uses `Passes::InertiaConfig` directly.
 Its builder-only publication preceded this registry; activation is now wired
 through the same helper, with separate integration gates in addition to the
 existing-pass before/after equivalence proof.
+
+The [suppressed-hook audit](passes/suppressed-hooks.md) also makes both memo
+passes, file-digest memo and all three AR passes sealed-only. Their cached
+facts/epochs do not certify suppressed dependency changes. Only props and
+endpoint remain in guarded `all-opt-in`; defaults remain empty. The generic
+registry drives the separate production sealed tier; old/mixed artifacts
+refuse whole, and test processes remain original-only.
 
 The opt-in `inertia/props` builder returns a gem-source rewrite through the
 existing runtime `files` protocol, not a replacement resolver subsystem.

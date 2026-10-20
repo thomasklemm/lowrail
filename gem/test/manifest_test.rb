@@ -87,4 +87,33 @@ class ManifestTest < Minitest::Test
     assert_equal({"file" => source}, unit["data"]["config"])
     assert_equal "puts #{root.inspect}", unit["data"]["code"]
   end
+
+  def test_each_old_or_mixed_sealed_only_artifact_refuses_before_any_installer
+    result = ruby_json(<<~'RUBY', setup: false, env: {"RUBYOPT" => "-I#{GEM_LIB}"})
+      require "json"
+      require "tmpdir"
+      require "lowrail"
+      require "lowrail/manifest"
+      ENV["RAILS_ENV"], ENV["LOWRAIL_SEALED"] = "production", "1"
+      rows = []
+      passes = Lowrail::Passes::REGISTRY.values.select { _1[:sealed_only] }.flat_map { _1[:passes] }
+      Dir.mktmpdir do |root|
+        Dir.mkdir(File.join(root, ".lowrail"))
+        passes.each do |pass|
+          unit = {"id" => 0, "pass" => pass, "facts" => []}
+          base = {"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
+            "compile_option" => "", "files" => {}, "rails_env" => "production", "units" => [unit]}
+          [base, base.merge("tier" => "sealed-v2"),
+            base.merge("tier" => "sealed-v1", "units" => [unit, {"id" => 1, "pass" => "endpoint/action", "facts" => []}])].each do |artifact|
+            File.write(File.join(root, ".lowrail/manifest.json"), JSON.generate(artifact))
+            rows << [Lowrail.setup(root: root), !!Lowrail.refusal_reason,
+              !!defined?(Lowrail::Guard), !!defined?(Lowrail::Loader)]
+          end
+        end
+      end
+      puts JSON.generate(rows)
+    RUBY
+    assert_equal 24, result.size
+    assert_equal [[false, true, false, false]], result.uniq
+  end
 end

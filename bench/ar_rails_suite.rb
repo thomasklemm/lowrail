@@ -69,10 +69,11 @@ if (build_root = ENV["RAILS_SUITE_BUILD"])
   exit! 0
 end
 if layer == "L3" && Lowrail.enabled?
-  abort "build a manifest first (script/rails-suite)" unless Lowrail.manifest
+  abort "build a manifest first (script/rails-suite)" unless Lowrail.manifest || Lowrail.refusal_reason
+  warn "[lowrail] L3 original-only: #{Lowrail.refusal_reason}" if Lowrail.refusal_reason
   { "active_record/ar_plans" => :ARPlans, "active_record/preload_plans" => :PreloadPlans,
     "active_record/instantiate" => :ARInstantiate }.each do |pass, runtime|
-    Lowrail.const_get(runtime).activate if Lowrail.manifest.units.any? { _1["pass"] == pass }
+    Lowrail.const_get(runtime).activate if Lowrail.manifest&.units&.any? { _1["pass"] == pass }
   end
 end
 Lowrail.write_json(ENV.fetch("LOWRAIL_OUTCOMES") + ".loaded.json", { "files" => files })

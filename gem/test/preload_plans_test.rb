@@ -8,6 +8,8 @@ class PreloadPlansTest < Minitest::Test
   # Real Rails/SQLite, through the public Preloader interface. No mocks of
   # loader internals: the same asymmetric workload must agree on both paths.
   SCENARIO = <<~'RUBY'
+    ENV["RAILS_ENV"] = "production"
+    ENV["LOWRAIL_SEALED"] = "1"
     gem "activerecord", "~> 8.1.4"
     require "active_record"
     require "lowrail"
@@ -97,7 +99,8 @@ class PreloadPlansTest < Minitest::Test
     PolyPost.create!(owner: a)
     dir = Dir.pwd
     File.write("manifest.json", JSON.generate({format: Lowrail::FORMAT, ruby_description: RUBY_DESCRIPTION,
-      compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 7, facts: []}]}))
+      compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [],
+      tier: "sealed-v1", rails_env: "production"}))
     File.write("ledger.json", "[]")
     built = Lowrail::PreloadBuild.build
     built[:units].each_with_index { |unit, i| unit["id"] = 8 + i }
@@ -322,7 +325,7 @@ class PreloadPlansTest < Minitest::Test
     puts JSON.generate(result)
   RUBY
 
-  def test_installs_before_active_record_is_loaded
+  def test_old_artifact_refuses_without_loading_active_record
     result = ruby_json(<<~'RUBY', setup: false, env: { "RUBYOPT" => "-I#{GEM_LIB}" })
       require "lowrail"
       require "json"
@@ -335,7 +338,7 @@ class PreloadPlansTest < Minitest::Test
         puts JSON.generate(installed: Lowrail.setup(root: root), active_record: !!defined?(ActiveRecord))
       end
     RUBY
-    assert_equal({ "installed" => true, "active_record" => false }, result)
+    assert_equal({ "installed" => false, "active_record" => false }, result)
   end
 
   def test_plans_keep_rails_results_and_invalidate
@@ -360,7 +363,7 @@ class PreloadPlansTest < Minitest::Test
       assert_equal off, on
       assert_equal off, disabled
       assert_equal off, stale
-      assert_equal [7, 8], on["unit_ids"]
+      assert_equal [8], on["unit_ids"]
       assert_equal [[], ["only A"]], on["habtm"]
       assert_operator on["noncanonical_refusals"], :>, 0
       assert_equal 1, on["root_loaders"]
@@ -418,7 +421,7 @@ class PreloadPlansTest < Minitest::Test
           end
         end
         assert_equal runs.first, runs.last
-        assert_equal [7], runs.last["unit_ids"] if patch == "batch"
+        assert_empty runs.last["unit_ids"] if patch == "batch"
         assert_operator runs.last["build_wrapper_calls"], :>, 10
       end
     end

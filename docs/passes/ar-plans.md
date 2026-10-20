@@ -1,6 +1,13 @@
-# Active Record SQL plans (opt-in)
+# Active Record SQL plans (sealed-only)
 
-`lowrail build APP --passes default,+ar_plans [--env test|production]` enables a narrow
+**Current status: sealed-only.** A suppressed visitor mutation hook bypasses
+cached method facts, the AR epoch and visitor identity. Guarded selection
+and old/mixed artifacts refuse; see the [audit](suppressed-hooks.md). Only
+production research under the separate [sealed contract](../sealed.md) is
+eligible; test processes stay original-only. The guarded measurements and
+commands below are historical, not accelerated L3 coverage.
+
+This is a narrow
 gem-level pass. It caches **plans, not rows**. Rails' existing `find_by` and
 unscoped-association StatementCaches are not Lowrail hits. This is not yet
 a demonstrated request-level optimization, nor support for arbitrary query

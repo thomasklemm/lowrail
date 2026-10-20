@@ -11,7 +11,7 @@ live in the linked docs; numbers come from executed runs, dated.
 |---|---|
 | Default build | lowers nothing: `view/link_to` and `route/path` quarantined (45fd07a); five-app manifests have 0 units |
 | Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; expanded corpus fixes early-autoload bugs, but strict load census rejects Redprints' loader adapter change ([compatibility report](compat.md)) |
-| Opt-in passes | exact, no accepted request win; see [DECISIONS](DECISIONS.md#passes) |
+| Opt-in passes | guarded selection: only props + endpoint; seven cached-fact passes sealed-only after suppressed-hook audit; see [DECISIONS](DECISIONS.md#passes) |
 | Measurement | interpreter fixed-heap/A/A protocol (c9d2397) accepted; YJIT whole-request cohorts rejected by the JIT-flat gate (07205de); guard micro K 822→425 interpreter / 371→140 YJIT Ir |
 | Biggest measured lever | endpoint render path, −26 %/−37 % handwritten upper bounds; caller-side certification loses (0fbb909) |
 | Types/MCP | typed facts (f704751), MCP + quality ledger (8df58ed) |
@@ -24,6 +24,13 @@ Ruby 4.0+ (gemspec), developed on 4.0.7; the second target is Ruby 4.1
 decision on 2026-10-20. Historical, not current support evidence: real-blog
 on Ruby 3.4.11 built the same 11 units and verified 21/21 identical with
 114 hits.
+
+**Quarantine supersedes the cached-fact results below.** Memo, file-digest
+memo, all three AR passes and config binding are now sealed-only; their old
+guarded commands refuse, and their previous hit maps are historical, not
+current support. Defaults remain empty. Production sealed research requires
+the separate contract; test processes refuse sealed artifacts. See the
+[suppressed-hook audit and current maps](passes/suppressed-hooks.md).
 
 - **Gem-breadth corpus:** four reproducible dependency-only Rails 8.1.4 /
   Ruby 4.0.7 overlays add CASA, Writebook, Fizzy and CodeTriage. CASA's I18n

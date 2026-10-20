@@ -28,10 +28,11 @@ why and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how a pass plugs in.
   observe stale helpers when code changed mid-request
   ([counterexamples](docs/passes/endpoint.md#source-arm-quarantine)). That cost
   the blog about 6 % on `/articles`, and we accept the loss.
-- **Opt-in passes exist** (memo, digest memo, AR plans, preload plans,
-  `inertia/config_bind`, [`inertia/props`](docs/passes/props.md), the
-  conservative `endpoint/action` slice). Each one
-  is exact, but none has an accepted whole-request win yet.
+- **Guarded opt-in passes** are [`inertia/props`](docs/passes/props.md) and
+  the conservative `endpoint/action` slice; neither has an accepted
+  whole-request win. Memo, digest memo, AR plans, preload plans and
+  `inertia/config_bind` are now **sealed-only**: suppressed mutation hooks
+  defeat their cached facts ([audit](docs/passes/suppressed-hooks.md)).
 - **Where speed could come from is measured.** On the blog, rendering is
   25–34 % of a request, events 3–4 %, routing and middleware about 2 %.
   Handwritten endpoint ceilings are −26 % (index) and −37 % (show) with
@@ -82,7 +83,7 @@ cargo build --release            # CLI at target/release/lowrail
 # 2. Boot facts and a build (writes APP/.lowrail/)
 lowrail facts path/to/app
 lowrail build path/to/app [--env test|production]   # default selection
-lowrail build path/to/app --passes default,+memo,+inertia_config
+lowrail build path/to/app --passes default,+props,+endpoint
 
 # 3. Prove it: your suite off vs on, per-test outcomes + ordered SQL
 lowrail verify path/to/app     # prints its test seed to stderr; SEED=… to fix it
@@ -112,8 +113,12 @@ with `Lowrail.refusal_reason`. In development it is off unless `LOWRAIL=1`.
 `+name`/`-name` in order. Names are the stable
 `area/name` identifiers in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 Short aliases are `memo`, `preload_plans`, `ar_instantiate`, `ar_plans`,
-`digest_memo`, `inertia_config`, `props` and `endpoint`. File formats are documented in
-[docs/FORMATS.md](docs/FORMATS.md).
+`digest_memo`, `inertia_config`, `props` and `endpoint`, but only `props` and
+`endpoint` remain eligible for guarded selection. The others refuse even in
+`all-opt-in`; old mixed artifacts refuse as a whole. Sealed research builds
+use `--sealed --env production` and require explicit production acceptance
+of the [sealed contract](docs/sealed.md); test processes stay original-only.
+File formats are documented in [docs/FORMATS.md](docs/FORMATS.md).
 
 `LOWRAIL_VERIFY_LOADS=1 lowrail verify APP` also compares non-autoloading
 constant censuses, Zeitwerk-loaded paths and executed Active Support load

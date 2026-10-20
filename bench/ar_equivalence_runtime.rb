@@ -20,7 +20,10 @@ module Lowrail
       manifest = Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
         "compile_option" => "", "files" => {}, "units" => units }, Dir.pwd)
       Stats.enable!
-      if Lowrail.enabled?
+      # Framework/test processes cannot accept the sealed production contract.
+      # Keep building/reporting candidates, but do not bypass artifact refusal
+      # by installing their runtimes directly. Zero hits here are intentional.
+      if Lowrail.enabled? && !manifest.refusal_reason
         Guard.install(manifest, Stats::STATE)
         { ARPlans => "active_record/ar_plans", PreloadPlans => "active_record/preload_plans",
           ARInstantiate => "active_record/instantiate" }.each do |runtime, pass|

@@ -6,6 +6,8 @@ class ARInstantiateTest < Minitest::Test
   include LowrailTest
 
   SCENARIO = <<~'RUBY'
+    ENV["RAILS_ENV"] = "production"
+    ENV["LOWRAIL_SEALED"] = "1"
     gem "activerecord", "8.1.4"
     require "active_record"
     require "lowrail"
@@ -71,7 +73,8 @@ class ARInstantiateTest < Minitest::Test
     Bicycle.create!(name: "two wheels")
     Vehicle.create!(name: "plain")
     File.write("manifest.json", JSON.generate({format: Lowrail::FORMAT, ruby_description: RUBY_DESCRIPTION,
-      compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 4, facts: []}]}))
+      compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [],
+      tier: "sealed-v1", rails_env: "production"}))
     File.write("ledger.json", "[]")
     built = Lowrail::ARInstantiateBuild.build
     built[:units].each_with_index { |unit, i| unit["id"] = 5 + i }
@@ -240,7 +243,7 @@ class ARInstantiateTest < Minitest::Test
       end
       assert_equal "13.02.1997", off.fetch("date")
       assert_equal false, off.fetch("loaded_at_boot")
-      assert_operator on.delete("hits"), :>, 0
+      assert_equal 0, on.delete("hits"), "old unmarked AR artifact must refuse before activation"
       off.delete("hits")
       assert_equal off, on
     end

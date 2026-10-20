@@ -1,6 +1,12 @@
 # Active Record instantiation variants
 
-Opt in with `lowrail build APP --passes default,+ar_instantiate`. This is a narrow
+**Current status: sealed-only.** Suppressed model singleton hooks bypass
+both the method certificate and AR epoch. Guarded selection and old/mixed
+artifacts refuse; see the [audit](suppressed-hooks.md). Only production
+research under the separate [sealed contract](../sealed.md) is eligible;
+test processes stay original-only. The guarded measurements below are historical.
+
+This is a narrow
 homogeneous-result loader variant, not attribute-reader specialization and
 not a replacement for Active Record objects. It is not enabled by default.
 

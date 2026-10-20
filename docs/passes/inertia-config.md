@@ -1,4 +1,12 @@
-# Inertia configuration binding — opt-in
+# Inertia configuration binding — sealed-only
+
+**Current status: sealed-only.** Suppressed `Hash.method_added` defeats the
+cached extraction certificate. Guarded selection and old/mixed artifacts
+refuse; see the [audit](suppressed-hooks.md). Production research requires
+the separate [sealed contract](../sealed.md); test processes stay original-only.
+The [fresh finite prices](next-levers.md) show −6.947% interpreter but
+**+16.339% YJIT** on Starter JSON, not a default promotion. The earlier
+guarded measurements and commands below are historical.
 
 Measured 2026-10-20, Ruby **4.0.7 +YJIT**, unchanged `script/corpus` pins.
 This implements [candidate 1](../candidates.md#1-inertiaconfig_bind), not a

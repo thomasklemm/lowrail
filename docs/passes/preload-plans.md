@@ -1,5 +1,12 @@
 # Active Record preload plans computed once
 
+**Current status: sealed-only.** Suppressed model singleton hooks bypass
+both the method certificate and AR epoch. Guarded selection and old/mixed
+artifacts refuse; see the [audit](suppressed-hooks.md). Only production
+research under the separate [sealed contract](../sealed.md) is eligible;
+test processes stay original-only. The guarded commands/results below are
+historical, not current support or accelerated L3 coverage.
+
 PLAN §9.2b (preload portion), measured 2026-10-20. Ruby **4.0.7 +YJIT**, Campfire
 [`af4dd9f`](https://github.com/basecamp/once-campfire/commit/af4dd9fd599c65e0e0fc1f614ee469f70156ddf5),
 Rails **8.2.0.alpha** at

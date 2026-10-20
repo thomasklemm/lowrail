@@ -1,8 +1,13 @@
 # Exaktes Memo für Datei-Digests
 
-Stand: 2026-10-20. Opt-in mit `lowrail build APP --passes default,+digest_memo`;
-Passname `digest/file_memo`. Unabhängig von `+memo` und
-`+preload_plans`; ohne Auswahl werden keine Digest-Dateien verändert.
+**Aktueller Status: sealed-only.** Unterdrückte Methoden-Hooks umgehen das
+Digest-Zertifikat trotz unveränderter Dateibytes. Guarded `+digest_memo`
+und alte/gemischte Artefakte werden vollständig abgelehnt; siehe
+[Audit und aktuelle Gates](suppressed-hooks.md). Nur der separate
+[Sealed-Vertrag](../sealed.md) erlaubt Produktionsforschung, keinen Testmodus.
+Die folgenden Guarded-Messungen und Befehle sind historisch.
+
+Stand: 2026-10-20. Passname `digest/file_memo`.
 
 ## Grenze und Auslieferung
 

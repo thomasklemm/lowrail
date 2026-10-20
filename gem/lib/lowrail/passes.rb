@@ -6,12 +6,12 @@ module Lowrail
   # names as aliases: emitted code and source certificates refer to them.
   module Passes
     REGISTRY = {
-      PreloadPlans: {file: "preload_plans", passes: %w[active_record/preload_plans]},
-      Memo: {file: "memo", passes: %w[memo/uri_join memo/sha256], source: true},
-      DigestMemo: {file: "digest_memo", passes: %w[digest/file_memo], source: true},
+      PreloadPlans: {file: "preload_plans", passes: %w[active_record/preload_plans], sealed_only: true},
+      Memo: {file: "memo", passes: %w[memo/uri_join memo/sha256], source: true, sealed_only: true},
+      DigestMemo: {file: "digest_memo", passes: %w[digest/file_memo], source: true, sealed_only: true},
       # This installer already subscribes to each model's Zeitwerk on_load.
-      ARInstantiate: {file: "ar_instantiate", passes: %w[active_record/instantiate], lazy: true},
-      ARPlans: {file: "ar_plans", passes: %w[active_record/ar_plans]},
+      ARInstantiate: {file: "ar_instantiate", passes: %w[active_record/instantiate], lazy: true, sealed_only: true},
+      ARPlans: {file: "ar_plans", passes: %w[active_record/ar_plans], sealed_only: true},
       InertiaConfig: {file: "inertia_config", passes: %w[inertia/config_bind], sealed_only: true},
       InertiaProps: {file: "inertia_props", passes: %w[inertia/props], source: true},
       Endpoint: {file: "endpoint", passes: %w[endpoint/action]},

@@ -72,7 +72,7 @@ class SealedLinkTest < Minitest::Test
       manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
       assert_equal Lowrail::FORMAT, manifest["format"]
       assert_equal "sealed-v1", manifest["tier"]
-      assert_equal ["sealed/link_to"], manifest.fetch("units").map { _1["pass"] }
+      link_unit = manifest.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("id").to_s
       scenario = <<~'RUBY'
         require "./config/environment"
         require "rack/mock"
@@ -105,8 +105,8 @@ class SealedLinkTest < Minitest::Test
           assert_equal off[key], sealed[key], "#{receiver}: #{key}"
         end
         assert_empty refused["hits"]
-        assert_equal receiver == "stock" ? 1 : 0, sealed.fetch("hits").fetch("0", 0), sealed.inspect
-        assert_equal receiver == "stock" ? 0 : 1, sealed.fetch("fallbacks").fetch("0", 0)
+        assert_equal receiver == "stock" ? 1 : 0, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
+        assert_equal receiver == "stock" ? 0 : 1, sealed.fetch("fallbacks").fetch(link_unit, 0)
         assert_equal '<a class="one&quot;two" href="/target?x=&lt;&amp;q=&quot;">A&lt;&amp;</a>', sealed["body"] if receiver == "stock"
       end
       FileUtils.mkdir_p(File.join(dir, "config/initializers"))
@@ -118,7 +118,7 @@ class SealedLinkTest < Minitest::Test
       out, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "production", "LOWRAIL_BUILD_JIT" => "0"), bin, "build", dir, "--env", "production", "--sealed")
       assert status.success?, "#{out}\n#{err}"
       refused = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
-      assert_empty refused.fetch("units")
+      refute refused.fetch("units").any? { _1["pass"] == "sealed/link_to" }
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
       assert ledger.any? { _1["detail"] == "non-stock helper visibility" }, ledger.inspect
     end

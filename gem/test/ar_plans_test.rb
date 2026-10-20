@@ -6,6 +6,8 @@ class ARPlansTest < Minitest::Test
   include LowrailTest
 
   SCENARIO = <<~'RUBY'
+    ENV["RAILS_ENV"] = "production"
+    ENV["LOWRAIL_SEALED"] = "1"
     gem "activerecord", "~> 8.1.4"
     require "active_record"
     require "lowrail"
@@ -49,7 +51,7 @@ class ARPlansTest < Minitest::Test
     end
     dir = ARGV.fetch(0)
     data = { "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
-      "files" => {}, "units" => [] }
+      "files" => {}, "units" => [], "tier" => "sealed-v1", "rails_env" => "production" }
     Lowrail.write_json(File.join(dir, "manifest.json"), data)
     Lowrail.write_json(File.join(dir, "ledger.json"), [])
     # Test scaffolding may live in Arel's namespace without being part of SQL

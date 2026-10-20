@@ -322,7 +322,9 @@ fully-literal price. This narrower census materially changes its priority.
 
 ### 1. `inertia/config_bind`
 
-- **Kind/default/needs:** runtime, opt-in; `booted_app` + method facts;
+- **Current boundary:** sealed-only after the [suppressed-hook audit](passes/suppressed-hooks.md);
+  the guarded sketch below is historical, not permission to select `+inertia_config`.
+- **Kind/default/needs:** runtime, sealed opt-in; `booted_app` + method facts;
   `Configuration#bind_controller` normal method variant, fresh result.
 - **Facts:** gem/Ruby/compiler identity; `Configuration.new`, `allocate`,
   `initialize`, `bind_controller`; Hash extraction/copy behavior and the

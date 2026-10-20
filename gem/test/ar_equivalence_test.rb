@@ -11,7 +11,7 @@ class AREquivalenceTest < Minitest::Test
     AREquivalence.schema
   RUBY
 
-  def test_all_passes_compose_and_shadow_preserves_queries_cache_records_and_callbacks
+  def test_sealed_only_candidates_refuse_without_changing_queries_cache_records_or_callbacks
     scenario = PRELUDE + <<~'RUBY'
       $callbacks = 0
       EqPost.after_find { $callbacks += 1 }
@@ -29,19 +29,17 @@ class AREquivalenceTest < Minitest::Test
       ActiveSupport::Notifications.unsubscribe(subscription)
       puts JSON.generate({ "results" => results, "all_events" => all_events, "callbacks" => $callbacks,
         "hits" => Lowrail::Stats.unit_hits.group_by { |id, _| built[:manifest].units[id.to_i]["pass"] }.transform_values { _1.sum(&:last) },
-        "checks" => Lowrail::ARShadow.counts })
+        "checks" => Lowrail::ARShadow.counts, "refusal" => built[:manifest].refusal_reason })
     RUBY
     outputs = [["0", "strict"], ["1", "0"], ["1", "strict"]].map do |mode, shadow|
       ruby_json(scenario, setup: false, env: { "RUBYLIB" => GEM_LIB, "LOWRAIL" => mode, "LOWRAIL_SHADOW" => shadow })
     end
     off, on, shadow = outputs
-    %w[active_record/ar_plans active_record/preload_plans active_record/instantiate].each do |pass|
-      assert_operator on.fetch("hits").fetch(pass, 0), :>, 0, pass
+    outputs.each do |output|
+      assert_empty output.delete("hits")
+      assert_empty output.delete("checks")
+      assert_match(/sealed-only.*active_record.*SEAL001/, output.delete("refusal"))
     end
-    %w[active_record/ar_plans active_record/preload_plans active_record/instantiate].each do |pass|
-      assert_operator shadow.fetch("checks").fetch(pass, 0), :>, 0, pass
-    end
-    outputs.each { _1.delete("hits"); _1.delete("checks") }
     assert_equal off, on
     assert_equal off, shadow
     assert_operator off.fetch("callbacks"), :>, 0

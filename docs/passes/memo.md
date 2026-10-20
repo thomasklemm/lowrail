@@ -1,6 +1,12 @@
 # Guarded memo: certified expressions, not arbitrary methods
 
-PLAN §9.2a, measured 2026-10-20. **Opt-in:** `lowrail build APP --passes default,+memo`.
+**Current status: sealed-only.** Suppressed singleton mutation hooks defeat
+both cached method certificates. Guarded `+memo` and old/mixed artifacts
+refuse; see the [audit and current gates](suppressed-hooks.md). Production
+research uses the separate [sealed contract](../sealed.md), never a test-mode
+override. The guarded measurements and commands below are historical.
+
+PLAN §9.2a, measured 2026-10-20.
 Ruby 4.0.7 +YJIT; Campfire and Rails pins are those in
 [Campfire M0](../m0/campfire.md). real-blog uses Rails 8.1.4.
 

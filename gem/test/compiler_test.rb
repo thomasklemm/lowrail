@@ -57,7 +57,7 @@ class CompilerTest < Minitest::Test
         "units" => [{ "id" => 0, "file" => good, "method" => "a", "facts" => [] },
                     { "id" => 1, "file" => bad, "method" => "b", "facts" => [] },
                     { "id" => 2, "file" => changed, "method" => "c", "facts" => [] },
-                    { "id" => 3, "kind" => "runtime", "file" => "Widget", "pass" => "active_record/instantiate", "facts" => [] },
+                    { "id" => 3, "kind" => "runtime", "file" => "Widget", "pass" => "inertia/props", "facts" => [] },
                     { "id" => 4, "kind" => "method", "target" => "InertiaRails::Configuration#bind_controller", "facts" => [] }]
       }
       err = StringIO.new

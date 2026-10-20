@@ -10,6 +10,7 @@ class EndpointTest < Minitest::Test
       require "./config/environment"
       require "rack/mock"
       require "lowrail"
+      require "lowrail/stats"
       require "lowrail/compiler"
       require "lowrail/endpoint_build"
       Rails.application.eager_load!
@@ -22,6 +23,20 @@ class EndpointTest < Minitest::Test
       compiled = Lowrail::Compiler.compile({"out" => File.expand_path(".lowrail"), "rails_env" => "test", "units" => built[:units]})
       raise "endpoint ISeq declined" unless compiled.fetch("units").size == 2
       Lowrail.setup(root: Dir.pwd)
+      if ENV["MUTATE"] == "warm"
+        2.times do
+          %w[/articles /articles/47].each do |path|
+            raise "warm response" unless Rack::MockRequest.new(Rails.application).get(path,
+              "HTTP_HOST" => "example.org", "HTTP_ACCEPT" => "text/html").status == 200
+          end
+        end
+        owner = ActionView::Helpers::UrlHelper
+        original = owner.instance_method(:link_to)
+        owner.define_singleton_method(:method_added) { |_| }
+        owner.define_method(:link_to) do |name, options|
+          original.bind_call(self, name, options) + "<!-- live helper -->".html_safe
+        end
+      end
       if ENV["MUTATE"] == "template"
         path = Rails.root.join("app/views/articles/index.html.erb")
         File.write(path, File.read(path) + "<!-- changed template -->")
@@ -103,7 +118,7 @@ class EndpointTest < Minitest::Test
       end
       puts JSON.generate({responses: results, hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks})
     RUBY
-    %w[0 1 2 3 4 5 template filter constant].each do |mutation|
+    %w[0 1 2 3 4 5 warm template filter constant].each do |mutation|
       realpath_tmpdir do |dir|
         write_endpoint_app(dir)
         result = ruby_json(scenario, chdir: dir, setup: false,
@@ -111,14 +126,22 @@ class EndpointTest < Minitest::Test
             "RUBYOPT" => "-I#{GEM_LIB} -rlowrail/setup"})
         index, show = result.fetch("responses")
         assert_equal [200, 200], [index.fetch("status"), show.fetch("status")]
-        assert_equal ["1", "2"], [index.fetch("effects"), show.fetch("effects")], "never replay the action or filters"
+        assert_equal mutation == "warm" ? ["5", "6"] : ["1", "2"], [index.fetch("effects"), show.fetch("effects")], "never replay the action or filters"
         assert_equal ["true", "true"], [index.fetch("assigned"), show.fetch("assigned")]
         assert_equal 10, index.fetch("body").scan('<a href="/target">link</a>').size
         assert_equal mutation == "constant" ? "47view-widget" : "47", show.fetch("body").strip
-        assert_equal %w[1 2 3 4].include?(mutation) ? 10 : 0, index.fetch("body").scan("<!-- live helper -->").size
+        assert_equal %w[1 2 3 4 warm].include?(mutation) ? 10 : 0, index.fetch("body").scan("<!-- live helper -->").size
         assert_equal mutation == "template", index.fetch("body").include?("<!-- changed template -->")
         assert_equal mutation == "filter" ? ["once", "once"] : [nil, nil], [index.fetch("filter"), show.fetch("filter")]
         assert_equal 1, result.fetch(%w[0 constant].include?(mutation) ? "hits" : "fallbacks").fetch("0", 0)
+        if mutation == "warm"
+          ["0", "1"].each do |mode|
+            control = ruby_json(scenario, chdir: dir, setup: false,
+              env: {"RAILS_ENV" => "test", "LOWRAIL" => mode, "MUTATE" => "warm",
+                "RUBYOPT" => "-I#{GEM_LIB} -rlowrail/setup"})
+            assert_equal result.fetch("responses"), control.fetch("responses"), "warm mutation, stats off, mode #{mode}"
+          end
+        end
       end
     end
   end
