@@ -74,6 +74,13 @@ windows.each do |window|
   window[:pools_after].each { |pool, stats| GC.stat_heap(pool, stats) }
   window[:gc_segments] = segments
 end
+ar_installed = 0
+if defined?(Lowrail::ARInstantiate)
+  ar_installed = Lowrail.manifest.units.count do |unit|
+    unit["pass"] == "active_record/instantiate" &&
+      Object.const_get(unit.fetch("ar_instantiate").fetch("model")).instance_variable_defined?(:@_lowrail_instantiate)
+  end
+end
 puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?, windows: windows,
-  heap_anchors: anchors.size,
+  heap_anchors: anchors.size, ar_installed: ar_installed,
   compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"

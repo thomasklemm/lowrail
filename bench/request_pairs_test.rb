@@ -5,6 +5,24 @@ require_relative "request_pairs"
 require_relative "gc_requests"
 
 class RequestPairsTest < Minitest::Test
+  def test_counter_refuses_an_ar_build_that_would_silently_decline
+    saved = ENV.to_h.slice("BENCH_COUNTER", "BENCH_INSTANTIATE_DIR", "BENCH_ROUNDS")
+    Dir.mktmpdir("lowrail-stale-build-test") do |dir|
+      FileUtils.mkdir_p(File.join(dir, ".lowrail"))
+      normal = { rails_env: "production", files: {}, templates: {}, units: [] }
+      File.write(File.join(dir, ".lowrail/manifest.json"), JSON.generate(normal))
+      extra = File.join(dir, "extra")
+      FileUtils.mkdir_p(extra)
+      units = [{ pass: "active_record/instantiate", ar_instantiate: { sources: { File.join(dir, "missing.rb") => "obsolete" } } }]
+      File.write(File.join(extra, "manifest.json"), JSON.generate(normal.merge(units: units)))
+      ENV.update("BENCH_COUNTER" => "callgrind", "BENCH_INSTANTIATE_DIR" => extra, "BENCH_ROUNDS" => "6")
+      error = assert_raises(RuntimeError) { RequestPairs.run(dir, File.join(dir, "out"), "GET:/") }
+      assert_match "AR build sources changed", error.message
+    end
+  ensure
+    %w[BENCH_COUNTER BENCH_INSTANTIATE_DIR BENCH_ROUNDS].each { ENV[_1] = saved[_1] }
+  end
+
   def test_gc_exclusion_preserves_mutator_work_between_incremental_segments
     skip "Valgrind not installed" unless system("sh", "-c", "command -v valgrind >/dev/null")
     Dir.mktmpdir("lowrail-counter-test") do |dir|

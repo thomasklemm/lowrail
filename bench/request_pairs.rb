@@ -119,6 +119,12 @@ module RequestPairs
         extra_data = JSON.parse(File.read(File.join(extra, "manifest.json")))
         raise "production --ar-instantiate build required" unless extra_data["rails_env"] == "production" &&
           extra_data.fetch("units").any? { _1["pass"] == "active_record/instantiate" }
+        if counter
+          certificates = extra_data.fetch("units").select { _1["pass"] == "active_record/instantiate" }
+          raise "AR build sources changed; rebuild before measuring" unless certificates.all? do |unit|
+            unit.fetch("ar_instantiate").fetch("sources").all? { |path, sha| File.file?(path) && Digest::SHA256.file(path).hexdigest == sha }
+          end
+        end
         layers["instantiate"] = File.join(tmp, "instantiate")
         FileUtils.mkdir_p(layers["instantiate"])
         FileUtils.cp_r(extra, File.join(layers["instantiate"], ".lowrail"))
@@ -239,6 +245,7 @@ module RequestPairs
             result = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
             raise "unexpected JIT mode" unless result.fetch("yjit") == jit
+            raise "AR build did not activate" if layer == "instantiate" && result.fetch("ar_installed").zero?
             windows = result.fetch("windows")
             windows.each_with_index do |window, index|
               window["instructions"] = File.foreach("#{data}.#{index + 1}").find { _1.start_with?("summary: ") }.split.fetch(1).to_i
