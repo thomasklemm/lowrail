@@ -255,3 +255,10 @@ Decisions:
    generation (schema, attribute methods, templates, routes, I18n), capture
    generated code with `TracePoint(:script_compiled)`, and record a test run
    (definitions after boot, observed types) as a third fact source.
+5. **Frozen string literals stay the app's decision.** Lowrail does not turn
+   on Freezolite or `frozen_string_literal` by default: freezing a literal
+   changes observable behavior (`FrozenError`, `frozen?`, identity) and
+   cannot be proven safe in general. Lowrail must deliver correctly next to
+   it. A later, optional `lowrail observe --frozen-literals` could run the
+   suite with `-W:deprecated` (chilled-string mutation warnings) and list
+   files without observed mutations as a recommendation, not a proof.
