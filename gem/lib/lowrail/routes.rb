@@ -4,14 +4,14 @@ module Lowrail
   # Runtime pieces of specialized named-route `*_path` helpers (see
   # docs/passes/route-helpers.md). Lowered code inlines what
   # ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper::
-  # OptimizedUrlHelper#call does for one route and calls these two methods for
+  # OptimizedUrlHelper#call does for one route and calls these methods for
   # the parts that depend on the call:
   #
-  #   prefix: the script name `ActionDispatch::Http::URL.path_for` starts the
-  #           path with, or nil when the url_options take a branch the
-  #           specialization does not cover (the caller then calls the helper);
+  #   finish: Rails' dynamic script-name and URL assembly after path formatting;
   #   seg:    Journey's segment escaping, skipping the gsub when nothing needs
   #           escaping.
+  # The build oracle uses prefix/url_prefix only to extract the path template;
+  # new emitted code does not inline script-name or URL assembly.
   #
   # Loaded at setup, so this file must not touch Rails constants at load time.
   module Routes
@@ -49,6 +49,23 @@ module Lowrail
         ::ActionDispatch::Http::URL.send(:build_host_url, host, o[:port], o[:protocol], o, script)
       rescue ::ArgumentError
         nil
+      end
+
+      # Keep Rails' dynamic finishing step after argument conversion and path
+      # formatting. Engines customize find_script_name on individual route sets;
+      # an override may also mutate options used by the final URL strategy.
+      def finish(path, options, target, url)
+        path << "/" if options[:trailing_slash] && !path.end_with?("/")
+        options[:path] = path
+        original_script_name = options.delete(:original_script_name)
+        script_name = target._routes.find_script_name(options)
+        script_name = original_script_name + script_name if original_script_name
+        options[:script_name] = script_name
+        if url
+          ::ActionDispatch::Http::URL.url_for(options)
+        else
+          ::ActionDispatch::Http::URL.path_for(options)
+        end
       end
 
       # Journey::Router::Utils.escape_segment(p) is

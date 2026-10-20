@@ -10,16 +10,16 @@
 //! ```text
 //! options = url_options.merge(route.defaults)
 //! path    = route.format(required_part => arg.to_param, ...)   # raises on nil/""
-//! script  = options[:script_name] || _routes.relative_url_root || ""
-//! result  = script.to_s.chomp("/") << path                     # path_for
+//! script  = _routes.find_script_name(options)
+//! result  = URL.path_for(options.merge(path: path, script_name: script))
 //! ```
 //!
-//! (plus `trailing_slash`, `original_script_name`, `params`, `anchor` keys,
-//! which the runtime helper declines). The pass asks the oracle for the
+//! The finishing step retains Rails' dynamic methods, including mounted-engine
+//! overrides and URL options. The pass asks the oracle for the
 //! path with marker arguments (the template), emits
 //!
 //! ```ruby
-//! ((::Lowrail.ok?(U, self.class)) ? (a0 = ARG0; (<Rails' conditions> && to_param checks) ? (prefix << "/articles/" << seg(p0)) : name_path(a0)) : (ORIGINAL))
+//! ((::Lowrail.ok?(U, self.class)) ? (a0 = ARG0; (<Rails' conditions> && to_param checks) ? finish(path, options, self, false) : name_path(a0)) : (ORIGINAL))
 //! ```
 //!
 //! on the call's first line, and has the oracle run that exact inner
@@ -56,8 +56,6 @@ const RAILS_DEPS: &[(&str, bool, &[&str])] = &[
     ),
     ("ActionDispatch::Journey::Route", false, &["format", "required_parts"]),
     ("ActionDispatch::Journey::Format", false, &["evaluate"]),
-    ("ActionDispatch::Routing::RouteSet", false, &["find_script_name", "relative_url_root"]),
-    ("ActionDispatch::Http::URL", true, &["path_for", "url_for", "full_url_for", "build_host_url", "normalize_protocol", "normalize_host", "normalize_port"]),
     ("ActionDispatch::Journey::Router::Utils", true, &["escape_segment"]),
     ("ActionDispatch::Journey::Router::Utils::UriEncoder", false, &["escape_segment", "escape"]),
 ];
@@ -525,26 +523,29 @@ fn arg_temp(tag: &str, i: usize) -> String {
 /// optimized path, then the inline path, else the helper with the evaluated
 /// arguments.
 pub fn inner_expr(helper: &str, kind: &str, pieces: &[Piece], tag: &str, temps: &[String]) -> String {
-    let prefix_fn = if kind == "url" { "url_prefix" } else { "prefix" };
-    let s = format!("__lr{tag}s");
+    let options = format!("__lr{tag}o");
+    let route = helper.strip_suffix("_path").or_else(|| helper.strip_suffix("_url")).unwrap();
     let p = |i: usize| format!("__lr{tag}p{i}");
     let mut conds = Vec::new();
     if let Some(last) = temps.last() {
         conds.push(format!("!(::Hash === {last} || ::ActionController::Parameters === {last})"));
     }
     conds.push("optimize_routes_generation?".to_string());
-    conds.push(format!("({s} = ::Lowrail::Routes.{prefix_fn}(url_options, self))"));
+    // Rails merges options before to_param, but resolves the script name only
+    // after formatting the path. Keep that order even for customized methods.
+    conds.push(format!("({options} = url_options.merge(::Rails.application.routes.named_routes.get(:{route}).defaults))"));
     for (i, t) in temps.iter().enumerate() {
         conds.push(format!("::String === ({} = {t}.to_param)", p(i)));
         conds.push(format!("!{}.empty?", p(i)));
     }
-    let mut fast = s.clone();
+    let mut path = "+\"\"".to_string();
     for piece in pieces {
         match piece {
-            Piece::Static(st) => fast.push_str(&format!(" << {}", ruby_str(st))),
-            Piece::Hole(i) => fast.push_str(&format!(" << ::Lowrail::Routes.seg({})", p(*i))),
+            Piece::Static(st) => path.push_str(&format!(" << {}", ruby_str(st))),
+            Piece::Hole(i) => path.push_str(&format!(" << ::Lowrail::Routes.seg({})", p(*i))),
         }
     }
+    let fast = format!("::Lowrail::Routes.finish({path}, {options}, self, {})", kind == "url");
     format!("({}) ? ({fast}) : {helper}({})", conds.join(" && "), temps.join(", "))
 }
 
@@ -628,27 +629,90 @@ mod tests {
         assert!(outcome(14).starts_with("not inside an instance method"));
         assert!(outcome(17).starts_with("not inside an instance method"));
         assert_eq!(outcome(18), "lowered");
-        // A _url helper starts from the host prefix instead of the script name.
-        assert!(out.code.contains("def url = ((::Lowrail.ok?(4, self.class)) ? ((optimize_routes_generation? && (__lr2s = ::Lowrail::Routes.url_prefix(url_options, self))) ? (__lr2s << \"/articles\") : articles_url()) : (articles_url))"), "{}", out.code);
+        // A _url helper retains Rails' full URL finishing strategy.
+        assert!(out.code.contains("::Lowrail::Routes.finish(+\"\" << \"/articles\", __lr2o, self, true)"), "{}", out.code);
         assert_eq!(out.sites.iter().filter(|s| s.helper == "logo_path").count(), 0, "custom helpers are not route sites");
         assert!(outcome(20).starts_with("options hash"));
         assert!(outcome(21).starts_with("0 positional argument(s), route has 1"));
         assert_eq!(outcome(22), "explicit receiver");
-        // Zero-argument helper: Rails' conditions, then the static path.
+        // Zero-argument helper: Rails' options merge, then the static path.
         assert!(out.code.contains(
-            "redirect_to ((::Lowrail.ok?(4, self.class)) ? ((optimize_routes_generation? && (__lr0s = ::Lowrail::Routes.prefix(url_options, self))) ? (__lr0s << \"/articles\") : articles_path()) : (articles_path)), status: :see_other"
+            "::Lowrail::Routes.finish(+\"\" << \"/articles\", __lr0o, self, false)"
         ), "{}", out.code);
         // One argument: evaluated once into a temp, to_param checked, segment escaped.
         assert!(out.code.contains(
-            "@url = ((::Lowrail.ok?(4, self.class)) ? (__lr1a0 = @article; (!(::Hash === __lr1a0 || ::ActionController::Parameters === __lr1a0) && optimize_routes_generation? && (__lr1s = ::Lowrail::Routes.prefix(url_options, self)) && ::String === (__lr1p0 = __lr1a0.to_param) && !__lr1p0.empty?) ? (__lr1s << \"/articles/\" << ::Lowrail::Routes.seg(__lr1p0)) : article_path(__lr1a0)) : (article_path(@article)))"
+            "::Lowrail::Routes.finish(+\"\" << \"/articles/\" << ::Lowrail::Routes.seg(__lr1p0), __lr1o, self, false)"
         ), "{}", out.code);
         let route_deps: Vec<_> = out.deps.iter().filter(|d| d.route.is_some()).map(|d| d.method.clone()).collect();
         assert_eq!(route_deps, vec!["article_path", "articles_path", "articles_url"]);
         assert!(out.deps.iter().all(|d| d.route.is_none() || d.receiver == "@self"));
-        assert!(out.deps.iter().any(|d| d.receiver == "ActionDispatch::Http::URL" && d.singleton && d.method == "path_for"));
+        assert!(out.deps.iter().all(|d| d.receiver != "ActionDispatch::Routing::RouteSet"), "dynamic route sets are called, not inlined");
         // One probe per helper, with the same inner expression shape.
         assert_eq!(fake.probes.len(), 3);
-        assert!(fake.probes.iter().any(|p| p.contains("__lrps << \\\"/articles/\\\" << ::Lowrail::Routes.seg(__lrpp0)")), "{:?}", fake.probes);
+        assert!(fake.probes.iter().any(|p| p.contains("::Lowrail::Routes.finish(+\\\"\\\" << \\\"/articles/\\\" << ::Lowrail::Routes.seg(__lrpp0)")), "{:?}", fake.probes);
+    }
+
+    #[test]
+    fn emitted_routes_preserve_engine_overrides_options_and_evaluation_order() {
+        use std::process::Command;
+        if !Command::new("ruby").args(["-e", "require 'active_support'; require 'action_controller'"])
+            .status().is_ok_and(|s| s.success()) {
+            eprintln!("skipped: Rails gems unavailable");
+            return;
+        }
+        for kind in ["path", "url"] {
+            let helper = format!("article_{kind}");
+            let expression = inner_expr(&helper, kind,
+                &[Piece::Static("/articles/".into()), Piece::Hole(0)], "test", &["arg".into()]);
+            let code = format!(r#"
+                require "active_support"
+                require "action_controller"
+                require {runtime:?}
+                ROUTES = ActionDispatch::Routing::RouteSet.new
+                ROUTES.draw {{ get "/articles/:id", to: "articles#show", as: :article }}
+                module Rails
+                  def self.application = self
+                  def self.routes = ROUTES
+                end
+                $events = []
+                ROUTES.define_singleton_method(:find_script_name) do |o|
+                  $events << ["script", o[:path], o[:controller], o[:action]]
+                  o[:host] = "engine.example"
+                  o[:params] = {{ q: "a b" }}
+                  "/mounted"
+                end
+                OTHER = ActionDispatch::Routing::RouteSet.new
+                OTHER.define_singleton_method(:find_script_name) {{ |_| raise "unrelated engine" }}
+                class Context
+                  include ROUTES.url_helpers
+                  def optimize_routes_generation? = true
+                  def url_options
+                    $events << "options"
+                    {{host: "example.org", original_script_name: "/root", trailing_slash: true, anchor: "end"}}
+                  end
+                end
+                class Argument
+                  def to_param
+                    $events << "param"
+                    "a b"
+                  end
+                end
+                ctx = Context.new
+                arg = Argument.new
+                want = ctx.public_send(:{helper}, arg)
+                events = $events.dup
+                $events.clear
+                have = ctx.instance_eval {{ {expression} }}
+                raise [want, have].inspect unless want == have
+                raise [events, $events].inspect unless events == $events
+                expected = "{host}/root/mounted/articles/a%20b/?q=a+b#end"
+                raise have.inspect unless have == expected
+                raise events.inspect unless events == ["options", "param", ["script", "/articles/a%20b/", "articles", "show"]]
+            "#, runtime = crate::facts::gem_dir().join("lib/lowrail/routes.rb").display().to_string(),
+                host = if kind == "url" { "http://engine.example" } else { "" });
+            let out = Command::new("ruby").args(["-e", &code]).output().unwrap();
+            assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+        }
     }
 
     #[test]

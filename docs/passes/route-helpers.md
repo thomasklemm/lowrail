@@ -21,9 +21,10 @@ options = t.url_options.merge(route.defaults)
 params  = {part_i => args[i].to_param}          # nil or "" → UrlGenerationError
 path    = route.format(params)                  # Journey: static text + escape_segment(value);
                                                 #   optional groups like (.:format) dropped
-path   << "/" if options[:trailing_slash]
-script  = options.delete(:script_name) || t._routes.relative_url_root || ""
-script  = options[:original_script_name] + script if present
+path   << "/" if options[:trailing_slash] && !path.end_with?("/")
+original_script = options.delete(:original_script_name)
+script  = t._routes.find_script_name(options)
+script  = original_script + script if present
 result  = script.to_s.chomp("/") << path        # Http::URL.path_for, + params/anchor keys
 ```
 
@@ -45,15 +46,17 @@ template), arguments on one line. The pass emits, on the call's first line:
 
 ```ruby
 ((::Lowrail.ok?(U, self.class)) ? (__lr0a0 = ARG; (!(::Hash === __lr0a0 || ::ActionController::Parameters === __lr0a0) &&
-  optimize_routes_generation? && (__lr0s = ::Lowrail::Routes.prefix(url_options, self)) &&
-  ::String === (__lr0p0 = __lr0a0.to_param) && !__lr0p0.empty?) ? (__lr0s << "/articles/" << ::Lowrail::Routes.seg(__lr0p0) << "/edit") : edit_article_path(__lr0a0)) : (edit_article_path(article)))
+  optimize_routes_generation? && (__lr0o = url_options.merge(::Rails.application.routes.named_routes.get(:edit_article).defaults)) &&
+  ::String === (__lr0p0 = __lr0a0.to_param) && !__lr0p0.empty?) ?
+  (::Lowrail::Routes.finish(+"" << "/articles/" << ::Lowrail::Routes.seg(__lr0p0) << "/edit", __lr0o, self, false)) : edit_article_path(__lr0a0)) : (edit_article_path(article)))
 ```
 
 (one line in the output). Arguments are evaluated once, in order. Rails' own
 conditions stay calls, so `default_url_options`, mounted script names and
-`to_param` overrides behave as before; `Routes.prefix` returns nil (helper
-called) for `trailing_slash`, `original_script_name`, `params`, `anchor`,
-non-`Hash` or defaulting option hashes. `Routes.seg` returns an ASCII value
+`to_param` overrides behave as before. Options are merged before argument
+conversion; the path is formatted before script-name resolution. `Routes.finish`
+retains `find_script_name` on the actual route-set object and Rails' final URL
+strategy, including option mutations made by that method. `Routes.seg` returns an ASCII value
 with no character Journey would escape as is, else calls
 `Journey::Router::Utils.escape_segment`. Templates add
 `defined?(name) == "method"` for argument-less calls, since a local passed to
@@ -65,9 +68,15 @@ Facts per unit: each helper as `@self#name_path` with the route
 route unchanged, no requirements, no glob), plus the Rails methods whose
 behavior is inlined (`OptimizedUrlHelper#call/optimized_helper/parameterize_args/optimize_routes_generation?`,
 `Journey::Route#format/required_parts`, `Journey::Format#evaluate`,
-`RouteSet#find_script_name/relative_url_root`, `Http::URL.path_for`,
 `Router::Utils.escape_segment`, `UriEncoder#escape_segment/escape`).
 Redrawing routes redefines the helpers, which resets the units.
+
+The first private-app iteration exposed a vacuous verify: an unrelated mounted
+engine's singleton `find_script_name` disabled every route unit through a global
+instance-override guard (0 hits, 794 fallbacks). That method and URL assembly are
+now called, not inlined. Their global facts are no longer needed. Public emitted
+Ruby tests check both path and URL helpers with mounted prefixes, options mutation,
+defaults, escaping, trailing slash, query/anchor, and argument-conversion order.
 
 ## How it is proven at build time
 
@@ -87,21 +96,16 @@ also checks the helper resolves to the route set's method in that class.
 
 ## `*_url` helpers
 
-Same shape as `*_path`, starting from `Lowrail::Routes.url_prefix(url_options,
-self)` instead of `prefix`. Rails ends `OptimizedUrlHelper#call` in
+Same shape as `*_path`, with `Routes.finish(..., true)`. Rails ends `OptimizedUrlHelper#call` in
 `Http::URL.url_for(options)`: `path_for` with `:only_path`, else
 `build_host_url(host, port, protocol, options, path_for(options))`.
-`url_prefix` calls Rails' own private `build_host_url` with the script name
-as the path, so host/port/protocol normalization, `subdomain`/`domain`/
-`tld_length` and `user`/`password` are Rails' code, not a copy; the route
-path is appended afterwards. A missing or non-String host and an invalid
-protocol return nil, so the real helper raises after `to_param`, as Rails
-does. Route defaults with host-part keys are refused. Facts add
-`Http::URL.url_for/full_url_for/build_host_url/normalize_*` and require the
-helper to be the route set's URL helper module method. Probes add an
+These methods remain dynamic Rails calls, not an inline host-prefix approximation.
+The guard requires the helper to be the route set's URL helper module method.
+Route defaults with host-part keys are still refused. Probes add an
 `https://user.example.co.uk:8443` request context.
 
-Per call (real-blog, controller with an HTTPS request, YJIT, 3 runs):
+Historical measurement **before the dynamic finishing change** (real-blog,
+controller with an HTTPS request, YJIT, 3 runs):
 `article_url(article)` 4.6–5.1 → 2.6–3.0 µs, 24 → 16 allocations. Most of
 what remains is the controller's `url_options` hash, which Rails builds on
 every call.
@@ -117,6 +121,10 @@ arguments, requirements or glob, route defaults that set url options,
 helper overridden in that class, probe mismatch.
 
 ## Results (2026-10-20, Ruby 4.0.7)
+
+The real-blog/Campfire timings and hit counts below predate the dynamic finishing
+change. They are not a performance claim for the new implementation; the private
+app iteration and its new timings are recorded in [ARGOS M0](../m0/argos.md).
 
 | App | Route sites lowered | Units | `lowrail verify` |
 |---|---|---|---|
