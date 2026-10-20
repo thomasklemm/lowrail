@@ -704,9 +704,224 @@ YJIT **does run** under this orb's Valgrind 3.19: a small correct-result probe
 compiled three ISeqs, and Rails compiled thousands. However, the initial
 50-warmup YJIT diagnostic still compiled roughly 700 additional ISeqs during
 its 200 measured requests; Callgrind attributed substantial work to the JIT
-compiler. It is not a steady-state comparison. Interpreter counts are primary
-here; `BENCH_JIT=1 BENCH_WARMUP=400` is available for longer-warmup investigation.
-No interpreter result below is a native YJIT speed claim.
+compiler. It is not a steady-state comparison. The gated mode below supersedes
+that diagnostic; historical interpreter results remain interpreter results.
+Neither interpreter nor YJIT instructions are native latency claims.
+
+### Quiescent YJIT instruction mode
+
+`BENCH_JIT=1 lowrail bench ...` uses the same fixed heaps, N=0/50 subtraction,
+six fresh-process rounds and unchanged total/GC-excluded A/A gates. After the
+ordinary `BENCH_WARMUP` requests, each worker warms in 200-request windows until
+`RubyVM::YJIT.runtime_stats` reports **all three** of `compiled_iseq_count`,
+`compiled_block_count` and `invalidation_count` unchanged for **three consecutive
+windows**. Three full GCs precede each observation. Warmup is bounded at 20,000
+additional requests; hitting the limit without convergence rejects the cohort.
+The full counter history, including unsuccessful warmups, is retained.
+
+Warm the observer too: after heap preparation, an enabled observer gets 200
+untimed rounds of the **exact** `GC.stat_heap(pool, existing_hash)`,
+`GC.stat(existing_hash)` and JIT snapshot signatures used at the endpoints.
+The one-argument heap queries used during setup do not warm the two-argument
+Ruby wrapper. The allocation survey identified this residual compilation as
+`stat_heap@<internal:gc>`; a shared operation regression reproduces flat request
+warmup followed by a failed window gate without observer warmup. Nil observers
+do none of this work, and no operation or captured CurrentAttributes is changed.
+
+Request workers also issue **one untimed settling request after each pre-window
+GC**, symmetrically for N=0/N=50 and total/GC-excluded modes, before either
+allocation or instruction endpoints. This is deliberately not an operation
+worker default: a request would replace the operation's captured context.
+Workers record `request_settle: true`; earlier cohorts retain their original
+protocol, not retrospectively corrected numbers.
+
+The worker snapshots the three counters immediately outside the GC/instruction
+endpoints. Every N=0 and N=50
+window, in both modes, must have identical before/after counters. A changed or
+missing counter rejects the **entire comparison**, even when its A/A and heap
+controls pass. Counts from rejected windows remain available as diagnostics;
+there is no filtering, automatic retry or widened tolerance. The untimed
+observer may compile during heap preparation, but not inside a measured window.
+
+`BENCH_JIT_WINDOW` and `BENCH_JIT_MAX_WARMUP` change the warmup window and bound;
+at least three windows are mandatory. `BENCH_JIT_CALL_THRESHOLD` optionally
+passes a positive `--yjit-call-threshold` to instruction workers. Default leaves
+Ruby's production threshold unchanged. Do not compare different thresholds as
+if they were one production configuration. YJIT statistics instrumentation is
+**not** enabled: these counters are available in ordinary Ruby 4.0.7 YJIT.
+No code-GC disabling, compiler freezing or application config change is used to
+manufacture stability. Interpreter workers still explicitly disable Rails'
+`config.yjit` before boot. Requested and **observed** JIT modes are separate
+metadata; observed state and the failed JIT gate appear even on a rejected run.
+
+A build must match that mode too. On this Ruby, `Array#each.source_location` is
+`nil` with YJIT off and `<internal:array>:219` with it on. For an interpreter
+cohort whose facts include it, use the existing `LOWRAIL_BUILD_JIT=0` build hook;
+otherwise activation should reject the build. Do not weaken the fact check or
+price a silently declined pass. YJIT cohorts keep production boot behavior.
+
+```sh
+# A currently available pass and its matching production build:
+BENCH_JIT=1 mise exec -- target/debug/lowrail bench APP \
+  --pass PASS --path /path --out /tmp/NEW-yjit
+# Historical source-cost study: disposable pre-quarantine checkout only.
+BENCH_JIT=1 mise exec -- ruby bench/experiments/yjit_study.rb /tmp/NEW-yjit-layers
+```
+
+The historical study pins the runtime/artifact before
+[`45fd07a`](https://github.com/thomasklemm/lowrail/commit/45fd07a851da4ecee8856a1fc2ea41c4843934d4),
+at
+[`c9d2397`](https://github.com/thomasklemm/lowrail/commit/c9d2397f1748579b04f6bddff48bc3bfc53d79b0).
+Both source passes are now wholly quarantined, including opt-in and old
+artifacts. Its `default` arm prices the **legacy guarded-source build**, not
+today's supported default. Do not bypass quarantine to recreate it in an app;
+use an isolated historical checkout. The published ceiling specimens themselves
+are unchanged by quarantine. Manifest, lockfile, runtime and harness hashes
+record the exact measured state.
+
+The study driver uses the published L1/L2/L2_events specimens **unchanged** in
+disposable app copies and the exact shared heap counter/estimators. Each route
+has its own independent off/off controls. It performs the same strict default
+build/activation probe and end-of-run build/runtime/harness fingerprint checks.
+Its finite fixture byte/header/SQL checks do not repair the specimens' known
+semantic omissions: L2_events lacks observable controller assigns and misses
+mid-request helper mutation. These remain conditional **upper bounds**, not
+supported passes or generator targets.
+
+Operation workers using `HeapWindows` opt in by warming their actual operation
+with `JitStability.warm { |count| ... }`, emitting that `jit_warmup` record and
+passing `observe: JitStability.method(:snapshot)` to `HeapWindows.run` when
+YJIT is actually enabled. The shared runner refuses YJIT workers without this
+proof; a long fixed iteration count alone is insufficient. The guard-cost
+driver uses the same gate. Interpreter's nil observer does no measured work.
+
+### YJIT protocol attribution and retained failures
+
+The initial finite blog study used six arms × six fresh processes on each of
+index/show. **All 72 workers failed the JIT window gate**, although both routes'
+total/GC-excluded A/A and all five heap controls passed. Ordinary request warmup
+was flat; this was not evidence of a steady measured path. A threshold-one
+native probe compiled over 11,000 ISeqs rather than about 2,800 at the production
+threshold; it was not promoted into a different production comparison.
+
+Two separate cold paths mattered. Compilation logging first identified
+ActiveRecord's `with_raw_connection` retry branch at bytecode offsets 83/87.
+The three-GC pause crosses its two-second idle threshold. An instrumented
+interpreter probe saw first-query ages **3.775 / 1.579 seconds** in total /
+GC-excluded windows; N=50 made the ordinary **150 SQL/raw-connection calls**,
+with **zero `verify!` or `active?` calls**, while N=0 made none. This read path
+uses `allow_retry: true`: the observed difference is retry-branch work, not an
+extra verification round-trip. It **does not cancel in N−0**.
+
+The request-only settling callback reduced the observed interpreter ages to
+**0.459 / 0.455 seconds**, and YJIT ages to **1.669 / 1.756 seconds**, still with
+150 ordinary queries and zero verification calls. These are attribution probes,
+not latency estimates. The separate six-round settled interpreter control
+**fails** GC-excluded A/A: **[−0.03980, −0.00157]%** misses zero; total A/A and
+heaps pass. It is retained, not rerun or represented as a corrected historical
+result. The corresponding YJIT baseline control passes both A/A gates, heaps,
+three-window warmup and all 48 measured counter comparisons.
+
+A complete throwaway N=0/N=50 run in both modes did not reliably remove the
+remaining +1 ISeq/+1 block, even with another 600 requests of flat warmup.
+The allocation survey then traced it to the GC-stat observer's cold signature,
+not an operation. Exact-signature observer warmup fixes the shared regression
+without relaxing the gate. Thus **warmup must exercise the measurement helpers,
+not only application requests**. Original rejections, intermediate controls,
+counter histories and raw per-window Ir are retained in
+[yjit-results.json](yjit-results.json).
+
+### Matched interpreter / YJIT request study
+
+**Neither full-request YJIT comparison is accepted.** After the observer and
+settling corrections, every worker reaches three flat warmup windows in
+800–1,800 additional requests, but measured windows still compile blocks:
+
+- Index: **4/36 workers reject**, adding 2, 16, 5 and 13 blocks. Both A/A
+  controls and all five heap gates pass.
+- Show: **5/36 workers reject**, adding 119, 16, 5, 28 and 13 blocks. Heaps
+  pass, but GC-excluded A/A also rejects: **[−0.10156, +0.72995]%**, beyond
+  ±0.5%. Total A/A passes.
+
+These additions change neither the compiled-ISeq count nor invalidations;
+watching ISeqs alone would miss them. One separate `--yjit-log=quiet` L1
+diagnostic did not reproduce the residual additions, so their sites remain
+**unattributed**. Do not assign them to request code or the observer without
+evidence. No further tuning or cohorts were used to obtain a passing result.
+Even arms whose own windows are flat remain part of the rejected comparison;
+they are not salvaged as accepted endpoint results.
+
+The matched interpreter comparisons use the same corrected request protocol,
+frozen runtime/build/specimens, six rounds, N=0/50 windows and seed 41231.
+Both routes pass total/GC-excluded A/A and all five heap gates. The separate
+failed two-arm interpreter control above remains in the record: acceptance of
+these planned multi-arm comparisons does not erase independent run variance.
+All workers report the actual intended JIT state, not merely its launch flag.
+
+Paired total-instruction Δ% versus the same round's no-Lowrail `off_a`;
+brackets are coarse nominal 95% bootstrap CIs. **Every YJIT cell is diagnostic
+only**, including its interval. Interpreter results are controlled work
+comparisons, not semantic certification of these historical specimens.
+
+| Route / comparison | Interpreter Δ% [95% CI] | YJIT Δ% [95% CI], rejected |
+|---|---:|---:|
+| `/articles`, legacy source build | −6.057 [−6.082, −6.029] | −5.463 [−5.487, −5.442] |
+| `/articles`, L1 | −2.232 [−2.254, −2.185] | −2.219 [−2.300, −1.752] |
+| `/articles`, L2 | −33.367 [−33.384, −33.342] | −31.835 [−31.878, −31.789] |
+| `/articles`, L2_events | −26.200 [−26.217, −26.171] | −22.897 [−22.962, −22.868] |
+| `/articles/1`, legacy source build | −1.048 [−1.084, −1.016] | −1.022 [−1.074, −0.981] |
+| `/articles/1`, L1 | −2.517 [−2.547, −2.490] | −2.440 [−2.511, −2.402] |
+| `/articles/1`, L2 | −40.869 [−40.881, −40.863] | −38.699 [−38.740, −38.259] |
+| `/articles/1`, L2_events | −37.289 [−37.316, −37.271] | −35.120 [−35.144, −35.097] |
+
+The diagnostic eventful ceiling moves from roughly −26/−37% to −23/−35%,
+but **this does not establish that the endpoint ceiling shrinks under YJIT**.
+The required quiescent-window condition failed, and the specimen still omits
+observable state/mutation behavior. No architecture-priority change, current
+source-pass support claim or native speed claim follows. Starter Kit's
+default/+inertia comparison was not run; the blog did not yield an accepted
+full-request YJIT measurement to extend.
+
+### Accepted YJIT guard micro and next-best proxies
+
+The guard micro is independently accepted: six interleaved fresh-process
+rounds per runtime, N=0/100,000, both modes, unchanged A/A and five-pool gates,
+and flat warmup/window counters in every worker. Subtract each round's empty
+loop from its guard arm, not separately estimated medians:
+
+| Cached guard implementation | Interpreter net Ir/check (published) | YJIT net Ir/check |
+|---|---:|---:|
+| Old cached dispatch | 822 | 371 |
+| Monomorphic K | 425 | 140 |
+| Change | −48.30% | **−62.26%** |
+
+Every new YJIT round gives exactly 371 / 140 in both modes. The old library is
+the unchanged archive of
+[`e01e496`](https://github.com/thomasklemm/lowrail/commit/e01e4968f022231cfd4c38d67b631399ceef4ab0);
+the K runtime matches the frozen request study's runtime fingerprint. The
+interpreter column is the earlier published micro, not a native timing or a
+new request-effect claim. K is not erased by YJIT, but a cheaper guard does not
+establish a material endpoint win.
+
+For now, use **allocations plus independently gated leaf-operation Ir**, with
+full-request YJIT Ir explicitly diagnostic when its compiler-state gate fails.
+For example, the matched interpreter eventful specimens allocate
+2358.37 → 1674.56 objects/index request and 2244.02 → 1277.44/show; the rejected
+YJIT comparisons record 2378.75 → 1688.69 and 2254.25 → 1282.27. These count
+objects, not bytes, retained memory or production GC cost, and do not repair
+the specimens' semantic omissions or certify a rejected cohort.
+
+A direct user-only hardware-cycles `perf_event_open` probe returned **ENOENT**:
+this orb exposes no usable event for that probe. There is no perf-stat-like
+cycles estimate to report, nor a validated native-time control. A quieter
+machine with independent native-YJIT cohorts/PMU counters is the next route to
+a production speed conclusion; converting interpreter Ir, emulated time or
+allocation counts into cycles would invent one. Sanitized evidence retains
+all eight request trials (including failures), per-window Ir/GC/allocation
+endpoints and five-pool capacities, warmup histories, runtime/build/harness
+fingerprints, idle-branch probes and the accepted guard comparisons in
+[yjit-results.json](yjit-results.json). No runtime or lowering change is part
+of this study.
 
 ### Controlled instruction results (2026-10-20)
 
