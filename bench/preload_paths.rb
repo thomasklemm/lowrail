@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Campfire preload microbenchmarks, production fixtures, Ruby +YJIT.
-# Run inside .corpus/campfire; use bench/preload_runs.rb for interleaving.
+# Run inside .corpus/campfire; lowrail bench owns interleaved pass gates.
 require File.expand_path("config/environment", Dir.pwd)
 require "json"
 Rails.application.eager_load!

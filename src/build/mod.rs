@@ -27,14 +27,11 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         match a.as_str() {
             "--env" => env = it.next().ok_or("--env needs a value")?.clone(),
             "--passes" => passes = Selection::parse(it.next().ok_or("--passes needs a value")?)?,
-            "--preload-plans" | "--memo" | "--ar-instantiate" | "--ar-plans" | "--digest-memo" => {
-                passes.set(&a.trim_start_matches("--").replace('-', "_"), true)?;
-            }
             _ if !a.starts_with('-') && app.is_none() => app = Some(PathBuf::from(a)),
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--passes default,+name,-name] [--preload-plans] [--memo] [--ar-instantiate] [--ar-plans] [--digest-memo]")?;
+    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--passes default,+name,-name]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
     println!("{}", build(&app, &env, &passes)?);
     Ok(())

@@ -1,6 +1,6 @@
 # Active Record instantiation variants
 
-Opt in with `lowrail build APP --ar-instantiate`. This is a narrow
+Opt in with `lowrail build APP --passes default,+ar_instantiate`. This is a narrow
 homogeneous-result loader variant, not attribute-reader specialization and
 not a replacement for Active Record objects. It is not enabled by default.
 
@@ -81,27 +81,30 @@ The measurements use Ruby 4.0.7 with YJIT, local databases, Redis for Campfire
 and the Starter Kit's SSR process. No build/test jobs run alongside timing.
 
 ```sh
-target/debug/lowrail build .corpus/campfire --ar-instantiate
+target/debug/lowrail build .corpus/campfire --passes default,+ar_instantiate
 PARALLEL_WORKERS=1 LOWRAIL_SQL_TRACE=full target/debug/lowrail verify \
   .corpus/campfire -- bin/rails test --seed 41231
 
 RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 target/debug/lowrail build .corpus/campfire \
-  --env production --ar-instantiate
+  --env production --passes default,+ar_instantiate
 BENCH_SECONDS=0.15 ruby bench/ar_instantiate_runs.rb \
-  .corpus/campfire /tmp/ar-campfire breakdown
-BENCH_SECONDS=0.3 ruby bench/ar_instantiate_runs.rb \
-  .corpus/campfire /tmp/ar-campfire micro
-BENCH_SECONDS=3 BENCH_PROFILES=1 ruby bench/ar_instantiate_runs.rb \
-  .corpus/campfire /tmp/ar-campfire requests
+  .corpus/campfire /tmp/ar-campfire-breakdown
+# Set BENCH_HEADERS and ROOM_PATH from the private prepared fixture.
+CAMPFIRE_RESPONSE_CACHE_MB=0 target/debug/lowrail bench .corpus/campfire \
+  --pass active_record/instantiate --counter native --model Message \
+  --micro-case load_20 --path "$ROOM_PATH" --out /tmp/ar-campfire
 ```
 
-The driver enables only `active_record/instantiate` units, alternates order
+The historical request/micro driver enabled only `active_record/instantiate` units, alternating order
 off/on then on/off, and starts a fresh `ruby --yjit` for each mode in each
 of five pairs. Timed runs have counters/reporters disabled. Requests use the
 existing `bench/requests.rb`, its 200-request warmup and authenticated HTML
 headers; Campfire has `CAMPFIRE_RESPONSE_CACHE_MB=0` throughout. HTTP status
 must be 2xx. Separate counted probes establish actual request hits/fallbacks.
-These are end-to-end Lowrail-on/off measurements, not a subtraction of the
+New request/micro gates use the shared command's A/A controls. The remaining
+`ar_instantiate_runs.rb` runs only the diagnostic internal-cost/StackProf
+breakdown, which the shared pass benchmark does not supply.
+The historical tables are end-to-end Lowrail-on/off measurements, not a subtraction of the
 runtime's general cost: disabled view/route units can still incur their
 fallback guards. The isolated loader microbenchmarks have no view/route work.
 
@@ -268,7 +271,7 @@ still no general request-level speedup from this pass.
 ## Correctness gates (2026-10-20)
 
 These are the new pass's counters, not the combined route/view counters.
-All builds include `--ar-instantiate`. SQL comparisons gate a single process
+All builds include `+ar_instantiate`. SQL comparisons gate a single process
 (`PARALLEL_WORKERS=1`), with full traces retained for diagnosis.
 
 | App | Outcomes off/on | Ordered same-thread queries | Instantiation hits | Fallbacks |
@@ -290,7 +293,7 @@ The full gem suite passes after syncing concurrent main: **77 tests,
 3 optional skips**. Rust: **26 unit + 3 integration tests pass**.
 `gem/test/preload_plans_test.rb` passes **3 tests / 76 assertions**, including
 the inherited-singleton-getter owner regression. The independent
-`build --preload-plans` real-blog control also verifies 21 outcomes and
+`build --passes default,+preload_plans` real-blog control also verifies 21 outcomes and
 125 queries identical, with **1 completed preload hit**, zero fallbacks
 (58 combined hits). No preload eligibility was silently lost.
 

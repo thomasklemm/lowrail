@@ -23,7 +23,7 @@ class DigestMemoTest < Minitest::Test
       assert status.success?, "#{err}\n#{out}"
       manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
       refute manifest["units"].any? { _1["pass"] == "digest/file_memo" }
-      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--digest-memo")
+      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--passes", "default,+digest_memo")
       assert status.success?, "#{err}\n#{out}"
       out, err, status = Open3.capture3(CLEAN_ENV, binary, "verify", dir, "--bisect", "--", RUBY, "bin/rails", "test", "--seed", "1729")
       assert status.success?, "#{err}\n#{out}"
@@ -128,7 +128,7 @@ class DigestMemoTest < Minitest::Test
           end
         end
       RUBY
-      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--digest-memo")
+      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--passes", "default,+digest_memo")
       assert status.success?, "#{err}\n#{out}"
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
       assert ledger.any? { _1["pass"] == "digest/file_memo" && _1["outcome"] == "refused" && _1["reason"] == "refinements" && _1["detail"] == "refined gem source" }

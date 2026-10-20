@@ -1,6 +1,6 @@
 # Active Record SQL plans (opt-in)
 
-`lowrail build APP --ar-plans [--env test|production]` enables a narrow
+`lowrail build APP --passes default,+ar_plans [--env test|production]` enables a narrow
 gem-level pass. It caches **plans, not rows**. Rails' existing `find_by` and
 unscoped-association StatementCaches are not Lowrail hits. This is not yet
 a demonstrated request-level optimization, nor support for arbitrary query
@@ -99,7 +99,7 @@ retried. Missing/stale/incompatible manifests are silent no-ops.
 ## Survey and deliberately unsupported app chains
 
 `bench/ar_survey.rb` inventories **query primitives**, not independently
-eligible sites; chained `includes.order` counts twice. With `--ar-plans`, the
+eligible sites; chained `includes.order` counts twice. With `+ar_plans`, the
 same source inventory is written to `ledger.json` under
 `active_record/ar_plans_survey`, alongside reflection decisions under
 `active_record/ar_plans`. Fixed keys alone are not a certificate.
@@ -272,7 +272,7 @@ does not explain ~1,197 µs/request. Its earlier +12.8% and final +13.35%
 request differences are not evidence of a guard-cost regression of that size.
 The zero-hit controls move substantially too. These request comparisons are
 **noise-dominated; no request-level gain or causal slowdown is established**.
-Stop collecting more pairs to chase that noise. Keep `--ar-plans` opt-in.
+Stop collecting more pairs to chase that noise. Keep `active_record/ar_plans` opt-in.
 
 ## Attribute dispatch: measured, not implemented
 
@@ -309,25 +309,33 @@ ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].sort.each { require_rela
 ruby bench/ar_diagnostics_test.rb
 ruby bench/ar_survey.rb .corpus/{real-blog,campfire,pingcrm,redprints-cfp,react-starter-kit}
 
-lowrail build .corpus/campfire --ar-plans
+lowrail build .corpus/campfire --passes default,+ar_plans
 PARALLEL_WORKERS=1 lowrail verify .corpus/campfire
 # RSpec apps need their actual test runner, not the default rails test:
 PARALLEL_WORKERS=1 lowrail verify .corpus/redprints-cfp -- bundle exec rspec
 PARALLEL_WORKERS=1 lowrail verify .corpus/react-starter-kit -- bundle exec rspec --exclude-pattern 'spec/system/**/*_spec.rb'
 
-RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 lowrail build .corpus/campfire --env production --ar-plans
-ruby bench/ar_cached_runs.rb .corpus/campfire /tmp/ar-reader-micro micro
-BENCH_READER=logo ruby bench/ar_cached_runs.rb .corpus/campfire /tmp/ar-logo-micro micro
-ruby bench/ar_cached_runs.rb .corpus/campfire /tmp/ar-reader-requests requests
-# Repeat the production build + two runners for PingCRM (zero-hit control).
+RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 lowrail build .corpus/campfire --env production --passes default,+ar_plans
+# Set BENCH_HEADERS and ROOM_PATH from the private prepared fixture.
+CAMPFIRE_RESPONSE_CACHE_MB=0 lowrail bench .corpus/campfire \
+  --pass active_record/ar_plans --path "$ROOM_PATH" --counter native \
+  --micro-case 'Message#rich_text_body (reset scope + read)' --out /tmp/ar-reader
+BENCH_READER=logo CAMPFIRE_RESPONSE_CACHE_MB=0 lowrail bench .corpus/campfire \
+  --pass active_record/ar_plans --path "$ROOM_PATH" --counter native \
+  --micro-case 'Account#logo_attachment (reset scope + read; missing attachment is valid)' --out /tmp/ar-logo
+# Repeat the production build + request gate for PingCRM (zero-hit control).
 # Untimed counts, from inside the production app with its actual manifest:
 # LOWRAIL=1 LOWRAIL_STATS=/tmp/ar-hits RUBYOPT='-I/abs/lowrail/gem/lib -rlowrail/setup' \
 #   BENCH_JSON=/tmp/ar-hits.json ruby --yjit /abs/lowrail/bench/ar_request_hits.rb
 ```
 
-`ar_cached_runs.rb` runs five alternating fresh-process on/off pairs, only
-this pass enabled; timing has stats/profiler disabled. The request runner
+The removed per-pass driver used five alternating fresh-process on/off pairs,
+only this pass enabled; timing had stats/profiler disabled. Its request runner
 calls `bench/requests.rb` with YJIT and 200 warmups/route, three seconds/route,
 and disables Campfire response caching. Report medians and min–max spreads,
 not the fastest cohort. A separate stats run verifies genuine executions;
 timing movement in a zero-hit control is not a speedup from the pass.
+
+Current measurements use `lowrail bench`'s shared controls and the retained
+`ar_cached_reader.rb` operation worker. `ar_plans_runs.rb` remains a diagnostic
+comparison of implementation alternatives with Lowrail off, not a pass gate.

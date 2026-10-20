@@ -281,16 +281,20 @@ and does not bypass that pending activation with a private hook.
 
 ### Remaining per-pass adapters
 
-The request branches of `ar_instantiate_runs.rb` and `ar_cached_runs.rb` now
-delegate to this command's Ruby entry point and produce its reports. Historical
-micro/breakdown entry points remain available as diagnostics. Still per-pass:
+The shared command supersedes `ar_cached_runs.rb`, `preload_runs.rb` and
+`memo_runs.rb` (removed), plus the instantiate request/micro branches. Repeat
+the prepared paths/formats with their private `BENCH_HEADERS` and cache
+settings instead of adding per-pass orchestration. Operation workers
+`ar_cached_reader.rb`, `ar_instantiate.rb` and `preload_paths.rb` remain the
+shared native adapters. Historical tables retain their original protocols;
+new results use the shared controls. Still per-pass:
 
 | Pass/tool | Remaining work, not supplied by the shared driver |
 |---|---|
 | route/path, view/link_to | guarded emitted-operation micros and site-specific budgets; `routes.rb` explicitly excludes the call-site guard and is not imported as a guarded saving |
-| memo, digest | guarded micro adapters and completed-hit denominators; `memo_runs.rb`, `memo_check.rb` and digest pass-specific fixtures remain diagnostic recipes |
-| preload | mixed-query/result workloads and the legacy multi-format/cache `preload_runs.rb` sweep; the narrow micro already uses the shared controls |
-| AR instantiate | per-model/row-shape budgets; do not apply one model's saving to another model or STI fallback |
+| memo, digest | guarded micro adapters and completed-hit denominators; `memo_check.rb` and digest pass-specific fixtures remain diagnostic recipes |
+| preload | mixed-query/result budgets; format/cache request sweeps use the shared command per prepared path, and the narrow native micro uses its shared controls |
+| AR instantiate | per-model/row-shape budgets; `ar_instantiate_runs.rb` retains only the internal-cost/StackProf breakdown (not a pass gate), which the shared driver does not cover |
 | AR plans | reader selection, completion frequency and cold/missing-attachment interpretation; `ar_plans_runs.rb` is a diagnostic implementation comparison, not an installed-pass gate |
 | new passes | attest runtime activation and add an operation adapter after defining a genuine completed-hit counter; shared request, rejection, A/A and report machinery needs no new copy |
 
@@ -617,7 +621,7 @@ no manifest, a compatible zero-unit/file/template manifest, the normal build
 with `LOWRAIL_UNITS=""`, and the normal default build. Builds are copied to
 private temporary roots; the app's manifest is never renamed or edited. An
 optional `BENCH_INSTANTIATE_DIR=/absolute/copied/.lowrail` adds a production
-default + `--ar-instantiate` build to the same rounds. Unit ids are not assumed.
+`--passes default,+ar_instantiate` build to the same rounds. Unit ids are not assumed.
 
 Timing uses `CLOCK_PROCESS_CPUTIME_ID` and `CLOCK_MONOTONIC`, alongside the
 delta of `GC.stat(:total_allocated_objects)`, divided by completed requests.

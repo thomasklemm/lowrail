@@ -162,7 +162,7 @@ work reduction, not a passed request-performance gate.
 
 **Refuse whole-method/importmap-location memoization on this Campfire boot.**
 No new registry entry, builder, runtime pass or `exp/importmap` hook is needed
-for a refusal. Existing `--memo` already records the relevant shared reasons:
+for a refusal. Existing `--passes default,+memo` already records the relevant shared reasons:
 `method_certificate` for an uncertified whole method, `call_certificate` for
 JSON/resolver work, and `regexp_timeout` for the `URI.join` expression.
 A duplicate runtime pass which only falls back would not establish coverage.
@@ -182,7 +182,7 @@ input domain would be additional work, not something established by this run.
 
 The existing URI memo can serve other certified, timeout-free apps; the
 existing SHA pass handles the two script digests at one source site. Building
-`--memo` and running the serial gate here gives **634 identical outcomes**,
+`--passes default,+memo` and running the serial gate here gives **634 identical outcomes**,
 **15,109 reported SQL events**, **8,444 hits across 53 units**, of which
 **1,332** are the existing SHA unit; zero fallbacks. These are **not** new
 importmap pass hits. New importmap pass result: **0 units / 0 hits, refused**.
@@ -234,7 +234,7 @@ ruby --yjit ../../bench/importmap.rb check ../campfire-importmap/app/controllers
 ruby --yjit ../../bench/importmap.rb boundary ../campfire-importmap/app/controllers/concerns/inline_script_hashes.rb
 
 # Existing Lowrail gate, not a new importmap pass:
-mise exec -- target/debug/lowrail build .corpus/campfire --memo
+mise exec -- target/debug/lowrail build .corpus/campfire --passes default,+memo
 RUBY_DEBUG_ENABLE=0 PARALLEL_WORKERS=1 LOWRAIL_SQL_TRACE=full mise exec -- \
   target/debug/lowrail verify .corpus/campfire -- bin/rails test --seed 41231
 ```

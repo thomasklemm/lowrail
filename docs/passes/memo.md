@@ -1,6 +1,6 @@
 # Guarded memo: certified expressions, not arbitrary methods
 
-PLAN §9.2a, measured 2026-10-20. **Opt-in:** `lowrail build APP --memo`.
+PLAN §9.2a, measured 2026-10-20. **Opt-in:** `lowrail build APP --passes default,+memo`.
 Ruby 4.0.7 +YJIT; Campfire and Rails pins are those in
 [Campfire M0](../m0/campfire.md). real-blog uses Rails 8.1.4.
 
@@ -84,7 +84,7 @@ certificate; JSON/resolver/file digest calls; unsupported arity, splats, blocks
 or multiline calls; nested overlaps; refinements/reflective activation; unknown
 implementations; and URI's timeout boundary. Runtime argument declines are not
 written to disk per request. `LOWRAIL_UNITS`, environment guards, bisection,
-denylisting and `LOWRAIL=0` retain their existing meanings. Without `--memo`
+denylisting and `LOWRAIL=0` retain their existing meanings. Without `+memo`
 there are no memo units or memo-specific tracing hooks.
 
 ## Equivalence evidence
@@ -95,10 +95,10 @@ The full gem run also used a disposable copy of the prepared real-blog app at
 ```sh
 cargo test
 ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].sort.each { require_relative _1 }'
-target/debug/lowrail build .corpus/campfire --memo
+target/debug/lowrail build .corpus/campfire --passes default,+memo
 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/campfire -- bin/rails test --seed 35709
 RUBY_DEBUG_ENABLE=0 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/campfire -- bin/rails test --seed 35709
-target/debug/lowrail build .corpus/real-blog --memo
+target/debug/lowrail build .corpus/real-blog --passes default,+memo
 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/real-blog
 ```
 
@@ -189,18 +189,23 @@ off records zero. There are no policy relaxations or nonce substitutions.
 
 ```sh
 RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 \
-  target/debug/lowrail build .corpus/campfire --env production --memo
-BENCH_ROUNDS=5 BENCH_SECONDS=3 ruby bench/memo_runs.rb \
-  .corpus/campfire /tmp/memo-results
+  target/debug/lowrail build .corpus/campfire --env production --passes default,+memo
+# Set BENCH_HEADERS and ROOM_PATH from the private prepared fixture.
+target/debug/lowrail bench .corpus/campfire --pass memo/sha256 \
+  --path "$ROOM_PATH" --out /tmp/memo-results
 ```
 
-The harness uses `bench/requests.rb`: YJIT, 200 warmups per route, three seconds
+The historical harness used `bench/requests.rb`: YJIT, 200 warmups per route, three seconds
 per case, five fresh-process on/off pairs, alternating pair order, all four HTML
 routes, sequential and without profilers or concurrent tests. Only memo units
 are enabled; stats are off. Off is ordinary Rails, on includes Lowrail's
 guard/load-time plumbing, not just the isolated intrinsic. Default response/
 record caches and disabled response/record caches are measured separately;
 fragment caches remain warm. Raw logs/authentication stay private in `/tmp`.
+
+The superseded request runner is removed. New measurements use `lowrail bench`
+with its mandatory A/A/heap controls; repeat each prepared path in both cache
+modes. Use stacked `--passes` with a separate default build to price a pass set.
 
 Each run reports mean request time; the table reports the median and
 min–max of five process means, not a confidence interval or latency percentile.

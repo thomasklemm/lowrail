@@ -16,7 +16,7 @@ method lookup chain. Unsupported inputs or invalid facts call `super`.
 The prepend is visible in `ancestors`; unlike a source splice, this pass
 does not promise an unchanged method owner for Preloader itself.
 
-`lowrail build APP --preload-plans [--env production]` selects the preload
+`lowrail build APP --passes default,+preload_plans [--env production]` selects the preload
 builder in `lowrail-runtime-build`, sharing one app boot with the other
 selected runtime passes. Rust merges the returned units and ledger before
 compilation, assigning ids after the source units; rebuilding is idempotent. There is no
@@ -170,9 +170,9 @@ The final combined route + preload build was verified with:
 cargo test
 ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].each { require_relative _1 }'
 cargo build
-target/debug/lowrail build .corpus/campfire --preload-plans
+target/debug/lowrail build .corpus/campfire --passes default,+preload_plans
 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/campfire -- bin/rails test --seed 35709
-target/debug/lowrail build .corpus/real-blog --preload-plans
+target/debug/lowrail build .corpus/real-blog --passes default,+preload_plans
 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/real-blog
 ```
 
@@ -239,12 +239,18 @@ headers from `bench/campfire_setup.rb`. No app source/lockfile changes.
 
 ```sh
 RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 \
-  target/debug/lowrail build .corpus/campfire --env production --preload-plans
-BENCH_ROUNDS=3 BENCH_SECONDS=3 ruby bench/preload_runs.rb \
-  .corpus/campfire /tmp/preload-micro micro
-BENCH_ROUNDS=3 BENCH_SECONDS=3 ruby bench/preload_runs.rb \
-  .corpus/campfire /tmp/preload-requests requests
+  target/debug/lowrail build .corpus/campfire --env production --passes default,+preload_plans
+# Set BENCH_HEADERS and ROOM_PATH from the private prepared fixture.
+target/debug/lowrail bench .corpus/campfire --pass active_record/preload_plans \
+  --counter native --micro-case already_loaded_creator --path "$ROOM_PATH" \
+  --out /tmp/preload-micro
 ```
+
+The removed per-pass runner's historical protocol follows below. New
+measurements use the shared command's A/A/heap gates with the retained
+`preload_paths.rb` operation worker. Repeat each prepared HTML/stream/JSON
+path separately, with its private `BENCH_HEADERS`, in both default-cache and
+`CAMPFIRE_RESPONSE_CACHE_MB=0` modes; the matrix is not a new measurement seam.
 
 The production log level also keeps app boot log messages out of the
 build-time oracle's stdout protocol. Timed code is Ruby +YJIT, sequential

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Untimed, warmed request probe. Use the same production build, fixture headers,
-# LOWRAIL_UNITS and response-cache settings as ar_cached_runs.rb. Output only
+# LOWRAIL_UNITS and response-cache settings as lowrail bench. Output only
 # public route labels and genuine completed plan executions, never credentials.
 # From the app: ruby --yjit /abs/lowrail/bench/ar_request_hits.rb
 require File.expand_path("config/environment", Dir.pwd)

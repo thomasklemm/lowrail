@@ -10,6 +10,43 @@ live in the linked docs; numbers come from executed runs, dated.
 Ruby 3.4+ (gemspec), developed on 4.0.7. real-blog on Ruby 3.4.11 builds the
 same 11 units and verifies 21/21 identical with 114 hits.
 
+- **Post-registry cleanup:** all build selection now uses `--passes`; the five
+  transitional per-pass flags are removed. Superseded cached-reader, preload
+  and memo runners are removed, as are instantiate's request/micro branches.
+  Its internal-cost/StackProf breakdown and the Lowrail-off AR implementation
+  comparison remain diagnostic, with their operation workers unchanged.
+  Application activation already has one owner; component-suite/test calls
+  and AR dependency-invalidation hooks are not redundant activation paths.
+  No gem runtime source changes are included in this cleanup.
+
+  Fresh pre-K default/all-opt-in builds across all five corpus apps, including
+  explicit browser gates, retain **1,626 identical gate outcomes / 34,042
+  identical ordered own-thread SQL events** in 20 before/after cases (suite
+  overlap is counted). Entire manifests and ledger identities/multiplicities
+  match; non-system per-unit hit/fallback maps match exactly. Eighteen total
+  maps are exact. The two Campfire browser controls are A/A on byte-identical
+  runtime code and manifests, not counter-equality claims:
+
+  | Browser build | Hits before → after | Fallbacks before → after |
+  |---|---:|---:|
+  | default | 4,169 → 4,193 | 0 → 0 |
+  | all-opt-in | 9,904 → 9,840 | 847 → 843 |
+
+  Default variance is at units 32/44/58 (+12/+4/+8); the all-opt-in map also
+  varies in dependent AR work. All original maps and other-thread SQL
+  advisories are [retained](cleanup-equivalence.json), alongside the earlier
+  [request-count attribution](runtime-pass-equivalence.json). Rust **34 tests**,
+  gem **90 tests / 1,575 assertions** (5 optional skips), bench **20 tests / 155
+  assertions** pass. Retained breakdown worker arguments, environment and
+  summary match the old diagnostic. No new speed/cold-cost claim; precompiling
+  `passes.rb` remains a separate follow-up.
+
+  After pulling main (including K), combined checks pass: Rust **34 tests**,
+  gem **91 tests / 1,586 assertions** (5 optional skips), bench **21 tests /
+  165 assertions**. A rebuilt default blog retains 21 identical outcomes and
+  125 identical ordered queries at both seeds: **57/0** hits/fallbacks at
+  41231, **55/1** at 14. The full cleanup matrix above remains explicitly
+  pre-K, not relabeled as a post-integration corpus run.
 - **Blog counter-order investigation:** archived runtimes `491ea27` and
   `f17790c` match exactly in 20 serial verifies each at `SEED=41231`
   (57 hits, zero fallbacks), and seed-by-seed for seeds 0–19:
@@ -117,10 +154,10 @@ same 11 units and verifies 21/21 identical with 114 hits.
   changes and unsupported shapes retain the original Rails path. Already-loaded
   micro path −22.1% time/−29.3% allocations, but presentation +19.3% and
   response-cache-disabled room +10.2%: not a general application-speed win,
-  so it is opt-in (`lowrail build --preload-plans`) until it no longer
+  so it is opt-in (`lowrail build APP --passes default,+preload_plans`) until it no longer
   slows real requests.
 - **AR SQL plans** ([survey, guards and measurements](passes/ar-plans.md)),
-  opt-in with `lowrail build --ar-plans`: fixed scoped-association readers
+  opt-in with `lowrail build APP --passes default,+ar_plans`: fixed scoped-association readers
   reuse Rails SQL builders/BindMaps; original relation loading, inverses,
   preloading, strict loading and query cache remain live. Five non-system
   corpus gates: **741 identical outcomes / 16,182 identical traced queries**.
@@ -133,7 +170,7 @@ same 11 units and verifies 21/21 identical with 114 hits.
   Keep opt-in. Attribute dispatch was a guarded negative result; general
   escaping app-chain plans remain unimplemented (SQL-only ceiling 21–22 µs).
 - **Active Record instantiation** ([measurements and guards](passes/ar-instantiate.md)),
-  opt-in `lowrail build --ar-instantiate`: normal per-model singleton `def`s,
+  opt-in `lowrail build APP --passes default,+ar_instantiate`: normal per-model singleton `def`s,
   lazy builder reuse, method facts and row-wise AR epoch guards; Rails still
   owns initialization, callbacks and STI. Five corpus apps: **779 outcomes
   and 17,261 ordered same-thread SQL events identical**, **3,363 pass hits**;
@@ -155,7 +192,7 @@ same 11 units and verifies 21/21 identical with 114 hits.
   **811 identical outcomes, 514 binding hits, zero fallbacks**, and all 12
   HTML/JSON byte comparisons pass. No temporary setup hook is needed.
 - **Guarded memo** ([certificate/refusal details](passes/memo.md)), opt-in
-  with `lowrail build --memo`: fresh-return SHA-256 string reuse, bounded by
+  with `lowrail build APP --passes default,+memo`: fresh-return SHA-256 string reuse, bounded by
   runtime keys and guarded implementation facts. Campfire **634 identical**,
   **1,242 memo reuses** with its debugger disabled in both modes; default-debug
   verification also identical but correctly falls back. Four production HTML
@@ -166,7 +203,7 @@ same 11 units and verifies 21/21 identical with 114 hits.
   medians **+3.9…+15.4% slower**, allocations +36…45/request. Not a general net
   win; keep it opt-in.
 - **Exact file-digest memo** ([contract and public fixture](passes/digest-memo.md)),
-  independent opt-in `lowrail build --digest-memo`: reread the complete binary
+  independent opt-in `lowrail build APP --passes default,+digest_memo`: reread the complete binary
   stream, reuse only after full byte equality; no stat-only shortcut or arbitrary
   Inertia-proc memo. RailsVite MD5 and vite_ruby SHA1 intrinsics retain original
   error/glob semantics. Public fixture: 7/7 identical, 65 reuses, no fallbacks.
@@ -287,7 +324,7 @@ same 11 units and verifies 21/21 identical with 114 hits.
 | App | Lowered | verify | Other |
 |---|---|---|---|
 | real-blog (Rails 8.1.4) | 9/9 `link_to` sites, 10/10 route sites (1 in a controller), 12 units including preload plans | 21/21 identical, 116 fast-path hits across all 12 units (2 preload hits) | 4 HTML routes byte-identical on/off (CSRF masked); request time within noise, allocs −1 to −6 %; `edit_article_path` 2.7 → 1.4 µs |
-| Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 108/162 route sites (51 `_url`) | 634/634 identical (2 skips both ways), 13238 hits across 52 units, 0 fallbacks; with `--preload-plans` 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
+| Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 108/162 route sites (51 `_url`) | 634/634 identical (2 skips both ways), 13238 hits across 52 units, 0 fallbacks; with `+preload_plans` 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
 | ARGOS (private, Rails 8.1.4) | 235/280 route sites + one opt-in digest site, 62 units; `link_to` 0/0 | 10,816 unit/request + 552 system outcomes identical; route 794/226 + digest 765/2,849 hits, zero fallbacks; SQL-trace caveat in notes | [Aggregate measurements](m0/argos.md): digest 298.40 → 129.81 µs; profile −14.3%, overview/list within noise; 14,734 type signatures, 3,053 non-untyped returns |
 | PingCRM (Rails 8.1.4, Ruby 4.0.7) | 30/30 route sites, 4 route units + preload | 26/26 identical, 11 route + 7 preload hits | [Public Inertia M0](m0/inertia.md); seed 41231, browser suite included |
 | Redprints CFP (Rails 8.1.3, Ruby 4.0.7) | 25/27 route sites, 14 route units; 9 Ruby files compiled | 50/50 non-system + 12/12 browser outcomes identical; 25 + 19 fast-path hits, **zero fallbacks** in both runs | Freezolite delivery and dynamic mounted-engine script completion fixed ([loader survey](loaders.md)) |

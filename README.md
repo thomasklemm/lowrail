@@ -27,10 +27,9 @@ modifiers in order. Names are the stable `area/name` identifiers in
 `path`, `uri_join`, `sha256`, `digest_memo`, `preload_plans`, `ar_instantiate`
 and `ar_plans`. `memo` selects both source memo passes.
 
-The existing `--memo`, `--digest-memo`, `--preload-plans`,
-`--ar-instantiate` and `--ar-plans` flags remain aliases. Command-line
-options are processed left to right; `--passes` resets to its list's
-selection. With no options, only `view/link_to` and `route/path` run.
+Use `--passes` for all opt-ins; the transitional per-pass build flags have
+been removed. Each `--passes` resets to its list's selection. With no
+options, only `view/link_to` and `route/path` run.
 
 For AR shadow checks, the relation fuzzer and Rails-suite evidence, see
 [Active Record equivalence](docs/ar-equivalence.md).

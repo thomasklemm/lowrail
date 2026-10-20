@@ -196,13 +196,13 @@ No digest caching pass was implemented or enabled in this iteration.
 
 ## Zweite Iteration: exaktes Digest-Memo (2026-10-20)
 
-Der neue, unabhängige Opt-in-Pass `lowrail build APP --digest-memo` senkt
+Der neue, unabhängige Opt-in-Pass `lowrail build APP --passes default,+digest_memo` senkt
 **eine Gem-Site in einer zusätzlichen Unit** ab: insgesamt 62 Units,
 58 Ruby-Dateien und vier Templates. Keine Digest-Ablehnung; die 45
 bisherigen Route-Ablehnungen bleiben bestehen. Keine Anwendungssourcen,
 Klassen-, Datei- oder Testnamen werden hier veröffentlicht. Die Integration
 verwendet weiterhin nur `RUBYOPT`; Gemfile und Lockfile bleiben unverändert.
-`--memo` und `--preload-plans` sind für diese Messungen aus.
+`memo` und `preload_plans` sind für diese Messungen nicht ausgewählt.
 
 Die Dateibytes werden jedes Mal vollständig neu gelesen. Nur ein exakter
 Byte-Vergleich darf den Hash sparen; kein Stat-Tupel, kein Memo einer
@@ -212,7 +212,7 @@ Stream-Vertrag bei Umbenennen, In-place-Änderung und Entfernen zwischen Reads
 sowie Guards und Grenzen stehen in [der Pass-Notiz](../passes/digest-memo.md).
 Die öffentliche RailsVite/Inertia/vite_ruby-Fixture verifiziert 7/7 identisch,
 71 Assertions pro Modus, 65 Digest-Hits und null Fallbacks, auch beim Build
-mit beiden Flags `--memo --digest-memo`. Die Memo-Purity-Prüfung lehnt die
+mit `--passes default,+memo,+digest_memo`. Die Memo-Purity-Prüfung lehnt die
 beliebige lazy Proc weiterhin ab; der Digest-Pass optimiert ihren Gem-Aufruf.
 
 ### Finale Differential-Gates nach Integration der Memo-Hooks

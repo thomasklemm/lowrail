@@ -99,13 +99,13 @@ From the Lowrail root, with the same PostgreSQL/host/browser environment:
 
 ```sh
 cargo build
-target/debug/lowrail build .corpus/pingcrm --preload-plans
+target/debug/lowrail build .corpus/pingcrm --passes default,+preload_plans
 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/pingcrm -- \
   bin/rails test test/models test/system --seed 41231
-target/debug/lowrail build .corpus/redprints-cfp --preload-plans
+target/debug/lowrail build .corpus/redprints-cfp --passes default,+preload_plans
 target/debug/lowrail verify .corpus/redprints-cfp -- bundle exec rspec --seed 41231
 target/debug/lowrail verify .corpus/redprints-cfp -- bundle exec rspec spec/system --seed 41231
-target/debug/lowrail build .corpus/react-starter-kit --preload-plans
+target/debug/lowrail build .corpus/react-starter-kit --passes default,+preload_plans
 target/debug/lowrail verify .corpus/react-starter-kit -- bundle exec rspec --seed 41231
 ```
 

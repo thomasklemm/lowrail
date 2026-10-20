@@ -1,8 +1,8 @@
 # Exaktes Memo für Datei-Digests
 
-Stand: 2026-10-20. Opt-in mit `lowrail build APP --digest-memo`;
-Passname `digest/file_memo`. Unabhängig von `--memo` und
-`--preload-plans`; ohne Flag werden keine Digest-Dateien verändert.
+Stand: 2026-10-20. Opt-in mit `lowrail build APP --passes default,+digest_memo`;
+Passname `digest/file_memo`. Unabhängig von `+memo` und
+`+preload_plans`; ohne Auswahl werden keine Digest-Dateien verändert.
 
 ## Grenze und Auslieferung
 
@@ -130,7 +130,7 @@ cargo build --release
 cargo test
 ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].each { require_relative _1 }'
 (cd fixtures/digest-app && bundle install)
-target/release/lowrail build fixtures/digest-app --digest-memo
+target/release/lowrail build fixtures/digest-app --passes default,+digest_memo
 target/release/lowrail verify fixtures/digest-app --bisect -- bin/rails test --seed 1729
 ```
 

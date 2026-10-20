@@ -192,7 +192,7 @@ Steps 1–5 are implemented. Step 4 follows the base-cost work in
 `docs/bench.md`; guard, loader and statistics hot paths remain unchanged.
 
 1. Pass registry in Rust (`src/passes.rs`: name, kind, default, builder) and
-   `--passes`; keep the old flags as aliases for one release.
+   `--passes`; the transitional per-pass build flags are now removed.
 2. One Ruby runtime-build entry point (`exe/lowrail-runtime-build`) that boots
    once and runs the selected builders; the existing `*_build.rb` files become
    builder functions returning `{units, ledger}`.
@@ -212,3 +212,25 @@ Steps 1–5 are implemented. Step 4 follows the base-cost work in
    and multi-unit/model `--budgets` input. It reports measured saving beside
    the summed individual expectations and a covariance-aware residual CI;
    missing budgets remain unmodeled. See [stacked pass sets](bench.md#stacked-pass-sets).
+
+### Post-migration cleanup
+
+Build selection uses only `--passes`; short names such as `+memo` and
+`+ar_instantiate` remain registry aliases, not separate CLI flags. Source
+delivery and runtime method bodies are unchanged by the cleanup.
+
+Application activation has one owner, `Passes.after_initialize`. Direct
+`activate` calls remain only where needed by isolated pass tests, method
+diagnostics and Rails **component** suites, which have no initialized Rails
+application to fire that hook. `AR.install`'s `:active_record` hook remains
+dependency invalidation, not an alternative per-pass activation path.
+
+The shared benchmark replaces the cached-reader, preload and memo request
+runners and the instantiate request/micro branches. Operation workers stay;
+instantiate's internal-cost/StackProf breakdown and `ar_plans_runs.rb`'s
+Lowrail-off implementation comparison are not covered by `lowrail bench`.
+See [the remaining diagnostics](bench.md#remaining-per-pass-adapters).
+
+The cleanup's [before/after corpus evidence](cleanup-equivalence.json) retains
+entire-manifest and ledger equality, ordered own-thread SQL and full per-unit
+maps, including the Campfire browser A/A variation rather than hiding it.
