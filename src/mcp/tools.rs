@@ -49,11 +49,7 @@ impl Data {
         let bytes = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
         let observed = read_optional(&self.app.join(".lowrail/observed.json"))?;
         if self.snapshot.as_ref().is_none_or(|s| s.bytes != bytes || s.observed != observed) {
-            let facts: Facts =
-                serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", path.display()))?;
-            if facts.format != 1 {
-                return Err(format!("unsupported facts format {}", facts.format));
-            }
+            let facts = crate::facts::load(&path)?;
             // Preserve optional fields (e.g. validations) not yet in Facts.
             #[derive(serde::Deserialize)]
             struct Models {

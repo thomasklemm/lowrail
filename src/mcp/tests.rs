@@ -133,9 +133,11 @@ fn method_status_does_not_attribute_neighboring_sites_to_a_method() {
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
     let source = dir.join("article.rb");
     std::fs::write(&source, "class Article\n def first\n  article_path(1)\n end\n def second\n  article_path(2)\n end\nend\n").unwrap();
-    std::fs::write(dir.join(".lowrail/facts.json"), json!({"format":1,"modules":[{"name":"Article","methods":[
-        {"name":"first","source_location":format!("{}:2",source.display())},
-        {"name":"second","source_location":format!("{}:5",source.display())}]}]}).to_string()).unwrap();
+    std::fs::write(dir.join(".lowrail/facts.json"), json!({"format":2,"app_root":"..",
+        "app_paths":{"values":["/modules/0/methods/0/source_location","/modules/0/methods/1/source_location"],"keys":[]},
+        "modules":[{"name":"Article","methods":[
+        {"name":"first","source_location":"article.rb:2"},
+        {"name":"second","source_location":"article.rb:5"}]}]}).to_string()).unwrap();
     std::fs::write(dir.join(".lowrail/ledger.json"), json!([
         {"target":source,"line":3,"outcome":"lowered","pass":"route/path"},
         {"target":source,"line":6,"outcome":"refused","reason":"argument_shape","pass":"route/path"}
