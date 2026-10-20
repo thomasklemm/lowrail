@@ -198,6 +198,59 @@ class RoutesTest < Minitest::Test
     end
   end
 
+  def test_generic_routes_preserve_defaults_recall_format_and_script_mutations
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "config/routes.rb" => <<~'RUBY')
+        Rails.application.routes.draw do
+          get "/users/:user_id/profile(.:format)", to: "profiles#show", as: :profile, defaults: { user_id: "me" }
+          get "/users/:user_id/widgets/:id(.:format)", to: "widgets#show", as: :user_widget
+          get "/default/users/:user_id/widgets/:id(.:format)", to: "widgets#show", as: :default_widget, defaults: { user_id: "me" }
+        end
+      RUBY
+      out = ruby_json(<<~'RUBY', chdir: dir, env: { "RAILS_ENV" => "test" })
+        require "./config/environment"
+        require "lowrail/oracle_routes"
+        Rails.application.eager_load!
+        routes = Rails.application.routes
+        req = ActionDispatch::Request.new(Rack::MockRequest.env_for("http://example.org/users/41/widgets/23",
+          "action_dispatch.routes" => routes))
+        req.path_parameters = { controller: "widgets", action: "show", user_id: "41", id: "23", format: "xml" }
+        c = ApplicationController.new
+        c.set_request!(req)
+        c.set_response!(ApplicationController.make_response!(req))
+        view = c.view_context
+        info = Lowrail::OracleRoutes.info(view, :profile_path)
+        paths = [view.profile_path, view.user_widget_path, view.user_widget_path("9"),
+                 view.default_widget_path("9"), view.user_widget_path("9", "87", "json")]
+        # A plausible default-expansion optimization: it preserves dynamic
+        # completion, but loses generic generation's supplied format.
+        fast = "Lowrail::Routes.finish(+'/users/me/profile', url_options.merge(Rails.application.routes.named_routes.get(:profile).defaults), self, false)"
+        probe = Lowrail::OracleRoutes.probe([["view", view]], [], fast, "profile_path")
+        view.define_singleton_method(:url_options) { c.url_options.merge(format: "json") }
+        supplied_format = view.profile_path
+        events = []
+        routes.define_singleton_method(:find_script_name) do |options|
+          events << "script"
+          options[:user_id] = "mounted"
+          "/engine"
+        end
+        param = Object.new
+        param.define_singleton_method(:to_param) { events << "param"; "9" }
+        mounted = view.default_widget_path(param)
+        puts JSON.generate(info: info, paths: paths, probe: probe, supplied_format: supplied_format, mounted: mounted, events: events)
+      RUBY
+      assert_equal ["user_id"], out.dig("info", "default_parts")
+      assert_equal ["user_id", "format"], out.dig("info", "segment_keys")
+      assert_equal ["/users/me/profile", "/users/41/widgets/23", "/users/9/widgets/23",
+                    "/default/users/me/widgets/9", "/users/9/widgets/87.json"], out["paths"]
+      assert_equal false, out.dig("probe", "ok")
+      assert_includes out.dig("probe", "reason"), "changing url_options [:format]"
+      assert_equal "/users/me/profile.json", out["supplied_format"]
+      assert_equal "/engine/default/users/mounted/widgets/9.json", out["mounted"]
+      assert_equal ["script", "param"], out["events"]
+    end
+  end
+
   def test_seg_skips_gsub_only_for_safe_ascii
     out = ruby_json(<<~'RUBY')
       require "json"

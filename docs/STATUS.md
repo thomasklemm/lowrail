@@ -32,6 +32,10 @@ same 11 units and verifies 21/21 identical with 114 hits.
   Block-backed `direct`/`resolve` helpers remain refused with block locations
   and operations: corpus blocks read current state, transform arguments or
   dispatch dynamically; a runtime probe rejects dropping their state/query.
+  Arity refusals now identify default-backed parts and optional segments;
+  Campfire's 17 such calls all default `user_id` to `"me"`, rather than
+  simply recalling missing IDs. Generic generation's mapping, format and
+  script-before-parameterization semantics remain an explicit boundary.
 - **Active Record preload plans** ([design and measurements](passes/preload-plans.md)):
   guarded gem-level trees, scopes and loader groups computed once; fresh
   Rails Association loaders per call, no cached rows. Schema/reflection/scope
@@ -173,8 +177,9 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 
 ## Next
 
-- `direct`/`resolve` helpers and missing route arguments; host normalization
-  is request-local now, but Rails' `url_options` assembly remains per call.
+- Generic route generation and guarded block-result mappings remain unsupported;
+  host normalization is request-local, but Rails' `url_options` assembly and
+  application overrides remain per call.
 - Broader benchmark coverage and confidence intervals (preload runs now interleave on/off).
 - Guarded memo for per-request work on boot-fixed inputs (ARGOS: Inertia
   asset-version digest 12.8 % self per request).

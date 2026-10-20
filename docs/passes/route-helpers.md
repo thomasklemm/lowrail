@@ -213,12 +213,58 @@ as above, again have overlapping ranges: **within noise**, not a new speedup.
 | Redprints proposals | 2027 (1899–2395) | 1998 (1895–2056) |
 | Starter dashboard, SSR | 3627 (3594–3785) | 3546 (3396–3690) |
 
+### Arity, defaults and recall (2026-10-20)
+
+Campfire's 17 arity refusals all have a route-default `user_id: "me"`:
+15 calls omit every argument, two pass one of two required parts. Describing
+these as 17 missing request-recalled IDs was inaccurate. The oracle now reports
+default-backed required parts and segment keys; the ledger identifies those
+defaults, optional segments and the unsupported generic generator semantics.
+
+They remain refused, not rewritten as an optimized helper with extra defaults.
+Rails' generic helper first maps short argument lists after removing keys
+supplied by controller options and route defaults. Without a `user_id` default,
+one argument fills `user_id` and the last `id` can come from recall; with the
+default, that argument fills `id`. Optional format supplied by `url_options`
+is honored; recalled format alone is discarded for these named routes. Extra
+arguments can fill optional format instead of being an error.
+
+Crucially, generic `RouteSet#url_for` calls `find_script_name` **before** Journey
+parameter conversion, and that method can mutate the parameters used to build
+the path. Reusing the optimized helper's path-first `finish` would be wrong.
+Exact specialization would need the generic generator's separate ordering,
+argument mapping, option filtering and recall contract, not another scoped
+RouteSet guard. The runtime fixture uses asymmetric IDs (41 / 23 / 9), supplied
+versus recalled format, and an engine singleton that changes `user_id` before
+`to_param`. New oracle probes reject naive default expansion on supplied format;
+the fake oracle keeps short, default-backed and excess-argument calls unchanged.
+No new units or arity-support claim are added.
+
+Final five-app rebuild/verify repeats the preceding outcomes and hit counts,
+with zero fallbacks in all six suites (including Redprints browser separately).
+Rust: 24 unit + 2 integration tests pass; gem: 61 runs, 1183 assertions,
+3 optional skips, no failures. Repeat micro: Rails 4.024 µs (3.934–4.188),
+uncached lowering 3.052 (2.951–3.255), host cache 2.248 (2.179–2.525),
+25 / 18 / 9 allocations. No runtime change is attributed to this refusal step.
+
+Final five-pair request cohorts, same interleaved protocol: all ranges overlap,
+so the request-level result is still **within noise**.
+
+| Request | off µs median (min–max) | on µs median (min–max) |
+|---|---:|---:|
+| real-blog articles | 1614 (1579–1778) | 1656 (1601–1696) |
+| real-blog article | 1642 (1617–1752) | 1659 (1582–1731) |
+| Campfire room, cached | 2223 (2199–2462) | 2163 (2102–2229) |
+| PingCRM organizations | 3032 (2863–3350) | 3044 (2865–3125) |
+| Redprints proposals | 2024 (1708–2071) | 1995 (1731–2136) |
+| Starter dashboard, SSR | 3718 (3583–3800) | 3668 (3473–3888) |
+
 ## Refused (ledger reasons)
 
 Direct /
 resolve helpers (`CustomUrlHelper`, e.g. `rails_blob_path`), explicit
 receiver (`main_app.x_path`, `url_helpers.x_path`), options hash, arity ≠
-required parts (Rails recalls missing parts from the request), not in an
+required parts (generic mapping/defaults/recall, described above), not in an
 instance method, a nested route call (the inner one is lowered), multi-line
 arguments, requirements or glob, route defaults that set url options,
 helper overridden in that class, probe mismatch.
@@ -290,5 +336,5 @@ request.
   variables; locals created by `eval`/`binding.local_variable_set` are not
   seen.
 - `direct`/`resolve` helpers (18 in Campfire) and arity mismatches
-  (Rails recalls parts from the request, 17) are now the largest refused
-  groups.
+  (17 default-backed Campfire calls, still requiring the generic generator)
+  remain the largest refused groups.

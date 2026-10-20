@@ -74,6 +74,10 @@ pub struct Info {
     #[serde(default)]
     pub parts: Vec<String>,
     #[serde(default)]
+    pub segment_keys: Vec<String>,
+    #[serde(default)]
+    pub default_parts: Vec<String>,
+    #[serde(default)]
     pub defaults: String,
     #[serde(default)]
     pub option_defaults: Vec<String>,
@@ -396,10 +400,13 @@ fn plan(code: &str, c: &Candidate, info: &Info, nested: bool, oracle: &mut dyn O
     }
     let args = c.args.clone()?;
     if args.len() != info.parts.len() {
+        let optional: Vec<_> = info.segment_keys.iter().filter(|p| !info.parts.contains(p)).cloned().collect();
         return Err(format!(
-            "{} positional argument(s), route has {} required part(s) (Rails takes the non-optimized path)",
+            "{} positional argument(s), route has {} required part(s); default-backed required parts: [{}], optional segments: [{}]; generic argument mapping, recall and script-name resolution before parameter conversion are not modeled",
             args.len(),
-            info.parts.len()
+            info.parts.len(),
+            info.default_parts.join(", "),
+            optional.join(", ")
         ));
     }
     if nested {
@@ -592,6 +599,7 @@ mod tests {
                 let route = |name: &str, spec: &str, parts: &[&str], template: &str| {
                     let kind = if helper.ends_with("_url") { "url" } else { "path" };
                     serde_json::json!({"kind": kind, "name": name, "spec": spec, "parts": parts, "defaults": "{}",
+                        "segment_keys": parts.iter().copied().chain(["format"]).collect::<Vec<_>>(),
                         "option_defaults": [], "optimized": true, "owner_ok": true, "source_location": "/rs.rb:334",
                         "visibility": "public", "template": template})
                     .to_string()
@@ -601,6 +609,9 @@ mod tests {
                     "article_path" => route("article", "/articles/:id(.:format)", &["id"], "/articles/LRHP0Q"),
                     "article_comment_path" => route("article_comment", "/articles/:article_id/comments/:id(.:format)", &["article_id", "id"], "/articles/LRHP0Q/comments/LRHP1Q"),
                     "articles_url" => route("articles", "/articles(.:format)", &[], "/articles"),
+                    "user_profile_path" => serde_json::json!({"kind": "path", "name": "user_profile", "parts": ["user_id"],
+                        "segment_keys": ["user_id", "format"], "default_parts": ["user_id"],
+                        "defaults": "{user_id: \"me\"}", "optimized": true, "owner_ok": true}).to_string(),
                     "fresh_article_path" => serde_json::json!({"kind": "custom", "reason": "fresh_article_path: block-backed direct/resolve helper; result-helper and argument/option mapping are not guarded"}).to_string(),
                     _ => r#"{"kind":"none"}"#.into(),
                 });
@@ -730,6 +741,21 @@ mod tests {
         assert_eq!(out.sites[0].outcome, "fresh_article_path: block-backed direct/resolve helper; result-helper and argument/option mapping are not guarded");
         assert!(out.deps.is_empty());
         assert!(fake.probes.is_empty(), "do not execute an unproven app block to guess an alias");
+    }
+
+    #[test]
+    fn arity_refusals_distinguish_defaults_optional_segments_and_recall() {
+        let code = "def defaults = user_profile_path\ndef recall = article_comment_path(comment)\ndef format = article_path(article, :json)\n";
+        let mut fake = Fake::default();
+        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default());
+        assert_eq!(out.code, code);
+        assert_eq!(out.sites.len(), 3);
+        assert!(out.sites[0].outcome.contains("default-backed required parts: [user_id], optional segments: [format]"));
+        assert!(out.sites[1].outcome.starts_with("1 positional argument(s), route has 2 required part(s); default-backed required parts: []"));
+        assert!(out.sites[2].outcome.starts_with("2 positional argument(s), route has 1 required part(s)"));
+        assert!(out.sites.iter().all(|s| s.outcome.contains("script-name resolution before parameter conversion are not modeled")));
+        assert!(out.deps.is_empty());
+        assert!(fake.probes.is_empty());
     }
 
     #[test]

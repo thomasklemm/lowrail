@@ -62,6 +62,8 @@ module Lowrail
           kind: kind, name: name.to_s,
           spec: route.path.spec.to_s,
           parts: route.required_parts.map(&:to_s),
+          segment_keys: route.segment_keys.map(&:to_s),
+          default_parts: (route.required_parts & route.defaults.keys).map(&:to_s),
           defaults: route.defaults.inspect,
           option_defaults: (route.defaults.keys & (kind == "url" ? OPTION_KEYS + URL_KEYS : OPTION_KEYS)).map(&:to_s),
           optimized: route.path.requirements.empty? && !route.path.spec.to_s.include?("*"),
@@ -113,7 +115,12 @@ module Lowrail
             { subdomain: "api", domain: "other.co.uk", tld_length: 2 },
             { user: "a b", password: "c@d" }, { only_path: true }, { only_path: false },
             { anchor: nil }, { anchor: "part" }, { params: { q: "a b" } },
-            { original_script_name: "/outer" }, { trailing_slash: false }
+            { original_script_name: "/outer" }, { trailing_slash: false },
+            # The generic generator honors supplied format and required-part
+            # recall; optimized helpers can deliberately ignore them. Probe
+            # rather than assume both helper paths use the same options.
+            { format: "json" }, { format: nil },
+            { _recall: { user_id: "41", id: "23", format: "xml" } }
           ]
           changes.each do |change|
             options.replace(ctx.url_options.merge(change).transform_values { |v| v.instance_of?(String) ? v.dup : v })
