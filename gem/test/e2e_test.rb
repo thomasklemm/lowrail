@@ -111,6 +111,33 @@ class E2ETest < Minitest::Test
     end
   end
 
+  def test_no_enabled_units_serves_originals_but_keeps_reporting
+    realpath_tmpdir do |dir|
+      build_app(dir)
+      env = { "LOWRAIL_UNITS" => "", "LOWRAIL_STATS" => File.join(dir, "stats") }
+      result = ruby_json(SCRIPT, chdir: dir, env: env)
+      refute result["loaded"], "a disabled build must not install delivery/invalidation hooks"
+      assert_equal ["orig", 2], result["compute"]
+      assert_equal ["orig", "CALC"], result["label"]
+      assert_empty result["hits"]
+      report = JSON.parse(File.read(Dir[File.join(dir, "stats.*")].fetch(0)))
+      assert_empty report["loaded_files"]
+      assert_empty report["unit_fallbacks"], "original source has no lowered calls to count"
+      # A nonempty subset must still deliver the file, with guards enforcing
+      # the selection at each site rather than disabling every unit.
+      result = ruby_json(SCRIPT, chdir: dir, env: env.merge("LOWRAIL_UNITS" => "0"))
+      assert result["loaded"]
+      assert_equal ["fast", 2], result["compute"]
+      assert_equal ["orig", "CALC"], result["label"]
+      assert_equal({ "0" => 1 }, result["hits"])
+      edit_manifest(dir) { |data| data.merge!("units" => [], "files" => {}, "templates" => {}) }
+      result = ruby_json(SCRIPT, chdir: dir, env: { "LOWRAIL_STATS" => File.join(dir, "stats-empty") })
+      refute result["loaded"], "an empty build needs no delivery/invalidation hooks either"
+      assert_equal ["orig", 2], result["compute"]
+      assert_empty result["hits"]
+    end
+  end
+
   def test_development_is_off_unless_forced
     realpath_tmpdir do |dir|
       build_app(dir)

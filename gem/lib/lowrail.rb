@@ -77,12 +77,13 @@ module Lowrail
 
     def setup(root: Dir.pwd, dir: File.join(root, ".lowrail"))
       return false unless enabled?
+      # With no selected units, serve original source rather than installing
+      # lowered code whose guards can only fall back. Reporters boot above.
+      return false if ENV["LOWRAIL_UNITS"] == ""
       path = File.join(dir, "manifest.json")
       return false unless File.file?(path)
 
       require_relative "lowrail/manifest"
-      require_relative "lowrail/guard"
-      require_relative "lowrail/loader"
 
       manifest = Manifest.load(path, dir)
       unless manifest.compatible?
@@ -91,6 +92,10 @@ module Lowrail
       end
       @root = root
       @manifest = manifest
+      return true if manifest.units.empty?
+
+      require_relative "lowrail/guard"
+      require_relative "lowrail/loader"
       Guard.install(manifest, defined?(Stats) && Stats.enabled? ? Stats::STATE : G)
       Loader.install(manifest)
       require_relative "lowrail/routes"

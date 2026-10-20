@@ -88,8 +88,9 @@ class ARInstantiateTest < Minitest::Test
       manifest["units"].each { |u| u["ar_instantiate"]&.fetch("sources")&.transform_values! { "stale" } }
       File.write("manifest.json", JSON.generate(manifest))
     end
-    Lowrail.setup(root: Dir.pwd, dir: Dir.pwd)
-    Lowrail::ARInstantiate.activate if ENV["LOWRAIL"] == "1"
+    # An empty selection now skips installation altogether, so there is no
+    # installed runtime plan to activate in that control.
+    Lowrail::ARInstantiate.activate if Lowrail.setup(root: Dir.pwd, dir: Dir.pwd)
     events = []
     subscription = ActiveSupport::Notifications.subscribe("instantiation.active_record") do |*args|
       payload = args.last
