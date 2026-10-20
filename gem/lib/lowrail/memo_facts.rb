@@ -17,7 +17,7 @@ module Lowrail
     # Static closure of native dispatch in the certified HTTP(S) join path.
     # The oracle probes exercise branches too, but probes alone are not purity proof.
     NATIVE = {
-      String => %i[to_str ascii_only? upcase tr downcase empty? to_i dup initialize_dup initialize_copy encode! delete! force_encoding gsub! split == freeze << index [] []= length bytesize match? start_with? hash eql? % ord is_a? kind_of? equal? nil?],
+      String => %i[to_str ascii_only? upcase tr downcase empty? to_i dup initialize_dup initialize_copy encode! delete! force_encoding gsub! split == freeze << index [] []= length bytesize match? start_with? hash eql? encoding % ord is_a? kind_of? equal? nil?],
       Array => %i[[] []= last first each << push delete empty? pop shift size join index slice! clear unshift include? inject hash eql?],
       Hash => %i[[] empty? default default_proc], MatchData => %i[[]], Regexp => %i[match],
       Integer => %i[> < + - ==], Encoding => %i[hash eql?],
@@ -126,7 +126,8 @@ module Lowrail
           facts << method_fact(mod, name, singleton: singleton)
         end
       end
-      { String => %i[dup initialize_dup initialize_copy hash eql? freeze encoding], Encoding => %i[hash eql?] }.each do |mod, names|
+      { String => %i[dup initialize_dup initialize_copy hash eql? freeze encoding],
+        Array => %i[hash eql?], Encoding => %i[hash eql?] }.each do |mod, names|
         names.each do |name|
           m = mod.instance_method(name)
           raise "non-native #{mod}##{name}" unless (!m.source_location || m.source_location.first.start_with?("<internal:")) && m.original_name == name

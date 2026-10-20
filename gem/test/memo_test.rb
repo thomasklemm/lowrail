@@ -85,6 +85,15 @@ class MemoTest < Minitest::Test
       raise "stale config" unless joined("https://port.test", "/a").port == 9443
       URI::HTTPS.send(:remove_const, :DEFAULT_PORT)
       URI::HTTPS.const_set(:DEFAULT_PORT, old_port)
+      # Encoding is a runtime key; a Ruby override must not collapse encodings.
+      encoding = String.instance_method(:encoding)
+      String.define_method(:encoding) { Encoding::US_ASCII }
+      ["/encoding-key".dup, "/encoding-key".b].each do |r|
+        actual = joined(base, r).path
+        original = URI.join(base, r).path
+        raise "overridden encoding collapsed keys" unless encoding.bind_call(actual) == encoding.bind_call(original)
+      end
+      String.define_method(:encoding, encoding)
       # A string subclass/conversion object may mutate or emit notifications.
       custom = Object.new
       def custom.to_str = ($conversions += 1; "/custom")
@@ -232,6 +241,15 @@ class MemoTest < Minitest::Test
       end
       hits = Lowrail::Stats.unit_hits.fetch("0", 0)
       raise "vacuous memo test" unless hits > 0
+      # These methods belong to the cache key, not the original digest closure.
+      hash_method, eql_method = Array.instance_method(:hash), Array.instance_method(:eql?)
+      Array.define_method(:hash) { 0 }
+      Array.define_method(:eql?) { |_| true }
+      ["left-key", "right-key"].each do |s|
+        raise "key methods collapsed distinct strings" unless hashed(s) == Digest::SHA256.base64digest(s)
+      end
+      Array.define_method(:hash, hash_method)
+      Array.define_method(:eql?, eql_method)
       wrapper = Module.new do
         def update(string)
           $updates += 1
@@ -291,9 +309,15 @@ class MemoTest < Minitest::Test
         file = "#{dir}/app/frontend/entry.js"
         File.write(file, "first")
         ViteRuby.reload_with(root: dir)
+        load File.expand_path("tests/fixtures/memo/inertia_eager_version.rb")
+        eager = InertiaRails.configuration.version.dup
+        File.write(file, "other")
+        sleep 1.1
+        raise "eager version recomputed" unless InertiaRails.configuration.version == eager
         load File.expand_path("tests/fixtures/memo/inertia_version.rb")
         first = InertiaRails.configuration.version.dup
-        File.write(file, "other") # same size, different content
+        raise "fixture missed changed file" if first == eager
+        File.write(file, "third") # same size, different content
         sleep 1.1 # Vite's documented one-second memo must expire
         second = InertiaRails.configuration.version
         raise "stale file digest" if first == second

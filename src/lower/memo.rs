@@ -135,10 +135,11 @@ mod tests {
 
     #[test]
     fn public_inertia_vite_fixture_is_refused_not_assumed_pure() {
-        let source = include_str!("../../tests/fixtures/memo/inertia_version.rb");
-        let result = lower(source, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin);
-        assert_eq!(result.code, source);
-        assert!(result.certificate.is_none());
-        assert!(result.sites.iter().any(|s| s.helper == "digest" && s.outcome.contains("no purity certificate")));
+        for source in [include_str!("../../tests/fixtures/memo/inertia_version.rb"), include_str!("../../tests/fixtures/memo/inertia_eager_version.rb")] {
+            let result = lower(source, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin);
+            assert_eq!(result.code, source);
+            assert!(result.certificate.is_none());
+            assert!(result.sites.iter().any(|s| s.helper == "digest" && s.outcome.contains("no purity certificate")));
+        }
     }
 }
