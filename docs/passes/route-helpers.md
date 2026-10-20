@@ -338,3 +338,133 @@ request.
 - `direct`/`resolve` helpers (18 in Campfire) and arity mismatches
   (17 default-backed Campfire calls, still requiring the generic generator)
   remain the largest refused groups.
+
+## Host-only controller defaults: extension audit, not implemented
+
+2026-10-20, following [the compiled-template coverage census](erb.md).
+Campfire's measured production room reaches seven successful guards/request
+but no completed lowering, because `SetCurrentRequest#default_url_options`
+contains host/protocol. Four of these calls are `*_path`; three are `*_url`.
+The following checks target **Rails 8.1.4**, not just the Campfire alpha.
+
+Host/protocol/port are irrelevant to the final path bytes in ordinary cases:
+[`RouteSet#url_for`](https://github.com/rails/rails/blob/v8.1.4/actionpack/lib/action_dispatch/routing/route_set.rb#L838-L900)
+removes them as reserved keys before generation, and
+[`Http::URL.path_for`](https://github.com/rails/rails/blob/v8.1.4/actionpack/lib/action_dispatch/http/url.rb#L169-L179)
+does not read them. A named `*_path` already selects the `PATH` strategy;
+it need not set an `only_path` key. `only_path: true` on generic `url_for`
+selects that same final strategy, not a different generation algorithm.
+Do not infer that a controller's host-only defaults imply host-only
+**url_options**: real controllers also supply request `_recall` and
+`script_name`/`original_script_name`.
+
+Executed asymmetric real-controller comparisons of generic versus forced
+optimized Rails helpers, route `/entries/:id`, argument `"a b"` from
+`to_param`, route relative root `/relative-root-7`, request port **9551**,
+default host/protocol/port with port **8449**. Both execute the actual Rails
+helper; forcing the predicate is an experiment, not new Lowrail code.
+
+| State | Generic and optimized path with a pure argument |
+|---|---|
+| Request script `/mount-3` | `/mount-3/entries/a%20b` |
+| Request script `""` | `/entries/a%20b` (empty script wins over relative root) |
+| No request script in this route context | `/relative-root-7/entries/a%20b` |
+| Default options additionally contain `script_name: "/default-script-5"`, no request script | `/default-script-5/entries/a%20b`; this extra default key must be refused by the proposed allow-list |
+
+Request recall deliberately also contains different `id: "27"` and
+`format: "xml"`; the explicit full-arity argument wins in these controls,
+and neither path has an XML suffix. These observations do not certify other
+optional-segment/default/mapping shapes. The existing arity, explicit-option,
+direct-helper and non-optimized-route refusals still apply.
+
+**A host/protocol/port allow-list alone is not exact.** Rails'
+[`OptimizedUrlHelper#call`](https://github.com/rails/rails/blob/v8.1.4/actionpack/lib/action_dispatch/routing/route_set.rb#L212-L267)
+parameterizes and formats **before** resolving the script name. Generic
+`RouteSet#url_for` resolves the script name **before** Generator/Journey
+parameterization. TracePoints observe `[script, param]` versus `[param, script]`
+in all four controls. A fifth test leaves defaults limited to the three
+allowed keys and makes the argument's `to_param` change the route config's
+relative root to `/changed-root-2`. No custom backend or engine method:
+
+```text
+generic Rails:          /relative-root-7/entries/a%20b
+forced optimized Rails: /changed-root-2/entries/a%20b
+```
+
+That counterexample changes output, not merely tracing. Existing Lowrail
+`Routes.finish` has optimized order, including setting `options[:path]`
+before calling `find_script_name`. Simply relaxing its live predicate loses
+generic semantics even if host/protocol/port cannot appear in the final path.
+
+An exact **separate generic-order variant** is plausible, not proved by this
+allow-list: retain the real `url_options` call, route-set defaults merge and
+raw-argument mapping; resolve script/original-script first on the actual
+options Hash; then specialize only the certified success path of
+Generator/Formatter. Preserve optional/default/recall behavior, query extras,
+conversion order/multiplicity, errors and mutable script-namer effects.
+Unsupported state discovered after script resolution/conversion cannot
+restart the entire original helper and repeat its side effects: it must
+continue the real remaining generic operation with the captured state.
+Requiring certified argument methods instead would shrink coverage and
+needs its own eligibility census; receiver guard hits do not prove argument
+purity. `*_url` host construction is outside this path-only proposal.
+
+**Decision:** report this boundary before implementation. Do not broaden the
+current optimized branch. No exact generic-order certificate/variant, new
+hits, per-hit saving or expected request gain is claimed. Raw control output
+is private at `.lowrail/erb-profile/rails-8.1.4.route-defaults.json`. This is
+an executed semantics probe, not a new route support or speed certificate.
+
+### Narrowing to certified parameter conversion
+
+A second, off-only census used 20 warmups and ten requests per route, tracing
+named-helper entry without changing its predicate. Campfire's four guarded
+path calls have the following actual arguments (one call each/request):
+
+| Helper; source | Positional arguments | Pure scalar-only condition | Base-AR extension candidate |
+|---|---|---|---|
+| `room_involvement_path`; `rooms/involvements/_bell:5` | `Rooms::Closed` | No | Yes, subject to the dependencies below |
+| `searches_path`; `rooms/show/_composer:4` | none | Vacuously yes | Not needed |
+| `room_messages_path`; `RoomsHelper#composer_form_tag` | `Rooms::Closed` | No | Yes, subject to the dependencies below |
+| `user_path`; `Users::AvatarsHelper#avatar_tag` | `User` | No | Yes, subject to the dependencies below |
+
+No String, Integer or Symbol was passed directly at these sites. Thus the
+scalar-only proposal covers **one of four calls**, not all four. The other
+three records have Integer `id`s, ordinary SQLite integer attribute types,
+and unoverridden `ActiveRecord::Integration#to_param`, primary-key `id`,
+`_read_attribute` and inherited `param_delimiter` readers at these boots.
+
+Blog's observed named `*_path` calls are likewise either argument-less or
+base-AR records, never directly passed scalars:
+
+| Request | Calls/request | No arguments | Record arguments |
+|---|---:|---:|---|
+| Articles index (two fixture articles) | 9 | 1 (`new_article_path`) | 8: `article_path` × 6, `edit_article_path` × 2; all `Article` |
+| Article show (one fixture comment) | 5 | 1 (`articles_path`) | `edit_article_path`, `article_path`, `article_comments_path`: `Article`; `article_comment_path`: `Article`, `Comment` |
+| Article edit | 3 | 1 (`articles_path`) | `article_path` × 2: `Article` |
+
+The counts include calls from polymorphic/form helpers as well as explicit
+template calls: they are an argument census, **not new lowerable source
+sites**. Blog already has an empty-defaults optimized branch; this proposed
+default-options extension adds no demonstrated blog coverage. All observed
+Article/Comment IDs are also Integers and their conversion readers have the
+same base owners, with no app override.
+
+On both Rails pins, base AR conversion is **not simply `id.to_s`**:
+[`to_param`](https://github.com/rails/rails/blob/v8.1.4/activerecord/lib/active_record/integration.rb#L57-L60)
+reads `id` twice, then `Array(id).join(self.class.param_delimiter)`. Certifying
+only that method does not certify `id`, attribute storage/type-casting,
+delimiter lookup, Array conversion/join or the ID's string conversion. The
+observed ordinary integer IDs suggest coverage for all three remaining
+Campfire calls, **if** that full conversion dependency set and the relevant
+script-resolution methods can be certified side-effect-free; a class census
+alone is not that proof. Singleton overrides, custom types/composite IDs and
+unknown conversion methods need refusal or additional facts. Argument
+expressions themselves must still be evaluated exactly once in source order.
+
+No implementation is made here. The scalar-only path covers 1/4 Campfire
+guarded path calls; the stronger base-AR proposal could cover 4/4, but remains
+uncertified pending a decision after the template-lookup survey. Raw method
+owners and per-site classes are private in
+`.lowrail/erb-profile/{campfire,blog}.route-arguments.json`. No additional
+hits, per-hit savings or route-speed claim is credited.
