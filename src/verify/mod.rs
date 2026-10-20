@@ -356,15 +356,26 @@ fn unstable(a: &Run, b: &Run) -> BTreeSet<String> {
 /// Isolate activation effects as well as executed fast paths. Passes.install
 /// respects LOWRAIL_UNITS, so disabled passes cannot run eager setup code.
 fn bisect_load_passes(app: &Path, cmd: &[String], manifest: &Value, report: &Report, seed: &[(String, String)]) -> Result<Vec<String>, String> {
-    let findings: Vec<_> = report.off.loads.symmetric_difference(&report.on.loads)
+    let mut findings: Vec<_> = report.off.loads.symmetric_difference(&report.on.loads)
         .filter(|entry| !report.unstable_loads.contains(*entry)).collect();
+    // An empty string disables setup entirely. A nonexistent (negative) ID
+    // keeps delivery installed but every source arm falls back: distinguish
+    // a loader/setup effect from a particular pass's activation.
+    let mut env = env_refs(seed);
+    env.push(("LOWRAIL_UNITS", "-1"));
+    let setup = run_labeled(app, cmd, &app.join(".lowrail/verify"), "loads-setup", "1", &env)?;
+    let mut culprits = Vec::new();
+    if findings.iter().any(|entry| report.off.loads.contains(*entry) != setup.loads.contains(*entry)) {
+        culprits.push("setup/source delivery (no active units)".into());
+        findings.retain(|entry| report.off.loads.contains(*entry) == setup.loads.contains(*entry));
+    }
+    if findings.is_empty() { return Ok(culprits); }
     let mut groups: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for unit in manifest["units"].as_array().into_iter().flatten() {
         if let (Some(pass), Some(id)) = (unit["pass"].as_str(), unit["id"].as_u64()) {
             groups.entry(pass.to_string()).or_default().push(id.to_string());
         }
     }
-    let mut culprits = Vec::new();
     for (index, (pass, ids)) in groups.into_iter().enumerate() {
         let list = ids.join(",");
         let mut env = env_refs(seed);

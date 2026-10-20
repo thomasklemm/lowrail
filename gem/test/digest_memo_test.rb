@@ -35,6 +35,15 @@ class DigestMemoTest < Minitest::Test
       assert report.fetch("unit_hits").values.all?(&:positive?)
       assert_empty report.fetch("unit_fallbacks")
 
+      # Pass isolation disables the specialization, not the runtime entry
+      # referenced by delivered source (including calls during app boot).
+      out, err, status = Open3.capture3(CLEAN_ENV.merge("LOWRAIL_UNITS" => "999999"),
+        binary, "verify", dir, "--", RUBY, "bin/rails", "test", "--seed", "1729")
+      assert status.success?, "#{err}\n#{out}"
+      assert_match(/LOWRAIL=1: 7 tests, 7 pass, 0 fail, 0 error, 0 skip/, out)
+      report = JSON.parse(File.read(File.join(dir, ".lowrail/verify/outcomes-1.json")))
+      assert_empty report.fetch("unit_hits")
+
       result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "test", "LOWRAIL" => "1", "LOWRAIL_STATS" => File.join(dir, "guard-stats")})
         require_relative "config/environment"
         manifest = RailsVite::Manifest.new(RailsVite.config.manifest_path)

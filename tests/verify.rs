@@ -92,23 +92,25 @@ fn verify_gates_reproducible_load_changes_and_isolates_the_pass() {
     std::fs::create_dir_all(app.join(".lowrail")).unwrap();
     std::fs::write(app.join(".lowrail/manifest.json"), serde_json::json!({"units":[
         {"id":7,"pass":"fixture/quiet"},{"id":9,"pass":"fixture/eager"}]}).to_string()).unwrap();
-    for changes_loads in [false, true] {
+    for changes_loads in ["none", "pass", "setup"] {
         let script = r#"
           extra=''
           case ",${LOWRAIL_UNITS-7,9}," in
-            *,9,*) if [ "$LOWRAIL" = 1 ] && [ "$1" = true ]; then extra=',"App::Early"'; fi ;;
+            *,9,*) if [ "$LOWRAIL" = 1 ] && [ "$1" = pass ]; then extra=',"App::Early"'; fi ;;
           esac
+          if [ "$LOWRAIL" = 1 ] && [ "$1" = setup ]; then extra=',"App::Early"'; fi
           printf '{"tests":{"a":{"result":"pass"}},"verify_loads":{"snapshot_seconds":0.012,"stages":{"first_test":{"constants":["App::Shared","Noise%s"%s]},"after_suite":{"constants":["App::Shared","App::Early"]}}}}' "$$" "$extra" > "$LOWRAIL_OUTCOMES"
         "#;
         let result = Command::new(env!("CARGO_BIN_EXE_lowrail"))
-            .args(["verify", app.to_str().unwrap(), "--", "sh", "-c", script, "sh", if changes_loads { "true" } else { "false" }])
+            .args(["verify", app.to_str().unwrap(), "--", "sh", "-c", script, "sh", changes_loads])
             .output().unwrap();
         let stdout = String::from_utf8_lossy(&result.stdout);
-        assert_eq!(result.status.success(), !changes_loads, "{stdout}");
+        assert_eq!(result.status.success(), changes_loads == "none", "{stdout}");
         let last: serde_json::Value = serde_json::from_slice(&std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
         assert!(!last["report"]["unstable_loads"].as_array().unwrap().is_empty());
-        if changes_loads {
-            assert_eq!(last["report"]["load_culprit_passes"], serde_json::json!(["fixture/eager"]));
+        if changes_loads != "none" {
+            let culprit = if changes_loads == "setup" { "setup/source delivery (no active units)" } else { "fixture/eager" };
+            assert_eq!(last["report"]["load_culprit_passes"], serde_json::json!([culprit]));
             assert!(stdout.contains("first_test\tconstants\tApp::Early"), "{stdout}");
         }
     }
