@@ -95,11 +95,16 @@ class ARPlansTest < Minitest::Test
     when "method"
       rel = a.association(:preferred_posts).scope.class
       rel.define_method(:build_arel) { |*args| super(*args).tap { _1.where(Post.arel_table[:title].eq("z")) } }
+    when "association_method"
+      holder = Writer._reflect_on_association(:preferred_posts).association_class
+      holder.define_method(:target_scope) { super().where(title: "z") }
     when "default_scope"
       Post.send(:default_scope, -> { where(title: "z") })
     when "column"
       Post.connection_pool.with_connection { _1.change_column(:posts, :published, :integer) }
       Post.reset_column_information
+    when "attribute"
+      Post.attribute(:published, :integer)
     when "annotations"
       ActiveRecord.query_transformers = [->(sql, *) { sql + " /* live annotation */" }]
     end
@@ -116,7 +121,7 @@ class ARPlansTest < Minitest::Test
     realpath_tmpdir do |dir|
       file = File.join(dir, "scenario.rb")
       File.write(file, SCENARIO)
-      %w[method default_scope column annotations].each do |change|
+      %w[method association_method default_scope column attribute annotations].each do |change|
         outputs = %w[0 1].map do |mode|
           out, err, status = ruby(file, dir, setup: false, env: { "LOWRAIL" => mode, "CHANGE" => change, "LOWRAIL_DEBUG" => "1", "RUBYLIB" => LowrailTest::GEM_LIB })
           assert status.success?, "#{change}: #{err}\n#{out}"
@@ -132,7 +137,7 @@ class ARPlansTest < Minitest::Test
         assert_equal [true, false, ["z"]], on.fetch("lazy")
         assert_equal ["a"], on.fetch("dynamic_changed")
         assert_equal "ActiveRecord::StrictLoadingViolationError", on.fetch("strict")
-        assert_equal [["z", true, false]], on.fetch("changed") if %w[method default_scope].include?(change)
+        assert_equal [["z", true, false]], on.fetch("changed") if %w[method association_method default_scope].include?(change)
         assert on.fetch("events").any? { _1.last == true }, "query cache was not exercised"
         %w[dynamic clock negative].each do |name|
           assert on.fetch("ledger").any? { |label, reason| label == "Writer##{name}_posts" && reason.include?("dynamic") }

@@ -42,7 +42,7 @@ class ARDiagnosticsTest < Minitest::Test
     RUBY
     parsed = Prism.parse(source)
     assert parsed.success?
-    visitor = ARSurvey.new("app/models/example.rb")
+    visitor = Lowrail::ARPlanSites.new("app/models/example.rb")
     visitor.visit(parsed.value)
     sites = visitor.ledger
     assert_equal 8, sites.size

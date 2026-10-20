@@ -34,7 +34,8 @@ module Lowrail
         @originals = data.fetch("originals").map do |fact|
           holder = Object.const_get(fact.fetch("receiver"))
           name = fact.fetch("method").to_sym
-          raise ArgumentError, "query hook changed" unless PreloadFacts.method_fact(holder, name) == fact
+          actual = PreloadFacts.method_fact(holder, name).merge("receiver" => fact.fetch("receiver"))
+          raise ArgumentError, "query hook changed" unless actual == fact
           [holder, name, holder.instance_method(name)]
         end
         data.fetch("edges").each do |label, edge|
@@ -54,7 +55,6 @@ module Lowrail
       def tag(association, scope)
         plan = @plans[association.reflection]
         return unless plan && Lowrail.enabled?
-        return unless guard_ok? && plan.valid?(association, scope)
         scope.instance_variable_set(:@lowrail_ar_plan, [plan, association])
       rescue StandardError => e
         Lowrail.debug("AR plan declined: #{e.class}: #{e.message}")

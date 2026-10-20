@@ -3,6 +3,7 @@
 require "json"
 require "digest"
 require_relative "ar_plan_facts"
+require_relative "ar_plan_sites"
 require_relative "ar_plans"
 
 module Lowrail
@@ -15,8 +16,9 @@ module Lowrail
       manifest = JSON.parse(File.read(path))
       ledger = JSON.parse(File.read(ledger_path))
       manifest["units"].reject! { _1["pass"] == "active_record/ar_plans" }
-      ledger.reject! { _1["pass"] == "active_record/ar_plans" }
-      models, edges, facts = {}, {}, []
+      ledger.reject! { %w[active_record/ar_plans active_record/ar_plans_survey].include?(_1["pass"]) }
+      ledger.concat(ARPlanSites.inventory(Rails.root.to_s)) if Rails.respond_to?(:root)
+      models, edges, facts, originals = {}, {}, [], []
       denied = File.file?(File.join(dir, "denylist.json")) && JSON.parse(File.read(File.join(dir, "denylist.json"))).any? { _1["pass"] == "active_record/ar_plans" }
       ActiveRecord::Base.descendants.sort_by { _1.name.to_s }.each do |owner|
         next if !owner.name || owner.abstract_class? || !owner.table_exists?
@@ -32,13 +34,19 @@ module Lowrail
             PreloadFacts::SCOPE_METHODS.each { facts << PreloadFacts.method_fact(model, _1, singleton: true) }
             facts << PreloadFacts.method_fact(model, :_read_attribute)
             [model.unscoped.class, model.send(:relation_delegate_class, ActiveRecord::AssociationRelation)].each do |relation|
-              %i[build_arel arel where where! order order! limit limit! select _select! build_where_clause].each {
+              receiver = Module.instance_method(:name).bind_call(relation)
+              %i[exec_main_query initialize_copy assert_modifiable!].each { originals << PreloadFacts.method_fact(relation, _1).merge("receiver" => receiver) }
+              names = ActiveRecord::QueryMethods.instance_methods(false) + ActiveRecord::QueryMethods.private_instance_methods(false)
+              (names - %i[assert_modifiable!]).each {
                 # Rails deliberately disguises a model-specific relation's
                 # .name as its superclass. Guard the actual constant instead.
-                facts << PreloadFacts.method_fact(relation, _1).merge("receiver" => Module.instance_method(:name).bind_call(relation))
+                facts << PreloadFacts.method_fact(relation, _1).merge("receiver" => receiver)
               }
             end
           end
+          %i[target_scope association_scope scope klass].each { facts << PreloadFacts.method_fact(reflection.association_class, _1) }
+          originals << PreloadFacts.method_fact(reflection.association_class, :skip_statement_cache?)
+          PreloadFacts::REFLECTION_METHODS.each { facts << PreloadFacts.method_fact(reflection.class, _1) }
           ARPlanFacts.bind_columns(reflection, info).each do |column|
             type = reflection.klass.type_for_attribute(column)
             type.class.ancestors.each do |holder|
@@ -66,8 +74,9 @@ module Lowrail
             facts << PreloadFacts.method_fact(holder, name)
           end
         end
-        originals = %i[exec_main_query initialize_copy assert_modifiable!].map { PreloadFacts.method_fact(ActiveRecord::Relation, _1) }
+        originals.concat(%i[exec_main_query initialize_copy assert_modifiable!].map { PreloadFacts.method_fact(ActiveRecord::Relation, _1) })
         originals << PreloadFacts.method_fact(ActiveRecord::Associations::Association, :skip_statement_cache?)
+        originals.uniq!
         # Track these names for invalidation without asking Guard to match a
         # framework definition hidden by our own prepend.
         %i[exec_main_query initialize_copy assert_modifiable!].each { facts << PreloadFacts.method_fact(ARPlans::RelationHook, _1) }
