@@ -62,7 +62,7 @@ tooling explains why and what to change.
 | Axis | Primary | Secondary / diagnostic |
 |---|---|---|
 | Rails | 8.1.4 | 8.2 alpha (Campfire's pin) |
-| Ruby | 4.0.7 (`mise.toml`) | 4.1 (preview), being added as a second matrix column |
+| Ruby (minimum 4.0) | 4.0.7 (`mise.toml`) | 4.1 (preview), compatibility currently blocked ([details](docs/ruby-4.1.md)) |
 | Execution | interpreter instruction counts (Callgrind, fixed heap, A/A controls) | YJIT under a strict JIT-flat gate; ZJIT being added, diagnostic only |
 
 How to read and reproduce measurements: [docs/bench.md](docs/bench.md).

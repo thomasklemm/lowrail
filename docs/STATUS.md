@@ -19,8 +19,11 @@ live in the linked docs; numbers come from executed runs, dated.
 
 ## Works (2026-10-20)
 
-Ruby 3.4+ (gemspec), developed on 4.0.7. real-blog on Ruby 3.4.11 builds the
-same 11 units and verifies 21/21 identical with 114 hits.
+Ruby 4.0+ (gemspec), developed on 4.0.7; the second target is Ruby 4.1
+([current compatibility stop](ruby-4.1.md)). Ruby 3.4 was dropped by owner
+decision on 2026-10-20. Historical, not current support evidence: real-blog
+on Ruby 3.4.11 built the same 11 units and verified 21/21 identical with
+114 hits.
 
 - **Post-registry cleanup:** all build selection now uses `--passes`; the five
   transitional per-pass flags are removed. Superseded cached-reader, preload
@@ -590,9 +593,10 @@ Executed on Ruby 4.0.7, using the `script/corpus` pins and seed 41231:
   `find_script_name` remains dynamic instead of using a class-wide guard
   that engine singleton overrides could invalidate.
 
-The full gem suite passes: 58 runs, 1583 assertions, 3 skips. Ruby 3.4.11
-targeted compiler/loader/end-to-end tests pass: 20 runs, 483 assertions,
-1 skip. Rust tests pass (22 unit + 2 integration). The two loader-policy
+The full gem suite passes: 58 runs, 1583 assertions, 3 skips. Historical
+Ruby 3.4.11 targeted compiler/loader/end-to-end tests passed: 20 runs,
+483 assertions, 1 skip; Ruby 3.4 is no longer a target. Rust tests pass
+(22 unit + 2 integration). The two loader-policy
 regressions fail on pre-fix main and pass with the fix. A further cached-hijack
 regression fails without the follow-up recipe guard and passes with it;
 tests cover actual frozen-literal behavior and lowered-file delivery, not
