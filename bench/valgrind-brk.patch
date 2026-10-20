@@ -1,0 +1,14 @@
+--- a/coregrind/m_initimg/initimg-linux.c
++++ b/coregrind/m_initimg/initimg-linux.c
+@@ -1108,7 +1108,9 @@
+       SizeT m1 = 1024 * 1024;
+-      SizeT m8 = 8 * m1;
++      /* Measurement-only: the fixed MRI pools exceed the stock 8 MiB brk
++         reservation. Reserve virtual space, not committed heap pages. */
++      SizeT maximum = 512 * m1;
+       SizeT dseg_max_size = (SizeT)VG_(client_rlimit_data).rlim_cur;
+       VG_(debugLog)(1, "initimg", "Setup client data (brk) segment\n");
+       if (dseg_max_size < m1) dseg_max_size = m1;
+-      if (dseg_max_size > m8) dseg_max_size = m8;
++      if (dseg_max_size > maximum) dseg_max_size = maximum;
+       dseg_max_size = VG_PGROUNDUP(dseg_max_size);

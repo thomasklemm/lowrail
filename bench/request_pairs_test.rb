@@ -5,6 +5,43 @@ require_relative "request_pairs"
 require_relative "gc_requests"
 
 class RequestPairsTest < Minitest::Test
+  def test_brk_overflow_rejects_the_cohort_in_preflight_or_a_successful_worker
+    saved = ENV.to_h.slice("PATH", "PROBE_WARNING", "BENCH_HEAP_SLOTS", "BENCH_JIT")
+    Dir.mktmpdir("lowrail-brk-refusal-test") do |dir|
+      executable = File.join(dir, "valgrind")
+      File.write(executable, <<~RUBY)
+        #!#{RbConfig.ruby}
+        if ARGV.include?("--version")
+          puts "valgrind-log-contract-probe"
+          exit
+        end
+        preflight = ARGV.include?("--tool=none")
+        log = ARGV.find { _1.start_with?("--log-file=") }.delete_prefix("--log-file=")
+        warning = ENV["PROBE_WARNING"] == (preflight ? "preflight" : "worker")
+        File.write(log, warning ? "==123== brk segment overflow in thread #1: can't grow\\n" : "==123== clean log\\n")
+        # A warning does not make Valgrind exit unsuccessfully on its own.
+        exit 0
+      RUBY
+      FileUtils.chmod(0o755, executable)
+      ENV.update("PATH" => "#{dir}:#{ENV.fetch('PATH')}", "BENCH_HEAP_SLOTS" => "50000,10000,5000,2000,1000", "BENCH_JIT" => "0")
+      %w[preflight worker].each do |phase|
+        ENV["PROBE_WARNING"] = phase
+        out = File.join(dir, phase)
+        FileUtils.mkdir_p(out)
+        error = assert_raises(RuntimeError) do
+          RequestPairs.heap_instructions({ "off_a" => {} }, dir, out, "GET:/", { rounds: 1, seed: 1, workers: {} })
+        end
+        assert_match "Valgrind brk reservation exhausted", error.message
+        rejection = JSON.parse(File.read(File.join(out, "valgrind-rejected.json")))
+        refute rejection.fetch("accepted")
+        assert_equal phase == "preflight" ? "preflight" : "0-off_a", rejection.fetch("worker")
+        refute File.exist?(File.join(out, "summary.json")), "no accepted summary may survive an overflow"
+      end
+    end
+  ensure
+    %w[PATH PROBE_WARNING BENCH_HEAP_SLOTS BENCH_JIT].each { ENV[_1] = saved[_1] }
+  end
+
   def test_instruction_reader_uses_self_totals_not_wrapped_summary
     Dir.mktmpdir("lowrail-profile-test") do |dir|
       path = File.join(dir, "profile")

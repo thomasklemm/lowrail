@@ -265,6 +265,58 @@ module RequestPairs
     Integer(line.split.fetch(1))
   end
 
+  def self.check_valgrind_log!(out, label)
+    path = File.join(out, "#{label}.valgrind.log")
+    return unless File.read(path).match?(/brk segment overflow|Cannot map memory to grow brk segment/)
+    File.write(File.join(out, "valgrind-rejected.json"), JSON.pretty_generate(
+      accepted: false, reason: "Valgrind brk reservation exhausted", worker: label,
+      log_sha256: Digest::SHA256.file(path).hexdigest))
+    raise "Valgrind brk reservation exhausted: #{label}; cohort rejected, inspect #{path}; use script/bench-valgrind"
+  end
+
+  def self.valgrind_preflight(out, floors, app:, env:)
+    executable = ENV.fetch("PATH").split(File::PATH_SEPARATOR).map { File.join(_1, "valgrind") }.find { File.executable?(_1) }
+    raise "Valgrind not found; use script/bench-valgrind" unless executable
+    executable = File.realpath(executable)
+    prefix = File.expand_path("..", File.dirname(executable))
+    manifest = File.join(prefix, "share/lowrail/valgrind.json")
+    build = JSON.parse(File.read(manifest)) if File.file?(manifest)
+    if build
+      tool = File.join(prefix, build.fetch("tool"))
+      raise "pinned Valgrind binary changed" unless Digest::SHA256.file(tool).hexdigest == build.fetch("tool_sha256")
+    end
+    version, status = Open3.capture2(executable, "--version")
+    raise "Valgrind version check failed" unless status.success?
+    rails_boot = File.file?(File.join(app, "config/application.rb"))
+    program = <<~'RUBY'
+      if ARGV.first == "rails"
+        require File.expand_path("config/application", Dir.pwd)
+        Rails.application.config.yjit = false
+        require File.expand_path("config/environment", Dir.pwd)
+        Rails.application.eager_load!
+      end
+      GC.disable
+      roots = [0, 4, 9, 19, 39].each_with_index.map do |length, pool|
+        target = Integer(ENV.fetch("RUBY_GC_HEAP_#{pool}_INIT_SLOTS", %w[1000000 250000 100000 20000 10000].fetch(pool)))
+        count = [target - GC.stat_heap(pool, :heap_live_slots), 0].max
+        Array.new(count) { Array.new(length) }
+      end
+      puts roots.sum(&:length)
+    RUBY
+    log = File.join(out, "preflight.valgrind.log")
+    ok = system(env.merge(floors).merge("RUBYOPT" => nil, "LOWRAIL" => "0"), executable, "--verbose", "--tool=none",
+      "--log-file=#{log}", RbConfig.ruby, "--disable-yjit", "-e", program, rails_boot ? "rails" : "heap",
+      chdir: app,
+      out: File.join(out, "preflight.log"), err: [:child, :out])
+    result = { pass: !!ok && !File.read(log).match?(/brk segment overflow|Cannot map memory to grow brk segment/),
+      version: version.strip, rails_boot: rails_boot, driver_sha256: Digest::SHA256.file(executable).hexdigest,
+      build: build, log_sha256: Digest::SHA256.file(log).hexdigest }
+    File.write(File.join(out, "valgrind-preflight.json"), JSON.pretty_generate(result))
+    check_valgrind_log!(out, "preflight")
+    raise "Valgrind allocation preflight failed; inspect #{log}" unless ok
+    result
+  end
+
   def self.heap_instructions(environments, app, out, route, metadata, worker: "heap_requests.rb",
     requests: Integer(ENV.fetch("BENCH_REQUESTS", "50")))
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
@@ -272,6 +324,7 @@ module RequestPairs
     raise "positive requests/jobs and five positive pool floors required" unless
       requests.positive? && jobs.positive? && slots.size == 5 && slots.all?(&:positive?)
     floors = slots.each_with_index.to_h { |count, pool| ["RUBY_GC_HEAP_#{pool}_INIT_SLOTS", count.to_s] }
+    metadata[:valgrind] = valgrind_preflight(out, floors, app: app, env: environments.fetch("off_a"))
     jit = ENV.fetch("BENCH_JIT", "0") == "1"
     jit_flags = [jit ? "--yjit" : "--disable-yjit"]
     if ENV["BENCH_JIT_CALL_THRESHOLD"]
@@ -299,10 +352,11 @@ module RequestPairs
             log = File.join(out, "#{label}.log")
             env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
               "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension)
-            ok = system(env, "valgrind", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
+            ok = system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
               RbConfig.ruby, *jit_flags, File.expand_path(worker, __dir__), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
+            check_valgrind_log!(out, label)
             raise "Callgrind failed: #{label}; inspect logs" unless ok
             result = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
@@ -388,6 +442,7 @@ module RequestPairs
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
     raise "positive requests/jobs required" unless requests.positive? && jobs.positive?
     jit = ENV.fetch("BENCH_JIT", "0") == "1"
+    metadata[:valgrind] = valgrind_preflight(out, {}, app: app, env: environments.fetch("off_a"))
     extension = compile_counter_extension(out)
     metadata.merge!(counter: "callgrind", region: "after warmup and GC", requests: requests, yjit: jit)
     samples = []
@@ -405,10 +460,11 @@ module RequestPairs
             label = "#{round}-#{layer}-#{n}"
             data = File.join(out, "#{label}.callgrind")
             env = environments.fetch(layer).merge("BENCH_COUNT_REQUESTS" => n.to_s, "BENCH_CALLGRIND_EXTENSION" => extension)
-            ok = system(env, "valgrind", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
+            ok = system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
               RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "requests.rb"), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: File.join(out, "#{label}.log"), err: [:child, :out])
+            check_valgrind_log!(out, label)
             raise "Callgrind failed: #{label}; inspect logs" unless ok
             result = File.readlines(File.join(out, "#{label}.log")).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))

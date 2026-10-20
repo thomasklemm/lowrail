@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Pinned measurement tool only; never changes system Valgrind or app sources.
+set -euo pipefail
+if [[ $# != 1 || $1 == --help ]]; then
+  echo 'Usage: script/bench-valgrind NEW_PREFIX'
+  echo 'Builds Valgrind 3.19.0 with a 512 MiB virtual brk reservation.'
+  echo 'Requires a C/C++ toolchain, make, curl, patch, tar, sha256sum and jq.'
+  exit "$(( $# != 1 ))"
+fi
+[[ $(uname -s) == Linux && $(uname -m) == x86_64 ]] || { echo 'This pin targets Linux amd64.' >&2; exit 1; }
+root=$(cd "$(dirname "$0")/.." && pwd)
+prefix=$(realpath -m "$1")
+[[ ! -e $prefix ]] || { echo 'Use a new installation directory.' >&2; exit 1; }
+source_sha=dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02
+patch_file="$root/bench/valgrind-brk.patch"
+build=$(mktemp -d)
+trap 'rm -rf "$build"' EXIT
+curl --fail --location --silent --show-error https://sourceware.org/pub/valgrind/valgrind-3.19.0.tar.bz2 -o "$build/source.tar.bz2"
+echo "$source_sha  $build/source.tar.bz2" | sha256sum --check --status
+tar -xjf "$build/source.tar.bz2" -C "$build"
+patch -d "$build/valgrind-3.19.0" -p1 < "$patch_file"
+# Configure and make require their source working directory.
+(
+  cd "$build/valgrind-3.19.0"
+  ./configure --prefix="$prefix" --enable-only64bit
+  make -j"${BENCH_TOOL_JOBS:-4}"
+  make install
+)
+tool="$prefix/libexec/valgrind/callgrind-amd64-linux"
+[[ -x $tool ]] || { echo 'This pin currently targets Linux amd64.' >&2; exit 1; }
+mkdir -p "$prefix/share/lowrail"
+jq -n --arg source_sha "$source_sha" --arg patch_sha "$(sha256sum "$patch_file" | cut -d' ' -f1)" \
+  --arg tool_sha "$(sha256sum "$tool" | cut -d' ' -f1)" \
+  --arg compiler "$(cc --version | head -1)" --arg libc "$(getconf GNU_LIBC_VERSION)" \
+  '{version:"3.19.0",source_sha256:$source_sha,patch_sha256:$patch_sha,brk_reservation_mib:512,
+    tool:"libexec/valgrind/callgrind-amd64-linux",tool_sha256:$tool_sha,compiler:$compiler,libc:$libc}' \
+  > "$prefix/share/lowrail/valgrind.json"
+printf '\nBuilt pinned tool; retain share/lowrail/valgrind.json with results.\nexport PATH=%q/bin:"$PATH"\nexport CPATH=%q/include${CPATH:+:$CPATH}\n' "$prefix" "$prefix"

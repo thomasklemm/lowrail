@@ -6,6 +6,100 @@ setup described in the [Campfire M0](m0/campfire.md). Ruby 3.4+ is required;
 these runs use the repository's Ruby 4.0.7. **Callgrind instructions are the
 primary work metric; native YJIT CPU/wall time and allocations are secondary.**
 
+## Valgrind brk reservation correction (2026-10-20)
+
+**The ordinary request worker is affected, not only a profiler.** A short
+Lowrail-off interpreter diagnostic of the unmodified `bench/heap_requests.rb`
+on real-blog-r4 `/articles` (N=2, stock Valgrind 3.19.0) emitted
+`brk segment overflow`. All twelve ordinary off-A/off-B workers in the initial
+hotspot index attempt emitted it too. This is a reproduced exposure of the
+shared worker, **not a retrospective observation of every published cohort**.
+
+On Linux, Valgrind 3.19.0's `ii_create_image` clamps its initial client data
+reservation to 1–8 MiB, even with unlimited `RLIMIT_DATA`. In `do_brk`, exceeding
+that reservation returns the **old** break; it does not relocate existing heap
+memory or resize/reorder our request windows. glibc 2.36 can satisfy subsequent
+allocations through noncontiguous `mmap` instead. That changes allocator layout
+and potentially its instruction work; passing A/A and Ruby pool-capacity checks
+does not prove neutrality. The warning is emitted only once per process, so
+absence later in a window is insufficient. `--main-stacksize` is unrelated;
+there is no 3.19.0 `--brk-size` option. The upstream manual explicitly prescribes
+rebuilding with a larger cap (`manual-core.limits`).
+
+### Historical results: preserve, flag, do not silently remeasure
+
+Published numeric exports below do not retain Valgrind stderr or a complete
+tool binary fingerprint, and their original private raw logs are unavailable
+in this orb. They used the shared Callgrind path before the overflow check.
+**Per-cohort overflow is unverified**, not confirmed absent or confirmed
+present. Treat their instruction budgets/deltas as historical stock-tool
+measurements with an unresolved allocator-layout caveat. An old “accepted”
+verdict means its original gates passed, **not** the new brk gate. Existing
+rejections remain rejected. No old number, A/A decision, correctness result or
+allocation census is rewritten by this correction.
+
+| Published evidence / documentation | Instruction measurements exposed to the old unchecked path |
+|---|---|
+| [bench-results.json](bench-results.json), [bench-cli-results.json](bench-cli-results.json) | Blog and Campfire base-cost/archived-runtime/named/stacked/request-budget comparisons, including retained rejections |
+| [yjit-results.json](yjit-results.json) | Interpreter controls and all diagnostic YJIT request/guard instruction cohorts; prior JIT/heap/A/A failures still apply |
+| [layer-ceiling-results.json](passes/layer-ceiling-results.json), [layer study](passes/layer-ceiling.md) | L0–L3, ordered ablation and L2_events interpreter request counts |
+| [endpoint.md](passes/endpoint.md), [endpoint-sections.json](passes/endpoint-sections.json) | Endpoint deficit/composition/quarantine request counts and caller-side section instruction budgets |
+| [speculation-ceilings.json](passes/speculation-ceilings.json), [speculation-evidence.json](passes/speculation-evidence.json), [speculation.md](passes/speculation.md) | Guard-elision request ceilings, K comparisons and interpreter/YJIT guard micros |
+| [allocations-micros.json](passes/allocations-micros.json) | Conditional form/props/FrozenRecord/DOM instruction micros, not the separate allocation census |
+| [importmap.md](passes/importmap.md), [campfire-fragments.md](passes/campfire-fragments.md) | Their Callgrind instruction comparisons/budgets; native timing and census-only observations are not brk-worker measurements |
+
+The confirmed **new**, initial hotspot index attempt is rejected for this
+protocol limitation; its partial data is retained, never salvaged as an
+accepted cohort. A 512 MiB-tool diagnostic recorded 559 `brk` calls with zero
+rejected growth, reaching `0x8b10000` from initial `0x4035000` (about 75 MiB),
+and no overflow warning. This validates the correction's mechanism, not the
+magnitude/sign of a historical result. Decision-critical old results require
+separately authorized, finite new cohorts, not retry-until-green here.
+
+### Pinned 512 MiB tool and refusal gate
+
+```sh
+# Toolchain/build work: do not run concurrently with a measurement.
+bash script/bench-valgrind /tmp/NEW-valgrind-3.19-brk512
+export PATH=/tmp/NEW-valgrind-3.19-brk512/bin:"$PATH"
+export CPATH=/tmp/NEW-valgrind-3.19-brk512/include${CPATH:+:$CPATH}
+# Retain share/lowrail/valgrind.json with the cohort evidence.
+```
+
+[`script/bench-valgrind`](../script/bench-valgrind) verifies upstream
+`valgrind-3.19.0.tar.bz2` SHA-256
+`dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02`, applies only
+[`bench/valgrind-brk.patch`](../bench/valgrind-brk.patch), configures
+`--enable-only64bit`, and installs to a **new**, explicit prefix. No system tool
+or app/runtime source is overwritten. The manifest records source/patch/tool
+SHA-256, compiler and libc; the rebuilt binary SHA is machine/build-specific,
+not falsely equated with the source archive SHA. This pin targets Linux amd64.
+The change reserves 512 MiB of **virtual address space**, not 512 MiB of live
+Ruby objects. Keep `ulimit -d` unlimited; a lower soft limit still constrains
+Valgrind's reservation. Ruby's five heap floors and all window/GC/A/A/JIT gates
+remain unchanged.
+
+The shared instruction driver performs an untimed app-boot/allocation preflight
+under Valgrind before launching a cohort (heap-only for non-Rails operation
+fixtures), retains `valgrind-preflight.json` and its logs, and refuses an
+overflow or failed probe. Pure synthetic allocations did **not** reproduce
+the stock-tool warning; the real blog boot does. Every actual Callgrind worker
+log is checked too: an app can outgrow a clean preflight. A warning
+rejects the **whole cohort**, regardless of A/A, with the offending log retained.
+Explicit verbosity prevents a quiet default from hiding the warning. Never
+silence it, change heap floors to evade it, or borrow clean workers from a
+rejected batch. Native timing and allocation-only drivers are unchanged.
+
+Validation: a clean-prefix scripted build completed; the stock-tool blog
+preflight was refused and the pinned-tool blog preflight passed with matching
+manifest/binary SHA. This orb's script-built Callgrind SHA-256 is
+`59a6676a349d1ca1e70ddececa704384c2bdf957c189ab8211ab3f89ecb02096`
+(not a universal binary hash). `ruby bench/request_pairs_test.rb` passes
+**11 tests / 82 assertions** and `ruby bench/pass_test.rb` passes
+**16 / 157**, no failures/errors/skips. The new public-driver regression
+checks both preflight and worker warnings even when the tool exits 0;
+it fails without the fix. No old result was remeasured.
+
 ## Shared command: `lowrail bench`
 
 **Current quarantine:** the default selection is empty. A default-only build
@@ -618,7 +712,9 @@ after Bundler locks the app's version (Campfire provides the real-app check).
 ## Primary: executed instructions
 
 ```sh
-sudo apt-get install valgrind # includes the client-request headers
+bash script/bench-valgrind /tmp/NEW-valgrind-3.19-brk512
+export PATH=/tmp/NEW-valgrind-3.19-brk512/bin:"$PATH"
+export CPATH=/tmp/NEW-valgrind-3.19-brk512/include${CPATH:+:$CPATH}
 BENCH_COUNTER=callgrind mise exec -- ruby bench/request_pairs.rb \
   .corpus/real-blog /tmp/blog-instructions GET:/articles
 # Campfire uses the same private BENCH_HEADERS/path setup shown below.
