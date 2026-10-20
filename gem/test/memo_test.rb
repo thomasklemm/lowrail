@@ -1,0 +1,214 @@
+# frozen_string_literal: true
+
+require_relative "test_helper"
+
+class MemoTest < Minitest::Test
+  include LowrailTest
+
+  PRELUDE = <<~'RUBY'
+    require "json"
+    require "lowrail"
+    require "lowrail/manifest"
+    require "lowrail/guard"
+    require "lowrail/memo"
+    require "lowrail/memo_facts"
+    require "lowrail/stats"
+    Lowrail::Stats.enable!
+    cert = Lowrail::MemoFacts.build
+    raise cert.fetch("decline") if cert["decline"]
+    unit = { "id" => 0, "kind" => "file", "file" => "/memo.rb", "pass" => "memo/uri_join",
+      "facts" => cert.fetch("facts"), "memo" => cert }
+    manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION,
+      "compile_option" => "", "files" => {}, "units" => [unit] }, "/tmp")
+    Lowrail::Guard.install(manifest, Lowrail::Stats::STATE)
+    Lowrail::Memo.install(manifest)
+    def joined(base, relative)
+      Lowrail::Memo.join(0, URI, base, relative) { |r, b, u| r.join(b, u) }
+    end
+    def outcome
+      uri = yield
+      [uri.class.name, uri.to_s, uri.instance_variables.to_h { |n|
+        v = uri.instance_variable_get(n)
+        [n, v.is_a?(String) ? [v, v.encoding.name, v.frozen?] : v]
+      }]
+    rescue StandardError => e
+      [e.class.name, e.message]
+    end
+  RUBY
+
+  def test_keys_fresh_returns_errors_and_guarded_fallback
+    out = ruby_json(PRELUDE + <<~'RUBY')
+      base = +"https://one.test:444/a/b"
+      url = +"../assets/first.js?x=2#fragment"
+      original = outcome { URI.join(base, url) }
+      first = joined(base, url)
+      first.path.replace("/poison")
+      first.host.replace("poison.test")
+      first.query.replace("poison")
+      first.freeze
+      raise "changed inputs" unless base == "https://one.test:444/a/b" && url == "../assets/first.js?x=2#fragment"
+      raise "shared return" unless outcome { joined(base, url) } == original
+      raise "wrong host key" unless joined("http://two.test:8080/root/", url).host == "two.test"
+      url.replace("/assets/other.js")
+      raise "mutable key" unless joined(base, url).path == "/assets/other.js"
+      raise "old key poisoned" unless joined(base, "../assets/first.js?x=2#fragment").path == "/assets/first.js"
+      cases = ["", "?q=x y", "#f", "//cdn.test:99/assets/x", "https://cdn.test/root/x", "http:opaque",
+        "a/../../b", "/%ff", "mailto:x@y", "has space", "\xFF".b, nil, URI("/relative")]
+      bases = ["https://a.test/a/../b/", "http://u:p@[::1]:8080/root/", "https://a.test".b]
+      bases.product(cases).each do |b, r|
+        expected = outcome { URI.join(b, r) }
+        2.times { raise "difference: #{[b,r].inspect}" unless outcome { joined(b, r) } == expected }
+      end
+      # ASCII string equality ignores compatible encodings; the memo must not.
+      [Encoding::US_ASCII, Encoding::UTF_8, Encoding::ASCII_8BIT].each do |enc|
+        r = "/encoding".dup.force_encoding(enc)
+        2.times { raise "encoding" unless outcome { joined(base, r) } == outcome { URI.join(base, r) } }
+      end
+      hits = Lowrail::Stats.unit_hits.fetch("0")
+      # An instrumentation wrapper is observable, even if its return is stable.
+      wrapper = Module.new do
+        def merge(other)
+          $events += 1
+          super
+        end
+      end
+      $events = 0
+      URI::Generic.prepend(wrapper)
+      3.times { joined(base, "/assets/other.js") }
+      raise "lost events" unless $events == 3
+      wrapper.send(:remove_method, :merge)
+      2.times { joined(base, "/assets/other.js") }
+      raise "did not recover" unless Lowrail::Stats.unit_hits.fetch("0") > hits
+      old_port = URI::HTTPS::DEFAULT_PORT
+      URI::HTTPS.send(:remove_const, :DEFAULT_PORT)
+      URI::HTTPS.const_set(:DEFAULT_PORT, 9443)
+      raise "stale config" unless joined("https://port.test", "/a").port == 9443
+      URI::HTTPS.send(:remove_const, :DEFAULT_PORT)
+      URI::HTTPS.const_set(:DEFAULT_PORT, old_port)
+      # A string subclass/conversion object may mutate or emit notifications.
+      custom = Object.new
+      def custom.to_str = ($conversions += 1; "/custom")
+      def custom.instance_of?(*) = raise("must not call argument reflection overrides")
+      $conversions = 0
+      2.times { joined(base, custom) }
+      raise "lost conversion" unless $conversions == 2
+      # Same bytes and line counts do not make a stale implementation safe.
+      cert["sources"].values.first["sha256"] = "0" * 64
+      Lowrail::Memo.install(manifest)
+      before = Lowrail::Stats.unit_hits.fetch("0")
+      2.times { raise "fallback result" unless joined(base, "/stale").path == "/stale" }
+      raise "stale source reused" unless before == Lowrail::Stats.unit_hits.fetch("0")
+      puts JSON.generate({ hits: hits, events: $events, conversions: $conversions })
+    RUBY
+    assert_operator out.fetch("hits"), :>, 10
+    assert_equal 3, out.fetch("events")
+    assert_equal 2, out.fetch("conversions")
+  end
+
+  def test_build_refuses_an_existing_observable_implementation
+    out = ruby_json(<<~'RUBY')
+      require "json"
+      require "lowrail/memo_facts"
+      URI.singleton_class.prepend(Module.new do
+        def join(*)
+          warn "observable"
+          super
+        end
+      end)
+      puts JSON.generate(Lowrail::MemoFacts.build)
+    RUBY
+    assert_match(/uncertified/, out.fetch("decline"))
+  end
+
+  def test_dispatch_configuration_reflection_and_tracing_boundaries
+    out = ruby_json(PRELUDE + <<~'RUBY')
+      2.times { joined("http://one.test", "/x") }
+      wrapper = Module.new do
+        def inject(*)
+          $injects += 1
+          super
+        end
+      end
+      $injects = 0
+      Array.prepend(wrapper)
+      3.times { joined("http://one.test", "/x") }
+      raise "lost Array#inject effects" unless $injects == 3
+      raise "certified observable inject" unless Lowrail::MemoFacts.build["decline"].include?("Array#inject")
+      wrapper.send(:remove_method, :inject)
+      2.times { joined("http://one.test", "/x") }
+      URI::HTTP.class_eval do
+        def instance_variables = super - [:@host]
+      end
+      joined("http://one.test", "/x").host.replace("poison.test")
+      raise "reflection leaked mutable cache" unless joined("http://one.test", "/x").host == "one.test"
+      URI::HTTP.send(:remove_method, :instance_variables)
+      trace_calls = 0
+      trace = TracePoint.new(:call) { |t| trace_calls += 1 if t.method_id == :join && t.defined_class == URI.singleton_class }
+      trace.enable { 3.times { joined("http://one.test", "/x") } }
+      raise "lost trace events" unless trace_calls == 3
+      initial = URI.const_get(:INITIAL_SCHEMES)
+      $defaults = 0
+      table = Hash.new { $defaults += 1; nil }.freeze
+      URI.send(:remove_const, :INITIAL_SCHEMES)
+      URI.const_set(:INITIAL_SCHEMES, table)
+      3.times { joined("http://one.test", "/x") }
+      raise "lost hash default effects" unless $defaults == 6
+      raise "certified effectful scheme table" unless Lowrail::MemoFacts.build["decline"] == "custom scheme table"
+      URI.send(:remove_const, :INITIAL_SCHEMES)
+      URI.const_set(:INITIAL_SCHEMES, initial)
+      old = URI.const_get(:Schemes)
+      replacement = Module.new
+      replacement.const_set(:HTTP, URI::HTTP)
+      replacement.const_set(:HTTPS, URI::HTTPS)
+      %i[ReservedChars EscapedChars].each { |n| replacement.singleton_class.const_set(n, old.singleton_class.const_get(n)) }
+      replacement.define_singleton_method(:escape) { |n| old.escape(n) }
+      replacement.define_singleton_method(:find) { |n| $finds += 1; old.find(n) }
+      2.times { joined("http://one.test", "/x") } # warm AFTER defining replacement methods
+      $finds = 0
+      URI.send(:remove_const, :Schemes)
+      URI.const_set(:Schemes, replacement)
+      3.times { joined("http://one.test", "/x") }
+      raise "lost scheme module effects" unless $finds == 6
+      puts JSON.generate({ injects: $injects, traces: trace_calls, defaults: $defaults, finds: $finds })
+    RUBY
+    assert_equal({ "injects" => 3, "traces" => 3, "defaults" => 6, "finds" => 6 }, out)
+  end
+
+  def test_public_inertia_vite_version_keeps_its_own_file_and_time_semantics
+    out = ruby_json(<<~'RUBY')
+      require "json"
+      begin
+        gem "vite_ruby", "3.11.1"
+        gem "inertia_rails", "3.23.0"
+      rescue Gem::LoadError
+        puts JSON.generate({ available: false })
+        exit
+      end
+      require "rails"
+      require "active_support/all"
+      require "action_controller"
+      require "inertia_rails"
+      require "vite_ruby"
+      require "tmpdir"
+      require "fileutils"
+      Dir.mktmpdir do |dir|
+        FileUtils.mkdir_p("#{dir}/config")
+        FileUtils.mkdir_p("#{dir}/app/frontend")
+        File.write("#{dir}/config/vite.json", JSON.generate({ all: { sourceCodeDir: "app/frontend" } }))
+        file = "#{dir}/app/frontend/entry.js"
+        File.write(file, "first")
+        ViteRuby.reload_with(root: dir)
+        load File.expand_path("tests/fixtures/memo/inertia_version.rb")
+        first = InertiaRails.configuration.version.dup
+        File.write(file, "other") # same size, different content
+        sleep 1.1 # Vite's documented one-second memo must expire
+        second = InertiaRails.configuration.version
+        raise "stale file digest" if first == second
+        puts JSON.generate({ available: true, changed: first != second, digest_size: second.size })
+      end
+    RUBY
+    skip "install vite_ruby 3.11.1 and inertia_rails 3.23.0 for the public analogue" unless out.fetch("available")
+    assert_equal true, out.fetch("changed")
+    assert_equal 40, out.fetch("digest_size")
+  end
+end

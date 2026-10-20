@@ -12,30 +12,32 @@ use serde_json::{Value, json};
 
 use crate::facts;
 use crate::lower::oracle::RubyOracle;
-use crate::lower::{route, view};
+use crate::lower::{memo, route, view};
 
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
     let mut env = "test".to_string();
     let mut preload = false;
+    let mut memo = false;
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
             "--env" => env = it.next().ok_or("--env needs a value")?.clone(),
             // Opt-in: measured slower on uncached Campfire (docs/passes/preload-plans.md).
             "--preload-plans" => preload = true,
+            "--memo" => memo = true,
             _ if app.is_none() => app = Some(PathBuf::from(a)),
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans]")?;
+    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans] [--memo]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
-    let report = build(&app, &env, preload)?;
+    let report = build(&app, &env, preload, memo)?;
     println!("{report}");
     Ok(())
 }
 
-pub fn build(app: &Path, env: &str, preload: bool) -> Result<String, String> {
+pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool) -> Result<String, String> {
     let dir = app.join(".lowrail");
     let facts_path = dir.join("facts.json");
     if !facts_path.exists() {
@@ -44,6 +46,7 @@ pub fn build(app: &Path, env: &str, preload: bool) -> Result<String, String> {
     let facts = facts::load(&facts_path)?;
     let mut oracle = RubyOracle::start(app, env)?;
     let mut routes = route::Cache::default();
+    let mut memo_certificate = None;
 
     // Units `lowrail verify --bisect` found to change outcomes stay unlowered
     // (denylist entries name a file and a pass).
@@ -109,23 +112,42 @@ pub fn build(app: &Path, env: &str, preload: bool) -> Result<String, String> {
     for path in ruby_files(&app.join("app")) {
         let Ok(original) = std::fs::read_to_string(&path) else { continue };
         let file = path.display().to_string();
+        let mut code = original.clone();
+        let before = units.len();
         if is_denied(&file, "route/path") {
             ledger.push(denied_entry("file", &file, "route/path"));
-            continue;
+        } else {
+            let unit = units.len();
+            let lowered = route::lower(&code, &route::Mode::RubyFile, unit, &mut oracle, &mut routes);
+            record(&mut ledger, "file", &file, "route/path", &lowered.sites);
+            if lowered.lowered_count() > 0 {
+                units.push(unit_json(unit, "file", &file, "route/path", &lowered));
+                code = lowered.code;
+            }
         }
-        let unit = units.len();
-        let lowered = route::lower(&original, &route::Mode::RubyFile, unit, &mut oracle, &mut routes);
-        record(&mut ledger, "file", &file, "route/path", &lowered.sites);
-        if lowered.lowered_count() == 0 {
-            continue;
+        if memo_enabled {
+            if is_denied(&file, "memo/uri_join") {
+                ledger.push(denied_entry("file", &file, "memo/uri_join"));
+            } else {
+                let unit = units.len();
+                let lowered = memo::lower(&code, unit, &mut oracle, &mut memo_certificate);
+                record(&mut ledger, "file", &file, "memo/uri_join", &lowered.sites);
+                let sites = lowered.sites.iter().filter(|s| s.outcome == "lowered").count();
+                if sites > 0 {
+                    let certificate = lowered.certificate.unwrap();
+                    units.push(json!({"id": unit, "kind": "file", "file": file, "pass": "memo/uri_join",
+                        "sites": sites, "facts": certificate["facts"], "memo": certificate}));
+                    code = lowered.code;
+                }
+            }
         }
+        if units.len() == before { continue; }
         let stem = path.strip_prefix(app).unwrap_or(&path).display().to_string().replace('/', "__");
         let lowered_path = src_dir.join(&stem);
         let original_path = src_dir.join(format!("{stem}.orig"));
-        std::fs::write(&lowered_path, &lowered.code).map_err(|e| e.to_string())?;
+        std::fs::write(&lowered_path, &code).map_err(|e| e.to_string())?;
         std::fs::write(&original_path, &original).map_err(|e| e.to_string())?;
         files.push(json!({"path": file, "lowered": lowered_path, "original": original_path}));
-        units.push(unit_json(unit, "file", &file, "route/path", &lowered));
     }
     drop(oracle);
 
@@ -170,7 +192,7 @@ pub fn build(app: &Path, env: &str, preload: bool) -> Result<String, String> {
 
 fn summary(ledger: &[Value], units: &[Value], templates: usize, files: usize, dir: &Path) -> String {
     let mut s = String::new();
-    for pass in ["view/link_to", "route/path"] {
+    for pass in ["view/link_to", "route/path", "memo/uri_join"] {
         let sites: Vec<&Value> = ledger.iter().filter(|l| l["pass"] == pass).collect();
         let lowered = sites.iter().filter(|l| l["outcome"] == "lowered").count();
         let n_units = units.iter().filter(|u| u["pass"] == pass).count();

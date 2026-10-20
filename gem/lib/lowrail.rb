@@ -101,6 +101,10 @@ module Lowrail
         require_relative "lowrail/preload_plans"
         PreloadPlans.install(manifest)
       end
+      if manifest.units.any? { _1["pass"] == "memo/uri_join" }
+        require_relative "lowrail/memo"
+        Memo.install(manifest)
+      end
       true
     end
 
