@@ -134,7 +134,7 @@ end
 class ObserveCorpusTest < Minitest::Test
   include LowrailTest
 
-  APP = File.expand_path("../../.corpus/real-blog-r4", __dir__)
+  APP = File.join(CORPUS_ROOT, "real-blog-r4")
 
   def test_real_blog_suite
     skip "no #{APP} (see script/corpus)" unless File.exist?(File.join(APP, "Gemfile.lock"))

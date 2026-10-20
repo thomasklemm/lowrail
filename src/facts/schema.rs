@@ -91,6 +91,8 @@ pub struct GeneratedStats {
     pub compilations: usize,
     pub bytes: usize,
     pub hook_seconds: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub linking_decline: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

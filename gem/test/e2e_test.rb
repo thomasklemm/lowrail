@@ -225,7 +225,7 @@ class E2ETest < Minitest::Test
     end
   end
 
-  REAL_BLOG = File.expand_path("../../.corpus/real-blog", __dir__)
+  REAL_BLOG = File.join(CORPUS_ROOT, "real-blog")
 
   # The hooks (with a compatible, empty manifest) must not change any
   # outcome of a real Rails suite, and the reporter must load via RUBYOPT

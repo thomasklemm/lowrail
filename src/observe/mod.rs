@@ -296,6 +296,9 @@ fn merge_parts(parts: Vec<Partial>) -> Observed {
         o.generated_stats.compilations += p.generated_stats.compilations;
         o.generated_stats.bytes += p.generated_stats.bytes;
         o.generated_stats.hook_seconds += p.generated_stats.hook_seconds;
+        if let Some(reason) = p.generated_stats.linking_decline {
+            o.generated_stats.linking_decline.get_or_insert(reason);
+        }
         o.timings.insert(p.pid.to_string(), p.timings);
         for m in p.defined_after_boot {
             defined
@@ -644,6 +647,10 @@ mod tests {
         let p2 = Partial {
             pid: 2,
             app_root: "/app".into(),
+            generated_stats: GeneratedStats {
+                linking_decline: Some("iseq_identity_unavailable: fresh wrappers".into()),
+                ..Default::default()
+            },
             defined_after_boot: vec![
                 om("Article", "title", Some("/gems/am/attr.rb:1"), None),
                 om("Rel", "recent", Some("/gems/ar/delegation.rb:70"), Some("r")),
@@ -666,6 +673,8 @@ mod tests {
         assert_eq!(o.defined_after_boot.len(), 6);
         assert_eq!(o.generated_scripts.len(), 3);
         assert_eq!(o.generated_scripts.iter().find(|s| s.sha256 == "t").unwrap().count, 2);
+        assert_eq!(serde_json::to_value(&o).unwrap()["generated_stats"]["linking_decline"],
+                   "iseq_identity_unavailable: fresh wrappers");
         let t = &o.types[0];
         assert_eq!((t.calls, t.saturated, t.returns.len()), (3, true, 2));
 

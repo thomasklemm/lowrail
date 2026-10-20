@@ -2,8 +2,10 @@
 
 2026-10-20. Optimize emitted Ruby for **both JITs**, without changing Ruby
 semantics or treating a JIT preference as a correctness proof. Ruby 4.0.7 is
-primary; the [4.1 preview matrix is blocked](ruby-4.1.md). No pass changes are
-part of this guide.
+measurement-primary; 4.1 is also a correctness target. Its gem suite and
+[five-app correctness matrix with dependency overlays are green](ruby-4.1.md).
+No pass changes are part of this guide; the singleton-class alternative still
+requires exactness and complete-check pricing before implementation.
 
 Sources below pin Ruby to
 [`2d08b5f`](https://github.com/ruby/ruby/commit/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1)

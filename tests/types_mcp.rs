@@ -6,10 +6,11 @@ use std::process::{Command, Stdio};
 
 #[test]
 fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let app = if root.join(".corpus/real-blog-r4").is_dir() {
-        root.join(".corpus/real-blog-r4")
-    } else { root.join(".corpus/real-blog") };
+    let root = std::env::var_os("LOWRAIL_TEST_CORPUS_ROOT").map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(".corpus"));
+    let app = if root.join("real-blog-r4").is_dir() {
+        root.join("real-blog-r4")
+    } else { root.join("real-blog") };
     if !app.is_dir() {
         eprintln!("skipping real-blog integration: run script/corpus real-blog");
         return;

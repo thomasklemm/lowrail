@@ -148,7 +148,7 @@ end
 
 # Integration: boot the real-blog corpus app (skipped when it is absent).
 class FactsRealBlogTest < Minitest::Test
-  APP = File.expand_path("../../.corpus/real-blog", __dir__)
+  APP = File.join(LowrailTest::CORPUS_ROOT, "real-blog")
   EXE = File.expand_path("../exe/lowrail-facts", __dir__)
 
   def self.facts

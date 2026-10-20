@@ -13,6 +13,7 @@ module LowrailTest
   GEM_ROOT = File.expand_path("..", __dir__)
   GEM_LIB = File.join(GEM_ROOT, "lib")
   COMPILE = File.join(GEM_ROOT, "exe", "lowrail-compile")
+  CORPUS_ROOT = File.expand_path(ENV.fetch("LOWRAIL_TEST_CORPUS_ROOT", "../../.corpus"), __dir__)
   RUBY = RbConfig.ruby
   SETUP_OPT = "-I#{GEM_LIB} -rlowrail/setup"
   # Variables a developer's shell might carry into the subprocesses.

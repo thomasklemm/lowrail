@@ -296,6 +296,9 @@ pub fn summary(facts: &Facts, path: &Path, size: u64) -> String {
             g.hook_seconds,
             counts(facts.generated_scripts.iter().map(|s| s.phase.split(':').next().unwrap_or("").to_string())),
         );
+        if let Some(reason) = &g.linking_decline {
+            let _ = writeln!(w, "generated identity linking refused: {reason}");
+        }
     }
     for e in facts.errors.iter().filter(|e| e.kind != "skipped").take(10) {
         let _ = writeln!(w, "  error: {}: {}", e.r#where, e.error);
@@ -364,13 +367,15 @@ fn counts(items: impl Iterator<Item = String>) -> String {
 #[cfg(test)]
 mod corpus_tests {
     use super::*;
-    use crate::facts::generated::Form;
+    use crate::facts::generated::{Form, Via};
 
     /// Boots real-blog (skipped when the corpus or its Ruby is missing),
     /// then links generated methods to the exact def in their script.
     #[test]
     fn real_blog_generated_methods_link_to_their_def() {
-        let app = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(".corpus/real-blog-r4");
+        let corpus = std::env::var_os("LOWRAIL_TEST_CORPUS_ROOT").map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(".corpus"));
+        let app = corpus.join("real-blog-r4");
         if !app.join("Gemfile.lock").exists() {
             eprintln!("skipped: no {}", app.display());
             return;
@@ -404,9 +409,20 @@ mod corpus_tests {
 
         let origins = c.app_relevant();
         let templates = origins.iter().filter(|o| matches!(o.origin, Origin::Template { .. })).count();
-        assert!(templates >= 10, "{templates} template methods");
-        let linked = origins.iter().filter(|o| o.generated.is_some()).count();
-        assert!(linked > 250, "{linked} app-relevant methods with a generated body");
+        if let Some(reason) = facts.generated_stats.as_ref().and_then(|s| s.linking_decline.as_deref()) {
+            assert!(reason.starts_with("iseq_identity_unavailable:"), "{reason}");
+            assert!(facts.modules.iter().flat_map(|m| &m.methods).all(|m| m.script.is_none()));
+            assert_eq!(g.via, Via::Location, "source display is not compilation provenance");
+            assert_eq!(templates, 0, "no identity-based template attribution");
+            assert!(facts.compiled_templates.iter().filter(|t| t.in_app == Some(true)).count() >= 10);
+            assert!(origins.iter().filter_map(|o| o.generated.as_ref()).all(|g| g.via == Via::Location));
+            assert!(summary(&facts, &out, 0).contains(reason));
+        } else {
+            assert_eq!(g.via, Via::Identity);
+            assert!(templates >= 10, "{templates} template methods");
+            let linked = origins.iter().filter(|o| o.generated.is_some()).count();
+            assert!(linked > 250, "{linked} app-relevant methods with a generated body");
+        }
         std::fs::remove_dir_all(&dir).ok();
     }
 }

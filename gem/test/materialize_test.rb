@@ -105,7 +105,7 @@ class MaterializeCorpusTest < Minitest::Test
   include LowrailTest
 
   def facts_for(app)
-    root = File.expand_path("../../.corpus/#{app}", __dir__)
+    root = File.join(CORPUS_ROOT, app)
     skip "no #{root} (see script/corpus)" unless File.exist?(File.join(root, "Gemfile.lock"))
     Dir.mktmpdir do |dir|
       out = File.join(dir, "facts.json")

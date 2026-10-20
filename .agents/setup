@@ -24,6 +24,12 @@ fi
 if ! gem list --installed --exact stackprof --version 0.2.28 >/dev/null; then
   gem install stackprof --version 0.2.28 --no-document
 fi
+ruby -rrubygems/dependency_installer - "$root/gem/lowrail.gemspec" <<'RUBY'
+Gem::Specification.load(ARGV.fetch(0)).development_dependencies.each do |dependency|
+  next if Gem::Specification.find_all_by_name(dependency.name, dependency.requirement).any?
+  Gem::DependencyInstaller.new(document: []).install(dependency.name, dependency.requirement)
+end
+RUBY
 cargo fetch --locked --manifest-path "$root/Cargo.toml"
 # Amp and services start in new login shells, not this setup process.
 marker='# Lowrail orb toolchain'

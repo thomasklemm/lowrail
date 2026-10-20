@@ -2,11 +2,13 @@
 
 2026-10-20. **Ruby 4.0 and 4.1 are correctness targets; 4.0.7 remains the
 measurement primary while 4.1 is a preview.** Ruby 3.4 is no longer a target.
-This is a target policy, not a claim that the application matrix already
-passes. The pinned preview builds with both JITs. The initial unchanged-bundle
-failure study below is retained as evidence; the authorized follow-up fixes
-Lowrail first, then tests source-Nokogiri dependency workarounds in disposable
-copies only. ZJIT measurement remains conditional on both steps being green.
+The pinned preview builds with both JITs. Lowrail's full gem and Cargo suites
+now pass on both versions. All five disposable application copies pass
+interpreter verification, and blog also passes with YJIT. This is a green
+correctness matrix with dependency overlays, not unchanged-bundle support.
+The initial unchanged-bundle failure study below is retained as evidence.
+The compatibility prerequisite for ZJIT measurement is satisfied; no
+performance cohort is credited by these correctness results.
 The [dual-JIT shape guide](jit-shapes.md), warning-only bytecode check and
 opt-in diagnostics do not weaken any gate.
 
@@ -47,12 +49,148 @@ opt-in diagnostics do not weaken any gate.
   records `ractor_trace_visibility`. Keep the old sentinel too. No hot-path
   instruction was added; this is setup-time admission, not a tracing workaround.
 
-Step-1 checks: full 4.0.7 `rake test` **101 runs / 1,203 assertions, zero
+Historical step-1 checks: full 4.0.7 `rake test` **101 runs / 1,203 assertions, zero
 failures/errors, 20 skips**. 4.1 own-code suite (`--exclude '/Corpus/'`)
 **98 / 1,124, zero failures/errors, 21 skips**. The three excluded tests boot
 the original corpus bundles and still fail at the documented dependency
-boundary, so the full 4.1 suite is **not yet green**. They must run again
-against the disposable copies in step 2; this exclusion is not a support gate.
+boundary. Step 2 below supersedes this partial run with the full suite, without
+exclusions; this earlier exclusion was not a support gate.
+
+## Follow-up step 2: source dependency workaround and correctness
+
+**Dependency workaround, not an application support claim.** Original
+`.corpus` pins, Gemfiles and lockfiles were not edited; all five original
+lock hashes still match the initial study below. Copies are under
+`.corpus/ruby41-source/APP`, with separate `.lowrail`, test databases and JS
+outputs. No application or Rails source patch, dependency version upgrade,
+gemspec edit or global `BUNDLE_FORCE_RUBY_PLATFORM` was used in the successful
+matrix. Redprints also requires the separately authorized FFI/SQLite source
+overrides and Bundler 4.0.20, described below.
+
+Nokogiri was explicitly forced to the source platform in each copied Gemfile:
+
+```ruby
+gem "nokogiri", "= 1.19.4", force_ruby_platform: true
+```
+
+`bundle lock --update nokogiri` adds **mini_portile2 2.8.9**. Nokogiri's source
+gem SHA256 is `50c951611c92bca05c51411aef45f1cbc50f2821c4802758c5c6d34696533ab5`;
+mini_portile2's is `0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289`.
+Build tools, libxml/libxslt build inputs and mini_portile2 are dependency
+setup, not Lowrail passes. `bundle install` alone is insufficient evidence:
+it sometimes exits zero while a subsequent `bundle exec ruby` cannot find
+the native variants in its frozen lock.
+
+For blog, Campfire, PingCRM and Starter, `bundle lock --add-platform ruby`
+then `BUNDLE_FROZEN=true bundle install` makes compatible source variants
+available **without forcing other gems**. Actual loaded variants: blog
+FFI 1.17.4 / SQLite 2.10.1; Campfire FFI 1.17.2 / SQLite 2.9.6;
+PingCRM FFI 1.17.4 / PG 1.7.0; Starter SQLite 2.9.6, all platform `ruby`.
+All load Nokogiri 1.19.4 and mini_portile2 2.8.9 as platform `ruby`.
+Existing gem version numbers are unchanged; lock differences are source
+variants/dependencies, platform/checksum metadata and the Nokogiri declaration.
+Final successful runs use the original Bundler versions: blog 4.0.20,
+Campfire **4.0.13**, PingCRM 4.0.21, Starter 4.0.3.
+
+**Redprints: recovered Rails-on-4.1 dependency boundary, not a Lowrail failure.** Its
+Bundler 2.6.8 install rejects `ffi-1.17.4-x86_64-linux-gnu`'s
+`>= 3.0, < 4.1.dev` constraint; SQLite 2.9.5's locked native variant also
+cannot be materialized. Adding platform `ruby` fails because locked
+`bundlebun-0.5.0.1.3.14` has no Ruby-platform package. A diagnostic
+`BUNDLE_VERSION=4.0.20` install and its suggested `bundle lock
+--normalize-platforms` both exit zero, but **runtime still fails** with
+`Could not find sqlite3-2.9.5-x86_64-linux-gnu,
+ffi-1.17.4-x86_64-linux-gnu`. The initial and normalized attempts are both
+failed setup, not recovered support. Build and both RSpec verify commands
+initially failed before Rails/outcome recording.
+
+After explicit authorization, the disposable Redprints copy adds
+`gem "ffi", "= 1.17.4", force_ruby_platform: true` and applies
+`force_ruby_platform: true` to its existing SQLite 2.9.5 declaration.
+`BUNDLE_VERSION=4.0.20 bundle lock --update nokogiri ffi sqlite3` followed by
+a frozen install loads those exact source versions successfully. Bundlebun
+is retained. Create the disposable copy's `log` and `tmp` directories before
+assets/test preparation (Avo requires `log`). Both RSpec suites then pass
+with and without Lowrail, as recorded below. This is a dependency workaround,
+not a change to corpus pins or an unchanged-bundle support claim.
+
+### Executed checks
+
+`LOWRAIL_TEST_CORPUS_ROOT` selects disposable fixtures for the gem and Rust
+tests; unset, it preserves the existing `.corpus` default. It does not select
+a VM, change a corpus pin, bypass a test or reuse another VM's facts. Rust now
+preserves `linking_decline` in its facts schema and observation merge and
+prints the refusal in `facts` summaries. Its real-blog regression still
+requires identity links on 4.0; on 4.1 it requires the explicit refusal,
+no `script` tags and no identity-based template attribution. The existing
+location-based **source display** remains labeled `Via::Location`; it is not
+compilation provenance or a lowering certificate.
+
+| Check | Ruby 4.0.7 (primary) | Ruby 4.1 preview (second correctness target) |
+|---|---|---|
+| Full gem `rake test`, no exclusions, integrated with `51686b7` | 118 runs / 1,291 assertions; 0 failures/errors; 19 skips | **118 / 4,132; 0 failures/errors; 7 skips** |
+| Full `cargo test` | **34 unit + 1 types/MCP + 2 verify pass** | **34 + 1 + 2 pass**, fresh preview facts |
+
+These counts include the separately landed compiler and sealed regressions. The
+initial 4.1 Rust corpus test failed its old template-link assumption after
+booting successfully; the refusal-aware regression passes, rather than
+skipping the corpus. Different optional-gem availability explains differing
+gem-suite skip counts; neither version's passing tests were excluded.
+The sealed test requires `minitest/mock`: declare `minitest-mock ~> 5.27`
+as a gem development dependency, and let `.agents/setup` install declared
+development dependencies. Isolated fresh GEM_HOME installs resolve 5.27.0
+and load `minitest/mock` on both VMs; no manual preinstallation is required.
+The 4.0 run uses the original corpus, the preview uses its disposable overlay.
+An initial 4.0 rerun mistakenly selected the preview corpus and failed three
+boot tests because that VM lacked the source Nokogiri/mini_portile2 packages;
+correcting the test axis, not changing code or excluding tests, yields the
+full passing run above.
+
+All app builds select **all-opt-in**, with interpreter flags
+`--disable-yjit --disable-zjit`, frozen copied bundles, test environment,
+seed **41231**, full SQL recording and serial Minitest workers. Browser
+dependencies: PingCRM/Redprints `bun install --frozen-lockfile`, Starter
+`npm ci`; test assets precompiled. Selenium uses the installed Chrome via
+`SE_CHROME_PATH`; it provisions its matching driver. PingCRM uses the local
+disposable PostgreSQL database `lowrail_ruby41_pingcrm_test`. No production
+database is involved.
+
+| App / mode | Build | On/off outcomes | Own-thread SQL | Fast-path hits / units | Fallbacks |
+|---|---|---|---|---|---|
+| Blog / interpreter | pass | **21/21 pass**, identical | 125, identical | **44 / 5** | 1 |
+| Campfire / interpreter | pass | **632 pass + 2 skip**, identical | 15,109, identical | **3,718 / 15** | 4,035 |
+| PingCRM / interpreter (models + system) | pass | **26/26 pass**, identical | 812, identical | **717 / 7** | 1 |
+| Redprints / interpreter, default | pass | **50/50 pass**, identical | 692, identical | **277 / 7** | 0 |
+| Redprints / interpreter, system | same build | **12/12 pass**, identical | 260, identical | **417 / 7** | 0 |
+| Starter / interpreter (includes system) | pass | **36/36 pass**, identical | 264, identical | **163 / 4** | 0 |
+| Blog / YJIT | reused compatible preview build | **21/21 pass**, identical | 125, identical | **44 / 5** | 1 |
+
+Each executed outcome writer reports the pinned preview, and diagnostics
+confirm both JITs off for interpreter verification, only YJIT on for blog's
+YJIT run. These are correctness runs, not timing comparisons. The initial
+Campfire build had no model schema and zero hits; its tests created the
+schema. That run is retained as a setup failure for coverage, not credited.
+After preparing its DB, refreshing facts (19 models) and rebuilding with the
+pinned Bundler, the table records actual covered units. It is not evidence
+that changing Bundler improved performance.
+
+**Differences and limitations, not suppressed:** PingCRM records other-thread
+SQL differences in nine browser tests; Campfire in one concurrency test.
+They remain advisory thread-interleaving differences, separate from the exact
+own-thread SQL check. Campfire's two existing skips remain. Its fallback
+totals include four instantiate units with no hits; there is no all-unit
+support claim. Blog retains a recorded `template_certificate` refusal for
+show (`compiled template depends on lexical scope`); the positive endpoint
+regression does not authorize bypassing this separate refusal. Digest
+file-memo still refuses 3.3.0 (`digest_version`), unlike the separately
+audited expression certificate. Route/view quarantine remains in force.
+These are **Lowrail-on-4.1 safe refusals**, not Rails test failures.
+
+**Disposition:** own-code compatibility is green on both targets; the five-app
+preview correctness matrix is green with the recorded dependency overlays.
+No observed Rails 8.1.4 runtime failure is patched locally. Proceed to step 3's
+ZJIT seam/cohorts; the singleton-guard alternative still requires complete-check
+pricing before implementation. Do not infer performance from these tests.
 
 ## Exact interpreter and reproducible matrix axis
 
@@ -91,7 +229,7 @@ already records the actual worker interpreter, not only the requested version.
 
 ```sh
 mise exec ruby@4.0.7 -- ruby -v             # primary, also: mise exec -- ruby -v
-mise exec ruby@4.1.0-preview1 -- ruby -v    # experimental second column
+mise exec ruby@4.1.0-preview1 -- ruby -v    # second correctness column
 mise exec ruby@4.1.0-preview1 -- ruby --disable-yjit --disable-zjit -e 'p [RubyVM::YJIT.enabled?, RubyVM::ZJIT.enabled?]'
 mise exec ruby@4.1.0-preview1 -- ruby --yjit --disable-zjit -e 'p [RubyVM::YJIT.enabled?, RubyVM::ZJIT.enabled?]'
 mise exec ruby@4.1.0-preview1 -- ruby --zjit --disable-yjit -e 'p [RubyVM::YJIT.enabled?, RubyVM::ZJIT.enabled?]'
@@ -101,24 +239,51 @@ These print `[false, false]`, `[true, false]`, `[false, true]`.
 Do not reuse facts, generated scripts or manifests across versions. The
 manifest's existing interpreter guard refuses mismatched binaries, but cached
 facts alone are not a matrix run. Use separate disposable corpus copies per
-version, keep their lockfiles identical, and build each one under its own
-interpreter before verify/bench. No lockfiles were changed in this study.
+version and build each one under its own interpreter before verify/bench.
+The unchanged-bundle study made no lock changes; step 2's dependency workarounds
+change **only the disposable locks**, so do not compare them to unchanged
+4.0 bundles as if Ruby alone were the changed variable in a speed study.
 
 ```sh
-# From gem/, for each version:
+# From gem/, with an absolute path to the prepared disposable corpus:
+export LOWRAIL_TEST_CORPUS_ROOT=/home/user/workspace/repo/.corpus/ruby41-source
 mise exec ruby@4.1.0-preview1 -- rake test
-# From the repository root, on a fresh per-version corpus:
+# Back at the repository root, retaining the same environment:
 mise exec ruby@4.1.0-preview1 -- cargo test
+export BUNDLE_FROZEN=true RAILS_ENV=test PARALLEL_WORKERS=1 SEED=41231
+export LOWRAIL_SQL_TRACE=full LOWRAIL_JIT_DIAGNOSTICS=1
+export SE_CHROME_PATH="$HOME/.agent-browser/browsers/chrome-155.0.8059.79/chrome"
+export RUBYOPT='--disable-yjit --disable-zjit'
 for app in real-blog-r4 campfire pingcrm redprints-cfp react-starter-kit; do
-  LOWRAIL_BUILD_JIT=0 mise exec ruby@4.1.0-preview1 -- \
-    target/debug/lowrail build ".corpus/$app" --env test --passes all-opt-in
-  mise exec ruby@4.1.0-preview1 -- target/debug/lowrail verify ".corpus/$app"
+  (
+    unset DATABASE_URL
+    if [ "$app" = pingcrm ]; then
+      export DATABASE_URL=postgresql:///lowrail_ruby41_pingcrm_test
+    fi
+    # Prepare DB/schema first. Refresh facts; do not reuse a pre-schema dump.
+    mise exec ruby@4.1.0-preview1 -- target/debug/lowrail facts "$LOWRAIL_TEST_CORPUS_ROOT/$app"
+    LOWRAIL_BUILD_JIT=0 mise exec ruby@4.1.0-preview1 -- \
+      target/debug/lowrail build "$LOWRAIL_TEST_CORPUS_ROOT/$app" --env test --passes all-opt-in
+    case "$app" in
+      pingcrm)
+        mise exec ruby@4.1.0-preview1 -- target/debug/lowrail verify "$LOWRAIL_TEST_CORPUS_ROOT/$app" -- \
+          bin/rails test test/models test/system --seed 41231 ;;
+      redprints-cfp|react-starter-kit)
+        mise exec ruby@4.1.0-preview1 -- target/debug/lowrail verify "$LOWRAIL_TEST_CORPUS_ROOT/$app" -- \
+          bundle exec rspec --seed 41231 ;;
+      *) mise exec ruby@4.1.0-preview1 -- target/debug/lowrail verify "$LOWRAIL_TEST_CORPUS_ROOT/$app" ;;
+    esac
+    if [ "$app" = redprints-cfp ]; then
+      mise exec ruby@4.1.0-preview1 -- target/debug/lowrail verify "$LOWRAIL_TEST_CORPUS_ROOT/$app" -- \
+        bundle exec rspec spec/system --seed 41231
+    fi
+  )
 done
-RUBYOPT=--yjit mise exec ruby@4.1.0-preview1 -- \
-  target/debug/lowrail verify .corpus/real-blog-r4
+RUBYOPT='--yjit --disable-zjit' mise exec ruby@4.1.0-preview1 -- \
+  target/debug/lowrail verify "$LOWRAIL_TEST_CORPUS_ROOT/real-blog-r4"
 # Once compatibility is fixed, bench uses the identical version axis:
 BENCH_JIT=1 mise exec ruby@4.1.0-preview1 -- target/debug/lowrail bench \
-  .corpus/real-blog-r4 --pass ar_instantiate --path /articles --out /tmp/new-41-cohort
+  "$LOWRAIL_TEST_CORPUS_ROOT/real-blog-r4" --pass ar_instantiate --path /articles --out /tmp/new-41-cohort
 ```
 
 The final bench command is an example of version selection, **not an executed
@@ -222,7 +387,7 @@ on 4.1 with the cached 4.0 facts withheld. Benchmark preflight again passes
 |---|---|---|
 | Old cached guard vs K | not started | blocked by the explicit compatibility stop; no numbers |
 | Allocation-study props micro | not started | same stop, including the otherwise standalone micro |
-| Blog index/show: off vs historical default, L2/L2_events | not started | corpus blocked; no numbers or accepted/rejected measurement cohort |
+| Blog index/show: off vs historical default, L2/L2_events | not started | five-app prerequisite still blocked at Redprints; no numbers or accepted/rejected measurement cohort |
 
 No retries-until-green, cohort salvage or substitutions. Existing
 [YJIT rejections](bench.md#matched-interpreter--yjit-request-study) remain
