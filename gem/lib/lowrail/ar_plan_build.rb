@@ -2,6 +2,7 @@
 
 require "json"
 require "digest"
+require "rbconfig"
 require_relative "ar_plan_facts"
 require_relative "ar_plan_sites"
 require_relative "ar_plans"
@@ -94,14 +95,25 @@ module Lowrail
         %i[exec_main_query initialize_copy assert_modifiable!].each { facts << PreloadFacts.method_fact(ARPlans::RelationHook, _1) }
         facts << PreloadFacts.method_fact(ARPlans::AssociationHook, :skip_statement_cache?)
         files = (facts + originals).filter_map { _1["source_location"]&.sub(/:\d+\z/, "") }
-        files.concat([__FILE__, ARPlanFacts.method(:scope_info).source_location.first,
-          ARPlans.method(:tag).source_location.first, PreloadFacts.method(:scope).source_location.first])
-        edges.each_value { files << _1.fetch("reflection").fetch("scope").first }
-        id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
-        manifest["units"] << { "id" => id, "kind" => "runtime", "file" => "active_record/ar_plans",
-          "pass" => "active_record/ar_plans", "facts" => facts.uniq,
-          "ar_plans" => { "edges" => edges, "models" => models, "originals" => originals,
-            "rails_version" => Rails.version, "sources" => files.uniq.to_h { [_1, Digest::SHA256.file(_1).hexdigest] } } }
+        # Stable method definitions are not a purity certificate for an app's
+        # replacement planner/visitor/quoter. Only the framework path is audited.
+        trusted = %w[activerecord activemodel activesupport].map { Gem.loaded_specs.fetch(_1).full_gem_path + "/" }
+        trusted.concat([__dir__ + "/", RbConfig::CONFIG.fetch("rubylibdir") + "/"])
+        if (custom = files.find { !_1.start_with?(*trusted) })
+          ledger.each do |entry|
+            entry["outcome"] = "custom planning implementation: #{custom}" if entry["outcome"] == "eligible scoped reader"
+          end
+          edges.clear
+        else
+          files.concat([__FILE__, ARPlanFacts.method(:scope_info).source_location.first,
+            ARPlans.method(:tag).source_location.first, PreloadFacts.method(:scope).source_location.first])
+          edges.each_value { files << _1.fetch("reflection").fetch("scope").first }
+          id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
+          manifest["units"] << { "id" => id, "kind" => "runtime", "file" => "active_record/ar_plans",
+            "pass" => "active_record/ar_plans", "facts" => facts.uniq,
+            "ar_plans" => { "edges" => edges, "models" => models, "originals" => originals,
+              "rails_version" => Rails.version, "sources" => files.uniq.to_h { [_1, Digest::SHA256.file(_1).hexdigest] } } }
+        end
       end
       Lowrail.write_json(path, manifest)
       Lowrail.write_json(ledger_path, ledger)

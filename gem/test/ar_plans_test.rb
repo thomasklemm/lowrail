@@ -33,6 +33,15 @@ class ARPlansTest < Minitest::Test
     class Post < ActiveRecord::Base
       belongs_to :writer, inverse_of: :posts
     end
+    class NoisyWriter < ActiveRecord::Base
+      self.table_name = "writers"
+      has_many :preferred_posts, -> { order(:title) }, class_name: "Post", foreign_key: :writer_id
+      def _read_attribute(*)
+        @attribute_reads = (@attribute_reads || 0) + 1
+        super
+      end
+      attr_reader :attribute_reads
+    end
     a = Writer.create!(name: "a")
     b = Writer.create!(name: "b")
     [[a, "z", true], [a, "a", true], [a, "hidden", false], [b, "foreign", true]].each do |writer, title, published|
@@ -67,6 +76,8 @@ class ARPlansTest < Minitest::Test
     }
     result["owners"] = [read.call(a), read.call(b), read.call(a)]
     result["hits_before_changes"] = Lowrail::Stats.unit_hits.values.sum
+    noisy = NoisyWriter.find(a.id)
+    result["owner_reader_effects"] = [noisy.preferred_posts.map(&:title), noisy.attribute_reads]
     # Query-cache flags and bind types/values must agree, not only row IDs.
     ActiveRecord::Base.cache do
       Post.connection_pool.with_connection(&:clear_query_cache)
@@ -115,6 +126,12 @@ class ARPlansTest < Minitest::Test
     result["changed"] = read.call(a)
     ActiveSupport::Notifications.unsubscribe(subscription)
     ledger = JSON.parse(File.read(File.join(dir, "ledger.json")))
+    if ENV.fetch("CHANGE") == "adapter"
+      # A rebuilt manifest must not certify a boot-time replacement quoter
+      # merely because its definition is stable.
+      Lowrail::ARPlanBuild.run(dir)
+      result["rebuilt_units"] = Lowrail::Manifest.load(File.join(dir, "manifest.json")).units.size
+    end
     result["ledger"] = ledger.map { [_1["method"], _1["outcome"]] }
     result["events"] = events
     puts JSON.generate(result)
@@ -141,6 +158,7 @@ class ARPlansTest < Minitest::Test
         assert_equal [true, false, ["z"]], on.fetch("lazy")
         assert_equal ["a"], on.fetch("dynamic_changed")
         assert_equal "ActiveRecord::StrictLoadingViolationError", on.fetch("strict")
+        assert_equal 0, on.fetch("rebuilt_units") if change == "adapter"
         assert_equal [["z", true, false]], on.fetch("changed") if %w[method association_method default_scope].include?(change)
         assert on.fetch("events").any? { _1.last == true }, "query cache was not exercised"
         %w[dynamic clock negative].each do |name|

@@ -77,6 +77,7 @@ module Lowrail
       return "default scope" unless owner.default_scopes.empty? && target.default_scopes.empty?
       return "STI target" if target.columns_hash.key?(target.inheritance_column)
       framework = %w[activerecord activemodel].map { Gem.loaded_specs.fetch(_1).full_gem_path + "/" }
+      return "custom owner attribute reader" unless owner.instance_method(:_read_attribute).source_location&.first&.start_with?(*framework)
       return "custom scope constructor" unless PreloadFacts::SCOPE_METHODS.all? { target.method(_1).source_location&.first&.start_with?(*framework) }
       return "custom reflection constructor" unless PreloadFacts::REFLECTION_METHODS.all? { reflection.method(_1).source_location&.first&.start_with?(*framework) }
       return "custom relation constructor" unless PreloadFacts::RELATION_METHODS.all? { target.unscoped.class.instance_method(_1).source_location&.first&.start_with?(*framework) }
