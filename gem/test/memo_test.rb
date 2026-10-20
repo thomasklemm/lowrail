@@ -373,7 +373,7 @@ class MemoTest < Minitest::Test
   end
 
   def test_public_inertia_vite_version_keeps_its_own_file_and_time_semantics
-    out = ruby_json(<<~'RUBY')
+    out = ruby_json("fixtures = #{File.expand_path('../../tests/fixtures/memo', __dir__).dump}\n" + <<~'RUBY')
       require "json"
       begin
         gem "vite_ruby", "3.11.1"
@@ -396,12 +396,12 @@ class MemoTest < Minitest::Test
         file = "#{dir}/app/frontend/entry.js"
         File.write(file, "first")
         ViteRuby.reload_with(root: dir)
-        load File.expand_path("tests/fixtures/memo/inertia_eager_version.rb")
+        load File.join(fixtures, "inertia_eager_version.rb")
         eager = InertiaRails.configuration.version.dup
         File.write(file, "other")
         sleep 1.1
         raise "eager version recomputed" unless InertiaRails.configuration.version == eager
-        load File.expand_path("tests/fixtures/memo/inertia_version.rb")
+        load File.join(fixtures, "inertia_version.rb")
         first = InertiaRails.configuration.version.dup
         raise "fixture missed changed file" if first == eager
         File.write(file, "third") # same size, different content
