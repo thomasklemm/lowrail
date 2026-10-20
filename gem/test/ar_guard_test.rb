@@ -48,6 +48,9 @@ class ARGuardTest < Minitest::Test
     out["skip_callback"] = change.() { Item.reset_callbacks(:initialize) }
     out["has_many"] = change.() { Item.has_many :parts }
     out["attribute"] = change.() { Other.attribute :extra, :integer }
+    Other.new # load the schema the earlier `attribute` call reset
+    out["define_attribute"] = change.() { Other.define_attribute("name", ActiveRecord::Type::Integer.new) }
+    out["reset_primary_key"] = change.() { Part.reset_primary_key }
     out["enum"] = change.() { Item.enum :state, { on: 0, off: 1 } }
     out["serialize"] = change.() { Other.serialize :name, coder: JSON }
     out["establish_connection"] = change.() { Other.establish_connection(adapter: "sqlite3", database: ":memory:") }
@@ -71,6 +74,8 @@ class ARGuardTest < Minitest::Test
       assert_equal %w[Item Special], r["skip_callback"]
       assert_equal %w[Item Special], r["has_many"]
       assert_equal ["Other"], r["attribute"]
+      assert_equal ["Other"], r["define_attribute"], "types change without a schema reload"
+      assert_equal ["Part"], r["reset_primary_key"]
       assert_equal %w[Item Special], r["enum"]
       assert_equal ["Other"], r["serialize"]
       assert_equal %w[Item Special Part Other], r["establish_connection"], "connection changes are global"

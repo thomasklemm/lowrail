@@ -11,7 +11,8 @@ module Lowrail
   #
   #   * schema and attributes: reload_schema_from_cache (reset_column_information,
   #     attribute, enum, serialize, table_name=, ignored_columns=, ...),
-  #     load_schema!, attribute, decorate_attributes, primary_key=;
+  #     load_schema!, attribute, define_attribute, decorate_attributes,
+  #     primary_key=, reset_primary_key;
   #   * default_scope;
   #   * callbacks: set_callbacks (set_callback, skip_callback, reset_callbacks);
   #   * reflections: Reflection.add_reflection, clear_reflections_cache;
@@ -34,8 +35,11 @@ module Lowrail
     @events = 0
 
     # Class-level methods whose call may change a plan's inputs.
-    CLASS_EVENTS = %i[reload_schema_from_cache load_schema! attribute decorate_attributes primary_key=
-                      default_scope set_callbacks clear_reflections_cache].freeze
+    # define_attribute changes types/defaults without a schema reload;
+    # reset_primary_key re-derives the key (8.1 goes through primary_key=,
+    # other versions may not). Names missing in a Rails version are skipped.
+    CLASS_EVENTS = %i[reload_schema_from_cache load_schema! attribute define_attribute decorate_attributes
+                      primary_key= reset_primary_key default_scope set_callbacks clear_reflections_cache].freeze
     GLOBAL_EVENTS = %i[establish_connection connects_to remove_connection].freeze
 
     class << self
