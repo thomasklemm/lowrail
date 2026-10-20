@@ -74,6 +74,8 @@ pub fn lower(code: &str, id: usize, oracle: &mut dyn Oracle, certificate: &mut O
                 (name == "base64digest" && !receiver.is_some_and(|r| r.trim_start_matches("::") == "Digest::SHA256")) ||
                 (name == "parse" && matches!(receiver, Some("JSON" | "::JSON")))) {
                 self.sites.push(Site { line, helper: name, outcome: "no purity certificate for the whole call; resolver, file, configuration or mutation effects remain in the original".into() });
+            } else if matches!(self.intrinsic, Intrinsic::UriJoin) && name == "bind_controller" {
+                self.sites.push(Site { line, helper: name, outcome: "request-bound controller and fresh mutable configuration; no boot-fixed result certificate".into() });
             }
             ruby_prism::visit_call_node(self, n);
         }
@@ -141,5 +143,9 @@ mod tests {
             assert!(result.certificate.is_none());
             assert!(result.sites.iter().any(|s| s.helper == "digest" && s.outcome.contains("no purity certificate")));
         }
+        let binding = "configuration.bind_controller(controller)";
+        let result = lower(binding, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin);
+        assert_eq!(result.code, binding);
+        assert!(result.sites.iter().any(|s| s.outcome.contains("request-bound controller")));
     }
 }
