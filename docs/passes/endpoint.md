@@ -6,6 +6,153 @@ Other applications/versions refuse at build time with a ledger reason. This
 is the first reviewable slice of layer D, **not** the whole-route handwritten
 ceiling, and it is not promoted to default.
 
+## Next pilot design: show-first section continuations
+
+**Design/cost gate only; not implemented or activated.** First target is
+`GET /articles/1`, against default ≈ off, using the `c9d2397` heap-observer
+warmup and symmetric post-GC request settling protocol. Index waits. Neither
+quarantined pass, the parked composition nor the old handwritten ceiling is
+a building block. The first candidate only expands the two show-page links;
+forms, tags outside those links, AR, renderers and events remain live Rails.
+
+The unit of certification is an **already-entered method body**, not an epoch
+covering subsequent calls. Generate from the actual compiled handler in its
+original compilation container (retain `Comment`'s CREF), not a copied `_run`
+wrapper. Invoke the real handler and compare its source once at compilation;
+a new resolver Template compiles afresh. Keep Rails' `_run`/normal method
+dispatch, so later compiled-method redefinitions win normally. No per-request
+file hashes or compiled-ISeq hashing. A section may use a cached build proof
+of its own body; every *removed nested dispatch* still needs effective-method
+identity/visibility on the actual receiver **after its arguments**. Suppressed
+hooks make a K/epoch-only shortcut insufficient. Do not reuse authorization
+across a live call, subscriber, conversion or block yield.
+
+Post-entry evaluation inventory, in execution order (each listed live call
+includes its complete dynamic subtree; no closure claim about that subtree):
+
+| Point | Section / exact continuation |
+|---|---|
+| Controller events, before/around filters, `set_article`/`Article.find`, action, view assigns and render-event starts | All live, once. Permission before them cannot authorize any later removed dispatch. A subscriber can change both state and methods. |
+| Show prologue: `content_for(:title)`, head capture block, `turbo_exempts_page_from_preview`, `@article.id`, notice/presence, title/body reads and output-buffer appends | Live, including coercion/escaping. Check the next expanded call only after these return; no template restart or replay of head capture. |
+| Each link's name, URL/record argument and keyword/hash construction; nested `edit_article_path(@article)` and zero-argument `articles_path` | Evaluate original receiver/arguments once, left-to-right, into locals. On failed `link_to` certificate, invoke the live helper with those locals and the original arity/keyword shape. Index later adds `article.title`, record URLs and `new_article_path`; it cannot inherit show's authorization. |
+| Inside `link_to`: option conversion/stringification, remote/method options, `url_target`/`url_for`, name/model predicates and href hash access | A live call ends the section. A failed next-callee certificate invokes that live callee with the saved arguments and resumes the caller's suffix. Never re-enter `link_to` after option conversion or URL work. Redefining an already-entered method does not replace its running body. |
+| Inside a named/polymorphic route: defaults/URL options, predicate, argument `to_param`, captured route's `format`, escaping and script/URL finishing | First candidate leaves the whole route live. A later route expansion must continue at `captured_route.format(converted_parts)` after conversion, not call `*_path(original_arg)` again, nor refetch a different route object. Preserve Rails' own error-path conversions; add none. |
+| Anchor construction: `content_tag`, name validation, `tag_builder`, actual builder's `content_tag_string`, `tag_options`/`tag_option`, escaping, coercions and SafeBuffer construction | Recheck each removed dispatch at its use on the actual builder/string/hash receiver, not the TagBuilder class alone. If name validation or builder acquisition runs live, recheck afterwards. Continue with the already computed content/options; do not regenerate the link or repeat a conversion. Unknown/custom coercions stay live. |
+| Remaining show body: destroy `button_to`; Turbo stream signing; `@article.comments`, collection iteration, each comment's `dom_id`, attributes, `comment.article`, delete button and nested route; `Comment.new`; `form_with`, builder `label`/`text_field`/`text_area`/`submit` and capture block | All live, including callbacks, SQL, CSRF/session work and empty collections. These are mutation boundaries before any later expansion, not permission to batch checks over the form or collection. Index's article partial also keeps `dom_id`, count/pluralize, truncate, three links and destroy button under their own future boundaries. |
+| Layout: title/head/body yields, CSRF/CSP tags, stylesheet/importmap helpers; render/controller finishes and response finalization | All live. Keep real controller/view objects, assignment order, payloads, event nesting, buffers and exception behavior. No layout/filter/envelope lowering in this step. |
+
+**Invariant budget per section:** incremental cost is exact residuals +
+branch/locals/continuation dispatch − removed interpreter/dispatch/allocation
+work; all live callees cancel against off. Charge entry and template delivery
+once, not as free work. A K check is about 425 interpreter Ir; the synthetic
+four-fact 4,470-Ir check is not a real-view certificate. The measured actual
+view receiver/visibility pair alone was about 10.8k Ir/call, so price the
+actual show receivers before generating a pass. Measure an optimistic
+check-only full-anchor certificate against the *entire* live anchor cost,
+plus the one-certificate/thin-body alternative; omit no remaining checks from
+any claimed complete cost. If even these optimistic budgets lose, stop this
+caller-side design before implementing it. Body-installed specializations
+that retain normal dispatch are a different, as-yet-unpriced design.
+
+**Mutation gate before any request benchmark:** separate controlled off/on
+processes, literal status/body/all-header equality and ordered SQL/event traces;
+never replay an authoritative request. Keep all existing 144 specimen pairs.
+Add once-only probes at name evaluation, each positional/keyword expression,
+option conversion, model/URL predicates, `url_for`, `to_param`, name validation,
+builder acquisition, builder formatting, attribute/value coercion and escaping.
+Include singleton/prepend/own-visibility changes, suppressed/conditional hooks,
+template/cache clears and compilation-container constant replacement. Existing
+subscriber redefinition, callbacks-once and assigns-visible probes remain.
+Failing a certificate must exercise the local live suffix, not restart a
+helper, renderer, action or filter. Only a green semantic matrix permits an
+opt-in show request comparison; both total/no-GC A/A, heaps and JIT-state
+controls must pass and show must be ≤ off before considering index.
+
+### Show section-cost gate: stop before runtime implementation
+
+**Stop this caller-side reflection design.** Its optimistic check-only arm
+already costs more than executing both original show links. This rejects the
+measured implementation, not all possible body-installed specializations that
+retain Ruby's normal dispatch; those remain unpriced. No new runtime pass,
+continuation generator, mutation matrix or whole-request show comparison was
+built/run. Index remains untouched, and neither source pass is reactivated.
+
+`bench/experiments/endpoint_sections.rb` captures the two actual show-page
+`link_to` calls using an **untimed** TracePoint, then measures operations on
+that real view and its actual tag builder. All workers have Lowrail off;
+no controller/template/helper method is replaced. The original arm executes
+both links. The thin arm checks effective `link_to` identity and visibility,
+then expands only its stock no-block body with every nested helper live.
+The check-only arm unrolls ten effective-method/visibility pairs per link:
+
+- View: `link_to`, `convert_options_to_data_attributes`, `url_target`,
+  `url_for`, `content_tag`, `ensure_valid_html5_tag_name`, `tag_builder`.
+- Actual builder: `content_tag_string`, `tag_options`, `tag_option`.
+
+These use captured core `Module#instance_method`, visibility predicates and
+`UnboundMethod#==`, not overridable reflection on the application receiver.
+The cheaper combined variants use `Module#public_instance_method` to combine
+identity and public visibility in one lookup; private methods still use the
+separate predicate. This avoids charging an unnecessary lookup on public calls.
+Holders and expected methods are captured **outside** the measured windows.
+This is an optimistic subset, **not a complete certificate**: remote-option
+helpers, String/Hash/escaping/value checks, repeated checks after live calls,
+holder acquisition, entry/template delivery and continuation work are absent.
+It does not authorize executing an accelerated arm.
+
+The initial four-arm cohort and subsequent six-arm comparison including the
+combined lookups each use six randomized fresh-process rounds, Ruby **4.0.7**,
+Rails **8.1.4**, seed **41231**, interpreter Callgrind, five standard heap floors,
+N=0/200 operation windows and the shared `c9d2397` `HeapWindows` protocol.
+Operation windows retain the captured context; they do not execute a request
+as a settling step. Both cohorts pass total/no-GC A/A, heap and actual
+interpreter-state controls; no collections occur inside measured windows.
+Source hashes match at finish. Both thin arms' stock results match bytes,
+encoding and HTML-safety flag in every worker; this is not the unexecuted
+mutation/response equivalence gate.
+
+The table is the **six-arm** comparison. Its total/no-GC A/A deltas are
+−0.009% [−0.099, +0.068] / −0.015% [−0.107, +0.069].
+
+| Operation, for both links together | Total interpreter Ir, median [95% CI] | GC-excluded Ir, median [95% CI] |
+|---|---:|---:|
+| Entire original links | 90,042 [89,957, 90,213] | 90,048 [90,037, 90,138] |
+| Separate-lookup checks alone | 112,135 [112,131, 112,140] | 112,135 [112,131, 112,140] |
+| Combined-lookup checks alone | 93,649 [93,645, 93,654] | 93,649 [93,645, 93,654] |
+| Combined checks minus entire original links | **+3,607 [+3,441, +3,688]** | **+3,601 [+3,507, +3,616]** |
+| Thin expansion, separate lookup, minus original | **+14,450 [+14,257, +14,555]** | **+14,452 [+14,256, +14,549]** |
+| Thin expansion, combined lookup, minus original | **+8,905 [+8,780, +9,006]** | **+8,905 [+8,780, +9,004]** |
+
+These are **operation costs, not request percentages or native speed claims**.
+Even replacing all the original anchor work with nothing cannot pay for this
+set of checks, even with the cheaper lookup. The less ambitious thin expansion
+also loses. All four measured candidate arms allocate 20 objects/two-link
+operation versus the original's 14. The initial accepted cohort's separate
+checks cost 112,471 versus 90,070 Ir for the original, a +22,401 deficit;
+the portable export retains that cohort too, not just the improved variant.
+
+`Kernel#method`/`public_method` are not safe drop-in shortcuts: when a target
+is missing they can invoke application `respond_to_missing?`. An executed
+Ruby probe observed one call from each getter, versus none from the captured
+`Module#instance_method` and `Module#public_instance_method` missing-method
+lookups. A guard must not introduce those effects before its live fallback.
+This is a semantics constraint, not a claim to have exhausted alternative
+lookup implementations.
+
+Reproduce after preparing the corpus production database/assets, including
+article 1 (the driver's initial request must return 200):
+
+```sh
+BENCH_JOBS=2 mise exec -- ruby bench/experiments/endpoint_sections.rb \
+  .corpus/real-blog-r4 /tmp/NEW-endpoint-section-budget
+```
+
+Portable numeric evidence: [endpoint-sections.json](endpoint-sections.json).
+Raw worker logs and counters stay private in
+`/tmp/endpoint-show-section-budget-v{2,3}/`. An earlier invocation failed
+before measurement on a relative worker path; it was fixed, not retried after
+a failed A/A control. The historical slice and its gates below are unchanged.
+
 ## What is generated, and what stays live
 
 The runtime builder runs in an off, booted application. It obtains Rails'

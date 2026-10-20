@@ -1,0 +1,853 @@
+{
+  "schema_version": 1,
+  "study": "Show-first caller-side section cost gate",
+  "verdict": "stop_measured_caller_side_design",
+  "scope": "Operation costs for the two captured show links; not a complete certificate, generated pilot or request benchmark",
+  "protocol": "c9d2397",
+  "corpus": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+  "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+  "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+  "rails": "8.1.4",
+  "combined_lookup_comparison": {
+    "seed": 41231,
+    "rounds": 6,
+    "iterations": 200,
+    "heap_slots": [
+      1000000,
+      250000,
+      100000,
+      20000,
+      10000
+    ],
+    "requested_yjit": false,
+    "actual_yjit": [
+      false
+    ],
+    "sources": {
+      "bench/experiments/endpoint_sections.rb": "ffc007801cf4fe5cc5d4815c23af9c4092dc8b1957d7e69cbef682016e11c6ff",
+      "bench/heap_windows.rb": "8998440ce9236fe1aea7b37dda42036c0096629f24e71c5c46dc5aa7dd79fc20",
+      "bench/request_pairs.rb": "3e12fa680a43e5740e32f3acc3bfe70c9ead76842b8d66fdac2a9e0c6a452fb0"
+    },
+    "prices": {
+      "instructions_total": {
+        "original_two_links": {
+          "median": 90042.1075,
+          "ci95": [
+            89956.7875,
+            90212.72
+          ]
+        },
+        "thin_increment": {
+          "median": 14449.6325,
+          "ci95": [
+            14257.035000000003,
+            14554.9925
+          ]
+        },
+        "thin_combined_increment": {
+          "median": 8904.875,
+          "ci95": [
+            8780.0625,
+            9005.805
+          ]
+        },
+        "checks_minus_entire_links": {
+          "median": 22093.055,
+          "ci95": [
+            21926.800000000003,
+            22174.017499999994
+          ]
+        },
+        "check_only_two_links": {
+          "median": 112135.1625,
+          "ci95": [
+            112130.805,
+            112139.52
+          ]
+        },
+        "combined_checks_minus_entire_links": {
+          "median": 3607.0550000000003,
+          "ci95": [
+            3440.800000000003,
+            3688.0174999999945
+          ]
+        },
+        "check_combined_two_links": {
+          "median": 93649.1625,
+          "ci95": [
+            93644.805,
+            93653.52
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "original_two_links": {
+          "median": 90047.91,
+          "ci95": [
+            90037.2475,
+            90138.02
+          ]
+        },
+        "thin_increment": {
+          "median": 14451.597499999996,
+          "ci95": [
+            14256.232499999998,
+            14549.495000000003
+          ]
+        },
+        "thin_combined_increment": {
+          "median": 8905.265,
+          "ci95": [
+            8780.477499999994,
+            9004.092499999999
+          ]
+        },
+        "checks_minus_entire_links": {
+          "median": 22087.265,
+          "ci95": [
+            21992.78499999999,
+            22102.260000000002
+          ]
+        },
+        "check_only_two_links": {
+          "median": 112135.1625,
+          "ci95": [
+            112130.805,
+            112139.52
+          ]
+        },
+        "combined_checks_minus_entire_links": {
+          "median": 3601.2649999999994,
+          "ci95": [
+            3506.784999999989,
+            3616.260000000002
+          ]
+        },
+        "check_combined_two_links": {
+          "median": 93649.1625,
+          "ci95": [
+            93644.805,
+            93653.52
+          ]
+        }
+      }
+    },
+    "controls": {
+      "accepted": true,
+      "aa": {
+        "pass": true,
+        "metrics": {
+          "instructions_total": true,
+          "instructions_no_gc": true
+        },
+        "tolerance_pct": 0.5
+      },
+      "aa_delta_pct": {
+        "instructions_total": {
+          "median": -0.00944416666832093,
+          "ci95": [
+            -0.09894307331082541,
+            0.06838944069322839
+          ]
+        },
+        "instructions_no_gc": {
+          "median": -0.015181570551731083,
+          "ci95": [
+            -0.10650322915867205,
+            0.06909520911830835
+          ]
+        },
+        "allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "heap_matched": true,
+      "heap_capacity": {
+        "0": {
+          "min": 1000442,
+          "max": 1000467,
+          "matched": true
+        },
+        "1": {
+          "min": 250421,
+          "max": 250440,
+          "matched": true
+        },
+        "2": {
+          "min": 100152,
+          "max": 100161,
+          "matched": true
+        },
+        "3": {
+          "min": 20174,
+          "max": 20179,
+          "matched": true
+        },
+        "4": {
+          "min": 10078,
+          "max": 10080,
+          "matched": true
+        }
+      },
+      "jit_pass": true
+    },
+    "samples": [
+      {
+        "check_only": {
+          "instructions_total": 112130.805,
+          "instructions_no_gc": 112139.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin_combined": {
+          "instructions_total": 98878.515,
+          "instructions_no_gc": 98958.475,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 89975.265,
+          "instructions_no_gc": 90054.88,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90052.99,
+          "instructions_no_gc": 90132.715,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104543.515,
+          "instructions_no_gc": 104624.195,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_combined": {
+          "instructions_total": 93644.805,
+          "instructions_no_gc": 93653.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "thin_combined": {
+          "instructions_total": 99095.465,
+          "instructions_no_gc": 99022.92,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_combined": {
+          "instructions_total": 93653.52,
+          "instructions_no_gc": 93644.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112139.52,
+          "instructions_no_gc": 112130.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104650.685,
+          "instructions_no_gc": 104570.59,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90086.215,
+          "instructions_no_gc": 90004.37,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90108.95,
+          "instructions_no_gc": 90040.915,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "check_combined": {
+          "instructions_total": 93644.805,
+          "instructions_no_gc": 93653.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90006.39,
+          "instructions_no_gc": 90087.545,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 89961.055,
+          "instructions_no_gc": 90040.94,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104456.92,
+          "instructions_no_gc": 104536.94,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112130.805,
+          "instructions_no_gc": 112139.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin_combined": {
+          "instructions_total": 98867.555,
+          "instructions_no_gc": 98947.875,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "check_combined": {
+          "instructions_total": 93653.52,
+          "instructions_no_gc": 93644.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90150.645,
+          "instructions_no_gc": 90080.895,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90117.015,
+          "instructions_no_gc": 90036.36,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104470.365,
+          "instructions_no_gc": 104389.78,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112139.52,
+          "instructions_no_gc": 112130.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin_combined": {
+          "instructions_total": 98943.725,
+          "instructions_no_gc": 98875.53,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "off_a": {
+          "instructions_total": 89952.52,
+          "instructions_no_gc": 90033.58,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 89958.225,
+          "instructions_no_gc": 90042.785,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104355.92,
+          "instructions_no_gc": 104440.775,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112130.805,
+          "instructions_no_gc": 112139.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin_combined": {
+          "instructions_total": 98977.615,
+          "instructions_no_gc": 99059.76,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_combined": {
+          "instructions_total": 93644.805,
+          "instructions_no_gc": 93653.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "off_b": {
+          "instructions_total": 90129.83,
+          "instructions_no_gc": 90047.615,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104469.145,
+          "instructions_no_gc": 104398.725,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112139.52,
+          "instructions_no_gc": 112130.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_combined": {
+          "instructions_total": 93653.52,
+          "instructions_no_gc": 93644.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90274.795,
+          "instructions_no_gc": 90195.145,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin_combined": {
+          "instructions_total": 99041.84,
+          "instructions_no_gc": 98961.465,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      }
+    ]
+  },
+  "initial_separate_lookup_cohort": {
+    "seed": 41231,
+    "rounds": 6,
+    "iterations": 200,
+    "heap_slots": [
+      1000000,
+      250000,
+      100000,
+      20000,
+      10000
+    ],
+    "requested_yjit": false,
+    "actual_yjit": [
+      false
+    ],
+    "sources": {
+      "bench/experiments/endpoint_sections.rb": "f0a7d193015ab808d630dc797bde214b4291159976a4bc1d062e8b7736de2445",
+      "bench/heap_windows.rb": "8998440ce9236fe1aea7b37dda42036c0096629f24e71c5c46dc5aa7dd79fc20",
+      "bench/request_pairs.rb": "3e12fa680a43e5740e32f3acc3bfe70c9ead76842b8d66fdac2a9e0c6a452fb0"
+    },
+    "prices": {
+      "instructions_total": {
+        "original_two_links": {
+          "median": 90069.95499999999,
+          "ci95": [
+            90054.0375,
+            90285.155
+          ]
+        },
+        "thin_increment": {
+          "median": 14025.21,
+          "ci95": [
+            13839.309999999998,
+            14104.270000000004
+          ]
+        },
+        "checks_minus_entire_links": {
+          "median": 22401.207500000004,
+          "ci95": [
+            22190.365000000005,
+            22412.767499999994
+          ]
+        },
+        "check_only_two_links": {
+          "median": 112471.1625,
+          "ci95": [
+            112466.805,
+            112475.52
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "original_two_links": {
+          "median": 90134.5575,
+          "ci95": [
+            89999.51749999999,
+            90272.9225
+          ]
+        },
+        "thin_increment": {
+          "median": 14024.849999999999,
+          "ci95": [
+            13840.002500000002,
+            14104.707500000004
+          ]
+        },
+        "checks_minus_entire_links": {
+          "median": 22340.96250000001,
+          "ci95": [
+            22198.239999999998,
+            22467.2875
+          ]
+        },
+        "check_only_two_links": {
+          "median": 112471.1625,
+          "ci95": [
+            112466.805,
+            112475.52
+          ]
+        }
+      }
+    },
+    "controls": {
+      "accepted": true,
+      "aa": {
+        "pass": true,
+        "metrics": {
+          "instructions_total": true,
+          "instructions_no_gc": true
+        },
+        "tolerance_pct": 0.5
+      },
+      "aa_delta_pct": {
+        "instructions_total": {
+          "median": -0.030455323323325123,
+          "ci95": [
+            -0.19007159807722385,
+            0.028865213872675266
+          ]
+        },
+        "instructions_no_gc": {
+          "median": -0.027902947400509914,
+          "ci95": [
+            -0.18769021720684842,
+            0.030284895417537205
+          ]
+        },
+        "allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "heap_matched": true,
+      "heap_capacity": {
+        "0": {
+          "min": 1000441,
+          "max": 1000466,
+          "matched": true
+        },
+        "1": {
+          "min": 250419,
+          "max": 250433,
+          "matched": true
+        },
+        "2": {
+          "min": 100151,
+          "max": 100160,
+          "matched": true
+        },
+        "3": {
+          "min": 20175,
+          "max": 20180,
+          "matched": true
+        },
+        "4": {
+          "min": 10078,
+          "max": 10080,
+          "matched": true
+        }
+      },
+      "jit_pass": true
+    },
+    "samples": [
+      {
+        "off_a": {
+          "instructions_total": 90065.605,
+          "instructions_no_gc": 90147.755,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104069.665,
+          "instructions_no_gc": 104150.17,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112466.805,
+          "instructions_no_gc": 112475.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90031.455,
+          "instructions_no_gc": 90115.185,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "check_only": {
+          "instructions_total": 112475.52,
+          "instructions_no_gc": 112466.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90480.97,
+          "instructions_no_gc": 90398.09,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90186.625,
+          "instructions_no_gc": 90106.32,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104160.825,
+          "instructions_no_gc": 104079.455,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "thin": {
+          "instructions_total": 104047.045,
+          "instructions_no_gc": 104127.355,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 89998.905,
+          "instructions_no_gc": 90081.29,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112466.805,
+          "instructions_no_gc": 112475.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90048.28,
+          "instructions_no_gc": 90128.715,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "check_only": {
+          "instructions_total": 112475.52,
+          "instructions_no_gc": 112466.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90089.34,
+          "instructions_no_gc": 90006.665,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104185.5,
+          "instructions_no_gc": 104104.275,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90068.625,
+          "instructions_no_gc": 89988.955,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "thin": {
+          "instructions_total": 104172.175,
+          "instructions_no_gc": 104252.205,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90123.61,
+          "instructions_no_gc": 90205.44,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90059.795,
+          "instructions_no_gc": 90140.4,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "check_only": {
+          "instructions_total": 112466.805,
+          "instructions_no_gc": 112475.52,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      },
+      {
+        "check_only": {
+          "instructions_total": 112475.52,
+          "instructions_no_gc": 112466.805,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_b": {
+          "instructions_total": 90062.48,
+          "instructions_no_gc": 89981.945,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "thin": {
+          "instructions_total": 104120.665,
+          "instructions_no_gc": 104039.655,
+          "allocations": 20,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        },
+        "off_a": {
+          "instructions_total": 90074.305,
+          "instructions_no_gc": 89992.37,
+          "allocations": 14,
+          "minor_gc_per_request": 0,
+          "major_gc_per_request": 0,
+          "gc_per_1k_allocations": 0
+        }
+      }
+    ]
+  }
+}
