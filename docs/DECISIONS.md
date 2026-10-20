@@ -68,6 +68,7 @@ upper bounds per route, not measured request wins. Re-measure with
 | Item | Est. removable share | Certification needed | State |
 |---|---|---|---|
 | Route lowering under host/protocol `default_url_options` | ~0.3 % Campfire room (19 calls × ~2 µs) | base-AR `to_param`, attribute/type facts; generic script order | parked ([route-helpers.md](passes/route-helpers.md)) |
+| View-scoped route-refusal cache | no current runtime purpose: quarantine removes every route source arm | reconsider only after an exact receiver/body and post-conversion continuation rewrite | parked WIP (patch + local stash), not shipped; no reactivation or further measurements |
 | Template lookup | ≤ 0.42 % blog edit, ≤ 0.24 % Campfire, ≤ 0.23 % Redprints, ≤ 0.08 % PingCRM | filesystem-resolver epoch on `clear_cache`/`DetailsKey.clear`, live details/locals | parked ([erb.md](passes/erb.md)) |
 | Callback machinery (no-around chains) | 0.14–0.98 % across 11 routes | chain identity + set/skip/reset_callbacks epoch | parked; Rails main PR 59094 removes part upstream |
 | `inertia/config_bind` | 0.5–2.8 % on JSON routes (expected) | implemented, opt-in | opt-in; may become obsolete with inertiajs/inertia-rails#437 |
