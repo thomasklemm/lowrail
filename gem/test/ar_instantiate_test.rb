@@ -200,7 +200,7 @@ class ARInstantiateTest < Minitest::Test
     skip "Rails is not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       model = LowrailTest::RAILS_APP.fetch("app/models/widget.rb").sub(
-        "enum :status", "BOOT_DATE = I18n.l(Date.new(1997, 2, 13))\n  enum :status")
+        "enum :status", "BOOT_DATE = I18n.l(Date.new(1997, 2, 13))\n  belongs_to :peer, class_name: 'Widget', foreign_key: :id, optional: true\n  enum :status")
       LowrailTest.write_rails_app(dir, "app/models/widget.rb" => model,
         "app/models/deferred_widget.rb" => <<~'RUBY',
           $deferred_widget_loaded = true
@@ -213,22 +213,26 @@ class ARInstantiateTest < Minitest::Test
       build = ruby_json(<<~'RUBY', chdir: dir, setup: false, env: { "RAILS_ENV" => "test", "RUBYLIB" => GEM_LIB })
         require_relative "config/environment"
         require "lowrail/ar_instantiate_build"
+        require "lowrail/preload_build"
         Widget
         DeferredWidget
         built = Lowrail::ARInstantiateBuild.build
+        built[:units].concat(Lowrail::PreloadBuild.build.fetch(:units))
         built[:units].each_with_index { |unit, id| unit["id"] = id }
         File.write(".lowrail/manifest.json", JSON.generate(format: 1,
           ruby_description: RUBY_DESCRIPTION, compile_option: "", files: {}, units: built[:units]))
-        puts JSON.generate(built[:units].map { _1.fetch("ar_instantiate").fetch("model") })
+        puts JSON.generate(built[:units].filter_map { _1.dig("ar_instantiate", "model") })
       RUBY
       assert_includes build, "Widget"
       assert_includes build, "DeferredWidget"
       code = <<~'RUBY'
         require_relative "config/environment"
         loaded_at_boot = !!$deferred_widget_loaded
+        preloader_at_boot = $LOADED_FEATURES.grep(%r{/active_record/associations/preloader(?:/|\.rb)}).sort
         Widget.create!(name: "localized", password: "password")
+        2.times { Widget.includes(:peer).first.peer.name }
         puts JSON.generate(date: Widget::BOOT_DATE, name: Widget.first.name, loaded_at_boot: loaded_at_boot,
-          deferred: DeferredWidget.first.name,
+          deferred: DeferredWidget.first.name, preloader_at_boot: preloader_at_boot,
           hits: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits.values.sum : 0)
       RUBY
       off, on = %w[0 1].map do |mode|

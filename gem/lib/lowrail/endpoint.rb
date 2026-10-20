@@ -48,7 +48,7 @@ module Lowrail
         @entries = {}
         return unless Rails.version == "8.1.4" && Rails.application.class.name == "RealBlogR4::Application"
         @units.group_by { _1.fetch("endpoint").fetch("controller") }.each do |name, units|
-          klass = Object.const_get(name)
+          klass = Lowrail.loaded_constant(name)
           valid = units.select do |unit|
             data = unit.fetch("endpoint")
             data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha } &&
@@ -152,7 +152,7 @@ module Lowrail
         request = controller.request
         expected = @unit.fetch("endpoint").fetch("action") == "show" ? %w[action controller id] : %w[action controller]
         request.get? && request.format == Mime[:html] && request.variant.empty? &&
-          request.parameters.keys.sort == expected && Object.const_get(@klass.name).equal?(@klass) &&
+          request.parameters.keys.sort == expected && Lowrail.loaded_constant(@klass.name).equal?(@klass) &&
           I18n.locale.to_s == @unit.fetch("endpoint").fetch("locale") &&
           @klass._process_action_callbacks.equal?(@callbacks) &&
           @klass.view_context_class.instance_method(:link_to) == @helper &&

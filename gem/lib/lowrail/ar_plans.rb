@@ -22,14 +22,14 @@ module Lowrail
         require "digest"
         return unless data.fetch("sources").all? { |path, sha| File.file?(path) && Digest::SHA256.file(path).hexdigest == sha }
         @originals = data.fetch("originals").map do |fact|
-          holder = Object.const_get(fact.fetch("receiver"))
+          holder = Lowrail.loaded_constant(fact.fetch("receiver"))
           name = fact.fetch("method").to_sym
           actual = PreloadFacts.method_fact(holder, name).merge("receiver" => fact.fetch("receiver"))
           raise ArgumentError, "query hook changed" unless actual == fact
           [holder, name, holder.instance_method(name)]
         end
         data.fetch("edges").each do |label, edge|
-          owner = Object.const_get(edge.fetch("owner"))
+          owner = Lowrail.loaded_constant(edge.fetch("owner"))
           reflection = owner._reflect_on_association(edge.fetch("name"))
           next unless reflection && PreloadFacts.reflection(reflection) == edge.fetch("reflection")
           next unless [owner, reflection.klass].all? { PreloadFacts.model(_1) == data.fetch("models").fetch(_1.name) }
@@ -77,7 +77,7 @@ module Lowrail
         @defaults = [@owner.default_scopes, @model.default_scopes]
         @role, @shard = @model.current_role, @model.current_shard
         @adapter = @model.with_connection(&:class)
-        @visitor = Object.const_get(visitor_name)
+        @visitor = Lowrail.loaded_constant(visitor_name)
         # Metadata reads can materialize Rails' lazy schema/type state.
         @epochs = [AR.epoch(@owner), AR.epoch(@model)]
         @cache = {}.compare_by_identity
@@ -86,7 +86,7 @@ module Lowrail
 
       def valid?(association, scope)
         association.owner.instance_of?(@owner) && association.klass.equal?(@model) &&
-          Object.const_get(@owner.name).equal?(@owner) && Object.const_get(@model.name).equal?(@model) &&
+          Lowrail.loaded_constant(@owner.name).equal?(@owner) && Lowrail.loaded_constant(@model.name).equal?(@model) &&
           @epochs == [AR.epoch(@owner), AR.epoch(@model)] &&
           @owner.table_name == @tables[0] && @model.table_name == @tables[1] &&
           @owner.columns_hash.equal?(@columns[0]) && @model.columns_hash.equal?(@columns[1]) &&

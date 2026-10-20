@@ -27,15 +27,13 @@ module Lowrail
         return unless Rails.version == @facts["rails_version"]
         require "digest"
         return unless @facts["sources"].all? { |p, sha| File.file?(p) && Digest::SHA256.file(p).hexdigest == sha }
-        # Force autoloads before installing a module/hit counting a unit.
-        ActiveRecord::Associations::Preloader::Association
         @originals = @facts["originals"].to_h do |f|
           name = f.fetch("method").to_sym
           raise ArgumentError, "preloader changed" unless PreloadFacts.method_fact(ActiveRecord::Associations::Preloader, name) == f
           [name, ActiveRecord::Associations::Preloader.instance_method(name)]
         end
         @relation_originals = @facts.fetch("relation_originals", []).map do |fact|
-          holder = Object.const_get(fact.fetch("receiver"))
+          holder = Lowrail.loaded_constant(fact.fetch("receiver"))
           name = fact.fetch("method").to_sym
           method = holder.instance_method(name)
           method = method.super_method while method&.owner == ARPlans::RelationHook
@@ -96,7 +94,8 @@ module Lowrail
           method = method.super_method while method&.owner == ARPlans::RelationHook
           method == original
         end && @facts.fetch("types").all? do |name, methods|
-          PreloadFacts.type_methods(Object.const_get(name)) == methods
+          type = Lowrail.loaded_constant(name)
+          type && PreloadFacts.type_methods(type) == methods
         end
       end
 
@@ -176,7 +175,7 @@ module Lowrail
       end
 
       def valid?
-        Object.const_get(owner.name).equal?(owner) && Object.const_get(target.name).equal?(target) &&
+        Lowrail.loaded_constant(owner.name).equal?(owner) && Lowrail.loaded_constant(target.name).equal?(target) &&
           owner._reflect_on_association(reflection.name).equal?(reflection) &&
           reflection.klass.equal?(target) && [reflection.join_primary_key, reflection.join_foreign_key, reflection.type] == @keys &&
           owner.columns_hash.equal?(@columns[0]) && target.columns_hash.equal?(@columns[1]) &&

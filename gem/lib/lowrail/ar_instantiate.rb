@@ -28,10 +28,7 @@ module Lowrail
           # Even after initialization, forcing a model to load can run lazy
           # framework hooks and change other models' callbacks/SQL. Observe
           # existing constants only; Zeitwerk installs late models naturally.
-          klass = name.split("::").inject(Object) do |owner, part|
-            break if owner.autoload?(part) || !owner.const_defined?(part, false)
-            owner.const_get(part, false)
-          end
+          klass = Lowrail.loaded_constant(name)
           activate_model(klass, unit) if klass
         end
       rescue LoadError => e

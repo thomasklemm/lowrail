@@ -50,8 +50,23 @@ module Lowrail
   NO_RECEIVER = Object.new.freeze
   private_constant :NO_RECEIVER
 
+  CONST_DEFINED = Module.instance_method(:const_defined?)
+  AUTOLOAD = Module.instance_method(:autoload?)
+  CONST_GET = Module.instance_method(:const_get)
+  private_constant :CONST_DEFINED, :AUTOLOAD, :CONST_GET
+
   class << self
     attr_reader :manifest, :root, :refusal_reason
+
+    # Runtime facts observe constants; they never resolve an autoload or
+    # invoke const_missing. A missing dependency means wait or fall back.
+    def loaded_constant(name)
+      name.delete_prefix("::").split("::").inject(Object) do |owner, part|
+        return unless Module === owner && CONST_DEFINED.bind_call(owner, part, false) &&
+          !AUTOLOAD.bind_call(owner, part, false)
+        CONST_GET.bind_call(owner, part, false)
+      end
+    end
 
     def enabled?
       flag = ENV["LOWRAIL"]

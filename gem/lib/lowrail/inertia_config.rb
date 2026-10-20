@@ -82,7 +82,7 @@ module Lowrail
             state[@id] = Guard.validate(@id) &&
               @klass.instance_method(:bind_controller).super_method == @original &&
               @unit.fetch("facts").all? do |fact|
-                holder = Object.const_get(fact.fetch("receiver"))
+                holder = Lowrail.loaded_constant(fact.fetch("receiver"))
                 holder = holder.singleton_class if fact["singleton"]
                 holder.instance_method(fact.fetch("method")).original_name.to_s == fact.fetch("original_name")
               end

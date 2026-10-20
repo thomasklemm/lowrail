@@ -130,7 +130,7 @@ module Lowrail
           return holds_on?(klass, name, fact) && no_instance_override?(klass, name) &&
                  (fact["route"].nil? || route_holds?(klass, name, fact["route"]))
         end
-        mod = Object.const_get(fact.fetch("receiver"))
+        mod = Lowrail.loaded_constant(fact.fetch("receiver")) or return false
         name = fact.fetch("method").to_sym
         singleton = fact["singleton"]
         holds_on?(singleton ? mod.singleton_class : mod, name, fact) &&
@@ -190,9 +190,10 @@ module Lowrail
       def same_definition?(meth, owner, name)
         iseq = RubyVM::InstructionSequence.of(meth) or return false
         owner_mod =
-          if (m = owner.match(/\A#<Class:(.+)>\z/)) then Object.const_get(m[1]).singleton_class
-          else Object.const_get(owner)
+          if (m = owner.match(/\A#<Class:(.+)>\z/)) then Lowrail.loaded_constant(m[1])&.singleton_class
+          else Lowrail.loaded_constant(owner)
           end
+        return false unless owner_mod
         orig = owner_mod.instance_method(name)
         orig.owner == owner_mod && RubyVM::InstructionSequence.of(orig).equal?(iseq)
       rescue NameError, ArgumentError

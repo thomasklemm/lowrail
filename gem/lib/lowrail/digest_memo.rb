@@ -24,12 +24,13 @@ module Lowrail
         valid = Guard.validate(id) && unit.fetch("digest_memo").fetch("sources").all? do |path, sha|
           Manifest.sha256_file(path) == sha
         end && unit.fetch("facts").all? do |fact|
-          mod = Object.const_get(fact.fetch("receiver"))
+          mod = Lowrail.loaded_constant(fact.fetch("receiver"))
           mod = mod.singleton_class if fact["singleton"]
           mod.instance_method(fact.fetch("method")).original_name.to_s == fact.fetch("original_name")
         end
         if valid
-          @algorithms[id] = unit.fetch("digest_memo").fetch("algorithms").map { Object.const_get(_1) }
+          @algorithms[id] = unit.fetch("digest_memo").fetch("algorithms").map { Lowrail.loaded_constant(_1) }
+          return state[id] = false unless @algorithms[id].all?
           # Setup runs before Bundler. Do not activate Digest until the app has.
           @digest ||= ::Digest
           @instance ||= ::Digest::Instance
