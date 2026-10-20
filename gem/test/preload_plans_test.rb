@@ -384,4 +384,18 @@ class PreloadPlansTest < Minitest::Test
       end
     end
   end
+
+  def test_inherited_singleton_getter_fact_names_its_real_owner
+    skip "Rails is not installed" unless LowrailTest.rails_installed?
+    fact = ruby_json(<<~'RUBY')
+      gem "activerecord", "~> 8.1.4"
+      require "active_record"
+      require "lowrail/preload_facts"
+      ActiveRecord::Base.class_attribute :lowrail_owner_probe, default: 17
+      class Post < ActiveRecord::Base; end
+      puts JSON.generate(Lowrail::PreloadFacts.method_fact(Post, :lowrail_owner_probe, singleton: true))
+    RUBY
+    assert_equal "Post", fact.fetch("receiver")
+    assert_equal "#<Class:ActiveRecord::Base>", fact.fetch("owner")
+  end
 end

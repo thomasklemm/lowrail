@@ -57,6 +57,9 @@ module Lowrail
       def source(id)
         <<~RUBY
           def _load_from_sql(result_set, &block)
+            # Alpha's schema attributes are Ractor-local. Do not even read the
+            # main Ractor's unshareable plan from a different Ractor.
+            return super unless ::Ractor.current.equal?(::Ractor.main)
             plan = @_lowrail_instantiate
             unless plan && plan.klass.equal?(self) && plan.valid?
               ::Lowrail::ARInstantiate.count(#{id}, false)

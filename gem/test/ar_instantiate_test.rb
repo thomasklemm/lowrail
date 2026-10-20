@@ -53,6 +53,12 @@ class ARInstantiateTest < Minitest::Test
         super
       end
     end
+    class CustomMetadataPost < Post
+      def self.column_names
+        $metadata_calls = ($metadata_calls || 0) + 1
+        super
+      end
+    end
     class Vehicle < ActiveRecord::Base; end
     class Bicycle < Vehicle; end
     class LatePost < Post; end
@@ -71,6 +77,9 @@ class ARInstantiateTest < Minitest::Test
     Lowrail::ARInstantiateBuild.run(Dir.pwd)
     manifest = JSON.parse(File.read("manifest.json"))
     raise "unit collision" unless manifest["units"].map { _1["id"] }.uniq.size == manifest["units"].size
+    if defined?(ActiveRecord::ModelSchema::SchemaContext)
+      raise "custom alpha metadata lowered" if manifest["units"].any? { _1.dig("ar_instantiate", "model") == "CustomMetadataPost" }
+    end
     if ENV["STALE_AR"]
       manifest["units"].each { |u| u["ar_instantiate"]&.fetch("sources")&.transform_values! { "stale" } }
       File.write("manifest.json", JSON.generate(manifest))
@@ -96,6 +105,9 @@ class ARInstantiateTest < Minitest::Test
     builder_before = ($builder_calls || 0)
     CustomBuilderPost.order(:id).to_a
     builder_calls = $builder_calls - builder_before
+    metadata_before = ($metadata_calls || 0)
+    metadata_rows = CustomMetadataPost.order(:id).map(&:title)
+    metadata_calls = $metadata_calls - metadata_before
     sti = Vehicle.order(:id).map { [_1.class.name, _1.name] }
     # Warm before adding callbacks: a boot-time "empty" assumption must expire.
     LatePost.first
@@ -141,7 +153,8 @@ class ARInstantiateTest < Minitest::Test
     ActiveSupport::Notifications.unsubscribe(subscription)
     hits = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits.values.sum : 0
     puts JSON.generate(snapshot: snapshot, frozen: frozen, inverse: inverse, custom: custom,
-      projection: projection, builder_calls: builder_calls, sti: sti, late: late, yielded: yielded, block: block_result,
+      projection: projection, builder_calls: builder_calls, metadata: [metadata_rows, metadata_calls],
+      sti: sti, late: late, yielded: yielded, block: block_result,
       schema: schema, dispatch: dispatched, new_subclass: new_subclass, events: events, hits: hits)
   RUBY
 
@@ -155,6 +168,7 @@ class ARInstantiateTest < Minitest::Test
       assert_equal [["tfel", "left-internal"], ["thgir", "right-internal"]], off["custom"]
       assert_equal [31, 47], off["projection"]
       assert_equal 2, off["builder_calls"]
+      assert_equal ["left", "right"], off["metadata"].first
       assert_equal [["Bicycle", "two wheels"], ["Vehicle", "plain"]], off["sti"]
       assert_equal ["LEFT", "RIGHT"], off["late"]
       assert_equal ["left", "right"], off["yielded"]

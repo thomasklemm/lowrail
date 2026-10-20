@@ -131,8 +131,12 @@ module Lowrail
     def method_fact(mod, name, singleton: false)
       holder = singleton ? mod.singleton_class : mod
       m = holder.instance_method(name)
+      owner = m.owner.name
+      if owner.nil? && m.owner.singleton_class? && (attached = m.owner.attached_object).is_a?(Module) && attached.name
+        owner = "#<Class:#{attached.name}>"
+      end
       { "receiver" => mod.name, "method" => name.to_s, "singleton" => singleton, "exact" => true,
-        "owner" => m.owner.name || "#<Class:#{mod.name}>",
+        "owner" => owner,
         "source_location" => m.source_location&.join(":"),
         "visibility" => holder.public_method_defined?(name) ? "public" : (holder.protected_method_defined?(name) ? "protected" : "private") }
     end

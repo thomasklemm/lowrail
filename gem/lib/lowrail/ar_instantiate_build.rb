@@ -12,7 +12,8 @@ module Lowrail
     AUDITED = {
       "querying.rb" => %w[3d51fd07ee5bdb2a54bf6c9c301102a6eecaaed9a4b8b27140388c6f0afa6050 1b04b14115fd59910be8bd3ac817535eb232dcb75c64b649591c49f089d1a604 c63a6f147d7b0fd7baba4c07d665138eb31de05608e456e8d3d555c915014862],
       "persistence.rb" => %w[eb8d37094567634d8fcfaa0876234ac52e1e3dab1c8efd50c036b0b15b9329f4 f5ad7f51dc23c2b996dac4d25894a0c75c12fe140c871e39bdc2120d54ed7d58 eee8add6f4a914d133f7638bc006c08b6696e692d5a663b4f5eee34ca2c61d6f],
-      "model_schema.rb" => %w[ac345e5094c9045ca04485b5ada74bf0869dafa02c343cd74675bd415598bc24 c593dd71fb08f82742b72dad61011c66aaf06019d860ddb85f53672ff13d5214 c9e2a46f7d4978d7f71ea04de25a2914dfd411cea018620be7f3d68b5040f93e]
+      "model_schema.rb" => %w[ac345e5094c9045ca04485b5ada74bf0869dafa02c343cd74675bd415598bc24 c593dd71fb08f82742b72dad61011c66aaf06019d860ddb85f53672ff13d5214 c9e2a46f7d4978d7f71ea04de25a2914dfd411cea018620be7f3d68b5040f93e],
+      "schema_context.rb" => %w[c5005016678a863c22f1476c77d9bc3fb5bbc2c75423a3870d884f576e5eb0f8]
     }.freeze
     module_function
 
@@ -47,6 +48,17 @@ module Lowrail
         unless sources.size == 3 && sources.all? { File.file?(_1) && AUDITED.fetch(File.basename(_1), []).include?(Digest::SHA256.file(_1).hexdigest) }
           reason ||= "unaudited Rails implementation"
         end
+        dependencies = alpha_dependencies(klass)
+        framework = %w[activerecord activemodel activesupport].map { Gem.loaded_specs.fetch(_1).full_gem_path + "/" }
+        dependencies.each do |mod, name, singleton|
+          method = singleton ? mod.method(name) : mod.instance_method(name)
+          path = method.source_location&.first
+          reason ||= "custom builder dependency #{mod.name}#{singleton ? '.' : '#'}#{name}" if path && !path.start_with?(*framework)
+          if path&.end_with?("/schema_context.rb") && !AUDITED.fetch("schema_context.rb").include?(Digest::SHA256.file(path).hexdigest)
+            reason ||= "unaudited schema context"
+          end
+          sources << path if path
+        end
         ledger << { "file" => klass.name, "method" => "#{klass.name}._load_from_sql", "pass" => pass,
           "outcome" => reason || "lowered (homogeneous results only)" }
         next if reason
@@ -54,13 +66,14 @@ module Lowrail
         facts = %i[attributes_builder instantiate_instance_of].map do |name|
           PreloadFacts.method_fact(klass, name, singleton: true)
         end
+        dependencies.each { |mod, name, singleton| facts << PreloadFacts.method_fact(mod, name, singleton: singleton) }
         # Include the replaced name so include/prepend/extend resets this unit.
         id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
         facts << { "receiver" => klass.name, "method" => "_load_from_sql", "singleton" => true,
           "owner" => "#<Class:#{klass.name}>", "source_location" => "lowrail:ar_instantiate:#{klass.name}:1",
           "visibility" => "public", "exact" => true }
-        # Initialization, callbacks, type filtering and builder methods remain
-        # live dispatches. Only these two model method calls are bypassed.
+        # Initialization, callbacks, type filtering and build_from_database
+        # remain live. Alpha's builder construction also needs the facts above.
         sources.concat([__FILE__, ARInstantiate.method(:source).source_location.first,
           File.expand_path("ar_guard.rb", __dir__)])
         manifest["units"] << { "id" => id, "kind" => "runtime", "file" => klass.name,
@@ -74,6 +87,21 @@ module Lowrail
       Lowrail.write_json(manifest_path, manifest)
       Lowrail.write_json(ledger_path, ledger)
       warn "[lowrail] AR instantiate: #{manifest['units'].count { _1['pass'] == pass }} model variants"
+    end
+
+    # 8.1 memoizes the builder itself. Alpha reconstructs it on each lookup,
+    # so its getter/constructor closure must also be certified, not just pinned
+    # if an app has replaced a getter with request-dependent behavior.
+    def alpha_dependencies(klass)
+      return [] unless defined?(ActiveRecord::ModelSchema::SchemaContext)
+      context = ActiveRecord::ModelSchema::SchemaContext
+      %i[schema_context schema_loaded? column_names primary_key primary_key_definition _primary_key_definition].map { [klass, _1, true] } +
+        %i[attributes model_class schema_loaded? column_names].map { [context, _1, false] } +
+        %i[builder context defaults types Array].map { [context::Attributes, _1, false] } +
+        %i[initialize build_from_database types default_attributes].map { [ActiveModel::AttributeSet::Builder, _1, false] } +
+        [[ActiveSupport::Ractors, :[], true], [ActiveModel::AttributeSet, :except, false],
+         [ActiveModel::AttributeSet, :attributes, false], [ActiveModel::AttributeSet::Builder, :new, true],
+         [Array, :-, false], [Hash, :except, false]]
     end
   end
 end
