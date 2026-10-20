@@ -29,7 +29,7 @@ stacked set as well as to single passes.
 |---|---|---|
 | Route lowerings | opt-in | Method wins (`article_url` 4.0 → 2.25 µs); no request claim yet |
 | Memo, digest memo | opt-in | Exact; digest memo helped one private app page; stacking candidate |
-| `active_record/instantiate` | opt-in | −38 % load-only on the Rails alpha; upstream fixed the builder (rails/rails@f126797d45), gain disappears on current main. Keep for the guard machinery, not for the win |
+| `active_record/instantiate` | parked | −38 % load-only on the Rails alpha; upstream fixed the builder (rails/rails@f126797d45), gain disappears on current main. Keep for the guard machinery, not for the win. First stacked measurement (blog `/articles`, fixed-heap): default+instantiate is **+0.59 % [+0.53, +0.60] instructions vs default**, i.e. a net cost on Rails 8.1. Parked: never part of a default set on 8.1; the builder should refuse where the per-row guard exceeds the saving |
 | AR plans, preload plans | opt-in | Expected effect < 0.2 %; zero Rails-suite reader/preload hits, being investigated (round 2) |
 | `inertia/config_bind` | opt-in | 5 → 3 objects/bind, expected 0.5–2.8 % on JSON routes; native A/A controls failed. Upstream PR inertiajs/inertia-rails#437 may make it obsolete; keep for older versions only |
 | Whole compiled ERB specialization | in progress | Candidate #2, up to ~2.8 % on blog edit |
