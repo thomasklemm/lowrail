@@ -150,6 +150,12 @@ shape checks and that token are measured; a complete certificate's extra cost
 is unpriced. Therefore these are conditional per-call budgets, not production
 guarded-pass gains or request-speedup claims.
 
+The subsequent opt-in [`inertia/props` pass](props.md) implements a real
+receiver/iterator certificate and mid-call mutation regressions. Its request
+measurements, including the certificate's cost, are separate from these
+conditional micro numbers; the survey is not retrospectively relabeled as
+the guarded pass's performance.
+
 The shared `RequestPairs.heap_instructions` / `HeapWindows` budget seam uses
 six fresh randomized off-A/off-B/variant rounds, fixed five-pool heap floors,
 N=0 subtraction from N=1000, total and GC-excluded Callgrind windows, zero

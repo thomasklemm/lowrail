@@ -130,6 +130,13 @@ Its builder-only publication preceded this registry; activation is now wired
 through the same helper, with separate integration gates in addition to the
 existing-pass before/after equivalence proof.
 
+The opt-in `inertia/props` builder returns a gem-source rewrite through the
+existing runtime `files` protocol, not a replacement resolver subsystem.
+`Passes::InertiaProps` authorizes only native ordinary-Hash iteration at each
+traversal entry, including recursion after app code; the prop body and original
+fallback remain in their original lexical scope. See [its mutation contract
+and measured request cost](passes/props.md).
+
 One `Passes.after_initialize` helper schedules every runtime's `activate`
 through Active Support's `:after_initialize` hook, which also runs immediately
 after an already-completed initialization. Before Rails exists, one temporary

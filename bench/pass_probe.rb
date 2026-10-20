@@ -33,6 +33,9 @@ module PassProbe
       when "inertia/config_bind"
         defined?(Lowrail::Passes::InertiaConfig::Variant) &&
           InertiaRails::Configuration < Lowrail::Passes::InertiaConfig::Variant && Lowrail::Guard.validate(unit.fetch("id"))
+      when "inertia/props"
+        defined?(Lowrail::Passes::InertiaProps) && Lowrail::Passes::InertiaProps.active?(unit.fetch("id")) &&
+          Lowrail::Guard.validate(unit.fetch("id")) && Lowrail::Stats.loaded_files.include?(unit.fetch("file"))
       when "endpoint/action"
         controller = Object.const_get(unit.fetch("endpoint").fetch("controller"))
         entry = Lowrail::Endpoint.entries&.fetch([controller, unit.fetch("endpoint").fetch("action")], nil)

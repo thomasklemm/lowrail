@@ -79,6 +79,11 @@ fn reason(pass: &str, detail: &str) -> &'static str {
             ("custom_view_run", "view_dispatch"), ("helper_implementation", "helper_implementation"),
             ("template:", "template_certificate"),
         ],
+        "inertia/props" => &[
+            ("gem_absent", "gem_absent"), ("unsupported_gem_version", "gem_version"),
+            ("source_changed", "source_changed"), ("resolver_override", "resolver_override"),
+            ("iteration_override", "iteration_override"), ("denylisted", "denylisted"),
+        ],
         "active_record/preload_plans" => &[
             ("missing reflection", "missing_reflection"), ("through association", "through"),
             ("polymorphic belongs_to", "polymorphic"), ("owner-dependent scope", "owner_scope"),

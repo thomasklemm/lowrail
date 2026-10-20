@@ -26,7 +26,8 @@ why and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how a pass plugs in.
   ([counterexamples](docs/passes/endpoint.md#source-arm-quarantine)). That cost
   the blog about 6 % on `/articles`, and we accept the loss.
 - **Opt-in passes exist** (memo, digest memo, AR plans, preload plans,
-  `inertia/config_bind`, the conservative `endpoint/action` slice). Each one
+  `inertia/config_bind`, [`inertia/props`](docs/passes/props.md), the
+  conservative `endpoint/action` slice). Each one
   is exact, but none has an accepted whole-request win yet.
 - **Where speed could come from is measured.** On the blog, rendering is
   25–34 % of a request, events 3–4 %, routing and middleware about 2 %.
@@ -108,7 +109,7 @@ with `Lowrail.refusal_reason`. In development it is off unless `LOWRAIL=1`.
 `+name`/`-name` in order. Names are the stable
 `area/name` identifiers in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 Short aliases are `memo`, `preload_plans`, `ar_instantiate`, `ar_plans`,
-`digest_memo`, `inertia_config` and `endpoint`. File formats are documented in
+`digest_memo`, `inertia_config`, `props` and `endpoint`. File formats are documented in
 [docs/FORMATS.md](docs/FORMATS.md).
 
 ## Complementary optimizations

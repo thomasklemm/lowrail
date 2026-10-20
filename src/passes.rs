@@ -34,6 +34,7 @@ pub const REGISTRY: &[Pass] = &[
     Pass { name: "active_record/instantiate", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "ar_instantiate_build", module: "ARInstantiateBuild" }, alias: "ar_instantiate" },
     Pass { name: "active_record/ar_plans", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "ar_plan_build", module: "ARPlanBuild" }, alias: "ar_plans" },
     Pass { name: "inertia/config_bind", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "inertia_config_build", module: "InertiaConfigBuild" }, alias: "inertia_config" },
+    Pass { name: "inertia/props", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "inertia_props_build", module: "InertiaPropsBuild" }, alias: "props" },
     Pass { name: "endpoint/action", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "endpoint_build", module: "EndpointBuild" }, alias: "endpoint" },
 ];
 
@@ -102,7 +103,7 @@ mod tests {
             ["memo/uri_join", "active_record/instantiate"]);
         assert!(names(Selection::parse("default,-path,+digest/file_memo,-digest_memo").unwrap()).is_empty());
         let mut aliases = Selection::default();
-        for name in ["memo", "preload_plans", "ar_instantiate", "ar_plans", "digest_memo", "inertia_config", "endpoint"] { aliases.set(name, true).unwrap(); }
+        for name in ["memo", "preload_plans", "ar_instantiate", "ar_plans", "digest_memo", "inertia_config", "props", "endpoint"] { aliases.set(name, true).unwrap(); }
         let available = REGISTRY.iter().filter(|p| quarantine_reason(p.name).is_none()).map(|p| p.name).collect::<Vec<_>>();
         assert_eq!(names(aliases), available);
         assert_eq!(names(Selection::parse("all-opt-in").unwrap()), available);

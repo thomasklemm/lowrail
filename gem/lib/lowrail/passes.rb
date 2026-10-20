@@ -12,6 +12,7 @@ module Lowrail
       ARInstantiate: ["ar_instantiate", %w[active_record/instantiate]],
       ARPlans: ["ar_plans", %w[active_record/ar_plans]],
       InertiaConfig: ["inertia_config", %w[inertia/config_bind]],
+      InertiaProps: ["inertia_props", %w[inertia/props]],
       Endpoint: ["endpoint", %w[endpoint/action]]
     }.freeze
 
