@@ -12,6 +12,7 @@ module Lowrail
     IVGET = Kernel.instance_method(:instance_variable_get)
     IVSET = Kernel.instance_method(:instance_variable_set)
     TRACE_STAT = TracePoint.method(:stat)
+    TRACE_ENABLED = TracePoint.instance_method(:enabled?)
     TIMEOUT = Regexp.method(:timeout)
     NATIVE_TIMEOUT = TIMEOUT.source_location.nil? && TIMEOUT.original_name == :timeout
     STRING_PRIVATE = String.private_instance_methods(false).sort.freeze
@@ -43,11 +44,15 @@ module Lowrail
         @tracing = false
         TracePoint.singleton_class.prepend(TraceConstructors)
         TracePoint.prepend(TraceActivation)
+        # Lowrail's preexisting RSpec attach hook observes only :end. Neither
+        # certified operation executes class/module bodies; keep this hook intact.
+        @reporter_trace = IVGET.bind_call(Lowrail::RSpec, :@load_hook) if defined?(Lowrail::RSpec)
+        @reporter_trace = nil unless TracePoint === @reporter_trace
         sentinel = Object.new
         visible = false
         ObjectSpace.each_object do |object|
           visible = true if sentinel.equal?(object)
-          @tracing = true if TracePoint === object
+          @tracing = true if TracePoint === object && !object.equal?(@reporter_trace)
         end
         # ObjectSpace omits unshareable objects after multi-ractor mode starts.
         @tracing = true unless visible
@@ -101,7 +106,9 @@ module Lowrail
     def prepared(id)
       unit = @units[id]
       # TracePoint.stat excludes targeted hooks; @tracing is sticky for them.
-      return false unless unit && !@tracing && TRACE_STAT.call.each_value.all? { _1.first.zero? }
+      return false unless unit && !@tracing
+      passive = @reporter_trace && TRACE_ENABLED.bind_call(@reporter_trace) ? 1 : 0
+      return false unless TRACE_STAT.call.each_value.all? { _1.first == passive }
       state = Guard.state
       # Any method invalidation starts a new memo generation, even if a patch
       # restores the same owner/source line. Never revive an old generation.

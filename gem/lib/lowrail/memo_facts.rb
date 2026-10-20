@@ -93,7 +93,7 @@ module Lowrail
           facts << method_fact(mod, name, singleton: true)
         end
       end
-      %w[memo.rb memo_facts.rb].each do |file|
+      %w[memo.rb memo_facts.rb rspec.rb].each do |file|
         path = File.join(__dir__, file)
         stat = File.stat(path)
         files[path] = { "mtime" => stat.mtime.to_r.to_s, "size" => stat.size, "sha256" => Digest::SHA256.file(path).hexdigest }
@@ -135,7 +135,7 @@ module Lowrail
         end
       end
       sources = [path, *$LOADED_FEATURES.select { _1.end_with?("/digest.so", "/digest/sha2.so") },
-        File.join(__dir__, "memo.rb"), __FILE__].uniq.to_h do |file|
+        File.join(__dir__, "memo.rb"), File.join(__dir__, "rspec.rb"), __FILE__].uniq.to_h do |file|
         stat = File.stat(file)
         [file, { "mtime" => stat.mtime.to_r.to_s, "size" => stat.size, "sha256" => Digest::SHA256.file(file).hexdigest }]
       end

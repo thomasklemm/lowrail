@@ -187,6 +187,38 @@ class MemoTest < Minitest::Test
     assert_equal({ "injects" => 3, "traces" => 3, "defaults" => 6, "finds" => 6 }, out)
   end
 
+  def test_passive_rspec_reporter_keeps_its_lifecycle_without_hiding_other_tracing
+    skip "rspec not installed" if Gem::Specification.find_all_by_name("rspec-core").empty?
+    prefix = "require 'lowrail/rspec'; Lowrail::RSpec.install('/unused-memo-report')\n"
+    out = ruby_json(prefix + PRELUDE + <<~'RUBY')
+      hook = Lowrail::RSpec.instance_variable_get(:@load_hook)
+      2.times { joined("https://one.test", "/x") }
+      raise "disabled reporter" unless hook.enabled?
+      hits = Lowrail::Stats.unit_hits.fetch("0", 0)
+      raise "reporter prevented memo" unless hits > 0
+      2.times do |phase|
+        calls = 0
+        set_trace_func(proc { |event, _, _, id, _, owner| calls += 1 if event == "call" && id == :join && owner == URI })
+        3.times { joined("https://one.test", "/x") }
+        set_trace_func(nil)
+        raise "lost legacy events in phase #{phase}: #{calls}" unless calls == 3
+        2.times { joined("https://one.test", "/x") }
+        require "rspec/core" if phase == 0
+      end
+      raise "reporter did not attach" if hook.enabled?
+      raise "did not resume after attach" unless Lowrail::Stats.unit_hits.fetch("0") > hits
+      # A stale passive-hook implementation invalidates the certificate too.
+      cert.fetch("sources").find { |path,_| path.end_with?("/rspec.rb") }.last["sha256"] = "0" * 64
+      Lowrail::Memo.install(manifest)
+      before = Lowrail::Stats.unit_hits.fetch("0")
+      2.times { joined("https://one.test", "/x") }
+      raise "stale reporter certificate" unless before == Lowrail::Stats.unit_hits.fetch("0")
+      puts JSON.generate({ hits: hits, reporter_disabled_after_attach: !hook.enabled? })
+    RUBY
+    assert_operator out.fetch("hits"), :>, 0
+    assert_equal true, out.fetch("reporter_disabled_after_attach")
+  end
+
   def test_timeouts_and_preexisting_or_later_tracing_decline_reuse
     out = ruby_json(PRELUDE + <<~'RUBY')
       calls = 0
