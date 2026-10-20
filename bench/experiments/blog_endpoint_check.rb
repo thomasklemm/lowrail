@@ -10,15 +10,21 @@ if ARGV.first != "worker"
   require "rbconfig"
   app, output = ARGV.first(2).map { File.expand_path(_1) }
   mutation = ARGV[2] || "none"
-  abort "usage: blog_endpoint_check.rb APP NEW_OUTPUT_DIR [MUTATION]" unless app && output
+  build = ARGV[3] && File.expand_path(ARGV[3])
+  abort "usage: blog_endpoint_check.rb APP NEW_OUTPUT_DIR [MUTATION [BUILD_DIR]]" unless app && output
   abort "output directory must be new" if File.exist?(output)
   FileUtils.mkdir_p(output, mode: 0o700)
+  if build
+    FileUtils.mkdir_p(File.join(output, "root"))
+    FileUtils.ln_s(build, File.join(output, "root/.lowrail"))
+  end
   lib = File.expand_path("../../gem/lib", __dir__)
   %w[off on].each do |arm|
     env = {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1",
       "LOWRAIL" => arm == "on" ? "1" : "0", "LOWRAIL_STATS" => "",
       "LOWRAIL_SHADOW" => "strict", "ENDPOINT_MUTATION" => mutation,
       "RUBYOPT" => "-I#{lib} -rlowrail/setup"}
+    env["LOWRAIL_ROOT"] = File.join(output, "root") if build
     ok = system(env, RbConfig.ruby, File.expand_path(__FILE__), "worker", File.join(output, "#{arm}.json"),
       chdir: app, out: File.join(output, "#{arm}.log"), err: [:child, :out])
     abort "#{arm} worker failed; inspect private log" unless ok
@@ -30,8 +36,12 @@ if ARGV.first != "worker"
     fields = (left.keys | right.keys).reject { left[_1] == right[_1] }
     abort "specimen #{index} differs: #{fields.join(', ')}; private raw responses retained"
   end
-  counts = on.fetch(%w[none render_subscriber].include?(mutation) ? "endpoint_hits" : "endpoint_fallbacks")
-  raise "endpoint coverage missing" unless counts.size == 2 && counts.values.all?(&:positive?)
+  if build && on.fetch("endpoint_hits").empty?
+    raise "default source coverage missing" if on.fetch("hits").empty?
+  else
+    counts = on.fetch(%w[none render_subscriber].include?(mutation) ? "endpoint_hits" : "endpoint_fallbacks")
+    raise "endpoint coverage missing" unless counts.size == 2 && counts.values.all?(&:positive?)
+  end
   puts "144 isolated pairs identical (#{mutation}): status, body, ALL headers, ordered SQL, controller/render event trace"
   puts "on hits=#{on.fetch('hits').inspect}; fallbacks=#{on.fetch('fallbacks').inspect}"
   exit
@@ -124,6 +134,7 @@ end
 
 mutation = ENV.fetch("ENDPOINT_MUTATION", "none")
 mod = ActionView::Helpers::UrlHelper
+armed = false
 patch = -> {
   original = mod.instance_method(:link_to)
   mod.define_method(:link_to) do |*args, **kwargs, &block|
@@ -155,12 +166,14 @@ when "filter"
 when "locale"
   I18n.available_locales = (I18n.available_locales + [:fr]).uniq
   I18n.locale = :fr
-when "subscriber"
+when "subscriber", "warm_suppressed"
   applied = false
   subscriber = Object.new
   subscriber.define_singleton_method(:start) do |*|
+    next if mutation == "warm_suppressed" && !armed
     unless applied
       applied = true
+      mod.define_singleton_method(:method_added) { |_| } if mutation == "warm_suppressed"
       patch.call
     end
   end
@@ -184,6 +197,7 @@ shapes = [{}, {"HTTP_ACCEPT" => accept}, {"HTTP_ACCEPT" => "text/html"},
   {"HTTP_USER_AGENT" => "Mozilla/5.0 Chrome/130.0.0.0 Safari/537.36"}, {"QUERY_STRING" => "extra=1"}]
 # Materialize all formats outside every comparison, symmetrically.
 paths.product(shapes).each { |path, headers| request.call(path, headers, nil, false) }
+armed = true
 responses = []
 %w[stock escaped empty].each do |fixture|
   Article.transaction(requires_new: true) do
