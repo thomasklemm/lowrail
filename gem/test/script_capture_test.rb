@@ -38,7 +38,9 @@ class ScriptCaptureTest < Minitest::Test
     facts = Lowrail::Facts.collect(app_root: Dir.pwd, generated_dir: File.join(dir, "generated"))
     target = facts["modules"].find { |m| m["name"] == "Gen::Target" }
     ours = facts["generated_scripts"].select { |s| s["path"].include?("fixture.rb") || s["path"].start_with?("gen/") }
-    puts JSON.generate("methods" => target["methods"], "scripts" => ours, "stats" => facts["generated_stats"])
+    probe = Gen::Target.instance_method(:alpha)
+    stable = RubyVM::InstructionSequence.of(probe).equal?(RubyVM::InstructionSequence.of(probe))
+    puts JSON.generate("methods" => target["methods"], "scripts" => ours, "stats" => facts["generated_stats"], "identity_stable" => stable)
   RUBY
 
   def test_scripts_are_captured_indexed_and_linked
@@ -77,13 +79,20 @@ class ScriptCaptureTest < Minitest::Test
       end
 
       # Methods compiled inside a script carry its digest, including blocks
-      # (define_method) and methods reported at the real file's line.
-      assert_equal readers["sha256"], methods["alpha"]["script"]
-      assert_equal readers["sha256"], methods["beta"]["script"]
-      assert_equal heredoc["sha256"], methods["gamma"]["script"]
+      # (define_method) and methods reported at the real file's line. VMs
+      # without compilation identity must record a refusal, not guess a link.
+      if data.fetch("identity_stable")
+        refute data["stats"].key?("linking_decline")
+        assert_equal readers["sha256"], methods["alpha"]["script"]
+        assert_equal readers["sha256"], methods["beta"]["script"]
+        assert_equal heredoc["sha256"], methods["gamma"]["script"]
+        assert_equal heredoc["sha256"], methods["delta"]["script"]
+        assert_equal evaled["sha256"], methods["epsilon"]["script"]
+      else
+        assert_match(/\Aiseq_identity_unavailable:/, data["stats"].fetch("linking_decline"))
+        assert methods.values.none? { _1.key?("script") }, "no fabricated compilation identity"
+      end
       assert_equal "gen/heredoc.rb:10", methods["gamma"]["source_location"]
-      assert_equal heredoc["sha256"], methods["delta"]["script"]
-      assert_equal evaled["sha256"], methods["epsilon"]["script"]
       assert_nil methods["plain"]["script"]
       assert_operator data["stats"]["compilations"], :>=, 4
     end

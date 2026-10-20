@@ -60,7 +60,7 @@ module Lowrail
         @types_only = types_only
         @samples = [samples, 1].max
         @extra = methods
-        @hooked = {}.compare_by_identity # iseq => record
+        @hooked = {} # UnboundMethod equality survives fresh ISeq wrappers.
         @records = []
         @t0 = clock
         @timings = {}
@@ -158,11 +158,11 @@ module Lowrail
       def hook(um, mod)
         iseq = RubyVM::InstructionSequence.of(um)
         return unless iseq
-        return if @hooked.key?(iseq)
+        return if @hooked.key?(um)
         rec = {"module" => label(mod), "name" => um.name.to_s, "singleton" => MOD_SINGLETON_P.bind_call(mod),
                "source_location" => (loc = um.source_location) && "#{loc[0]}:#{loc[1]}",
                "calls" => 0, "self" => Hash.new(0), "args" => {}, "ivars" => {}, "returns" => Hash.new(0), "saturated" => false}
-        @hooked[iseq] = rec
+        @hooked[um] = rec
         cap = @samples
         tp = TracePoint.new(:call, :return) do |t|
           if t.event == :call
@@ -278,6 +278,9 @@ module Lowrail
           .sort_by { |e| [e["path"], e["lineno"], e["sha256"]] }
         out["generated_stats"] = {"scripts" => ScriptCapture.count, "compilations" => ScriptCapture.compilations,
                                   "bytes" => ScriptCapture.compiled_bytes, "hook_seconds" => ScriptCapture.hook_seconds.round(3)}
+        if (reason = ScriptCapture.linking_decline)
+          out["generated_stats"]["linking_decline"] = reason
+        end
         out["samples_per_method"] = @samples
         out["types"] = (@records || []).select { |r| r["calls"] > 0 }.map { |r| finish(r) }
           .sort_by { |r| [r["module"], r["singleton"] ? 1 : 0, r["name"]] }

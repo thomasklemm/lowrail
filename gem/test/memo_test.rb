@@ -274,9 +274,10 @@ class MemoTest < Minitest::Test
     ["trace = TracePoint.new(:call) {}\n", "Ractor.new { 1 }.value\n"].each do |prefix|
       out = ruby_json(prefix + PRELUDE + <<~'RUBY')
         2.times { joined("https://one.test", "/x") }
-        puts JSON.generate({ hits: Lowrail::Stats.unit_hits.fetch("0", 0) })
+        puts JSON.generate({ hits: Lowrail::Stats.unit_hits.fetch("0", 0), refusal: Lowrail::Memo.refusal_reason })
       RUBY
       assert_equal 0, out.fetch("hits")
+      assert_match(/\Aractor_trace_visibility:/, out.fetch("refusal")) if prefix.start_with?("Ractor")
     end
   end
 

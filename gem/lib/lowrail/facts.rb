@@ -95,6 +95,9 @@ module Lowrail
             "bytes" => ScriptCapture.compiled_bytes,
             "hook_seconds" => ScriptCapture.hook_seconds.round(3),
           }
+          if (reason = ScriptCapture.linking_decline)
+            out["generated_stats"]["linking_decline"] = reason
+          end
         end
         @script_index = nil
         out["errors"] = @errors.sort_by { |e| [e["where"], e["error"]] }

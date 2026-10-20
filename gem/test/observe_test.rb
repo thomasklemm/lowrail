@@ -47,7 +47,7 @@ class ObserveTest < Minitest::Test
       env = CLEAN_ENV.merge("RUBYOPT" => "-I#{GEM_LIB} -rlowrail/observe", "LOWRAIL" => "0",
                             "LOWRAIL_OBSERVE" => obs, "LOWRAIL_OBSERVE_SAMPLES" => samples.to_s,
                             "LOWRAIL_OBSERVE_TYPES_ONLY" => types_only ? "1" : "0",
-                            "LOWRAIL_OBSERVE_METHODS" => "ActiveRecord::Base#save!,Nope#missing")
+                            "LOWRAIL_OBSERVE_METHODS" => "ActiveRecord::Base#save!,ActiveRecord::Base#save!,Nope#missing")
       out, err, status = Open3.capture3(env, RUBY, "-Itest", "test/models/widget_test.rb", chdir: dir)
       files = Dir[File.join(obs, "observed-*.json")]
       data = files.size == 1 ? JSON.parse(File.read(files.first)) : nil
@@ -79,9 +79,15 @@ class ObserveTest < Minitest::Test
     # Without materialize, attribute methods appear during the run.
     m = defined("Widget::GeneratedAttributeMethods", "name")
     refute_nil m
-    assert m["script"], "linked to its generated script"
-    assert(@o["generated_scripts"].any? { |s| s["sha256"] == m["script"] && s["phase"] == "test" })
-    assert File.exist?(File.join(@dir, ".lowrail", "generated", "#{m["script"]}.rb"))
+    if (reason = @o["generated_stats"]["linking_decline"])
+      assert_match(/\Aiseq_identity_unavailable:/, reason)
+      refute m.key?("script")
+      assert(@o["generated_scripts"].any? { |s| s["phase"] == "test" })
+    else
+      assert m["script"], "linked to its generated script"
+      assert(@o["generated_scripts"].any? { |s| s["sha256"] == m["script"] && s["phase"] == "test" })
+      assert File.exist?(File.join(@dir, ".lowrail", "generated", "#{m["script"]}.rb"))
+    end
     # Relation delegation generated on first call through a relation.
     assert defined("Widget::GeneratedRelationMethods", "cheapest")
     # Test code is defined after boot too.
@@ -101,6 +107,7 @@ class ObserveTest < Minitest::Test
     # Framework method from LOWRAIL_OBSERVE_METHODS.
     save = types("ActiveRecord::Base", "save!")
     refute_nil save, @o["types"].map { |t| t.values_at("module", "name") }.inspect
+    assert_equal 1, @o["types"].count { |t| t["module"] == "ActiveRecord::Base" && t["name"] == "save!" }, "repeated targets must not duplicate profiles"
     assert_equal({"TrueClass" => 1}, save["returns"])
     assert_equal({}, save["args"], "anonymous ** is not sampled")
     greet = types("Widget", "greet")

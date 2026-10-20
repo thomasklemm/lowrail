@@ -175,7 +175,12 @@ A method's `script` is set when its ISeq was compiled inside a captured
 script (identity of the ISeq, through `InstructionSequence#each_child`),
 including `define_method` blocks inside the script and methods whose
 `source_location` points into a real gem file because eval was given
-`__FILE__, __LINE__`. `src/facts/generated.rs` finds the exact `def` (or
+`__FILE__, __LINE__`. On VMs with fresh ISeq wrappers (4.1 preview), exact
+linking is refused: `generated_stats.linking_decline` records
+`iseq_identity_unavailable: ...`, and methods have no guessed `script` key.
+Captured sources and ordinary method facts remain available. Bytecode/source
+equality cannot replace compilation identity or certify lexical environments.
+`src/facts/generated.rs` finds the exact `def` (or
 call) at the relative line with Prism; untagged methods are matched by path,
 line range and a `def` of that name as a fallback. `lowrail facts APP --show
 Mod#meth` prints a method's origin and generated body.

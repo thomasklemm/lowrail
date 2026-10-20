@@ -71,20 +71,30 @@ class MaterializeTest < Minitest::Test
     assert_equal %w[_row.html.erb index.html.erb], compiled
     container = @f["modules"].find { |m| m["synthetic"] && m["name"].end_with?("view_context_class") }
     index = container["methods"].find { |m| m["source_location"]&.include?("widgets/index.html.erb") }
-    script = @f["generated_scripts"].find { |s| s["sha256"] == index["script"] }
-    assert_equal "materialize:templates", script["phase"]
-    source = File.read(File.join(@dir, ".lowrail", "generated", "#{script["sha256"]}.rb"))
-    assert_includes source, "def #{index["name"]}(local_assigns, output_buffer"
+    if (reason = @f["generated_stats"]["linking_decline"])
+      assert_match(/\Aiseq_identity_unavailable:/, reason)
+      refute index.key?("script")
+    else
+      script = @f["generated_scripts"].find { |s| s["sha256"] == index["script"] }
+      assert_equal "materialize:templates", script["phase"]
+      source = File.read(File.join(@dir, ".lowrail", "generated", "#{script["sha256"]}.rb"))
+      assert_includes source, "def #{index["name"]}(local_assigns, output_buffer"
+    end
     helpers = @f["modules"].find { |m| m["name"] == "Rails.application.routes.named_routes.path_helpers_module" }
     assert_equal %w[widget_path widgets_path], helpers["methods"].map { |m| m["name"] }.sort
   end
 
   def test_generated_scripts_cover_attribute_methods
     title = mod("Widget::GeneratedAttributeMethods")["methods"].find { |m| m["name"] == "name" }
-    script = @f["generated_scripts"].find { |s| s["sha256"] == title["script"] }
-    refute_nil script, "attribute reader is linked to its generated script"
-    assert_equal "materialize:models", script["phase"]
-    assert_includes File.read(File.join(@dir, ".lowrail", "generated", "#{script["sha256"]}.rb")), "def name;"
+    if (reason = @f["generated_stats"]["linking_decline"])
+      assert_match(/\Aiseq_identity_unavailable:/, reason)
+      refute title.key?("script")
+    else
+      script = @f["generated_scripts"].find { |s| s["sha256"] == title["script"] }
+      refute_nil script, "attribute reader is linked to its generated script"
+      assert_equal "materialize:models", script["phase"]
+      assert_includes File.read(File.join(@dir, ".lowrail", "generated", "#{script["sha256"]}.rb")), "def name;"
+    end
   end
 end
 
@@ -112,7 +122,13 @@ class MaterializeCorpusTest < Minitest::Test
     assert_operator f["compiled_templates"].count { |t| t["in_app"] }, :>, 5
     assert(f["modules"].any? { |m| m["synthetic"] && m["name"].end_with?(".view_context_class") && !m["methods"].empty? })
     assert_equal sidecar_files, f["generated_scripts"].map { |s| s["sha256"] }.uniq.size
-    assert_operator f["modules"].sum { |m| m["methods"].count { |x| x["script"] } }, :>, 1000
+    linked = f["modules"].sum { |m| m["methods"].count { |x| x["script"] } }
+    if (reason = f["generated_stats"]["linking_decline"])
+      assert_match(/\Aiseq_identity_unavailable:/, reason)
+      assert_equal 0, linked
+    else
+      assert_operator linked, :>, 1000
+    end
   end
 
   def test_real_blog = check(*facts_for("real-blog-r4"))

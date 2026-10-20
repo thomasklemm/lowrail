@@ -1,12 +1,58 @@
 # Ruby 4.1 preview / ZJIT investigation
 
-2026-10-20. **Keep Ruby 4.0.7 primary. The 4.1 column is blocked, not
-supported.** The pinned preview builds with both JITs, but the unchanged
-corpus cannot resolve its dependencies, and Lowrail's own suite fails on it.
-The requested compatibility stop applies: no ZJIT benchmark mode or flat gate
-is shipped and no performance cohort was started. The independent
-[dual-JIT shape guide](jit-shapes.md), warning-only bytecode check and opt-in
-diagnostics do not change any pass or weaken any gate.
+2026-10-20. **Ruby 4.0 and 4.1 are correctness targets; 4.0.7 remains the
+measurement primary while 4.1 is a preview.** Ruby 3.4 is no longer a target.
+This is a target policy, not a claim that the application matrix already
+passes. The pinned preview builds with both JITs. The initial unchanged-bundle
+failure study below is retained as evidence; the authorized follow-up fixes
+Lowrail first, then tests source-Nokogiri dependency workarounds in disposable
+copies only. ZJIT measurement remains conditional on both steps being green.
+The [dual-JIT shape guide](jit-shapes.md), warning-only bytecode check and
+opt-in diagnostics do not weaken any gate.
+
+## Follow-up step 1: own-code compatibility
+
+- **Generated-script linking refuses exactly.** The preview's `iseqw_new`
+  allocates fresh wrappers; `of(method)` cannot identify the wrapper visited
+  through `each_child`. Capture and ordinary method facts still work, but
+  facts/observation now record `generated_stats.linking_decline` beginning
+  `iseq_identity_unavailable`, with no fabricated `script` links. Structural
+  bytecode, source hash and path/line equality do not establish compilation
+  identity or lexical environment. On 4.0.7 the identity map and all links are
+  unchanged. Tests require links where identity exists, and the explicit
+  refusal where it does not; they do not skip the unsupported case.
+- **Observation deduplication uses UnboundMethod equality**, not transient
+  ISeq wrappers. Repeated explicit observation targets must yield one profile.
+- **URI 1.1.2:** the bundled preview `common.rb` differs from the certified
+  installed 1.1.2 by three documentation links only. Added its exact SHA256
+  to the whitelist; the other four source files are identical. No version-wide
+  trust or source-check bypass.
+- **Digest 3.3.0:** `digest.rb` and `sha2init.c` are identical to 3.2.1's
+  Ruby 4.0.7 copies. The `digest.c` diff changes export linkage, length-number
+  conversion in `digest_length`, and initializes a metadata-search local to
+  nil; the SHA256/base64digest call closure is unchanged. The expression
+  certificate accepts exactly 3.2.1/3.3.0, retaining method/source checks and
+  runtime native-binary fingerprints. This does not extend `digest/file_memo`.
+- **Endpoint zero-hit explained and fixed:** a captured request shows matching
+  template bodies but different 4.1 `source_hash` metadata after Rails generates
+  fresh method names. Exclude this parser field alongside node IDs/locations;
+  keep the executable instructions, literals and every existing certificate.
+  The original end-to-end mutation/visibility/event test now exercises hits
+  on both versions instead of silently using the original template.
+- **Ractor refusal:** after URI certification, its existing regression test
+  exposed 4.1's changed ObjectSpace visibility. `gc.c:2060–2105` now exposes
+  our own heap in multi-Ractor mode while hiding foreign unshareable objects.
+  The old sentinel alone no longer certifies tracing visibility. A visible
+  non-main Ractor now conservatively disables reuse; `Memo.refusal_reason`
+  records `ractor_trace_visibility`. Keep the old sentinel too. No hot-path
+  instruction was added; this is setup-time admission, not a tracing workaround.
+
+Step-1 checks: full 4.0.7 `rake test` **101 runs / 1,203 assertions, zero
+failures/errors, 20 skips**. 4.1 own-code suite (`--exclude '/Corpus/'`)
+**98 / 1,124, zero failures/errors, 21 skips**. The three excluded tests boot
+the original corpus bundles and still fail at the documented dependency
+boundary, so the full 4.1 suite is **not yet green**. They must run again
+against the disposable copies in step 2; this exclusion is not a support gate.
 
 ## Exact interpreter and reproducible matrix axis
 
@@ -78,7 +124,7 @@ BENCH_JIT=1 mise exec ruby@4.1.0-preview1 -- target/debug/lowrail bench \
 The final bench command is an example of version selection, **not an executed
 or accepted measurement**. `BENCH_JIT` still accepts only `0`/`1`.
 
-## Correctness matrix: unchanged applications first
+## Initial correctness matrix: unchanged applications first
 
 Lowrail base:
 [`07205de`](https://github.com/thomasklemm/lowrail/commit/07205de08030f5406eb224b3bfe467fd01be799f).

@@ -53,13 +53,19 @@ module Lowrail
         ObjectSpace.each_object do |object|
           visible = true if sentinel.equal?(object)
           @tracing = true if TracePoint === object && !object.equal?(@reporter_trace)
+          if Ractor === object && !object.equal?(Ractor.main)
+            @tracing = "ractor_trace_visibility: cannot certify tracing in another Ractor's heap"
+          end
         end
-        # ObjectSpace omits unshareable objects after multi-ractor mode starts.
-        @tracing = true unless visible
+        # 4.0 hides even our sentinel after multi-Ractor mode starts. 4.1
+        # exposes our heap again, but still hides other Ractors' TracePoints.
+        @tracing ||= "ractor_trace_visibility: ObjectSpace hides unshareable tracing state" unless visible
       end
       @units = units.to_h { [_1.fetch("id"), _1] }
       @prepared = {}
     end
+
+    def refusal_reason = (String === @tracing ? @tracing : nil)
 
     def tracing!
       @tracing = true if Ractor.main?

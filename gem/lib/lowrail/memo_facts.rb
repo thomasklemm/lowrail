@@ -8,7 +8,8 @@ module Lowrail
   # merely by recording its current owner/source. Unknown implementations decline.
   module MemoFacts
     SOURCES = {
-      "common.rb" => %w[34d54db928f8bbe0f809054fe14227754f8fed0a6e8571dc76cfc63bfbe9c2db cbd572dad20a8146bda78001cc94b3ecf5f3f10786401579429f35c52b0d3026],
+      # The preview's bundled 1.1.2 changes three documentation links only.
+      "common.rb" => %w[34d54db928f8bbe0f809054fe14227754f8fed0a6e8571dc76cfc63bfbe9c2db cbd572dad20a8146bda78001cc94b3ecf5f3f10786401579429f35c52b0d3026 b692509e9d303b33d9c4350a9c7267c951cca59fa9f8b9c85e0d62ed5dafd652],
       "generic.rb" => %w[29153bbd5f742b5666fd99b00abd9dc81619cdda2647efcf9e1177660cf4965b 92977ce363df1b55dd2b8215d8854504ba125045ff7cb04e817189f8482c2568],
       "http.rb" => %w[41506c2a655ae190cd8a7f30ab578e4127d2b54dda455f5f6a3fae559bda17fa],
       "https.rb" => %w[f0ccad29b07fb7dab6a8e6a343fb1b123b5849ac122e9b83d8b57ab6831684ab],
@@ -103,12 +104,12 @@ module Lowrail
       { "decline" => e.message }
     end
 
-    # Digest 3.2.1's C implementation allocates a private digest, calls
+    # Digest 3.2.1/3.3.0's audited C path allocates a private digest, calls
     # initialize/digest/reset/update/finish/reset, then Array#pack('m0').
     # There are no file reads, clock reads, provider config or caller mutation.
     def digest
       require "digest/sha2"
-      raise "uncertified Digest version" unless Digest::VERSION == "3.2.1"
+      raise "uncertified Digest version" unless %w[3.2.1 3.3.0].include?(Digest::VERSION)
       method = Digest::SHA256.method(:base64digest)
       path = method.source_location&.first
       raise "uncertified base64digest" unless path && method.owner.equal?(Digest::Class.singleton_class) &&

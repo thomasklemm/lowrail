@@ -12,8 +12,8 @@ module Lowrail
   # path, eval line, defining module, caller). The top-level ISeq of every
   # compilation is retained so that, at dump time, a method's ISeq can be
   # mapped back to the script that defined it by identity
-  # (RubyVM::InstructionSequence#each_child). Wrapper objects are cached by
-  # the VM, so identity holds.
+  # (RubyVM::InstructionSequence#each_child). On VMs without cached wrappers
+  # (Ruby 4.1), capture still works but exact method linking is refused.
   #
   # Loaded from RUBYOPT by lowrail/observe: requires no default gems at load
   # (digest is required at dump time).
@@ -92,10 +92,18 @@ module Lowrail
 
       def count = list.size
 
+      def linking_decline
+        probe = method(:walk)
+        return if RubyVM::InstructionSequence.of(probe).equal?(RubyVM::InstructionSequence.of(probe))
+        "iseq_identity_unavailable: VM returns fresh wrappers; bytecode/source equality is not compilation identity"
+      end
+
       # Identity map from every ISeq compiled inside a script (methods,
-      # blocks, class bodies) to the script.
+      # blocks, class bodies) to the script. Never guess using source locations
+      # or bytecode: identical bodies can have different lexical environments.
       def iseq_index
         index = {}.compare_by_identity
+        return index if linking_decline
         list.each do |s|
           s.iseqs.each { |iseq| walk(iseq, s, index) }
         end

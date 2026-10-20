@@ -31,8 +31,9 @@ module Lowrail
           value = value.map { canonicalize.call(_1) }
           if value.first == "YARVInstructionSequence/SimpleDataFormat"
             # These fields describe parser locations, not executed code. The
-            # compiled-template name contains an intentionally process-local ID.
-            value[4] = value[4].reject { |key, _| %i[node_id node_ids code_location].include?(key) }
+            # compiled-template name contains an intentionally process-local ID,
+            # also included in Ruby 4.1's source_hash. Keep all executable fields.
+            value[4] = value[4].reject { |key, _| %i[node_id node_ids code_location source_hash].include?(key) }
             value[5] = value[5].gsub(label, "<template>")
           end
           value
