@@ -1,0 +1,1097 @@
+{
+  "format": 1,
+  "scope": "Pre-fix diagnostics only; no link_to promotion, no hypothetical trace-tax subtraction",
+  "delivery_boundary": "ca814ae9168946d90e9895e9feb4d85ed68c4c2b",
+  "interpreter": {
+    "index": {
+      "status": "accepted",
+      "measurement_complete": false,
+      "route": "GET:/articles",
+      "coverage": {
+        "requests": 10,
+        "route_completions_per_request": 0,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+        "units": [
+          {
+            "fallbacks_per_request": 0,
+            "hits_per_request": 7,
+            "id": 0,
+            "pass": "sealed/link_to"
+          }
+        ],
+        "yjit": false,
+        "zjit": false
+      },
+      "manifest_sha256": "be50b7449dc9f9855da5534afb1a67ba72637256319c1aff13b5b3975875650b",
+      "runtime_fingerprint_sha256": "2e51c2f92f4eb477d8b594ac1066c39f463bb780649d88c6c3d0ed130d4fd41a",
+      "harness_fingerprint_sha256": "eea7b851cee792df1909ed224128e743e9e229da1a2bf80b0e4c66dd4f3a2667",
+      "request_context_sha256": "7abfd86e688ffe435d358a9a2499dce394bf1a203c56fe6160622a8e72c15ba4",
+      "provenance": {
+        "requested_jit": "interpreter",
+        "actual_jit": [
+          "interpreter"
+        ],
+        "heap_mode": "fixed",
+        "heap_slots": [
+          1000000,
+          250000,
+          100000,
+          20000,
+          10000
+        ],
+        "seed": 41231,
+        "rounds": 6,
+        "requests": 50,
+        "valgrind": {
+          "build": {
+            "brk_reservation_mib": 512,
+            "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+            "libc": "glibc 2.36",
+            "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+            "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+            "tool": "libexec/valgrind/callgrind-amd64-linux",
+            "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+            "version": "3.19.0"
+          },
+          "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+          "log_sha256": "447c13a36c5ba26d7dbc1f7156b8beeec7eb7a3f063c0345251d7360269fcafd",
+          "pass": true,
+          "rails_boot": true,
+          "version": "valgrind-3.19.0"
+        }
+      },
+      "request": {
+        "aa": {
+          "metrics": {
+            "instructions_no_gc": true,
+            "instructions_total": true
+          },
+          "pass": true,
+          "tolerance_pct": 0.5
+        },
+        "heap_matched": true,
+        "jit_flat": true,
+        "layers": {
+          "default": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  -0.3374170748581595,
+                  -0.2866631511190265
+                ],
+                "median": -0.30491771493506015
+              },
+              "value": {
+                "ci95": [
+                  2350.69,
+                  2351.52
+                ],
+                "median": 2351.14
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  1.9222123082193066,
+                  2.0193760839444685
+                ],
+                "median": 1.9905463479444885
+              },
+              "value": {
+                "ci95": [
+                  9283520.4,
+                  9289731.93
+                ],
+                "median": 9286116.47
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  1.9159848722851258,
+                  2.0004166684737257
+                ],
+                "median": 1.9742133041997012
+              },
+              "value": {
+                "ci95": [
+                  9283866.86,
+                  9287313.11
+                ],
+                "median": 9286270.11
+              }
+            }
+          },
+          "off_a": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  2357.99,
+                  2359.08
+                ],
+                "median": 2358.19
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  9104475.45,
+                  9108841.25
+                ],
+                "median": 9105850.52
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  9104177.4,
+                  9111050.18
+                ],
+                "median": 9105767.44
+              }
+            }
+          },
+          "off_b": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  -0.033907099275021224,
+                  0.030109719815851754
+                ],
+                "median": 0.005088785179363509
+              },
+              "value": {
+                "ci95": [
+                  2358.18,
+                  2358.76
+                ],
+                "median": 2358.3500000000004
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  -0.006377053823425349,
+                  0.021022739744436247
+                ],
+                "median": 0.0061537733115346605
+              },
+              "value": {
+                "ci95": [
+                  9104798.92,
+                  9109150.3
+                ],
+                "median": 9107111.96
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  -0.021632713136721105,
+                  0.02477196058968678
+                ],
+                "median": -0.000333012066588978
+              },
+              "value": {
+                "ci95": [
+                  9105189.92,
+                  9109078.97
+                ],
+                "median": 9106979.98
+              }
+            }
+          }
+        }
+      }
+    },
+    "show": {
+      "status": "accepted",
+      "measurement_complete": false,
+      "route": "GET:/articles/1",
+      "coverage": {
+        "requests": 10,
+        "route_completions_per_request": 0,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+        "units": [
+          {
+            "fallbacks_per_request": 0,
+            "hits_per_request": 2,
+            "id": 0,
+            "pass": "sealed/link_to"
+          }
+        ],
+        "yjit": false,
+        "zjit": false
+      },
+      "manifest_sha256": "be50b7449dc9f9855da5534afb1a67ba72637256319c1aff13b5b3975875650b",
+      "runtime_fingerprint_sha256": "2e51c2f92f4eb477d8b594ac1066c39f463bb780649d88c6c3d0ed130d4fd41a",
+      "harness_fingerprint_sha256": "eea7b851cee792df1909ed224128e743e9e229da1a2bf80b0e4c66dd4f3a2667",
+      "request_context_sha256": "d4aa189124012f42d47f7bce124e88c68da30b99f36c9b1a76773de082a1d710",
+      "provenance": {
+        "requested_jit": "interpreter",
+        "actual_jit": [
+          "interpreter"
+        ],
+        "heap_mode": "fixed",
+        "heap_slots": [
+          1000000,
+          250000,
+          100000,
+          20000,
+          10000
+        ],
+        "seed": 41231,
+        "rounds": 6,
+        "requests": 50,
+        "valgrind": {
+          "build": {
+            "brk_reservation_mib": 512,
+            "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+            "libc": "glibc 2.36",
+            "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+            "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+            "tool": "libexec/valgrind/callgrind-amd64-linux",
+            "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+            "version": "3.19.0"
+          },
+          "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+          "log_sha256": "08d2f6b68815da7ffc1c9cbbfa7c42710b34b0761b3b1c15e68b8ea49dadfe4b",
+          "pass": true,
+          "rails_boot": true,
+          "version": "valgrind-3.19.0"
+        }
+      },
+      "request": {
+        "aa": {
+          "metrics": {
+            "instructions_no_gc": true,
+            "instructions_total": true
+          },
+          "pass": true,
+          "tolerance_pct": 0.5
+        },
+        "heap_matched": true,
+        "jit_flat": true,
+        "layers": {
+          "default": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  -0.12563033970222626,
+                  -0.052583232493791376
+                ],
+                "median": -0.09713717586911641
+              },
+              "value": {
+                "ci95": [
+                  2241.8,
+                  2242.88
+                ],
+                "median": 2242.13
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  2.9715655866250468,
+                  3.0508365251729064
+                ],
+                "median": 2.992323644633055
+              },
+              "value": {
+                "ci95": [
+                  9010655.86,
+                  9016396.51
+                ],
+                "median": 9012221.21
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  2.978241242711721,
+                  3.0367486977423974
+                ],
+                "median": 2.992976013831583
+              },
+              "value": {
+                "ci95": [
+                  9011862.25,
+                  9013993.73
+                ],
+                "median": 9013273.36
+              }
+            }
+          },
+          "off_a": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  2244.06,
+                  2244.68
+                ],
+                "median": 2244.25
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  8748398.370000001,
+                  8752145.48
+                ],
+                "median": 8749927.989999998
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  8748329.010000002,
+                  8751929.34
+                ],
+                "median": 8750647.969999999
+              }
+            }
+          },
+          "off_b": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  -0.02227591427808595,
+                  0.024953085671353126
+                ],
+                "median": -0.0026721490061387687
+              },
+              "value": {
+                "ci95": [
+                  2243.98,
+                  2244.7799999999997
+                ],
+                "median": 2244.23
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  -0.0015491052123728366,
+                  0.017630371784704835
+                ],
+                "median": 0.0002185831887602241
+              },
+              "value": {
+                "ci95": [
+                  8749483.809999999,
+                  8752009.9
+                ],
+                "median": 8750404.03
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  -0.010834381415969485,
+                  0.021938028453216685
+                ],
+                "median": 0.004142556266983899
+              },
+              "value": {
+                "ci95": [
+                  8749570.43,
+                  8751802.74
+                ],
+                "median": 8750866.67
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "rejected_yjit": {
+    "index": {
+      "status": "rejected",
+      "measurement_complete": false,
+      "route": "GET:/articles",
+      "coverage": {
+        "requests": 10,
+        "route_completions_per_request": 0,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "units": [
+          {
+            "fallbacks_per_request": 0,
+            "hits_per_request": 7,
+            "id": 0,
+            "pass": "sealed/link_to"
+          }
+        ],
+        "yjit": true,
+        "zjit": false
+      },
+      "manifest_sha256": "be50b7449dc9f9855da5534afb1a67ba72637256319c1aff13b5b3975875650b",
+      "runtime_fingerprint_sha256": "2e51c2f92f4eb477d8b594ac1066c39f463bb780649d88c6c3d0ed130d4fd41a",
+      "harness_fingerprint_sha256": "eea7b851cee792df1909ed224128e743e9e229da1a2bf80b0e4c66dd4f3a2667",
+      "request_context_sha256": "7abfd86e688ffe435d358a9a2499dce394bf1a203c56fe6160622a8e72c15ba4",
+      "provenance": {
+        "requested_jit": "yjit",
+        "actual_jit": [
+          "yjit"
+        ],
+        "heap_mode": "fixed",
+        "heap_slots": [
+          1000000,
+          250000,
+          100000,
+          20000,
+          10000
+        ],
+        "seed": 41231,
+        "rounds": 6,
+        "requests": 50,
+        "valgrind": {
+          "build": {
+            "brk_reservation_mib": 512,
+            "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+            "libc": "glibc 2.36",
+            "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+            "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+            "tool": "libexec/valgrind/callgrind-amd64-linux",
+            "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+            "version": "3.19.0"
+          },
+          "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+          "log_sha256": "c87b5fb8f771223f7110ca1adbddf55f86f11e4819c24dc345da65dc6d2fbfc0",
+          "pass": true,
+          "rails_boot": true,
+          "version": "valgrind-3.19.0"
+        }
+      },
+      "request": {
+        "aa": {
+          "metrics": {
+            "instructions_no_gc": false,
+            "instructions_total": true
+          },
+          "pass": false,
+          "tolerance_pct": 0.5
+        },
+        "heap_matched": true,
+        "jit_flat": false,
+        "layers": {
+          "default": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  -0.687921703889538,
+                  -0.3595728578494328
+                ],
+                "median": -0.5352826679512368
+              },
+              "value": {
+                "ci95": [
+                  2361.8100000000004,
+                  2369.27
+                ],
+                "median": 2365.52
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  31.85592524014067,
+                  33.95430936505001
+                ],
+                "median": 32.1910632069043
+              },
+              "value": {
+                "ci95": [
+                  7501199.949999999,
+                  7615896.56
+                ],
+                "median": 7557818.35
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  31.551604333691344,
+                  33.990392270294336
+                ],
+                "median": 32.972778290054734
+              },
+              "value": {
+                "ci95": [
+                  7500387.35,
+                  7614973.83
+                ],
+                "median": 7556956.390000001
+              }
+            }
+          },
+          "off_a": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  2377.75,
+                  2378.51
+                ],
+                "median": 2377.98
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  5683916.23,
+                  5720354.720000001
+                ],
+                "median": 5687416.39
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  0,
+                  0
+                ],
+                "median": 0
+              },
+              "value": {
+                "ci95": [
+                  5680337.97,
+                  5701669.779999999
+                ],
+                "median": 5685812.9
+              }
+            }
+          },
+          "off_b": {
+            "allocations": {
+              "delta_pct": {
+                "ci95": [
+                  0.0016827434950184017,
+                  0.03869146789372557
+                ],
+                "median": 0.021023519480600772
+              },
+              "value": {
+                "ci95": [
+                  2378.1899999999996,
+                  2378.98
+                ],
+                "median": 2378.5299999999997
+              }
+            },
+            "instructions_no_gc": {
+              "delta_pct": {
+                "ci95": [
+                  -0.6312827898350304,
+                  0.05467420230684805
+                ],
+                "median": -0.052432897973786474
+              },
+              "value": {
+                "ci95": [
+                  5682653.98,
+                  5688060.05
+                ],
+                "median": 5684825.67
+              }
+            },
+            "instructions_total": {
+              "delta_pct": {
+                "ci95": [
+                  -0.33468971328319275,
+                  0.4485846571100738
+                ],
+                "median": 0.029692985146556605
+              },
+              "value": {
+                "ci95": [
+                  5682444.74,
+                  5708209
+                ],
+                "median": 5685227.970000001
+              }
+            }
+          }
+        }
+      }
+    },
+    "show": {
+      "status": "rejected",
+      "measurement_complete": false,
+      "route": null,
+      "coverage": null,
+      "manifest_sha256": null,
+      "runtime_fingerprint_sha256": null,
+      "harness_fingerprint_sha256": null,
+      "request_context_sha256": null,
+      "provenance": {
+        "requested_jit": null,
+        "actual_jit": null,
+        "heap_mode": null,
+        "heap_slots": null,
+        "seed": null,
+        "rounds": null,
+        "requests": null,
+        "valgrind": null
+      },
+      "request": null
+    },
+    "additional_refusal": "Source pin changed during index diagnostic; show refused stale sealed_build.rb before measurement. No retry."
+  },
+  "decomposition": {
+    "arm_mapping": {
+      "empty": "A: zero units, public setup skips activation",
+      "default": "B: factory only, full activation; stock dispatch and templates",
+      "stacked": "C: full pilot"
+    },
+    "protocol": {
+      "seed": 41231,
+      "rounds": 6,
+      "route": "GET:/articles",
+      "manifest_sha256": "be50b7449dc9f9855da5534afb1a67ba72637256319c1aff13b5b3975875650b",
+      "default_manifest_sha256": "6287107e0b57a89655f9655323b4484eddb3501927fd646f547c8ce15dd99350",
+      "heap_mode": "fixed",
+      "heap_slots": [
+        1000000,
+        250000,
+        100000,
+        20000,
+        10000
+      ],
+      "requested_jit": "interpreter",
+      "actual_jit": [
+        "interpreter"
+      ],
+      "valgrind": {
+        "pass": true,
+        "version": "valgrind-3.19.0",
+        "rails_boot": true,
+        "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+        "build": {
+          "version": "3.19.0",
+          "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+          "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+          "brk_reservation_mib": 512,
+          "tool": "libexec/valgrind/callgrind-amd64-linux",
+          "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+          "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+          "libc": "glibc 2.36"
+        },
+        "log_sha256": "cb484ddd6f0a213a9c7129cdcea37352db8c11d4920c57814e8b422c4cd55aba"
+      }
+    },
+    "controls": {
+      "aa": {
+        "pass": true,
+        "metrics": {
+          "instructions_total": true,
+          "instructions_no_gc": true
+        },
+        "tolerance_pct": 0.5
+      },
+      "heap_matched": true,
+      "jit_flat": true
+    },
+    "layers": {
+      "empty": {
+        "instructions_total": {
+          "value": {
+            "median": 9097991.85,
+            "ci95": [
+              9095464.4,
+              9101339.6
+            ]
+          },
+          "delta_pct": {
+            "median": -0.029561285261076042,
+            "ci95": [
+              -0.07975557007876,
+              0.01560047243222007
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 9099904.559999999,
+            "ci95": [
+              9095749.469999999,
+              9101335.02
+            ]
+          },
+          "delta_pct": {
+            "median": -0.0043892241930687526,
+            "ci95": [
+              -0.08649512813859173,
+              0.034054598909871725
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2358.33,
+            "ci95": [
+              2357.92,
+              2358.83
+            ]
+          },
+          "delta_pct": {
+            "median": -0.008479822262924541,
+            "ci95": [
+              -0.03391520528381875,
+              0.025868316210087006
+            ]
+          }
+        }
+      },
+      "off_a": {
+        "instructions_total": {
+          "value": {
+            "median": 9099920.02,
+            "ci95": [
+              9099348.18,
+              9104059.5
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 9099497.5,
+            "ci95": [
+              9098014.2,
+              9104654.26
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2358.5699999999997,
+            "ci95": [
+              2358.04,
+              2358.8599999999997
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "stacked": {
+        "instructions_total": {
+          "value": {
+            "median": 9286352.870000001,
+            "ci95": [
+              9282607.75,
+              9354134.71
+            ]
+          },
+          "delta_pct": {
+            "median": 2.037478069880694,
+            "ci95": [
+              1.9825690253786776,
+              2.7897868578226626
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 9286685.07,
+            "ci95": [
+              9283311.07,
+              9357294.79
+            ]
+          },
+          "delta_pct": {
+            "median": 2.0490835453942924,
+            "ci95": [
+              1.9728005394451187,
+              2.847429352224262
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2351.55,
+            "ci95": [
+              2350.76,
+              2355.16
+            ]
+          },
+          "delta_pct": {
+            "median": -0.2938134743887322,
+            "ci95": [
+              -0.3231042574111609,
+              -0.1463104418234995
+            ]
+          }
+        }
+      },
+      "default": {
+        "instructions_total": {
+          "value": {
+            "median": 9422506.780000001,
+            "ci95": [
+              9419964.16,
+              9425220.9
+            ]
+          },
+          "delta_pct": {
+            "median": 3.5377675637744743,
+            "ci95": [
+              3.4802169506747527,
+              3.578167832981405
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 9422744.42,
+            "ci95": [
+              9420103.559999999,
+              9425240.86
+            ]
+          },
+          "delta_pct": {
+            "median": 3.5529900982708917,
+            "ci95": [
+              3.4764193976463464,
+              3.5843364506810693
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2358.41,
+            "ci95": [
+              2358.1099999999997,
+              2358.8500000000004
+            ]
+          },
+          "delta_pct": {
+            "median": 0.002121329025622787,
+            "ci95": [
+              -0.017383060428682873,
+              0.011025078040771685
+            ]
+          }
+        }
+      }
+    },
+    "vm_trace_self_no_gc_ir_per_request": [
+      {
+        "empty": 0,
+        "default": 283074,
+        "stacked": 279876.3
+      },
+      {
+        "empty": 0,
+        "default": 283074,
+        "stacked": 279708
+      },
+      {
+        "empty": 0,
+        "default": 283074,
+        "stacked": 279708
+      },
+      {
+        "empty": 0,
+        "default": 283074,
+        "stacked": 279708
+      },
+      {
+        "empty": 0,
+        "default": 283074,
+        "stacked": 279708
+      },
+      {
+        "empty": 0,
+        "default": 283074,
+        "stacked": 283173
+      }
+    ]
+  },
+  "original_index_vm_trace_self": {
+    "scope": "Native vm_trace self Ir, accepted index cohort, N=0/50 no-GC subtraction; not additive inclusive costs",
+    "rows": [
+      {
+        "empty": 0,
+        "default": 279708,
+        "difference": 279708
+      },
+      {
+        "empty": 0,
+        "default": 279708,
+        "difference": 279708
+      },
+      {
+        "empty": 0,
+        "default": 279708,
+        "difference": 279708
+      },
+      {
+        "empty": 0,
+        "default": 279708,
+        "difference": 279708
+      },
+      {
+        "empty": 0,
+        "default": 279708,
+        "difference": 279708
+      },
+      {
+        "empty": 0,
+        "default": 279708,
+        "difference": 279708
+      }
+    ]
+  },
+  "delivery_comparison": {
+    "tag_helper.rb": {
+      "methods": 22,
+      "changed": [
+        [
+          "tag_builder",
+          600
+        ]
+      ],
+      "original_recipe": "597d78d066183580433870c4742521b7ee5956736f06d9131814dfd387e4e278",
+      "manifest_recipe": "597d78d066183580433870c4742521b7ee5956736f06d9131814dfd387e4e278",
+      "defaults_at_delivery": {
+        "inline_const_cache": true,
+        "peephole_optimization": true,
+        "tailcall_optimization": false,
+        "specialized_instruction": true,
+        "operands_unification": true,
+        "instructions_unification": false,
+        "debug_frozen_string_literal": false,
+        "coverage_enabled": true,
+        "debug_level": 0,
+        "frozen_string_literal": null
+      },
+      "specimen": [
+        "tag_options",
+        235
+      ],
+      "normalized_specimen_equal": true
+    },
+    "metal.rb": {
+      "methods": 25,
+      "changed": [
+        [
+          "dispatch",
+          249
+        ]
+      ],
+      "original_recipe": "597d78d066183580433870c4742521b7ee5956736f06d9131814dfd387e4e278",
+      "manifest_recipe": "597d78d066183580433870c4742521b7ee5956736f06d9131814dfd387e4e278",
+      "defaults_at_delivery": {
+        "inline_const_cache": true,
+        "peephole_optimization": true,
+        "tailcall_optimization": false,
+        "specialized_instruction": true,
+        "operands_unification": true,
+        "instructions_unification": false,
+        "debug_frozen_string_literal": false,
+        "coverage_enabled": true,
+        "debug_level": 0,
+        "frozen_string_literal": null
+      },
+      "specimen": [
+        "performed?",
+        245
+      ],
+      "normalized_specimen_equal": true
+    }
+  },
+  "correctness": {
+    "isolated_pairs": 144,
+    "hits": 350,
+    "fallbacks": 0,
+    "default_outcomes": 779,
+    "campfire_skips": 2,
+    "pingcrm_cross_thread_sql_advisories": 9,
+    "rails_l3": {
+      "actionpack": 4095,
+      "actionview": 2747,
+      "actionview_actionpack": 242,
+      "actionview_activerecord": {
+        "outcomes": 173,
+        "hits": 122,
+        "fallbacks": 3
+      }
+    }
+  }
+}

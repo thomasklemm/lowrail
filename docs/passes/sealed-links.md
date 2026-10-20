@@ -1,6 +1,8 @@
-# Sealed links: pre-implementation prices
+# Sealed links: prices and pre-fix delivery diagnostics
 
-Status: operation prices, **not a deployed pass or request speed claim**.
+Status: the opt-in delivery boundary is published; **no request win or
+promotion claim**. Request measurements below precede the central activation
+TracePoint fix and must not judge the pilot after that fix.
 The guarded tier and the source-arm quarantine are unchanged. The five-app
 [seal census](../sealed-corpus.md) precedes these experiments; the blog is
 seal-clean only in the documented, dynamic, test-observed sense.
@@ -108,3 +110,95 @@ The previous two prices use `sealed_helpers.rb APP NEW_OUTDIR` and
 `sealed_links.rb APP NEW_OUTDIR` without `--provenance`. Their executed source
 fingerprints are retained; the new optional branch does not retroactively
 change those sources. No native YJIT/ZJIT or whole-request gain is claimed.
+
+## Delivered pilot: pre-fix request diagnostics, not a promotion
+
+[The generic eligibility boundary](https://github.com/thomasklemm/lowrail/commit/ca814ae9168946d90e9895e9feb4d85ed68c4c2b)
+adds registry `sealed_only`, `build --sealed --env production`, the
+`sealed-v1` manifest and explicit production opt-in. Old/mixed artifacts
+refuse whole; tests run original-only, without a certificate bypass. This
+includes `inertia/config_bind` eligibility, not its promotion. The guarded
+`view/link_to` and `route/path` arms remain quarantined. The pilot is the
+separate `sealed/link_to` pass; routes stay live and unlowered.
+
+Before request measurement, the existing isolated checker matched **144
+pairs** of status, byte body, all headers, ordered SQL, controller/render
+events and assigns: **350 hits, zero fallbacks**. The five-app default verify
+matched **779 outcomes**, including two unchanged Campfire skips and the
+separately selected Redprints browser suite. PingCRM retained nine advisory
+cross-thread SQL-order differences; own-thread SQL was identical. AP/AV L3
+matched 4,095 / 2,747 outcomes with zero units/hits; AV-AP matched 242. AV-AR
+matched 173 with the existing AR units' 122 hits / three fallbacks. These are
+not sealed fast-path coverage claims for test processes.
+
+One finite c9d2397 interpreter cohort per route, Ruby 4.0.7, seed 41231,
+six rounds, N=0/50, five matched fixed heaps and the pinned 512 MiB Valgrind:
+
+| Route | Off Ir/request | Sealed Ir/request | Paired total delta, 95% CI | Objects off → sealed | Hits/request |
+|---|---:|---:|---|---|---:|
+| Index | 9,105,767 | 9,286,270 | **+1.974% [1.916, 2.000]** | 2,358.19 → 2,351.14 | 7 |
+| Show | 8,750,648 | 9,013,273 | **+2.993% [2.978, 3.037]** | 2,244.25 → 2,242.13 | 2 |
+
+Total/no-GC A/A, actual interpreter/JIT-state and heap controls pass. These
+are accepted **pre-fix diagnostic measurements**, not a verdict on link
+specialization: activation leaves a global tracing tax after its TracePoint
+is disabled. Native `vm_trace` **self**, with N=0/50 no-GC subtraction, is
+exactly **0 versus 279,708 Ir/request in all six index rounds**. Inclusive
+callee costs are not added to that figure, nor is this tax subtracted to
+manufacture a hypothetical post-fix endpoint saving.
+
+### Finite A/B/C decomposition
+
+A second, single finite index interpreter diagnostic uses the same protocol:
+
+| Arm | Meaning | Total Ir/request | Delta versus off, 95% CI | Objects/request |
+|---|---|---:|---|---:|
+| Off | No setup | 9,099,920 | control | 2,358.57 |
+| A | Public sealed setup with zero units | 9,097,992 | −0.030% [−0.080, +0.016] | 2,358.33 |
+| B | A + factory body delivery/registration; no dispatch or link sites | 9,422,507 | **+3.538% [3.480, 3.578]** | 2,358.41 |
+| C | Full pilot | 9,286,353 | +2.037% [1.983, 2.790] | 2,351.55 |
+
+A returns before installing Guard/Loader/pass activation and has no
+activation TracePoint. B executes the actual full activation machinery and
+already reproduces the tax **without changing dispatch**: `vm_trace` self is
+283,074 Ir/request in every round; A is zero. C is 279,708 in four rounds,
+279,876 / 283,173 in the other two. The factory-only arm is therefore enough
+to locate the flat tax outside link sites and dispatch; no new dispatch-only
+or TracePoint-disabled request cohort was started. The requested targeted
+dispatch-inclusive A/C profile was also collected, but its own target
+TracePoint perturbs tracing: 7,386,034 → 8,024,321 inclusive Ir is not dispatch
+self cost or an accepted request benchmark.
+
+### Whole-file delivery is not the compiler-options explanation
+
+At the real Loader seam, compare each original ISeq with its delivered
+binary. `tag_helper.rb` has 22 methods, only `tag_builder` changed;
+`metal.rb` has 25, only `dispatch` changed. All **45 unchanged method
+subtrees** match after removing only parser IDs, source hashes and source
+coordinates. Original/delivered compilation recipe hashes are identical;
+`specialized_instruction` is true and `frozen_string_literal` is nil with
+source magic comments retained. Address-normalized disassembly diffs of
+unchanged `tag_options` and `performed?` are empty.
+
+That refutes differing compilation options for untouched methods, **not**
+VM-level trace patching: Ruby disassembly presents trace opcodes as ordinary
+instructions, and a disabled global TracePoint can leave sticky tracing
+state. The central production activation fix is owned separately; this
+pilot does not change it.
+
+### Rejected YJIT and the next gate
+
+The finite pre-fix YJIT index cohort is **rejected**: no-GC A/A and JIT
+flatness both fail. Its +32.973% diagnostic delta is retained only in the
+[numeric export](sealed-link-pilot.json), never as an accepted result. The
+final boot-visibility refusal fix also changed a pinned builder source while
+that diagnostic was running, precluding stable-source interpretation. YJIT
+show refuses before measurement because the artifact is stale. No retry to
+green and no inferred YJIT saving.
+
+Boot visibility now has an independent stock check: a body ISeq fingerprint
+alone does not certify visibility. A private `content_tag_string` is refused
+at build, with a permanent public-build regression. After the central fix,
+rebuild the source-pinned artifact, repeat the correctness gates and run
+fresh, finite interpreter **and** YJIT index/show cohorts. Promotion remains
+pending; the micro price cannot replace the request gate.
