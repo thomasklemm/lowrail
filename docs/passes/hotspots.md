@@ -9,9 +9,13 @@ or a production latency profile. Existing allocation evidence is in
 **First priority table:** blog `/articles/1`, Starter dashboard HTML/JSON and
 PingCRM organizations HTML. Blog show and Starter JSON pass all controls;
 Starter HTML and PingCRM are diagnostic/rejected, for the reasons below.
-The remaining declared routes, Redprints and secondary Campfire are still
-being collected. The current three-app ranking is therefore **provisional
-and descriptive**, not a completed four-app result.
+All ten primary request-shape cohorts are now complete: seven accepted,
+three rejected. All three blog routes, both Starter JSON routes and both
+Redprints routes pass; Starter dashboard HTML and both PingCRM routes do not.
+The four-primary-app ranking is **descriptive**, because it includes those
+rejections, not a newly accepted aggregate. Secondary Campfire coverage is
+limited by the sampler failures recorded below: its JSON map is diagnostic,
+both HTML maps are unavailable, and **no Campfire cohort is accepted**.
 
 The first map's large non-view owners are ActiveSupport utilities, Rack/request
 work and AR query/adapter work. Keep the sealed pilot focused on fixed caller
@@ -151,6 +155,56 @@ is [+0.0128%, +0.0421%], excluding zero even though it lies well inside ±0.5%.
 Total A/A [−0.0080%, +0.0263%], sampler A/A, both-arm fidelity, heaps and
 capture checks pass. It remains diagnostic without a replacement cohort.
 
+The separate PingCRM contacts JSON cohort is also **rejected for ordinary
+A/A**: total [−0.0514%, −0.0014%] and no-GC [−0.0714%, −0.0147%] exclude zero.
+Sampler A/A, both-arm fidelity, all heaps, JIT state and capture/overflow gates
+pass. The small control discrepancy is retained, not explained away or rerun.
+Both PingCRM routes and their aggregate are therefore diagnostic.
+
+Campfire room and sidebar HTML are **unavailable / tool-rejected**, not noisy
+accepted maps. In each, trace A aborts in Callgrind `threads.c:247`,
+`vgCallgrind_post_signal`, on `sigNum == vgCallgrind_current_state.sig`;
+no full round was aggregated. The surviving trace B was cancelled after each
+failure, with its logs kept. No brk overflow appears. The failure stack includes
+MRI `fiber_setcontext` and Enumerator `zip`, but a focused Fiber/zip probe did
+not reproduce it: **the cause is unassigned**, not an established Fiber bug.
+The ordinary off-A room worker completed all four windows without the assertion.
+This differs from the reproduced shared-worker brk exposure and does not
+establish that ordinary non-sampling `lowrail bench` workers have this failure.
+The assertion is not suppressed, and no partial arm or HTML result is salvaged.
+The separately declared bot JSON route does not replace or retry either HTML cohort;
+secondary coverage excludes the unavailable HTML requests.
+
+Campfire bot JSON completed its six scheduled rounds and is **rejected for
+capture integrity**: 12 of 858,820 captures are empty. Ordinary and sampler
+A/A, all heaps, both-arm fidelity and overflow gates pass; maximum lag is
+1,107 Ir. Empty stacks enter the client/seam fallback only to retain the
+partition, not as evidence that their unknown work is client overhead.
+Finishing the declared rounds supplies diagnostic uncertainty, not a rescue
+of a cohort whose capture gate already failed. No Campfire result is retried.
+Its large residual is not wholly opaque: URI alone owns **18.97 [18.89,
+19.02]%** of the request, within the **26.82%** other-gem/stdlib bucket.
+These prefix-only captures do not establish which URI callers dominate; do
+not import Starter's cookie diagnosis into Campfire or infer an importmap
+saving from a JSON route. Association/query shape and URI callers are app
+investigation leads, not accepted optimization budgets or an HTML profile.
+
+Publishing the method addendum required the authorized pull/rebase. Main had
+meanwhile changed `heap_windows.rb` and `request_pairs.rb` for multi-pool/JIT
+support and heap-preparation seams. The paused blog-edit attempt had four
+aggregated rounds and PingCRM contacts three. Both were **terminated before
+resuming**, rejected for source integrity, and retained with old/new source
+hashes; no worker from them is reused. Completed blog index and detail cohorts
+had finished, and all their measured-source hashes were verified **before**
+the pull. Their completed verdicts remain valid for those exact source pins.
+The unfinished shapes get separately declared finite new-source cohorts, not
+a retry after a failed A/A/fidelity gate. They retain Ruby 4.0.7, the same five
+floors, windows, fixture and sampler tool. The export distinguishes the
+source pins; do not read an app aggregate spanning these pins as a controlled
+before/after benchmark of the shared-worker refactor. Each exported provenance
+entry names its completed shapes and cohort root; interrupted attempts carry
+that root too, so old/new source pins are not ambiguously pooled.
+
 ## Workload and reproduction
 
 Build all five pins with `script/corpus`, using the repository's Ruby 4.0.7.
@@ -163,6 +217,14 @@ real Node SSR server; it is not a cached/stubbed HTML fixture. Its profiled
 worker checks rendered child elements below `#app` before warming.
 Private authenticated headers and dynamic paths stay in `tmp/m0/`, never in
 the export. Keep the same database/assets/auth fixture for every arm.
+
+The blog fixture sends **no incoming cookie**. `Rack::MockRequest` does not
+carry response cookies into later requests, so warming does not turn it into
+a returning browser session. Blog token/session/cookie costs include this
+new-session shape. Authenticated Inertia/Campfire routes replay their fixed
+private incoming headers instead; outgoing cookie refresh/commit still runs.
+These are fixture-specific request shapes, not a cross-app session-policy
+experiment or an estimate of a deployment's returning-user traffic.
 
 The finite request-shape set is blog index/show/edit HTML; Starter dashboard
 HTML and JSON plus profile JSON; PingCRM organizations HTML and contacts JSON;
@@ -177,6 +239,10 @@ not an isolated route-versus-format experiment.
 Redprints' untouched corpus pin is **8.1.3**. This study uses a disposable
 `redprints-hotspots-r4` copy with only the framework gems updated to **8.1.4**;
 Inertia/StoreModel/FrozenRecord/Freezolite and app code remain unchanged.
+Use the [allocation study's copy/update procedure](allocations.md#reproduction)
+with that new directory name; refuse any unrelated dependency/source change.
+The measured lock SHA-256 is
+`1d14f5e2979e4693fa770010c26f93d003e7c8dcc54d32995ce2074277bd8654`.
 Campfire retains its **8.2.0.alpha** lock and is never pooled into the primary
 ranking. Locks, loaded gem versions, actual heaps, all signed attribution
 counts, controls, source/tool fingerprints and worker-log digests are in
@@ -241,15 +307,18 @@ conditional pools must not be added to this map or to each other.
 
 | Hotspot family | Best-fit lever | Boundary and existing decision rows |
 |---|---|---|
-| AS utilities/I18n/time | **Sealed endpoint**, for fixed caller structure only | Preserve live locale, defaults, type conversion and mutable tables; a seal is not permission to freeze request values. Overlaps **Whole compiled ERB specialization**, **CurrentAttributes default tuple iteration**, **Literal inflection plans**. Their narrow eligible pools do not cover this whole bucket. |
+| AS utilities/I18n/time | **Guarded caller-specific pass / upstream** for Inertia config extraction; **sealed endpoint** for fixed render callers | Starter's dominant Hash extraction is mostly outside the action/render seal boundary; see the detail addendum. Preserve live locale, defaults, type conversion and mutable tables, not request-value caches. Overlaps **inertia/config_bind**, **Whole compiled ERB specialization**, **CurrentAttributes default tuple iteration**, **Literal inflection plans**. Their narrow eligible pools do not cover this whole bucket. |
 | Rack/middleware/request | **Upstream Rails/Rack** | Retain the real envelope and state/security/exception pipeline, rather than infer a large middleware-removal budget from inclusive cost. Overlaps **Replacement-layer ceiling, Rails 8.1.4 blog index/show** and **Remaining controller/params/response interpretation**. **Upstream static miss candidates** is an adjacent, separately counted bucket, not an extra saving inside this row. |
 | Other gems/stdlib/app | **App recommendation: inspect the named gem/prefix before changing code** | This heterogeneous residual includes URI/concurrency/stdlib machinery, not one certifiable pass. There is **no exact existing residual-wide decision row**. **Literal inflection plans** and the two **Net::HTTP** allocation follow-ups overlap only their named mechanisms, not the rest. Never claim the residual is all avoidable VM dispatch. |
 | AR query/relation | **Guarded pass**, only for a proven fixed query shape | Keep current scopes, authorization, binds, quoting, ordered SQL, connection/shard facts and notifications. Overlaps **Fixed query-shape allocation plans**, **AR plans, preload plans** and **Escaping AR app-chain plans**. A large source bucket does not reopen the parked instantiate pass or price database-server work. |
+| AR associations/preload | **App recommendation** to inspect the actual association/query shape; **guarded pass** only for a certified fixed plan | Overlaps **AR plans, preload plans** and **Escaping AR app-chain plans**. Keep live association state, scopes, authorization, reflection/key/connection facts and invalidation; neither result caching nor an N+1 diagnosis follows from inclusive cost alone. Campfire's 10.72% self is diagnostic, not a pass ceiling. |
 | Session/cookies/crypto | **Upstream Rails**, not a boot-time session/result cache | Fresh authenticated state and cryptographic work remain necessary. There is **no existing standalone session pass row**; this overlaps the retained session/cookie boundary in **Replacement-layer ceiling, Rails 8.1.4 blog index/show** and **Remaining controller/params/response interpretation**. GET-only fixtures do not certify CSRF verification or writes. |
 | View helpers/tags/forms; buffers/rendering | **Sealed endpoint** for compiled caller structure; **upstream Rails** for a general primitive | Preserve helpers, escaping, fresh buffers, form model/state and events. Overlaps **Two tiers: guarded (default) and sealed (opt-in)**, **endpoint/action**, **Compiled form/literal-tag intermediates**, **Tag/form attribute component**, **SafeBuffer/OutputBuffer interpretation**, and quarantined **Source view/link_to and route/path**. No safety refusal or quarantine is reversed. |
 | Inertia props/config/render | **Guarded pass**, with net guard cost measured separately | Preserve per-request props, partial/deferred/once/rescue behavior, iterator identity and post-app-code checks. Overlaps **inertia/config_bind**, **inertia/props**, **Inertia prop path scaffolding** and **Inertia metadata try dispatch**. Existing rejected final-runtime props evidence is not upgraded by a hotspot map. |
 | SSR HTTP client | **App recommendation**, including separate Node/IPC/latency profiling | The denominator excludes Node CPU and waiting, so this is Ruby protocol/setup work, not an SSR-removal budget. Overlaps **Net::HTTP SSR setter discovery** and **Net::HTTP header capitalization**. A future guarded component can target only those certified intermediates, never cache personalized SSR output. |
 | AR SQL/adapter | **Upstream Rails/adapter** | Native client decoding/type work is real work; server CPU is absent. Overlaps **PostgreSQL type-map tuple dispatch** and **Fixed query-shape allocation plans**. Keep result rows, casts, adapter extensions and connection/OID generations; inspect query count/data shape separately in the app. |
+| AR attributes/casts | **Upstream Rails**, or a narrow guarded component only after pricing | Retain missing/default/cached-nil/custom-type/dirty-tracking behavior and live values. Overlaps **AttributeSet reads/casting**, **AttributeSet key unions**, and only actual matching sites of **StoreModel scalar-read forwarding**. The earlier combined direct-ivar prototype lost on blog show; this source-owned pool is not removable credit or permission to bypass casts. |
+| JSON/serialization | **Sealed endpoint**, only for fixed serializer caller structure; **app recommendation** for redundant payload work | Preserve live getters, authorization, custom `as_json`/`to_json`, escaping and output shape. Overlaps **Fixed-shape serialization**; its narrow PingCRM estimate is not an all-app ceiling. The existing Redprints Alba key-plan prototype lost, so a large Alba/JSON bucket does not reopen that implementation or imply equivalent removable work. See the serialization addendum below. |
 
 <!-- BEGIN GENERATED HOTSPOT TABLES -->
 
@@ -259,10 +328,27 @@ Rejected means the entire request-shape cohort is diagnostic; it is not rerun or
 
 | Request shape | Total / no-GC M Ir | Baseline A/A CI %, total / no-GC | Heap | Sampler A/A | Fidelity | Capture | Verdict |
 |---|---:|---|---|---|---|---|---|
+| blog-edit-html | 6.092 / 6.093 | [-0.0106, +0.0649] / [-0.0230, +0.0322] | pass | pass | pass | pass | **accepted** |
+| blog-index-html | 9.101 / 9.101 | [-0.0380, +0.0600] / [-0.0505, +0.0512] | pass | pass | pass | pass | **accepted** |
 | blog-show-html | 8.746 / 8.749 | [-0.0727, +0.0248] / [-0.0619, +0.0033] | pass | pass | pass | pass | **accepted** |
 | starter-dashboard-html | 8.518 / 8.518 | [-0.0280, +0.0441] / [-0.0439, +0.0280] | pass | pass | FAIL | pass | **REJECTED** |
 | starter-dashboard-json | 5.140 / 5.142 | [-0.0254, +0.0812] / [-0.0374, +0.0224] | pass | pass | pass | pass | **accepted** |
+| starter-profile-json | 5.264 / 5.264 | [-0.1282, +0.0844] / [-0.0662, +0.0198] | pass | pass | pass | pass | **accepted** |
+| pingcrm-contacts-json | 13.243 / 13.246 | [-0.0514, -0.0014] / [-0.0714, -0.0147] | pass | pass | pass | pass | **REJECTED** |
 | pingcrm-organizations-html | 11.960 / 11.959 | [-0.0080, +0.0263] / [+0.0128, +0.0421] | pass | pass | pass | pass | **REJECTED** |
+| redprints-proposal-json | 8.668 / 8.670 | [-0.0255, +0.0509] / [-0.0229, +0.0462] | pass | pass | pass | pass | **accepted** |
+| redprints-proposals-html | 15.152 / 15.152 | [-0.0081, +0.0266] / [-0.0141, +0.0221] | pass | pass | pass | pass | **accepted** |
+| campfire-json-uncached | 47.222 / 46.552 | [-0.0072, +0.0330] / [-0.0024, +0.0335] | pass | pass | pass | FAIL | **REJECTED** |
+
+### Interrupted cohorts — rejected, no partial salvage
+
+| Attempt / shape | Aggregated rounds | Rejection |
+|---|---:|---|
+| lowrail-hotspots-rest-a / blog-edit-html | 4 | Source-integrity rejection: paused after four aggregated rounds; pull --rebase changed bench/heap_windows.rb and bench/request_pairs.rb before remaining workers. Terminated without resuming; no mixed-source or partial-arm salvage. |
+| lowrail-hotspots-rest-b / pingcrm-contacts-json | 3 | Source-integrity rejection: paused after three aggregated rounds; pull --rebase changed bench/heap_windows.rb and bench/request_pairs.rb before remaining workers. Terminated without resuming; no mixed-source or partial-arm salvage. |
+| lowrail-hotspots-finite / blog-index-html | 5 | brk segment overflow; interrupted, no partial-arm salvage |
+| lowrail-hotspots-campfire-room / campfire-room-uncached | 0 | Tool failure: trace-A aborted on Callgrind threads.c:247 vgCallgrind_post_signal assertion (sigNum == vgCallgrind_current_state.sig). Zero complete rounds; no partial-arm salvage. Surviving trace-B cancelled after the failure. |
+| lowrail-hotspots-campfire-other / campfire-sidebar-uncached | 0 | Tool failure: trace-A aborted on the same Callgrind threads.c:247 vgCallgrind_post_signal assertion as the room shape. Zero complete rounds; surviving trace-B cancelled, no partial-arm salvage. |
 
 ## Route/format detail
 
@@ -270,6 +356,16 @@ Five largest self costs per request shape; intervals include all six rounds.
 
 | Request shape | Subsystem | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---|---:|---:|
+| blog-edit-html | AS utilities/I18n/time | 94.62 [94.52, 94.68] | 24.04 [23.75, 24.18] |
+| blog-edit-html | Rack/middleware/request | 98.18 [98.12, 98.21] | 13.69 [13.37, 13.94] |
+| blog-edit-html | View helpers/tags/forms | 41.66 [41.50, 42.01] | 12.43 [12.04, 12.62] |
+| blog-edit-html | Other gems/stdlib/app | 100.00 [100.00, 100.00] | 9.56 [9.44, 9.62] |
+| blog-edit-html | Rendering/lookup/helpers | 75.13 [74.89, 75.21] | 6.65 [6.44, 6.92] |
+| blog-index-html | Rack/middleware/request | 98.79 [98.77, 98.85] | 12.20 [12.03, 12.29] |
+| blog-index-html | AS utilities/I18n/time | 96.56 [96.49, 96.63] | 11.62 [11.48, 11.78] |
+| blog-index-html | AR query/relation | 81.68 [81.57, 81.73] | 10.30 [10.15, 10.81] |
+| blog-index-html | View helpers/tags/forms | 14.37 [14.25, 14.79] | 8.17 [8.10, 8.35] |
+| blog-index-html | Rendering/lookup/helpers | 80.92 [80.80, 80.98] | 7.64 [7.43, 7.76] |
 | blog-show-html | AS utilities/I18n/time | 96.34 [96.24, 96.42] | 17.02 [16.80, 17.28] |
 | blog-show-html | View helpers/tags/forms | 30.02 [29.81, 30.07] | 11.79 [11.59, 12.01] |
 | blog-show-html | Rack/middleware/request | 98.75 [98.75, 98.79] | 11.56 [11.42, 11.71] |
@@ -285,234 +381,393 @@ Five largest self costs per request shape; intervals include all six rounds.
 | starter-dashboard-json | Other gems/stdlib/app | 100.00 [99.99, 100.01] | 10.15 [9.94, 10.50] |
 | starter-dashboard-json | AR query/relation | 66.11 [65.95, 66.21] | 8.29 [8.17, 8.55] |
 | starter-dashboard-json | Inertia props/config/render | 76.81 [76.66, 77.01] | 8.23 [8.13, 8.32] |
+| starter-profile-json | AS utilities/I18n/time | 92.96 [92.89, 93.02] | 24.65 [24.47, 25.10] |
+| starter-profile-json | Rack/middleware/request | 97.05 [96.97, 97.08] | 13.25 [12.96, 13.63] |
+| starter-profile-json | Other gems/stdlib/app | 100.00 [100.00, 100.00] | 10.01 [9.90, 10.13] |
+| starter-profile-json | AR SQL/adapter | 16.08 [15.89, 16.22] | 8.16 [7.91, 8.46] |
+| starter-profile-json | AR query/relation | 65.74 [65.58, 65.83] | 8.09 [7.89, 8.54] |
+| pingcrm-contacts-json (REJECTED) | AR query/relation | 86.49 [86.42, 86.53] | 18.60 [18.28, 18.79] |
+| pingcrm-contacts-json (REJECTED) | AS utilities/I18n/time | 37.68 [37.59, 37.99] | 12.65 [12.52, 12.96] |
+| pingcrm-contacts-json (REJECTED) | AR attributes/casts | 13.62 [13.56, 13.92] | 10.47 [10.32, 10.64] |
+| pingcrm-contacts-json (REJECTED) | Other gems/stdlib/app | 100.00 [100.00, 100.00] | 9.22 [9.06, 9.48] |
+| pingcrm-contacts-json (REJECTED) | AR SQL/adapter | 20.84 [20.73, 21.00] | 8.96 [8.75, 9.16] |
 | pingcrm-organizations-html (REJECTED) | AS utilities/I18n/time | 48.38 [48.17, 48.54] | 15.74 [15.54, 15.96] |
 | pingcrm-organizations-html (REJECTED) | AR query/relation | 85.20 [85.09, 85.30] | 14.86 [14.61, 15.13] |
 | pingcrm-organizations-html (REJECTED) | Other gems/stdlib/app | 100.00 [100.00, 100.00] | 9.94 [9.77, 10.24] |
 | pingcrm-organizations-html (REJECTED) | Rack/middleware/request | 98.71 [98.67, 98.74] | 9.38 [9.36, 9.42] |
 | pingcrm-organizations-html (REJECTED) | AR SQL/adapter | 15.71 [15.59, 15.73] | 6.78 [6.58, 6.82] |
+| redprints-proposal-json | AR query/relation | 78.60 [78.55, 78.75] | 22.23 [21.78, 22.60] |
+| redprints-proposal-json | AS utilities/I18n/time | 95.29 [95.26, 95.41] | 16.22 [16.01, 16.44] |
+| redprints-proposal-json | AR SQL/adapter | 24.69 [24.61, 24.74] | 11.30 [11.12, 11.50] |
+| redprints-proposal-json | Rack/middleware/request | 98.20 [98.17, 98.25] | 9.16 [9.10, 9.48] |
+| redprints-proposal-json | Other gems/stdlib/app | 100.00 [100.00, 100.00] | 6.85 [6.67, 6.98] |
+| redprints-proposals-html | AS utilities/I18n/time | 97.40 [97.35, 97.45] | 16.52 [16.26, 16.69] |
+| redprints-proposals-html | AR attributes/casts | 22.59 [22.32, 22.74] | 14.21 [14.10, 14.36] |
+| redprints-proposals-html | Rack/middleware/request | 99.02 [98.99, 99.05] | 10.01 [9.85, 10.17] |
+| redprints-proposals-html | JSON/serialization | 55.37 [55.33, 55.40] | 9.68 [9.43, 9.80] |
+| redprints-proposals-html | AR query/relation | 86.33 [86.29, 86.38] | 7.78 [7.70, 7.82] |
+| campfire-json-uncached (REJECTED) | Other gems/stdlib/app | 98.56 [98.56, 98.57] | 26.82 [26.64, 26.93] |
+| campfire-json-uncached (REJECTED) | AR query/relation | 93.92 [93.89, 93.94] | 17.70 [17.57, 17.80] |
+| campfire-json-uncached (REJECTED) | AR associations/preload | 42.11 [42.04, 42.12] | 10.72 [10.63, 10.78] |
+| campfire-json-uncached (REJECTED) | AR SQL/adapter | 19.73 [19.68, 19.78] | 9.40 [9.36, 9.44] |
+| campfire-json-uncached (REJECTED) | AS utilities/I18n/time | 97.79 [97.76, 97.82] | 7.59 [7.45, 7.68] |
 
 ## blog
 
-Equal shape weights: blog-show-html.
+Equal shape weights: blog-edit-html, blog-index-html, blog-show-html.
 
 All constituent cohorts accepted.
 
 | Subsystem | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `AS utilities/I18n/time` | 96.34 [96.24, 96.42] | 17.02 [16.80, 17.28] |
-| `View helpers/tags/forms` | 30.02 [29.81, 30.07] | 11.79 [11.59, 12.01] |
-| `Rack/middleware/request` | 98.75 [98.75, 98.79] | 11.56 [11.42, 11.71] |
-| `Other gems/stdlib/app` | 100.00 [100.00, 100.00] | 7.83 [7.65, 8.10] |
-| `AR query/relation` | 81.79 [81.69, 81.93] | 7.01 [6.71, 7.21] |
-| `Buffers/escaping` | 21.02 [20.94, 21.20] | 6.94 [6.84, 7.02] |
-| `Rendering/lookup/helpers` | 81.00 [80.84, 81.07] | 6.77 [6.41, 6.86] |
-| `Session/cookies/crypto` | 92.46 [92.42, 92.56] | 5.61 [5.51, 5.67] |
-| `Routing/URL generation` | 82.92 [82.83, 82.98] | 5.08 [4.93, 5.34] |
-| `AR SQL/adapter` | 9.64 [9.53, 9.68] | 4.13 [4.08, 4.21] |
-| `CSRF` | 9.54 [9.42, 9.61] | 2.94 [2.91, 3.21] |
-| `AR attributes/casts` | 3.49 [3.21, 3.59] | 2.86 [2.63, 2.91] |
-| `Events/logging` | 93.26 [93.21, 93.34] | 2.35 [2.30, 2.37] |
-| `Controller dispatch/response` | 81.97 [81.88, 82.04] | 1.59 [1.49, 1.65] |
-| `AR associations/preload` | 10.61 [10.47, 10.66] | 1.38 [1.28, 1.49] |
-| `Callback machinery` | 95.03 [95.01, 95.17] | 1.17 [1.07, 1.20] |
-| `Static-file miss` | 96.40 [96.38, 96.46] | 1.09 [1.07, 1.13] |
-| `AR instantiation/model` | 6.13 [6.03, 6.22] | 0.86 [0.84, 0.89] |
-| `Benchmark client/seam` | 100.00 [100.00, 100.00] | 0.75 [0.72, 0.76] |
-| `Assets/importmap/CSP` | 4.17 [4.13, 4.25] | 0.55 [0.49, 0.61] |
-| `App templates` | 65.97 [65.88, 66.09] | 0.43 [0.37, 0.49] |
-| `JSON/serialization` | 0.24 [0.21, 0.25] | 0.24 [0.21, 0.25] |
-| `App helpers` | 1.56 [1.52, 1.60] | 0.10 [0.06, 0.11] |
-| `App controllers` | 77.11 [76.91, 77.15] | 0.03 [0.02, 0.05] |
+| `AS utilities/I18n/time` | 95.85 [95.78, 95.87] | 17.56 [17.40, 17.69] |
+| `Rack/middleware/request` | 98.59 [98.55, 98.60] | 12.48 [12.35, 12.58] |
+| `View helpers/tags/forms` | 28.66 [28.60, 28.90] | 10.80 [10.66, 10.90] |
+| `Other gems/stdlib/app` | 100.00 [100.00, 100.00] | 8.14 [8.00, 8.23] |
+| `Rendering/lookup/helpers` | 79.00 [78.92, 79.03] | 6.99 [6.91, 7.06] |
+| `Buffers/escaping` | 19.70 [19.66, 19.74] | 6.68 [6.65, 6.72] |
+| `AR query/relation` | 79.91 [79.86, 80.03] | 6.41 [6.33, 6.61] |
+| `Session/cookies/crypto` | 91.48 [91.44, 91.52] | 5.02 [4.93, 5.08] |
+| `AR SQL/adapter` | 9.55 [9.46, 9.64] | 4.57 [4.49, 4.63] |
+| `Routing/URL generation` | 81.09 [80.98, 81.12] | 4.10 [4.00, 4.28] |
+| `AR attributes/casts` | 3.36 [3.29, 3.50] | 2.77 [2.67, 2.85] |
+| `Events/logging` | 92.36 [92.33, 92.39] | 2.65 [2.58, 2.66] |
+| `CSRF` | 8.13 [8.06, 8.17] | 2.37 [2.30, 2.43] |
+| `AR associations/preload` | 9.00 [8.97, 9.02] | 2.27 [2.25, 2.36] |
+| `Controller dispatch/response` | 80.02 [79.95, 80.07] | 1.58 [1.57, 1.65] |
+| `Static-file miss` | 95.93 [95.91, 95.96] | 1.29 [1.23, 1.30] |
+| `Callback machinery` | 94.39 [94.35, 94.45] | 1.26 [1.21, 1.35] |
+| `Benchmark client/seam` | 100.00 [100.00, 100.00] | 0.84 [0.82, 0.86] |
+| `AR instantiation/model` | 5.15 [5.05, 5.18] | 0.81 [0.76, 0.83] |
+| `Assets/importmap/CSP` | 4.77 [4.71, 4.79] | 0.65 [0.63, 0.66] |
+| `App templates` | 63.07 [63.01, 63.22] | 0.43 [0.41, 0.46] |
+| `JSON/serialization` | 0.24 [0.23, 0.26] | 0.24 [0.23, 0.26] |
+| `App helpers` | 1.02 [1.00, 1.03] | 0.05 [0.04, 0.06] |
+| `App controllers` | 74.58 [74.50, 74.63] | 0.05 [0.04, 0.05] |
 | `GC` | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] |
 
 ### Rails components and gems
 
 | Component | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `ActiveSupport` | 96.37 [96.28, 96.45] | 20.87 [20.69, 20.96] |
-| `ActionView` | 81.00 [80.84, 81.07] | 20.11 [19.84, 20.24] |
-| `ActiveRecord` | 82.14 [82.07, 82.26] | 13.72 [13.50, 13.97] |
-| `ActionDispatch` | 97.73 [97.72, 97.75] | 9.70 [9.39, 9.83] |
-| `rack` | 99.99 [99.99, 99.99] | 9.27 [9.17, 9.51] |
-| `i18n` | 5.99 [5.89, 6.09] | 5.85 [5.76, 5.90] |
-| `ActionController` | 82.31 [82.26, 82.37] | 4.93 [4.76, 5.09] |
-| `Ruby stdlib/internal` | 100.00 [100.00, 100.00] | 4.47 [4.37, 4.64] |
-| `uri` | 2.71 [2.64, 2.76] | 2.71 [2.64, 2.76] |
-| `ActiveModel` | 6.29 [6.11, 6.44] | 2.59 [2.54, 2.71] |
-| `concurrent-ruby` | 2.64 [2.48, 2.98] | 2.09 [1.97, 2.37] |
-| `base64` | 0.69 [0.65, 0.79] | 0.65 [0.60, 0.71] |
+| `ActiveSupport` | 95.88 [95.83, 95.91] | 21.30 [21.16, 21.47] |
+| `ActionView` | 79.00 [78.92, 79.03] | 19.54 [19.29, 19.62] |
+| `ActiveRecord` | 80.34 [80.23, 80.42] | 14.00 [13.89, 14.13] |
+| `rack` | 99.99 [99.99, 99.99] | 10.03 [9.93, 10.17] |
+| `ActionDispatch` | 97.42 [97.39, 97.45] | 9.12 [9.02, 9.17] |
+| `i18n` | 6.17 [6.12, 6.20] | 5.98 [5.89, 6.03] |
+| `ActionController` | 80.42 [80.35, 80.47] | 4.39 [4.28, 4.46] |
+| `Ruby stdlib/internal` | 100.00 [100.00, 100.00] | 3.92 [3.90, 4.02] |
+| `ActiveModel` | 6.02 [5.90, 6.15] | 2.60 [2.53, 2.67] |
+| `uri` | 2.49 [2.44, 2.56] | 2.49 [2.44, 2.56] |
+| `concurrent-ruby` | 2.99 [2.96, 3.10] | 2.39 [2.33, 2.50] |
+| `sqlite3` | 0.99 [0.95, 1.05] | 0.97 [0.93, 1.02] |
 
 ### Gem/file prefixes (top self costs)
 
 | Prefix | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `GEM/activesupport-8.1.4/lib/active_support` | 96.37 [96.28, 96.45] | 20.87 [20.69, 20.96] |
-| `GEM/actionview-8.1.4/lib/action_view` | 81.00 [80.84, 81.07] | 20.11 [19.84, 20.24] |
-| `GEM/activerecord-8.1.4/lib/active_record` | 82.14 [82.07, 82.26] | 13.65 [13.42, 13.88] |
-| `GEM/actionpack-8.1.4/lib/action_dispatch` | 97.73 [97.72, 97.75] | 9.70 [9.39, 9.83] |
-| `GEM/rack-3.2.7/lib/rack` | 99.99 [99.99, 99.99] | 9.27 [9.17, 9.51] |
-| `GEM/actionpack-8.1.4/lib/action_controller` | 82.25 [82.20, 82.32] | 4.42 [4.28, 4.53] |
-| `GEM/i18n-1.15.2/lib/i18n` | 5.36 [5.23, 5.45] | 4.33 [4.09, 4.41] |
-| `RUBY/openssl/hmac.rb` | 2.76 [2.62, 2.85] | 2.76 [2.62, 2.85] |
-| `GEM/uri-1.1.2/lib/uri` | 2.71 [2.64, 2.76] | 2.71 [2.64, 2.76] |
-| `GEM/activemodel-8.1.4/lib/active_model` | 6.29 [6.11, 6.44] | 2.59 [2.54, 2.71] |
+| `GEM/activesupport-8.1.4/lib/active_support` | 95.88 [95.83, 95.91] | 21.30 [21.16, 21.47] |
+| `GEM/actionview-8.1.4/lib/action_view` | 79.00 [78.92, 79.03] | 19.54 [19.29, 19.62] |
+| `GEM/activerecord-8.1.4/lib/active_record` | 80.34 [80.23, 80.42] | 13.21 [13.09, 13.31] |
+| `GEM/rack-3.2.7/lib/rack` | 99.99 [99.99, 99.99] | 10.03 [9.93, 10.17] |
+| `GEM/actionpack-8.1.4/lib/action_dispatch` | 97.42 [97.39, 97.45] | 9.12 [9.02, 9.17] |
+| `GEM/i18n-1.15.2/lib/i18n` | 5.43 [5.42, 5.48] | 4.39 [4.32, 4.45] |
+| `GEM/actionpack-8.1.4/lib/action_controller` | 80.35 [80.29, 80.41] | 3.82 [3.71, 3.87] |
+| `GEM/activemodel-8.1.4/lib/active_model` | 6.02 [5.90, 6.15] | 2.60 [2.53, 2.67] |
+| `GEM/uri-1.1.2/lib/uri` | 2.49 [2.44, 2.56] | 2.49 [2.44, 2.56] |
+| `GEM/concurrent-ruby-1.3.8/lib/concurrent-ruby` | 2.99 [2.96, 3.10] | 2.39 [2.33, 2.50] |
 
 ## starter
 
-Equal shape weights: starter-dashboard-html, starter-dashboard-json.
+Equal shape weights: starter-dashboard-html, starter-dashboard-json, starter-profile-json.
 
 **Descriptive: at least one constituent cohort is rejected.**
 
 | Subsystem | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `Rack/middleware/request` | 97.73 [97.72, 97.77] | 19.57 [19.53, 19.70] |
-| `AS utilities/I18n/time` | 94.47 [94.42, 94.50] | 17.47 [17.33, 17.69] |
-| `Other gems/stdlib/app` | 100.00 [100.00, 100.00] | 9.34 [9.19, 9.53] |
-| `Session/cookies/crypto` | 88.82 [88.77, 88.87] | 6.90 [6.80, 6.93] |
-| `AR query/relation` | 66.64 [66.56, 66.67] | 6.70 [6.57, 6.83] |
-| `AR SQL/adapter` | 13.28 [13.18, 13.40] | 6.58 [6.42, 6.68] |
-| `Inertia props/config/render` | 72.58 [72.42, 72.64] | 6.07 [5.97, 6.09] |
-| `SSR HTTP client` | 6.30 [6.26, 6.33] | 6.05 [6.01, 6.07] |
-| `AR attributes/casts` | 4.66 [4.58, 4.75] | 3.33 [3.26, 3.42] |
-| `Events/logging` | 89.90 [89.86, 89.95] | 2.16 [2.10, 2.20] |
-| `Callback machinery` | 92.69 [92.62, 92.74] | 1.84 [1.76, 1.92] |
-| `Controller dispatch/response` | 66.73 [66.71, 66.86] | 1.73 [1.67, 1.84] |
-| `Benchmark client/seam` | 100.00 [100.00, 100.00] | 1.56 [1.52, 1.60] |
-| `Static-file miss` | 94.19 [94.12, 94.22] | 1.54 [1.50, 1.58] |
-| `JSON/serialization` | 1.53 [1.49, 1.57] | 1.53 [1.49, 1.57] |
-| `Rendering/lookup/helpers` | 65.44 [65.41, 65.56] | 1.50 [1.41, 1.56] |
-| `CSRF` | 3.34 [3.21, 3.38] | 1.11 [1.06, 1.16] |
-| `Buffers/escaping` | 1.11 [1.09, 1.14] | 0.97 [0.94, 1.02] |
-| `AR associations/preload` | 11.58 [11.54, 11.66] | 0.93 [0.85, 1.02] |
-| `AR instantiation/model` | 6.70 [6.66, 6.75] | 0.84 [0.80, 0.86] |
-| `View helpers/tags/forms` | 1.35 [1.31, 1.38] | 0.82 [0.77, 0.82] |
-| `Assets/importmap/CSP` | 2.01 [1.99, 2.05] | 0.81 [0.76, 0.83] |
-| `Routing/URL generation` | 67.83 [67.77, 67.86] | 0.53 [0.50, 0.61] |
-| `App controllers` | 26.53 [26.46, 26.57] | 0.05 [0.04, 0.07] |
-| `App templates` | 3.74 [3.70, 3.77] | 0.05 [0.04, 0.08] |
-| `App models` | 11.47 [11.44, 11.55] | 0.01 [0.00, 0.01] |
+| `AS utilities/I18n/time` | 93.96 [93.93, 94.00] | 19.90 [19.74, 20.09] |
+| `Rack/middleware/request` | 97.50 [97.47, 97.54] | 17.54 [17.36, 17.58] |
+| `Other gems/stdlib/app` | 100.00 [100.00, 100.00] | 9.58 [9.46, 9.67] |
+| `AR query/relation` | 66.32 [66.28, 66.37] | 7.20 [7.11, 7.27] |
+| `Session/cookies/crypto` | 87.92 [87.90, 88.00] | 7.17 [7.07, 7.29] |
+| `AR SQL/adapter` | 14.23 [14.13, 14.28] | 7.12 [6.93, 7.24] |
+| `Inertia props/config/render` | 74.07 [73.94, 74.13] | 6.68 [6.57, 6.76] |
+| `SSR HTTP client` | 4.20 [4.17, 4.22] | 4.03 [4.01, 4.04] |
+| `AR attributes/casts` | 4.95 [4.82, 4.99] | 3.52 [3.45, 3.59] |
+| `Events/logging` | 89.07 [88.99, 89.13] | 2.04 [2.00, 2.07] |
+| `Callback machinery` | 92.08 [92.04, 92.14] | 2.00 [1.94, 2.07] |
+| `Controller dispatch/response` | 66.49 [66.37, 66.51] | 1.78 [1.76, 1.85] |
+| `Benchmark client/seam` | 100.00 [100.00, 100.00] | 1.72 [1.66, 1.76] |
+| `Static-file miss` | 93.68 [93.66, 93.74] | 1.66 [1.61, 1.71] |
+| `JSON/serialization` | 1.45 [1.39, 1.49] | 1.45 [1.39, 1.49] |
+| `Rendering/lookup/helpers` | 65.10 [65.01, 65.15] | 1.17 [1.12, 1.20] |
+| `CSRF` | 3.28 [3.20, 3.32] | 1.08 [1.06, 1.13] |
+| `AR associations/preload` | 12.48 [12.44, 12.51] | 1.04 [0.93, 1.10] |
+| `AR instantiation/model` | 7.19 [7.15, 7.26] | 0.89 [0.84, 0.97] |
+| `Routing/URL generation` | 67.91 [67.83, 67.95] | 0.66 [0.64, 0.70] |
+| `Buffers/escaping` | 0.74 [0.73, 0.76] | 0.65 [0.63, 0.68] |
+| `View helpers/tags/forms` | 0.90 [0.87, 0.92] | 0.55 [0.51, 0.55] |
+| `Assets/importmap/CSP` | 1.34 [1.33, 1.37] | 0.54 [0.51, 0.55] |
+| `App controllers` | 28.54 [28.50, 28.62] | 0.07 [0.06, 0.09] |
+| `App templates` | 2.50 [2.46, 2.51] | 0.04 [0.03, 0.05] |
+| `App models` | 12.38 [12.31, 12.43] | 0.01 [0.00, 0.02] |
 | `GC` | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] |
 
 ### Rails components and gems
 
 | Component | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `ActiveSupport` | 94.51 [94.48, 94.54] | 24.32 [24.05, 24.57] |
-| `rack` | 99.99 [99.98, 100.00] | 16.83 [16.79, 17.01] |
-| `ActiveRecord` | 67.13 [67.05, 67.17] | 14.16 [14.08, 14.23] |
-| `Ruby stdlib/internal` | 100.00 [100.00, 100.00] | 9.00 [8.96, 9.19] |
-| `ActionDispatch` | 96.27 [96.25, 96.35] | 7.90 [7.61, 8.06] |
-| `inertia_rails` | 72.58 [72.42, 72.64] | 6.07 [5.97, 6.09] |
-| `uri` | 4.34 [4.24, 4.43] | 4.34 [4.24, 4.43] |
-| `ActiveModel` | 5.29 [5.27, 5.41] | 3.53 [3.41, 3.56] |
-| `ActionController` | 66.92 [66.89, 67.09] | 3.11 [2.95, 3.22] |
-| `ActionView` | 65.44 [65.41, 65.56] | 2.84 [2.76, 2.86] |
-| `concurrent-ruby` | 2.44 [2.37, 2.47] | 1.68 [1.63, 1.73] |
-| `sqlite3` | 1.35 [1.30, 1.42] | 1.34 [1.27, 1.38] |
+| `ActiveSupport` | 94.01 [93.97, 94.04] | 26.79 [26.53, 27.00] |
+| `ActiveRecord` | 66.86 [66.76, 66.90] | 15.29 [15.18, 15.41] |
+| `rack` | 99.99 [99.98, 100.00] | 14.51 [14.48, 14.66] |
+| `ActionDispatch` | 95.96 [95.94, 96.02] | 8.52 [8.42, 8.77] |
+| `Ruby stdlib/internal` | 100.00 [100.00, 100.00] | 7.29 [7.17, 7.39] |
+| `inertia_rails` | 74.07 [73.94, 74.13] | 6.68 [6.57, 6.76] |
+| `uri` | 4.55 [4.51, 4.59] | 4.55 [4.51, 4.59] |
+| `ActiveModel` | 5.63 [5.61, 5.72] | 3.70 [3.63, 3.72] |
+| `ActionController` | 66.69 [66.58, 66.77] | 3.13 [3.05, 3.22] |
+| `ActionView` | 65.10 [65.01, 65.15] | 2.05 [2.01, 2.08] |
+| `concurrent-ruby` | 2.42 [2.34, 2.48] | 1.62 [1.56, 1.66] |
+| `sqlite3` | 1.44 [1.42, 1.47] | 1.41 [1.40, 1.44] |
 
 ### Gem/file prefixes (top self costs)
 
 | Prefix | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `GEM/activesupport-8.1.4/lib/active_support` | 94.51 [94.48, 94.54] | 24.32 [24.05, 24.57] |
-| `GEM/rack-3.2.7/lib/rack` | 99.99 [99.98, 100.00] | 16.83 [16.79, 17.01] |
-| `GEM/activerecord-8.1.4/lib/active_record` | 67.13 [67.05, 67.17] | 14.02 [13.96, 14.11] |
-| `GEM/actionpack-8.1.4/lib/action_dispatch` | 96.27 [96.25, 96.35] | 7.90 [7.61, 8.06] |
-| `GEM/inertia_rails-3.22.0/lib/inertia_rails` | 72.58 [72.42, 72.64] | 6.03 [5.94, 6.07] |
-| `GEM/uri-1.1.1/lib/uri` | 4.34 [4.24, 4.43] | 4.34 [4.24, 4.43] |
-| `RUBY/net/http.rb` | 6.29 [6.25, 6.32] | 3.55 [3.54, 3.59] |
-| `GEM/activemodel-8.1.4/lib/active_model` | 5.29 [5.27, 5.41] | 3.53 [3.41, 3.56] |
-| `GEM/actionview-8.1.4/lib/action_view` | 65.44 [65.41, 65.56] | 2.84 [2.76, 2.86] |
-| `GEM/actionpack-8.1.4/lib/action_controller` | 66.85 [66.81, 67.00] | 2.38 [2.24, 2.48] |
+| `GEM/activesupport-8.1.4/lib/active_support` | 94.01 [93.97, 94.04] | 26.79 [26.53, 27.00] |
+| `GEM/activerecord-8.1.4/lib/active_record` | 66.86 [66.76, 66.90] | 15.15 [15.04, 15.30] |
+| `GEM/rack-3.2.7/lib/rack` | 99.99 [99.98, 100.00] | 14.51 [14.48, 14.66] |
+| `GEM/actionpack-8.1.4/lib/action_dispatch` | 95.96 [95.94, 96.02] | 8.52 [8.42, 8.77] |
+| `GEM/inertia_rails-3.22.0/lib/inertia_rails` | 74.07 [73.94, 74.13] | 6.65 [6.55, 6.73] |
+| `GEM/uri-1.1.1/lib/uri` | 4.55 [4.51, 4.59] | 4.55 [4.51, 4.59] |
+| `GEM/activemodel-8.1.4/lib/active_model` | 5.63 [5.61, 5.72] | 3.70 [3.63, 3.72] |
+| `GEM/actionpack-8.1.4/lib/action_controller` | 66.60 [66.49, 66.66] | 2.43 [2.35, 2.52] |
+| `RUBY/net/http.rb` | 4.20 [4.17, 4.21] | 2.37 [2.36, 2.39] |
+| `GEM/actionview-8.1.4/lib/action_view` | 65.10 [65.01, 65.15] | 2.05 [2.01, 2.08] |
 
 ## pingcrm
 
-Equal shape weights: pingcrm-organizations-html.
+Equal shape weights: pingcrm-contacts-json, pingcrm-organizations-html.
 
 **Descriptive: at least one constituent cohort is rejected.**
 
 | Subsystem | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `AS utilities/I18n/time` | 48.38 [48.17, 48.54] | 15.74 [15.54, 15.96] |
-| `AR query/relation` | 85.20 [85.09, 85.30] | 14.86 [14.61, 15.13] |
-| `Other gems/stdlib/app` | 100.00 [100.00, 100.00] | 9.94 [9.77, 10.24] |
-| `Rack/middleware/request` | 98.71 [98.67, 98.74] | 9.38 [9.36, 9.42] |
-| `AR SQL/adapter` | 15.71 [15.59, 15.73] | 6.78 [6.58, 6.82] |
-| `AR attributes/casts` | 8.36 [8.26, 8.69] | 6.22 [6.01, 6.39] |
-| `Authorization` | 18.83 [18.64, 18.92] | 6.03 [5.89, 6.16] |
-| `Inertia props/config/render` | 94.82 [94.77, 94.86] | 5.52 [5.34, 5.58] |
-| `Rendering/lookup/helpers` | 85.06 [84.99, 85.12] | 3.83 [3.78, 3.92] |
-| `JSON/serialization` | 14.32 [14.22, 14.35] | 3.69 [3.57, 3.84] |
-| `Session/cookies/crypto` | 93.54 [93.51, 93.57] | 3.54 [3.43, 3.60] |
-| `Events/logging` | 94.50 [94.47, 94.53] | 2.17 [2.14, 2.24] |
-| `Controller dispatch/response` | 85.78 [85.67, 85.84] | 1.77 [1.72, 1.81] |
-| `View helpers/tags/forms` | 2.95 [2.85, 3.05] | 1.70 [1.61, 1.75] |
-| `Buffers/escaping` | 1.95 [1.88, 1.97] | 1.63 [1.60, 1.66] |
-| `AR instantiation/model` | 2.73 [2.65, 2.80] | 1.31 [1.27, 1.39] |
-| `CSRF` | 3.46 [3.39, 3.50] | 1.22 [1.20, 1.27] |
-| `Callback machinery` | 95.02 [94.95, 95.05] | 0.91 [0.84, 1.00] |
-| `Benchmark client/seam` | 100.00 [100.00, 100.00] | 0.90 [0.84, 0.92] |
-| `Assets/importmap/CSP` | 5.68 [5.58, 5.74] | 0.85 [0.78, 0.89] |
-| `Static-file miss` | 96.84 [96.80, 96.87] | 0.83 [0.77, 0.86] |
-| `AR associations/preload` | 5.90 [5.86, 5.96] | 0.54 [0.51, 0.60] |
-| `Routing/URL generation` | 86.38 [86.33, 86.42] | 0.33 [0.31, 0.35] |
-| `App controllers` | 49.21 [49.15, 49.31] | 0.12 [0.09, 0.13] |
-| `App models` | 2.30 [2.26, 2.34] | 0.12 [0.09, 0.15] |
-| `App templates` | 10.28 [10.22, 10.34] | 0.11 [0.10, 0.14] |
+| `AR query/relation` | 85.85 [85.76, 85.92] | 16.70 [16.59, 16.84] |
+| `AS utilities/I18n/time` | 43.10 [42.88, 43.19] | 14.19 [14.09, 14.42] |
+| `Other gems/stdlib/app` | 100.00 [100.00, 100.00] | 9.61 [9.51, 9.74] |
+| `Rack/middleware/request` | 98.79 [98.76, 98.81] | 8.53 [8.46, 8.57] |
+| `AR attributes/casts` | 11.07 [10.96, 11.17] | 8.36 [8.18, 8.48] |
+| `AR SQL/adapter` | 18.24 [18.22, 18.34] | 7.85 [7.68, 7.99] |
+| `Authorization` | 17.75 [17.68, 17.81] | 5.74 [5.68, 5.78] |
+| `Inertia props/config/render` | 95.07 [95.06, 95.10] | 5.44 [5.32, 5.55] |
+| `JSON/serialization` | 23.89 [23.84, 23.92] | 4.37 [4.31, 4.44] |
+| `Session/cookies/crypto` | 93.84 [93.83, 93.90] | 3.14 [3.07, 3.19] |
+| `AR associations/preload` | 13.63 [13.55, 13.70] | 2.74 [2.70, 2.76] |
+| `Rendering/lookup/helpers` | 85.67 [85.62, 85.77] | 2.13 [2.10, 2.14] |
+| `Events/logging` | 94.76 [94.73, 94.80] | 1.86 [1.82, 1.90] |
+| `Controller dispatch/response` | 86.34 [86.28, 86.44] | 1.51 [1.46, 1.54] |
+| `AR instantiation/model` | 3.71 [3.68, 3.81] | 1.50 [1.46, 1.53] |
+| `CSRF` | 2.83 [2.75, 2.86] | 1.00 [0.98, 1.03] |
+| `Callback machinery` | 95.25 [95.23, 95.31] | 0.95 [0.86, 0.97] |
+| `Benchmark client/seam` | 100.00 [100.00, 100.00] | 0.85 [0.82, 0.86] |
+| `View helpers/tags/forms` | 1.48 [1.43, 1.53] | 0.85 [0.81, 0.87] |
+| `Buffers/escaping` | 0.98 [0.95, 0.99] | 0.82 [0.80, 0.84] |
+| `Static-file miss` | 97.00 [96.97, 97.02] | 0.77 [0.74, 0.80] |
+| `Assets/importmap/CSP` | 2.84 [2.79, 2.87] | 0.43 [0.39, 0.45] |
+| `Routing/URL generation` | 86.92 [86.88, 86.98] | 0.32 [0.29, 0.33] |
+| `App controllers` | 51.71 [51.69, 51.80] | 0.19 [0.18, 0.20] |
+| `App models` | 3.11 [3.09, 3.18] | 0.16 [0.14, 0.17] |
+| `App templates` | 5.14 [5.11, 5.17] | 0.05 [0.05, 0.07] |
 | `GC` | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] |
 
 ### Rails components and gems
 
 | Component | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `ActiveRecord` | 85.43 [85.33, 85.55] | 24.47 [24.21, 24.71] |
-| `ActiveSupport` | 95.26 [95.21, 95.35] | 20.95 [20.59, 21.20] |
-| `rack` | 99.99 [99.98, 100.00] | 6.34 [6.26, 6.42] |
-| `ActionView` | 85.06 [84.99, 85.12] | 6.04 [5.89, 6.10] |
-| `cancancan` | 18.83 [18.64, 18.92] | 6.03 [5.89, 6.16] |
-| `ActionDispatch` | 98.13 [98.09, 98.19] | 5.76 [5.61, 5.94] |
-| `inertia_rails` | 94.82 [94.77, 94.86] | 5.52 [5.35, 5.60] |
-| `ActiveModel` | 12.01 [11.91, 12.32] | 5.51 [5.43, 5.75] |
-| `Ruby stdlib/internal` | 100.00 [100.00, 100.00] | 3.64 [3.56, 3.79] |
-| `ActionController` | 85.88 [85.78, 85.93] | 3.03 [2.98, 3.11] |
-| `jbuilder` | 13.46 [13.42, 13.54] | 2.91 [2.77, 2.99] |
-| `concurrent-ruby` | 2.88 [2.78, 2.96] | 2.59 [2.55, 2.71] |
+| `ActiveRecord` | 86.06 [85.97, 86.14] | 30.20 [30.03, 30.56] |
+| `ActiveSupport` | 95.51 [95.47, 95.60] | 18.47 [18.30, 18.73] |
+| `ActiveModel` | 13.89 [13.79, 14.04] | 7.21 [7.09, 7.33] |
+| `cancancan` | 17.75 [17.68, 17.81] | 5.74 [5.68, 5.78] |
+| `rack` | 99.99 [99.99, 100.00] | 5.62 [5.60, 5.75] |
+| `ActionDispatch` | 98.24 [98.22, 98.29] | 5.46 [5.31, 5.61] |
+| `inertia_rails` | 95.07 [95.06, 95.10] | 5.45 [5.32, 5.56] |
+| `jbuilder` | 23.05 [22.99, 23.08] | 3.52 [3.50, 3.59] |
+| `Ruby stdlib/internal` | 100.00 [100.00, 100.00] | 3.34 [3.25, 3.40] |
+| `ActionView` | 85.67 [85.62, 85.77] | 3.22 [3.16, 3.25] |
+| `concurrent-ruby` | 2.80 [2.76, 2.84] | 2.55 [2.52, 2.60] |
+| `ActionController` | 86.44 [86.39, 86.52] | 2.53 [2.53, 2.57] |
 
 ### Gem/file prefixes (top self costs)
 
 | Prefix | Inclusive % [95% CI] | Self % [95% CI] |
 |---|---:|---:|
-| `GEM/activerecord-8.1.4/lib/active_record` | 85.43 [85.33, 85.55] | 21.07 [20.77, 21.32] |
-| `GEM/activesupport-8.1.4/lib/active_support` | 95.26 [95.21, 95.35] | 20.95 [20.59, 21.20] |
-| `GEM/rack-3.2.7/lib/rack` | 99.99 [99.98, 100.00] | 6.34 [6.26, 6.42] |
-| `GEM/actionview-8.1.4/lib/action_view` | 85.06 [84.99, 85.12] | 6.04 [5.89, 6.10] |
-| `GEM/cancancan-3.7.0/lib/cancan` | 18.83 [18.64, 18.92] | 6.03 [5.89, 6.16] |
-| `GEM/actionpack-8.1.4/lib/action_dispatch` | 98.13 [98.09, 98.19] | 5.76 [5.61, 5.94] |
-| `GEM/activemodel-8.1.4/lib/active_model` | 12.01 [11.91, 12.32] | 5.51 [5.43, 5.75] |
-| `GEM/inertia_rails-3.23.0/lib/inertia_rails` | 94.82 [94.77, 94.86] | 5.50 [5.33, 5.58] |
-| `GEM/activerecord-8.1.4/lib/arel` | 4.43 [4.22, 4.48] | 3.44 [3.31, 3.49] |
-| `GEM/concurrent-ruby-1.3.8/lib/concurrent-ruby` | 2.88 [2.78, 2.96] | 2.59 [2.55, 2.71] |
+| `GEM/activerecord-8.1.4/lib/active_record` | 86.06 [85.97, 86.14] | 26.45 [26.31, 26.83] |
+| `GEM/activesupport-8.1.4/lib/active_support` | 95.51 [95.47, 95.60] | 18.47 [18.30, 18.73] |
+| `GEM/activemodel-8.1.4/lib/active_model` | 13.89 [13.79, 14.04] | 7.21 [7.09, 7.33] |
+| `GEM/cancancan-3.7.0/lib/cancan` | 17.75 [17.68, 17.81] | 5.74 [5.68, 5.78] |
+| `GEM/rack-3.2.7/lib/rack` | 99.99 [99.99, 100.00] | 5.62 [5.60, 5.75] |
+| `GEM/actionpack-8.1.4/lib/action_dispatch` | 98.24 [98.22, 98.29] | 5.46 [5.31, 5.61] |
+| `GEM/inertia_rails-3.23.0/lib/inertia_rails` | 95.07 [95.06, 95.10] | 5.42 [5.31, 5.54] |
+| `GEM/activerecord-8.1.4/lib/arel` | 4.90 [4.85, 4.96] | 3.74 [3.67, 3.79] |
+| `GEM/actionview-8.1.4/lib/action_view` | 85.67 [85.62, 85.77] | 3.22 [3.16, 3.25] |
+| `GEM/jbuilder-2.15.1/lib/jbuilder.rb` | 23.03 [22.97, 23.07] | 2.70 [2.68, 2.71] |
+
+## redprints
+
+Equal shape weights: redprints-proposal-json, redprints-proposals-html.
+
+All constituent cohorts accepted.
+
+| Subsystem | Inclusive % [95% CI] | Self % [95% CI] |
+|---|---:|---:|
+| `AS utilities/I18n/time` | 96.34 [96.31, 96.43] | 16.38 [16.23, 16.45] |
+| `AR query/relation` | 82.47 [82.42, 82.56] | 15.02 [14.76, 15.18] |
+| `AR attributes/casts` | 15.29 [15.14, 15.39] | 10.04 [9.93, 10.11] |
+| `Rack/middleware/request` | 98.61 [98.60, 98.63] | 9.63 [9.47, 9.78] |
+| `AR SQL/adapter` | 16.41 [16.35, 16.45] | 8.02 [7.91, 8.11] |
+| `JSON/serialization` | 39.13 [38.99, 39.21] | 6.97 [6.93, 7.07] |
+| `Other gems/stdlib/app` | 100.00 [100.00, 100.00] | 5.98 [5.91, 6.04] |
+| `Session/cookies/crypto` | 93.29 [93.26, 93.33] | 3.96 [3.87, 4.02] |
+| `AR associations/preload` | 22.38 [22.26, 22.50] | 3.65 [3.53, 3.71] |
+| `Inertia props/config/render` | 86.21 [86.09, 86.26] | 3.34 [3.26, 3.50] |
+| `FrozenRecord` | 2.87 [2.80, 2.88] | 2.64 [2.58, 2.66] |
+| `Rendering/lookup/helpers` | 81.97 [81.93, 82.06] | 2.01 [1.98, 2.08] |
+| `StoreModel` | 8.83 [8.70, 8.90] | 1.78 [1.75, 1.86] |
+| `Events/logging` | 93.93 [93.89, 94.02] | 1.60 [1.58, 1.70] |
+| `Callback machinery` | 95.31 [95.29, 95.34] | 1.31 [1.22, 1.41] |
+| `AR instantiation/model` | 10.16 [10.11, 10.20] | 1.13 [1.06, 1.19] |
+| `Controller dispatch/response` | 82.73 [82.65, 82.77] | 1.10 [1.05, 1.12] |
+| `Buffers/escaping` | 2.29 [2.24, 2.33] | 1.05 [1.00, 1.10] |
+| `Benchmark client/seam` | 100.00 [100.00, 100.00] | 0.96 [0.92, 0.99] |
+| `Static-file miss` | 96.37 [96.36, 96.39] | 0.89 [0.85, 0.93] |
+| `View helpers/tags/forms` | 1.35 [1.28, 1.37] | 0.63 [0.61, 0.67] |
+| `CSRF` | 1.88 [1.83, 1.90] | 0.62 [0.60, 0.65] |
+| `Routing/URL generation` | 83.51 [83.40, 83.55] | 0.44 [0.42, 0.48] |
+| `Assets/importmap/CSP` | 2.72 [2.70, 2.74] | 0.41 [0.39, 0.43] |
+| `App controllers` | 77.81 [77.77, 77.85] | 0.28 [0.25, 0.29] |
+| `App models` | 8.47 [8.46, 8.54] | 0.16 [0.14, 0.18] |
+| `App templates` | 32.61 [32.56, 32.64] | 0.04 [0.03, 0.06] |
+| `GC` | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] |
+
+### Rails components and gems
+
+| Component | Inclusive % [95% CI] | Self % [95% CI] |
+|---|---:|---:|
+| `ActiveRecord` | 82.69 [82.61, 82.77] | 27.73 [27.66, 27.90] |
+| `ActiveSupport` | 96.36 [96.33, 96.46] | 19.28 [19.03, 19.67] |
+| `ActiveModel` | 14.07 [13.95, 14.21] | 8.59 [8.52, 8.72] |
+| `rack` | 99.99 [99.99, 100.00] | 7.69 [7.57, 7.79] |
+| `alba` | 37.40 [37.28, 37.46] | 5.48 [5.42, 5.55] |
+| `ActionDispatch` | 97.82 [97.78, 97.83] | 5.13 [5.01, 5.29] |
+| `inertia_rails` | 86.21 [86.09, 86.26] | 3.34 [3.26, 3.51] |
+| `sqlite3` | 3.33 [3.27, 3.36] | 3.29 [3.25, 3.33] |
+| `ActionView` | 81.97 [81.93, 82.06] | 3.06 [3.02, 3.11] |
+| `frozen_record` | 2.87 [2.80, 2.88] | 2.64 [2.58, 2.66] |
+| `Ruby stdlib/internal` | 100.00 [100.00, 100.00] | 2.60 [2.53, 2.64] |
+| `tzinfo` | 2.95 [2.86, 3.06] | 2.55 [2.44, 2.66] |
+
+### Gem/file prefixes (top self costs)
+
+| Prefix | Inclusive % [95% CI] | Self % [95% CI] |
+|---|---:|---:|
+| `GEM/activerecord-8.1.4/lib/active_record` | 82.69 [82.61, 82.77] | 23.90 [23.81, 24.03] |
+| `GEM/activesupport-8.1.4/lib/active_support` | 96.36 [96.33, 96.46] | 19.28 [19.03, 19.67] |
+| `GEM/activemodel-8.1.4/lib/active_model` | 14.07 [13.95, 14.21] | 8.59 [8.52, 8.72] |
+| `GEM/rack-3.2.6/lib/rack` | 99.99 [99.99, 100.00] | 7.69 [7.57, 7.79] |
+| `GEM/actionpack-8.1.4/lib/action_dispatch` | 97.82 [97.78, 97.83] | 5.13 [5.01, 5.29] |
+| `GEM/alba-3.10.0/lib/alba` | 37.40 [37.28, 37.46] | 4.68 [4.62, 4.76] |
+| `GEM/inertia_rails-3.21.2/lib/inertia_rails` | 86.21 [86.09, 86.26] | 3.33 [3.25, 3.50] |
+| `GEM/sqlite3-2.9.5-x86_64-linux-gnu/lib/sqlite3` | 3.33 [3.27, 3.36] | 3.29 [3.25, 3.33] |
+| `GEM/actionview-8.1.4/lib/action_view` | 81.97 [81.93, 82.06] | 3.06 [3.02, 3.11] |
+| `GEM/frozen_record-0.27.4/lib/frozen_record` | 2.87 [2.80, 2.88] | 2.64 [2.58, 2.66] |
+
+## campfire
+
+Equal shape weights: campfire-json-uncached.
+
+**Descriptive: at least one constituent cohort is rejected.**
+
+| Subsystem | Inclusive % [95% CI] | Self % [95% CI] |
+|---|---:|---:|
+| `Other gems/stdlib/app` | 98.56 [98.56, 98.57] | 26.82 [26.64, 26.93] |
+| `AR query/relation` | 93.92 [93.89, 93.94] | 17.70 [17.57, 17.80] |
+| `AR associations/preload` | 42.11 [42.04, 42.12] | 10.72 [10.63, 10.78] |
+| `AR SQL/adapter` | 19.73 [19.68, 19.78] | 9.40 [9.36, 9.44] |
+| `AS utilities/I18n/time` | 97.79 [97.76, 97.82] | 7.59 [7.45, 7.68] |
+| `AR attributes/casts` | 9.63 [9.55, 9.70] | 7.04 [7.00, 7.10] |
+| `Rack/middleware/request` | 98.38 [98.36, 98.39] | 6.22 [6.16, 6.28] |
+| `Events/logging` | 97.37 [97.35, 97.39] | 4.40 [4.34, 4.50] |
+| `AR instantiation/model` | 9.38 [9.31, 9.45] | 2.46 [2.43, 2.50] |
+| `GC` | 1.42 [1.41, 1.43] | 1.42 [1.41, 1.43] |
+| `JSON/serialization` | 52.16 [52.11, 52.19] | 1.29 [1.28, 1.31] |
+| `Assets/importmap/CSP` | 25.92 [25.90, 25.97] | 1.21 [1.19, 1.26] |
+| `Rendering/lookup/helpers` | 93.88 [93.85, 93.90] | 0.82 [0.80, 0.86] |
+| `Controller dispatch/response` | 94.03 [94.00, 94.06] | 0.72 [0.71, 0.76] |
+| `Session/cookies/crypto` | 96.23 [96.19, 96.24] | 0.66 [0.63, 0.70] |
+| `Callback machinery` | 96.59 [96.56, 96.62] | 0.48 [0.46, 0.49] |
+| `Routing/URL generation` | 94.40 [94.36, 94.43] | 0.36 [0.35, 0.38] |
+| `Static-file miss` | 97.92 [97.90, 97.93] | 0.22 [0.21, 0.23] |
+| `App controllers` | 92.58 [92.52, 92.60] | 0.19 [0.19, 0.20] |
+| `App models` | 45.51 [45.42, 45.54] | 0.10 [0.09, 0.11] |
+| `Benchmark client/seam` | 98.56 [98.56, 98.57] | 0.07 [0.06, 0.07] |
+| `Buffers/escaping` | 0.07 [0.06, 0.07] | 0.07 [0.06, 0.07] |
+| `App templates` | 51.88 [51.84, 51.93] | 0.05 [0.04, 0.05] |
+| `CSRF` | 0.01 [0.01, 0.01] | 0.00 [0.00, 0.01] |
+
+### Rails components and gems
+
+| Component | Inclusive % [95% CI] | Self % [95% CI] |
+|---|---:|---:|
+| `ActiveRecord` | 93.95 [93.92, 93.96] | 38.73 [38.67, 38.85] |
+| `uri` | 18.97 [18.89, 19.02] | 18.97 [18.89, 19.02] |
+| `ActiveSupport` | 97.83 [97.81, 97.85] | 12.73 [12.64, 12.80] |
+| `ActiveModel` | 7.38 [7.26, 7.41] | 6.17 [6.09, 6.22] |
+| `Ruby stdlib/internal` | 98.56 [98.56, 98.57] | 4.17 [4.11, 4.20] |
+| `ActionDispatch` | 98.15 [98.13, 98.16] | 3.92 [3.83, 3.96] |
+| `sqlite3` | 3.40 [3.36, 3.43] | 3.38 [3.33, 3.41] |
+| `rack` | 98.56 [98.55, 98.57] | 3.01 [2.96, 3.09] |
+| `App` | 94.41 [94.37, 94.45] | 1.59 [1.56, 1.64] |
+| `GC` | 1.42 [1.41, 1.43] | 1.42 [1.41, 1.43] |
+| `sentry-ruby` | 97.21 [97.19, 97.23] | 0.98 [0.93, 1.02] |
+| `ActionController` | 94.04 [94.00, 94.07] | 0.97 [0.95, 1.00] |
+
+### Gem/file prefixes (top self costs)
+
+| Prefix | Inclusive % [95% CI] | Self % [95% CI] |
+|---|---:|---:|
+| `GEM/rails-e3d5c569d217/activerecord/lib` | 93.95 [93.92, 93.96] | 38.97 [38.91, 39.08] |
+| `GEM/uri-1.1.1/lib/uri` | 18.97 [18.89, 19.02] | 18.97 [18.89, 19.02] |
+| `GEM/rails-e3d5c569d217/activesupport/lib` | 97.83 [97.81, 97.85] | 12.73 [12.64, 12.80] |
+| `GEM/rails-e3d5c569d217/activemodel/lib` | 7.38 [7.26, 7.41] | 6.17 [6.09, 6.22] |
+| `GEM/rails-e3d5c569d217/actionpack/lib` | 98.15 [98.13, 98.16] | 4.89 [4.82, 4.91] |
+| `GEM/sqlite3-2.9.6-x86_64-linux-gnu/lib/sqlite3` | 3.40 [3.36, 3.43] | 3.38 [3.33, 3.41] |
+| `GEM/rack-3.2.7/lib/rack` | 98.56 [98.55, 98.57] | 3.01 [2.96, 3.09] |
+| `RUBY/<internal:marshal>` | 1.48 [1.43, 1.50] | 1.48 [1.43, 1.50] |
+| `GC` | 1.42 [1.41, 1.43] | 1.42 [1.41, 1.43] |
+| `APP/app/controllers` | 92.30 [92.25, 92.31] | 1.41 [1.38, 1.43] |
 
 ## Cross-app self-cost ranking
 
-Equal weight per available primary app (blog, starter, pingcrm), then per measured route/format. Campfire is excluded.
+Equal weight per available primary app (blog, starter, pingcrm, redprints), then per measured route/format. Campfire is excluded.
 
 **Descriptive: includes a rejected cohort; not an accepted aggregate.**
 
 | Rank | Subsystem | Mean self % [95% CI] |
 |---:|---|---:|
-| 1 | AS utilities/I18n/time | 16.76 [16.68, 16.83] |
-| 2 | Rack/middleware/request | 13.52 [13.46, 13.57] |
-| 3 | AR query/relation | 9.48 [9.34, 9.73] |
-| 4 | Other gems/stdlib/app | 9.03 [9.02, 9.14] |
-| 5 | AR SQL/adapter | 5.81 [5.77, 5.85] |
-| 6 | Session/cookies/crypto | 5.33 [5.32, 5.35] |
-| 7 | View helpers/tags/forms | 4.76 [4.71, 4.82] |
-| 8 | AR attributes/casts | 4.15 [4.01, 4.19] |
-| 9 | Rendering/lookup/helpers | 4.01 [3.94, 4.06] |
-| 10 | Inertia props/config/render | 3.85 [3.79, 3.88] |
-| 11 | Buffers/escaping | 3.18 [3.14, 3.23] |
-| 12 | Events/logging | 2.23 [2.21, 2.24] |
+| 1 | AS utilities/I18n/time | 17.02 [16.94, 17.07] |
+| 2 | Rack/middleware/request | 12.05 [11.97, 12.06] |
+| 3 | AR query/relation | 11.33 [11.22, 11.46] |
+| 4 | Other gems/stdlib/app | 8.32 [8.29, 8.35] |
+| 5 | AR SQL/adapter | 6.89 [6.83, 6.91] |
+| 6 | AR attributes/casts | 6.16 [6.10, 6.22] |
+| 7 | Session/cookies/crypto | 4.82 [4.79, 4.85] |
+| 8 | Inertia props/config/render | 3.88 [3.83, 3.90] |
+| 9 | JSON/serialization | 3.26 [3.23, 3.29] |
+| 10 | View helpers/tags/forms | 3.20 [3.17, 3.24] |
+| 11 | Rendering/lookup/helpers | 3.07 [3.05, 3.09] |
+| 12 | AR associations/preload | 2.43 [2.38, 2.45] |
 
 <!-- END GENERATED HOTSPOT TABLES -->
 
@@ -555,13 +810,13 @@ change any original accepted/rejected verdict.
 Whole-request %, median [nominal 95% CI]; files are under `active_support/`.
 Related files are grouped explicitly, never inclusive-cost sums.
 
-| Source family / principal file or method | Blog show | Starter JSON |
+| Source family / principal file or method | Blog show | Starter dashboard JSON |
 |---|---:|---:|
 | SafeBuffer / ERB::Util (`core_ext/string/output_safety.rb`, `core_ext/erb/util.rb`) | 5.76 [5.69, 5.97] | 0.00 [0.00, 0.00] |
 | `core_ext/object/blank.rb` (`blank?`, presence) | 3.16 [3.13, 3.21] | 0.51 [0.42, 0.64] |
 | `ordered_options.rb` (`InheritableOptions#initialize`, `OrderedOptions#method_missing`) | 2.02 [1.93, 2.06] | 1.45 [1.29, 1.59] |
 | Notifications / Instrumenter / subscribers | 1.57 [1.51, 1.65] | 1.23 [1.10, 1.35] |
-| Hash core_ext (`hash/slice.rb#extract!`, `hash/keys.rb` transforms) | 1.47 [1.39, 1.65] | 12.86 [12.64, 13.10] |
+| Hash core_ext (`core_ext/hash/slice.rb#extract!`, `core_ext/hash/keys.rb` transforms) | 1.47 [1.39, 1.65] | 12.86 [12.64, 13.10] |
 | `callbacks.rb` (`run_callbacks`, filters) | 1.11 [1.10, 1.14] | 2.23 [1.93, 2.41] |
 | Message encryptor/verifier, messages/codec/metadata/rotator, key generator | 1.03 [0.98, 1.08] | 3.91 [3.63, 4.13] |
 | `isolated_execution_state.rb` | 0.96 [0.87, 1.09] | 1.53 [1.41, 1.73] |
@@ -589,7 +844,7 @@ subsets are in the numeric export; zero sampled work is not non-execution.
 
 ### Rack and Rails HTTP self
 
-| Disjoint source family (broader than the original Rack subsystem) | Blog show | Starter JSON |
+| Disjoint source family (broader than the original Rack subsystem) | Blog show | Starter dashboard JSON |
 |---|---:|---:|
 | Rack ETag / ConditionalGet | 4.90 [4.88, 4.97] | 0.93 [0.90, 1.01] |
 | Rack Request / query parser / Utils | 1.68 [1.60, 1.85] | 3.58 [3.44, 3.84] |
@@ -606,7 +861,7 @@ subsets are in the numeric export; zero sampled work is not non-execution.
 
 Notable Rack method self costs:
 
-| Method | Blog show | Starter JSON |
+| Method | Blog show | Starter dashboard JSON |
 |---|---:|---:|
 | `Headers#[]=` | 0.63 [0.55, 0.70] | 1.18 [1.06, 1.32] |
 | `Headers#downcase_key` | 0.19 [0.17, 0.23] | 0.33 [0.29, 0.35] |
@@ -618,8 +873,10 @@ Notable Rack method self costs:
 Starter `Utils.parse_cookies_header` is **0.50 [0.48, 0.54]%**, but its native
 URI decode descendants are charged to URI, not Rack (see the top-five table).
 Likewise `set_cookie_header` does not include its **2.56%** URI-escape self
-descendant. MockResponse's `identify_cookie_attributes` alone is
-**0.85 [0.77, 0.94]%** Starter, explicitly client work. `FileHandler#file_readable?`
+descendant. Both hot URI encode/decode methods have **zero sampled mock-phase
+self** in every round: these are app-stack cookie costs outside the action,
+not the mock client's cookie parsing. MockResponse's `identify_cookie_attributes`
+alone is **0.85 [0.77, 0.94]%** Starter, explicitly client work. `FileHandler#file_readable?`
 is **1.12 [1.03, 1.23]%** there, below Static's inclusive wrapper. Neither fixture
 has a sampled Rack::Static/Files source frame; Rails Static is the measured
 miss path, not evidence that static serving itself is free.
@@ -656,10 +913,10 @@ credited savings. “App” never permits a behavior change in Lowrail itself.
 | `Rack::ETag#digest_body` (`rack/etag.rb`) | 4.83 [4.79, 4.86] | 0.00 — outside | **App recommendation**: review validator/body policy; keep SHA/ETag by default. Outside existing endpoint/action and remaining controller/params/response interpretation budgets |
 | `TagBuilder#tag_options` (`action_view/helpers/tag_helper.rb`) | 3.77 [3.59, 4.04] | 3.77 — inside | **Upstream Rails**, then sealed component only if priced: Tag/form attribute component; Compiled form/literal-tag intermediates. The upstream append fusion does not remove all 3.77% |
 | `TagBuilder#tag_option` (same file) | 3.29 [3.16, 3.44] | 3.29 — inside | **Upstream Rails / sealed endpoint**: same tag/compiled-form rows, SafeBuffer/OutputBuffer interpretation; retain escaping and fresh output. Inclusive costs overlap the preceding row |
-| `String#blank?` (`active_support/core_ext/object/blank.rb`) | 2.88 [2.86, 2.94] | 2.83 — mostly inside | **Sealed endpoint**, only fixed caller/option interpretation; live string/encoding checks stay. Overlaps compiled form/tag and endpoint/action, not a generic blank-result cache |
+| `String#blank?` (`active_support/core_ext/object/blank.rb`) | 2.88 [2.86, 2.94] | 2.83 — mostly inside | **Sealed endpoint / upstream**, not a generic blank-result cache. Overlaps **Upstream String#blank? / sealed backport** (candidate #3 prerequisites and guardless-backport refusal apply), compiled form/tag and endpoint/action. This source-owned pool is not that backport's removable budget |
 | `OpenSSL::HMAC.digest` (`openssl/hmac.rb`) | 2.26 [2.21, 2.38] | 2.26 — inside | **App recommendation / retain primitive**: token/security work is not a guarded-pass saving. Overlaps endpoint/action's explicit live token/CSRF residue, not its removable rendering structure |
 
-| Starter JSON method (file) | Self % [95% CI] | Inside action/render self % | Lever / existing DECISIONS overlap |
+| Starter dashboard JSON method (file) | Self % [95% CI] | Inside action/render self % | Lever / existing DECISIONS overlap |
 |---|---:|---:|---|
 | `Hash#extract!` (`active_support/core_ext/hash/slice.rb`) | 11.60 [11.37, 11.82] | 4.10 — mixed, mostly outside | **Guarded pass / upstream Inertia** at the specific bind caller: inertia/config_bind and Inertia config extraction Hashes. All 5,458 signed net samples have bind_controller on stack; no generic Hash rewrite |
 | `Configuration#bind_controller` (`inertia_rails/configuration.rb`) | 3.19 [3.09, 3.42] | 1.17 — mixed, mostly outside | **Guarded pass / upstream Inertia**: same two rows. Inclusive **15.05 [14.94, 15.36]%** contains the extract! work; action-only sealing does not cover middleware invocations |
@@ -669,7 +926,7 @@ credited savings. “App” never permits a behavior change in Lowrail itself.
 
 ### Serialization decision: do not promote the wrong pool
 
-Starter JSON's ActiveSupport share is **not mostly JSON encoding**. Its dominant
+Starter dashboard JSON's ActiveSupport share is **not mostly JSON encoding**. Its dominant
 method is `Hash#extract!`, reached from
 `InertiaRails::Configuration#initialize` → `bind_controller`; the recorded
 callers include Inertia middleware version/session checks and XSRF policy as
@@ -740,6 +997,23 @@ instruction-weighting/recursive-stack/GC contract plus exact path/count and
 qualified-method/location recovery: **6,210 samples**, expected B inclusive
 **74.883%**, observed **75.137%**, maximum lag **30 Ir**, **236 GC samples**.
 The numeric reporter checks the full method-self partition in every round;
-inclusive recursion is deduplicated by method, not by frame ID. Shared-driver
-tests remain **11 / 82** and pass tests **16 / 157**, all green. No pass/runtime
-or allocation-census change accompanies the addendum.
+inclusive recursion is deduplicated by method, not by frame ID. At the detail
+source pin, shared-driver tests passed **11 / 82**. After integrating the newer
+shared worker, they pass **12 / 130**; pass tests remain **16 / 157**, all green.
+No pass/runtime or allocation-census change accompanies the addendum.
+
+The complete map's final audit checks **396** round/mode/axis self partitions
+across eleven complete cohorts, retains all five interrupted attempts, and
+finds no overflow in a completed worker. The four previously published shape
+exports and the separate method-detail export are unchanged. Every completed
+shape links to exactly one measured-source provenance entry. All five new
+cohort roots' measured-source hashes and the sampler engine were rechecked
+before the publication pull/rebase; the numbers belong to those pins, not to
+an assertion that later main revisions were remeasured. No private request
+headers or bodies are exported.
+
+After the publication rebase, shared-driver tests pass **13 / 151**, pass
+tests **16 / 157**, profile-summary tests **1 / 9** and callback-survey tests
+**1 / 10**, with no failures, errors or skips. The rebase leaves all report
+data unchanged; the updated `String#blank?` overlap above points to main's
+separate sealed-candidate decision, not a new measurement or promotion here.

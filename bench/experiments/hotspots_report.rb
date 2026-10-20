@@ -74,7 +74,10 @@ module HotspotReport
     fingerprints = data.fetch("workers").values.select { _1["trace"] }.map { _1.slice("rails", "lock_sha256", "gems") }.uniq
     raise "inconsistent app lock/dependencies" unless fingerprints.size == 1
     { "name" => File.basename(dir), "app" => File.basename(dir).split("-").first,
-      "route" => data.fetch("route_label"), "format" => data.fetch("format"), "accepted" => control.fetch("accepted"),
+      "route" => data.fetch("route_label"),
+      "format" => data["app"] == "campfire" ? (data["route_label"] == "json" ? "json" : "html") : data.fetch("format"),
+      **(data["app"] == "campfire" ? { "cache_mode" => data.fetch("format") } : {}),
+      "accepted" => control.fetch("accepted"),
       "fingerprint" => fingerprints.first, "baseline_aa" => summary.fetch("aa"),
       "heap" => summary.fetch("heap_capacity"), "heap_matched" => summary.fetch("heap_matched"),
       "jit" => summary.fetch("jit"), "sampler_controls" => control,
@@ -251,15 +254,24 @@ module HotspotReport
       end
       [key, estimate(values)]
     end.sort_by { |_, value| -value[:median] }.to_h
-    provenance = inputs.map { JSON.parse(File.read(File.join(_1, "provenance.json"))) }
-    provenance.each { _1.delete("valgrind") }
+    provenance = inputs.map do |dir|
+      entry = JSON.parse(File.read(File.join(dir, "provenance.json")))
+      entry.delete("valgrind")
+      entry.merge("cohort_root" => File.basename(dir),
+        "completed_shapes" => Dir[File.join(dir, "*", "sampler-controls.json")].sort.map { File.basename(File.dirname(_1)) })
+    end
     interrupted = inputs.flat_map { Dir[File.join(_1, "*", "*.valgrind.log")] }.group_by { File.dirname(_1) }.filter_map do |dir, logs|
       next if File.exist?(File.join(dir, "sampler-controls.json"))
-      next unless logs.any? { File.read(_1).include?("brk segment overflow") }
-      data = JSON.parse(File.read(File.join(dir, "samples.json")))
-      { name: File.basename(dir), accepted: false, reason: "brk segment overflow; interrupted, no partial-arm salvage",
+      note = File.join(dir, "interrupted.json")
+      interruption = File.file?(note) ? JSON.parse(File.read(note)) : nil
+      next unless interruption || logs.any? { File.read(_1).include?("brk segment overflow") }
+      samples_path = File.join(dir, "samples.json")
+      data = File.file?(samples_path) ? JSON.parse(File.read(samples_path)) : { "samples" => [] }
+      { name: File.basename(dir), cohort_root: File.basename(File.dirname(dir)), accepted: false,
+        reason: interruption ? interruption.fetch("reason") : "brk segment overflow; interrupted, no partial-arm salvage",
+        interruption: interruption,
         aggregated_rounds: data.fetch("samples").size,
-        samples_sha256: Digest::SHA256.file(File.join(dir, "samples.json")).hexdigest,
+        samples_sha256: File.file?(samples_path) ? Digest::SHA256.file(samples_path).hexdigest : nil,
         worker_logs: logs.sort.to_h do |path|
           [File.basename(path), { sha256: Digest::SHA256.file(path).hexdigest,
             brk_overflow: File.read(path).include?("brk segment overflow") }]
@@ -277,6 +289,13 @@ module HotspotReport
       prices = shape.fetch("baseline_prices").values.map { format("%.3f", _1.fetch("median") / 1e6) }.join(" / ")
       aa = shape.fetch("baseline_aa_intervals").values.map { "[#{_1.fetch('ci95').map { |v| format('%+.4f', v) }.join(', ')}]" }.join(" / ")
       lines << "| #{shape.fetch('name')} | #{prices} | #{aa} | #{shape['heap_matched'] ? 'pass' : 'FAIL'} | #{control.dig('sampler_aa', 'aa', 'pass') ? 'pass' : 'FAIL'} | #{control['fidelity_pass'] ? 'pass' : 'FAIL'} | #{control['integrity'] ? 'pass' : 'FAIL'} | **#{shape['accepted'] ? 'accepted' : 'REJECTED'}** |"
+    end
+    unless interrupted.empty?
+      lines += ["", "### Interrupted cohorts — rejected, no partial salvage", "",
+        "| Attempt / shape | Aggregated rounds | Rejection |", "|---|---:|---|"]
+      interrupted.each do |cohort|
+        lines << "| #{cohort[:cohort_root]} / #{cohort[:name]} | #{cohort[:aggregated_rounds]} | #{cohort[:reason]} |"
+      end
     end
     lines += ["", "## Route/format detail", "", "Five largest self costs per request shape; intervals include all six rounds.", "",
       "| Request shape | Subsystem | Inclusive % [95% CI] | Self % [95% CI] |", "|---|---|---:|---:|"]
