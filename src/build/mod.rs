@@ -17,22 +17,25 @@ use crate::lower::{route, view};
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
     let mut env = "test".to_string();
+    let mut preload = false;
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
             "--env" => env = it.next().ok_or("--env needs a value")?.clone(),
+            // Opt-in: measured slower on uncached Campfire (docs/passes/preload-plans.md).
+            "--preload-plans" => preload = true,
             _ if app.is_none() => app = Some(PathBuf::from(a)),
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail build APP [--env test|production]")?;
+    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
-    let report = build(&app, &env)?;
+    let report = build(&app, &env, preload)?;
     println!("{report}");
     Ok(())
 }
 
-pub fn build(app: &Path, env: &str) -> Result<String, String> {
+pub fn build(app: &Path, env: &str, preload: bool) -> Result<String, String> {
     let dir = app.join(".lowrail");
     let facts_path = dir.join("facts.json");
     if !facts_path.exists() {
@@ -145,6 +148,9 @@ pub fn build(app: &Path, env: &str) -> Result<String, String> {
         .map_err(|e| format!("running lowrail-compile: {e}"))?;
     if !status.success() {
         return Err("lowrail-compile failed".into());
+    }
+    if !preload {
+        return Ok(summary(&ledger, &units, templates.len(), files.len(), &dir));
     }
     let preload_status = Command::new("bundle")
         .args(["exec", "ruby"])

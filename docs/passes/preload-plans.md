@@ -16,7 +16,7 @@ method lookup chain. Unsupported inputs or invalid facts call `super`.
 The prepend is visible in `ancestors`; unlike a source splice, this pass
 does not promise an unchanged method owner for Preloader itself.
 
-`lowrail build APP [--env production]` runs `lowrail-preload-build` after
+`lowrail build APP --preload-plans [--env production]` runs `lowrail-preload-build` after
 ordinary template/Ruby compilation. The helper boots the real app in that
 environment and augments the **same manifest and ledger**. One runtime unit
 gets `max(existing unit ids) + 1`; rebuilding is idempotent. There is no
@@ -170,9 +170,9 @@ The final combined route + preload build was verified with:
 cargo test
 ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].each { require_relative _1 }'
 cargo build
-target/debug/lowrail build .corpus/campfire
+target/debug/lowrail build .corpus/campfire --preload-plans
 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/campfire -- bin/rails test --seed 35709
-target/debug/lowrail build .corpus/real-blog
+target/debug/lowrail build .corpus/real-blog --preload-plans
 PARALLEL_WORKERS=1 target/debug/lowrail verify .corpus/real-blog
 ```
 
@@ -239,7 +239,7 @@ headers from `bench/campfire_setup.rb`. No app source/lockfile changes.
 
 ```sh
 RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 \
-  target/debug/lowrail build .corpus/campfire --env production
+  target/debug/lowrail build .corpus/campfire --env production --preload-plans
 BENCH_ROUNDS=3 BENCH_SECONDS=3 ruby bench/preload_runs.rb \
   .corpus/campfire /tmp/preload-micro micro
 BENCH_ROUNDS=3 BENCH_SECONDS=3 ruby bench/preload_runs.rb \

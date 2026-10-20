@@ -27,7 +27,9 @@ live in the linked docs; numbers come from executed runs, dated.
   Rails Association loaders per call, no cached rows. Schema/reflection/scope
   changes and unsupported shapes retain the original Rails path. Already-loaded
   micro path −22.1% time/−29.3% allocations, but presentation +19.3% and
-  response-cache-disabled room +10.2%: not a general application-speed win.
+  response-cache-disabled room +10.2%: not a general application-speed win,
+  so it is opt-in (`lowrail build --preload-plans`) until it no longer
+  slows real requests.
 - **Runtime gem**: `load_iseq` seam (composes with Bootsnap in either order),
   template seam (lowered handler code while the source digest matches),
   guards that reset on every definition path and revalidate lazily
