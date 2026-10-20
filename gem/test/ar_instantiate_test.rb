@@ -91,7 +91,7 @@ class ARInstantiateTest < Minitest::Test
     inverse = Writer.includes(:posts).find(a.id).then { |w| w.posts.all? { _1.writer.equal?(w) } }
     custom = CustomPost.order(:id).map { [_1.custom, _1.internal] }
     projected = Post._load_from_sql(ActiveRecord::Result.new(["score", "extra_number"], [["31", "47"]],
-      { "score" => ActiveRecord::Type::String.new, "extra_number" => ActiveRecord::Type::Integer.new })).first
+      [ActiveRecord::Type::String.new, ActiveRecord::Type::Integer.new])).first
     projection = [projected.score, projected["extra_number"]]
     builder_before = ($builder_calls || 0)
     CustomBuilderPost.order(:id).to_a
