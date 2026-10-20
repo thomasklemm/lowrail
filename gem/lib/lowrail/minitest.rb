@@ -73,6 +73,7 @@ module Lowrail
           "unit_hits" => stats["unit_hits"], "unit_fallbacks" => stats["unit_fallbacks"],
           "sql" => SqlTrace.snapshot }
         data["jit_diagnostics"] = [JitDiagnostics.snapshot] if defined?(JitDiagnostics)
+        data["verify_loads"] = VerifyLoads.snapshot if defined?(VerifyLoads)
         data
       end
     end
@@ -91,7 +92,9 @@ module Lowrail
 
       def start; end
 
-      def prerecord(_klass, _name); end
+      def prerecord(_klass, _name)
+        VerifyLoads.capture("first_test") if defined?(VerifyLoads)
+      end
 
       def passed? = true
 
@@ -150,6 +153,14 @@ module Lowrail
         merged["processes"] << data["pid"]
         (merged["ruby_descriptions"] ||= []) << data["ruby"] if data["ruby"]
         (merged["jit_diagnostics"] ||= []).concat(data["jit_diagnostics"]) if data["jit_diagnostics"]
+        if (loads = data["verify_loads"])
+          target = (merged["verify_loads"] ||= { "stages" => {}, "snapshot_seconds" => 0.0 })
+          target["snapshot_seconds"] += loads.fetch("snapshot_seconds")
+          loads.fetch("stages").each do |stage, categories|
+            snapshot = (target["stages"][stage] ||= {})
+            categories.each { |category, values| snapshot[category] = ((snapshot[category] || []) | values).sort }
+          end
+        end
       end
       merged["unit_hits"] = merged["unit_hits"].to_h
       merged["unit_fallbacks"] = merged["unit_fallbacks"].to_h

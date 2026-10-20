@@ -86,6 +86,10 @@ module Lowrail
         Stats.enable!
       end
       if ENV["LOWRAIL_OUTCOMES"]
+        if ENV["LOWRAIL_VERIFY_LOADS"] == "1"
+          require_relative "lowrail/verify_loads"
+          VerifyLoads.install
+        end
         require_relative "lowrail/sql_trace"
         require_relative "lowrail/minitest"
         Lowrail::Minitest.install(ENV["LOWRAIL_OUTCOMES"])

@@ -69,6 +69,46 @@ class MinitestPluginTest < Minitest::Test
     end
   end
 
+  def test_opt_in_load_census_observes_but_never_forces_autoloads
+    skip "Active Support and Zeitwerk are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "models"))
+      late = File.join(dir, "models/census_late.rb")
+      File.write(late, "class CensusLate; end\nActiveSupport.run_load_hooks(:census_probe)\n")
+      File.write(File.join(dir, "models/untouched.rb"), "raise 'observer forced an autoload'\n")
+      File.write(File.join(dir, "suite.rb"), <<~'RUBY')
+        require "minitest/autorun"
+        require "active_support/lazy_load_hooks"
+        require "zeitwerk"
+        loader = Zeitwerk::Loader.new
+        loader.push_dir(File.join(Dir.pwd, "models"))
+        loader.setup
+        ActiveSupport.on_load(:census_probe) { $hook_calls = ($hook_calls || 0) + 1 }
+        class CensusTest < Minitest::Test
+          def test_late_load
+            assert_equal "CensusLate", CensusLate.name
+            assert_equal 1, $hook_calls
+          end
+        end
+      RUBY
+      %w[0 1].each do |mode|
+        path = File.join(dir, "outcomes-#{mode}.json")
+        _out, err, status = ruby("suite.rb", chdir: dir, env: {
+          "LOWRAIL" => mode, "LOWRAIL_OUTCOMES" => path, "LOWRAIL_VERIFY_LOADS" => "1" })
+        assert status.success?, err
+        census = JSON.parse(File.read(path)).fetch("verify_loads")
+        first, last = census.fetch("stages").values_at("first_test", "after_suite")
+        refute_includes first.fetch("constants"), "CensusLate"
+        assert_includes last.fetch("constants"), "CensusLate"
+        refute_includes first.fetch("zeitwerk_paths"), late
+        assert_includes last.fetch("zeitwerk_paths"), late
+        assert last.fetch("on_load_hooks").any? { _1.start_with?("census_probe\t") }
+        refute_includes last.fetch("constants"), "Untouched"
+        assert_operator census.fetch("snapshot_seconds"), :>, 0
+      end
+    end
+  end
+
   RAILS_SUITE = <<~'RUBY'
     require "active_support"
     require "active_support/test_case"

@@ -45,6 +45,7 @@ module Lowrail
       end
 
       def start(key)
+        VerifyLoads.capture("first_test") if defined?(VerifyLoads)
         return unless enabled? && subscribe
         hook_rails
         @mutex.synchronize do

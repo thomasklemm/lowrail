@@ -112,6 +112,14 @@ Short aliases are `memo`, `preload_plans`, `ar_instantiate`, `ar_plans`,
 `digest_memo`, `inertia_config`, `props` and `endpoint`. File formats are documented in
 [docs/FORMATS.md](docs/FORMATS.md).
 
+`LOWRAIL_VERIFY_LOADS=1 lowrail verify APP` also compares non-autoloading
+constant censuses, Zeitwerk-loaded paths and executed Active Support load
+hooks at the first test and after the suite, including load/hook order.
+Reproducible differences fail verification and automatically probe each pass;
+off/off and on/on variation is reported separately as advisory noise.
+This observer is opt-in because its snapshots and boot hooks have a cost;
+the corpus compatibility checks enable it. Snapshot time is in the report.
+
 ## Complementary optimizations
 
 Lowrail only applies changes it can guard exactly. These stay the app's own

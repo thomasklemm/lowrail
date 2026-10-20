@@ -85,3 +85,32 @@ fn verify_excludes_sql_traces_unstable_between_off_runs() {
     }
     std::fs::remove_dir_all(app).unwrap();
 }
+
+#[test]
+fn verify_gates_reproducible_load_changes_and_isolates_the_pass() {
+    let app = std::env::temp_dir().join(format!("lowrail-verify-loads-{}", std::process::id()));
+    std::fs::create_dir_all(app.join(".lowrail")).unwrap();
+    std::fs::write(app.join(".lowrail/manifest.json"), serde_json::json!({"units":[
+        {"id":7,"pass":"fixture/quiet"},{"id":9,"pass":"fixture/eager"}]}).to_string()).unwrap();
+    for changes_loads in [false, true] {
+        let script = r#"
+          extra=''
+          case ",${LOWRAIL_UNITS-7,9}," in
+            *,9,*) if [ "$LOWRAIL" = 1 ] && [ "$1" = true ]; then extra=',"App::Early"'; fi ;;
+          esac
+          printf '{"tests":{"a":{"result":"pass"}},"verify_loads":{"snapshot_seconds":0.012,"stages":{"first_test":{"constants":["App::Shared","Noise%s"%s]},"after_suite":{"constants":["App::Shared","App::Early"]}}}}' "$$" "$extra" > "$LOWRAIL_OUTCOMES"
+        "#;
+        let result = Command::new(env!("CARGO_BIN_EXE_lowrail"))
+            .args(["verify", app.to_str().unwrap(), "--", "sh", "-c", script, "sh", if changes_loads { "true" } else { "false" }])
+            .output().unwrap();
+        let stdout = String::from_utf8_lossy(&result.stdout);
+        assert_eq!(result.status.success(), !changes_loads, "{stdout}");
+        let last: serde_json::Value = serde_json::from_slice(&std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
+        assert!(!last["report"]["unstable_loads"].as_array().unwrap().is_empty());
+        if changes_loads {
+            assert_eq!(last["report"]["load_culprit_passes"], serde_json::json!(["fixture/eager"]));
+            assert!(stdout.contains("first_test\tconstants\tApp::Early"), "{stdout}");
+        }
+    }
+    std::fs::remove_dir_all(app).unwrap();
+}

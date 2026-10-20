@@ -42,7 +42,10 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         serde_json::from_slice(&std::fs::read(manifest_path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?
     } else { Value::Null };
     let seed = seed_env();
-    let report = verify(&app, &cmd, &seed, observe_types)?;
+    let mut report = verify(&app, &cmd, &seed, observe_types)?;
+    if !report.load_differences().is_empty() {
+        report.load_culprit_passes = bisect_load_passes(&app, &cmd, &manifest, &report, &seed)?;
+    }
     println!("{}", report.render());
     let mut overhead = None;
     let mut recorder_ok = true;
@@ -51,8 +54,9 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         let control = Report { off: plain, on: Run {
             tests: report.on.tests.clone(), sql: report.on.sql.clone(),
             sql_other: report.on.sql_other.clone(), processes: report.on.processes,
+            loads: report.on.loads.clone(),
             exit_ok: report.on.exit_ok, ..Default::default()
-        }, unstable_sql: BTreeSet::new() };
+        }, ..Default::default() };
         overhead = Some(serde_json::json!({"recorded_seconds":report.on.seconds,
             "plain_seconds":control.off.seconds,
             "percent":(report.on.seconds / control.off.seconds - 1.0) * 100.0,
@@ -92,17 +96,22 @@ pub struct Run {
     /// Process-wide JIT snapshots; never part of equivalence or coverage gates.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub jit_diagnostics: Vec<Value>,
+    #[serde(skip_serializing_if = "BTreeSet::is_empty")]
+    pub loads: BTreeSet<String>,
+    pub load_snapshot_seconds: f64,
     pub seconds: f64,
     pub exit_ok: bool,
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, Default, serde::Serialize)]
 pub struct Report {
     pub off: Run,
     pub on: Run,
     /// Tests whose SQL trace already differs between two LOWRAIL=0 runs
     /// (inlined sequence ids, time, randomness). Their traces cannot gate.
     pub unstable_sql: BTreeSet<String>,
+    pub unstable_loads: BTreeSet<String>,
+    pub load_culprit_passes: Vec<String>,
 }
 
 impl Report {
@@ -152,10 +161,19 @@ impl Report {
             .collect()
     }
 
+    pub fn load_differences(&self) -> Vec<String> {
+        self.off.loads.symmetric_difference(&self.on.loads)
+            .filter(|entry| !self.unstable_loads.contains(*entry))
+            .map(|entry| format!("{}: {entry}", if self.on.loads.contains(entry) { "on only" } else { "off only" }))
+            .chain(self.off.loads.union(&self.on.loads).filter(|entry| entry.contains("\terrors\t")).cloned())
+            .collect()
+    }
+
     pub fn identical(&self) -> bool {
         !self.off.tests.is_empty()
             && self.differences().is_empty()
             && (!self.sql_gates() || self.sql_differences().is_empty())
+            && self.load_differences().is_empty()
             && self.off.exit_ok == self.on.exit_ok
     }
 
@@ -228,6 +246,17 @@ impl Report {
         for ruby in self.off.ruby_descriptions.union(&self.on.ruby_descriptions) {
             s.push_str(&format!("\nRuby: {ruby}"));
         }
+        if !self.off.loads.is_empty() || !self.on.loads.is_empty() {
+            let differences = self.load_differences();
+            s.push_str(&format!("\nload census: {} differences; {} unstable entries advisory; snapshots off/on {:.4}/{:.4}s",
+                differences.len(), self.unstable_loads.len(), self.off.load_snapshot_seconds, self.on.load_snapshot_seconds));
+            for finding in differences.iter().take(50) {
+                s.push_str(&format!("\n  {finding}"));
+            }
+            if !self.load_culprit_passes.is_empty() {
+                s.push_str(&format!("\nload census culprit passes: {}", self.load_culprit_passes.join(", ")));
+            }
+        }
         let diagnostics = self.off.jit_diagnostics.len() + self.on.jit_diagnostics.len();
         if diagnostics > 0 {
             s.push_str(&format!("\nJIT diagnostics: {diagnostics} process snapshots in last.json (not per-ISeq counters; not a gate)"));
@@ -278,21 +307,23 @@ fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: 
         std::fs::rename(tmp, out).map_err(|e| e.to_string())?;
         on
     } else { run_with(app, cmd, &dir, "1", &env)? };
-    let mut report = Report { off, on, unstable_sql: BTreeSet::new() };
+    let mut report = Report { off, on, ..Default::default() };
     // Only when SQL would fail the gate: a second LOWRAIL=0 run tells
     // run-to-run noise apart from differences Lowrail causes.
-    if report.sql_gates() && !report.sql_differences().is_empty() {
-        eprintln!("lowrail verify: SQL traces differ; control run with LOWRAIL=0");
+    if (report.sql_gates() && !report.sql_differences().is_empty()) || !report.load_differences().is_empty() {
+        eprintln!("lowrail verify: SQL/load traces differ; control run with LOWRAIL=0");
         let control = run_labeled(app, cmd, &dir, "0-control", "0", &env)?;
         report.unstable_sql = unstable(&report.off, &control);
+        report.unstable_loads = report.off.loads.symmetric_difference(&control.loads).cloned().collect();
         // A test that varies only now and then can agree in two off runs by
         // chance. If differences remain, repeat the on run as well: only a
         // difference both on runs agree on, against two agreeing off runs,
         // counts as caused by Lowrail.
-        if !report.sql_differences().is_empty() {
-            eprintln!("lowrail verify: SQL traces still differ; control run with LOWRAIL=1");
+        if !report.sql_differences().is_empty() || !report.load_differences().is_empty() {
+            eprintln!("lowrail verify: SQL/load traces still differ; control run with LOWRAIL=1");
             let on_control = run_labeled(app, cmd, &dir, "1-control", "1", &env)?;
             report.unstable_sql.extend(unstable(&report.on, &on_control));
+            report.unstable_loads.extend(report.on.loads.symmetric_difference(&on_control.loads).cloned());
         }
     }
     Ok(report)
@@ -322,6 +353,33 @@ fn unstable(a: &Run, b: &Run) -> BTreeSet<String> {
     a.sql.iter().filter(|(name, x)| b.sql.get(*name).map(|y| &y.0) != Some(&x.0)).map(|(name, _)| name.clone()).collect()
 }
 
+/// Isolate activation effects as well as executed fast paths. Passes.install
+/// respects LOWRAIL_UNITS, so disabled passes cannot run eager setup code.
+fn bisect_load_passes(app: &Path, cmd: &[String], manifest: &Value, report: &Report, seed: &[(String, String)]) -> Result<Vec<String>, String> {
+    let findings: Vec<_> = report.off.loads.symmetric_difference(&report.on.loads)
+        .filter(|entry| !report.unstable_loads.contains(*entry)).collect();
+    let mut groups: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for unit in manifest["units"].as_array().into_iter().flatten() {
+        if let (Some(pass), Some(id)) = (unit["pass"].as_str(), unit["id"].as_u64()) {
+            groups.entry(pass.to_string()).or_default().push(id.to_string());
+        }
+    }
+    let mut culprits = Vec::new();
+    for (index, (pass, ids)) in groups.into_iter().enumerate() {
+        let list = ids.join(",");
+        let mut env = env_refs(seed);
+        env.push(("LOWRAIL_UNITS", &list));
+        let on = run_labeled(app, cmd, &app.join(".lowrail/verify"), &format!("loads-pass-{index}"), "1", &env)?;
+        if findings.iter().any(|entry| report.off.loads.contains(*entry) != on.loads.contains(*entry)) {
+            culprits.push(pass);
+        }
+    }
+    if culprits.is_empty() {
+        culprits.push("setup/source delivery or combined passes (no single pass reproduces)".into());
+    }
+    Ok(culprits)
+}
+
 /// Finds the units whose lowering changes outcomes: splits the unit set and
 /// reruns the suite with only one half enabled (LOWRAIL_UNITS), recursing
 /// into halves that still differ. A set whose halves are each clean is
@@ -342,9 +400,10 @@ fn bisect_units(app: &Path, cmd: &[String], off: &Run, unstable: &BTreeSet<Strin
         env.push(("LOWRAIL_UNITS", &list));
         let on = run_with(app, cmd, &dir, "1", &env)?;
         let r = Report {
-            off: Run { tests: off.tests.clone(), sql: off.sql.clone(), sql_other: off.sql_other.clone(), exit_ok: off.exit_ok, ..Default::default() },
+            off: Run { tests: off.tests.clone(), sql: off.sql.clone(), sql_other: off.sql_other.clone(), loads: off.loads.clone(), exit_ok: off.exit_ok, ..Default::default() },
             on,
             unstable_sql: unstable.clone(),
+            ..Default::default()
         };
         eprintln!("bisect: units [{list}] → {}", if r.identical() { "identical" } else { "differs" });
         Ok(!r.identical())
@@ -436,6 +495,24 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         }
         if let Some(snapshots) = data["jit_diagnostics"].as_array() {
             run.jit_diagnostics.extend(snapshots.iter().cloned());
+        }
+        if let Some(stages) = data["verify_loads"]["stages"].as_object() {
+            run.load_snapshot_seconds += data["verify_loads"]["snapshot_seconds"].as_f64().unwrap_or(0.0);
+            for required in ["first_test", "after_suite"] {
+                if !stages.contains_key(required) {
+                    run.loads.insert(format!("{required}\terrors\tload snapshot missing"));
+                }
+            }
+            for (stage, categories) in stages {
+                run.loads.insert(format!("{stage}\tpresent\t"));
+                for (category, entries) in categories.as_object().into_iter().flatten() {
+                    for entry in entries.as_array().into_iter().flatten().filter_map(Value::as_str) {
+                        run.loads.insert(format!("{stage}\t{category}\t{entry}"));
+                    }
+                }
+            }
+        } else if std::env::var("LOWRAIL_VERIFY_LOADS").as_deref() == Ok("1") {
+            run.loads.insert("first_test\terrors\tload census missing from outcomes".into());
         }
         run.processes += match data["processes"].as_array() {
             Some(list) => list.len(),
