@@ -3,6 +3,13 @@
 # Revised, literal-name-only link price. Not installed in Lowrail. URL selection,
 # option conversion, input escaping and PRE_CONTENT_STRINGS consumption stay live.
 if ENV["SEALED_LINK_WORKER"]
+  if ENV["SEALED_LINK_PROVENANCE"]
+    require_relative "sealed_provenance"
+    unless ENV["SEALED_LINK_WORKER"] == "original"
+      ENV["LOWRAIL"] = "1"
+      factory_path, delivery = SealedBuilderCost.install
+    end
+  end
   require File.expand_path("config/application", Dir.pwd)
   Rails.application.config.yjit = false
   require File.expand_path("config/environment", Dir.pwd)
@@ -14,8 +21,12 @@ if ENV["SEALED_LINK_WORKER"]
   Rails.logger.level = :error
   ActiveRecord::Base.logger = nil
   require File.expand_path("../../gem/lib/lowrail/templates", __dir__)
+  delivery&.disable
+  raise "factory delivery absent" if delivery && SealedBuilderCost::SERVED != [factory_path]
+  SealedBuilderCost::ACTIVE[0] = true if ENV["SEALED_LINK_PROVENANCE"]
 
   module SealedLinkCost
+    PROVENANCE = !!ENV["SEALED_LINK_PROVENANCE"]
     SINGLETON = Kernel.instance_method(:singleton_class)
     METHOD = Module.instance_method(:instance_method)
     PUBLIC = Module.instance_method(:public_method_defined?)
@@ -33,10 +44,12 @@ if ENV["SEALED_LINK_WORKER"]
     def self.check(view, url, html, css)
       # Charge an epoch read at every hit as well as request-local permission:
       # conservative versus reading the epoch only at request entry.
-      return false unless Thread.current[:lowrail_sealed_price] && EPOCH[0] == 0 &&
+      return false unless Ractor.current.equal?(Ractor.main) &&
+        Thread.current[:lowrail_sealed_price] && EPOCH[0] == 0 &&
         String === url && ENCODING.bind_call(url) == Encoding::UTF_8 && VALID.bind_call(url) &&
         html.size == 2 && html["class"] == css && html["href"].equal?(url)
       builder = view.send(:tag_builder)
+      return SealedBuilderCost::BUILDERS.key?(builder) if PROVENANCE
       return false unless BUILDER === builder
       holder = SINGLETON.bind_call(builder)
       # Current UnboundMethods allocate on stock Ruby; these are NOT called
@@ -81,6 +94,12 @@ if ENV["SEALED_LINK_WORKER"]
     render = ->(value) { "#{prefix}#{Lowrail::Html.attr(value)}\">#{ActionView::Helpers::TagHelper::PRE_CONTENT_STRINGS['a']}#{suffix}".html_safe }
     original = -> { view.link_to(name, url, {class: css}) }
     checks = -> { SealedLinkCost.check(view, url, html, css) }
+    if SealedLinkCost::PROVENANCE && ENV["SEALED_LINK_WORKER"] == "original"
+      # Off workers leave the factory untouched. Certify the pristine captured
+      # holder solely for untimed boundary probes; timed off calls never read
+      # this map, and every iteration constructs its own stock builder.
+      SealedBuilderCost::BUILDERS[view.send(:tag_builder)] = true
+    end
     prelude = -> {
       converted = view.send(:convert_options_to_data_attributes, url, static_options)
       selected = view.send(:url_target, name, url)
@@ -105,6 +124,14 @@ if ENV["SEALED_LINK_WORKER"]
     builder = view.send(:tag_builder)
     # Private singleton overrides and singleton prepend both escaped v1's
     # singleton_methods scan. Every refusal is checked before timed windows.
+    if SealedLinkCost::PROVENANCE
+      # A factory-issued builder is structurally immutable under SEAL001.
+      # Test a preexisting foreign holder instead, including reinitialization:
+      # initialize alone must NEVER confer constructor provenance.
+      builder = SealedLinkCost::BUILDER.new(view)
+      original_builder = view.instance_variable_get(:@tag_builder)
+      view.instance_variable_set(:@tag_builder, builder)
+    end
     builder.define_singleton_method(:tag_option) { |*| "changed" }
     builder.singleton_class.send(:private, :tag_option)
     raise "private override accepted" if checks.call
@@ -113,6 +140,11 @@ if ENV["SEALED_LINK_WORKER"]
     builder.singleton_class.send(:private, :content_tag_string)
     raise "visibility accepted" if checks.call
     builder.singleton_class.send(:remove_method, :content_tag_string)
+    if SealedLinkCost::PROVENANCE
+      builder.send(:initialize, view)
+      raise "reinitialized foreign builder accepted" if checks.call
+      view.instance_variable_set(:@tag_builder, original_builder)
+    end
     original_builder = view.instance_variable_get(:@tag_builder)
     substitute = SealedLinkCost::BUILDER.new(view)
     extension = Module.new { private; def tag_option(*) = "changed" }
@@ -154,28 +186,43 @@ if ENV["SEALED_LINK_WORKER"]
     {original: original, checks: checks, prelude: prelude, residue: residue, candidate: candidate}
   end
   calls = operations.map { _1.fetch(ENV.fetch("SEALED_LINK_WORKER").to_sym) }
-  200.times { calls.each(&:call) }
+  views = links.map(&:first).uniq
+  iterate = -> {
+    views.each { _1.instance_variable_set(:@tag_builder, nil) } if SealedLinkCost::PROVENANCE
+    calls.each(&:call)
+  }
+  200.times { iterate.call }
   windows = HeapWindows.windows(Integer(ENV.fetch("BENCH_REQUESTS")), ["link"])
-  anchors = HeapWindows.run(windows) { |n, _| n.times { calls.each(&:call) } }
+  anchors = HeapWindows.run(windows) do |n, _|
+    n.times { iterate.call }
+    # Symmetric N=0/N=200 collection charges weak-key cleanup to the slope;
+    # total includes it, no_gc excludes it. No cleanup hidden in warmup.
+    GC.start if SealedLinkCost::PROVENANCE
+  end
   puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?,
     windows: windows, heap_anchors: anchors, ar_installed: 0, links: links.size,
+    provenance: SealedLinkCost::PROVENANCE, fresh_builder_contexts: views.size,
     operations: {link: {invocations_per_iteration: links.size}})}"
   exit
 end
 
 require_relative "../request_pairs"
-app, out = ARGV.map { File.expand_path(_1) }
-abort "usage: sealed_links.rb APP NEW_OUTDIR" unless app && out
+app, out = ARGV.first(2).map { File.expand_path(_1) }
+abort "usage: sealed_links.rb APP NEW_OUTDIR [--provenance]" unless app && out
+raise "unknown price mode" unless ARGV.size == 2 || ARGV[2..] == ["--provenance"]
+provenance = ARGV[2] == "--provenance"
 raise "output directory must be new" if File.exist?(out)
 FileUtils.mkdir_p(out, mode: 0o700)
 env = {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "0", "RUBYOPT" => nil,
   "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "BENCH_JIT" => "0"}
 environments = %w[off_a off_b checks prelude residue candidate].to_h do |arm|
-  [arm, env.merge("SEALED_LINK_WORKER" => arm.start_with?("off") ? "original" : arm)]
+  [arm, env.merge("SEALED_LINK_WORKER" => arm.start_with?("off") ? "original" : arm,
+    "SEALED_LINK_PROVENANCE" => provenance ? "1" : nil)]
 end
 sources = [__FILE__, File.expand_path("../heap_windows.rb", __dir__), File.expand_path("../request_pairs.rb", __dir__),
-  File.expand_path("../../gem/lib/lowrail/templates.rb", __dir__)].to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
-metadata = {seed: 41231, rounds: 6, workers: {}, sources: sources}
+  File.expand_path("sealed_provenance.rb", __dir__),
+  *Dir[File.expand_path("../../gem/lib/**/*.rb", __dir__)]].to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
+metadata = {seed: 41231, rounds: 6, workers: {}, sources: sources, provenance: provenance}
 accepted = RequestPairs.heap_instructions(environments, app, out, "GET:/articles/1", metadata,
   worker: File.expand_path(__FILE__), requests: 200)
 raise "study source changed" unless sources.all? { |file, sha| Digest::SHA256.file(file).hexdigest == sha }

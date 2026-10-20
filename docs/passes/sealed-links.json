@@ -1,0 +1,1940 @@
+{
+  "format": 1,
+  "scope": "Finite pre-implementation operation prices, not request results or deployment certification",
+  "v1": {
+    "accepted": true,
+    "prices": {
+      "link": {
+        "instructions_total": {
+          "off_a": {
+            "median": 90378.1425,
+            "ci95": [
+              90304.295,
+              90429.23000000001
+            ]
+          },
+          "checks": {
+            "median": 38698.925,
+            "ci95": [
+              38692.535,
+              38701.315
+            ]
+          },
+          "residue": {
+            "median": 18966.175,
+            "ci95": [
+              18960.785,
+              18969.565
+            ]
+          },
+          "candidate": {
+            "median": 56142.575,
+            "ci95": [
+              56137.185,
+              56148.965
+            ]
+          },
+          "candidate_minus_original": {
+            "median": -34235.567500000005,
+            "ci95": [
+              -34280.26500000001,
+              -34167.11
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "off_a": {
+            "median": 90361.815,
+            "ci95": [
+              90329.2425,
+              90419.985
+            ]
+          },
+          "checks": {
+            "median": 38696.925,
+            "ci95": [
+              38692.535,
+              38703.315
+            ]
+          },
+          "residue": {
+            "median": 18965.175,
+            "ci95": [
+              18960.785,
+              18970.565
+            ]
+          },
+          "candidate": {
+            "median": 56141.575,
+            "ci95": [
+              56137.185,
+              56149.965
+            ]
+          },
+          "candidate_minus_original": {
+            "median": -34217.240000000005,
+            "ci95": [
+              -34274.020000000004,
+              -34191.0575
+            ]
+          }
+        }
+      },
+      "route": {
+        "instructions_total": {
+          "off_a": {
+            "median": 48978.3875,
+            "ci95": [
+              48940.604999999996,
+              48998.5075
+            ]
+          },
+          "checks": {
+            "median": 16240.1,
+            "ci95": [
+              16239.1,
+              16240.1
+            ]
+          },
+          "residue": {
+            "median": 29831.395,
+            "ci95": [
+              29820.395,
+              29893.395
+            ]
+          },
+          "candidate": {
+            "median": 44290.79,
+            "ci95": [
+              44277.79,
+              44292.79
+            ]
+          },
+          "candidate_minus_original": {
+            "median": -4686.5975,
+            "ci95": [
+              -4714.217499999999,
+              -4655.314999999999
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "off_a": {
+            "median": 48978.485,
+            "ci95": [
+              48940.4925,
+              48998.552500000005
+            ]
+          },
+          "checks": {
+            "median": 16240.1,
+            "ci95": [
+              16239.1,
+              16240.1
+            ]
+          },
+          "residue": {
+            "median": 29831.395,
+            "ci95": [
+              29820.395,
+              29893.395
+            ]
+          },
+          "candidate": {
+            "median": 44290.79,
+            "ci95": [
+              44277.79,
+              44292.79
+            ]
+          },
+          "candidate_minus_original": {
+            "median": -4686.695,
+            "ci95": [
+              -4714.262500000001,
+              -4655.202499999999
+            ]
+          }
+        }
+      }
+    },
+    "caveat": "Finite blog-shaped pre-implementation price, not deployed code or a request saving. Per-hit epoch read is conservatively charged."
+  },
+  "v2": {
+    "layers": {
+      "prelude": {
+        "instructions_total": {
+          "value": {
+            "median": 18762.2125,
+            "ci95": [
+              18757.855,
+              18973.57
+            ]
+          },
+          "delta_pct": {
+            "median": -79.2798187432955,
+            "ci95": [
+              -79.3055414695148,
+              -79.05898419308636
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 18767.57,
+            "ci95": [
+              18761.2125,
+              18964.855
+            ]
+          },
+          "delta_pct": {
+            "median": -79.28858385541577,
+            "ci95": [
+              -79.3054038257034,
+              -79.05014872983199
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2,
+            "ci95": [
+              2,
+              2
+            ]
+          },
+          "delta_pct": {
+            "median": -87.5,
+            "ci95": [
+              -87.5,
+              -87.5
+            ]
+          }
+        }
+      },
+      "residue": {
+        "instructions_total": {
+          "value": {
+            "median": 17334.677499999998,
+            "ci95": [
+              17326.32,
+              17339.035
+            ]
+          },
+          "delta_pct": {
+            "median": -80.86300508200537,
+            "ci95": [
+              -80.88128209619211,
+              -80.85992286706804
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 17332.677499999998,
+            "ci95": [
+              17330.32,
+              17337.035
+            ]
+          },
+          "delta_pct": {
+            "median": -80.86728613219873,
+            "ci95": [
+              -80.88115257172619,
+              -80.85576147706925
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 6,
+            "ci95": [
+              6,
+              6
+            ]
+          },
+          "delta_pct": {
+            "median": -62.5,
+            "ci95": [
+              -62.5,
+              -62.5
+            ]
+          }
+        }
+      },
+      "off_a": {
+        "instructions_total": {
+          "value": {
+            "median": 90586.5775,
+            "ci95": [
+              90534.2225,
+              90676.42749999999
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 90614.61499999999,
+            "ci95": [
+              90524.99,
+              90657.545
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 16,
+            "ci95": [
+              16,
+              16
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "off_b": {
+        "instructions_total": {
+          "value": {
+            "median": 90561.39749999999,
+            "ci95": [
+              90526.99,
+              90619.6575
+            ]
+          },
+          "delta_pct": {
+            "median": -0.004419421537765755,
+            "ci95": [
+              -0.11164947708043327,
+              0.017761274613814493
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 90579.545,
+            "ci95": [
+              90516.49,
+              90608.0375
+            ]
+          },
+          "delta_pct": {
+            "median": -0.007258754741462647,
+            "ci95": [
+              -0.11037600070429865,
+              0.014987978499797494
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 16,
+            "ci95": [
+              16,
+              16
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "checks": {
+        "instructions_total": {
+          "value": {
+            "median": 33643.7725,
+            "ci95": [
+              33641.415,
+              33652.13
+            ]
+          },
+          "delta_pct": {
+            "median": -62.85788321976589,
+            "ci95": [
+              -62.8920686788517,
+              -62.83900819668732
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 33645.7725,
+            "ci95": [
+              33639.415,
+              33652.13
+            ]
+          },
+          "delta_pct": {
+            "median": -62.862359454013095,
+            "ci95": [
+              -62.88695797733121,
+              -62.83963676240856
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 10,
+            "ci95": [
+              10,
+              10
+            ]
+          },
+          "delta_pct": {
+            "median": -37.5,
+            "ci95": [
+              -37.5,
+              -37.5
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "instructions_total": {
+          "value": {
+            "median": 64392.3575,
+            "ci95": [
+              64375,
+              64900.715
+            ]
+          },
+          "delta_pct": {
+            "median": -28.906217775345695,
+            "ci95": [
+              -28.977542667162467,
+              -28.35232345253457
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 64395.3575,
+            "ci95": [
+              64378.3575,
+              64894.3575
+            ]
+          },
+          "delta_pct": {
+            "median": -28.947125948410307,
+            "ci95": [
+              -28.972503503273543,
+              -28.315939000621327
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 18,
+            "ci95": [
+              18,
+              18
+            ]
+          },
+          "delta_pct": {
+            "median": 12.5,
+            "ci95": [
+              12.5,
+              12.5
+            ]
+          }
+        }
+      }
+    },
+    "aa": {
+      "pass": true,
+      "metrics": {
+        "instructions_total": true,
+        "instructions_no_gc": true
+      },
+      "tolerance_pct": 0.5
+    },
+    "gc": {
+      "off_a": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "off_b": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "checks": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "prelude": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "residue": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "candidate": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "heap_capacity": {
+      "0": {
+        "min": 1000443,
+        "max": 1000451,
+        "matched": true
+      },
+      "1": {
+        "min": 250422,
+        "max": 250429,
+        "matched": true
+      },
+      "2": {
+        "min": 100152,
+        "max": 100154,
+        "matched": true
+      },
+      "3": {
+        "min": 20178,
+        "max": 20179,
+        "matched": true
+      },
+      "4": {
+        "min": 10078,
+        "max": 10079,
+        "matched": true
+      }
+    },
+    "heap_matched": true,
+    "jit": {
+      "requested_yjit": false,
+      "actual_yjit": [
+        false
+      ],
+      "pass": true,
+      "workers": {
+        "0-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        }
+      }
+    }
+  },
+  "v3": {
+    "layers": {
+      "residue": {
+        "instructions_total": {
+          "value": {
+            "median": 20440.035,
+            "ci95": [
+              20435.405,
+              20525.09
+            ]
+          },
+          "delta_pct": {
+            "median": -78.62680318010365,
+            "ci95": [
+              -78.63285052765191,
+              -78.53324445011668
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 19637.685,
+            "ci95": [
+              19614.49,
+              19710.0875
+            ]
+          },
+          "delta_pct": {
+            "median": -78.89214061062063,
+            "ci95": [
+              -78.90101930936015,
+              -78.79627533172984
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 6,
+            "ci95": [
+              6,
+              6
+            ]
+          },
+          "delta_pct": {
+            "median": -64.70588235294117,
+            "ci95": [
+              -64.70588235294117,
+              -64.70588235294117
+            ]
+          }
+        }
+      },
+      "prelude": {
+        "instructions_total": {
+          "value": {
+            "median": 21376.855,
+            "ci95": [
+              21368.54,
+              21381.8575
+            ]
+          },
+          "delta_pct": {
+            "median": -77.65033860959747,
+            "ci95": [
+              -77.65826790411725,
+              -77.63293000187687
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 21106.0775,
+            "ci95": [
+              21083.4225,
+              21127.675
+            ]
+          },
+          "delta_pct": {
+            "median": -77.30607608048462,
+            "ci95": [
+              -77.31015319044927,
+              -77.28984577668375
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2,
+            "ci95": [
+              2,
+              2
+            ]
+          },
+          "delta_pct": {
+            "median": -88.23529411764706,
+            "ci95": [
+              -88.23529411764706,
+              -88.23529411764706
+            ]
+          }
+        }
+      },
+      "off_a": {
+        "instructions_total": {
+          "value": {
+            "median": 95638.11,
+            "ci95": [
+              95585.4225,
+              95663.13
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 92980.9975,
+            "ci95": [
+              92912.9575,
+              93061.17749999999
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 17,
+            "ci95": [
+              17,
+              17
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "off_b": {
+        "instructions_total": {
+          "value": {
+            "median": 95605.4275,
+            "ci95": [
+              95574.775,
+              95656.02249999999
+            ]
+          },
+          "delta_pct": {
+            "median": -0.024142938502980105,
+            "ci95": [
+              -0.03712616909717359,
+              0.008530224881564408
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 92959.13500000001,
+            "ci95": [
+              92877.8,
+              93070.445
+            ]
+          },
+          "delta_pct": {
+            "median": -0.023512917056911498,
+            "ci95": [
+              -0.03783831979685681,
+              0.009957946198424494
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 17,
+            "ci95": [
+              17,
+              17
+            ]
+          },
+          "delta_pct": {
+            "median": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "checks": {
+        "instructions_total": {
+          "value": {
+            "median": 19919.245000000003,
+            "ci95": [
+              19872.68,
+              19967.6575
+            ]
+          },
+          "delta_pct": {
+            "median": -79.17079890563615,
+            "ci95": [
+              -79.21470875664701,
+              -79.12337831852636
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 19635.6975,
+            "ci95": [
+              19580.3975,
+              19685.817499999997
+            ]
+          },
+          "delta_pct": {
+            "median": -78.88504540618473,
+            "ci95": [
+              -78.93175318098804,
+              -78.83769646933256
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 1,
+            "ci95": [
+              1,
+              1
+            ]
+          },
+          "delta_pct": {
+            "median": -94.11764705882352,
+            "ci95": [
+              -94.11764705882352,
+              -94.11764705882352
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "instructions_total": {
+          "value": {
+            "median": 52761.917499999996,
+            "ci95": [
+              52707.994999999995,
+              52807.6975
+            ]
+          },
+          "delta_pct": {
+            "median": -44.83195395441062,
+            "ci95": [
+              -44.871873193583085,
+              -44.783845190315304
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 51417.44,
+            "ci95": [
+              51370.065,
+              51475.0625
+            ]
+          },
+          "delta_pct": {
+            "median": -44.69858639320368,
+            "ci95": [
+              -44.7264950661924,
+              -44.67452950948149
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 9,
+            "ci95": [
+              9,
+              9
+            ]
+          },
+          "delta_pct": {
+            "median": -47.05882352941176,
+            "ci95": [
+              -47.05882352941176,
+              -47.05882352941176
+            ]
+          }
+        }
+      }
+    },
+    "aa": {
+      "pass": true,
+      "metrics": {
+        "instructions_total": true,
+        "instructions_no_gc": true
+      },
+      "tolerance_pct": 0.5
+    },
+    "gc": {
+      "off_a": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.005,
+          "ci95": [
+            0.005,
+            0.005
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.29411764705882354,
+          "ci95": [
+            0.29411764705882354,
+            0.29411764705882354
+          ]
+        }
+      },
+      "off_b": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.005,
+          "ci95": [
+            0.005,
+            0.005
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.29411764705882354,
+          "ci95": [
+            0.29411764705882354,
+            0.29411764705882354
+          ]
+        }
+      },
+      "checks": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.005,
+          "ci95": [
+            0.005,
+            0.005
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 5,
+          "ci95": [
+            5,
+            5
+          ]
+        }
+      },
+      "prelude": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.005,
+          "ci95": [
+            0.005,
+            0.005
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 2.5,
+          "ci95": [
+            2.5,
+            2.5
+          ]
+        }
+      },
+      "residue": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.005,
+          "ci95": [
+            0.005,
+            0.005
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.8333333333333334,
+          "ci95": [
+            0.8333333333333334,
+            0.8333333333333334
+          ]
+        }
+      },
+      "candidate": {
+        "minor_gc_per_request": {
+          "median": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.005,
+          "ci95": [
+            0.005,
+            0.005
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.5555555555555556,
+          "ci95": [
+            0.5555555555555556,
+            0.5555555555555556
+          ]
+        }
+      }
+    },
+    "heap_capacity": {
+      "0": {
+        "min": 1000439,
+        "max": 1000455,
+        "matched": true
+      },
+      "1": {
+        "min": 250431,
+        "max": 250442,
+        "matched": true
+      },
+      "2": {
+        "min": 100151,
+        "max": 100159,
+        "matched": true
+      },
+      "3": {
+        "min": 20176,
+        "max": 20179,
+        "matched": true
+      },
+      "4": {
+        "min": 10078,
+        "max": 10078,
+        "matched": true
+      }
+    },
+    "heap_matched": true,
+    "jit": {
+      "requested_yjit": false,
+      "actual_yjit": [
+        false
+      ],
+      "pass": true,
+      "workers": {
+        "0-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_b": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-checks": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-candidate": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-residue": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_a": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-prelude": {
+          "actual_yjit": false,
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        }
+      }
+    }
+  },
+  "protocol": {
+    "seed": 41231,
+    "rounds": 6,
+    "N": [
+      0,
+      200
+    ],
+    "mode": "interpreter",
+    "tool": {
+      "pass": true,
+      "version": "valgrind-3.19.0",
+      "rails_boot": true,
+      "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+      "build": {
+        "version": "3.19.0",
+        "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+        "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+        "brk_reservation_mib": 512,
+        "tool": "libexec/valgrind/callgrind-amd64-linux",
+        "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+        "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+        "libc": "glibc 2.36"
+      },
+      "log_sha256": "3f1a0b88cf88e400a58e84f5d8d2ee4660325162a2f2d3a518cd17fc6095a975"
+    },
+    "heap_slots": [
+      1000000,
+      250000,
+      100000,
+      20000,
+      10000
+    ]
+  },
+  "executed_sources": {
+    "v1": {
+      "bench/experiments/sealed_helpers.rb": "92bcf073df06fda701e8759a4b3e43248a1b3caa71ed9afa6861e02449a6c4b8",
+      "/home/user/workspace/repo/bench/heap_windows.rb": "8998440ce9236fe1aea7b37dda42036c0096629f24e71c5c46dc5aa7dd79fc20",
+      "/home/user/workspace/repo/bench/request_pairs.rb": "175b8fd25898aa03cb2740d970d43c16f027dc60496a2f601744c474c6fd89b9",
+      "/home/user/workspace/repo/gem/lib/lowrail/templates.rb": "ce0b4e9a505aa282f131291329e7a552a11cc0fa5fda692d152e3686da08279e",
+      "/home/user/workspace/repo/gem/lib/lowrail/routes.rb": "4c5b749e77209c7a306d6c716e4d37dfe14d53e80847b7a0f9ad714eb54c0f85"
+    },
+    "v2": {
+      "bench/experiments/sealed_links.rb": "39eca08c85e2640a6e09772713779aae349c222ce8665ff8650cb25661d61fb1",
+      "/home/user/workspace/repo/bench/heap_windows.rb": "8998440ce9236fe1aea7b37dda42036c0096629f24e71c5c46dc5aa7dd79fc20",
+      "/home/user/workspace/repo/bench/request_pairs.rb": "175b8fd25898aa03cb2740d970d43c16f027dc60496a2f601744c474c6fd89b9",
+      "/home/user/workspace/repo/gem/lib/lowrail/templates.rb": "ce0b4e9a505aa282f131291329e7a552a11cc0fa5fda692d152e3686da08279e"
+    },
+    "v3": {
+      "bench/experiments/sealed_links.rb": "951ea314ef5026e10a17d1bcfb366a322b1d0aa0f7450c2a5e66225560dc4ad8",
+      "/home/user/workspace/repo/bench/heap_windows.rb": "8998440ce9236fe1aea7b37dda42036c0096629f24e71c5c46dc5aa7dd79fc20",
+      "/home/user/workspace/repo/bench/request_pairs.rb": "175b8fd25898aa03cb2740d970d43c16f027dc60496a2f601744c474c6fd89b9",
+      "/home/user/workspace/repo/bench/experiments/sealed_provenance.rb": "4548a32a7a1d2dcc0da61c86ed53454892c5d93dc0fcaca6ab6c4a89ce9c225d",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_guard.rb": "72d97ef27340d5e017c9df60ef005645dac0e0309cbeca87bbcd6edf3aed7ed0",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_instantiate.rb": "5d59e8983fa6781977ac1743f0d2e4f79acf1083f0748756d322125c3f44314f",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_instantiate_build.rb": "f726732acf8fbc18d9f8c94529f5b841c94dc7c924da5635de4a866ae226b356",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_plan_build.rb": "e87421da59bcefb63b414a8e9c7adcc27c47a3c0aa03551f182fe5d02ddbb47a",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_plan_facts.rb": "dfd04d08ab7e74a7ed7b30fcf53ff2bc6001d3ade6b85644ca12c372ead47d9a",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_plan_sites.rb": "0bf7051d9af853c832c69426623ccb920490c3c05b136738c84457601c7d2dcb",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_plans.rb": "899a94ad12d1f2c45b5dda3f0cb74ae88dee61756404b0c7b6d45cffc827e8a6",
+      "/home/user/workspace/repo/gem/lib/lowrail/ar_shadow.rb": "6d95adb126d88f62c74bc9c5858bdffe2d41a017ae19e030f9b375b277afb422",
+      "/home/user/workspace/repo/gem/lib/lowrail/compilation.rb": "117a290092cb72f21f074737c40a2859300a369b62b08bf57e24ac94c816b98a",
+      "/home/user/workspace/repo/gem/lib/lowrail/compiler.rb": "1ca141ff21a7e08f4457fd1e1c182b274427b6c6ed7c4196678d3b100ba46c78",
+      "/home/user/workspace/repo/gem/lib/lowrail/digest_memo.rb": "affea7b66a0cb357b2e81b49453dd5d5a856e983b25ecf58637b5a590ce34475",
+      "/home/user/workspace/repo/gem/lib/lowrail/digest_memo_build.rb": "473cb2383546b0f674d9e3bae970603230dbc8289768fe0d11ec85eec9ede2fa",
+      "/home/user/workspace/repo/gem/lib/lowrail/endpoint.rb": "0e76c7dc06f71af7498759041655b33b0eef07b4cd8c147152be86669445f90a",
+      "/home/user/workspace/repo/gem/lib/lowrail/endpoint_build.rb": "f879fc7ea70028062daea277b2235703a8b91e71151b8f68edc90e85e3fc2063",
+      "/home/user/workspace/repo/gem/lib/lowrail/facts.rb": "6a4da76dde0dcf17d13c21057d1a6c570829348e726baef17f6810a0cd0cd05b",
+      "/home/user/workspace/repo/gem/lib/lowrail/guard.rb": "189ad92f5963f57bdd4d0528fbc9a4fcb2ae15db2e1aa2666210f4b86a74f3fc",
+      "/home/user/workspace/repo/gem/lib/lowrail/inertia_config.rb": "270bbcc9621cb5512f8b0777fdd5f2772d2f1e9ef7a54e3cd5446480b668e7ff",
+      "/home/user/workspace/repo/gem/lib/lowrail/inertia_config_build.rb": "d4ac21ee498700ec426c96b7d7efceacf5cea9b627ee484278a6a9827d9af3bd",
+      "/home/user/workspace/repo/gem/lib/lowrail/inertia_props.rb": "2063023df8f23ef89c46abdfa448693166efdb1c5c0eb1d0546f64ffae4d8259",
+      "/home/user/workspace/repo/gem/lib/lowrail/inertia_props_build.rb": "15eae72432076a3b8f567737ac9e26d074ac152b5f10b174ad42a2833ce422e5",
+      "/home/user/workspace/repo/gem/lib/lowrail/jit_diagnostics.rb": "d7c6d8dfd9494e1f496b48f0650c342a91410da7ba899c38a0937f18dafebb18",
+      "/home/user/workspace/repo/gem/lib/lowrail/jit_shapes.rb": "046d58ec87e394fbad13974bd4d8abae2361e8b3aaacdc664072c5f7f0e57ffb",
+      "/home/user/workspace/repo/gem/lib/lowrail/loader.rb": "9529c34703c708462aa1c7d453b785e483d172956aad3901f9bf1f7a68b8716b",
+      "/home/user/workspace/repo/gem/lib/lowrail/manifest.rb": "45dabea68c2267506592f17f2f5b1c2cf6e907e308c72ba3603572081d5aaf2c",
+      "/home/user/workspace/repo/gem/lib/lowrail/materialize.rb": "1c5e0f460103b3e5b3c3b5455f7cc67135fd18068505bb4041a522e47f75a2ed",
+      "/home/user/workspace/repo/gem/lib/lowrail/memo.rb": "645a9f88bb9c114345a50f090860f9365e0d8b94c4bbc6aa3130afbb22771a9f",
+      "/home/user/workspace/repo/gem/lib/lowrail/memo_facts.rb": "75a40a2bad4fb0a118d970db55e2728587a101fdbec28e0515ecb7c02cbe2018",
+      "/home/user/workspace/repo/gem/lib/lowrail/minitest.rb": "257e67267cb2d3de020b3cb5c938fcecb73d83de8f447bdb65737a4637a9a17b",
+      "/home/user/workspace/repo/gem/lib/lowrail/observe.rb": "aa25c1e137426e82a72e30a292233de3435061fb38bcc30faea297ded575374f",
+      "/home/user/workspace/repo/gem/lib/lowrail/oracle_routes.rb": "3e5543c327ea86c306f288df386e98efc14d7741541ed6e7d2caea252b354802",
+      "/home/user/workspace/repo/gem/lib/lowrail/passes.rb": "a43d78e36835eed09ac9af1219ae4bff4a083556660face9180598cad0f361f3",
+      "/home/user/workspace/repo/gem/lib/lowrail/preload_build.rb": "5d562d1c33884481c73ca3f0fd89f33d776dfa01fbdc3267880a24e6e2021b28",
+      "/home/user/workspace/repo/gem/lib/lowrail/preload_facts.rb": "89f08a90fc97e4a1e502bae7803fcc369bb2d57bf58d29b79eaa643c1cd5c099",
+      "/home/user/workspace/repo/gem/lib/lowrail/preload_plans.rb": "427b19500eb8e346aab995798c309fd37c0a06a5a8e49600e9a1676a6f16c501",
+      "/home/user/workspace/repo/gem/lib/lowrail/routes.rb": "4c5b749e77209c7a306d6c716e4d37dfe14d53e80847b7a0f9ad714eb54c0f85",
+      "/home/user/workspace/repo/gem/lib/lowrail/rspec.rb": "790c1fcedb5df0834909632d69e8e48cbd0769d6576efc1c6b3287ae07a31422",
+      "/home/user/workspace/repo/gem/lib/lowrail/script_capture.rb": "027a119d9b2bbf342fa44fa276f22c86b9643d8cffd632d78187eae25a53153c",
+      "/home/user/workspace/repo/gem/lib/lowrail/seal.rb": "358d59c7b51f5255c2649a624d0ea3f6dc2869bd4a4aaa82823ef054c1462805",
+      "/home/user/workspace/repo/gem/lib/lowrail/seal_rules.rb": "96d7ed8f0681e70600d1a12c9269aa201af7902886c3b23949cea892d11c48b6",
+      "/home/user/workspace/repo/gem/lib/lowrail/seal_snapshot.rb": "85e14c98ac1ddcfe0405c6ae7c742b0c101dbcf52a668fccdc55ee82ede304e4",
+      "/home/user/workspace/repo/gem/lib/lowrail/seal_static.rb": "981e5f9cfa1d68ebb5809f46fed1cd97bbb2fc8232d353eb69a0b1c463a82c7a",
+      "/home/user/workspace/repo/gem/lib/lowrail/setup.rb": "83180b9cbbf6e2538c0a4c2f11155ae49392f64e87625dd608911dee19df5c6f",
+      "/home/user/workspace/repo/gem/lib/lowrail/sql_trace.rb": "32ccf8ceec5d42882995801e915ff3f4b48bbfa1e5f8e4f6b50fe11e61114e43",
+      "/home/user/workspace/repo/gem/lib/lowrail/stats.rb": "cdc78ed35415d55e6a32ffaa5f2c5aba5809f8b4608fa00f3452db85df464e95",
+      "/home/user/workspace/repo/gem/lib/lowrail/templates.rb": "ce0b4e9a505aa282f131291329e7a552a11cc0fa5fda692d152e3686da08279e",
+      "/home/user/workspace/repo/gem/lib/lowrail/verify_loads.rb": "cb30d406367c70d5fa3931935b3645e2b1e84f4aebc92712d95c82f8a721037e",
+      "/home/user/workspace/repo/gem/lib/lowrail.rb": "bc8dd1c819c0a2bc7491683339b83b0b3fa2c6b39a5b5803ab2e47d7df1fc9ff",
+      "/home/user/workspace/repo/gem/lib/minitest/lowrail_plugin.rb": "9f05c90d5c1fd15acceeb54f75b16e57e2cde4fe796fe97f6f3f70f3e7119911"
+    }
+  },
+  "v3_samples": [
+    {
+      "residue": {
+        "instructions_total": 20439.815,
+        "instructions_no_gc": 19641.685,
+        "allocations": 6
+      },
+      "prelude": {
+        "instructions_total": 21382.615,
+        "instructions_no_gc": 21128.675,
+        "allocations": 2
+      },
+      "off_a": {
+        "instructions_total": 95571.77,
+        "instructions_no_gc": 93009.88,
+        "allocations": 17
+      },
+      "off_b": {
+        "instructions_total": 95550.215,
+        "instructions_no_gc": 92988.155,
+        "allocations": 17
+      },
+      "checks": {
+        "instructions_total": 19869.765,
+        "instructions_no_gc": 19687.12,
+        "allocations": 1
+      },
+      "candidate": {
+        "instructions_total": 52704.525,
+        "instructions_no_gc": 51454.935,
+        "allocations": 9
+      }
+    },
+    {
+      "prelude": {
+        "instructions_total": 21377.01,
+        "instructions_no_gc": 21089.48,
+        "allocations": 2
+      },
+      "candidate": {
+        "instructions_total": 52802.72,
+        "instructions_no_gc": 51367.885,
+        "allocations": 9
+      },
+      "residue": {
+        "instructions_total": 20445.565,
+        "instructions_no_gc": 19614.49,
+        "allocations": 6
+      },
+      "checks": {
+        "instructions_total": 19965.92,
+        "instructions_no_gc": 19578.295,
+        "allocations": 1
+      },
+      "off_b": {
+        "instructions_total": 95653.37,
+        "instructions_no_gc": 92930.115,
+        "allocations": 17
+      },
+      "off_a": {
+        "instructions_total": 95677.99,
+        "instructions_no_gc": 92952.115,
+        "allocations": 17
+      }
+    },
+    {
+      "off_b": {
+        "instructions_total": 95604.945,
+        "instructions_no_gc": 93043.535,
+        "allocations": 17
+      },
+      "candidate": {
+        "instructions_total": 52721.115,
+        "instructions_no_gc": 51475.935,
+        "allocations": 9
+      },
+      "off_a": {
+        "instructions_total": 95599.075,
+        "instructions_no_gc": 93036.2,
+        "allocations": 17
+      },
+      "checks": {
+        "instructions_total": 19875.595,
+        "instructions_no_gc": 19684.515,
+        "allocations": 1
+      },
+      "residue": {
+        "instructions_total": 20435.415,
+        "instructions_no_gc": 19637.685,
+        "allocations": 6
+      },
+      "prelude": {
+        "instructions_total": 21376.7,
+        "instructions_no_gc": 21122.675,
+        "allocations": 2
+      }
+    },
+    {
+      "off_a": {
+        "instructions_total": 95648.27,
+        "instructions_no_gc": 92923.8,
+        "allocations": 17
+      },
+      "candidate": {
+        "instructions_total": 52809.355,
+        "instructions_no_gc": 51372.245,
+        "allocations": 9
+      },
+      "off_b": {
+        "instructions_total": 95605.91,
+        "instructions_no_gc": 92881.8,
+        "allocations": 17
+      },
+      "checks": {
+        "instructions_total": 19962.625,
+        "instructions_no_gc": 19582.5,
+        "allocations": 1
+      },
+      "residue": {
+        "instructions_total": 20440.255,
+        "instructions_no_gc": 19614.49,
+        "allocations": 6
+      },
+      "prelude": {
+        "instructions_total": 21373.02,
+        "instructions_no_gc": 21085.48,
+        "allocations": 2
+      }
+    },
+    {
+      "off_a": {
+        "instructions_total": 95648.23,
+        "instructions_no_gc": 93086.155,
+        "allocations": 17
+      },
+      "off_b": {
+        "instructions_total": 95658.675,
+        "instructions_no_gc": 93097.355,
+        "allocations": 17
+      },
+      "residue": {
+        "instructions_total": 20435.395,
+        "instructions_no_gc": 19637.685,
+        "allocations": 6
+      },
+      "checks": {
+        "instructions_total": 19875.865,
+        "instructions_no_gc": 19683.545,
+        "allocations": 1
+      },
+      "prelude": {
+        "instructions_total": 21381.1,
+        "instructions_no_gc": 21126.675,
+        "allocations": 2
+      },
+      "candidate": {
+        "instructions_total": 52711.465,
+        "instructions_no_gc": 51474.19,
+        "allocations": 9
+      }
+    },
+    {
+      "off_b": {
+        "instructions_total": 95599.335,
+        "instructions_no_gc": 92873.8,
+        "allocations": 17
+      },
+      "checks": {
+        "instructions_total": 19969.395,
+        "instructions_no_gc": 19587.85,
+        "allocations": 1
+      },
+      "candidate": {
+        "instructions_total": 52806.04,
+        "instructions_no_gc": 51379.945,
+        "allocations": 9
+      },
+      "residue": {
+        "instructions_total": 20604.615,
+        "instructions_no_gc": 19778.49,
+        "allocations": 6
+      },
+      "off_a": {
+        "instructions_total": 95627.99,
+        "instructions_no_gc": 92902.115,
+        "allocations": 17
+      },
+      "prelude": {
+        "instructions_total": 21364.06,
+        "instructions_no_gc": 21081.365,
+        "allocations": 2
+      }
+    }
+  ]
+}

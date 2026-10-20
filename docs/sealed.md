@@ -199,7 +199,13 @@ diagnostic observation alone is not a safe continuation.
 Gates are five-app verify, AP/AV L3, isolated response/SQL/event/assign pairs,
 and one finite c9d2397 interpreter cohort on index/show against off. A price
 failure stops implementation; missing certificates refuse rather than waive
-the gate. No first-pilot result is yet claimed.
+the gate. The [finite operation prices](passes/sealed-links.md) now include
+fresh-builder provenance with real original-body ISeq delivery, weak-map
+registration/lookup and GC cleanup: 95,638 → 52,762 interpreter Ir for two
+literal-name links, 17 → 9 objects. This clears that measured builder-cost
+hurdle, not the complete deployment certificate or request gates. Route's
+initial incomplete −4,687-Ir price does not authorize its activation. No
+first-pilot request result is yet claimed.
 
 ### Subsequent show endpoint: compiler phases
 
