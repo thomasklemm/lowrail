@@ -29,16 +29,45 @@ to false before initialization: Rails otherwise enables it even when Ruby
 starts with `--disable-yjit`. Every worker reports its actual JIT state and
 the driver rejects a mismatch. Do not infer interpreter mode from command flags.
 
-Each of three independent rounds runs fresh N=0 and N=200 processes per
-layer, with a seeded randomized order and at most four concurrent workers.
-Each process boots production Rails, warms 50 requests, then runs `GC.start`.
+Each of six independent rounds boots a fresh process per layer, with a
+seeded randomized order and at most four concurrent workers. Each process
+warms 50 requests, then measures N=0 and N=50 windows in both total and
+GC-excluded modes. Their order alternates by round. Before **each** window,
+three full GCs mature survivors and clear garbage. All five size pools have
+the same explicit `RUBY_GC_HEAP_0_INIT_SLOTS` through `_4_INIT_SLOTS` floors:
+1,000,000 / 250,000 / 100,000 / 20,000 / 10,000. These oversized floors
+are experimental controls, **not a proposed production GC setting**. The
+settings alone do not reserve pages. Untimed preparation fills each pool
+with disposable Arrays and retains sparse page anchors (about 2,200 small
+Arrays, counted in worker metadata) so full GC cannot move empty pages out
+of eden. GC is disabled only while building these fillers; it is enabled
+for every warmup/measured request. This is a 64-bit MRI diagnostic, not a
+production-heap retention measurement. The driver checks actual starting
+capacities across all layers/windows: they must reach the target and match
+within one page per pool, or the experiment exits 2. It also records every
+pool's live/free slots and allocated-page/object counters.
+
 A tiny Ruby extension (`bench/callgrind.c`, compiled into the private output
 directory) uses Callgrind's client requests to start instrumentation **after**
-warmup/GC, zero counters and dump **before** reporting/exit. Read the client
-dump (`.callgrind.1`), not the process-exit total. `(Ir200 − Ir0) / 200`
-also subtracts the fixed measurement seam. Boot is not counted or estimated;
-ordinary request-loop GC remains included. Warmup and measurement call the
-same loop ISeq. `--smc-check=all-non-file` handles generated machine code.
+warmup/GC, zero counters and dump **before** reporting. Read the four client
+dumps (`.callgrind.1` through `.4`), not the process-exit total. Each mode
+reports `(Ir50 − Ir0) / 50`, removing the measurement seam. Total mode
+includes ordinary request-loop GC; the second mode suspends collection only
+between Ruby's internal `GC_ENTER`/`GC_EXIT` events, for every incremental
+mark/lazy-sweep segment. `GC_START` through `GC_END_SWEEP` would incorrectly
+exclude Ruby work between segments. Barrier/entry/exit fringe remains in
+the GC-excluded count. A Valgrind regression checks that incremental GC work
+is removed while intervening arithmetic remains counted, against a separate
+GC-disabled synthetic control. **GC stays enabled in all request windows.**
+
+Both windows retain absolute `GC.stat` endpoints: minor/major counts,
+live/old objects, allocated objects and collector time. The summary includes
+collections/request and collections/1,000 allocations. A fixed-heap slice
+can contain zero GCs: it isolates request work at that capacity, not the
+steady-state GC tax of a production heap. Compare total and excluded counts
+rather than silently presenting the latter as total work. Warmup and
+measurement call the same loop ISeq. `--smc-check=all-non-file` handles
+generated machine code.
 
 This refines whole-process N=200 minus N=0 subtraction: it avoids subtracting
 two large, potentially different boot/GC/JIT totals and is much cheaper than
@@ -49,11 +78,15 @@ make a control pass. These are **software-executed instructions**, not PMU
 counts, CPU cycles or latency; syscall/kernel work is not counted. Interpreter
 counts do not capture YJIT execution, compiler, code-layout or cache effects.
 
-`BENCH_REQUESTS=200`, `BENCH_ROUNDS=3`, `BENCH_JOBS=4`, `BENCH_WARMUP=50`,
+`BENCH_REQUESTS=50`, `BENCH_ROUNDS=6`, `BENCH_JOBS=4`, `BENCH_WARMUP=50`,
 `BENCH_JIT=0` and `BENCH_SEED=41231` are the counter defaults. Samples retain
-both raw totals, so the subtraction is auditable. Bootstrap whole independent
-rounds (5,000 resamples), not requests or individual instructions. With only
-three rounds these are coarse nominal intervals, not calibrated 95% coverage.
+all raw totals, so the subtraction is auditable. `BENCH_HEAP_SLOTS` overrides
+the five comma-separated floors; keep them identical across comparisons.
+Bootstrap whole independent rounds (5,000 resamples), not requests or
+individual instructions. Six rounds still give coarse nominal intervals,
+not calibrated 95% coverage. `BENCH_HEAP_MODE=legacy` retains the earlier
+N=200, three-round diagnostic without heap-phase normalization; do not use
+its total counts as the primary comparison.
 Use `BENCH_LOWRAIL_LIB=/absolute/old/gem/lib` for a complete old runtime snapshot
 without changing the app/build; before/after must use identical manifests.
 The optional AR build below works in both modes.
@@ -248,8 +281,9 @@ increase. The top positive differences are marking, sweeping and ISeq/IMEMO
 marking; VM dispatch work falls. No-manifest outliers show the same GC signature
 despite zero request-time Lowrail calls. This establishes collection work in
 the measured difference, not a universal 8% guard tax or proof of a zero base
-cost. Primary results **include** this GC work; do not subtract it away or
-disable GC to turn a comparison green.
+cost. The fixed-heap protocol above replaces that confounded short-window
+comparison and reports both total and GC-excluded work, with collection
+rates. No runtime retention/GC tuning change follows from this diagnosis.
 
 Correctness after both changes: `lowrail verify`, `PARALLEL_WORKERS=1`,
 `LOWRAIL_SQL_TRACE=full`, test seed 41231:

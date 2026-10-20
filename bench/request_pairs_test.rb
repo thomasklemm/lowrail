@@ -5,6 +5,48 @@ require_relative "request_pairs"
 require_relative "gc_requests"
 
 class RequestPairsTest < Minitest::Test
+  def test_gc_exclusion_preserves_mutator_work_between_incremental_segments
+    skip "Valgrind not installed" unless system("sh", "-c", "command -v valgrind >/dev/null")
+    Dir.mktmpdir("lowrail-counter-test") do |dir|
+      extension = RequestPairs.compile_counter_extension(dir)
+      script = File.join(dir, "probe.rb")
+      File.write(script, <<~'RUBY')
+        require ARGV.fetch(0)
+        mode = ARGV.fetch(1)
+        roots = Array.new(200_000) { "a" * 48 }
+        3.times { GC.start }
+        GC.disable if mode == "disabled"
+        pending = 0
+        checksum = 0
+        LowrailCallgrindBench.start(mode == "excluded")
+        10.times do
+          GC.start(immediate_mark: false, immediate_sweep: false) unless mode == "disabled"
+          pending += 1 if GC.latest_gc_info(:state) != :none
+          5000.times { checksum = (checksum * 1664525 + 1013904223) & 0xffffffff }
+        end
+        segments = LowrailCallgrindBench.finish
+        puts [checksum, pending, segments, roots.size].join(",")
+      RUBY
+      results = %w[disabled total excluded].to_h do |mode|
+        output = File.join(dir, mode)
+        text, status = Open3.capture2e({ "RUBYOPT" => nil }, "valgrind", "--tool=callgrind",
+          "--instr-atstart=no", "--callgrind-out-file=#{output}", "--log-file=#{output}.log",
+          RbConfig.ruby, "--disable-yjit", script, extension, mode)
+        assert status.success?, text
+        instructions = File.foreach("#{output}.1").find { _1.start_with?("summary: ") }.split.fetch(1).to_i
+        [mode, { data: text.strip.split(",").map(&:to_i), instructions: instructions }]
+      end
+      # Independent affine-transform exponentiation modulo 2**32 gives this
+      # 50,000-step LCG reference, not the counter's measured output.
+      results.each_value { assert_equal 119_094_416, _1[:data][0] }
+      assert_operator results["excluded"][:data][1], :>, 0, "probe must exercise incremental GC"
+      assert_operator results["excluded"][:data][2], :>, 0
+      assert_operator results["total"][:instructions], :>, results["excluded"][:instructions] * 1.1
+      assert_in_delta results["disabled"][:instructions], results["excluded"][:instructions],
+        results["disabled"][:instructions] * 0.02
+    end
+  end
+
   def test_memory_attribution_deduplicates_containers_without_following_weak_references
     text = "x" * 512
     array = [text, text]

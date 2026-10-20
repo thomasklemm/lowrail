@@ -87,8 +87,10 @@ module RequestPairs
     seed = Integer(ENV.fetch("BENCH_SEED", "41231"))
     counter = ENV["BENCH_COUNTER"] == "callgrind"
     diagnostic = ENV["BENCH_COUNTER"] == "gc"
-    rounds = Integer(ENV.fetch("BENCH_ROUNDS", counter || diagnostic ? "3" : "8"))
-    raise "too few rounds" if rounds < (counter || diagnostic ? 3 : 8)
+    fixed_heap = counter && ENV["BENCH_HEAP_MODE"] != "legacy"
+    minimum = fixed_heap ? 6 : (counter || diagnostic ? 3 : 8)
+    rounds = Integer(ENV.fetch("BENCH_ROUNDS", minimum.to_s))
+    raise "too few rounds" if rounds < minimum
     workers = {}
     environments = {}
     samples = []
@@ -127,6 +129,9 @@ module RequestPairs
         cache_mb: ENV["CAMPFIRE_RESPONSE_CACHE_MB"], variant_app: variant, workers: {} }
       lib = File.expand_path(ENV.fetch("BENCH_LOWRAIL_LIB", File.join(root, "gem/lib")))
       metadata[:runtime_sha256] = Digest::SHA256.file(File.join(lib, "lowrail.rb")).hexdigest
+      metadata[:runtime_files_sha256] = Dir.glob(File.join(lib, "**/*.rb")).sort.to_h do |path|
+        [path.delete_prefix(lib + "/"), Digest::SHA256.file(path).hexdigest]
+      end
       layers.each do |layer, build_root|
         env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
           "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => build_root,
@@ -144,6 +149,7 @@ module RequestPairs
         metadata[:workers][layer] = receive(workers.fetch(layer))
         warn "warm #{File.basename(app)} #{layer}"
       end
+      return heap_instructions(environments, app, out, route, metadata) if fixed_heap
       return instructions(environments, app, out, route, metadata) if counter
       return diagnostics(environments, app, out, route, metadata) if diagnostic
       # One fixed request count for every layer, calibrated to baseline CPU
@@ -189,19 +195,110 @@ module RequestPairs
     end
   end
 
-  # Client requests exclude boot/warmup from instrumentation. Subtract fresh
-  # N=0 from N=requests to remove the measurement seam too. These are software
-  # instruction counts, not PMU instructions or elapsed time under emulation.
-  def self.instructions(environments, app, out, route, metadata)
-    requests = Integer(ENV.fetch("BENCH_REQUESTS", "200"))
-    jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
-    raise "positive requests/jobs required" unless requests.positive? && jobs.positive?
-    jit = ENV.fetch("BENCH_JIT", "0") == "1"
+  def self.compile_counter_extension(out)
     extension = File.join(out, "lowrail_callgrind.#{RbConfig::CONFIG.fetch("DLEXT")}")
     cc = RbConfig::CONFIG.fetch("LDSHARED").shellsplit
     raise "could not compile Callgrind client requests" unless system(*cc, "-fPIC", "-O2",
       "-I#{RbConfig::CONFIG.fetch("rubyhdrdir")}", "-I#{RbConfig::CONFIG.fetch("rubyarchhdrdir")}",
       File.join(__dir__, "callgrind.c"), "-o", extension)
+    extension
+  end
+
+  def self.heap_instructions(environments, app, out, route, metadata)
+    requests = Integer(ENV.fetch("BENCH_REQUESTS", "50"))
+    jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
+    slots = ENV.fetch("BENCH_HEAP_SLOTS", "1000000,250000,100000,20000,10000").split(",").map { Integer(_1) }
+    raise "positive requests/jobs and five positive pool floors required" unless
+      requests.positive? && jobs.positive? && slots.size == 5 && slots.all?(&:positive?)
+    floors = slots.each_with_index.to_h { |count, pool| ["RUBY_GC_HEAP_#{pool}_INIT_SLOTS", count.to_s] }
+    jit = ENV.fetch("BENCH_JIT", "0") == "1"
+    extension = compile_counter_extension(out)
+    metadata.merge!(counter: "callgrind", heap_mode: "fixed", heap_slots: slots,
+      region: "after warmup and three full GCs", requests: requests, yjit: jit)
+    samples = []
+    rng = Random.new(metadata.fetch(:seed))
+    metadata.fetch(:rounds).times do |round|
+      queue = Queue.new
+      environments.keys.shuffle(random: rng).each { queue << _1 }
+      row = {}
+      lock = Mutex.new
+      Array.new([jobs, environments.size].min) do
+        Thread.new do
+          loop do
+            layer = queue.pop(true)
+            label = "#{round}-#{layer}"
+            data = File.join(out, "#{label}.callgrind")
+            log = File.join(out, "#{label}.log")
+            env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
+              "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension)
+            ok = system(env, "valgrind", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
+              "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
+              RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "heap_requests.rb"), route,
+              chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
+            raise "Callgrind failed: #{label}; inspect logs" unless ok
+            result = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
+            result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
+            raise "unexpected JIT mode" unless result.fetch("yjit") == jit
+            windows = result.fetch("windows")
+            windows.each_with_index do |window, index|
+              window["instructions"] = File.foreach("#{data}.#{index + 1}").find { _1.start_with?("summary: ") }.split.fetch(1).to_i
+            end
+            metrics = %w[total no_gc].to_h do |mode|
+              empty, full = windows.select { _1.fetch("mode") == mode }.sort_by { _1.fetch("requests") }
+              count = full.fetch("instructions") - empty.fetch("instructions")
+              raise "nonpositive count for #{label}/#{mode}" unless count.positive?
+              ["instructions_#{mode}", count.fdiv(requests)]
+            end
+            full = windows.find { _1["mode"] == "total" && _1["requests"] == requests }
+            delta = full.fetch("after").to_h { |key, value| [key, value - full.fetch("before").fetch(key)] }
+            allocations = delta.fetch("total_allocated_objects")
+            collections = delta.fetch("minor_gc_count") + delta.fetch("major_gc_count")
+            metrics.merge!("allocations" => allocations.fdiv(requests),
+              "minor_gc_per_request" => delta.fetch("minor_gc_count").fdiv(requests),
+              "major_gc_per_request" => delta.fetch("major_gc_count").fdiv(requests),
+              "gc_per_1k_allocations" => 1000.0 * collections / allocations, "windows" => windows)
+            lock.synchronize { row[layer] = metrics; metadata.fetch(:workers)[label] = result }
+          rescue ThreadError
+            break
+          end
+        rescue StandardError => error
+          error
+        end
+      end.map(&:value).each { raise _1 if _1.is_a?(Exception) }
+      samples << row
+      File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
+      warn "fixed-heap Callgrind round #{round + 1}/#{metadata.fetch(:rounds)}"
+    end
+    summary = summarize(samples, seed: metadata.fetch(:seed), tolerance: Float(ENV.fetch("BENCH_AA_TOLERANCE", "0.5")),
+      metrics: %w[instructions_total instructions_no_gc allocations], controls: %w[instructions_total instructions_no_gc])
+    summary[:gc] = environments.keys.to_h do |layer|
+      [layer, %w[minor_gc_per_request major_gc_per_request gc_per_1k_allocations].to_h do |metric|
+        [metric, estimate(samples.map { _1.fetch(layer).fetch(metric) }, seed: metadata.fetch(:seed))]
+      end]
+    end
+    # Init slots are floors, not hard limits. Check actual capacities across
+    # every measured layer/window; allow one page's rounding per size pool.
+    summary[:heap_capacity] = slots.each_index.to_h do |pool|
+      stats = samples.flat_map { |round| round.values.flat_map { _1.fetch("windows") } }
+        .select { _1.fetch("requests").positive? }.map { _1.fetch("pools_before").fetch(pool.to_s) }
+      capacities = stats.map { _1.fetch("heap_eden_slots") }
+      page_slots = GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE).fdiv(stats.first.fetch("slot_size")).ceil
+      [pool, { min: capacities.min, max: capacities.max,
+        matched: capacities.min >= slots.fetch(pool) && capacities.max - capacities.min <= page_slots }]
+    end
+    summary[:heap_matched] = summary[:heap_capacity].values.all? { _1.fetch(:matched) }
+    File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary))
+    puts JSON.pretty_generate(summary)
+    summary.fetch(:aa).fetch(:pass) && summary.fetch(:heap_matched)
+  end
+
+  # Legacy short-window diagnostic: includes boot-dependent GC phase.
+  def self.instructions(environments, app, out, route, metadata)
+    requests = Integer(ENV.fetch("BENCH_REQUESTS", "200"))
+    jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
+    raise "positive requests/jobs required" unless requests.positive? && jobs.positive?
+    jit = ENV.fetch("BENCH_JIT", "0") == "1"
+    extension = compile_counter_extension(out)
     metadata.merge!(counter: "callgrind", region: "after warmup and GC", requests: requests, yjit: jit)
     samples = []
     rng = Random.new(metadata.fetch(:seed))
