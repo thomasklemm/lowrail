@@ -308,8 +308,32 @@ is cleared in timed request workers and micro probes. No new stats flags or
 gate exceptions are introduced; unavailable per-ISeq counters/ratios are null.
 See [scope and limitations](jit-shapes.md#diagnostic-counters-never-gates).
 The reproducible Ruby version axis is `mise exec ruby@VERSION -- ...`; 4.0.7
-remains the default. The [4.1 preview column](ruby-4.1.md) currently stops at
-compatibility failures, so `BENCH_JIT=zjit` is **not** an available mode.
+remains the default. The [4.1 preview column](ruby-4.1.md) passes the five-app
+correctness prerequisite with disposable dependency overlays.
+`BENCH_JIT=zjit` selects a **diagnostic-only fixed-heap Callgrind mode**;
+`0`/`interpreter` and `1`/`yjit` retain their existing meanings.
+Both actual JIT enablement states are recorded and checked, including Rails'
+late YJIT activation. Native and legacy-counter ZJIT modes refuse explicitly.
+The preview exposes no invalidation count: the ZJIT flat gate therefore
+**rejects with `missing_counters: ["invalidation_count"]`**, rather than
+equating flat invalidation time with no invalidations or inventing zero.
+Compilation counts, generated exit-stub counts and compile/invalidation times
+are retained as observations, never substituted for the missing count.
+Three flat warm windows, every measured window, A/A, heap and brk controls
+remain mandatory. ZJIT cannot promote a pass even if a later VM supplies the
+missing counter.
+
+Ruby 4.1 preview has **12 pools** (32–1024 bytes), not 4.0's five (40–640).
+Heap preparation and matching cover every actual pool. Defaults retain the
+published slot floors by size band: ≤40 bytes: 1M; ≤80: 250k; ≤160: 100k;
+≤320: 20k; larger: 10k. Thus 4.0's defaults are unchanged. An explicit
+`BENCH_HEAP_SLOTS` must provide one positive floor per actual pool. The
+32-byte pool uses Object fillers; the others use embedded Arrays. Capacity
+matching still allows at most one page per pool, never an ignored new pool.
+Observer prewarm also runs the exact pool-loop ISeq used at both endpoints.
+The 12-pool regression caught that loop compiling in the third window:
+compiled ISeqs 21 → 23, blocks 176 → 188, with unchanged workload. A shared
+endpoint observer warms that code outside all windows; the gate is unchanged.
 
 Outputs, also on rejection:
 

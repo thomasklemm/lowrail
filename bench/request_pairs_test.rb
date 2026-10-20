@@ -5,6 +5,30 @@ require_relative "request_pairs"
 require_relative "gc_requests"
 
 class RequestPairsTest < Minitest::Test
+  def test_jit_gate_rejects_wrong_modes_missing_counters_and_nonflat_windows
+    { "yjit" => %w[compiled_iseq_count compiled_block_count invalidation_count],
+      "zjit" => %w[compiled_iseq_count failed_iseq_count compiled_side_exit_count compile_time_ns invalidation_time_ns invalidation_count] }.each do |jit, keys|
+      counters = keys.to_h { [_1, 17] }
+      worker = { "yjit" => jit == "yjit", "zjit" => jit == "zjit",
+        "jit_warmup" => { "stable" => true, "consecutive_flat_windows" => 3 },
+        "windows" => [{ "jit_before" => counters.dup, "jit_after" => counters.dup }] }
+      assert JitStability.control({ "worker" => worker }, requested: jit).fetch(:pass)
+      refute JitStability.control({ "worker" => worker }, requested: "0").fetch(:pass)
+      counters.each_key do |key|
+        worker["windows"][0]["jit_after"][key] = 18
+        refute JitStability.control({ "worker" => worker }, requested: jit).fetch(:pass), key
+        worker["windows"][0]["jit_after"][key] = 17
+        worker["windows"][0]["jit_before"].delete(key)
+        result = JitStability.control({ "worker" => worker }, requested: jit)
+        refute result.fetch(:pass), key
+        assert_includes result.fetch(:workers).fetch("worker").fetch(:missing_counters), key.to_sym
+        worker["windows"][0]["jit_before"][key] = 17
+      end
+      worker["jit_warmup"]["consecutive_flat_windows"] = 2
+      refute JitStability.control({ "worker" => worker }, requested: jit).fetch(:pass)
+    end
+  end
+
   def test_brk_overflow_rejects_the_cohort_in_preflight_or_a_successful_worker
     saved = ENV.to_h.slice("PATH", "PROBE_WARNING", "BENCH_HEAP_SLOTS", "BENCH_JIT")
     Dir.mktmpdir("lowrail-brk-refusal-test") do |dir|
@@ -23,7 +47,7 @@ class RequestPairsTest < Minitest::Test
         exit 0
       RUBY
       FileUtils.chmod(0o755, executable)
-      ENV.update("PATH" => "#{dir}:#{ENV.fetch('PATH')}", "BENCH_HEAP_SLOTS" => "50000,10000,5000,2000,1000", "BENCH_JIT" => "0")
+      ENV.update("PATH" => "#{dir}:#{ENV.fetch('PATH')}", "BENCH_HEAP_SLOTS" => Array.new(GC.stat_heap.size, 10_000).join(","), "BENCH_JIT" => "0")
       %w[preflight worker].each do |phase|
         ENV["PROBE_WARNING"] = phase
         out = File.join(dir, phase)
@@ -166,7 +190,7 @@ class RequestPairsTest < Minitest::Test
   def test_operation_windows_sum_allocations_and_keep_zero_allocation_reports_finite
     skip "Valgrind not installed" unless system("sh", "-c", "command -v valgrind >/dev/null")
     saved = ENV.to_h.slice("BENCH_HEAP_SLOTS", "BENCH_JIT")
-    ENV.update("BENCH_HEAP_SLOTS" => "50000,10000,5000,2000,1000", "BENCH_JIT" => "0")
+    ENV.update("BENCH_HEAP_SLOTS" => Array.new(GC.stat_heap.size, 10_000).join(","), "BENCH_JIT" => "0")
     Dir.mktmpdir("lowrail-operation-window-test") do |dir|
       script = File.join(dir, "operation.rb")
       File.write(script, <<~RUBY)
@@ -185,17 +209,21 @@ class RequestPairsTest < Minitest::Test
             Object.new if id == 12
           end
         end
-        if RubyVM::YJIT.enabled?
+        if JitStability.enabled?
           warmup = JitStability.warm { |count| ids.each { operation.call(count, _1) } }
           observe = JitStability.method(:snapshot)
         end
         anchors = HeapWindows.run(windows, settle: settle, observe: observe, &operation)
-        puts "LOWRAIL_BENCH " + JSON.generate(yjit: !!RubyVM::YJIT.enabled?, windows: windows,
+        puts "LOWRAIL_BENCH " + JSON.generate(**JitStability.state, windows: windows,
           heap_anchors: anchors, jit_warmup: warmup, operations: ids.to_h { [_1, {}] })
       RUBY
-      [false, true].each do |empty|
-        ENV["BENCH_JIT"] = empty ? "1" : "0"
-        out = File.join(dir, empty ? "empty" : "mixed")
+      modes = %w[0 1]
+      _, _, zjit = Open3.capture3({ "RUBYOPT" => nil }, RbConfig.ruby, "--disable-yjit", "--zjit", "-e", "exit(RubyVM::ZJIT.enabled? ? 0 : 1)")
+      modes << "zjit" if zjit.success?
+      modes.each do |mode|
+        empty = mode != "0"
+        ENV["BENCH_JIT"] = mode
+        out = File.join(dir, mode)
         FileUtils.mkdir_p(out)
         environments = %w[off_a off_b on].to_h { [_1, { "RUBYOPT" => nil, "EMPTY_ONLY" => empty ? "1" : nil }] }
         capture_io do
@@ -207,9 +235,16 @@ class RequestPairsTest < Minitest::Test
           # Only unit 12 allocates: charging just the first window loses it.
           assert_in_delta(empty ? 0 : 1, sample.fetch("allocations"), 0.05)
           assert_equal(empty ? ["11"] : %w[11 12], sample.fetch("operations").keys.sort)
+          assert_equal GC.stat_heap.size, sample.fetch("windows").first.fetch("pools_before").size
         end
         summary = JSON.parse(File.read(File.join(out, "summary.json")))
-        assert summary.fetch("jit").fetch("pass"), summary.fetch("jit").inspect
+        if mode == "zjit"
+          refute summary.fetch("jit").fetch("pass"), "preview lacks a public invalidation counter"
+          assert_equal ["zjit"], summary.fetch("jit").fetch("actual_jit")
+          assert summary.fetch("jit").fetch("workers").values.all? { _1.fetch("missing_counters").include?("invalidation_count") }
+        else
+          assert summary.fetch("jit").fetch("pass"), summary.fetch("jit").inspect
+        end
         if empty
           assert_nil summary.fetch("layers").fetch("off_a").fetch("allocations").fetch("delta_pct")
           assert_nil summary.fetch("gc").fetch("off_a").fetch("gc_per_1k_allocations")

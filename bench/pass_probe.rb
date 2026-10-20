@@ -55,8 +55,8 @@ module PassProbe
 end
 
 if $PROGRAM_NAME == __FILE__
-  jit = ENV.fetch("BENCH_JIT", "0") == "1"
-  unless jit
+  require_relative "jit_stability"
+  if JitStability.mode != "yjit"
     require File.expand_path("config/application", Dir.pwd)
     Rails.application.config.yjit = false
   end
@@ -65,12 +65,12 @@ if $PROGRAM_NAME == __FILE__
   Rails.application.eager_load!
   Rails.logger.level = :error
   ActiveRecord::Base.logger = nil if defined?(ActiveRecord::Base)
-  raise "unexpected JIT mode" unless !!RubyVM::YJIT.enabled? == jit
+  JitStability.assert_mode!
   ids = ENV.fetch("BENCH_UNITS").split(",").map { Integer(_1) }
   units = PassProbe.active!(ids) if ENV["LOWRAIL"] == "1"
   if ENV["BENCH_MICRO_SCRIPT"]
     load ENV.fetch("BENCH_MICRO_SCRIPT")
-    result = { yjit: !!RubyVM::YJIT.enabled?, ruby: RUBY_DESCRIPTION }
+    result = { **JitStability.state, ruby: RUBY_DESCRIPTION }
   else
     require "rack/mock"
     session = Rack::MockRequest.new(Rails.application)
@@ -104,13 +104,13 @@ if $PROGRAM_NAME == __FILE__
         raise "build inactive: original ISeq served for #{file}"
       end
     end
-    result = { yjit: !!RubyVM::YJIT.enabled?, ruby: RUBY_DESCRIPTION, requests: n,
+    result = { **JitStability.state, ruby: RUBY_DESCRIPTION, requests: n,
       units: units.map { |unit| { id: unit.fetch("id"), pass: unit.fetch("pass"),
         hits_per_request: Lowrail::Stats.unit_hits.fetch(unit.fetch("id").to_s, 0).fdiv(n),
         fallbacks_per_request: Lowrail::Stats.unit_fallbacks.fetch(unit.fetch("id").to_s, 0).fdiv(n) } },
       route_completions_per_request: defined?(Lowrail::Routes) ? Lowrail::Routes.instance_variable_get(:@bench_completions).fdiv(n) : 0 }
   end
-  raise "unexpected JIT mode" unless result.fetch(:yjit) == jit
+  JitStability.assert_mode!
   if ENV["LOWRAIL_JIT_DIAGNOSTICS"] == "1"
     require_relative "../gem/lib/lowrail/jit_diagnostics"
     result[:jit_diagnostics] = Lowrail::JitDiagnostics.snapshot

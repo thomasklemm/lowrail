@@ -2,7 +2,8 @@
 
 # Fixed-heap instruction worker. Keep separate from the native timing worker:
 # even unused additional ISeqs can change its initial heap/GC phase.
-if ENV.fetch("BENCH_JIT", "0") != "1"
+require_relative "jit_stability"
+if JitStability.mode != "yjit"
   require File.expand_path("config/application", Dir.pwd)
   Rails.application.config.yjit = false
 end
@@ -15,6 +16,7 @@ require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
 Rails.application.eager_load!
 Rails.logger.level = :warn
 ActiveRecord::Base.logger = nil if defined?(ActiveRecord::Base)
+JitStability.assert_mode!
 abort "usage: heap_requests.rb VERB:PATH" unless ARGV.size == 1
 verb, path = ARGV.first.split(":", 2)
 session = Rack::MockRequest.new(Rails.application)
@@ -33,8 +35,7 @@ end
 # or arrays are allocated between each window's GC.stat endpoints.
 windows = HeapWindows.windows(n)
 counted_requests(Integer(ENV.fetch("BENCH_WARMUP", "50")), session, verb, path, headers)
-if RubyVM::YJIT.enabled?
-  require_relative "jit_stability"
+if JitStability.enabled?
   jit_warmup = JitStability.warm { |count| counted_requests(count, session, verb, path, headers) }
   observe = JitStability.method(:snapshot)
 end
@@ -58,6 +59,6 @@ if defined?(Lowrail::ARInstantiate)
       Object.const_get(unit.fetch("ar_instantiate").fetch("model")).instance_variable_defined?(:@_lowrail_instantiate)
   end
 end
-puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?, windows: windows,
+puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, windows: windows,
   heap_anchors: anchors, ar_installed: ar_installed, jit_warmup: jit_warmup, request_settle: true,
   compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"

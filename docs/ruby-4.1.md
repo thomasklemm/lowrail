@@ -385,9 +385,9 @@ on 4.1 with the cached 4.0 facts withheld. Benchmark preflight again passes
 
 | Requested finite cohort | Interpreter / YJIT / ZJIT on 4.1 | Disposition |
 |---|---|---|
-| Old cached guard vs K | not started | blocked by the explicit compatibility stop; no numbers |
-| Allocation-study props micro | not started | same stop, including the otherwise standalone micro |
-| Blog index/show: off vs historical default, L2/L2_events | not started | five-app prerequisite still blocked at Redprints; no numbers or accepted/rejected measurement cohort |
+| Old cached guard vs K | pending finite cohort | compatibility prerequisite satisfied; no numbers yet |
+| Allocation-study props micro | pending finite cohort | same pinned preview and dependency overlay |
+| Blog index/show: off vs historical default, L2/L2_events | pending finite cohort | historical runtime/specimens must remain pinned, not current quarantined default |
 
 No retries-until-green, cohort salvage or substitutions. Existing
 [YJIT rejections](bench.md#matched-interpreter--yjit-request-study) remain
@@ -399,7 +399,7 @@ omissions. The allocation study's older default is
 [`8df58ed`](https://github.com/thomasklemm/lowrail/commit/8df58ed), not today's
 empty default. These are different baselines, not interchangeable results.
 
-The next ZJIT seam needs **three flat warm windows and no compilation or
+The ZJIT seam requires **three flat warm windows and no compilation or
 invalidation in any measured window**, alongside unchanged fixed heaps,
 both A/A controls, GC.stat_heap-signature prewarm and request-only settling.
 ZJIT's `compiled_side_exit_count` counts **compiled exit stubs**, not executed
@@ -407,6 +407,26 @@ exits. `invalidation_time_ns` is time, not a public invalidation generation.
 The release build does not supply `ratio_in_zjit` or executed side-exit counts;
 do not replace the strict YJIT gate with whichever ZJIT numbers are available.
 ZJIT remains diagnostic, never pass promotion evidence in this investigation.
+`BENCH_JIT=zjit` now runs the fixed-heap worker, with both actual JIT states
+checked. It records `compiled_iseq_count`, `failed_iseq_count`, generated
+`compiled_side_exit_count`, `compile_time_ns`, `invalidation_time_ns`, and a
+null `invalidation_count`. The latter explicitly rejects the flat gate:
+the preview cannot provide the requested equivalent invalidation proof.
+No extra stats instrumentation or VM patch is added to invent that proof.
+The public operation regression exercises actual interpreter/YJIT/ZJIT on
+the preview; only ZJIT must reject for this missing capability. YJIT's three
+required counters are unchanged.
+
+The preview has 12 actual heap pools (32, 40, 64, 80, 96, 128, 160, 256,
+512, 640, 768, 1024 bytes). Preparation/checks now cover all 12; 4.0's
+five defaults stay unchanged. Source: `gc/default/default.c:237–241` and
+`EACH_POOL_SLOT_SIZE`; direct `GC.stat_heap`/ObjectSpace probes confirm each
+filler's actual slot. The 32-byte pool uses Object, others embedded Arrays.
+A 12-pool regression also found endpoint observer-loop self-compilation
+(21 → 23 ISeqs, 176 → 188 blocks in the first no-GC window). The shared
+observer loop is now itself prewarmed, not excluded from the flat gate.
+These are protocol adaptations before the finite cohorts, not discarded
+measurement retries. Use the pinned `script/bench-valgrind` 512 MiB-brk tool.
 
 ## Mutation APIs: no usable public broad epoch found
 

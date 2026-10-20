@@ -7,6 +7,7 @@ require "json"
 require "fileutils"
 require "tmpdir"
 require_relative "jit_stability"
+require_relative "heap_windows"
 require "open3"
 require "rbconfig"
 require "digest"
@@ -93,6 +94,7 @@ module RequestPairs
     counter = ENV["BENCH_COUNTER"] == "callgrind"
     diagnostic = ENV["BENCH_COUNTER"] == "gc"
     fixed_heap = counter && ENV["BENCH_HEAP_MODE"] != "legacy"
+    raise "ZJIT diagnostics require fixed-heap Callgrind" if JitStability.mode == "zjit" && !fixed_heap
     minimum = fixed_heap ? 6 : (counter || diagnostic ? 3 : 8)
     rounds = Integer(ENV.fetch("BENCH_ROUNDS", minimum.to_s))
     raise "too few rounds" if rounds < minimum
@@ -275,6 +277,7 @@ module RequestPairs
   end
 
   def self.valgrind_preflight(out, floors, app:, env:)
+    floors = HeapWindows.floors.each_with_index.to_h { |n, pool| ["RUBY_GC_HEAP_#{pool}_INIT_SLOTS", n.to_s] }.merge(floors)
     executable = ENV.fetch("PATH").split(File::PATH_SEPARATOR).map { File.join(_1, "valgrind") }.find { File.executable?(_1) }
     raise "Valgrind not found; use script/bench-valgrind" unless executable
     executable = File.realpath(executable)
@@ -295,17 +298,13 @@ module RequestPairs
         require File.expand_path("config/environment", Dir.pwd)
         Rails.application.eager_load!
       end
-      GC.disable
-      roots = [0, 4, 9, 19, 39].each_with_index.map do |length, pool|
-        target = Integer(ENV.fetch("RUBY_GC_HEAP_#{pool}_INIT_SLOTS", %w[1000000 250000 100000 20000 10000].fetch(pool)))
-        count = [target - GC.stat_heap(pool, :heap_live_slots), 0].max
-        Array.new(count) { Array.new(length) }
-      end
-      puts roots.sum(&:length)
+      require ARGV.fetch(1)
+      puts HeapWindows.prepare_heap.size
     RUBY
     log = File.join(out, "preflight.valgrind.log")
     ok = system(env.merge(floors).merge("RUBYOPT" => nil, "LOWRAIL" => "0"), executable, "--verbose", "--tool=none",
-      "--log-file=#{log}", RbConfig.ruby, "--disable-yjit", "-e", program, rails_boot ? "rails" : "heap",
+      "--log-file=#{log}", RbConfig.ruby, *JitStability.flags("0"), "-e", program,
+      rails_boot ? "rails" : "heap", File.expand_path("heap_windows.rb", __dir__),
       chdir: app,
       out: File.join(out, "preflight.log"), err: [:child, :out])
     result = { pass: !!ok && !File.read(log).match?(/brk segment overflow|Cannot map memory to grow brk segment/),
@@ -320,22 +319,21 @@ module RequestPairs
   def self.heap_instructions(environments, app, out, route, metadata, worker: "heap_requests.rb",
     requests: Integer(ENV.fetch("BENCH_REQUESTS", "50")))
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
-    slots = ENV.fetch("BENCH_HEAP_SLOTS", "1000000,250000,100000,20000,10000").split(",").map { Integer(_1) }
-    raise "positive requests/jobs and five positive pool floors required" unless
-      requests.positive? && jobs.positive? && slots.size == 5 && slots.all?(&:positive?)
+    slots = HeapWindows.floors
+    raise "positive requests/jobs required" unless requests.positive? && jobs.positive?
     floors = slots.each_with_index.to_h { |count, pool| ["RUBY_GC_HEAP_#{pool}_INIT_SLOTS", count.to_s] }
     metadata[:valgrind] = valgrind_preflight(out, floors, app: app, env: environments.fetch("off_a"))
-    jit = ENV.fetch("BENCH_JIT", "0") == "1"
-    jit_flags = [jit ? "--yjit" : "--disable-yjit"]
+    jit = JitStability.mode
+    jit_flags = JitStability.flags(jit)
     if ENV["BENCH_JIT_CALL_THRESHOLD"]
       threshold = Integer(ENV.fetch("BENCH_JIT_CALL_THRESHOLD"))
-      raise "positive JIT call threshold requires BENCH_JIT=1" unless jit && threshold.positive?
+      raise "positive JIT call threshold requires BENCH_JIT=1/yjit" unless jit == "yjit" && threshold.positive?
       jit_flags << "--yjit-call-threshold=#{threshold}"
       metadata[:jit_call_threshold] = threshold
     end
     extension = compile_counter_extension(out)
     metadata.merge!(counter: "callgrind", heap_mode: "fixed", heap_slots: slots,
-      region: "after warmup and three full GCs", requests: requests, requested_yjit: jit)
+      region: "after warmup and three full GCs", requests: requests, requested_yjit: jit == "yjit", requested_jit: jit)
     samples = []
     rng = Random.new(metadata.fetch(:seed))
     metadata.fetch(:rounds).times do |round|
@@ -394,6 +392,7 @@ module RequestPairs
       end.map(&:value).each { raise _1 if _1.is_a?(Exception) }
       samples << row
       metadata[:actual_yjit] = metadata.fetch(:workers).values.map { _1.fetch("yjit") }.uniq
+      metadata[:actual_jit] = metadata.fetch(:workers).values.map { JitStability.actual(_1) }.uniq
       File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
       warn "fixed-heap Callgrind round #{round + 1}/#{metadata.fetch(:rounds)}"
     end

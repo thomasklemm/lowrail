@@ -30,6 +30,7 @@ CASES = {
 }.freeze
 
 if ARGV.first == "--worker"
+  JitStability.assert_mode!
   $LOAD_PATH.unshift(ENV.fetch("GUARD_LOWRAIL_LIB", File.expand_path("../gem/lib", __dir__)))
   require "lowrail"
   require "lowrail/manifest"
@@ -62,34 +63,28 @@ if ARGV.first == "--worker"
     end
   RUBY
   GuardCostSite.run(100_000)
-  jit_warmup = JitStability.warm { |count| GuardCostSite.run(count) } if RubyVM::YJIT.enabled?
-  lengths = [0, 4, 9, 19, 39]
-  anchors = []
-  3.times { GC.start }
-  raise "GC was disabled" if GC.disable
-  GC.stat_heap.each do |pool, stats|
-    target = Integer(ENV.fetch("RUBY_GC_HEAP_#{pool}_INIT_SLOTS"))
-    fillers = Array.new([target - stats.fetch(:heap_live_slots), 0].max) { Array.new(lengths.fetch(pool)) }
-    stride = GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE) / stats.fetch(:slot_size) / 2
-    fillers.each_with_index { |object, index| anchors << object if (index % stride).zero? }
-    anchors << fillers.last unless fillers.empty?
-    fillers.clear
+  jit_warmup = JitStability.warm { |count| GuardCostSite.run(count) } if JitStability.enabled?
+  anchors = HeapWindows.prepare_heap
+  if JitStability.enabled?
+    200.times do
+      GC.stat_heap.transform_values { _1.fetch(:heap_eden_slots) }
+      JitStability.snapshot
+    end
   end
-  GC.enable
   n = Integer(ENV.fetch("GUARD_REQUESTS", "100000"))
   modes = Integer(ENV.fetch("GUARD_ROUND", "0")).even? ? %w[total no_gc] : %w[no_gc total]
   windows = modes.product([0, n]).map do |mode, count|
     3.times { GC.start }
     before = GC.stat_heap.transform_values { _1.fetch(:heap_eden_slots) }
-    jit_before = JitStability.snapshot if RubyVM::YJIT.enabled?
+    jit_before = JitStability.snapshot if JitStability.enabled?
     LowrailCallgrindBench.start(mode == "no_gc")
     GuardCostSite.run(count)
     segments = LowrailCallgrindBench.finish
-    jit_after = JitStability.snapshot if RubyVM::YJIT.enabled?
+    jit_after = JitStability.snapshot if JitStability.enabled?
     { mode: mode, checks: count, capacities: before, gc_segments: segments,
       jit_before: jit_before, jit_after: jit_after }
   end
-  puts "LOWRAIL_BENCH #{JSON.generate(case: name, windows: windows, yjit: RubyVM::YJIT.enabled?, jit_warmup: jit_warmup)}"
+  puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, case: name, windows: windows, jit_warmup: jit_warmup)}"
   exit
 end
 
@@ -99,17 +94,20 @@ unless ARGV[1] == "--summarize"
   FileUtils.mkdir_p(out)
   extension = RequestPairs.compile_counter_extension(out)
   rows = []
-  env = { "BENCH_CALLGRIND_EXTENSION" => extension, "RUBYOPT" => nil, "LOWRAIL_SPECULATE" => nil }
-  [1_000_000, 250_000, 100_000, 20_000, 10_000].each_with_index { |n, i| env["RUBY_GC_HEAP_#{i}_INIT_SLOTS"] = n.to_s }
+  env = { "BENCH_CALLGRIND_EXTENSION" => extension, "RUBYOPT" => nil, "LOWRAIL_SPECULATE" => nil,
+    "BENCH_JIT" => ENV.fetch("GUARD_JIT", ENV.fetch("BENCH_JIT", "1")) }
+  HeapWindows.floors.each_with_index { |n, i| env["RUBY_GC_HEAP_#{i}_INIT_SLOTS"] = n.to_s }
+  RequestPairs.valgrind_preflight(out, env.select { |key, _| key.start_with?("RUBY_GC_HEAP_") }, app: Dir.pwd, env: env)
   6.times do |round|
     samples = {}
     (ENV.fetch("GUARD_CASES", CASES.keys.join(",")).split(",") + ["loop_b"]).shuffle(random: Random.new(41231 + round)).each do |label|
       name = label == "loop_b" ? "loop" : label
       prefix = File.join(out, "#{round}-#{label}")
-      jit = ENV.fetch("GUARD_JIT", "1") == "1" ? "--yjit" : "--disable-yjit"
       ok = system(env.merge("GUARD_ROUND" => round.to_s), "valgrind", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
-        "--callgrind-out-file=#{prefix}.callgrind", RbConfig.ruby, jit, __FILE__, "--worker", name,
+        "--log-file=#{prefix}.valgrind.log", "--callgrind-out-file=#{prefix}.callgrind",
+        RbConfig.ruby, *JitStability.flags(env.fetch("BENCH_JIT")), __FILE__, "--worker", name,
         out: prefix + ".log", err: [:child, :out])
+      RequestPairs.check_valgrind_log!(out, "#{round}-#{label}")
       abort "failed: #{prefix}.log" unless ok
       meta = JSON.parse(File.readlines(prefix + ".log").find { _1.start_with?("LOWRAIL_BENCH ") }.delete_prefix("LOWRAIL_BENCH "))
       values = 4.times.map { |i| Integer(File.read("#{prefix}.callgrind.#{i + 1}")[/^totals: (\d+)/, 1]) }
@@ -133,10 +131,10 @@ end
 capacities = rows.flat_map { |row| row.values.flat_map { _1.fetch("metadata").fetch("windows").map { |w| w.fetch("capacities") } } }
 # Match the request harness: actual floors in every pool, and at most one
 # page's difference. Ruby can move one embedded Array between size pools.
-floors = [1_000_000, 250_000, 100_000, 20_000, 10_000]
+floors = HeapWindows.floors
 heap_ok = floors.each_with_index.all? do |floor, pool|
   values = capacities.map { _1.fetch(pool.to_s) }
-  values.min >= floor && values.max - values.min <= GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE) / (40 << pool)
+  values.min >= floor && values.max - values.min <= GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE) / GC.stat_heap(pool, :slot_size)
 end
 aa = %w[total no_gc].to_h do |metric|
   estimate = RequestPairs.estimate(rows.map { 100 * (_1.fetch("loop_b").fetch(metric) / _1.fetch("loop").fetch(metric) - 1) }, seed: 41231)
@@ -144,7 +142,7 @@ aa = %w[total no_gc].to_h do |metric|
   [metric, estimate.merge(pass: lo <= 0 && hi >= 0 && lo >= -0.5 && hi <= 0.5)]
 end
 workers = rows.each_with_index.flat_map { |row, round| row.map { |name, sample| ["#{round}-#{name}", sample.fetch("metadata")] } }.to_h
-jit = JitStability.control(workers, requested: ENV.fetch("GUARD_JIT", "1") == "1")
+jit = JitStability.control(workers, requested: ENV.fetch("GUARD_JIT", ENV.fetch("BENCH_JIT", "1")))
 File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary: summary, capacities: capacities.uniq, heap_ok: heap_ok, aa: aa, jit: jit))
 puts JSON.pretty_generate(summary)
 abort "heap, A/A or JIT gate failed" unless heap_ok && aa.values.all? { _1.fetch(:pass) } && jit.fetch(:pass)

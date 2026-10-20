@@ -13,13 +13,14 @@ groups.select! { |name, _| ARGV.drop(1).include?(name) } if ARGV.size > 1
 groups.each do |group, directory|
   dir = File.join(out, group)
   FileUtils.mkdir_p(dir, mode: 0o700)
-  app = File.join(root, ".corpus", directory)
+  app = File.join(ENV.fetch("BENCH_CORPUS_ROOT", File.join(root, ".corpus")), directory)
   base = { "LOWRAIL" => "0", "RUBYOPT" => nil, "RAILS_ENV" => "production",
     "RAILS_LOG_LEVEL" => "error", "SECRET_KEY_BASE_DUMMY" => "1", "ALLOC_MICRO_APP" => group }
   environments = %w[off_a off_b on].to_h do |arm|
     [arm, base.merge("ALLOC_MICRO_ARM" => arm == "on" ? "on" : "off")]
   end
-  metadata = { seed: 41231, rounds: 6, workers: {} }
+  metadata = { seed: 41231, rounds: 6, workers: {},
+    lockfile_sha256: Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest }
   passed = RequestPairs.heap_instructions(environments, app, dir, "GET:/unused", metadata,
     worker: File.join(__dir__, "allocations_micro.rb"), requests: 1000)
   samples = JSON.parse(File.read(File.join(dir, "samples.json"))).fetch("samples")

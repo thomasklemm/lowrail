@@ -3,19 +3,19 @@
 # Handwritten, conditional measurement specimens. Never installed into Rails.
 # FACTS models an already-valid invalidatable method/source/schema certificate;
 # this file does NOT implement its invalidation machinery or claim support.
+require_relative "../jit_stability"
 require File.expand_path("config/application", Dir.pwd)
-Rails.application.config.yjit = false unless ENV.fetch("BENCH_JIT", "0") == "1"
+Rails.application.config.yjit = false unless JitStability.mode == "yjit"
 require File.expand_path("config/environment", Dir.pwd)
 require "json"
 require "digest"
 require_relative "../heap_windows"
-require_relative "../jit_stability"
 require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
 Rails.application.eager_load!
 Rails.logger.level = :error
 ActiveRecord::Base.logger = nil
-raise "wrong Rails/JIT" unless Rails.version == "8.1.4" &&
-  !!RubyVM::YJIT.enabled? == (ENV.fetch("BENCH_JIT", "0") == "1")
+raise "wrong Rails" unless Rails.version == "8.1.4"
+JitStability.assert_mode!
 raise "must not load Lowrail" if defined?(Lowrail)
 
 module AllocationsMicro
@@ -153,11 +153,11 @@ arm = ENV.fetch("ALLOC_MICRO_ARM") == "on" ? :on : :off
 operations = records.transform_values { _1.fetch(arm) }
 operations.each_value { AllocationsMicro.repeat(5000, _1) }
 operation = ->(count, id) { AllocationsMicro.repeat(count, operations.fetch(id)) }
-jit_warmup = JitStability.warm { |count| operations.each_key { operation.call(count, _1) } } if RubyVM::YJIT.enabled?
+jit_warmup = JitStability.warm { |count| operations.each_key { operation.call(count, _1) } } if JitStability.enabled?
 n = Integer(ENV.fetch("BENCH_REQUESTS", "1000"))
 windows = HeapWindows.windows(n, operations.keys)
-anchors = HeapWindows.run(windows, observe: RubyVM::YJIT.enabled? ? JitStability.method(:snapshot) : nil, &operation)
-puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?, windows: windows,
+anchors = HeapWindows.run(windows, observe: JitStability.enabled? ? JitStability.method(:snapshot) : nil, &operation)
+puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, windows: windows,
   heap_anchors: anchors, operations: operations.keys.to_h { [_1, { invocations_per_iteration: 1 }] },
   checks: checks, jit_warmup: jit_warmup, specimen_sha256: Digest::SHA256.file(__FILE__).hexdigest,
   seam_sha256: %w[heap_windows.rb jit_stability.rb request_pairs.rb].to_h { [_1, Digest::SHA256.file(File.expand_path("../#{_1}", __dir__)).hexdigest] })}"

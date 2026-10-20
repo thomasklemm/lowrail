@@ -5,12 +5,34 @@
 require_relative "../pass"
 
 root = File.expand_path("../..", __dir__)
-app = File.join(root, ".corpus/real-blog-r4")
+app = File.expand_path(ENV.fetch("BENCH_APP", File.join(root, ".corpus/real-blog-r4")))
 out = File.expand_path(ARGV.fetch(0))
 raise "new output directory required" if File.exist?(out)
 FileUtils.mkdir_p(out, mode: 0o700)
-lib = File.join(root, "gem/lib")
-manifest = PassBench.preflight(File.join(app, ".lowrail"), lib)
+historical = File.expand_path(ENV["BENCH_HISTORICAL_ROOT"]) if ENV["BENCH_HISTORICAL_ROOT"]
+lib = File.join(historical || root, "gem/lib")
+# Only this explicitly historical experiment may load the quarantined runtime.
+# Rebuild its ISeqs for this VM; never make current Lowrail admit old artifacts.
+if historical
+  expected = Open3.capture2("git", "-C", root, "ls-tree", "-r", "--name-only", "c9d2397", "gem/lib").first.lines.map(&:strip).to_h do |path|
+    bytes, status = Open3.capture2("git", "-C", root, "show", "c9d2397:#{path}")
+    raise "cannot read historical runtime" unless status.success?
+    [path.delete_prefix("gem/lib/"), Digest::SHA256.hexdigest(bytes)]
+  end
+  raise "historical runtime must be exactly c9d2397" unless PassBench.runtime_fingerprint(lib) == expected
+end
+preflight = -> {
+  if historical
+    text, error, status = Open3.capture3({ "RUBYOPT" => nil }, RbConfig.ruby, "-e",
+      'require ARGV.fetch(0); puts JSON.generate(PassBench.preflight(ARGV.fetch(1), ARGV.fetch(2)))',
+      File.join(historical, "bench/pass.rb"), File.join(app, ".lowrail"), lib)
+    raise "historical preflight failed: #{error}" unless status.success?
+    JSON.parse(text.lines.last)
+  else
+    PassBench.preflight(File.join(app, ".lowrail"), lib)
+  end
+}
+manifest = preflight.call
 runtime = PassBench.runtime_fingerprint(lib)
 harness = PassBench.harness_fingerprint
 specimens = %w[blog_layers.rb blog_ablation.rb blog_eventful.rb blog_check.rb yjit_study.rb].to_h do |file|
@@ -28,7 +50,7 @@ begin
   environments = { "off_a" => env.merge("BENCH_WORKDIR" => app), "off_b" => env.merge("BENCH_WORKDIR" => app) }
   %w[L1 L2 L2_events].each do |stage|
     check = File.join(out, "#{stage}-checks.json")
-    raise "#{stage} fixture equivalence failed" unless system(env, RbConfig.ruby, File.join(__dir__, "blog_ablation.rb"), stage, check,
+    raise "#{stage} fixture equivalence failed" unless system(env, RbConfig.ruby, *JitStability.flags(env.fetch("BENCH_JIT")), File.join(__dir__, "blog_ablation.rb"), stage, check,
       chdir: app, out: check + ".log", err: [:child, :out])
     variant = Dir.mktmpdir("blog-yjit-#{stage}-", File.dirname(app))
     variants << variant
@@ -51,6 +73,7 @@ begin
     metadata = { seed: 41231, rounds: 6, workers: {}, specimens: specimens, coverage: coverage,
       head_revision: Open3.capture2("git", "-C", root, "rev-parse", "HEAD").first.strip,
       runtime_files_sha256: runtime, harness_files_sha256: harness,
+      historical_runtime: historical && "c9d2397f1748579b04f6bddff48bc3bfc53d79b0",
       manifest_sha256: Digest::SHA256.file(File.join(app, ".lowrail/manifest.json")).hexdigest,
       lockfile_sha256: Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest }
     ok = RequestPairs.heap_instructions(environments, app, dir, "GET:#{path}", metadata)
@@ -58,7 +81,7 @@ begin
     puts "#{path}: #{ok ? 'accepted' : 'rejected (retained)'}"
     $stdout.flush
   end
-  raise "build changed during study" unless manifest == PassBench.preflight(File.join(app, ".lowrail"), lib)
+  raise "build changed during study" unless manifest == preflight.call
   raise "runtime changed during study" unless runtime == PassBench.runtime_fingerprint(lib)
   raise "harness changed during study" unless harness == PassBench.harness_fingerprint
   raise "specimen changed during study" unless specimens.all? do |file, sha|

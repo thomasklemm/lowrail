@@ -67,7 +67,7 @@ module PassBench
   def self.probe(app, out, env, route, label, diagnostics: false)
     env = env.merge("LOWRAIL_JIT_DIAGNOSTICS" => diagnostics ? ENV["LOWRAIL_JIT_DIAGNOSTICS"] : nil)
     log = File.join(out, "#{label}.log")
-    ok = system(env, RbConfig.ruby, env.fetch("BENCH_JIT") == "1" ? "--yjit" : "--disable-yjit",
+    ok = system(env, RbConfig.ruby, *JitStability.flags(env.fetch("BENCH_JIT")),
       File.join(__dir__, "pass_probe.rb"), route, chdir: app, out: log, err: [:child, :out])
     raise "activation/JIT probe failed; inspect #{log}" unless ok
     line = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
@@ -165,6 +165,7 @@ module PassBench
     lines << "\nVerdict: **#{result.fetch(:status)}**. #{result[:error]}"
     lines << "\nDeltas compare with no setup; off_b is the independent A/A control."
     lines << "\nObserved YJIT: #{result.fetch(:actual_yjit).join(', ')}." if result[:actual_yjit]
+    lines << "\nObserved JIT mode: #{result.fetch(:actual_jit).join(', ')}; ZJIT is diagnostic only." if result[:actual_jit]
     if (jit = result.dig(:request, "jit"))
       lines << "\nJIT mode/warmup/window gate: **#{jit.fetch('pass') ? 'pass' : 'reject'}** (three consecutive flat warmup windows, then no compilation or invalidation inside any measured window)."
     end
@@ -250,7 +251,8 @@ module PassBench
           %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].any? { ENV[_1] }
         warn "[lowrail] *** UNSAFE GUARD-TAX EXPERIMENT: ONLY THE UNGUARDED LAYER BYPASSES FACTS. NEVER DEPLOY. ***"
       end
-      raise "BENCH_JIT must be 0 or 1" unless %w[0 1].include?(ENV.fetch("BENCH_JIT", "0"))
+      jit_mode = JitStability.mode
+      raise "ZJIT diagnostics require fixed-heap Callgrind" if jit_mode == "zjit" && counter != "callgrind"
       raise "legacy heap mode is diagnostic only" if ENV["BENCH_HEAP_MODE"] == "legacy"
       raise "A/A tolerance is fixed; do not widen controls" if ENV["BENCH_AA_TOLERANCE"]
       raise "native needs at least five independent cohorts" if counter == "native" && Integer(ENV.fetch("BENCH_COHORTS", "5")) < 5
@@ -359,7 +361,8 @@ module PassBench
         raw = JSON.parse(File.read(File.join(out, "requests/samples.json")))
         workers = raw["cohorts"] ? raw.fetch("cohorts").flat_map { _1.fetch("workers").values } : raw.fetch("workers").values
         result[:actual_yjit] = workers.map { _1.fetch("yjit") }.uniq
-        raise "unexpected JIT mode in request workers" unless workers.all? { _1.fetch("yjit") == (env.fetch("BENCH_JIT") == "1") }
+        result[:actual_jit] = workers.map { JitStability.actual(_1) }.uniq
+        raise "unexpected JIT mode in request workers" unless workers.all? { JitStability.actual(_1) == JitStability.mode(env.fetch("BENCH_JIT")) }
       end
       raise "request A/A, heap, activation or JIT checks failed; inspect requests.log" unless ok
       if stacked

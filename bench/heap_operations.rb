@@ -4,11 +4,12 @@
 # Only the replay arm differs; counters/capture never run in measured windows.
 # Lock gems before capture requires JSON/Prism, but install before application
 # requires targeted gem methods (notably RailsVite::Manifest).
+require_relative "jit_stability"
 require File.expand_path("config/boot", Dir.pwd)
 require_relative "operation_capture"
 OperationCapture.install
 require File.expand_path("config/application", Dir.pwd)
-Rails.application.config.yjit = false unless ENV.fetch("BENCH_JIT", "0") == "1"
+Rails.application.config.yjit = false unless JitStability.mode == "yjit"
 require File.expand_path("config/environment", Dir.pwd)
 require "rack/mock"
 require_relative "heap_windows"
@@ -17,7 +18,7 @@ require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
 Rails.application.eager_load!
 Rails.logger.level = :error
 ActiveRecord::Base.logger = nil if defined?(ActiveRecord::Base)
-raise "unexpected JIT mode" unless !!RubyVM::YJIT.enabled? == (ENV.fetch("BENCH_JIT", "0") == "1")
+JitStability.assert_mode!
 PassProbe.active!(ENV.fetch("BENCH_UNITS").split(",").map { Integer(_1) })
 
 verb, path = ARGV.fetch(0).split(":", 2)
@@ -95,9 +96,18 @@ operations.each do |id, calls|
 end
 n = Integer(ENV.fetch("BENCH_REQUESTS", "50"))
 windows = HeapWindows.windows(n, operations.keys)
-anchors = HeapWindows.run(windows, prepare: OperationCapture.method(:restore_context)) do |count, id|
+if JitStability.enabled?
+  jit_warmup = JitStability.warm do |count|
+    operations.each do |id, calls|
+      OperationCapture.restore_context(id)
+      count.times { calls.each(&:call) }
+    end
+  end
+  observe = JitStability.method(:snapshot)
+end
+anchors = HeapWindows.run(windows, prepare: OperationCapture.method(:restore_context), observe: observe) do |count, id|
   calls = operations.fetch(id)
   count.times { calls.each(&:call) }
 end
-puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?, windows: windows,
-  operations: metadata, heap_anchors: anchors, ar_installed: 0)}"
+puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, windows: windows,
+  operations: metadata, heap_anchors: anchors, ar_installed: 0, jit_warmup: jit_warmup)}"
