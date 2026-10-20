@@ -37,8 +37,9 @@ same 11 units and verifies 21/21 identical with 114 hits.
   template seam (lowered handler code while the source digest matches),
   guards that reset on every definition path and revalidate lazily
   (including stubs on single objects), per-view-class checks, env check,
-  stats, Minitest outcome reporter across forked workers. Setup loads no
-  default gems, so apps pinning `json` still boot.
+  stats, Minitest outcome reporter across forked workers and RSpec per-example
+  outcomes via RUBYOPT (explicit `verify APP -- bundle exec rspec ...`). Setup
+  loads no default gems, so apps pinning `json` still boot.
 - **`lowrail verify [--bisect]`**: suite with `LOWRAIL=0` and `1`, per-test
   outcomes and fast-path hits. `--bisect` reruns with unit subsets
   (`LOWRAIL_UNITS`) and writes `.lowrail/denylist.json`, which `build`
@@ -62,6 +63,16 @@ same 11 units and verifies 21/21 identical with 114 hits.
 | real-blog (Rails 8.1.4) | 9/9 `link_to` sites, 10/10 route sites (1 in a controller), 12 units including preload plans | 21/21 identical, 116 fast-path hits across all 12 units (2 preload hits) | 4 HTML routes byte-identical on/off (CSRF masked); request time within noise, allocs −1 to −6 %; `edit_article_path` 2.7 → 1.4 µs |
 | Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 108/162 route sites (51 `_url`) | 634/634 identical (2 skips both ways), 13238 hits across 52 units, 0 fallbacks; with `--preload-plans` 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
 | ARGOS (private, Rails 8.1.4) | not built yet | — | M0 aggregates in `docs/m0/argos.md` |
+| PingCRM (Rails 8.1.4, Ruby 4.0.7) | 30/30 route sites, 4 route units + preload | 26/26 identical, 11 route + 7 preload hits | [Public Inertia M0](m0/inertia.md); seed 41231, browser suite included |
+| Redprints CFP (Rails 8.1.3, Ruby 4.0.7) | 25/27 route sites, 14 route units + preload | 62/62 identical, **zero hits: fallback only** (7 template fallbacks) | Runs without patches despite Ruby 3.4 pin; Freezolite/require-hooks delivery boundary in [M0](m0/inertia.md) |
+| React Starter Kit (Rails 8.1.4, Ruby 4.0.7) | 23/26 route sites, 8 route units + preload | 36/36 identical, 25 route hits across 7 units; no preload hits | [M0](m0/inertia.md) includes healthy SSR HTML and authenticated JSON |
+
+Public Inertia builds and `observe` completed on all three. Lowrail-off
+production/YJIT baselines and StackProf area shares are in [the M0](m0/inertia.md),
+not speedup claims. All three version digests are eager boot Strings: **zero
+digest calls across 400 traced requests/app**, unlike ARGOS's version proc.
+Configuration binding and serializer/prop descriptors are measured candidates;
+dynamic users, props, SQL and SSR output must remain per request.
 
 ### Build surface (2026-10-20)
 
