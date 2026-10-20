@@ -6,6 +6,7 @@
 require "json"
 require "fileutils"
 require "tmpdir"
+require_relative "jit_stability"
 require "open3"
 require "rbconfig"
 require "digest"
@@ -272,9 +273,16 @@ module RequestPairs
       requests.positive? && jobs.positive? && slots.size == 5 && slots.all?(&:positive?)
     floors = slots.each_with_index.to_h { |count, pool| ["RUBY_GC_HEAP_#{pool}_INIT_SLOTS", count.to_s] }
     jit = ENV.fetch("BENCH_JIT", "0") == "1"
+    jit_flags = [jit ? "--yjit" : "--disable-yjit"]
+    if ENV["BENCH_JIT_CALL_THRESHOLD"]
+      threshold = Integer(ENV.fetch("BENCH_JIT_CALL_THRESHOLD"))
+      raise "positive JIT call threshold requires BENCH_JIT=1" unless jit && threshold.positive?
+      jit_flags << "--yjit-call-threshold=#{threshold}"
+      metadata[:jit_call_threshold] = threshold
+    end
     extension = compile_counter_extension(out)
     metadata.merge!(counter: "callgrind", heap_mode: "fixed", heap_slots: slots,
-      region: "after warmup and three full GCs", requests: requests, yjit: jit)
+      region: "after warmup and three full GCs", requests: requests, requested_yjit: jit)
     samples = []
     rng = Random.new(metadata.fetch(:seed))
     metadata.fetch(:rounds).times do |round|
@@ -293,12 +301,11 @@ module RequestPairs
               "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension)
             ok = system(env, "valgrind", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
-              RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.expand_path(worker, __dir__), route,
+              RbConfig.ruby, *jit_flags, File.expand_path(worker, __dir__), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
             raise "Callgrind failed: #{label}; inspect logs" unless ok
             result = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
-            raise "unexpected JIT mode" unless result.fetch("yjit") == jit
             raise "AR build did not activate" if layer == "instantiate" && result.fetch("ar_installed").zero?
             windows = result.fetch("windows")
             windows.each_with_index do |window, index|
@@ -332,6 +339,7 @@ module RequestPairs
         end
       end.map(&:value).each { raise _1 if _1.is_a?(Exception) }
       samples << row
+      metadata[:actual_yjit] = metadata.fetch(:workers).values.map { _1.fetch("yjit") }.uniq
       File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
       warn "fixed-heap Callgrind round #{round + 1}/#{metadata.fetch(:rounds)}"
     end
@@ -368,9 +376,10 @@ module RequestPairs
         matched: capacities.min >= slots.fetch(pool) && capacities.max - capacities.min <= page_slots }]
     end
     summary[:heap_matched] = summary[:heap_capacity].values.all? { _1.fetch(:matched) }
+    summary[:jit] = JitStability.control(metadata.fetch(:workers), requested: jit)
     File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary))
     puts JSON.pretty_generate(summary)
-    summary.fetch(:aa).fetch(:pass) && summary.fetch(:heap_matched)
+    summary.fetch(:aa).fetch(:pass) && summary.fetch(:heap_matched) && summary.fetch(:jit).fetch(:pass)
   end
 
   # Legacy short-window diagnostic: includes boot-dependent GC phase.

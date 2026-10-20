@@ -13,6 +13,31 @@ class RequestPairsTest < Minitest::Test
     end
   end
 
+  def test_jit_gate_requires_actual_mode_and_flat_warmup_and_measurement
+    counters = { "compiled_iseq_count" => 73, "compiled_block_count" => 901, "invalidation_count" => 12 }
+    worker = { "yjit" => true, "jit_warmup" => { "stable" => true, "consecutive_flat_windows" => 3 },
+      "windows" => [{ "jit_before" => counters, "jit_after" => counters.dup }] }
+    assert JitStability.control({ "on" => worker }, requested: true).fetch(:pass)
+    counters.each_key do |key|
+      changed = Marshal.load(Marshal.dump(worker))
+      changed.fetch("windows").first.fetch("jit_after")[key] += 1
+      refute JitStability.control({ "on" => changed }, requested: true).fetch(:pass), key
+    end
+    worker.fetch("jit_warmup")["stable"] = false
+    refute JitStability.control({ "on" => worker }, requested: true).fetch(:pass)
+    worker["jit_warmup"] = nil
+    refute JitStability.control({ "on" => worker }, requested: true).fetch(:pass)
+    worker["yjit"] = false
+    result = JitStability.control({ "on" => worker }, requested: true)
+    refute result.fetch(:pass)
+    assert_equal [false], result.fetch(:actual_yjit)
+    assert JitStability.control({ "off" => worker }, requested: false).fetch(:pass)
+    worker["yjit"] = true
+    result = JitStability.control({ "unexpected" => worker }, requested: false)
+    refute result.fetch(:pass)
+    assert_equal [true], result.fetch(:actual_yjit)
+  end
+
   def test_comparisons_refuse_an_ar_build_that_would_silently_decline
     saved = ENV.to_h.slice("BENCH_COUNTER", "BENCH_INSTANTIATE_DIR", "BENCH_ROUNDS", "BENCH_LOWRAIL_LIB")
     Dir.mktmpdir("lowrail-stale-build-test") do |dir|

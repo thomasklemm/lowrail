@@ -12,7 +12,7 @@ module HeapWindows
     end
   end
 
-  def self.run(windows, prepare: nil)
+  def self.run(windows, prepare: nil, observe: nil)
     3.times { GC.start }
     raise "app disabled GC" if GC.disable
     lengths = [0, 4, 9, 19, 39]
@@ -30,6 +30,7 @@ module HeapWindows
     windows.each do |window|
       prepare&.call(window[:unit])
       3.times { GC.start }
+      window[:jit_before] = observe.call if observe
       window[:pools_before].each { |pool, stats| GC.stat_heap(pool, stats) }
       GC.stat(window[:before])
       LowrailCallgrindBench.start(window[:mode] == "no_gc")
@@ -37,6 +38,7 @@ module HeapWindows
       segments = LowrailCallgrindBench.finish
       GC.stat(window[:after])
       window[:pools_after].each { |pool, stats| GC.stat_heap(pool, stats) }
+      window[:jit_after] = observe.call if observe
       window[:gc_segments] = segments
     end
     anchors.size

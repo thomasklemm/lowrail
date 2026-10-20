@@ -62,6 +62,7 @@ if ARGV.first == "--worker"
     end
   RUBY
   GuardCostSite.run(100_000)
+  jit_warmup = JitStability.warm { |count| GuardCostSite.run(count) } if RubyVM::YJIT.enabled?
   lengths = [0, 4, 9, 19, 39]
   anchors = []
   3.times { GC.start }
@@ -80,12 +81,15 @@ if ARGV.first == "--worker"
   windows = modes.product([0, n]).map do |mode, count|
     3.times { GC.start }
     before = GC.stat_heap.transform_values { _1.fetch(:heap_eden_slots) }
+    jit_before = JitStability.snapshot if RubyVM::YJIT.enabled?
     LowrailCallgrindBench.start(mode == "no_gc")
     GuardCostSite.run(count)
     segments = LowrailCallgrindBench.finish
-    { mode: mode, checks: count, capacities: before, gc_segments: segments }
+    jit_after = JitStability.snapshot if RubyVM::YJIT.enabled?
+    { mode: mode, checks: count, capacities: before, gc_segments: segments,
+      jit_before: jit_before, jit_after: jit_after }
   end
-  puts "LOWRAIL_BENCH #{JSON.generate(case: name, windows: windows, yjit: RubyVM::YJIT.enabled?)}"
+  puts "LOWRAIL_BENCH #{JSON.generate(case: name, windows: windows, yjit: RubyVM::YJIT.enabled?, jit_warmup: jit_warmup)}"
   exit
 end
 
@@ -139,6 +143,8 @@ aa = %w[total no_gc].to_h do |metric|
   lo, hi = estimate.fetch(:ci95)
   [metric, estimate.merge(pass: lo <= 0 && hi >= 0 && lo >= -0.5 && hi <= 0.5)]
 end
-File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary: summary, capacities: capacities.uniq, heap_ok: heap_ok, aa: aa))
+workers = rows.each_with_index.flat_map { |row, round| row.map { |name, sample| ["#{round}-#{name}", sample.fetch("metadata")] } }.to_h
+jit = JitStability.control(workers, requested: ENV.fetch("GUARD_JIT", "1") == "1")
+File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary: summary, capacities: capacities.uniq, heap_ok: heap_ok, aa: aa, jit: jit))
 puts JSON.pretty_generate(summary)
-abort "heap or A/A gate failed" unless heap_ok && aa.values.all? { _1.fetch(:pass) }
+abort "heap, A/A or JIT gate failed" unless heap_ok && aa.values.all? { _1.fetch(:pass) } && jit.fetch(:pass)

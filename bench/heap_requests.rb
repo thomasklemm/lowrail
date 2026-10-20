@@ -33,6 +33,11 @@ end
 # or arrays are allocated between each window's GC.stat endpoints.
 windows = HeapWindows.windows(n)
 counted_requests(Integer(ENV.fetch("BENCH_WARMUP", "50")), session, verb, path, headers)
+if RubyVM::YJIT.enabled?
+  require_relative "jit_stability"
+  jit_warmup = JitStability.warm { |count| counted_requests(count, session, verb, path, headers) }
+  observe = JitStability.method(:snapshot)
+end
 
 # Init slots are lazy growth floors, not preallocated pages. Fill each pool
 # explicitly, then discard most fillers. On 64-bit MRI these Array lengths
@@ -40,7 +45,7 @@ counted_requests(Integer(ENV.fetch("BENCH_WARMUP", "50")), session, verb, path, 
 # driver. GC is disabled only during this untimed preparation, never during
 # warmup or a measured request. Sparse anchors keep pages from moving to the
 # tomb heap during full GC. Their small, artificial live set is reported.
-anchors = HeapWindows.run(windows) do |count|
+anchors = HeapWindows.run(windows, observe: observe) do |count|
   counted_requests(count, session, verb, path, headers)
 end
 ar_installed = 0
@@ -51,5 +56,5 @@ if defined?(Lowrail::ARInstantiate)
   end
 end
 puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?, windows: windows,
-  heap_anchors: anchors, ar_installed: ar_installed,
+  heap_anchors: anchors, ar_installed: ar_installed, jit_warmup: jit_warmup,
   compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"

@@ -162,6 +162,10 @@ module PassBench
     end
     lines << "\nVerdict: **#{result.fetch(:status)}**. #{result[:error]}"
     lines << "\nDeltas compare with no setup; off_b is the independent A/A control."
+    lines << "\nObserved YJIT: #{result.fetch(:actual_yjit).join(', ')}." if result[:actual_yjit]
+    if (jit = result.dig(:request, "jit"))
+      lines << "\nJIT mode/warmup/window gate: **#{jit.fetch('pass') ? 'pass' : 'reject'}** (three consecutive flat warmup windows, then no compilation or invalidation inside any measured window)."
+    end
     if result[:coverage]
       lines << "\nCompleted routes/request: #{result.fetch(:coverage).fetch('route_completions_per_request')}; other per-unit counts in JSON. Source guard counts are not completion counts."
     end
@@ -348,11 +352,13 @@ module PassBench
         out: File.join(out, "requests.log"), err: [:child, :out])
       result[:request] = JSON.parse(File.read(File.join(out, "requests/summary.json"))) if File.file?(File.join(out, "requests/summary.json"))
       result[:provenance] = JSON.parse(File.read(File.join(out, "requests/samples.json"))).reject { |key, _| %w[samples workers cohorts].include?(key) } if counter == "callgrind" && result[:request]
+      if File.file?(File.join(out, "requests/samples.json"))
+        raw = JSON.parse(File.read(File.join(out, "requests/samples.json")))
+        workers = raw["cohorts"] ? raw.fetch("cohorts").flat_map { _1.fetch("workers").values } : raw.fetch("workers").values
+        result[:actual_yjit] = workers.map { _1.fetch("yjit") }.uniq
+        raise "unexpected JIT mode in request workers" unless workers.all? { _1.fetch("yjit") == (env.fetch("BENCH_JIT") == "1") }
+      end
       raise "request A/A, heap, activation or JIT checks failed; inspect requests.log" unless ok
-      raw = JSON.parse(File.read(File.join(out, "requests/samples.json")))
-      workers = raw["cohorts"] ? raw.fetch("cohorts").flat_map { _1.fetch("workers").values } : raw.fetch("workers").values
-      raise "unexpected JIT mode in request workers" unless workers.all? { _1.fetch("yjit") == (env.fetch("BENCH_JIT") == "1") }
-      result[:actual_yjit] = workers.map { _1.fetch("yjit") }.uniq
       if stacked
         result[:stack] = StackBudget.report(raw, result, result[:budget_input], default_passes,
           seed: Integer(ENV.fetch("BENCH_SEED", "41231")))
