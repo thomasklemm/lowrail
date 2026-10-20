@@ -35,10 +35,15 @@ stacked set as well as to single passes.
 | `inertia/config_bind` | opt-in | 5 → 3 objects/bind, expected 0.5–2.8 % on JSON routes; native A/A controls failed. Upstream PR inertiajs/inertia-rails#437 may make it obsolete; keep for older versions only |
 | Whole compiled ERB specialization | surveyed; no pass | I18n epoch not closed; Campfire URLs have 7 valid guards but 0 completed lowerings/request. No credited saving; [profile and refusals](passes/erb.md) |
 | Literal-run ERB | rejected | 2 sites across five apps; two append calls saved per rendered layout do not justify a pass/guard ([survey](passes/erb.md)) |
+<<<<<<< Updated upstream
 | Route pass with host/protocol `default_url_options` | parked | Widening the optimized predicate is not exact (`to_param` ordering counterexample); scalar-only args cover 1/4 Campfire path calls, base-AR `to_param` certification would cover 4/4, but the ceiling is ~0.3 % of an uncached room request (19 calls × ~2 µs). Revisit as a stacking item once per-hit route budgets exist ([route-helpers.md](passes/route-helpers.md)) |
 | Template lookup | next | Overlaps Rails-suite hot methods (`LookupContext#find`, `PathSet#find`) |
+=======
+| Route pass with host/protocol `default_url_options` | parked | Scalar-only conversion covers 1/4 Campfire path calls; full base-AR certification could cover 4/4 but needs attribute/type/conversion facts. Revisit as a stacking item after shared per-hit route budgets ([route-helpers.md](passes/route-helpers.md)) |
+| Template lookup | parked | At most 0.42% before complete guards; `clear_cache` and `DetailsKey.clear` change Templates while path/details identities stay unchanged. Needs a filesystem-resolver epoch ([survey](passes/template-lookup.md)) |
+>>>>>>> Stashed changes
 | `run_callbacks` specialization | survey | 22.5 % inclusive in Rails-suite profiles; build only if ≥ 2 % expected on a corpus route |
-| Literal tag attributes | parked | Candidate #4 also owns tag-options/form-builder attribute work (4.46 % blog / 2.90 % Campfire cost shares, not savings); [boundaries](passes/erb.md) |
+| Literal tag attributes | survey | Candidate #4 owns tag-options/form-builder attribute work (4.46 % blog / 2.90 % Campfire cost shares, not savings); establish per-site removable work before implementation ([boundaries](passes/erb.md)) |
 | Fixed-shape serialization | parked | 0–0.18 %; Alba key-plan prototype **rejected** (regressed Redprints, +20 objects) |
 | Empty callbacks (standalone) | rejected | < 0.006 %; superseded by the `run_callbacks` survey |
 | Campfire CSP/importmap reuse | rejected as a pass | A cache changes `Regexp.timeout` semantics; fixed in the app instead (upstream PR) |

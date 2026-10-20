@@ -15,10 +15,12 @@ other candidates as small experiments, not promises of material gains.
 Follow-up: [the ERB investigation](passes/erb.md) rejected literal-run fusion
 (2 sites across five apps) and found no certifiable I18n epoch or completed
 Campfire URL lowering on the profiled room. No compiled-template pass was
-retained; template lookup (#3) is next. The original budgets below remain
-hypotheses, not achieved savings. Candidate #4 owns tag-option construction
+retained; [template lookup (#3)](passes/template-lookup.md) is now surveyed
+and parked: cache clears defeat identity-only guards, and the small ceiling
+does not justify a new resolver epoch. The original budgets below remain
+hypotheses, not achieved savings. Candidate #4 is next; it owns tag-option construction
 and the attribute-building parts of `form_with`, `label`, `text_field` and
-`textarea` as one helper family, rather than a second whole-form pass. Its
+`submit` (also `textarea`) as one helper family, rather than a second whole-form pass. Its
 broader 4.46% / 2.90% blog-edit/Campfire cost shares do not replace the narrow
 literal-attribute eligibility or price dynamic builder/I18n work as static.
 

@@ -24,7 +24,13 @@ same 11 units and verifies 21/21 identical with 114 hits.
   stays identical. Rust: 31 unit + 3 integration tests pass. No runtime fix
   or new pass was made. Three Action View before-gate groups retain 2,747 + 242 +
   173 identical outcomes in every layer. Tag/form attribute work belongs to
-  candidate #4; template lookup (#3) is next. No per-hit or request win claimed.
+  candidate #4. No per-hit or request win claimed.
+- **Template lookup surveyed and parked** ([survey](passes/template-lookup.md)):
+  all five production HTML workloads already reuse filesystem/bound-template
+  caches, with zero warm scans/builds. Rails 8.1.4 and the Campfire alpha both
+  return new Templates after `clear_cache`/`DetailsKey.clear` while path and
+  context-details identities remain unchanged. A complete filesystem-resolver
+  epoch is needed for at most 0.42% opportunity before guards. No new pass.
 - **Shared pass benchmark** (`lowrail bench APP --pass NAME [--path /path]`):
   fixed-heap Callgrind primary, independent mandatory A/A controls, actual-JIT
   attestation, general stale-build and activation rejection. Separate counted
@@ -536,12 +542,12 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 
 ## Next
 
-- Audit an exact route/path extension for host/protocol/port-only controller
-  defaults before template lookup; preserve generic generation's script-name
-  and parameter-conversion order rather than removing the live predicate.
-- Template lookup (#3) after the [ERB helper refusals](passes/erb.md);
-  establish resolver/path/details invalidation before any pass. Tag options
-  and form-builder attribute work remain together under candidate #4.
+- Survey candidate #4 as one family: literal tag options and form-builder
+  attribute work. Establish per-site removable work, keeping dynamic values,
+  escaping, data/aria nesting, booleans and custom overrides live.
+- Route defaults and template lookup are parked. Revisit routes as a stacking
+  item after shared per-hit budgets; argument-less conversion covers 1/4
+  Campfire guarded path calls, full base-AR certification could cover 4/4.
 - Generic route generation and guarded block-result mappings remain unsupported;
   host normalization is request-local, but Rails' `url_options` assembly and
   application overrides remain per call.

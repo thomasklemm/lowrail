@@ -328,9 +328,10 @@ hits in other requests/test environments, where controller defaults differ.
 - `stylesheet_link_tag`, `csrf_meta_tags`, `image_tag`: noted only. Asset
   hosts/paths and overrides remain dynamic; CSRF output is per request by
   design. No cache or pass is proposed for them.
-- **Candidate 3, template lookup, is next** after these refusals, with its
-  own mutable-resolver/path/details contract still to establish. This report
-  does not implement it or presume its micro ceiling survives guards.
+- **Candidate 3, template lookup, is parked** after its
+  [five-app survey](template-lookup.md). Resolver cache clears defeat
+  path/details identity checks; at most 0.42% before complete guards does
+  not justify a new filesystem-resolver epoch now.
 
 Private evidence: `.lowrail/erb-survey/*.json`,
 `.lowrail/erb-profile/{blog,campfire}.{metadata,stackprof,split,inputs}.json`,
@@ -346,4 +347,4 @@ gate run for a new variant, or shared `lowrail bench` speed result produced:
 there is no surviving variant to gate or benchmark. The existing three-group
 Action View before result remains valid. No default promotion, per-hit
 saving, or route-speed claim follows from this research. Documentation is
-the deliverable; app-code changes and publication are explicitly out of scope.
+the deliverable; no app-code change or public upstream issue was made.
