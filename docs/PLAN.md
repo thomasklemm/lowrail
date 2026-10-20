@@ -13,6 +13,39 @@ leaves everything else alone. It is deeply inspired by
 | Implementation | Rust | Rust (Prism and Rubydex as native crates) |
 | Correctness bar | emitted app passes its tests | the app's own test suite gives *identical per-test results* with Lowrail on and off |
 
+## 0. What changed since this plan (2026-10-20)
+
+The sections below are the original first-iteration plan, kept for context.
+Where they disagree with this section, this section wins.
+
+1. **Exactness covers mid-request mutation.** Entry-time guards plus
+   `method_added`-style hooks are not enough. A warmed process can suppress
+   hooks, and a lowered region can evaluate app code (`to_param`, helper
+   arguments) that changes the very methods it inlined. Both former default
+   passes were quarantined for this
+   ([endpoint.md](passes/endpoint.md#source-arm-quarantine)). §3.3's
+   "known holes" are therefore refusals, not documentation items.
+2. **Speed claims (contract 4).** The primary gate is interpreter instruction
+   counts under the fixed-heap/A/A protocol in [bench.md](bench.md). YJIT
+   counts only when every window passes the JIT-flat gate. So far no
+   whole-request YJIT cohort has passed, and ZJIT is diagnostic only.
+3. **Where the speed is (answers §2 and M0).** Single-site specializations,
+   guard elision, callbacks, template lookup, ERB literals and small
+   component replacements mostly measure or estimate below 1 % of real
+   requests. The exceptions are app-specific: `inertia/config_bind` is
+   estimated at 0.5–2.8 % on JSON routes, and digest memo helped one private
+   page ([DECISIONS](DECISIONS.md)). Whole-endpoint lowering of the render path is
+   the only measured large lever (−26 %/−37 % handwritten, events kept, upper
+   bounds). Certifying it from the call site costs more than it saves.
+4. **Two tiers.** *Guarded* (default, any app, unchanged contract) and
+   *sealed* (opt-in). In the sealed tier the app accepts a no-mutation-after-boot
+   contract, checked by its own test suite through `lowrail seal-check`, so
+   endpoints can be compiled ahead of time without per-call checks. Apps
+   outside the contract keep running guarded, with a ledger of what to change.
+5. **Targets.** Rails 8.1.4 and Ruby 4.0.7 are primary. Ruby 4.1 is being added as a
+   second matrix column, with ZJIT as a diagnostic execution mode. Spinel
+   remains out of scope.
+
 ## 1. Contract
 
 1. **Boots everything.** Any Rails app with any gems boots and runs with

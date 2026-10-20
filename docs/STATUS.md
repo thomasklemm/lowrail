@@ -5,6 +5,18 @@ Decisions on what to pursue, park or reject: [DECISIONS.md](DECISIONS.md).
 Living summary of what works, what was learned, and what is next. Details
 live in the linked docs; numbers come from executed runs, dated.
 
+## At a glance (2026-10-20)
+
+| Area | State |
+|---|---|
+| Default build | lowers nothing: `view/link_to` and `route/path` quarantined (45fd07a); five-app manifests have 0 units |
+| Correctness gates | five-app `verify` identical; Rails 8.1.4 AP/AV/AR suites identical; the one known red test (5a15175) is green by refusal |
+| Opt-in passes | exact, no accepted request win; see [DECISIONS](DECISIONS.md#passes) |
+| Measurement | interpreter fixed-heap/A/A protocol (c9d2397) accepted; YJIT whole-request cohorts rejected by the JIT-flat gate (07205de); guard micro K 822→425 interpreter / 371→140 YJIT Ir |
+| Biggest measured lever | endpoint render path, −26 %/−37 % handwritten upper bounds; caller-side certification loses (0fbb909) |
+| Types/MCP | typed facts (f704751), MCP + quality ledger (8df58ed) |
+| In progress | body-installed endpoint pricing (guarded tier); sealed tier + `seal-check`; props pass; Ruby 4.1/ZJIT matrix |
+
 ## Works (2026-10-20)
 
 Ruby 3.4+ (gemspec), developed on 4.0.7. real-blog on Ruby 3.4.11 builds the
@@ -643,6 +655,20 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
    run-dependent order, so script digests differ while `def` texts match.
 
 ## Next
+
+Current priorities (2026-10-20):
+
+1. **Endpoint, guarded tier:** price body-installed specialization, where
+   normal VM dispatch keeps identity, visibility and redefinition exact, on
+   the two show links before any runtime implementation.
+2. **Sealed tier:** contract (`docs/sealed.md`), `lowrail seal-check` detector
+   and five-app violation ledger, then a blog show sealed-endpoint pilot.
+3. **Props pass** from the allocation survey (interpreter and YJIT micro gates
+   pass), opt-in, with mutation regressions.
+4. **Ruby 4.1 matrix column and ZJIT diagnostic mode,** plus a check for a
+   public VM invalidation API.
+
+Older follow-ups:
 
 - Candidate #4 is **parked, upstream-solved**, with no Lowrail backport:
   Rails main's [49580d1d](https://github.com/rails/rails/commit/49580d1d041eb88adca2948b3592b43bd17c7d7b)

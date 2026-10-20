@@ -1,61 +1,141 @@
 # Lowrail
 
-Lowrail lowers what it can of a Rails application into specialized Ruby and
-leaves everything else alone. The real Rails and every gem keep running;
-specialized methods are delivered as MRI instruction sequences at boot and
-guarded by the boot facts they assume, falling back to the original code the
-moment a fact stops holding.
+Lowrail boots a Rails application, learns what is fixed after boot, and
+delivers specialized Ruby for the parts it can prove equivalent, as MRI
+instruction sequences. The real Rails and every gem keep running. Anything
+Lowrail cannot prove stays the app's own code, and every refusal is recorded
+with its reason.
 
-Inspired by [Roundhouse](https://github.com/rubys/roundhouse). Status: planning
-and first vertical slice. See [docs/PLAN.md](docs/PLAN.md) and, for how a
-pass plugs in, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Inspired by [Roundhouse](https://github.com/rubys/roundhouse), with a
+different bet: keep the real framework, lower only what can be guarded
+exactly, and measure every claim. See [docs/PLAN.md](docs/PLAN.md) for the
+why and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how a pass plugs in.
 
-## Goals
+## Status (2026-10-20)
 
-- Every Rails app with every gem boots and runs with Lowrail installed.
-- The app's test suite gives identical per-test results with `LOWRAIL=1` and
-  `LOWRAIL=0`, checked by `lowrail verify`.
-- One precise type model from static analysis (Prism, Rubydex), a real boot,
-  and observed types, exposed through an MCP server and RBS/RBI generation.
+**Research prototype. No production speedup today.**
 
-## Selecting build passes
+- **Correctness machinery works.** `lowrail verify` runs an app's own suite
+  with Lowrail off and on and compares per-test outcomes and ordered SQL.
+  The pinned Rails 8.1.4 framework suites are a standing gate
+  ([rails-suite.md](docs/rails-suite.md)). Five corpus apps verify identically:
+  blog, Campfire, PingCRM, Redprints and React Starter Kit.
+- **The default build lowers nothing.** The two former default passes,
+  `view/link_to` and `route/path`, are quarantined. Warmed apps could
+  observe stale helpers when code changed mid-request
+  ([counterexamples](docs/passes/endpoint.md#source-arm-quarantine)). That cost
+  the blog about 6 % on `/articles`, and we accept the loss.
+- **Opt-in passes exist** (memo, digest memo, AR plans, preload plans,
+  `inertia/config_bind`, the conservative `endpoint/action` slice). Each one
+  is exact, but none has an accepted whole-request win yet.
+- **Where speed could come from is measured.** On the blog, rendering is
+  25–34 % of a request, events 3–4 %, routing and middleware about 2 %.
+  Handwritten endpoint ceilings are −26 % (index) and −37 % (show) with
+  events kept. They are upper bounds, not delivered results
+  ([layer study](docs/passes/layer-ceiling.md)). Checking from the call site
+  costs more than the work it saves
+  ([cost gate](docs/passes/endpoint.md#show-section-cost-gate-stop-before-runtime-implementation)).
+- **Types and MCP work.** `lowrail types` and `lowrail mcp` serve boot facts,
+  typed facts (proven, static or observed), refusal reasons and the last
+  verify hits ([types.md](docs/types.md)).
 
-`lowrail build APP --passes default,+ar_instantiate` starts
-with the default selection, then applies comma-separated `+name`/`-name`
-modifiers in order. Names are the stable `area/name` identifiers in
-[the architecture](docs/ARCHITECTURE.md); short aliases include
-`uri_join`, `sha256`, `digest_memo`, `preload_plans`, `ar_instantiate`
-and `ar_plans`. `memo` selects both source memo passes.
+Every pursued, parked and rejected idea is in
+[docs/DECISIONS.md](docs/DECISIONS.md). Dated evidence is in
+[docs/STATUS.md](docs/STATUS.md).
 
-Use `--passes` for all opt-ins; the transitional per-pass build flags have
-been removed. Each `--passes` resets to its list's selection. With no
-options, no specialization currently runs. **`view/link_to` and `route/path`
-are quarantined**, including their aliases, explicit opt-in and `all-opt-in`.
-An old artifact containing either pass is refused as a whole before delivery,
-with a boot warning and `Lowrail.refusal_reason`; rebuild it. This is a
-correctness refusal, not a claim that those lowerings have been repaired.
-See [the counterexamples and rewrite boundary](docs/passes/endpoint.md#source-arm-quarantine).
+## Direction
 
-For AR shadow checks, the relation fuzzer and Rails-suite evidence, see
-[Active Record equivalence](docs/ar-equivalence.md).
-`script/rails-suite` runs the pinned Rails framework suites off/on with
-setup-only, guarded-fallback and runtime-pass layers; see the standing
-[Rails compatibility gate](docs/rails-suite.md).
+Two tiers, so that every app keeps running and apps that opt in can go
+further:
+
+| Tier | Who | Promise | State |
+|---|---|---|---|
+| **guarded** (default) | any Rails app, any gem | identical test outcomes; specializations guarded and refused when not exact | works; currently lowers nothing by default |
+| **sealed** (opt-in) | apps that accept a contract: no code, subscriber, config or route mutation after boot, among others | compile endpoints ahead of time without per-call checks; `lowrail seal-check` runs the app's suite and lists every violation with `file:line` and the code change that fixes it | being designed ([decision](docs/DECISIONS.md#architecture)) |
+
+Apps that do not meet the sealed contract still run in the guarded tier. The
+tooling explains why and what to change.
+
+## Target matrix
+
+| Axis | Primary | Secondary / diagnostic |
+|---|---|---|
+| Rails | 8.1.4 | 8.2 alpha (Campfire's pin) |
+| Ruby | 4.0.7 (`mise.toml`) | 4.1 (preview), being added as a second matrix column |
+| Execution | interpreter instruction counts (Callgrind, fixed heap, A/A controls) | YJIT under a strict JIT-flat gate; ZJIT being added, diagnostic only |
+
+How to read and reproduce measurements: [docs/bench.md](docs/bench.md).
+
+## Usage
+
+Lowrail is not published as a gem. Use it from a checkout, on a disposable
+copy of your app or in CI. Do not use it in production yet.
+
+```sh
+# 1. Toolchain: a Rust toolchain and the Ruby pinned in mise.toml
+cargo build --release            # CLI at target/release/lowrail
+
+# 2. Boot facts and a build (writes APP/.lowrail/)
+lowrail facts path/to/app
+lowrail build path/to/app [--env test|production]   # default selection
+lowrail build path/to/app --passes default,+memo,+inertia_config
+
+# 3. Prove it: your suite off vs on, per-test outcomes + ordered SQL
+lowrail verify path/to/app     # prints its test seed to stderr; SEED=… to fix it
+
+# 4. Types and tooling
+lowrail observe path/to/app    # record observed types from a test run
+lowrail types path/to/app --rbs sig/lowrail
+lowrail mcp path/to/app        # read-only MCP server over stdio
+
+# 5. Measurements (see docs/bench.md before trusting a number)
+lowrail bench path/to/app --pass NAME
+```
+
+The runtime loads without app or Gemfile changes:
+
+```sh
+RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails test
+```
+
+Alternatively, add `require "lowrail/setup"` in `config/boot.rb`, before or
+after Bootsnap. `LOWRAIL=0` disables it. A missing, stale or incompatible build
+is a silent no-op, and an artifact containing quarantined passes is refused
+with `Lowrail.refusal_reason`. In development it is off unless `LOWRAIL=1`.
+`LOWRAIL_DEBUG=1` prints refusals.
+
+`--passes` must start with `default` or `all-opt-in`, then applies
+`+name`/`-name` in order. Names are the stable
+`area/name` identifiers in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Short aliases are `memo`, `preload_plans`, `ar_instantiate`, `ar_plans`,
+`digest_memo`, `inertia_config` and `endpoint`. File formats are documented in
+[docs/FORMATS.md](docs/FORMATS.md).
 
 ## Complementary optimizations
 
-Lowrail only applies changes it can guard exactly. Some well-known speedups
-change observable behavior, so they stay the app's own decision. Lowrail
-works next to them and does not turn them on:
+Lowrail only applies changes it can guard exactly. These stay the app's own
+decision, and Lowrail works next to them:
 
-- **YJIT** (`RUBY_YJIT_ENABLE=1` or `RubyVM::YJIT.enable`): recommended in
-  production. Lowrail's guards and lowered methods are written for it.
-- **Bootsnap**: works in any load order; Bootsnap caches the original
-  bytecode, Lowrail serves its lowered bytecode.
+- **YJIT** (`RUBY_YJIT_ENABLE=1`): recommended in production. Lowrail measures
+  under it too, but its primary gate is interpreter instruction counts,
+  because whole-request YJIT windows do not yet pass our compiler-state gate.
+- **Bootsnap**: works in any load order. Bootsnap caches the original
+  bytecode, and Lowrail serves its lowered bytecode.
 - **Frozen string literals** (`# frozen_string_literal: true` or
-  [Freezolite](https://github.com/ruby-next/freezolite)): fewer string
-  allocations, but mutating a literal then raises `FrozenError`. Enable it
-  only after your suite passes with it; Ruby 3.4+'s
-  `-W:deprecated` warns on mutation of chilled literals. Lowrail compiles
-  each file with the same options the app's loaders use, see
-  [docs/loaders.md](docs/loaders.md).
+  [Freezolite](https://github.com/ruby-next/freezolite)): fewer allocations,
+  but mutating a literal then raises. Enable it only after your suite passes
+  with it. Lowrail compiles each file with the same options the app's loaders
+  use ([loaders.md](docs/loaders.md)).
+
+## Docs
+
+| Read | For |
+|---|---|
+| [PLAN.md](docs/PLAN.md) | goals, contract, why this design |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | pipeline, pass contract, registry |
+| [DECISIONS.md](docs/DECISIONS.md) | what is pursued, parked or rejected, plus the stacking backlog |
+| [STATUS.md](docs/STATUS.md) | dated evidence log |
+| [bench.md](docs/bench.md) | measurement protocol and results |
+| [types.md](docs/types.md) | typed facts, MCP and RBS |
+| [docs/passes/](docs/passes/) | one study per pass or idea |
+| [rails-suite.md](docs/rails-suite.md), [ar-equivalence.md](docs/ar-equivalence.md) | framework-suite and Active Record gates |
