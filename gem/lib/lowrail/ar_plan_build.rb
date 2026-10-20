@@ -62,6 +62,18 @@ module Lowrail
         end
       end
       unless edges.empty?
+        adapters = models.keys.map { Object.const_get(_1).with_connection(&:class) }.uniq
+        adapters.each do |adapter|
+          # Arel visitors delegate quoting and compilation to the adapter.
+          # Guard the concrete implementation, including inherited methods,
+          # without requiring other adapter subclasses to agree with it.
+          names = adapter.instance_methods + adapter.private_instance_methods + adapter.protected_instance_methods
+          names -= Object.instance_methods + Object.private_instance_methods + Object.protected_instance_methods
+          names.uniq.each { facts << PreloadFacts.method_fact(adapter, _1).merge("exact" => true) }
+          %i[quote_table_name quote_column_name].each do |name|
+            facts << PreloadFacts.method_fact(adapter, name, singleton: true).merge("exact" => true) if adapter.respond_to?(name)
+          end
+        end
         holders = [ActiveRecord::QueryMethods, ActiveRecord::Relation::WhereClause,
           ActiveRecord::PredicateBuilder, ActiveRecord::TableMetadata, ActiveRecord::Relation,
           ActiveRecord::Associations::AssociationScope, ActiveRecord::Associations::Association]

@@ -105,6 +105,10 @@ class ARPlansTest < Minitest::Test
       Post.reset_column_information
     when "attribute"
       Post.attribute(:published, :integer)
+    when "adapter"
+      Post.connection_pool.with_connection do |connection|
+        connection.class.define_method(:quote_table_name) { |name| "[#{name}]" }
+      end
     when "annotations"
       ActiveRecord.query_transformers = [->(sql, *) { sql + " /* live annotation */" }]
     end
@@ -121,7 +125,7 @@ class ARPlansTest < Minitest::Test
     realpath_tmpdir do |dir|
       file = File.join(dir, "scenario.rb")
       File.write(file, SCENARIO)
-      %w[method association_method default_scope column attribute annotations].each do |change|
+      %w[method association_method default_scope column attribute adapter annotations].each do |change|
         outputs = %w[0 1].map do |mode|
           out, err, status = ruby(file, dir, setup: false, env: { "LOWRAIL" => mode, "CHANGE" => change, "LOWRAIL_DEBUG" => "1", "RUBYLIB" => LowrailTest::GEM_LIB })
           assert status.success?, "#{change}: #{err}\n#{out}"

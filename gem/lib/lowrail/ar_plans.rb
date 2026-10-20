@@ -81,12 +81,14 @@ module Lowrail
         @reflection, @owner, @model = reflection, reflection.active_record, reflection.klass
         @scope_info = scope_info
         raise ArgumentError, "uncertified scope" if ARPlanFacts.decline(reflection, scope_info)
-        @epochs = [AR.epoch(@owner), AR.epoch(@model)]
         @tables = [@owner.table_name.dup, @model.table_name.dup]
         @columns = [@owner.columns_hash, @model.columns_hash]
         @types = [@owner.attribute_types, @model.attribute_types]
         @defaults = [@owner.default_scopes, @model.default_scopes]
         @role, @shard = @model.current_role, @model.current_shard
+        @adapter = @model.with_connection(&:class)
+        # Metadata reads can materialize Rails' lazy schema/type state.
+        @epochs = [AR.epoch(@owner), AR.epoch(@model)]
         @cache = {}.compare_by_identity
         @lock = Mutex.new
       end
@@ -112,6 +114,7 @@ module Lowrail
 
       def execute(association, scope)
         @model.with_connection do |connection|
+          return nil unless connection.instance_of?(@adapter)
           cached = @lock.synchronize do
             cached = @cache[connection]
             if !cached || cached[0] != connection.prepared_statements
