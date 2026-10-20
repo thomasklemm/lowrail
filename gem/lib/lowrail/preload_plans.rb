@@ -79,8 +79,8 @@ module Lowrail
         nil
       end
 
-      def hit
-        Stats.count(@unit, true) if defined?(Stats) && Stats.enabled?
+      def count(hit)
+        Stats.count(@unit, hit) if defined?(Stats) && Stats.enabled?
       end
 
       def guard_ok?
@@ -275,7 +275,7 @@ module Lowrail
           end
           shadow&.advance(ready.map(&:last))
         end
-        PreloadPlans.hit
+        PreloadPlans.count(true)
         execution.roots = @roots.filter_map { loaders[_1] }
         execution.complete = true
         execution
@@ -298,6 +298,7 @@ module Lowrail
           @lowrail_result ||= @lowrail_plan.call(records)
           return @lowrail_result.roots.dup if @lowrail_result.complete
         end
+        PreloadPlans.count(false)
         super
       end
 

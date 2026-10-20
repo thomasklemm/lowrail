@@ -52,6 +52,18 @@ class ARPlansTest < Minitest::Test
       "files" => {}, "units" => [] }
     Lowrail.write_json(File.join(dir, "manifest.json"), data)
     Lowrail.write_json(File.join(dir, "ledger.json"), [])
+    # Test scaffolding may live in Arel's namespace without being part of SQL
+    # planning. A namespace-wide inventory would incorrectly refuse the reader.
+    File.write(File.join(dir, "arel_test.rb"), <<~'CODE')
+      require "minitest/test"
+      require "lowrail/minitest"
+      module Arel
+        class ReaderTest < Minitest::Test
+          def before = :test_only
+        end
+      end
+    CODE
+    require File.join(dir, "arel_test.rb")
     built = Lowrail::ARPlanBuild.build
     built[:units].each_with_index { |unit, i| unit["id"] = i }
     data["units"] = built[:units]

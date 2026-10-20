@@ -22,8 +22,11 @@ class PreloadPlansTest < Minitest::Test
       create_table(:posts) { |t| t.integer :writer_id; t.integer :alternate_id; t.string :title }
       create_table(:notes) { |t| t.integer :post_id; t.string :body }
       create_table(:poly_posts) { |t| t.integer :owner_id; t.string :owner_type }
+      create_table(:labels) { |t| t.string :name }
+      create_table(:labels_writers, id: false) { |t| t.integer :label_id; t.integer :writer_id }
     end
     class Writer < ActiveRecord::Base
+      has_and_belongs_to_many :labels
       has_many :posts, inverse_of: :writer
       has_many :other_posts, class_name: "Post", foreign_key: :writer_id
       has_many :peers, class_name: "Writer", foreign_key: :id, inverse_of: false
@@ -34,6 +37,9 @@ class PreloadPlansTest < Minitest::Test
       has_many :reflection_posts, class_name: "Post", foreign_key: :writer_id
       has_many :poly_posts, as: :owner
       has_many :native_poly_posts, class_name: "NativePolyPost", as: :owner
+    end
+    class Label < ActiveRecord::Base
+      has_and_belongs_to_many :writers
     end
     class Post < ActiveRecord::Base
       belongs_to :writer, inverse_of: :posts
@@ -109,6 +115,12 @@ class PreloadPlansTest < Minitest::Test
     ActiveSupport.run_load_hooks(:after_initialize)
     result = { "unit_ids" => JSON.parse(File.read("manifest.json"))["units"].map { _1["id"] } }
     preload = ->(rows, spec, **opts) { ActiveRecord::Associations::Preloader.new(records: rows, associations: spec, **opts).call }
+    a.labels << Label.create!(name: "only A")
+    rows = [Writer.find(b.id), Writer.find(a.id)]
+    preload.call(rows, :labels)
+    result["habtm"] = rows.map { _1.labels.map(&:name) }
+    result["habtm_fallbacks"] = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_fallbacks.fetch("8", 0) : 0
+    result["noncanonical_refusals"] = built[:ledger].count { _1["outcome"] == "noncanonical model name" }
     signature = ->(rows) { rows.map { |r| [r.name, r.association(:posts).loaded?, r.posts.map { |p| [p.title, p.association(:notes).loaded?, p.notes.map(&:body), p.writer.equal?(r)] }] } }
     rows = [Writer.find(b.id), Writer.find(a.id), Writer.find(a.id)]
     result["root_loaders"] = preload.call(rows, { posts: :notes }).size
@@ -327,10 +339,14 @@ class PreloadPlansTest < Minitest::Test
       assert_empty off.delete("hits")
       assert_empty disabled.delete("hits")
       assert_empty stale.delete("hits")
+      assert_equal 1, on.delete("habtm_fallbacks")
+      [off, disabled, stale].each { assert_equal 0, _1.delete("habtm_fallbacks") }
       assert_equal off, on
       assert_equal off, disabled
       assert_equal off, stale
       assert_equal [7, 8], on["unit_ids"]
+      assert_equal [[], ["only A"]], on["habtm"]
+      assert_operator on["noncanonical_refusals"], :>, 0
       assert_equal 1, on["root_loaders"]
       assert_equal 1, on["available_false"]
       assert_equal 1, on["available_custom"]
@@ -380,7 +396,10 @@ class PreloadPlansTest < Minitest::Test
               "LOWRAIL_STATS" => File.join(dir, "wrapper-#{mode}") })
           skip "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
           assert status.success?, "#{err}\n#{out}"
-          JSON.parse(out.lines.last).tap { assert_empty _1.delete("hits") }
+          JSON.parse(out.lines.last).tap do |result|
+            assert_empty result.delete("hits")
+            result.delete("habtm_fallbacks")
+          end
         end
         assert_equal runs.first, runs.last
         assert_equal [7], runs.last["unit_ids"] if patch == "batch"

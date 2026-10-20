@@ -96,6 +96,14 @@ module Lowrail
       return "non-certified scope" unless certified_scope?(r)
       return "composite key" if Array === r.join_primary_key || Array === r.join_foreign_key
       k = r.klass
+      # The shared unit and its model/edge maps use these public names as
+      # constant identities. HABTM join classes deliberately disguise .name;
+      # accepting them would poison every guard (and collide across owners).
+      return "noncanonical model name" unless [owner, k].all? do |model|
+        model.name && Object.const_get(model.name).equal?(model)
+      rescue NameError
+        false
+      end
       return "abstract target" if k.abstract_class?
       return "default scope" unless k.default_scopes.empty?
       # An app can override these constructors to inject request state without

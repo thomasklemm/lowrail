@@ -78,7 +78,14 @@ module Lowrail
         holders = [ActiveRecord::QueryMethods, ActiveRecord::Relation::WhereClause,
           ActiveRecord::PredicateBuilder, ActiveRecord::TableMetadata, ActiveRecord::Relation,
           ActiveRecord::Associations::AssociationScope, ActiveRecord::Associations::Association]
-        holders.concat(ObjectSpace.each_object(Module).select { _1.name&.start_with?("Arel::") })
+        # Minitest describe classes advertise names that look like Arel
+        # constants, but aren't planning implementations. Exclude test classes,
+        # not arbitrary non-library declarations: a replacement Arel node must
+        # still fail source certification, even when installed before build.
+        holders.concat(ObjectSpace.each_object(Module).select do |mod|
+          name = Module.instance_method(:name).bind_call(mod)
+          name&.start_with?("Arel::") && !(defined?(::Minitest::Test) && Class === mod && mod <= ::Minitest::Test)
+        end)
         # Include the live hierarchy even for visitors outside Arel's namespace.
         holders.concat(visitors.flat_map { |visitor| visitor.ancestors.take_while { _1 != Object } })
         holders.uniq!

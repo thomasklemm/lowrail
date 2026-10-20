@@ -216,11 +216,37 @@ same 11 units and verifies 21/21 identical with 114 hits.
   **3162/3162**, AM **1100/1100**, Mailer **268/268** in every layer;
   AS **5814/5815** and inline AJ **209/212** have four dynamic printed
   identities, not outcome failures. Railties is a bounded **125/125**.
-  Zero reproducible differences; L3 has **136,719 instantiation hits**, no
-  SQL-reader/preload hits. Earlier AR baseline failure was plan construction
-  inside the off suite; construction now runs separately. No held runtime
-  file changed. Framework/app profile intersection is recorded for later
-  pass work, not a speed claim or full Rails support certificate.
+  **Round 2** adds genuine coverage with zero shadow mismatches: preload
+  **2 H / 650 F** in full SQLite, **1 / 652** in PG, **5 / 2** in AV-AR;
+  one isolated, unmodified Rails association test has **1 reader H / 0 F**.
+  Full AR still refuses 94 otherwise eligible readers because of genuine
+  fake planners; no test-directory whitelist or guard weakening. Refusing
+  144 noncanonical HABTM edges stops 546 unresolvable facts from disabling
+  every ordinary preload. Full per-reason ledgers and per-unit H/F (including
+  zeros) are retained. SQLite's **68,857/11,616** and AV's **118/0**
+  instantiation controls remain exact. Five AR-only corpus gates retain
+  **742 identical outcomes / 16,193 ordered same-thread queries**.
+  Redis exercises **671 additional AS tests** (matching skips 1,068 → 397);
+  full Railties generators and external AJ adapters remain unrun.
+  These are bounded compatibility/coverage results, not speed claims.
+- **AR visitor correctness fix**
+  ([identity audit](ar-equivalence.md#connection-identity-audit-2026-10-20-round-2)):
+  cached reader SQL is pinned to the certified visitor object; a connection
+  visitor swap falls back without lazy re-certification. Published separately
+  in [`9020e7a`](https://github.com/thomasklemm/lowrail/commit/9020e7a19ea5de9705f916e6b51add4e6c770831),
+  after SQLite/PG/AV gates. Seven mutations across reader/preload/instantiate
+  yield **21 identical exact row/query comparisons**; before, reader visitor
+  replacement produced two strict shadow mismatches. Preload and instantiate
+  are unaffected in the tested visitor/adapter/pool/role/shard/prepared cases.
+- **Callbacks surveyed and parked**
+  ([census and budgets](rails-suite.md#round-2-callbacks-are-parked-not-a-225-app-opportunity)):
+  five apps have only **4–7 calls/request**, no nonempty symbol-condition-only
+  chains. Eligible no-around machinery accounts for **0.141–0.975%** of eleven
+  route captures before guards; the 22.5% Rails-suite inclusive figure wraps
+  callback/action bodies and is not removable. Rails already caches compiled
+  chains; upstream [PR59094](https://github.com/rails/rails/pull/59094) removes
+  known-terminator thunks. No new runtime pass or ≥2% request claim. Revisit
+  only as a stacking item with shared fixed-heap operation adapters/controls.
 - **`lowrail verify [--bisect]`**: suite with `LOWRAIL=0` and `1`, per-test
   outcomes and fast-path hits. `--bisect` reruns with unit subsets
   (`LOWRAIL_UNITS`) and writes `.lowrail/denylist.json`, which `build`

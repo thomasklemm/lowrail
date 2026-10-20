@@ -23,6 +23,7 @@ OptionParser.new do |parser|
   parser.on("--seed N", Integer) { options[:seed] = _1 }
   parser.on("--prepare", "Install the component test bundle, then exit") { options[:prepare] = true }
   parser.on("--profile", "Collect separate Lowrail-off StackProf runs") { options[:profile] = true }
+  parser.on("--callbacks", "Collect a separate untimed Lowrail-off callback census") { options[:callbacks] = true }
 end.parse!
 abort "Ruby 3.4+ required" if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.4")
 abort "select at least one suite and layer" if options[:suites].empty? || options[:layers].empty?
@@ -120,6 +121,7 @@ options[:suites].each do |suite|
         "LOWRAIL_SQL_TRACE" => "0", "LOWRAIL_SHADOW" => "strict", "RAILS_SUITE_LAYER" => layer,
         "RAILS_SUITE_BUILD" => mode == "off-build" ? build_root : nil,
         "RAILS_SUITE_PROFILE" => mode == "off-profile" ? path + ".stackprof" : nil,
+        "RAILS_SUITE_CALLBACKS" => mode == "off-callbacks" ? path + ".callbacks.json" : nil,
         "PARALLEL_WORKERS" => "1", "MT_CPU" => "1", "SEED" => options[:seed].to_s, "AJ_ADAPTER" => "inline" }
       command = [RbConfig.ruby, "-rbundler/setup", "#{ROOT}/bench/ar_rails_suite.rb", *files, "--seed", options[:seed].to_s]
       start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -150,6 +152,16 @@ options[:suites].each do |suite|
         data = JSON.parse(File.read(on))
         comparisons[layer]["hits"] = data.fetch("unit_hits").values.sum
         comparisons[layer]["fallbacks"] = data.fetch("unit_fallbacks").values.sum
+        units = case layer
+        when "L2" then manifest.fetch("units")
+        when "L3" then JSON.parse(File.read(File.join(build_root, ".lowrail/manifest.json"))).fetch("units")
+        else []
+        end
+        comparisons[layer]["units"] = units.map do |unit|
+          id = unit.fetch("id").to_s
+          { "id" => unit.fetch("id"), "pass" => unit.fetch("pass"), "target" => unit["file"],
+            "hits" => data.fetch("unit_hits").fetch(id, 0), "fallbacks" => data.fetch("unit_fallbacks").fetch(id, 0) }
+        end
         shadow = JSON.parse(File.read(on + ".shadow.json"))
         comparisons[layer]["hooks"] = shadow.fetch("hooks")
         comparisons[layer]["shadow_mismatches"] = shadow.fetch("mismatches")
@@ -163,6 +175,7 @@ options[:suites].each do |suite|
       end
     end
     run.call("off-profile", "L1") if options[:profile]
+    run.call("off-callbacks", "L1") if options[:callbacks]
     summary[label] = { "runs" => runs, "layers" => comparisons }
     File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary))
   end

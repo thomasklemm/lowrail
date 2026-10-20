@@ -76,6 +76,12 @@ if layer == "L3" && Lowrail.enabled?
   end
 end
 Lowrail.write_json(ENV.fetch("LOWRAIL_OUTCOMES") + ".loaded.json", { "files" => files })
+if (survey = ENV["RAILS_SUITE_CALLBACKS"])
+  abort "callback census must run with LOWRAIL=0" unless ENV["LOWRAIL"] == "0"
+  require_relative "callback_survey"
+  CallbackSurvey.start
+  Minitest.after_run { Lowrail.write_json(survey, CallbackSurvey.finish) }
+end
 if (profile = ENV["RAILS_SUITE_PROFILE"])
   abort "profiles must run with LOWRAIL=0" unless ENV["LOWRAIL"] == "0"
   require "stackprof"
