@@ -18,11 +18,12 @@ Campfire URL lowering on the profiled room. No compiled-template pass was
 retained; [template lookup (#3)](passes/template-lookup.md) is now surveyed
 and parked: cache clears defeat identity-only guards, and the small ceiling
 does not justify a new resolver epoch. The original budgets below remain
-hypotheses, not achieved savings. Candidate #4 is next; it owns tag-option construction
-and the attribute-building parts of `form_with`, `label`, `text_field` and
-`submit` (also `textarea`) as one helper family, rather than a second whole-form pass. Its
-broader 4.46% / 2.90% blog-edit/Campfire cost shares do not replace the narrow
-literal-attribute eligibility or price dynamic builder/I18n work as static.
+hypotheses, not achieved savings. [Candidate #4](passes/tag-options.md) was
+surveyed as one tag/form component and parked as upstream-solved by Rails
+[49580d1d](https://github.com/rails/rails/commit/49580d1d041eb88adca2948b3592b43bd17c7d7b).
+Estimated pre-guard saving is only ~0.3–0.45% blog edit / ~0.2–0.3% Campfire;
+the broader 4.46% / 2.90% envelopes are costs, not savings. No guarded
+backport was built. It remains the cheapest later component-pass pilot.
 
 The ranking uses the sum of the best measured-route opportunity in each
 app, divided by guard complexity. This equals mean effect on covered apps ×

@@ -597,9 +597,18 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 
 ## Next
 
-- Survey candidate #4 as one family: literal tag options and form-builder
-  attribute work. Establish per-site removable work, keeping dynamic values,
-  escaping, data/aria nesting, booleans and custom overrides live.
+- Candidate #4 is **parked, upstream-solved**, with no Lowrail backport:
+  Rails main's [49580d1d](https://github.com/rails/rails/commit/49580d1d041eb88adca2948b3592b43bd17c7d7b)
+  fuses attribute appends (not yet in `8-1-stable` or 8.1.0–8.1.4).
+  Estimated pre-guard saving is only ~0.3–0.45% blog edit / ~0.2–0.3%
+  Campfire room. [Five-app census and per-site refusals](passes/tag-options.md):
+  12/94/2/0/0 direct tag/form sites; 504 scratch controls per Rails pin,
+  zero differences. It remains the cheapest later component pilot.
+- **Campfire fragment caches stay** ([measurements](passes/campfire-fragments.md)):
+  six native off/off/on cohorts find no uncached-all-pass render cheaper
+  than its warm hit (roughly 1.8–9.6× the hit cost). Uncached off/on query
+  counts and complete collection HTML agree; native A/A fails, so no precise pass gain is claimed.
+  App recommendation only; no cache-policy or runtime changes.
 - Route defaults and template lookup are parked. Revisit routes as a stacking
   item after shared per-hit budgets; argument-less conversion covers 1/4
   Campfire guarded path calls, full base-AR certification could cover 4/4.
