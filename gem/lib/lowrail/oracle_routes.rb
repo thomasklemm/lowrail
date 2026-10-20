@@ -88,6 +88,32 @@ module Lowrail
             next if want == have
             return { ok: false, reason: "#{label}, args #{vals.map { short(_1) }.join(", ")}: helper #{want.inspect[0, 160]} vs specialized #{have.inspect[0, 160]}" }
           end
+          # Warm the same request cache, then vary inputs without allocating
+          # a new context. App url_options overrides must still run per call.
+          varied = ctx.clone
+          options = ctx.url_options.dup
+          varied.define_singleton_method(:url_options) { options }
+          vals = temps.map { "x" }
+          changes = [
+            { host: +"one.example.org", protocol: "https://", port: 8443, script_name: +"/first/" },
+            { host: "two.example.net", protocol: "http://", port: 8080, script_name: "/second/" },
+            { subdomain: "api", domain: "other.co.uk", tld_length: 2 },
+            { user: "a b", password: "c@d" }, { only_path: true }, { only_path: false },
+            { anchor: nil }, { anchor: "part" }, { params: { q: "a b" } },
+            { original_script_name: "/outer" }, { trailing_slash: false }
+          ]
+          changes.each do |change|
+            options.replace(ctx.url_options.merge(change).transform_values { |v| v.instance_of?(String) ? v.dup : v })
+            2.times do
+              want = run(varied, temps, vals, original)
+              have = run(varied, temps, vals, fast)
+              runs += 1
+              return { ok: false, reason: "#{label}, changing url_options #{change.keys}: helper #{want.inspect} vs specialized #{have.inspect}" } unless want == have
+              # In-place changes must not mutate the stored cache key.
+              options[:host].replace("changed.example.com") if options[:host].instance_of?(String) && !options[:host].frozen?
+              options[:script_name].replace("/changed/") if options[:script_name].instance_of?(String) && !options[:script_name].frozen?
+            end
+          end
         end
         { ok: true, runs: runs }
       end

@@ -56,6 +56,7 @@ const RAILS_DEPS: &[(&str, bool, &[&str])] = &[
     ),
     ("ActionDispatch::Journey::Route", false, &["format", "required_parts"]),
     ("ActionDispatch::Journey::Format", false, &["evaluate"]),
+    ("ActionDispatch::Http::URL", true, &["url_for", "full_url_for", "build_host_url", "normalize_protocol", "normalize_host", "normalize_port", "named_host?", "secure_protocol"]),
     ("ActionDispatch::Journey::Router::Utils", true, &["escape_segment"]),
     ("ActionDispatch::Journey::Router::Utils::UriEncoder", false, &["escape_segment", "escape"]),
 ];
@@ -545,7 +546,10 @@ pub fn inner_expr(helper: &str, kind: &str, pieces: &[Piece], tag: &str, temps: 
             Piece::Hole(i) => path.push_str(&format!(" << ::Lowrail::Routes.seg({})", p(*i))),
         }
     }
-    let fast = format!("::Lowrail::Routes.finish({path}, {options}, self, {})", kind == "url");
+    // Old manifests did not guard host normalization. Opt in explicitly so
+    // their four-argument finish calls retain Rails' uncached URL strategy.
+    let host_cache = if kind == "url" { ", true" } else { "" };
+    let fast = format!("::Lowrail::Routes.finish({path}, {options}, self, {}{host_cache})", kind == "url");
     format!("({}) ? ({fast}) : {helper}({})", conds.join(" && "), temps.join(", "))
 }
 
@@ -630,7 +634,7 @@ mod tests {
         assert!(outcome(17).starts_with("not inside an instance method"));
         assert_eq!(outcome(18), "lowered");
         // A _url helper retains Rails' full URL finishing strategy.
-        assert!(out.code.contains("::Lowrail::Routes.finish(+\"\" << \"/articles\", __lr2o, self, true)"), "{}", out.code);
+        assert!(out.code.contains("::Lowrail::Routes.finish(+\"\" << \"/articles\", __lr2o, self, true, true)"), "{}", out.code);
         assert_eq!(out.sites.iter().filter(|s| s.helper == "logo_path").count(), 0, "custom helpers are not route sites");
         assert!(outcome(20).starts_with("options hash"));
         assert!(outcome(21).starts_with("0 positional argument(s), route has 1"));
@@ -647,6 +651,7 @@ mod tests {
         assert_eq!(route_deps, vec!["article_path", "articles_path", "articles_url"]);
         assert!(out.deps.iter().all(|d| d.route.is_none() || d.receiver == "@self"));
         assert!(out.deps.iter().all(|d| d.receiver != "ActionDispatch::Routing::RouteSet"), "dynamic route sets are called, not inlined");
+        assert!(out.deps.iter().any(|d| d.receiver == "ActionDispatch::Http::URL" && d.singleton && d.method == "normalize_host"));
         // One probe per helper, with the same inner expression shape.
         assert_eq!(fake.probes.len(), 3);
         assert!(fake.probes.iter().any(|p| p.contains("::Lowrail::Routes.finish(+\\\"\\\" << \\\"/articles/\\\" << ::Lowrail::Routes.seg(__lrpp0)")), "{:?}", fake.probes);

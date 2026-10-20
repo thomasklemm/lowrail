@@ -54,7 +54,7 @@ module Lowrail
       # Keep Rails' dynamic finishing step after argument conversion and path
       # formatting. Engines customize find_script_name on individual route sets;
       # an override may also mutate options used by the final URL strategy.
-      def finish(path, options, target, url)
+      def finish(path, options, target, url, memoize_host = false)
         path << "/" if options[:trailing_slash] && !path.end_with?("/")
         options[:path] = path
         original_script_name = options.delete(:original_script_name)
@@ -62,10 +62,45 @@ module Lowrail
         script_name = original_script_name + script_name if original_script_name
         options[:script_name] = script_name
         if url
-          ::ActionDispatch::Http::URL.url_for(options)
+          memoize_host ? url_for(options, target) : ::ActionDispatch::Http::URL.url_for(options)
         else
           ::ActionDispatch::Http::URL.path_for(options)
         end
+      end
+
+      # Called only after Rails' dynamic script-name completion. Never cache
+      # url_options, find_script_name, the route path, or query/anchor work.
+      # Only the common, scalar host case is memoized; complex options use
+      # Rails unchanged. The lowering guards the URL methods bypassed here.
+      def url_for(o, t)
+        url = ::ActionDispatch::Http::URL
+        unless o.instance_of?(Hash) && o.default_proc.nil? && o.default.nil? &&
+               !o[:only_path] && o[:host].instance_of?(String) &&
+               o[:path].instance_of?(String) && (o[:script_name].nil? || o[:script_name].instance_of?(String)) &&
+               !o.key?(:params) && !o.key?(:anchor) && !o.key?(:subdomain) && !o.key?(:domain) &&
+               !o.key?(:tld_length) && !o.key?(:user) && !o.key?(:password) &&
+               t.respond_to?(:request) && (request = t.request) && !request.frozen?
+          return url.url_for(o)
+        end
+        key = [o[:host], o[:port], o[:protocol], o.key?(:port), url.secure_protocol]
+        unless key.all? { |v| v.nil? || v.equal?(true) || v.equal?(false) || v.instance_of?(String) || v.instance_of?(Integer) }
+          return url.url_for(o)
+        end
+        # path_for must run before host normalization (including errors).
+        path = url.path_for(o)
+        cached = request.instance_variable_get(:@_lowrail_host_prefix)
+        if cached && cached[0] == key
+          i = 0
+          while i < key.size
+            break if key[i].instance_of?(String) && key[i].encoding != cached[0][i].encoding
+            i += 1
+          end
+          return cached[1].dup << path if i == key.size
+        end
+        prefix = url.send(:build_host_url, o[:host], o[:port], o[:protocol], o, +"")
+        snapshot = key.map { |v| v.instance_of?(String) ? v.dup.freeze : v }
+        request.instance_variable_set(:@_lowrail_host_prefix, [snapshot, prefix.freeze])
+        prefix.dup << path
       end
 
       # Journey::Router::Utils.escape_segment(p) is

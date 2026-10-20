@@ -76,6 +76,78 @@ class RoutesTest < Minitest::Test
     assert_equal [nil, nil, nil, nil], out["declined"]
   end
 
+  def test_url_completion_tracks_request_options_and_returns_an_unshared_string
+    out = ruby_json(<<~'RUBY')
+      require "json"
+      require "rails"
+      require "active_support/core_ext/object/to_query"
+      require "action_controller"
+      require "action_view"
+      require "lowrail/routes"
+      routes = ActionDispatch::Routing::RouteSet.new
+      routes.draw { resources :widgets }
+      Rails.define_singleton_method(:application) { Struct.new(:routes).new(routes) }
+      class Controller < ActionController::Base; end
+      Controller.include(routes.url_helpers)
+      Controller.define_method(:_routes) { routes }
+      def Controller.new_request(routes, url)
+        c = new
+        req = ActionDispatch::Request.new(Rack::MockRequest.env_for(url, "action_dispatch.routes" => routes))
+        c.set_request!(req)
+        c.set_response!(make_response!(req))
+        c
+      end
+      c = Controller.new_request(routes, "https://one.example.org:8443/widgets/7")
+      checks = []
+      check = ->(ctx) do
+        want = ctx.widget_url("a b")
+        2.times do
+          have = Lowrail::Routes.url_for(ctx.url_options.merge(path: "/widgets/a%20b"), ctx)
+          raise "encoding changed" unless have.encoding == want.encoding
+          checks << [want, have.dup]
+          have << "mutation"
+        end
+      end
+      check.call(c)
+      c.request.script_name = "/mount/"
+      check.call(c.view_context)
+      # Rails keeps its base snapshot even after defaults/host change, but
+      # observes the script name each call. Do not create a second snapshot.
+      c.request.set_header("HTTP_HOST", "ignored.example.net")
+      c.default_url_options = { host: "also-ignored.example.net" }
+      check.call(c)
+      c.default_url_options = {}
+      # A Current-style url_options override, including in-place mutations.
+      options = c.url_options.transform_values { |v| v.instance_of?(String) ? v.dup : v }
+      c.define_singleton_method(:url_options) { options }
+      check.call(c)
+      options[:host].replace("two.example.net")
+      options[:script_name].replace("/changed/")
+      options[:protocol] = "http://"
+      options[:port] = 8080
+      check.call(c)
+      options[:host] = options[:host].encode(Encoding::US_ASCII)
+      check.call(c)
+      options[:protocol] = nil
+      ActionDispatch::Http::URL.secure_protocol = false
+      check.call(c)
+      ActionDispatch::Http::URL.secure_protocol = true
+      check.call(c)
+      ActionDispatch::Http::URL.secure_protocol = false
+      options[:host] = "https://embedded.example.com:9443"
+      options.delete(:port)
+      check.call(c)
+      options[:port] = nil
+      check.call(c)
+      check.call(Controller.new_request(routes, "http://three.example.com/widgets/9"))
+      puts JSON.generate(checks)
+    RUBY
+    out.each { |want, have| assert_equal want, have }
+    assert_equal "https://one.example.org:8443/mount/widgets/a%20b", out[2][1]
+    assert_equal "http://two.example.net:8080/changed/widgets/a%20b", out[8][1]
+    assert_equal "http://three.example.com/widgets/a%20b", out.last[1]
+  end
+
   def test_seg_skips_gsub_only_for_safe_ascii
     out = ruby_json(<<~'RUBY')
       require "json"

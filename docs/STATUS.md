@@ -24,7 +24,11 @@ same 11 units and verifies 21/21 identical with 114 hits.
   `*_path` calls in templates and in Ruby files under `app/` (the first
   Ruby-file pass, served through `load_iseq`); probes run the emitted code
   next to the real helper. Guards on `@self` facts are checked per class of
-  `self` (`Lowrail.ok?`).
+  `self` (`Lowrail.ok?`). Dynamic engine script completion stays in Rails;
+  `_url` host normalization is memoized only on the request, keyed by its
+  scalar inputs (including in-place string/encoding changes). `url_options`
+  and application overrides remain live. `article_url` construction is
+  3.71 → 2.21 µs, 25 → 9 allocations (YJIT; see pass notes).
 - **Active Record preload plans** ([design and measurements](passes/preload-plans.md)):
   guarded gem-level trees, scopes and loader groups computed once; fresh
   Rails Association loaders per call, no cached rows. Schema/reflection/scope
@@ -166,8 +170,8 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 
 ## Next
 
-- Controller `url_options` per call (most of what a lowered `_url` helper
-  still costs), `direct`/`resolve` helpers.
+- `direct`/`resolve` helpers and missing route arguments; host normalization
+  is request-local now, but Rails' `url_options` assembly remains per call.
 - Broader benchmark coverage and confidence intervals (preload runs now interleave on/off).
 - Guarded memo for per-request work on boot-fixed inputs (ARGOS: Inertia
   asset-version digest 12.8 % self per request).

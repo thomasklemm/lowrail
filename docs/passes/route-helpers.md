@@ -99,7 +99,7 @@ also checks the helper resolves to the route set's method in that class.
 Same shape as `*_path`, with `Routes.finish(..., true)`. Rails ends `OptimizedUrlHelper#call` in
 `Http::URL.url_for(options)`: `path_for` with `:only_path`, else
 `build_host_url(host, port, protocol, options, path_for(options))`.
-These methods remain dynamic Rails calls, not an inline host-prefix approximation.
+Script completion remains a dynamic Rails call, including any option mutation.
 The guard requires the helper to be the route set's URL helper module method.
 Route defaults with host-part keys are still refused. Probes add an
 `https://user.example.co.uk:8443` request context.
@@ -109,6 +109,70 @@ controller with an HTTPS request, YJIT, 3 runs):
 `article_url(article)` 4.6–5.1 → 2.6–3.0 µs, 24 → 16 allocations. Most of
 what remains is the controller's `url_options` hash, which Rails builds on
 every call.
+
+### Request-local host normalization (2026-10-20)
+
+Rails 8.1.4 and the pinned 8.2 alpha already snapshot host, optional port,
+protocol, `_recall` and controller `default_url_options` in `@_url_options`.
+The latter can read `Current`/locale; Rails captures that first result, not
+every later value. Views delegate to their controller. Each call still selects
+the script name from request routes, engine script name or original script name,
+and duplicates/merges the base hash. Route-set defaults and
+`optimize_routes_generation?` remain live. Replacing this with a second
+controller-options cache would risk different invalidation semantics.
+
+Instead, new `_url` expressions opt into host-only memoization with a fifth
+`finish` argument. Four-argument calls in older manifests keep Rails' uncached
+strategy. `url_options`, options merging, `to_param`, `find_script_name` and
+`path_for` still run each call, in Rails' order. Only normalized host text is
+stored on the request. Its key includes host, port, protocol, **port-key
+presence**, `URL.secure_protocol`, and string encodings; strings are copied so
+in-place mutations miss. Query/anchor, subdomain/domain/TLD, credentials,
+non-scalar options and non-request contexts use Rails unchanged. The URL methods
+bypassed by a cache hit are guarded; engine route sets are never globally guarded.
+No rows, final paths or application override results are cached.
+
+Oracle probes warm the cache then vary URL options on the same request, including
+in-place changes. Runtime regression coverage changes script name, request,
+defaults, a Current-style override, encoding, secure-protocol config and embedded
+host ports. The emitted-Ruby engine ordering/mutation regression remains intact.
+
+`bench/routes.rb`, production real-blog, YJIT, seven interleaved 200k-call
+samples (construction includes controller `url_options` and AR `to_param`,
+excludes the call-site guard):
+
+| `article_url(article)` | median µs (min–max) | allocations |
+|---|---:|---:|
+| Rails | 3.711 (3.575–4.065) | 25 |
+| Dynamic finishing, no host cache | 2.791 (2.741–2.900) | 18 |
+| Request-local host cache | 2.205 (2.160–2.356) | 9 |
+
+Five-app builds and per-test verification after combining the loader and engine
+fixes: real-blog 21/21, 55 hits; Campfire 634/634 (2 skips), 7200 hits;
+PingCRM 26/26 including system, 11 hits; Redprints 50/50 + 12/12 system,
+25 + 19 hits; React Starter Kit 36/36, 25 hits. **Zero route-guard fallbacks**
+throughout; real-blog recorded one existing `view/link_to` fallback (unit 0),
+also seen in the loader-only run. No new sites are added by host memoization.
+
+Production requests (`bench/requests.rb`, five alternating off/on fresh-process
+pairs, YJIT, 200 warm-ups, 2 s/sample; same fixture cookies, default caches,
+healthy starter SSR). These compare all enabled lowerings against Rails,
+not host caching in isolation:
+
+| Request | off µs median (min–max) | on µs median (min–max) |
+|---|---:|---:|
+| real-blog articles | 1563 (1538–1591) | 1505 (1322–1714) |
+| real-blog article | 1616 (1589–1652) | 1514 (1462–1712) |
+| Campfire room, cached | 2201 (1884–2272) | 1875 (1794–2133) |
+| PingCRM organizations | 2599 (2550–2864) | 2423 (2311–2736) |
+| Redprints proposals | 1682 (1641–1918) | 1690 (1634–1748) |
+| Starter dashboard, SSR | 3280 (3185–3358) | 3302 (3008–3708) |
+
+**Request-level effects are within noise** (overlapping cohort ranges).
+The Inertia GETs mainly exercise rendering rather than the lowered redirect
+sites; their allocation counts are effectively unchanged. real-blog articles
+allocations fall 2404 → 2282 from the full view/route pipeline. No application
+speedup is attributed specifically to host memoization.
 
 ## Refused (ledger reasons)
 
