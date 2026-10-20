@@ -54,8 +54,11 @@ module Lowrail
         return unless Array === records && !records.empty?
         root = records.first.class
         return unless records.all? { _1.instance_of?(root) }
-        key = [root, normalize(spec)]
-        return unless key.last
+        spec = normalize(spec)
+        return unless spec
+        # Hash equality ignores insertion order, but Rails loader/query order
+        # does not. Marshal preserves container types, keys and entry order.
+        key = [root, Marshal.dump(spec).freeze]
         @lock.synchronize do
           p = @plans[key]
           # A structural scheduling decline can always stay on Rails, even
@@ -67,7 +70,7 @@ module Lowrail
           # Includes specs can be constructed dynamically. Bound retained plan
           # structures; a full cache simply uses Rails, never evicts app data.
           return if @plans.size >= 256
-          built = build(key.last, root)
+          built = build(spec, root)
           @plans[key] = built unless built.nil?
           built || nil
         end
@@ -96,11 +99,15 @@ module Lowrail
       def normalize(spec)
         case spec
         when Symbol then spec
-        when String then spec.dup.freeze
+        when String
+          return unless spec.instance_of?(String) && spec.singleton_methods.empty?
+          String.new(spec).freeze
         when Array
+          return unless spec.instance_of?(Array) && spec.singleton_methods.empty?
           a = spec.map { normalize(_1) }
           a.freeze if a.all?
         when Hash
+          return unless spec.instance_of?(Hash) && spec.singleton_methods.empty?
           a = spec.map { |k, v| [normalize(k), v.nil? ? [] : normalize(v)] }
           a.to_h.freeze if a.all? { |k, v| (Symbol === k || String === k) && v }
         when nil then [].freeze

@@ -119,6 +119,11 @@ class PreloadPlansTest < Minitest::Test
     preload.call(rows, { peers: :peers, posts: nil })
     ActiveSupport::Notifications.unsubscribe(subscription)
     result["scheduling_queries"] = queries
+    result["hash_order"] = [{ peers: nil, posts: nil }, { posts: nil, peers: nil }].map do |spec|
+      preload.call([Writer.find(a.id)], spec).map { _1.klass.name }
+    end
+    custom_name = Class.new(String) { def to_sym = :peers }.new("posts")
+    result["custom_name"] = preload.call([Writer.find(a.id)], custom_name).map { _1.klass.name }
     empty = Writer.create!(name: "empty")
     # Cross-branch table dependencies use Rails, including repeated calls and
     # branches pruned by absent rows. Only a fallback marker may be retained.
@@ -228,6 +233,8 @@ class PreloadPlansTest < Minitest::Test
       assert_equal [true, false], on["repeat_call"]
       assert_equal 1, on["grouped_queries"]
       assert_equal %w[writers posts writers], on["scheduling_queries"]
+      assert_equal [%w[Writer Post], %w[Post Writer]], on["hash_order"]
+      assert_equal ["Writer"], on["custom_name"]
       assert_equal ["first", "second", "new"], on["current_scope"]
       %w[dynamic method_change default_scope].each { assert_equal ["second"], on[_1], _1 }
       assert_equal ["second"], on["custom_constructor"]
