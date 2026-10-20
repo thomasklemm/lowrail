@@ -130,11 +130,16 @@ class PreloadPlansTest < Minitest::Test
     rows.first.association(:posts).reset
     again = repeated.call
     result["repeat_call"] = [first.zip(again).all? { |x, y| x.equal?(y) }, rows.first.association(:posts).loaded?]
+    first.clear
+    repeated.loaders.clear
+    result["return_container"] = repeated.call.size
     inspected = ActiveRecord::Associations::Preloader.new(records: [Writer.find(a.id)], associations: { posts: :notes })
     roots = inspected.call
     result["branch_state"] = [inspected.branches.all?(&:done?),
       inspected.branches.flat_map(&:loaders).zip(roots).all? { |x, y| x.equal?(y) },
       inspected.branches.first.children.all?(&:done?)]
+    inspected.branches.clear
+    result["branch_mutation"] = inspected.call.size
     rows = [Writer.find(a.id), Writer.find(b.id)]
     queries = []
     subscription = ActiveSupport::Notifications.subscribe("sql.active_record") { |*args| queries << args.last[:sql] if args.last[:sql].start_with?("SELECT") }
@@ -294,7 +299,9 @@ class PreloadPlansTest < Minitest::Test
       assert_equal ["first", "second", "new"], on["private_scope"]
       assert_equal ["second"], on["inspected_scope"]
       assert_equal [true, false], on["repeat_call"]
+      assert_equal 1, on["return_container"]
       assert_equal [true, true, true], on["branch_state"]
+      assert_equal 0, on["branch_mutation"]
       assert_equal 1, on["grouped_queries"]
       assert_equal %w[writers posts writers], on["scheduling_queries"]
       assert_equal [%w[Writer Post], %w[Post Writer]], on["hash_order"]

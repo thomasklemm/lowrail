@@ -288,7 +288,7 @@ module Lowrail
       def call
         if @lowrail_plan && PreloadPlans.guard_ok? && @lowrail_plan.valid?
           @lowrail_result ||= @lowrail_plan.call(records)
-          return @lowrail_result.roots if @lowrail_result.complete
+          return @lowrail_result.roots.dup if @lowrail_result.complete
         end
         super
       end
@@ -299,16 +299,15 @@ module Lowrail
             children: @lowrail_plan.spec, associate_by_default: associate_by_default, scope: scope)
           @tree.preloaded_records = records
           @lowrail_plan.bind_tree(@tree, @lowrail_result) if @lowrail_result
-          # A caller preparing loaders before #call owns that Rails tree.
-          unless @lowrail_result&.complete
-            @lowrail_plan = @lowrail_result = nil
-          end
+          # Once exposed, the caller owns this mutable Rails tree, including
+          # changes after a completed call. Subsequent calls use it directly.
+          @lowrail_plan = @lowrail_result = nil
         end
         super
       end
 
       def loaders
-        @lowrail_result&.roots || super
+        @lowrail_result&.roots&.dup || super
       end
     end
   end
