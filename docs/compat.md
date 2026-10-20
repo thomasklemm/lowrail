@@ -1,0 +1,281 @@
+# Gem-breadth compatibility corpus — 2026-10-20
+
+This is a compatibility experiment, **not** a claim that every Rails app or
+every listed gem is supported. Four real app pins extend `script/corpus`;
+three have green upgraded baselines; Fizzy is a useful negative control. The
+exercise found genuine Lowrail load-order bugs. It also found a remaining
+require-hooks delivery boundary which the stricter verifier rejects.
+
+All new copies use **Ruby 4.0.7 and Rails 8.1.4**. Ruby 3.4 was dropped by
+owner decision; 4.1 is a target, not an exercised column in this experiment.
+Only `.ruby-version`, `Gemfile` and `Gemfile.lock` change, through checked-in
+`fixtures/corpus/*.patch`. No app/gem implementation or test is patched, no
+upstream repository is modified, and no app failures are suppressed.
+
+## Pins and dependency breadth
+
+| App / pinned upstream commit | Original Rails / Ruby | Gems present in the tested lockfile |
+|---|---|---|
+| [CASA](https://github.com/rubyforgood/casa/commit/b584d2e6e6ebffe382f34c2ec202d20384d035ca) | 8.1.3.1 / 4.0.6 | Devise 5.0.4, Pundit 2.5.2, ViewComponent 4.15.0, Pagy 9.4.0, FriendlyId 5.7.0, Turbo 2.0.23, Stimulus 1.3.4, Active Storage, RSpec Rails 8.0.4, FactoryBot 6.5.6 |
+| [Writebook](https://github.com/basecamp/writebook/commit/be1f8fcf1b0fc8064011c2d29d75133885b182e2) | 8.0.0.beta1 (git) / 3.4.7 | Turbo 2.0.11, Stimulus 1.3.4, Active Storage, Resque 2.6.0, image_processing 1.14.0, Minitest, Capybara/Selenium |
+| [Fizzy](https://github.com/basecamp/fizzy/commit/6f1d200316ec3bae91d32c557d88647300807ee9) | 8.1.0.alpha (git) / 3.4.1 | Solid Queue 1.1.2, Solid Cache/Cable, Turbo 2.0.11, Stimulus 1.3.4, Active Storage, Bootsnap 1.18.4, Minitest |
+| [CodeTriage](https://github.com/codetriage/codetriage/commit/d1868f8634e97a111a7fca49d58cc776d206007e) | 8.1.3.1 / 4.0.5 | Devise 5.0.4, Sidekiq 8.1.7, OmniAuth, Sprockets, will_paginate, Bootsnap 1.25.0, SimpleCov/Minitest |
+
+The lockfile overlays update Rails' components and their required dependency
+metadata. Writebook also needs Rack 3.2.7, image_processing 1.14.0 /
+mini_magick 5.4.0 and securerandom 0.4.1; Fizzy needs Rack 3.2.7. The complete
+resolved changes, including platforms, are in the patches rather than an
+unbounded `bundle update`. Assets use the apps' own build commands. CASA's
+Node pin is 24.22.0; PostgreSQL and Redis are local disposable services.
+
+**Remaining breadth gaps:** no accepted new baseline exercises Ransack,
+PaperTrail, Kaminari, Sorbet runtime or dry-rb. CanCanCan exists in the
+original PingCRM corpus, but its one-test suite records no fast-path hits;
+presence is not coverage. Sidekiq is present in CodeTriage and exercised
+through the app's test adapter, not against a production worker deployment.
+Do not turn gem presence into a support claim for every gem feature.
+
+### Rejected candidates
+
+Human Essentials and Circulate originally pin Ruby 3.4.5. Their disposable
+Ruby-version overlays were retried on 4.0.7 **without Lowrail**:
+
+- Human Essentials stops while requiring delayed_job 4.1.13: missing
+  `benchmark`, removed from Ruby 4's default gems. No runtime shim is added.
+  The earlier 3.4 experiment is diagnostic only, not a supported matrix row.
+- Circulate's exact minitest 5.26.0 dependency requires Ruby < 4.0, so the
+  unchanged dependency constraint cannot resolve. Drop it, rather than patch
+  app/test code to manufacture a green result.
+- Newer Fizzy snapshots require private gems or Rails 8.2; the public
+  historical pin above is reproducible, but not green on Rails 8.1.4.
+
+## Results
+
+Commands use `RAILS_ENV=test`, seed **41231**, one Minitest worker, strict AR
+shadow checking through verify, and **`LOWRAIL_VERIFY_LOADS=1`**. First run
+the app's own suite with `LOWRAIL=0` and no Lowrail preload. Then collect
+facts, build `default`, verify, build `all-opt-in`, verify. Browser suites
+are separate so they cannot disappear behind a default exclusion.
+
+"Identical" means equal per-test outcomes and equal ordered own-thread SQL
+digests **outside identities unstable in off/off or on/on controls**. Those
+identities remain advisory in the report; it does not mean every raw query
+in two processes was identical. SQL values/order are not newly normalized
+for these apps. Other-thread SQL remains advisory, including browser server
+queries. A failed plain baseline is not repaired or called a support gate.
+
+| App / suite | Plain baseline | Default verify (0 units) | All-opt-in verify | All-opt-in hits / fallbacks | Problems / scope |
+|---|---|---|---|---|---|
+| CASA, non-system | 2,992 examples; 0 failures, 21 pending | identical; 47 SQL-noisy identities; 0 stable load differences | identical; same 47 advisory identities, 0 stable load differences | 12,920 / 3,645 | 12,820 / 2,733 instantiate; 100 / 912 preload; locale bug fixed |
+| CASA, system | 769 examples; 0 failures | identical; 5 SQL-noisy identities, 0 stable load differences | identical; 62,268 queries, same 5 advisories; 0 stable load differences | 8,121 / 2,621 (instantiate) | Actual headless Chrome/Capybara suite; 8 unstable load entries |
+| Writebook, non-system | 119 tests, 381 assertions; all pass | identical, 8,028 queries | identical, 8,028 queries | 2,714 / 0 (instantiate) | 0 stable load differences; 8 unstable load entries |
+| Writebook, system | 2 tests, 8 assertions; all pass | identical, 217 queries | identical, 217 queries | 143 / 0 (instantiate) | Chrome, 0 stable load differences; 8 unstable entries |
+| Fizzy | 124 tests; 117 pass, 7 errors | identical errors, 5,322 queries | identical errors, 5,322 queries | 1,963 / 51 (instantiate) | App calls nonexistent instance `Current.reset_all`; 0 stable load differences; 26 unstable in all-opt-in |
+| CodeTriage | 222 tests, 483 assertions; all pass on a fresh schema-only DB | identical, 2,873 queries; 3 SQL-noisy identities | identical, 2,873 queries; same 3 advisories | 933 / 1 | Instantiate 933 / 0, preload 0 / 1; 0 stable load differences, 24 unstable entries; Label association modeling refusal retained |
+
+Fizzy's `test/system` contains only `.keep` at this pin: no browser coverage
+can be claimed. CodeTriage's regular integration tests run in its main suite;
+no separate real-browser coverage is claimed for it.
+Writebook's browser process enables YJIT itself; those are correctness runs,
+not JIT-flat benchmarks or speed claims.
+
+### Facts and build cost
+
+Wall seconds, single observations in the shared orb (not a performance study).
+Facts boot excludes eager loading and dumping, shown separately. Build
+includes planning/materialization and compilation where applicable. Default
+builds still write their refusal ledger even though they lower nothing.
+
+| App | Facts boot | Eager load | Dump | Default build wall | All-opt-in build wall |
+|---|---:|---:|---:|---:|---:|
+| CASA | 3.65 | 1.22 | 2.16 | 6.25 | 12.33 |
+| Writebook | 2.15 | 0.44 | 1.07 | 3.48 | 6.78 |
+| Fizzy | 1.06 | 0.57 | 1.20 | 2.56 | 5.57 |
+| CodeTriage | 1.85 | 0.15 | 1.96 | 3.03 | 5.69 |
+
+CodeTriage facts retains one modeling error:
+`Label association repos klass: NoMethodError: undefined method 'klass' for nil`.
+Its app declares `has_many :repos, through: :repo_lables` (misspelled).
+It is recorded, not swallowed or converted into an eligible association.
+The other three have zero modeling errors (skipped framework/internal
+observations remain separately counted).
+
+## What the experiment found
+
+### Fixed Lowrail defects
+
+1. **Pre-Rails setup compilation:** a parser-sensitive `defined?` check in
+   a modifier `while` in `preload_facts.rb` raised `SyntaxError` on Ruby 3.4
+   before Active Record was loaded. Moving the condition outside the loop
+   retains its semantics and makes pre-framework setup loadable. The gem
+   regression exercises setup before Rails/Active Record. This independent
+   fix is retained even though Ruby 3.4 is no longer a supported target.
+2. **Activation before I18n initialization (CASA):** the model evaluates a
+   locale-formatted date during class loading. Two off controls returned
+   `01/01/1989`; two on controls returned `1989-01-01`. Disabling activation
+   removed the failure; selecting instantiate reproduced it. An
+   `after_initialize` callback itself can precede Rails' I18n callback.
+   Shared activation now waits until `Application#initialize!` has returned,
+   rather than forcing model constants from an unfinished framework. The
+   regression uses an asymmetric date and an actual locale file, not a
+   CASA-specific exception.
+3. **Lazy app hook (Fizzy):** instantiate forced
+   `ActiveStorage::Attachment` to load, causing the app's `on_load` callback
+   to change dependent-destroy behavior and issue two additional SELECTs.
+   Instantiate now visits already-loaded models and subscribes to Zeitwerk
+   for later loads. It does not eagerly load the remaining models. The gem
+   regression verifies late models and hook/SQL behavior.
+4. **Other early framework loads:** the new census caught preload activation
+   loading `Preloader`/`Association` early; shared fact-receiver activation
+   now waits for naturally loaded dependencies. AR epoch installation also
+   no longer forces `ActiveRecord::Base`. Guard and plan constant lookups
+   refuse unresolved autoloads instead of triggering them. This applies to
+   all runtime installers, not two app-specific patches.
+5. **Bisection:** disabling a source pass must retain its runtime entry
+   points: the delivered original arm still references them. Otherwise the
+   digest fixture crashed with `Lowrail::DigestMemo` missing before any
+   pass could be diagnosed. The real source-delivery regression and CLI
+   regression pass. A no-active-unit probe now separates setup/delivery
+   load differences from individual activation effects.
+
+After rebasing onto current main, the complete Ruby 4.0.7 gem run reports
+**120 tests, 5,424 assertions, 0 failures/errors/skips**. The expanded loader
+matrix, with both require-hooks versions installed, reports **7 tests, 1,582
+assertions, 0 failures/errors/skips**. `cargo test --all-targets` passes all
+**38 tests** (34 unit, 4 integration); the release build also passes after
+the rebase. These are correctness checks, not throughput benchmarks.
+
+The final gem run includes the real-blog observation/materialization and
+framework-profiler tests that were skipped in the initial 120-test run.
+An intermediate fixture setup used a symlink as the observer's app root,
+which did not match Ruby's physical source paths; discard that cohort.
+Physical disposable copies pass, without changing the observer or tests.
+
+### App/environment noise, not Lowrail fixes
+
+Human Essentials' earlier default build had zero units yet eight apparent
+SQL differences. Repeat controls and full traces identified unseeded factory
+choices, including `product_drives.rb`'s `[true, false].sample`, which change
+conditional query paths. It was not evidence that default lowering changed
+the app. That preliminary 3.4 cohort also exposes existing association and
+collation-sensitive app behavior. No SQL suppression or app workaround was
+added. The optional per-test `Kernel.srand` proposal is **not implemented**:
+the app is excluded on Ruby 4, and a suite-order seed is not a certificate
+that all application randomness is synchronized. The noisy traces remain
+advisory/diagnostic rather than a green support result.
+
+Database authentication mistakes during setup were discarded, not counted
+as app or Lowrail failures. In particular, CodeTriage's CI database config
+defaults to user `postgres`; a socket DATABASE_URL must explicitly name the
+local role, or Rails merges that username back in. CASA's DatabaseCleaner
+requires a host-bearing URL. CodeTriage's earlier 222 fixture FK errors came
+from development seed rows (`repo_labels.repo_id=2`) left in the test DB;
+the fixtures do not clear that seed table. A fresh schema-only database
+passes all 222 tests without any app changes. Discard the seeded cohort;
+`script/corpus` prepares new test schemas without running development seeds.
+
+### Still refused: require-hooks/Bootsnap load behavior
+
+The existing Redprints suite still has **50 passing examples and 692
+identical queries**, 277 hits / 0 fallbacks. But its strict census finds
+**26 stable load differences**, with 32 unstable entries separately recorded.
+Lowrail changes require-hooks' adapter from Bootsnap to plain ISeq and also
+changes Bundlebun integration load order. The setup-only probe reproduces
+differences; pass-isolated probes additionally report instantiate, preload
+and Inertia config activation. Do not call a setup effect one pass's bug or
+call the clean outcomes-only comparison full compatibility.
+
+Both require-hooks 0.4.0 and 0.5.1 detect Bootsnap from the **top method's
+source path**. A 32-process order/mode probe confirms the difference and
+shows that later installation preserves the adapter in one ordering, but
+does not solve generic boot-time/build delivery. No cheap exact general
+replacement is established. Keep strict verify rejected; no forced mode,
+introspection spoof, suppressed census entry or automatic runtime refusal
+is introduced. [Full detection check, matrix and alternatives](loaders.md#unresolved-require-hooks-adapter-selection).
+
+## Existing corpus and framework regression gates
+
+All five original apps were rebuilt all-opt-in after the shared activation
+change. Per-unit maps were compared, not only total hits.
+
+| App | Outcomes / own-thread SQL | Before → final hits / fallbacks | Explanation |
+|---|---|---|---|
+| Real Blog | 21 pass / 125 queries identical; 0 load differences | 41 / 2 → 41 / 1 | Preload no longer runs merely to force its framework dependencies; instantiate map unchanged |
+| Campfire | 632 pass + 2 libvips skips / 15,108 queries identical; 0 load differences | 2,651 / 5,102 → 2,651 / 3,129 | Instantiate map unchanged; preload's 929 and AR plans' 1,044 setup fallbacks disappear when their unloaded fact receivers are not forced |
+| PingCRM | 1 pass / 4 queries identical; 0 load differences | 0 / 0 → 0 / 0 | No hit coverage; cannot certify its Inertia passes from this suite |
+| Redprints CFP | 50 pass / 692 queries identical; **strict load gate rejected** | 241 / 36 → 277 / 0 | Inertia config's 36 fallback calls become hits after valid initialization; require-hooks boundary remains open |
+| React Starter Kit | 36 pass / 264 queries identical; 0 stable load differences, 8 unstable | 110 / 53 → 163 / 0 | Inertia config's 53 calls now hit; instantiate/props maps unchanged |
+
+Rails 8.1.4 AP/AV/AR L3: **4,095 / 2,747 / 9,240** outcomes identical;
+AV-with-AP **242**, AV-with-AR **173** identical; zero shadow mismatches.
+The harness explicitly calls runtime activation **after loading fixtures**
+(`bench/ar_rails_suite.rb`), so it does not depend on a Rails application's
+`initialize!`. These component suites are not ordinary initialized apps.
+AR's last clean pre-change control has 68,858 hits / 12,267 fallbacks;
+the refreshed final cohort has the same totals. Against the intermediate
+lazy-model cohort (68,859 / 12,266), one preload attempt falls back instead
+of hitting; the instantiate map is unchanged. AP/AV without AR remain
+zero-hit as before.
+
+An intermediate AV-with-AR cohort lost 118 instantiate hits (123 / 2 →
+4 / 3 total). A direct activation probe confirmed the affected models were
+already loaded and the original method/version matched, but every source
+certificate still contained the old `ar_guard.rb` hash. This is correct
+stale-artifact refusal, **not** a missing `initialize!` path. A fresh combined
+framework cohort with the identical dependency lockfile and rebuilt guards
+recovers all 118 instantiate hits: final **122 / 3**, versus **123 / 2**
+before; only preload changes **5 / 2 → 4 / 3**. No instantiate hits are lost
+to missing initialization. The old 4-hit artifact cohort remains rejected
+as hit-coverage evidence, rather than weakening its source hash check.
+The framework harness disables SQL recording, so it is an outcome/shadow
+gate, **not** an own-thread-SQL gate.
+
+Boot smoke checks also cover Rails runner, `rake -T`, console and a non-Rails
+Rack app: all exit successfully; the Rack app stays unchanged without any
+`Application#initialize!`. Runner/console initialize Rails themselves;
+pending activation in uninitialized/no-Rails paths is a no-op, not an error.
+
+An old mixed/quarantined CodeTriage artifact was exercised separately:
+`Lowrail.refusal_reason` records the quarantined source pass/rebuild reason,
+no manifest is installed, Rails 8.1.4 boots and the original model query
+returns its result. The valid artifact was restored afterwards.
+
+## Reproduction
+
+Use isolated copies/databases; never point these commands at a live app DB.
+`script/corpus` verifies the pin and applies a dependency patch once; a
+reverse applicability check accepts rerunning the same overlay, but rejects
+drift. Fresh Writebook bootstrap (clone, frozen bundle, schema, assets) was
+also executed successfully.
+
+```sh
+cargo build --release
+# CASA example: provision a fresh local role-owned DB and Redis first.
+export DATABASE_URL='postgresql://user@localhost/lowrail_casa_test?host=/var/run/postgresql'
+script/corpus casa
+export RAILS_ENV=test SEED=41231 MT_CPU=1 PARALLEL_WORKERS=1
+export LOWRAIL_VERIFY_LOADS=1
+mise exec ruby@4.0.7 node@24.22.0 -- bash
+# Plain baseline, before installing any Lowrail preload:
+(cd .corpus/casa && LOWRAIL=0 bundle exec rspec --seed 41231 \
+  --exclude-pattern 'spec/system/**/*_spec.rb')
+target/release/lowrail facts .corpus/casa
+for tier in default all-opt-in; do
+  target/release/lowrail build .corpus/casa --passes "$tier"
+  target/release/lowrail verify .corpus/casa -- bundle exec rspec --seed 41231 \
+    --exclude-pattern 'spec/system/**/*_spec.rb'
+  # Preserve .lowrail/verify/last.json before the next tier overwrites it.
+done
+# Repeat baseline/build/verify with: bundle exec rspec --seed 41231 spec/system
+```
+
+For Writebook/Fizzy/CodeTriage the suite command is
+`bundle exec rails test --seed 41231`; Writebook's browser command is
+`bundle exec rails test:system --seed 41231`. Use a separate database/copy
+for concurrently running system and non-system suites. Chrome/driver and
+libvips/ImageMagick must be installed as required by the apps' own tests.
+`LOWRAIL_SQL_TRACE=full` retains query lines for diagnosis. Census overhead
+on three alternating Real Blog off/on pairs: observer disabled
+1.83/1.80/1.85 s, enabled 1.94/2.05/1.95 s, median **+0.12 s / +6.6%**;
+snapshots themselves about 0.05 s. This is why the census is opt-in rather
+than hidden in ordinary verify overhead.

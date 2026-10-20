@@ -10,7 +10,7 @@ live in the linked docs; numbers come from executed runs, dated.
 | Area | State |
 |---|---|
 | Default build | lowers nothing: `view/link_to` and `route/path` quarantined (45fd07a); five-app manifests have 0 units |
-| Correctness gates | five-app `verify` identical; Rails 8.1.4 AP/AV/AR suites identical; the one known red test (5a15175) is green by refusal |
+| Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; expanded corpus fixes early-autoload bugs, but strict load census rejects Redprints' loader adapter change ([compatibility report](compat.md)) |
 | Opt-in passes | exact, no accepted request win; see [DECISIONS](DECISIONS.md#passes) |
 | Measurement | interpreter fixed-heap/A/A protocol (c9d2397) accepted; YJIT whole-request cohorts rejected by the JIT-flat gate (07205de); guard micro K 822→425 interpreter / 371→140 YJIT Ir |
 | Biggest measured lever | endpoint render path, −26 %/−37 % handwritten upper bounds; caller-side certification loses (0fbb909) |
@@ -20,10 +20,22 @@ live in the linked docs; numbers come from executed runs, dated.
 ## Works (2026-10-20)
 
 Ruby 4.0+ (gemspec), developed on 4.0.7; the second target is Ruby 4.1
-([current compatibility stop](ruby-4.1.md)). Ruby 3.4 was dropped by owner
+([separate compatibility matrix](ruby-4.1.md)). Ruby 3.4 was dropped by owner
 decision on 2026-10-20. Historical, not current support evidence: real-blog
 on Ruby 3.4.11 built the same 11 units and verified 21/21 identical with
 114 hits.
+
+- **Gem-breadth corpus:** four reproducible dependency-only Rails 8.1.4 /
+  Ruby 4.0.7 overlays add CASA, Writebook, Fizzy and CodeTriage. CASA's I18n
+  date formatting and Fizzy's Active Storage callback exposed genuine early
+  loads; initialization, already-loaded-constant and lazy model/epoch gates
+  fix them with regressions. Opt-in verify load censuses found further
+  preload loads and reject the remaining require-hooks/Bootsnap adapter
+  change. Fresh framework artifacts recover all instantiate hits; an
+  intermediate 118-hit loss was correct refusal of an old runtime source
+  hash, not a missing `initialize!` path. Baseline failures, browser coverage,
+  SQL controls, per-app hits/fallbacks, pins and boot/build timings:
+  [compat.md](compat.md).
 
 - **Post-registry cleanup:** all build selection now uses `--passes`; the five
   transitional per-pass flags are removed. Superseded cached-reader, preload

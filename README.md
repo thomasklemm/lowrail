@@ -18,8 +18,11 @@ why and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how a pass plugs in.
 - **Correctness machinery works.** `lowrail verify` runs an app's own suite
   with Lowrail off and on and compares per-test outcomes and ordered SQL.
   The pinned Rails 8.1.4 framework suites are a standing gate
-  ([rails-suite.md](docs/rails-suite.md)). Five corpus apps verify identically:
-  blog, Campfire, PingCRM, Redprints and React Starter Kit.
+  ([rails-suite.md](docs/rails-suite.md)). Five original corpus apps retain
+  identical outcomes/SQL. The expanded [gem-breadth corpus](docs/compat.md)
+  found and fixed early-autoload bugs; the stricter load census still
+  rejects Redprints' require-hooks adapter change. No universal support
+  claim follows from the green outcome comparisons.
 - **The default build lowers nothing.** The two former default passes,
   `view/link_to` and `route/path`, are quarantined. Warmed apps could
   observe stale helpers when code changed mid-request
@@ -62,7 +65,7 @@ tooling explains why and what to change.
 | Axis | Primary | Secondary / diagnostic |
 |---|---|---|
 | Rails | 8.1.4 | 8.2 alpha (Campfire's pin) |
-| Ruby (minimum 4.0) | 4.0.7 (`mise.toml`) | 4.1 (preview), compatibility currently blocked ([details](docs/ruby-4.1.md)) |
+| Ruby (minimum 4.0) | 4.0.7 (`mise.toml`) | 4.1 preview ([separate compatibility matrix](docs/ruby-4.1.md)) |
 | Execution | interpreter instruction counts (Callgrind, fixed heap, A/A controls) | YJIT under a strict JIT-flat gate; ZJIT being added, diagnostic only |
 
 How to read and reproduce measurements: [docs/bench.md](docs/bench.md).
@@ -144,6 +147,7 @@ decision, and Lowrail works next to them:
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | pipeline, pass contract, registry |
 | [DECISIONS.md](docs/DECISIONS.md) | what is pursued, parked or rejected, plus the stacking backlog |
 | [STATUS.md](docs/STATUS.md) | dated evidence log |
+| [compat.md](docs/compat.md) | pinned real apps, gem breadth, baseline failures, load-order findings and verify results |
 | [bench.md](docs/bench.md) | measurement protocol and results |
 | [types.md](docs/types.md) | typed facts, MCP and RBS |
 | [docs/passes/](docs/passes/) | one study per pass or idea |
