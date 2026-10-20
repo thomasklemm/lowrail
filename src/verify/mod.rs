@@ -31,13 +31,14 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     if cmd.is_empty() {
         return Err("test command must not be empty".into());
     }
-    let report = verify(&app, &cmd)?;
+    let seed = seed_env();
+    let report = verify(&app, &cmd, &seed)?;
     println!("{}", report.render());
     if report.identical() {
         return Ok(());
     }
     if bisect {
-        let culprits = bisect_units(&app, &cmd, &report.off)?;
+        let culprits = bisect_units(&app, &cmd, &report.off, &seed)?;
         println!("culprit units: {culprits:?}");
         write_denylist(&app, &culprits, &report.differences())?;
     }
@@ -51,6 +52,12 @@ pub struct Run {
     /// Guard false: the original code ran. Not a failure, but a unit that only
     /// falls back is a pass that does nothing (often a guard bug).
     pub unit_fallbacks: BTreeMap<String, u64>,
+    /// Per-test SQL trace digest and event count (gem/lib/lowrail/sql_trace.rb).
+    pub sql: BTreeMap<String, (String, u64)>,
+    /// Digest of queries from other threads (advisory: interleaving varies).
+    pub sql_other: BTreeMap<String, String>,
+    /// Test processes that recorded outcomes (forked workers count).
+    pub processes: usize,
     pub seconds: f64,
     pub exit_ok: bool,
 }
@@ -77,8 +84,41 @@ impl Report {
         out
     }
 
+    /// Tests whose SQL trace differs. Only tests traced in both runs count:
+    /// suites without Active Record have no traces.
+    pub fn sql_differences(&self) -> Vec<String> {
+        self.off
+            .sql
+            .iter()
+            .filter_map(|(name, off)| match self.on.sql.get(name) {
+                Some(on) if on.0 != off.0 => Some(format!("{name}: {} → {} queries", off.1, on.1)),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// With several test processes, which test runs first in a process (and
+    /// so does once-per-process work such as lazy schema or trigger setup)
+    /// depends on scheduling, so SQL traces only gate single-process runs.
+    pub fn sql_gates(&self) -> bool {
+        self.off.processes <= 1 && self.on.processes <= 1
+    }
+
+    /// Tests whose queries on other threads differ; advisory only.
+    pub fn sql_other_differences(&self) -> Vec<String> {
+        self.off
+            .sql_other
+            .iter()
+            .filter(|(name, off)| self.on.sql.contains_key(*name) && self.on.sql_other.get(*name) != Some(off))
+            .map(|(name, _)| name.clone())
+            .collect()
+    }
+
     pub fn identical(&self) -> bool {
-        !self.off.tests.is_empty() && self.differences().is_empty() && self.off.exit_ok == self.on.exit_ok
+        !self.off.tests.is_empty()
+            && self.differences().is_empty()
+            && (!self.sql_gates() || self.sql_differences().is_empty())
+            && self.off.exit_ok == self.on.exit_ok
     }
 
     pub fn render(&self) -> String {
@@ -104,6 +144,32 @@ impl Report {
                 s.push_str(&format!("  {d}\n"));
             }
         }
+        let traced = self.off.sql.keys().filter(|k| self.on.sql.contains_key(*k)).count();
+        let sql_diffs = self.sql_differences();
+        if sql_diffs.is_empty() {
+            let queries: u64 = self.off.sql.values().map(|v| v.1).sum();
+            s.push_str(&format!("sql traces: identical for {traced} tests ({queries} queries)\n"));
+        } else {
+            let note = if self.sql_gates() {
+                ""
+            } else {
+                " [advisory: several test processes; rerun with one worker, e.g. PARALLEL_WORKERS=1, to gate on SQL]"
+            };
+            s.push_str(&format!(
+                "sql traces: {} of {traced} tests differ (LOWRAIL_SQL_TRACE=full shows the queries){note}\n",
+                sql_diffs.len()
+            ));
+            for d in sql_diffs.iter().take(50) {
+                s.push_str(&format!("  {d}\n"));
+            }
+        }
+        let other = self.sql_other_differences();
+        if !other.is_empty() {
+            s.push_str(&format!("sql traces on other threads: {} tests differ [advisory: thread interleaving]\n", other.len()));
+            for d in other.iter().take(10) {
+                s.push_str(&format!("  {d}\n"));
+            }
+        }
         let hits: u64 = self.on.unit_hits.values().sum();
         s.push_str(&format!("fast-path hits: {hits} across {} units", self.on.unit_hits.len()));
         for (u, n) in &self.on.unit_hits {
@@ -119,11 +185,29 @@ impl Report {
     }
 }
 
-pub fn verify(app: &Path, cmd: &[String]) -> Result<Report, String> {
+/// Both runs (and bisect reruns) use the same test order, so
+/// order-dependent work (the first test in a process loads schemas, creates
+/// triggers, warms caches) lands in the same test. An explicit SEED,
+/// TESTOPTS or SPEC_OPTS wins.
+fn seed_env() -> Vec<(String, String)> {
+    if ["SEED", "TESTOPTS", "SPEC_OPTS"].iter().any(|k| std::env::var_os(k).is_some()) {
+        return Vec::new();
+    }
+    let seed = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.subsec_nanos() % 65_536).unwrap_or(1729);
+    eprintln!("lowrail verify: test seed {seed} for every run");
+    vec![("SEED".into(), seed.to_string()), ("SPEC_OPTS".into(), format!("--seed {seed}"))]
+}
+
+fn env_refs(env: &[(String, String)]) -> Vec<(&str, &str)> {
+    env.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect()
+}
+
+pub fn verify(app: &Path, cmd: &[String], seed: &[(String, String)]) -> Result<Report, String> {
     let dir = app.join(".lowrail/verify");
     std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-    let off = run(app, cmd, &dir, "0")?;
-    let on = run(app, cmd, &dir, "1")?;
+    let env = env_refs(seed);
+    let off = run_with(app, cmd, &dir, "0", &env)?;
+    let on = run_with(app, cmd, &dir, "1", &env)?;
     Ok(Report { off, on })
 }
 
@@ -131,7 +215,7 @@ pub fn verify(app: &Path, cmd: &[String]) -> Result<Report, String> {
 /// reruns the suite with only one half enabled (LOWRAIL_UNITS), recursing
 /// into halves that still differ. A set whose halves are each clean is
 /// reported whole (the units only fail together).
-fn bisect_units(app: &Path, cmd: &[String], off: &Run) -> Result<Vec<Vec<u64>>, String> {
+fn bisect_units(app: &Path, cmd: &[String], off: &Run, seed: &[(String, String)]) -> Result<Vec<Vec<u64>>, String> {
     let manifest: Value = serde_json::from_str(
         &std::fs::read_to_string(app.join(".lowrail/manifest.json")).map_err(|e| e.to_string())?,
     )
@@ -143,8 +227,10 @@ fn bisect_units(app: &Path, cmd: &[String], off: &Run) -> Result<Vec<Vec<u64>>, 
     let mut differs = |set: &[u64]| -> Result<bool, String> {
         runs += 1;
         let list = set.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(",");
-        let on = run_with(app, cmd, &dir, "1", &[("LOWRAIL_UNITS", &list)])?;
-        let r = Report { off: Run { tests: off.tests.clone(), exit_ok: off.exit_ok, ..Default::default() }, on };
+        let mut env = env_refs(seed);
+        env.push(("LOWRAIL_UNITS", &list));
+        let on = run_with(app, cmd, &dir, "1", &env)?;
+        let r = Report { off: Run { tests: off.tests.clone(), sql: off.sql.clone(), sql_other: off.sql_other.clone(), exit_ok: off.exit_ok, ..Default::default() }, on };
         eprintln!("bisect: units [{list}] → {}", if r.identical() { "identical" } else { "differs" });
         Ok(!r.identical())
     };
@@ -178,10 +264,6 @@ fn write_denylist(app: &Path, culprits: &[Vec<u64>], evidence: &[String]) -> Res
     std::fs::write(&path, serde_json::to_string_pretty(&list).unwrap()).map_err(|e| e.to_string())?;
     println!("denylist: {}", path.display());
     Ok(())
-}
-
-fn run(app: &Path, cmd: &[String], dir: &Path, mode: &str) -> Result<Run, String> {
-    run_with(app, cmd, dir, mode, &[])
 }
 
 fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&str, &str)]) -> Result<Run, String> {
@@ -221,11 +303,24 @@ fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&s
         }
         let data: Value = serde_json::from_str(&std::fs::read_to_string(entry.path()).map_err(|e| e.to_string())?)
             .map_err(|e| format!("{name}: {e}"))?;
+        run.processes += match data["processes"].as_array() {
+            Some(list) => list.len(),
+            None => usize::from(data["tests"].as_object().is_some_and(|t| !t.is_empty())),
+        };
         if let Some(tests) = data["tests"].as_object() {
             for (k, v) in tests {
                 let result = v["result"].as_str().unwrap_or("?").to_string();
                 let failure = v["failure"].as_str().unwrap_or("").to_string();
                 run.tests.insert(k.clone(), (result, failure));
+            }
+        }
+        if let Some(sql) = data["sql"].as_object() {
+            for (k, v) in sql {
+                let digest = v["digest"].as_str().unwrap_or("").to_string();
+                run.sql.insert(k.clone(), (digest, v["n"].as_u64().unwrap_or(0)));
+                if let Some(o) = v["other_digest"].as_str() {
+                    run.sql_other.insert(k.clone(), o.to_string());
+                }
             }
         }
         if let Some(hits) = data["unit_hits"].as_object() {

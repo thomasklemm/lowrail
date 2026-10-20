@@ -70,6 +70,16 @@ same 11 units and verifies 21/21 identical with 114 hits.
   (`LOWRAIL_UNITS`) and writes `.lowrail/denylist.json`, which `build`
   honors. Checked with a fault injected into one real-blog unit: found in 4
   reruns, the rebuild skips that template.
+- **SQL-trace differential in `verify`** (`gem/lib/lowrail/sql_trace.rb`):
+  per test, the ordered sql.active_record events of the test's thread
+  (name, SQL with timestamps and 6+-digit literals masked, bind
+  name:class, cached flag, row count) must match between `LOWRAIL=0` and
+  `1`. Schema, fixture, connection-setup and internal-table queries are
+  excluded; other threads' queries are advisory. Both runs share one seed
+  (`SEED`/`SPEC_OPTS`); with several test processes the SQL check is
+  advisory (run `PARALLEL_WORKERS=1` to gate). `LOWRAIL_SQL_TRACE=full`
+  stores the lines, `=0` disables. Campfire: 634 tests, 15,103 queries,
+  identical; real-blog: 21 tests, 125 queries, identical.
 - **Build surface** (PLAN 9.4): `lowrail facts` materializes lazy
   surface before dumping (production eager load, attribute methods,
   relation delegation, lazy routes, view context classes, every template

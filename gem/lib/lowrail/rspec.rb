@@ -19,7 +19,7 @@ module Lowrail
       return if @attached || !defined?(::RSpec::Core::Formatters) || !::RSpec.respond_to?(:configure)
       @attached = true
       @load_hook&.disable
-      ::RSpec::Core::Formatters.register(Formatter, :example_passed, :example_failed, :example_pending, :close)
+      ::RSpec::Core::Formatters.register(Formatter, :example_started, :example_passed, :example_failed, :example_pending, :close)
       ::RSpec.configure { |config| config.add_formatter(Formatter) }
       true
     end
@@ -29,11 +29,13 @@ module Lowrail
         @tests = {}
       end
 
+      def example_started(notification) = SqlTrace.start(notification.example.id)
       def example_passed(notification) = record(notification.example, "pass")
       def example_failed(notification) = record(notification.example, "fail")
       def example_pending(notification) = record(notification.example, "skip")
 
       def record(example, status)
+        SqlTrace.finish
         entry = { "result" => status }
         error = example.exception || example.execution_result.pending_exception
         if error

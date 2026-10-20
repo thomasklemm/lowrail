@@ -62,6 +62,7 @@ module Lowrail
         Stats.enable!
       end
       if ENV["LOWRAIL_OUTCOMES"]
+        require_relative "lowrail/sql_trace"
         require_relative "lowrail/minitest"
         Lowrail::Minitest.install(ENV["LOWRAIL_OUTCOMES"])
         require_relative "lowrail/rspec"

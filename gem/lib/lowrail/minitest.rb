@@ -26,7 +26,9 @@ module Lowrail
   #
   #   {"tests": {"ArticleTest#test_x": {"result": "pass|fail|error|skip",
   #              "failure": "Class: first line"}},
-  #    "unit_hits": {"0": 12}, "unit_fallbacks": {...}, "pid": .., "ppid": ..}
+  #    "unit_hits": {"0": 12}, "unit_fallbacks": {...}, "pid": .., "ppid": ..,
+  #    "sql": {"ArticleTest#test_x": {"digest": .., "n": .., "skipped": ..}}}
+  #   (SQL traces: lowrail/sql_trace.rb)
   module Minitest
     class << self
       attr_reader :path, :reporter
@@ -68,7 +70,8 @@ module Lowrail
       def file_data(tests)
         stats = defined?(Stats) && Stats.enabled? ? Stats.snapshot : { "unit_hits" => {}, "unit_fallbacks" => {} }
         { "pid" => Process.pid, "ppid" => Process.ppid, "tests" => tests,
-          "unit_hits" => stats["unit_hits"], "unit_fallbacks" => stats["unit_fallbacks"] }
+          "unit_hits" => stats["unit_hits"], "unit_fallbacks" => stats["unit_fallbacks"],
+          "sql" => SqlTrace.snapshot }
       end
     end
 
@@ -131,7 +134,7 @@ module Lowrail
     def self.write_report(path, tests)
       own = file_data(tests)
       Lowrail.write_json("#{path}.#{Process.pid}", own)
-      merged = { "tests" => {}, "unit_hits" => Hash.new(0), "unit_fallbacks" => Hash.new(0), "processes" => [] }
+      merged = { "tests" => {}, "unit_hits" => Hash.new(0), "unit_fallbacks" => Hash.new(0), "sql" => {}, "processes" => [] }
       children = Dir.glob("#{path}.*").filter_map do |f|
         next unless f.match?(/\.\d+\z/) && f != "#{path}.#{Process.pid}"
         data = read_json(f)
@@ -139,6 +142,7 @@ module Lowrail
       end
       [own, *children].each do |data|
         merged["tests"].merge!(data["tests"] || {})
+        merged["sql"].merge!(data["sql"] || {})
         data["unit_hits"]&.each { |id, n| merged["unit_hits"][id] += n }
         data["unit_fallbacks"]&.each { |id, n| merged["unit_fallbacks"][id] += n }
         merged["processes"] << data["pid"]
@@ -170,6 +174,7 @@ module Lowrail
       def init_plugins(options)
         super
         Lowrail::Minitest.attach(reporter)
+        Lowrail::SqlTrace.hook_minitest
       end
     end
   end
