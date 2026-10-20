@@ -6,6 +6,11 @@ class RSpecReporterTest < Minitest::Test
   include LowrailTest
 
   SUITE = <<~'RUBY'
+    if Gem::Specification.find_all_by_name("bootsnap").any?
+      require "bootsnap"
+      Bootsnap.setup(cache_dir: File.join(Dir.pwd, "tmp/cache"), development_mode: false,
+                     load_path_cache: true, compile_cache_iseq: true, compile_cache_yaml: false)
+    end
     require "rspec/autorun"
     require File.join(Dir.pwd, "app")
     RSpec.describe "same descriptions" do

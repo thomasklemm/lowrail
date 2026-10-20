@@ -7,24 +7,21 @@ module Lowrail
     def self.install(path)
       return if @path
       @path = path
-      Kernel.prepend(RequireHook)
-      attach
+      return if attach
+      # Do not wrap Kernel#require: Bootsnap aliases that method and an
+      # inherited prepend would make its original-require alias recurse.
+      # This temporary hook disappears as soon as RSpec's API exists.
+      @load_hook = TracePoint.new(:end) { attach }
+      @load_hook.enable
     end
 
     def self.attach
       return if @attached || !defined?(::RSpec::Core::Formatters) || !::RSpec.respond_to?(:configure)
       @attached = true
+      @load_hook&.disable
       ::RSpec::Core::Formatters.register(Formatter, :example_passed, :example_failed, :example_pending, :close)
       ::RSpec.configure { |config| config.add_formatter(Formatter) }
-    end
-
-    module RequireHook
-      def require(path)
-        result = super
-        Lowrail::RSpec.attach if path == "rspec/core" || path == "rspec/core/runner"
-        result
-      end
-      private :require
+      true
     end
 
     class Formatter
