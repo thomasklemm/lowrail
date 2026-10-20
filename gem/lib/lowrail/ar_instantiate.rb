@@ -33,7 +33,6 @@ module Lowrail
           next unless data.fetch("sources").all? { |p, sha| File.file?(p) && Digest::SHA256.file(p).hexdigest == sha }
           klass = Object.const_get(data.fetch("model"))
           next unless original_fact(klass.method(:_load_from_sql)) == data.fetch("original")
-          klass.define_attribute_methods
           Entry.new(klass, unit)
         rescue StandardError, ScriptError => e
           Lowrail.debug("AR instantiate declined: #{e.class}: #{e.message}")
@@ -102,21 +101,27 @@ module Lowrail
     end
 
     class Entry
-      attr_reader :klass, :builder, :id
+      attr_reader :klass, :id
 
       def initialize(klass, unit)
         @klass, @unit = klass, unit
         @id = unit.fetch("id")
-        @builder = klass.attributes_builder
-        @epoch = AR.epoch(klass)
+        @builder = @epoch = nil
+      end
+
+      # Do not force schema/type initialization at activation. The first
+      # lookup occurs at Rails' original first-row position, after notification
+      # start and STI discrimination, and only after method facts validate.
+      def builder
+        @builder ||= @klass.attributes_builder.tap { @epoch = AR.epoch(@klass) }
       end
 
       def current?
-        Guard.state[@id] == true && AR.epoch(@klass) == @epoch
+        Guard.state[@id] == true && (!@epoch || AR.epoch(@klass) == @epoch)
       end
 
       def valid?
-        return false unless AR.epoch(@klass) == @epoch
+        return false if @epoch && AR.epoch(@klass) != @epoch
         state = Guard.state
         return state[@id] unless state[@id].nil?
         original = @klass.method(:_load_from_sql).super_method
