@@ -62,7 +62,9 @@ if ENV["BENCH_PIPE"]
     raise "positive request count required" unless n.positive?
     if (mode = command["profile"])
       require "stackprof"
-      profile = StackProf.run(mode: mode.to_sym, raw: true, interval: mode == "object" ? 1 : 1000) do
+      # Raw every-object stacks can consume gigabytes for a few Rails
+      # requests. Sample objects and retain aggregate frames, not a timeline.
+      profile = StackProf.run(mode: mode.to_sym, raw: mode != "object", interval: mode == "object" ? 100 : 1000) do
         n.times { call(session, verb, path, headers) }
       end
       File.write(command.fetch("output"), JSON.generate(profile))
@@ -70,8 +72,9 @@ if ENV["BENCH_PIPE"]
     elsif command["trace"]
       counts = Hash.new(0)
       names = Hash.new(0)
+      gem_path = File.expand_path("../gem/lib/", __dir__) + "/"
       trace = TracePoint.new(:call) do |tp|
-        next unless tp.path.start_with?(File.expand_path("../gem/lib/", __dir__))
+        next unless tp.path.start_with?(gem_path)
         counts["#{tp.defined_class}##{tp.method_id}"] += 1
         names[tp.binding.local_variable_get(:name)] += 1 if tp.method_id == :reset_method
       end

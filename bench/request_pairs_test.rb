@@ -28,4 +28,18 @@ class RequestPairsTest < Minitest::Test
     refute RequestPairs.summarize(rounds, seed: 1, tolerance: 2)[:aa][:pass]
     assert_equal 2.5, RequestPairs.median([1, 2, 3, 8])
   end
+
+  def test_repeated_blocks_do_not_hide_process_specific_bias
+    cohorts = [-3, -1, 0, 2, 4].map do |bias|
+      Array.new(40) do
+        { "off_a" => RequestPairs::METRICS.to_h { [_1, 100.0] },
+          "off_b" => RequestPairs::METRICS.to_h { [_1, 100.0 + bias] } }
+      end
+    end
+    result = RequestPairs.summarize(cohorts.flatten, cohorts: cohorts, seed: 1, tolerance: 2)
+    refute result[:aa][:pass]
+    low, high = result[:layers]["off_b"]["cpu_us"][:delta_pct][:ci95]
+    assert_in_delta(-3, low, 1e-9)
+    assert_in_delta 4, high, 1e-9
+  end
 end

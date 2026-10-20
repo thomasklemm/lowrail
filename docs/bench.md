@@ -8,6 +8,8 @@ these runs use the repository's Ruby 4.0.7 and YJIT.
 ```sh
 RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 mise exec -- \
   target/debug/lowrail build .corpus/real-blog --env production
+# Include independently booted processes in uncertainty, not just block noise.
+export BENCH_COHORTS=5 BENCH_ROUNDS=8 BENCH_SECONDS=0.6
 mise exec -- taskset -c 2 ruby bench/request_pairs.rb \
   .corpus/real-blog /tmp/blog-costs GET:/articles
 
@@ -47,23 +49,31 @@ during timing. Default-cache Campfire repeats the same authenticated path;
 cache-disabled Campfire still retains warm fragment caches.
 
 The summary reports medians of block means, not request latency percentiles.
-95% percentile-bootstrap CIs use 5,000 resamples of **whole rounds**, with a
-fixed seed. Changes are medians of same-round ratios to `off_a`, not ratios of
-aggregate medians. This retains within-round pairing. The off/off control must
+95% percentile-bootstrap CIs use 5,000 resamples with a fixed seed. In a
+single-cohort diagnostic run (the default), these resample **whole rounds**.
+For reported comparisons use `BENCH_COHORTS=5` or more: each cohort boots new
+workers, uses a different order seed and runs `BENCH_ROUNDS` rounds. The final
+estimator is the median of cohort medians, bootstrapping **cohorts**, so a
+process-specific JIT/heap bias is not mistaken for many independent samples.
+Changes first take same-round ratios to `off_a`, not ratios of aggregate
+medians. All cohorts, including individually failed controls, are retained;
+there is no retry-until-green. Five cohorts still give coarse bounds and are
+not a guarantee against host interference. The off/off control must
 include zero in its CPU and wall difference CIs, **and both entire intervals
 must fit inside ±2%**. Otherwise the driver exits 2 and results are not accepted
 as a pass comparison. This is a practical noise gate, not proof of exact
 equality or a correction for process-specific JIT layout and host interference.
 
-`BENCH_ROUNDS`, `BENCH_SECONDS`, `BENCH_WARMUP` and `BENCH_SEED` configure the
+`BENCH_COHORTS`, `BENCH_ROUNDS`, `BENCH_SECONDS`, `BENCH_WARMUP` and `BENCH_SEED` configure the
 experiment. Keep them fixed between before/after runs; do not widen
 `BENCH_AA_TOLERANCE` just to pass a failed control. `samples.json` records all
 rounds, Ruby/YJIT/process identities, request count and manifest digest;
 `summary.json` contains estimates, CIs and the control verdict. Output must be
 a new directory. Raw logs/headers stay private, outside Git.
 
-`BENCH_PROFILES=1` additionally records CPU (1 ms) and object (every allocation)
-StackProf profiles **after all timing**, then traces Lowrail Ruby call counts
+`BENCH_PROFILES=1` additionally records CPU (1 ms) and object (1/100 allocations,
+aggregate frames only to bound memory)
+StackProf profiles **after the first cohort's timing**, then traces Lowrail Ruby call counts
 and invalidation names for 100 warmed requests. Profiles are explanatory, not
 timing samples. `bench/profile_summary.rb` can summarize raw profiles. The
 ordinary `bench/requests.rb` one-shot interface remains available.

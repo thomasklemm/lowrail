@@ -27,12 +27,18 @@ module RequestPairs
     { median: median(values), ci95: [draws[(bootstrap * 0.025).floor], draws[(bootstrap * 0.975).floor]] }
   end
 
-  def self.summarize(rounds, seed:, tolerance:)
+  def self.summarize(rounds, seed:, tolerance:, cohorts: nil)
     layers = rounds.first.keys
     result = layers.to_h do |layer|
       metrics = METRICS.to_h do |metric|
         absolute = rounds.map { _1.fetch(layer).fetch(metric) }
         delta = rounds.map { 100 * (_1.fetch(layer).fetch(metric) / _1.fetch("off_a").fetch(metric) - 1) }
+        if cohorts
+          absolute = cohorts.map { |rows| median(rows.map { _1.fetch(layer).fetch(metric) }) }
+          delta = cohorts.map do |rows|
+            median(rows.map { 100 * (_1.fetch(layer).fetch(metric) / _1.fetch("off_a").fetch(metric) - 1) })
+          end
+        end
         [metric, { value: estimate(absolute, seed: seed), delta_pct: estimate(delta, seed: seed) }]
       end
       [layer, metrics]
@@ -42,6 +48,34 @@ module RequestPairs
       [metric, low <= 0 && high >= 0 && low >= -tolerance && high <= tolerance]
     end
     { layers: result, aa: { pass: controls.values.all?, metrics: controls, tolerance_pct: tolerance } }
+  end
+
+  # Independently booted cohorts account for process-specific JIT/heap state.
+  # Do not bootstrap hundreds of blocks from one process as if they were
+  # hundreds of independent boots. Keep failed controls, never retry to green.
+  def self.experiment(app, out, route)
+    count = Integer(ENV.fetch("BENCH_COHORTS", "1"))
+    return run(app, out, route) if count == 1
+    raise "at least 5 independent cohorts required" if count < 5
+    out = File.expand_path(out)
+    raise "output directory must be new" if File.exist?(out)
+    FileUtils.mkdir_p(out, mode: 0o700)
+    seed = Integer(ENV.fetch("BENCH_SEED", "41231"))
+    cohorts = count.times.map do |i|
+      dir = File.join(out, "cohort-#{i}")
+      env = { "BENCH_COHORTS" => "1", "BENCH_SEED" => (seed + i).to_s,
+        "BENCH_PROFILES" => i.zero? ? ENV["BENCH_PROFILES"] : nil }
+      system(env, RbConfig.ruby, __FILE__, app, dir, route, out: File.join(out, "cohort-#{i}.log"), err: [:child, :out])
+      raise "cohort #{i} failed; inspect logs" unless [0, 2].include?($?.exitstatus)
+      warn "cohort #{i + 1}/#{count} (control exit=#{$?.exitstatus})"
+      JSON.parse(File.read(File.join(dir, "samples.json")))
+    end
+    rows = cohorts.map { _1.fetch("samples") }
+    summary = summarize(rows.flatten, seed: seed, tolerance: Float(ENV.fetch("BENCH_AA_TOLERANCE", "2")), cohorts: rows)
+    File.write(File.join(out, "samples.json"), JSON.pretty_generate(cohorts: cohorts))
+    File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary))
+    puts JSON.pretty_generate(summary)
+    summary.fetch(:aa).fetch(:pass)
   end
 
   def self.run(app, out, route)
@@ -154,5 +188,5 @@ end
 
 if $PROGRAM_NAME == __FILE__
   abort "usage: request_pairs.rb APP NEW_OUTDIR GET:/path" unless ARGV.size == 3
-  exit(RequestPairs.run(*ARGV) ? 0 : 2)
+  exit(RequestPairs.experiment(*ARGV) ? 0 : 2)
 end
