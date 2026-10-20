@@ -16,3 +16,21 @@ and first vertical slice. See [docs/PLAN.md](docs/PLAN.md).
   `LOWRAIL=0`, checked by `lowrail verify`.
 - One precise type model from static analysis (Prism, Rubydex), a real boot,
   and observed types, exposed through an MCP server and RBS/RBI generation.
+
+## Complementary optimizations
+
+Lowrail only applies changes it can guard exactly. Some well-known speedups
+change observable behavior, so they stay the app's own decision. Lowrail
+works next to them and does not turn them on:
+
+- **YJIT** (`RUBY_YJIT_ENABLE=1` or `RubyVM::YJIT.enable`): recommended in
+  production. Lowrail's guards and lowered methods are written for it.
+- **Bootsnap**: works in any load order; Bootsnap caches the original
+  bytecode, Lowrail serves its lowered bytecode.
+- **Frozen string literals** (`# frozen_string_literal: true` or
+  [Freezolite](https://github.com/ruby-next/freezolite)): fewer string
+  allocations, but mutating a literal then raises `FrozenError`. Enable it
+  only after your suite passes with it; Ruby 3.4+'s
+  `-W:deprecated` warns on mutation of chilled literals. Lowrail compiles
+  each file with the same options the app's loaders use, see
+  [docs/loaders.md](docs/loaders.md).
