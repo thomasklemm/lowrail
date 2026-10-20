@@ -423,6 +423,12 @@ rescued build exception) or `unclassified` (a new unmapped explanation,
 never discarded). Plain successful source/digest sites use `lowered`;
 preload eligibility uses `runtime_tree`, AR scoped readers `scoped_reader`,
 and instantiation `homogeneous_results`.
+
+Template source passes also use `template_context` when a handler body parses
+inside Action View's method context but not at top level (for example a
+layout's bare `yield`), or `template_parse` when the wrapped body still fails.
+Both record a whole-handler `compiled_body` refusal and retain original code;
+this diagnostic does not broaden lowering eligibility or add runtime hits.
 The AR query inventory remains under `active_record/ar_plans_survey` (not
 a separately selectable pass); its `receiver`, `shape` and `app` metadata
 are retained. It reports unsupported source queries, never successful units.

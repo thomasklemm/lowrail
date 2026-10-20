@@ -131,6 +131,9 @@ pub fn lower(original: &str, mode: &Mode, unit: usize, oracle: &mut dyn Oracle, 
     let result = ruby_prism::parse(code.as_bytes());
     let unchanged = || Lowered { code: original.to_string(), ..Default::default() };
     if result.errors().next().is_some() {
+        if matches!(mode, Mode::Template { .. }) {
+            return Lowered { code: original.to_string(), sites: vec![super::view::template_parse_refusal(code)], deps: vec![] };
+        }
         return unchanged();
     }
     let template = matches!(mode, Mode::Template { .. });

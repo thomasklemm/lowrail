@@ -30,6 +30,8 @@ fn reason(pass: &str, detail: &str) -> &'static str {
         "lowered (homogeneous results only)" => return "homogeneous_results",
         "denylisted by verify --bisect" => return "denylisted",
         _ if detail.starts_with("declined:") => return "builder_error",
+        _ if detail.starts_with("template requires method context") => return "template_context",
+        _ if detail.starts_with("template source does not parse") => return "template_parse",
         _ => {}
     }
     // Match stable portions only: details can contain helper/model names,
@@ -135,5 +137,16 @@ mod tests {
         assert_eq!(survey["shape"], "dynamic");
         assert_eq!(survey["outcome"], "refused");
         assert_eq!(survey["reason"], "query_certificate");
+        for pass in ["view/link_to", "route/path"] {
+            for (detail, reason) in [
+                ("template requires method context; diagnostic only, original handler retained", "template_context"),
+                ("template source does not parse in method context: expected an expression", "template_parse"),
+            ] {
+                let entry = normalize(json!({"template": "app/views/layouts/application.html.erb", "helper": "compiled_body",
+                    "pass": pass, "outcome": detail}));
+                assert_eq!(entry["reason"], reason);
+                assert_eq!(entry["outcome"], "refused");
+            }
+        }
     }
 }

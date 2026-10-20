@@ -297,6 +297,19 @@ pass parsing/diagnostics is a separate existing-pass follow-up; even then
 these four sites face the options/direct/default-backed boundaries above.
 No runtime or parser change was made in this investigation.
 
+**Ledger-only follow-up:** source passes now reparse otherwise rejected
+handler bodies inside `def __lowrail_template__; …; end`, as Action View
+does. A successful method-context parse records `template_context`; a
+remaining syntax error records `template_parse` with the parser's explanation.
+Both retain the original handler and refuse lowering, so this is not new
+layout optimization. The regression (layout `yield` plus malformed-handler
+control, both source passes) fails before the fix and passes after it.
+`cargo test --locked`: 31 unit + 3 integration tests pass. Rebuilding Campfire
+adds **14 refusal-only rows** (7 templates × 2 passes), including the layout;
+the **entire manifest is identical**, all 60 units, templates and file entries,
+so no new fast path or hit was introduced. Evidence comparison is retained
+in `.lowrail/erb-ledger-before`.
+
 **Decision:** no cheap new named-route eligibility on this measured room,
 and no completed existing lowering to price. Guard facts alone do not permit
 specializing away generic route generation. The 5.72% bucket is not credited

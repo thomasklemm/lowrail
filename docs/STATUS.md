@@ -18,9 +18,11 @@ same 11 units and verifies 21/21 identical with 114 hits.
   five result-changing mutation probes bypass the proposed I18n setter epoch.
   Campfire has 7 route guard hits but **zero completed specializations** per
   request: live controller defaults disable Rails' optimized route branch.
-  Per-site coverage also exposes four layout calls absent from the build
-  ledger due to top-level parsing of legal template `yield`. No runtime fix
-  or pass was made. Three Action View before-gate groups retain 2,747 + 242 +
+  The layout ledger gap is fixed diagnostically: rejected handlers are parsed
+  in a method, then refused as `template_context` or `template_parse` rather
+  than omitted. Campfire gains 14 refusal rows; its entire 60-unit manifest
+  stays identical. Rust: 31 unit + 3 integration tests pass. No runtime fix
+  or new pass was made. Three Action View before-gate groups retain 2,747 + 242 +
   173 identical outcomes in every layer. Tag/form attribute work belongs to
   candidate #4; template lookup (#3) is next. No per-hit or request win claimed.
 - **Shared pass benchmark** (`lowrail bench APP --pass NAME [--path /path]`):
@@ -370,6 +372,9 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 
 ## Next
 
+- Audit an exact route/path extension for host/protocol/port-only controller
+  defaults before template lookup; preserve generic generation's script-name
+  and parameter-conversion order rather than removing the live predicate.
 - Template lookup (#3) after the [ERB helper refusals](passes/erb.md);
   establish resolver/path/details invalidation before any pass. Tag options
   and form-builder attribute work remain together under candidate #4.

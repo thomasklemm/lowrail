@@ -74,6 +74,18 @@ impl Lowered {
     }
 }
 
+/// Diagnose handler bodies in Action View's method context, without expanding
+/// the existing source passes' lowering eligibility (or adding fast-path hits).
+pub(super) fn template_parse_refusal(code: &str) -> Site {
+    let wrapped = format!("def __lowrail_template__;{code}\nend");
+    let result = ruby_prism::parse(wrapped.as_bytes());
+    let outcome = match result.errors().next() {
+        Some(error) => format!("template source does not parse in method context: {}", error.message()),
+        None => "template requires method context; diagnostic only, original handler retained".into(),
+    };
+    Site { line: 1, helper: "compiled_body".into(), outcome }
+}
+
 /// Methods `link_to(name, url_string_or_record, literal_html_options)` runs
 /// through for the shapes this pass accepts.
 const LINK_TO_VIEW_DEPS: &[&str] = &["link_to", "url_for", "content_tag", "url_target", "convert_options_to_data_attributes", "tag_builder"];
@@ -91,7 +103,7 @@ pub fn lower_template(original: &str, locals: &[String], unit: usize, oracle: &m
     let result = ruby_prism::parse(code.as_bytes());
     let mut out = Lowered::default();
     if result.errors().next().is_some() {
-        return Lowered { code: original.to_string(), ..Default::default() };
+        return Lowered { code: original.to_string(), sites: vec![template_parse_refusal(code)], deps: vec![] };
     }
     let mut calls = Vec::new();
     collect_appended_calls(&result.node(), &mut calls);
@@ -493,5 +505,24 @@ mod tests {
         assert_eq!(out.lowered_count(), 0);
         assert_eq!(out.code, code);
         assert_eq!(out.sites[0].outcome, "link_to: html options are not literal");
+    }
+
+    #[test]
+    fn layout_yield_and_invalid_handler_have_refusals_without_new_lowerings() {
+        use super::super::route;
+        for (code, reason) in [
+            ("@output_buffer.append=(link_to \"Home\", articles_path);\n@output_buffer.append=(yield :sidebar);\n@output_buffer", "template requires method context"),
+            ("@output_buffer.append=(link_to \"Home\", articles_path);\n@output_buffer.append=(yield :sidebar);\nif", "template source does not parse"),
+        ] {
+            let view = lower_template(code, &[], 0, &mut Fake);
+            let route = route::lower(code, &route::Mode::Template { locals: &[] }, 0, &mut Fake, &mut route::Cache::default());
+            for out in [view, route] {
+                assert_eq!(out.code, code);
+                assert_eq!(out.lowered_count(), 0);
+                assert_eq!(out.sites.len(), 1, "a refused handler must not disappear");
+                assert!(out.sites[0].outcome.starts_with(reason), "{:?}", out.sites);
+                assert!(out.deps.is_empty());
+            }
+        }
     }
 }
