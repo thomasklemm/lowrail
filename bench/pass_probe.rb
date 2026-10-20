@@ -111,5 +111,9 @@ if $PROGRAM_NAME == __FILE__
       route_completions_per_request: defined?(Lowrail::Routes) ? Lowrail::Routes.instance_variable_get(:@bench_completions).fdiv(n) : 0 }
   end
   raise "unexpected JIT mode" unless result.fetch(:yjit) == jit
+  if ENV["LOWRAIL_JIT_DIAGNOSTICS"] == "1"
+    require_relative "../gem/lib/lowrail/jit_diagnostics"
+    result[:jit_diagnostics] = Lowrail::JitDiagnostics.snapshot
+  end
   puts "LOWRAIL_BENCH #{JSON.generate(result)}"
 end

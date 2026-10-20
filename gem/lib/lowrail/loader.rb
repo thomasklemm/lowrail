@@ -45,6 +45,7 @@ module Lowrail
         bin = @manifest.iseq_for(path, original: original, compile_option: options) or return nil
         iseq = RubyVM::InstructionSequence.load_from_binary(File.binread(bin))
         Stats.loaded(path) if defined?(Stats)
+        JitDiagnostics.record(iseq, path, @manifest.units) if defined?(JitDiagnostics)
         iseq
       rescue StandardError => e
         Lowrail.debug("#{path}: #{e.class}: #{e.message}; compiling original source")

@@ -65,6 +65,7 @@ module Lowrail
     # independent of whether lowering is active (verify needs outcomes for
     # LOWRAIL=0 runs too).
     def boot(root: Dir.pwd)
+      require_relative "lowrail/jit_diagnostics" if ENV["LOWRAIL_JIT_DIAGNOSTICS"] == "1"
       if ENV["LOWRAIL_STATS"] || ENV["LOWRAIL_OUTCOMES"]
         require_relative "lowrail/stats"
         Stats.enable!

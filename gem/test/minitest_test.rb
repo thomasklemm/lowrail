@@ -47,6 +47,16 @@ class MinitestPluginTest < Minitest::Test
       assert_equal "Minitest::Skip: later", tests["SampleTest#test_skip"]["failure"]
       assert_equal({ "0" => 5 }, data["unit_hits"])
       assert_equal 1, per_process.size
+      refute data.key?("jit_diagnostics"), "diagnostics are opt-in"
+      diagnosed, = run_suite(dir, "LOWRAIL_JIT_DIAGNOSTICS" => "1", "RUBYOPT" => "#{SETUP_OPT} --yjit")
+      assert_equal data["tests"], diagnosed["tests"]
+      assert_equal data["unit_hits"], diagnosed["unit_hits"]
+      snapshot = diagnosed.fetch("jit_diagnostics").fetch(0)
+      assert_includes snapshot["ruby"], "ruby #{RUBY_VERSION}"
+      assert_equal true, snapshot.dig("jits", "yjit", "enabled")
+      assert_equal false, snapshot.dig("jits", "zjit", "enabled")
+      assert_nil snapshot["per_iseq_counters"]
+      assert_equal [0, 1], snapshot.fetch("delivered_method_iseqs").flat_map { _1.fetch("candidate_unit_ids") }.sort
     end
   end
 

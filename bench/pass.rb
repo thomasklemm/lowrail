@@ -64,7 +64,8 @@ module PassBench
     data
   end
 
-  def self.probe(app, out, env, route, label)
+  def self.probe(app, out, env, route, label, diagnostics: false)
+    env = env.merge("LOWRAIL_JIT_DIAGNOSTICS" => diagnostics ? ENV["LOWRAIL_JIT_DIAGNOSTICS"] : nil)
     log = File.join(out, "#{label}.log")
     ok = system(env, RbConfig.ruby, env.fetch("BENCH_JIT") == "1" ? "--yjit" : "--disable-yjit",
       File.join(__dir__, "pass_probe.rb"), route, chdir: app, out: log, err: [:child, :out])
@@ -296,11 +297,12 @@ module PassBench
       env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
         "LOWRAIL" => "1", "LOWRAIL_ROOT" => app, "LOWRAIL_UNITS" => ids, "BENCH_UNITS" => ids,
         "LOWRAIL_STATS" => "", "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil, "LOWRAIL_SHADOW" => nil,
+        "LOWRAIL_JIT_DIAGNOSTICS" => nil,
         "LOWRAIL_SPECULATE" => nil, "LOWRAIL_SPECULATE_KEEP" => nil,
         "BENCH_JIT" => counter == "native" ? "1" : ENV.fetch("BENCH_JIT", "0"),
         "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter == "native" ? "400" : "50"),
         "RUBYOPT" => "-I#{lib} -rlowrail/setup" }
-      result[:coverage] = probe(app, out, env, route, "coverage")
+      result[:coverage] = probe(app, out, env, route, "coverage", diagnostics: true)
       if options[:speculate]
         require_relative "experiments/speculative_build"
         speculative = File.join(out, "unsafe-build")

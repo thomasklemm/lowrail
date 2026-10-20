@@ -88,6 +88,10 @@ pub struct Run {
     pub sql_other: BTreeMap<String, String>,
     /// Test processes that recorded outcomes (forked workers count).
     pub processes: usize,
+    pub ruby_descriptions: BTreeSet<String>,
+    /// Process-wide JIT snapshots; never part of equivalence or coverage gates.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub jit_diagnostics: Vec<Value>,
     pub seconds: f64,
     pub exit_ok: bool,
 }
@@ -220,6 +224,13 @@ impl Report {
         for (u, n) in &self.on.unit_fallbacks {
             let only = if self.on.unit_hits.contains_key(u) { "" } else { " (never took the fast path)" };
             s.push_str(&format!("\n  unit {u}: {n}{only}"));
+        }
+        for ruby in self.off.ruby_descriptions.union(&self.on.ruby_descriptions) {
+            s.push_str(&format!("\nRuby: {ruby}"));
+        }
+        let diagnostics = self.off.jit_diagnostics.len() + self.on.jit_diagnostics.len();
+        if diagnostics > 0 {
+            s.push_str(&format!("\nJIT diagnostics: {diagnostics} process snapshots in last.json (not per-ISeq counters; not a gate)"));
         }
         s
     }
@@ -417,6 +428,15 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         }
         let data: Value = serde_json::from_str(&std::fs::read_to_string(entry.path()).map_err(|e| e.to_string())?)
             .map_err(|e| format!("{name}: {e}"))?;
+        if let Some(ruby) = data["ruby"].as_str() {
+            run.ruby_descriptions.insert(ruby.to_string());
+        }
+        if let Some(rubies) = data["ruby_descriptions"].as_array() {
+            run.ruby_descriptions.extend(rubies.iter().filter_map(Value::as_str).map(str::to_string));
+        }
+        if let Some(snapshots) = data["jit_diagnostics"].as_array() {
+            run.jit_diagnostics.extend(snapshots.iter().cloned());
+        }
         run.processes += match data["processes"].as_array() {
             Some(list) => list.len(),
             None => usize::from(data["tests"].as_object().is_some_and(|t| !t.is_empty())),

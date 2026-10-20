@@ -91,6 +91,48 @@ class CompilerTest < Minitest::Test
     assert_match(/usage/, err)
   end
 
+  def test_shape_warnings_preserve_delivery_and_existing_ledger
+    realpath_tmpdir do |dir|
+      path = File.join(dir, "shapes.rb")
+      File.write(path, <<~RUBY)
+        class ShapeFixture
+          def small; #{(["value"] * 7).join(";")}; end
+          def large; #{(["value"] * 8).join(";")}; end
+          def guarded; ::Lowrail::G[0] = true; ::Lowrail::K[0] = self.class; ::Lowrail::V[0] = {}; end
+          def noisy(*args, **kw, &block)
+            singleton_class
+            send(:value, *args, **kw, &block)
+            binding
+            TracePoint.new(:call) {}
+            Object.const_set(:TestMarker, 1)
+          end
+          define_method(:value) { 1 }
+        end
+      RUBY
+      out = File.join(dir, ".lowrail")
+      FileUtils.mkdir_p(out)
+      existing = { "pass" => "test", "outcome" => "refused", "detail" => "keep me" }
+      Lowrail.write_json(File.join(out, "ledger.json"), [existing])
+      input = { "out" => out, "files" => [{ "path" => path, "lowered" => path }],
+        "units" => [{ "id" => 3, "file" => path, "method" => "ShapeFixture#noisy" }] }
+      manifest = Lowrail::Compiler.compile(input, err: StringIO.new)
+      ledger = JSON.parse(File.read(File.join(out, "ledger.json")))
+      assert_equal existing, ledger.first
+      warnings = ledger.drop(1)
+      assert warnings.all? { _1["outcome"] == "warning" && _1["pass"] == "jit/shape" && _1["target"] == path }
+      %w[inline_size dynamic_send block_method singleton_class call_shape tracing_binding constant_write].each do |reason|
+        assert_includes warnings.map { _1["reason"] }, reason
+      end
+      assert_includes warnings.select { _1["reason"] == "inline_size" }.map { _1["site"] }, "large"
+      refute_includes warnings.select { _1["reason"] == "inline_size" }.map { _1["site"] }, "small"
+      refute warnings.any? { _1["site"] == "guarded" && _1["reason"] == "constant_write" }, "container writes are not constant reassignment"
+      assert_equal [3], manifest["units"].map { _1["id"] }
+      assert File.file?(File.join(out, manifest["files"][path]["iseq"]))
+      Lowrail::Compiler.compile(input, err: StringIO.new)
+      assert_equal ledger, JSON.parse(File.read(File.join(out, "ledger.json"))), "rebuild replaces shape diagnostics"
+    end
+  end
+
   private
 
   LABEL = /\A(?:block (?:\(\d+ levels\) )?in )?<(?:main|compiled)>\z/

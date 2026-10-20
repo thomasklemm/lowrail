@@ -371,13 +371,15 @@ normalizes the combined ledger, and writes `units.json` and `ledger.json`
 once. The compiler observes the app's per-file loader policy in its own boot,
 compiles lowered files and writes `manifest.json` once. Runtime units pass
 through compilation unchanged. There are no per-pass artifact rewrites.
+The compiler then atomically appends/replaces only `jit/shape` warning rows in
+the ledger, after inspecting the emitted binaries; it does not rewrite pass decisions.
 With cached facts, a default build has two app boots (oracle + compiler);
 an all-pass build has three (plus the shared runtime builder), down from six.
 A fresh facts dump adds one boot in either design.
 
 ## ledger.json — every site a pass looked at
 
-Written once by `lowrail build`, using the same schema for all passes:
+Written by `lowrail build`, using the same schema for all passes:
 
 ```json
 [{"pass": "route/path", "target": "/abs/app/views/articles/_article.html.erb", "line": 13,
@@ -390,9 +392,12 @@ Written once by `lowrail build`, using the same schema for all passes:
 `target` replaces `file`/`template`/`method`: a source path, model name,
 association label or, for a whole-pass diagnostic, the pass name. `site`
 replaces `helper`/`method`, with `"*"` when no narrower site is known.
-`line` is 0 for non-source diagnostics. `outcome` is **only** `lowered` or
-`refused`; `detail` preserves the complete previous free-text outcome.
+`line` is 0 for non-source diagnostics. Pass decisions have `outcome`
+`lowered` or `refused`; `detail` preserves the complete previous free-text outcome.
 The Rust build boundary normalizes both source and Ruby builder diagnostics.
+Compiler-only `jit/shape` rows use `outcome: "warning"`, never lowering or
+refusing a unit. Their reasons and inspection gaps are documented in the
+[JIT shape guide](jit-shapes.md#cheap-build-time-check).
 
 One entry per diagnostic site/outcome; `copies` (always present, at least 1)
 preserves repeated occurrences in a pass's input. A helper copied into both
@@ -456,3 +461,12 @@ an aggregate `path` after its forked workers finish. Verify reads the aggregate
 when present, otherwise the per-process files, so hits are not counted twice.
 Use `lowrail verify APP -- bundle exec rspec --seed 12345` for RSpec; custom
 test commands are also accepted by `lowrail observe`.
+
+Outcome writers include `ruby: RUBY_DESCRIPTION` (merged Minitest files use
+`ruby_descriptions`). Verify preserves the distinct descriptions for each
+off/on run, making the [explicit mise Ruby axis](ruby-4.1.md) auditable.
+`LOWRAIL_JIT_DIAGNOSTICS=1` adds a `jit_diagnostics` array of **separate
+process-lifetime snapshots**, not additive per-test or per-ISeq counters.
+Unavailable values are null. Verify retains this array under
+`last.json` → `report.off/on.jit_diagnostics` without including it in any gate.
+See the [counter scope and limitations](jit-shapes.md#diagnostic-counters-never-gates).

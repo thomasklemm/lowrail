@@ -69,9 +69,11 @@ module Lowrail
 
       def file_data(tests)
         stats = defined?(Stats) && Stats.enabled? ? Stats.snapshot : { "unit_hits" => {}, "unit_fallbacks" => {} }
-        { "pid" => Process.pid, "ppid" => Process.ppid, "tests" => tests,
+        data = { "pid" => Process.pid, "ppid" => Process.ppid, "tests" => tests, "ruby" => RUBY_DESCRIPTION,
           "unit_hits" => stats["unit_hits"], "unit_fallbacks" => stats["unit_fallbacks"],
           "sql" => SqlTrace.snapshot }
+        data["jit_diagnostics"] = [JitDiagnostics.snapshot] if defined?(JitDiagnostics)
+        data
       end
     end
 
@@ -146,6 +148,8 @@ module Lowrail
         data["unit_hits"]&.each { |id, n| merged["unit_hits"][id] += n }
         data["unit_fallbacks"]&.each { |id, n| merged["unit_fallbacks"][id] += n }
         merged["processes"] << data["pid"]
+        (merged["ruby_descriptions"] ||= []) << data["ruby"] if data["ruby"]
+        (merged["jit_diagnostics"] ||= []).concat(data["jit_diagnostics"]) if data["jit_diagnostics"]
       end
       merged["unit_hits"] = merged["unit_hits"].to_h
       merged["unit_fallbacks"] = merged["unit_fallbacks"].to_h

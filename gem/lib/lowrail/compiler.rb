@@ -6,6 +6,7 @@ require "fileutils"
 require_relative "../lowrail"
 require_relative "manifest"
 require_relative "compilation"
+require_relative "jit_shapes"
 
 module Lowrail
   # Build step behind `gem/exe/lowrail-compile UNITS_JSON` (see
@@ -84,6 +85,30 @@ module Lowrail
         }
         manifest["rails_env"] = input["rails_env"] if input["rails_env"]
         manifest["templates"] = templates unless templates.empty?
+        warnings = []
+        artifacts = files.map { |path, entry| [path, entry.fetch("iseq")] }
+        units.each do |unit|
+          if unit["pass"] == "endpoint/action"
+            artifacts << [unit.fetch("target"), unit.fetch("endpoint").fetch("iseq")]
+          elsif %w[runtime method].include?(unit["kind"])
+            warnings << JitShapes.warning(unit["target"] || unit["file"], "*", 0, "uninspected",
+              "#{unit['pass']}: runtime-installed body; no emitted binary at this build boundary")
+          end
+        end
+        templates.each_key do |path|
+          warnings << JitShapes.warning(path, "*", 0, "uninspected", "template method ISeq is compiled by Action View at runtime")
+        end
+        artifacts.each do |target, relative|
+          iseq = RubyVM::InstructionSequence.load_from_binary(File.binread(File.join(out, relative)))
+          warnings.concat(JitShapes.check(iseq, target))
+        rescue StandardError, ScriptError => e
+          warnings << JitShapes.warning(target, "*", 0, "uninspected", "#{e.class}: #{e.message.lines.first&.chomp}")
+        end
+        ledger_path = File.join(out, "ledger.json")
+        ledger = File.file?(ledger_path) ? JSON.parse(File.read(ledger_path)) : []
+        ledger.reject! { _1["pass"] == "jit/shape" }
+        Lowrail.write_json(ledger_path, ledger + warnings)
+        err.puts "[lowrail] #{warnings.size} JIT shape warning(s); diagnostic only (ledger.json)" unless warnings.empty?
         Lowrail.write_json(File.join(out, "manifest.json"), manifest)
         manifest
       end

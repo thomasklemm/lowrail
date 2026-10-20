@@ -99,6 +99,15 @@ JIT state is checked too; Ruby flags alone do not override production
 changes. None of these probes runs in a measured window. A zero-hit cached
 route is valid coverage evidence, not evidence that its pass improved anything.
 
+`LOWRAIL_JIT_DIAGNOSTICS=1` additionally saves process-wide JIT counters in
+`coverage.jit_diagnostics`, **only in the untimed activation probe**. The flag
+is cleared in timed request workers and micro probes. No new stats flags or
+gate exceptions are introduced; unavailable per-ISeq counters/ratios are null.
+See [scope and limitations](jit-shapes.md#diagnostic-counters-never-gates).
+The reproducible Ruby version axis is `mise exec ruby@VERSION -- ...`; 4.0.7
+remains the default. The [4.1 preview column](ruby-4.1.md) currently stops at
+compatibility failures, so `BENCH_JIT=zjit` is **not** an available mode.
+
 Outputs, also on rejection:
 
 - **`result.json`**, schema version 1, recursively sorted object keys: verdict,
