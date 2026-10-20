@@ -66,6 +66,18 @@ module Lowrail
         Materialize.run(app_root: @root, measure: false, record: ->(where, error) {
           @errors << {"where" => where, "error" => "#{error.class}: #{error.message.lines.first&.strip}"}
         })
+        # These framework dependencies are deliberately lazy even after Rails'
+        # eager loaders. Resolve them before inventorying the sealed surface,
+        # not during the first request/fixture quote. Guarded boot is unchanged.
+        require "useragent" if defined?(::ActionController::AllowBrowser)
+        ::ActiveSupport::Multibyte::Chars if defined?(::ActiveSupport::Multibyte)
+        ::ActionDispatch::Routing::RoutesProxy if defined?(::ActionDispatch::Routing)
+        if defined?(::ActiveRecord::Base)
+          ::ActiveRecord::InternalMetadata
+          ::ActiveRecord::SchemaMigration
+        end
+        ::Thor::Group if defined?(::Thor)
+        ::Rails.application.env_config if defined?(::Rails.application) && ::Rails.application
         modules = ObjectSpace.each_object(Module).to_a
         modules.each do |mod|
           name = NAME.bind_call(mod)

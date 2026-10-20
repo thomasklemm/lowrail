@@ -151,6 +151,12 @@ The comparison reports unique rule/source-file pairs matched/unobserved and
 dynamic-only, plus their unmatched rate. This is **coverage disagreement**;
 an unexecuted hint is not refuted. Semantic disagreement rate is unavailable
 without independent evidence, not fabricated as 0%.
+The five-app census has 91–97% unmatched source pairs. Static results therefore
+remain a pure onboarding hint list with **no certification gate weight**; no
+static-precision tuning is required for the blog pilot. Destination comparisons
+cost 136–175 ms/test in the shared orb (two comparisons/test plus boundaries),
+excluding tracing/materialization/serialization. This is acceptable CI-tool
+overhead, not a production request check or an isolated performance result.
 Incomplete boot/materialization or no recorded tests is not a clean result.
 
 On any observed violation a process-global monotonic epoch changes. Test
