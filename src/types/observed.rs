@@ -98,6 +98,7 @@ fn class_type(facts: &Facts, class: &str) -> String {
         "TrueClass" | "FalseClass" => "bool".into(),
         "Array" => "Array[untyped]".into(),
         "Hash" => "Hash[untyped, untyped]".into(),
+        "Set" | "Thread::Queue" => format!("{class}[untyped]"),
         _ => {
             for (suffix, base) in [("::ActiveRecord_Relation", "ActiveRecord::Relation"),
                 ("::ActiveRecord_Associations_CollectionProxy", "ActiveRecord::Associations::CollectionProxy")]

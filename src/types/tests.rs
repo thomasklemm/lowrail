@@ -199,7 +199,10 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
             "parameters":if name == "dynamic" { json!([["req","value"]]) } else { json!([]) }})).collect();
     let facts: Facts = serde_json::from_value(json!({"app_root":dir,
         "models":[{"name":"Article","columns":[{"name":"title","type":"string","null":true}]}],
-        "modules":[{"name":"Article","methods":methods}]})).unwrap();
+        "modules":[{"name":"Article","methods":methods},
+            {"name":"Outer","kind":"class"},
+            {"name":"Outer::Item","kind":"class"},
+            {"name":"Outer::Parameters","kind":"class"}]})).unwrap();
     let mut model = TypeModel::from_facts(&facts);
     assert_eq!(model.fact("Article#literal", "return").unwrap().proven_type(), Some("Integer"));
     assert_eq!(model.fact("Article#caller", "return").unwrap().proven_type(), None);
@@ -213,7 +216,9 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
             "args":{"value":{"Symbol":2,"String":1}},"returns":{"String":3},
             "ivars":{"@articles":{"Article::ActiveRecord_Relation":3}}},
         {"module":"#<Class:Article>","singleton":true,"name":"list","calls":2,
-            "returns":{"Article::ActiveRecord_Relation":2}}
+            "returns":{"Article::ActiveRecord_Relation":2}},
+        {"module":"Outer::Item","name":"read","calls":4,
+            "returns":{"Outer::Parameters":1,"Set":1,"Thread::Queue":1,"Tempfile":1}}
     ]});
     model.merge_observed(&facts, samples.to_string().as_bytes()).unwrap();
     let title = model.fact("Article#title", "return").unwrap();
@@ -234,11 +239,15 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
     assert_eq!(model.fact("Article#dynamic", "ivar:@articles").unwrap().name, "ActiveRecord::Relation[Article]");
     assert!(model.fact("Article#dynamic", "ivar:@articles").unwrap().proven_type().is_none());
     assert_eq!(model.fact("Article#caller", "return").unwrap().name, "Integer", "no inference from observations");
+    assert_eq!(model.fact("Outer::Item#read", "return").unwrap().name,
+        "(Outer::Parameters | Set[untyped] | Tempfile | Thread::Queue[untyped])");
     let input = model.typed_facts();
     assert_eq!(input["format"], 1);
     assert_eq!(input["methods"]["Article#dynamic"]["return_type"]["evidence"], "observed");
     model.write_rbs(&facts, &dir.join("sig")).unwrap();
-    let validation = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
-    assert!(validation.status.success(), "{}", String::from_utf8_lossy(&validation.stdout));
+    if std::process::Command::new("rbs").arg("--version").output().is_ok() {
+        let validation = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
+        assert!(validation.status.success(), "{}{}", String::from_utf8_lossy(&validation.stdout), String::from_utf8_lossy(&validation.stderr));
+    }
     std::fs::remove_dir_all(dir).unwrap();
 }

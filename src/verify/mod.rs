@@ -35,10 +35,17 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     if cmd.is_empty() {
         return Err("test command must not be empty".into());
     }
+    // Bind counters to the build selected before execution, not a newer
+    // manifest another build might publish while the suite is running.
+    let manifest_path = app.join(".lowrail/manifest.json");
+    let manifest: Value = if manifest_path.exists() {
+        serde_json::from_slice(&std::fs::read(manifest_path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?
+    } else { Value::Null };
     let seed = seed_env();
     let report = verify(&app, &cmd, &seed, observe_types)?;
     println!("{}", report.render());
     let mut overhead = None;
+    let mut recorder_ok = true;
     if observe_overhead {
         let plain = run_labeled(&app, &cmd, &app.join(".lowrail/verify"), "1-no-recorder", "1", &env_refs(&seed))?;
         let control = Report { off: plain, on: Run {
@@ -49,12 +56,14 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         overhead = Some(serde_json::json!({"recorded_seconds":report.on.seconds,
             "plain_seconds":control.off.seconds,
             "percent":(report.on.seconds / control.off.seconds - 1.0) * 100.0,
+            "identical":control.identical(),
             "outcomes_identical":control.differences().is_empty(),
             "sql_differences":control.sql_differences()}));
         println!("recorder overhead (single wall-time pair, not a speed claim): {}", overhead.as_ref().unwrap());
-        if !control.identical() { return Err("recorder control differs".into()); }
+        recorder_ok = control.identical();
     }
-    write_last(&app, &cmd, &report, overhead)?;
+    write_last(&app, &cmd, &manifest, &report, overhead)?;
+    if !recorder_ok { return Err("recorder control differs".into()); }
     if report.identical() {
         return Ok(());
     }
@@ -278,11 +287,7 @@ fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: 
     Ok(report)
 }
 
-fn write_last(app: &Path, cmd: &[String], report: &Report, overhead: Option<Value>) -> Result<(), String> {
-    let manifest = app.join(".lowrail/manifest.json");
-    let manifest: Value = if manifest.exists() {
-        serde_json::from_slice(&std::fs::read(manifest).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?
-    } else { Value::Null };
+fn write_last(app: &Path, cmd: &[String], manifest: &Value, report: &Report, overhead: Option<Value>) -> Result<(), String> {
     let mut passes: BTreeMap<String, Value> = BTreeMap::new();
     for unit in manifest["units"].as_array().into_iter().flatten() {
         let Some(pass) = unit["pass"].as_str() else { continue };
@@ -292,7 +297,8 @@ fn write_last(app: &Path, cmd: &[String], report: &Report, overhead: Option<Valu
             entry[field] = Value::from(entry[field].as_u64().unwrap() + counts.get(&id).copied().unwrap_or(0));
         }
     }
-    let result = serde_json::json!({"format":1,"command":cmd,"identical":report.identical(),
+    let identical = report.identical() && overhead.as_ref().is_none_or(|o| o["identical"] == true);
+    let result = serde_json::json!({"format":1,"command":cmd,"identical":identical,
         "manifest":manifest,"report":report,"passes":passes,"recorder_overhead":overhead});
     let path = app.join(".lowrail/verify/last.json");
     let tmp = path.with_extension("json.tmp");

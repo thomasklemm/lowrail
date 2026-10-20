@@ -6,7 +6,10 @@ use std::process::{Command, Stdio};
 
 #[test]
 fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
-    let app = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(".corpus/real-blog");
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let app = if root.join(".corpus/real-blog-r4").is_dir() {
+        root.join(".corpus/real-blog-r4")
+    } else { root.join(".corpus/real-blog") };
     if !app.is_dir() {
         eprintln!("skipping real-blog integration: run script/corpus real-blog");
         return;
@@ -111,7 +114,7 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
         let response: Value = serde_json::from_str(&line).unwrap();
         assert_eq!(response["id"], id);
         if id == 2 {
-            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 6);
+            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 8);
         } else {
             assert_eq!(response["result"]["isError"], false);
             assert_eq!(

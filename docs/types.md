@@ -113,11 +113,66 @@ or validation of source freshness. Regenerate facts after changing the app.
 `--rbs OUT_DIR` creates `OUT_DIR/app.rbs` and `lowrail_support.rbs` (normally
 choose an app `sig/` subdirectory). Output is deterministic. Provenance is
 also emitted as comments. The support file supplies minimal Rails relation,
-TimeWithZone, Date and BigDecimal declarations for standalone `rbs validate`; omit it when
-loading a full Rails RBS collection. This is generated member information,
+TimeWithZone, Date, BigDecimal and Tempfile declarations and name-only stubs for
+namespaced external classes introduced by observations (e.g. strong parameters
+and safe strings). Array, Hash, Set and Queue samples do not infer element
+types. Namespace class/module kinds come from boot facts even when the namespace
+has no modeled methods. Omit the support file when loading full Rails/stdlib
+signatures. This is generated member information,
 not a complete Rails signature distribution. Existing files with these two
 names in the chosen output directory are overwritten; other files are left
 alone. Tests invoke `rbs validate` when the executable is available.
+
+## Type quality ledger — 2026-10-20
+
+Ruby 4.0.7, RBS 4.2.0; corpus revisions are pinned in `script/corpus`.
+`real-blog-r4` is the generated Rails 8.1.4 blog. Other app labels below map to
+`pingcrm`, `redprints-cfp`, `react-starter-kit`, and `campfire` respectively.
+These are type coverage measurements, **not** lowering or application support
+claims. Only real-blog has the recording-on equivalence gate in this round.
+
+"Methods" counts signatures in `lowrail types`; "boot entries" counts all
+method entries across the boot dump, including framework/gem modules, not just
+the modeled subset. Return columns count non-`untyped` returns carrying each
+source (once per method/source). Sources **overlap** and must not be added.
+Conflicts count contradictory method/slot/class rows; each row retains its
+sample multiplicity. Zero conflicts does not imply exhaustive observations.
+
+| App | Methods / boot entries | Typed returns | boot_fact | schema | inference | observed | Conflicts | `rbs validate` |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| real-blog-r4 | 161 / 50,496 | 68 | 55 | 11 | 2 | 13 | 0 | Pass |
+| PingCRM | 440 / 55,048 | 157 | 90 | 61 | 6 | 0 | 0 | Fail: synthetic `Pagy.ancestors[0]` receiver |
+| Redprints | 2,812 / 68,264 | 439 | 278 | 146 | 9 | 81 | 0 | Fail: synthetic `Builder.ancestors[0]` receiver |
+| Starter | 234 / 49,722 | 104 | 83 | 13 | 7 | 39 | 0 | Pass |
+| Campfire | 3,056 / 61,740 | 991 | 802 | 125 | 56 | 558 | 0 | Pass |
+
+Observed-only returns (previously untyped) are **11 / 0 / 80 / 34 / 535** in
+table order. Sampled method counts are **13 / 0 / 81 / 39 / 558**. The two RBS
+failures also reproduce with observations absent: the static catalog contains
+synthetic non-constant receiver names. They are not filtered away or counted
+as valid RBS. The corpus check also caught and fixed class namespaces being
+redeclared as modules, Queue generic redeclarations, and missing Set/Tempfile
+type shapes introduced by samples.
+
+Observation scope, all with seed 41231 and one worker:
+
+- real-blog: `lowrail verify APP --observe-overhead`; **21 tests**, identical
+  outcomes and **125 ordered SQL queries**, **57 hits / 0 fallbacks**. The
+  enabled/no-recorder control also matched outcomes and SQL. Recording took
+  **2.1861s vs 2.0754s (+5.33%)**, including startup. The preceding 16-sample
+  pair was **2.3085s vs 2.0863s (+10.65%)**. These are noisy wall-time pairs,
+  not a stable performance estimate or a speed claim.
+- PingCRM: `bin/rails test`: **1 test / 1 assertion**, no application methods
+  called by this suite. Its empty observed column is a coverage gap.
+- Redprints: RSpec excluding `spec/system/**/*`: **50 examples**, green.
+- Starter: same non-system RSpec scope: **35 examples**, green.
+- Campfire: `bin/rails test`: **634 tests / 3,856 assertions / 2 skips**, green.
+
+The non-blog runs used dedicated `lowrail observe` with
+`LOWRAIL_OBSERVE_TYPES_ONLY=1 PARALLEL_WORKERS=1`, capped at 16 samples per
+method/process. Refresh a row by regenerating facts, running its stated
+observation scope, then `lowrail types APP --rbs OUT` and `rbs -I OUT validate`.
+No baseline or diagnostic is suppressed to make the table green.
 
 ## Stdio MCP
 
@@ -135,12 +190,14 @@ Tools:
 
 | Tool | Arguments | Result |
 |---|---|---|
-| `type_of` | `target`: `Article#title`, `Article.all` or `article_path` | RBS signature, return/parameter types and provenance, roles |
+| `type_of` | `target`: `Article#title`, `Article.all` or `article_path`; optional `slot`: `return`, `arg:name`, `ivar:@name` | Signature/types, provenance, counts, evidence, conflicts; a slot query includes `proven_type` (name or null) |
 | `method_facts` | `target`: `Class#method` or `Class.method` | Resolved boot method, owner/source/parameters/ISeq kind and existing origin classifier result |
 | `model` | `name`: model class | Raw columns, attributes, associations, callbacks; validations if recorded in the facts |
 | `routes` | optional `name`, `path`, `controller` substrings (combined with AND) | Matching routes, in route-set order |
 | `lowering_ledger` | none | Current `.lowrail/ledger.json`, or an explicit missing-ledger result |
-| `diagnostics` | none | Explicit placeholder; source-read/parse diagnostics only |
+| `lowering_status` | `target`: `Class#method` or `Class.method` | Matched ledger sites and original reasons; `lowered`, `refused`, `mixed`, or `not_recorded` |
+| `verify_stats` | none | Last completed verify's pass/unit hits and fallbacks, command, equivalence result, recorder overhead and `matches_current_manifest` |
+| `diagnostics` | none | Source-read/parse diagnostics and static/observed type conflicts |
 
 For example, a tools/call request after initialization:
 
@@ -148,12 +205,32 @@ For example, a tools/call request after initialization:
 {"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"type_of","arguments":{"target":"Article#title"}}}
 ```
 
-Facts are compared by file contents on each data-tool request and the cached
+Facts and observations are compared by file contents on each data-tool request and the cached
 model is rebuilt on changes, even if mtime/size are unchanged. A malformed or
-missing replacement produces a tool error, never a stale successful answer;
-later requests retry reading the file. The ledger is read for every ledger
+missing facts replacement produces a tool error, never a stale successful answer;
+removing observations removes their types, and malformed observations error.
+Later requests retry reading the file. The ledger is read for every ledger
 request. Source-only edits require regenerated facts (or server restart).
 Tool failures use MCP `isError`; protocol failures use JSON-RPC error codes.
+
+Method status matches an explicit method target, or source-file ledger sites
+within the actual Prism `def` span resolved from boot facts. It does not
+attribute a neighboring method's sites to the whole file. An absent ledger
+row means **not recorded**, not a fabricated refusal. Site-level `mixed`
+does not claim a whole method was replaced. Template-to-action attribution
+is not inferred without an explicit method-target row.
+
+Verify atomically persists `.lowrail/verify/last.json` on completed runs,
+including non-identical ones. Pass counters are bound to the manifest captured
+before execution. MCP rereads the report and current manifest every request;
+build mismatch is visible, not relabeled as current coverage. This comparison
+is not a source-freshness certificate. Raw per-unit counters remain available.
+
+Real client check: the official Python MCP SDK **2.3.0** completed initialize,
+initialized notification, tools/list, calls to `type_of` (exit ivar with
+observed evidence and null proof), `lowering_status`, `verify_stats` (57 hits)
+and `diagnostics`, then clean stdio shutdown. `cargo test --test types_mcp`
+also launches the real executable over stdin/stdout and validates blog RBS.
 
 The current fact dumper does not record validations or enum mappings. Missing
 validations are reported as unavailable, not as an empty validated set.

@@ -22,7 +22,7 @@ fn protocol_errors_notifications_and_tool_discovery() {
     assert_eq!(responses[2]["error"]["code"], -32000);
     assert_eq!(responses[3]["result"]["protocolVersion"], "2025-06-18");
     let tools = responses[4]["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 6);
+    assert_eq!(tools.len(), 8);
     assert!(tools.iter().any(|t| t["name"] == "type_of"));
     assert_eq!(responses[5]["error"]["code"], -32602);
     assert_eq!(responses[6]["result"], json!({}));
@@ -68,10 +68,7 @@ fn data_tools_refresh_facts_and_ledger_without_serving_stale_answers() {
         data.call("lowering_ledger", &json!({})).unwrap()["ledger"],
         ledger
     );
-    assert_eq!(
-        data.call("diagnostics", &json!({})).unwrap()["status"],
-        "placeholder"
-    );
+    assert_eq!(data.call("diagnostics", &json!({})).unwrap()["conflicts"], json!([]));
     assert!(data.call("type_of", &json!({})).is_err());
     assert!(data.call("routes", &json!({"path":42})).is_err());
     assert!(data.call("model", &json!({"name":"Missing"})).is_err());
@@ -94,5 +91,54 @@ fn data_tools_refresh_facts_and_ledger_without_serving_stale_answers() {
             .unwrap()["type"]["return_type"]["name"],
         "bool?"
     );
+    let observed = dir.join(".lowrail/observed.json");
+    std::fs::write(&observed, json!({"format":1,"types":[{"module":"Article","name":"title",
+        "returns":{"Integer":3},"calls":3}]}).to_string()).unwrap();
+    let ty = data.call("type_of", &json!({"target":"Article#title","slot":"return"})).unwrap();
+    assert_eq!(ty["fact"]["name"], "bool?");
+    assert_eq!(ty["fact"]["samples"]["Integer"], 3);
+    assert_eq!(ty["proven_type"], Value::Null);
+    assert_eq!(ty["conflicts"][0]["count"], 3);
+    std::fs::write(&observed, "{").unwrap();
+    assert!(data.call("type_of", &json!({"target":"Article#title"})).is_err());
+    std::fs::remove_file(&observed).unwrap();
+    assert_eq!(data.call("diagnostics", &json!({})).unwrap()["conflicts"], json!([]));
+    assert_eq!(data.call("lowering_status", &json!({"target":"Article#title"})).unwrap()["sites"], ledger);
+    assert_eq!(data.call("verify_stats", &json!({})).unwrap()["available"], false);
+    let manifest = json!({"units":[{"id":3,"pass":"route/path"}]});
+    std::fs::create_dir_all(dir.join(".lowrail/verify")).unwrap();
+    std::fs::write(dir.join(".lowrail/manifest.json"), manifest.to_string()).unwrap();
+    std::fs::write(dir.join(".lowrail/verify/last.json"), json!({"format":1,"manifest":manifest,
+        "passes":{"route/path":{"hits":7,"fallbacks":2}},
+        "report":{"on":{"unit_hits":{"3":7},"unit_fallbacks":{"3":2}}}}).to_string()).unwrap();
+    let stats = data.call("verify_stats", &json!({})).unwrap();
+    assert_eq!(stats["matches_current_manifest"], true);
+    assert_eq!(stats["passes"]["route/path"]["fallbacks"], 2);
+    std::fs::write(dir.join(".lowrail/manifest.json"), "{}").unwrap();
+    assert_eq!(data.call("verify_stats", &json!({})).unwrap()["matches_current_manifest"], false);
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn method_status_does_not_attribute_neighboring_sites_to_a_method() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-span-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
+    let source = dir.join("article.rb");
+    std::fs::write(&source, "class Article\n def first\n  article_path(1)\n end\n def second\n  article_path(2)\n end\nend\n").unwrap();
+    std::fs::write(dir.join(".lowrail/facts.json"), json!({"format":1,"modules":[{"name":"Article","methods":[
+        {"name":"first","source_location":format!("{}:2",source.display())},
+        {"name":"second","source_location":format!("{}:5",source.display())}]}]}).to_string()).unwrap();
+    std::fs::write(dir.join(".lowrail/ledger.json"), json!([
+        {"target":source,"line":3,"outcome":"lowered","pass":"route/path"},
+        {"target":source,"line":6,"outcome":"refused","reason":"argument_shape","pass":"route/path"}
+    ]).to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    let first = data.call("lowering_status", &json!({"target":"Article#first"})).unwrap();
+    assert_eq!(first["status"], "lowered");
+    assert_eq!(first["sites"].as_array().unwrap().len(), 1);
+    let second = data.call("lowering_status", &json!({"target":"Article#second"})).unwrap();
+    assert_eq!(second["status"], "refused");
+    assert_eq!(second["sites"][0]["reason"], "argument_shape");
+    assert_eq!(data.call("lowering_status", &json!({"target":"Article#missing"})).unwrap()["status"], "not_recorded");
     std::fs::remove_dir_all(dir).unwrap();
 }

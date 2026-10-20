@@ -47,6 +47,10 @@ impl<'a> Declaration<'a> {
         })
     }
 
+    fn existing(&mut self, name: &str) -> Option<&mut Self> {
+        name.split("::").try_fold(self, |node, part| node.children.get_mut(part))
+    }
+
     fn render(&self, out: &mut String, indent: &str) {
         for (name, node) in &self.children {
             let kind = if node.kind.is_empty() {
@@ -99,8 +103,9 @@ pub(super) fn write(model: &TypeModel, facts: &Facts, out: &Path) -> Result<(), 
         root.at(&sig.receiver).methods.push(sig);
     }
     for module in &facts.modules {
-        if model.methods.values().any(|s| s.receiver == module.name) {
-            root.at(&module.name).kind = if module.kind == "class" {
+        // A class may be only a namespace here, not a method receiver.
+        if let Some(node) = root.existing(&module.name) {
+            node.kind = if module.kind == "class" {
                 "class"
             } else {
                 "module"
@@ -113,7 +118,7 @@ pub(super) fn write(model: &TypeModel, facts: &Facts, out: &Path) -> Result<(), 
     std::fs::write(out.join("app.rbs"), app).map_err(|e| e.to_string())?;
     // Minimal declarations for standalone validation, not a replacement for
     // Rails signatures. Keep this separate when using a Rails RBS collection.
-    let mut support = String::from("# Omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\nmodule ActiveRecord\n  class Relation[Elem]\n  end\n  module Associations\n    class CollectionProxy[Elem] < Relation[Elem]\n    end\n  end\nend\n");
+    let mut support = String::from("# Omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nclass Tempfile\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\nmodule ActiveRecord\n  class Relation[Elem]\n  end\n  module Associations\n    class CollectionProxy[Elem] < Relation[Elem]\n    end\n  end\nend\n");
     // Samples can introduce framework classes not used by the static catalog
     // (e.g. strong parameters or safe strings). Emit name-only stubs, not
     // invented signatures, for those namespaced external classes.
@@ -123,19 +128,16 @@ pub(super) fn write(model: &TypeModel, facts: &Facts, out: &Path) -> Result<(), 
             if !ty.provenance.iter().any(|p| p.source == Source::Observed) { continue; }
             for name in ty.name.split(|c: char| !c.is_ascii_alphanumeric() && c != '_' && c != ':') {
                 if !name.contains("::") || !observed::constant(name)
-                    || matches!(name, "ActiveSupport::TimeWithZone" | "ActiveRecord::Relation" | "ActiveRecord::Associations::CollectionProxy")
-                    || model.methods.values().any(|s| s.receiver == name)
-                    || facts.models.iter().any(|m| m.name == name)
+                    || matches!(name, "Thread::Queue" | "ActiveSupport::TimeWithZone" | "ActiveRecord::Relation" | "ActiveRecord::Associations::CollectionProxy")
+                    || root.existing(name).is_some()
                 { continue; }
                 external.at(name).kind = "class";
-                let parts: Vec<_> = name.split("::").collect();
-                for i in 1..=parts.len() {
-                    let prefix = parts[..i].join("::");
-                    if let Some(module) = facts.modules.iter().find(|m| m.name == prefix) {
-                        external.at(&prefix).kind = if module.kind == "class" { "class" } else { "module" };
-                    }
-                }
             }
+        }
+    }
+    for module in &facts.modules {
+        if let Some(node) = external.existing(&module.name) {
+            node.kind = if module.kind == "class" { "class" } else { "module" };
         }
     }
     external.render(&mut support, "");

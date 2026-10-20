@@ -5,13 +5,18 @@ use std::process::Command;
 fn verify_counts_merged_minitest_or_independent_rspec_processes_once() {
     let app = std::env::temp_dir().join(format!("lowrail-verify-{}", std::process::id()));
     std::fs::create_dir_all(&app).unwrap();
+    std::fs::create_dir_all(app.join(".lowrail")).unwrap();
+    let manifest = serde_json::json!({"units":[{"id":7,"pass":"route/path"},{"id":9,"pass":"view/link_to"}]});
+    std::fs::write(app.join(".lowrail/manifest.json"), manifest.to_string()).unwrap();
     for merged in [false, true] {
         let script = r#"
           [ "$LOWRAIL_SHADOW" = strict ] || exit 42
-          printf '%s' '{"tests":{"example[1:1]":{"result":"pass"}},"unit_hits":{"7":3}}' > "$LOWRAIL_OUTCOMES.1"
-          printf '%s' '{"tests":{"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":2}}' > "$LOWRAIL_OUTCOMES.2"
+          printf '%s' '{"tests":{"example[1:1]":{"result":"pass"}},"unit_hits":{"7":3},"unit_fallbacks":{"9":4}}' > "$LOWRAIL_OUTCOMES.1"
+          printf '%s' '{"tests":{"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":2},"unit_fallbacks":{"9":2}}' > "$LOWRAIL_OUTCOMES.2"
           if [ "$1" = true ]; then
-            printf '%s' '{"tests":{"example[1:1]":{"result":"pass"},"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":5}}' > "$LOWRAIL_OUTCOMES"
+            printf '%s' '{"tests":{"example[1:1]":{"result":"pass"},"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":5},"unit_fallbacks":{"9":6}}' > "$LOWRAIL_OUTCOMES"
+            # A newer build during execution must not relabel these counters.
+            printf '%s' '{"units":[{"id":7,"pass":"different/pass"}]}' > .lowrail/manifest.json
           fi
         "#;
         let result = Command::new(env!("CARGO_BIN_EXE_lowrail"))
@@ -41,6 +46,11 @@ fn verify_counts_merged_minitest_or_independent_rspec_processes_once() {
             stdout.contains("fast-path hits: 5 across 1 units"),
             "{stdout}"
         );
+        let last: serde_json::Value = serde_json::from_slice(&std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
+        assert_eq!(last["identical"], true);
+        assert_eq!(last["manifest"], manifest);
+        assert_eq!(last["passes"]["route/path"], serde_json::json!({"hits":5,"fallbacks":0}));
+        assert_eq!(last["passes"]["view/link_to"], serde_json::json!({"hits":0,"fallbacks":6}));
     }
     std::fs::remove_dir_all(app).unwrap();
 }
