@@ -24,25 +24,32 @@ if ARGV.first != "worker"
       "LOWRAIL" => arm == "on" ? "1" : "0", "LOWRAIL_STATS" => "",
       "LOWRAIL_SHADOW" => "strict", "ENDPOINT_MUTATION" => mutation,
       "RUBYOPT" => "-I#{lib} -rlowrail/setup"}
+    if ENV["SEALED_RENDERER_STAGE"]
+      env.merge!("LOWRAIL" => "0", "RUBYOPT" => nil,
+        "SEALED_RENDERER_ARM" => arm, "SEALED_RENDERER_STAGE" => ENV.fetch("SEALED_RENDERER_STAGE"))
+    end
     env["LOWRAIL_ROOT"] = File.join(output, "root") if build
     ok = system(env, RbConfig.ruby, File.expand_path(__FILE__), "worker", File.join(output, "#{arm}.json"),
       chdir: app, out: File.join(output, "#{arm}.log"), err: [:child, :out])
     abort "#{arm} worker failed; inspect private log" unless ok
   end
   off, on = %w[off on].map { JSON.parse(File.read(File.join(output, "#{_1}.json"))) }
-  raise "specimen count" unless off.fetch("responses").size == 144 && on.fetch("responses").size == 144
+  count = ENV["SEALED_RENDERER_STAGE"] ? 192 : 144
+  raise "specimen count" unless off.fetch("responses").size == count && on.fetch("responses").size == count
   off.fetch("responses").zip(on.fetch("responses")).each_with_index do |(left, right), index|
     next if left == right
     fields = (left.keys | right.keys).reject { left[_1] == right[_1] }
     abort "specimen #{index} differs: #{fields.join(', ')}; private raw responses retained"
   end
-  if build && on.fetch("endpoint_hits").empty?
+  if ENV["SEALED_RENDERER_STAGE"]
+    raise "specimen coverage missing" unless on.fetch("specimen_hits").positive? && off.fetch("specimen_hits").zero?
+  elsif build && on.fetch("endpoint_hits").empty?
     raise "default source coverage missing" if on.fetch("hits").empty?
   else
     counts = on.fetch(%w[none render_subscriber].include?(mutation) ? "endpoint_hits" : "endpoint_fallbacks")
     raise "endpoint coverage missing" unless counts.size == 2 && counts.values.all?(&:positive?)
   end
-  puts "144 isolated pairs identical (#{mutation}): status, body, ALL headers, ordered SQL, controller/render event trace"
+  puts "#{count} isolated pairs identical (#{mutation}): status, body, ALL headers, ordered SQL, controller/render event trace"
   puts "on hits=#{on.fetch('hits').inspect}; fallbacks=#{on.fetch('fallbacks').inspect}"
   exit
 end
@@ -106,6 +113,14 @@ class EndpointEvents
     state = controller && {"action" => controller.action_name,
       "articles_assigned" => controller.instance_variable_defined?(:@articles),
       "article_assigned" => controller.instance_variable_defined?(:@article)}
+    if state && ENV["SEALED_RENDERER_STAGE"]
+      article = controller.instance_variable_get(:@article)
+      state["assign_keys"] = controller.view_assigns.keys.sort
+      state["article"] = article && [article.class.name, article.attributes,
+        article.persisted?, article.association(:comments).loaded?]
+      state["transaction_open"] = ActiveRecord::Base.connection.transaction_open?
+      state["query_cache"] = ActiveRecord::Base.connection.query_cache_enabled
+    end
     events << [boundary, name, value(payload), state]
   end
   def start(name, id, payload) = record("start", name, payload)
@@ -197,9 +212,16 @@ shapes = [{}, {"HTTP_ACCEPT" => accept}, {"HTTP_ACCEPT" => "text/html"},
   {"HTTP_USER_AGENT" => "Mozilla/5.0 Chrome/130.0.0.0 Safari/537.36"}, {"QUERY_STRING" => "extra=1"}]
 # Materialize all formats outside every comparison, symmetrically.
 paths.product(shapes).each { |path, headers| request.call(path, headers, nil, false) }
+if ENV["SEALED_RENDERER_STAGE"]
+  require_relative "sealed_renderer"
+  SealedRenderer.install(ENV.fetch("SEALED_RENDERER_STAGE")) if ENV.fetch("SEALED_RENDERER_ARM") == "on"
+  paths.product(shapes).each { |path, headers| request.call(path, headers, nil, false) }
+end
 armed = true
 responses = []
-%w[stock escaped empty].each do |fixture|
+fixtures = %w[stock escaped empty]
+fixtures << "empty_comments" if ENV["SEALED_RENDERER_STAGE"]
+fixtures.each do |fixture|
   Article.transaction(requires_new: true) do
     if fixture == "escaped"
       Article.update_all(title: "literal <&\"' Ω", body: "line <&\"' Ω\n" * 30)
@@ -207,6 +229,8 @@ responses = []
     elsif fixture == "empty"
       Comment.delete_all
       Article.delete_all
+    elsif fixture == "empty_comments"
+      Comment.delete_all
     end
     first = request.call("/articles", {}, nil, false)
     cookie = first.fetch("headers").fetch("set-cookie").split(";").first
@@ -225,4 +249,6 @@ endpoint_fallbacks = units.to_h do |unit|
   [unit.fetch("target"), Lowrail::Stats.unit_fallbacks.fetch(unit.fetch("id").to_s, 0)]
 end
 File.write(destination, JSON.generate({responses: responses, endpoint_hits: endpoint_hits, endpoint_fallbacks: endpoint_fallbacks,
-  hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks}))
+  specimen_hits: defined?(SealedRenderer) ? SealedRenderer.hits : 0,
+  hits: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {},
+  fallbacks: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_fallbacks : {}}))

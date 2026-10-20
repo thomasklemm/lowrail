@@ -45,6 +45,28 @@ integrated by the publication rebase; see the explicit provenance boundary.
    822.005 → 425.004 interpreter Ir/check and 371 → 140 YJIT. Both modes'
    arm cohorts pass every control. Still no accepted request/native speed win.
 
+## Finite sealed-renderer experiment (2026-10-20)
+
+**2× target missed; no third mini-runtime/bridge tier is promoted.** Five
+cumulative specimens each pass 192 isolated body/all-header/ordered-SQL/
+event/assign/state pairs, including empty comments. The final stage also
+passes a side-effecting render subscriber. Pinned-tool interpreter controls
+pass: Rails **8.744456 → 6.120350 M Ir** (−30.016%, about 1.43×),
+**2244.30 → 1465.73 objects/request**. Historical 5.473809 M L2_events remains
+non-equivalent; the conservative restoration is not a minimal observer tax.
+
+Form expansion saves 1.296 M, then filters/token-tag/collection composition
+save 0.045/0.081/0.217 M. AR/security/fanout boundary diagnostics price
+1.286/1.120/0.270 M, but overlap and perturb work +3.37%: no additive or
+irreducible-floor claim. Remaining Rails integration/live helpers on top of
+real AR/security block this specimen, not event fanout alone. Another roughly
+**1.75 M Ir** is needed to halve Rails' work. This finite result is not a
+proof that every more aggressive sealed renderer must fail. Keep real
+AR/security/events, existing tiers, default and quarantine unchanged; no
+runtime implementation follows. The single YJIT cohort is rejected: 5/48
+workers compile in measured windows and GC-excluded A/A misses zero; no
+retry or clean-arm salvage. [Experiment, ablations and controls](passes/sealed-renderer.md).
+
 ## Architecture
 
 | Item | State | Why / evidence |
