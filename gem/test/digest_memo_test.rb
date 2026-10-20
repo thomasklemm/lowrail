@@ -131,7 +131,7 @@ class DigestMemoTest < Minitest::Test
       out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--digest-memo")
       assert status.success?, "#{err}\n#{out}"
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
-      assert ledger.any? { _1["pass"] == "digest/file_memo" && _1["outcome"] == "refined gem source" }
+      assert ledger.any? { _1["pass"] == "digest/file_memo" && _1["outcome"] == "refused" && _1["reason"] == "refinements" && _1["detail"] == "refined gem source" }
       result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "test", "LOWRAIL" => "1"})
         require_relative "config/environment"
         puts JSON.generate(digest: RailsVite::Manifest.new("unused").digest)

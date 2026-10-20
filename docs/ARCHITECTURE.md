@@ -32,7 +32,8 @@ PLAN.md stays the "why"; this file is the "how a pass plugs in".
 
 ## 2. Before migration: two pass kinds, wired by hand
 
-Steps 1–2 now use `src/passes.rs` and `exe/lowrail-runtime-build`.
+Steps 1–3 now use `src/passes.rs`, `exe/lowrail-runtime-build` and the shared
+ledger schema documented in FORMATS.md.
 The four old per-pass build executables below were internal drivers; no
 benchmark calls them. They have been removed and the pass notes updated.
 The table and pain points record the pre-migration design.
@@ -142,8 +143,9 @@ across requests; refusal reasons are recorded, never silent.
 
 ## 5. Migration
 
-Order matters because `lowrail.rb` and `guard.rb` are being changed by the
-base-cost work (`docs/bench.md`); the migration starts after that lands.
+Steps 1–3 are implemented without changing runtime delivery or installation.
+Step 4 must wait for the base-cost work (`docs/bench.md`) in `lowrail.rb`
+and `guard.rb` to land.
 
 1. Pass registry in Rust (`src/passes.rs`: name, kind, default, builder) and
    `--passes`; keep the old flags as aliases for one release.

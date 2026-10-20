@@ -152,6 +152,50 @@ digest calls across 400 traced requests/app**, unlike ARGOS's version proc.
 Configuration binding and serializer/prop descriptors are measured candidates;
 dynamic users, props, SQL and SSR output must remain per request.
 
+### Pass-build migration, steps 1–3 (2026-10-20)
+
+The Rust registry owns pass selection (`--passes default,+name,-name`, with
+legacy flags retained), ordering and summary. All selected runtime builders
+share one boot and return data; Rust merges units and the shared reason-coded
+ledger before the compiler writes the manifest. Runtime delivery, guards and
+installation are unchanged; architecture step 4 remains separate.
+
+Before/after evidence is saved in [build-pass-equivalence.json](build-pass-equivalence.json):
+every pass's units, lowered/refused diagnostics, hits and fallbacks, including
+explicit zeros, corpus pins, timings and comparison fingerprints. Ruby 4.0.7,
+seed 41231, `PARALLEL_WORKERS=1`, local Redis/PostgreSQL, cached facts. Baseline
+is [c57b26a](https://github.com/thomasklemm/lowrail/commit/c57b26a29ec4f13e053413f761ff8cfe77ca1acc).
+Default and all-pass configurations each cover **779 outcomes**: blog 21,
+Campfire 634 (2 skips), PingCRM 1 + 25 browser, Redprints 50 + 12 browser,
+starter kit 36. Outcomes and ordered same-thread SQL match across all four
+baseline/candidate × off/on runs. Diagnostic identities/multiplicities and
+per-pass hits/fallbacks match, not just totals. No unit ids changed: traversal
+and runtime pass order were retained. Manifest comparison allows Ruby's
+method-fact enumeration order and the changed builders' own source hashes;
+compiled-file entries, templates and other payload values match.
+
+| App | Default build seconds, before → after | All passes, before → after |
+|---|---|---|
+| real-blog | 4.49 → 5.05 | 9.92 → 6.98 |
+| Campfire | 16.44 → 17.44 | 27.79 → 19.12 |
+| PingCRM | 4.61 → 4.89 | 9.61 → 6.09 |
+| Redprints CFP | 10.88 → 10.70 | 23.54 → 14.22 |
+| React Starter Kit | 4.12 → 3.97 | 9.88 → 5.16 |
+
+Single wall-clock observations, not a controlled speed claim. Measured boots:
+default **2 → 2**, all passes **6 → 3** (oracle, runtime builders, compiler);
+fresh facts add one. Other-thread SQL remains advisory: nine PingCRM browser
+tests in both versions, and one Campfire default test after migration. Their
+own-thread traces match. Corpus digest/URI coverage is zero; Campfire's
+default debugger keeps memo/preload hits at zero in both versions. Gem fixtures
+exercise these behaviors; no new support claim follows from zero-hit gates.
+
+`cargo test --locked`: **30 unit + 3 integration passed**; release build passed.
+Full gem suite from the repository root: **77 runs, 1418 assertions, 0 failures,
+0 errors, 3 skips** (optional minitest-mock and two tests expecting the separate
+`real-blog-r4` directory). Selection and unit/ledger merging have Rust tests;
+ledger normalization preserves detail, copies and survey metadata.
+
 ### Per-file loader policy (2026-10-20)
 
 Build captures the app's real compiler calls, including Freezolite's temporary

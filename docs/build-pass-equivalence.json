@@ -1,0 +1,1290 @@
+{
+  "date": "2026-10-20",
+  "baseline_commit": "c57b26a29ec4f13e053413f761ff8cfe77ca1acc",
+  "candidate": "5128703 + 861ce69 + shared-ledger-schema working tree",
+  "ruby": "4.0.7",
+  "seed": 41231,
+  "parallel_workers": 1,
+  "corpus_pins": {
+    "campfire": "https://github.com/basecamp/once-campfire@af4dd9fd599c65e0e0fc1f614ee469f70156ddf5:.",
+    "pingcrm": "https://github.com/ledermann/pingcrm@22464f822dcf59c4425993dd623780ad44497fda:.",
+    "react-starter-kit": "https://github.com/inertia-rails/react-starter-kit@f8081935e9bda68f8ef1ec53dc7eed19c819ee68:.",
+    "real-blog": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+    "redprints-cfp": "https://github.com/evilmartians/redprints-cfp@6080fc24fbf0015f7e5a5ae932e903731502c65a:."
+  },
+  "default": "view/link_to,route/path",
+  "all": "default,+memo,+digest_memo,+preload_plans,+ar_instantiate,+ar_plans",
+  "notes": [
+    "Boot counts measured by a temporary initializer recording LOWRAIL_BOOT_LOG; cached facts. Fresh facts add one boot.",
+    "Build seconds are single wall-clock observations, not controlled performance claims.",
+    "Manifest comparison sorts facts/originals arrays (Ruby reflection order), normalizes the archived baseline gem path, and checks rather than compares content hashes of the two edited builder files. Other values, compiled files, templates and ids match.",
+    "Per-pass values are shared before/after only after asserting exact equality; every absent pass is explicitly zero.",
+    "Ledger lowered includes former eligible runtime outcomes; detail and copies are retained when comparing identities.",
+    "SQL equality compares ordered full same-thread lines and digests across baseline/candidate and LOWRAIL=0/1. Other-thread SQL remains advisory.",
+    "Campfire keeps its default debugger: memo/preload units have zero hits in this gate; no new support or speed claim.",
+    "Digest and URI units have zero corpus coverage; the gem suite exercises digest fixtures and memo behavior.",
+    "No unit-id renumbering occurred: source traversal and digest/preload/instantiate/plans runtime order were preserved."
+  ],
+  "build_and_verify": [
+    {
+      "app": "real-blog",
+      "mode": "default",
+      "suite": "non-system",
+      "tests": 21,
+      "outcomes": {
+        "pass": 21
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "cc8958cfb2005639234541a9658e5ab587940e2d3e84d915d4d8ed9eaf8d29b1",
+        "canonical_ledger": "18be84355b1b0d33ba51095962c8a13276dbb3aa94374413553d1beceda62a9e",
+        "outcomes": "f97d49a002a413796426ff82449fca180c0003b7cfa59e5b81962c146cd09c0b",
+        "same_thread_sql": "3142731bce9d31c681052c8a7953e9eea8c16bdf03153a34455b303465b0bf9a"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 4.493761713000026,
+        "boots": 2
+      },
+      "after": {
+        "build_seconds": 5.051246223999897,
+        "boots": 2
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 5,
+          "lowered": 9,
+          "refused": 0,
+          "hits": 30,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 6,
+          "lowered": 10,
+          "refused": 0,
+          "hits": 27,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "real-blog",
+      "mode": "all",
+      "suite": "non-system",
+      "tests": 21,
+      "outcomes": {
+        "pass": 21
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "ad7c2ffce56f886cf2e1b43d68c9d42a08bde9d8ed5eb1bc75a84e8ed0823400",
+        "canonical_ledger": "488f42dbb83f3acc672b468c588ce8e13d6ba98c30a4c49385f82b0608a1ddff",
+        "outcomes": "f97d49a002a413796426ff82449fca180c0003b7cfa59e5b81962c146cd09c0b",
+        "same_thread_sql": "3142731bce9d31c681052c8a7953e9eea8c16bdf03153a34455b303465b0bf9a"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 9.923104443999932,
+        "boots": 6
+      },
+      "after": {
+        "build_seconds": 6.9840636970000105,
+        "boots": 3
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 5,
+          "lowered": 9,
+          "refused": 0,
+          "hits": 30,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 6,
+          "lowered": 10,
+          "refused": 0,
+          "hits": 27,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 1,
+          "lowered": 2,
+          "refused": 0,
+          "hits": 1,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 2,
+          "lowered": 2,
+          "refused": 0,
+          "hits": 41,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 2,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 2,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "campfire",
+      "mode": "default",
+      "suite": "non-system",
+      "tests": 634,
+      "outcomes": {
+        "pass": 632,
+        "skip": 2
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "98f1a494b59bc058fe819c3632f6cdb917c7063de99a0155253eb1cc1645e5fa",
+        "canonical_ledger": "e8148f9dc5661943360066c1b0aea677cd4a1bbb6b1f2086d62401551c28939d",
+        "outcomes": "e1d6ebf6a69d8ae268e97727f07d50ecff60df19688175fa819785107f4c00eb",
+        "same_thread_sql": "7900fcdc160db4a309a29f452bea1b4d3b7934c0d3446ff6fefdd1afd8c7e795"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": [
+          "sql traces on other threads: 1 tests differ [advisory: thread interleaving]"
+        ]
+      },
+      "before": {
+        "build_seconds": 16.436969474999955,
+        "boots": 2
+      },
+      "after": {
+        "build_seconds": 17.441123917999903,
+        "boots": 2
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 1,
+          "lowered": 1,
+          "refused": 3,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 59,
+          "lowered": 108,
+          "refused": 54,
+          "hits": 7200,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "campfire",
+      "mode": "all",
+      "suite": "non-system",
+      "tests": 634,
+      "outcomes": {
+        "pass": 632,
+        "skip": 2
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "99b4c61b7199ef220d1a602b47372fd83fa137e8870e935b55cea8cfacd482cc",
+        "canonical_ledger": "e4a71f3af703de2201dd4678bf6e718d4a3df606351634df2791653c3a89065f",
+        "outcomes": "e1d6ebf6a69d8ae268e97727f07d50ecff60df19688175fa819785107f4c00eb",
+        "same_thread_sql": "7900fcdc160db4a309a29f452bea1b4d3b7934c0d3446ff6fefdd1afd8c7e795"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 27.794129714000064,
+        "boots": 6
+      },
+      "after": {
+        "build_seconds": 19.121638435000023,
+        "boots": 3
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 1,
+          "lowered": 1,
+          "refused": 3,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 59,
+          "lowered": 108,
+          "refused": 54,
+          "hits": 7200,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 22,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 1,
+          "lowered": 1,
+          "refused": 1,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 1,
+          "lowered": 42,
+          "refused": 18,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 19,
+          "lowered": 19,
+          "refused": 0,
+          "hits": 2651,
+          "fallbacks": 3129
+        },
+        "active_record/ar_plans": {
+          "units": 1,
+          "lowered": 8,
+          "refused": 52,
+          "hits": 677,
+          "fallbacks": 367
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 66,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "pingcrm",
+      "mode": "default",
+      "suite": "non-system",
+      "tests": 1,
+      "outcomes": {
+        "pass": 1
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "ec2cea26d17fe4e2ba3a58b42d9bf03b7bb2d324cfe01ecd6e835deeb1b9602a",
+        "canonical_ledger": "a780fafa8000ee80482ace988e836128798f756f6416edad22077683c6286fe3",
+        "outcomes": "2ef44b508ccf592b58f4f6841a900fde2111651e46f385e783363237ce3255a8",
+        "same_thread_sql": "739a0c24d9828a3176d641f78c8e8ab7422af5e18b241e20a918c2d8810a699d"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 4.606589224000004,
+        "boots": 2
+      },
+      "after": {
+        "build_seconds": 4.891766980000284,
+        "boots": 2
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 4,
+          "lowered": 30,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "pingcrm",
+      "mode": "all",
+      "suite": "non-system",
+      "tests": 1,
+      "outcomes": {
+        "pass": 1
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "f2c6283f2c88cd30351338180b438be163a6b164384b3fa0fd2eb86a5145838a",
+        "canonical_ledger": "a290ac3514a3eabf9a265b293d500bff9d15cc276aff95f85995e44fa2887ce1",
+        "outcomes": "2ef44b508ccf592b58f4f6841a900fde2111651e46f385e783363237ce3255a8",
+        "same_thread_sql": "739a0c24d9828a3176d641f78c8e8ab7422af5e18b241e20a918c2d8810a699d"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 9.605388941000001,
+        "boots": 6
+      },
+      "after": {
+        "build_seconds": 6.085620028999983,
+        "boots": 3
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 4,
+          "lowered": 30,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 1,
+          "lowered": 1,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 1,
+          "lowered": 12,
+          "refused": 10,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 7,
+          "lowered": 7,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 22,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 13,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "redprints-cfp",
+      "mode": "default",
+      "suite": "non-system",
+      "tests": 50,
+      "outcomes": {
+        "pass": 50
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "a43cc435aeb4b6b5a5764dd9f7931c52d64651ea38d4a74cf6e0e88b10fafa92",
+        "canonical_ledger": "75b1966a5f68ab340cef7fa191c4bae3a635b90fcd3d6c4b4f0e3c9e9685ab09",
+        "outcomes": "73abe77480f4789716d8a76e4bf3f952efc2f46462add5db7419e43093ff9172",
+        "same_thread_sql": "2862e79b1ccaa154009df768e55e1ef2d87dcdea6f235f9a449bede5d6e1f8f1"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 10.877129534999995,
+        "boots": 2
+      },
+      "after": {
+        "build_seconds": 10.698800883999866,
+        "boots": 2
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 1,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 14,
+          "lowered": 25,
+          "refused": 2,
+          "hits": 25,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "redprints-cfp",
+      "mode": "all",
+      "suite": "non-system",
+      "tests": 50,
+      "outcomes": {
+        "pass": 50
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "442493a5df70fa71d64378e5120b0403cbe26babebcfc9dfa19c22d1aa86efeb",
+        "canonical_ledger": "e1b9e145e1ab9c14da79a3630c7fcbe8e944a844657595e6dd1963991257137f",
+        "outcomes": "73abe77480f4789716d8a76e4bf3f952efc2f46462add5db7419e43093ff9172",
+        "same_thread_sql": "2862e79b1ccaa154009df768e55e1ef2d87dcdea6f235f9a449bede5d6e1f8f1"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 23.5396209889999,
+        "boots": 6
+      },
+      "after": {
+        "build_seconds": 14.21712376000005,
+        "boots": 3
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 1,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 14,
+          "lowered": 25,
+          "refused": 2,
+          "hits": 25,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 1,
+          "lowered": 1,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 1,
+          "lowered": 38,
+          "refused": 11,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 21,
+          "lowered": 21,
+          "refused": 0,
+          "hits": 227,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 49,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 31,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "react-starter-kit",
+      "mode": "default",
+      "suite": "non-system",
+      "tests": 36,
+      "outcomes": {
+        "pass": 36
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "0139a587ddd9b38911c47cef2cfdfc2c82203c78bf4edad81dafede5b122d96b",
+        "canonical_ledger": "2e7aebb818e188bef7a5d8da3c6ea217b0f2cf4091dd650f4545d2865ddabb96",
+        "outcomes": "58c6fb3ee6d1cd33721143b689353f5be0a4633c863dc82955f554dc39472aad",
+        "same_thread_sql": "dfc091382b699e0ce73a6dfe450d592cbe7690908a70a18365ef7fa4fd1f07fb"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 4.119845987999952,
+        "boots": 2
+      },
+      "after": {
+        "build_seconds": 3.9704599639999287,
+        "boots": 2
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 2,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 8,
+          "lowered": 23,
+          "refused": 3,
+          "hits": 25,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "react-starter-kit",
+      "mode": "all",
+      "suite": "non-system",
+      "tests": 36,
+      "outcomes": {
+        "pass": 36
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "01089c8520946bd750163beabe50a3a0882efb9d273c1b144568678732b6f815",
+        "canonical_ledger": "a08bdc2a0c30f4db4488dbb3ebe217f5f628a8643254ba630a1324f02b3e4ec3",
+        "outcomes": "58c6fb3ee6d1cd33721143b689353f5be0a4633c863dc82955f554dc39472aad",
+        "same_thread_sql": "dfc091382b699e0ce73a6dfe450d592cbe7690908a70a18365ef7fa4fd1f07fb"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "before": {
+        "build_seconds": 9.883826725999938,
+        "boots": 6
+      },
+      "after": {
+        "build_seconds": 5.1626331630000095,
+        "boots": 3
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 2,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "units": 8,
+          "lowered": 23,
+          "refused": 3,
+          "hits": 25,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "units": 1,
+          "lowered": 1,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "units": 1,
+          "lowered": 2,
+          "refused": 0,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "units": 2,
+          "lowered": 2,
+          "refused": 0,
+          "hits": 80,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 2,
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "units": 0,
+          "lowered": 0,
+          "refused": 3,
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    }
+  ],
+  "supplemental_browser_verify": [
+    {
+      "app": "pingcrm",
+      "mode": "default",
+      "suite": "system",
+      "tests": 25,
+      "outcomes": {
+        "pass": 25
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "ec2cea26d17fe4e2ba3a58b42d9bf03b7bb2d324cfe01ecd6e835deeb1b9602a",
+        "canonical_ledger": "a780fafa8000ee80482ace988e836128798f756f6416edad22077683c6286fe3",
+        "outcomes": "b495632e5c747ab1d8235c212b1fd1bde64909e2286852d2a9b3317c69249000",
+        "same_thread_sql": "6c5cde0573032e23ae298951882b7adfb419130aa92689f6ba198a14a34471f9"
+      },
+      "sql_trace_advisories": {
+        "before": [
+          "sql traces on other threads: 9 tests differ [advisory: thread interleaving]"
+        ],
+        "after": [
+          "sql traces on other threads: 9 tests differ [advisory: thread interleaving]"
+        ]
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "hits": 11,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "pingcrm",
+      "mode": "all",
+      "suite": "system",
+      "tests": 25,
+      "outcomes": {
+        "pass": 25
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "f2c6283f2c88cd30351338180b438be163a6b164384b3fa0fd2eb86a5145838a",
+        "canonical_ledger": "a290ac3514a3eabf9a265b293d500bff9d15cc276aff95f85995e44fa2887ce1",
+        "outcomes": "b495632e5c747ab1d8235c212b1fd1bde64909e2286852d2a9b3317c69249000",
+        "same_thread_sql": "6c5cde0573032e23ae298951882b7adfb419130aa92689f6ba198a14a34471f9"
+      },
+      "sql_trace_advisories": {
+        "before": [
+          "sql traces on other threads: 9 tests differ [advisory: thread interleaving]"
+        ],
+        "after": [
+          "sql traces on other threads: 9 tests differ [advisory: thread interleaving]"
+        ]
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "hits": 11,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "hits": 7,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "hits": 222,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "redprints-cfp",
+      "mode": "default",
+      "suite": "system",
+      "tests": 12,
+      "outcomes": {
+        "pass": 12
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "a43cc435aeb4b6b5a5764dd9f7931c52d64651ea38d4a74cf6e0e88b10fafa92",
+        "canonical_ledger": "75b1966a5f68ab340cef7fa191c4bae3a635b90fcd3d6c4b4f0e3c9e9685ab09",
+        "outcomes": "381caf3fec6dc03e3b6d1efe8e9717cb1e66fcb22874bcbeb9940c79c5a06b3a",
+        "same_thread_sql": "3103736d62be9f9d5da6bbb4535a2225a759cfcca6ff44c44b452fb6442690d8"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "hits": 19,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    },
+    {
+      "app": "redprints-cfp",
+      "mode": "all",
+      "suite": "system",
+      "tests": 12,
+      "outcomes": {
+        "pass": 12
+      },
+      "checks": {
+        "manifest_including_ids_equivalent": true,
+        "ledger_identities_and_multiplicities_identical": true,
+        "per_pass_hits_and_fallbacks_identical": true,
+        "outcomes_identical_all_four_runs": true,
+        "same_thread_ordered_sql_identical_all_four_runs": true
+      },
+      "fingerprints": {
+        "canonical_manifest": "442493a5df70fa71d64378e5120b0403cbe26babebcfc9dfa19c22d1aa86efeb",
+        "canonical_ledger": "e1b9e145e1ab9c14da79a3630c7fcbe8e944a844657595e6dd1963991257137f",
+        "outcomes": "381caf3fec6dc03e3b6d1efe8e9717cb1e66fcb22874bcbeb9940c79c5a06b3a",
+        "same_thread_sql": "3103736d62be9f9d5da6bbb4535a2225a759cfcca6ff44c44b452fb6442690d8"
+      },
+      "sql_trace_advisories": {
+        "before": [],
+        "after": []
+      },
+      "per_pass_before_and_after": {
+        "view/link_to": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "route/path": {
+          "hits": 19,
+          "fallbacks": 0
+        },
+        "memo/uri_join": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "memo/sha256": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "digest/file_memo": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/preload_plans": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/instantiate": {
+          "hits": 147,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans": {
+          "hits": 0,
+          "fallbacks": 0
+        },
+        "active_record/ar_plans_survey": {
+          "hits": 0,
+          "fallbacks": 0
+        }
+      }
+    }
+  ]
+}

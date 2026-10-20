@@ -4,6 +4,7 @@
 //! under app/ (lowered sources compiled by `gem/exe/lowrail-compile` and
 //! served through load_iseq). Every site a pass looked at is in ledger.json.
 
+mod ledger;
 mod runtime;
 
 use std::collections::BTreeMap;
@@ -148,14 +149,15 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
 
     for output in runtime::run(app, env, passes, &denied)? {
         let sources = runtime::merge(&mut units, &mut ledger, output)?;
-        for (index, source) in sources.into_iter().enumerate() {
-            let dest = src_dir.join(format!("runtime__{index}.rb"));
+        for source in sources {
+            let dest = src_dir.join(format!("runtime__{}.rb", files.len()));
             let original = dest.with_extension("rb.orig");
             std::fs::write(&dest, source.code).map_err(|e| e.to_string())?;
             std::fs::write(&original, source.original).map_err(|e| e.to_string())?;
             files.push(json!({"path": source.path, "lowered": dest, "original": original}));
         }
     }
+    let ledger: Vec<_> = ledger.into_iter().map(ledger::normalize).collect();
     let input = json!({
         "out": dir,
         "rails_env": env,
@@ -189,12 +191,15 @@ fn summary(ledger: &[Value], units: &[Value], templates: usize, files: usize, di
         let n_units = units.iter().filter(|u| u["pass"] == pass).count();
         s.push_str(&format!("{pass}: {lowered} of {} sites lowered, {n_units} units\n", sites.len()));
     }
-    let mut reasons: BTreeMap<String, usize> = BTreeMap::new();
-    for l in ledger.iter().filter(|l| l["outcome"] != "lowered") {
-        *reasons.entry(format!("{}: {}", l["pass"].as_str().unwrap_or(""), l["outcome"].as_str().unwrap_or(""))).or_default() += 1;
+    let mut reasons = BTreeMap::new();
+    for l in ledger.iter().filter(|l| l["outcome"] == "refused") {
+        *reasons.entry((l["pass"].as_str().unwrap(), l["reason"].as_str().unwrap())).or_insert(0) += 1;
     }
-    for (r, n) in reasons {
-        s.push_str(&format!("  {n:4}  {r}\n"));
+    if !reasons.is_empty() {
+        s.push_str("Refusals (unique ledger sites; see detail/copies in ledger):\n  count  pass                            reason\n");
+    }
+    for ((pass, reason), n) in reasons {
+        s.push_str(&format!("  {n:5}  {pass:32} {reason}\n"));
     }
     s.push_str(&format!("{templates} templates and {files} Ruby files lowered; ledger: {}", dir.join("ledger.json").display()));
     s

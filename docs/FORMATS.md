@@ -300,6 +300,10 @@ Units: `kind` is `"template"` (code served through the template seam,
 `file` is the template identifier) or `"file"` (a Ruby file served through
 `load_iseq`); `pass` names the lowering pass (`view/link_to`, `route/path`);
 `sites` counts lowered call sites. Unit ids are unique across passes.
+Method/model variants retain `kind: "runtime"` and their existing pass-specific
+payloads (`preload_facts`, `ar_instantiate`, `ar_plans`). They need no compiled
+file. The runtime install contract is unchanged by migration steps 1–3;
+the target `target`/`data` unit layout is not introduced here.
 
 Facts: a method fact holds when `receiver#method` (or `receiver.method` with
 `"singleton": true`) resolves to that owner, source location and visibility
@@ -341,22 +345,87 @@ compiling (the current passes analyze disk source), or when its SHA-256 differs 
 the pass lowered. `templates` and `rails_env` are copied to the manifest;
 template units need no compiled file.
 
+### Build orchestration and private runtime-builder protocol
+
+`src/passes.rs` declares pass names, source/runtime kind, defaults, aliases
+and builders in execution order. Source passes run over each template/file
+in that order (link_to before routes). Runtime passes run in one
+`bundle exec ruby gem/exe/lowrail-runtime-build` process, with the app already
+booted and eager loaded. No runtime process is launched when none is selected.
+
+Rust sends one JSON request on stdin:
+`{"builders":[{"file":"preload_build","module":"PreloadBuild"}],"denied":[]}`.
+The registry supplies these names, not app input. Each module's
+`build(denied: [])` returns `{units:, ledger:}` without reading/writing build
+artifacts. Stdout returns an array of those results in registry order; app
+stdout is redirected to stderr before boot so logging cannot corrupt JSON.
+
+Digest lowering additionally returns `files: [{path:, original:, parts:}]`.
+Each part is literal source text or a numeric index into that result's units.
+Rust allocates final ids and renders only those numeric parts; source strings
+are never searched/replaced for ids. This preserves arbitrary Ruby literals
+and UTF-8 source. Builders neither allocate global ids nor write source files.
+
+Rust merges units/diagnostics, assigns runtime ids after the source ids,
+normalizes the combined ledger, and writes `units.json` and `ledger.json`
+once. The compiler observes the app's per-file loader policy in its own boot,
+compiles lowered files and writes `manifest.json` once. Runtime units pass
+through compilation unchanged. There are no per-pass artifact rewrites.
+With cached facts, a default build has two app boots (oracle + compiler);
+an all-pass build has three (plus the shared runtime builder), down from six.
+A fresh facts dump adds one boot in either design.
+
 ## ledger.json — every site a pass looked at
 
-Written by `lowrail build`. One entry per (file, line, helper, outcome):
+Written once by `lowrail build`, using the same schema for all passes:
 
 ```json
-[{"template": "/abs/app/views/articles/_article.html.erb", "line": 13, "pass": "route/path",
-  "helper": "edit_article_path", "outcome": "lowered", "copies": 2},
- {"file": "/abs/app/models/webhook.rb", "line": 45, "pass": "route/path",
-  "helper": "message_path", "outcome": "Webhook#message_path is defined by Webhook, not the route set"}]
+[{"pass": "route/path", "target": "/abs/app/views/articles/_article.html.erb", "line": 13,
+  "site": "edit_article_path", "outcome": "lowered", "reason": "lowered", "detail": "lowered", "copies": 2},
+ {"pass": "route/path", "target": "/abs/app/models/webhook.rb", "line": 45,
+  "site": "message_path", "outcome": "refused", "reason": "overridden_helper",
+  "detail": "Webhook#message_path is defined by Webhook, not the route set", "copies": 1}]
 ```
 
-`template` or `file` names where the site is; `outcome` is `"lowered"` or
-the reason it was not. `copies` > 1 when the same call occurs several times
-in the code a pass saw (a route helper inside a lowered `link_to` appears in
-both its fast path and its fallback). Denylisted units appear as
-`{"line": 0, "helper": "*", "outcome": "denylisted by verify --bisect"}`.
+`target` replaces `file`/`template`/`method`: a source path, model name,
+association label or, for a whole-pass diagnostic, the pass name. `site`
+replaces `helper`/`method`, with `"*"` when no narrower site is known.
+`line` is 0 for non-source diagnostics. `outcome` is **only** `lowered` or
+`refused`; `detail` preserves the complete previous free-text outcome.
+The Rust build boundary normalizes both source and Ruby builder diagnostics.
+
+One entry per diagnostic site/outcome; `copies` (always present, at least 1)
+preserves repeated occurrences in a pass's input. A helper copied into both
+branches of a lowered link_to has two copies but one ledger row. Build's
+single refusal table groups rows by `(pass, reason)` without multiplying
+copies. Runtime `eligible …` and `lowered (homogeneous results only)` outcomes
+now count as lowered, not refused. This describes build eligibility, not
+runtime coverage; use verify hits/fallbacks to establish coverage.
+
+### Reason codes
+
+Codes are stable within each pass. `detail`, not the code, carries variable
+helper/model names, paths, exceptions and probe differences.
+
+| Pass | Refusal codes (meaning follows the code; full explanation in `detail`) |
+|---|---|
+| `view/link_to` | `arity`, `arguments`, `dynamic_options`, `model_class`, `record_url`, `url_shape`, `unsafe_html`, `marker`, `escaping`, `multiline`, `dependency`, `oracle_error`, `probe_error` |
+| `route/path` | `options_hash`, `arguments`, `explicit_receiver`, `context`, `block`, `arity`, `nested`, `multiline`, `reparse`, `non_optimized`, `url_defaults`, `overridden_helper`, `block_helper`, `helper_kind`, `template`, `marker`, `template_encoding`, `probe_mismatch`, `probe_error`, `dependency`, `oracle_error` |
+| `memo/uri_join`, `memo/sha256` | `method_certificate`, `call_certificate`, `request_bound`, `call_shape`, `arity`, `arguments`, `multiline`, `refinements`, `nested`, `regexp_timeout`, `certificate` (uncertified version/implementation/configuration or certificate evaluation failure) |
+| `digest/file_memo` | `refinements`, `multiline`, `digest_version`, `digest_class`, `method_owner`, `path_coercion`, `file_implementation`, `method_alias`, `native_method` |
+| `active_record/preload_plans` | `missing_reflection`, `through`, `polymorphic`, `owner_scope`, `scope_type`, `scope_certificate`, `composite_key`, `abstract_target`, `default_scope`, `reflection_constructor`, `association_constructor`, `scope_constructor`, `relation_constructor`, `sti`, `deprecated`, `framework_implementation` |
+| `active_record/instantiate` | `load_override`, `dispatch_override`, `builder_override`, `rails_implementation`, `builder_dependency`, `schema_context` |
+| `active_record/ar_plans` | `no_scope`, `owner_scope`, `scope_source`, `scope_parse`, `scope_location`, `scope_parameters`, `scope_chain`, `scope_dynamic`, `through`, `polymorphic`, `extensions`, `composite_key`, `default_scope`, `sti`, `attribute_reader`, `scope_constructor`, `reflection_constructor`, `relation_constructor`, `scope_column`, `scope_type`, `planning_implementation` |
+| `active_record/ar_plans_survey` | `statement_cache`, `query_certificate`, `query_block`, `where_chain`, `dynamic_predicate`, `predicate_keys`, `predicate_shape`, `dynamic_arguments` |
+
+All passes may use `denylisted` (verify's bisection), `builder_error` (a
+rescued build exception) or `unclassified` (a new unmapped explanation,
+never discarded). Plain successful source/digest sites use `lowered`;
+preload eligibility uses `runtime_tree`, AR scoped readers `scoped_reader`,
+and instantiation `homogeneous_results`.
+The AR query inventory remains under `active_record/ar_plans_survey` (not
+a separately selectable pass); its `receiver`, `shape` and `app` metadata
+are retained. It reports unsupported source queries, never successful units.
 
 ## verify outcomes — `outcomes-<mode>.json`
 
