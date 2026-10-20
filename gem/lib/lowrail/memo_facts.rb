@@ -77,6 +77,9 @@ module Lowrail
       end
       raise "custom string conversion" if String.method(:try_convert).source_location || String.method(:try_convert).original_name != :try_convert
       facts << method_fact(String, :try_convert, singleton: true)
+      timeout = Regexp.method(:timeout)
+      raise "custom regexp timeout getter" if timeout.source_location || timeout.original_name != :timeout
+      facts << method_fact(Regexp, :timeout, singleton: true)
       %i[const_defined? const_get].each do |name|
         schemes = URI.const_get(:Schemes)
         m = schemes.method(name)
@@ -104,6 +107,8 @@ module Lowrail
     # Request/asset/config helpers are residual calls, not boot constants.
     def config
       parser = URI::DEFAULT_PARSER
+      raise "regexp timeouts are observable runtime inputs" unless Regexp.timeout.nil? &&
+        [*parser.regexp.values, URI::RFC3986_Parser::RFC3986_URI, URI::RFC3986_Parser::RFC3986_relative_ref].all? { _1.timeout.nil? }
       raise "mutable/custom URI parser" unless parser.instance_of?(URI::RFC3986_Parser) && parser.frozen? &&
         parser.regexp.frozen? && parser.regexp.values.all?(&:frozen?) && URI::PARSER.equal?(parser)
       escapes = %i[ReservedChars EscapedChars].map { URI.const_get(:Schemes).singleton_class.const_get(_1) }
@@ -113,7 +118,7 @@ module Lowrail
       raise "custom scheme table" unless initial.instance_of?(Hash) && initial.frozen? && initial.empty? &&
         initial.default.nil? && initial.default_proc.nil? && initial.singleton_methods.empty?
       { "version" => URI::VERSION, "ports" => [URI::HTTP::DEFAULT_PORT, URI::HTTPS::DEFAULT_PORT],
-        "scheme_escapes" => escapes,
+        "scheme_escapes" => escapes, "regexp_timeout" => nil,
         "regexp" => parser.regexp.to_h { |k, v| [k.to_s, [v.source, v.options]] },
         "absolute" => [URI::RFC3986_Parser::RFC3986_URI.source, URI::RFC3986_Parser::RFC3986_URI.options],
         "relative" => [URI::RFC3986_Parser::RFC3986_relative_ref.source, URI::RFC3986_Parser::RFC3986_relative_ref.options] }

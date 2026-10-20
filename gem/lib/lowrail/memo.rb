@@ -12,19 +12,61 @@ module Lowrail
     IVGET = Kernel.instance_method(:instance_variable_get)
     IVSET = Kernel.instance_method(:instance_variable_set)
     TRACE_STAT = TracePoint.method(:stat)
+    TIMEOUT = Regexp.method(:timeout)
+    NATIVE_TIMEOUT = TIMEOUT.source_location.nil? && TIMEOUT.original_name == :timeout
     STRING_PRIVATE = String.private_instance_methods(false).sort.freeze
+
+    # TracePoint.stat excludes targeted hooks. Once Ruby tracing may have
+    # become observable, keep this process on the original program forever.
+    module TraceConstructors
+      def new(...)
+        Memo.tracing!
+        super
+      end
+
+      def trace(...)
+        Memo.tracing!
+        super
+      end
+    end
+
+    module TraceActivation
+      def enable(...)
+        Memo.tracing!
+        super
+      end
+    end
     module_function
 
     def install(manifest)
+      unless defined?(@tracing)
+        @tracing = false
+        TracePoint.singleton_class.prepend(TraceConstructors)
+        TracePoint.prepend(TraceActivation)
+        sentinel = Object.new
+        visible = false
+        ObjectSpace.each_object do |object|
+          visible = true if sentinel.equal?(object)
+          @tracing = true if TracePoint === object
+        end
+        # ObjectSpace omits unshareable objects after multi-ractor mode starts.
+        @tracing = true unless visible
+      end
       @units = manifest.units.select { _1["pass"] == "memo/uri_join" }.to_h { [_1.fetch("id"), _1] }
       @prepared = {}
     end
 
+    def tracing!
+      @tracing = true if Ractor.main?
+    end
+
     def join(id, receiver, base, relative)
+      return yield(receiver, base, relative) unless Ractor.main?
       unit = @units[id]
       # Keep traced calls in the original program, including target TracePoints
       # and set_trace_func. Do not hide instrumentation events on cache hits.
-      return yield(receiver, base, relative) unless unit && TRACE_STAT.call.each_value.all? { _1.first.zero? }
+      return yield(receiver, base, relative) unless unit && !@tracing && NATIVE_TIMEOUT && TIMEOUT.call.nil? &&
+        TRACE_STAT.call.each_value.all? { _1.first.zero? }
       state = Guard.state
       # Any method invalidation starts a new memo generation, even if a patch
       # restores the same owner/source line. Never revive an old generation.

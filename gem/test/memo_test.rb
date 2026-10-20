@@ -142,6 +142,10 @@ class MemoTest < Minitest::Test
       joined("http://one.test", "/x").host.replace("poison.test")
       raise "reflection leaked mutable cache" unless joined("http://one.test", "/x").host == "one.test"
       URI::HTTP.send(:remove_method, :instance_variables)
+      targeted_calls = 0
+      targeted = TracePoint.new(:call) { targeted_calls += 1 }
+      targeted.enable(target: URI.method(:join)) { 3.times { joined("http://one.test", "/x") } }
+      raise "lost targeted trace events" unless targeted_calls == 3
       trace_calls = 0
       trace = TracePoint.new(:call) { |t| trace_calls += 1 if t.method_id == :join && t.defined_class == URI.singleton_class }
       trace.enable { 3.times { joined("http://one.test", "/x") } }
@@ -172,6 +176,38 @@ class MemoTest < Minitest::Test
       puts JSON.generate({ injects: $injects, traces: trace_calls, defaults: $defaults, finds: $finds })
     RUBY
     assert_equal({ "injects" => 3, "traces" => 3, "defaults" => 6, "finds" => 6 }, out)
+  end
+
+  def test_timeouts_and_preexisting_or_later_tracing_decline_reuse
+    out = ruby_json(PRELUDE + <<~'RUBY')
+      calls = 0
+      operation = -> { Lowrail::Memo.join(0, URI, "https://one.test", "/x") { |r,b,u| calls += 1; r.join(b,u) } }
+      2.times { operation.call }
+      raise "did not memoize" unless calls == 1
+      Regexp.timeout = 0.1
+      raise "certified timeouts" unless Lowrail::MemoFacts.build["decline"] == "regexp timeouts are observable runtime inputs"
+      3.times { operation.call }
+      raise "cached under timeout" unless calls == 4
+      Regexp.timeout = nil
+      operation.call
+      raise "did not recover" unless calls == 4
+      trace = TracePoint.trace(:call) {}
+      trace.disable
+      Lowrail::Memo.install(manifest)
+      2.times { operation.call }
+      raise "revived after tracing" unless calls == 6
+      # Hooks installed in main must not raise in a foreign ractor.
+      raise "foreign trace" unless Ractor.new { TracePoint.new(:call) {}.enabled? }.value == false
+      puts JSON.generate({ calls: calls })
+    RUBY
+    assert_equal 6, out.fetch("calls")
+    ["trace = TracePoint.new(:call) {}\n", "Ractor.new { 1 }.value\n"].each do |prefix|
+      out = ruby_json(prefix + PRELUDE + <<~'RUBY')
+        2.times { joined("https://one.test", "/x") }
+        puts JSON.generate({ hits: Lowrail::Stats.unit_hits.fetch("0", 0) })
+      RUBY
+      assert_equal 0, out.fetch("hits")
+    end
   end
 
   def test_public_inertia_vite_version_keeps_its_own_file_and_time_semantics
