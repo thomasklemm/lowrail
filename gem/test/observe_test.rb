@@ -24,6 +24,10 @@ class ObserveTest < Minitest::Test
           20.times { assert_equal "a (live)", w.label }
           w.greet("x", loud: true)
           w.greet(:y)
+          w.instance_variable_set(:@sample, "first")
+          w.greet(:z)
+          w.instance_variable_set(:@sample, 9)
+          w.greet(:last)
         end
 
         def test_relation_delegation
@@ -34,14 +38,15 @@ class ObserveTest < Minitest::Test
     RUBY
   }.freeze
 
-  def self.observed_run(samples: 4)
+  def self.observed_run(samples: 4, types_only: false)
     @runs ||= {}
-    @runs[samples] ||= begin
+    @runs[[samples, types_only]] ||= begin
       dir = File.realpath(Dir.mktmpdir("lowrail-obs"))
       LowrailTest.write_rails_app(dir, SUITE)
       obs = File.join(dir, ".lowrail", "observe")
       env = CLEAN_ENV.merge("RUBYOPT" => "-I#{GEM_LIB} -rlowrail/observe", "LOWRAIL" => "0",
                             "LOWRAIL_OBSERVE" => obs, "LOWRAIL_OBSERVE_SAMPLES" => samples.to_s,
+                            "LOWRAIL_OBSERVE_TYPES_ONLY" => types_only ? "1" : "0",
                             "LOWRAIL_OBSERVE_METHODS" => "ActiveRecord::Base#save!,Nope#missing")
       out, err, status = Open3.capture3(env, RUBY, "-Itest", "test/models/widget_test.rb", chdir: dir)
       files = Dir[File.join(obs, "observed-*.json")]
@@ -99,10 +104,22 @@ class ObserveTest < Minitest::Test
     assert_equal({"TrueClass" => 1}, save["returns"])
     assert_equal({}, save["args"], "anonymous ** is not sampled")
     greet = types("Widget", "greet")
-    assert_equal({"other" => {"String" => 1, "Symbol" => 1}, "loud" => {"TrueClass" => 1, "FalseClass" => 1}}, greet["args"])
-    assert_equal({"String" => 1, "NilClass" => 1}, greet["returns"])
+    assert_equal({"other" => {"String" => 1, "Symbol" => 3}, "loud" => {"TrueClass" => 1, "FalseClass" => 3}}, greet["args"])
+    assert_equal({"String" => 1, "NilClass" => 3}, greet["returns"])
+    assert_equal({"String" => 1, "Integer" => 1}, greet["ivars"]["@sample"], "absence must not be recorded as nil")
     # Test methods are not sampled.
     assert_nil types("WidgetTest", "test_label")
+  end
+
+  def test_lightweight_types_only_run_preserves_samples_and_outcomes
+    _dir, data, log, status = self.class.observed_run(types_only: true)
+    assert status.success?, log
+    assert_match(/2 runs, \d+ assertions, 0 failures, 0 errors/, log)
+    refute data.key?("generated_scripts")
+    refute data.key?("defined_after_boot")
+    assert_equal @o["types"].map { |t| t.slice("module", "name", "returns", "args", "ivars") },
+                 data["types"].sort_by { |t| [t["module"], t["singleton"] ? 1 : 0, t["name"]] }
+                   .map { |t| t.slice("module", "name", "returns", "args", "ivars") }
   end
 end
 
@@ -123,8 +140,13 @@ class ObserveCorpusTest < Minitest::Test
       assert status.success?, err + out
       assert_match(/0 failures, 0 errors/, out)
       files = Dir[File.join(obs, "observed-*.json")]
-      assert_equal 1, files.size
-      o = JSON.parse(File.read(files.first))
+      assert_operator files.size, :>=, 1
+      # Rails test preparation may also boot a child process (asset tasks).
+      # Check the process that actually ran the controller suite.
+      o = files.map { |f| JSON.parse(File.read(f)) }.find do |data|
+        data["types"].any? { |t| t["module"] == "ArticlesController" && t["name"] == "show" }
+      end
+      refute_nil o, "no controller samples in #{files.size} process files"
       assert_operator o["defined_after_boot"].size, :>, 1000
       show = o["types"].find { |t| t["module"] == "ArticlesController" && t["name"] == "show" }
       refute_nil show, o["types"].map { |t| t.values_at("module", "name") }.inspect

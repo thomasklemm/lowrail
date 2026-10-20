@@ -1,5 +1,6 @@
 //! Boot-first advisory types. These are not guards and never authorize lowering.
 mod infer;
+mod observed;
 mod rbs;
 #[cfg(test)]
 mod tests;
@@ -29,6 +30,19 @@ pub struct Provenance {
 pub struct Type {
     pub name: String,
     pub provenance: Vec<Provenance>,
+    pub evidence: Evidence,
+    /// Raw class histogram, never a confidence score or a proof.
+    pub samples: BTreeMap<String, u64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Evidence {
+    /// No value check within this analyzed body. The consumer must still
+    /// certify effective method lookup/source and the surrounding execution.
+    ProvenBody,
+    Static,
+    Observed,
 }
 
 impl Type {
@@ -39,7 +53,14 @@ impl Type {
                 source,
                 detail: detail.into(),
             }],
+            evidence: Evidence::Static,
+            samples: BTreeMap::new(),
         }
+    }
+
+    pub fn proven_type(&self) -> Option<&str> {
+        (self.evidence == Evidence::ProvenBody && self.name != "untyped")
+            .then_some(self.name.as_str())
     }
 
     fn inferred(mut self, detail: String) -> Self {
@@ -68,6 +89,9 @@ pub struct Signature {
     pub singleton: bool,
     pub parameters: Vec<Parameter>,
     pub return_type: Type,
+    /// Per-method exit facts, not controller-to-view flow guarantees.
+    pub ivars: BTreeMap<String, Type>,
+    pub observation: Option<crate::observe::MethodTypes>,
     /// Action/callback roles do not imply a particular Ruby return value.
     pub roles: Vec<String>,
 }
@@ -76,12 +100,33 @@ impl Signature {
     pub fn signature(&self) -> String {
         rbs::signature(self)
     }
+
+    /// Stable build-input query: `return`, `arg:name`, or `ivar:@name`.
+    pub fn fact(&self, slot: &str) -> Option<&Type> {
+        if slot == "return" {
+            Some(&self.return_type)
+        } else if let Some(name) = slot.strip_prefix("arg:") {
+            self.parameters.iter().find(|p| p.name == name).map(|p| &p.ty)
+        } else {
+            self.ivars.get(slot.strip_prefix("ivar:")?)
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct Conflict {
+    pub method: String,
+    pub slot: String,
+    pub static_type: String,
+    pub observed_class: String,
+    pub count: u64,
 }
 
 #[derive(Debug, Default, Serialize)]
 pub struct TypeModel {
     pub methods: BTreeMap<String, Signature>,
     pub diagnostics: Vec<String>,
+    pub conflicts: Vec<Conflict>,
 }
 
 pub fn key(receiver: &str, method: &str, singleton: bool) -> String {
@@ -132,6 +177,14 @@ pub fn resolve<'a>(
 }
 
 impl TypeModel {
+    pub fn load(app: &Path, facts: &Facts) -> Result<Self, String> {
+        let mut model = Self::from_facts(facts);
+        if let Some(bytes) = observed::read(app)? {
+            model.merge_observed(facts, &bytes)?;
+        }
+        Ok(model)
+    }
+
     pub fn from_facts(facts: &Facts) -> Self {
         let mut out = Self::default();
         for model in &facts.models {
@@ -281,6 +334,8 @@ impl TypeModel {
                     ty: Type::new("untyped", Source::BootFact, "parameters not recorded"),
                 }],
                 return_type: ty,
+                ivars: BTreeMap::new(),
+                observation: None,
                 roles: vec![],
             })
     }
@@ -293,6 +348,15 @@ impl TypeModel {
         self.methods
             .get(query)
             .or_else(|| self.get("Lowrail::RouteHelpers", query, false))
+    }
+
+    pub fn fact(&self, target: &str, slot: &str) -> Option<&Type> {
+        self.lookup(target)?.fact(slot)
+    }
+
+    pub fn typed_facts(&self) -> serde_json::Value {
+        serde_json::json!({"format":1, "methods":self.methods,
+            "conflicts":self.conflicts, "diagnostics":self.diagnostics})
     }
 
     pub fn write_rbs(&self, facts: &Facts, out: &Path) -> Result<(), String> {
@@ -330,7 +394,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         return Err(usage.into());
     }
     let facts = facts::load(Path::new(app).join(".lowrail/facts.json"))?;
-    let model = TypeModel::from_facts(&facts);
+    let model = TypeModel::load(Path::new(app), &facts)?;
     if rest.len() == 2 {
         model.write_rbs(&facts, Path::new(&rest[1]))?;
     }

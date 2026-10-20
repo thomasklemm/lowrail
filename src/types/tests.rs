@@ -185,3 +185,60 @@ fn template_source_locations_are_not_parsed_as_ruby() {
     assert!(model.lookup("Views#render_worker").is_none());
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
+    let dir = std::env::temp_dir().join(format!("lowrail-type-observed-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("article.rb");
+    std::fs::write(&file, "class Article\n def literal = 7\n def caller = literal\n def dynamic(value); value.to_s; end\n def self.list = @articles = all\n def exit_literal = @n = 3\n def mutate; @n = 3; literal; @n; end\nend\n").unwrap();
+    let methods: Vec<_> = [("literal",2,false),("caller",3,false),("dynamic",4,false),
+        ("list",5,true),("exit_literal",6,false),("mutate",7,false)].into_iter()
+        .map(|(name,line,singleton)| json!({"name":name,"singleton":singleton,
+            "source_location":format!("{}:{line}",file.display()),
+            "parameters":if name == "dynamic" { json!([["req","value"]]) } else { json!([]) }})).collect();
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,
+        "models":[{"name":"Article","columns":[{"name":"title","type":"string","null":true}]}],
+        "modules":[{"name":"Article","methods":methods}]})).unwrap();
+    let mut model = TypeModel::from_facts(&facts);
+    assert_eq!(model.fact("Article#literal", "return").unwrap().proven_type(), Some("Integer"));
+    assert_eq!(model.fact("Article#caller", "return").unwrap().proven_type(), None);
+    assert_eq!(model.fact("Article#exit_literal", "ivar:@n").unwrap().proven_type(), Some("Integer"));
+    assert!(model.fact("Article#mutate", "ivar:@n").is_none(), "calls can mutate ivars");
+    assert_eq!(model.fact("Article.list", "ivar:@articles").unwrap().name, "ActiveRecord::Relation[Article]");
+    let samples = json!({"format":1,"app_root":dir,"samples_per_method":16,"types":[
+        {"module":"Article","name":"title","calls":5,"returns":{"String":2,"NilClass":1,"Integer":2}},
+        {"module":"Article","name":"literal","calls":1,"returns":{"String":1}},
+        {"module":"Article","name":"dynamic","calls":3,"saturated":false,
+            "args":{"value":{"Symbol":2,"String":1}},"returns":{"String":3},
+            "ivars":{"@articles":{"Article::ActiveRecord_Relation":3}}},
+        {"module":"#<Class:Article>","singleton":true,"name":"list","calls":2,
+            "returns":{"Article::ActiveRecord_Relation":2}}
+    ]});
+    model.merge_observed(&facts, samples.to_string().as_bytes()).unwrap();
+    let title = model.fact("Article#title", "return").unwrap();
+    assert_eq!(title.name, "String?", "observations cannot narrow or overwrite a static fact");
+    assert_eq!(title.samples, BTreeMap::from([("String".into(),2),("NilClass".into(),1),("Integer".into(),2)]));
+    assert_eq!(model.conflicts.len(), 2, "nil is compatible, Integer and literal contradiction are not");
+    assert_eq!((model.conflicts[0].method.as_str(),model.conflicts[0].count), ("Article#title",2));
+    assert_eq!(model.fact("Article#literal", "return").unwrap().proven_type(), None);
+    let value = model.fact("Article#dynamic", "arg:value").unwrap();
+    assert_eq!(value.name, "(String | Symbol)");
+    assert_eq!(value.evidence, Evidence::Observed);
+    assert_eq!(value.proven_type(), None);
+    let dynamic = model.lookup("Article#dynamic").unwrap();
+    assert_eq!(dynamic.observation.as_ref().unwrap().calls, 3);
+    assert!(!dynamic.observation.as_ref().unwrap().saturated);
+    assert_eq!(dynamic.return_type.name, "String");
+    assert_eq!(dynamic.return_type.evidence, Evidence::Observed);
+    assert_eq!(model.fact("Article#dynamic", "ivar:@articles").unwrap().name, "ActiveRecord::Relation[Article]");
+    assert!(model.fact("Article#dynamic", "ivar:@articles").unwrap().proven_type().is_none());
+    assert_eq!(model.fact("Article#caller", "return").unwrap().name, "Integer", "no inference from observations");
+    let input = model.typed_facts();
+    assert_eq!(input["format"], 1);
+    assert_eq!(input["methods"]["Article#dynamic"]["return_type"]["evidence"], "observed");
+    model.write_rbs(&facts, &dir.join("sig")).unwrap();
+    let validation = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
+    assert!(validation.status.success(), "{}", String::from_utf8_lossy(&validation.stdout));
+    std::fs::remove_dir_all(dir).unwrap();
+}

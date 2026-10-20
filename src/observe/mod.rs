@@ -94,6 +94,8 @@ pub struct MethodTypes {
     #[serde(rename = "self")]
     pub self_: BTreeMap<String, u64>,
     pub args: BTreeMap<String, BTreeMap<String, u64>>,
+    /// Receiver ivars present at sampled returns; absence is not nil.
+    pub ivars: BTreeMap<String, BTreeMap<String, u64>>,
     pub returns: BTreeMap<String, u64>,
 }
 
@@ -327,6 +329,9 @@ fn merge_parts(parts: Vec<Partial>) -> Observed {
                 add_counts(&mut e.returns, &t.returns);
                 for (arg, c) in &t.args {
                     add_counts(e.args.entry(arg.clone()).or_default(), c);
+                }
+                for (ivar, c) in &t.ivars {
+                    add_counts(e.ivars.entry(ivar.clone()).or_default(), c);
                 }
             }
             e.calls += t.calls;

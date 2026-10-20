@@ -113,6 +113,32 @@ pub(super) fn write(model: &TypeModel, facts: &Facts, out: &Path) -> Result<(), 
     std::fs::write(out.join("app.rbs"), app).map_err(|e| e.to_string())?;
     // Minimal declarations for standalone validation, not a replacement for
     // Rails signatures. Keep this separate when using a Rails RBS collection.
-    std::fs::write(out.join("lowrail_support.rbs"), "# Omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\nmodule ActiveRecord\n  class Relation[Elem]\n  end\n  module Associations\n    class CollectionProxy[Elem] < Relation[Elem]\n    end\n  end\nend\n").map_err(|e| e.to_string())?;
+    let mut support = String::from("# Omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\nmodule ActiveRecord\n  class Relation[Elem]\n  end\n  module Associations\n    class CollectionProxy[Elem] < Relation[Elem]\n    end\n  end\nend\n");
+    // Samples can introduce framework classes not used by the static catalog
+    // (e.g. strong parameters or safe strings). Emit name-only stubs, not
+    // invented signatures, for those namespaced external classes.
+    let mut external = Declaration::default();
+    for sig in model.methods.values() {
+        for ty in std::iter::once(&sig.return_type).chain(sig.parameters.iter().map(|p| &p.ty)) {
+            if !ty.provenance.iter().any(|p| p.source == Source::Observed) { continue; }
+            for name in ty.name.split(|c: char| !c.is_ascii_alphanumeric() && c != '_' && c != ':') {
+                if !name.contains("::") || !observed::constant(name)
+                    || matches!(name, "ActiveSupport::TimeWithZone" | "ActiveRecord::Relation" | "ActiveRecord::Associations::CollectionProxy")
+                    || model.methods.values().any(|s| s.receiver == name)
+                    || facts.models.iter().any(|m| m.name == name)
+                { continue; }
+                external.at(name).kind = "class";
+                let parts: Vec<_> = name.split("::").collect();
+                for i in 1..=parts.len() {
+                    let prefix = parts[..i].join("::");
+                    if let Some(module) = facts.modules.iter().find(|m| m.name == prefix) {
+                        external.at(&prefix).kind = if module.kind == "class" { "class" } else { "module" };
+                    }
+                }
+            }
+        }
+    }
+    external.render(&mut support, "");
+    std::fs::write(out.join("lowrail_support.rbs"), support).map_err(|e| e.to_string())?;
     Ok(())
 }

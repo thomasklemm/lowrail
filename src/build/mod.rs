@@ -44,6 +44,10 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
         facts::dump(app, &facts_path)?;
     }
     let facts = facts::load(&facts_path)?;
+    // Shared advisory input, available before any builder runs. It grants
+    // no authority to lower; pass-specific certificates still own that.
+    let typed_facts = crate::types::TypeModel::load(app, &facts)?.typed_facts();
+    write_atomic(&dir.join("typed_facts.json"), &serde_json::to_string_pretty(&typed_facts).unwrap())?;
     let mut oracle = RubyOracle::start(app, env)?;
     let mut routes = route::Cache::default();
     let mut memo_certificate = None;
@@ -161,6 +165,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
         "files": files,
         "templates": templates,
         "units": units,
+        "typed_facts": typed_facts,
     });
     let input_path = dir.join("units.json");
     write_atomic(&input_path, &serde_json::to_string_pretty(&input).unwrap())?;

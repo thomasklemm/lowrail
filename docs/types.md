@@ -1,4 +1,4 @@
-# Boot-first types and MCP (first iteration)
+# Boot-first types and MCP
 
 Target: Ruby 3.4+ (development pins 4.0.7), Rails 8.1+.
 
@@ -13,9 +13,64 @@ rbs -I .corpus/real-blog/sig/lowrail validate
 app. Stdout is a JSON object with a `methods` map keyed by `Class#method` or
 `Class.method`, and source-read/parse diagnostics. Every return/parameter type
 has a `name` (RBS notation) and `provenance` entries with `source` and `detail`.
-Sources are `boot_fact`, `schema`, `inference`, and (reserved for future
-profiling input) `observed`. No observed samples are fabricated or imported
-yet. These types are advisory: a lowering consumer must still build guards.
+Sources are `boot_fact`, `schema`, `inference`, and `observed`. Existing
+`.lowrail/observed.json` samples are merged **after** static inference, never
+fed back into it. Types remain advisory unless explicitly proven within an
+analyzed body; a lowering consumer must still certify its execution context.
+
+## Observed types
+
+```sh
+lowrail verify APP --observe-types
+lowrail verify APP --observe-overhead # also one enabled/no-recorder control
+lowrail observe APP --samples 16 --overhead # full definition/script census
+```
+
+Verify records only its first **on** run, using targeted method TracePoints,
+not a global call hook. The lightweight mode omits script capture and the
+all-module definition census. The default cap is 16 returns per method per
+process (`LOWRAIL_OBSERVE_SAMPLES`); args are sampled at entry and receiver
+ivars at return. Missing ivars are not nil observations. Sampling never calls
+the object's own reflection methods, enumerates a collection, or runs SQL.
+Counts, calls, cap/saturation and raw class names survive in `observation`;
+each typed slot also retains its class histogram in `samples`. Saturation
+means **recording stopped**, not exhaustive coverage. Exceptions, recursion,
+threads and uncalled methods can leave incomplete samples.
+
+Observations fill `untyped`, or annotate a static type without narrowing it.
+A contradicting sample creates a `conflicts` row with method, slot, static
+type, class and count; the static name is preserved and body proof withdrawn.
+`String?` plus String-only samples stays `String?`. Anonymous classes stay
+`untyped`; model-specific Rails relation class names are rendered as advisory
+`Relation[Model]`, not evidence about loaded elements. Regenerate facts and
+observations after source changes; no source-freshness certificate is implied.
+
+## Typed-facts build API (format 1)
+
+Before builders run, `lowrail build` writes `.lowrail/typed_facts.json` and
+includes the same object as `units.json["typed_facts"]`. It contains `format`,
+`methods`, `conflicts`, `diagnostics`. No existing lowerer consumes it yet.
+Rust callers use `TypeModel::fact(target, slot)`; Ruby builders can read
+`methods[target]["return_type"]`, `["parameters"]` (find by name), or
+`["ivars"]["@articles"]`. Slots are `return`, `arg:name`, `ivar:@name`.
+Every type has `name`, `provenance`, `evidence`, and `samples`:
+
+| Evidence | Consumer contract |
+|---|---|
+| `proven_body` | Literal/local assignment proof **within the analyzed method body**. No value-class check needed there; still certify the unchanged effective method/source and execution context with the normal pass guard. `proven_type()` returns the name only for this case. |
+| `static` | Schema, boot catalog, or call-based inference. Needs method/schema/config certificates and, when applicable, live value checks. Storage nullability is not a Ruby-object invariant. |
+| `observed` | Sample-only type. Needs a live value/shape check and the usual semantic certificates; never returned by `proven_type()`. |
+
+Per-method ivars describe exit state, not view-entry dominance. Calls kill
+static ivar knowledge because they can mutate the receiver. An observed
+Article argument does **not** prove stock AR `to_param`; use the resolved
+boot method plus a live lookup/epoch certificate. This API supplies type
+candidates, not a method-implementation certificate or a runtime guard.
+
+Roundhouse reference: its `Ty` lattice and post-fixpoint `MethodDef.signature`
+stamping keep consumers consistent; its call-site "observations" are static,
+not runtime samples. Lowrail likewise keeps provenance/counts outside the
+type union and proof separate from precision.
 
 ## What is modeled
 

@@ -323,25 +323,32 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
         let mut changes = Vec::new();
         for (id, (expr, location)) in &bodies {
             let sig = &model.methods[id];
+            let mut locals = BTreeMap::new();
             let ty = evaluate(
                 expr,
                 model,
                 &sig.receiver,
                 sig.singleton,
-                &mut BTreeMap::new(),
+                &mut locals,
             )
             .map(|t| t.inferred(format!("{id} at {location}")));
+            let ivars: BTreeMap<_, _> = if ty.is_some() {
+                locals.into_iter().filter(|(name, _)| name.starts_with('@'))
+                    .map(|(name, ty)| (name, ty.inferred(format!("{id} at {location}")))).collect()
+            } else { BTreeMap::new() };
             if let Some(ty) = ty
-                && ty.name != sig.return_type.name
+                && (ty != sig.return_type || ivars != sig.ivars)
             {
-                changes.push((id.clone(), ty));
+                changes.push((id.clone(), ty, ivars));
             }
         }
         if changes.is_empty() {
             break;
         }
-        for (id, ty) in changes {
-            model.methods.get_mut(&id).unwrap().return_type = ty;
+        for (id, ty, ivars) in changes {
+            let sig = model.methods.get_mut(&id).unwrap();
+            sig.return_type = ty;
+            sig.ivars = ivars;
         }
     }
 }
@@ -355,7 +362,11 @@ fn evaluate(
 ) -> Option<Type> {
     match expr {
         Expr::Unknown => None,
-        Expr::Literal(name) => Some(Type::new(*name, Source::Inference, "Ruby literal")),
+        Expr::Literal(name) => {
+            let mut ty = Type::new(*name, Source::Inference, "Ruby literal");
+            ty.evidence = Evidence::ProvenBody;
+            Some(ty)
+        }
         Expr::Self_ => Some(Type::new(
             if singleton {
                 format!("singleton({receiver})")
@@ -388,7 +399,13 @@ fn evaluate(
                     false,
                 ),
             };
-            let ty = model.get(&class, name, single)?.return_type.clone();
+            // A call may mutate the receiver's ivars, even when its return
+            // type is known. Never carry an exit-ivar proof across it.
+            locals.retain(|name, _| !name.starts_with('@'));
+            let mut ty = model.get(&class, name, single)?.return_type.clone();
+            // Even a literal-returning callee can be replaced at runtime.
+            // No call/lookup proof is supplied by this advisory walker.
+            ty.evidence = Evidence::Static;
             (ty.name != "untyped").then_some(ty)
         }
     }

@@ -43,25 +43,28 @@ module Lowrail
     KERNEL_CLASS = Kernel.instance_method(:class)
     KERNEL_IS_A = Kernel.instance_method(:is_a?)
     KERNEL_SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
+    KERNEL_IVARS = Kernel.instance_method(:instance_variables)
+    KERNEL_IVAR_GET = Kernel.instance_method(:instance_variable_get)
     # Not app code for type sampling: vendored, generated and test code.
     SKIP_DIRS = %w[vendor node_modules tmp .lowrail test spec].freeze
 
     class << self
       attr_reader :dir, :root, :samples
 
-      def install(dir:, root: Dir.pwd, types: true, samples: 16, methods: [])
+      def install(dir:, root: Dir.pwd, types: true, samples: 16, methods: [], types_only: false)
         return if @installed
         @installed = true
         @dir = dir
         @root = File.join(File.expand_path(root), "")
         @types = types
-        @samples = samples
+        @types_only = types_only
+        @samples = [samples, 1].max
         @extra = methods
         @hooked = {}.compare_by_identity # iseq => record
         @records = []
         @t0 = clock
         @timings = {}
-        ScriptCapture.start(phase: "boot")
+        ScriptCapture.start(phase: "boot") unless @types_only
         Object.singleton_class.prepend(ConstHook)
         at_exit { write }
       end
@@ -81,9 +84,9 @@ module Lowrail
         return if @baseline
         t = clock
         @timings["boot_seconds"] = (t - @t0).round(3)
-        @baseline = snapshot
+        @baseline = @types_only ? {} : snapshot
         @baseline_modules = @baseline.size
-        ScriptCapture.phase = "test"
+        ScriptCapture.phase = "test" unless @types_only
         @timings["snapshot_seconds"] = (clock - t).round(3)
         return unless @types
         t = clock
@@ -158,7 +161,7 @@ module Lowrail
         return if @hooked.key?(iseq)
         rec = {"module" => label(mod), "name" => um.name.to_s, "singleton" => MOD_SINGLETON_P.bind_call(mod),
                "source_location" => (loc = um.source_location) && "#{loc[0]}:#{loc[1]}",
-               "calls" => 0, "self" => Hash.new(0), "args" => {}, "returns" => Hash.new(0), "saturated" => false}
+               "calls" => 0, "self" => Hash.new(0), "args" => {}, "ivars" => {}, "returns" => Hash.new(0), "saturated" => false}
         @hooked[iseq] = rec
         cap = @samples
         tp = TracePoint.new(:call, :return) do |t|
@@ -168,6 +171,10 @@ module Lowrail
             sample_args(t, rec)
           else
             rec["returns"][class_label(t.return_value)] += 1
+            KERNEL_IVARS.bind_call(t.self).each do |name|
+              value = KERNEL_IVAR_GET.bind_call(t.self, name)
+              (rec["ivars"][name.to_s] ||= Hash.new(0))[class_label(value)] += 1
+            end
             if rec["returns"].sum { _2 } >= cap
               rec["saturated"] = true
               t.disable
@@ -220,6 +227,7 @@ module Lowrail
 
       def write
         return unless @baseline
+        return write_types if @types_only
         require "json"
         require_relative "facts"
         require_relative "materialize"
@@ -288,7 +296,24 @@ module Lowrail
 
       def finish(rec)
         rec.merge("self" => rec["self"].to_h, "returns" => rec["returns"].to_h,
-                  "args" => rec["args"].transform_values(&:to_h))
+                  "args" => rec["args"].transform_values(&:to_h),
+                  "ivars" => rec["ivars"].transform_values(&:to_h))
+      end
+
+      # Verify needs only bounded type samples, not the definition census or
+      # script capture. Do not load/materialize Rails methods at process exit.
+      def write_types
+        require "json"
+        require "fileutils"
+        FileUtils.mkdir_p(@dir)
+        out = {"format" => 1, "pid" => Process.pid, "app_root" => @root.chomp("/"),
+               "ruby_description" => RUBY_DESCRIPTION, "samples_per_method" => @samples,
+               "hooked_methods" => @records.size,
+               "types" => @records.select { |r| r["calls"] > 0 }.map { |r| finish(r) },
+               "timings" => @timings.merge("process_seconds" => clock - @t0)}
+        path = File.join(@dir, "observed-#{Process.pid}.json")
+        File.write("#{path}.tmp", JSON.generate(out))
+        File.rename("#{path}.tmp", path)
       end
 
       def visibility_map(mod)
@@ -319,5 +344,6 @@ if (dir = ENV["LOWRAIL_OBSERVE"]) && !dir.empty?
     types: ENV["LOWRAIL_OBSERVE_TYPES"] != "0",
     samples: Integer(ENV.fetch("LOWRAIL_OBSERVE_SAMPLES", "16"), exception: false) || 16,
     methods: ENV.fetch("LOWRAIL_OBSERVE_METHODS", "").split(",").map(&:strip).reject(&:empty?),
+    types_only: ENV["LOWRAIL_OBSERVE_TYPES_ONLY"] == "1",
   )
 end

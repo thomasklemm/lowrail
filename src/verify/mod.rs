@@ -13,11 +13,15 @@ use serde_json::Value;
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
     let mut bisect = false;
+    let mut observe_types = false;
+    let mut observe_overhead = false;
     let mut cmd: Vec<String> = vec!["bin/rails".into(), "test".into()];
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
             "--bisect" => bisect = true,
+            "--observe-types" => observe_types = true,
+            "--observe-overhead" => { observe_types = true; observe_overhead = true; }
             "--" => {
                 cmd = it.by_ref().cloned().collect();
                 break;
@@ -26,14 +30,31 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail verify APP [--bisect] [-- TEST COMMAND...]")?;
+    let app = app.ok_or("usage: lowrail verify APP [--bisect] [--observe-types|--observe-overhead] [-- TEST COMMAND...]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
     if cmd.is_empty() {
         return Err("test command must not be empty".into());
     }
     let seed = seed_env();
-    let report = verify(&app, &cmd, &seed)?;
+    let report = verify(&app, &cmd, &seed, observe_types)?;
     println!("{}", report.render());
+    let mut overhead = None;
+    if observe_overhead {
+        let plain = run_labeled(&app, &cmd, &app.join(".lowrail/verify"), "1-no-recorder", "1", &env_refs(&seed))?;
+        let control = Report { off: plain, on: Run {
+            tests: report.on.tests.clone(), sql: report.on.sql.clone(),
+            sql_other: report.on.sql_other.clone(), processes: report.on.processes,
+            exit_ok: report.on.exit_ok, ..Default::default()
+        }, unstable_sql: BTreeSet::new() };
+        overhead = Some(serde_json::json!({"recorded_seconds":report.on.seconds,
+            "plain_seconds":control.off.seconds,
+            "percent":(report.on.seconds / control.off.seconds - 1.0) * 100.0,
+            "outcomes_identical":control.differences().is_empty(),
+            "sql_differences":control.sql_differences()}));
+        println!("recorder overhead (single wall-time pair, not a speed claim): {}", overhead.as_ref().unwrap());
+        if !control.identical() { return Err("recorder control differs".into()); }
+    }
+    write_last(&app, &cmd, &report, overhead)?;
     if report.identical() {
         return Ok(());
     }
@@ -45,7 +66,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     Err("outcomes differ".into())
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize)]
 pub struct Run {
     pub tests: BTreeMap<String, (String, String)>,
     pub unit_hits: BTreeMap<String, u64>,
@@ -62,7 +83,7 @@ pub struct Run {
     pub exit_ok: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct Report {
     pub off: Run,
     pub on: Run,
@@ -212,12 +233,31 @@ fn env_refs(env: &[(String, String)]) -> Vec<(&str, &str)> {
     env.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect()
 }
 
-pub fn verify(app: &Path, cmd: &[String], seed: &[(String, String)]) -> Result<Report, String> {
+fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: bool) -> Result<Report, String> {
     let dir = app.join(".lowrail/verify");
     std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
     let env = env_refs(seed);
     let off = run_with(app, cmd, &dir, "0", &env)?;
-    let on = run_with(app, cmd, &dir, "1", &env)?;
+    let observe_dir = dir.join("observe-on");
+    let on = if observe_types {
+        if observe_dir.exists() { std::fs::remove_dir_all(&observe_dir).map_err(|e| e.to_string())?; }
+        std::fs::create_dir_all(&observe_dir).map_err(|e| e.to_string())?;
+        let path = observe_dir.display().to_string();
+        let root = app.display().to_string();
+        let mut recording = env.clone();
+        recording.extend([("LOWRAIL_OBSERVE", path.as_str()), ("LOWRAIL_OBSERVE_ROOT", root.as_str()),
+            ("LOWRAIL_OBSERVE_TYPES_ONLY", "1")]);
+        let on = run_with(app, cmd, &dir, "1", &recording)?;
+        let mut samples = crate::observe::merge(&observe_dir)?;
+        samples.command = cmd.to_vec();
+        samples.seconds = on.seconds;
+        samples.exit_ok = on.exit_ok;
+        let out = app.join(".lowrail/observed.json");
+        let tmp = out.with_extension("json.tmp");
+        std::fs::write(&tmp, serde_json::to_vec(&samples).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+        std::fs::rename(tmp, out).map_err(|e| e.to_string())?;
+        on
+    } else { run_with(app, cmd, &dir, "1", &env)? };
     let mut report = Report { off, on, unstable_sql: BTreeSet::new() };
     // Only when SQL would fail the gate: a second LOWRAIL=0 run tells
     // run-to-run noise apart from differences Lowrail causes.
@@ -236,6 +276,28 @@ pub fn verify(app: &Path, cmd: &[String], seed: &[(String, String)]) -> Result<R
         }
     }
     Ok(report)
+}
+
+fn write_last(app: &Path, cmd: &[String], report: &Report, overhead: Option<Value>) -> Result<(), String> {
+    let manifest = app.join(".lowrail/manifest.json");
+    let manifest: Value = if manifest.exists() {
+        serde_json::from_slice(&std::fs::read(manifest).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?
+    } else { Value::Null };
+    let mut passes: BTreeMap<String, Value> = BTreeMap::new();
+    for unit in manifest["units"].as_array().into_iter().flatten() {
+        let Some(pass) = unit["pass"].as_str() else { continue };
+        let id = unit["id"].to_string();
+        let entry = passes.entry(pass.into()).or_insert_with(|| serde_json::json!({"hits":0,"fallbacks":0}));
+        for (field, counts) in [("hits", &report.on.unit_hits), ("fallbacks", &report.on.unit_fallbacks)] {
+            entry[field] = Value::from(entry[field].as_u64().unwrap() + counts.get(&id).copied().unwrap_or(0));
+        }
+    }
+    let result = serde_json::json!({"format":1,"command":cmd,"identical":report.identical(),
+        "manifest":manifest,"report":report,"passes":passes,"recorder_overhead":overhead});
+    let path = app.join(".lowrail/verify/last.json");
+    let tmp = path.with_extension("json.tmp");
+    std::fs::write(&tmp, serde_json::to_vec_pretty(&result).unwrap()).map_err(|e| e.to_string())?;
+    std::fs::rename(tmp, path).map_err(|e| e.to_string())
 }
 
 /// Tests whose own-thread SQL trace differs between two runs of one mode.
@@ -315,11 +377,14 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         }
     }
     let gem_lib = crate::facts::gem_dir().join("lib");
-    let rubyopt = format!(
+    let mut rubyopt = format!(
         "{} -I{} -rlowrail/setup",
         std::env::var("RUBYOPT").unwrap_or_default(),
         gem_lib.display()
     );
+    if extra_env.iter().any(|(k, _)| *k == "LOWRAIL_OBSERVE") {
+        rubyopt.push_str(" -rlowrail/observe");
+    }
     let started = Instant::now();
     let status = Command::new(&cmd[0])
         .args(&cmd[1..])
@@ -329,6 +394,7 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         .env("LOWRAIL_SHADOW", "strict")
         .env("LOWRAIL_OUTCOMES", &out)
         .env("LOWRAIL_STATS", "") // counts on; hits come via LOWRAIL_OUTCOMES, no extra stats file
+        .env_remove("LOWRAIL_OBSERVE")
         .envs(extra_env.iter().copied())
         .status()
         .map_err(|e| format!("running {}: {e}", cmd.join(" ")))?;

@@ -1,0 +1,122 @@
+//! Observations annotate static facts; they never participate in inference.
+use super::*;
+use crate::observe::Observed;
+
+pub(super) fn read(app: &Path) -> Result<Option<Vec<u8>>, String> {
+    let path = app.join(".lowrail/observed.json");
+    match std::fs::read(&path) {
+        Ok(bytes) => Ok(Some(bytes)),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(format!("{}: {e}", path.display())),
+    }
+}
+
+impl TypeModel {
+    pub fn merge_observed(&mut self, facts: &Facts, bytes: &[u8]) -> Result<(), String> {
+        let observed: Observed = serde_json::from_slice(bytes).map_err(|e| format!("observed.json: {e}"))?;
+        if observed.format != 1 {
+            return Err(format!("unsupported observed format {}", observed.format));
+        }
+        if !facts.app_root.is_empty() && observed.app_root != facts.app_root {
+            return Err("observed.json belongs to a different app root".into());
+        }
+        for sample in observed.types {
+            let receiver = if sample.singleton {
+                sample.module.strip_prefix("#<Class:").and_then(|s| s.strip_suffix('>'))
+                    .unwrap_or(&sample.module)
+            } else {
+                &sample.module
+            };
+            if !constant(receiver) {
+                self.diagnostics.push(format!("unrepresentable observed receiver {}", sample.module));
+                continue;
+            }
+            let id = key(receiver, &sample.name, sample.singleton);
+            let mut conflicts = Vec::new();
+            // Keep after-boot definitions visible, even if boot missed them.
+            let sig = self.insert(receiver, &sample.name, sample.singleton,
+                Type::new("untyped", Source::Observed, "method seen only at runtime"));
+            sig.observation = Some(sample.clone());
+            let detail = format!("{} calls, capped={}, limit={}; {}", sample.calls,
+                sample.saturated, observed.samples_per_method,
+                sample.source_location.as_deref().unwrap_or("unknown source"));
+            for name in sample.ivars.keys() {
+                sig.ivars.entry(name.clone()).or_insert_with(||
+                    Type::new("untyped", Source::Observed, "receiver ivar at method exit"));
+            }
+            let mut slots = vec![("return".to_owned(), &mut sig.return_type, &sample.returns)];
+            for p in &mut sig.parameters {
+                // rest/keyrest are containers, whereas RBS expects element/value
+                // types. Keep these untyped rather than emitting Array as *T.
+                if matches!(p.kind.as_str(), "req" | "opt" | "key" | "keyreq")
+                    && let Some(counts) = sample.args.get(&p.name)
+                {
+                    slots.push((format!("arg:{}", p.name), &mut p.ty, counts));
+                }
+            }
+            for (name, ty) in &mut sig.ivars {
+                if let Some(counts) = sample.ivars.get(name) {
+                    slots.push((format!("ivar:{name}"), ty, counts));
+                }
+            }
+            for (slot, ty, counts) in slots {
+                if counts.is_empty() { continue; }
+                for (class, count) in counts {
+                    *ty.samples.entry(class.clone()).or_default() += count;
+                    if ty.name != "untyped" && !compatible(facts, &ty.name, class) {
+                        conflicts.push(Conflict { method: id.clone(), slot: slot.clone(),
+                            static_type: ty.name.clone(), observed_class: class.clone(), count: *count });
+                        // A contradicted body fact is not usable as proof.
+                        ty.evidence = Evidence::Static;
+                    }
+                }
+                ty.provenance.push(Provenance { source: Source::Observed, detail: detail.clone() });
+                if ty.name == "untyped" {
+                    let arms: std::collections::BTreeSet<_> = counts.keys().map(|c| class_type(facts, c)).collect();
+                    ty.name = if arms.contains("untyped") { "untyped".into() }
+                        else if arms.len() == 1 { arms.into_iter().next().unwrap() }
+                        else { format!("({})", arms.into_iter().collect::<Vec<_>>().join(" | ")) };
+                    ty.evidence = Evidence::Observed;
+                }
+            }
+            self.conflicts.extend(conflicts);
+        }
+        Ok(())
+    }
+}
+
+pub(super) fn constant(name: &str) -> bool {
+    !name.is_empty() && name.split("::").all(|part| {
+        part.as_bytes().first().is_some_and(u8::is_ascii_uppercase)
+            && part.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')
+    })
+}
+
+fn class_type(facts: &Facts, class: &str) -> String {
+    match class {
+        "NilClass" => "nil".into(),
+        "TrueClass" | "FalseClass" => "bool".into(),
+        "Array" => "Array[untyped]".into(),
+        "Hash" => "Hash[untyped, untyped]".into(),
+        _ => {
+            for (suffix, base) in [("::ActiveRecord_Relation", "ActiveRecord::Relation"),
+                ("::ActiveRecord_Associations_CollectionProxy", "ActiveRecord::Associations::CollectionProxy")]
+            {
+                if let Some(model) = class.strip_suffix(suffix)
+                    && facts.models.iter().any(|m| m.name == model)
+                {
+                    return format!("{base}[{model}]");
+                }
+            }
+            if constant(class) { class.into() } else { "untyped".into() }
+        }
+    }
+}
+
+fn compatible(facts: &Facts, static_type: &str, class: &str) -> bool {
+    let observed = class_type(facts, class);
+    let ty = static_type.trim_end_matches('?').trim_matches(['(', ')']);
+    (static_type.ends_with('?') && class == "NilClass")
+        || ty.split(" | ").any(|arm| arm == observed
+            || facts.modules.iter().any(|m| m.name == class && m.ancestors.iter().any(|a| a == arm)))
+}
