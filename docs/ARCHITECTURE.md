@@ -175,7 +175,11 @@ the registry or installing delivery, invalidation or activation hooks.
    budgets and rejected controls are recorded, not promoted.
 6. **Promote** to `default: on` only if the expected effect, individually or
    as a measured pass set, is ≥ 2 % on some corpus route, the measurement
-   agrees, and nothing gets slower beyond noise. Otherwise it stays opt-in
+   agrees, and nothing gets slower beyond noise. That includes YJIT:
+   whenever a YJIT request cohort for the route passes its gates, the pass
+   must not regress there either. An interpreter win alone does not
+   promote (2026-10-20: `inertia/config_bind` −6.9 % interpreter but
+   +16.3 % under YJIT on Starter JSON, accepted cohort). Otherwise it stays opt-in
    with its numbers in `docs/passes/`. Smaller passes may stack; do not demand
    that each independently cross the threshold.
 
