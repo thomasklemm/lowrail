@@ -193,3 +193,139 @@ preserves the original result's mutability. A future pass also needs guards
 on the digest/method/path dependencies, original fallback on changes, missing
 files and read errors, and an explicit concurrent-file-change contract.
 No digest caching pass was implemented or enabled in this iteration.
+
+## Zweite Iteration: exaktes Digest-Memo (2026-10-20)
+
+Der neue, unabhängige Opt-in-Pass `lowrail build APP --digest-memo` senkt
+**eine Gem-Site in einer zusätzlichen Unit** ab: insgesamt 62 Units,
+58 Ruby-Dateien und vier Templates. Keine Digest-Ablehnung; die 45
+bisherigen Route-Ablehnungen bleiben bestehen. Keine Anwendungssourcen,
+Klassen-, Datei- oder Testnamen werden hier veröffentlicht. Die Integration
+verwendet weiterhin nur `RUBYOPT`; Gemfile und Lockfile bleiben unverändert.
+`--memo` und `--preload-plans` sind für diese Messungen aus.
+
+Die Dateibytes werden jedes Mal vollständig neu gelesen. Nur ein exakter
+Byte-Vergleich darf den Hash sparen; kein Stat-Tupel, kein Memo einer
+beliebigen Version-Proc und kein zweites Öffnen nach dem Vergleich.
+Fehler und Globs bleiben im ursprünglichen Gem-Verhalten. Der definierte
+Stream-Vertrag bei Umbenennen, In-place-Änderung und Entfernen zwischen Reads
+sowie Guards und Grenzen stehen in [der Pass-Notiz](../passes/digest-memo.md).
+Die öffentliche RailsVite/Inertia/vite_ruby-Fixture verifiziert 7/7 identisch,
+71 Assertions pro Modus, 65 Digest-Hits und null Fallbacks, auch beim Build
+mit beiden Flags `--memo --digest-memo`. Die Memo-Purity-Prüfung lehnt die
+beliebige lazy Proc weiterhin ab; der Digest-Pass optimiert ihren Gem-Aufruf.
+
+### Finale Differential-Gates nach Integration der Memo-Hooks
+
+Dieselbe private App-Revision, Ruby 4.0.7, Rails 8.1.4, lokale PostgreSQL-DB;
+`VCR_RECORD_MODE=none`, Seed 1729, acht Unit-/Request- und vier System-Worker.
+Die beiden Rails-Suiten laufen nacheinander, nie gleichzeitig in diesem Baum.
+Beide Befehle verwenden `lowrail verify APP --bisect -- …`.
+
+| Gate | Off | On | Identität | Hits Route / Digest | Fallbacks |
+|---|---:|---:|---|---:|---:|
+| Unit + Request | 10.816, 63,1 s | 10.816, 62,9 s | 10.815 Pass + derselbe eine Skip | 794 / **765** | **0** |
+| System | 552, 95,8 s | 552, 93,6 s | alle 552 Pass | 226 / **2.849** | **0** |
+
+Verglichen werden alle Testidentitäten und Ergebnisse, nicht nur Summen.
+Es gibt keine Outcome-Differenz zu bisecten und keine neue Denylist.
+Suite-Laufzeiten sind wegen Parallelisierung/Browserlast keine
+Performance-Messung und belegen keinen Speedup.
+Die finale Rust-Suite: 26 Unit-Tests + zwei Integrationsharnesses grün;
+optionale externe Corpus-Bodies sind in diesem Checkout nicht vorhanden.
+Gem-Suite: 77 Tests, 875 Assertions, keine Fehler, zwölf explizite optionale
+Dependency-/Corpus-Skips. Das ist keine Behauptung vollständiger Corpus-Abdeckung.
+Auch das gebaute/entpackte Gem besteht die öffentliche Fixture mit 7/7,
+65 Hits und null Fallbacks; der Runtime-Pfad wird auf das Paket geprüft.
+
+**SQL-Trace-Grenze:** Der inzwischen integrierte zusätzliche Tracer meldet
+parallel 288/10.816 Unit-/Request- und 2/552 System-Traces als abweichend
+(advisory, nicht Outcome-Differenzen). Serielle Kontrollen derselben auffälligen
+Tests mit **allen Units deaktiviert** liefern weiterhin 242/288 beziehungsweise
+4/4 abweichende Traces, null Hits und identische Testergebnisse; die seriellen
+Verify-Befehle enden deshalb mit Exit 1. Vier Systemfälle werden ausgewählt,
+weil zusätzlich zur Digest-Differenz auch unterschiedliche Query-Zahlen zählen.
+Eine bestätigte Ursache: kleine Sequenz-IDs in SQL-Literalen unterscheiden sich
+zwischen zwei Läufen, während der Tracer erst sechsstellige Zahlen normalisiert;
+PostgreSQL-Sequenzen werden durch einen Test-Rollback nicht zurückgesetzt.
+Die Kontrolle zeigt Unterschiede ohne Fast Path, nicht die vollständige Ursache
+jeder Warnung. Es wird **keine vollständige SQL-Identität behauptet** und weder
+der Tracer abgeschaltet noch eine breitere Zahlenmaskierung eingebaut.
+
+### Fünf interleavte YJIT-Paare
+
+Zehn frische Prozesse, Reihenfolge Off/On, On/Off im Wechsel. Jede der drei
+authentifizierten Inertia-JSON-Seiten erhält 100 Warmups und 200 gemessene
+Requests je Prozess. Zeit bleibt wie zuvor eingefroren, Fixtures und
+Authentifizierung kommen aus der lokalen Testschnittstelle; Query-Caches
+werden vor jedem Request geleert. Jeder Response wird auf HTTP 200,
+erwartete Komponente und passende Version geprüft. Stats und Profiler sind
+für diese Zeitmessungen aus. Beide Modi laden Setup, Off setzt `LOWRAIL=0`.
+Die Zahlen sind Median der fünf Prozessmediane und deren Min–Max, keine
+Konfidenzintervalle und keine Produktionslast-Simulation.
+
+| Seite | Off, ms (Min–Max) | On, ms (Min–Max) | Medianänderung |
+|---|---:|---:|---:|
+| Overview | 19,064 (18,169–21,568) | 17,905 (17,004–20,157) | −6,1 % |
+| List | 8,793 (8,395–10,284) | 7,640 (7,388–9,550) | −13,1 % |
+| Profile settings | 7,096 (6,775–7,421) | 6,082 (5,704–6,739) | **−14,3 %** |
+
+Bei Profile sind die Bereiche knapp getrennt und jedes der fünf Paare
+schneller (−5,0 bis −19,0 %); diese Kohorte zeigt dort ein einheitliches
+Signal. Overview und List haben überlappende Bereiche und jeweils auch
+langsamere On-Paare: ihre Medianänderungen sind **nicht klar vom Rauschen
+getrennt**. Auch bessere Mediane garantieren keine besseren Tails: p95 über
+die fünf Prozesse liegt Off/On bei Overview 27,26–30,85 / 19,99–31,38 ms,
+List 10,81–12,57 / 12,11–15,72 ms, Profile 8,17–9,80 / 8,63–13,62 ms.
+
+Allokationen steigen stabil um rund **21 Objekte/Request**: 23.007 →
+23.028 / 5.066 → 5.087 / 3.756 → 3.777. Reale SQL-Zahlen bleiben
+25 / 11 / 8 in beiden Modi; diese Zählung schließt `SCHEMA`, `TRANSACTION`
+und Cache-Treffer aus und ist deshalb nicht direkt mit älteren absoluten
+Zählungen gleichzusetzen. Ein separater Stats-Lauf zählt **6.300 echte
+Digest-Wiederverwendungen**, sieben je Request über 900 Requests inklusive
+Warmups, **keinen Route-Hit und null Fallbacks**. Die Request-Gewinne sind
+damit nicht bloß aus Suite-Hits abgeleitet.
+
+### Kosten und verbleibende Kandidaten
+
+Fünf alternierende YJIT-Mikrorunden im selben Prozess, 100 Warmups + 2.000
+Aufrufe je Alternative, Dateigröße 177.268 Bytes; Median und Min–Max der
+Rundenmittel:
+
+| Operation | µs/Aufruf | Objekte/Aufruf |
+|---|---:|---:|
+| Originaler MD5-Dateiaufruf mit Pathname | 298,40 (297,34–312,24) | 10 |
+| Finaler Guard + Chunk-Read + Byte-Memo | **129,81 (97,47–176,06)** | 13 |
+
+Der vollständige Pass ist teurer als der frühere unbewachte
+`binread`-Prototyp mit 84,67 µs: Guard, gleiche Chunk-/Stream-Semantik,
+Pfadprüfung und Inhaltsindex sind Teil der Messung. Der frühere Stat-Wert
+von 3,53 µs ist weiterhin **kein exakter Beweis** und wurde nicht eingebaut.
+
+Ein separater On-StackProf-Wall-Lauf (1 ms, je 200 Requests nach 100 Warmups)
+liefert 7.697 berichtete, 7.696 in Raw-Stacks repräsentierte Samples und
+drei verpasste Samples. Prozentzahlen verwenden die repräsentierten
+Samples; inklusive Bereiche zählen jedes Sample je Bereich nur einmal und
+dürfen nicht addiert werden. Native Digest-Updates haben **null Self-Samples**
+statt 15,8 % in der vorigen Kohorte. Das Manifest-/Memo-Read-/Vergleichsbudget
+bleibt bei **6,48 % inklusiv**; SQL-Ausführung bei **33,90 % self** kann der
+Ruby-Pass nicht beseitigen. Die nächsten gemessenen Ruby-Kandidaten:
+
+1. **Arel-/Query-Planung:** `build_arel` und Visitors **6,08 % inklusiv,
+   1,64 % self**; keine Implementierung in dieser Iteration.
+2. **Attribut-/Typ-Dispatch:** ActiveModel-Attribute/Registrierung/Lazy-Set
+   und ActiveRecord-Attribut-/Typ-Dispatch **4,34 % inklusiv, 2,00 % self**;
+   keine Werte oder benutzerdefinierten Konvertierungen memoisiert.
+3. **Inhaltsindex des exakten Byte-Memos:** `String#hash` innerhalb des
+   Memos **2,48 % self**, zusätzlich Read **1,10 % self**. Einen billigeren
+   Index dürfte man nur mit weiter vollständigem Byte-Beweis verwenden,
+   nicht als Ersatz durch einen Stat-Guard.
+
+Offene Grenzen: mehr transiente Allokationen, vollständig erhaltenes
+Datei-IO, begrenzter Cache, bekannte Call-Site-Guard-Grenzen und keine
+Aussage über kalte OS-Caches oder parallele Produktionslast. Daher bleibt
+der Pass zunächst opt-in. Die private Integration und ihre temporären
+Harness-Dateien wurden nach der Messung entfernt; der private Worktree ist
+sauber. Keine ARGOS-Änderung wurde committed oder in das Lowrail-Repository
+übertragen.

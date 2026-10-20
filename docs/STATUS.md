@@ -55,6 +55,17 @@ same 11 units and verifies 21/21 identical with 114 hits.
   candidate. Five interleaved pairs: cached medians −2.7…−6.1%, but cache-disabled
   medians **+3.9…+15.4% slower**, allocations +36…45/request. Not a general net
   win; keep it opt-in.
+- **Exact file-digest memo** ([contract and public fixture](passes/digest-memo.md)),
+  independent opt-in `lowrail build --digest-memo`: reread the complete binary
+  stream, reuse only after full byte equality; no stat-only shortcut or arbitrary
+  Inertia-proc memo. RailsVite MD5 and vite_ruby SHA1 intrinsics retain original
+  error/glob semantics. Public fixture: 7/7 identical, 65 reuses, no fallbacks.
+  Private-app gates: 10,816 unit/request + 552 system outcomes identical,
+  765/2,849 digest reuses, zero fallbacks. Five YJIT pairs: profile median −14.3%
+  with narrowly separated ranges; overview/list −6.1%/−13.1% remain within
+  overlapping noise. More allocations (+21/request), worse p95 tails, full file
+  IO and guard limits remain. SQL-trace warnings also reproduce with every unit
+  disabled; see the aggregate notes rather than assuming full SQL identity.
 - **Runtime gem**: `load_iseq` / ISeq eval seams (composes with Bootsnap and
   require-hooks/Freezolite in every installation order), per-file compiler
   contracts captured from the booted app, unchanged-source/original-ISeq
@@ -97,7 +108,7 @@ same 11 units and verifies 21/21 identical with 114 hits.
 |---|---|---|---|
 | real-blog (Rails 8.1.4) | 9/9 `link_to` sites, 10/10 route sites (1 in a controller), 12 units including preload plans | 21/21 identical, 116 fast-path hits across all 12 units (2 preload hits) | 4 HTML routes byte-identical on/off (CSRF masked); request time within noise, allocs −1 to −6 %; `edit_article_path` 2.7 → 1.4 µs |
 | Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 108/162 route sites (51 `_url`) | 634/634 identical (2 skips both ways), 13238 hits across 52 units, 0 fallbacks; with `--preload-plans` 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
-| ARGOS (private, Rails 8.1.4) | 235/280 route sites, 61 units; `link_to` 0/0 | 10,816 unit/request + 552 system outcomes identical; 794/226 guard hits, zero guard fallbacks; three units unexercised | [Iteration and aggregate measurements](m0/argos.md): page/boot timing within noise; 14,734 type signatures, 3,053 non-untyped returns; digest 15.8% self remains a candidate |
+| ARGOS (private, Rails 8.1.4) | 235/280 route sites + one opt-in digest site, 62 units; `link_to` 0/0 | 10,816 unit/request + 552 system outcomes identical; route 794/226 + digest 765/2,849 hits, zero fallbacks; SQL-trace caveat in notes | [Aggregate measurements](m0/argos.md): digest 298.40 → 129.81 µs; profile −14.3%, overview/list within noise; 14,734 type signatures, 3,053 non-untyped returns |
 | PingCRM (Rails 8.1.4, Ruby 4.0.7) | 30/30 route sites, 4 route units + preload | 26/26 identical, 11 route + 7 preload hits | [Public Inertia M0](m0/inertia.md); seed 41231, browser suite included |
 | Redprints CFP (Rails 8.1.3, Ruby 4.0.7) | 25/27 route sites, 14 route units; 9 Ruby files compiled | 50/50 non-system + 12/12 browser outcomes identical; 25 + 19 fast-path hits, **zero fallbacks** in both runs | Freezolite delivery and dynamic mounted-engine script completion fixed ([loader survey](loaders.md)) |
 | React Starter Kit (Rails 8.1.4, Ruby 4.0.7) | 23/26 route sites, 8 route units + preload | 36/36 identical, 25 route hits across 7 units; no preload hits | [M0](m0/inertia.md) includes healthy SSR HTML and authenticated JSON |
@@ -202,6 +213,6 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
   host normalization is request-local, but Rails' `url_options` assembly and
   application overrides remain per call.
 - Broader benchmark coverage and confidence intervals (preload runs now interleave on/off).
-- Broader memo certificates for timeout-sensitive URI work and file-backed
-  asset versions (ARGOS's private digest remains unoptimized).
+- Broader memo certificates for timeout-sensitive URI work; exact file-digest
+  memo now works, but its byte-indexing/read cost remains measurable.
 - Active Record attribute/reflection dispatch (ARGOS, Campfire uncached).
