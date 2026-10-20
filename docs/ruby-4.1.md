@@ -186,11 +186,20 @@ file-memo still refuses 3.3.0 (`digest_version`), unlike the separately
 audited expression certificate. Route/view quarantine remains in force.
 These are **Lowrail-on-4.1 safe refusals**, not Rails test failures.
 
+The table records the step-2 outcome/SQL matrix, not a later loader-census
+certificate. Subsequent main-branch work found a reproducible require-hooks
+adapter-selection/load-order difference on Ruby 4.0.7, including with no
+active units ([loader refusal](loaders.md#unresolved-require-hooks-adapter-selection)). That is
+a Lowrail delivery boundary, not a preview-specific Rails failure. This study
+did not rerun that expanded strict loader matrix on 4.1; the earlier green
+outcomes must not be presented as proof that the ordering difference is absent.
+
 **Disposition:** own-code compatibility is green on both targets; the five-app
 preview correctness matrix is green with the recorded dependency overlays.
 No observed Rails 8.1.4 runtime failure is patched locally. Proceed to step 3's
-ZJIT seam/cohorts; the singleton-guard alternative still requires complete-check
-pricing before implementation. Do not infer performance from these tests.
+ZJIT seam/cohorts. The owner subsequently dropped the singleton-guard rewrite
+because the guarded endpoint slice stopped; retain only the future/sealed-code
+rule in [jit-shapes.md](jit-shapes.md). Do not infer performance from these tests.
 
 ## Exact interpreter and reproducible matrix axis
 
@@ -287,7 +296,8 @@ BENCH_JIT=1 mise exec ruby@4.1.0-preview1 -- target/debug/lowrail bench \
 ```
 
 The final bench command is an example of version selection, **not an executed
-or accepted measurement**. `BENCH_JIT` still accepts only `0`/`1`.
+or accepted measurement**. The step-3 seam also accepts `interpreter`, `yjit`
+and diagnostic-only `zjit`, retaining `0`/`1` as interpreter/YJIT aliases.
 
 ## Initial correctness matrix: unchanged applications first
 
@@ -385,9 +395,89 @@ on 4.1 with the cached 4.0 facts withheld. Benchmark preflight again passes
 
 | Requested finite cohort | Interpreter / YJIT / ZJIT on 4.1 | Disposition |
 |---|---|---|
-| Old cached guard vs K | pending finite cohort | compatibility prerequisite satisfied; no numbers yet |
-| Allocation-study props micro | pending finite cohort | same pinned preview and dependency overlay |
-| Blog index/show: off vs historical default, L2/L2_events | pending finite cohort | historical runtime/specimens must remain pinned, not current quarantined default |
+| Old cached guard vs K | 1,760 → 375 / 1,045 → 66 / 1,026 → 56 net Ir/check | interpreter and YJIT accepted; ZJIT strict rejection, available-counter partial flatness only |
+| Allocation-study props micro | −3.358% / −11.141% / −2.185% total Ir | all rejected: interpreter excluded-GC A/A, YJIT heap, ZJIT missing strict invalidation proof |
+| Blog index: L2 / L2_events vs off | −32.843% / −25.592%; −31.376% / −21.840%; −31.736% / −22.327% | entire comparison rejected: historical default did not activate; both JIT modes also fail heap/strict-flat controls |
+| Blog show: L2 / L2_events vs off | −39.772% / −36.265%; −36.975% / −33.533%; −37.204% / −34.025% | same rejection; unchanged handwritten ceilings only, no default/pass credit |
+
+All requested finite cohorts are finished. The columns above are interpreter,
+YJIT, ZJIT, on the **same pinned 4.1 executable**, not the primary 4.0.7.
+The [numeric export](ruby-4.1-cohorts.json) retains paired samples, bootstrap
+95% intervals, heap signatures, A/A verdicts, actual JIT modes and warm/window
+counters, input hashes and the activation trace. Raw samples are hashed before
+slimming GC snapshots. The available-counter partial gate is postprocessed
+from those unchanged observations; an assertion checks that every original
+strict JIT verdict stays unchanged. No cohort was retried or repaired.
+
+Every blog A/A control passes. Interpreter heaps and the interpreter gate
+pass, but that does not repair activation. YJIT index/show have **3/36 and
+4/36 non-flat measured workers**, respectively, despite flat warmups, and both
+have mismatched heaps. ZJIT's exposed counters pass the partial gate in all
+**36/36 workers per route**, but both heaps mismatch and the missing
+invalidation count still rejects the strict gate. Together with guard and
+props, all **114 ZJIT workers** pass only the available-counter partial gate.
+
+For completeness, the **inactive** historical-default arms' raw total-Ir
+changes are index/show +0.02392%/+0.05694% interpreter,
++0.01465%/+0.12533% YJIT and −0.38978%/−0.28945% ZJIT. None is a Lowrail
+effect: zero fast-path hits makes every default comparison invalid. The
+nonzero ZJIT differences despite inactive lowering are another reason not to
+interpret these rejected controls as an optimization result.
+
+**Recommendation:** keep 4.0.7 primary, 4.1 as a correctness target, ZJIT
+diagnostic only, and the guard-included interpreter/YJIT micro decision rule.
+No pass or endpoint priority changes. Fix deploy-path portability separately;
+do not reinterpret or rerun this finite study after that fix. The singleton
+rewrite was canceled with the guarded endpoint slice; only the future-code
+rule and the `public_method` callback limit remain in the shape guide.
+
+Guard prices subtract the paired loop arm in every round, after N=0 seam
+subtraction. Their six-round bootstrap 95% intervals round to the displayed
+integers in all three modes. Both A/A controls and every heap match in all
+three guard cohorts. ZJIT still fails the strict gate; its 24 workers are
+flat only for the five available counters. This is not a native-speed or
+cross-Ruby comparison, nor evidence that whole requests are stable.
+
+The props specimen removes **13 objects/call** in every mode. Paired total-Ir
+savings are 5,580 [5,578, 5,621] interpreter, 5,976 [5,921, 6,032] YJIT,
+and 1,569 [1,545, 1,606] ZJIT. These remain diagnostics, not accepted pass
+budgets: the interpreter excluded-GC A/A interval is
+[+0.000274%, +0.052607%], excluding zero; YJIT's 40-byte heap pool ranges
+1,000,446–1,002,086 slots, more than one page; ZJIT's A/A/heaps and all
+18 workers' available-counter partial flatness pass, but its strict proof
+is unavailable. The handwritten fact-token specimen is not the production
+`inertia/props` pass and does not price that pass's exact residual checks.
+
+The finite cohort invocation uses the same pinned preview executable for all
+three modes and the `d7d62ba` Valgrind build, not stock Valgrind:
+
+```sh
+export PATH="$HOME/.local/lowrail-valgrind-3.19-brk512/bin:$PATH"
+export CPATH="$HOME/.local/lowrail-valgrind-3.19-brk512/include"
+# APP is a disposable preview blog copy with the production fixtures/assets
+# prepared as in bench.md, and its c9d2397 default rebuilt on this VM.
+# HISTORICAL_ROOT is a git archive of c9d2397, not current runtime libraries.
+for mode in interpreter yjit zjit; do
+  GUARD_JIT="$mode" GUARD_CASES=loop,cached,inline \
+    mise exec ruby@4.1.0-preview1 -- ruby bench/guard_breakdown.rb "$OUT/guard-$mode"
+  BENCH_JIT="$mode" BENCH_CORPUS_ROOT="$PWD/.corpus/ruby41-source" \
+    mise exec ruby@4.1.0-preview1 -- ruby bench/experiments/allocations_micro_study.rb "$OUT/props-$mode" props
+  BENCH_JIT="$mode" BENCH_APP="$APP" BENCH_HISTORICAL_ROOT="$HISTORICAL_ROOT" \
+    mise exec ruby@4.1.0-preview1 -- ruby bench/experiments/yjit_study.rb "$OUT/blog-$mode"
+done
+```
+
+All output directories must be new; retain nonzero/rejected results and
+continue to the next requested cohort. Six rounds each, seed **41231**;
+guard **100,000** checks/window, props **1,000** resolutions/window, requests
+**50**/window. Each also measures N=0 and GC-included/excluded windows.
+JIT warm chunks **200**, maximum **20,000**, three consecutive flat chunks;
+no call-threshold override. Props remains the allocation study's handwritten
+fact-token specimen, **not the guarded `inertia/props` pass**. Blog fixtures
+have three articles and three comments. L1/L2/L2_events are unchanged
+published ceiling specimens, with the same omissions; their fixture checks
+run separately for every mode. The historical default has 11 units, five
+templates and one Ruby file. This does not re-enable quarantined passes.
 
 No retries-until-green, cohort salvage or substitutions. Existing
 [YJIT rejections](bench.md#matched-interpreter--yjit-request-study) remain
@@ -399,13 +489,32 @@ omissions. The allocation study's older default is
 [`8df58ed`](https://github.com/thomasklemm/lowrail/commit/8df58ed), not today's
 empty default. These are different baselines, not interchangeable results.
 
+**Activation rejection, independent of the numerical controls:** the historical
+artifact was rebuilt on this VM under the dependency-overlay blog path, then
+copied with the application to the disposable request-study path. Its manifest
+file/template keys and method source facts still name the former root. Every
+default coverage probe reports **zero hits and zero completed lowerings**.
+A separate untimed handler trace confirms Rails compiles templates under the
+new root while the manifest retains the old keys. Identical source bytes and
+a compatible Ruby do not relocate these keys automatically. Therefore the
+entire blog comparison is rejected, even where its raw numerical summary says
+accepted. Do not interpret its near-zero default effect as a measured Lowrail
+result or salvage clean arms. Retain the L2/L2_events observations only as
+diagnostics of unchanged handwritten ceiling specimens and their existing
+semantic omissions. The owner requested a separate relocation fix after this
+finite study; it does not retroactively repair these measurements.
+
 The ZJIT seam requires **three flat warm windows and no compilation or
 invalidation in any measured window**, alongside unchanged fixed heaps,
 both A/A controls, GC.stat_heap-signature prewarm and request-only settling.
 ZJIT's `compiled_side_exit_count` counts **compiled exit stubs**, not executed
 exits. `invalidation_time_ns` is time, not a public invalidation generation.
-The release build does not supply `ratio_in_zjit` or executed side-exit counts;
-do not replace the strict YJIT gate with whichever ZJIT numbers are available.
+Default release options do not supply `ratio_in_zjit` or executed side-exit
+counts. A separate untimed `--zjit-stats` probe exposes `side_exit_count`,
+but still no invalidation count or ratio on this build. The ratio requires
+`ZJIT_STATS` interpreter instrumentation, not just the runtime stats flag
+(`zjit/src/stats.rs:939–948`). Do not replace the strict YJIT gate with
+whichever ZJIT numbers are available.
 ZJIT remains diagnostic, never pass promotion evidence in this investigation.
 `BENCH_JIT=zjit` now runs the fixed-heap worker, with both actual JIT states
 checked. It records `compiled_iseq_count`, `failed_iseq_count`, generated
@@ -427,6 +536,26 @@ A 12-pool regression also found endpoint observer-loop self-compilation
 observer loop is now itself prewarmed, not excluded from the flat gate.
 These are protocol adaptations before the finite cohorts, not discarded
 measurement retries. Use the pinned `script/bench-valgrind` 512 MiB-brk tool.
+
+### Partial gate: available ZJIT counter flatness only
+
+The five exposed counters can establish a **partial gate**: three consecutive
+flat warm chunks, then unchanged `compiled_iseq_count`, `failed_iseq_count`,
+`compiled_side_exit_count`, `compile_time_ns`, and `invalidation_time_ns` across
+every observed window. Require the actual ZJIT-only mode too. Missing any of
+these five fails even the partial gate. Keep its result separate from the
+strict gate, A/A and heap verdicts; a partial pass cannot accept a cohort.
+
+This is evidence of no observed successful/failed compilation or exit-stub
+generation, and flat measured compiler/invalidation time. It does **not** prove
+no invalidation, no executed side exits, stable execution ratio, or a steady
+profile for every lowered ISeq. Source: the default counter set in
+[`zjit/src/stats.rs:154–169`](https://github.com/ruby/ruby/blob/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1/zjit/src/stats.rs#L154-L169)
+and the time-accumulating
+[`compile_patch_points!`](https://github.com/ruby/ruby/blob/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1/zjit/src/invariants.rs#L12-L38).
+Time is summed from `Instant::elapsed` nanoseconds (`stats.rs:987–993`),
+not an invalidation generation. No stats option, threshold change or VM patch
+was added to the measured workers.
 
 ## Mutation APIs: no usable public broad epoch found
 

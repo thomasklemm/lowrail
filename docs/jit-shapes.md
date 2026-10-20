@@ -4,8 +4,10 @@
 semantics or treating a JIT preference as a correctness proof. Ruby 4.0.7 is
 measurement-primary; 4.1 is also a correctness target. Its gem suite and
 [five-app correctness matrix with dependency overlays are green](ruby-4.1.md).
-No pass changes are part of this guide; the singleton-class alternative still
-requires exactness and complete-check pricing before implementation.
+No pass changes are part of this guide. The guarded endpoint slice was
+[stopped](https://github.com/thomasklemm/lowrail/commit/5f81980fb0cee2cfee6c379c25fd29b71c48389e);
+its singleton-class rewrite is dropped, not a pending runtime task. Retain
+the finding below for future/sealed code.
 
 Sources below pin Ruby to
 [`2d08b5f`](https://github.com/ruby/ruby/commit/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1)
@@ -72,6 +74,17 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    `invalidate_no_singleton_class` counter. Distinguish ordinary instances
    from class/module singleton setup; do not remove visibility or effective
    method checks to avoid the singleton class.
+   **Bound `Kernel#public_method` is not a drop-in exact replacement.** On
+   a missing/undefined method it calls application `respond_to_missing?`;
+   captured `Module#instance_method` raises without that callback. This is
+   observable even when both ultimately raise NameError. Confirmed on 4.0.7
+   and the pinned preview: remove `link_to`, record callback names, then the
+   old lookup records `[]`, `public_method` records `[:link_to]`. Source:
+   [`proc.c:2547–2561`](https://github.com/ruby/ruby/blob/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1/proc.c#L2547-L2561).
+   Future sealed code must not create eigenclasses as provenance evidence;
+   use an exact certified factory boundary or retain ordinary dispatch, and
+   price all residual checks. Array enumeration before lookup may avoid the
+   missing-method callback, but is not a demonstrated cheap/atomic guard.
 
 7. **Avoid unnecessary splat, keyword-splat, forwarding and passed blocks in
    a certified hot path; inspect actual fallback/exit counters.** Not all of
@@ -124,7 +137,7 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
 | Current place / cost | Alternative and required boundary |
 |---|---|
 | Historical source lowering (`src/lower/route.rs`, `view.rs`) puts K/ok? or G/check plus both arms in the original method | A separately profiled whole-method `def`, selected before first use, preserving lexical nesting and an exact original body. Only if facts cannot change, or complete invalidation/local continuation protects every use. The quarantined passes remain quarantined; moving their existing checks to load would be wrong. |
-| `gem/lib/lowrail/endpoint.rb`, `Entry#template_current?` and `#helper_current?`, use bound `singleton_class` on each live view | A candidate is bound `Object#public_method` for the real effective method, followed by `unbind` equality; for `_run`, walk `Method#super_method` past the known runner modules. It reads `CLASS_OF(obj)` without creating a singleton class (`proc.c:2907ff`). A preview control gives equal for inherited real methods, unequal after a singleton override, NameError for private. Full missing-method, suppressed-hook and mutation certification plus cost measurement still required; comparing only `view.class.instance_method` would miss singleton overrides. |
+| Stopped guarded endpoint: `gem/lib/lowrail/endpoint.rb`, `Entry#template_current?` and `#helper_current?`, use bound `singleton_class` on each live view | Do not carry this into future/sealed code. Bound `Kernel#public_method` plus `unbind` reads `CLASS_OF(obj)` without creating an eigenclass, but the missing/undefined-method callback above makes the simple replacement inexact. Comparing only `view.class.instance_method` misses singleton overrides. No runtime rewrite or pricing cohort was performed after the owner dropped this step. |
 | Endpoint generated `_run` wraps inline template bodies/collection dispatch; `process(action, ...)` and Execution forward arguments | Retain real def ISeqs, but choose one separately compiled template method per certified shape and explicit call signature for a closed endpoint. Keep original generic `_run`/`process` as fallback; preserve locals, buffer restore, CREF, events, streaming and every live helper boundary. No wholesale endpoint bypass. |
 | `ARInstantiate.source` emits a real `def _load_from_sql`, but carries entry/per-row certificates, blocks and original arms | An entry-only variant is not exact: notification subscribers and preceding rows' callbacks can mutate methods/schema. Retain per-row `plan.current?`; if a whole certified component can have separate original/fast ISeqs, price that complete guard/dispatch cost, without replaying rows. No safe load-only alternative established. |
 | `AR.hooks_for` uses `define_method` with `*args, **kw, &blk` closures | Generate real def hooks with signatures from audited methods and an immutable setup-time event/target table. Preserve private visibility, alias/super behavior and hook semantics. Only helps schema/mutation paths unless those methods are hot; do not count build-only define_methods as request work. |
@@ -173,9 +186,14 @@ available, with no manufactured per-unit attribution.
 The output keeps their numeric counters plus explicit nullable exit count,
 invalidation count and `ratio_in_jit` (YJIT `ratio_in_yjit`, ZJIT
 `ratio_in_zjit`). Availability depends on the build/stats options. The preview
-release provides ZJIT compiled/failed ISeq counts and invalidation time, but
-not executed exits, an invalidation count or execution ratio. **Compiled exit
-stubs are not executed side exits. Missing is null, not zero.**
+release's default options provide ZJIT compiled/failed ISeq counts and
+invalidation time, but not executed exits, an invalidation count or execution
+ratio. An **untimed** `--zjit-stats` probe does expose `side_exit_count` in
+this release build; it still exposes no invalidation count, and
+`ratio_in_zjit` additionally needs a `ZJIT_STATS` build's interpreter instruction
+counter (`stats.rs:939–948`). Do not inject that instrumentation into these
+measured cohorts. **Compiled exit stubs are not executed side exits. Missing
+is null, not zero.**
 
 Neither public API exposes per-ISeq exits/invalidations/ratios. File delivery
 optionally retains named method ISeqs with candidate unit IDs and YJIT's

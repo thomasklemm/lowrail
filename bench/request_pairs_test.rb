@@ -29,6 +29,37 @@ class RequestPairsTest < Minitest::Test
     end
   end
 
+  def test_partial_zjit_flatness_never_substitutes_for_missing_invalidation_proof
+    keys = %w[compiled_iseq_count failed_iseq_count compiled_side_exit_count compile_time_ns invalidation_time_ns]
+    counters = keys.to_h { [_1, 17] }.merge("invalidation_count" => nil)
+    worker = { "yjit" => false, "zjit" => true,
+      "jit_warmup" => { "stable" => false, "observed_counters_flat" => true, "consecutive_flat_windows" => 3,
+        "history" => [0, 200, 400, 600].map { { "requests" => _1, "counters" => counters.dup } } },
+      "windows" => [{ "jit_before" => counters.dup, "jit_after" => counters.dup }] }
+    result = JitStability.control({ "worker" => worker }, requested: "zjit")
+    refute result.fetch(:pass)
+    assert result.fetch(:partial_gate).fetch(:pass)
+    keys.each do |key|
+      worker["windows"][0]["jit_after"][key] = 18
+      refute JitStability.control({ "worker" => worker }, requested: "zjit").fetch(:partial_gate).fetch(:pass), key
+      worker["windows"][0]["jit_after"][key] = 17
+      worker["jit_warmup"]["history"][1]["counters"][key] = 16
+      refute JitStability.control({ "worker" => worker }, requested: "zjit").fetch(:partial_gate).fetch(:pass), key
+      worker["jit_warmup"]["history"][1]["counters"][key] = nil
+      refute JitStability.control({ "worker" => worker }, requested: "zjit").fetch(:partial_gate).fetch(:pass), key
+      worker["jit_warmup"]["history"][1]["counters"][key] = 17
+    end
+    first = worker["jit_warmup"]["history"].shift
+    refute JitStability.control({ "worker" => worker }, requested: "zjit").fetch(:partial_gate).fetch(:pass)
+    worker["jit_warmup"]["history"].unshift(first)
+    worker["yjit"] = true
+    refute JitStability.control({ "worker" => worker }, requested: "zjit").fetch(:partial_gate).fetch(:pass)
+    worker["yjit"] = false
+    worker["windows"].clear
+    refute JitStability.control({ "worker" => worker }, requested: "zjit").fetch(:partial_gate).fetch(:pass)
+    refute JitStability.control({}, requested: "zjit").fetch(:partial_gate).fetch(:pass)
+  end
+
   def test_brk_overflow_rejects_the_cohort_in_preflight_or_a_successful_worker
     saved = ENV.to_h.slice("PATH", "PROBE_WARNING", "BENCH_HEAP_SLOTS", "BENCH_JIT")
     Dir.mktmpdir("lowrail-brk-refusal-test") do |dir|

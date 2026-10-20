@@ -70,7 +70,8 @@ module JitStability
   # JSON worker observations, not the flag passed to Ruby, decide the gate.
   def self.control(workers, requested:)
     requested = mode(requested)
-    observations = workers.transform_values do |worker|
+    partial = {} if requested == "zjit"
+    observations = workers.to_h do |name, worker|
       actual = actual(worker)
       enabled = actual != "interpreter"
       keys = counters(actual)
@@ -81,13 +82,37 @@ module JitStability
         before, after = window.values_at("jit_before", "jit_after")
         before && after && keys.all? { |key| before[key.to_s].is_a?(Integer) && before[key.to_s] == after[key.to_s] }
       end
-      { actual_jit: actual, actual_yjit: worker.fetch("yjit"), missing_counters: missing,
+      if partial
+        available = ZJIT_COUNTERS - [:invalidation_count]
+        history = warm ? warm.fetch("history", []).last(4) : []
+        warm_flat = history.size == 4 && available.all? do |key|
+          values = history.map { _1.dig("counters", key.to_s) }
+          values.all? { _1.is_a?(Integer) } && values.uniq.size == 1
+        end
+        windows = worker.fetch("windows")
+        windows_flat = !windows.empty? && windows.all? do |window|
+          available.all? do |key|
+            before, after = window.dig("jit_before", key.to_s), window.dig("jit_after", key.to_s)
+            before.is_a?(Integer) && before == after
+          end
+        end
+        partial[name] = { actual_jit: actual, warmup_stable: warm_flat,
+          windows_stable: windows_flat, pass: actual == "zjit" && warm_flat && windows_flat }
+      end
+      [name, { actual_jit: actual, actual_yjit: worker.fetch("yjit"), missing_counters: missing,
         mode_matched: actual == requested, warmup_stable: warm_ok,
-        windows_stable: windows_ok, pass: actual == requested && warm_ok && windows_ok }
+        windows_stable: windows_ok, pass: actual == requested && warm_ok && windows_ok }]
     end
-    { requested_jit: requested, diagnostic_only: requested == "zjit",
+    result = { requested_jit: requested, diagnostic_only: requested == "zjit",
       requested_yjit: requested == "yjit", actual_yjit: workers.values.map { _1.fetch("yjit") }.uniq,
       actual_jit: workers.values.map { actual(_1) }.uniq,
       pass: observations.values.all? { _1.fetch(:pass) }, workers: observations }
+    if partial
+      result[:partial_gate] = { scope: "available_counter_flatness_only; no invalidation-count proof",
+        counters: ZJIT_COUNTERS - [:invalidation_count],
+        pass: !partial.empty? && partial.values.all? { _1.fetch(:pass) },
+        workers: partial }
+    end
+    result
   end
 end
