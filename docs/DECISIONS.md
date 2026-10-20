@@ -18,7 +18,7 @@ stacked set as well as to single passes.
 | Item | State | Why / evidence |
 |---|---|---|
 | Pass registry, single runtime-build boot, shared ledger (migration 1–3) | done | Behavior-equivalent; [build-pass-equivalence.json](build-pass-equivalence.json) |
-| Runtime `Lowrail::Passes` registry (migration 4) | in progress | Non-browser gates identical, request cost −0.02 % (noise). Cold require+setup +0.76 % once per boot from parsing the shared registry, not eager pass loading. Gated on browser counter attribution |
+| Runtime `Lowrail::Passes` registry (migration 4) | done (491ea27) | 811 outcomes, ordered SQL, per-unit maps and Rails L3 identical; request −0.02 % (noise); cold require+setup +0.76 % once per boot (registry parsing, not eager loading). Open: intermittent real-blog link_to fallback (1 of 7 runs) under investigation |
 | `lowrail bench APP --pass/--passes` (migration 5) | done (6f9e27a, 8db84d8) | One shared method: fixed-heap Callgrind, A/A, actual JIT state, stale-build rejection ([bench.md](bench.md)) |
 | SQL-trace differential in verify | done | Fixed seed, symmetric repeat controls |
 | Rails 8.1.4 framework suites as gate | done | [rails-suite.md](rails-suite.md); zero reproducible differences |
