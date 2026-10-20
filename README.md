@@ -20,9 +20,10 @@ why and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how a pass plugs in.
   The pinned Rails 8.1.4 framework suites are a standing gate
   ([rails-suite.md](docs/rails-suite.md)). Five original corpus apps retain
   identical outcomes/SQL. The expanded [gem-breadth corpus](docs/compat.md)
-  found and fixed early-autoload bugs; the stricter load census still
-  rejects Redprints' require-hooks adapter change. No universal support
-  claim follows from the green outcome comparisons.
+  found and fixed early-autoload bugs. Hook-free delivery preserves
+  require-hooks' adapter; Redprints passes the strict load census only by
+  refusing Bundlebun delivery/activation, losing its 277 hits. No universal
+  support claim follows from the green outcome comparisons.
 - **The default build lowers nothing.** The two former default passes,
   `view/link_to` and `route/path`, are quarantined. Warmed apps could
   observe stale helpers when code changed mid-request

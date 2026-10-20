@@ -1,10 +1,12 @@
 # Loader composition and compile options
 
-Checked 2026-10-20 on MRI 4.0.7 (3.4.11 results below are historical;
-Ruby 3.4 is no longer targeted). Lowrail preserves per-file compiler policy;
-it does **not** enable frozen string literals for the app. This is narrower
-than preserving loader selection: the strict load census rejects the
-require-hooks/Bootsnap ordering described below.
+Checked 2026-10-20 on MRI 4.0.7 and 4.1.0-preview1 (`2d08b5f42f`). Lowrail
+preserves per-file compiler policy; it does **not** enable frozen string
+literals for the app. Neither build capture nor runtime delivery defines a
+`load_iseq` method. The existing method's owner, source location and method
+chain stay unchanged; require-hooks keeps its original adapter selection.
+Redprints additionally needs the targeted Bundlebun refusal below: its strict
+load census passes, but it now has **zero fast-path hits**.
 
 ## Why the process-wide fingerprint was insufficient
 
@@ -29,15 +31,40 @@ enough: on MRI 4.0.7, with process `frozen_string_literal: false`, even
 false. The fixture caught that difference. Source magic comments remain
 authoritative.
 
-Runtime delegates to the original loader first. It observes compiler calls
-and Bootsnap deserialization, checks the per-file recipe fingerprint **and**
-the original ISeq fingerprint and disk digest, then substitutes the lowered
-binary. For require-hooks the substitution also happens at `ISeq#eval`,
-inside its callbacks. Unknown recipes, changed source/transforms, missing or
-broken binaries, and active Coverage retain original code. Digest is still
-loaded lazily, but its nested requires preserve the active compile defaults.
-Lowrail never substitutes before Bootsnap serializes: its cache contains
-originals, safe for subsequent `LOWRAIL=0` processes or changed builds.
+Runtime leaves the original loader alone and substitutes only at these
+boundaries, after checking the per-file recipe fingerprint **and** the
+original ISeq fingerprint and disk digest:
+
+- **Native MRI compilation:** MRI's `InstructionSequence.translate(iseq)`
+  callback handles plain require/load when no loader returns bytecode. Only
+  tracked top-level file ISeqs are eligible, never method/block/eval ISeqs.
+  Build observes the complete native binary, including its different
+  top-level label; runtime checks that actual binary without recompilation
+  or fingerprint normalization. Standalone builds can obtain an additional
+  native fingerprint by stopping the native C load at `translate`, before
+  evaluation or `script_compiled`. This is never attempted through existing
+  load hooks, translators, warning callbacks or active TracePoints. Existing
+  translators retain the runtime boundary in either order. Custom warning
+  callbacks also decline native substitution: they can change compiler
+  options during parsing, so final defaults cannot certify the recipe.
+- **Bootsnap:** `storage_to_output` substitutes after native cache
+  serialization, for both cache misses and hits. Compiler APIs always return
+  originals, including when a compiler uses a display filename different
+  from the absolute source path. The cache remains safe for subsequent
+  `LOWRAIL=0` processes or changed builds.
+- **Explicit execution:** `ISeq#eval` substitutes inside require-hooks'
+  callbacks. Its empty-ISeq protocol, source transformations and callbacks
+  remain owned by require-hooks, not reconstructed by Lowrail.
+
+Unknown recipes, changed source/transforms, missing or broken binaries, and
+active Coverage retain original code. Digest is still loaded lazily, but
+its nested requires preserve the active compile defaults. Runtime native
+compilation occurs exactly once: certification must not call compiler
+wrappers or re-emit source warnings. The app file is **never evaluated twice**.
+No compiler/delivery hooks are installed for manifests without source files.
+Unobserved inner compiler wrappers cannot inherit an outer default-options
+snapshot. Old artifacts without the observed native fingerprint safely miss
+native delivery until rebuilt; API/cache delivery retains its own certificate.
 
 A require-hooks bytecode hijack can use options unrelated to Bootsnap's
 selected compiler. Its warm cached binary does not prove that recipe, even
@@ -71,19 +98,21 @@ was executed. The regression matrix below names what was actually tested.
 
 ### Installation order
 
-Lowrail may load before, between, or after Bootsnap and require-hooks. Its
-outer hook always delegates; the eval hook handles require-hooks' private
-empty-ISeq protocol. Other modules and callbacks are not removed/reordered.
+Lowrail may load before, between, or after Bootsnap and require-hooks. It
+does not add an outer `load_iseq` hook at all, during build or runtime.
+Other load methods and callbacks are not removed/reordered. A later Bootsnap
+installation attaches the cache-output observer through the existing prepend
+notification, without rewrapping the load method.
 
 Bootsnap after require-hooks can hide require-hooks **without Lowrail too**.
 Tests build with the app's own loader order and compare against that exact
 baseline, including mutable literals when Freezolite is hidden. Lowrail must
 not silently repair that order and change application behavior. To enable
 Freezolite's policy, applications should follow its documented order:
-Bootsnap first, Freezolite after. Lowrail's placement preserves the tested
-literal results, but is **not independent of loader selection**.
+Bootsnap first, Freezolite after. Lowrail preserves that order's literal
+results **and** its loader selection; it does not force an adapter.
 
-### Unresolved: require-hooks adapter selection
+### Resolved: require-hooks adapter selection
 
 In both [0.4.0](https://github.com/ruby-next/require-hooks/blob/v0.4.0/lib/require-hooks/setup.rb)
 and [0.5.1](https://github.com/ruby-next/require-hooks/blob/v0.5.1/lib/require-hooks/setup.rb),
@@ -98,8 +127,9 @@ RubyVM::InstructionSequence.respond_to?(:load_iseq) &&
 
 True selects `require-hooks/mode/bootsnap`; false selects `mode/load_iseq`.
 Without MRI it uses the Kernel patch. Neither `defined?(Bootsnap)` nor the
-method owner decides this. Lowrail's prepended method has a Lowrail source
-location, so its presence changes the answer.
+method owner decides this. The former Lowrail wrapper changed the answer;
+removing both wrapper definitions fixes the detector rather than falsifying
+introspection or setting `REQUIRE_HOOKS_MODE`.
 
 A fresh-process probe on Ruby 4.0.7, Bootsnap 1.26.0 and **each** require-hooks
 version confirms the following. B = Bootsnap, H = require-hooks, L = Lowrail;
@@ -107,31 +137,53 @@ the off run keeps B/H order and disables L.
 
 | Installation order | Off adapter | On adapter |
 |---|---|---|
-| L, B, H or B, L, H | Bootsnap | plain ISeq (**difference**) |
+| L, B, H or B, L, H | Bootsnap | Bootsnap |
 | B, H, L | Bootsnap | Bootsnap |
 | L, H, B; H, L, B; H, B, L | plain ISeq | plain ISeq |
 | L, H or H, L, without Bootsnap | plain ISeq | plain ISeq |
 
-All 32 off/on processes returned the expected original/lowered fixture
-result; that does not certify unchanged loading. Redprints' real suite also
-has identical outcomes/SQL but the census rejects reproducible adapter and
-load-order differences, including with no active units. This is a **Lowrail
-delivery/setup problem**, not a Freezolite/app failure or random test noise.
+The earlier 32-process probe found adapter changes in 2/6 permutations while
+still delivering the fixture correctly. The new regression compares the full
+method chain (owners, source locations, parameters), adapter and census
+during build and off/cold-on/warm-on/off runs, not only return values.
 
-Installing only after H preserves the choice in that order, but a generic
-delay until Rails initialization misses earlier file delivery and does not
-fix `Compilation::Capture#load_iseq` during build. Prepending another wrapper
-or chaining with `super` still changes the top method's source location.
-Using only Bootsnap's deserialization seam does not cover native MRI require
-without Bootsnap, cold compilation, or require-hooks' eval/empty-ISeq path;
-substituting before serialization would contaminate the app's original cache.
-No cheap, general, exact replacement has been established for these seams.
-Keep the strict verify refusal rather than change gem mode, falsify
-introspection, or weaken delivery fingerprints. This is not an automatic
-runtime artifact refusal: the existing delivery implementation remains, and
-this ordering has **no strict compatibility claim**. Invariant 7 takes
-precedence over the earlier acceptance of adapter changes. See
-[compatibility results](compat.md) and [DECISIONS](DECISIONS.md).
+Late installation alone was rejected: it misses early file delivery and
+does not establish that a detector never checks again. A registry would
+require changing the app's loader; substituting at compiler return would
+poison Bootsnap's cache. The three downstream boundaries above cover the
+tested native/cold/warm/eval cases without either compromise.
+
+### Refused: Bundlebun integration enumeration
+
+Hook-free delivery removes require-hooks' adapter difference in Redprints,
+but leaves **12 stable load-event differences** (formerly 26), with the same
+50 outcomes, 692 queries and 277 hits. Bundlebun 0.5.0.1.3.14 enumerates
+`Integrations.constants` unsorted and autoloads each entry. Additional
+runtime identifier interning changes MRI's constant enumeration order.
+An 18-process control separates this from adapter selection: all six off
+and six setup-only boots use CSS/ExecJS/JS/Vite; all six active boots use
+ExecJS/Vite/CSS/JS. The adapter is correct in every case.
+An independent off-only probe changes integration order merely by compiling
+(not evaluating) one additional symbol literal before app boot. Runtime
+activation need not execute at all to expose this identifier sensitivity.
+
+No exact general solution to that enumeration sensitivity is established.
+Rather than sort someone else's constants or force their integration order,
+setup refuses **all delivery and runtime activation before loading runtime
+installers** if Bundlebun is already defined or the app's `Gemfile.lock`
+lists it. This deliberately covers locked Bundlebun versions conservatively;
+it does not load the gem to inspect it. Build records `bundlebun_load_order`
+in the delivery ledger and manifest; stats expose `refusal_reason`. A saved
+refusal also requires rebuilding after a lockfile change. Old artifacts
+refuse through runtime detection too. This is not a certificate for arbitrary
+dependencies introduced dynamically or through an unexamined alternate lock.
+
+Redprints now passes strict verify: **50 pass, 692 identical queries, zero
+stable load differences**, 32 unstable advisory entries, **0 hits / 0
+fallbacks**. The former 277 hits are intentionally lost, so the requested
+nonzero-hit Redprints gate is **not satisfied**. This is a targeted no-op,
+not full active support. See [compatibility results](compat.md) and
+[DECISIONS](DECISIONS.md).
 
 ## Executed regression matrix
 
@@ -143,8 +195,13 @@ safety and baseline literal behavior.
 
 - MRI 4.0.7: Freezolite 0.7.0; require-hooks 0.4.0 and 0.5.1; no Bootsnap
   (both orders), and Bootsnap 1.18.6, 1.24.6, 1.26.0 (all six permutations).
-- MRI 3.4.11: Freezolite 0.7.0, require-hooks 0.5.1, Bootsnap 1.18.6 and
-  1.26.0; both orders without Bootsnap and all six permutations with each.
+- MRI 4.1.0-preview1: Freezolite 0.7.0, require-hooks 0.4.0 and 0.5.1,
+  Bootsnap 1.26.0; both orders without Bootsnap and all six permutations with it.
+- Both Ruby targets: explicit load-state/census matrix, Bootsnap absent or
+  1.26.0, require-hooks absent/0.4.0/0.5.1, every Lowrail placement (19 orders
+  per Ruby). SHA2 is loaded symmetrically by the fixture, like the Rails
+  corpus: this isolates loader composition, not bare-app stdlib dependencies.
+  Lazy digest loading itself can add stdlib constants in a bare app.
 - Selected Bootsnap frozen-literal compiler with Lowrail before/after it;
   removing the policy refuses the old artifact.
 - Changed options after a successful load; options affecting only strings
@@ -155,17 +212,27 @@ safety and baseline literal behavior.
   cold, warm and off runs preserve the original result for every installed
   require-hooks/Bootsnap pair above, including when original ISeq bytes alone
   cannot detect the recipe mismatch.
+- Explicit compiler serialization, transformed input with a separate display
+  filename, existing translators/compiler/warning overrides in both orders,
+  and runtime/build/saved Bundlebun refusal. Native delivery introduces zero
+  compiler calls, emits source warnings once, and its standalone build
+  certificate never evaluates the file. The rejected canonical-runtime
+  recompile introduced one compiler call and doubled source warnings. The
+  inner-compiler regression fails without its recipe guard: original `1`
+  becomes `false` from an incorrectly compiled introduced string.
 
-The two new loader-policy regression cases fail on pre-fix main (two
-failures). The cached-hijack regression also fails without its follow-up
-guard (the warm run incorrectly serves lowered code); the full gem suite
-passes with both fixes. Reproduce with the repo's mise Ruby and installed
-app dependencies:
+Loader suite: **13 tests, 2,039 assertions** on 4.0.7; **13 tests, 1,452
+assertions** on 4.1-preview; no failures/errors/skips.
+
+The load-state regression fails against unchanged main because build capture
+adds its own `load_iseq` method. Earlier loader-policy and cached-hijack
+regressions remain in the suite. Reproduce with installed app dependencies:
 
 ```sh
 gem install freezolite require-hooks bootsnap --no-document
-ruby -Igem/lib gem/test/loader_test.rb
-ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].sort.each { require_relative _1 }'
+mise exec -- ruby -Igem/lib gem/test/loader_test.rb
+mise exec ruby@4.1.0-preview1 -- ruby -Igem/lib gem/test/loader_test.rb
+mise exec -- ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].sort.each { require_relative _1 }'
 ```
 
 Per-app verification results are recorded in [STATUS](STATUS.md); this

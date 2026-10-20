@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Lowrail
-  # Second delivery seam next to load_iseq: ActionView compiles templates with
+  # Separate from file ISeq delivery: ActionView compiles templates with
   # module_eval, so lowered template code is swapped in where Rails asks the
   # handler for the template's Ruby code. Only when the template source still
   # has the digest it was lowered from; otherwise Rails' own handler runs.

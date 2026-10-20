@@ -45,6 +45,10 @@ Where they disagree with this section, this section wins.
 5. **Targets.** Rails 8.1.4 and Ruby 4.0.7 are primary. Ruby 4.1 is being added as a
    second matrix column, with ZJIT as a diagnostic execution mode. Spinel
    remains out of scope.
+6. **Delivery no longer overrides `load_iseq`.** Native translation, cache
+   output and explicit eval preserve existing load hooks and adapter selection.
+   Bundlebun's order-sensitive integration loading requires a targeted no-op;
+   Redprints loses its fast-path hits ([loaders.md](loaders.md)).
 
 ## 1. Contract
 

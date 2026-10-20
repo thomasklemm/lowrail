@@ -33,6 +33,7 @@ module Lowrail
       def run(argv, err: $stderr)
         input = argv.first or (err.puts("usage: lowrail-compile UNITS_JSON"); return 2)
         input = JSON.parse(File.read(input))
+        input["delivery_refusal"] = Lowrail.delivery_refusal(Dir.pwd)
         Compilation.boot(input) if input["rails_env"] && File.file?("config/environment.rb")
         manifest = compile(input, err: err)
         err.puts "[lowrail] compiled #{manifest["files"].size} file(s), #{manifest["units"].size} unit(s)"
@@ -93,6 +94,7 @@ module Lowrail
         manifest["rails_env"] = input["rails_env"] if input["rails_env"]
         manifest["tier"] = input["tier"] if input["tier"]
         manifest["templates"] = templates unless templates.empty?
+        manifest["delivery_refusal"] = input["delivery_refusal"] if input["delivery_refusal"]
         warnings = []
         artifacts = files.map { |path, entry| [path, entry.fetch("iseq")] }
         units.each do |unit|
@@ -114,7 +116,13 @@ module Lowrail
         end
         ledger_path = File.join(out, "ledger.json")
         ledger = File.file?(ledger_path) ? JSON.parse(File.read(ledger_path)) : []
-        ledger.reject! { _1["pass"] == "jit/shape" }
+        ledger.reject! { %w[jit/shape delivery].include?(_1["pass"]) }
+        if input["delivery_refusal"]
+          ledger << { "pass" => "delivery", "target" => "delivery", "site" => "*", "line" => 0,
+                      "outcome" => "refused", "reason" => "bundlebun_load_order",
+                      "detail" => input["delivery_refusal"], "copies" => 1 }
+          err.puts "[lowrail] #{input['delivery_refusal']}"
+        end
         err.puts "[lowrail] #{warnings.size} JIT shape warning(s); diagnostic only (ledger.json)" unless warnings.empty?
         manifest = Paths.relative(manifest, root: root, dir: out)
         manifest["build_root"] = root # provenance/refusal only, never a lookup root
@@ -168,11 +176,15 @@ module Lowrail
           File.binwrite(tmp, binary)
           File.rename(tmp, dest)
         end
-        { "iseq" => "iseq/#{name}", "source_sha256" => sha,
+        entry = { "iseq" => "iseq/#{name}", "source_sha256" => sha,
           "lowered" => Pathname.new(File.expand_path(lowered)).relative_path_from(Pathname.new(File.dirname(iseq_dir))).to_s,
           "lowered_sha256" => Digest::SHA256.hexdigest(src.b), "iseq_sha256" => Digest::SHA256.hexdigest(binary),
           "original_iseq_sha256" => fingerprint, "portable_fingerprint" => target != path,
           "compile_option" => compilation.fetch(:compile_option) }
+        if target == path && compilation[:native_iseq_sha256]
+          entry["native_iseq_sha256"] = compilation[:native_iseq_sha256]
+        end
+        entry
       end
     end
   end

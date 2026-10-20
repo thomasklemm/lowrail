@@ -97,8 +97,10 @@ module Lowrail
       def unit_fallbacks = counts(MISSES)
 
       def snapshot
-        { "pid" => Process.pid, "ppid" => Process.ppid, "unit_hits" => unit_hits,
+        data = { "pid" => Process.pid, "ppid" => Process.ppid, "unit_hits" => unit_hits,
           "unit_fallbacks" => unit_fallbacks, "loaded_files" => loaded_files }
+        data["refusal_reason"] = Lowrail.refusal_reason if Lowrail.refusal_reason
+        data
       end
 
       def write(path)

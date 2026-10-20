@@ -20,7 +20,7 @@ PLAN.md stays the "why"; this file is the "how a pass plugs in".
         │
         ▼
  delivery at runtime (gem/lib/lowrail.rb setup)
-   source units  → lowered ISeqs via load_iseq / template seam
+   source units  → lowered ISeqs via translate / cache output / eval; template seam
    runtime units → method variants installed after Rails initializes
         │
         ▼

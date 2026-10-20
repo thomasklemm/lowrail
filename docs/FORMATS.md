@@ -320,6 +320,14 @@ Registered require-hooks hijacks therefore cannot borrow the selected
 Bootsnap compiler's recipe: their warm cached bytecode runs unchanged when
 the actual compilation policy is no longer observable.
 
+Native compilation is observed at `translate`, without runtime recompilation
+or binary normalization. Standalone builds may also record an optional
+`native_iseq_sha256`, captured before evaluation through a guarded native
+load: native and explicit compiler APIs have different top-level labels.
+Either complete binary fingerprint is accepted under the same recorded
+recipe and unchanged source digest. A missing native certificate safely
+misses native delivery until rebuilt.
+
 The top-level `compile_option` remains build-process metadata, not a file
 delivery guard. Format-1 manifests now refuse as a whole with a recorded
 rebuild reason; Rust can still read same-root format-1 facts. File delivery also
@@ -338,8 +346,9 @@ for the gem survey, installation-order behavior, and tested versions.
 
 Units: `kind` is `"template"` (code served through the template seam,
 `file` is the template identifier) or `"file"` (a Ruby file served through
-`load_iseq`); `pass` names the lowering pass (`view/link_to`, `route/path`);
-`sites` counts lowered call sites. Unit ids are unique across passes.
+native translation, cache output or ISeq eval); `pass` names the lowering
+pass (`view/link_to`, `route/path`); `sites` counts lowered call sites.
+Unit ids are unique across passes.
 Method/model variants retain `kind: "runtime"` and their existing pass-specific
 payloads (`preload_facts`, `ar_instantiate`, `ar_plans`). They need no compiled
 file. The runtime install contract is unchanged by migration steps 1–3;

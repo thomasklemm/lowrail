@@ -119,6 +119,7 @@ module Lowrail
       # because RAILS_ENV is often set only after setup).
       @rails_env = data["rails_env"]
       @units = data.fetch("units")
+      @refusal_reason ||= data["delivery_refusal"]
       sealed_units = @units.any? { Passes.sealed_only?(_1["pass"]) || _1["pass"].to_s.start_with?("sealed/") }
       if data["tier"] == "sealed-v1"
         unless ENV["LOWRAIL_SEALED"] == "1" && ENV["RAILS_ENV"] == "production" &&
@@ -169,7 +170,7 @@ module Lowrail
         return Lowrail.refuse("compiler recipe mismatch or unobserved: #{source_path}; using original source")
       end
       # The recipe alone cannot detect external source transforms or hijacks.
-      unless original && fingerprint == Manifest.iseq_fingerprint(original, portable: entry["portable_fingerprint"])
+      unless original && [fingerprint, entry["native_iseq_sha256"]].include?(Manifest.iseq_fingerprint(original, portable: entry["portable_fingerprint"]))
         return Lowrail.refuse("original ISeq mismatch: #{source_path}; loader transform or target-root recipe differs")
       end
       lowered = File.expand_path(entry.fetch("lowered"), @dir)

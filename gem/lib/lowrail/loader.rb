@@ -3,7 +3,7 @@
 require_relative "compilation"
 
 module Lowrail
-  # Hooks RubyVM::InstructionSequence.load_iseq, the seam Bootsnap uses.
+  # Deliver after compilation/cache deserialization, never through load_iseq.
   #
   # Let the app's loader produce the original ISeq first. Only an exact
   # fingerprint match permits substitution; this includes per-file compiler
@@ -21,10 +21,10 @@ module Lowrail
       def install(manifest)
         @manifest = manifest
         @served = {}
+        return if manifest.files.empty?
         iseq_singleton.prepend(Compilation::Capture) unless iseq_singleton < Compilation::Capture
         Compilation.hook_bootsnap
         RubyVM::InstructionSequence.prepend(Evaluation) unless RubyVM::InstructionSequence < Evaluation
-        prepend_hook
       end
 
       def installed? = !@manifest.nil?
@@ -36,11 +36,9 @@ module Lowrail
       def iseq_singleton = RubyVM::InstructionSequence.singleton_class
 
       # Called from Guard::ModuleHooks#prepend_features after any prepend.
-      def prepended_to(base, mod)
-        return unless @manifest && base.equal?(iseq_singleton)
-        return if mod.equal?(@hook)
+      def prepended_to(base, _mod)
+        return unless @manifest && !@manifest.files.empty? && base.equal?(iseq_singleton)
         Compilation.hook_bootsnap
-        prepend_hook
       end
 
       # Returns a lowered ISeq for path, or nil to fall through.
@@ -63,22 +61,6 @@ module Lowrail
       rescue StandardError => e
         Lowrail.refuse("#{path}: #{e.class}: #{e.message}; compiling original source")
         nil
-      end
-
-      private
-
-      def prepend_hook
-        hook = Module.new do
-          def load_iseq(path)
-            original = defined?(super) ? super : nil
-            return original unless ::Lowrail::Loader.manifest.lowered?(path)
-            return original if defined?(::Coverage) && ::Coverage.running?
-            original ||= RubyVM::InstructionSequence.compile_file(path)
-            ::Lowrail::Loader.serve(path, original: original) || original
-          end
-        end
-        @hook = hook
-        iseq_singleton.prepend(hook)
       end
     end
 

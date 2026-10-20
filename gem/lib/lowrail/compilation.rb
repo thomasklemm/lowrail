@@ -72,10 +72,49 @@ module Lowrail
       end
 
       def original(path)
+        api = RubyVM::InstructionSequence
+        unless [api.singleton_class, Capture].include?(api.method(:compile_file).owner) && native_compiler?(:compile_file)
+          raise ArgumentError, "cannot certify an unobserved compiler override"
+        end
         defaults = RubyVM::InstructionSequence.compile_option
+        native = capture_native(path)
         record(path, File.read(path, encoding: Encoding::UTF_8), defaults, nil, :compile, 1,
-               RubyVM::InstructionSequence.compile_file(path))
-        files.fetch(path)
+               api.compile_file(path))
+        compilation = files.fetch(path)
+        compilation[:native_iseq_sha256] = Digest::SHA256.hexdigest(native.to_binary) if native
+        compilation
+      end
+
+      def native_compiler?(name)
+        api = RubyVM::InstructionSequence
+        compiler = api.singleton_class < Capture ? Capture.instance_method(name).bind(api).super_method : api.method(name)
+        compiler && compiler.owner.equal?(api.singleton_class) && compiler.source_location.nil?
+      end
+
+      def native_warnings?
+        warning = Warning.method(:warn)
+        warning.owner.equal?(Warning) && warning.source_location.nil?
+      end
+
+      # Standalone builds have no app boot to observe. Obtain the native root
+      # ISeq by aborting MRI's load at translate, before evaluation or the
+      # script_compiled event. Never attempt this through an app's loader,
+      # translator, warning callback, or active TracePoint.
+      def capture_native(path)
+        api = RubyVM::InstructionSequence
+        return if api.respond_to?(:load_iseq, true) || !Kernel.method(:load).source_location.nil? || !native_warnings?
+        return if ObjectSpace.each_object(TracePoint).any?(&:enabled?)
+        api.singleton_class.prepend(Capture) unless api.singleton_class < Capture
+        translator = api.method(:translate)
+        return unless translator.owner.equal?(Capture) && !translator.super_method
+        previous = Thread.current[:lowrail_native_compilation]
+        capture = [[path, File.realpath(path)], Object.new]
+        begin
+          Thread.current[:lowrail_native_compilation] = capture
+          catch(capture[1]) { Kernel.load(path) }
+        ensure
+          Thread.current[:lowrail_native_compilation] = previous
+        end
       end
 
       def lowered(source, path, compilation)
@@ -91,20 +130,52 @@ module Lowrail
     end
 
     module Capture
-      # MRI's default compiler is internal; route only tracked files through
-      # the observable compile_file API when no gem loader handled them.
-      def load_iseq(path)
-        iseq = defined?(super) ? super : nil
-        iseq || (Compilation.booted? && Compilation.tracked?(path) ? compile_file(path) : nil)
+      # MRI calls translate after native compilation, including plain require.
+      # Do not deliver from explicit compiler APIs: a caller such as Bootsnap
+      # may serialize their result. Only native top-level files come here;
+      # method/block ISeqs must retain their lexical environment. An existing
+      # translator owns this boundary, so delegate without substituting.
+      def translate(iseq)
+        return super if defined?(super)
+        path = iseq.absolute_path
+        capture = Thread.current[:lowrail_native_compilation]
+        throw(capture[1], iseq) if capture && capture[0].include?(path) && iseq.to_a[9] == :top
+        return iseq if Thread.current[:lowrail_compilation] || !Compilation.tracked?(path)
+        return iseq unless iseq.to_a[9] == :top
+        return iseq unless RubyVM::InstructionSequence.method(:translate).owner.equal?(Capture)
+        return iseq if defined?(::Coverage) && ::Coverage.respond_to?(:running?) && ::Coverage.running?
+        # A warning callback can change compiler options during parsing. Its
+        # final defaults do not certify the options of this native compilation.
+        return iseq unless Compilation.native_warnings?
+        begin
+          defaults = RubyVM::InstructionSequence.compile_option
+          if Compilation.booted?
+            Compilation.record(path, File.read(path, encoding: Encoding::UTF_8), defaults, nil, :compile, 1, iseq)
+            iseq
+          else
+            Compilation.record_options(iseq, defaults, nil)
+            ::Lowrail::Loader.serve(path, original: iseq) || iseq
+          end
+        rescue StandardError, ScriptError => e
+          Lowrail.debug("#{path}: cannot certify native compilation: #{e.class}: #{e.message}")
+          iseq
+        end
       end
 
       %i[compile compile_prism compile_parsey].each do |compiler|
         next unless RubyVM::InstructionSequence.respond_to?(compiler)
         define_method(compiler) do |source, *args|
-          path = args[0]
-          return super(source, *args) unless Compilation.tracked?(path)
-          defaults = RubyVM::InstructionSequence.compile_option
-          iseq = super(source, *args)
+          path = args[1] || args[0]
+          tracked = Compilation.tracked?(path)
+          defaults = RubyVM::InstructionSequence.compile_option if tracked
+          previous = Thread.current[:lowrail_compilation]
+          begin
+            Thread.current[:lowrail_compilation] = true
+            iseq = super(source, *args)
+          ensure
+            Thread.current[:lowrail_compilation] = previous
+          end
+          return iseq unless tracked && Compilation.native_compiler?(compiler)
           if Compilation.booted?
             Compilation.record(path, source, defaults, args[3], compiler, args[2] || 1, iseq)
           else
@@ -116,9 +187,16 @@ module Lowrail
       %i[compile_file compile_file_prism compile_file_parsey].each do |compiler|
         next unless RubyVM::InstructionSequence.respond_to?(compiler)
         define_method(compiler) do |path, *args|
-          return super(path, *args) unless Compilation.tracked?(path)
-          defaults = RubyVM::InstructionSequence.compile_option
-          iseq = super(path, *args)
+          tracked = Compilation.tracked?(path)
+          defaults = RubyVM::InstructionSequence.compile_option if tracked
+          previous = Thread.current[:lowrail_compilation]
+          begin
+            Thread.current[:lowrail_compilation] = true
+            iseq = super(path, *args)
+          ensure
+            Thread.current[:lowrail_compilation] = previous
+          end
+          return iseq unless tracked && Compilation.native_compiler?(compiler)
           text_compiler = compiler.to_s.sub("_file", "").to_sym
           if Compilation.booted?
             Compilation.record(path, File.read(path, encoding: Encoding::UTF_8), defaults, args[0], text_compiler, 1, iseq)
@@ -146,7 +224,7 @@ module Lowrail
         if equal?(cache) || (defined?(cache::Compiler) && instance_of?(cache::Compiler))
           Compilation.record_options(iseq, defaults, instance_variable_get(:@compile_options))
         end
-        iseq
+        ::Lowrail::Loader.serve(iseq.absolute_path, original: iseq) || iseq
       end
     end
   end

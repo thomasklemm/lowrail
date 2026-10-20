@@ -81,6 +81,17 @@ module Lowrail
       env != "development"
     end
 
+    # Bundlebun autoloads integrations by enumerating unsorted constants.
+    # Even interning Lowrail's runtime identifiers changes MRI's enumeration
+    # order. Refuse before requiring any runtime installer, without loading
+    # the gem to detect it. The lockfile also covers RUBYOPT before Bundler.
+    def delivery_refusal(root)
+      lock = File.join(root, "Gemfile.lock")
+      if defined?(::Bundlebun) || (File.file?(lock) && File.read(lock).match?(/^    bundlebun \(/))
+        "bundlebun_load_order: unsorted integration autoloads depend on runtime symbol allocation; Lowrail delivery and activation refused"
+      end
+    end
+
     # Entry point used by lowrail/setup: stats and the outcome reporters are
     # independent of whether lowering is active (verify needs outcomes for
     # LOWRAIL=0 runs too).
@@ -121,6 +132,7 @@ module Lowrail
       dir ||= File.join(root, ".lowrail")
       path = File.join(dir, "manifest.json")
       return false unless File.file?(path)
+      return false if (@refusal_reason = delivery_refusal(root))
 
       require_relative "lowrail/manifest"
 

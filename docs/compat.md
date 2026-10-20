@@ -3,11 +3,14 @@
 This is a compatibility experiment, **not** a claim that every Rails app or
 every listed gem is supported. Four real app pins extend `script/corpus`;
 three have green upgraded baselines; Fizzy is a useful negative control. The
-exercise found genuine Lowrail load-order bugs. It also found a remaining
-require-hooks delivery boundary which the stricter verifier rejects.
+exercise found genuine Lowrail load-order bugs. Hook-free delivery now fixes
+require-hooks adapter selection; Bundlebun's integration order still needs a
+targeted delivery/activation refusal. Redprints passes strict verify only as
+a no-op, losing its former 277 fast-path hits.
 
-All new copies use **Ruby 4.0.7 and Rails 8.1.4**. Ruby 3.4 was dropped by
-owner decision; 4.1 is a target, not an exercised column in this experiment.
+All new app copies use **Ruby 4.0.7 and Rails 8.1.4**. Ruby 3.4 was dropped by
+owner decision; the loader regression matrix also exercises 4.1-preview,
+not these four app suites.
 Only `.ruby-version`, `Gemfile` and `Gemfile.lock` change, through checked-in
 `fixtures/corpus/*.patch`. No app/gem implementation or test is patched, no
 upstream repository is modified, and no app failures are suppressed.
@@ -66,7 +69,7 @@ queries. A failed plain baseline is not repaired or called a support gate.
 
 | App / suite | Plain baseline | Default verify (0 units) | All-opt-in verify | All-opt-in hits / fallbacks | Problems / scope |
 |---|---|---|---|---|---|
-| CASA, non-system | 2,992 examples; 0 failures, 21 pending | identical; 47 SQL-noisy identities; 0 stable load differences | identical; same 47 advisory identities, 0 stable load differences | 12,920 / 3,645 | 12,820 / 2,733 instantiate; 100 / 912 preload; locale bug fixed |
+| CASA, non-system | 2,992 examples; 0 failures, 21 pending | delivery recheck: SQL gate rejected on seed spec; outcomes identical, 0 stable load differences | identical, 126,101 queries; 46 advisory identities, 0 stable load differences | 12,920 / 3,645 | 12,820 / 2,733 instantiate; 100 / 912 preload; locale bug fixed; default SQL recheck not green |
 | CASA, system | 769 examples; 0 failures | identical; 5 SQL-noisy identities, 0 stable load differences | identical; 62,268 queries, same 5 advisories; 0 stable load differences | 8,121 / 2,621 (instantiate) | Actual headless Chrome/Capybara suite; 8 unstable load entries |
 | Writebook, non-system | 119 tests, 381 assertions; all pass | identical, 8,028 queries | identical, 8,028 queries | 2,714 / 0 (instantiate) | 0 stable load differences; 8 unstable load entries |
 | Writebook, system | 2 tests, 8 assertions; all pass | identical, 217 queries | identical, 217 queries | 143 / 0 (instantiate) | Chrome, 0 stable load differences; 8 unstable entries |
@@ -78,6 +81,28 @@ can be claimed. CodeTriage's regular integration tests run in its main suite;
 no separate real-browser coverage is claimed for it.
 Writebook's browser process enables YJIT itself; those are correctness runs,
 not JIT-flat benchmarks or speed claims.
+
+### Delivery-seam recheck
+
+Fresh default/all-opt-in Writebook, Fizzy and CodeTriage verification retains
+the outcomes, own-thread SQL and hits/fallbacks above, with zero stable load
+differences. Writebook's separate browser cohort also retains 2 outcomes /
+217 queries / 143 hits; default has 10 unstable load entries and all-opt-in 8.
+Fizzy's seven pre-existing errors are still a negative control, not support.
+
+CASA's zero-unit default recheck retains all 2,992 outcomes and a clean load
+census, but **fails the SQL gate**: the seed example has 6,092 off versus
+6,094 on queries, with 46 other SQL identities advisory. Keep that rejected
+cohort rather than excluding the example or retrying until green. Six
+isolated **off-only** seed-example runs also vary (6,534/6,531 queries and
+three distinct digests); this establishes noise in the same example, not
+the precise cause of the original two-query discrepancy. The app's seed
+populator contains unseeded `sample`/`rand` calls despite its separate Faker
+seed. The separately scheduled all-opt-in cohort passes with 126,101 queries,
+46 advisory identities and the unchanged 12,920 / 3,645 hits/fallbacks; it
+does not erase the default failure. No app/test/RNG workaround or SQL
+normalization was added. The full requested unchanged-app gate cannot be
+called green from this cohort.
 
 ### Facts and build cost
 
@@ -138,12 +163,14 @@ observations remain separately counted).
    regression pass. A no-active-unit probe now separates setup/delivery
    load differences from individual activation effects.
 
-After rebasing onto current main, the complete Ruby 4.0.7 gem run reports
-**120 tests, 5,424 assertions, 0 failures/errors/skips**. The expanded loader
-matrix, with both require-hooks versions installed, reports **7 tests, 1,582
-assertions, 0 failures/errors/skips**. `cargo test --all-targets` passes all
-**38 tests** (34 unit, 4 integration); the release build also passes after
-the rebase. These are correctness checks, not throughput benchmarks.
+The complete Ruby 4.0.7 gem run after hook-free delivery reports **126 tests,
+5,881 assertions, 0 failures/errors/skips**. The loader matrix reports **13
+tests, 2,039 assertions** on 4.0.7 and **13 tests, 1,452 assertions** on
+4.1-preview, both without failures/errors/skips. `cargo test --all-targets`
+passes all **38 tests** (34 unit, 4 integration); the release build also
+passes. These are correctness checks, not throughput benchmarks. The first
+full gem attempt lacked the fixture's `rails_vite` 0.3.0; installing that
+existing dependency fixes it without changing code or assertions.
 
 The final gem run includes the real-blog observation/materialization and
 framework-profiler tests that were skipped in the initial 120-test run.
@@ -174,36 +201,49 @@ the fixtures do not clear that seed table. A fresh schema-only database
 passes all 222 tests without any app changes. Discard the seeded cohort;
 `script/corpus` prepares new test schemas without running development seeds.
 
-### Still refused: require-hooks/Bootsnap load behavior
+### Hook-free delivery; Bundlebun still refused
 
-The existing Redprints suite still has **50 passing examples and 692
-identical queries**, 277 hits / 0 fallbacks. But its strict census finds
-**26 stable load differences**, with 32 unstable entries separately recorded.
-Lowrail changes require-hooks' adapter from Bootsnap to plain ISeq and also
-changes Bundlebun integration load order. The setup-only probe reproduces
-differences; pass-isolated probes additionally report instantiate, preload
-and Inertia config activation. Do not call a setup effect one pass's bug or
-call the clean outcomes-only comparison full compatibility.
+The previous Redprints cohort had **50 passing examples and 692 identical
+queries**, 277 hits / 0 fallbacks, but **26 stable load differences**. Both
+require-hooks 0.4.0 and 0.5.1 detect Bootsnap from the top `load_iseq` method's
+source path; Lowrail's former wrapper changed the adapter in 2/6 orders.
 
-Both require-hooks 0.4.0 and 0.5.1 detect Bootsnap from the **top method's
-source path**. A 32-process order/mode probe confirms the difference and
-shows that later installation preserves the adapter in one ordering, but
-does not solve generic boot-time/build delivery. No cheap exact general
-replacement is established. Keep strict verify rejected; no forced mode,
-introspection spoof, suppressed census entry or automatic runtime refusal
-is introduced. [Full detection check, matrix and alternatives](loaders.md#unresolved-require-hooks-adapter-selection).
+Build capture and runtime now define no `load_iseq` method. Native MRI
+translation, post-serialization Bootsnap output and explicit eval deliver
+lowered ISeqs without changing that method's owner, source or method chain.
+Both Ruby 4.0.7 and 4.1-preview pass the presence/absence/all-order matrix,
+including cold/warm/on/off cache checks and the load census. No gem mode is
+forced and no introspection is spoofed.
+
+With that fix alone Redprints retains its 277 hits, but **12 stable load
+differences** remain. Bundlebun enumerates integration constants unsorted;
+additional Lowrail runtime identifier interning changes the autoload order.
+Six off and six setup-only fresh boots agree, while six active boots use
+another order with the same correct adapter. This is not random suite noise
+or a source-pass outcome divergence.
+
+No exact general fix to that sensitivity was established. A known/locked
+Bundlebun bundle now refuses delivery and runtime activation before runtime
+installers load, with `bundlebun_load_order` in ledger/manifest and the stats
+refusal reason. Existing artifacts are caught too. Final strict Redprints
+verify: **50 pass, 692 identical queries, 0 stable load differences**, 32
+unstable advisory entries, **0 hits / 0 fallbacks**. The retained-hit gate is
+**not met**: this is safe refusal, not active Redprints support. No upstream
+repository or integration order was patched. [Detection, seams, matrix and
+limits](loaders.md#refused-bundlebun-integration-enumeration).
 
 ## Existing corpus and framework regression gates
 
 All five original apps were rebuilt all-opt-in after the shared activation
-change. Per-unit maps were compared, not only total hits.
+change and again after hook-free delivery. Per-unit maps were compared, not
+only total hits. The Redprints refusal is an intentional coverage loss.
 
 | App | Outcomes / own-thread SQL | Before → final hits / fallbacks | Explanation |
 |---|---|---|---|
 | Real Blog | 21 pass / 125 queries identical; 0 load differences | 41 / 2 → 41 / 1 | Preload no longer runs merely to force its framework dependencies; instantiate map unchanged |
 | Campfire | 632 pass + 2 libvips skips / 15,108 queries identical; 0 load differences | 2,651 / 5,102 → 2,651 / 3,129 | Instantiate map unchanged; preload's 929 and AR plans' 1,044 setup fallbacks disappear when their unloaded fact receivers are not forced |
 | PingCRM | 1 pass / 4 queries identical; 0 load differences | 0 / 0 → 0 / 0 | No hit coverage; cannot certify its Inertia passes from this suite |
-| Redprints CFP | 50 pass / 692 queries identical; **strict load gate rejected** | 241 / 36 → 277 / 0 | Inertia config's 36 fallback calls become hits after valid initialization; require-hooks boundary remains open |
+| Redprints CFP | 50 pass / 692 queries identical; 0 stable load differences | 277 / 0 → **0 / 0** | Adapter selection fixed; targeted Bundlebun refusal drops all delivery/activation, not active support |
 | React Starter Kit | 36 pass / 264 queries identical; 0 stable load differences, 8 unstable | 110 / 53 → 163 / 0 | Inertia config's 53 calls now hit; instantiate/props maps unchanged |
 
 Rails 8.1.4 AP/AV/AR L3: **4,095 / 2,747 / 9,240** outcomes identical;

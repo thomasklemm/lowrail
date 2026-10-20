@@ -10,7 +10,7 @@ live in the linked docs; numbers come from executed runs, dated.
 | Area | State |
 |---|---|
 | Default build | lowers nothing: `view/link_to` and `route/path` quarantined (45fd07a); five-app manifests have 0 units |
-| Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; expanded corpus fixes early-autoload bugs, but strict load census rejects Redprints' loader adapter change ([compatibility report](compat.md)) |
+| Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; hook-free delivery preserves loader selection; Redprints' strict load census passes with targeted Bundlebun refusal, **0 hits** ([compatibility report](compat.md)) |
 | Opt-in passes | guarded selection: only props + endpoint; seven cached-fact passes sealed-only after suppressed-hook audit; see [DECISIONS](DECISIONS.md#passes) |
 | Measurement | interpreter fixed-heap/A/A protocol (c9d2397) accepted; YJIT whole-request cohorts rejected by the JIT-flat gate (07205de); guard micro K 822→425 interpreter / 371→140 YJIT Ir |
 | Biggest measured lever | endpoint render path, −26 %/−37 % handwritten upper bounds; caller-side certification loses (0fbb909) |
@@ -37,8 +37,10 @@ the separate contract; test processes refuse sealed artifacts. See the
   date formatting and Fizzy's Active Storage callback exposed genuine early
   loads; initialization, already-loaded-constant and lazy model/epoch gates
   fix them with regressions. Opt-in verify load censuses found further
-  preload loads and reject the remaining require-hooks/Bootsnap adapter
-  change. Fresh framework artifacts recover all instantiate hits; an
+  preload loads. Hook-free delivery fixes require-hooks/Bootsnap adapter
+  selection; Bundlebun's unsorted integration enumeration requires a targeted
+  delivery/activation refusal, so Redprints loses its 277 hits. Fresh
+  framework artifacts recover all instantiate hits; an
   intermediate 118-hit loss was correct refusal of an old runtime source
   hash, not a missing `initialize!` path. Baseline failures, browser coverage,
   SQL controls, per-app hits/fallbacks, pins and boot/build timings:
@@ -178,7 +180,7 @@ the separate contract; test processes refuse sealed artifacts. See the
 - **Route pass `route/path`** (`src/lower/route.rs`,
   [docs/passes/route-helpers.md](passes/route-helpers.md)): named-route
   `*_path` calls in templates and in Ruby files under `app/` (the first
-  Ruby-file pass, served through `load_iseq`); probes run the emitted code
+  Ruby-file pass, served as ISeqs); probes run the emitted code
   next to the real helper. Guards on `@self` facts are checked per class of
   `self` (`Lowrail.ok?`). Dynamic engine script completion stays in Rails;
   `_url` host normalization is memoized only on the request, keyed by its
@@ -257,8 +259,9 @@ the separate contract; test processes refuse sealed artifacts. See the
   overlapping noise. More allocations (+21/request), worse p95 tails, full file
   IO and guard limits remain. SQL-trace warnings also reproduce with every unit
   disabled; see the aggregate notes rather than assuming full SQL identity.
-- **Runtime gem**: `load_iseq` / ISeq eval seams (composes with Bootsnap and
-  require-hooks/Freezolite in every installation order), per-file compiler
+- **Runtime gem**: native translate / cache-output / ISeq eval seams, with
+  no `load_iseq` definition (preserves Bootsnap and require-hooks/Freezolite
+  method chains and adapter selection in every tested order), per-file compiler
   contracts captured from the booted app, unchanged-source/original-ISeq
   fingerprints, and original-only Bootsnap caches ([survey and tests](loaders.md));
   template seam (lowered handler code while the source digest matches),
@@ -656,8 +659,9 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 1. **Speed is in framework code** (M0: real-blog app self time ≈0 %,
    Campfire 1.5–4.9 %), so lowering targets Rails and gem code as used by the
    app, not just `app/**/*.rb`.
-2. **Two delivery seams**: `load_iseq` for Ruby files, the handler call in
-   `ActionView::Template#compiled_source` for templates.
+2. **Two delivery kinds**: Ruby-file ISeqs at native compilation, cache output
+   or explicit eval, and the handler call in
+   `ActionView::Template#compiled_source` for templates. No `load_iseq` override.
 3. **Per-call-site guards beat per-method guards** for a first pass: they
    keep line numbers, never evaluate arguments twice, and need no change to
    method tables.
