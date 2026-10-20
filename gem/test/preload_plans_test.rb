@@ -322,6 +322,22 @@ class PreloadPlansTest < Minitest::Test
     puts JSON.generate(result)
   RUBY
 
+  def test_installs_before_active_record_is_loaded
+    result = ruby_json(<<~'RUBY', setup: false, env: { "RUBYOPT" => "-I#{GEM_LIB}" })
+      require "lowrail"
+      require "json"
+      require "tmpdir"
+      Dir.mktmpdir do |root|
+        Dir.mkdir(File.join(root, ".lowrail"))
+        File.write(File.join(root, ".lowrail/manifest.json"), JSON.generate(
+          format: 1, ruby_description: RUBY_DESCRIPTION, compile_option: "", files: {},
+          units: [{id: 0, pass: "active_record/preload_plans", facts: [], preload_facts: {}}]))
+        puts JSON.generate(installed: Lowrail.setup(root: root), active_record: !!defined?(ActiveRecord))
+      end
+    RUBY
+    assert_equal({ "installed" => true, "active_record" => false }, result)
+  end
+
   def test_plans_keep_rails_results_and_invalidate
     realpath_tmpdir do |dir|
       File.write(File.join(dir, "scenario.rb"), SCENARIO)

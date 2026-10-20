@@ -122,7 +122,9 @@ module Lowrail
       }
       return "custom relation constructor" unless RELATION_METHODS.all? { |name|
         method = k.unscoped.class.instance_method(name)
-        method = method.super_method while defined?(ARPlans::RelationHook) && method&.owner == ARPlans::RelationHook
+        if defined?(ARPlans::RelationHook)
+          method = method.super_method while method&.owner == ARPlans::RelationHook
+        end
         method&.source_location&.first&.start_with?(*framework)
       }
       # QueryAttribute memoizes serialized constant predicates inside a scope.
