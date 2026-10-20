@@ -148,6 +148,56 @@ class RoutesTest < Minitest::Test
     assert_equal "http://three.example.com/widgets/a%20b", out.last[1]
   end
 
+  def test_custom_helper_probes_reject_discarding_block_state_and_resolve_mapping
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "config/routes.rb" => <<~'RUBY')
+        class RouteCurrent
+          class << self; attr_accessor :version, :calls; end
+        end
+        RouteCurrent.version = "alpha"
+        RouteCurrent.calls = 0
+        Rails.application.routes.draw do
+          resources :widgets
+          direct :fresh_widget do |value, options|
+            RouteCurrent.calls += 1
+            route_for(:widget, value, options.merge(v: RouteCurrent.version))
+          end
+          resolve("Widget") do |widget, options|
+            RouteCurrent.calls += 1
+            route_for(:widget, widget.id, options.merge(v: RouteCurrent.version))
+          end
+        end
+      RUBY
+      out = ruby_json(<<~'RUBY', chdir: dir, env: { "RAILS_ENV" => "test" })
+        require "./config/environment"
+        require "lowrail/oracle_routes"
+        Rails.application.eager_load!
+        Rails.application.routes.default_url_options[:host] = "example.org"
+        c = ApplicationController.new
+        c.set_request!(ActionDispatch::TestRequest.create)
+        c.set_response!(ApplicationController.make_response!(c.request))
+        view = c.view_context
+        info = Lowrail::OracleRoutes.info(view, :fresh_widget_path)
+        untouched = RouteCurrent.calls
+        probe = Lowrail::OracleRoutes.probe([["view", view]], ["a"], "widget_path(a)", "fresh_widget_path(a)")
+        RouteCurrent.calls = 0
+        widget = Widget.new(id: 31)
+        first = [view.fresh_widget_path("7"), view.polymorphic_path(widget)]
+        RouteCurrent.version = "beta"
+        second = [view.fresh_widget_path("7"), view.polymorphic_path(widget)]
+        puts JSON.generate(info: info, untouched: untouched, probe: probe, first: first, second: second, calls: RouteCurrent.calls)
+      RUBY
+      assert_equal "custom", out.dig("info", "kind")
+      assert_includes out.dig("info", "reason"), "argument/option mapping are not guarded"
+      assert_includes out.dig("info", "reason"), "route_for"
+      assert_equal 0, out["untouched"], "diagnostics must not execute app blocks"
+      assert_equal false, out.dig("probe", "ok"), "forwarding without the block loses its query/state"
+      assert_equal ["/widgets/7?v=alpha", "/widgets/31?v=alpha"], out["first"]
+      assert_equal ["/widgets/7?v=beta", "/widgets/31?v=beta"], out["second"]
+      assert_equal 4, out["calls"], "each helper must execute its block exactly once"
+    end
+  end
+
   def test_seg_skips_gsub_only_for_safe_ascii
     out = ruby_json(<<~'RUBY')
       require "json"

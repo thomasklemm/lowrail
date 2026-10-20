@@ -29,6 +29,9 @@ same 11 units and verifies 21/21 identical with 114 hits.
   scalar inputs (including in-place string/encoding changes). `url_options`
   and application overrides remain live. `article_url` construction is
   3.71 → 2.21 µs, 25 → 9 allocations (YJIT; see pass notes).
+  Block-backed `direct`/`resolve` helpers remain refused with block locations
+  and operations: corpus blocks read current state, transform arguments or
+  dispatch dynamically; a runtime probe rejects dropping their state/query.
 - **Active Record preload plans** ([design and measurements](passes/preload-plans.md)):
   guarded gem-level trees, scopes and loader groups computed once; fresh
   Rails Association loaders per call, no cached rows. Schema/reflection/scope

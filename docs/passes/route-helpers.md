@@ -174,6 +174,45 @@ sites; their allocation counts are effectively unchanged. real-blog articles
 allocations fall 2404 → 2282 from the full view/route pipeline. No application
 speedup is attributed specifically to host memoization.
 
+### Block-backed `direct` / `resolve` helpers (2026-10-20)
+
+No new shape is claimed. Campfire's 18 refused calls are six
+`fresh_account_logo_path` (reads `Current.account` and its timestamp), seven
+`fresh_user_avatar_path` (calls `avatar_token` and transforms the timestamp),
+and five `rails_blob_path` (dispatches through the mutable
+`resolve_model_to_route` setting). Redprints' `rails_blob_url` uses that same
+Active Storage dispatch. None is a pure alias with unchanged arguments/options.
+Active Storage's subsequent helpers also sign records and handle expiry,
+filename and glob segments. Sampling their output cannot prove the app block's
+branches or effects, and calling it twice could change behavior.
+
+The ledger now records the block's source location and ISeq sends when its
+identity is unique, explicitly naming the missing result-helper and
+argument/option-mapping guards. Diagnostics never execute the block. The
+runtime fixture exercises both `direct` and `resolve`, changes Current-style
+state on the same view, checks once-only block execution, and proves the oracle
+rejects an ordinary-helper forwarding candidate that drops that state/query.
+The fake oracle checks that refusal leaves the source unchanged without probes.
+
+All five apps rebuilt and verified again: 21 / 634 (2 skips) / 26 / (50 + 12
+browser) / 36 outcomes identical, 57 / 7200 / 11 / (25 + 19) / 25 hits,
+zero fallbacks. Gem suite: 60 runs, 1173 assertions, 3 optional skips, no
+failures. This step changes diagnostics only, not runtime route generation.
+
+Repeat micro (same seven-sample protocol): Rails 4.160 µs (3.917–4.635),
+uncached lowering 3.119 (2.971–3.269), host cache 2.373 (2.326–2.867);
+allocations remain 25 / 18 / 9. Repeat five-pair request runs, same protocol
+as above, again have overlapping ranges: **within noise**, not a new speedup.
+
+| Request | off µs median (min–max) | on µs median (min–max) |
+|---|---:|---:|
+| real-blog articles | 1761 (1655–1786) | 1620 (1451–2117) |
+| real-blog article | 1725 (1701–1849) | 1843 (1551–2037) |
+| Campfire room, cached | 2349 (2266–2678) | 2230 (2078–2312) |
+| PingCRM organizations | 3033 (2936–3126) | 2952 (2791–3052) |
+| Redprints proposals | 2027 (1899–2395) | 1998 (1895–2056) |
+| Starter dashboard, SSR | 3627 (3594–3785) | 3546 (3396–3690) |
+
 ## Refused (ledger reasons)
 
 Direct /

@@ -601,6 +601,7 @@ mod tests {
                     "article_path" => route("article", "/articles/:id(.:format)", &["id"], "/articles/LRHP0Q"),
                     "article_comment_path" => route("article_comment", "/articles/:article_id/comments/:id(.:format)", &["article_id", "id"], "/articles/LRHP0Q/comments/LRHP1Q"),
                     "articles_url" => route("articles", "/articles(.:format)", &[], "/articles"),
+                    "fresh_article_path" => serde_json::json!({"kind": "custom", "reason": "fresh_article_path: block-backed direct/resolve helper; result-helper and argument/option mapping are not guarded"}).to_string(),
                     _ => r#"{"kind":"none"}"#.into(),
                 });
             }
@@ -718,6 +719,17 @@ mod tests {
             let out = Command::new("ruby").args(["-e", &code]).output().unwrap();
             assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
         }
+    }
+
+    #[test]
+    fn custom_blocks_are_not_treated_as_named_route_aliases() {
+        let code = "def x = fresh_article_path(@article)\n";
+        let mut fake = Fake::default();
+        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default());
+        assert_eq!(out.code, code);
+        assert_eq!(out.sites[0].outcome, "fresh_article_path: block-backed direct/resolve helper; result-helper and argument/option mapping are not guarded");
+        assert!(out.deps.is_empty());
+        assert!(fake.probes.is_empty(), "do not execute an unproven app block to guess an alias");
     }
 
     #[test]

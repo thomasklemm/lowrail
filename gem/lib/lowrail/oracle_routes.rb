@@ -38,7 +38,20 @@ module Lowrail
         kind = helper.end_with?("_url") ? "url" : "path"
         name = helper.delete_suffix("_#{kind}")
         route = named.get(name)
-        return { kind: "custom", reason: "#{helper} is a direct/resolve helper (CustomUrlHelper)" } unless route
+        unless route
+          # Diagnostics only: never execute an arbitrary application block to
+          # guess a mapping. A finite sample cannot prove its other branches,
+          # purity, Current reads or argument transformations.
+          blocks = ObjectSpace.each_object(ActionDispatch::Routing::RouteSet::CustomUrlHelper).select { |h| h.name.to_s == name }
+          detail = if blocks.one?
+            block = blocks.first.block
+            sends = RubyVM::InstructionSequence.of(block)&.disasm&.scan(/\bmid:([^,\s]+)/)&.flatten&.uniq || []
+            " (#{block.source_location&.join(":")}; block sends: #{sends.join(", ")})"
+          else
+            " (block identity is not uniquely recoverable)"
+          end
+          return { kind: "custom", reason: "#{helper}: block-backed direct/resolve helper; result-helper and argument/option mapping are not guarded#{detail}" }
+        end
         meth = begin
           view.class.instance_method(helper)
         rescue NameError
