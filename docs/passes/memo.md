@@ -89,6 +89,9 @@ there are no memo units or memo-specific tracing hooks.
 
 ## Equivalence evidence
 
+The full gem run also used a disposable copy of the prepared real-blog app at
+`.corpus/real-blog-r4`, the existing gem suite's legacy Ruby-4 fixture path.
+
 ```sh
 cargo test
 ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].sort.each { require_relative _1 }'
