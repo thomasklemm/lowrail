@@ -112,6 +112,14 @@ module RequestPairs
       FileUtils.mkdir_p(missing)
       layers = { "off_a" => nil, "off_b" => nil, "missing" => missing, "empty" => empty,
                  "disabled" => normal, "default" => normal }
+      # A runtime-only refactor uses the exact same build in a same-round
+      # before worker, rather than comparing two unrelated off baselines.
+      if (baseline = ENV["BENCH_BASELINE_LIB"])
+        raise "runtime comparison requires fixed-heap Callgrind" unless fixed_heap
+        raise "runtime comparison needs a source-only build" if data.fetch("units").any? { _1["kind"] == "runtime" || _1["kind"] == "method" }
+        baseline = File.expand_path(baseline)
+        layers["before"] = normal
+      end
       # Compare an upstream app fix with the same independent A/A workers and
       # measurement seam. This layer never loads Lowrail or the original build.
       variant = File.expand_path(ENV["BENCH_VARIANT_APP"]) if ENV["BENCH_VARIANT_APP"]
@@ -141,13 +149,19 @@ module RequestPairs
       metadata[:runtime_files_sha256] = Dir.glob(File.join(lib, "**/*.rb")).sort.to_h do |path|
         [path.delete_prefix(lib + "/"), Digest::SHA256.file(path).hexdigest]
       end
+      if baseline
+        metadata[:baseline_runtime_files_sha256] = Dir.glob(File.join(baseline, "**/*.rb")).sort.to_h do |path|
+          [path.delete_prefix(baseline + "/"), Digest::SHA256.file(path).hexdigest]
+        end
+      end
       layers.each do |layer, build_root|
+        runtime_lib = layer == "before" ? baseline : lib
         env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
           "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => build_root,
           "LOWRAIL_UNITS" => layer == "disabled" ? "" : nil,
           "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil,
           "LOWRAIL_SHADOW" => nil,
-          "RUBYOPT" => build_root ? "-I#{lib} -rlowrail/setup" : nil,
+          "RUBYOPT" => build_root ? "-I#{runtime_lib} -rlowrail/setup" : nil,
           "BENCH_PIPE" => counter || diagnostic ? nil : "1",
           "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter || diagnostic ? "50" : "400"),
           "BENCH_JSON" => nil, "BENCH_PROFILE" => nil, "BENCH_DUMP" => nil }
@@ -291,6 +305,12 @@ module RequestPairs
     end
     summary = summarize(samples, seed: metadata.fetch(:seed), tolerance: Float(ENV.fetch("BENCH_AA_TOLERANCE", "0.5")),
       metrics: %w[instructions_total instructions_no_gc allocations], controls: %w[instructions_total instructions_no_gc])
+    if environments.key?("before")
+      summary[:runtime_change_pct] = %w[instructions_total instructions_no_gc].to_h do |metric|
+        values = samples.map { 100 * (_1.fetch("default").fetch(metric) / _1.fetch("before").fetch(metric) - 1) }
+        [metric, estimate(values, seed: metadata.fetch(:seed))]
+      end
+    end
     summary[:gc] = environments.keys.to_h do |layer|
       [layer, %w[minor_gc_per_request major_gc_per_request gc_per_1k_allocations].to_h do |metric|
         [metric, estimate(samples.map { _1.fetch(layer).fetch(metric) }, seed: metadata.fetch(:seed))]
