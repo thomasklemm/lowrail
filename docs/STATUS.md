@@ -10,6 +10,19 @@ live in the linked docs; numbers come from executed runs, dated.
 Ruby 3.4+ (gemspec), developed on 4.0.7. real-blog on Ruby 3.4.11 builds the
 same 11 units and verifies 21/21 identical with 114 hits.
 
+- **Compiled ERB investigation, no new pass** ([survey/profile/refusals](passes/erb.md)):
+  literal-run fusion rejected (blog 1 / Campfire 0 / PingCRM 0 / Redprints 0 /
+  starter 1 eligible templates). Off-only profiles assign 9.09% of blog edit
+  to I18n and 5.72% of uncached Campfire room to URL generation, not savings.
+  Blog has 11 key lookups/request (10 misses, 1 hit), all label/submit defaults;
+  five result-changing mutation probes bypass the proposed I18n setter epoch.
+  Campfire has 7 route guard hits but **zero completed specializations** per
+  request: live controller defaults disable Rails' optimized route branch.
+  Per-site coverage also exposes four layout calls absent from the build
+  ledger due to top-level parsing of legal template `yield`. No runtime fix
+  or pass was made. Three Action View before-gate groups retain 2,747 + 242 +
+  173 identical outcomes in every layer. Tag/form attribute work belongs to
+  candidate #4; template lookup (#3) is next. No per-hit or request win claimed.
 - **Shared pass benchmark** (`lowrail bench APP --pass NAME [--path /path]`):
   fixed-heap Callgrind primary, independent mandatory A/A controls, actual-JIT
   attestation, general stale-build and activation rejection. Separate counted
@@ -357,6 +370,9 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 
 ## Next
 
+- Template lookup (#3) after the [ERB helper refusals](passes/erb.md);
+  establish resolver/path/details invalidation before any pass. Tag options
+  and form-builder attribute work remain together under candidate #4.
 - Generic route generation and guarded block-result mappings remain unsupported;
   host normalization is request-local, but Rails' `url_options` assembly and
   application overrides remain per call.

@@ -32,10 +32,11 @@ stacked set as well as to single passes.
 | `active_record/instantiate` | parked | −38 % load-only on the Rails alpha; upstream fixed the builder (rails/rails@f126797d45), gain disappears on current main. Keep for the guard machinery, not for the win. First stacked measurement (blog `/articles`, fixed-heap): default+instantiate is **+0.59 % [+0.53, +0.60] instructions vs default**, i.e. a net cost on Rails 8.1. Parked: never part of a default set on 8.1; the builder should refuse where the per-row guard exceeds the saving |
 | AR plans, preload plans | opt-in | Expected effect < 0.2 %; zero Rails-suite reader/preload hits, being investigated (round 2) |
 | `inertia/config_bind` | opt-in | 5 → 3 objects/bind, expected 0.5–2.8 % on JSON routes; native A/A controls failed. Upstream PR inertiajs/inertia-rails#437 may make it obsolete; keep for older versions only |
-| Whole compiled ERB specialization | in progress | Candidate #2, up to ~2.8 % on blog edit |
+| Whole compiled ERB specialization | surveyed; no pass | I18n epoch not closed; Campfire URLs have 7 valid guards but 0 completed lowerings/request. No credited saving; [profile and refusals](passes/erb.md) |
+| Literal-run ERB | rejected | 2 sites across five apps; two append calls saved per rendered layout do not justify a pass/guard ([survey](passes/erb.md)) |
 | Template lookup | next | Overlaps Rails-suite hot methods (`LookupContext#find`, `PathSet#find`) |
 | `run_callbacks` specialization | survey | 22.5 % inclusive in Rails-suite profiles; build only if ≥ 2 % expected on a corpus route |
-| Literal tag attributes | parked | 0–0.2 %; revisit as a stacking item after ERB |
+| Literal tag attributes | parked | Candidate #4 also owns tag-options/form-builder attribute work (4.46 % blog / 2.90 % Campfire cost shares, not savings); [boundaries](passes/erb.md) |
 | Fixed-shape serialization | parked | 0–0.18 %; Alba key-plan prototype **rejected** (regressed Redprints, +20 objects) |
 | Empty callbacks (standalone) | rejected | < 0.006 %; superseded by the `run_callbacks` survey |
 | Campfire CSP/importmap reuse | rejected as a pass | A cache changes `Regexp.timeout` semantics; fixed in the app instead (upstream PR) |
