@@ -35,7 +35,7 @@ stacked set as well as to single passes.
 | `inertia/config_bind` | opt-in | 5 → 3 objects/bind, expected 0.5–2.8 % on JSON routes; native A/A controls failed. Upstream PR inertiajs/inertia-rails#437 may make it obsolete; keep for older versions only |
 | Whole compiled ERB specialization | surveyed; no pass | I18n epoch not closed; Campfire URLs have 7 valid guards but 0 completed lowerings/request. No credited saving; [profile and refusals](passes/erb.md) |
 | Literal-run ERB | rejected | 2 sites across five apps; two append calls saved per rendered layout do not justify a pass/guard ([survey](passes/erb.md)) |
-| Route pass with host/protocol `default_url_options` | parked | Widening the optimized predicate is not exact (`to_param` ordering counterexample); a narrower arg-class condition is being surveyed ([route-helpers.md](passes/route-helpers.md)) |
+| Route pass with host/protocol `default_url_options` | parked | Widening the optimized predicate is not exact (`to_param` ordering counterexample); scalar-only args cover 1/4 Campfire path calls, base-AR `to_param` certification would cover 4/4, but the ceiling is ~0.3 % of an uncached room request (19 calls × ~2 µs). Revisit as a stacking item once per-hit route budgets exist ([route-helpers.md](passes/route-helpers.md)) |
 | Template lookup | next | Overlaps Rails-suite hot methods (`LookupContext#find`, `PathSet#find`) |
 | `run_callbacks` specialization | survey | 22.5 % inclusive in Rails-suite profiles; build only if ≥ 2 % expected on a corpus route |
 | Literal tag attributes | parked | Candidate #4 also owns tag-options/form-builder attribute work (4.46 % blog / 2.90 % Campfire cost shares, not savings); [boundaries](passes/erb.md) |
