@@ -42,6 +42,14 @@ module Lowrail
   # V[id] = {klass => true/false}.
   V = []
 
+  # Last receiver class validated true for each unit. Generated code compares
+  # class identity here before entering the polymorphic V cache. A private,
+  # non-class sentinel keeps an overridden #class returning nil from matching
+  # an unchecked slot. Statistics mode never publishes a class here.
+  K = []
+  NO_RECEIVER = Object.new.freeze
+  private_constant :NO_RECEIVER
+
   class << self
     attr_reader :manifest, :root
 
@@ -118,6 +126,7 @@ module Lowrail
       cache = (V[id] ||= {}.compare_by_identity)
       s = cache[klass]
       s = cache[klass] = Guard.validate(id, klass: klass) if s.nil?
+      K[id] = klass if s && !(defined?(Stats) && Stats.enabled?)
       s
     end
     alias view_ok? ok?

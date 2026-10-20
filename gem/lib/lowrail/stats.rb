@@ -52,6 +52,8 @@ module Lowrail
         return if @enabled
         @enabled = true
         @loaded = []
+        # A class published before late activation must not bypass counting.
+        Lowrail::K.fill(NO_RECEIVER)
         Lowrail.singleton_class.prepend(ReceiverGuardCounts)
         Lowrail.singleton_class.class_eval do
           remove_method :check # replaced, not wrapped: no extra frame per call

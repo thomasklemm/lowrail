@@ -131,6 +131,45 @@ class GuardTest < Minitest::Test
     assert_equal({ "0" => 1 }, out["misses"])
   end
 
+  def test_inline_receiver_cache_preserves_fallbacks_and_late_statistics
+    out = ruby_json(<<~'RUBY')
+      require "json"
+      require "lowrail"
+      require "lowrail/manifest"
+      require "lowrail/guard"
+      require "lowrail/stats"
+      class Base
+        def foo = 7
+        def lowered
+          (self.class.equal?(::Lowrail::K[7]) || ::Lowrail.ok?(7, self.class)) ? [:fast, 7] : [:original, foo]
+        end
+      end
+      class A < Base; end
+      class B < Base; end
+      fact = { "receiver" => "@self", "method" => "foo", "owner" => "Base",
+        "source_location" => Base.instance_method(:foo).source_location.join(":"), "visibility" => "public" }
+      manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+        "files" => {}, "units" => [{ "id" => 7, "facts" => [fact] }] }, "/tmp")
+      Lowrail::Guard.install(manifest)
+      nil_class = A.new
+      def nil_class.class = nil
+      other_class = A.new
+      def other_class.class = B
+      values = [nil_class.lowered, A.new.lowered, B.new.lowered, other_class.lowered]
+      class B; def foo = 19; end
+      values << B.new.lowered # the published class must have been invalidated
+      B.remove_method(:foo)
+      values << B.new.lowered
+      Lowrail::Stats.enable! # must withdraw a class published before counting
+      values.concat([B.new.lowered, B.new.lowered])
+      puts JSON.generate(values: values, hits: Lowrail::Stats.unit_hits, misses: Lowrail::Stats.unit_fallbacks)
+    RUBY
+    assert_equal [["original", 7], ["fast", 7], ["fast", 7], ["fast", 7],
+                  ["original", 19], ["fast", 7], ["fast", 7], ["fast", 7]], out["values"]
+    assert_equal({ "7" => 2 }, out["hits"])
+    assert_equal({}, out["misses"])
+  end
+
   FACTS_SCRIPT = <<~'RUBY'
     require "json"
     require "lowrail"

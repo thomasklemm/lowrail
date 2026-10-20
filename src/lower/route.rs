@@ -19,7 +19,7 @@
 //! path with marker arguments (the template), emits
 //!
 //! ```ruby
-//! ((::Lowrail.ok?(U, self.class)) ? (a0 = ARG0; (<Rails' conditions> && to_param checks) ? finish(path, options, self, false) : name_path(a0)) : (ORIGINAL))
+//! ((self.class.equal?(::Lowrail::K[U]) || ::Lowrail.ok?(U, self.class)) ? (a0 = ARG0; (<Rails' conditions> && to_param checks) ? finish(path, options, self, false) : name_path(a0)) : (ORIGINAL))
 //! ```
 //!
 //! on the call's first line, and has the oracle run that exact inner
@@ -567,7 +567,7 @@ fn emit(code: &str, c: &Candidate, prepared: &Prepared, unit: usize, k: usize, t
     let tag = k.to_string();
     let args = c.args.as_ref().expect("planned");
     let temps: Vec<String> = (0..args.len()).map(|i| arg_temp(&tag, i)).collect();
-    let mut guard = format!("::Lowrail.ok?({unit}, self.class)");
+    let mut guard = format!("(self.class.equal?(::Lowrail::K[{unit}]) || ::Lowrail.ok?({unit}, self.class))");
     if c.vcall && template {
         // In a template the name may be a local variable passed to render
         // (Rails declares locals in a preamble Prism does not see here).
@@ -767,7 +767,7 @@ mod tests {
         let locals = vec!["comment".to_string()];
         let out = lower(code, &Mode::Template { locals: &locals }, 0, &mut Fake::default(), &mut Cache::default());
         assert_eq!(out.lowered_count(), 2, "{:?}", out.sites);
-        assert!(out.code.contains("(::Lowrail.ok?(0, self.class) && defined?(articles_path) == \"method\")"), "{}", out.code);
+        assert!(out.code.contains("((self.class.equal?(::Lowrail::K[0]) || ::Lowrail.ok?(0, self.class)) && defined?(articles_path) == \"method\")"), "{}", out.code);
         assert!(out.code.contains("__lr1a0 = comment.article; __lr1a1 = comment; "), "{}", out.code);
         assert!(out.code.contains("<< \"/articles/\" << ::Lowrail::Routes.seg(__lr1p0) << \"/comments/\" << ::Lowrail::Routes.seg(__lr1p1)"));
         assert!(out.code.ends_with(": (article_comment_path(comment.article, comment))) );"));

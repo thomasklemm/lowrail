@@ -9,7 +9,7 @@
 //! exactly HTML attribute or content escaping, and replaces the call with
 //!
 //! ```ruby
-//! ((::Lowrail.ok?(U, self.class) && <type checks>) ? (<inline>) : (<original call>))
+//! (((self.class.equal?(::Lowrail::K[U]) || ::Lowrail.ok?(U, self.class)) && <type checks>) ? (<inline>) : (<original call>))
 //! ```
 //!
 //! The replacement keeps the original text verbatim in the fallback branch and
@@ -439,7 +439,7 @@ fn lower_link_to(code: &str, call: &ruby_prism::CallNode, unit: usize, oracle: &
     if inline.contains('\n') {
         return Err("link_to: specialized code would span lines".into());
     }
-    let mut guard = format!("::Lowrail.ok?({unit}, self.class)");
+    let mut guard = format!("(self.class.equal?(::Lowrail::K[{unit}]) || ::Lowrail.ok?({unit}, self.class))");
     for c in cond {
         guard.push_str(&format!(" && {c}"));
     }
@@ -483,7 +483,7 @@ mod tests {
         let out = lower_template(code, &["article".into()], 3, &mut Fake);
         assert_eq!(out.lowered_count(), 1, "{:?}", out.sites);
         assert_eq!(out.code.matches('\n').count(), code.matches('\n').count());
-        assert!(out.code.contains("::Lowrail.ok?(3, self.class) && defined?(article) == \"local-variable\" && article.instance_of?(::Article) && article.persisted?"));
+        assert!(out.code.contains("(self.class.equal?(::Lowrail::K[3]) || ::Lowrail.ok?(3, self.class)) && defined?(article) == \"local-variable\" && article.instance_of?(::Article) && article.persisted?"));
         assert!(out.code.contains(r##"__lru = article_path(article); "<a class=\"a&amp;b\" href=\"#{::Lowrail::Html.attr(__lru)}\">Show</a>".html_safe"##), "{}", out.code);
         assert!(out.code.contains(": (link_to \"Show\", article, class: \"a&b\"))"));
         assert!(out.deps.iter().any(|d| d.method == "article_path" && d.receiver == "@self"));

@@ -44,6 +44,8 @@ module Lowrail
         @units = manifest.units.to_h { |u| [u.fetch("id"), u] }
         @names = manifest.units_by_method
         @overrides = {} # name => ObjectSpace::WeakMap{obj => true}
+        # Compiler refusals can leave gaps in the manifest's unit IDs.
+        K.replace(Array.new((@units.keys.max || -1) + 1, NO_RECEIVER))
         Module.prepend(ModuleHooks) unless Module < ModuleHooks
         BasicObject.prepend(ObjectHooks) unless BasicObject < ObjectHooks
       end
@@ -64,7 +66,7 @@ module Lowrail
         ids = @names[name] or return
         # Late YJIT.enable temporarily undefines Array#each while replacing it.
         # Invalidation must not dispatch through the method being invalidated.
-        ARRAY_EACH.bind_call(ids) { |id| @state[id] = nil; V[id] = nil }
+        ARRAY_EACH.bind_call(ids) { |id| @state[id] = nil; V[id] = nil; K[id] = NO_RECEIVER }
       end
 
       # A module was included/prepended/extended: every tracked name it (or
