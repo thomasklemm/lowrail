@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 # Whole-request activation diagnosis; never changes pass files or app sources.
+# Select the app's locked default gems before the driver requires JSON.
+require File.expand_path("config/boot", Dir.pwd) if ENV["YJIT_REQUEST_ARM"]
 require_relative "../request_pairs"
 
 if ENV["YJIT_REQUEST_ARM"]
@@ -73,6 +75,7 @@ FileUtils.mkdir_p(out, mode: 0o700)
 lib = File.expand_path("../../gem/lib", __dir__)
 headers = File.read(File.join(app, "tmp/m0/headers-json.json"))
 env = {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
+  "LOWRAIL_SEALED" => "1",
   "BENCH_HEADERS" => headers, "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_JIT_DIAGNOSTICS" => nil}
 arms = %w[off_a off_b guarded active_original]
 environments = arms.to_h do |label|

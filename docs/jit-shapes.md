@@ -24,6 +24,11 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    the method's lexical constant scope, parameters, visibility and original
    fallback. Source: Fractal's first rule and Ruby's
    [ZJIT overview](https://github.com/ruby/ruby/blob/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1/doc/jit/zjit.md).
+   [Finite YJIT ablations](passes/yjit-regression.md) put the same tiny body
+   at 441.965 Ir in a plain/separately selected def, versus 470.965 with an
+   inline G branch. The selected-def binder saves 75.835% versus original;
+   the existing guarded binder saves 65.215%. These are micro shapes, not
+   whole-request promotion or permission to drop guards.
 
 2. **Choose at load time only when the lifetime of the facts is covered.**
    Fractal avoids per-call checks and avoids compiling an original only to
@@ -44,6 +49,8 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    to a BMETHOD
    ([`codegen.rs:7495–7537`](https://github.com/ruby/ruby/blob/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1/yjit/src/codegen.rs#L7495-L7537)).
    Build-only Prism visitors using `define_method` are not request overhead.
+   A no-block YJIT body costs only 444.965 versus 441.965 Ir as a def in the
+   finite shape micro; BMETHOD alone is not the config request regression.
 
 4. **Keep hot call sites receiver/name-stable; prefer direct named calls to
    dynamic `send`.** A receiver-type guard plus a direct send can expose an
@@ -85,6 +92,10 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    use an exact certified factory boundary or retain ordinary dispatch, and
    price all residual checks. Array enumeration before lookup may avoid the
    missing-method callback, but is not a demonstrated cheap/atomic guard.
+   The real nested props micro confirms this cost independently: +68.962%
+   guarded, versus −11.255% with only its guard replaced by cached G, and
+   17 extra singleton-class send fallbacks per resolution. The latter is an
+   intentionally inexact ablation, not an implemented replacement.
 
 7. **Avoid unnecessary splat, keyword-splat, forwarding and passed blocks in
    a certified hot path; inspect actual fallback/exit counters.** Not all of
@@ -98,9 +109,23 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    names concrete splat/keyword/BMETHOD/block side-exit and fallback reasons.
    Preserve keyword separation, arity, block identity and once-only evaluation;
    a generic public signature may still require forwarding on fallback.
+   Finite YJIT evidence: direct/splat 481.965/567.965 Ir; literal keyword/
+   Hash kwargs 482.965/1,194.136; mono/eight-class sends 546.965/696.090.
+   Price the actual public signature instead of extrapolating these deltas.
 
-8. **Leave no profiling TracePoint active after setup, and avoid hot
-   `binding`/`eval`.** YJIT explicitly recommends avoiding TracePoint/binding;
+8. **Never enable a global return TracePoint in production, even briefly;
+   avoid hot `binding`/`eval`.** Disabling a global hook does not restore
+   executable instruction shape on Ruby 4.0.7 or the 4.1 preview: the VM's
+   historical mask remains set, including for future ISeqs. YJIT exits at
+   `trace_leave`; disasm/to_a print bare `leave`, so use executable counters.
+   The finite unrelated-body micro adds exactly 157 YJIT / 72 interpreter
+   Ir per return after disable. A targeted boot-only return hook exactly
+   matches off; native `exit_trace_leave` is 0 instead of 1,000 per 1,000
+   calls on both VMs. Production activation targets initialize! only;
+   Loader records delivery directly, with nontracing lazy readiness hooks.
+   [Diagnosis, inventory and evidence](passes/yjit-regression.md);
+   [pinned Ruby mechanism](upstream-drafts/ruby-sticky-trace.md).
+   YJIT explicitly recommends avoiding TracePoint/binding;
    ZJIT's `NoTracePoint` patchpoints and environment-escape assumptions are
    invalidated by these operations
    ([`invariants.rs:454ff`](https://github.com/ruby/ruby/blob/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1/zjit/src/invariants.rs#L454)).
@@ -120,6 +145,9 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    **4** after removing/reassigning G with populated read sites. This is a
    cache probe, not proof of a usable epoch, nor a performance cohort. Avoid
    fresh runtime `const_set`/`remove_const`; cold setup constants are different.
+   The finite 4.0.7 YJIT G/K/V entry-write micro likewise records zero
+   invalidations; container reads still cost instructions (cached G/K/V
+   examples 474.965/518.965/837.930 Ir versus 441.965 bare).
 
 10. **Keep hot callees small enough to be considered for ZJIT inlining, not
     artificially small at any semantic cost.** The preview's default callee

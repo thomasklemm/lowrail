@@ -125,7 +125,7 @@ class SealedLinkTest < Minitest::Test
         "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "CHECK_YJIT_TRACE" => "1",
         "RUBYOPT" => "#{SETUP_OPT} --yjit --yjit-stats=quiet"})
       assert_nil traced["refusal"]
-      assert_operator traced.fetch("hits").fetch("0", 0), :>, 0
+      assert_operator traced.fetch("hits").fetch(link_unit, 0), :>, 0
       assert_equal 0, traced.fetch("trace_exits"), "boot observers must not patch unrelated request ISeqs"
       FileUtils.mkdir_p(File.join(dir, "config/initializers"))
       File.write(File.join(dir, "config/initializers/private_builder.rb"), <<~'RUBY')
