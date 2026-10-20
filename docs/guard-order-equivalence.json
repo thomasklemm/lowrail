@@ -1,0 +1,547 @@
+{
+  "date": "2026-10-20",
+  "app": "real-blog-r4",
+  "ruby": "4.0.7",
+  "workers": 1,
+  "default_units": 11,
+  "runtime_refs": [
+    "491ea2771624464ff420672c0a8bcd8688d97346",
+    "f17790c"
+  ],
+  "command": "SEED=N PARALLEL_WORKERS=1 MT_CPU=1 LOWRAIL_SQL_TRACE=full lowrail verify APP -- ruby -IARCHIVED_LIB bin/rails test --seed N",
+  "fixed_seed": 41231,
+  "fixed_runs_per_runtime": 20,
+  "varied_seed_runs": [
+    {
+      "seed": 0,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 1,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 16,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 2,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    },
+    {
+      "seed": 3,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 16,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 4,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 5,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 16,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 6,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 7,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 8,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 9,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 10,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 11,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    },
+    {
+      "seed": 12,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 13,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    },
+    {
+      "seed": 14,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 20,
+          "1": 16,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {
+          "0": 1
+        }
+      }
+    },
+    {
+      "seed": 15,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    },
+    {
+      "seed": 16,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    },
+    {
+      "seed": 17,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    },
+    {
+      "seed": 18,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    },
+    {
+      "seed": 19,
+      "both_runtimes": {
+        "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+        "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+        "outcomes": 21,
+        "queries": 125,
+        "unit_hits": {
+          "0": 21,
+          "1": 17,
+          "2": 4,
+          "3": 4,
+          "4": 1,
+          "5": 1,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 1
+        },
+        "unit_fallbacks": {}
+      }
+    }
+  ],
+  "fixed_result": {
+    "outcomes_sha256": "8af34cc22808900b3a5f0223cab232de6d83dedd8a08f91a717ca5b21d640837",
+    "sql_sha256": "86d43fbafa94b331de4135f2fe18d7aa76af92cf576b87e19bd1a3673343e90c",
+    "outcomes": 21,
+    "queries": 125,
+    "unit_hits": {
+      "0": 21,
+      "1": 17,
+      "2": 4,
+      "3": 4,
+      "4": 1,
+      "5": 1,
+      "6": 2,
+      "7": 2,
+      "8": 2,
+      "9": 2,
+      "10": 1
+    },
+    "unit_fallbacks": {}
+  },
+  "varied_totals_per_runtime": [
+    {
+      "hits": 55,
+      "fallbacks": 1,
+      "runs": 4
+    },
+    {
+      "hits": 56,
+      "fallbacks": 1,
+      "runs": 8
+    },
+    {
+      "hits": 57,
+      "fallbacks": 0,
+      "runs": 8
+    }
+  ],
+  "diagnosis": {
+    "seed14_test": "CommentTest#test_belongs_to_article_association",
+    "seed0_test": "ArticleTest#test_destroys_comments_when_article_is_destroyed",
+    "callback": "Comment after_create_commit/after_destroy_commit -> article.broadcast_replace_to(\"articles\")",
+    "rejected_fact": "@self#article_path: missing method on anonymous ActionView class before Rails lazy route loading",
+    "original_link_to_entry_article_path_defined": false,
+    "original_link_to_return_article_path_defined": true,
+    "original_link_to_return_source": "actionpack-8.1.4/lib/action_dispatch/routing/route_set.rb:334",
+    "disposition": "Legitimate conservative fallback before lazy route materialization. No guard or default seed behavior changed."
+  }
+}

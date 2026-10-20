@@ -10,6 +10,35 @@ live in the linked docs; numbers come from executed runs, dated.
 Ruby 3.4+ (gemspec), developed on 4.0.7. real-blog on Ruby 3.4.11 builds the
 same 11 units and verifies 21/21 identical with 114 hits.
 
+- **Blog counter-order investigation:** archived runtimes `491ea27` and
+  `f17790c` match exactly in 20 serial verifies each at `SEED=41231`
+  (57 hits, zero fallbacks), and seed-by-seed for seeds 0–19:
+
+  | Hits / fallbacks | Runs per runtime | Seeds |
+  |---|---:|---|
+  | 57 / 0 | 8 | 2, 11, 13, 15–19 |
+  | 56 / 1 | 8 | 0, 4, 6–10, 12 |
+  | 55 / 1 | 4 | 1, 3, 5, 14 |
+
+  All 80 verifies retain 21 identical outcomes and 125 identical ordered
+  same-thread queries; the complete per-unit maps match between runtimes.
+  At seed 14, `CommentTest#test_belongs_to_article_association` creates a
+  comment; its `after_create_commit` broadcasts the article before a controller
+  request. At seed 0 the destroy-comment callback runs inside
+  `ArticleTest#test_destroys_comments_when_article_is_destroyed` instead.
+  Unit 0 correctly rejects `@self#article_path`: that method is **absent** on
+  the anonymous view class. Tracing the original `link_to` shows it absent on
+  entry and present on return at Rails' `route_set.rb:334`: lazy route loading,
+  not an object-id cache collision or a registry regression. The fallback can
+  also skip a nested unit 1 route hit. No guard is weakened or changed.
+  [Retained per-seed maps and digests](guard-order-equivalence.json).
+
+  Plain `lowrail verify` chooses a fresh seed on each invocation, prints
+  `lowrail verify: test seed N for every run` to **stderr**, and shares it
+  across off/on/bisect runs. Existing `SEED`, `TESTOPTS` or `SPEC_OPTS` takes
+  precedence; it does not announce a generated seed in that case. Reproduce
+  the 55/1 case with `SEED=14 PARALLEL_WORKERS=1 MT_CPU=1 lowrail verify
+  .corpus/real-blog-r4`. The default seed policy is unchanged.
 - **Compiled ERB investigation, no new pass** ([survey/profile/refusals](passes/erb.md)):
   literal-run fusion rejected (blog 1 / Campfire 0 / PingCRM 0 / Redprints 0 /
   starter 1 eligible templates). Off-only profiles assign 9.09% of blog edit
