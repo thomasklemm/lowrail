@@ -52,7 +52,7 @@ module Lowrail
         # ObjectSpace omits unshareable objects after multi-ractor mode starts.
         @tracing = true unless visible
       end
-      @units = manifest.units.select { _1["pass"] == "memo/uri_join" }.to_h { [_1.fetch("id"), _1] }
+      @units = manifest.units.select { _1["pass"].to_s.start_with?("memo/") }.to_h { [_1.fetch("id"), _1] }
       @prepared = {}
     end
 
@@ -62,20 +62,8 @@ module Lowrail
 
     def join(id, receiver, base, relative)
       return yield(receiver, base, relative) unless Ractor.main?
-      unit = @units[id]
-      # Keep traced calls in the original program, including target TracePoints
-      # and set_trace_func. Do not hide instrumentation events on cache hits.
-      return yield(receiver, base, relative) unless unit && !@tracing && NATIVE_TIMEOUT && TIMEOUT.call.nil? &&
-        TRACE_STAT.call.each_value.all? { _1.first.zero? }
-      state = Guard.state
-      # Any method invalidation starts a new memo generation, even if a patch
-      # restores the same owner/source line. Never revive an old generation.
-      if state[id].nil?
-        @prepared.delete(id)
-        state[id] = Guard.validate(id)
-      end
-      return yield(receiver, base, relative) unless state[id]
-      memo = @prepared.fetch(id) { @prepared[id] = prepare(unit) }
+      return yield(receiver, base, relative) unless NATIVE_TIMEOUT && TIMEOUT.call.nil?
+      memo = prepared(id)
       return yield(receiver, base, relative) unless memo && receiver.equal?(memo[:uri]) && constants_hold?(memo) &&
         plain_string?(base) && plain_string?(relative) && base.ascii_only? && relative.ascii_only? &&
         /\Ahttps?:\/\//i.match?(base) && !/\A(?!https?:)[a-z][a-z0-9+.-]*:/i.match?(relative)
@@ -93,6 +81,35 @@ module Lowrail
         memo[:values][[base.dup.freeze, base.encoding, relative.dup.freeze, relative.encoding]] = copy(result)
       end
       result
+    end
+
+    def digest(id, receiver, string)
+      return yield(receiver, string) unless Ractor.main?
+      memo = prepared(id)
+      return yield(receiver, string) unless memo && constants_hold?(memo) && receiver.equal?(memo[:constants][1]) && plain_string?(string)
+      key = [string, string.encoding]
+      if (value = memo[:values][key])
+        result = value.dup
+        Stats.count(id, true) if defined?(Stats) && Stats.enabled?
+        return result
+      end
+      result = yield(receiver, string)
+      memo[:values][[string.dup.freeze, string.encoding]] = result.dup.freeze if memo[:values].size < LIMIT
+      result
+    end
+
+    def prepared(id)
+      unit = @units[id]
+      # TracePoint.stat excludes targeted hooks; @tracing is sticky for them.
+      return false unless unit && !@tracing && TRACE_STAT.call.each_value.all? { _1.first.zero? }
+      state = Guard.state
+      # Any method invalidation starts a new memo generation, even if a patch
+      # restores the same owner/source line. Never revive an old generation.
+      if state[id].nil?
+        @prepared.delete(id)
+        state[id] = Guard.validate(id)
+      end
+      state[id] && @prepared.fetch(id) { @prepared[id] = prepare(unit) }
     end
 
     def plain_string?(s)
@@ -119,7 +136,13 @@ module Lowrail
       return false unless data.fetch("sources").all? { |path, fact|
         File.file?(path) && File.size(path) == fact.fetch("size") && File.mtime(path).to_r.to_s == fact.fetch("mtime") &&
           Digest::SHA256.file(path).hexdigest == fact.fetch("sha256")
-      } && MemoFacts.config == data.fetch("config")
+      }
+      if data["intrinsic"] == "sha256"
+        certificate = MemoFacts.digest
+        return false if certificate["decline"] || certificate["config"] != data.fetch("config")
+        return { intrinsic: "sha256", constants: constants("sha256"), values: {} }
+      end
+      return false unless MemoFacts.config == data.fetch("config")
       # Guard's source-location facts intentionally tolerate restored aliases;
       # certification also rejects native aliases with a different original name.
       return false if MemoFacts.build["decline"]
@@ -134,12 +157,13 @@ module Lowrail
     end
 
     def constants_hold?(memo)
-      constants.each_with_index.all? { |v, i| v.equal?(memo[:constants][i]) }
+      constants(memo[:intrinsic]).each_with_index.all? { |v, i| v.equal?(memo[:constants][i]) }
     rescue NameError
       false
     end
 
-    def constants
+    def constants(intrinsic = nil)
+      return [Digest, Digest::SHA256, Digest::Class, Digest::Base, Digest::Instance] if intrinsic == "sha256"
       [URI, URI::Generic, URI::HTTP, URI::HTTPS, URI::RFC3986_Parser, URI::DEFAULT_PARSER,
         URI.const_get(:INITIAL_SCHEMES), URI::RFC3986_Parser::RFC3986_URI, URI::RFC3986_Parser::RFC3986_relative_ref,
         URI::HTTP::DEFAULT_PORT, URI::HTTPS::DEFAULT_PORT, URI::Generic::DEFAULT_PORT, URI::PARSER, URI.const_get(:Schemes),

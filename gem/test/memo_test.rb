@@ -210,6 +210,63 @@ class MemoTest < Minitest::Test
     end
   end
 
+  def test_string_digest_keys_mutation_and_observable_dispatch
+    prelude = PRELUDE.sub("MemoFacts.build", "MemoFacts.digest").sub('"memo/uri_join"', '"memo/sha256"')
+    out = ruby_json(prelude + <<~'RUBY')
+      def hashed(string)
+        Lowrail::Memo.digest(0, Digest::SHA256, string) { |r,s| r.base64digest(s) }
+      end
+      Regexp.timeout = 1 # Rails' default must not disable a regex-free intrinsic.
+      input = +"abc"
+      expected = "ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0="
+      hashed(input).replace("poison")
+      raise "shared return" unless hashed(input) == expected && !hashed(input).frozen?
+      input.replace("different")
+      raise "mutable key" unless hashed(input) == Digest::SHA256.base64digest(input)
+      ["\xFF\0".b, "abc".b, "abc".encode("UTF-16LE"), ""].each do |s|
+        2.times do
+          actual = hashed(s)
+          original = Digest::SHA256.base64digest(s)
+          raise "bytes or encoding" unless actual == original && actual.encoding == original.encoding
+        end
+      end
+      hits = Lowrail::Stats.unit_hits.fetch("0", 0)
+      raise "vacuous memo test" unless hits > 0
+      wrapper = Module.new do
+        def update(string)
+          $updates += 1
+          super
+        end
+      end
+      $updates = 0
+      Digest::Base.prepend(wrapper)
+      3.times { hashed("abc") }
+      raise "lost digest effects" unless $updates == 3
+      raise "certified wrapper" unless Lowrail::MemoFacts.digest["decline"].include?("update")
+      wrapper.send(:remove_method, :update)
+      conversions = 0
+      object = Object.new
+      object.define_singleton_method(:to_str) { conversions += 1; "abc" }
+      2.times { raise "conversion" unless hashed(object) == expected }
+      raise "lost conversions" unless conversions == 2
+      2.times do
+        begin
+          hashed(nil)
+          raise "lost error"
+        rescue TypeError
+        end
+      end
+      targeted = 0
+      trace = TracePoint.new(:call) { targeted += 1 }
+      trace.enable(target: Digest::SHA256.method(:base64digest)) { 3.times { hashed("abc") } }
+      raise "lost tracing" unless targeted == 3
+      puts JSON.generate({ hits: hits, conversions: conversions, traces: targeted })
+    RUBY
+    assert_operator out.fetch("hits"), :>, 0
+    assert_equal 2, out.fetch("conversions")
+    assert_equal 3, out.fetch("traces")
+  end
+
   def test_public_inertia_vite_version_keeps_its_own_file_and_time_semantics
     out = ruby_json(<<~'RUBY')
       require "json"

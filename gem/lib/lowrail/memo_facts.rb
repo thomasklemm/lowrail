@@ -98,8 +98,48 @@ module Lowrail
         stat = File.stat(path)
         files[path] = { "mtime" => stat.mtime.to_r.to_s, "size" => stat.size, "sha256" => Digest::SHA256.file(path).hexdigest }
       end
-      { "facts" => facts.uniq, "sources" => files, "config" => config }
+      { "intrinsic" => "uri_join", "facts" => facts.uniq, "sources" => files, "config" => config }
     rescue StandardError => e
+      { "decline" => e.message }
+    end
+
+    # Digest 3.2.1's C implementation allocates a private digest, calls
+    # initialize/digest/reset/update/finish/reset, then Array#pack('m0').
+    # There are no file reads, clock reads, provider config or caller mutation.
+    def digest
+      require "digest/sha2"
+      raise "uncertified Digest version" unless Digest::VERSION == "3.2.1"
+      method = Digest::SHA256.method(:base64digest)
+      path = method.source_location&.first
+      raise "uncertified base64digest" unless path && method.owner.equal?(Digest::Class.singleton_class) &&
+        method.original_name == :base64digest && Digest::SHA256.file(path).hexdigest == "13e5659ff480961c93a7a8dc43aa1e3067c4e1ac1b16ec024eb64697a36c498c"
+      facts = [method_fact(Digest::SHA256, :base64digest, singleton: true)]
+      expected = [[Digest::SHA256, true, { digest: Digest::Class.singleton_class }],
+        [Digest::SHA256, false, { initialize: Digest::Class, digest: Digest::Instance,
+          reset: Digest::Base, update: Digest::Base, finish: Digest::Base }],
+        [Array, false, { pack: Array }]]
+      expected.each do |mod, singleton, names|
+        names.each do |name, owner|
+          m = (singleton ? mod.singleton_class : mod).instance_method(name)
+          native = m.source_location.nil? || m.source_location.first.start_with?("<internal:")
+          raise "uncertified #{mod}##{name}" unless native && m.owner.equal?(owner) && m.original_name == name
+          facts << method_fact(mod, name, singleton: singleton)
+        end
+      end
+      { String => %i[dup initialize_dup initialize_copy hash eql? freeze encoding], Encoding => %i[hash eql?] }.each do |mod, names|
+        names.each do |name|
+          m = mod.instance_method(name)
+          raise "non-native #{mod}##{name}" unless (!m.source_location || m.source_location.first.start_with?("<internal:")) && m.original_name == name
+          facts << method_fact(mod, name)
+        end
+      end
+      sources = [path, *$LOADED_FEATURES.select { _1.end_with?("/digest.so", "/digest/sha2.so") },
+        File.join(__dir__, "memo.rb"), __FILE__].uniq.to_h do |file|
+        stat = File.stat(file)
+        [file, { "mtime" => stat.mtime.to_r.to_s, "size" => stat.size, "sha256" => Digest::SHA256.file(file).hexdigest }]
+      end
+      { "intrinsic" => "sha256", "facts" => facts, "sources" => sources, "config" => { "version" => Digest::VERSION } }
+    rescue StandardError, LoadError => e
       { "decline" => e.message }
     end
 

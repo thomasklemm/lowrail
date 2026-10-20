@@ -47,6 +47,7 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool) -> Result
     let mut oracle = RubyOracle::start(app, env)?;
     let mut routes = route::Cache::default();
     let mut memo_certificate = None;
+    let mut digest_certificate = None;
 
     // Units `lowrail verify --bisect` found to change outcomes stay unlowered
     // (denylist entries name a file and a pass).
@@ -126,18 +127,21 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool) -> Result
             }
         }
         if memo_enabled {
-            if is_denied(&file, "memo/uri_join") {
-                ledger.push(denied_entry("file", &file, "memo/uri_join"));
-            } else {
-                let unit = units.len();
-                let lowered = memo::lower(&code, unit, &mut oracle, &mut memo_certificate);
-                record(&mut ledger, "file", &file, "memo/uri_join", &lowered.sites);
-                let sites = lowered.sites.iter().filter(|s| s.outcome == "lowered").count();
-                if sites > 0 {
-                    let certificate = lowered.certificate.unwrap();
-                    units.push(json!({"id": unit, "kind": "file", "file": file, "pass": "memo/uri_join",
-                        "sites": sites, "facts": certificate["facts"], "memo": certificate}));
-                    code = lowered.code;
+            for (intrinsic, cache) in [(memo::Intrinsic::UriJoin, &mut memo_certificate), (memo::Intrinsic::Sha256, &mut digest_certificate)] {
+                let pass = intrinsic.pass();
+                if is_denied(&file, pass) {
+                    ledger.push(denied_entry("file", &file, pass));
+                } else {
+                    let unit = units.len();
+                    let lowered = memo::lower(&code, unit, &mut oracle, cache, intrinsic);
+                    record(&mut ledger, "file", &file, pass, &lowered.sites);
+                    let sites = lowered.sites.iter().filter(|s| s.outcome == "lowered").count();
+                    if sites > 0 {
+                        let certificate = lowered.certificate.unwrap();
+                        units.push(json!({"id": unit, "kind": "file", "file": file, "pass": pass,
+                            "sites": sites, "facts": certificate["facts"], "memo": certificate}));
+                        code = lowered.code;
+                    }
                 }
             }
         }
@@ -192,7 +196,7 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool) -> Result
 
 fn summary(ledger: &[Value], units: &[Value], templates: usize, files: usize, dir: &Path) -> String {
     let mut s = String::new();
-    for pass in ["view/link_to", "route/path", "memo/uri_join"] {
+    for pass in ["view/link_to", "route/path", "memo/uri_join", "memo/sha256"] {
         let sites: Vec<&Value> = ledger.iter().filter(|l| l["pass"] == pass).collect();
         let lowered = sites.iter().filter(|l| l["outcome"] == "lowered").count();
         let n_units = units.iter().filter(|u| u["pass"] == pass).count();
