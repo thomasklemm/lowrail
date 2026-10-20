@@ -12,6 +12,7 @@ module ARProfileSummary
     name = frame.fetch("name", "")
     file = frame.fetch("file", "")
     return "execution" if name.match?(/ActiveRecord::ConnectionAdapters::.*#(?:raw_execute|perform_query|execute_batch_statements)\z/)
+    return "types_instantiation" if file.start_with?("lowrail:ar_instantiate:")
     return "types_instantiation" if name.match?(/\AActiveModel::(?:Attribute|LazyAttribute|Type::)/) ||
       name.match?(/\AActiveRecord::(?:Type::|AttributeMethods|AttributeSet|TypeCaster)/) ||
       name.match?(/ActiveRecord::.*[#.](?:instantiate\w*|_instantiate\w*|_load_from_sql|attributes_builder)\z/)

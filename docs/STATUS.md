@@ -57,6 +57,16 @@ same 11 units and verifies 21/21 identical with 114 hits.
   are noise-dominated, including 7–9% movement on zero-hit PingCRM controls.
   Keep opt-in. Attribute dispatch was a guarded negative result; general
   escaping app-chain plans remain unimplemented (SQL-only ceiling 21–22 µs).
+- **Active Record instantiation** ([measurements and guards](passes/ar-instantiate.md)),
+  opt-in `lowrail build --ar-instantiate`: normal per-model singleton `def`s,
+  lazy builder reuse, method facts and row-wise AR epoch guards; Rails still
+  owns initialization, callbacks and STI. Five corpus apps: **779 outcomes
+  and 17,261 ordered same-thread SQL events identical**, **3,363 pass hits**;
+  Campfire's 3,129 fallbacks are 958 STI rows + 2,171 calls after a captured
+  schema-test connection switch. Alpha 20/200-row load-only −38.9%/−37.0%,
+  four fewer allocations/row; Rails 8.1 usually regresses. Five interleaved
+  request pairs/app show **no request win**: blog +25.5% repeatably slower,
+  other apps inconclusive within overlapping noise. Keep it opt-in.
 - **Guarded memo** ([certificate/refusal details](passes/memo.md)), opt-in
   with `lowrail build --memo`: fresh-return SHA-256 string reuse, bounded by
   runtime keys and guarded implementation facts. Campfire **634 identical**,
