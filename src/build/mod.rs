@@ -21,6 +21,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let mut memo = false;
     let mut ar_instantiate = false;
     let mut ar_plans = false;
+    let mut digest_memo = false;
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
@@ -30,13 +31,14 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             "--memo" => memo = true,
             "--ar-instantiate" => ar_instantiate = true,
             "--ar-plans" => ar_plans = true,
+            "--digest-memo" => digest_memo = true,
             _ if app.is_none() => app = Some(PathBuf::from(a)),
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans] [--memo] [--ar-instantiate] [--ar-plans]")?;
+    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans] [--memo] [--ar-instantiate] [--ar-plans] [--digest-memo]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
-    let report = build(&app, &env, preload, memo)?;
+    let report = build(&app, &env, preload, memo, digest_memo)?;
     if ar_instantiate {
         let status = Command::new("bundle")
             .args(["exec", "ruby"])
@@ -71,7 +73,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool) -> Result<String, String> {
+pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool, digest_memo: bool) -> Result<String, String> {
     let dir = app.join(".lowrail");
     let facts_path = dir.join("facts.json");
     if !facts_path.exists() {
@@ -199,6 +201,24 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool) -> Result
     let input_path = dir.join("units.json");
     write_atomic(&input_path, &serde_json::to_string_pretty(&input).unwrap())?;
     write_atomic(&dir.join("ledger.json"), &serde_json::to_string_pretty(&ledger).unwrap())?;
+    if digest_memo {
+        let status = Command::new("bundle")
+            .args(["exec", "ruby"])
+            .arg(facts::gem_dir().join("exe/lowrail-digest-build"))
+            .arg(&input_path)
+            .current_dir(app)
+            .env_remove("RUBYOPT")
+            .env("RAILS_ENV", env)
+            .status()
+            .map_err(|e| format!("digest memo facts: {e}"))?;
+        if !status.success() {
+            return Err(format!("digest memo facts failed ({status})"));
+        }
+        let input: Value = serde_json::from_str(&std::fs::read_to_string(&input_path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+        files = input["files"].as_array().unwrap().clone();
+        units = input["units"].as_array().unwrap().clone();
+        ledger = serde_json::from_str(&std::fs::read_to_string(dir.join("ledger.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    }
     let status = Command::new("bundle")
         .args(["exec", "ruby"])
         .arg(facts::gem_dir().join("exe/lowrail-compile"))
@@ -230,7 +250,7 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool) -> Result
 
 fn summary(ledger: &[Value], units: &[Value], templates: usize, files: usize, dir: &Path) -> String {
     let mut s = String::new();
-    for pass in ["view/link_to", "route/path", "memo/uri_join", "memo/sha256"] {
+    for pass in ["view/link_to", "route/path", "memo/uri_join", "memo/sha256", "digest/file_memo"] {
         let sites: Vec<&Value> = ledger.iter().filter(|l| l["pass"] == pass).collect();
         let lowered = sites.iter().filter(|l| l["outcome"] == "lowered").count();
         let n_units = units.iter().filter(|u| u["pass"] == pass).count();

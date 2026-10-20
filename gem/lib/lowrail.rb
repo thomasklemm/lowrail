@@ -106,6 +106,10 @@ module Lowrail
         require_relative "lowrail/memo"
         Memo.install(manifest)
       end
+      if manifest.units.any? { _1["pass"] == "digest/file_memo" }
+        require_relative "lowrail/digest_memo"
+        DigestMemo.install(manifest)
+      end
       if manifest.units.any? { _1["pass"] == "active_record/instantiate" }
         require_relative "lowrail/ar_instantiate"
         ARInstantiate.install(manifest)

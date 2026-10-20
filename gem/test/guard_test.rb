@@ -128,7 +128,8 @@ class GuardTest < Minitest::Test
       "wrong line" => fact("Base", "title", "Base", "#{f}:99"),
       "wrong visibility" => fact("Base", "title", "Base", "#{f}:8", visibility: "private"),
       "missing constant" => fact("Nope", "title", "Nope", nil),
-      "missing method" => fact("Base", "nope", "Base", nil)
+      "missing method" => fact("Base", "nope", "Base", nil),
+      "native inherited singleton" => fact("File", "open", "#<Class:IO>", nil, singleton: true)
     }
     units = facts.each_with_index.map { |(k, fa), i| { "id" => i, "file" => "/x.rb", "method" => k, "facts" => [fa] } }
     m = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => "", "compile_option" => "", "files" => {}, "units" => units }, "/tmp")
@@ -137,15 +138,25 @@ class GuardTest < Minitest::Test
     facts.each_key.with_index { |k, i| out[k] = Lowrail::Guard.validate(i) }
     class Child; def title = "c"; end
     out["after subclass override"] = Lowrail::Guard.validate(0)
+    native_id = facts.keys.index("native inherited singleton")
+    original = File.method(:open)
+    File.define_singleton_method(:open) { |*args, &block| original.call(*args, &block) }
+    out["native wrapped"] = Lowrail::Guard.validate(native_id)
+    File.singleton_class.define_method(:open, original)
+    out["native restored copy"] = Lowrail::Guard.validate(native_id)
+    File.singleton_class.alias_method(:open, :read)
+    out["native different alias"] = Lowrail::Guard.validate(native_id)
+    File.singleton_class.remove_method(:open)
+    out["native restored lookup"] = Lowrail::Guard.validate(native_id)
     puts JSON.generate(out)
   RUBY
 
   def test_fact_validation
     r = ruby_json(FACTS_SCRIPT, setup: false, env: { "RUBYOPT" => "-I#{GEM_LIB}" })
-    %w[instance inherited\ via\ subclass\ receiver singleton\ own singleton\ from\ extended\ module protected cfunc].each do |k|
+    %w[instance inherited\ via\ subclass\ receiver singleton\ own singleton\ from\ extended\ module protected cfunc native\ inherited\ singleton native\ restored\ lookup].each do |k|
       assert r[k], "#{k} should hold"
     end
-    %w[wrong\ owner wrong\ line wrong\ visibility missing\ constant missing\ method after\ subclass\ override].each do |k|
+    %w[wrong\ owner wrong\ line wrong\ visibility missing\ constant missing\ method after\ subclass\ override native\ wrapped native\ restored\ copy native\ different\ alias].each do |k|
       refute r[k], "#{k} should not hold"
     end
   end

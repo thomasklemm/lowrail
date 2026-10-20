@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+gem "rails", "8.1.4"
+gem "rails_vite", "0.3.0"
+gem "inertia_rails", "3.22.0"
+gem "vite_ruby", "3.11.1"
+gem "minitest"
