@@ -156,16 +156,24 @@ the registry or installing delivery, invalidation or activation hooks.
 
 1. **Survey**: the builder runs in report-only mode over the corpus; the
    ledger shows eligible sites and refusals by reason.
-2. **Implement** behind `opt-in`, with tests that fail on a plausible wrong
+2. **Price before building** (added 2026-10-20). Measure the complete exact
+   check cost per hit, including every post-entry boundary, against the
+   whole original work it replaces, with one finite micro cohort. If the
+   checks alone cost more than the saving, stop at design. Pricing stopped
+   both guarded endpoint designs before implementation (caller-side sections:
+   93,649 Ir of checks vs 90,042 Ir for two links; body-installed: 94,466 vs
+   89,729). `inertia/props` was built first and lost (micro −5,894 Ir/call,
+   request +0.87 % with per-iteration checks).
+3. **Implement** behind `opt-in`, with tests that fail on a plausible wrong
    implementation (asymmetric inputs, a fact changed after boot).
-3. **Gate**: `lowrail verify` on all corpus apps: identical outcomes and SQL
+4. **Gate**: `lowrail verify` on all corpus apps: identical outcomes and SQL
    traces, hits where they genuinely occur, every fallback explained.
-4. **Measure** with `lowrail bench`: saved µs or instructions per completed hit
+5. **Measure** with `lowrail bench`: saved µs or instructions per completed hit
    (guard included) × hits per request = expected effect; then the measured
    request effect against an A/A control. Keep metrics/JIT state comparable;
    guard success alone is not necessarily a completed specialization. Partial
    budgets and rejected controls are recorded, not promoted.
-5. **Promote** to `default: on` only if the expected effect, individually or
+6. **Promote** to `default: on` only if the expected effect, individually or
    as a measured pass set, is ≥ 2 % on some corpus route, the measurement
    agrees, and nothing gets slower beyond noise. Otherwise it stays opt-in
    with its numbers in `docs/passes/`. Smaller passes may stack; do not demand
