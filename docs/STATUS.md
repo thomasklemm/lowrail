@@ -22,6 +22,12 @@ live in the linked docs; numbers come from executed runs, dated.
   Ruby-file pass, served through `load_iseq`); probes run the emitted code
   next to the real helper. Guards on `@self` facts are checked per class of
   `self` (`Lowrail.ok?`).
+- **Active Record preload plans** ([design and measurements](passes/preload-plans.md)):
+  guarded gem-level trees, scopes and loader groups computed once; fresh
+  Rails Association loaders per call, no cached rows. Schema/reflection/scope
+  changes and unsupported shapes retain the original Rails path. Already-loaded
+  micro path −22.1% time/−29.3% allocations, but presentation +19.3% and
+  response-cache-disabled room +10.2%: not a general application-speed win.
 - **Runtime gem**: `load_iseq` seam (composes with Bootsnap in either order),
   template seam (lowered handler code while the source digest matches),
   guards that reset on every definition path and revalidate lazily
@@ -40,8 +46,8 @@ live in the linked docs; numbers come from executed runs, dated.
 
 | App | Lowered | verify | Other |
 |---|---|---|---|
-| real-blog (Rails 8.1.4) | 9/9 `link_to` sites, 10/10 route sites (1 in a controller), 11 units | 21/21 identical, 110 fast-path hits across all 11 units | 4 HTML routes byte-identical on/off (CSRF masked); request time within noise, allocs −1 to −6 %; `edit_article_path` 2.7 → 1.4 µs |
-| Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 57/162 route sites (62 refused `_url`), 34 units | 634/634 identical (2 skips both ways), 27/33 route units hit, 0 fallbacks | M0 in `docs/m0/campfire.md` |
+| real-blog (Rails 8.1.4) | 9/9 `link_to` sites, 10/10 route sites (1 in a controller), 12 units including preload plans | 21/21 identical, 116 fast-path hits across all 12 units (2 preload hits) | 4 HTML routes byte-identical on/off (CSRF masked); request time within noise, allocs −1 to −6 %; `edit_article_path` 2.7 → 1.4 µs |
+| Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 57/162 route sites (62 refused `_url`), 35 units including preload plans | 634/634 identical (2 skips both ways), 27/33 route units hit, 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
 | ARGOS (private, Rails 8.1.4) | not built yet | — | M0 aggregates in `docs/m0/argos.md` |
 
 ## Learned
@@ -65,7 +71,7 @@ live in the linked docs; numbers come from executed runs, dated.
 ## Next
 
 - `_url` route helpers (the largest refused group in Campfire).
-- Benchmark harness with interleaved on/off runs and confidence intervals.
+- Broader benchmark coverage and confidence intervals (preload runs now interleave on/off).
 - Guarded memo for per-request work on boot-fixed inputs (ARGOS: Inertia
   asset-version digest 12.8 % self per request).
 - Active Record attribute/reflection dispatch (ARGOS, Campfire uncached).
