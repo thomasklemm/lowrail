@@ -41,8 +41,10 @@ module Lowrail
         end
         entries.each do |entry|
           klass = entry.klass
-          klass.singleton_class.class_eval(source(entry.id), "lowrail:ar_instantiate:#{klass.name}", 1)
           klass.instance_variable_set(:@_lowrail_instantiate, entry)
+          klass.singleton_class.class_eval(source(entry.id), "lowrail:ar_instantiate:#{klass.name}", 1)
+        rescue StandardError, ScriptError => e
+          Lowrail.debug("AR instantiate installation declined: #{e.class}: #{e.message}")
         end
       rescue LoadError => e
         Lowrail.debug("AR instantiate unavailable: #{e.message}")

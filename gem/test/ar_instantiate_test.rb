@@ -35,11 +35,16 @@ class ARInstantiateTest < Minitest::Test
       attribute :score, CountedType.new
     end
     class CustomPost < Post
-      attr_reader :custom
+      attr_reader :custom, :internal
       def init_with_attributes(attributes, new_record = false)
         super
         @custom = title.reverse
         self
+      end
+      private
+      def init_internals
+        super
+        @internal = title + "-internal"
       end
     end
     class CustomBuilderPost < Post
@@ -84,7 +89,10 @@ class ARInstantiateTest < Minitest::Test
     raise "not lazy" unless lazy == 0 && $casts == 2
     frozen = Post.all.load.records.frozen?
     inverse = Writer.includes(:posts).find(a.id).then { |w| w.posts.all? { _1.writer.equal?(w) } }
-    custom = CustomPost.order(:id).map(&:custom)
+    custom = CustomPost.order(:id).map { [_1.custom, _1.internal] }
+    projected = Post._load_from_sql(ActiveRecord::Result.new(["score", "extra_number"], [["31", "47"]],
+      { "score" => ActiveRecord::Type::String.new, "extra_number" => ActiveRecord::Type::Integer.new })).first
+    projection = [projected.score, projected["extra_number"]]
     builder_before = ($builder_calls || 0)
     CustomBuilderPost.order(:id).to_a
     builder_calls = $builder_calls - builder_before
@@ -133,7 +141,7 @@ class ARInstantiateTest < Minitest::Test
     ActiveSupport::Notifications.unsubscribe(subscription)
     hits = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits.values.sum : 0
     puts JSON.generate(snapshot: snapshot, frozen: frozen, inverse: inverse, custom: custom,
-      builder_calls: builder_calls, sti: sti, late: late, yielded: yielded, block: block_result,
+      projection: projection, builder_calls: builder_calls, sti: sti, late: late, yielded: yielded, block: block_result,
       schema: schema, dispatch: dispatched, new_subclass: new_subclass, events: events, hits: hits)
   RUBY
 
@@ -144,7 +152,8 @@ class ARInstantiateTest < Minitest::Test
       assert_equal [["left", 17, false, false, true, true], ["right", 29, false, false, true, true]], off["snapshot"]
       assert_equal true, off["frozen"]
       assert_equal true, off["inverse"]
-      assert_equal ["tfel", "thgir"], off["custom"]
+      assert_equal [["tfel", "left-internal"], ["thgir", "right-internal"]], off["custom"]
+      assert_equal [31, 47], off["projection"]
       assert_equal 2, off["builder_calls"]
       assert_equal [["Bicycle", "two wheels"], ["Vehicle", "plain"]], off["sti"]
       assert_equal ["LEFT", "RIGHT"], off["late"]
