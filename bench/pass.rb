@@ -2,6 +2,7 @@
 
 require "optparse"
 require_relative "request_pairs"
+require_relative "stack_budget"
 require_relative "../gem/lib/lowrail"
 require_relative "../gem/lib/lowrail/manifest"
 
@@ -127,7 +128,9 @@ module PassBench
 
   def self.table(result)
     native = result[:counter] == "native"
-    lines = ["Pass: `#{result.fetch(:pass)}`; counter: `#{result.fetch(:counter)}`. The default layer enables the selected units.", "",
+    selection = result[:passes] ? "Pass set: `#{result.fetch(:passes).join(',')}`. Stacked and default use separate builds." :
+      "Pass: `#{result.fetch(:pass)}`. The default layer enables the selected units."
+    lines = ["#{selection} Counter: `#{result.fetch(:counter)}`.", "",
       native ? "| Layer | CPU µs/request | Δ% [95% CI] | Wall µs/request | Δ% [95% CI] |" :
       "| Layer | Instructions/request | Δ% [95% CI] | GC-excluded Ir/request | Δ% [95% CI] |",
       "|---|---:|---:|---:|---:|"]
@@ -144,7 +147,35 @@ module PassBench
     if result[:coverage]
       lines << "\nCompleted routes/request: #{result.fetch(:coverage).fetch('route_completions_per_request')}; other per-unit counts in JSON. Source guard counts are not completion counts."
     end
-    if (micro = result[:micro])
+    if (stack = result[:stack])
+      lines << "\n| Reference / metric | Measured saving/request [95% CI] | Sum individual expected [95% CI] | Measured − expected [95% CI] |"
+      lines << "|---|---:|---:|---:|"
+      stack.fetch(:comparisons).each do |reference, metrics|
+        metrics.each do |metric, comparison|
+          cells = %i[measured_saved_per_request sum_individual_expected_saved_per_request measured_minus_expected].map do |key|
+            value = comparison[key]
+            value ? format("%+.3f [%+.3f, %+.3f]", value.fetch(:median), *value.fetch(:ci95)) : "unmodeled"
+          end
+          lines << "| #{reference} / #{metric} | #{cells.join(' | ')} |"
+        end
+      end
+      lines << "\nPositive savings are better. Default comparison predicts opt-in budgets only; no-setup predicts all supplied budgets. Residuals also include setup cost and unmodeled work, not just interactions."
+      lines << "\nBudget: #{stack.fetch(:budget_status)}. Unmodeled hit units: #{stack.fetch(:unmodeled_unit_ids).join(',')}. No promotion claim from partial budgets."
+      lines << "\nUnpriced fallback units: #{stack.fetch(:unmodeled_fallback_unit_ids).join(',')}." unless stack.fetch(:unmodeled_fallback_unit_ids).empty?
+      lines << "\nRemoved default passes (unmodeled reference work): #{stack.fetch(:removed_default_passes).join(',')}." unless stack.fetch(:removed_default_passes).empty?
+      unless stack.fetch(:units).empty?
+        lines << "\n| Unit / model (#{stack.fetch(:metric)}) | Guard-included saved/hit [95% CI] | Completed hits/request | Expected saving/request [95% CI] |"
+        lines << "|---|---:|---:|---:|"
+        stack.fetch(:units).each do |unit|
+          cost, expected = unit.fetch(:saved_per_hit), unit.fetch(:expected_saved_per_request)
+          frequency = unit.fetch(:hits_per_request)
+          frequency = RequestPairs.median(frequency) if frequency.is_a?(Array)
+          lines << format("| %d / %s | %+.3f [%+.3f, %+.3f] | %.3f | %+.3f [%+.3f, %+.3f] |",
+            unit.fetch(:id), unit[:model] || unit.fetch(:pass), cost.fetch(:median), *cost.fetch(:ci95), frequency,
+            expected.fetch(:median), *expected.fetch(:ci95))
+        end
+      end
+    elsif (micro = result[:micro])
       lines << format("\nUnit %d guard-included micro: %.4f µs/hit × %.3f hits/request = %.4f expected µs/request (native YJIT; not interpreter instructions). Unmodeled hit units: %s.",
         micro.fetch(:unit_id), micro.fetch(:saved_per_hit).fetch(:median), micro.fetch(:hits_per_request), micro.fetch(:expected_us_per_request).fetch(:median), micro.fetch(:unmodeled_unit_ids).join(","))
       if (measured = result[:measured_us_saved_per_request])
@@ -162,8 +193,19 @@ module PassBench
     out = File.expand_path(options.fetch(:out, File.join(app, "tmp/lowrail-bench")))
     raise "output directory must be new: #{out}" if File.exist?(out)
     FileUtils.mkdir_p(out, mode: 0o700)
-    result = { schema_version: 1, pass: options.fetch(:pass), counter: options.fetch(:counter, "callgrind"), status: "rejected" }
+    result = { schema_version: 1, pass: options[:pass], counter: options.fetch(:counter, "callgrind"), status: "rejected" }
+    result[:passes] = options.fetch(:passes).split(",") if options[:passes]
     begin
+      stacked = !!options[:passes]
+      raise "choose --pass or --passes" if !!options[:pass] == stacked
+      if stacked
+        raise "stacked mode needs --default-build DIR" unless options[:default_build]
+        raise "stacked mode uses --budgets, not --micro-case/--model" if options[:micro_case] || options[:model]
+        raise "stacked mode cannot combine other comparison layers" if
+          %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].any? { ENV[_1] }
+      elsif options[:default_build] || options[:budgets]
+        raise "--default-build and --budgets require --passes"
+      end
       counter = result.fetch(:counter)
       raise "counter must be callgrind or native" unless %w[callgrind native].include?(counter)
       raise "BENCH_JIT must be 0 or 1" unless %w[0 1].include?(ENV.fetch("BENCH_JIT", "0"))
@@ -171,20 +213,38 @@ module PassBench
       raise "A/A tolerance is fixed; do not widen controls" if ENV["BENCH_AA_TOLERANCE"]
       raise "native needs at least five independent cohorts" if counter == "native" && Integer(ENV.fetch("BENCH_COHORTS", "5")) < 5
       baseline = File.expand_path(ENV["BENCH_BASELINE_LIB"]) if ENV["BENCH_BASELINE_LIB"]
-      raise "runtime comparison requires --pass default" if baseline && options.fetch(:pass) != "default"
+      raise "runtime comparison requires --pass default" if baseline && options[:pass] != "default"
       lib = File.expand_path(ENV.fetch("BENCH_LOWRAIL_LIB", File.join(__dir__, "../gem/lib")))
       data = preflight(File.join(app, ".lowrail"), lib)
       result[:manifest_sha256] = Digest::SHA256.file(File.join(app, ".lowrail/manifest.json")).hexdigest
       result[:runtime_files_sha256] = runtime_fingerprint(lib)
+      result[:runtime_fingerprint_sha256] = Digest::SHA256.hexdigest(JSON.generate(canonical(result.fetch(:runtime_files_sha256))))
       result[:app] = File.basename(app)
       result[:lockfile_sha256] = Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest if File.file?(File.join(app, "Gemfile.lock"))
       result[:corpus_source] = File.read(File.join(app, ".lowrail-corpus-source")).strip if File.file?(File.join(app, ".lowrail-corpus-source"))
-      selected = data.fetch("units").select { options.fetch(:pass) == "default" || _1.fetch("pass") == options.fetch(:pass) }
-      raise "no units for #{options.fetch(:pass)}; build production with that pass first" if selected.empty?
+      selected = data.fetch("units").select do |unit|
+        stacked ? result.fetch(:passes).include?(unit.fetch("pass")) : options.fetch(:pass) == "default" || unit.fetch("pass") == options.fetch(:pass)
+      end
+      raise "no units for selection; build production with that pass first" if selected.empty?
+      if stacked
+        raise "stack build contains unselected passes; rebuild with exactly --passes SET" unless selected == data.fetch("units")
+        reference = File.expand_path(options.fetch(:default_build))
+        reference_data = preflight(reference, lib)
+        default_passes = options.fetch(:default_passes).split(",")
+        raise "default reference contains opt-in passes" unless reference_data.fetch("units").all? { default_passes.include?(_1.fetch("pass")) }
+        raise "default reference belongs to another app" unless reference_data.fetch("units").all? do |unit|
+          !unit["file"] || unit.fetch("file").start_with?(app + "/")
+        end
+        result[:default_manifest_sha256] = Digest::SHA256.file(File.join(reference, "manifest.json")).hexdigest
+      end
       route = options.fetch(:path, "/")
       route = "GET:#{route}" unless route.match?(/\A[A-Z]+:/)
       raise "--path must be a local request path" unless route.match?(/\A[A-Z]+:\//)
       result[:route] = route
+      # Tie externally counted completion frequencies to the same request,
+      # without writing private authentication headers into the report.
+      result[:request_context_sha256] = Digest::SHA256.hexdigest(JSON.generate(canonical(
+        route: route, headers: JSON.parse(ENV.fetch("BENCH_HEADERS", "{}")), cache_mb: ENV["CAMPFIRE_RESPONSE_CACHE_MB"])))
       ids = selected.map { _1.fetch("id") }.join(",")
       env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
         "LOWRAIL" => "1", "LOWRAIL_ROOT" => app, "LOWRAIL_UNITS" => ids, "BENCH_UNITS" => ids,
@@ -193,6 +253,18 @@ module PassBench
         "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter == "native" ? "400" : "50"),
         "RUBYOPT" => "-I#{lib} -rlowrail/setup" }
       result[:coverage] = probe(app, out, env, route, "coverage")
+      if stacked
+        Dir.mktmpdir("lowrail-bench-default") do |tmp|
+          FileUtils.ln_s(reference, File.join(tmp, ".lowrail"))
+          default_ids = reference_data.fetch("units").map { _1.fetch("id") }.join(",")
+          result[:default_coverage] = probe(app, out, env.merge("LOWRAIL_ROOT" => tmp, "LOWRAIL_UNITS" => default_ids,
+            "BENCH_UNITS" => default_ids), route, "default-coverage")
+        end
+        if options[:budgets]
+          result[:budget_input] = JSON.parse(File.read(options.fetch(:budgets)))
+          StackBudget.validate!(result.fetch(:budget_input), result, selected)
+        end
+      end
       if baseline
         preflight(File.join(app, ".lowrail"), baseline)
         result[:baseline_runtime_files_sha256] = runtime_fingerprint(baseline)
@@ -200,7 +272,7 @@ module PassBench
       end
       extra = ENV["BENCH_INSTANTIATE_DIR"]
       if extra
-        raise "extra build is only supported with --pass default" unless options.fetch(:pass) == "default"
+        raise "extra build is only supported with --pass default" unless options[:pass] == "default"
         extra_data = preflight(File.expand_path(extra), lib)
         Dir.mktmpdir("lowrail-bench-extra") do |tmp|
           FileUtils.ln_s(File.expand_path(extra), File.join(tmp, ".lowrail"))
@@ -211,7 +283,8 @@ module PassBench
       end
       # The request driver, not this parent, assigns each worker's setup layer.
       run_env = env.merge("RUBYOPT" => nil, "LOWRAIL_STATS" => nil, "BENCH_COUNTER" => counter == "callgrind" ? "callgrind" : nil,
-        "BENCH_HEAP_MODE" => "fixed", "BENCH_UNITS" => options.fetch(:pass) == "default" ? nil : ids)
+        "BENCH_HEAP_MODE" => "fixed", "BENCH_UNITS" => options[:pass] == "default" ? nil : ids,
+        "BENCH_DEFAULT_DIR" => reference)
       ok = system(run_env, RbConfig.ruby, File.join(__dir__, "request_pairs.rb"), app, File.join(out, "requests"), route,
         out: File.join(out, "requests.log"), err: [:child, :out])
       result[:request] = JSON.parse(File.read(File.join(out, "requests/summary.json"))) if File.file?(File.join(out, "requests/summary.json"))
@@ -221,6 +294,10 @@ module PassBench
       workers = raw["cohorts"] ? raw.fetch("cohorts").flat_map { _1.fetch("workers").values } : raw.fetch("workers").values
       raise "unexpected JIT mode in request workers" unless workers.all? { _1.fetch("yjit") == (env.fetch("BENCH_JIT") == "1") }
       result[:actual_yjit] = workers.map { _1.fetch("yjit") }.uniq
+      if stacked
+        result[:stack] = StackBudget.report(raw, result, result[:budget_input], default_passes,
+          seed: Integer(ENV.fetch("BENCH_SEED", "41231")))
+      end
       # Keep time and instruction budgets separate: a YJIT micro cannot
       # predict an interpreter instruction count by changing its unit label.
       if options[:micro_case]
@@ -242,6 +319,7 @@ module PassBench
       end
       # Detect a concurrent rebuild/edit rather than publish mixed provenance.
       raise "build changed during measurement" unless data == preflight(File.join(app, ".lowrail"), lib)
+      raise "default build changed during measurement" if stacked && reference_data != preflight(reference, lib)
       raise "extra build changed during measurement" if extra && extra_data != preflight(File.expand_path(extra), lib)
       raise "runtime changed during measurement" unless result.fetch(:runtime_files_sha256) == runtime_fingerprint(lib)
       if baseline
@@ -254,6 +332,11 @@ module PassBench
     ensure
       result[:measurement_complete] = !!(result[:status] == "accepted" && result[:counter] == "native" &&
         result[:micro] && result[:micro].fetch(:unmodeled_unit_ids).empty?)
+      if result[:stack]
+        result[:measurement_complete] = !!(result[:status] == "accepted" && result[:budget_input] &&
+          result.fetch(:stack).fetch(:unmodeled_unit_ids).empty? && result.fetch(:stack).fetch(:removed_default_passes).empty? &&
+          result.fetch(:stack).fetch(:unmodeled_fallback_unit_ids).empty?)
+      end
       File.write(File.join(out, "result.json"), JSON.pretty_generate(canonical(result)) + "\n")
       File.write(File.join(out, "table.md"), table(result))
       puts table(result)
@@ -266,10 +349,10 @@ end
 if $PROGRAM_NAME == __FILE__
   options = {}
   parser = OptionParser.new do |p|
-    %w[pass path out counter micro-case model].each { |name| p.on("--#{name} VALUE") { options[name.tr('-', '_').to_sym] = _1 } }
+    %w[pass passes default-passes default-build budgets path out counter micro-case model].each { |name| p.on("--#{name} VALUE") { options[name.tr('-', '_').to_sym] = _1 } }
     p.on("--diagnostics") { options[:diagnostics] = true }
   end
   parser.parse!
-  abort "usage: pass.rb APP --pass NAME [--path /path] [--out NEW_DIR]" unless ARGV.one? && options[:pass]
+  abort "usage: pass.rb APP --pass NAME [--path /path] [--out NEW_DIR] (pass sets: use lowrail bench)" unless ARGV.one? && (options[:pass] || options[:passes])
   exit(PassBench.run(ARGV.first, options) ? 0 : 2)
 end

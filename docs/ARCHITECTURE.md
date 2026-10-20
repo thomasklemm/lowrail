@@ -168,5 +168,7 @@ and `guard.rb` to land.
    per-hit budgets. Existing AR/preload method micros share fresh-process
    A/A orchestration; remaining operation adapters are listed in
    [bench.md](bench.md#remaining-per-pass-adapters). Stacked `--passes` mode
-   with a separate default reference and an additivity budget is the
-   [immediate follow-up](bench.md#immediate-follow-up-stacked-pass-sets).
+   uses a separate saved default build, the same no-setup/A/A/heap gates,
+   and multi-unit/model `--budgets` input. It reports measured saving beside
+   the summed individual expectations and a covariance-aware residual CI;
+   missing budgets remain unmodeled. See [stacked pass sets](bench.md#stacked-pass-sets).

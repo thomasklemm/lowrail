@@ -47,10 +47,11 @@ impl Default for Selection {
 impl Selection {
     pub fn parse(list: &str) -> Result<Self, String> {
         let mut items = list.split(',');
-        if items.next() != Some("default") {
-            return Err("--passes must start with default, followed by +name/-name".into());
-        }
-        let mut selected = Self::default();
+        let mut selected = match items.next() {
+            Some("default") => Self::default(),
+            Some("all-opt-in") => Self(REGISTRY.iter().map(|p| p.name).collect()),
+            _ => return Err("--passes must start with default or all-opt-in, followed by +name/-name".into()),
+        };
         for item in items {
             let (enabled, name) = match item.as_bytes().first() {
                 Some(b'+') => (true, &item[1..]),
@@ -92,6 +93,8 @@ mod tests {
         let mut aliases = Selection::default();
         for name in ["memo", "preload_plans", "ar_instantiate", "ar_plans", "digest_memo", "inertia_config"] { aliases.set(name, true).unwrap(); }
         assert_eq!(names(aliases), REGISTRY.iter().map(|p| p.name).collect::<Vec<_>>());
+        assert_eq!(names(Selection::parse("all-opt-in").unwrap()), REGISTRY.iter().map(|p| p.name).collect::<Vec<_>>());
+        assert!(!Selection::parse("all-opt-in,-ar_instantiate").unwrap().contains("active_record/instantiate"));
         assert!(Selection::parse("default,-view/link_to,-route/path").unwrap().iter().next().is_none());
     }
 

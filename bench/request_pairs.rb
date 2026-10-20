@@ -33,11 +33,11 @@ module RequestPairs
     result = layers.to_h do |layer|
       estimates = metrics.to_h do |metric|
         absolute = rounds.map { _1.fetch(layer).fetch(metric) }
-        delta = rounds.map { 100 * (_1.fetch(layer).fetch(metric) / _1.fetch("off_a").fetch(metric) - 1) }
+        delta = rounds.map { 100 * (_1.fetch(layer).fetch(metric).fdiv(_1.fetch("off_a").fetch(metric)) - 1) }
         if cohorts
           absolute = cohorts.map { |rows| median(rows.map { _1.fetch(layer).fetch(metric) }) }
           delta = cohorts.map do |rows|
-            median(rows.map { 100 * (_1.fetch(layer).fetch(metric) / _1.fetch("off_a").fetch(metric) - 1) })
+            median(rows.map { 100 * (_1.fetch(layer).fetch(metric).fdiv(_1.fetch("off_a").fetch(metric)) - 1) })
           end
         end
         [metric, { value: estimate(absolute, seed: seed), delta_pct: estimate(delta, seed: seed) }]
@@ -112,6 +112,16 @@ module RequestPairs
       FileUtils.mkdir_p(missing)
       layers = { "off_a" => nil, "off_b" => nil, "missing" => missing, "empty" => empty,
                  "disabled" => normal, "default" => normal }
+      # A stack needs an actual default-only build, not a guard mask over
+      # optional emitted sites or installed method variants.
+      if (reference = ENV["BENCH_DEFAULT_DIR"])
+        raise "stacked reference cannot combine with other comparison layers" if
+          %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].any? { ENV[_1] }
+        layers["default"] = File.join(tmp, "default")
+        FileUtils.mkdir_p(layers["default"])
+        FileUtils.cp_r(File.expand_path(reference), File.join(layers["default"], ".lowrail"))
+        layers["stacked"] = normal
+      end
       # A runtime-only refactor uses the exact same build in a same-round
       # before worker, rather than comparing two unrelated off baselines.
       if (baseline = ENV["BENCH_BASELINE_LIB"])
@@ -145,6 +155,9 @@ module RequestPairs
       metadata = { seed: seed, rounds: rounds, route: route, app: File.basename(app),
         manifest_sha256: Digest::SHA256.file(source).hexdigest,
         cache_mb: ENV["CAMPFIRE_RESPONSE_CACHE_MB"], variant_app: variant, workers: {} }
+      if reference
+        metadata[:default_manifest_sha256] = Digest::SHA256.file(File.join(layers.fetch("default"), ".lowrail/manifest.json")).hexdigest
+      end
       metadata[:runtime_sha256] = Digest::SHA256.file(File.join(lib, "lowrail.rb")).hexdigest
       metadata[:runtime_files_sha256] = Dir.glob(File.join(lib, "**/*.rb")).sort.to_h do |path|
         [path.delete_prefix(lib + "/"), Digest::SHA256.file(path).hexdigest]
@@ -158,7 +171,8 @@ module RequestPairs
         runtime_lib = layer == "before" ? baseline : lib
         env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
           "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => build_root,
-          "LOWRAIL_UNITS" => layer == "disabled" ? "" : (layer == "default" ? ENV["BENCH_UNITS"] : nil),
+          "LOWRAIL_UNITS" => layer == "disabled" ? "" :
+            ((layer == "stacked" || (layer == "default" && !reference)) ? ENV["BENCH_UNITS"] : nil),
           "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil,
           "LOWRAIL_SHADOW" => nil,
           "RUBYOPT" => build_root ? "-I#{runtime_lib} -rlowrail/setup" : nil,

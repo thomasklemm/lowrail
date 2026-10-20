@@ -22,8 +22,16 @@ same 11 units and verifies 21/21 identical with 114 hits.
   runs reproduce the base-cost result with both A/A and heap controls passing;
   the native guarded micro's failed A/A remains rejected. Exact numbers and
   run-to-run CI caveats are [recorded with the CLI validation](bench.md#cli-validation-against-the-base-cost-experiment).
-  Stacked `--passes`/additivity measurement is the immediate follow-up, not
-  implemented by treating today's selected/default layer as a stack report.
+  Stacked `--passes SET --default-build DIR` retains a separate default
+  reference beside no-setup and the measured stack, with the same controls.
+  Multi-unit/model `--budgets` input carries guarded operation replicates;
+  the additivity residual resamples joint budget vectors and independent
+  request boots, rather than adding CI endpoints. Missing budgets remain
+  explicitly unmodeled; this does not manufacture instruction micros.
+  First default+AR stacks pass all instruction A/A/heap gates: blog **+0.588%**
+  versus default, Campfire uncached **−0.066%** (CI crosses zero); no incremental
+  ≥2% win. Per-model instruction prices remain unmodeled, and the Inertia set
+  awaits step 4 activation. See [stacked validation](bench.md#stacked-cli-validation).
   See [the protocol and remaining adapters](bench.md#shared-command-lowrail-bench).
 - **Boot facts** (`lowrail facts APP`): modules, methods with owner,
   source location, visibility and ISeq kind, models, controllers, routes and

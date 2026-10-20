@@ -6344,5 +6344,2029 @@
     "schema_version": 1,
     "status": "accepted"
   },
+  "stacked": {
+    "measurement_base_revision": "6f9e27ad2f986671d21c9d843c89ea9d43268bc9",
+    "notes": [
+      "Fresh fixed-heap instruction request measurements, not native speed or promotion claims.",
+      "Current reporter and paired estimates replay retained raw samples exactly; heap/activation/JIT gates passed on the real stack.",
+      "Per-unit instruction budgets were not supplied; expected sums stay unmodeled. Arithmetic/covariance tests use explicitly synthetic data, never fitted corpus budgets.",
+      "Private headers, route identifiers and raw worker logs are not published here. Per-model successful/fallback frequencies are separate untimed observations.",
+      "Nominal bootstrap confidence intervals understate independent run-to-run variance."
+    ],
+    "rejected": {
+      "bad-reference": {
+        "error": "default reference contains opt-in passes",
+        "measurement_complete": false,
+        "passes": [
+          "view/link_to",
+          "route/path",
+          "memo/uri_join",
+          "memo/sha256",
+          "digest/file_memo",
+          "active_record/preload_plans",
+          "active_record/instantiate",
+          "active_record/ar_plans",
+          "inertia/config_bind"
+        ],
+        "status": "rejected"
+      },
+      "broken-control": {
+        "budget_input": {
+          "manifest_sha256": "f52570b214c547836d9fb109d757a0628022fcd1008098ed0f9214ccfa61976f",
+          "metric": "instructions_total",
+          "request_context_sha256": "7abfd86e688ffe435d358a9a2499dce394bf1a203c56fe6160622a8e72c15ba4",
+          "route": "GET:/articles",
+          "runtime_fingerprint_sha256": "c3af8cccd2e22ad128d177de31f0fae357ba8b0dd5f243b330b9b14785018430",
+          "schema_version": 1,
+          "units": [
+            {
+              "guard_included": true,
+              "hits_per_iteration": 20,
+              "id": 11,
+              "model": "Article",
+              "pass": "active_record/instantiate",
+              "samples": [
+                {
+                  "off_a": 1000,
+                  "off_b": 1100,
+                  "on": 900
+                },
+                {
+                  "off_a": 1000,
+                  "off_b": 1100,
+                  "on": 900
+                },
+                {
+                  "off_a": 1000,
+                  "off_b": 1100,
+                  "on": 900
+                },
+                {
+                  "off_a": 1000,
+                  "off_b": 1100,
+                  "on": 900
+                },
+                {
+                  "off_a": 1000,
+                  "off_b": 1100,
+                  "on": 900
+                },
+                {
+                  "off_a": 1000,
+                  "off_b": 1100,
+                  "on": 900
+                }
+              ],
+              "source": "deliberately broken A/A control, not a measured budget"
+            }
+          ],
+          "yjit": false
+        },
+        "error": "budget unit 11 A/A failed",
+        "measurement_complete": false,
+        "passes": [
+          "view/link_to",
+          "route/path",
+          "active_record/instantiate"
+        ],
+        "status": "rejected"
+      }
+    },
+    "runs": {
+      "blog": {
+        "actual_yjit": [
+          false
+        ],
+        "cache_mb": null,
+        "corpus_source": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+        "counter": "callgrind",
+        "coverage": [
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 9.0,
+            "id": 0,
+            "model": null,
+            "pass": "view/link_to"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 9.0,
+            "id": 1,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 4,
+            "model": null,
+            "pass": "view/link_to"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 5,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 3.0,
+            "id": 11,
+            "model": "Article",
+            "pass": "active_record/instantiate"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 3.0,
+            "id": 12,
+            "model": "Comment",
+            "pass": "active_record/instantiate"
+          }
+        ],
+        "default_manifest_sha256": "f5172d707a6f1a3cb15a690dc115cb97dd544a74b4c2691562826f69ebd99258",
+        "heap_slots": [
+          1000000,
+          250000,
+          100000,
+          20000,
+          10000
+        ],
+        "lockfile_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+        "manifest_sha256": "f52570b214c547836d9fb109d757a0628022fcd1008098ed0f9214ccfa61976f",
+        "measurement_complete": false,
+        "passes": [
+          "view/link_to",
+          "route/path",
+          "active_record/instantiate"
+        ],
+        "replay_matches": true,
+        "request": {
+          "aa": {
+            "metrics": {
+              "instructions_no_gc": true,
+              "instructions_total": true
+            },
+            "pass": true,
+            "tolerance_pct": 0.5
+          },
+          "gc": {
+            "default": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "disabled": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "empty": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "missing": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_a": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_b": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "stacked": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            }
+          },
+          "heap_capacity": {
+            "0": {
+              "matched": true,
+              "max": 1000467,
+              "min": 1000426
+            },
+            "1": {
+              "matched": true,
+              "max": 250446,
+              "min": 250411
+            },
+            "2": {
+              "matched": true,
+              "max": 100165,
+              "min": 100147
+            },
+            "3": {
+              "matched": true,
+              "max": 20181,
+              "min": 20172
+            },
+            "4": {
+              "matched": true,
+              "max": 10080,
+              "min": 10074
+            }
+          },
+          "heap_matched": true,
+          "layers": {
+            "default": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.2256423942599435,
+                    -5.168329986982834
+                  ],
+                  "median": -5.208130150552737
+                },
+                "value": {
+                  "ci95": [
+                    2235.31,
+                    2236.0200000000004
+                  ],
+                  "median": 2235.7200000000003
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.990451970125332,
+                    -5.905069750987169
+                  ],
+                  "median": -5.951235303826335
+                },
+                "value": {
+                  "ci95": [
+                    8570839.620000001,
+                    8592449.84
+                  ],
+                  "median": 8583050.41
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.9856791296620635,
+                    -5.9108630035144385
+                  ],
+                  "median": -5.953888341884839
+                },
+                "value": {
+                  "ci95": [
+                    8572903.41,
+                    8591411.03
+                  ],
+                  "median": 8583427.280000001
+                }
+              }
+            },
+            "disabled": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.05002362037543895,
+                    0.019935567422113554
+                  ],
+                  "median": -0.0033919289022465993
+                },
+                "value": {
+                  "ci95": [
+                    2357.38,
+                    2358.54
+                  ],
+                  "median": 2358.29
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.07995497181619293,
+                    0.0013179091938375631
+                  ],
+                  "median": -0.053687013034597886
+                },
+                "value": {
+                  "ci95": [
+                    9110342.23,
+                    9131562.82
+                  ],
+                  "median": 9120864.21
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.10037894965131966,
+                    -0.01291384059541878
+                  ],
+                  "median": -0.06454231869376659
+                },
+                "value": {
+                  "ci95": [
+                    9109867.32,
+                    9130671.719999999
+                  ],
+                  "median": 9119929.51
+                }
+              }
+            },
+            "empty": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.016532289002924028,
+                    0.035627798879134254
+                  ],
+                  "median": 0.00000023733059961728031
+                },
+                "value": {
+                  "ci95": [
+                    2358.29,
+                    2358.6899999999996
+                  ],
+                  "median": 2358.4700000000003
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.06861993028087765,
+                    0.024900617410195114
+                  ],
+                  "median": -0.021237788889288955
+                },
+                "value": {
+                  "ci95": [
+                    9112841.739999998,
+                    9132496.129999999
+                  ],
+                  "median": 9123576.530000001
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.06993862734533951,
+                    0.015040587066805777
+                  ],
+                  "median": -0.01996968635000207
+                },
+                "value": {
+                  "ci95": [
+                    9114094.469999999,
+                    9133649.120000001
+                  ],
+                  "median": 9122118.43
+                }
+              }
+            },
+            "missing": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.02373813948215453,
+                    0.029266220485202332
+                  ],
+                  "median": -0.006360449347919683
+                },
+                "value": {
+                  "ci95": [
+                    2358.03,
+                    2358.51
+                  ],
+                  "median": 2358.44
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.07887881079420844,
+                    0.0007113229088140383
+                  ],
+                  "median": -0.0387022267653081
+                },
+                "value": {
+                  "ci95": [
+                    9112218.43,
+                    9129904.58
+                  ],
+                  "median": 9122053.629999999
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.09369224604039994,
+                    -0.00511477846974473
+                  ],
+                  "median": -0.04340963520096941
+                },
+                "value": {
+                  "ci95": [
+                    9112028.04,
+                    9131507.370000001
+                  ],
+                  "median": 9120180.33
+                }
+              }
+            },
+            "off_a": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    2357.7200000000003,
+                    2358.92
+                  ],
+                  "median": 2358.3599999999997
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    9116315.2,
+                    9134438.559999999
+                  ],
+                  "median": 9124088.32
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    9113396.33,
+                    9135473.3
+                  ],
+                  "median": 9127829.260000002
+                }
+              }
+            },
+            "off_b": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.03899790880655951,
+                    0.04920054999569823
+                  ],
+                  "median": 0.008906035679107083
+                },
+                "value": {
+                  "ci95": [
+                    2358.0,
+                    2358.88
+                  ],
+                  "median": 2358.5699999999997
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.008526144356579834,
+                    0.03648268268008348
+                  ],
+                  "median": -0.003893338932037249
+                },
+                "value": {
+                  "ci95": [
+                    9116954.379999999,
+                    9135043.24
+                  ],
+                  "median": 9125038.850000001
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.04364667613854234,
+                    0.029690002109306057
+                  ],
+                  "median": 0.01216295763288855
+                },
+                "value": {
+                  "ci95": [
+                    9114911.850000001,
+                    9136513.780000001
+                  ],
+                  "median": 9125108.309999999
+                }
+              }
+            },
+            "stacked": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.002795484917478,
+                    -4.914284917167993
+                  ],
+                  "median": -4.9633194042935145
+                },
+                "value": {
+                  "ci95": [
+                    2240.87,
+                    2241.95
+                  ],
+                  "median": 2241.25
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.421303668867333,
+                    -5.359809143775568
+                  ],
+                  "median": -5.402496977622473
+                },
+                "value": {
+                  "ci95": [
+                    8623623.879999999,
+                    8642996.66
+                  ],
+                  "median": 8631477.48
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.463387539805425,
+                    -5.369575268441734
+                  ],
+                  "median": -5.393416652735134
+                },
+                "value": {
+                  "ci95": [
+                    8622696.39,
+                    8641563.76
+                  ],
+                  "median": 8631684.879999999
+                }
+              }
+            }
+          }
+        },
+        "requests": 50,
+        "rounds": 6,
+        "route_completions_per_request": 10.0,
+        "runtime_fingerprint_sha256": "c3af8cccd2e22ad128d177de31f0fae357ba8b0dd5f243b330b9b14785018430",
+        "samples": [
+          {
+            "default": {
+              "allocations": 2235.66,
+              "instructions_no_gc": 8592656.58,
+              "instructions_total": 8576562.9
+            },
+            "disabled": {
+              "allocations": 2358.28,
+              "instructions_no_gc": 9130994.4,
+              "instructions_total": 9111632.62
+            },
+            "empty": {
+              "allocations": 2358.2,
+              "instructions_no_gc": 9132881.86,
+              "instructions_total": 9114464.24
+            },
+            "missing": {
+              "allocations": 2358.5,
+              "instructions_no_gc": 9130678.58,
+              "instructions_total": 9113333.4
+            },
+            "off_a": {
+              "allocations": 2358.14,
+              "instructions_no_gc": 9129870.8,
+              "instructions_total": 9112893.66
+            },
+            "off_b": {
+              "allocations": 2358.74,
+              "instructions_no_gc": 9129298.14,
+              "instructions_total": 9113155.74
+            },
+            "stacked": {
+              "allocations": 2242.2,
+              "instructions_no_gc": 8637835.14,
+              "instructions_total": 8622746.0
+            }
+          },
+          {
+            "default": {
+              "allocations": 2236.26,
+              "instructions_no_gc": 8569430.42,
+              "instructions_total": 8590291.66
+            },
+            "disabled": {
+              "allocations": 2358.3,
+              "instructions_no_gc": 9111424.84,
+              "instructions_total": 9128102.58
+            },
+            "empty": {
+              "allocations": 2358.38,
+              "instructions_no_gc": 9112153.62,
+              "instructions_total": 9129168.08
+            },
+            "missing": {
+              "allocations": 2358.52,
+              "instructions_no_gc": 9111116.72,
+              "instructions_total": 9127027.26
+            },
+            "off_a": {
+              "allocations": 2357.5,
+              "instructions_no_gc": 9118305.84,
+              "instructions_total": 9134083.46
+            },
+            "off_b": {
+              "allocations": 2358.78,
+              "instructions_no_gc": 9117933.0,
+              "instructions_total": 9136042.72
+            },
+            "stacked": {
+              "allocations": 2241.7,
+              "instructions_no_gc": 8624036.24,
+              "instructions_total": 8641462.2
+            }
+          },
+          {
+            "default": {
+              "allocations": 2235.56,
+              "instructions_no_gc": 8592243.1,
+              "instructions_total": 8572938.06
+            },
+            "disabled": {
+              "allocations": 2357.38,
+              "instructions_no_gc": 9132131.24,
+              "instructions_total": 9111948.78
+            },
+            "empty": {
+              "allocations": 2358.64,
+              "instructions_no_gc": 9129947.88,
+              "instructions_total": 9113724.7
+            },
+            "missing": {
+              "allocations": 2358.26,
+              "instructions_no_gc": 9129112.26,
+              "instructions_total": 9111529.18
+            },
+            "off_a": {
+              "allocations": 2359.18,
+              "instructions_no_gc": 9136322.18,
+              "instructions_total": 9121575.06
+            },
+            "off_b": {
+              "allocations": 2357.62,
+              "instructions_no_gc": 9137869.24,
+              "instructions_total": 9117538.5
+            },
+            "stacked": {
+              "allocations": 2240.7,
+              "instructions_no_gc": 8640952.84,
+              "instructions_total": 8622646.78
+            }
+          },
+          {
+            "default": {
+              "allocations": 2235.78,
+              "instructions_no_gc": 8572248.82,
+              "instructions_total": 8590446.54
+            },
+            "disabled": {
+              "allocations": 2358.74,
+              "instructions_no_gc": 9114790.26,
+              "instructions_total": 9133240.86
+            },
+            "empty": {
+              "allocations": 2358.42,
+              "instructions_no_gc": 9117205.18,
+              "instructions_total": 9135509.48
+            },
+            "missing": {
+              "allocations": 2358.5,
+              "instructions_no_gc": 9114995.0,
+              "instructions_total": 9132413.9
+            },
+            "off_a": {
+              "allocations": 2358.66,
+              "instructions_no_gc": 9115671.84,
+              "instructions_total": 9134336.04
+            },
+            "off_b": {
+              "allocations": 2358.38,
+              "instructions_no_gc": 9120779.56,
+              "instructions_total": 9136984.84
+            },
+            "stacked": {
+              "allocations": 2241.34,
+              "instructions_no_gc": 8625119.82,
+              "instructions_total": 8641665.32
+            }
+          },
+          {
+            "default": {
+              "allocations": 2235.06,
+              "instructions_no_gc": 8591359.62,
+              "instructions_total": 8572868.76
+            },
+            "disabled": {
+              "allocations": 2357.38,
+              "instructions_no_gc": 9126938.16,
+              "instructions_total": 9108102.02
+            },
+            "empty": {
+              "allocations": 2358.74,
+              "instructions_no_gc": 9132110.4,
+              "instructions_total": 9115068.78
+            },
+            "missing": {
+              "allocations": 2357.8,
+              "instructions_no_gc": 9129130.58,
+              "instructions_total": 9112526.9
+            },
+            "off_a": {
+              "allocations": 2357.94,
+              "instructions_no_gc": 9132554.94,
+              "instructions_total": 9113899.0
+            },
+            "off_b": {
+              "allocations": 2358.98,
+              "instructions_no_gc": 9132217.24,
+              "instructions_total": 9116667.96
+            },
+            "stacked": {
+              "allocations": 2241.16,
+              "instructions_no_gc": 8645040.48,
+              "instructions_total": 8625345.4
+            }
+          },
+          {
+            "default": {
+              "allocations": 2235.78,
+              "instructions_no_gc": 8574741.2,
+              "instructions_total": 8592375.52
+            },
+            "disabled": {
+              "allocations": 2358.34,
+              "instructions_no_gc": 9109259.62,
+              "instructions_total": 9127910.24
+            },
+            "empty": {
+              "allocations": 2358.52,
+              "instructions_no_gc": 9113529.86,
+              "instructions_total": 9131788.76
+            },
+            "missing": {
+              "allocations": 2358.38,
+              "instructions_no_gc": 9113320.14,
+              "instructions_total": 9130600.84
+            },
+            "off_a": {
+              "allocations": 2358.58,
+              "instructions_no_gc": 9116958.56,
+              "instructions_total": 9136610.56
+            },
+            "off_b": {
+              "allocations": 2358.4,
+              "instructions_no_gc": 9115975.76,
+              "instructions_total": 9132678.12
+            },
+            "stacked": {
+              "allocations": 2241.04,
+              "instructions_no_gc": 8623211.52,
+              "instructions_total": 8638024.36
+            }
+          }
+        ],
+        "seed": 41231,
+        "stack": {
+          "budget_status": "not_supplied",
+          "comparisons": {
+            "default": {
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.5455248277749902,
+                    0.6310201252462955
+                  ],
+                  "median": 0.5918364820417632
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    -54143.34000000078,
+                    -46824.44000000041
+                  ],
+                  "median": -50790.37000000011
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.5348758770298834,
+                    0.6041770787760248
+                  ],
+                  "median": 0.5877558404781102
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    -51847.710000000894,
+                    -45915.96999999974
+                  ],
+                  "median": -50439.62999999896
+                }
+              }
+            },
+            "no_setup": {
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.421303668867333,
+                    -5.359809143775568
+                  ],
+                  "median": -5.402496977622473
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    489033.2399999993,
+                    494819.46999999974
+                  ],
+                  "median": 492891.35000000056
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -5.463387539805425,
+                    -5.369575268441734
+                  ],
+                  "median": -5.393416652735134
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    489350.6299999999,
+                    498757.24000000115
+                  ],
+                  "median": 492645.9900000002
+                }
+              }
+            }
+          },
+          "metric": null,
+          "removed_default_passes": [],
+          "units": [],
+          "unmodeled_fallback_unit_ids": [],
+          "unmodeled_unit_ids": [
+            0,
+            1,
+            4,
+            5,
+            11,
+            12
+          ]
+        },
+        "status": "accepted",
+        "warmup": 50
+      },
+      "campfire-uncached": {
+        "actual_yjit": [
+          false
+        ],
+        "cache_mb": "0",
+        "corpus_source": "https://github.com/basecamp/once-campfire@af4dd9fd599c65e0e0fc1f614ee469f70156ddf5:.",
+        "counter": "callgrind",
+        "coverage": [
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 16,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 21,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 24,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 2.0,
+            "id": 55,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 58,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 59,
+            "model": null,
+            "pass": "route/path"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 5.0,
+            "id": 60,
+            "model": "Account",
+            "pass": "active_record/instantiate"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 10.0,
+            "id": 62,
+            "model": "ActionText::RichText",
+            "pass": "active_record/instantiate"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 2.0,
+            "id": 67,
+            "model": "Boost",
+            "pass": "active_record/instantiate"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 10.0,
+            "id": 69,
+            "model": "Message",
+            "pass": "active_record/instantiate"
+          },
+          {
+            "fallbacks_per_request": 2.0,
+            "hits_per_request": 0.0,
+            "id": 71,
+            "model": "Room",
+            "pass": "active_record/instantiate"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 1.0,
+            "id": 76,
+            "model": "Session",
+            "pass": "active_record/instantiate"
+          },
+          {
+            "fallbacks_per_request": 0.0,
+            "hits_per_request": 6.0,
+            "id": 77,
+            "model": "User",
+            "pass": "active_record/instantiate"
+          }
+        ],
+        "default_manifest_sha256": "a6d1464e3f15dbbc790b6874884b3848dae0b0809350fe2f07aea49b10f3eaa1",
+        "heap_slots": [
+          1000000,
+          250000,
+          100000,
+          20000,
+          10000
+        ],
+        "lockfile_sha256": "b26ccac52dda4ab689c1aadbbf5d5ce75492cb25349b930c826f1ad2885501ae",
+        "manifest_sha256": "aec9164670920acad0b3fee3a48a28d066b300609ce823053365a40e8ed0e3ed",
+        "measurement_complete": false,
+        "passes": [
+          "view/link_to",
+          "route/path",
+          "active_record/instantiate"
+        ],
+        "replay_matches": true,
+        "request": {
+          "aa": {
+            "metrics": {
+              "instructions_no_gc": true,
+              "instructions_total": true
+            },
+            "pass": true,
+            "tolerance_pct": 0.5
+          },
+          "gc": {
+            "default": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0017706432664003934,
+                  0.0017709199897983545
+                ],
+                "median": 0.0017707718224554577
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              }
+            },
+            "disabled": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0017729286220228976,
+                  0.0017730913011660184
+                ],
+                "median": 0.0017730158512136724
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              }
+            },
+            "empty": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0017729828450110997,
+                  0.0017731431780660931
+                ],
+                "median": 0.0017730417861636888
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              }
+            },
+            "missing": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0017729569111423454,
+                  0.0017730598625687274
+                ],
+                "median": 0.0017729993475418136
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              }
+            },
+            "off_a": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0017730292115776107,
+                  0.0017731816912379406
+                ],
+                "median": 0.001773096016260908
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              }
+            },
+            "off_b": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.001772973414726414,
+                  0.0017731510358290137
+                ],
+                "median": 0.0017730512176007203
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              }
+            },
+            "stacked": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0017787477882977413,
+                  0.0017788901775835082
+                ],
+                "median": 0.0017787636081006313
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.02,
+                  0.02
+                ],
+                "median": 0.02
+              }
+            }
+          },
+          "heap_capacity": {
+            "0": {
+              "matched": true,
+              "max": 1000463,
+              "min": 1000428
+            },
+            "1": {
+              "matched": true,
+              "max": 250444,
+              "min": 250416
+            },
+            "2": {
+              "matched": true,
+              "max": 100166,
+              "min": 100143
+            },
+            "3": {
+              "matched": true,
+              "max": 20180,
+              "min": 20172
+            },
+            "4": {
+              "matched": true,
+              "max": 10081,
+              "min": 10075
+            }
+          },
+          "heap_matched": true,
+          "layers": {
+            "default": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.1228755484251165,
+                    0.13843452025363856
+                  ],
+                  "median": 0.13240734699286882
+                },
+                "value": {
+                  "ci95": [
+                    22587.13,
+                    22590.66
+                  ],
+                  "median": 22589.02
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.11723659055915547,
+                    0.1972460633471118
+                  ],
+                  "median": 0.1761009967076732
+                },
+                "value": {
+                  "ci95": [
+                    93172749.15,
+                    93247358.33
+                  ],
+                  "median": 93217262.75
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.054596558632991066,
+                    0.1960355351754428
+                  ],
+                  "median": 0.13564835490481597
+                },
+                "value": {
+                  "ci95": [
+                    99614448.56,
+                    99656902.9
+                  ],
+                  "median": 99626889.91
+                }
+              }
+            },
+            "disabled": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.001728729220967784,
+                    0.013121513780867122
+                  ],
+                  "median": 0.0039007448235817144
+                },
+                "value": {
+                  "ci95": [
+                    22559.47,
+                    22561.54
+                  ],
+                  "median": 22560.43
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.03656501037220816,
+                    0.05330394776612568
+                  ],
+                  "median": 0.009350148443731943
+                },
+                "value": {
+                  "ci95": [
+                    93036818.4,
+                    93095820.35
+                  ],
+                  "median": 93072461.86
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.03575369140799145,
+                    0.04656922338517333
+                  ],
+                  "median": 0.021660590148520065
+                },
+                "value": {
+                  "ci95": [
+                    99462488.51,
+                    99578117.67
+                  ],
+                  "median": 99505660.77000001
+                }
+              }
+            },
+            "empty": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.00004433021041916341,
+                    0.005762579743462393
+                  ],
+                  "median": 0.002127713451083313
+                },
+                "value": {
+                  "ci95": [
+                    22558.809999999998,
+                    22560.85
+                  ],
+                  "median": 22560.1
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.020724924715731508,
+                    0.0720663536159627
+                  ],
+                  "median": 0.05420935759830048
+                },
+                "value": {
+                  "ci95": [
+                    93084174.1,
+                    93130829.16
+                  ],
+                  "median": 93102628.57
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.03144933251431059,
+                    0.08787809195431873
+                  ],
+                  "median": 0.050469198597724585
+                },
+                "value": {
+                  "ci95": [
+                    99515673.18,
+                    99599393.4
+                  ],
+                  "median": 99567832.49000001
+                }
+              }
+            },
+            "missing": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.0004432466931325596,
+                    0.010639066094497718
+                  ],
+                  "median": 0.0062058352709448705
+                },
+                "value": {
+                  "ci95": [
+                    22559.870000000003,
+                    22561.18
+                  ],
+                  "median": 22560.64
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.021537955673106568,
+                    0.015114692435691524
+                  ],
+                  "median": -0.0018688616226947286
+                },
+                "value": {
+                  "ci95": [
+                    93043814.62,
+                    93076686.48
+                  ],
+                  "median": 93052615.56
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0007294457160689216,
+                    0.01619039702434044
+                  ],
+                  "median": 0.010901316610079093
+                },
+                "value": {
+                  "ci95": [
+                    99466045.03,
+                    99561752.52000001
+                  ],
+                  "median": 99513845.15
+                }
+              }
+            },
+            "off_a": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    22558.32,
+                    22560.260000000002
+                  ],
+                  "median": 22559.41
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    93046223.8,
+                    93074244.77000001
+                  ],
+                  "median": 93060365.96000001
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    99450505.32,
+                    99560092.43
+                  ],
+                  "median": 99503369.95
+                }
+              }
+            },
+            "off_b": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.005097479614912803,
+                    0.011392675662780238
+                  ],
+                  "median": 0.0011081619231023687
+                },
+                "value": {
+                  "ci95": [
+                    22558.71,
+                    22560.97
+                  ],
+                  "median": 22559.98
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.02258550487069244,
+                    0.03648783142515821
+                  ],
+                  "median": -0.005620049100740765
+                },
+                "value": {
+                  "ci95": [
+                    93043393.35,
+                    93087379.64
+                  ],
+                  "median": 93057762.73
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.018043611364954026,
+                    0.03993101970655166
+                  ],
+                  "median": 0.00039973319463371126
+                },
+                "value": {
+                  "ci95": [
+                    99438840.94,
+                    99571696.64
+                  ],
+                  "median": 99525613.11
+                }
+              }
+            },
+            "stacked": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.3277058490357643,
+                    -0.3131438519295038
+                  ],
+                  "median": -0.3201711108253513
+                },
+                "value": {
+                  "ci95": [
+                    22485.93,
+                    22487.73
+                  ],
+                  "median": 22487.53
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.020120103094756203,
+                    0.07252395461988526
+                  ],
+                  "median": 0.036515197678110844
+                },
+                "value": {
+                  "ci95": [
+                    93089575.57,
+                    93113704.69
+                  ],
+                  "median": 93097742.72999999
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.03703857654350218,
+                    0.09969392284152612
+                  ],
+                  "median": 0.06696167365302097
+                },
+                "value": {
+                  "ci95": [
+                    99503699.4,
+                    99644410.87
+                  ],
+                  "median": 99568551.91
+                }
+              }
+            }
+          }
+        },
+        "requests": 50,
+        "rounds": 6,
+        "route_completions_per_request": 0.0,
+        "runtime_fingerprint_sha256": "c3af8cccd2e22ad128d177de31f0fae357ba8b0dd5f243b330b9b14785018430",
+        "samples": [
+          {
+            "default": {
+              "allocations": 22590.26,
+              "instructions_no_gc": 93229777.64,
+              "instructions_total": 99626454.24
+            },
+            "disabled": {
+              "allocations": 22559.92,
+              "instructions_no_gc": 93068301.3,
+              "instructions_total": 99491145.12
+            },
+            "empty": {
+              "allocations": 22560.36,
+              "instructions_no_gc": 93114849.1,
+              "instructions_total": 99535775.42
+            },
+            "missing": {
+              "allocations": 22559.72,
+              "instructions_no_gc": 93046017.98,
+              "instructions_total": 99463895.98
+            },
+            "off_a": {
+              "allocations": 22560.36,
+              "instructions_no_gc": 93053986.0,
+              "instructions_total": 99445368.86
+            },
+            "off_b": {
+              "allocations": 22558.5,
+              "instructions_no_gc": 93031190.68,
+              "instructions_total": 99426763.16
+            },
+            "stacked": {
+              "allocations": 22485.56,
+              "instructions_no_gc": 93093069.72,
+              "instructions_total": 99511687.18
+            }
+          },
+          {
+            "default": {
+              "allocations": 22587.74,
+              "instructions_no_gc": 93171594.22,
+              "instructions_total": 99609210.68
+            },
+            "disabled": {
+              "allocations": 22560.38,
+              "instructions_no_gc": 93090362.94,
+              "instructions_total": 99570810.0
+            },
+            "empty": {
+              "allocations": 22560.12,
+              "instructions_no_gc": 93102930.0,
+              "instructions_total": 99607754.04
+            },
+            "missing": {
+              "allocations": 22560.94,
+              "instructions_no_gc": 93056827.48,
+              "instructions_total": 99545809.02
+            },
+            "off_a": {
+              "allocations": 22559.46,
+              "instructions_no_gc": 93052337.64,
+              "instructions_total": 99551804.86
+            },
+            "off_b": {
+              "allocations": 22559.66,
+              "instructions_no_gc": 93059814.06,
+              "instructions_total": 99557785.32
+            },
+            "stacked": {
+              "allocations": 22487.6,
+              "instructions_no_gc": 93121175.56,
+              "instructions_total": 99651572.32
+            }
+          },
+          {
+            "default": {
+              "allocations": 22591.06,
+              "instructions_no_gc": 93258071.16,
+              "instructions_total": 99662214.8
+            },
+            "disabled": {
+              "allocations": 22561.0,
+              "instructions_no_gc": 93035303.26,
+              "instructions_total": 99433831.9
+            },
+            "empty": {
+              "allocations": 22561.34,
+              "instructions_no_gc": 93077951.06,
+              "instructions_total": 99495570.94
+            },
+            "missing": {
+              "allocations": 22560.6,
+              "instructions_no_gc": 93041611.26,
+              "instructions_total": 99468194.08
+            },
+            "off_a": {
+              "allocations": 22560.16,
+              "instructions_no_gc": 93066745.92,
+              "instructions_total": 99455641.78
+            },
+            "off_b": {
+              "allocations": 22560.46,
+              "instructions_no_gc": 93090376.16,
+              "instructions_total": 99493440.9
+            },
+            "stacked": {
+              "allocations": 22487.56,
+              "instructions_no_gc": 93091388.62,
+              "instructions_total": 99495711.62
+            }
+          },
+          {
+            "default": {
+              "allocations": 22587.82,
+              "instructions_no_gc": 93173904.08,
+              "instructions_total": 99619686.44
+            },
+            "disabled": {
+              "allocations": 22560.48,
+              "instructions_no_gc": 93038333.54,
+              "instructions_total": 99519015.86
+            },
+            "empty": {
+              "allocations": 22557.96,
+              "instructions_no_gc": 93102327.14,
+              "instructions_total": 99591032.76
+            },
+            "missing": {
+              "allocations": 22560.02,
+              "instructions_no_gc": 93094793.04,
+              "instructions_total": 99577522.0
+            },
+            "off_a": {
+              "allocations": 22557.98,
+              "instructions_no_gc": 93074953.84,
+              "instructions_total": 99568380.0
+            },
+            "off_b": {
+              "allocations": 22560.3,
+              "instructions_no_gc": 93055711.4,
+              "instructions_total": 99563194.56
+            },
+            "stacked": {
+              "allocations": 22487.86,
+              "instructions_no_gc": 93087762.52,
+              "instructions_total": 99602022.16
+            }
+          },
+          {
+            "default": {
+              "allocations": 22590.22,
+              "instructions_no_gc": 93236645.5,
+              "instructions_total": 99651591.0
+            },
+            "disabled": {
+              "allocations": 22562.08,
+              "instructions_no_gc": 93076622.42,
+              "instructions_total": 99492305.68
+            },
+            "empty": {
+              "allocations": 22560.08,
+              "instructions_no_gc": 93146809.22,
+              "instructions_total": 99552598.26
+            },
+            "missing": {
+              "allocations": 22561.42,
+              "instructions_no_gc": 93058579.92,
+              "instructions_total": 99481881.28
+            },
+            "off_a": {
+              "allocations": 22558.66,
+              "instructions_no_gc": 93073535.7,
+              "instructions_total": 99468204.06
+            },
+            "off_b": {
+              "allocations": 22561.48,
+              "instructions_no_gc": 93055596.02,
+              "instructions_total": 99450918.72
+            },
+            "stacked": {
+              "allocations": 22487.5,
+              "instructions_no_gc": 93102415.74,
+              "instructions_total": 99535081.66
+            }
+          },
+          {
+            "default": {
+              "allocations": 22586.52,
+              "instructions_no_gc": 93204747.86,
+              "instructions_total": 99627325.58
+            },
+            "disabled": {
+              "allocations": 22559.02,
+              "instructions_no_gc": 93101277.76,
+              "instructions_total": 99585425.34
+            },
+            "empty": {
+              "allocations": 22559.66,
+              "instructions_no_gc": 93090397.14,
+              "instructions_total": 99583066.72
+            },
+            "missing": {
+              "allocations": 22560.68,
+              "instructions_no_gc": 93048403.64,
+              "instructions_total": 99545983.04
+            },
+            "off_a": {
+              "allocations": 22559.36,
+              "instructions_no_gc": 93040109.96,
+              "instructions_total": 99538535.84
+            },
+            "off_b": {
+              "allocations": 22558.92,
+              "instructions_no_gc": 93084383.12,
+              "instructions_total": 99580198.72
+            },
+            "stacked": {
+              "allocations": 22486.3,
+              "instructions_no_gc": 93106233.82,
+              "instructions_total": 99637249.42
+            }
+          }
+        ],
+        "seed": 41231,
+        "stack": {
+          "budget_status": "not_supplied",
+          "comparisons": {
+            "default": {
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.16268401467077198,
+                    -0.07328311038412028
+                  ],
+                  "median": -0.1248315581287518
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    68280.1099999994,
+                    151695.22999999672
+                  ],
+                  "median": 116371.90000000596
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.1419920987924539,
+                    0.02624439809569834
+                  ],
+                  "median": -0.0664645455152102
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    -26142.739999994636,
+                    141506.2599999979
+                  ],
+                  "median": 66215.66999999434
+                }
+              }
+            },
+            "no_setup": {
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.020120103094756203,
+                    0.07252395461988526
+                  ],
+                  "median": 0.036515197678110844
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    -67480.8900000006,
+                    -18725.689999997616
+                  ],
+                  "median": -33981.87999999523
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.03703857654350218,
+                    0.09969392284152612
+                  ],
+                  "median": 0.06696167365302097
+                },
+                "measured_saved_per_request": {
+                  "ci95": [
+                    -99240.51999999583,
+                    -36856.0
+                  ],
+                  "median": -66597.9600000009
+                }
+              }
+            }
+          },
+          "metric": null,
+          "removed_default_passes": [],
+          "units": [],
+          "unmodeled_fallback_unit_ids": [
+            71
+          ],
+          "unmodeled_unit_ids": [
+            16,
+            21,
+            24,
+            55,
+            58,
+            59,
+            60,
+            62,
+            67,
+            69,
+            76,
+            77
+          ]
+        },
+        "status": "accepted",
+        "warmup": 50
+      }
+    }
+  },
   "validation_schema_version": 1
 }

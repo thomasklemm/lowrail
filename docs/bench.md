@@ -112,30 +112,172 @@ Interpreter instructions cannot be converted into YJIT µs; the default run
 keeps these separate and cannot constitute a complete promotion measurement.
 Request-only acceptance is not pass promotion or a native speed claim.
 
-### Immediate follow-up: stacked pass sets
+### Stacked pass sets
 
-The current CLI accepts `--pass NAME`, **not** `--passes`. Stacked measurement
-is the immediate follow-up, not a claim that every individual pass must save
-2% by itself. Many smaller passes may add up to a worthwhile set.
+Many sub-2% passes may add up to a worthwhile set. `--passes SET` is mutually
+exclusive with `--pass NAME`, uses the build selector's aliases/groups/modifiers,
+and adds a **stacked** layer alongside no-setup, independent off/off A/A and
+a **separate default reference**. `all-opt-in` selects every registered pass,
+including defaults, in both `build` and `bench` through the same selector.
+Passes without eligible units stay listed in the selection
+but contribute no measured coverage; selecting them is not a support claim.
 
-The intended interface is `--passes default,+ar_instantiate,+inertia/config_bind`
-or `--passes all-opt-in`, against a build containing all requested units. It
-needs a **separate stacked layer alongside no-setup, default and independent
-A/A workers**. Reusing today's selected/default layer would erase the default
-comparison and make the result ambiguous. The output must show stacked saving
-against both references, the sum of comparable individual guard-included
-expected effects, the difference from that sum, and per-unit coverage/fallbacks
-to reveal overlap or interference. Missing budgets must remain unmodeled;
-µs/YJIT and interpreter instructions must not be added together. Controls keep
-their present gates. Native uncertainty must account for independent boots,
-not treat blocks from one worker as independent experiments.
+```sh
+app=.corpus/real-blog-r4
+RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 mise exec -- \
+  target/debug/lowrail build "$app" --env production --passes default
+cp -a "$app/.lowrail" /tmp/blog-default-build # NEW directory
+RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 mise exec -- \
+  target/debug/lowrail build "$app" --env production --passes default,+ar_instantiate
+mise exec -- target/debug/lowrail bench "$app" \
+  --passes default,+ar_instantiate --default-build /tmp/blog-default-build \
+  --path /articles --out /tmp/blog-stack
+# Add --budgets /absolute/budgets.json for the per-hit/additivity comparison.
+# With a matching build, also accepted:
+# --passes default,+ar_instantiate,+inertia/config_bind
+# --passes all-opt-in
+```
 
-This also needs multi-operation/model budget input, whereas today's guarded
-micro adapter deliberately models one unit at a time. It is therefore a
-report/measurement-contract extension, not just another selector spelling.
-`--pass default` over an optional build does measure its complete enabled set
-against no setup, but does **not** provide the separate default reference or
-additivity report and must not be presented as that feature.
+`--default-build` points at the saved **.lowrail directory**, not its parent.
+Both complete builds get strict source/certificate, activation, actual-JIT and
+end-of-run fingerprint checks. The reference must contain only registry-default
+passes, from the same app. Build it with `--passes default`; the manifest does
+not yet certify which absent sites the builder refused. The stacked build must
+contain no unselected passes. Masking their guards is **not** sufficient: emitted
+fallback sites and optional runtime wrappers still cost instructions. The
+reference and stack are copied privately; the app's build is never renamed or
+edited by bench. Other extra-build/archived-runtime/app-fix layers cannot be
+combined with stacked mode. All existing A/A and fixed-heap gates apply to
+**every** layer, unchanged; native runs retain five independent boot cohorts.
+
+#### Multi-unit/model expected budgets
+
+`--budgets FILE` imports independently measured, guard-included operations,
+not a percentage fitted to the request result. Schema 1 contains:
+
+```json
+{
+  "schema_version": 1,
+  "manifest_sha256": "exact stacked manifest digest",
+  "runtime_fingerprint_sha256": "exact runtime digest from result.json",
+  "request_context_sha256": "exact private-header/cache/route digest from result.json",
+  "route": "GET:/articles",
+  "metric": "instructions_total",
+  "yjit": false,
+  "units": [
+    {
+      "id": 11, "pass": "active_record/instantiate", "model": "Article",
+      "guard_included": true, "source": "path to measured operation/counter evidence",
+      "hits_per_iteration": 20,
+      "samples": [
+        {"off_a": 1000, "off_b": 1000, "on": 960},
+        {"off_a": 1000, "off_b": 1000, "on": 961},
+        {"off_a": 1000, "off_b": 1000, "on": 959},
+        {"off_a": 1000, "off_b": 1000, "on": 958},
+        {"off_a": 1000, "off_b": 1000, "on": 962},
+        {"off_a": 1000, "off_b": 1000, "on": 960}
+      ]
+    }
+  ]
+}
+```
+
+**Format illustration only; these are not measured corpus numbers.** Add one
+entry for each unit/model/operation being modeled, with distinct IDs; never
+reuse Article's price for Comment. Operation values are **per iteration**, in
+the named metric. `(off_a − on) / hits_per_iteration` gives saved cost per
+completed hit, including its guard. The denominator comes from a separate
+counted operation, never inferred from row count or iterations alone. Keep
+negative savings. `source` identifies reviewable raw evidence, including heap
+controls for instruction micros; a label is provenance, not proof supplied by
+this importer. The importer recomputes every operation's A/A CI: contains zero
+and inside ±0.5% for instructions or ±2% for native µs. Failed controls reject
+the whole run rather than silently dropping unfavorable models.
+
+Every entry's sample array needs at least six **independent replicate
+measurements**, with equal array lengths aligned across operations. A shared
+control must use the same replicate index. The tool resamples those vectors
+together, not each unit independently, then sums individual median expectations.
+For native inputs, use independently booted samples, not within-boot blocks.
+Metric, manifest, runtime, request context and **actual** JIT must match.
+Instruction totals, GC-excluded instructions and native CPU/wall µs are distinct
+metrics. Fingerprints are exposed in any result for the unchanged build;
+budgets are copied into the final JSON, so later input edits cannot rewrite it.
+Request context fingerprints bind completion frequencies to the route, private
+authentication headers and Campfire cache setting without publishing headers.
+
+Known runtime completion counters supply hits/request from the warmed coverage
+probe. Source guard counts do **not** certify completed specializations: source
+budgets must additionally supply `completed_hits_per_request_samples`, aligned
+with their operation samples and collected separately on this exact route.
+Runtime budgets may also supply these samples when frequency varies. Otherwise
+the report conditions its uncertainty on the observed ten-request frequency;
+it does not infer a population CI for request frequency from a constant count.
+
+The short table and `result.stack` report signed measured saving versus
+**no setup** and **default**. The expected sum against no setup includes all
+supplied budgets; the incremental sum against default includes only opt-in
+budgets, not the default savings a second time. Default-work frequency changes,
+setup cost, overlap and unmodeled operations remain in the residual. Thus
+`measured_minus_expected` is an additivity diagnostic, **not** an automatic
+attribution of all unexplained work to interactions. Its CI independently
+resamples request rounds/boot cohorts and the joint budget vectors; adding CI
+endpoints or arbitrarily pairing unrelated experiments is not valid.
+
+Without budgets the real request comparison still runs, but the expected sum
+is **unmodeled**, never zero. Missing hit units are enumerated and partial
+budgets keep `measurement_complete: false`. Removing default passes also marks
+the default reference's removed work as unmodeled, not as an opt-in gain.
+Fallback-only units (for example Campfire's STI Room loads) are separately
+listed as unpriced; zero fast-path hits do not make their guards free. These
+also keep the budget partial, even if all successful-hit units have prices.
+The importer does not create instruction-micro adapters or convert old unguarded
+timings into valid inputs.
+Nominal bootstrap CIs still understate independent run-to-run variance; inspect
+controls and repeat evidence before promotion, not just a narrow interval.
+
+#### Stacked CLI validation
+
+Fresh production `default,+ar_instantiate` runs on 2026-10-20, on the runtime
+at [6f9e27a](https://github.com/thomasklemm/lowrail/commit/6f9e27ad2f986671d21c9d843c89ea9d43268bc9)
+before migration step 4: Ruby 4.0.7, **actual YJIT off**, six independent
+fixed-heap rounds × seven layers, 50 warmup and N=0/50 windows in each mode.
+Both total/GC-excluded A/A controls and all five heap gates **passed on both
+apps**. Default references are actual separately built default-only snapshots.
+
+| App / total instructions | Default vs no setup Δ% [95% CI] | Stack vs no setup Δ% [95% CI] | Stack vs default Δ% [95% CI] |
+|---|---:|---:|---:|
+| real-blog `/articles` | −5.954 [−5.986, −5.911] | −5.393 [−5.463, −5.370] | +0.588 [+0.535, +0.604] |
+| Campfire uncached room | +0.136 [+0.055, +0.196] | +0.067 [+0.037, +0.100] | −0.066 [−0.142, +0.026] |
+
+Blog's stack saves 492,646 total instructions/request against no setup, but
+**adds 50,440** relative to default. Campfire saves 66,216 against default
+(CI −26,143 to +141,506 saved), while adding 66,598 against no setup. These
+are not an incremental ≥2% win. GC-excluded stack deltas against default are
+blog **+0.592%** [+0.546, +0.631] and Campfire **−0.125%** [−0.163, −0.073].
+Instruction results are not native YJIT speed claims.
+
+Blog completes three Article and three Comment instantiations/request.
+Campfire completes 34: Account 5, ActionText::RichText 10, Boost 2, Message 10,
+Session 1 and User 6; its two Room STI rows remain fallbacks. No model borrows
+another model's price. **Comparable per-hit instruction inputs are absent**,
+so these corpus runs deliberately report expected sums as unmodeled and
+`measurement_complete: false`, not invented additivity evidence.
+
+The current reporter and paired estimators replay both retained sets of raw
+samples exactly. Deterministic multi-model tests independently check signed,
+fractional prices, shared-control covariance, partial/zero-budget distinction
+and native whole-boot uncertainty. Synthetic arithmetic/table smoke checks
+are labeled as such, not published as corpus prices. A deliberately +10%
+integer-valued budget A/A is **rejected**, preserving its raw input; so is an
+optional build mislabeled as the default reference. Wrong JIT, metric, model,
+request context and stale budget fingerprints are also rejected by tests.
+Retained estimates, controls, heap bounds, per-model counts and round samples:
+[`bench-cli-results.json` → `stacked`](bench-cli-results.json).
+
+PingCRM/Starter `+inertia/config_bind` validation remains conditional on step
+4 publishing and activating the registry. This change edits no runtime files
+and does not bypass that pending activation with a private hook.
 
 ### Remaining per-pass adapters
 

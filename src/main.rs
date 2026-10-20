@@ -17,7 +17,8 @@ const USAGE: &str = "usage: lowrail <command> [args]
   parse FILE...        check that files parse with Prism
   facts APP            boot APP, write APP/.lowrail/facts.json, print a summary
   build APP            lower APP using its facts, write ISeqs + manifest
-  bench APP --pass NAME [--path PATH]  controlled pass/request measurements
+  bench APP (--pass NAME | --passes SET --default-build DIR) [--path PATH]
+                       controlled pass/request measurements; --budgets JSON for additivity
   types APP [--rbs DIR] derive types from boot facts, optionally write RBS
   mcp APP              serve read-only type/fact tools over stdio
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes
