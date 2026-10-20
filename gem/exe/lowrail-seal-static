@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+# No app boot or test execution. Bundler supplies the pinned Prism and gem paths.
+require "json"
+require_relative "../lib/lowrail/seal_static"
+root, output = ARGV
+abort "usage: lowrail-seal-static APP OUTPUT" unless root && output
+report = Lowrail::SealStatic.run(File.expand_path(root))
+File.write(output, JSON.pretty_generate(report))
+warn "static seal hints: #{report.fetch('hints').size}; parse errors: #{report.fetch('errors').size}"

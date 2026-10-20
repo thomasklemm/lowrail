@@ -22,7 +22,7 @@ fn protocol_errors_notifications_and_tool_discovery() {
     assert_eq!(responses[2]["error"]["code"], -32000);
     assert_eq!(responses[3]["result"]["protocolVersion"], "2025-06-18");
     let tools = responses[4]["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 8);
+    assert_eq!(tools.len(), 10);
     assert!(tools.iter().any(|t| t["name"] == "type_of"));
     assert_eq!(responses[5]["error"]["code"], -32602);
     assert_eq!(responses[6]["result"], json!({}));
@@ -62,6 +62,14 @@ fn data_tools_refresh_facts_and_ledger_without_serving_stale_answers() {
         data.call("lowering_ledger", &json!({})).unwrap()["available"],
         false
     );
+    assert_eq!(data.call("seal_ledger", &json!({})).unwrap()["available"], false);
+    let seal = json!({"format":1,"ledger":[{"pattern":"config_changed","file":"test/example.rb","line":12,"remedy":"move to boot"}]});
+    std::fs::write(dir.join(".lowrail/seal.json"), seal.to_string()).unwrap();
+    assert_eq!(data.call("seal_ledger", &json!({})).unwrap()["report"], seal);
+    assert_eq!(data.call("doctor", &json!({})).unwrap()["available"], false);
+    let doctor = json!({"format":1,"boot_ok":true,"baseline_ok":true,"static":{"hints":[]}});
+    std::fs::write(dir.join(".lowrail/doctor.json"), doctor.to_string()).unwrap();
+    assert_eq!(data.call("doctor", &json!({})).unwrap()["report"], doctor);
     let ledger = json!([{"method":"Article#title","reason":"unsupported"}]);
     std::fs::write(dir.join(".lowrail/ledger.json"), ledger.to_string()).unwrap();
     assert_eq!(

@@ -11,6 +11,8 @@ pub(super) fn list() -> Vec<Value> {
         ("model", "Model columns, associations, callbacks and available validations", json!({"name":string}), vec!["name"]),
         ("routes", "Routes filtered by name/path/controller substrings (AND)", json!({"name":string,"path":string,"controller":string}), vec![]),
         ("lowering_ledger", "Current lowering ledger, including reasons not lowered", json!({}), vec![]),
+        ("seal_ledger", "Last seal-check observations, affected tests and remedies; not proof of contract enforcement", json!({}), vec![]),
+        ("doctor", "Last onboarding report: boot, baseline suite, static hints, optional seal-check and grouped guarded refusals", json!({}), vec![]),
         ("lowering_status", "Per-method ledger sites: lowered/refused and original reasons; not_recorded is not refused", json!({"target":string}), vec!["target"]),
         ("verify_stats", "Pass and unit hits/fallbacks from the last verify, with build freshness", json!({}), vec![]),
         ("diagnostics", "Source diagnostics and static/observed type conflicts", json!({}), vec![]),
@@ -88,6 +90,13 @@ impl Data {
                 .and_then(Value::as_str)
                 .ok_or_else(|| format!("{key} is required"))
         };
+        if name == "seal_ledger" || name == "doctor" {
+            let file = if name == "doctor" { "doctor.json" } else { "seal.json" };
+            return match read_optional(&self.app.join(".lowrail").join(file))? {
+                Some(bytes) => Ok(json!({"available":true,"report":serde_json::from_slice::<Value>(&bytes).map_err(|e| e.to_string())?})),
+                None => Ok(json!({"available":false,"reason":format!("no {file}; run lowrail {} APP", if name == "doctor" { "doctor" } else { "seal-check" })})),
+            };
+        }
         if name == "lowering_ledger" {
             let path = self.app.join(".lowrail/ledger.json");
             return match std::fs::read(&path) {

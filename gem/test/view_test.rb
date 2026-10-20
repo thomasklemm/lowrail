@@ -55,6 +55,8 @@ class ViewTest < Minitest::Test
       assert_empty on.fetch("hits"), "refusal must not be reported as accelerated coverage"
       assert_equal 10, off.fetch("changed").scan("<!-- live helper -->").size
       assert_equal off.fetch("changed"), on.fetch("changed"), "a real subscriber must not leave a stale source arm authorized"
+      observed = seal_repro(dir, scenario, target: "ActionView::Helpers::UrlHelper", operation: "define_method")
+      assert_equal off.fetch("changed"), observed.fetch("changed")
     end
   end
 
@@ -73,7 +75,7 @@ class ViewTest < Minitest::Test
       RUBY
       "app/views/widgets/index.html.erb" => '<%= link_to boundary_label, "/target" %>'
     ) do |dir|
-      off, on = paired_requests(dir, <<~'RUBY')
+      off, on = paired_requests(dir, <<~'RUBY', seal_target: "ActionView::Helpers::TagHelper::TagBuilder")
         $name_calls = 0
         $armed = false
         warm = request.call
@@ -111,7 +113,7 @@ class ViewTest < Minitest::Test
       RUBY
       "app/views/widgets/index.html.erb" => '<%= widget_path(route_argument) %>'
     ) do |dir|
-      off, on = paired_requests(dir, <<~'RUBY')
+      off, on = paired_requests(dir, <<~'RUBY', seal_target: "ActionDispatch::Journey::Route")
         $conversions = 0
         $armed = false
         warm = request.call
@@ -144,7 +146,7 @@ class ViewTest < Minitest::Test
     end
   end
 
-  def paired_requests(dir, body)
+  def paired_requests(dir, body, seal_target:)
     script = <<~RUBY
       require "./config/environment"
       require "rack/mock"
@@ -154,6 +156,24 @@ class ViewTest < Minitest::Test
       end
       puts JSON.generate(result)
     RUBY
+    observed = seal_repro(dir, script, target: seal_target, operation: "define_singleton_method")
+    assert_equal 1, observed["calls"] || observed["conversions"], "detector must not replay an effectful argument"
     %w[0 1].map { |mode| ruby_json(script, chdir: dir, env: {"RAILS_ENV" => "test", "LOWRAIL" => mode}) }
+  end
+
+  def seal_repro(dir, script, target:, operation:)
+    path = File.join(dir, "seal_repro.rb")
+    File.write(path, script)
+    output = File.join(dir, "seal-observations")
+    out, err, status = ruby(path, chdir: dir, env: {"RAILS_ENV" => "test", "LOWRAIL" => "0",
+      "LOWRAIL_SEAL_CHECK" => output, "LOWRAIL_SEAL_ROOT" => dir, "LOWRAIL_STATS" => "",
+      "RUBYOPT" => "-I#{GEM_LIB} -rlowrail/setup -rlowrail/seal"})
+    assert status.success?, "#{out}\n#{err}"
+    report = JSON.parse(File.read(Dir[File.join(output, "seal-*.json")].fetch(0)))
+    assert report.fetch("sealed"), report.fetch("errors").inspect
+    assert report.fetch("ledger").any? { |row| row["rule"] == "SEAL001" && row["target"] == target &&
+      row["operation"] == operation && row["confidence"] == "proven" && row["line"].positive? &&
+      File.file?(row["file"]) }, "missing mutation location for #{target}"
+    JSON.parse(out.lines.last)
   end
 end

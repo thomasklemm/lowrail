@@ -8,6 +8,7 @@ mod lower;
 mod mcp;
 mod observe;
 mod passes;
+mod seal;
 mod types;
 mod verify;
 
@@ -22,6 +23,8 @@ const USAGE: &str = "usage: lowrail <command> [args]
   types APP [--rbs DIR] derive types from boot facts, optionally write RBS
   mcp APP              serve read-only type/fact tools over stdio
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes
+  seal-check APP       run APP's tests and report post-seal contract observations
+  doctor APP           boot, baseline tests, static hints and optional --seal-check
   observe APP          run APP's tests with the recorder, write .lowrail/observed.json";
 
 fn main() -> ExitCode {
@@ -35,6 +38,8 @@ fn main() -> ExitCode {
             "types" => types::cli(rest),
             "mcp" => mcp::cli(rest),
             "verify" => verify::cli(rest),
+            "seal-check" => seal::cli(rest),
+            "doctor" => seal::doctor(rest),
             "observe" => observe::cli(rest),
             _ => Err(USAGE.to_string()),
         },
