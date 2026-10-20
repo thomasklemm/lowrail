@@ -1,0 +1,126 @@
+--- a/callgrind/main.c
++++ b/callgrind/main.c
+@@ -1639,11 +1639,52 @@
+ static
+ Bool CLG_(handle_client_request)(ThreadId tid, UWord *args, UWord *ret)
+ {
++   extern Bool lowrail_sampling, lowrail_pending, lowrail_paused;
++   extern ThreadId lowrail_tid;
++   extern ULong lowrail_budget, lowrail_lag, lowrail_rng, lowrail_work, lowrail_issued;
+    if (!VG_IS_TOOL_USERREQ('C','T',args[0])
+        && VG_USERREQ__GDB_MONITOR_COMMAND   != args[0])
+       return False;
+ 
+    switch(args[0]) {
++   case VG_USERREQ_TOOL_BASE('C','T') + 101:
++      lowrail_tid = tid;
++      lowrail_sampling = True;
++      lowrail_pending = False;
++      lowrail_paused = False;
++      lowrail_work = lowrail_issued = 0;
++      lowrail_rng = args[1] ? args[1] : 1;
++      lowrail_budget = 1 + (lowrail_rng & 65535);
++      *ret = 1;
++      break;
++   case VG_USERREQ_TOOL_BASE('C','T') + 102:
++      lowrail_sampling = False;
++      *ret = lowrail_work;
++      break;
++   case VG_USERREQ_TOOL_BASE('C','T') + 103:
++      lowrail_pending = False;
++      *ret = lowrail_lag;
++      break;
++   case VG_USERREQ_TOOL_BASE('C','T') + 104:
++      lowrail_paused = args[1] != 0;
++      *ret = 1;
++      break;
++   case VG_USERREQ_TOOL_BASE('C','T') + 105:
++      *ret = lowrail_issued;
++      break;
++   /* Lowrail measurement-only extension, not part of the public ABI.
++      Client requests terminate a VEX block. setup_bbcc charges that block
++      on entry to the NEXT block, so include the pending block exactly once
++      in this read-only snapshot. Cache simulation must remain disabled. */
++   case VG_USERREQ_TOOL_BASE('C','T') + 100:
++      CLG_(switch_thread)(tid);
++      tl_assert(!CLG_(clo).simulate_cache);
++      *ret = CLG_(current_state).cost[ fullOffset(EG_IR) ];
++      if (CLG_(current_state).collect && CLG_(current_state).bbcc)
++         *ret += CLG_(current_state).bbcc->bb->jmp[
++                    CLG_(current_state).jmps_passed].instr + 1;
++      break;
++
+    case VG_USERREQ__DUMP_STATS:     
+       CLG_(dump_profile)("Client Request", True);
+       *ret = 0;                 /* meaningless */
+--- a/callgrind/bbcc.c
++++ b/callgrind/bbcc.c
+@@ -28,6 +28,32 @@
+ #include "costs.h"
+ 
+ #include "pub_tool_threadstate.h"
++#include "../coregrind/pub_core_threadstate.h"
++
++/* Private instruction sampler; deliberately limited to the requesting
++ * thread and normal client execution, never its signal-handler work. */
++extern Int VG_(tkill)(Int lwpid, Int signo);
++Bool lowrail_sampling, lowrail_pending, lowrail_paused;
++ThreadId lowrail_tid;
++ULong lowrail_budget, lowrail_lag, lowrail_rng, lowrail_work, lowrail_issued;
++
++static void lowrail_sample(UInt count, ThreadId tid) {
++    if (!lowrail_sampling || lowrail_paused || tid != lowrail_tid || CLG_(current_state).sig) return;
++    lowrail_work += count;
++    if (lowrail_pending) { lowrail_lag += count; return; }
++    if (lowrail_budget > count) { lowrail_budget -= count; return; }
++    lowrail_pending = True;
++    lowrail_issued++;
++    lowrail_lag = 0;
++    lowrail_rng ^= lowrail_rng << 13;
++    lowrail_rng ^= lowrail_rng >> 7;
++    lowrail_rng ^= lowrail_rng << 17;
++    lowrail_budget = 32768 + (lowrail_rng & 65535);
++    VG_(tkill)(VG_(gettid)(), VKI_SIGPROF);
++    /* Poll the queued client signal on the next dispatcher entry, not a
++     * million guest instructions later at the ordinary scheduling quantum. */
++    VG_(get_ThreadState)(tid)->arch.vex.host_EvC_COUNTER = 0;
++}
+ 
+ /*------------------------------------------------------------*/
+ /*--- BBCC operations                                      ---*/
+@@ -609,6 +635,7 @@
+ 	      /* update Ir cost */              
+               UInt instr_count = last_bb->jmp[passed].instr+1;
+               CLG_(current_state).cost[ fullOffset(EG_IR) ] += instr_count;
++	      lowrail_sample(instr_count, tid);
+ 	  }
+ 	}
+ 	else {
+@@ -618,6 +645,7 @@
+ 	      /* update Ir cost */
+               UInt instr_count = last_bb->jmp[passed].instr+1;
+               CLG_(current_state).cost[ fullOffset(EG_IR) ] += instr_count;
++	      lowrail_sample(instr_count, tid);
+               CLG_(current_state).nonskipped->skipped[ fullOffset(EG_IR) ]
+ 		+= instr_count;
+ 	  }
+--- a/coregrind/m_initimg/initimg-linux.c
++++ b/coregrind/m_initimg/initimg-linux.c
+@@ -1105,13 +1105,15 @@
+    //     p: load_client()     [for 'info' and hence VG_(brk_base)]
+    //--------------------------------------------------------------
+    { 
+       SizeT m1 = 1024 * 1024;
+-      SizeT m8 = 8 * m1;
++      /* Measurement-only: the fixed MRI pools exceed the stock 8 MiB brk
++         reservation. Reserve virtual space, not committed heap pages. */
++      SizeT maximum = 512 * m1;
+       SizeT dseg_max_size = (SizeT)VG_(client_rlimit_data).rlim_cur;
+       VG_(debugLog)(1, "initimg", "Setup client data (brk) segment\n");
+       if (dseg_max_size < m1) dseg_max_size = m1;
+-      if (dseg_max_size > m8) dseg_max_size = m8;
++      if (dseg_max_size > maximum) dseg_max_size = maximum;
+       dseg_max_size = VG_PGROUNDUP(dseg_max_size);
+ 
+       setup_client_dataseg( dseg_max_size );
+    }
