@@ -51,7 +51,7 @@ module Lowrail
   private_constant :NO_RECEIVER
 
   class << self
-    attr_reader :manifest, :root
+    attr_reader :manifest, :root, :refusal_reason
 
     def enabled?
       flag = ENV["LOWRAIL"]
@@ -94,6 +94,10 @@ module Lowrail
       require_relative "lowrail/manifest"
 
       manifest = Manifest.load(path, dir)
+      if (@refusal_reason = manifest.refusal_reason)
+        warn "[lowrail] #{@refusal_reason}; running without Lowrail"
+        return false
+      end
       unless manifest.compatible?
         debug "manifest built for #{manifest.ruby_description} (format #{manifest.format}); running #{RUBY_DESCRIPTION}. Falling back to plain Ruby."
         return false

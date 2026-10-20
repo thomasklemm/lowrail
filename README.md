@@ -20,16 +20,21 @@ pass plugs in, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Selecting build passes
 
-`lowrail build APP --passes default,+ar_instantiate,-view/link_to` starts
-with the default source passes, then applies comma-separated `+name`/`-name`
+`lowrail build APP --passes default,+ar_instantiate` starts
+with the default selection, then applies comma-separated `+name`/`-name`
 modifiers in order. Names are the stable `area/name` identifiers in
-[the architecture](docs/ARCHITECTURE.md); short aliases include `link_to`,
-`path`, `uri_join`, `sha256`, `digest_memo`, `preload_plans`, `ar_instantiate`
+[the architecture](docs/ARCHITECTURE.md); short aliases include
+`uri_join`, `sha256`, `digest_memo`, `preload_plans`, `ar_instantiate`
 and `ar_plans`. `memo` selects both source memo passes.
 
 Use `--passes` for all opt-ins; the transitional per-pass build flags have
 been removed. Each `--passes` resets to its list's selection. With no
-options, only `view/link_to` and `route/path` run.
+options, no specialization currently runs. **`view/link_to` and `route/path`
+are quarantined**, including their aliases, explicit opt-in and `all-opt-in`.
+An old artifact containing either pass is refused as a whole before delivery,
+with a boot warning and `Lowrail.refusal_reason`; rebuild it. This is a
+correctness refusal, not a claim that those lowerings have been repaired.
+See [the counterexamples and rewrite boundary](docs/passes/endpoint.md#source-arm-quarantine).
 
 For AR shadow checks, the relation fuzzer and Rails-suite evidence, see
 [Active Record equivalence](docs/ar-equivalence.md).

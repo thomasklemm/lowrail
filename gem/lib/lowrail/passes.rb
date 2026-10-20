@@ -16,6 +16,7 @@ module Lowrail
     }.freeze
 
     def self.install(manifest)
+      return if manifest.refusal_reason
       # Source delivery cannot wait for after_initialize: initializers may
       # already require lowered files or compile templates. These seams keep
       # their existing APIs and are shared by all source passes.

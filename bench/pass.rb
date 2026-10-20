@@ -18,6 +18,7 @@ module PassBench
       checked = data.merge("ruby_description" => data.fetch("ruby_description").delete_prefix("[LOWRAIL UNSAFE] "))
     end
     manifest = Lowrail::Manifest.new(checked, dir)
+    raise manifest.refusal_reason if manifest.refusal_reason
     raise "stale build: incompatible Ruby/format" unless manifest.compatible?
     raise "production build required" unless manifest.rails_env == "production"
     root_lib = File.expand_path("../gem/lib", __dir__) + "/"

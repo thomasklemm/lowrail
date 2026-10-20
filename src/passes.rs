@@ -25,8 +25,8 @@ pub struct Pass {
 }
 
 pub const REGISTRY: &[Pass] = &[
-    Pass { name: "view/link_to", kind: Kind::Source, default: true, builder: Builder::View, alias: "link_to" },
-    Pass { name: "route/path", kind: Kind::Source, default: true, builder: Builder::Route, alias: "path" },
+    Pass { name: "view/link_to", kind: Kind::Source, default: false, builder: Builder::View, alias: "link_to" },
+    Pass { name: "route/path", kind: Kind::Source, default: false, builder: Builder::Route, alias: "path" },
     Pass { name: "memo/uri_join", kind: Kind::Source, default: false, builder: Builder::Memo(Intrinsic::UriJoin), alias: "uri_join" },
     Pass { name: "memo/sha256", kind: Kind::Source, default: false, builder: Builder::Memo(Intrinsic::Sha256), alias: "sha256" },
     Pass { name: "digest/file_memo", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "digest_memo_build", module: "DigestMemoBuild" }, alias: "digest_memo" },
@@ -36,6 +36,13 @@ pub const REGISTRY: &[Pass] = &[
     Pass { name: "inertia/config_bind", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "inertia_config_build", module: "InertiaConfigBuild" }, alias: "inertia_config" },
     Pass { name: "endpoint/action", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "endpoint_build", module: "EndpointBuild" }, alias: "endpoint" },
 ];
+
+pub fn quarantine_reason(name: &str) -> Option<&'static str> {
+    match name {
+        "view/link_to" | "route/path" => Some("quarantined: source arms lack exact receiver certificates and continuation after app-defined argument/conversion code"),
+        _ => None,
+    }
+}
 
 pub struct Selection(BTreeSet<&'static str>);
 
@@ -50,7 +57,7 @@ impl Selection {
         let mut items = list.split(',');
         let mut selected = match items.next() {
             Some("default") => Self::default(),
-            Some("all-opt-in") => Self(REGISTRY.iter().map(|p| p.name).collect()),
+            Some("all-opt-in") => Self(REGISTRY.iter().filter(|p| quarantine_reason(p.name).is_none()).map(|p| p.name).collect()),
             _ => return Err("--passes must start with default or all-opt-in, followed by +name/-name".into()),
         };
         for item in items {
@@ -68,6 +75,9 @@ impl Selection {
         let matches: Vec<_> = REGISTRY.iter().filter(|p| p.name == name || p.alias == name || (name == "memo" && p.name.starts_with("memo/"))).collect();
         if matches.is_empty() { return Err(format!("unknown pass {name}")); }
         for pass in matches {
+            if enabled && let Some(reason) = quarantine_reason(pass.name) {
+                return Err(format!("{}: {reason}", pass.name));
+            }
             if enabled { self.0.insert(pass.name); } else { self.0.remove(pass.name); }
         }
         Ok(())
@@ -87,14 +97,15 @@ mod tests {
     #[test]
     fn selection_defaults_aliases_groups_and_last_modifier_wins() {
         let names = |s: Selection| s.iter().map(|p| p.name).collect::<Vec<_>>();
-        assert_eq!(names(Selection::parse("default").unwrap()), ["view/link_to", "route/path"]);
+        assert!(names(Selection::parse("default").unwrap()).is_empty());
         assert_eq!(names(Selection::parse("default,+ar_instantiate,-view/link_to,+memo,-memo/sha256").unwrap()),
-            ["route/path", "memo/uri_join", "active_record/instantiate"]);
-        assert_eq!(names(Selection::parse("default,-path,+path,+digest/file_memo,-digest_memo").unwrap()), ["view/link_to", "route/path"]);
+            ["memo/uri_join", "active_record/instantiate"]);
+        assert!(names(Selection::parse("default,-path,+digest/file_memo,-digest_memo").unwrap()).is_empty());
         let mut aliases = Selection::default();
         for name in ["memo", "preload_plans", "ar_instantiate", "ar_plans", "digest_memo", "inertia_config", "endpoint"] { aliases.set(name, true).unwrap(); }
-        assert_eq!(names(aliases), REGISTRY.iter().map(|p| p.name).collect::<Vec<_>>());
-        assert_eq!(names(Selection::parse("all-opt-in").unwrap()), REGISTRY.iter().map(|p| p.name).collect::<Vec<_>>());
+        let available = REGISTRY.iter().filter(|p| quarantine_reason(p.name).is_none()).map(|p| p.name).collect::<Vec<_>>();
+        assert_eq!(names(aliases), available);
+        assert_eq!(names(Selection::parse("all-opt-in").unwrap()), available);
         assert!(!Selection::parse("all-opt-in,-ar_instantiate").unwrap().contains("active_record/instantiate"));
         assert!(Selection::parse("default,-view/link_to,-route/path").unwrap().iter().next().is_none());
     }
@@ -103,6 +114,9 @@ mod tests {
     fn selection_rejects_typos_and_malformed_lists() {
         for bad in ["", "all", "+memo", "default,", "default,memo", "default,+", "default,+typo", "default,-typo", "default,default"] {
             assert!(Selection::parse(bad).is_err(), "accepted {bad}");
+        }
+        for name in ["view/link_to", "link_to", "route/path", "path"] {
+            assert!(Selection::parse(&format!("default,+{name}")).err().unwrap().contains("quarantined"));
         }
     }
 }

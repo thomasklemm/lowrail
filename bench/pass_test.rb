@@ -27,9 +27,20 @@ class PassBenchTest < Minitest::Test
     run_rejection(manifest.merge("ruby_description" => "obsolete Ruby")) do |result|
       assert_includes result.fetch("error"), "incompatible Ruby/format"
     end
-    run_rejection(manifest.merge("units" => [{ "id" => 0, "pass" => "route/path", "facts" => [] }],
+    run_rejection(manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "facts" => [] }],
       "templates" => { "/missing/template.erb" => { "source_sha256" => "stale" } })) do |result|
       assert_includes result.fetch("error"), "stale build"
+    end
+  end
+
+  def test_old_source_artifacts_are_rejected_as_quarantined_not_inactive_measurements
+    %w[view/link_to route/path].each do |pass|
+      units = [{"id" => 0, "pass" => pass, "facts" => []},
+        {"id" => 1, "pass" => "memo/uri_join", "facts" => []}]
+      run_rejection(manifest.merge("units" => units)) do |result|
+        assert_includes result.fetch("error"), "quarantined"
+        assert_includes result.fetch("error"), pass
+      end
     end
   end
 
@@ -51,9 +62,9 @@ class PassBenchTest < Minitest::Test
       assert_raises(RuntimeError) { PassBench.preflight(dir, lib, unsafe: true) }
     end
     run_rejection(manifest, speculate: "unguarded", counter: "native") { assert_includes _1.fetch("error"), "fixed-heap Callgrind" }
-    mixed = manifest.merge("units" => [{ "id" => 0, "pass" => "route/path", "facts" => [] },
-      { "id" => 1, "pass" => "view/link_to", "facts" => [] }])
-    run_rejection(mixed, pass: "route/path", speculate: "unguarded") { assert_includes _1.fetch("error"), "separate single-pass build" }
+    mixed = manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "facts" => [] },
+      { "id" => 1, "pass" => "memo/sha256", "facts" => [] }])
+    run_rejection(mixed, pass: "memo/uri_join", speculate: "unguarded") { assert_includes _1.fetch("error"), "separate single-pass build" }
   end
 
   def test_speculative_source_elision_preserves_literals_live_predicates_and_unselected_guards
@@ -102,13 +113,13 @@ class PassBenchTest < Minitest::Test
   end
 
   def test_stack_requires_an_actual_default_reference_not_an_optional_build
-    options = { pass: nil, passes: "route/path,active_record/instantiate", default_passes: "route/path" }
+    options = { pass: nil, passes: "memo/uri_join,active_record/instantiate", default_passes: "memo/uri_join" }
     run_rejection(manifest, **options) { assert_includes _1.fetch("error"), "needs --default-build" }
-    data = manifest.merge("units" => [{ "id" => 0, "pass" => "route/path", "facts" => [] }])
+    data = manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "facts" => [] }])
     Dir.mktmpdir("lowrail-default-reference-test") do |dir|
       File.write(File.join(dir, "manifest.json"), JSON.generate(manifest.merge("units" => [{ "id" => 1, "pass" => "active_record/instantiate", "facts" => [] }])))
       run_rejection(data, **options, default_build: dir) { assert_includes _1.fetch("error"), "reference contains opt-in" }
-      File.write(File.join(dir, "manifest.json"), JSON.generate(manifest.merge("units" => [{ "id" => 0, "pass" => "route/path", "file" => "/another/app.rb", "facts" => [] }])))
+      File.write(File.join(dir, "manifest.json"), JSON.generate(manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "file" => "/another/app.rb", "facts" => [] }])))
       run_rejection(data, **options, default_build: dir) { assert_includes _1.fetch("error"), "another app" }
     end
   end

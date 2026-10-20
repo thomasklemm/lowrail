@@ -46,6 +46,12 @@ module Lowrail
         @overrides = {} # name => ObjectSpace::WeakMap{obj => true}
         # Compiler refusals can leave gaps in the manifest's unit IDs.
         K.replace(Array.new((@units.keys.max || -1) + 1, NO_RECEIVER))
+        if manifest.refusal_reason
+          G.clear
+          @state.clear
+          V.clear
+          return
+        end
         Module.prepend(ModuleHooks) unless Module < ModuleHooks
         BasicObject.prepend(ObjectHooks) unless BasicObject < ObjectHooks
       end
@@ -54,6 +60,7 @@ module Lowrail
 
       def validate(id, klass: nil)
         unit = @units[id] or return false
+        return false if @manifest.refusal_reason
         return false unless env_ok? && enabled_unit?(id)
         unit.fetch("facts").all? { |fact| holds?(fact, klass) }
       rescue StandardError => e

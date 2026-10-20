@@ -300,8 +300,10 @@ class RoutesTest < Minitest::Test
                             "defaults" => { controller: "articles" }.inspect } }
       # A *_url helper lives in the route set's URL helper module.
       url_fact = fact.merge("method" => "article_url", "source_location" => $urls.instance_method(:article_url).source_location.join(":"))
-      units = [{ "id" => 0, "kind" => "file", "file" => "/x.rb", "pass" => "route/path", "facts" => [fact] },
-               { "id" => 1, "kind" => "file", "file" => "/x.rb", "pass" => "route/path", "facts" => [fact, url_fact] }]
+      # Exercise the generic fact validator, not the quarantined source pass.
+      # Old route/path artifacts are separately required to refuse at boot.
+      units = [{ "id" => 0, "kind" => "file", "file" => "/x.rb", "pass" => "test/route_facts", "facts" => [fact] },
+               { "id" => 1, "kind" => "file", "file" => "/x.rb", "pass" => "test/route_facts", "facts" => [fact, url_fact] }]
       manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
                                          "files" => {}, "units" => units }, "/tmp")
       Lowrail::Guard.install(manifest)

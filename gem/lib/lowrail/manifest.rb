@@ -85,7 +85,9 @@ module Lowrail
   # names its ISeq binary and the SHA-256 of the source it was lowered from.
   # Units are the guarded specializations, each with the facts it assumes.
   class Manifest
-    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method
+    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method, :refusal_reason
+
+    QUARANTINED_PASSES = %w[view/link_to route/path].freeze
 
     def self.load(path, dir = File.dirname(path))
       new(MiniJSON.parse(File.read(path, encoding: Encoding::UTF_8)), dir)
@@ -104,6 +106,10 @@ module Lowrail
       # because RAILS_ENV is often set only after setup).
       @rails_env = data["rails_env"]
       @units = data.fetch("units")
+      unsafe = @units.filter_map { |unit| unit["pass"] if QUARANTINED_PASSES.include?(unit["pass"]) }.uniq
+      unless unsafe.empty?
+        @refusal_reason = "quarantined source passes: #{unsafe.join(', ')}; receiver certificates and post-argument/conversion continuations are incomplete; rebuild required"
+      end
       # Symbol keys: the method_added hooks look up every defined name, and a
       # Symbol lookup does not allocate.
       by_method = Hash.new { |h, k| h[k] = [] }
@@ -117,7 +123,7 @@ module Lowrail
     # Cheap checks done at setup. The per-file loader fingerprint needs
     # SHA-256 and is checked lazily on the first lookup (see #iseq_for).
     def compatible?
-      @format == FORMAT && Manifest.normalize(@ruby_description) == Manifest.normalize(RUBY_DESCRIPTION)
+      @refusal_reason.nil? && @format == FORMAT && Manifest.normalize(@ruby_description) == Manifest.normalize(RUBY_DESCRIPTION)
     end
 
     def lowered?(source_path)
@@ -127,6 +133,7 @@ module Lowrail
     # Returns the ISeq binary path when the on-disk source still matches what
     # was lowered, else nil (the caller compiles the source normally).
     def iseq_for(source_path, original: nil, compile_option: nil)
+      return nil if @refusal_reason
       entry = @files[source_path] or return nil
       # Old builds have no loader contract: rebuild rather than assume their
       # process-wide defaults describe the app's per-file compilation.

@@ -29,6 +29,7 @@ fn reason(pass: &str, detail: &str) -> &'static str {
         "eligible scoped reader" => return "scoped_reader",
         "lowered (homogeneous results only)" => return "homogeneous_results",
         "denylisted by verify --bisect" => return "denylisted",
+        _ if detail.starts_with("quarantined:") => return "quarantined",
         _ if detail.starts_with("declined:") => return "builder_error",
         _ if detail.starts_with("template requires method context") => return "template_context",
         _ if detail.starts_with("template source does not parse") => return "template_parse",

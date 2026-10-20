@@ -8,6 +8,14 @@ primary work metric; native YJIT CPU/wall time and allocations are secondary.**
 
 ## Shared command: `lowrail bench`
 
+**Current quarantine:** the default selection is empty. A default-only build
+correctly rejects `lowrail bench --pass default` with `no units`, rather than
+claiming acceleration. Explicit route/link-to selectors and old artifacts are
+also refused. The examples below describe the measurement protocol; use an
+available opt-in build for active-pass measurements. The before/after loss
+experiment uses `request_pairs.rb` with an archived pre-quarantine runtime,
+as recorded in [endpoint quarantine](passes/endpoint.md#quarantine-cost-and-gates).
+
 Migration step 5 uses the existing harness, not a second measurement method:
 
 ```sh

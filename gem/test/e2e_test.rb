@@ -75,6 +75,49 @@ class E2ETest < Minitest::Test
     end
   end
 
+  def test_old_mixed_source_artifacts_refuse_before_source_or_template_delivery
+    %w[view/link_to route/path].each do |pass|
+      realpath_tmpdir do |dir|
+        units = default_units(dir)
+        units[0]["pass"] = pass
+        build_app(dir, units: units)
+        edit_manifest(dir) do |manifest|
+          manifest["templates"] = {"/old/template.erb" => {"source_sha256" => "old", "code" => "raise 'old template delivered'"}}
+        end
+        code = SCRIPT + <<~'RUBY'
+          require "lowrail/guard"
+          require "lowrail/passes"
+          manifest = Lowrail::Manifest.load(File.join(Dir.pwd, ".lowrail/manifest.json"))
+          Lowrail::Passes.install(manifest)
+          Lowrail::G.replace([true, true])
+          Lowrail::Stats::STATE.replace([true, true])
+          Lowrail::V.replace([{Calc => true}, {Calc => true}])
+          Lowrail::K.replace([Calc, Calc])
+          Lowrail::Guard.install(manifest, Lowrail::Stats::STATE)
+          puts JSON.generate(r.merge(reason: Lowrail.refusal_reason,
+            templates_installed: !!defined?(Lowrail::Templates), loaded_files: Lowrail::Stats.loaded_files,
+            guard_decisions: [Lowrail::Guard.validate(0), Lowrail::Guard.validate(1)],
+            stale_authorization: Lowrail::G.any?(true) || Lowrail::Stats::STATE.any?(true) || Lowrail::V.any? { _1&.value?(true) } || Lowrail::K.any? { _1.equal?(Calc) },
+            delivered: manifest.iseq_for(File.join(Dir.pwd, "app.rb"))))
+        RUBY
+        out, err, status = ruby("-e", code, chdir: dir, env: {"LOWRAIL_STATS" => ""})
+        assert status.success?, err
+        result = JSON.parse(out.lines.last)
+        refute result.fetch("loaded")
+        refute result.fetch("templates_installed")
+        assert_equal ["orig", 2], result.fetch("compute")
+        assert_equal ["orig", "CALC"], result.fetch("label"), "safe units in a mixed artifact must not be delivered either"
+        assert_empty result.fetch("hits")
+        assert_empty result.fetch("loaded_files")
+        assert_equal [false, false], result.fetch("guard_decisions")
+        refute result.fetch("stale_authorization")
+        assert_nil result.fetch("delivered")
+        assert_includes result.fetch("reason"), pass
+        assert_includes err, result.fetch("reason"), "quarantine must have an observable boot refusal, not a silent stale fast path"
+      end
+    end
+  end
+
   def test_compile_option_mismatch_is_noop
     realpath_tmpdir do |dir|
       build_app(dir)

@@ -2,7 +2,7 @@
 
 use std::process::Command;
 
-use crate::passes::{Selection, REGISTRY};
+use crate::passes::{Selection, REGISTRY, quarantine_reason};
 
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut forwarded = Vec::new();
@@ -20,6 +20,9 @@ pub fn cli(args: &[String]) -> Result<(), String> {
                     REGISTRY.iter().find(|p| p.name == name || p.alias == name)
                         .ok_or_else(|| format!("unknown pass {name}"))?.name
                 };
+                if let Some(reason) = quarantine_reason(canonical) {
+                    return Err(format!("{canonical}: {reason}"));
+                }
                 if pass.replace(canonical).is_some() { return Err("specify --pass once".into()); }
             }
             "--passes" => {
@@ -51,4 +54,15 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let status = Command::new("ruby").arg(script).arg(app)
         .args(forwarded).status().map_err(|e| format!("benchmark: {e}"))?;
     if status.success() { Ok(()) } else { Err(format!("benchmark rejected ({status}); inspect result.json and private logs")) }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn bench_cannot_select_quarantined_source_passes() {
+        for name in ["view/link_to", "link_to", "route/path", "path"] {
+            let args = ["--pass", name, "/unused"].map(String::from);
+            assert!(super::cli(&args).unwrap_err().contains("quarantined"));
+        }
+    }
 }

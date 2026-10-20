@@ -177,3 +177,134 @@ reference follows publication. No saving is claimed yet. The old eventful
 a supported semantic target. Widen in separate measured, paired-gated steps:
 helpers, partial/collection dispatch, layout, then filter dispatch. Each needs
 its own new facts/local continuation; none is implied by this slice.
+
+## Exact-slice measurement and rejected composition
+
+The published conservative slice's index benchmark passed the fixed-heap and
+A/A gates, but **regressed** against a separate default build: 8.574259 →
+10.170184 M Ir/request, paired **+1,593,364 Ir, +18.565% [18.534, 18.646]**.
+Allocations were 2,235.14 → 2,689.86. This is not the handwritten ceiling.
+
+An inclusive-caller diagnostic explains the budget below. Inclusive deltas
+are not independent causal ablations; notably `Endpoint.current` overlaps
+its callers. No double counting is intended.
+
+| Cost | Net Ir/request | Interpretation |
+|---|---:|---|
+| Entry | 415,186 | Includes 370,696 for four request-time SHA computations |
+| Template checks | 165,064 | 14 calls |
+| Helper checks | 106,806 | 10 calls |
+| Lost default view/route source splices | 549,861 | Raw handler bodies superseded the default lowerings |
+| Remainder | 356,447 | Includes 139,331 from 24 `Endpoint.current` lookups; not another additive row |
+
+Unpublished composition work removes request-time file hashing, pins selected
+runtime Template identities, passes the execution as a local, and starts from
+post-source-pass bodies. Its descriptive index result was 9.052005 versus
+8.574968 M Ir (**+5.56%**), with ten route completions and one endpoint hit.
+**Rejected:** off/off A/A excludes zero ([+0.004, +0.069]%), and the warmed
+suppressed-hook specimen renders stale output. It is neither a published
+performance result nor a semantically certified implementation.
+
+Pricing only effective `link_to` receiver identity plus public visibility
+costs about **10,830–10,836 Ir/hit**, leaving diagnostic per-hit savings
+34,075 and 26,062 on two view units (nine and one invocations per request).
+Those two units pass their controls, but the experiment as a whole fails
+route-unit A/A. More importantly this is **not the complete source-arm
+certificate**. Neither these numbers nor the composition result licenses
+shipping a residual or reactivating a pass.
+
+## Source-arm quarantine
+
+The owner chose quarantine before a continuation/body-certificate rewrite.
+Both `view/link_to` and `route/path` are unavailable in default, explicit
+`+name`/aliases and `all-opt-in`. Every new build records a pass-level
+`quarantined` refusal. Runtime rejects an old artifact containing either
+pass **as a whole**, including otherwise safe units and template entries,
+before installing delivery hooks. The reason is retained as
+`Lowrail.refusal_reason` and emitted in a boot warning. Direct guard validation
+and binary lookup also refuse it; installing such a guard withdraws G/V/K
+authorizations. No repaired accelerated-arm support is claimed.
+
+Three independently executed Rails 8.1.4 fixtures establish the boundary:
+
+| Mutation | Original Rails | Previous default source arm |
+|---|---|---|
+| Warm guard; process-action subscriber suppresses `method_added`, redefines `link_to` | Ten live-helper markers | Zero markers |
+| `link_to` name expression changes actual `tag_builder.content_tag_string` | `<!-- changed builder -->` | Old anchor |
+| Route argument's `to_param` installs singleton `route.format` returning `/changed` | `/changed`, one conversion | `/widgets/7`, one conversion |
+
+The last two mutations occur **after** entry authorization. Even checking the
+actual receiver and its visibility at entry is insufficient; the route's
+class method fact also cannot describe a singleton override on the captured
+route object. A whole-helper fallback after conversion would repeat effects.
+The permanent regressions keep the observable outputs and once-only name /
+conversion assertions; quarantine makes them green by refusal, not by
+silently removing mutation coverage.
+
+The rewrite is a separate opt-in pilot. It must certify actual method bodies
+and receiver provenance, preserve argument evaluation once and in order, and
+continue locally after every application-code boundary (name, arguments,
+`to_param`, builder). Each such point needs a mutation probe, paired isolated
+response/header/SQL/event gates, and fixed-heap cost ≤ the new default.
+The pending endpoint composition is not published or reactivated on unsafe
+source arms. The old eventful −26/−37% handwritten results remain upper bounds
+missing observable assigns and mutation behavior.
+
+### Quarantine cost and gates
+
+This deliberately **loses** the previous source-pass instruction saving.
+Six fresh fixed-heap interpreter Callgrind rounds per route, 50 requests per
+worker, no YJIT, use the shared `bench/request_pairs.rb` protocol. The
+`before` layer uses archived pre-quarantine runtime sources from
+[fecd033](https://github.com/thomasklemm/lowrail/commit/fecd033) and its
+production default artifact. The current `default` layer refuses that same
+artifact at boot; it is an original-Rails path, **not successful activation**.
+The independent `empty` layer agrees within noise. No production bypass was
+added, and the blog was restored to a fresh test/default build afterwards.
+The harness is also pinned to that pre-quarantine revision: these cohorts
+precede the later heap-observer warmup/post-GC settling refinement in
+[c9d2397](https://github.com/thomasklemm/lowrail/commit/c9d2397). They are not
+a measurement under that newer protocol.
+
+| GET | Off M Ir/request | Former unsafe default M Ir (Δ vs off, 95% CI) | Quarantined M Ir (Δ vs off, 95% CI) | Loss vs former default, paired 95% CI |
+|---|---:|---:|---:|---:|
+| `/articles` | 9.122639 | 8.575382 (−5.995% [−6.012, −5.966]) | 9.120766 (−0.006% [−0.037, +0.013]) | +6.367% [+6.333, +6.386] |
+| `/articles/1` | 8.771261 | 8.684129 (−0.987% [−1.040, −0.977]) | 8.769938 (−0.004% [−0.033, +0.046]) | +0.998% [+0.960, +1.086] |
+
+Both total/GC-excluded A/A controls include zero and pass the fixed 0.5%
+tolerance. Total-Ir A/A is +0.003% [−0.012, +0.014] index and +0.001%
+[−0.028, +0.039] show; heap capacities match and all warmup/window JIT checks
+pass. These are instruction losses, **not native YJIT throughput claims**.
+Private evidence: `/tmp/lowrail-quarantine-{index,show}-cost/{samples,summary}.json`.
+
+Runtime/build gates after quarantine:
+
+- Gem: **97 runs / 1,733 assertions**, zero failures/errors, six optional
+  dependency skips. Includes the previously red warmed-subscriber test and
+  the name-expression/builder and conversion/formatter regressions.
+- `cargo test`: **34 unit + 3 integration tests** pass. Benchmark contract:
+  **16 runs / 157 assertions**, zero failures/errors/skips. Explicit build
+  and bench selectors reject both names and aliases; old/mixed artifacts
+  reject rather than silently producing inactive performance results.
+  After integrating the newer harness, all benchmark tests pass:
+  **30 runs / 262 assertions**, zero failures/errors/skips.
+- AP L3: **4,095** identical. AV L3: **2,747 + 242 + 173** identical;
+  zero differences/shadow mismatches. AV/AR retains **123 hits / 2 fallbacks**
+  from other runtime passes, not source-arm coverage.
+- Five-app default verify has identical outcomes and own-thread SQL digests:
+  blog **21**; Campfire **634** (two matching skips); PingCRM **26**;
+  Redprints **50** plus **12** browser-system examples; Starter **36**.
+  Every app's unit-hit and unit-fallback maps are **`{}`**, with **zero
+  emitted route units and no executable source completion arms**. This is
+  quarantine compatibility evidence, not accelerated coverage. Other-thread
+  SQL differences remain advisory: one Campfire and nine PingCRM cases.
+
+Campfire's query totals are 15,109 off / 15,108 on because the concurrent
+repair test records 41 / 40 including other threads; its own-thread digest
+is identical. PingCRM totals are 812 / 812. No advisory was suppressed and
+neither these totals nor green outcomes certify the disabled source arms.
+Earlier browser runs without Chrome had matching failures; those were not
+counted as passing. The completed Redprints browser gate uses `BROWSER_PATH`
+pointing to the installed Chrome. PingCRM uses the existing private PostgreSQL
+socket. Final evidence is in `/tmp/lowrail-quarantine-corpus-final/` and
+`/tmp/lowrail-quarantine-framework-final/`; request secrets stay private.

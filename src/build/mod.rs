@@ -16,7 +16,7 @@ use serde_json::{Value, json};
 use crate::facts;
 use crate::lower::oracle::RubyOracle;
 use crate::lower::{memo, route, view};
-use crate::passes::{Builder, Kind, REGISTRY, Selection};
+use crate::passes::{Builder, Kind, REGISTRY, Selection, quarantine_reason};
 
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
@@ -63,7 +63,9 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
 
     let mut templates = BTreeMap::new();
     let mut units: Vec<Value> = Vec::new();
-    let mut ledger: Vec<Value> = Vec::new();
+    let mut ledger: Vec<Value> = REGISTRY.iter().filter_map(|pass| {
+        quarantine_reason(pass.name).map(|reason| json!({"pass": pass.name, "outcome": reason}))
+    }).collect();
     for t in &facts.templates {
         if t.handler != "ActionView::Template::Handlers::ERB" {
             continue;

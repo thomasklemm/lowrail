@@ -1,5 +1,13 @@
 # Pass `route/path` — named-route `*_path` helpers
 
+**Quarantined, not opt-in.** Neither `route/path` nor `view/link_to` can be
+selected or delivered from old artifacts. The implementation and measurements
+below are historical: argument evaluation and `to_param` can change the actual
+route formatter after entry authorization. See the permanent counterexamples,
+whole-artifact refusal and required continuation rewrite in
+[the quarantine contract](endpoint.md#source-arm-quarantine). No safe source
+arm remains active; the proposed refusal cache is parked, not published.
+
 Code: `src/lower/route.rs` (pass), `gem/lib/lowrail/routes.rb` (runtime),
 `gem/lib/lowrail/oracle_routes.rb` (build-time oracle side), route facts in
 `gem/lib/lowrail/guard.rb`. Runs on compiled ERB (after `view/link_to`, so
