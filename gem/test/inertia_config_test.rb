@@ -173,8 +173,9 @@ class InertiaConfigTest < Minitest::Test
   RUBY
 
   def test_binding_contract_across_supported_gems
-    %w[3.21.2 3.22.0 3.23.0].each do |version|
-      assert Gem::Specification.find_all_by_name("inertia_rails", version).any?, "install inertia_rails #{version}"
+    versions = %w[3.21.2 3.22.0 3.23.0]
+    skip_missing_inertia_versions(*versions)
+    versions.each do |version|
       result = ruby_json(SCENARIO, env: {"INERTIA_VERSION" => version})
       assert_equal "exact", result["contract"]
       assert_operator result["hits"], :>=, 10
@@ -183,6 +184,7 @@ class InertiaConfigTest < Minitest::Test
   end
 
   def test_plain_and_stale_build_controls
+    skip_missing_inertia_versions("3.23.0")
     %w[PLAIN STALE].each do |control|
       result = ruby_json(SCENARIO, env: {"INERTIA_VERSION" => "3.23.0", control => "1"})
       assert_equal "exact", result["contract"]
@@ -192,10 +194,18 @@ class InertiaConfigTest < Minitest::Test
   end
 
   def test_private_binding_and_overridden_schema_are_not_installed
+    skip_missing_inertia_versions("3.23.0")
     %w[build install schema].each do |phase|
       result = ruby_json(SCENARIO, env: {"INERTIA_VERSION" => "3.23.0", "PRIVATE_AT" => phase})
       assert_equal phase == "schema" ? "schema refused" : "private preserved", result["contract"]
       assert_equal 0, result["hits"]
     end
+  end
+
+  private
+
+  def skip_missing_inertia_versions(*versions)
+    missing = versions.select { Gem::Specification.find_all_by_name("inertia_rails", _1).empty? }
+    skip "install inertia_rails #{missing.join(', ')} to run Inertia configuration tests" unless missing.empty?
   end
 end
