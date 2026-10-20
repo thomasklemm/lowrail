@@ -1,0 +1,235 @@
+diff --git a/class.c b/class.c
+index 6a5c128..f9bdc90 100644
+--- a/class.c
++++ b/class.c
+@@ -1291,6 +1291,7 @@ make_metaclass(VALUE klass)
+     // Full class ancestry may not have been filled until we reach here.
+     rb_class_update_superclasses(METACLASS_OF(metaclass));
+ 
++    rb_vm_mutation_epoch_bump();
+     return metaclass;
+ }
+ 
+@@ -1313,6 +1314,7 @@ make_singleton_class(VALUE obj)
+     rb_zjit_invalidate_no_singleton_class(orig_class);
+ 
+     SET_METACLASS_OF(klass, METACLASS_OF(rb_class_real(orig_class)));
++    rb_vm_mutation_epoch_bump();
+     return klass;
+ }
+ 
+@@ -1695,6 +1697,7 @@ rb_include_module(VALUE klass, VALUE module)
+     int changed = 0;
+ 
+     ensure_includable(klass, module);
++    rb_vm_mutation_epoch_bump();
+ 
+     changed = include_modules_at(klass, RCLASS_ORIGIN(klass), module, TRUE);
+     if (changed < 0)
+@@ -1726,6 +1729,7 @@ rb_include_module(VALUE klass, VALUE module)
+             iclass = iclass->next;
+         }
+     }
++    rb_vm_mutation_epoch_bump();
+ }
+ 
+ static enum rb_id_table_iterator_result
+@@ -1949,6 +1953,7 @@ rb_prepend_module(VALUE klass, VALUE module)
+     if (module_in_super_chain(klass, module))
+         rb_raise(rb_eArgError, "cyclic prepend detected");
+ 
++    rb_vm_mutation_epoch_bump();
+     klass_had_no_origin = ensure_origin(klass);
+     changed = do_include_modules_at(klass, klass, module, FALSE, false);
+     RUBY_ASSERT(changed >= 0); // already checked for cyclic prepend above
+@@ -1992,6 +1997,7 @@ rb_prepend_module(VALUE klass, VALUE module)
+         }
+         RB_GC_GUARD(new_origins);
+     }
++    rb_vm_mutation_epoch_bump();
+ }
+ 
+ /*
+diff --git a/internal/vm.h b/internal/vm.h
+index 09dfaf1..372324d 100644
+--- a/internal/vm.h
++++ b/internal/vm.h
+@@ -43,6 +43,8 @@ enum method_missing_reason {
+ VALUE rb_vm_push_frame_fname(struct rb_execution_context_struct *ec, VALUE fname);
+ 
+ /* vm.c */
++/* Experimental conservative code-mutation generation; not a public API. */
++void rb_vm_mutation_epoch_bump(void);
+ VALUE rb_obj_is_thread(VALUE obj);
+ void rb_vm_mark(void *ptr);
+ void rb_vm_register_global_object(VALUE obj);
+diff --git a/variable.c b/variable.c
+index 4397ae3..ec5c618 100644
+--- a/variable.c
++++ b/variable.c
+@@ -3007,6 +3007,7 @@ rb_autoload_str(VALUE module, ID name, VALUE feature)
+     VALUE result = rb_mutex_synchronize(autoload_mutex, autoload_synchronized, (VALUE)&arguments);
+ 
+     if (result == Qtrue) {
++        rb_vm_mutation_epoch_bump();
+         const_added(module, name);
+     }
+ }
+@@ -3640,6 +3641,8 @@ rb_const_remove(VALUE mod, ID id)
+     VALUE writable_ce = 0;
+     if (rb_id_table_lookup(RCLASS_WRITABLE_CONST_TBL(mod), id, &writable_ce)) {
+         rb_id_table_delete(RCLASS_WRITABLE_CONST_TBL(mod), id);
++        /* Warning.warn below may reenter Ruby after the constant is gone. */
++        rb_vm_mutation_epoch_bump();
+         if ((rb_const_entry_t *)writable_ce != ce) {
+             xfree((rb_const_entry_t *)writable_ce);
+         }
+@@ -3929,6 +3932,7 @@ const_set(VALUE klass, ID id, VALUE val)
+     check_before_mod_set(klass, id, val, "constant");
+ 
+     RB_VM_LOCKING() {
++        rb_vm_mutation_epoch_bump();
+         struct rb_id_table *tbl = RCLASS_WRITABLE_CONST_TBL(klass);
+         if (!tbl) {
+             tbl = rb_id_table_create(0);
+@@ -4006,6 +4010,7 @@ autoload_const_value_for_named_constant(VALUE module, ID name, struct autoload_c
+ static void
+ const_tbl_update(struct autoload_const *ac, int autoload_force)
+ {
++    rb_vm_mutation_epoch_bump();
+     VALUE value;
+     VALUE klass = ac->module;
+     VALUE val = ac->value;
+@@ -4037,6 +4042,7 @@ const_tbl_update(struct autoload_const *ac, int autoload_force)
+                 ce->line = line;
+             }
+             RUBY_ASSERT_CRITICAL_SECTION_LEAVE();
++            rb_vm_mutation_epoch_bump();
+             return;
+         }
+         else {
+@@ -4072,6 +4078,7 @@ setup_const_entry(rb_const_entry_t *ce, VALUE klass, VALUE val,
+     ce->flag = visibility;
+     RB_OBJ_WRITE(klass, &ce->value, val);
+     RB_OBJ_WRITE(klass, &ce->file, rb_source_location(&ce->line));
++    rb_vm_mutation_epoch_bump();
+ }
+ 
+ void
+diff --git a/vm.c b/vm.c
+index 9a5bfe1..1c777bd 100644
+--- a/vm.c
++++ b/vm.c
+@@ -727,6 +727,28 @@ rb_serial_t ruby_vm_constant_cache_invalidations = 0;
+ rb_serial_t ruby_vm_constant_cache_misses = 0;
+ rb_serial_t ruby_vm_global_cvar_state = 1;
+ 
++/* Lowrail local experiment, GCC/Clang LP64 only. Saturate, never wrap/box.
++ * nil permanently disables certificates once the Fixnum range is exhausted.
++ * Atomics avoid torn/lost generations, but are not a multi-Ractor seqlock.
++ */
++static unsigned long ruby_vm_mutation_epoch = 0;
++
++void
++rb_vm_mutation_epoch_bump(void)
++{
++    unsigned long old = __atomic_load_n(&ruby_vm_mutation_epoch, __ATOMIC_RELAXED);
++    while (old < (unsigned long)FIXNUM_MAX &&
++           !__atomic_compare_exchange_n(&ruby_vm_mutation_epoch, &old, old + 1,
++                                        true, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
++}
++
++static VALUE
++vm_mutation_epoch(VALUE self)
++{
++    unsigned long epoch = __atomic_load_n(&ruby_vm_mutation_epoch, __ATOMIC_RELAXED);
++    return epoch < (unsigned long)FIXNUM_MAX ? LONG2FIX(epoch) : Qnil;
++}
++
+ static const struct rb_callcache vm_empty_cc = {
+     .flags = T_IMEMO | (imemo_callcache << FL_USHIFT) | VM_CALLCACHE_UNMARKABLE,
+     .klass = Qundef,
+@@ -4244,6 +4266,7 @@ Init_VM(void)
+     rb_undef_alloc_func(rb_cRubyVM);
+     rb_undef_method(CLASS_OF(rb_cRubyVM), "new");
+     rb_define_singleton_method(rb_cRubyVM, "stat", vm_stat, -1);
++    rb_define_singleton_method(rb_cRubyVM, "mutation_epoch", vm_mutation_epoch, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines", vm_keep_script_lines, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines=", vm_keep_script_lines_set, 1);
+ 
+diff --git a/vm_method.c b/vm_method.c
+index 49c183e..ee58f8a 100644
+--- a/vm_method.c
++++ b/vm_method.c
+@@ -317,6 +317,7 @@ rb_vm_mtbl_dump(const char *msg, VALUE klass, ID target_mid)
+ static inline void
+ vm_cme_invalidate(rb_callable_method_entry_t *cme)
+ {
++    rb_vm_mutation_epoch_bump();
+     VM_ASSERT(IMEMO_TYPE_P(cme, imemo_ment), "cme: %d", imemo_type((VALUE)cme));
+     VM_ASSERT(callable_method_entry_p(cme));
+     METHOD_ENTRY_INVALIDATED_SET(cme);
+@@ -339,6 +340,7 @@ void rb_clear_constant_cache(void) {}
+ void
+ rb_clear_constant_cache_for_id(ID id)
+ {
++    rb_vm_mutation_epoch_bump();
+     VALUE lookup_result;
+     rb_vm_t *vm = GET_VM();
+ 
+@@ -375,6 +377,7 @@ invalidate_method_cache_in_cc_table(VALUE tbl, ID mid)
+     VALUE ccs_data;
+     if (tbl && rb_managed_id_table_lookup(tbl, mid, &ccs_data)) {
+         struct rb_class_cc_entries *ccs = (struct rb_class_cc_entries *)ccs_data;
++        rb_vm_mutation_epoch_bump();
+         rb_yjit_cme_invalidate((rb_callable_method_entry_t *)ccs->cme);
+         rb_zjit_cme_invalidate((rb_callable_method_entry_t *)ccs->cme);
+         if (NIL_P(ccs->cme->owner)) invalidate_negative_cache(mid);
+@@ -389,6 +392,7 @@ invalidate_callable_method_entry_in_callable_m_table(struct rb_id_table *tbl, ID
+ {
+     VALUE cme;
+     if (tbl && rb_id_table_lookup(tbl, mid, &cme)) {
++        rb_vm_mutation_epoch_bump();
+         rb_yjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_zjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_id_table_delete(tbl, mid);
+@@ -458,6 +462,7 @@ invalidate_complemented_method_entry_in_callable_m_table(struct rb_id_table *tbl
+ {
+     VALUE cme;
+     if (tbl && rb_id_table_lookup(tbl, mid, &cme)) {
++        rb_vm_mutation_epoch_bump();
+         rb_yjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_zjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_id_table_delete(tbl, mid);
+@@ -606,6 +611,7 @@ clear_iclass_method_cache_by_id_for_refinements(VALUE klass, VALUE d)
+ void
+ rb_clear_method_cache(VALUE klass_or_module, ID mid)
+ {
++    rb_vm_mutation_epoch_bump();
+     if (RB_TYPE_P(klass_or_module, T_MODULE)) {
+         VALUE module = klass_or_module; // alias
+ 
+@@ -811,6 +817,7 @@ rb_vm_delete_cc_refinement(const struct rb_callcache *cc)
+ void
+ rb_clear_all_refinement_method_cache(void)
+ {
++    rb_vm_mutation_epoch_bump();
+     rb_vm_t *vm = GET_VM();
+ 
+     RB_VM_LOCK_ENTER();
+@@ -842,6 +849,7 @@ rb_method_table_insert0(VALUE klass, struct rb_id_table *table, ID method_id, co
+     VM_ASSERT_TYPE3(table_owner, T_CLASS, T_ICLASS, T_MODULE);
+     rb_id_table_insert(table, method_id, (VALUE)me);
+     RB_OBJ_WRITTEN(table_owner, Qundef, (VALUE)me);
++    rb_vm_mutation_epoch_bump();
+ }
+ 
+ // rb_f_notimplement has an extra trailing argument to distinguish it from other methods
+@@ -2175,6 +2183,7 @@ remove_method(VALUE klass, ID mid)
+     }
+     rb_clear_method_cache(klass, mid);
+     rb_id_table_delete(RCLASS_WRITABLE_M_TBL(klass), mid);
++    rb_vm_mutation_epoch_bump();
+ 
+     rb_vm_check_redefinition_opt_method(me, klass);
+ 
