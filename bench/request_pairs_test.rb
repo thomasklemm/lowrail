@@ -29,6 +29,21 @@ class RequestPairsTest < Minitest::Test
     assert_equal 2.5, RequestPairs.median([1, 2, 3, 8])
   end
 
+  def test_instruction_control_ignores_emulation_time
+    rounds = [-0.1, 0.0, 0.1].map do |noise|
+      { "off_a" => { "instructions" => 1000.0, "wall_us" => 100.0 },
+        "off_b" => { "instructions" => 1000.0 + noise, "wall_us" => 900.0 },
+        "fast" => { "instructions" => 875.0, "wall_us" => 1100.0 } }
+    end
+    result = RequestPairs.summarize(rounds, seed: 1, tolerance: 0.5,
+      metrics: ["instructions"], controls: ["instructions"])
+    assert result[:aa][:pass]
+    assert_in_delta(-12.5, result[:layers]["fast"]["instructions"][:delta_pct][:median], 1e-9)
+    rounds.each { _1["off_b"]["instructions"] += 10.0 }
+    refute RequestPairs.summarize(rounds, seed: 1, tolerance: 0.5,
+      metrics: ["instructions"], controls: ["instructions"])[:aa][:pass]
+  end
+
   def test_repeated_blocks_do_not_hide_process_specific_bias
     cohorts = [-3, -1, 0, 2, 4].map do |bias|
       Array.new(40) do

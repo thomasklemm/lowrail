@@ -16,6 +16,13 @@
 stackprof = Gem::Specification.find_by_name("stackprof")
 $LOAD_PATH.unshift(*stackprof.full_require_paths)
 
+if ENV["BENCH_COUNT_REQUESTS"] && ENV["BENCH_JIT"] != "1"
+  # Rails production enables YJIT late, even after ruby --disable-yjit.
+  # Configure the real application before its finisher runs, then verify the
+  # actual runtime state in the driver rather than trusting command flags.
+  require File.expand_path("config/application", Dir.pwd)
+  Rails.application.config.yjit = false
+end
 require File.expand_path("config/environment", Dir.pwd)
 require "rack/mock"
 require "json"
@@ -43,6 +50,25 @@ if (dump = ENV["BENCH_DUMP"]) # first response body per route, for on/off diffs
   routes.each do |verb, path|
     File.write(File.join(dump, "#{verb}#{path.tr("/", "_")}.html"), call(session, verb, path, headers).body)
   end
+end
+
+if ENV["BENCH_COUNT_REQUESTS"]
+  n = Integer(ENV.fetch("BENCH_COUNT_REQUESTS"))
+  raise "one route and nonnegative request count required" unless routes.one? && n >= 0
+  verb, path = routes.first
+  require ENV["BENCH_CALLGRIND_EXTENSION"] if ENV["BENCH_CALLGRIND_EXTENSION"]
+  # Warm the same loop ISeq that will be measured, including under YJIT.
+  def counted_requests(n, session, verb, path, headers)
+    n.times { call(session, verb, path, headers) }
+  end
+  counted_requests(Integer(ENV.fetch("BENCH_WARMUP", "50")), session, verb, path, headers)
+  GC.start
+  LowrailCallgrindBench.start if defined?(LowrailCallgrindBench)
+  counted_requests(n, session, verb, path, headers)
+  LowrailCallgrindBench.finish if defined?(LowrailCallgrindBench)
+  puts "LOWRAIL_BENCH #{JSON.generate(requests: n, ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?,
+    compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"
+  exit
 end
 
 routes.each { |verb, path| Integer(ENV.fetch("BENCH_WARMUP", "200")).times { call(session, verb, path, headers) } }
