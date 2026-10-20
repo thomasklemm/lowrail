@@ -44,6 +44,17 @@ same 11 units and verifies 21/21 identical with 114 hits.
   response-cache-disabled room +10.2%: not a general application-speed win,
   so it is opt-in (`lowrail build --preload-plans`) until it no longer
   slows real requests.
+- **Guarded memo** ([certificate/refusal details](passes/memo.md)), opt-in
+  with `lowrail build --memo`: fresh-return SHA-256 string reuse, bounded by
+  runtime keys and guarded implementation facts. Campfire **634 identical**,
+  **1,242 memo reuses** with its debugger disabled in both modes; default-debug
+  verification also identical but correctly falls back. Four production HTML
+  routes have byte-identical CSP headers in both cache modes. Rails' regexp
+  timeout prevents URI memoization by default; file-backed version procs and
+  whole importmap resolvers remain refused. real-blog **21 identical**, no memo
+  candidate. Five interleaved pairs: cached medians −2.7…−6.1%, but cache-disabled
+  medians **+3.9…+15.4% slower**, allocations +36…45/request. Not a general net
+  win; keep it opt-in.
 - **Runtime gem**: `load_iseq` / ISeq eval seams (composes with Bootsnap and
   require-hooks/Freezolite in every installation order), per-file compiler
   contracts captured from the booted app, unchanged-source/original-ISeq
@@ -181,6 +192,6 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
   host normalization is request-local, but Rails' `url_options` assembly and
   application overrides remain per call.
 - Broader benchmark coverage and confidence intervals (preload runs now interleave on/off).
-- Guarded memo for per-request work on boot-fixed inputs (ARGOS: Inertia
-  asset-version digest 12.8 % self per request).
+- Broader memo certificates for timeout-sensitive URI work and file-backed
+  asset versions (ARGOS's private digest remains unoptimized).
 - Active Record attribute/reflection dispatch (ARGOS, Campfire uncached).
