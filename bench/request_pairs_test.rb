@@ -135,20 +135,29 @@ class RequestPairsTest < Minitest::Test
       File.write(script, <<~RUBY)
         require "json"
         require #{File.expand_path("heap_windows", __dir__).dump}
+        require #{File.expand_path("jit_stability", __dir__).dump}
         require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
         ids = ENV["EMPTY_ONLY"] ? [11] : [11, 12]
         windows = HeapWindows.windows(Integer(ENV.fetch("BENCH_REQUESTS")), ids)
-        anchors = HeapWindows.run(windows) do |count, id|
+        # A settling callback must not charge its allocations to either window.
+        settle = -> { 1000.times { Object.new } } if ENV["EMPTY_ONLY"]
+        operation = ->(count, id) do
           checksum = 0
           count.times do
             checksum += 1
             Object.new if id == 12
           end
         end
+        if RubyVM::YJIT.enabled?
+          warmup = JitStability.warm { |count| ids.each { operation.call(count, _1) } }
+          observe = JitStability.method(:snapshot)
+        end
+        anchors = HeapWindows.run(windows, settle: settle, observe: observe, &operation)
         puts "LOWRAIL_BENCH " + JSON.generate(yjit: !!RubyVM::YJIT.enabled?, windows: windows,
-          heap_anchors: anchors, operations: ids.to_h { [_1, {}] })
+          heap_anchors: anchors, jit_warmup: warmup, operations: ids.to_h { [_1, {}] })
       RUBY
       [false, true].each do |empty|
+        ENV["BENCH_JIT"] = empty ? "1" : "0"
         out = File.join(dir, empty ? "empty" : "mixed")
         FileUtils.mkdir_p(out)
         environments = %w[off_a off_b on].to_h { [_1, { "RUBYOPT" => nil, "EMPTY_ONLY" => empty ? "1" : nil }] }
@@ -163,6 +172,7 @@ class RequestPairsTest < Minitest::Test
           assert_equal(empty ? ["11"] : %w[11 12], sample.fetch("operations").keys.sort)
         end
         summary = JSON.parse(File.read(File.join(out, "summary.json")))
+        assert summary.fetch("jit").fetch("pass"), summary.fetch("jit").inspect
         if empty
           assert_nil summary.fetch("layers").fetch("off_a").fetch("allocations").fetch("delta_pct")
           assert_nil summary.fetch("gc").fetch("off_a").fetch("gc_per_1k_allocations")

@@ -45,7 +45,10 @@ end
 # driver. GC is disabled only during this untimed preparation, never during
 # warmup or a measured request. Sparse anchors keep pages from moving to the
 # tomb heap during full GC. Their small, artificial live set is reported.
-anchors = HeapWindows.run(windows, observe: observe) do |count|
+# The GC pause can cross ActiveRecord's idle threshold. Settle only requests,
+# symmetrically before N=0/N=50 endpoints; operation workers own captured context.
+settle = -> { counted_requests(1, session, verb, path, headers) }
+anchors = HeapWindows.run(windows, observe: observe, settle: settle) do |count|
   counted_requests(count, session, verb, path, headers)
 end
 ar_installed = 0
@@ -56,5 +59,5 @@ if defined?(Lowrail::ARInstantiate)
   end
 end
 puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?, windows: windows,
-  heap_anchors: anchors, ar_installed: ar_installed, jit_warmup: jit_warmup,
+  heap_anchors: anchors, ar_installed: ar_installed, jit_warmup: jit_warmup, request_settle: true,
   compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"

@@ -12,7 +12,7 @@ module HeapWindows
     end
   end
 
-  def self.run(windows, prepare: nil, observe: nil)
+  def self.run(windows, prepare: nil, observe: nil, settle: nil)
     3.times { GC.start }
     raise "app disabled GC" if GC.disable
     lengths = [0, 4, 9, 19, 39]
@@ -27,9 +27,19 @@ module HeapWindows
       fillers.clear
     end
     GC.enable
+    # Warm the exact observation signatures, not just the workload. Ruby's
+    # two-argument stat_heap wrapper can otherwise compile inside the gate.
+    if observe
+      200.times do
+        windows.first.fetch(:pools_before).each { |pool, stats| GC.stat_heap(pool, stats) }
+        GC.stat(windows.first.fetch(:before))
+        observe.call
+      end
+    end
     windows.each do |window|
       prepare&.call(window[:unit])
       3.times { GC.start }
+      settle&.call
       window[:jit_before] = observe.call if observe
       window[:pools_before].each { |pool, stats| GC.stat_heap(pool, stats) }
       GC.stat(window[:before])
