@@ -57,12 +57,13 @@ class CompilerTest < Minitest::Test
         "units" => [{ "id" => 0, "file" => good, "method" => "a", "facts" => [] },
                     { "id" => 1, "file" => bad, "method" => "b", "facts" => [] },
                     { "id" => 2, "file" => changed, "method" => "c", "facts" => [] },
-                    { "id" => 3, "kind" => "runtime", "file" => "Widget", "pass" => "active_record/instantiate", "facts" => [] }]
+                    { "id" => 3, "kind" => "runtime", "file" => "Widget", "pass" => "active_record/instantiate", "facts" => [] },
+                    { "id" => 4, "kind" => "method", "target" => "InertiaRails::Configuration#bind_controller", "facts" => [] }]
       }
       err = StringIO.new
       manifest = Lowrail::Compiler.compile(input, err: err)
       assert_equal [good], manifest["files"].keys
-      assert_equal [0, 3], manifest["units"].map { _1["id"] }
+      assert_equal [0, 3, 4], manifest["units"].map { _1["id"] }
       assert_match(/skipping #{Regexp.escape(bad)}: SyntaxError/, err.string)
       assert_match(/skipping #{Regexp.escape(changed)}: .*source changed/, err.string)
       assert_match(/dropping unit 1/, err.string)
