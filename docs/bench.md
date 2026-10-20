@@ -50,8 +50,10 @@ pool's live/free slots and allocated-page/object counters.
 A tiny Ruby extension (`bench/callgrind.c`, compiled into the private output
 directory) uses Callgrind's client requests to start instrumentation **after**
 warmup/GC, zero counters and dump **before** reporting. Read the four client
-dumps (`.callgrind.1` through `.4`), not the process-exit total. Each mode
-reports `(Ir50 − Ir0) / 50`, removing the measurement seam. Total mode
+dumps (`.callgrind.1` through `.4`), not the process-exit total. Use each
+dump's trailing `totals: Ir`: Valgrind 3.19 can wrap `summary:`
+after repeated zero/dump requests; `totals:` agrees with summed self costs.
+Each mode reports `(Ir50 − Ir0) / 50`, removing the measurement seam. Total mode
 includes ordinary request-loop GC; the second mode suspends collection only
 between Ruby's internal `GC_ENTER`/`GC_EXIT` events, for every incremental
 mark/lazy-sweep segment. `GC_START` through `GC_END_SWEEP` would incorrectly
@@ -59,6 +61,9 @@ exclude Ruby work between segments. Barrier/entry/exit fringe remains in
 the GC-excluded count. A Valgrind regression checks that incremental GC work
 is removed while intervening arithmetic remains counted, against a separate
 GC-disabled synthetic control. **GC stays enabled in all request windows.**
+Total and excluded modes use separate windows, not simultaneous counters.
+Ordinary request variation can put an excluded median slightly above total
+when neither window collects; their difference is not an exact GC-cost estimate.
 
 Both windows retain absolute `GC.stat` endpoints: minor/major counts,
 live/old objects, allocated objects and collector time. The summary includes
@@ -90,6 +95,10 @@ its total counts as the primary comparison.
 Use `BENCH_LOWRAIL_LIB=/absolute/old/gem/lib` for a complete old runtime snapshot
 without changing the app/build; before/after must use identical manifests.
 The optional AR build below works in both modes.
+All comparisons check every AR source certificate before boot; primary
+counter and native workers also require installed model entries afterward. A manifest that
+silently declines is not an active-pass measurement. Rebuild after changing
+its certified builder/runtime files; do not edit certificate hashes by hand.
 
 YJIT **does run** under this orb's Valgrind 3.19: a small correct-result probe
 compiled three ISeqs, and Rails compiled thousands. However, the initial
@@ -98,6 +107,113 @@ its 200 measured requests; Callgrind attributed substantial work to the JIT
 compiler. It is not a steady-state comparison. Interpreter counts are primary
 here; `BENCH_JIT=1 BENCH_WARMUP=400` is available for longer-warmup investigation.
 No interpreter result below is a native YJIT speed claim.
+
+### Controlled instruction results (2026-10-20)
+
+Production builds held identical across runtime snapshots. Before entry point:
+[22466cf](https://github.com/thomasklemm/lowrail/commit/22466cf0a56dbe1c5e32948745e8724618e0cd0f);
+after runtime:
+[ed4169e](https://github.com/thomasklemm/lowrail/commit/ed4169e972091cc7db33655619eeb2f7eaa38b1e).
+The baseline snapshot's statistics file already contains the opt-in counting
+module, but it is never loaded in these statistics-disabled workers. Other
+baseline runtime files match the before commit. AR helpers are frozen before
+the concurrent upstream shadow/epoch changes; these are not measurements of
+that later AR runtime. Full runtime digests, estimates and diagnostic endpoints
+are in [bench-results.json](bench-results.json).
+
+Corpus: real-blog `/articles` from Roundhouse
+[bb90df2](https://github.com/rubys/roundhouse/commit/bb90df2514f80817f98d89848dd0a6baa8df20a9),
+Campfire's authenticated M0 room at
+[af4dd9f](https://github.com/basecamp/once-campfire/commit/af4dd9fd599c65e0e0fc1f614ee469f70156ddf5).
+Uncached means `CAMPFIRE_RESPONSE_CACHE_MB=0`; cached uses its default 64 MB.
+Tables show millions of instructions/request and percent changes against
+the same-round **no-setup** process, median [nominal 95% bootstrap CI].
+Allocations come from the total window. The independent A/A row is not
+another setup layer. Small nonzero residuals comparable to A/A variation,
+especially on paths with no Lowrail calls, are not optimization wins.
+
+**Before:** blog and uncached Campfire pass both A/A gates. Cached Campfire
+fails: its total A/A interval is [−0.0563%, −0.0016%], GC-excluded
+[−0.0466%, −0.0072%]. These are tiny differences, but neither interval includes
+zero, so **all before-cached rows are descriptive, not accepted pass comparisons**.
+No control was retried or tolerance widened. All actual heap-capacity checks pass.
+
+| Before app/layer | Total M Ir/request | Total Δ% [95% CI] | GC-excluded M Ir/request | Excluded Δ% [95% CI] | Objects/request |
+|---|---:|---:|---:|---:|---:|
+| blog no setup | 9.116181 | reference | 9.116012 | reference | 2,358.64 |
+| blog A/A | 9.115508 | -0.0100 [-0.0412, +0.0324] | 9.115415 | -0.0208 [-0.0388, +0.0244] | 2,358.90 |
+| blog no manifest | 9.113436 | -0.007 [-0.059, +0.016] | 9.113841 | -0.002 [-0.080, +0.022] | 2,358.71 |
+| blog zero units | 9.115876 | -0.014 [-0.049, +0.014] | 9.114429 | -0.022 [-0.056, +0.025] | 2,358.24 |
+| blog all disabled | 9.139336 | +0.245 [+0.225, +0.265] | 9.138198 | +0.246 [+0.208, +0.268] | 2,358.71 |
+| blog default | 8.592069 | -5.759 [-5.780, -5.721] | 8.592494 | -5.749 [-5.766, -5.710] | 2,235.29 |
+| blog + instantiate | 8.610147 | -5.556 [-5.575, -5.524] | 8.612189 | -5.533 [-5.573, -5.497] | 2,234.78 |
+| Campfire uncached no setup | 99.533238 | reference | 93.080259 | reference | 22,564.40 |
+| Campfire uncached A/A | 99.557027 | +0.0308 [-0.0011, +0.0521] | 93.103733 | +0.0305 [-0.0002, +0.0591] | 22,564.36 |
+| Campfire uncached no manifest | 99.519876 | -0.007 [-0.034, +0.005] | 93.076590 | -0.010 [-0.026, +0.015] | 22,563.99 |
+| Campfire uncached zero units | 99.506223 | -0.020 [-0.046, -0.008] | 93.046583 | -0.044 [-0.068, -0.012] | 22,565.05 |
+| Campfire uncached all disabled | 99.506437 | -0.033 [-0.074, +0.017] | 93.067517 | -0.013 [-0.039, +0.019] | 22,563.50 |
+| Campfire uncached default | 99.660419 | +0.135 [+0.085, +0.170] | 93.246972 | +0.174 [+0.142, +0.211] | 22,592.52 |
+| Campfire uncached + instantiate | 99.388782 | -0.113 [-0.171, -0.092] | 92.974509 | -0.113 [-0.151, -0.075] | 22,455.69 |
+| Campfire cached no setup | 17.044085 | reference | 17.044064 | reference | 6,159.35 |
+| Campfire cached A/A | 17.036842 | -0.0390 [-0.0563, -0.0016] | 17.040560 | -0.0173 [-0.0466, -0.0072] | 6,158.54 |
+| Campfire cached no manifest | 17.062484 | +0.100 [+0.046, +0.155] | 17.057214 | +0.088 [+0.043, +0.201] | 6,158.93 |
+| Campfire cached zero units | 17.039935 | -0.031 [-0.049, +0.011] | 17.039076 | -0.016 [-0.053, +0.014] | 6,158.51 |
+| Campfire cached all disabled | 17.038020 | -0.024 [-0.051, +0.012] | 17.044273 | -0.004 [-0.036, +0.023] | 6,158.77 |
+| Campfire cached default | 17.037746 | -0.028 [-0.053, -0.016] | 17.038956 | -0.033 [-0.050, -0.005] | 6,158.73 |
+| Campfire cached + instantiate | 17.058217 | +0.075 [+0.035, +0.092] | 17.060559 | +0.118 [+0.037, +0.211] | 6,158.52 |
+
+**After:** all three experiments pass both A/A gates and the heap checks.
+
+| After app/layer | Total M Ir/request | Total Δ% [95% CI] | GC-excluded M Ir/request | Excluded Δ% [95% CI] | Objects/request |
+|---|---:|---:|---:|---:|---:|
+| blog no setup | 9.114348 | reference | 9.114436 | reference | 2,358.51 |
+| blog A/A | 9.116245 | +0.010 [-0.020, +0.038] | 9.118641 | +0.010 [-0.017, +0.067] | 2,358.24 |
+| blog no manifest | 9.113769 | -0.027 [-0.044, +0.008] | 9.114013 | -0.010 [-0.032, +0.009] | 2,358.20 |
+| blog zero units | 9.117842 | +0.010 [-0.013, +0.055] | 9.116120 | +0.018 [+0.008, +0.033] | 2,358.35 |
+| blog all disabled | 9.111781 | -0.038 [-0.059, -0.014] | 9.112329 | -0.033 [-0.056, -0.007] | 2,357.76 |
+| blog default | 8.571585 | -5.959 [-5.983, -5.949] | 8.573076 | -5.950 [-5.966, -5.935] | 2,235.18 |
+| blog + instantiate | 8.594770 | -5.728 [-5.746, -5.681] | 8.594305 | -5.713 [-5.744, -5.702] | 2,235.36 |
+| Campfire uncached no setup | 99.526772 | reference | 93.083091 | reference | 22,564.51 |
+| Campfire uncached A/A | 99.533335 | -0.003 [-0.016, +0.017] | 93.071316 | -0.008 [-0.026, +0.002] | 22,564.16 |
+| Campfire uncached no manifest | 99.512512 | -0.018 [-0.031, -0.005] | 93.068327 | -0.013 [-0.030, +0.007] | 22,564.13 |
+| Campfire uncached zero units | 99.570279 | +0.038 [+0.009, +0.074] | 93.101260 | +0.033 [-0.002, +0.063] | 22,563.93 |
+| Campfire uncached all disabled | 99.488576 | -0.042 [-0.056, -0.015] | 93.054634 | -0.036 [-0.059, -0.017] | 22,563.92 |
+| Campfire uncached default | 99.634945 | +0.122 [+0.054, +0.151] | 93.221525 | +0.138 [+0.113, +0.187] | 22,593.03 |
+| Campfire uncached + instantiate | 99.402175 | -0.126 [-0.133, -0.102] | 92.943689 | -0.155 [-0.170, -0.119] | 22,458.04 |
+| Campfire cached no setup | 17.045931 | reference | 17.048568 | reference | 6,158.87 |
+| Campfire cached A/A | 17.039339 | -0.031 [-0.065, +0.012] | 17.044127 | -0.024 [-0.069, +0.012] | 6,158.66 |
+| Campfire cached no manifest | 17.055089 | +0.046 [-0.026, +0.109] | 17.050962 | +0.037 [-0.026, +0.109] | 6,158.79 |
+| Campfire cached zero units | 17.059574 | +0.050 [-0.008, +0.109] | 17.052948 | +0.050 [-0.019, +0.126] | 6,158.77 |
+| Campfire cached all disabled | 17.052515 | +0.042 [-0.030, +0.065] | 17.050499 | +0.041 [-0.025, +0.061] | 6,158.76 |
+| Campfire cached default | 17.037368 | -0.045 [-0.110, +0.022] | 17.037540 | -0.054 [-0.114, +0.022] | 6,159.13 |
+| Campfire cached + instantiate | 17.046951 | +0.029 [-0.046, +0.081] | 17.047151 | +0.013 [-0.047, +0.047] | 6,158.72 |
+
+Blog's all-disabled overhead shrinks from +0.245% to a tiny −0.038%
+residual, not a claim of negative setup cost. Default work falls from
+−5.759% to −5.959% relative to off. Campfire uncached's default adds a
+small, reproducible +0.122% total / +0.138% GC-excluded work; it does not
+complete route specializations on this endpoint (see profiles below).
+Cached default and instantiate results are **within noise**. No-manifest,
+zero-unit and disabled residuals across the accepted experiments stay below
+0.1% in magnitude; the small signed estimates are not meaningful speedups.
+
+The optional instantiate build is compared against off, not against default.
+On blog it uses slightly more instructions than default; on uncached Campfire
+it changes the sign to a small −0.126% total / −0.155% excluded difference.
+A fresh counted probe confirms six instantiate hits/request on blog and
+34 hits plus two STI fallbacks/request on uncached Campfire. Cached requests
+have no AR work. These source-pinned counts do not establish a native win.
+
+All fixed-heap blog and cached windows have zero minor and major collections
+(including every layer and both runtime versions). Every uncached window
+with 50 requests has exactly one minor and one major collection: each rate
+is 0.020 [0.020, 0.020]/request. In the after total windows, combined
+collections/1,000 allocations are 0.001773 [0.001773, 0.001773] off,
+0.001770 [0.001770, 0.001771] default, and
+0.001781 [0.001781, 0.001781] instantiate. All raw rates/intervals and
+minor/major/live/old/allocation endpoints are in the numeric export.
+The fixed experiment equalizes phase; these artificial capacities and
+50-request rates are not a production steady-state GC prediction.
 
 ## Secondary: native YJIT time and allocations
 
@@ -180,6 +296,47 @@ instructions/request are available. Callgrind supplies the software counts
 above; do not divide whole-process perf totals (including boot/warmup) by
 timed requests.
 
+### Observed native results
+
+Five fresh-boot cohorts × eight rotated rounds, 0.6 CPU-second blocks,
+400 warmup requests, YJIT on, CPU 2. Values are percent changes relative
+to the same-round no-setup worker, median [nominal 95% CI]. Off/off is the
+independent A/A control. **All three before controls fail; after, only
+uncached Campfire passes.** Failed controls are retained, not rerun away.
+
+| App/layer | Before CPU Δ% | After CPU Δ% | Before wall Δ% | After wall Δ% |
+|---|---:|---:|---:|---:|
+| blog A/A | −0.02 [−4.07, +5.40] | −0.39 [−2.09, +1.09] | −0.03 [−4.08, +5.73] | −0.39 [−2.11, +1.09] |
+| blog no manifest | +1.68 [−3.67, +6.06] | −0.78 [−1.17, +2.38] | +1.68 [−3.66, +6.04] | −0.63 [−1.17, +2.39] |
+| blog zero units | +1.46 [−2.41, +3.38] | +0.85 [−2.65, +3.58] | +1.49 [−2.42, +3.35] | +0.86 [−2.65, +3.60] |
+| blog all disabled | +16.94 [+3.68, +21.28] | −0.57 [−2.13, +0.68] | +16.94 [+3.85, +21.30] | −0.57 [−2.12, +0.67] |
+| blog default | +10.66 [−2.22, +16.80] | +4.64 [−2.95, +8.72] | +10.41 [−2.24, +16.81] | +4.63 [−2.95, +8.73] |
+| Campfire uncached A/A | +1.18 [−1.96, +3.07] | +0.59 [−1.64, +1.51] | +1.24 [−1.98, +3.02] | +0.56 [−1.67, +1.49] |
+| Campfire uncached no manifest | +14.39 [+6.88, +16.32] | +13.68 [+7.18, +15.20] | +14.37 [+6.92, +16.28] | +13.66 [+7.21, +15.20] |
+| Campfire uncached zero units | +0.23 [−5.57, +2.24] | +0.95 [−0.76, +15.66] | +0.09 [−5.56, +2.15] | +0.98 [−0.81, +15.59] |
+| Campfire uncached all disabled | −0.26 [−3.32, +3.24] | +10.23 [−1.69, +14.97] | −0.41 [−3.35, +3.21] | +10.08 [−1.70, +14.93] |
+| Campfire uncached default | −2.87 [−5.21, −1.01] | +0.64 [−7.30, +4.25] | −2.70 [−5.34, −1.14] | +0.64 [−7.30, +4.20] |
+| Campfire cached A/A | +0.36 [−4.75, +7.12] | +0.34 [−2.16, +0.78] | +0.37 [−4.78, +7.13] | +0.32 [−2.12, +0.53] |
+| Campfire cached no manifest | +15.00 [+10.11, +25.47] | +15.28 [+12.34, +20.14] | +15.00 [+10.11, +25.62] | +15.30 [+12.35, +20.17] |
+| Campfire cached zero units | −6.31 [−6.34, −1.49] | +7.17 [+0.54, +20.11] | −6.36 [−6.38, −1.49] | +7.10 [+0.49, +20.15] |
+| Campfire cached all disabled | −4.01 [−9.85, −3.39] | +15.33 [+12.90, +16.79] | −4.04 [−10.25, −3.38] | +15.30 [+12.87, +16.85] |
+| Campfire cached default | −6.92 [−11.12, −4.07] | −2.34 [−3.82, +3.62] | −6.96 [−11.13, −4.49] | −2.42 [−3.86, +3.62] |
+
+Baseline off CPU medians before → after are 2,048 → 1,920 µs on blog,
+18,642 → 15,849 µs on uncached Campfire and 3,342 → 2,822 µs cached.
+These between-experiment shifts are **not** runtime-fix gains. The one accepted
+default timing comparison, uncached Campfire after, is plainly **within noise**.
+Blog/cached timings remain inconclusive because their A/A gates fail.
+No native default-build speedup is established.
+
+Even the accepted uncached native experiment shows +13.68% CPU for setup
+with no manifest, despite zero request-time Lowrail calls. Native boot/JIT/GC
+sensitivity is unresolved; do not claim universal zero native setup cost
+from interpreter instruction counts. The after native AR build was found to
+have stale source certificates and silently declined. It is omitted here,
+not reported as active AR performance; the primary counter uses fresh builds
+and verifies their installation.
+
 ## GC and retained-memory diagnosis
 
 ```sh
@@ -224,6 +381,69 @@ data: keep them private, never commit or publish them.** Raw stat/snapshot
 results live in `samples.json`; these diagnostics are not latency samples and
 do not claim an A/A instruction-control verdict.
 
+### Observed production-heap diagnosis (2026-10-20)
+
+Three independent interpreter workers per layer, 50 warmup + 200 requests,
+**without** fixed-heap preparation. Medians below; ranges show all collection
+counts. Slots/old objects are thousands. End-window live slots include
+uncollected garbage and are **not** retained sizes.
+
+| App/layer | Live slots start → end, k | Old objects start → end, k | Allocations/request | Minor / major GCs in 200 requests |
+|---|---:|---:|---:|---:|
+| blog off | 297.4 → 381.1 | 284.6 → 297.4 | 2,358.5 | 3 / 0 |
+| blog default | 300.6 → 339.1 | 300.6 → 300.6 | 2,235.4 | 7–8 / 0–1 |
+| Campfire uncached off | 372.7 → 479.0 | 372.6 → 372.6 | 22,572.8 | 32–33 / 0 |
+| Campfire uncached default | 382.7 → 581.2 | 382.6 → 382.6 | 22,596.1 | 17–18 / 0 |
+| Campfire cached off | 372.8 → 497.9 | 372.7 → 372.7 | 6,158.8 | 6–8 / 0–1 |
+| Campfire cached default | 382.8 → 597.2 | 380.0 → 382.7 | 6,158.3 | 4 / 0 |
+
+Blog allocates **5.2% fewer objects** but collects more often. Campfire's
+direction reverses despite almost unchanged allocation counts. Blog's
+one-full-GC start leaves about 13k surviving baseline objects not yet old;
+the fixed protocol's three full GCs remove that age difference. A separate
+pool probe found the default blog heap starting with about 62–65k free
+40-byte slots versus 84–94k off; major collection reasons included `nofree`.
+Thus short-window collection counts are strongly boot/heap-phase dependent.
+They do not establish a guard tax, and old-object age is not retention.
+
+Independent ObjectSpace workers, median decimal MB, off → default:
+
+| App | `memsize_of_all` after boot | After warmup | Warm Ruby ISeq wrappers | Warm native VM ISeqs |
+|---|---:|---:|---:|---:|
+| blog | 17.730 → 17.937 | 18.022 → 18.215 | 264 → 277 | 40,602 → 40,746 |
+| Campfire uncached | 21.106 → 22.290 | 22.200 → 23.397 | 9 → 21 | 49,038 → 49,182 |
+| Campfire cached | 21.106 → 22.289 | 22.335 → 23.531 | 9 → 21 | 49,038 → 49,182 |
+
+Boot Ruby ISeq-wrapper counts are 262 → 262 on blog and 5 → 7 on Campfire;
+boot native ISeqs are 40,086 → 40,230 and 48,080 → 48,224 respectively.
+Separate YJIT-enabled diagnostics give nearly identical retained sizes:
+post-warmup `memsize_of_all` is 18.032 → 18.227 MB on blog,
+22.599 → 23.794 MB on uncached Campfire, and 22.358 → 23.555 MB cached.
+Those native runs are still short-window GC diagnostics, not latency controls.
+
+Warm retained live-object differences are about **3.2k blog / 10.1k Campfire**,
+not a second app heap. Both add exactly 144 native ISeqs, rather than
+another application-sized set of 40k/49k ISeqs. Largest `count_objects_size` categories
+after warmup, off → default, decimal MB:
+
+| Category | blog | Campfire uncached |
+|---|---:|---:|
+| IMEMO (ISeqs and VM metadata) | 43.519 → 43.788 | 54.097 → 54.478 |
+| typed DATA (includes duplicate ISeq-wrapper bodies) | 9.896 → 9.998 | 12.141 → 12.239 |
+| Strings | 6.402 → 6.516 | 7.424 → 8.325 |
+| Arrays | 5.039 → 5.057 | 5.943 → 5.978 |
+| Classes | 3.139 → 3.141 | 3.753 → 3.756 |
+| Hashes | 1.833 → 1.870 | 2.064 → 2.291 |
+
+Lowrail's deduplicated manifest container graphs occupy 0.133 / 1.110 MB;
+facts account for 0.107 / 0.925 MB of those, chiefly strings and hashes.
+Guard's override Hash plus WeakMap shallow storage is 368 bytes in either app;
+Compilation's weak-key storage is 192 / 928 bytes and receiver caches
+1,216 / 3,224 bytes. Container sections share references: do not add them,
+or add the duplicate ISeq-wrapper category, to claim retained bytes.
+This is modest genuine retention, not evidence that it explains the much
+larger collection-count differences. No retention/runtime GC fix was made.
+
 ## Profiles and safe reductions
 
 The production manifests are held fixed across runtime changes (11 default
@@ -247,7 +467,7 @@ These fixes change runtime delivery/counting, not lowering decisions:
 with Ruby's `-I`; it reports actual YJIT state. For the instruction micro,
 set `GUARD_REQUESTS=100000` and `BENCH_CALLGRIND_EXTENSION` to the shared library
 produced by the request counter, then run under the same Callgrind flags.
-Divide the client-dump `summary: Ir` by the reported 1,500,000 checks. The tiny
+Divide the client-dump `totals: Ir` by the reported 1,500,000 checks. The tiny
 fixed clock/loop seam is included in both versions; emulated CPU time is not
 a native time result.
 
@@ -285,7 +505,9 @@ cost. The fixed-heap protocol above replaces that confounded short-window
 comparison and reports both total and GC-excluded work, with collection
 rates. No runtime retention/GC tuning change follows from this diagnosis.
 
-Correctness after both changes: `lowrail verify`, `PARALLEL_WORKERS=1`,
+Correctness after both changes, repeated after integrating main's
+[AR shadow/epoch changes](https://github.com/thomasklemm/lowrail/commit/d9fd466afac5de38c30ecb5d4b56f475ed4dd840)
+with fresh builds: `lowrail verify`, `PARALLEL_WORKERS=1`,
 `LOWRAIL_SQL_TRACE=full`, test seed 41231:
 
 | App/build | Identical outcomes | Identical SQL events | Guard/pass hits | Fallbacks |
@@ -296,7 +518,8 @@ Correctness after both changes: `lowrail verify`, `PARALLEL_WORKERS=1`,
 | Campfire + instantiate | 634 (2 skips) | 15,108 | 9,851 / 65 units | 3,129 / 17 units |
 
 AR fallbacks preserve the pre-existing STI/schema-switch boundaries. The gem
-suite passes (79 tests, 1,269 assertions, four optional-dependency/corpus skips),
-as do Rust tests and the benchmark's control tests. No hooks or facts were
-weakened. Hardware PMU counters and a validated native latency improvement
-remain unavailable.
+suite passes (84 tests, 1,302 assertions, four optional-dependency/corpus skips),
+as do Rust tests (30 unit, one types/MCP integration and two verification
+tests) and the benchmark's control tests (8 tests, 43 assertions, including
+the Valgrind regression). No hooks or facts were weakened. Hardware PMU
+counters and a validated native latency improvement remain unavailable.

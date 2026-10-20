@@ -65,8 +65,11 @@ same 11 units and verifies 21/21 identical with 114 hits.
   Campfire's 3,129 fallbacks are 958 STI rows + 2,171 calls after a captured
   schema-test connection switch. Alpha 20/200-row load-only −38.9%/−37.0%,
   four fewer allocations/row; Rails 8.1 usually regresses. Five interleaved
-  request pairs/app show **no request win**: blog +25.5% repeatably slower,
-  other apps inconclusive within overlapping noise. Keep it opt-in.
+  request pairs/app established **no request win**. Their blog +25.5% median
+  did not control boot/heap phase; it is not an identified hot-path tax.
+  See the [controlled instruction and GC diagnosis](bench.md) for the later
+  default/instantiate comparison; no native YJIT request win is established.
+  Keep it opt-in.
 - **Guarded memo** ([certificate/refusal details](passes/memo.md)), opt-in
   with `lowrail build --memo`: fresh-return SHA-256 string reuse, bounded by
   runtime keys and guarded implementation facts. Campfire **634 identical**,
@@ -99,6 +102,29 @@ same 11 units and verifies 21/21 identical with 114 hits.
   stats, Minitest outcome reporter across forked workers and RSpec per-example
   outcomes via RUBYOPT (explicit `verify APP -- bundle exec rspec ...`). Setup
   loads no default gems, so apps pinning `json` still boot.
+- **Layered request costs** ([method and results](bench.md)):
+  `bench/request_pairs.rb` separates no setup, no manifest, zero units,
+  all-disabled, default and optional instantiate builds. Primary Callgrind
+  counts control all five heap-pool capacities, retain GC endpoints and
+  report total/GC-excluded instructions with bootstrap CIs and independent
+  off/off gates. Native YJIT CPU/wall and allocations remain secondary;
+  failed controls are retained. Empty selections/manifests no longer install
+  delivery/invalidation hooks. Disabled statistics leave the receiver guard
+  hot path (1,295 → 663 instructions/check in a YJIT micro); class-identity
+  caches and invalidation semantics are unchanged. Production-heap diagnosis
+  finds allocation/GC-count changes driven by boot phase, with modest
+  retained manifest/fact data, not a second application ISeq set. No runtime
+  retention/GC tuning change was made. After-change interpreter total
+  instructions, default vs no setup (95% bootstrap CIs): blog
+  **−5.959% [−5.983, −5.949]**; Campfire uncached
+  **+0.122% [+0.054, +0.151]**; cached
+  **−0.045% [−0.110, +0.022], within noise**. All three after A/A gates pass;
+  the before-cached gate fails and is not accepted. The all-disabled blog
+  tax falls from +0.245% to below 0.1%. Optional instantiate uses −5.728%
+  on blog / −0.126% uncached Campfire vs off, on the frozen pre-shadow AR
+  runtime. No native YJIT speedup is established. Fresh builds after merging
+  concurrent AR changes still verify identical outcomes/full SQL:
+  blog 21/125 events, Campfire 634/15,108, default and instantiate, serial.
 - **`lowrail verify [--bisect]`**: suite with `LOWRAIL=0` and `1`, per-test
   outcomes and fast-path hits. `--bisect` reruns with unit subsets
   (`LOWRAIL_UNITS`) and writes `.lowrail/denylist.json`, which `build`
@@ -288,7 +314,8 @@ per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 - Generic route generation and guarded block-result mappings remain unsupported;
   host normalization is request-local, but Rails' `url_options` assembly and
   application overrides remain per call.
-- Broader benchmark coverage and confidence intervals (preload runs now interleave on/off).
+- Extend controlled instruction measurements to the other corpus apps and
+  resolve native YJIT boot/GC sensitivity before claiming request speedups.
 - Broader memo certificates for timeout-sensitive URI work; exact file-digest
   memo now works, but its byte-indexing/read cost remains measurable.
 - Active Record attribute/reflection dispatch (ARGOS, Campfire uncached).
