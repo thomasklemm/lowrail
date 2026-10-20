@@ -193,5 +193,12 @@ The [unsubmitted upstream draft](../upstream-drafts/inertia_rails.md) proposes
 accepting the constructor's already-owned canonical keyword-rest Hash rather
 than re-extracting it. Keeping `.new`/`initialize` dispatch makes that smaller
 than a guarded allocate shortcut and could remove this cost for all users.
-The draft's constructor probe is not an upstream performance result. No issue
-or pull request was opened.
+The draft's constructor probe is not an upstream performance result.
+
+A separate upstream PR now covers the same cost:
+[inertiajs/inertia-rails#437](https://github.com/inertiajs/inertia-rails/pull/437)
+(cheaper configuration binding plus plain-data scans; open, not merged,
+upstream CI not yet run). Its own synthetic production/YJIT pairs (no DB, 10
+interleaved pairs, 10/10 faster each) save 38.6–143.3 µs/request CPU; that is
+the PR's measurement, not a Lowrail result. If it merges, this pass's gain
+disappears on the new version and the pass should refuse it as a stale fact.
