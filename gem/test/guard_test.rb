@@ -81,6 +81,24 @@ class GuardTest < Minitest::Test
     assert_operator results.size, :>=, 25
   end
 
+  def test_late_yjit_enable_can_replace_a_tracked_array_iterator
+    out = ruby_json(<<~'RUBY')
+      require "json"
+      require "lowrail"
+      require "lowrail/manifest"
+      require "lowrail/guard"
+      fact = { "receiver" => "Array", "method" => "each", "owner" => "Array", "source_location" => nil, "visibility" => "public" }
+      manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+        "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
+      Lowrail::Guard.install(manifest)
+      RubyVM::YJIT.enable
+      sum = 0
+      [1, 2, 3].each { sum += _1 }
+      puts JSON.generate({ sum: sum, enabled: RubyVM::YJIT.enabled? })
+    RUBY
+    assert_equal({ "sum" => 6, "enabled" => true }, out)
+  end
+
   FACTS_SCRIPT = <<~'RUBY'
     require "json"
     require "lowrail"

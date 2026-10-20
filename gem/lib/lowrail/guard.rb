@@ -33,6 +33,7 @@ module Lowrail
   module Guard
     MOD_NAME = Module.instance_method(:name)
     SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
+    ARRAY_EACH = Array.instance_method(:each)
 
     class << self
       attr_reader :manifest, :state
@@ -61,7 +62,9 @@ module Lowrail
       # Hot at boot: called for every method definition in the process.
       def reset_method(name)
         ids = @names[name] or return
-        ids.each { |id| @state[id] = nil; V[id] = nil }
+        # Late YJIT.enable temporarily undefines Array#each while replacing it.
+        # Invalidation must not dispatch through the method being invalidated.
+        ARRAY_EACH.bind_call(ids) { |id| @state[id] = nil; V[id] = nil }
       end
 
       # A module was included/prepended/extended: every tracked name it (or
