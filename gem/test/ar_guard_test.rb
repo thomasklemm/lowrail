@@ -8,6 +8,20 @@ require_relative "test_helper"
 class ARGuardTest < Minitest::Test
   include LowrailTest
 
+  def test_install_between_active_record_require_and_first_base_use_stays_lazy
+    result = ruby_json(<<~'RUBY', setup: false, env: { "RUBYLIB" => GEM_LIB })
+      require "active_record"
+      require "lowrail/ar_guard"
+      require "json"
+      path = ActiveRecord.autoload?(:Base)
+      Lowrail::AR.install
+      lazy = path && ActiveRecord.autoload?(:Base) == path
+      ActiveRecord::Base
+      puts JSON.generate([lazy, Lowrail::AR.installed?])
+    RUBY
+    assert_equal [true, true], result
+  end
+
   SCENARIO = <<~'RUBY'
     require "lowrail/ar_guard"
     Lowrail::AR.install # before Active Record is loaded, as under RUBYOPT
