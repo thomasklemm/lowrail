@@ -41,6 +41,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let mut ledger = vec![];
     let mut tests = serde_json::Map::new();
     let mut patterns = std::collections::BTreeMap::<String, usize>::new();
+    let mut classifications = std::collections::BTreeMap::<String, usize>::new();
     for entry in std::fs::read_dir(&dir).map_err(|e| e.to_string())?.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
         if !name.starts_with("seal-") || !name.ends_with(".json") { continue; }
@@ -48,6 +49,9 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         if let Some(rows) = data["ledger"].as_array() {
             for row in rows {
                 *patterns.entry(row["pattern"].as_str().unwrap_or("unknown").into()).or_default() += 1;
+                let key = format!("{}/{}", row["confidence"].as_str().unwrap_or("unknown"),
+                    row["classification"]["kind"].as_str().unwrap_or("needs_review"));
+                *classifications.entry(key).or_default() += 1;
                 ledger.push(row.clone());
             }
         }
@@ -57,11 +61,12 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let sealed = processes.iter().any(|p| p["sealed"] == true);
     let complete = sealed && !tests.is_empty() && processes.iter().all(|p| p["errors"].as_array().is_some_and(|e| e.is_empty()));
     let report = json!({"format":1,"command":cmd,"exit_ok":status.success(),"complete":complete,
-        "patterns":patterns,"tests":tests,"ledger":ledger,"processes":processes});
+        "patterns":patterns,"classifications":classifications,"tests":tests,"ledger":ledger,"processes":processes});
     let path = app.join(".lowrail/seal.json");
     std::fs::write(&path, serde_json::to_vec_pretty(&report).unwrap()).map_err(|e| e.to_string())?;
     println!("seal ledger: {}\n{} observations; {} tests; complete: {}", path.display(), ledger.len(), tests.len(), complete);
     for (pattern, count) in patterns { println!("  {count:>6} {pattern}"); }
+    for (classification, count) in classifications { println!("  {count:>6} {classification}"); }
     println!("Advisory only: mutations deopt, not test failures; no detection-completeness or speed claim.");
     if !status.success() { return Err("app test command failed (ledger retained)".into()); }
     if !complete { return Err("seal census incomplete: no sealed tests or materialization errors (see ledger)".into()); }

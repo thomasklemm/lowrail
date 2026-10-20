@@ -4,6 +4,7 @@
 # operations rather than wrapping Module#private/class_eval (which would change
 # lexical semantics). This is evidence about exercised code, NOT enforcement.
 require_relative "seal_rules"
+require_relative "seal_snapshot"
 
 module Lowrail
   module Seal
@@ -41,6 +42,9 @@ module Lowrail
         @targets = {}.compare_by_identity
         @containers = {}.compare_by_identity
         @tables = {}.compare_by_identity
+        @structural = {}.compare_by_identity
+        @candidates = Hash.new { |h, k| h[k] = [] }
+        @comparisons = []
         @route_objects = {}.compare_by_identity
         @active_tests = {}
         at_exit { write }
@@ -90,6 +94,7 @@ module Lowrail
         end
         attach_tests
         @boot&.disable
+        @targets.each_key { |holder| @structural[holder] = SealSnapshot.capture(holder) }
         @sealed = true
         @trace = TracePoint.new(:call, :c_call, :return, :c_return) { observe(_1) }
         @trace.enable
@@ -112,7 +117,7 @@ module Lowrail
           ANCESTORS.bind_call(holder).each do |ancestor|
             @targets[ancestor] ||= NAME.bind_call(ancestor) || "#{name}::<anonymous ancestor>"
           end
-          @targets[holder] ||= name
+          @targets[holder] = holder.equal?(mod) ? name : "#{name}.singleton_class"
         end
       end
 
@@ -145,6 +150,17 @@ module Lowrail
           target = @targets[CLASS.bind_call(receiver)]
         end
         if MUTATIONS.include?(method) && target
+          if %i[define_singleton_method singleton_method_added singleton_method_removed singleton_method_undefined extend public_class_method private_class_method].include?(method)
+            holder = SINGLETON.bind_call(receiver)
+            @targets[holder] ||= "#{target}::<observed instance singleton>"
+            # Before an explicit API, capture a newly encountered instance's
+            # holder. A callback first seen after mutation cannot establish its
+            # previous state; it remains only a hint.
+            if %i[define_singleton_method extend public_class_method private_class_method].include?(method)
+              @structural[holder] ||= SealSnapshot.capture(holder)
+            end
+            target = @targets.fetch(holder)
+          end
           record("method_or_constant_mutation", target, method, event)
         elsif SUBSCRIPTIONS.include?(method) && defined?(::ActiveSupport::Notifications) &&
             (receiver.equal?(::ActiveSupport::Notifications) || (defined?(::ActiveSupport::Notifications::Fanout) && ::ActiveSupport::Notifications::Fanout === receiver))
@@ -161,29 +177,70 @@ module Lowrail
       def record(pattern, target, operation, event)
         EPOCH[0] += 1
         locations = caller_locations(2, 40)
+        context = locations.reject { _1.path == __FILE__ }.first(24).map { {"file" => _1.path, "line" => _1.lineno, "label" => _1.base_label} }
         location = locations.find { |loc| loc.path.start_with?("#{@root}/test/", "#{@root}/spec/") } ||
           locations.find { |loc| loc.path != __FILE__ && !loc.path.start_with?("<internal:") }
         file, line = location ? [location.path, location.lineno] : [event.path, event.lineno]
         stub = locations.any? { |loc| loc.path.match?(%r{/(?:mocha(?:-[^/]+)?/|minitest/mock\.rb|rspec-mocks)}) }
         test = @active_tests[Thread.current]
         @tests[test] = "this test runs unoptimized" if test
-        finding = SealRules.finding(SealRules::PATTERNS.fetch(pattern), confidence: "proven",
+        # An API/callback is a candidate, not proof that its receiver changed.
+        # In particular append_features/extend_object run on the source module.
+        finding = SealRules.finding(SealRules::PATTERNS.fetch(pattern), confidence: "hint",
           file: event.path, line: event.lineno, root: @root, target: target,
           pattern: pattern, operation: operation.to_s, test: test, test_double: stub,
-          observed_at: "#{event.path}:#{event.lineno}", caller_file: file, caller_line: line)
+          observed_at: "#{event.path}:#{event.lineno}", caller_file: file, caller_line: line,
+          context: context, detail: "API/callback observed; state change is not yet confirmed.")
         finding["remedy"] = "Keep the test double; this test runs unoptimized (process-wide deopt persists after restoration)." if stub
         @ledger << finding
+        @candidates[target] << finding
       end
 
       def start_test(key)
         @active_tests[Thread.current] = key
-        check_tables if @sealed
+        checkpoint if @sealed
         @tests[key] = EPOCH[0].zero? ? "optimized eligible (not coverage)" : "this test runs unoptimized"
       end
 
       def finish_test
-        check_tables if @sealed
+        checkpoint if @sealed
         @active_tests.delete(Thread.current)
+      end
+
+      def checkpoint
+        started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        @trace&.disable
+        @structural.each do |holder, previous|
+          current = SealSnapshot.capture(holder)
+          changes = SealSnapshot.diff(previous, current)
+          unless changes.empty?
+            EPOCH[0] += 1
+            target = @targets.fetch(holder)
+            candidates = @candidates[target]
+            test = @active_tests[Thread.current]
+            @tests[test] = "this test runs unoptimized" if test
+            # Keep the candidate's location separate from the proof boundary.
+            source = candidates.last
+            location = caller_locations.find { _1.path != __FILE__ }
+            @ledger << SealRules.finding("SEAL001", confidence: "proven", root: @root,
+              file: source ? source.fetch("file") : (location&.path || "<seal-check snapshot>"),
+              line: source ? source.fetch("line") : (location&.lineno || 0),
+              target: target, test: test, pattern: "method_or_constant_mutation", operation: "state_difference",
+              changes: changes, candidates: candidates.map { _1.slice("file", "line", "operation", "origin", "context") },
+              location_kind: source ? "candidate; confirmed at checkpoint" : "checkpoint; mutation source unknown",
+              detail: "Certified destination state differs from the previous checkpoint.")
+          end
+          @structural[holder] = current
+        end
+        @candidates.clear
+        check_tables
+      rescue StandardError, ScriptError => error
+        EPOCH[0] += 1
+        @errors << {"where" => "seal checkpoint", "error" => "#{error.class}: #{error.message}"}
+      ensure
+        @comparisons << {"test" => @active_tests[Thread.current], "seconds" => Process.clock_gettime(Process::CLOCK_MONOTONIC) - started,
+          "holders" => @structural.size}
+        @trace&.enable if @sealed && !@writing
       end
 
       def table_snapshot(table)
@@ -229,16 +286,27 @@ module Lowrail
       end
 
       def write
+        @writing = true
         @trace&.disable
         @boot&.disable
-        check_tables if @sealed
+        checkpoint if @sealed
         require "json"
         require "fileutils"
         FileUtils.mkdir_p(@dir)
+        environment = defined?(::Rails.env) ? ::Rails.env.to_s : ENV["RAILS_ENV"]
+        @ledger.each do |row|
+          row["classification"] = SealRules.classify(row, root: @root, environment: environment)
+          case row.dig("classification", "kind")
+          when "test_only"
+            row["remedy"] = "Test-only machinery in RAILS_ENV=test: retain it and run this process unoptimized. Not a production-contract violation."
+          when "lazy_materialization"
+            row["remedy"] = "Finish this lazy generation/loading before the seal, or exclude the target. This census has not proved the later seal point."
+          end
+        end
         data = {"format" => 1, "pid" => Process.pid, "sealed" => !!@sealed,
           "epoch" => EPOCH[0], "targets" => @targets.values.uniq.sort,
-          "tests" => @tests, "ledger" => @ledger, "errors" => @errors,
-          "limits" => "Observed execution only; suppressed callbacks, captured core bindings, plain def/constant assignment and native writes may escape detection. Not production enforcement."}
+          "tests" => @tests, "ledger" => @ledger, "errors" => @errors, "comparisons" => @comparisons,
+          "limits" => "Destination snapshots prove surviving method/visibility/ancestor/constant deltas, including suppressed callbacks. Restored-between-checkpoint edits, inherited undef tombstones, unknown instance singletons and opaque/native writes may escape. API callbacks alone are hints. Not production enforcement."}
         File.write(File.join(@dir, "seal-#{Process.pid}.json"), JSON.pretty_generate(data))
       end
     end

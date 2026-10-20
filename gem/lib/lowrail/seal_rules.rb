@@ -35,6 +35,70 @@ module Lowrail
       {"kind" => "ruby_or_external"}
     end
 
+    # Relevance is separate from proof. In particular a test stack somewhere
+    # above an app definition cannot excuse that definition. Unknown provenance
+    # remains reviewable, never silently counted as compatible or incompatible.
+    def self.classify(row, root:, environment:)
+      test_file = ->(path) do
+        path && (path.start_with?("#{root}/test/", "#{root}/spec/") ||
+          path.match?(%r{/(?:minitest[^/]*/|rspec[^/]*/|capybara[^/]*/|webmock[^/]*/|mocha[^/]*/|rails-dom-testing[^/]*/)}) ||
+          path.match?(%r{/lib/(?:active_support|active_record|active_job|action_controller|action_dispatch|action_mailer|action_cable|turbo)/(?:testing/|test_|fixtures\.rb|executor/test_helper\.rb|broadcastable/test_helper\.rb)}) ||
+          path.match?(%r{/lib/(?:action_cable|action_view|rails)/(?:(?:channel|connection|generators)/)?(?:test_|testing/)}))
+      end
+      classify_source = ->(path) do
+        if environment == "test" && test_file.call(path)
+          "test_only"
+        elsif path && path.start_with?("#{root}/app/", "#{root}/lib/")
+          "production_relevant"
+        else
+          "needs_review"
+        end
+      end
+      changes = row["changes"]
+      parts = []
+      if changes
+        changes.fetch("methods", []).each do |method|
+          path = method.dig("after", "source_location", 0)
+          kind = classify_source.call(path)
+          # Only additions from named Rails generators are materialization.
+          # Replacement/removal/visibility changes are not excused by a stack.
+          if !method["before"] && kind == "needs_review" && path&.match?(%r{/lib/(?:active_record|active_model)/.*(?:attribute|association|delegation)})
+            kind = "lazy_materialization"
+          end
+          parts << {"part" => "method #{method['name']}", "kind" => kind, "source" => path}
+        end
+        changes.fetch("constant_sources", []).each do |constant|
+          path = constant.dig("after_source", 0)
+          kind = classify_source.call(path)
+          if kind == "needs_review" && constant["after_kind"] == "value" &&
+              [nil, "autoload"].include?(constant["before_kind"]) && path && origin(path, root)["kind"] == "gem"
+            kind = "lazy_materialization"
+          end
+          parts << {"part" => "constant #{constant['name']}", "kind" => kind, "source" => path}
+        end
+        if (ancestors = changes["ancestors"])
+          delta = (ancestors[0] - ancestors[1]) | (ancestors[1] - ancestors[0])
+          kind = if environment == "test" && !delta.empty? && delta.all? { _1.match?(/::(?:Testing|TestHelper)(?:::|\z)|\A(?:Mocha|Minitest|RSpec::Mocks|WebMock)::/) }
+            "test_only"
+          else
+            "needs_review"
+          end
+          parts << {"part" => "ancestors", "kind" => kind, "names" => delta}
+        end
+      else
+        paths = [row["file"], *row.fetch("context", []).map { _1["file"] }]
+        # Stop at the first app runtime frame or explicit test support frame;
+        # an unrelated test runner frame further up is not causal evidence.
+        path = paths.find { test_file.call(_1) || _1&.start_with?("#{root}/app/", "#{root}/lib/") }
+        parts << {"part" => "candidate", "kind" => classify_source.call(path), "source" => path}
+      end
+      parts.each { |part| part["origin"] = origin(part["source"], root) if part["source"] }
+      kinds = parts.map { _1.fetch("kind") }.uniq
+      kind = kinds.size == 1 ? kinds.first : "mixed_or_needs_review"
+      {"kind" => kind || "needs_review", "environment" => environment,
+        "basis" => "source/changed-state classification, not a production coverage certificate", "parts" => parts}
+    end
+
     def self.finding(rule, confidence:, file:, line:, root:, gems: Gem.loaded_specs.values, **detail)
       origin = origin(file, root, gems)
       advice = if origin["kind"] == "gem"

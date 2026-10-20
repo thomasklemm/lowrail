@@ -37,8 +37,21 @@ purity review, SEAL004 subscribers, SEAL005 runtime config/routes/resolvers,
 SEAL006 unresolved dispatch, SEAL007 locals, SEAL008 framework tables and
 SEAL009 delivery introspection. Static and dynamic results use these IDs;
 SEAL002/003/006/007/009 are review hints, not dynamically proved purity or
-reachability assertions. Proven observations mean an API/callback executed or
-a checkpoint changed, not necessarily a distinct successful mutation.
+reachability assertions. A callback/API is a **hint**, not proof that its
+receiver changed. A **proven** row requires a changed certified destination
+snapshot. Counts are checkpoint observations, not unique mutations.
+
+The structural snapshot records own public/protected/private methods (including
+UnboundMethod identity, owner, source and visibility), ancestors, singleton
+holders and own constant/autoload bindings. It compares before/after each test
+and at exit. It does not call autoloads. Suppressed callbacks and direct `def`
+or constant assignment are caught **if the changed state survives to a
+checkpoint on an inventoried holder**; restored-between-checkpoint edits,
+inherited `undef` tombstones and unknown instance singleton holders remain
+gaps. For include/extend, a source-module callback without a destination delta
+is only a hint, even if the source module was certified. Snapshot rows retain
+candidate file:line separately from the checkpoint. With no candidate, the
+mutation source is explicitly unknown, not attributed to the checkpoint code.
 
 * **SEAL008, framework heap tables:** no in-place changes to contents,
   defaults/default Procs or nested values of tables consumed by an expansion.
@@ -124,8 +137,16 @@ read-only MCP tool **`seal_ledger`** serves it without needing a facts build.
 MCP **`doctor`** serves the onboarding report including static hints, source
 app/gem attribution (gem name/version), dynamic evidence and disagreements.
 Gem findings suggest an upstream issue or excluding the target, never an app
-rewrite to patch a dependency. Static scope is app/config/lib plus exact gem
-files named by a previous dynamic census, not a whole-dependency proof.
+rewrite to patch a dependency. Relevance is a separate field: `test_only`
+(justified only in `RAILS_ENV=test`), `lazy_materialization` (move loading or
+generation before the seal), `production_relevant`, or unresolved/mixed.
+Each changed-state component retains its source. A test runner further up
+the stack never excuses an app method change. Headline contract counts include
+only proven production-relevant changes; unresolved provenance is reported
+separately, never counted as a compatible app. Lazy/test exclusions do not
+authorize an affected sealed fast path in that test process. Static scope is
+app/config/lib plus exact gem files named by a previous dynamic census, not
+a whole-dependency proof.
 The comparison reports unique rule/source-file pairs matched/unobserved and
 dynamic-only, plus their unmatched rate. This is **coverage disagreement**;
 an unexecuted hint is not refuted. Semantic disagreement rate is unavailable
@@ -136,7 +157,8 @@ On any observed violation a process-global monotonic epoch changes. Test
 doubles (Minitest stub, mocha and RSpec mocks) receive the same treatment:
 **“this test runs unoptimized”**, not a red test. Restoration does not restore
 authorization; later tests in that process stay deoptimized. A sealed request
-entry reads this epoch once before entering any generated code. No successful
+entry must read this epoch once before entering any generated code; no sealed
+delivery is installed by this tooling step. No successful
 test is thereby credited with fast-path coverage. Do not reuse a request's
 permission across an observed in-flight mutation: the detector is diagnostic,
 and that request is not certified even if it began before deoptimization.
@@ -145,7 +167,11 @@ Ruby cannot enforce the contract completely. `method_added` can be suppressed;
 captured `UnboundMethod#bind_call` can bypass wrappers; plain `def` without a
 class keyword and direct constant assignment need not have a detectable class
 reopening. TracePoint sees many ordinary callback cases, not every native or
-suppressed path. Config setters/opaque objects, aliased mutation APIs,
+suppressed path. Surviving destination changes additionally have snapshot
+coverage, not complete mutation detection. Notifications/config/route APIs
+currently remain hints without a state comparison; they deopt conservatively
+but do not establish that a subscription or write succeeded. Config
+setters/opaque objects, aliased mutation APIs,
 non-exercised branches, native writes and child processes without the observer
 can escape it. Purity, request independence and the absence of dynamic dispatch
 need source/certificate review in addition to execution. An undetected

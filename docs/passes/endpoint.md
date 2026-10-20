@@ -304,17 +304,26 @@ runtime config/route/resolver mutation in concept, but its current watcher
 does not cover arbitrary tables or ivars. The other relevant IDs are
 `SEAL002` request-dependent URL defaults, `SEAL003` custom `to_param` needing
 a purity certificate, `SEAL004` subscriber-set mutation, `SEAL006` unresolved
-dynamic dispatch, and `SEAL007` undeclared template locals. None is a general
-value/purity/receiver or observational-equivalence certificate.
+dynamic dispatch, and `SEAL007` undeclared template locals. The sealed
+follow-up adds `SEAL008` for framework heap tables (API observation plus
+per-test/end snapshots, not complete write detection), and `SEAL009` for
+accepted delivery-introspection exclusions. None is a general
+value/purity/receiver certificate.
 
 The proposed Ruby 4.0.7 VM patch uses an atomic saturated global generation,
 bumped at method-table/cache/entry changes, visibility, include/prepend,
 singleton creation and constant set/clear/autoload, read by a direct C
 `RubyVM.mutation_epoch`. It covers structural changes to a **previously
 certified actual holder**, not future-receiver provenance or heap writes.
-At this handoff its exact-method probe matrix and read/branch Ir are still
-pending; no numeric epoch-cost claim is available. Active lexical refinements
-need a separate certificate; universal refinement/Box coverage is not proven.
+The [final six-round study](vm-epoch.md) accepts read/compare/compare+branch
+costs of **195/249/267 interpreter Ir**, **36/49/52 YJIT Ir**, zero allocations.
+All ten actual-holder replacement/own-visibility probes, 48 structural and
+15 constant/autoload/Zeitwerk cases per mode, and both mid-call repros detect
+changes. The warning-reentry repair bumps before `Warning.warn` on removal.
+Only patched Ruby provides this API; 4.1-preview1/master do not. An ordinary
+getter can lie: trusted/intrinsic read **and comparison** remain necessary.
+Active lexical refinements need a separate certificate; no universal
+refinement/Box/Ractor or complete VM-reentry certificate is proven.
 
 In the table **M** means method identity/visibility on a certified holder:
 sealed contract `SEAL001`, or a boot baseline plus an unchanged structural VM
@@ -325,7 +334,10 @@ an accounting estimate, not ten independently measured or equal prices.
 **R** means actual-receiver/provenance certification still required. Under a
 satisfied seal there is no per-call **structural** guard; under the VM design
 one shared epoch check may replace several structural lookups in an uninterrupted
-section, but its measured cost is unknown, not zero.
+section. Two interpreter checkpoints estimate **534 Ir** against 94,466
+historical check Ir (about 177× cheaper), **not** a net endpoint saving or
+proof that two checkpoints suffice. Holder/input/config/table residuals and
+post-call local continuations remain mandatory.
 
 | Fact | (a) Sealed contract / current gap | (b) Structural VM epoch | (c) Residual and interpreter Ir estimate |
 |---|---|---|---|
@@ -341,14 +353,14 @@ section, but its measured cost is unknown, not zero.
 | Builder `tag_option` (private) | `SEAL001` on certified actual builder | M | M + R; ≈4,723/use average; escaping/array/hash/value dispatch remains live. |
 | View/builder holder, singleton class and ancestor chain | `SEAL001` forbids structural changes; **future receiver / ivar replacement GAP**, no rule certifies it | Structural change yes; replacement `@tag_builder`/future receiver no | R at every acquisition after live code. One cached-class K comparison costs ≈425 Ir as a **proxy only**; effective singleton-holder acquisition/complete provenance is unpriced. |
 | Core/helper primitives: Hash `stringify_keys`, `delete`, `[]`, `[]=`, `each_pair`; String/Regexp/safety/encoding and ERB escaping methods | `SEAL001` only on certified method/instance targets; no primitive semantic/purity certificate | Method mutation yes, assuming actual holder/lexical baseline; per-value state no | Keep live dispatch (0 **extra specialization-check** Ir, original work retained), or add M + R for each removed call; ≈4.7k/fact-use is only a reflection proxy, not a primitive measurement. |
-| Constant bindings, including tag tables and helper/model modules | `SEAL001`; direct constant/uncached-autoload detector gaps remain | Set/clear/autoload intended coverage, probe matrix pending | Boot identities still required. Simple direct constant-identity check ≈311 Ir/binding from speculation micro if retained; no claim it detects in-place mutation. |
+| Constant bindings, including tag tables and helper/model modules | `SEAL001`; direct constant/uncached-autoload detector gaps remain | Final 15-case set/clear/autoload/Zeitwerk matrix detects changes; no heap-write coverage | Boot identities still required. Simple direct constant-identity check ≈311 Ir/binding from speculation micro if retained; no claim it detects in-place mutation. |
 | Stock Rails 8.1.4 `TAG_TYPES` contents | Source constructs and **freezes** the Hash; certify that actual object/immutable keys and Symbol values at boot, plus `SEAL001` for binding/Hash methods | Binding/method changes only, sufficient for that frozen-content fact once proven | No repeated content snapshot for the certified stock frozen object. A replacement mutable Hash is a new heap-fact gap, not permission from a matching epoch. |
-| `PRE_CONTENT_STRINGS` contents and default Proc; replacement mutable tag/config tables | `SEAL005` concept; **current table watcher GAP** | **No**, in-place Hash/default/value writes do not bump structural epoch | Read live at original point and preserve default Proc invocation/once-only effects (0 extra check, original work retained), or exact independent contents/default/value certificate. Full cost unpriced; ≈2,081 Ir for a simple two-key config snapshot is only a prior micro proxy, not this table's certificate. |
+| `PRE_CONTENT_STRINGS` contents and default Proc; replacement mutable tag/config tables | `SEAL008` now watches the two named tag tables and snapshots String bytes/encoding/defaults per test/end; undone-between-checkpoints and other-table GAP remains | **No**, in-place Hash/default/value writes do not bump structural epoch | Read live at original point and preserve default Proc invocation/once-only effects (0 extra check, original work retained), or exact independent contents/default/value certificate. Full cost unpriced; ≈2,081 Ir for a simple two-key config snapshot is only a prior micro proxy, not this table's certificate. |
 | Input class/shape/key order/value, HTML safety, encoding and frozen state | **GAP**; no SEAL rule asserts these request facts | **No**, heap/value facts | Per-use value certificate or live operation. ≈425 Ir for one class K comparison is a lower-scope proxy only; complete check unpriced and cannot be replaced by `Class === value` alone. |
-| `to_param`, model predicates, blocks and arbitrary coercion callbacks | `SEAL003` is only a custom-`to_param` purity requirement/hint; `SEAL006` flags unresolved sends, neither proves general purity | Detects structural mutation caused by callback, not callback effects/heap writes | Keep live once; checkpoint after callback and continue with computed arguments. 0 extra guard for a call left live; epoch checkpoint cost pending, reflection M costs above if used instead. Never replay action/helper/conversion. |
+| `to_param`, model predicates, blocks and arbitrary coercion callbacks | `SEAL003` is only a custom-`to_param` purity requirement/hint; `SEAL006` flags unresolved sends, neither proves general purity | Detects structural mutation caused by callback, not callback effects/heap writes | Keep live once; checkpoint after callback and continue with computed arguments. 0 extra guard for a call left live; measured epoch compare+branch 267 interpreter Ir excludes local-continuation/residual cost. Never replay action/helper/conversion. |
 | Request-dependent config/default URLs, route/resolver state | `SEAL002`/`SEAL005`; legitimate request-dependent values are not fixed by sealing | Definition/binding changes only, not nested config state | Remain live in this link-only design; 0 extra specialization check, unchanged original cost. Any removal needs a separate value plan/snapshot, unpriced. |
 | Subscribers, template locals, lexical refinements | `SEAL004`/`SEAL007` address first two only; `SEAL001` refinement contract is not a proven detector | Not subscriber/locals/heap state; active refinements require lexical baseline | Keep events/real locals/call boundaries; refuse unsupported lexical scope rather than price an invented universal check. |
-| `<compiled>` frame, trace events, edited ISeq identity and reload-handle inequality | **Observational-equivalence GAP**, explicitly not promised by sealing | **No**, mutation generation cannot restore these observations | Refusal, not a per-request guard or an Ir saving. No zero-cost equivalence claim. |
+| `<compiled>` frame, trace events, edited ISeq identity and reload-handle inequality | `SEAL009`: explicit production exclusion or refusal; cold-only delivery before handles escape | **No**, mutation generation cannot restore these observations | Refusal without accepted exclusion, not a per-request guard or an Ir saving. Late reload remains refused. No zero-cost equivalence claim. |
 
 The 425/311/2,081-Ir proxies are the published interpreter micros in
 [speculation.md](speculation.md#fixed-heap-guard-micro-costs); they are deliberately

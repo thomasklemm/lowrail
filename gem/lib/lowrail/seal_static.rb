@@ -104,7 +104,18 @@ module Lowrail
       # Exact files named by dynamic evidence, not a broad scan of all gems.
       dynamic_path = File.join(root, ".lowrail/seal.json")
       dynamic = File.file?(dynamic_path) ? JSON.parse(File.read(dynamic_path)).fetch("ledger") : []
-      gem_files = dynamic.filter_map { |row| row["observed_at"]&.sub(/:\d+\z/, "") }
+      proof_sources = ->(row) do
+        changes = row["changes"]
+        if changes
+          [*changes.fetch("methods", []).filter_map { _1.dig("after", "source_location", 0) },
+            *changes.fetch("constant_sources", []).filter_map { _1.dig("after_source", 0) }].uniq
+        elsif row["location_kind"] == "checkpoint; mutation source unknown" || row["operation"] == "snapshot_difference"
+          []
+        else
+          [row["file"]].compact
+        end
+      end
+      gem_files = dynamic.flat_map { |row| [row["observed_at"]&.sub(/:\d+\z/, ""), *proof_sources.call(row)] }.compact
         .select { |file| File.file?(file) && file.end_with?(".rb") && SealRules.origin(file, root)["kind"] == "gem" }.uniq
       errors = []
       hints = (app_files + gem_files).uniq.sort.flat_map do |file|
@@ -116,11 +127,13 @@ module Lowrail
       # An unmatched hint is unobserved, not false. Dynamic runtime operations
       # and source hints have different coverage. Compare rule + source file.
       hinted = hints.map { [_1["rule"], _1["file"]] }.uniq
-      proven = dynamic.map { [_1["rule"], _1["observed_at"]&.sub(/:\d+\z/, "") || _1["file"]] }.uniq
+      proofs = dynamic.select { _1["confidence"] == "proven" }
+      proven = proofs.flat_map { |row| proof_sources.call(row).map { [row["rule"], _1] } }.uniq
       matched = hinted & proven
       {"format" => 1, "rules" => SealRules::RULES, "hints" => hints, "errors" => errors,
         "scope" => "app/config/lib plus gem files named by dynamic evidence (not all dependencies)",
-        "comparison" => {"basis" => "unique rule/source-file pairs; absence of dynamic evidence is not refutation",
+        "comparison" => {"basis" => "unique rule/changed-source-file pairs; candidate callbacks are not proof; absence of evidence is not refutation",
+          "proofs_without_source" => proofs.count { proof_sources.call(_1).empty? },
           "hint_pairs" => hinted.size, "proven_pairs" => proven.size, "matched_pairs" => matched.size,
           "unobserved_hint_pairs" => hinted - proven, "dynamic_only_pairs" => proven - hinted,
           "unmatched_rate" => (hinted | proven).empty? ? nil : 1.0 - matched.size.fdiv((hinted | proven).size),

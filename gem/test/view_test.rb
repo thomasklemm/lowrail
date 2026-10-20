@@ -171,9 +171,10 @@ class ViewTest < Minitest::Test
     assert status.success?, "#{out}\n#{err}"
     report = JSON.parse(File.read(Dir[File.join(output, "seal-*.json")].fetch(0)))
     assert report.fetch("sealed"), report.fetch("errors").inspect
-    assert report.fetch("ledger").any? { |row| row["rule"] == "SEAL001" && row["target"] == target &&
-      row["operation"] == operation && row["confidence"] == "proven" && row["line"].positive? &&
-      File.file?(row["file"]) }, "missing mutation location for #{target}"
+    assert report.fetch("ledger").any? { |row| row["rule"] == "SEAL001" && row["target"].start_with?(target) &&
+      row["confidence"] == "proven" && row["operation"] == "state_difference" &&
+      row.fetch("candidates").any? { _1["operation"] == operation && _1["line"].positive? && File.file?(_1["file"]) } },
+      "missing confirmed mutation and candidate location for #{target}"
     JSON.parse(out.lines.last)
   end
 end

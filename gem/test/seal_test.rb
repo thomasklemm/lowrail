@@ -40,6 +40,38 @@ class SealTest < Minitest::Test
     assert_match(/upstream issue.*exclude/, finding["remedy"])
   end
 
+  def test_classification_never_excuses_app_mutation_for_having_a_test_caller
+    changes = {"methods" => [{"name" => "value", "before" => {},
+      "after" => {"source_location" => ["/app/app/models/example.rb", 9]}}]}
+    row = {"file" => "/gems/minitest/lib/minitest/test.rb", "changes" => changes}
+    assert_equal "production_relevant", Lowrail::SealRules.classify(row, root: "/app", environment: "test")["kind"]
+    row["changes"] = {"ancestors" => [["Example"], ["Example", "ActiveJob::TestHelper::TestQueueAdapter"]]}
+    assert_equal "test_only", Lowrail::SealRules.classify(row, root: "/app", environment: "test")["kind"]
+    assert_equal "needs_review", Lowrail::SealRules.classify(row, root: "/app", environment: "production")["kind"]
+    row["changes"] = {"methods" => [{"name" => "value", "after" => {"source_location" => ["/app/test/support/stubs.rb", 2]}}]}
+    assert_equal "test_only", Lowrail::SealRules.classify(row, root: "/app", environment: "test")["kind"]
+    assert_equal "needs_review", Lowrail::SealRules.classify(row, root: "/app", environment: "production")["kind"]
+  end
+
+  def test_static_comparison_uses_confirmed_changed_source_not_callback_candidates
+    Dir.mktmpdir do |root|
+      FileUtils.mkdir_p(File.join(root, "app/models"))
+      FileUtils.mkdir_p(File.join(root, ".lowrail"))
+      file = File.join(root, "app/models/example.rb")
+      File.write(file, "def run; C.define_method(:value) { 7 }; end")
+      report = File.join(root, ".lowrail/seal.json")
+      row = {"rule" => "SEAL001", "confidence" => "hint", "file" => file}
+      File.write(report, JSON.generate("ledger" => [row]))
+      assert_equal 0, Lowrail::SealStatic.run(root).dig("comparison", "proven_pairs")
+      row.merge!("confidence" => "proven", "file" => "<checkpoint>", "changes" => {
+        "methods" => [{"after" => {"source_location" => [file, 1]}}]})
+      File.write(report, JSON.generate("ledger" => [row]))
+      comparison = Lowrail::SealStatic.run(root).fetch("comparison")
+      assert_equal 1, comparison["matched_pairs"]
+      assert_nil comparison["semantic_disagreement_rate"]
+    end
+  end
+
   def test_post_seal_mutations_deopt_without_changing_stub_or_lexical_visibility
     Dir.mktmpdir do |dir|
       out, err, status = ruby("-I#{GEM_LIB}", "-e", <<~'RUBY', setup: false, env: {"OUTPUT" => dir})
@@ -76,7 +108,8 @@ class SealTest < Minitest::Test
       assert_equal "this test runs unoptimized", report["tests"]["stub example"]
       assert_equal "this test runs unoptimized", report["tests"]["later example"]
       assert report["ledger"].any? { _1["test_double"] && _1["rule"] == "SEAL001" }
-      assert report["ledger"].all? { _1["confidence"] == "proven" && _1["line"].is_a?(Integer) }
+      assert report["ledger"].any? { _1["confidence"] == "hint" && _1["test_double"] }
+      assert report["ledger"].any? { _1["confidence"] == "proven" && _1["operation"] == "state_difference" }
     end
   end
 
@@ -106,6 +139,36 @@ class SealTest < Minitest::Test
         puts JSON.generate(Lowrail::Seal.ledger)
       RUBY
       assert data.any? { _1["rule"] == "SEAL008" && _1["operation"] == "snapshot_difference" }
+    end
+  end
+
+  def test_destination_snapshot_not_source_callback_proves_suppressed_edits
+    Dir.mktmpdir do |dir|
+      data = ruby_json(<<~'RUBY', setup: false, env: {"OUTPUT" => dir, "RUBYOPT" => "-I#{GEM_LIB}"})
+        require 'json'
+        require 'lowrail/seal'
+        module Certified
+          def self.method_added(*) = nil
+          def value = 7
+        end
+        class Other; end
+        Lowrail::Seal.install(dir: ENV.fetch('OUTPUT'), targets: ['Certified'])
+        Lowrail::Seal.activate
+        Lowrail::Seal.start_test('include elsewhere')
+        Other.include(Certified)
+        Lowrail::Seal.finish_test
+        raise 'source module falsely changed' if Lowrail::Seal.ledger.any? { _1['confidence'] == 'proven' }
+        Lowrail::Seal.start_test('suppressed definition and visibility')
+        Certified.module_eval('def value = 29', __FILE__, __LINE__)
+        Certified.send(:protected, :value)
+        Lowrail::Seal.finish_test
+        puts JSON.generate(Lowrail::Seal.ledger)
+      RUBY
+      proof = data.select { _1["confidence"] == "proven" && _1["target"] == "Certified" }
+      assert_equal 1, proof.size
+      change = proof.fetch(0).fetch("changes").fetch("methods").find { _1["name"] == "value" }
+      assert_equal "protected", change.fetch("after").fetch("visibility")
+      assert_equal "public", change.fetch("before").fetch("visibility")
     end
   end
 end
