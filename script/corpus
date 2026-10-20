@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # Fetch a pinned corpus app into .corpus/<name> (not checked in) and install
-# its bundle. Usage: script/corpus real-blog|campfire [DIRNAME]
+# its bundle. Usage: script/corpus APP [DIRNAME]
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 name=${1:?app name}
 dest="$root/.corpus/${2:-$name}"
 mkdir -p "$root/.corpus"
+if ! command -v ruby >/dev/null || [ "$(ruby -e 'print RUBY_VERSION')" != 4.0.7 ]; then
+  mise=$(command -v mise || true)
+  mise=${mise:-$HOME/.local/bin/mise}
+  "$mise" install ruby@4.0.7
+  export PATH="$("$mise" where ruby@4.0.7)/bin:$PATH"
+fi
 case "$name" in
   real-blog)
     # rubys/roundhouse fixtures/real-blog, Rails 8.1.4
@@ -16,13 +22,20 @@ case "$name" in
     # main on 2026-10-19; its lockfile pins Rails 8.2.0.alpha.
     rev=af4dd9fd599c65e0e0fc1f614ee469f70156ddf5
     repo=https://github.com/basecamp/once-campfire
-    sub=.
-    if ! command -v ruby >/dev/null || [ "$(ruby -e 'print RUBY_VERSION')" != 4.0.7 ]; then
-      mise=$(command -v mise || true)
-      mise=${mise:-$HOME/.local/bin/mise}
-      "$mise" install ruby@4.0.7
-      export PATH="$("$mise" where ruby@4.0.7)/bin:$PATH"
-    fi ;;
+    sub=. ;;
+  pingcrm)
+    # Public Inertia apps, main/HEAD on 2026-10-20. See docs/m0/inertia.md.
+    rev=22464f822dcf59c4425993dd623780ad44497fda
+    repo=https://github.com/ledermann/pingcrm
+    sub=. ;;
+  redprints-cfp)
+    rev=6080fc24fbf0015f7e5a5ae932e903731502c65a
+    repo=https://github.com/evilmartians/redprints-cfp
+    sub=. ;;
+  react-starter-kit)
+    rev=f8081935e9bda68f8ef1ec53dc7eed19c819ee68
+    repo=https://github.com/inertia-rails/react-starter-kit
+    sub=. ;;
   *) echo "unknown corpus app: $name" >&2; exit 2 ;;
 esac
 if [ ! -d "$dest" ]; then
@@ -41,15 +54,19 @@ if [ ! -d "$dest" ]; then
   rm -rf "$tmp"
   echo "$repo@$rev:$sub" > "$dest/.lowrail-corpus-source"
 fi
-if [ "$name" = campfire ]; then
+if [ "$name" != real-blog ]; then
   [ "$(git -C "$dest" rev-parse HEAD)" = "$rev" ] || {
-    echo "Campfire checkout is not the pinned revision; use a new DIRNAME" >&2
+    echo "$name checkout is not the pinned revision; use a new DIRNAME" >&2
     exit 1
   }
   (
     cd "$dest"
     BUNDLE_FROZEN=true bundle install --quiet
     RAILS_ENV=test bundle exec rails db:prepare
+    case "$name" in
+      pingcrm|redprints-cfp) bun install --frozen-lockfile ;;
+      react-starter-kit) npm ci --no-audit --no-fund ;;
+    esac
     RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec rails db:prepare assets:precompile
   )
 else
