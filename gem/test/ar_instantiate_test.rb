@@ -195,4 +195,39 @@ class ARInstantiateTest < Minitest::Test
       end
     end
   end
+
+  def test_early_setup_preserves_locale_dependent_model_definitions
+    skip "Rails is not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      model = LowrailTest::RAILS_APP.fetch("app/models/widget.rb").sub(
+        "enum :status", "BOOT_DATE = I18n.l(Date.new(1997, 2, 13))\n  enum :status")
+      LowrailTest.write_rails_app(dir, "app/models/widget.rb" => model,
+        "config/locales/en.yml" => "en:\n  date:\n    formats:\n      default: '%d.%m.%Y'\n")
+      FileUtils.mkdir_p(File.join(dir, ".lowrail"))
+      build = ruby_json(<<~'RUBY', chdir: dir, setup: false, env: { "RAILS_ENV" => "test", "RUBYLIB" => GEM_LIB })
+        require_relative "config/environment"
+        require "lowrail/ar_instantiate_build"
+        Widget
+        built = Lowrail::ARInstantiateBuild.build
+        built[:units].each_with_index { |unit, id| unit["id"] = id }
+        File.write(".lowrail/manifest.json", JSON.generate(format: 1,
+          ruby_description: RUBY_DESCRIPTION, compile_option: "", files: {}, units: built[:units]))
+        puts JSON.generate(built[:units].map { _1.fetch("ar_instantiate").fetch("model") })
+      RUBY
+      assert_includes build, "Widget"
+      code = <<~'RUBY'
+        require_relative "config/environment"
+        Widget.create!(name: "localized", password: "password")
+        puts JSON.generate(date: Widget::BOOT_DATE, name: Widget.first.name,
+          hits: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits.values.sum : 0)
+      RUBY
+      off, on = %w[0 1].map do |mode|
+        ruby_json(code, chdir: dir, env: { "RAILS_ENV" => "test", "LOWRAIL" => mode, "LOWRAIL_STATS" => "" })
+      end
+      assert_equal "13.02.1997", off.fetch("date")
+      assert_operator on.delete("hits"), :>, 0
+      off.delete("hits")
+      assert_equal off, on
+    end
+  end
 end

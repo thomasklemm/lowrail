@@ -42,7 +42,24 @@ module Lowrail
     # TracePoint waits for Rails::Application, then hands off to the same hook.
     def self.after_initialize(runtime)
       if defined?(::ActiveSupport) && ::ActiveSupport.respond_to?(:on_load)
-        ::ActiveSupport.on_load(:after_initialize) { runtime.activate }
+        ::ActiveSupport.on_load(:after_initialize, yield: true) do |app|
+          if !app.respond_to?(:initialized?) || app.initialized?
+            runtime.activate
+          else
+            # Our hook can precede Rails' own after_initialize callbacks,
+            # including I18n initialization. Activating model/controller plans
+            # here would autoload app code against unfinished framework config.
+            (@activations ||= []) << runtime
+            next if @activation&.enabled?
+            @activation = TracePoint.new(:return) do |event|
+              next unless event.method_id == :initialize! && event.self.equal?(app) && app.initialized?
+              @activation.disable
+              pending, @activations = @activations, []
+              pending.each(&:activate)
+            end
+            @activation.enable
+          end
+        end
       else
         (@pending ||= []) << runtime
         return if @boot&.enabled?
