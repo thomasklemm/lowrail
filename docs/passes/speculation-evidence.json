@@ -1,0 +1,3582 @@
+{
+  "scope": "Rails 8.1; Ruby 4.0.7; Campfire supplementary",
+  "seed": 41231,
+  "metric": "native instructions (Ir); not Ruby bytecodes or nanoseconds",
+  "micros": {
+    "old_cached_interpreter": {
+      "rounds": 6,
+      "samples_sha256": "97a96e23baa4908b164c0a009b19e64050b5adf756d7045f34334252754b8434",
+      "heap_ok": true,
+      "capacities": [
+        {
+          "0": 1000452,
+          "1": 250429,
+          "2": 100155,
+          "3": 20176,
+          "4": 10078
+        }
+      ],
+      "aa": {
+        "total": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        },
+        "no_gc": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        }
+      },
+      "net_over_loop_ir": {
+        "array": {
+          "total": {
+            "median": 121.99999999999997,
+            "ci95": [
+              121.99999999999994,
+              122.0
+            ]
+          },
+          "no_gc": {
+            "median": 121.99999999999997,
+            "ci95": [
+              121.99999999999994,
+              122.0
+            ]
+          }
+        },
+        "hash": {
+          "total": {
+            "median": 220.99999999999997,
+            "ci95": [
+              220.99999999999994,
+              221.0
+            ]
+          },
+          "no_gc": {
+            "median": 220.99999999999997,
+            "ci95": [
+              220.99999999999994,
+              221.0
+            ]
+          }
+        },
+        "dispatch": {
+          "total": {
+            "median": 314.0016999999999,
+            "ci95": [
+              314.00166999999993,
+              314.00172999999995
+            ]
+          },
+          "no_gc": {
+            "median": 314.0016999999999,
+            "ci95": [
+              314.00166999999993,
+              314.00172999999995
+            ]
+          }
+        },
+        "receiver": {
+          "total": {
+            "median": 336.00343,
+            "ci95": [
+              336.0034,
+              336.00346
+            ]
+          },
+          "no_gc": {
+            "median": 336.00343,
+            "ci95": [
+              336.0034,
+              336.00346
+            ]
+          }
+        },
+        "cached": {
+          "total": {
+            "median": 822.0054600000001,
+            "ci95": [
+              822.0054600000001,
+              822.0054600000001
+            ]
+          },
+          "no_gc": {
+            "median": 822.0054600000001,
+            "ci95": [
+              822.0054600000001,
+              822.0054600000001
+            ]
+          }
+        }
+      },
+      "samples_ir": [
+        {
+          "array": {
+            "total": 516.97885,
+            "no_gc": 517.0
+          },
+          "hash": {
+            "total": 615.97885,
+            "no_gc": 616.0
+          },
+          "loop": {
+            "total": 394.97885,
+            "no_gc": 395.0
+          },
+          "dispatch": {
+            "total": 708.98052,
+            "no_gc": 709.00173
+          },
+          "receiver": {
+            "total": 730.98225,
+            "no_gc": 731.00346
+          },
+          "loop_b": {
+            "total": 394.97885,
+            "no_gc": 395.0
+          },
+          "cached": {
+            "total": 1216.98431,
+            "no_gc": 1217.00546
+          }
+        },
+        {
+          "receiver": {
+            "total": 731.00346,
+            "no_gc": 730.98225
+          },
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97885
+          },
+          "hash": {
+            "total": 616.0,
+            "no_gc": 615.97885
+          },
+          "cached": {
+            "total": 1217.00546,
+            "no_gc": 1216.98431
+          },
+          "dispatch": {
+            "total": 709.00173,
+            "no_gc": 708.98052
+          },
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97885
+          },
+          "array": {
+            "total": 517.0,
+            "no_gc": 516.97885
+          }
+        },
+        {
+          "receiver": {
+            "total": 730.98225,
+            "no_gc": 731.00346
+          },
+          "dispatch": {
+            "total": 708.98052,
+            "no_gc": 709.00173
+          },
+          "cached": {
+            "total": 1216.98431,
+            "no_gc": 1217.00546
+          },
+          "loop_b": {
+            "total": 394.97885,
+            "no_gc": 395.0
+          },
+          "loop": {
+            "total": 394.97885,
+            "no_gc": 395.0
+          },
+          "hash": {
+            "total": 615.97885,
+            "no_gc": 616.0
+          },
+          "array": {
+            "total": 516.97885,
+            "no_gc": 517.0
+          }
+        },
+        {
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97885
+          },
+          "hash": {
+            "total": 616.0,
+            "no_gc": 615.97885
+          },
+          "dispatch": {
+            "total": 709.00173,
+            "no_gc": 708.98052
+          },
+          "receiver": {
+            "total": 731.00346,
+            "no_gc": 730.98225
+          },
+          "cached": {
+            "total": 1217.00546,
+            "no_gc": 1216.98431
+          },
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97885
+          },
+          "array": {
+            "total": 517.0,
+            "no_gc": 516.97885
+          }
+        },
+        {
+          "receiver": {
+            "total": 730.98225,
+            "no_gc": 731.00346
+          },
+          "cached": {
+            "total": 1216.98431,
+            "no_gc": 1217.00546
+          },
+          "loop": {
+            "total": 394.97885,
+            "no_gc": 395.0
+          },
+          "dispatch": {
+            "total": 708.98052,
+            "no_gc": 709.00173
+          },
+          "loop_b": {
+            "total": 394.97885,
+            "no_gc": 395.0
+          },
+          "hash": {
+            "total": 615.97885,
+            "no_gc": 616.0
+          },
+          "array": {
+            "total": 516.97885,
+            "no_gc": 517.0
+          }
+        },
+        {
+          "receiver": {
+            "total": 731.00346,
+            "no_gc": 730.98225
+          },
+          "hash": {
+            "total": 616.0,
+            "no_gc": 615.97885
+          },
+          "array": {
+            "total": 517.0,
+            "no_gc": 516.97885
+          },
+          "cached": {
+            "total": 1217.00546,
+            "no_gc": 1216.98431
+          },
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97885
+          },
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97885
+          },
+          "dispatch": {
+            "total": 709.00173,
+            "no_gc": 708.98052
+          }
+        }
+      ]
+    },
+    "old_cached_yjit": {
+      "rounds": 6,
+      "samples_sha256": "51b7b6a9c86f82dda055ff3aff667c521ab5bf1a2e0e684e1bd3600010b2ff2e",
+      "heap_ok": true,
+      "capacities": [
+        {
+          "0": 1000453,
+          "1": 250430,
+          "2": 100153,
+          "3": 20176,
+          "4": 10078
+        }
+      ],
+      "aa": {
+        "total": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        },
+        "no_gc": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        }
+      },
+      "net_over_loop_ir": {
+        "array": {
+          "total": {
+            "median": 86.0,
+            "ci95": [
+              86.0,
+              86.0
+            ]
+          },
+          "no_gc": {
+            "median": 86.0,
+            "ci95": [
+              86.0,
+              86.0
+            ]
+          }
+        },
+        "hash": {
+          "total": {
+            "median": 179.00000000000006,
+            "ci95": [
+              179.00000000000006,
+              179.00000000000006
+            ]
+          },
+          "no_gc": {
+            "median": 179.0,
+            "ci95": [
+              179.0,
+              179.0
+            ]
+          }
+        },
+        "dispatch": {
+          "total": {
+            "median": 109.99993999999998,
+            "ci95": [
+              109.99993999999998,
+              109.99993999999998
+            ]
+          },
+          "no_gc": {
+            "median": 110.0,
+            "ci95": [
+              110.0,
+              110.0
+            ]
+          }
+        },
+        "receiver": {
+          "total": {
+            "median": 101.99993999999998,
+            "ci95": [
+              101.99993999999998,
+              101.99993999999998
+            ]
+          },
+          "no_gc": {
+            "median": 102.0,
+            "ci95": [
+              102.0,
+              102.0
+            ]
+          }
+        },
+        "cached": {
+          "total": {
+            "median": 371.00000000000006,
+            "ci95": [
+              371.00000000000006,
+              371.00000000000006
+            ]
+          },
+          "no_gc": {
+            "median": 371.0,
+            "ci95": [
+              371.0,
+              371.0
+            ]
+          }
+        }
+      },
+      "samples_ir": [
+        {
+          "array": {
+            "total": 468.96936,
+            "no_gc": 469.0
+          },
+          "hash": {
+            "total": 561.96936,
+            "no_gc": 562.0
+          },
+          "loop": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "dispatch": {
+            "total": 492.9693,
+            "no_gc": 493.0
+          },
+          "receiver": {
+            "total": 484.9693,
+            "no_gc": 485.0
+          },
+          "loop_b": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "cached": {
+            "total": 753.96936,
+            "no_gc": 754.0
+          }
+        },
+        {
+          "receiver": {
+            "total": 484.9693,
+            "no_gc": 485.0
+          },
+          "loop": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "hash": {
+            "total": 561.96936,
+            "no_gc": 562.0
+          },
+          "cached": {
+            "total": 753.96936,
+            "no_gc": 754.0
+          },
+          "dispatch": {
+            "total": 492.9693,
+            "no_gc": 493.0
+          },
+          "loop_b": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "array": {
+            "total": 468.96936,
+            "no_gc": 469.0
+          }
+        },
+        {
+          "receiver": {
+            "total": 484.9693,
+            "no_gc": 485.0
+          },
+          "dispatch": {
+            "total": 492.9693,
+            "no_gc": 493.0
+          },
+          "cached": {
+            "total": 753.96936,
+            "no_gc": 754.0
+          },
+          "loop_b": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "loop": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "hash": {
+            "total": 561.96936,
+            "no_gc": 562.0
+          },
+          "array": {
+            "total": 468.96936,
+            "no_gc": 469.0
+          }
+        },
+        {
+          "loop": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "hash": {
+            "total": 561.96936,
+            "no_gc": 562.0
+          },
+          "dispatch": {
+            "total": 492.9693,
+            "no_gc": 493.0
+          },
+          "receiver": {
+            "total": 484.9693,
+            "no_gc": 485.0
+          },
+          "cached": {
+            "total": 753.96936,
+            "no_gc": 754.0
+          },
+          "loop_b": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "array": {
+            "total": 468.96936,
+            "no_gc": 469.0
+          }
+        },
+        {
+          "receiver": {
+            "total": 484.9693,
+            "no_gc": 485.0
+          },
+          "cached": {
+            "total": 753.96936,
+            "no_gc": 754.0
+          },
+          "loop": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "dispatch": {
+            "total": 492.9693,
+            "no_gc": 493.0
+          },
+          "loop_b": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "hash": {
+            "total": 561.96936,
+            "no_gc": 562.0
+          },
+          "array": {
+            "total": 468.96936,
+            "no_gc": 469.0
+          }
+        },
+        {
+          "receiver": {
+            "total": 484.9693,
+            "no_gc": 485.0
+          },
+          "hash": {
+            "total": 561.96936,
+            "no_gc": 562.0
+          },
+          "array": {
+            "total": 468.96936,
+            "no_gc": 469.0
+          },
+          "cached": {
+            "total": 753.96936,
+            "no_gc": 754.0
+          },
+          "loop_b": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "loop": {
+            "total": 382.96936,
+            "no_gc": 383.0
+          },
+          "dispatch": {
+            "total": 492.9693,
+            "no_gc": 493.0
+          }
+        }
+      ]
+    },
+    "residuals_interpreter": {
+      "rounds": 6,
+      "samples_sha256": "d338779827ed1e4bac225d7afa3d023eb80621d8053129a5b9f0ff5188cff09f",
+      "heap_ok": true,
+      "capacities": [
+        {
+          "0": 1000452,
+          "1": 250429,
+          "2": 100155,
+          "3": 20176,
+          "4": 10078
+        }
+      ],
+      "aa": {
+        "total": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        },
+        "no_gc": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        }
+      },
+      "net_over_loop_ir": {
+        "visibility": {
+          "total": {
+            "median": 369.00172999999995,
+            "ci95": [
+              369.00172999999995,
+              369.00172999999995
+            ]
+          },
+          "no_gc": {
+            "median": 369.00172999999995,
+            "ci95": [
+              369.00172999999995,
+              369.00172999999995
+            ]
+          }
+        },
+        "constant_identity": {
+          "total": {
+            "median": 311.00219000000004,
+            "ci95": [
+              311.00219000000004,
+              311.00219000000004
+            ]
+          },
+          "no_gc": {
+            "median": 311.00219000000004,
+            "ci95": [
+              311.00219000000004,
+              311.00219000000004
+            ]
+          }
+        },
+        "inline": {
+          "total": {
+            "median": 425.00392,
+            "ci95": [
+              425.00392,
+              425.00392
+            ]
+          },
+          "no_gc": {
+            "median": 425.00392,
+            "ci95": [
+              425.00392,
+              425.00392
+            ]
+          }
+        },
+        "method_identity": {
+          "total": {
+            "median": 1138.2774599999998,
+            "ci95": [
+              1138.2774599999998,
+              1138.2774599999998
+            ]
+          },
+          "no_gc": {
+            "median": 1138.27746,
+            "ci95": [
+              1138.27746,
+              1138.27746
+            ]
+          }
+        },
+        "exact_residuals": {
+          "total": {
+            "median": 4470.28732,
+            "ci95": [
+              4468.28732,
+              4472.28732
+            ]
+          },
+          "no_gc": {
+            "median": 4470.28732,
+            "ci95": [
+              4468.28732,
+              4472.28732
+            ]
+          }
+        },
+        "snapshot": {
+          "total": {
+            "median": 2081.00202,
+            "ci95": [
+              2081.00202,
+              2086.00202
+            ]
+          },
+          "no_gc": {
+            "median": 2081.00202,
+            "ci95": [
+              2081.00202,
+              2086.00202
+            ]
+          }
+        }
+      },
+      "samples_ir": [
+        {
+          "visibility": {
+            "total": 763.97719,
+            "no_gc": 764.00173
+          },
+          "constant_identity": {
+            "total": 705.97765,
+            "no_gc": 706.00219
+          },
+          "loop": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "inline": {
+            "total": 819.97938,
+            "no_gc": 820.00392
+          },
+          "method_identity": {
+            "total": 1533.25292,
+            "no_gc": 1533.27746
+          },
+          "exact_residuals": {
+            "total": 4867.26278,
+            "no_gc": 4867.28732
+          },
+          "loop_b": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "snapshot": {
+            "total": 2475.97748,
+            "no_gc": 2476.00202
+          }
+        },
+        {
+          "method_identity": {
+            "total": 1533.25292,
+            "no_gc": 1533.27746
+          },
+          "constant_identity": {
+            "total": 705.97765,
+            "no_gc": 706.00219
+          },
+          "loop": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "snapshot": {
+            "total": 2475.97748,
+            "no_gc": 2476.00202
+          },
+          "exact_residuals": {
+            "total": 4863.26278,
+            "no_gc": 4863.28732
+          },
+          "inline": {
+            "total": 819.97938,
+            "no_gc": 820.00392
+          },
+          "loop_b": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "visibility": {
+            "total": 763.97719,
+            "no_gc": 764.00173
+          }
+        },
+        {
+          "method_identity": {
+            "total": 1533.25292,
+            "no_gc": 1533.27746
+          },
+          "inline": {
+            "total": 819.97938,
+            "no_gc": 820.00392
+          },
+          "snapshot": {
+            "total": 2475.97748,
+            "no_gc": 2476.00202
+          },
+          "loop_b": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "loop": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "constant_identity": {
+            "total": 705.97765,
+            "no_gc": 706.00219
+          },
+          "exact_residuals": {
+            "total": 4863.26278,
+            "no_gc": 4863.28732
+          },
+          "visibility": {
+            "total": 763.97719,
+            "no_gc": 764.00173
+          }
+        },
+        {
+          "loop": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "constant_identity": {
+            "total": 705.97765,
+            "no_gc": 706.00219
+          },
+          "inline": {
+            "total": 819.97938,
+            "no_gc": 820.00392
+          },
+          "method_identity": {
+            "total": 1533.25292,
+            "no_gc": 1533.27746
+          },
+          "exact_residuals": {
+            "total": 4867.26278,
+            "no_gc": 4867.28732
+          },
+          "snapshot": {
+            "total": 2479.97748,
+            "no_gc": 2480.00202
+          },
+          "loop_b": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "visibility": {
+            "total": 763.97719,
+            "no_gc": 764.00173
+          }
+        },
+        {
+          "method_identity": {
+            "total": 1533.25292,
+            "no_gc": 1533.27746
+          },
+          "exact_residuals": {
+            "total": 4867.26278,
+            "no_gc": 4867.28732
+          },
+          "loop": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "inline": {
+            "total": 819.97938,
+            "no_gc": 820.00392
+          },
+          "loop_b": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "snapshot": {
+            "total": 2481.97748,
+            "no_gc": 2482.00202
+          },
+          "constant_identity": {
+            "total": 705.97765,
+            "no_gc": 706.00219
+          },
+          "visibility": {
+            "total": 763.97719,
+            "no_gc": 764.00173
+          }
+        },
+        {
+          "method_identity": {
+            "total": 1533.25292,
+            "no_gc": 1533.27746
+          },
+          "snapshot": {
+            "total": 2475.97748,
+            "no_gc": 2476.00202
+          },
+          "visibility": {
+            "total": 763.97719,
+            "no_gc": 764.00173
+          },
+          "constant_identity": {
+            "total": 705.97765,
+            "no_gc": 706.00219
+          },
+          "exact_residuals": {
+            "total": 4863.26278,
+            "no_gc": 4863.28732
+          },
+          "loop_b": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "loop": {
+            "total": 394.97546,
+            "no_gc": 395.0
+          },
+          "inline": {
+            "total": 819.97938,
+            "no_gc": 820.00392
+          }
+        }
+      ]
+    },
+    "inline_yjit": {
+      "rounds": 6,
+      "samples_sha256": "547693950a024d399855780e7d8ba94f02c36a7bf4edee931f25cdaa8789c935",
+      "heap_ok": true,
+      "capacities": [
+        {
+          "0": 1000452,
+          "1": 250431,
+          "2": 100153,
+          "3": 20176,
+          "4": 10078
+        },
+        {
+          "0": 1000453,
+          "1": 250430,
+          "2": 100154,
+          "3": 20176,
+          "4": 10077
+        },
+        {
+          "0": 1000453,
+          "1": 250430,
+          "2": 100153,
+          "3": 20176,
+          "4": 10078
+        }
+      ],
+      "aa": {
+        "total": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        },
+        "no_gc": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        }
+      },
+      "net_over_loop_ir": {
+        "object_method": {
+          "total": {
+            "median": 1285.69114,
+            "ci95": [
+              1285.69114,
+              1285.69114
+            ]
+          },
+          "no_gc": {
+            "median": 1285.69114,
+            "ci95": [
+              1285.69114,
+              1285.69114
+            ]
+          }
+        },
+        "exact_residuals": {
+          "total": {
+            "median": 3019.27396,
+            "ci95": [
+              3015.27396,
+              3019.27396
+            ]
+          },
+          "no_gc": {
+            "median": 3019.27396,
+            "ci95": [
+              3015.27396,
+              3019.27396
+            ]
+          }
+        },
+        "inline": {
+          "total": {
+            "median": 140.00000000000003,
+            "ci95": [
+              140.0,
+              140.00000000000006
+            ]
+          },
+          "no_gc": {
+            "median": 140.00000000000003,
+            "ci95": [
+              140.0,
+              140.00000000000006
+            ]
+          }
+        },
+        "inline_truthy": {
+          "total": {
+            "median": 230.00000000000003,
+            "ci95": [
+              230.0,
+              230.00000000000006
+            ]
+          },
+          "no_gc": {
+            "median": 230.00000000000003,
+            "ci95": [
+              230.0,
+              230.00000000000006
+            ]
+          }
+        }
+      },
+      "samples_ir": [
+        {
+          "object_method": {
+            "total": 1668.66321,
+            "no_gc": 1668.69114
+          },
+          "exact_residuals": {
+            "total": 3398.24603,
+            "no_gc": 3398.27396
+          },
+          "loop": {
+            "total": 382.97207,
+            "no_gc": 383.0
+          },
+          "inline": {
+            "total": 522.97207,
+            "no_gc": 523.0
+          },
+          "inline_truthy": {
+            "total": 612.97207,
+            "no_gc": 613.0
+          },
+          "loop_b": {
+            "total": 382.97207,
+            "no_gc": 383.0
+          }
+        },
+        {
+          "loop": {
+            "total": 383.0,
+            "no_gc": 382.97207
+          },
+          "exact_residuals": {
+            "total": 3402.27396,
+            "no_gc": 3402.24603
+          },
+          "inline": {
+            "total": 523.0,
+            "no_gc": 522.97207
+          },
+          "inline_truthy": {
+            "total": 613.0,
+            "no_gc": 612.97207
+          },
+          "loop_b": {
+            "total": 383.0,
+            "no_gc": 382.97207
+          },
+          "object_method": {
+            "total": 1668.69114,
+            "no_gc": 1668.66321
+          }
+        },
+        {
+          "inline_truthy": {
+            "total": 612.97207,
+            "no_gc": 613.0
+          },
+          "inline": {
+            "total": 522.97207,
+            "no_gc": 523.0
+          },
+          "loop_b": {
+            "total": 382.97207,
+            "no_gc": 383.0
+          },
+          "loop": {
+            "total": 382.97207,
+            "no_gc": 383.0
+          },
+          "exact_residuals": {
+            "total": 3398.24603,
+            "no_gc": 3398.27396
+          },
+          "object_method": {
+            "total": 1668.66321,
+            "no_gc": 1668.69114
+          }
+        },
+        {
+          "loop": {
+            "total": 383.0,
+            "no_gc": 382.97207
+          },
+          "inline_truthy": {
+            "total": 613.0,
+            "no_gc": 612.97207
+          },
+          "exact_residuals": {
+            "total": 3402.27396,
+            "no_gc": 3402.24603
+          },
+          "inline": {
+            "total": 523.0,
+            "no_gc": 522.97207
+          },
+          "loop_b": {
+            "total": 383.0,
+            "no_gc": 382.97207
+          },
+          "object_method": {
+            "total": 1668.69114,
+            "no_gc": 1668.66321
+          }
+        },
+        {
+          "inline_truthy": {
+            "total": 612.97207,
+            "no_gc": 613.0
+          },
+          "loop": {
+            "total": 382.97207,
+            "no_gc": 383.0
+          },
+          "loop_b": {
+            "total": 382.97207,
+            "no_gc": 383.0
+          },
+          "inline": {
+            "total": 522.97207,
+            "no_gc": 523.0
+          },
+          "exact_residuals": {
+            "total": 3402.24603,
+            "no_gc": 3402.27396
+          },
+          "object_method": {
+            "total": 1668.66321,
+            "no_gc": 1668.69114
+          }
+        },
+        {
+          "object_method": {
+            "total": 1668.69114,
+            "no_gc": 1668.66321
+          },
+          "exact_residuals": {
+            "total": 3402.27396,
+            "no_gc": 3402.24603
+          },
+          "loop_b": {
+            "total": 383.0,
+            "no_gc": 382.97207
+          },
+          "inline_truthy": {
+            "total": 613.0,
+            "no_gc": 612.97207
+          },
+          "loop": {
+            "total": 383.0,
+            "no_gc": 382.97207
+          },
+          "inline": {
+            "total": 523.0,
+            "no_gc": 522.97207
+          }
+        }
+      ]
+    },
+    "constant_interpreter": {
+      "rounds": 6,
+      "samples_sha256": "7ea6d96bc3f95640aa7b7bed13eb34e13ff6ff48cf308e0fc4f00c2b5e777d6c",
+      "heap_ok": true,
+      "capacities": [
+        {
+          "0": 1000452,
+          "1": 250429,
+          "2": 100155,
+          "3": 20176,
+          "4": 10078
+        }
+      ],
+      "aa": {
+        "total": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        },
+        "no_gc": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        }
+      },
+      "net_over_loop_ir": {
+        "constant_epoch": {
+          "total": {
+            "median": 7280.00173,
+            "ci95": [
+              7152.00173,
+              7440.00173
+            ]
+          },
+          "no_gc": {
+            "median": 7280.00173,
+            "ci95": [
+              7152.00173,
+              7440.00173
+            ]
+          }
+        },
+        "constant_counter": {
+          "total": {
+            "median": 7081.00173,
+            "ci95": [
+              7033.00173,
+              7161.00173
+            ]
+          },
+          "no_gc": {
+            "median": 7081.00173,
+            "ci95": [
+              7033.00173,
+              7161.00173
+            ]
+          }
+        }
+      },
+      "samples_ir": [
+        {
+          "loop": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "constant_epoch": {
+            "total": 7866.9799,
+            "no_gc": 7867.00173
+          },
+          "loop_b": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "constant_counter": {
+            "total": 7523.9799,
+            "no_gc": 7524.00173
+          }
+        },
+        {
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "constant_counter": {
+            "total": 7428.00173,
+            "no_gc": 7427.9799
+          },
+          "constant_epoch": {
+            "total": 7643.00173,
+            "no_gc": 7642.9799
+          },
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          }
+        },
+        {
+          "constant_counter": {
+            "total": 7427.9799,
+            "no_gc": 7428.00173
+          },
+          "loop": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "constant_epoch": {
+            "total": 7578.9799,
+            "no_gc": 7579.00173
+          },
+          "loop_b": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          }
+        },
+        {
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "constant_epoch": {
+            "total": 7515.00173,
+            "no_gc": 7514.9799
+          },
+          "constant_counter": {
+            "total": 7588.00173,
+            "no_gc": 7587.9799
+          },
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          }
+        },
+        {
+          "constant_epoch": {
+            "total": 7802.9799,
+            "no_gc": 7803.00173
+          },
+          "constant_counter": {
+            "total": 7523.9799,
+            "no_gc": 7524.00173
+          },
+          "loop": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "loop_b": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          }
+        },
+        {
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "constant_epoch": {
+            "total": 7707.00173,
+            "no_gc": 7706.9799
+          },
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "constant_counter": {
+            "total": 7428.00173,
+            "no_gc": 7427.9799
+          }
+        }
+      ]
+    },
+    "constant_yjit": {
+      "rounds": 6,
+      "samples_sha256": "b6a32773e2a07d744017154ef4eac1f240231299225ccb2aed7b6b324d63b608",
+      "heap_ok": true,
+      "capacities": [
+        {
+          "0": 1000453,
+          "1": 250430,
+          "2": 100153,
+          "3": 20176,
+          "4": 10078
+        }
+      ],
+      "aa": {
+        "total": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        },
+        "no_gc": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        }
+      },
+      "net_over_loop_ir": {
+        "constant_epoch": {
+          "total": {
+            "median": 7027.0,
+            "ci95": [
+              6963.0,
+              7203.0
+            ]
+          },
+          "no_gc": {
+            "median": 7027.0,
+            "ci95": [
+              6963.0,
+              7203.0
+            ]
+          }
+        },
+        "constant_counter": {
+          "total": {
+            "median": 6970.0,
+            "ci95": [
+              6906.0,
+              7114.0
+            ]
+          },
+          "no_gc": {
+            "median": 6970.0,
+            "ci95": [
+              6906.0,
+              7114.0
+            ]
+          }
+        }
+      },
+      "samples_ir": [
+        {
+          "loop": {
+            "total": 382.97163,
+            "no_gc": 383.0
+          },
+          "constant_epoch": {
+            "total": 7665.97163,
+            "no_gc": 7666.0
+          },
+          "loop_b": {
+            "total": 382.97163,
+            "no_gc": 383.0
+          },
+          "constant_counter": {
+            "total": 7288.97163,
+            "no_gc": 7289.0
+          }
+        },
+        {
+          "loop": {
+            "total": 383.0,
+            "no_gc": 382.97163
+          },
+          "constant_counter": {
+            "total": 7385.0,
+            "no_gc": 7384.97163
+          },
+          "constant_epoch": {
+            "total": 7410.0,
+            "no_gc": 7409.97163
+          },
+          "loop_b": {
+            "total": 383.0,
+            "no_gc": 382.97163
+          }
+        },
+        {
+          "constant_counter": {
+            "total": 7288.97163,
+            "no_gc": 7289.0
+          },
+          "loop": {
+            "total": 382.97163,
+            "no_gc": 383.0
+          },
+          "constant_epoch": {
+            "total": 7313.97163,
+            "no_gc": 7314.0
+          },
+          "loop_b": {
+            "total": 382.97163,
+            "no_gc": 383.0
+          }
+        },
+        {
+          "loop": {
+            "total": 383.0,
+            "no_gc": 382.97163
+          },
+          "constant_epoch": {
+            "total": 7410.0,
+            "no_gc": 7409.97163
+          },
+          "constant_counter": {
+            "total": 7449.0,
+            "no_gc": 7448.97163
+          },
+          "loop_b": {
+            "total": 383.0,
+            "no_gc": 382.97163
+          }
+        },
+        {
+          "constant_epoch": {
+            "total": 7377.97163,
+            "no_gc": 7378.0
+          },
+          "constant_counter": {
+            "total": 7544.97163,
+            "no_gc": 7545.0
+          },
+          "loop": {
+            "total": 382.97163,
+            "no_gc": 383.0
+          },
+          "loop_b": {
+            "total": 382.97163,
+            "no_gc": 383.0
+          }
+        },
+        {
+          "loop_b": {
+            "total": 383.0,
+            "no_gc": 382.97163
+          },
+          "constant_epoch": {
+            "total": 7506.0,
+            "no_gc": 7505.97163
+          },
+          "loop": {
+            "total": 383.0,
+            "no_gc": 382.97163
+          },
+          "constant_counter": {
+            "total": 7321.0,
+            "no_gc": 7320.97163
+          }
+        }
+      ]
+    },
+    "singleton_interpreter": {
+      "rounds": 6,
+      "samples_sha256": "ccc4f061a342a01714ae3f624eaa01d09a84f6a1092fea53dc84ecdf1b5586c0",
+      "heap_ok": true,
+      "capacities": [
+        {
+          "0": 1000452,
+          "1": 250429,
+          "2": 100155,
+          "3": 20176,
+          "4": 10078
+        }
+      ],
+      "aa": {
+        "total": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        },
+        "no_gc": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "pass": true
+        }
+      },
+      "net_over_loop_ir": {
+        "object_method": {
+          "total": {
+            "median": 1795.6963700000001,
+            "ci95": [
+              1795.6963700000001,
+              1795.6963700000001
+            ]
+          },
+          "no_gc": {
+            "median": 1795.6963700000001,
+            "ci95": [
+              1795.6963700000001,
+              1795.6963700000001
+            ]
+          }
+        }
+      },
+      "samples_ir": [
+        {
+          "loop": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "loop_b": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "object_method": {
+            "total": 2190.67454,
+            "no_gc": 2190.69637
+          }
+        },
+        {
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "object_method": {
+            "total": 2190.69637,
+            "no_gc": 2190.67454
+          },
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          }
+        },
+        {
+          "object_method": {
+            "total": 2190.67454,
+            "no_gc": 2190.69637
+          },
+          "loop": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "loop_b": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          }
+        },
+        {
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "object_method": {
+            "total": 2190.69637,
+            "no_gc": 2190.67454
+          }
+        },
+        {
+          "loop_b": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          },
+          "object_method": {
+            "total": 2190.67454,
+            "no_gc": 2190.69637
+          },
+          "loop": {
+            "total": 394.97817,
+            "no_gc": 395.0
+          }
+        },
+        {
+          "loop_b": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "loop": {
+            "total": 395.0,
+            "no_gc": 394.97817
+          },
+          "object_method": {
+            "total": 2190.69637,
+            "no_gc": 2190.67454
+          }
+        }
+      ]
+    }
+  },
+  "old_cached_yjit_function_lines": {
+    "net_ir": 371.0,
+    "functions": {
+      "0x0000000020288226": 164.0,
+      "rb_vm_ic_hit_p": 79.0,
+      "rb_st_lookup": 56.0,
+      "rb_hash_aref": 34.0,
+      "builtin_inline_class_20": 24.0,
+      "rb_yarv_ary_entry_internal": 16.0,
+      "rb_ident_hash": 14.0,
+      "rb_hash_start": 3.0,
+      "pthread_mutex_lock@@GLIBC_2.2.5": 0.0,
+      "pthread_mutex_unlock@@GLIBC_2.2.5": 0.0,
+      "__pthread_mutex_unlock_usercnt": 0.0,
+      "rb_get_alloc_func": 0.0,
+      "rb_vm_lock_enter_body_cr": 0.0,
+      "rb_gc_writebarrier": 0.0,
+      "rb_wb_protected_newobj_of": 0.0,
+      "rb_vm_check_ints": 0.0,
+      "rb_vm_lock_leave_body": 0.0,
+      "vm_lock_enter": 0.0,
+      "vm_caller_setup_arg_block.constprop.0": 0.0,
+      "vm_call_iseq_setup_normal_0start_0params_1locals": 0.0,
+      "vm_call_iseq_setup_normal_0start_1params_3locals": 0.0,
+      "vm_search_cc": 0.0,
+      "ractor_safe_call_cfunc_0": 0.0,
+      "vm_sendish.constprop.0": 0.0,
+      "vm_invoke_iseq_block": 0.0,
+      "vm_call_cfunc_with_frame": 0.0,
+      "vm_invokeblock_i": 0.0,
+      "vm_call_cfunc_with_frame_": 0.0,
+      "vm_exec_core'2": 0.0,
+      "rb_vm_opt_getconstant_path": 0.0,
+      "vm_defined": 0.0,
+      "vm_env_cref": 0.0,
+      "CALLER_SETUP_ARG": 0.0,
+      "vm_lookup_cc": 0.0,
+      "call_cfunc_0": 0.0,
+      "rb_obj_dummy0": 0.0,
+      "rb_obj_alloc": 0.0,
+      "rb_class_allocate_instance": 0.0,
+      "rb_gc_heap_id_for_size": 0.0,
+      "newobj_cache_miss": 0.0,
+      "rb_gc_size_allocatable_p": 0.0,
+      "rb_managed_id_table_lookup": 0.0,
+      "rb_native_mutex_unlock": 0.0,
+      "rb_native_mutex_lock": 0.0,
+      "yjit_compile": 0.0,
+      "VM_CF_BLOCK_HANDLER": 0.0,
+      "start": 0.0,
+      "malloc": 0.0,
+      "_int_malloc": 0.0,
+      "__strlen_avx2": 0.0,
+      "ruby_xmalloc": 0.0,
+      "rb_get_iseq_body_iseq_encoded": 0.0,
+      "rb_FL_TEST": 0.0,
+      "rb_iseq_encoded_size": 0.0,
+      "rb_vm_insn_decode": 0.0,
+      "rb_vm_barrier": 0.0,
+      "RCLASS_EXT_WRITABLE": 0.0,
+      "rb_yjit_constant_ic_update": 0.0,
+      "yjit::invariants::rb_yjit_constant_ic_update::{{closure}}": 0.0,
+      "rb_imemo_new": 0.0,
+      "rb_iseq_get_yjit_payload": 0.0,
+      "rb_st_numcmp": 0.0,
+      "rb_st_numhash": 0.0,
+      "rb_set_insert": 0.0,
+      "find_table_entry_ind": 0.0,
+      "yjit::cruby::with_vm_lock": 0.0,
+      "rb_const_get": 0.0,
+      "rb_const_get_0": 0.0,
+      "rb_const_search_from": 0.0,
+      "rb_jit_vm_unlock": 0.0,
+      "rb_jit_multi_ractor_p": 0.0,
+      "rb_jit_vm_lock_then_barrier": 0.0,
+      "vm_exec_core": 0.0,
+      "vm_call_method_each_type": 0.0,
+      "vm_call_general": 0.0,
+      "vm_call_cfunc_other": 0.0,
+      "vm_call_cfunc": 0.0,
+      "vm_call_method": 0.0,
+      "rb_gc_impl_malloc": 0.0,
+      "gc_writebarrier_generational.constprop.0": 0.0,
+      "rb_id_table_lookup": 0.0,
+      "rb_id_table_insert_key": 0.0,
+      "callable_method_entry_or_negative": 0.0,
+      "rb_check_overloaded_cme": 0.0,
+      "rb_managed_id_table_insert": 0.0,
+      "0x00000000202880bd": -19.0
+    },
+    "lines": [
+      {
+        "file": "???",
+        "function": "0x0000000020288226",
+        "line": 0,
+        "ir_per_check": 164.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_hash_aref",
+        "line": 2092,
+        "ir_per_check": 12.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_hash_aref",
+        "line": 2101,
+        "ir_per_check": 11.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 854,
+        "ir_per_check": 11.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 1065,
+        "ir_per_check": 10.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 1088,
+        "ir_per_check": 9.0
+      },
+      {
+        "file": "kernel.rbinc",
+        "function": "builtin_inline_class_20",
+        "line": 17,
+        "ir_per_check": 8.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 6573,
+        "ir_per_check": 8.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 845,
+        "ir_per_check": 8.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 867,
+        "ir_per_check": 7.0
+      },
+      {
+        "file": "kernel.rbinc",
+        "function": "builtin_inline_class_20",
+        "line": 13,
+        "ir_per_check": 6.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 6590,
+        "ir_per_check": 6.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 6570,
+        "ir_per_check": 6.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 839,
+        "ir_per_check": 6.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 6591,
+        "ir_per_check": 6.0
+      },
+      {
+        "file": "imemo.h",
+        "function": "rb_vm_ic_hit_p",
+        "line": 170,
+        "ir_per_check": 6.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 825,
+        "ir_per_check": 6.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 1086,
+        "ir_per_check": 5.0
+      },
+      {
+        "file": "special_consts.h",
+        "function": "builtin_inline_class_20",
+        "line": 329,
+        "ir_per_check": 4.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 331,
+        "ir_per_check": 4.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 6589,
+        "ir_per_check": 4.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 960,
+        "ir_per_check": 4.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_ident_hash",
+        "line": 282,
+        "ir_per_check": 3.0
+      },
+      {
+        "file": "array.h",
+        "function": "rb_yarv_ary_entry_internal",
+        "line": 60,
+        "ir_per_check": 3.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_hash_aref",
+        "line": 2055,
+        "ir_per_check": 3.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_hash_aref",
+        "line": 2063,
+        "ir_per_check": 3.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 324,
+        "ir_per_check": 3.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 853,
+        "ir_per_check": 3.0
+      },
+      {
+        "file": "vm_core.h",
+        "function": "rb_vm_ic_hit_p",
+        "line": 1576,
+        "ir_per_check": 3.0
+      },
+      {
+        "file": "special_consts.h",
+        "function": "rb_ident_hash",
+        "line": 291,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_ident_hash",
+        "line": 377,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_ident_hash",
+        "line": 298,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_ident_hash",
+        "line": 383,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "rarray.h",
+        "function": "rb_yarv_ary_entry_internal",
+        "line": 259,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "rarray.h",
+        "function": "rb_yarv_ary_entry_internal",
+        "line": 242,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "array.h",
+        "function": "rb_yarv_ary_entry_internal",
+        "line": 61,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "array.h",
+        "function": "rb_yarv_ary_entry_internal",
+        "line": 65,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "jit.c",
+        "function": "rb_yarv_ary_entry_internal",
+        "line": 506,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "object.c",
+        "function": "builtin_inline_class_20",
+        "line": 298,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "hash.c",
+        "function": "rb_hash_aref",
+        "line": 2095,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 1070,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 1085,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 1072,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "st.c",
+        "function": "rb_st_lookup",
+        "line": 1074,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 6583,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "ractor_core.h",
+        "function": "rb_vm_ic_hit_p",
+        "line": 163,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 872,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "vm_insnhelper.c",
+        "function": "rb_vm_ic_hit_p",
+        "line": 827,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "random.c",
+        "function": "rb_hash_start",
+        "line": 1778,
+        "ir_per_check": 2.0
+      },
+      {
+        "file": "???",
+        "function": "0x00000000202880bd",
+        "line": 0,
+        "ir_per_check": -19.0
+      }
+    ]
+  },
+  "counterexamples": {
+    "holes": {
+      "suppressed_callback": {
+        "cached_guard": true,
+        "exact_residual": false,
+        "original_definition": 7,
+        "actual": 19
+      },
+      "conditional_super": {
+        "cached_guard": true,
+        "exact_residual": false,
+        "original_definition": 7,
+        "actual": 19
+      },
+      "own_visibility": {
+        "cached_guard": true,
+        "exact_residual": false,
+        "original_definition": 7,
+        "actual": "NoMethodError"
+      },
+      "singleton_callback": {
+        "cached_guard": true,
+        "exact_residual": false,
+        "original_definition": 7,
+        "actual": 29
+      },
+      "constant_replacement": {
+        "cached_guard": true,
+        "exact_residual": false,
+        "original": 7,
+        "actual": 23
+      },
+      "direct_mutation": {
+        "epoch_unchanged": true,
+        "same_identity": true,
+        "exact_residual": false,
+        "original": 7,
+        "actual": 31
+      }
+    },
+    "const_added": {
+      "added": [
+        "Token"
+      ],
+      "replaced": [
+        "Token",
+        "Token"
+      ],
+      "removed": [
+        "Token",
+        "Token"
+      ]
+    }
+  },
+  "constant_epoch": {
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+    "zeitwerk": "2.8.3",
+    "cases": [
+      {
+        "case": "const_get_only/replacement",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "const_get_only/remove_const",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "inline_cached/replacement",
+        "delta": {
+          "constant_cache_invalidations": 1,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "inline_cached/remove_const",
+        "delta": {
+          "constant_cache_invalidations": 1,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "UncachedAutoloadQ70/register",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 1,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "UncachedAutoloadQ70/materialize",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 3,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "UncachedAutoloadQ70/remove_const",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "CachedAutoloadQ70/register",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "CachedAutoloadQ70/materialize",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 2,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "CachedAutoloadQ70/remove_const",
+        "delta": {
+          "constant_cache_invalidations": 1,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "unmaterialized_autoload/remove_const",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "zeitwerk_uncached/reload",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 3,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "zeitwerk_uncached/rematerialize",
+        "delta": {
+          "constant_cache_invalidations": 0,
+          "constant_cache_misses": 1,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "zeitwerk_cached/reload",
+        "delta": {
+          "constant_cache_invalidations": 2,
+          "constant_cache_misses": 0,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      },
+      {
+        "case": "zeitwerk_cached/rematerialize",
+        "delta": {
+          "constant_cache_invalidations": 1,
+          "constant_cache_misses": 2,
+          "global_cvar_state": 0,
+          "next_shape_id": 0,
+          "shape_cache_size": 0
+        }
+      }
+    ],
+    "conclusion": "constant_cache_invalidations counts registered inline-cache entries cleared, not all constant mutations"
+  },
+  "unsafe_rails": {
+    "activesupport": {
+      "L1": {
+        "observations": [
+          5815,
+          5815
+        ],
+        "identical": 5814,
+        "outcomes": [
+          {
+            "pass": 4747,
+            "skip": 1068
+          },
+          {
+            "pass": 4747,
+            "skip": 1068
+          }
+        ],
+        "unstable": [
+          "DuplicableTest#test_#<Class:0x00007f9bbfce5e70>#duplicable?_matches_#<Class:0x00007f9bbfce5e70>#dup_behavior",
+          "DuplicableTest#test_#<Class:0x00007fb2ce94e430>#duplicable?_matches_#<Class:0x00007fb2ce94e430>#dup_behavior"
+        ],
+        "transient": [
+          "DuplicableTest#test_#<Class:0x00007f058341e6c0>#duplicable?_matches_#<Class:0x00007f058341e6c0>#dup_behavior"
+        ],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          5815,
+          5815
+        ],
+        "identical": 5814,
+        "outcomes": [
+          {
+            "pass": 4747,
+            "skip": 1068
+          },
+          {
+            "pass": 4747,
+            "skip": 1068
+          }
+        ],
+        "unstable": [
+          "DuplicableTest#test_#<Class:0x00007f9bbfce5e70>#duplicable?_matches_#<Class:0x00007f9bbfce5e70>#dup_behavior",
+          "DuplicableTest#test_#<Class:0x00007fb2ce94e430>#duplicable?_matches_#<Class:0x00007fb2ce94e430>#dup_behavior"
+        ],
+        "transient": [
+          "DuplicableTest#test_#<Class:0x00007fc62b969e40>#duplicable?_matches_#<Class:0x00007fc62b969e40>#dup_behavior"
+        ],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          5815,
+          5815
+        ],
+        "identical": 5814,
+        "outcomes": [
+          {
+            "pass": 4747,
+            "skip": 1068
+          },
+          {
+            "pass": 4747,
+            "skip": 1068
+          }
+        ],
+        "unstable": [
+          "DuplicableTest#test_#<Class:0x00007f9bbfce5e70>#duplicable?_matches_#<Class:0x00007f9bbfce5e70>#dup_behavior",
+          "DuplicableTest#test_#<Class:0x00007fb2ce94e430>#duplicable?_matches_#<Class:0x00007fb2ce94e430>#dup_behavior"
+        ],
+        "transient": [
+          "DuplicableTest#test_#<Class:0x00007fa8ed631d78>#duplicable?_matches_#<Class:0x00007fa8ed631d78>#dup_behavior"
+        ],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "activemodel": {
+      "L1": {
+        "observations": [
+          1100,
+          1100
+        ],
+        "identical": 1100,
+        "outcomes": [
+          {
+            "pass": 1100
+          },
+          {
+            "pass": 1100
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          1100,
+          1100
+        ],
+        "identical": 1100,
+        "outcomes": [
+          {
+            "pass": 1100
+          },
+          {
+            "pass": 1100
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          1100,
+          1100
+        ],
+        "identical": 1100,
+        "outcomes": [
+          {
+            "pass": 1100
+          },
+          {
+            "pass": 1100
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "activerecord": {
+      "L1": {
+        "observations": [
+          9240,
+          9240
+        ],
+        "identical": 9240,
+        "outcomes": [
+          {
+            "pass": 9196,
+            "skip": 44
+          },
+          {
+            "pass": 9196,
+            "skip": 44
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          9240,
+          9240
+        ],
+        "identical": 9240,
+        "outcomes": [
+          {
+            "pass": 9196,
+            "skip": 44
+          },
+          {
+            "pass": 9196,
+            "skip": 44
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          9240,
+          9240
+        ],
+        "identical": 9206,
+        "outcomes": [
+          {
+            "pass": 9196,
+            "skip": 44
+          },
+          {
+            "pass": 9162,
+            "skip": 44,
+            "error": 34
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {
+          "BasicsTest#test_typecasting_aliases": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "BasicsTest#test_select_symbol": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "AttributeMethodsTest#test_write_attribute_does_not_raise_when_the_attribute_isn't_selected": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "DirtyTest#test_save_should_not_save_serialized_attribute_with_partial_writes_if_not_present": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "CalculationsTest#test_pluck_with_type_cast_does_not_corrupt_the_query_cache": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "UniquenessValidationTest#test_validate_case_insensitive_uniqueness": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "StoreTest#test_accessing_attributes_not_exposed_by_accessors_encoded_with_JSON": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "StoreTest#test_convert_store_attributes_from_Hash_to_HashWithIndifferentAccess_saving_the_data_and_access_attributes_indifferently": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "StoreTest#test_store_takes_precedence_when_updating_store_and_accessor": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "StoreTest#test_serialize_stored_nested_attributes": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "StoreTest#test_accessing_attributes_not_exposed_by_accessors": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "HasManyAssociationsTestPrimaryKeys#test_has_many_assignment_with_custom_primary_key": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "HasManyAssociationsTestPrimaryKeys#test_ids_on_unloaded_association_with_custom_primary_key": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "HasManyAssociationsTestPrimaryKeys#test_ids_on_loaded_association_with_custom_primary_key": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "HasManyAssociationsTest#test_calling_first_nth_or_last_on_existing_record_with_build_should_load_association": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "OptimisticLockingWithSchemaChangeTest#test_increment_counter_updates_lock_version": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "OptimisticLockingWithSchemaChangeTest#test_decrement_counter_updates_custom_lock_version": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "OptimisticLockingWithSchemaChangeTest#test_decrement_counter_updates_lock_version": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "OptimisticLockingWithSchemaChangeTest#test_destroy_dependents": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "OptimisticLockingWithSchemaChangeTest#test_update_counters_updates_custom_lock_version": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "OptimisticLockingWithSchemaChangeTest#test_update_counters_updates_lock_version": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "OptimisticLockingWithSchemaChangeTest#test_increment_counter_updates_custom_lock_version": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "SerializedAttributeTestWithYamlSafeLoad#test_serialize_attribute_via_select_method_when_time_zone_available": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "LeftOuterJoinAssociationTest#test_construct_finder_sql_does_not_table_name_collide_on_duplicate_associations": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "FilterAttributesTest#test_filter_attributes_on_pretty_print": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "FilterAttributesTest#test_filter_attributes_affects_attribute_for_inspect": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "FilterAttributesTest#test_filter_attributes": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "FilterAttributesTest#test_filter_attributes_could_be_overwritten_by_models": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "CascadedEagerLoadingTest#test_eager_association_loading_grafts_stashed_associations_to_correct_parent": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "ActiveRecord::CustomPropertiesTest#test_attributes_not_backed_by_database_columns_are_always_initialized": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "ActiveRecord::CustomPropertiesTest#test_overloaded_properties_save": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "CounterCacheTest#test_reset_the_right_counter_if_two_have_the_same_foreign_key": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "CounterCacheTest#test_removing_association_updates_counter": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          },
+          "YamlSerializationTest#test_new_records_remain_new_after_round_trip": {
+            "off": [
+              {
+                "result": "pass"
+              }
+            ],
+            "on": [
+              {
+                "result": "error",
+                "failure": "Lowrail::ARShadow::Mismatch: active_record/instantiate: Rails planning differs (see AR shadow mismatch)"
+              }
+            ]
+          }
+        },
+        "hits": 75433,
+        "fallbacks": 10208,
+        "exit_codes": [
+          0,
+          0,
+          1,
+          1
+        ]
+      }
+    },
+    "actionpack": {
+      "L1": {
+        "observations": [
+          4095,
+          4095
+        ],
+        "identical": 4095,
+        "outcomes": [
+          {
+            "pass": 4095
+          },
+          {
+            "pass": 4095
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          4095,
+          4095
+        ],
+        "identical": 4095,
+        "outcomes": [
+          {
+            "pass": 4095
+          },
+          {
+            "pass": 4095
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          4095,
+          4095
+        ],
+        "identical": 4095,
+        "outcomes": [
+          {
+            "pass": 4095
+          },
+          {
+            "pass": 4095
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "actionview": {
+      "L1": {
+        "observations": [
+          2747,
+          2747
+        ],
+        "identical": 2747,
+        "outcomes": [
+          {
+            "pass": 2747
+          },
+          {
+            "pass": 2747
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          2747,
+          2747
+        ],
+        "identical": 2747,
+        "outcomes": [
+          {
+            "pass": 2747
+          },
+          {
+            "pass": 2747
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          2747,
+          2747
+        ],
+        "identical": 2747,
+        "outcomes": [
+          {
+            "pass": 2747
+          },
+          {
+            "pass": 2747
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "actionview-actionpack": {
+      "L1": {
+        "observations": [
+          242,
+          242
+        ],
+        "identical": 242,
+        "outcomes": [
+          {
+            "pass": 242
+          },
+          {
+            "pass": 242
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          242,
+          242
+        ],
+        "identical": 242,
+        "outcomes": [
+          {
+            "pass": 242
+          },
+          {
+            "pass": 242
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          242,
+          242
+        ],
+        "identical": 242,
+        "outcomes": [
+          {
+            "pass": 242
+          },
+          {
+            "pass": 242
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "actionview-activerecord": {
+      "L1": {
+        "observations": [
+          173,
+          173
+        ],
+        "identical": 173,
+        "outcomes": [
+          {
+            "pass": 173
+          },
+          {
+            "pass": 173
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          173,
+          173
+        ],
+        "identical": 173,
+        "outcomes": [
+          {
+            "pass": 173
+          },
+          {
+            "pass": 173
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          173,
+          173
+        ],
+        "identical": 173,
+        "outcomes": [
+          {
+            "pass": 173
+          },
+          {
+            "pass": 173
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 123,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "activejob": {
+      "L1": {
+        "observations": [
+          212,
+          212
+        ],
+        "identical": 209,
+        "outcomes": [
+          {
+            "pass": 212
+          },
+          {
+            "pass": 212
+          }
+        ],
+        "unstable": [
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:54.522315029_+0000..2026-10-20_15:09:54.522320041_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:54_+0000..Tue,_20_Oct_2026_15:09:54_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:54.522208484_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:56.406989194_+0000..2026-10-20_15:09:56.406994004_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:56_+0000..Tue,_20_Oct_2026_15:09:56_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:56.406892192_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim"
+        ],
+        "transient": [
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:57.179256095_+0000..2026-10-20_15:09:57.179261469_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:57_+0000..Tue,_20_Oct_2026_15:09:57_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:57.179153273_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim"
+        ],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          212,
+          212
+        ],
+        "identical": 209,
+        "outcomes": [
+          {
+            "pass": 212
+          },
+          {
+            "pass": 212
+          }
+        ],
+        "unstable": [
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:54.522315029_+0000..2026-10-20_15:09:54.522320041_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:54_+0000..Tue,_20_Oct_2026_15:09:54_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:54.522208484_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:56.406989194_+0000..2026-10-20_15:09:56.406994004_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:56_+0000..Tue,_20_Oct_2026_15:09:56_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:56.406892192_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim"
+        ],
+        "transient": [
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:59.8636878_+0000..2026-10-20_15:09:59.863692672_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:59_+0000..Tue,_20_Oct_2026_15:09:59_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:59.863596626_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim"
+        ],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          212,
+          212
+        ],
+        "identical": 209,
+        "outcomes": [
+          {
+            "pass": 212
+          },
+          {
+            "pass": 212
+          }
+        ],
+        "unstable": [
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:54.522315029_+0000..2026-10-20_15:09:54.522320041_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:54_+0000..Tue,_20_Oct_2026_15:09:54_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:54.522208484_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:09:56.406989194_+0000..2026-10-20_15:09:56.406994004_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:09:56_+0000..Tue,_20_Oct_2026_15:09:56_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:09:56.406892192_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim"
+        ],
+        "transient": [
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-20_05:10:02.618763564_+0000..2026-10-20_15:10:02.618769002_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_Tue,_22_Sep_2026_15:10:02_+0000..Tue,_20_Oct_2026_15:10:02_+0000_verbatim",
+          "ArgumentSerializationTest#test_serializes_Range_-_2026-10-10_15:10:02.618634064_+0000..#<Date:_2026-10-20_((2461334j,0s,0n),+0s,2299161j)>_verbatim"
+        ],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "actionmailer": {
+      "L1": {
+        "observations": [
+          268,
+          268
+        ],
+        "identical": 268,
+        "outcomes": [
+          {
+            "pass": 268
+          },
+          {
+            "pass": 268
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L2": {
+        "observations": [
+          268,
+          268
+        ],
+        "identical": 268,
+        "outcomes": [
+          {
+            "pass": 268
+          },
+          {
+            "pass": 268
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 17,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      },
+      "L3": {
+        "observations": [
+          268,
+          268
+        ],
+        "identical": 268,
+        "outcomes": [
+          {
+            "pass": 268
+          },
+          {
+            "pass": 268
+          }
+        ],
+        "unstable": [],
+        "transient": [],
+        "differences": {},
+        "hits": 0,
+        "fallbacks": 0,
+        "exit_codes": [
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "ar_epoch_only_control": {
+    "observations": [
+      9240,
+      9240
+    ],
+    "identical": 9240,
+    "outcomes": [
+      {
+        "pass": 9196,
+        "skip": 44
+      },
+      {
+        "pass": 9196,
+        "skip": 44
+      }
+    ],
+    "differences": {},
+    "hits": 68857,
+    "fallbacks": 11616,
+    "exit_codes": [
+      0,
+      0,
+      0
+    ],
+    "shadow_mismatches": []
+  },
+  "corpus_refusals_census": {
+    "real-blog-r4": {
+      "view/link_to:template_context": 3,
+      "route/path:template_context": 3,
+      "active_record/ar_plans_survey:query_certificate": 2,
+      "active_record/ar_plans:no_scope": 2,
+      "inertia/config_bind:unclassified": 1
+    },
+    "pingcrm": {
+      "view/link_to:template_context": 3,
+      "route/path:template_context": 3,
+      "active_record/preload_plans:polymorphic": 1,
+      "active_record/preload_plans:scope_certificate": 3,
+      "active_record/preload_plans:through": 6,
+      "active_record/ar_plans_survey:query_certificate": 9,
+      "active_record/ar_plans_survey:where_chain": 1,
+      "active_record/ar_plans_survey:dynamic_predicate": 3,
+      "active_record/ar_plans:no_scope": 19,
+      "active_record/ar_plans:scope_dynamic": 3
+    },
+    "react-starter-kit": {
+      "view/link_to:template_context": 3,
+      "route/path:template_context": 3,
+      "view/link_to:url_shape": 2,
+      "route/path:options_hash": 3,
+      "active_record/ar_plans_survey:statement_cache": 1,
+      "active_record/ar_plans_survey:query_certificate": 1,
+      "active_record/ar_plans_survey:where_chain": 1,
+      "active_record/ar_plans:no_scope": 2
+    },
+    "redprints-cfp": {
+      "view/link_to:template_context": 4,
+      "route/path:template_context": 4,
+      "view/link_to:url_shape": 1,
+      "route/path:block_helper": 2,
+      "active_record/preload_plans:polymorphic": 1,
+      "active_record/preload_plans:scope_certificate": 3,
+      "active_record/preload_plans:through": 7,
+      "active_record/ar_plans_survey:dynamic_predicate": 2,
+      "active_record/ar_plans_survey:query_certificate": 21,
+      "active_record/ar_plans_survey:dynamic_arguments": 2,
+      "active_record/ar_plans_survey:statement_cache": 5,
+      "active_record/ar_plans_survey:where_chain": 1,
+      "active_record/ar_plans:no_scope": 45,
+      "active_record/ar_plans:scope_dynamic": 4
+    }
+  },
+  "limitations": [
+    "Guard-tax request ceilings pending bench worker ownership release",
+    "Literal response-byte differential not run",
+    "Rails suite SQL tracing disabled",
+    "Current-runtime invalidation holes remain open; candidate residuals are not a certified complete guard"
+  ]
+}
