@@ -33,6 +33,14 @@ class SqlTraceTest < Minitest::Test
       end
 
       def test_no_sql = assert(true)
+
+      def test_invalid_encoding
+        # SQLite accepts this byte sequence; a diagnostic subscriber must not
+        # change its outcome. Distinct bytes must retain distinct trace lines.
+        bytes = ENV["VARIANT"] == "b" ? "\xFE" : "\xFF"
+        Item.connection_pool.with_connection { _1.execute("select 1 as '#{bytes}'") }
+        assert true
+      end
     end
   RUBY
 
@@ -55,6 +63,7 @@ class SqlTraceTest < Minitest::Test
       refute_equal a1["ItemTest#test_lookup"]["digest"], b["ItemTest#test_lookup"]["digest"]
       assert_equal a1["ItemTest#test_cached"].slice("digest", "n"), b["ItemTest#test_cached"].slice("digest", "n")
       assert_equal 0, a1["ItemTest#test_no_sql"]["n"]
+      refute_equal a1["ItemTest#test_invalid_encoding"]["digest"], b["ItemTest#test_invalid_encoding"]["digest"]
     end
   end
 

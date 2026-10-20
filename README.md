@@ -32,6 +32,9 @@ The existing `--memo`, `--digest-memo`, `--preload-plans`,
 options are processed left to right; `--passes` resets to its list's
 selection. With no options, only `view/link_to` and `route/path` run.
 
+For AR shadow checks, the relation fuzzer and Rails-suite evidence, see
+[Active Record equivalence](docs/ar-equivalence.md).
+
 ## Complementary optimizations
 
 Lowrail only applies changes it can guard exactly. Some well-known speedups

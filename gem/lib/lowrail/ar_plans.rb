@@ -2,6 +2,7 @@
 
 require_relative "ar_plan_facts"
 require_relative "ar_guard"
+require_relative "ar_shadow"
 
 module Lowrail
   # The original Association#find_target and Relation#exec_queries still run.
@@ -134,6 +135,7 @@ module Lowrail
           values = ActiveRecord::Associations::AssociationScope.get_bind_values(association.owner, @reflection.chain)
           binds = bind_map.bind(values)
           sql = builder.sql_for(binds, connection)
+          ARShadow.query("active_record/ar_plans", @model, connection, sql, binds, scope) if ARShadow.enabled?
           result = @model._query_by_sql(connection, sql, binds, preparable: true, allow_retry: builder.retryable)
           ARPlans.count(true)
           result

@@ -75,6 +75,10 @@ module Lowrail
         return unless @key
         name = payload[:name].to_s
         sql = payload[:sql].to_s
+        # SQLite accepts arbitrary bytes, including invalid UTF-8. Tracing
+        # must not turn a successful query into an exception, nor conflate
+        # distinct invalid byte sequences via replacement characters.
+        sql = "<#{sql.encoding}:#{sql.b.unpack1('H*')}>" unless sql.valid_encoding?
         skip = Thread.current[:lowrail_sql_suspended] || name == "SCHEMA" || name.start_with?("Fixture") || sql.match?(INTERNAL_TABLES)
         line = skip ? nil : [name, sql.gsub(TIMESTAMP, "'<ts>'").gsub(LONG_NUMBER, "<n>"), binds(payload[:binds]), payload[:cached] ? "cached" : "", payload[:row_count]].join("\t")
         @mutex.synchronize do

@@ -7,6 +7,7 @@ fn verify_counts_merged_minitest_or_independent_rspec_processes_once() {
     std::fs::create_dir_all(&app).unwrap();
     for merged in [false, true] {
         let script = r#"
+          [ "$LOWRAIL_SHADOW" = strict ] || exit 42
           printf '%s' '{"tests":{"example[1:1]":{"result":"pass"}},"unit_hits":{"7":3}}' > "$LOWRAIL_OUTCOMES.1"
           printf '%s' '{"tests":{"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":2}}' > "$LOWRAIL_OUTCOMES.2"
           if [ "$1" = true ]; then

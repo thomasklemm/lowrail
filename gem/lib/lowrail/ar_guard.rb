@@ -28,7 +28,10 @@ module Lowrail
   # walks the class's descendants; that happens at boot and when a test
   # changes a model, never per request.
   module AR
-    EPOCHS = {}.compare_by_identity
+    # Rails tracks descendants weakly. Retaining a removed STI class here
+    # would keep it in Rails' type predicates after its constant is unloaded.
+    # WeakMap preserves identity keys; integer epoch values are immediate.
+    EPOCHS = ObjectSpace::WeakMap.new
     LOCK = Mutex.new
     @counter = 0
     @global = 0
@@ -120,7 +123,20 @@ module Lowrail
             end
           next unless visibility
           mod.define_method(name) do |*args, **kw, &blk|
-            super(*args, **kw, &blk)
+            # Minitest's stub restores an inherited method by aliasing it
+            # onto the receiver. That can leave a copy of this very wrapper
+            # below our prepend: plain super then recurses into its own copy.
+            hook = mod.instance_method(name).bind(self)
+            original = hook.super_method
+            while original&.source_location == hook.source_location
+              # Method#super_method on an aliased define_method can return
+              # that same alias forever. Walk its owning ancestors instead.
+              holder = original.owner.ancestors.drop_while { !_1.equal?(original.owner) }.drop(1).find do |ancestor|
+                ancestor.instance_methods(false).include?(name) || ancestor.private_instance_methods(false).include?(name)
+              end
+              original = holder&.instance_method(name)&.bind(self)
+            end
+            original.call(*args, **kw, &blk)
           ensure
             event.call(self)
           end

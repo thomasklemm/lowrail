@@ -113,7 +113,9 @@ module Lowrail
         k.method(name).source_location&.first&.start_with?(*framework)
       }
       return "custom relation constructor" unless RELATION_METHODS.all? { |name|
-        k.unscoped.class.instance_method(name).source_location&.first&.start_with?(*framework)
+        method = k.unscoped.class.instance_method(name)
+        method = method.super_method while defined?(ARPlans::RelationHook) && method&.owner == ARPlans::RelationHook
+        method&.source_location&.first&.start_with?(*framework)
       }
       # QueryAttribute memoizes serialized constant predicates inside a scope.
       # An app type can depend on Current/time even with a literal scope.

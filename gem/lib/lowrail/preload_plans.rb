@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative "preload_facts"
+require_relative "ar_shadow"
+require_relative "ar_plans"
 
 module Lowrail
   # Structural templates only. Every call makes fresh Rails Association and
@@ -44,6 +46,16 @@ module Lowrail
           name = f.fetch("method").to_sym
           raise ArgumentError, "preloader changed" unless PreloadFacts.method_fact(ActiveRecord::Associations::Preloader, name) == f
           [name, ActiveRecord::Associations::Preloader.instance_method(name)]
+        end
+        @relation_originals = @facts.fetch("relation_originals", []).map do |fact|
+          holder = Object.const_get(fact.fetch("receiver"))
+          name = fact.fetch("method").to_sym
+          method = holder.instance_method(name)
+          method = method.super_method while method&.owner == ARPlans::RelationHook
+          actual = PreloadFacts.method_fact(holder, name).merge("owner" => method&.owner&.name,
+            "source_location" => method&.source_location&.join(":"))
+          raise ArgumentError, "relation changed" unless actual == fact
+          [holder, name, method]
         end
         ActiveRecord::Associations::Preloader.prepend(Hook)
       rescue StandardError, ScriptError => e
@@ -92,6 +104,10 @@ module Lowrail
           m = ActiveRecord::Associations::Preloader.instance_method(name)
           m = m.super_method while m && m.owner == Hook
           m == original
+        end && @relation_originals.all? do |holder, name, original|
+          method = holder.instance_method(name)
+          method = method.super_method while method&.owner == ARPlans::RelationHook
+          method == original
         end && @facts.fetch("types").all? do |name, methods|
           PreloadFacts.type_methods(Object.const_get(name)) == methods
         end
@@ -248,6 +264,7 @@ module Lowrail
       def call(records)
         loaders = {}.compare_by_identity
         execution = Execution.new(nil, loaders, false)
+        shadow = ARShadow.preload(records, spec) if ARShadow.enabled?
         @steps.each do |groups|
           # Rails snapshots all scopes/groups in a frontier before querying.
           # Callbacks may change facts for the next frontier, not that snapshot.
@@ -264,10 +281,12 @@ module Lowrail
             end
             [nodes, active]
           end
+          shadow&.check(ready.map(&:last))
           ready.each do |nodes, active|
             next if active.empty?
             nodes.first.edge.query.load_records_in_batch(active)
           end
+          shadow&.advance(ready.map(&:last))
         end
         PreloadPlans.hit
         execution.roots = @roots.filter_map { loaders[_1] }

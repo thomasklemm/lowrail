@@ -7,6 +7,8 @@ require "open3"
 require "rbconfig"
 require "fileutils"
 
+ENV["LOWRAIL_SHADOW"] = "strict"
+
 module LowrailTest
   GEM_ROOT = File.expand_path("..", __dir__)
   GEM_LIB = File.join(GEM_ROOT, "lib")
@@ -15,7 +17,7 @@ module LowrailTest
   SETUP_OPT = "-I#{GEM_LIB} -rlowrail/setup"
   # Variables a developer's shell might carry into the subprocesses.
   CLEAN_ENV = %w[LOWRAIL LOWRAIL_ROOT LOWRAIL_STATS LOWRAIL_OUTCOMES LOWRAIL_DEBUG RUBYOPT
-                 RAILS_ENV RACK_ENV BUNDLE_GEMFILE].to_h { [_1, nil] }
+                 RAILS_ENV RACK_ENV BUNDLE_GEMFILE].to_h { [_1, nil] }.merge("LOWRAIL_SHADOW" => "strict")
 
   # The sample app used by the end-to-end and guard tests. Unit 0 assumes
   # Dep.value (singleton fact), unit 1 assumes Calc#name (instance fact).

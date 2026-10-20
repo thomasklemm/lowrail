@@ -326,6 +326,7 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         .current_dir(app)
         .env("RUBYOPT", rubyopt.trim())
         .env("LOWRAIL", mode)
+        .env("LOWRAIL_SHADOW", "strict")
         .env("LOWRAIL_OUTCOMES", &out)
         .env("LOWRAIL_STATS", "") // counts on; hits come via LOWRAIL_OUTCOMES, no extra stats file
         .envs(extra_env.iter().copied())

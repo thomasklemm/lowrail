@@ -83,4 +83,55 @@ class ARGuardTest < Minitest::Test
       assert r["public_kept"]
     end
   end
+
+  def test_alias_restoration_of_inherited_hooks_does_not_recurse
+    result = ruby_json(<<~'RUBY', setup: false, env: { "RUBYLIB" => GEM_LIB })
+      require "active_record"
+      require "lowrail/ar_guard"
+      require "json"
+      Lowrail::AR.install
+      base = ActiveRecord::Base
+      base.establish_connection(adapter: "sqlite3", database: ":memory:")
+      ActiveRecord::Schema.verbose = false
+      ActiveRecord::Schema.define { create_table(:probes) }
+      # Same alias/define/restore protocol as Minitest::Mock#stub. Use an
+      # inherited macro, then call it normally after repeated restorations.
+      2.times do
+        base.singleton_class.alias_method :saved_attribute, :attribute
+        base.singleton_class.define_method(:attribute) { |*| :stubbed }
+        raise "stub bypassed" unless base.attribute(:probe, :integer) == :stubbed
+        base.singleton_class.alias_method :attribute, :saved_attribute
+        base.singleton_class.remove_method :saved_attribute
+        base.attribute(:probe, :integer)
+      end
+      class Probe < ActiveRecord::Base; end
+      puts JSON.generate([Probe.type_for_attribute(:probe).type, Lowrail::AR.epoch(Probe) > 0])
+    RUBY
+    assert_equal ["integer", true], result
+  end
+
+  def test_removed_sti_classes_do_not_remain_in_query_predicates
+    result = ruby_json(<<~'RUBY', setup: false, env: { "RUBYLIB" => GEM_LIB })
+      require "active_record"
+      require "lowrail/ar_guard"
+      require "json"
+      Lowrail::AR.install
+      ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+      ActiveRecord::Schema.verbose = false
+      ActiveRecord::Schema.define { create_table(:guard_items) { |t| t.string :type } }
+      class GuardItem < ActiveRecord::Base; end
+      class StableGuardItem < GuardItem; end
+      before = StableGuardItem.all.to_sql
+      def introduce_temporary_subclass
+        Object.const_set(:TemporaryGuardItem, Class.new(StableGuardItem))
+        TemporaryGuardItem.attribute :extra, :integer
+        Object.send(:remove_const, :TemporaryGuardItem)
+        nil
+      end
+      introduce_temporary_subclass
+      3.times { GC.start(full_mark: true, immediate_sweep: true) }
+      puts JSON.generate([before, StableGuardItem.all.to_sql])
+    RUBY
+    assert_equal result.first, result.last, "epoch bookkeeping must not retain removed STI descendants"
+  end
 end

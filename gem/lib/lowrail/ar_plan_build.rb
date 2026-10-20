@@ -56,6 +56,9 @@ module Lowrail
         rescue StandardError => e
           ledger << { "pass" => "active_record/ar_plans", "method" => label, "outcome" => "declined: #{e.class}: #{e.message.lines.first.strip}" }
         end
+      rescue StandardError => e
+        ledger << { "pass" => "active_record/ar_plans", "file" => owner.name,
+          "outcome" => "model unavailable: #{e.class}: #{e.message.lines.first.strip}" }
       end
       unless edges.empty?
         adapters = models.keys.map { Object.const_get(_1).with_connection(&:class) }.uniq

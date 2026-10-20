@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "ar_shadow"
+
 module Lowrail
   # One ordinary singleton-class def (and ISeq) per model. Rails still owns
   # object initialization, lazy casting, callbacks and instrumentation.
@@ -84,6 +86,7 @@ module Lowrail
                   # A subscriber or a preceding row's block/callback may change
                   # methods or schema. Resume Rails row loading, never replay rows.
                   if plan.current?
+                    ::Lowrail::ARShadow.instantiate(self, plan.builder) if ::Lowrail::ARShadow.enabled?
                     attributes = plan.builder.build_from_database(record, column_types)
                     object = allocate.init_with_attributes(attributes, &block)
                     ::Lowrail::ARInstantiate.count(#{id}, true)

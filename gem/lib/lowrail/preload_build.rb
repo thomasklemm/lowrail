@@ -60,9 +60,12 @@ module Lowrail
             types[type.class.name] ||= PreloadFacts.type_methods(type.class)
           end
           edges[label] = PreloadFacts.reflection(r)
-        rescue StandardError => e
+        rescue StandardError, NotImplementedError => e
           ledger << { "method" => label, "pass" => "active_record/preload_plans", "outcome" => "declined: #{e.class}" }
         end
+      rescue StandardError => e
+        ledger << { "file" => klass.name, "pass" => "active_record/preload_plans",
+          "outcome" => "model unavailable: #{e.class}: #{e.message.lines.first.strip}" }
       end
       unless edges.empty?
         preloader = ActiveRecord::Associations::Preloader
@@ -76,15 +79,23 @@ module Lowrail
             facts << PreloadFacts.method_fact(mod, name)
           end
         end
+        # ARPlans transparently wraps these relation methods. Check the Rails
+        # body under that exact wrapper, not a method owner that our own
+        # installation changes. Keep wrapper facts for invalidation as well.
+        relation_originals, facts = facts.partition { |f|
+          f["receiver"] == "ActiveRecord::Relation" && %w[initialize_copy exec_main_query].include?(f["method"])
+        }
+        relation_originals.uniq!
+        relation_originals.each { facts << PreloadFacts.method_fact(ARPlans::RelationHook, _1.fetch("method")) }
         # Pin the implementation of private Rails APIs used by this pass.
-        files = (facts + originals).filter_map { _1["source_location"]&.sub(/:\d+\z/, "") }.uniq
+        files = (facts + originals + relation_originals).filter_map { _1["source_location"]&.sub(/:\d+\z/, "") }.uniq
         files.concat(types.values.flat_map(&:values).flatten(1).map(&:first))
         files << PreloadFacts.method(:decline).source_location.first
         edges.each_value { |e| files << e["scope"].first if e["scope"] }
         units << { "kind" => "runtime", "file" => "active_record/preload_plans",
           "pass" => "active_record/preload_plans", "facts" => facts.uniq,
           "preload_facts" => { "models" => models, "edges" => edges,
-            "originals" => originals, "types" => types,
+            "originals" => originals, "relation_originals" => relation_originals, "types" => types,
             "rails_version" => Rails.version, "sources" => files.uniq.to_h { [_1, Digest::SHA256.file(_1).hexdigest] } } }
       end
       warn "[lowrail] preload plans: #{edges.size} eligible associations, #{ledger.count { _1["pass"] == "active_record/preload_plans" } - edges.size} declined"
