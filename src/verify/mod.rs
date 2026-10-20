@@ -3,7 +3,7 @@
 //! meaningful together with the fast-path hit counts, so those are reported
 //! per unit.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::Instant;
@@ -38,7 +38,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         return Ok(());
     }
     if bisect {
-        let culprits = bisect_units(&app, &cmd, &report.off, &seed)?;
+        let culprits = bisect_units(&app, &cmd, &report.off, &report.unstable_sql, &seed)?;
         println!("culprit units: {culprits:?}");
         write_denylist(&app, &culprits, &report.differences())?;
     }
@@ -66,6 +66,9 @@ pub struct Run {
 pub struct Report {
     pub off: Run,
     pub on: Run,
+    /// Tests whose SQL trace already differs between two LOWRAIL=0 runs
+    /// (inlined sequence ids, time, randomness). Their traces cannot gate.
+    pub unstable_sql: BTreeSet<String>,
 }
 
 impl Report {
@@ -90,6 +93,7 @@ impl Report {
         self.off
             .sql
             .iter()
+            .filter(|(name, _)| !self.unstable_sql.contains(*name))
             .filter_map(|(name, off)| match self.on.sql.get(name) {
                 Some(on) if on.0 != off.0 => Some(format!("{name}: {} → {} queries", off.1, on.1)),
                 _ => None,
@@ -146,6 +150,12 @@ impl Report {
         }
         let traced = self.off.sql.keys().filter(|k| self.on.sql.contains_key(*k)).count();
         let sql_diffs = self.sql_differences();
+        if !self.unstable_sql.is_empty() {
+            s.push_str(&format!(
+                "sql traces: {} tests excluded, their queries already differ between two LOWRAIL=0 runs\n",
+                self.unstable_sql.len()
+            ));
+        }
         if sql_diffs.is_empty() {
             let queries: u64 = self.off.sql.values().map(|v| v.1).sum();
             s.push_str(&format!("sql traces: identical for {traced} tests ({queries} queries)\n"));
@@ -208,14 +218,28 @@ pub fn verify(app: &Path, cmd: &[String], seed: &[(String, String)]) -> Result<R
     let env = env_refs(seed);
     let off = run_with(app, cmd, &dir, "0", &env)?;
     let on = run_with(app, cmd, &dir, "1", &env)?;
-    Ok(Report { off, on })
+    let mut report = Report { off, on, unstable_sql: BTreeSet::new() };
+    // Only when SQL would fail the gate: a second LOWRAIL=0 run tells
+    // run-to-run noise apart from differences Lowrail causes.
+    if report.sql_gates() && !report.sql_differences().is_empty() {
+        eprintln!("lowrail verify: SQL traces differ; control run with LOWRAIL=0");
+        let control = run_labeled(app, cmd, &dir, "0-control", "0", &env)?;
+        report.unstable_sql = report
+            .off
+            .sql
+            .iter()
+            .filter(|(name, off)| control.sql.get(*name).map(|c| &c.0) != Some(&off.0))
+            .map(|(name, _)| name.clone())
+            .collect();
+    }
+    Ok(report)
 }
 
 /// Finds the units whose lowering changes outcomes: splits the unit set and
 /// reruns the suite with only one half enabled (LOWRAIL_UNITS), recursing
 /// into halves that still differ. A set whose halves are each clean is
 /// reported whole (the units only fail together).
-fn bisect_units(app: &Path, cmd: &[String], off: &Run, seed: &[(String, String)]) -> Result<Vec<Vec<u64>>, String> {
+fn bisect_units(app: &Path, cmd: &[String], off: &Run, unstable: &BTreeSet<String>, seed: &[(String, String)]) -> Result<Vec<Vec<u64>>, String> {
     let manifest: Value = serde_json::from_str(
         &std::fs::read_to_string(app.join(".lowrail/manifest.json")).map_err(|e| e.to_string())?,
     )
@@ -230,7 +254,11 @@ fn bisect_units(app: &Path, cmd: &[String], off: &Run, seed: &[(String, String)]
         let mut env = env_refs(seed);
         env.push(("LOWRAIL_UNITS", &list));
         let on = run_with(app, cmd, &dir, "1", &env)?;
-        let r = Report { off: Run { tests: off.tests.clone(), sql: off.sql.clone(), sql_other: off.sql_other.clone(), exit_ok: off.exit_ok, ..Default::default() }, on };
+        let r = Report {
+            off: Run { tests: off.tests.clone(), sql: off.sql.clone(), sql_other: off.sql_other.clone(), exit_ok: off.exit_ok, ..Default::default() },
+            on,
+            unstable_sql: unstable.clone(),
+        };
         eprintln!("bisect: units [{list}] → {}", if r.identical() { "identical" } else { "differs" });
         Ok(!r.identical())
     };
@@ -267,9 +295,14 @@ fn write_denylist(app: &Path, culprits: &[Vec<u64>], evidence: &[String]) -> Res
 }
 
 fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&str, &str)]) -> Result<Run, String> {
-    let out = dir.join(format!("outcomes-{mode}.json"));
+    run_labeled(app, cmd, dir, mode, mode, extra_env)
+}
+
+/// `label` names the outcome files, `mode` is the LOWRAIL value.
+fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, extra_env: &[(&str, &str)]) -> Result<Run, String> {
+    let out = dir.join(format!("outcomes-{label}.json"));
     for entry in std::fs::read_dir(dir).map_err(|e| e.to_string())?.flatten() {
-        if entry.file_name().to_string_lossy().starts_with(&format!("outcomes-{mode}.json")) {
+        if entry.file_name().to_string_lossy().starts_with(&format!("outcomes-{label}.json")) {
             let _ = std::fs::remove_file(entry.path());
         }
     }
@@ -295,7 +328,7 @@ fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&s
     // also writes a merged report: do not count its workers twice.
     for entry in std::fs::read_dir(dir).map_err(|e| e.to_string())?.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
-        if !name.starts_with(&format!("outcomes-{mode}.json")) {
+        if !name.starts_with(&format!("outcomes-{label}.json")) {
             continue;
         }
         if out.is_file() && entry.path() != out {
