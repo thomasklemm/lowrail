@@ -13,8 +13,8 @@ class RequestPairsTest < Minitest::Test
     end
   end
 
-  def test_counter_refuses_an_ar_build_that_would_silently_decline
-    saved = ENV.to_h.slice("BENCH_COUNTER", "BENCH_INSTANTIATE_DIR", "BENCH_ROUNDS")
+  def test_comparisons_refuse_an_ar_build_that_would_silently_decline
+    saved = ENV.to_h.slice("BENCH_COUNTER", "BENCH_INSTANTIATE_DIR", "BENCH_ROUNDS", "BENCH_LOWRAIL_LIB")
     Dir.mktmpdir("lowrail-stale-build-test") do |dir|
       FileUtils.mkdir_p(File.join(dir, ".lowrail"))
       normal = { rails_env: "production", files: {}, templates: {}, units: [] }
@@ -23,12 +23,26 @@ class RequestPairsTest < Minitest::Test
       FileUtils.mkdir_p(extra)
       units = [{ pass: "active_record/instantiate", ar_instantiate: { sources: { File.join(dir, "missing.rb") => "obsolete" } } }]
       File.write(File.join(extra, "manifest.json"), JSON.generate(normal.merge(units: units)))
-      ENV.update("BENCH_COUNTER" => "callgrind", "BENCH_INSTANTIATE_DIR" => extra, "BENCH_ROUNDS" => "6")
-      error = assert_raises(RuntimeError) { RequestPairs.run(dir, File.join(dir, "out"), "GET:/") }
+      ENV.update("BENCH_INSTANTIATE_DIR" => extra, "BENCH_ROUNDS" => "8")
+      [nil, "callgrind", "gc"].each_with_index do |counter, index|
+        ENV["BENCH_COUNTER"] = counter
+        error = assert_raises(RuntimeError) { RequestPairs.run(dir, File.join(dir, "out-#{index}"), "GET:/") }
+        assert_match "AR build sources changed", error.message
+      end
+      # The checkout matches, but the library actually loaded by workers
+      # does not. It must not masquerade as an active certified AR build.
+      certified = File.expand_path("../gem/lib/lowrail/ar_guard.rb", __dir__)
+      units.first[:ar_instantiate][:sources] = { certified => Digest::SHA256.file(certified).hexdigest }
+      File.write(File.join(extra, "manifest.json"), JSON.generate(normal.merge(units: units)))
+      lib = File.join(dir, "lib")
+      FileUtils.mkdir_p(File.join(lib, "lowrail"))
+      File.write(File.join(lib, "lowrail/ar_guard.rb"), "obsolete")
+      ENV["BENCH_LOWRAIL_LIB"] = lib
+      error = assert_raises(RuntimeError) { RequestPairs.run(dir, File.join(dir, "out-override"), "GET:/") }
       assert_match "AR build sources changed", error.message
     end
   ensure
-    %w[BENCH_COUNTER BENCH_INSTANTIATE_DIR BENCH_ROUNDS].each { ENV[_1] = saved[_1] }
+    %w[BENCH_COUNTER BENCH_INSTANTIATE_DIR BENCH_ROUNDS BENCH_LOWRAIL_LIB].each { ENV[_1] = saved[_1] }
   end
 
   def test_gc_exclusion_preserves_mutator_work_between_incremental_segments

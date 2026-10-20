@@ -80,8 +80,16 @@ if ENV["BENCH_PIPE"]
   abort "pipe mode needs exactly one route" unless routes.one?
   verb, path = routes.first
   reply = ->(data) { puts "LOWRAIL_BENCH #{JSON.generate(data)}"; $stdout.flush }
+  ar_installed = 0
+  if defined?(Lowrail::ARInstantiate)
+    ar_installed = Lowrail.manifest.units.count do |unit|
+      unit["pass"] == "active_record/instantiate" &&
+        Object.const_get(unit.fetch("ar_instantiate").fetch("model")).instance_variable_defined?(:@_lowrail_instantiate)
+    end
+  end
   reply.call(ready: true, pid: Process.pid, ruby: RUBY_DESCRIPTION,
-    yjit: RubyVM::YJIT.enabled?, units: defined?(Lowrail) && Lowrail.manifest&.units&.size)
+    yjit: RubyVM::YJIT.enabled?, units: defined?(Lowrail) && Lowrail.manifest&.units&.size,
+    ar_installed: ar_installed)
   STDIN.each_line do |line|
     command = JSON.parse(line)
     n = Integer(command.fetch("requests"))

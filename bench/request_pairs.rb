@@ -91,6 +91,8 @@ module RequestPairs
     minimum = fixed_heap ? 6 : (counter || diagnostic ? 3 : 8)
     rounds = Integer(ENV.fetch("BENCH_ROUNDS", minimum.to_s))
     raise "too few rounds" if rounds < minimum
+    root = File.expand_path("..", __dir__)
+    lib = File.expand_path(ENV.fetch("BENCH_LOWRAIL_LIB", File.join(root, "gem/lib")))
     workers = {}
     environments = {}
     samples = []
@@ -119,21 +121,22 @@ module RequestPairs
         extra_data = JSON.parse(File.read(File.join(extra, "manifest.json")))
         raise "production --ar-instantiate build required" unless extra_data["rails_env"] == "production" &&
           extra_data.fetch("units").any? { _1["pass"] == "active_record/instantiate" }
-        if counter
-          certificates = extra_data.fetch("units").select { _1["pass"] == "active_record/instantiate" }
-          raise "AR build sources changed; rebuild before measuring" unless certificates.all? do |unit|
-            unit.fetch("ar_instantiate").fetch("sources").all? { |path, sha| File.file?(path) && Digest::SHA256.file(path).hexdigest == sha }
+        certificates = extra_data.fetch("units").select { _1["pass"] == "active_record/instantiate" }
+        raise "AR build sources changed; rebuild before measuring" unless certificates.all? do |unit|
+          unit.fetch("ar_instantiate").fetch("sources").all? do |path, sha|
+            # A library override must match the certificate too, not merely
+            # the checkout whose absolute paths the builder recorded.
+            actual = path.start_with?("#{root}/gem/lib/") ? File.join(lib, path.delete_prefix("#{root}/gem/lib/")) : path
+            [path, actual].uniq.all? { File.file?(_1) && Digest::SHA256.file(_1).hexdigest == sha }
           end
         end
         layers["instantiate"] = File.join(tmp, "instantiate")
         FileUtils.mkdir_p(layers["instantiate"])
         FileUtils.cp_r(extra, File.join(layers["instantiate"], ".lowrail"))
       end
-      root = File.expand_path("..", __dir__)
       metadata = { seed: seed, rounds: rounds, route: route, app: File.basename(app),
         manifest_sha256: Digest::SHA256.file(source).hexdigest,
         cache_mb: ENV["CAMPFIRE_RESPONSE_CACHE_MB"], variant_app: variant, workers: {} }
-      lib = File.expand_path(ENV.fetch("BENCH_LOWRAIL_LIB", File.join(root, "gem/lib")))
       metadata[:runtime_sha256] = Digest::SHA256.file(File.join(lib, "lowrail.rb")).hexdigest
       metadata[:runtime_files_sha256] = Dir.glob(File.join(lib, "**/*.rb")).sort.to_h do |path|
         [path.delete_prefix(lib + "/"), Digest::SHA256.file(path).hexdigest]
@@ -143,6 +146,7 @@ module RequestPairs
           "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => build_root,
           "LOWRAIL_UNITS" => layer == "disabled" ? "" : nil,
           "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil,
+          "LOWRAIL_SHADOW" => nil,
           "RUBYOPT" => build_root ? "-I#{lib} -rlowrail/setup" : nil,
           "BENCH_PIPE" => counter || diagnostic ? nil : "1",
           "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter || diagnostic ? "50" : "400"),
@@ -153,6 +157,7 @@ module RequestPairs
         stdin, stdout, wait = Open3.popen2e(env, RbConfig.ruby, "--yjit", File.join(__dir__, "requests.rb"), route, chdir: env.fetch("BENCH_WORKDIR"))
         workers[layer] = { stdin: stdin, stdout: stdout, wait: wait, log: File.open(File.join(out, "#{layer}.log"), "w") }
         metadata[:workers][layer] = receive(workers.fetch(layer))
+        raise "AR build did not activate" if layer == "instantiate" && metadata[:workers][layer].fetch("ar_installed").zero?
         warn "warm #{File.basename(app)} #{layer}"
       end
       return heap_instructions(environments, app, out, route, metadata) if fixed_heap
