@@ -37,6 +37,54 @@ class PassBenchTest < Minitest::Test
     run_rejection(manifest) { assert_includes _1.fetch("error"), "no units" }
   end
 
+  def test_unsafe_snapshot_declines_normally_and_cannot_skip_existing_preflight
+    data = manifest.merge("ruby_description" => "[LOWRAIL UNSAFE] #{RUBY_DESCRIPTION}")
+    run_rejection(data) { assert_includes _1.fetch("error"), "incompatible Ruby/format" }
+    Dir.mktmpdir("lowrail-unsafe-preflight") do |dir|
+      file = File.join(dir, "manifest.json")
+      File.write(file, JSON.generate(data))
+      lib = File.expand_path("../gem/lib", __dir__)
+      assert_equal data, PassBench.preflight(dir, lib, unsafe: true)
+      File.write(file, JSON.generate(data.merge("ruby_description" => "[LOWRAIL UNSAFE] obsolete Ruby")))
+      assert_raises(RuntimeError) { PassBench.preflight(dir, lib, unsafe: true) }
+      File.write(file, JSON.generate(data.merge("templates" => { "/missing.erb" => { "source_sha256" => "stale" } })))
+      assert_raises(RuntimeError) { PassBench.preflight(dir, lib, unsafe: true) }
+    end
+    run_rejection(manifest, speculate: "unguarded", counter: "native") { assert_includes _1.fetch("error"), "fixed-heap Callgrind" }
+    mixed = manifest.merge("units" => [{ "id" => 0, "pass" => "route/path", "facts" => [] },
+      { "id" => 1, "pass" => "view/link_to", "facts" => [] }])
+    run_rejection(mixed, pass: "route/path", speculate: "unguarded") { assert_includes _1.fetch("error"), "separate single-pass build" }
+  end
+
+  def test_speculative_source_elision_preserves_literals_live_predicates_and_unselected_guards
+    require_relative "experiments/speculative_build"
+    guard = "self.class.equal?(::Lowrail::K[0]) || ::Lowrail.ok?(0, self.class)"
+    source = <<~RUBY
+      # frozen_string_literal: true
+      label = "café"; literal = #{guard.dump}
+      [literal, ((#{guard}) ? (live ? :fast : :dynamic_fallback) : :original),
+       ((#{guard.sub('[0]', '[1]').sub('(0,', '(1,')}) ? :unselected : :original),
+       ((::Lowrail::G[2] || ::Lowrail.check(2)) ? :global_fast : :original)]
+    RUBY
+    counts = {}
+    lowered = SpeculativeBuild.elide(source, [0, 2], counts)
+    assert_equal({ "0" => 1, "2" => 1 }, counts)
+    assert_equal source.bytesize, lowered.bytesize
+    assert_equal source.lines.map(&:bytesize), lowered.lines.map(&:bytesize)
+    script = <<~RUBY
+      require "json"
+      module Lowrail
+        K = []; G = []
+        def self.ok?(*) = false
+        def self.check(*) = false
+      end
+      puts JSON.generate([true, false].map { |live| eval(#{lowered.dump}) })
+    RUBY
+    output, error, status = Open3.capture3({ "RUBYOPT" => nil }, RbConfig.ruby, "-e", script)
+    assert status.success?, error
+    assert_equal [[guard, "fast", "original", "global_fast"], [guard, "dynamic_fallback", "original", "global_fast"]], JSON.parse(output)
+  end
+
   def test_one_boot_cannot_masquerade_as_independent_native_cohorts
     saved = ENV["BENCH_COHORTS"]
     ENV["BENCH_COHORTS"] = "1"

@@ -44,6 +44,26 @@ exclude the other passes at build time, e.g.
 `BENCH_INSTANTIATE_DIR` still adds a second complete build to a
 default/base-cost experiment. It too gets a strict activation probe.
 
+`--speculate unguarded` adds a **measurement-only unsafe** layer to the
+fixed-heap Callgrind experiment (`--pass default` or a named pass). It first
+runs the ordinary strict guarded preflight and coverage probe, then recompiles
+a disposable snapshot with the selected generated source guards elided.
+All build units must be selected: named passes need their own single-pass
+build, not a guard mask over a mixed build. Otherwise the partial bypass
+changes the cost of unselected sites and is not an isolated guard ablation.
+Live argument/type/scope predicates remain. Runtime passes bypass shared
+method facts and the instantiate epoch but retain dispatch and pass-specific
+structural checks: this is not a zero-overhead runtime-pass ceiling.
+The unsafe snapshot has an incompatible manifest marker; only the
+ancestry-checked source-checkout experiment accepts it. Never deploy it.
+Every guarded/original/off worker explicitly clears both unsafe ENV variables.
+The unsafe layer gets its own full preflight and activation/JIT probe; all
+ordinary A/A, heap and provenance checks remain mandatory. `request.guard_tax`
+retains paired guarded-minus-unsafe Ir/request and percentages (including
+negative estimates). `measurement_complete` remains false. This mode cannot
+combine with stacked budgets, native timing or other comparison layers.
+See [the speculation study](passes/speculation.md) for results and limits.
+
 `BENCH_BASELINE_LIB=/absolute/archived/gem/lib` adds the existing same-manifest
 before-runtime instruction layer and `runtime_change_pct`. Use a source-only
 build with `--pass default`: named selection would otherwise compare different

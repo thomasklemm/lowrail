@@ -126,6 +126,13 @@ module RequestPairs
         FileUtils.cp_r(File.expand_path(reference), File.join(layers["default"], ".lowrail"))
         layers["stacked"] = normal
       end
+      if (speculative = ENV["BENCH_SPECULATIVE_DIR"])
+        raise "unsafe comparison requires fixed-heap Callgrind and no other comparison layers" unless fixed_heap &&
+          !reference && %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].none? { ENV[_1] }
+        layers["unguarded"] = File.join(tmp, "unguarded")
+        FileUtils.mkdir_p(layers["unguarded"])
+        FileUtils.cp_r(File.expand_path(speculative), File.join(layers["unguarded"], ".lowrail"))
+      end
       # A runtime-only refactor uses the exact same build in a same-round
       # before worker, rather than comparing two unrelated off baselines.
       if (baseline = ENV["BENCH_BASELINE_LIB"])
@@ -162,6 +169,7 @@ module RequestPairs
       if reference
         metadata[:default_manifest_sha256] = Digest::SHA256.file(File.join(layers.fetch("default"), ".lowrail/manifest.json")).hexdigest
       end
+      metadata[:unsafe_manifest_sha256] = Digest::SHA256.file(File.join(speculative, "manifest.json")).hexdigest if speculative
       metadata[:runtime_sha256] = Digest::SHA256.file(File.join(lib, "lowrail.rb")).hexdigest
       metadata[:runtime_files_sha256] = Dir.glob(File.join(lib, "**/*.rb")).sort.to_h do |path|
         [path.delete_prefix(lib + "/"), Digest::SHA256.file(path).hexdigest]
@@ -176,9 +184,10 @@ module RequestPairs
         env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
           "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => build_root,
           "LOWRAIL_UNITS" => layer == "disabled" ? "" :
-            ((layer == "stacked" || (layer == "default" && !reference)) ? ENV["BENCH_UNITS"] : nil),
+            ((%w[stacked unguarded].include?(layer) || (layer == "default" && !reference)) ? ENV["BENCH_UNITS"] : nil),
           "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil,
           "LOWRAIL_SHADOW" => nil,
+          "LOWRAIL_SPECULATE" => layer == "unguarded" ? "unguarded" : nil, "LOWRAIL_SPECULATE_KEEP" => nil,
           "RUBYOPT" => build_root ? "-I#{runtime_lib} -rlowrail/setup" : nil,
           "BENCH_PIPE" => counter || diagnostic ? nil : "1",
           "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter || diagnostic ? "50" : "400"),
@@ -332,6 +341,14 @@ module RequestPairs
       summary[:runtime_change_pct] = %w[instructions_total instructions_no_gc].to_h do |metric|
         values = samples.map { 100 * (_1.fetch("default").fetch(metric) / _1.fetch("before").fetch(metric) - 1) }
         [metric, estimate(values, seed: metadata.fetch(:seed))]
+      end
+    end
+    if environments.key?("unguarded")
+      summary[:guard_tax] = %w[instructions_total instructions_no_gc].to_h do |metric|
+        savings = samples.map { _1.fetch("default").fetch(metric) - _1.fetch("unguarded").fetch(metric) }
+        percentages = samples.zip(savings).map { |row, saved| 100 * saved / row.fetch("default").fetch(metric) }
+        [metric, { saved_per_request: estimate(savings, seed: metadata.fetch(:seed)),
+          pct_of_guarded: estimate(percentages, seed: metadata.fetch(:seed)) }]
       end
     end
     summary[:gc] = environments.keys.to_h do |layer|

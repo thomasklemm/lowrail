@@ -9,10 +9,15 @@ require_relative "../gem/lib/lowrail/manifest"
 
 # One report contract over the existing request/GC harness and method micros.
 module PassBench
-  def self.preflight(dir, lib)
+  def self.preflight(dir, lib, unsafe: false)
     path = File.join(dir, "manifest.json")
     data = JSON.parse(File.read(path))
-    manifest = Lowrail::Manifest.new(data, dir)
+    checked = data
+    if unsafe
+      raise "unsafe snapshot marker missing" unless data.fetch("ruby_description").start_with?("[LOWRAIL UNSAFE] ")
+      checked = data.merge("ruby_description" => data.fetch("ruby_description").delete_prefix("[LOWRAIL UNSAFE] "))
+    end
+    manifest = Lowrail::Manifest.new(checked, dir)
     raise "stale build: incompatible Ruby/format" unless manifest.compatible?
     raise "production build required" unless manifest.rails_env == "production"
     root_lib = File.expand_path("../gem/lib", __dir__) + "/"
@@ -82,8 +87,8 @@ module PassBench
   end
 
   def self.harness_fingerprint
-    Dir.glob(File.join(__dir__, "*.{rb,c}")).reject { _1.end_with?("_test.rb") }.sort.to_h do |file|
-      [File.basename(file), Digest::SHA256.file(file).hexdigest]
+    Dir.glob(File.join(__dir__, "**/*.{rb,c}")).reject { _1.end_with?("_test.rb") }.sort.to_h do |file|
+      [file.delete_prefix(__dir__ + "/"), Digest::SHA256.file(file).hexdigest]
     end
   end
 
@@ -160,6 +165,14 @@ module PassBench
     if result[:coverage]
       lines << "\nCompleted routes/request: #{result.fetch(:coverage).fetch('route_completions_per_request')}; other per-unit counts in JSON. Source guard counts are not completion counts."
     end
+    if result[:speculation]
+      lines << "\n**UNSAFE measurement only; never deploy.** Source guards elided; runtime dispatch and live input predicates remain. No support/promotion claim."
+      result.fetch(:request, {}).fetch("guard_tax", {}).each do |metric, comparison|
+        saved, percent = comparison.values_at("saved_per_request", "pct_of_guarded")
+        lines << format("\nGuarded − unsafe %s: %+.3f Ir/request [%+.3f, %+.3f], %+.3f%% [%+.3f, %+.3f] of guarded work.",
+          metric, saved.fetch("median"), *saved.fetch("ci95"), percent.fetch("median"), *percent.fetch("ci95"))
+      end
+    end
     if (stack = result[:stack])
       lines << "\n| Reference / metric | Measured saving/request [95% CI] | Sum individual expected [95% CI] | Measured − expected [95% CI] |"
       lines << "|---|---:|---:|---:|"
@@ -224,6 +237,13 @@ module PassBench
       end
       counter = result.fetch(:counter)
       raise "counter must be callgrind or native" unless %w[callgrind native].include?(counter)
+      if options[:speculate]
+        raise "only --speculate unguarded is supported" unless options[:speculate] == "unguarded"
+        raise "unsafe comparison requires fixed-heap Callgrind, --pass and no other comparison layers" if
+          stacked || counter != "callgrind" || options[:micro_case] || options[:diagnostics] ||
+          %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].any? { ENV[_1] }
+        warn "[lowrail] *** UNSAFE GUARD-TAX EXPERIMENT: ONLY THE UNGUARDED LAYER BYPASSES FACTS. NEVER DEPLOY. ***"
+      end
       raise "BENCH_JIT must be 0 or 1" unless %w[0 1].include?(ENV.fetch("BENCH_JIT", "0"))
       raise "legacy heap mode is diagnostic only" if ENV["BENCH_HEAP_MODE"] == "legacy"
       raise "A/A tolerance is fixed; do not widen controls" if ENV["BENCH_AA_TOLERANCE"]
@@ -244,6 +264,10 @@ module PassBench
         stacked ? result.fetch(:passes).include?(unit.fetch("pass")) : options.fetch(:pass) == "default" || unit.fetch("pass") == options.fetch(:pass)
       end
       raise "no units for selection; build production with that pass first" if selected.empty?
+      # A partial unsafe receiver bypass changes the cost of disabled sites.
+      # Price a pass on a separate single-pass build, never mask a mixed build.
+      raise "unsafe comparison needs all build units selected; use a separate single-pass build" if
+        options[:speculate] && selected != data.fetch("units")
       if stacked
         raise "stack build contains unselected passes; rebuild with exactly --passes SET" unless selected == data.fetch("units")
         reference = File.expand_path(options.fetch(:default_build))
@@ -267,10 +291,24 @@ module PassBench
       env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
         "LOWRAIL" => "1", "LOWRAIL_ROOT" => app, "LOWRAIL_UNITS" => ids, "BENCH_UNITS" => ids,
         "LOWRAIL_STATS" => "", "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil, "LOWRAIL_SHADOW" => nil,
+        "LOWRAIL_SPECULATE" => nil, "LOWRAIL_SPECULATE_KEEP" => nil,
         "BENCH_JIT" => counter == "native" ? "1" : ENV.fetch("BENCH_JIT", "0"),
         "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter == "native" ? "400" : "50"),
         "RUBYOPT" => "-I#{lib} -rlowrail/setup" }
       result[:coverage] = probe(app, out, env, route, "coverage")
+      if options[:speculate]
+        require_relative "experiments/speculative_build"
+        speculative = File.join(out, "unsafe-build")
+        result[:speculation] = SpeculativeBuild.build(app, speculative, selected.map { _1.fetch("id") }, env,
+          File.join(out, "unsafe-build.log"))
+        speculative_data = preflight(speculative, lib, unsafe: true)
+        result[:speculation][:manifest_sha256] = Digest::SHA256.file(File.join(speculative, "manifest.json")).hexdigest
+        Dir.mktmpdir("lowrail-bench-unsafe") do |tmp|
+          FileUtils.ln_s(speculative, File.join(tmp, ".lowrail"))
+          result[:speculation][:coverage] = probe(app, out, env.merge("LOWRAIL_ROOT" => tmp,
+            "LOWRAIL_SPECULATE" => "unguarded"), route, "unsafe-coverage")
+        end
+      end
       if stacked
         Dir.mktmpdir("lowrail-bench-default") do |tmp|
           FileUtils.ln_s(reference, File.join(tmp, ".lowrail"))
@@ -305,7 +343,7 @@ module PassBench
       # The request driver, not this parent, assigns each worker's setup layer.
       run_env = env.merge("RUBYOPT" => nil, "LOWRAIL_STATS" => nil, "BENCH_COUNTER" => counter == "callgrind" ? "callgrind" : nil,
         "BENCH_HEAP_MODE" => "fixed", "BENCH_UNITS" => options[:pass] == "default" ? nil : ids,
-        "BENCH_DEFAULT_DIR" => reference)
+        "BENCH_DEFAULT_DIR" => reference, "BENCH_SPECULATIVE_DIR" => speculative)
       ok = system(run_env, RbConfig.ruby, File.join(__dir__, "request_pairs.rb"), app, File.join(out, "requests"), route,
         out: File.join(out, "requests.log"), err: [:child, :out])
       result[:request] = JSON.parse(File.read(File.join(out, "requests/summary.json"))) if File.file?(File.join(out, "requests/summary.json"))
@@ -340,6 +378,7 @@ module PassBench
       end
       # Detect a concurrent rebuild/edit rather than publish mixed provenance.
       raise "build changed during measurement" unless data == preflight(File.join(app, ".lowrail"), lib)
+      raise "unsafe build changed during measurement" if speculative && speculative_data != preflight(speculative, lib, unsafe: true)
       raise "default build changed during measurement" if stacked && reference_data != preflight(reference, lib)
       raise "extra build changed during measurement" if extra && extra_data != preflight(File.expand_path(extra), lib)
       raise "runtime changed during measurement" unless result.fetch(:runtime_files_sha256) == runtime_fingerprint(lib)
@@ -373,7 +412,7 @@ end
 if $PROGRAM_NAME == __FILE__
   options = {}
   parser = OptionParser.new do |p|
-    %w[pass passes default-passes default-build budgets path out counter micro-case model].each { |name| p.on("--#{name} VALUE") { options[name.tr('-', '_').to_sym] = _1 } }
+    %w[pass passes default-passes default-build budgets path out counter micro-case model speculate].each { |name| p.on("--#{name} VALUE") { options[name.tr('-', '_').to_sym] = _1 } }
     p.on("--measure-budgets") { options[:measure_budgets] = true }
     p.on("--diagnostics") { options[:diagnostics] = true }
   end

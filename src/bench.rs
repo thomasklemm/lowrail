@@ -29,7 +29,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
                 if names.is_empty() { return Err("bench pass set must not be empty".into()); }
                 if passes.replace(names).is_some() { return Err("specify --passes once".into()); }
             }
-            "--path" | "--out" | "--counter" | "--micro-case" | "--model" | "--default-build" | "--budgets" => {
+            "--path" | "--out" | "--counter" | "--micro-case" | "--model" | "--default-build" | "--budgets" | "--speculate" => {
                 forwarded.push(arg.clone());
                 forwarded.push(it.next().ok_or_else(|| format!("{arg} needs a value"))?.clone());
             }

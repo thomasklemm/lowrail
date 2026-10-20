@@ -4,33 +4,28 @@
 # LOWRAIL_SPECULATE=unguarded lowrail bench|verify ...
 # Data-dependent branches (STI, argument shape, scopes, etc.) are NOT facts
 # and remain live. This is not permission to cache request inputs.
+require_relative "experiments/speculation_context"
+
 module Lowrail
   module Speculation
     MODE = ENV.fetch("LOWRAIL_SPECULATE")
     abort "[lowrail] unknown speculation mode #{MODE.inspect}" unless MODE == "unguarded"
 
-    # The source-checkout Rails runner is another differential verifier. Do
-    # not accept arbitrary Ruby/shell commands containing the words 'bench'
-    # or 'verify'. Fail closed on platforms without procfs.
-    def self.context
-      pid = Process.ppid
-      while pid > 1
-        args = File.binread("/proc/#{pid}/cmdline").split("\0")
-        return args[1] if File.basename(args[0].to_s) == "lowrail" && %w[bench verify].include?(args[1])
-        cwd = File.readlink("/proc/#{pid}/cwd")
-        return "rails-suite" if args.any? { File.expand_path(_1, cwd) == File.expand_path("../script/rails-suite", __dir__) }
-        pid = Integer(File.read("/proc/#{pid}/status")[/^PPid:\s+(\d+)/, 1])
-      end
-      nil
-    rescue SystemCallError, ArgumentError, TypeError
-      nil
-    end
-
-    CONTEXT = context
+    CONTEXT = SpeculationContext.context
     abort "[lowrail] REFUSING UNSAFE speculation: only lowrail bench/verify or script/rails-suite may enable it (never a production server)" unless CONTEXT
     abort "[lowrail] REFUSING UNSAFE speculation in production verification" if
       CONTEXT != "bench" && [ENV["RAILS_ENV"], ENV["RACK_ENV"]].include?("production")
     warn "[lowrail] *** UNSAFE UNGUARDED MEASUREMENT: BOOT FACTS ARE NOT CHECKED. NEVER DEPLOY. context=#{CONTEXT} ***"
+
+    # Branch-elided snapshots are deliberately incompatible with the ordinary
+    # runtime. Only this ancestry-checked experiment accepts their marker;
+    # their format, exact Ruby version and loader contracts still must match.
+    module UnsafeManifest
+      def compatible?
+        super || (@ruby_description.start_with?("[LOWRAIL UNSAFE] ") && @format == Lowrail::FORMAT &&
+          Lowrail::Manifest.normalize(@ruby_description.delete_prefix("[LOWRAIL UNSAFE] ")) == Lowrail::Manifest.normalize(RUBY_DESCRIPTION))
+      end
+    end
 
     module GuardBypass
       def install(manifest, state = Lowrail::G)
@@ -57,6 +52,12 @@ module Lowrail
           ReceiverBypass.module_eval do
             def ok?(id, klass) = true
             alias view_ok? ok?
+          end
+          if ENV["LOWRAIL_SPECULATE_KEEP"] != "ar_epoch"
+            InstantiateBypass.module_eval do
+              def valid? = true
+              def current? = true
+            end
           end
         end
       end
@@ -88,11 +89,11 @@ module Lowrail
       # Attribution control: keep just the existing AR schema/type epoch,
       # while still bypassing method facts. No new runtime policy is implied.
       if ENV["LOWRAIL_SPECULATE_KEEP"] == "ar_epoch"
-        def valid? = !@epoch || Lowrail::AR.epoch(@klass) == @epoch
+        def valid? = Speculation.ids.include?(@id) ? (!@epoch || Lowrail::AR.epoch(@klass) == @epoch) : super
         alias current? valid?
       else
-        def valid? = true
-        def current? = true
+        def valid? = Speculation.ids.include?(@id) || super
+        def current? = Speculation.ids.include?(@id) || super
       end
     end
 
@@ -108,6 +109,8 @@ module Lowrail
   end
 end
 
+require_relative "../gem/lib/lowrail/manifest"
+Lowrail::Manifest.prepend(Lowrail::Speculation::UnsafeManifest)
 require_relative "../gem/lib/lowrail/guard"
 Lowrail::Guard.singleton_class.prepend(Lowrail::Speculation::GuardBypass)
 Lowrail.singleton_class.prepend(Lowrail::Speculation::ReceiverBypass)
