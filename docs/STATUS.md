@@ -125,6 +125,18 @@ same 11 units and verifies 21/21 identical with 114 hits.
   runtime. No native YJIT speedup is established. Fresh builds after merging
   concurrent AR changes still verify identical outcomes/full SQL:
   blog 21/125 events, Campfire 634/15,108, default and instantiate, serial.
+- **Rails' own compatibility gate** (`script/rails-suite`, [results and recipe](rails-suite.md)):
+  pinned v8.1.4 component suites, setup-only / synthetic guarded fallback /
+  existing AR-pass layers against independent off/off controls. SQLite AR
+  **9240/9240**, PostgreSQL AR **10186/10186**, AP **4095/4095**, AV
+  **3162/3162**, AM **1100/1100**, Mailer **268/268** in every layer;
+  AS **5814/5815** and inline AJ **209/212** have four dynamic printed
+  identities, not outcome failures. Railties is a bounded **125/125**.
+  Zero reproducible differences; L3 has **136,719 instantiation hits**, no
+  SQL-reader/preload hits. Earlier AR baseline failure was plan construction
+  inside the off suite; construction now runs separately. No held runtime
+  file changed. Framework/app profile intersection is recorded for later
+  pass work, not a speed claim or full Rails support certificate.
 - **`lowrail verify [--bisect]`**: suite with `LOWRAIL=0` and `1`, per-test
   outcomes and fast-path hits. `--bisect` reruns with unit subsets
   (`LOWRAIL_UNITS`) and writes `.lowrail/denylist.json`, which `build`

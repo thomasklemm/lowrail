@@ -143,14 +143,23 @@ tested here. `bench/ar_rails_suite.rb` loads repository component sources
 and gemspecs, loads test models, then builds/activates Lowrail's runtime
 units against those models without a fake Rails application or weaker guards.
 
-With SQLite (`ARCONN=sqlite3_mem`), seed 41231, off and on both report:
+**Historical harness caveat (corrected by the standing
+[Rails-suite gate](rails-suite.md)):** this experiment built plans inside
+both test processes, including `LOWRAIL=0`. The numbers below describe those
+schema-materialized processes, not an untouched Rails baseline.
+
+With SQLite (`ARCONN=sqlite3_mem`), seed 41231, the old off and on both reported:
 
 **9,240 runs, 31,031 assertions, one identical failure, zero errors, 44 skips.**
 
 The failure is
 `ViewWithPrimaryKeyTest#test_does_not_assume_id_column_as_primary_key`
-(`Expected "id" to be nil`), also present with Lowrail disabled. This is
-**not a green Rails suite**. Compared all per-test results/failures including
+(`Expected "id" to be nil`). It also occurred with lowering disabled because
+the builder still ran there. It was **a harness side effect, not an existing
+Rails failure**: the new no-build off process passes all 9,240 tests (44
+skips), and separate-process construction preserves all 17 focused view-test
+outcomes with genuine instantiation hits. The historical comparison was
+**not a green Rails suite**. It compared all per-test results/failures including
 multiplicities: 9,238 distinct printed identities, two duplicated Arel
 identities, 9,240 identical observations. Subprocess reports remain separate.
 
@@ -174,25 +183,22 @@ identities, 9,240 identical observations. Subprocess reports remain separate.
   in at least one control. Unlike the synthetic differential, these trace
   digests intentionally mask values/timestamps; use shadow for exact binds.
 
-Reproduce in a disposable Rails checkout (SQLite CLI and Rails component
-test dependencies required: sqlite3, pg, bcrypt, minitest/mock,
-minitest-reporters, minitest-retry, railties and ordinary Rails dependencies):
+Use the corrected runner from the Lowrail checkout (SQLite CLI and native
+gem build prerequisites required). It builds in a separate process and loads
+the resulting manifest through the actual `RUBYOPT` setup path:
 
 ```sh
-# Run from rails/rails/activerecord at v8.1.4; substitute your Lowrail path.
-LOWRAIL=0 LOWRAIL_SQL_TRACE=full LOWRAIL_OUTCOMES=/tmp/rails-off.json \
-  ruby -I/abs/lowrail/gem/lib /abs/lowrail/bench/ar_rails_suite.rb --seed 41231
-LOWRAIL=1 LOWRAIL_SQL_TRACE=full LOWRAIL_OUTCOMES=/tmp/rails-on.json \
-  ruby -I/abs/lowrail/gem/lib /abs/lowrail/bench/ar_rails_suite.rb --seed 41231
-ruby /abs/lowrail/bench/ar_rails_suite.rb --compare /tmp/rails-off.json /tmp/rails-on.json
+mise exec -- script/rails-suite --prepare
+mise exec -- script/rails-suite --suites activerecord
 ```
 
 The default glob includes general AR cases and SQLite adapter cases, not
 other adapters or encryption performance benchmarks. Optional filename
-arguments restrict the case files. Outcome files include normal SQL/stats
-reports, `.build.json` records units/refusals, and `.shadow.json` records
-checks/mismatches and duplicate-safe outcome observations. Compare observations,
-not only test totals or the subprocess exit code.
+arguments after `--` restrict the case files. `.build.json` records
+units/refusals, and `.shadow.json` records checks/mismatches and duplicate-safe
+outcome observations. The new gate disables SQL tracing; the masked SQL
+numbers above are historical evidence, not fresh independent-process SQL
+coverage. Compare observations, not only totals or the subprocess exit code.
 
 ## Defects exposed and repaired
 
@@ -234,7 +240,8 @@ cannot prove purity, concurrency behavior or equivalence. Existing
 certification/guards, refusal ledgers and app-specific `lowrail verify`
 remain required. Adapters, server settings, collation, prepared statements,
 async execution, replicas/shards and Rails versions differ. PostgreSQL is
-covered only by this synthetic grammar, not its full Rails adapter suite.
+covered here by the synthetic grammar; the newer [standing Rails-suite
+gate](rails-suite.md) also runs its general and PostgreSQL adapter cases.
 No Rails 8.2-alpha, application corpus or system-test run is claimed here.
 This provides more independent opportunities to falsify equivalence, not a
 universal support or speed claim.

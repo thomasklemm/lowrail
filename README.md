@@ -34,6 +34,9 @@ selection. With no options, only `view/link_to` and `route/path` run.
 
 For AR shadow checks, the relation fuzzer and Rails-suite evidence, see
 [Active Record equivalence](docs/ar-equivalence.md).
+`script/rails-suite` runs the pinned Rails framework suites off/on with
+setup-only, guarded-fallback and runtime-pass layers; see the standing
+[Rails compatibility gate](docs/rails-suite.md).
 
 ## Complementary optimizations
 

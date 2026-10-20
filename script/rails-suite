@@ -1,0 +1,173 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+require "optparse"
+require "open3"
+require "rbconfig"
+require "digest"
+require "shellwords"
+require_relative "../bench/rails_suite_report"
+
+ROOT = File.expand_path("..", __dir__)
+RAILS_REV = "c3466ea00d7121798e3aa3144ffdf7174b81d8cb"
+options = { checkout: "#{ROOT}/.corpus/rails", out: "#{ROOT}/.lowrail/rails-suite",
+  suites: %w[activesupport activemodel activerecord actionpack actionview activejob actionmailer],
+  layers: %w[L1 L2 L3], seed: 41231 }
+OptionParser.new do |parser|
+  parser.banner = "Usage: mise exec -- script/rails-suite [options] [-- test/files.rb --name /pattern/]"
+  parser.on("--checkout DIR") { options[:checkout] = File.expand_path(_1) }
+  parser.on("--out DIR", "Use a new directory for each evidence cohort") { options[:out] = File.expand_path(_1) }
+  parser.on("--suites LIST", "Comma-separated components; railties runs isolated files") { options[:suites] = _1.split(",") }
+  parser.on("--layers LIST") { options[:layers] = _1.split(",") }
+  parser.on("--seed N", Integer) { options[:seed] = _1 }
+  parser.on("--prepare", "Install the component test bundle, then exit") { options[:prepare] = true }
+  parser.on("--profile", "Collect separate Lowrail-off StackProf runs") { options[:profile] = true }
+end.parse!
+abort "Ruby 3.4+ required" if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.4")
+abort "select at least one suite and layer" if options[:suites].empty? || options[:layers].empty?
+abort "unknown layer" unless (options[:layers] - %w[L1 L2 L3]).empty?
+abort "unknown suite" unless (options[:suites] - %w[activesupport activemodel activerecord actionpack actionview activejob actionmailer railties]).empty?
+checkout, out = options.values_at(:checkout, :out)
+FileUtils.mkdir_p([File.dirname(checkout), out])
+unless File.directory?(checkout)
+  abort "clone failed" unless system("git", "clone", "--quiet", "--depth", "1", "--branch", "v8.1.4", "https://github.com/rails/rails.git", checkout)
+end
+revision, status = Open3.capture2("git", "-C", checkout, "rev-parse", "HEAD")
+abort "checkout must be Rails v8.1.4 (#{RAILS_REV})" unless status.success? && revision.strip == RAILS_REV
+changes, = Open3.capture2("git", "-C", checkout, "diff", "HEAD", "--")
+abort "Rails tracked sources are modified" unless changes.empty?
+
+# A component-only dependency bundle: no external queue servers, browsers,
+# cloud SDKs or Rails release tooling. Preserve its lockfile with the evidence.
+gemfile = File.join(out, "Gemfile")
+unless File.exist?(gemfile)
+  component_gems = Dir["#{checkout}/*/*.gemspec"].sort.map do |path|
+    "gem #{File.basename(path, '.gemspec').inspect}, path: #{File.dirname(path).inspect}"
+  end
+  dependencies = {
+    "minitest" => "~> 6.0", "minitest-mock" => ">= 0", "minitest-reporters" => ">= 0", "minitest-retry" => ">= 0",
+    "rake" => ">= 13", "sqlite3" => ">= 2.1", "pg" => "~> 1.3", "bcrypt" => "~> 3.1",
+    "connection_pool" => "< 3", "dalli" => ">= 3, < 5", "listen" => "~> 3.3", "libxml-ruby" => ">= 0",
+    "rack-cache" => "~> 1.2", "rexml" => ">= 0", "msgpack" => ">= 1.7", "stackprof" => "= 0.2.28",
+    "propshaft" => ">= 0.1.7", "importmap-rails" => ">= 1.2.3", "sprockets-rails" => ">= 2",
+    "redis" => ">= 4.0.1, < 7",
+    "capybara" => ">= 3.39", "selenium-webdriver" => ">= 4.20",
+    "sneakers" => ">= 0",
+    "webmock" => ">= 0", "launchy" => ">= 0", "bootsnap" => ">= 1.4", "debug" => ">= 1.1"
+  }
+  File.write(gemfile, (["source 'https://rubygems.org'", *component_gems] +
+    dependencies.map { |name, version| "gem #{name.inspect}, #{version.split(', ').map(&:inspect).join(', ')}" }).join("\n") + "\n")
+end
+if options[:prepare]
+  unless File.exist?(gemfile + ".lock")
+    File.write(gemfile + ".lock", File.read("#{ROOT}/bench/rails_suite.lock").gsub("@RAILS_CHECKOUT@", checkout))
+  end
+  exit(system({ "BUNDLE_GEMFILE" => gemfile, "BUNDLE_FROZEN" => "true" }, RbConfig.ruby, "-S", "bundle", "install") ? 0 : 1)
+end
+abort "run with --prepare first" unless File.exist?(gemfile + ".lock")
+
+runtime_hash = Digest::SHA256.hexdigest(Dir["#{ROOT}/gem/lib/**/*.rb", "#{ROOT}/bench/*rails*rb", __FILE__].sort.map { File.binread(_1) }.join)
+File.write(File.join(out, "environment.json"), JSON.pretty_generate({ ruby: RUBY_DESCRIPTION,
+  rails: RAILS_REV, lowrail: `git -C #{Shellwords.escape(ROOT)} rev-parse HEAD`.strip,
+  runtime_sha256: runtime_hash, seed: options[:seed], arguments: ARGV,
+  adapter: ENV.fetch("ARCONN", "sqlite3_mem"), layers: options[:layers] }))
+
+# Synthetic fallback manifest. All guards refer to an absent constant, but
+# names are real framework operations so definition/include/stub hooks work.
+# Stale source/template entries deliberately exercise original-only delivery.
+fallback_root = File.join(out, "fallback")
+FileUtils.mkdir_p(File.join(fallback_root, ".lowrail"))
+names = %w[initialize call name render find exec_queries _load_from_sql build_arel association to_sql
+  method_missing respond_to_missing? validate save include prepend extend]
+manifest = { "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+  "files" => Dir["#{checkout}/*/lib/**/*.rb"].to_h { [_1, { "source_sha256" => "never", "original_iseq_sha256" => "never", "compile_option" => "never", "iseq" => "absent.bin" }] },
+  "templates" => Dir["#{checkout}/*/test/**/*.erb"].to_h { [_1, { "source_sha256" => "never", "code" => "raise 'unreachable synthetic template'" }] },
+  "units" => names.each_with_index.map { |name, id| { "id" => id, "pass" => "rails_suite/fallback", "facts" => [
+    { "receiver" => "LowrailRailsSuiteAbsentConstant", "method" => name, "owner" => "never", "visibility" => "public" }] } } }
+File.write(File.join(fallback_root, ".lowrail/manifest.json"), JSON.generate(manifest))
+FileUtils.mkdir_p(File.join(out, "empty"))
+
+summary = {}
+options[:suites].each do |suite|
+  directory = File.join(checkout, suite)
+  # Action View's upstream rake task uses three processes (helper constants
+  # conflict if integration files are loaded into the template process).
+  groups = if !ARGV.empty?
+    { suite => ARGV }
+  elsif suite == "actionview"
+    { "actionview" => [], "actionview-actionpack" => Dir["#{directory}/test/actionpack/**/*_test.rb"].sort,
+      "actionview-activerecord" => Dir["#{directory}/test/activerecord/*_test.rb"].sort }
+  elsif suite == "railties"
+    Dir["#{directory}/test/**/*_test.rb"].sort.reject { _1.include?("/fixtures/") || _1.include?("/isolation/assets/") }.
+      to_h { |file| ["railties-#{file.delete_prefix(directory + '/test/').delete_suffix('.rb').tr('/', '-')}", [file]] }
+  else
+    { suite => [] }
+  end
+  groups.each do |label, files|
+    puts "== #{label} =="
+    $stdout.flush
+    runs = {}
+    build_root = File.join(out, "build-#{label}")
+    FileUtils.mkdir_p(File.join(build_root, ".lowrail"))
+    run = lambda do |mode, layer, suffix = mode|
+      path = File.join(out, "#{label}-#{suffix}.json")
+      abort "refusing to overwrite evidence #{path}" if File.exist?(path)
+      env = { "BUNDLE_GEMFILE" => gemfile, "RUBYOPT" => "-I#{ROOT}/gem/lib -rlowrail/setup",
+        "LOWRAIL" => mode.start_with?("off") ? "0" : "1", "LOWRAIL_OUTCOMES" => path,
+        "LOWRAIL_ROOT" => { "L2" => fallback_root, "L3" => build_root }.fetch(layer, File.join(out, "empty")),
+        "LOWRAIL_UNITS" => nil, "LOWRAIL_STATS" => nil, "LOWRAIL_DEBUG" => nil,
+        "LOWRAIL_SQL_TRACE" => "0", "LOWRAIL_SHADOW" => "strict", "RAILS_SUITE_LAYER" => layer,
+        "RAILS_SUITE_BUILD" => mode == "off-build" ? build_root : nil,
+        "RAILS_SUITE_PROFILE" => mode == "off-profile" ? path + ".stackprof" : nil,
+        "PARALLEL_WORKERS" => "1", "MT_CPU" => "1", "SEED" => options[:seed].to_s, "AJ_ADAPTER" => "inline" }
+      command = [RbConfig.ruby, "-rbundler/setup", "#{ROOT}/bench/ar_rails_suite.rb", *files, "--seed", options[:seed].to_s]
+      start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      system(env, *command, chdir: directory, out: path + ".log", err: [:child, :out])
+      runs[suffix] = { "seconds" => (Process.clock_gettime(Process::CLOCK_MONOTONIC) - start).round(2), "exit" => $?.exitstatus,
+        "path" => path, "command" => command.shelljoin, "environment" => env }
+      puts "  #{suffix}: #{runs[suffix]['seconds']}s, exit #{runs[suffix]['exit']}"
+      $stdout.flush
+      path
+    end
+    run.call("off-build", "build") if options[:layers].include?("L3")
+    off = run.call("off", "L1")
+    # Some Rails test identities embed Time.current to whole seconds. Two
+    # subsecond runs are not an independent control for those identities.
+    sleep 1.1
+    control = run.call("off-repeat", "L1")
+    comparisons = {}
+    options[:layers].each do |layer|
+      on = run.call(layer, layer)
+      if [off, control, on].all? { File.exist?(_1 + ".shadow.json") && File.exist?(_1 + ".loaded.json") }
+        initial = RailsSuiteReport.compare(off, on, control)
+        repeat = nil
+        unless initial["differences"].empty?
+          sleep 1.1
+          repeat = run.call(layer, layer, "#{layer}-repeat")
+        end
+        comparisons[layer] = RailsSuiteReport.compare(off, on, control, repeat)
+        data = JSON.parse(File.read(on))
+        comparisons[layer]["hits"] = data.fetch("unit_hits").values.sum
+        comparisons[layer]["fallbacks"] = data.fetch("unit_fallbacks").values.sum
+        shadow = JSON.parse(File.read(on + ".shadow.json"))
+        comparisons[layer]["hooks"] = shadow.fetch("hooks")
+        comparisons[layer]["shadow_mismatches"] = shadow.fetch("mismatches")
+        comparisons[layer]["exit_codes"] = %W[off off-repeat #{layer}].map { runs.fetch(_1).fetch("exit") }
+        if repeat
+          abort "incomplete repeat #{repeat}" unless File.exist?(repeat + ".loaded.json")
+          comparisons[layer]["exit_codes"] << runs.fetch("#{layer}-repeat").fetch("exit")
+        end
+      else
+        comparisons[layer] = { "status" => "incomplete: missing outcomes (see logs)" }
+      end
+    end
+    run.call("off-profile", "L1") if options[:profile]
+    summary[label] = { "runs" => runs, "layers" => comparisons }
+    File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary))
+  end
+end
+exit(summary.values.all? { |suite| suite.fetch("layers").values.all? {
+  _1["status"].nil? && _1.fetch("differences").empty? && _1.fetch("observations").all?(&:positive?) &&
+    _1.fetch("exit_codes").uniq.size == 1 && _1.fetch("shadow_mismatches").empty?
+} } ? 0 : 1)
