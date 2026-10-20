@@ -34,6 +34,7 @@ pub const REGISTRY: &[Pass] = &[
     Pass { name: "active_record/instantiate", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "ar_instantiate_build", module: "ARInstantiateBuild" }, alias: "ar_instantiate" },
     Pass { name: "active_record/ar_plans", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "ar_plan_build", module: "ARPlanBuild" }, alias: "ar_plans" },
     Pass { name: "inertia/config_bind", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "inertia_config_build", module: "InertiaConfigBuild" }, alias: "inertia_config" },
+    Pass { name: "endpoint/action", kind: Kind::Runtime, default: false, builder: Builder::Runtime { file: "endpoint_build", module: "EndpointBuild" }, alias: "endpoint" },
 ];
 
 pub struct Selection(BTreeSet<&'static str>);
@@ -91,7 +92,7 @@ mod tests {
             ["route/path", "memo/uri_join", "active_record/instantiate"]);
         assert_eq!(names(Selection::parse("default,-path,+path,+digest/file_memo,-digest_memo").unwrap()), ["view/link_to", "route/path"]);
         let mut aliases = Selection::default();
-        for name in ["memo", "preload_plans", "ar_instantiate", "ar_plans", "digest_memo", "inertia_config"] { aliases.set(name, true).unwrap(); }
+        for name in ["memo", "preload_plans", "ar_instantiate", "ar_plans", "digest_memo", "inertia_config", "endpoint"] { aliases.set(name, true).unwrap(); }
         assert_eq!(names(aliases), REGISTRY.iter().map(|p| p.name).collect::<Vec<_>>());
         assert_eq!(names(Selection::parse("all-opt-in").unwrap()), REGISTRY.iter().map(|p| p.name).collect::<Vec<_>>());
         assert!(!Selection::parse("all-opt-in,-ar_instantiate").unwrap().contains("active_record/instantiate"));

@@ -14,6 +14,15 @@ module Lowrail
 
       def call(template, source)
         require "digest" # lazily: setup must not load default gems (see lowrail.rb)
+        # Endpoint generation retains the live handler invocation (including
+        # config, extensions and effects). Only its exact compiled body may be
+        # substituted. Existing source passes retain their delivery contract.
+        if @entry.key?("original")
+          code = @original.call(template, source)
+          return code unless code == @entry.fetch("original") &&
+            Digest::SHA256.hexdigest(source.b) == @entry.fetch("source_sha256")
+          return @entry.fetch("code").dup
+        end
         if Digest::SHA256.hexdigest(source.b) == @entry.fetch("source_sha256")
           Lowrail.debug("template #{template.identifier}: lowered")
           @entry.fetch("code").dup

@@ -54,6 +54,20 @@ module Lowrail
 
         templates = input["templates"] || {}
         units = Array(input["units"]).select do |unit|
+          if unit["pass"] == "endpoint/action"
+            begin
+              data = unit.fetch("endpoint")
+              binary = RubyVM::InstructionSequence.compile(data.fetch("code"), "lowrail:endpoint", "lowrail:endpoint", 1).to_binary
+              name = "#{Digest::SHA256.hexdigest(binary)}.bin"
+              File.binwrite(File.join(iseq_dir, name), binary)
+              data["iseq"] = "iseq/#{name}"
+              data["iseq_sha256"] = Digest::SHA256.hexdigest(binary)
+              next true
+            rescue StandardError, ScriptError => e
+              err.puts "[lowrail] dropping endpoint #{unit['target']}: #{e.class}: #{e.message.lines.first&.chomp}"
+              next false
+            end
+          end
           next true if %w[runtime method].include?(unit["kind"])
           next true if files.key?(unit["file"])
           next true if unit["kind"] == "template" && templates.key?(unit["file"])

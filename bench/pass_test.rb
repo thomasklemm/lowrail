@@ -80,6 +80,15 @@ class PassBenchTest < Minitest::Test
       File.write(target, "changed")
       error = assert_raises(RuntimeError) { PassBench.preflight(dir, lib) }
       assert_includes error.message, "stale build"
+      binary = File.join(dir, "endpoint.bin")
+      File.binwrite(binary, RubyVM::InstructionSequence.compile("Module.new").to_binary)
+      data = manifest.merge("units" => [{ "id" => 0, "pass" => "endpoint/action", "facts" => [],
+        "endpoint" => { "templates" => {}, "iseq" => "endpoint.bin", "iseq_sha256" => Digest::SHA256.file(binary).hexdigest } }])
+      File.write(File.join(dir, "manifest.json"), JSON.generate(data))
+      assert_equal data, PassBench.preflight(dir, lib)
+      File.binwrite(binary, "corrupt")
+      error = assert_raises(RuntimeError) { PassBench.preflight(dir, lib) }
+      assert_includes error.message, "stale build"
     end
   end
 

@@ -73,6 +73,11 @@ fn reason(pass: &str, detail: &str) -> &'static str {
             ("non-certified Digest file implementation", "file_implementation"),
             ("aliased digest/IO method", "method_alias"), ("non-native digest/IO method", "native_method"),
         ],
+        "endpoint/action" => &[
+            ("unsupported_rails_version", "rails_version"), ("unsupported_application", "application"),
+            ("custom_view_run", "view_dispatch"), ("helper_implementation", "helper_implementation"),
+            ("template:", "template_certificate"),
+        ],
         "active_record/preload_plans" => &[
             ("missing reflection", "missing_reflection"), ("through association", "through"),
             ("polymorphic belongs_to", "polymorphic"), ("owner-dependent scope", "owner_scope"),
@@ -132,6 +137,12 @@ mod tests {
         assert_eq!(eligible["reason"], "runtime_tree");
         assert_eq!(eligible["target"], "Post#writer");
         assert_eq!(eligible["line"], 0);
+        for (detail, code) in [("unsupported_application", "application"), ("unsupported_rails_version", "rails_version")] {
+            let entry = normalize(json!({"method": "ArticlesController", "pass": "endpoint/action", "outcome": detail}));
+            assert_eq!(entry["target"], "ArticlesController");
+            assert_eq!(entry["reason"], code);
+            assert_eq!(entry["outcome"], "refused");
+        }
         let survey = normalize(json!({"file": "app/models/post.rb", "line": 5, "helper": "where", "shape": "dynamic",
             "pass": "active_record/ar_plans_survey", "outcome": "not certified: implicit scope/model; lazy/scoping/metadata contract unproven"}));
         assert_eq!(survey["shape"], "dynamic");

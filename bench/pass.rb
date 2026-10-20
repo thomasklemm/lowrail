@@ -34,6 +34,12 @@ module PassBench
       case value
       when Hash
         value.each do |key, child|
+          if key == "endpoint"
+            child.fetch("templates").each { |file, template| check.call(file, template.fetch("source_sha256")) }
+            binary = File.join(dir, child.fetch("iseq"))
+            check.call(binary, child.fetch("iseq_sha256"))
+            RubyVM::InstructionSequence.load_from_binary(File.binread(binary))
+          end
           if key == "sources"
             child.each do |file, fingerprint|
               check.call(file, fingerprint.is_a?(Hash) ? fingerprint.fetch("sha256") : fingerprint)

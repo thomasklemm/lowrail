@@ -7,6 +7,16 @@ Rails **8.1.4**, Ruby **4.0.7**, actual **YJIT off**. Campfire's 8.2 alpha is
 excluded. The broader multi-app subsystem survey is deferred, not completed
 by these two routes. Redprints' existing pin is 8.1.3, not the 8.1.4 target.
 
+**Later correction:** the event-preserving handwritten specimen did not assign
+`@articles`/`@article` on the real controller as Rails does. A render subscriber
+can distinguish it, and a process-action subscriber that redefines `link_to`
+produces ten markers in Rails but none in that specimen. Its −26/−37% numbers
+are therefore **upper bounds with omitted observable behavior**, not supported
+equivalence or a demonstrated generator target. "Accepted" below refers only
+to measurement controls. The owner selected a conservative, real-controller
+process-seam pilot; see [endpoint.md](endpoint.md). It preserves the real event
+pipeline and uses isolated paired shadow, never request replay.
+
 ## What the layers actually replace
 
 All handwritten code is in [`bench/experiments/`](../../bench/experiments/),

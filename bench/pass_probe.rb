@@ -33,6 +33,10 @@ module PassProbe
       when "inertia/config_bind"
         defined?(Lowrail::Passes::InertiaConfig::Variant) &&
           InertiaRails::Configuration < Lowrail::Passes::InertiaConfig::Variant && Lowrail::Guard.validate(unit.fetch("id"))
+      when "endpoint/action"
+        controller = Object.const_get(unit.fetch("endpoint").fetch("controller"))
+        entry = Lowrail::Endpoint.entries&.fetch([controller, unit.fetch("endpoint").fetch("action")], nil)
+        entry && entry.id == unit.fetch("id")
       else
         raise "no activation adapter for runtime pass #{unit.fetch('pass')}" if %w[runtime method model].include?(unit["kind"])
         # Source/call-site passes are delivered lazily. Zero route coverage is
