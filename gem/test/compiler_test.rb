@@ -62,7 +62,7 @@ class CompilerTest < Minitest::Test
       }
       err = StringIO.new
       manifest = Lowrail::Compiler.compile(input, err: err)
-      assert_equal [good], manifest["files"].keys
+      assert_equal ["good.rb"], manifest["files"].keys
       assert_equal [0, 3, 4], manifest["units"].map { _1["id"] }
       assert_match(/skipping #{Regexp.escape(bad)}: SyntaxError/, err.string)
       assert_match(/skipping #{Regexp.escape(changed)}: .*source changed/, err.string)
@@ -72,7 +72,7 @@ class CompilerTest < Minitest::Test
       assert_equal manifest, on_disk
       assert_equal Lowrail::Manifest.compile_option_fingerprint, on_disk["compile_option"]
       assert_equal RUBY_DESCRIPTION, on_disk["ruby_description"]
-      entry = on_disk["files"][good]
+      entry = on_disk["files"]["good.rb"]
       assert_equal Digest::SHA256.file(good).hexdigest, entry["source_sha256"]
       assert File.file?(File.join(out, entry["iseq"]))
       assert_empty Dir.glob(File.join(out, "**/*.tmp.*")), "temporary files left behind"
@@ -89,6 +89,20 @@ class CompilerTest < Minitest::Test
     _, err, status = ruby(COMPILE, setup: false)
     assert_equal 2, status.exitstatus
     assert_match(/usage/, err)
+  end
+
+  def test_target_root_refuses_a_recipe_with_different_nested_frame_labels
+    realpath_tmpdir do |dir|
+      file = File.join(dir, "blocks.rb")
+      File.write(file, "[1].map { |x| x + 1 }\n")
+      manifest = Lowrail::Compiler.compile({"out" => File.join(dir, ".lowrail"),
+        "target_root" => File.join(dir, "deploy"), "files" => [{"path" => file, "lowered" => file}],
+        "units" => [{"id" => 0, "kind" => "file", "file" => file, "facts" => []}]}, err: StringIO.new)
+      assert_empty manifest.fetch("files")
+      assert_empty manifest.fetch("units")
+      ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
+      assert ledger.any? { _1["pass"] == "delivery/relocation" && _1["detail"].include?("nested frame labels") }
+    end
   end
 
   def test_shape_warnings_preserve_delivery_and_existing_ledger
@@ -127,7 +141,7 @@ class CompilerTest < Minitest::Test
       refute_includes warnings.select { _1["reason"] == "inline_size" }.map { _1["site"] }, "small"
       refute warnings.any? { _1["site"] == "guarded" && _1["reason"] == "constant_write" }, "container writes are not constant reassignment"
       assert_equal [3], manifest["units"].map { _1["id"] }
-      assert File.file?(File.join(out, manifest["files"][path]["iseq"]))
+      assert File.file?(File.join(out, manifest["files"]["shapes.rb"]["iseq"]))
       Lowrail::Compiler.compile(input, err: StringIO.new)
       assert_equal ledger, JSON.parse(File.read(File.join(out, "ledger.json"))), "rebuild replaces shape diagnostics"
     end

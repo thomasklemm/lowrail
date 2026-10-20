@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "paths"
 
 module Lowrail
   # Boot fact dumper. Walks every module in ObjectSpace and, when Rails is
@@ -12,7 +13,7 @@ module Lowrail
   # core implementation instead. Every per-module, per-method, per-model and
   # per-controller step rescues and records the failure under "errors".
   module Facts
-    FORMAT = 1
+    FORMAT = 2
 
     MOD_NAME = Module.instance_method(:name)
     MOD_INSPECT = Module.instance_method(:to_s)
@@ -42,6 +43,8 @@ module Lowrail
         started = clock
         facts = collect(app_root: app_root, generated_dir: generated_dir)
         facts["timings"] = timings.transform_keys(&:to_s).merge("dump_seconds" => (clock - started).round(3)).sort.to_h
+        dir = io_or_path.respond_to?(:write) ? facts.fetch("app_root") : File.dirname(File.expand_path(io_or_path))
+        facts = Paths.relative(facts, root: facts.fetch("app_root"), dir: dir)
         json = JSON.generate(facts)
         if io_or_path.respond_to?(:write)
           io_or_path.write(json)

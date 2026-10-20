@@ -62,7 +62,7 @@ if (build_root = ENV["RAILS_SUITE_BUILD"])
   end
   units = built ? built[:manifest].units : []
   Lowrail.write_json(File.join(build_root, ".lowrail/manifest.json"), {
-    "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "", "files" => {}, "units" => units })
+    "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "", "files" => {}, "units" => units })
   Lowrail.write_json(ENV.fetch("LOWRAIL_OUTCOMES") + ".build.json", {
     "units" => units.map { [_1["id"], _1["pass"], _1["file"]] }, "ledger" => built ? built[:ledger] : [] })
   # Never run the suite in this process: schema materialization changes tests.

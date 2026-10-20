@@ -65,6 +65,87 @@ class E2ETest < Minitest::Test
     end
   end
 
+  def test_target_root_artifact_delivers_after_copy_and_refuses_changed_content
+    realpath_tmpdir do |parent|
+      a = File.join(parent, "build")
+      b = File.join(parent, "release") # deliberately nonexistent during build
+      Dir.mkdir(a)
+      extra = <<~'RUBY'
+        class Calc
+          def paths = [__FILE__, __dir__, caller_locations(0, 1).first.path]
+        end
+      RUBY
+      build_app(a, compile: false, lowered: LOWERED_SRC + extra)
+      File.write(File.join(a, "app.rb"), APP_SRC + extra)
+      input_path = File.join(a, "units.json")
+      _, err, status = ruby(COMPILE, input_path, setup: false)
+      assert status.success?, err
+      probe = SCRIPT + <<~'RUBY'
+        puts JSON.generate(r.merge(paths: c.paths, reason: Lowrail.refusal_reason,
+          location: Calc.instance_method(:compute).source_location, compiles: $compiler_calls || 0))
+      RUBY
+      baseline = ruby_json(probe, chdir: a, env: {"LOWRAIL_STATS" => ""})
+      assert_equal({"0" => 1, "1" => 1}, baseline.fetch("hits"))
+      input = JSON.parse(File.read(input_path)).merge("target_root" => b)
+      File.write(input_path, JSON.generate(input))
+      _, err, status = ruby(COMPILE, input_path, setup: false)
+      assert status.success?, err
+      assert_match(/compiled 1 file/, err)
+      FileUtils.cp_r(a, b)
+      FileUtils.rm_rf(a) # no accidental reads from the build tree
+      compiler_observer = <<~'RUBY'
+        $compiler_calls = 0
+        RubyVM::InstructionSequence.singleton_class.prepend(Module.new do
+          def compile(...)
+            $compiler_calls += 1
+            super
+          end
+        end)
+      RUBY
+      relocated = ruby_json(compiler_observer + probe, chdir: b, env: {"LOWRAIL_STATS" => ""})
+      assert_equal baseline.fetch("hits"), relocated.fetch("hits")
+      assert_equal baseline.fetch("compute"), relocated.fetch("compute")
+      assert_equal baseline.fetch("label"), relocated.fetch("label")
+      assert_equal [File.join(b, "app.rb"), b, File.join(b, "app.rb")], relocated.fetch("paths")
+      assert_equal [File.join(b, "app.rb"), 6], relocated.fetch("location")
+      assert_equal 0, relocated.fetch("compiles"), "delivery must not reenter the public text compiler"
+      assert_nil relocated.fetch("reason")
+
+      %w[original lowered].each do |which|
+        path = File.join(b, which == "original" ? "app.rb" : ".lowrail/src/app.rb")
+        source = File.binread(path)
+        File.binwrite(path, source + "# changed\n")
+        out, err, status = ruby("-e", probe, chdir: b, env: {"LOWRAIL_STATS" => "", "LOWRAIL_DEBUG" => "1"})
+        assert status.success?, err
+        refused = JSON.parse(out.lines.last)
+        assert_equal ["orig", 2], refused.fetch("compute")
+        assert_empty refused.fetch("hits")
+        assert_includes refused.fetch("reason"), "#{which == 'original' ? 'source' : 'lowered source'} digest mismatch"
+        assert_includes err, refused.fetch("reason")
+        File.binwrite(path, source)
+      end
+    end
+  end
+
+  def test_copy_of_path_bound_binaries_records_boot_refusal
+    realpath_tmpdir do |parent|
+      a = File.join(parent, "build")
+      b = File.join(parent, "release")
+      Dir.mkdir(a)
+      build_app(a)
+      FileUtils.cp_r(a, b)
+      probe = SCRIPT + "\nputs JSON.generate(r.merge(reason: Lowrail.refusal_reason))"
+      out, err, status = ruby("-e", probe,
+        chdir: b, env: {"LOWRAIL_STATS" => "", "LOWRAIL_DEBUG" => "1"})
+      assert status.success?, err
+      result = JSON.parse(out.lines.last)
+      assert_equal ["orig", 2], result.fetch("compute")
+      assert_empty result.fetch("hits")
+      assert_includes result.fetch("reason"), "--target-root #{b}"
+      assert_includes err, result.fetch("reason")
+    end
+  end
+
   def test_ruby_description_mismatch_is_noop
     realpath_tmpdir do |dir|
       build_app(dir)

@@ -170,3 +170,64 @@ ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].sort.each { require_rela
 
 Per-app verification results are recorded in [STATUS](STATUS.md); this
 survey does not claim support for unexercised files or a performance gain.
+
+## Deploy paths
+
+Build and runtime directories need not be identical. Format-2 manifests and
+facts store typed app-owned paths/template keys relative to the app root.
+Setup resolves them against an initialized `Rails.root`, or the actual boot
+directory/explicit `LOWRAIL_ROOT` before Rails exists. It never consults the
+recorded `build_root` for lookups. Opaque config/code/reflection values are not
+rewritten: a retained build-root dependency becomes a `delivery/relocation`
+ledger warning and a refusal if the artifact moves. Endpoint compiled-method
+certificates are explicitly path-bound. External gem installations retain
+their own absolute paths and certificates; this is not gem-path rebasing.
+
+**File ISeqs still embed filenames. Build them for the deploy directory:**
+
+```sh
+lowrail build /ci/build/app --target-root /app --env production
+# Copy the app, including .lowrail/src and .lowrail/iseq, to /app.
+# Boot there, or set LOWRAIL_ROOT=/app before lowrail/setup runs.
+```
+
+The target directory must be absolute but need not exist at build time.
+Omitting the option targets the current build root. A file artifact delivered
+at any other root refuses before installation, with `Lowrail.refusal_reason`
+and a `LOWRAIL_DEBUG` boot warning naming the required rebuild command.
+Template/runtime-only artifacts need no file-binary retargeting when all
+their certificates are portable. Missing/changed original or lowered sources,
+changed binary bytes, unknown recipes, or changed live-loader originals also
+record refusals and run original code. Rebuild format-1 artifacts; their
+untyped absolute metadata cannot safely be interpreted as portable.
+
+The build replays the observed original compiler recipe first at the build
+path and then at the target path, and compiles the lowered source at the
+target path with that same recipe. Original and lowered content digests
+remain independent of the directory. For retargeted files the original
+certificate is the full serialized `ISeq#to_a`, normalizing only the root
+`<main>`/`<compiled>` label already distinguished by file/text compilation.
+Nested frames, instructions, paths and literal values are not normalized.
+If replay cannot reproduce the observed original (for example, a top-level
+block retains `block in <main>` instead of `block in <compiled>`), build
+refuses that file and records why; it does not weaken the comparison.
+
+### Why not compile lowered source at runtime?
+
+The source is present, but invoking a public text compiler is another
+observable loader event. A fresh-process probe on **both 4.0.7 and the pinned
+4.1 preview** prepends a compiler hook that records calls and rewrites the
+literal `lowered` to `hooked`. Loading the prebuilt binary returns `lowered`
+with zero hook calls; compiling that identical lowered text at boot returns
+`hooked` with one call. Recipe options and source digests alone do not prove
+that this newly invoked hook preserves the program. Temporarily removing
+the hook or bypassing it would change the loader policy too. No TracePoint
+event claim is needed for this counterexample.
+
+Therefore the exact, authorized alternative is AOT `--target-root`, not a
+transparent runtime recompile fallback. It adds **zero runtime compilations**
+but still pays live-original validation. The boot-component prices and
+copied-blog verification are reported in [ruby-4.1.md](ruby-4.1.md#relocation-follow-up).
+This changes delivery, not pass eligibility: `tier: sealed-v1`, registry
+`sealed_only`, explicit production opt-in and old/mixed-artifact refusals
+remain exactly the separate sealed contract.

@@ -12,7 +12,7 @@ require "lowrail/guard"
 class GuardProbe; def foo = 1; end
 fact = { "receiver" => "@self", "method" => "foo", "owner" => "GuardProbe", "visibility" => "public",
          "source_location" => GuardProbe.instance_method(:foo).source_location.join(":") }
-m = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+m = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
   "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
 Lowrail::Guard.install(m)
 module Lowrail

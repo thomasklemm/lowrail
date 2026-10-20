@@ -13,6 +13,17 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Relocatable delivery (2026-10-20)
+
+Use typed app-root-relative metadata and explicit AOT `build --target-root`
+for file ISeqs. Do not transparently recompile lowered source at boot: public
+compiler hooks can add effects and change the result on both supported VMs.
+Original/lowered source digests, binary digest and live-loader recipe/ISeq
+checks remain mandatory. Path-bound or old artifacts refuse with a recorded
+reason rather than silently delivering zero hits. Preserve the independent
+sealed-tier admission and quarantine. [Loader contract](loaders.md#deploy-paths),
+[reported costs and copied-app checks](ruby-4.1.md#relocation-follow-up).
+
 ## 512 MiB decision recheck (2026-10-20)
 
 The authorized finite remeasurement on the pinned brk512 tool is in

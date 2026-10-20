@@ -25,9 +25,34 @@ const USAGE: &str = "usage: lowrail facts APP [--out PATH] [--no-boot] [--origin
 pub fn load(path: impl AsRef<Path>) -> Result<Facts, String> {
     let path = path.as_ref();
     let bytes = std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?;
-    let facts: Facts =
+    let mut data: serde_json::Value =
         serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", path.display()))?;
-    if facts.format != 1 {
+    if data["format"] == 2 {
+        let anchor = data["app_root"].as_str().ok_or("facts missing app_root")?;
+        let root = path.parent().unwrap_or(Path::new(".")).join(anchor)
+            .canonicalize().map_err(|e| format!("facts app_root: {e}"))?;
+        let paths = data["app_paths"].clone();
+        let expand = |s: &str| {
+            let (prefix, relative) = s.strip_prefix("(eval at ").map_or(("", s), |p| ("(eval at ", p));
+            let absolute = if relative == "." { root.clone() } else { root.join(relative) };
+            format!("{prefix}{}", absolute.display())
+        };
+        for pointer in paths["values"].as_array().ok_or("facts missing app_paths.values")? {
+            let pointer = pointer.as_str().ok_or("invalid facts path pointer")?;
+            let value = data.pointer_mut(pointer).ok_or_else(|| format!("missing facts path {pointer}"))?;
+            *value = serde_json::Value::String(expand(value.as_str().ok_or("invalid facts path value")?));
+        }
+        for pointer in paths["keys"].as_array().ok_or("facts missing app_paths.keys")?.iter().rev() {
+            let pointer = pointer.as_str().ok_or("invalid facts key pointer")?;
+            let entries = data.pointer_mut(pointer).and_then(|v| v.as_object_mut())
+                .ok_or_else(|| format!("missing facts path map {pointer}"))?;
+            *entries = std::mem::take(entries).into_iter().map(|(key, value)| (expand(&key), value)).collect();
+        }
+        data["app_root"] = serde_json::json!(root);
+    }
+    let facts: Facts =
+        serde_json::from_value(data).map_err(|e| format!("{}: {e}", path.display()))?;
+    if !matches!(facts.format, 1 | 2) {
         return Err(format!(
             "{}: unsupported facts format {}",
             path.display(),
@@ -368,6 +393,29 @@ fn counts(items: impl Iterator<Item = String>) -> String {
 mod corpus_tests {
     use super::*;
     use crate::facts::generated::{Form, Via};
+
+    #[test]
+    fn relative_facts_follow_the_copied_app_root() {
+        let dir = std::env::temp_dir().join(format!("lowrail-relative-facts-{}", std::process::id()));
+        let a = dir.join("build/.lowrail");
+        let b = dir.join("release/.lowrail");
+        std::fs::create_dir_all(&a).unwrap();
+        std::fs::create_dir_all(&b).unwrap();
+        let data = serde_json::json!({"format":2, "app_root":"..",
+            "app_paths":{"values":["/modules/0/methods/0/source_location", "/templates/0/identifier"],"keys":[]},
+            "modules":[{"name":"Widget", "methods":[{"name":"value", "source_location":"app/widget.rb:9"}]}],
+            "templates":[{"identifier":"app/views/a.html.erb", "code":"puts '/build/unchanged'"}]});
+        std::fs::write(a.join("facts.json"), data.to_string()).unwrap();
+        std::fs::copy(a.join("facts.json"), b.join("facts.json")).unwrap();
+        std::fs::remove_dir_all(dir.join("build")).unwrap();
+        let facts = load(b.join("facts.json")).unwrap();
+        assert_eq!(facts.app_root, dir.join("release").to_str().unwrap());
+        assert_eq!(facts.modules[0].methods[0].source_location.as_deref(),
+            Some(format!("{}/release/app/widget.rb:9", dir.display()).as_str()));
+        assert_eq!(facts.templates[0].identifier, dir.join("release/app/views/a.html.erb").to_str().unwrap());
+        assert_eq!(facts.templates[0].code, "puts '/build/unchanged'");
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 
     /// Boots real-blog (skipped when the corpus or its Ruby is missing),
     /// then links generated methods to the exact def in their script.

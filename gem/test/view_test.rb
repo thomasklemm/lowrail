@@ -1,9 +1,50 @@
 # frozen_string_literal: true
 
 require_relative "test_helper"
+require "digest"
 
 class ViewTest < Minitest::Test
   include LowrailTest
+
+  def test_template_keys_and_guard_locations_relocate_with_the_app
+    realpath_tmpdir do |parent|
+      a = File.join(parent, "build")
+      b = File.join(parent, "release")
+      Dir.mkdir(a)
+      build_app(a, compile: false)
+      template = File.join(a, "sample.html.erb")
+      File.write(template, "<%= 'orig' %>")
+      input = {"out" => File.join(a, ".lowrail"), "files" => [],
+        "templates" => {template => {"source_sha256" => Digest::SHA256.file(template).hexdigest,
+          "code" => '@output_buffer.safe_append=(::Lowrail.check(0) ? "fast" : "orig"); @output_buffer'}},
+        "units" => [default_units(a).first.merge("kind" => "template", "file" => template)]}
+      File.write(File.join(a, "units.json"), JSON.generate(input))
+      _, err, status = ruby(COMPILE, File.join(a, "units.json"), setup: false)
+      assert status.success?, err
+      script = <<~'RUBY'
+        require "json"
+        require "action_view"
+        require "./app"
+        file = File.join(Dir.pwd, "sample.html.erb")
+        view = ActionView::Base.with_empty_template_cache.new(ActionView::LookupContext.new([]), {}, nil)
+        template = ActionView::Template.new(File.read(file), file,
+          ActionView::Template.handler_for_extension("erb"), locals: [], format: :html)
+        puts JSON.generate(body: template.render(view, {}).to_s,
+          hits: Lowrail::Stats.unit_hits, reason: Lowrail.refusal_reason)
+      RUBY
+      baseline = ruby_json(script, chdir: a, env: {"LOWRAIL_STATS" => ""})
+      assert_equal "fast", baseline.fetch("body")
+      assert_equal({"0" => 1}, baseline.fetch("hits"))
+      FileUtils.cp_r(a, b)
+      FileUtils.rm_rf(a)
+      assert_equal baseline, ruby_json(script, chdir: b, env: {"LOWRAIL_STATS" => ""})
+      File.write(File.join(b, "sample.html.erb"), "<%= 'changed' %>")
+      refused = ruby_json(script, chdir: b, env: {"LOWRAIL_STATS" => ""})
+      assert_equal "changed", refused.fetch("body")
+      assert_empty refused.fetch("hits")
+      assert_includes refused.fetch("reason"), "template source digest mismatch"
+    end
+  end
 
   # Quarantine is an explicit refusal, not accelerated-arm certification.
   # Keep the original failing request and require Rails' observable result.

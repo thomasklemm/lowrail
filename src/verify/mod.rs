@@ -442,7 +442,7 @@ fn write_denylist(app: &Path, culprits: &[Vec<u64>], evidence: &[String]) -> Res
     for set in culprits {
         for id in set {
             if let Some(u) = manifest["units"].as_array().into_iter().flatten().find(|u| u["id"].as_u64() == Some(*id)) {
-                list.push(serde_json::json!({"file": u["file"], "pass": u["pass"], "evidence": evidence.iter().take(5).collect::<Vec<_>>()}));
+                list.push(serde_json::json!({"file": u["file"], "kind": u["kind"], "pass": u["pass"], "evidence": evidence.iter().take(5).collect::<Vec<_>>()}));
             }
         }
     }

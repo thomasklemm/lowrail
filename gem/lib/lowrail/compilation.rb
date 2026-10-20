@@ -53,9 +53,15 @@ module Lowrail
       end
 
       def record(path, source, defaults, options, compiler, line, iseq)
+        portable = begin
+          Manifest.iseq_fingerprint(iseq, portable: true)
+        rescue ArgumentError, TypeError
+          nil # Only target-root builds need this additional representation.
+        end
         files[path] = {
           source_sha256: Digest::SHA256.hexdigest(source.b),
           iseq_sha256: Digest::SHA256.hexdigest(iseq.to_binary),
+          portable_iseq_sha256: portable,
           compile_option: Manifest.compile_option_fingerprint(defaults, options),
           defaults: defaults, options: options.is_a?(Hash) ? options.dup : options, compiler: compiler, line: line
         }

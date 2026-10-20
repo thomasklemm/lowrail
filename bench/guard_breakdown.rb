@@ -49,7 +49,7 @@ if ARGV.first == "--worker"
   end
   fact = { "receiver" => "@self", "method" => "foo", "owner" => "GuardCostReceiver", "visibility" => "public",
     "source_location" => GuardCostReceiver.instance_method(:foo).source_location.join(":") }
-  manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+  manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
     "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
   Lowrail::Guard.install(manifest)
   100_000.times { Lowrail.ok?(0, GuardCostReceiver) }

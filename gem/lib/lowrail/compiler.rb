@@ -3,6 +3,7 @@
 require "json"
 require "digest"
 require "fileutils"
+require "pathname"
 require_relative "../lowrail"
 require_relative "manifest"
 require_relative "compilation"
@@ -40,17 +41,23 @@ module Lowrail
 
       def compile(input, err: $stderr)
         out = File.expand_path(input.fetch("out"))
+        root = File.expand_path(input.fetch("app_root") { File.dirname(out) })
+        target_root = input["target_root"] || root
+        raise ArgumentError, "target_root must be absolute" unless target_root == File.expand_path(target_root)
         iseq_dir = File.join(out, "iseq")
         FileUtils.mkdir_p(iseq_dir)
 
         files = {}
+        relocation_errors = []
         Array(input["files"]).each do |entry|
           path = entry.fetch("path")
+          target = path.start_with?(root + "/") ? File.join(target_root, path.delete_prefix(root + "/")) : path
           expected = entry["source_sha256"] || (entry["original"] && Digest::SHA256.file(entry["original"]).hexdigest)
-          compiled = compile_file(path, entry.fetch("lowered"), expected, iseq_dir)
+          compiled = compile_file(path, entry.fetch("lowered"), expected, iseq_dir, target: target)
           files[path] = compiled
         rescue StandardError, ScriptError => e
           err.puts "[lowrail] skipping #{path}: #{e.class}: #{e.message.lines.first&.chomp}"
+          relocation_errors << "#{path}: #{e.message.lines.first&.chomp}" if target && target != path
         end
 
         templates = input["templates"] || {}
@@ -108,13 +115,27 @@ module Lowrail
         ledger_path = File.join(out, "ledger.json")
         ledger = File.file?(ledger_path) ? JSON.parse(File.read(ledger_path)) : []
         ledger.reject! { _1["pass"] == "jit/shape" }
-        Lowrail.write_json(ledger_path, ledger + warnings)
         err.puts "[lowrail] #{warnings.size} JIT shape warning(s); diagnostic only (ledger.json)" unless warnings.empty?
+        manifest = Paths.relative(manifest, root: root, dir: out)
+        manifest["build_root"] = root # provenance/refusal only, never a lookup root
+        manifest["iseq_root"] = target_root unless files.empty?
+        reasons = relocation_errors
+        reasons << "endpoint factories retain path-derived compiled-method certificates" if units.any? { _1["pass"] == "endpoint/action" }
+        if Paths.contains_root?(manifest["units"], root) || Paths.contains_root?(manifest["templates"], root)
+          reasons << "opaque code/config/reflection values retain the build root"
+        end
+        manifest["relocation_refusals"] = reasons
+        ledger.reject! { _1["pass"] == "delivery/relocation" }
+        reasons.each do |reason|
+          ledger << { "pass" => "delivery/relocation", "outcome" => "warning", "reason" => "nonrelocatable",
+            "detail" => reason, "copies" => 1 }
+        end
+        Lowrail.write_json(ledger_path, ledger + warnings)
         Lowrail.write_json(File.join(out, "manifest.json"), manifest)
         manifest
       end
 
-      def compile_file(path, lowered, expected_sha, iseq_dir)
+      def compile_file(path, lowered, expected_sha, iseq_dir, target: path)
         raise ArgumentError, "path must be absolute" unless path == File.expand_path(path)
         sha = Digest::SHA256.file(path).hexdigest
         if expected_sha && expected_sha != sha
@@ -129,7 +150,17 @@ module Lowrail
         unless compilation.fetch(:source_sha256) == sha
           raise ArgumentError, "app loader transformed the source; lower the transformed source first"
         end
-        binary = Compilation.lowered(src, path, compilation).to_binary
+        fingerprint = compilation.fetch(:iseq_sha256)
+        if target != path
+          original = File.read(path, encoding: Encoding::UTF_8)
+          replay = Compilation.lowered(original, path, compilation)
+          unless compilation[:portable_iseq_sha256] &&
+              Manifest.iseq_fingerprint(replay, portable: true) == compilation[:portable_iseq_sha256]
+            raise ArgumentError, "target-root recipe cannot reproduce the original ISeq (including nested frame labels)"
+          end
+          fingerprint = Manifest.iseq_fingerprint(Compilation.lowered(original, target, compilation), portable: true)
+        end
+        binary = Compilation.lowered(src, target, compilation).to_binary
         name = "#{Digest::SHA256.hexdigest(binary)}.bin"
         dest = File.join(iseq_dir, name)
         unless File.exist?(dest)
@@ -138,7 +169,9 @@ module Lowrail
           File.rename(tmp, dest)
         end
         { "iseq" => "iseq/#{name}", "source_sha256" => sha,
-          "original_iseq_sha256" => compilation.fetch(:iseq_sha256),
+          "lowered" => Pathname.new(File.expand_path(lowered)).relative_path_from(Pathname.new(File.dirname(iseq_dir))).to_s,
+          "lowered_sha256" => Digest::SHA256.hexdigest(src.b), "iseq_sha256" => Digest::SHA256.hexdigest(binary),
+          "original_iseq_sha256" => fingerprint, "portable_fingerprint" => target != path,
           "compile_option" => compilation.fetch(:compile_option) }
       end
     end

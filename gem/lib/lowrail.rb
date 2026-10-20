@@ -23,7 +23,7 @@
 # lookup of a lowered file (which happens after Bundler has set up).
 module Lowrail
   VERSION = "0.0.1"
-  FORMAT = 1
+  FORMAT = 2
 
   # Guard states, indexed by unit id. nil = not yet validated, true = facts
   # hold, false = facts failed. Lowered code reads this array directly:
@@ -104,27 +104,40 @@ module Lowrail
       setup(root: root)
     rescue StandardError, ScriptError => e
       # Never break an app: any failure here leaves plain Ruby running.
-      warn "[lowrail] setup failed (#{e.class}: #{e.message}); running without Lowrail" if ENV["LOWRAIL_DEBUG"]
+      refuse("setup failed (#{e.class}: #{e.message}); running without Lowrail")
       false
     end
 
-    def setup(root: Dir.pwd, dir: File.join(root, ".lowrail"))
+    def setup(root: Dir.pwd, dir: nil)
       return false unless enabled?
       # With no selected units, serve original source rather than installing
       # lowered code whose guards can only fall back. Reporters boot above.
       return false if ENV["LOWRAIL_UNITS"] == ""
+      # Do not ask Rails.application to instantiate itself during RUBYOPT.
+      if defined?(::Rails) && (app = ::Rails.instance_variable_get(:@application)) && app.initialized?
+        root = ::Rails.root.to_s
+      end
+      root = File.expand_path(root)
+      dir ||= File.join(root, ".lowrail")
       path = File.join(dir, "manifest.json")
       return false unless File.file?(path)
 
       require_relative "lowrail/manifest"
 
-      manifest = Manifest.load(path, dir)
+      # Under RUBYOPT Rails does not exist yet; the boot root is the caller's
+      # actual application directory, never a path taken from the build.
+      manifest = Manifest.load(path, dir, root: root)
       if (@refusal_reason = manifest.refusal_reason)
-        warn "[lowrail] #{@refusal_reason}; running without Lowrail"
+        # Preserve the quarantine's existing unconditional warning.
+        if @refusal_reason.start_with?("quarantined")
+          warn "[lowrail] #{@refusal_reason}; running without Lowrail"
+        else
+          debug "#{@refusal_reason}; running without Lowrail"
+        end
         return false
       end
       unless manifest.compatible?
-        debug "manifest built for #{manifest.ruby_description} (format #{manifest.format}); running #{RUBY_DESCRIPTION}. Falling back to plain Ruby."
+        refuse("manifest built for #{manifest.ruby_description} (format #{manifest.format}); running #{RUBY_DESCRIPTION}. Falling back to plain Ruby.")
         return false
       end
       @root = root
@@ -171,6 +184,12 @@ module Lowrail
 
     def debug(msg)
       warn "[lowrail] #{msg}" if ENV["LOWRAIL_DEBUG"]
+    end
+
+    def refuse(reason)
+      @refusal_reason ||= reason
+      debug reason
+      nil
     end
   end
 end

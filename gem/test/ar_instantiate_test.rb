@@ -70,7 +70,7 @@ class ARInstantiateTest < Minitest::Test
     y = a.posts.create!(title: "right", score: 29)
     Bicycle.create!(name: "two wheels")
     Vehicle.create!(name: "plain")
-    File.write("manifest.json", JSON.generate({format: 1, ruby_description: RUBY_DESCRIPTION,
+    File.write("manifest.json", JSON.generate({format: Lowrail::FORMAT, ruby_description: RUBY_DESCRIPTION,
       compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 4, facts: []}]}))
     File.write("ledger.json", "[]")
     built = Lowrail::ARInstantiateBuild.build
@@ -219,7 +219,7 @@ class ARInstantiateTest < Minitest::Test
         built = Lowrail::ARInstantiateBuild.build
         built[:units].concat(Lowrail::PreloadBuild.build.fetch(:units))
         built[:units].each_with_index { |unit, id| unit["id"] = id }
-        File.write(".lowrail/manifest.json", JSON.generate(format: 1,
+        File.write(".lowrail/manifest.json", JSON.generate(format: Lowrail::FORMAT,
           ruby_description: RUBY_DESCRIPTION, compile_option: "", files: {}, units: built[:units]))
         puts JSON.generate(built[:units].filter_map { _1.dig("ar_instantiate", "model") })
       RUBY

@@ -48,7 +48,7 @@ class ARPlansTest < Minitest::Test
       Post.create!(writer: writer, title: title, published: published)
     end
     dir = ARGV.fetch(0)
-    data = { "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+    data = { "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
       "files" => {}, "units" => [] }
     Lowrail.write_json(File.join(dir, "manifest.json"), data)
     Lowrail.write_json(File.join(dir, "ledger.json"), [])

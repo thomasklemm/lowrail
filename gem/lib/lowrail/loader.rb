@@ -40,15 +40,22 @@ module Lowrail
 
       # Returns a lowered ISeq for path, or nil to fall through.
       def serve(path, original: nil)
+        # The eval seam must not validate our replacement as an original.
+        return nil if original && @replacements&.key?(original)
         return nil if defined?(::Coverage) && ::Coverage.respond_to?(:running?) && ::Coverage.running?
         options = Compilation.options_for(original)
         bin = @manifest.iseq_for(path, original: original, compile_option: options) or return nil
-        iseq = RubyVM::InstructionSequence.load_from_binary(File.binread(bin))
+        binary = File.binread(bin)
+        unless Manifest.digest.hexdigest(binary) == @manifest.files.fetch(path).fetch("iseq_sha256")
+          return Lowrail.refuse("lowered ISeq digest mismatch: #{path}; using original source")
+        end
+        iseq = RubyVM::InstructionSequence.load_from_binary(binary)
+        (@replacements ||= ObjectSpace::WeakKeyMap.new)[iseq] = true
         Stats.loaded(path) if defined?(Stats)
         JitDiagnostics.record(iseq, path, @manifest.units) if defined?(JitDiagnostics)
         iseq
       rescue StandardError => e
-        Lowrail.debug("#{path}: #{e.class}: #{e.message}; compiling original source")
+        Lowrail.refuse("#{path}: #{e.class}: #{e.message}; compiling original source")
         nil
       end
 

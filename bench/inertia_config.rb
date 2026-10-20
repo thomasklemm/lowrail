@@ -29,7 +29,7 @@ when "micro"
   built = Lowrail::InertiaConfigBuild.build
   abort built[:ledger].inspect unless built[:units].size == 1
   built[:units].first["id"] = 0
-  manifest = Lowrail::Manifest.new({"format" => 1, "ruby_description" => RUBY_DESCRIPTION,
+  manifest = Lowrail::Manifest.new({"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
     "compile_option" => Lowrail::Manifest.compile_option_fingerprint, "files" => {}, "units" => built[:units]}, Dir.pwd)
   Lowrail::Guard.install(manifest)
   pass.install(manifest.units)

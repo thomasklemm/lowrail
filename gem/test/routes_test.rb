@@ -304,7 +304,7 @@ class RoutesTest < Minitest::Test
       # Old route/path artifacts are separately required to refuse at boot.
       units = [{ "id" => 0, "kind" => "file", "file" => "/x.rb", "pass" => "test/route_facts", "facts" => [fact] },
                { "id" => 1, "kind" => "file", "file" => "/x.rb", "pass" => "test/route_facts", "facts" => [fact, url_fact] }]
-      manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+      manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
                                          "files" => {}, "units" => units }, "/tmp")
       Lowrail::Guard.install(manifest)
       res = {}

@@ -15,7 +15,7 @@ results = {}
   original = klass.instance_method(:foo)
   fact = { "receiver" => "@self", "method" => "foo", "owner" => "SpeculationHoleHost", "visibility" => "public",
     "source_location" => original.source_location.join(":") }
-  manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+  manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
     "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
   Lowrail::V.clear
   Lowrail::Guard.install(manifest)
@@ -60,7 +60,7 @@ original = SpeculationConstant::Target.method(:foo)
 fact = { "receiver" => "SpeculationConstant::Target", "method" => "foo", "singleton" => true,
   "owner" => "#<Class:SpeculationConstant::Original>", "visibility" => "public",
   "source_location" => original.source_location.join(":") }
-manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
   "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
 Lowrail::G.clear
 Lowrail::Guard.install(manifest)

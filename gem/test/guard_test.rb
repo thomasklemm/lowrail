@@ -19,7 +19,7 @@ class GuardTest < Minitest::Test
       { "id" => i, "file" => "/x.rb", "method" => "X#y", "facts" => [{ "receiver" => "Object", "method" => n, "singleton" => false,
         "owner" => "Object", "source_location" => nil, "visibility" => "public" }] }
     end
-    manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+    manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
                                        "files" => {}, "units" => units }, "/tmp")
     Lowrail::Guard.install(manifest)
     G = Lowrail::G
@@ -88,7 +88,7 @@ class GuardTest < Minitest::Test
       require "lowrail/manifest"
       require "lowrail/guard"
       fact = { "receiver" => "Array", "method" => "each", "owner" => "Array", "source_location" => nil, "visibility" => "public" }
-      manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+      manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
         "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
       Lowrail::Guard.install(manifest)
       RubyVM::YJIT.enable
@@ -111,7 +111,7 @@ class GuardTest < Minitest::Test
       class B < Base; end
       fact = { "receiver" => "@self", "method" => "foo", "owner" => "Base",
         "source_location" => Base.instance_method(:foo).source_location.join(":"), "visibility" => "public" }
-      manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+      manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
         "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
       Lowrail::Guard.install(manifest)
       states = [Lowrail.ok?(0, A), Lowrail.view_ok?(0, B)]
@@ -148,7 +148,7 @@ class GuardTest < Minitest::Test
       class B < Base; end
       fact = { "receiver" => "@self", "method" => "foo", "owner" => "Base",
         "source_location" => Base.instance_method(:foo).source_location.join(":"), "visibility" => "public" }
-      manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+      manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
         "files" => {}, "units" => [{ "id" => 7, "facts" => [fact] }] }, "/tmp")
       Lowrail::Guard.install(manifest)
       nil_class = A.new
@@ -203,7 +203,7 @@ class GuardTest < Minitest::Test
       "native inherited singleton" => fact("File", "open", "#<Class:IO>", nil, singleton: true)
     }
     units = facts.each_with_index.map { |(k, fa), i| { "id" => i, "file" => "/x.rb", "method" => k, "facts" => [fa] } }
-    m = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => "", "compile_option" => "", "files" => {}, "units" => units }, "/tmp")
+    m = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => "", "compile_option" => "", "files" => {}, "units" => units }, "/tmp")
     Lowrail::Guard.install(m)
     out = {}
     facts.each_key.with_index { |k, i| out[k] = Lowrail::Guard.validate(i) }

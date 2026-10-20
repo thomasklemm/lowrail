@@ -21,7 +21,7 @@ class InertiaPropsTest < Minitest::Test
     unit = built[:units].first.merge("id" => 0)
     unit["data"]["sources"].transform_values! { "stale" } if ENV["STALE"]
     unit["data"].delete("sources") if ENV["MALFORMED"]
-    manifest = Lowrail::Manifest.new({"format" => 1, "ruby_description" => RUBY_DESCRIPTION,
+    manifest = Lowrail::Manifest.new({"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
       "compile_option" => Lowrail::Manifest.compile_option_fingerprint, "files" => {}, "units" => [unit]}, Dir.pwd)
     Lowrail::Stats.enable!
     Lowrail::Guard.install(manifest, Lowrail::Stats::STATE)

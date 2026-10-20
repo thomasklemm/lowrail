@@ -601,3 +601,73 @@ Box creation also invalidates ZJIT's root-box assumption
 separate app worlds, not a drop-in isolation boundary around selected methods
 of today's live Rails object graph. Keep process isolation for verification
 and retain exact guards. No Box integration was implemented.
+
+## Relocation follow-up
+
+The rejected historical comparison exposed a real deployment defect, not a
+benchmark inconvenience: absolute template keys and certificates can silently
+miss after CI/deploy directory changes. The follow-up changes delivery only;
+it does **not** rerun/salvage the rejected cohorts or restore quarantined passes.
+
+**Chosen alternative: `lowrail build --target-root /deploy/app`.** Format-2
+facts/manifests contain typed root-relative metadata. Templates and runtime
+certificates resolve at the actual root. File ISeqs are AOT-compiled for the
+requested deploy path with the observed loader recipe, independent original
+and lowered source digests, a binary digest, and a live-original ISeq check.
+Unreproducible nested frames/opaque path-bound certificates refuse explicitly;
+old artifacts require rebuilding. See [deploy paths](loaders.md#deploy-paths).
+`sealed-v1`/`sealed_only` admission and quarantine remain in force after
+integration with the separately published sealed tier.
+
+### Reported boot cost, not a throughput claim
+
+Pinned preview, interpreter, current actual build inputs; five warmup calls
+and 61 measured calls per operation, median milliseconds. Each recipe was
+observed by `Compilation.boot` with its disposable Bootsnap cache. This is
+component timing, **not** end-to-end cold-boot timing or an accepted bench
+cohort. Blog selected preload/instantiate; Campfire selected SHA256 memo.
+
+| App/file | Lowered files | Hypothetical compile at boot, ms/file | Total hypothetical compile, ms | Chosen extra runtime compilations |
+|---|---:|---:|---:|---:|
+| Blog | 0 | n/a | 0 | 0 |
+| Campfire `app/controllers/concerns/inline_script_hashes.rb` (2,501 bytes) | 1 | 0.0745 | 0.0745 | 0 |
+
+For that Campfire file, binary deserialization costs 0.0181 ms, the structural
+original-ISeq certificate 0.1698 ms, and hashing the in-memory lowered bytes
+0.00987 ms (disk IO excluded). AOT avoids extra lowered-source compilation;
+it does **not** make validation free. No claim that the full boot is faster.
+The public-compiler-hook counterexample returns `lowered`/zero extra calls
+for AOT versus `hooked`/one call for runtime text compilation on both Rubies;
+this exactness difference, not 0.0745 ms, decides against runtime recompilation.
+
+### Executed relocation checks
+
+- Permanent file and template regressions build in A, copy to B, delete A,
+  and require identical nonzero hits. The file case also checks `__FILE__`,
+  `__dir__`, caller paths and method source locations at B, and zero public
+  text-compiler calls. Editing either original or lowered source yields
+  original behavior, zero hits, a recorded digest refusal and a debug warning.
+  Changed template bytes run Rails' original handler with a recorded refusal.
+- A copied 4.1 blog (`build --passes default,+preload_plans,+ar_instantiate
+  --target-root B`, then `verify B`) has **21 identical outcomes, 125 identical
+  SQL queries, 41 hits across two instantiate units**, matching verification
+  in A. The preloader has one fallback and no hits; this is not a preloader
+  support claim. Both runs are interpreter checks on the pinned preview.
+- The copied Campfire SHA256 file is delivered at its target root: its loaded
+  filename and method source location name B, and the two-call `abc` digest
+  result matches the independent known digest. Its memo arm records no hits
+  in this boot: the observed sticky tracing state is true and `prepared(0)`
+  returns false. This is delivery evidence, **not** new memo-support evidence;
+  this follow-up does not change the memo pass's tracing admission.
+- The A→B file/template regressions both fail on the pre-fix sealed-tier
+  baseline on **each** Ruby (two failures: empty hits; template returns the
+  original body with no refusal). With this change they pass on both VMs.
+
+After integrating sealed-tier eligibility, full `rake test` without exclusions
+passes **127 runs / 1,460 assertions / 19 skips** on 4.0.7 and **127 / 4,231 /
+8 skips** on 4.1, zero failures/errors. The existing sealed link delivery pilot
+is deliberately 4.0.7-only; its 4.1 skip is not sealed-pilot support. Constructor
+and old/missing/wrong-tier refusals run on both VMs, including rejecting
+format-1 sealed artifacts. Full `cargo test` passes **35 unit + 1 types/MCP +
+3 verify** tests on each VM. Different optional dependencies and the explicit
+pilot boundary account for skips; no test selection exclusions were used.

@@ -43,7 +43,7 @@ class InertiaConfigTest < Minitest::Test
     raise built.inspect unless built[:units].size == 1 && built[:ledger].first["reason"] == "canonical_schema"
     unit = built[:units].first.merge("id" => 0)
     unit["data"]["sources"].transform_values! { "stale" } if ENV["STALE"]
-    manifest = Lowrail::Manifest.new({"format" => 1, "ruby_description" => RUBY_DESCRIPTION,
+    manifest = Lowrail::Manifest.new({"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
       "compile_option" => Lowrail::Manifest.compile_option_fingerprint, "files" => {}, "units" => [unit],
       "tier" => "sealed-v1", "rails_env" => "production"}, Dir.pwd)
     preexisting = klass.default

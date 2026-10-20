@@ -19,15 +19,21 @@ module Lowrail
         # substituted. Existing source passes retain their delivery contract.
         if @entry.key?("original")
           code = @original.call(template, source)
-          return code unless code == @entry.fetch("original") &&
-            Digest::SHA256.hexdigest(source.b) == @entry.fetch("source_sha256")
+          unless code == @entry.fetch("original")
+            Lowrail.refuse("template handler body changed: #{template.identifier}; rebuild required")
+            return code
+          end
+          unless Digest::SHA256.hexdigest(source.b) == @entry.fetch("source_sha256")
+            Lowrail.refuse("template source digest mismatch: #{template.identifier}; rebuild required")
+            return code
+          end
           return @entry.fetch("code").dup
         end
         if Digest::SHA256.hexdigest(source.b) == @entry.fetch("source_sha256")
           Lowrail.debug("template #{template.identifier}: lowered")
           @entry.fetch("code").dup
         else
-          Lowrail.debug("template #{template.identifier}: source changed, using Rails' handler")
+          Lowrail.refuse("template source digest mismatch: #{template.identifier}; using Rails' handler")
           @original.call(template, source)
         end
       end

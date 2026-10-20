@@ -1,6 +1,17 @@
-# Data formats (v1)
+# Data formats
 
 All files are JSON, written under `<app>/.lowrail/`.
+Facts and runtime manifests use **format 2**; the observation and other report
+formats below keep their independent version numbers. App-owned metadata paths
+are relative to the app root, including template identifiers and map keys.
+`app_root` locates that root relative to the JSON file's directory (normally
+`".."`). `app_paths.values` and `app_paths.keys` are JSON pointers identifying
+exactly which metadata values/maps must be expanded by readers. The Ruby and
+Rust readers resolve values before renaming parent map keys. Ruby source,
+configuration, schema literals and reflection options are never text-rewritten.
+External gem paths remain absolute and must still satisfy their certificates.
+In-memory facts returned by `Facts.collect` remain absolute; persistence uses
+this relative representation. An IO dump is anchored to the supplied app root.
 
 ## facts.json — what the booted app looks like
 
@@ -16,11 +27,13 @@ Prism can look at the source span.
 
 ```json
 {
-  "format": 1,
-  "ruby_description": "...", "rails_version": "8.1.4", "app_root": "/abs",
+  "format": 2,
+  "ruby_description": "...", "rails_version": "8.1.4", "app_root": "..",
+  "app_paths": {"values": ["/load_path_features/0", "/templates/0/identifier",
+                            "/modules/0/const_source_location", "/compiled_templates/0/identifier"], "keys": []},
   "yjit": false,
   "gems": [{"name": "activerecord", "version": "8.1.4", "path": "/abs/gems/activerecord-8.1.4"}],
-  "load_path_features": ["/abs/file.rb", "..."],        // $LOADED_FEATURES, sorted
+  "load_path_features": ["app/file.rb", "..."],        // $LOADED_FEATURES, sorted
   "models": [{
     "name": "Article", "table": "articles", "primary_key": "id",
     "attribute_methods_defined": true,
@@ -39,7 +52,7 @@ Prism can look at the source span.
               "app": "ActionCable::Server::Base", "engine": false, "internal": true}],
   "template_config": {"frozen_string_literal": false, "annotate_rendered_view_with_filenames": false},
   "templates": [{
-    "identifier": "/abs/app/views/articles/index.html.erb", "virtual_path": "articles/index",
+    "identifier": "app/views/articles/index.html.erb", "virtual_path": "articles/index",
     "format": "html", "variant": null, "handler": "ActionView::Template::Handlers::ERB",
     "source_sha256": "...", "code": "@output_buffer.safe_append='...", "strict_locals": null
   }],
@@ -49,7 +62,7 @@ Prism can look at the source span.
     "name": "Article", "kind": "class", "superclass": "ApplicationRecord",
     "ancestors": ["Article", "Article::GeneratedAssociationMethods", "..."],
     "singleton_ancestors": ["#<Class:Article>", "..."],
-    "const_source_location": "/abs/app/models/article.rb:1",
+    "const_source_location": "app/models/article.rb:1",
     "methods": [{
       "name": "title", "singleton": false, "visibility": "public",
       "owner": "Article::GeneratedAttributeMethods",
@@ -68,7 +81,7 @@ Prism can look at the source span.
   "materialize": [{"step": "eager_load", "seconds": 0.18, "modules": 1520, "methods": 9114,
                    "scripts": 693, "census_seconds": 0.02, "errors": 0},
                   {"step": "relation_delegation", "...": "...", "note": "speculative: 6 model class methods"}],
-  "compiled_templates": [{"identifier": "/abs/app/views/articles/index.html.erb",
+  "compiled_templates": [{"identifier": "app/views/articles/index.html.erb",
                           "method": "_app_views_articles_index_html_erb___123_456", "in_app": true}],
   "generated_scripts": [{
     "sha256": "...", "bytes": 776, "lines": 2,
@@ -262,18 +275,23 @@ See [the separate contract](sealed.md#artifact-acceptance-and-the-first-delivere
 
 ```json
 {
-  "format": 1,
+  "format": 2,
   "ruby_description": "...",
+  "app_root": "..", "build_root": "/build/app", "iseq_root": "/deploy/app",
+  "app_paths": {"values": ["/units/0/file"], "keys": ["/files", "/templates"]},
+  "relocation_refusals": [],
   "compile_option": "<sha256 of sorted RubyVM::InstructionSequence.compile_option>",
   "rails_env": "test",                                  // units apply only in this env
-  "files": {"/abs/app/helpers/rooms_helper.rb": {
+  "files": {"app/helpers/rooms_helper.rb": {
     "iseq": "iseq/<sha>.bin", "source_sha256": "...",
+    "lowered": "src/app__helpers__rooms_helper.rb", "lowered_sha256": "...", "iseq_sha256": "...",
     "compile_option": "<sha256 of this file's compiler defaults and explicit options>",
+    "portable_fingerprint": true,
     "original_iseq_sha256": "<sha256 of the app loader's original ISeq binary>"}},
-  "templates": {"/abs/app/views/articles/_article.html.erb": {
+  "templates": {"app/views/articles/_article.html.erb": {
     "source_sha256": "...", "code": "<lowered compiled ERB code>", "units": [0, 1]}},
   "units": [{
-    "id": 1, "kind": "template", "file": "/abs/app/views/articles/_article.html.erb",
+    "id": 1, "kind": "template", "file": "app/views/articles/_article.html.erb",
     "pass": "route/path", "sites": 3,
     "facts": [
       {"receiver": "@self", "method": "article_path", "owner": null,
@@ -303,8 +321,18 @@ Bootsnap compiler's recipe: their warm cached bytecode runs unchanged when
 the actual compilation policy is no longer observable.
 
 The top-level `compile_option` remains build-process metadata, not a file
-delivery guard. Older format-1 file entries lacking the per-file contract
-silently run original code until rebuilt; their template entries still work.
+delivery guard. Format-1 manifests now refuse as a whole with a recorded
+rebuild reason; Rust can still read same-root format-1 facts. File delivery also
+validates the lowered source and binary digests. `iseq_root` is the required
+runtime root for a file-binary artifact; `build_root` is provenance, never a
+lookup root. For `--target-root`, `portable_fingerprint` selects the full
+`ISeq#to_a` Marshal digest, normalizing **only** the root `<main>`/`<compiled>`
+label; operands, nested frame labels, paths and literal Strings are preserved.
+The build must first reproduce the observed original under that rule. Other
+serialization versions or changed nested frames refuse instead of being
+normalized away. Same-root file builds retain the original binary fingerprint.
+Opaque path-bound certificates are listed in `relocation_refusals` and the
+`delivery/relocation` ledger; moving such a build refuses at boot.
 Coverage always runs original source. See [loader composition](loaders.md)
 for the gem survey, installation-order behavior, and tested versions.
 
@@ -331,7 +359,7 @@ the named route to still have that path spec, required parts and
 ## build input for lowrail-compile — `units.json`
 
 ```json
-{"out": "/abs/app/.lowrail", "rails_env": "test",
+{"out": "/abs/app/.lowrail", "app_root": "/abs/app", "target_root": "/deploy/app", "rails_env": "test",
  "files": [{"path": "/abs/app/models/article.rb",
             "lowered": "/abs/app/.lowrail/src/app__models__article.rb",
             "original": "/abs/app/.lowrail/src/app__models__article.rb.orig"}],
@@ -347,6 +375,10 @@ removed afterwards; the app's existing cache is untouched. It then compiles
 each lowered source with the original path, parser, line, process defaults
 and explicit options, writes binaries, and atomically writes `manifest.json`.
 Defaults are restored after every compilation, including syntax errors.
+Optional `target_root` comes from `lowrail build --target-root PATH`; it must
+be absolute but need not exist during build. Only app-owned file compilation
+filenames change; gem file paths and compiler policy do not. The runtime does
+not recompile lowered files. See [the deployment contract](loaders.md#deploy-paths).
 Without a Rails environment (standalone compiler fixtures), the recipe is
 the current process's `compile_file` policy.
 

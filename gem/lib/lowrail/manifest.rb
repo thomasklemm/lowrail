@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "passes"
+require_relative "paths"
 
 module Lowrail
   # Minimal JSON reader for the manifest. Boot runs before bundler/setup when
@@ -83,21 +84,31 @@ module Lowrail
     end
   end
 
-  # The build output. Files are keyed by absolute source path; each entry
-  # names its ISeq binary and the SHA-256 of the source it was lowered from.
+  # Persisted app paths are relative; consumers see resolved absolute paths.
+  # Each file names its ISeq binary and the original source's SHA-256.
   # Units are the guarded specializations, each with the facts it assumes.
   class Manifest
     attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method, :refusal_reason
 
     QUARANTINED_PASSES = %w[view/link_to route/path].freeze
 
-    def self.load(path, dir = File.dirname(path))
-      new(MiniJSON.parse(File.read(path, encoding: Encoding::UTF_8)), dir)
+    def self.load(path, dir = File.dirname(path), root: nil)
+      new(MiniJSON.parse(File.read(path, encoding: Encoding::UTF_8)), dir, root: root)
     end
 
-    def initialize(data, dir)
+    def initialize(data, dir, root: nil)
       @dir = dir
       @format = data.fetch("format")
+      root ||= File.expand_path(data.fetch("app_root", ".."), dir)
+      moved = data["build_root"] && root != data["build_root"]
+      if @format != FORMAT
+        @refusal_reason = "unsupported manifest format #{@format}; rebuild for relocatable format #{FORMAT}"
+      elsif data["iseq_root"] && root != data["iseq_root"]
+        @refusal_reason = "relocation unsupported: path-bound ISeqs target #{data['iseq_root']}, not #{root}; rebuild with --target-root #{root}"
+      elsif moved && !data.fetch("relocation_refusals", []).empty?
+        @refusal_reason = "relocation unsupported: #{data.fetch('relocation_refusals').join('; ')}; rebuild at the runtime root"
+      end
+      Paths.resolve!(data, root: root)
       @ruby_description = data.fetch("ruby_description")
       @compile_option = data.fetch("compile_option")
       @files = data.fetch("files")
@@ -147,14 +158,24 @@ module Lowrail
     def iseq_for(source_path, original: nil, compile_option: nil)
       return nil if @refusal_reason
       entry = @files[source_path] or return nil
+      return Lowrail.refuse("source missing: #{source_path}") unless File.file?(source_path)
+      unless Manifest.sha256_file(source_path) == entry.fetch("source_sha256")
+        return Lowrail.refuse("source digest mismatch: #{source_path}; rebuild required")
+      end
       # Old builds have no loader contract: rebuild rather than assume their
       # process-wide defaults describe the app's per-file compilation.
-      fingerprint = entry["original_iseq_sha256"] or return nil
-      return nil unless compile_option && compile_option == entry["compile_option"]
+      fingerprint = entry["original_iseq_sha256"] or return Lowrail.refuse("missing original ISeq certificate: #{source_path}; rebuild required")
+      unless compile_option && compile_option == entry["compile_option"]
+        return Lowrail.refuse("compiler recipe mismatch or unobserved: #{source_path}; using original source")
+      end
       # The recipe alone cannot detect external source transforms or hijacks.
-      return nil unless original && fingerprint == Manifest.iseq_fingerprint(original)
-      return nil unless File.file?(source_path)
-      return nil unless Manifest.sha256_file(source_path) == entry.fetch("source_sha256")
+      unless original && fingerprint == Manifest.iseq_fingerprint(original, portable: entry["portable_fingerprint"])
+        return Lowrail.refuse("original ISeq mismatch: #{source_path}; loader transform or target-root recipe differs")
+      end
+      lowered = File.expand_path(entry.fetch("lowered"), @dir)
+      unless File.file?(lowered) && Manifest.sha256_file(lowered) == entry.fetch("lowered_sha256")
+        return Lowrail.refuse("lowered source digest mismatch: #{source_path}; rebuild required")
+      end
       File.join(@dir, entry.fetch("iseq"))
     end
 
@@ -170,8 +191,16 @@ module Lowrail
       digest.hexdigest(sorted.inspect)
     end
 
-    def self.iseq_fingerprint(iseq)
-      digest.hexdigest(iseq.to_binary)
+    def self.iseq_fingerprint(iseq, portable: false)
+      return digest.hexdigest(iseq.to_binary) unless portable
+      data = iseq.to_a
+      unless data[0] == "YARVInstructionSequence/SimpleDataFormat" && data[1] == 4 && %w[<main> <compiled>].include?(data[5])
+        raise ArgumentError, "unsupported target-root ISeq serialization"
+      end
+      # Only the top-level frame label differs between compile_file and text
+      # compilation. Preserve every operand, nested ISeq and literal string.
+      data[5] = "<top>"
+      digest.hexdigest(Marshal.dump(data))
     end
 
     def self.sha256_file(path)

@@ -61,7 +61,7 @@ class FactsTest < Minitest::Test
   end
 
   def test_top_level_shape
-    assert_equal 1, facts["format"]
+    assert_equal Lowrail::Facts::FORMAT, facts["format"]
     assert_equal RUBY_DESCRIPTION, facts["ruby_description"]
     assert_nil facts["rails_version"]
     assert_equal [], facts["models"]
@@ -156,7 +156,7 @@ class FactsRealBlogTest < Minitest::Test
       out = File.join(dir, "facts.json")
       run = -> { system("bundle", "exec", "ruby", EXE, out, chdir: APP, err: File::NULL) }
       ok = defined?(Bundler) ? Bundler.with_unbundled_env(&run) : run.call
-      ok ? JSON.parse(File.read(out)) : {}
+      ok ? Lowrail::Paths.resolve!(JSON.parse(File.read(out)), root: APP) : {}
     end
   end
 

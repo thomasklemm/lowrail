@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "test_helper"
+require "lowrail"
 
 class SealedLinkTest < Minitest::Test
   include LowrailTest
@@ -69,6 +70,7 @@ class SealedLinkTest < Minitest::Test
       out, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "production", "LOWRAIL_BUILD_JIT" => "0"), bin, "build", dir, "--env", "production", "--sealed")
       assert status.success?, "#{out}\n#{err}"
       manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
+      assert_equal Lowrail::FORMAT, manifest["format"]
       assert_equal "sealed-v1", manifest["tier"]
       assert_equal ["sealed/link_to"], manifest.fetch("units").map { _1["pass"] }
       scenario = <<~'RUBY'

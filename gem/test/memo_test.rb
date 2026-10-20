@@ -18,7 +18,7 @@ class MemoTest < Minitest::Test
     raise cert.fetch("decline") if cert["decline"]
     unit = { "id" => 0, "kind" => "file", "file" => "/memo.rb", "pass" => "memo/uri_join",
       "facts" => cert.fetch("facts"), "memo" => cert }
-    manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION,
+    manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
       "compile_option" => "", "files" => {}, "units" => [unit] }, "/tmp")
     Lowrail::Guard.install(manifest, Lowrail::Stats::STATE)
     Lowrail::Passes::Memo.install(manifest.units)

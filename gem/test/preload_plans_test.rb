@@ -96,7 +96,7 @@ class PreloadPlansTest < Minitest::Test
     x.notes.create!(body: "x1"); x.notes.create!(body: "x2"); z.notes.create!(body: "z1")
     PolyPost.create!(owner: a)
     dir = Dir.pwd
-    File.write("manifest.json", JSON.generate({format: 1, ruby_description: RUBY_DESCRIPTION,
+    File.write("manifest.json", JSON.generate({format: Lowrail::FORMAT, ruby_description: RUBY_DESCRIPTION,
       compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 7, facts: []}]}))
     File.write("ledger.json", "[]")
     built = Lowrail::PreloadBuild.build
@@ -330,7 +330,7 @@ class PreloadPlansTest < Minitest::Test
       Dir.mktmpdir do |root|
         Dir.mkdir(File.join(root, ".lowrail"))
         File.write(File.join(root, ".lowrail/manifest.json"), JSON.generate(
-          format: 1, ruby_description: RUBY_DESCRIPTION, compile_option: "", files: {},
+          format: Lowrail::FORMAT, ruby_description: RUBY_DESCRIPTION, compile_option: "", files: {},
           units: [{id: 0, pass: "active_record/preload_plans", facts: [], preload_facts: {}}]))
         puts JSON.generate(installed: Lowrail.setup(root: root), active_record: !!defined?(ActiveRecord))
       end

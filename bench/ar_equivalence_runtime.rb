@@ -17,7 +17,7 @@ module Lowrail
       built = [ARPlanBuild, PreloadBuild, ARInstantiateBuild].map(&:build)
       units = built.flat_map { _1[:units] }
       units.each_with_index { |unit, id| unit["id"] = id }
-      manifest = Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION,
+      manifest = Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
         "compile_option" => "", "files" => {}, "units" => units }, Dir.pwd)
       Stats.enable!
       if Lowrail.enabled?
