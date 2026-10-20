@@ -5,6 +5,14 @@ require_relative "request_pairs"
 require_relative "gc_requests"
 
 class RequestPairsTest < Minitest::Test
+  def test_instruction_reader_uses_self_totals_not_wrapped_summary
+    Dir.mktmpdir("lowrail-profile-test") do |dir|
+      path = File.join(dir, "profile")
+      File.write(path, "events: Ir\nsummary: 18446744073709122988\nfl=probe.c\nfn=work\n1 1610\ntotals: 1610\n")
+      assert_equal 1610, RequestPairs.instruction_total(path)
+    end
+  end
+
   def test_counter_refuses_an_ar_build_that_would_silently_decline
     saved = ENV.to_h.slice("BENCH_COUNTER", "BENCH_INSTANTIATE_DIR", "BENCH_ROUNDS")
     Dir.mktmpdir("lowrail-stale-build-test") do |dir|
@@ -51,7 +59,7 @@ class RequestPairsTest < Minitest::Test
           "--instr-atstart=no", "--callgrind-out-file=#{output}", "--log-file=#{output}.log",
           RbConfig.ruby, "--disable-yjit", script, extension, mode)
         assert status.success?, text
-        instructions = File.foreach("#{output}.1").find { _1.start_with?("summary: ") }.split.fetch(1).to_i
+        instructions = RequestPairs.instruction_total("#{output}.1")
         [mode, { data: text.strip.split(",").map(&:to_i), instructions: instructions }]
       end
       # Independent affine-transform exponentiation modulo 2**32 gives this

@@ -210,6 +210,14 @@ module RequestPairs
     extension
   end
 
+  def self.instruction_total(path)
+    # Valgrind 3.19 can wrap the summary after ZERO_STATS/multiple dumps.
+    # The trailing totals still agree with the sum of all self-cost rows.
+    line = File.foreach(path).find { _1.start_with?("totals: ") }
+    raise "missing Callgrind totals: #{path}" unless line
+    Integer(line.split.fetch(1))
+  end
+
   def self.heap_instructions(environments, app, out, route, metadata)
     requests = Integer(ENV.fetch("BENCH_REQUESTS", "50"))
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
@@ -248,7 +256,7 @@ module RequestPairs
             raise "AR build did not activate" if layer == "instantiate" && result.fetch("ar_installed").zero?
             windows = result.fetch("windows")
             windows.each_with_index do |window, index|
-              window["instructions"] = File.foreach("#{data}.#{index + 1}").find { _1.start_with?("summary: ") }.split.fetch(1).to_i
+              window["instructions"] = instruction_total("#{data}.#{index + 1}")
             end
             metrics = %w[total no_gc].to_h do |mode|
               empty, full = windows.select { _1.fetch("mode") == mode }.sort_by { _1.fetch("requests") }
@@ -330,7 +338,7 @@ module RequestPairs
             result = File.readlines(File.join(out, "#{label}.log")).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
             raise "unexpected JIT mode" unless result.fetch("yjit") == jit
-            total = File.foreach("#{data}.1").find { _1.start_with?("summary: ") }.split.fetch(1).to_i
+            total = instruction_total("#{data}.1")
             lock.synchronize do
               (totals[layer] ||= {})[n] = total
               metadata.fetch(:workers)[label] = result
