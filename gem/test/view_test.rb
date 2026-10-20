@@ -20,7 +20,7 @@ class ViewTest < Minitest::Test
       manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
       assert_empty manifest.fetch("units"), "default source passes are quarantined, not merely guarded"
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
-      assert_equal %w[route/path view/link_to], ledger.select { _1["reason"] == "quarantined" }.map { _1.fetch("pass") }.sort
+      assert_equal %w[inertia/config_bind route/path view/link_to], ledger.select { _1["reason"] == "quarantined" }.map { _1.fetch("pass") }.sort
       refute manifest.fetch("units").any? { _1["pass"] == "endpoint/action" }
       scenario = <<~'RUBY'
         require "./config/environment"

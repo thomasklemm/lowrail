@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "passes"
+
 module Lowrail
   # Minimal JSON reader for the manifest. Boot runs before bundler/setup when
   # Lowrail is loaded through RUBYOPT, and requiring the json default gem there
@@ -106,6 +108,16 @@ module Lowrail
       # because RAILS_ENV is often set only after setup).
       @rails_env = data["rails_env"]
       @units = data.fetch("units")
+      sealed_units = @units.any? { Passes.sealed_only?(_1["pass"]) || _1["pass"].to_s.start_with?("sealed/") }
+      if data["tier"] == "sealed-v1"
+        unless ENV["LOWRAIL_SEALED"] == "1" && ENV["RAILS_ENV"] == "production" &&
+            @rails_env == "production" && @units.all? { Passes.sealed_only?(_1["pass"]) }
+          @refusal_reason = "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+        end
+      elsif data["tier"] || sealed_units
+        names = @units.filter_map { _1["pass"] if Passes.sealed_only?(_1["pass"]) }.uniq
+        @refusal_reason = "unknown or missing sealed artifact version (sealed-only: #{names.join(', ')}); cached hooks cannot certify post-seal mutations (SEAL001); rebuild with --sealed required"
+      end
       unsafe = @units.filter_map { |unit| unit["pass"] if QUARANTINED_PASSES.include?(unit["pass"]) }.uniq
       unless unsafe.empty?
         @refusal_reason = "quarantined source passes: #{unsafe.join(', ')}; receiver certificates and post-argument/conversion continuations are incomplete; rebuild required"

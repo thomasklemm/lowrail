@@ -6,6 +6,10 @@ class InertiaConfigTest < Minitest::Test
   include LowrailTest
 
   SCENARIO = <<~'RUBY'
+    # This standalone production fixture explicitly accepts sealed delivery;
+    # test-mode apps and old unmarked artifacts must remain original-only.
+    ENV["RAILS_ENV"] = "production"
+    ENV["LOWRAIL_SEALED"] = "1"
     gem "inertia_rails", ENV.fetch("INERTIA_VERSION")
     require "rails"
     require "action_controller/railtie"
@@ -40,7 +44,8 @@ class InertiaConfigTest < Minitest::Test
     unit = built[:units].first.merge("id" => 0)
     unit["data"]["sources"].transform_values! { "stale" } if ENV["STALE"]
     manifest = Lowrail::Manifest.new({"format" => 1, "ruby_description" => RUBY_DESCRIPTION,
-      "compile_option" => Lowrail::Manifest.compile_option_fingerprint, "files" => {}, "units" => [unit]}, Dir.pwd)
+      "compile_option" => Lowrail::Manifest.compile_option_fingerprint, "files" => {}, "units" => [unit],
+      "tier" => "sealed-v1", "rails_env" => "production"}, Dir.pwd)
     preexisting = klass.default
     hash = preexisting.instance_variable_get(:@options)
     def hash.keys = raise("preexisting keys must not run")

@@ -5,6 +5,8 @@ require "lowrail"
 require "lowrail/manifest"
 
 class ManifestTest < Minitest::Test
+  include LowrailTest
+
   def test_minijson_matches_json
     samples = [
       {}, [], nil, true, false, 0, -12, 3.5, -1.25e-3, "", "plain",
@@ -42,5 +44,27 @@ class ManifestTest < Minitest::Test
     base = "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
     assert_equal Lowrail::Manifest.normalize(base),
                  Lowrail::Manifest.normalize(base.sub("+PRISM", "+YJIT +PRISM"))
+  end
+
+  def test_sealed_artifact_requires_its_own_opt_in_and_never_reopens_quarantine
+    result = ruby_json(<<~'RUBY', setup: false, env: {"RUBYOPT" => "-I#{GEM_LIB}"})
+      require "json"
+      require "lowrail"
+      require "lowrail/manifest"
+      data = {"format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+        "files" => {}, "tier" => "sealed-v1", "rails_env" => "production",
+        "units" => [{"id" => 0, "pass" => "sealed/link_to", "facts" => []}]}
+      config = data.merge("units" => [{"id" => 0, "pass" => "inertia/config_bind", "facts" => []}])
+      rows = [[nil, "production", data], ["1", "test", data], ["1", "production", data],
+        ["1", "production", data.reject { _1 == "tier" }],
+        ["1", "production", data.merge("tier" => "sealed-v2")],
+        ["1", "production", data.merge("units" => [{"id" => 0, "pass" => "view/link_to", "facts" => []}])],
+        ["1", "production", config], ["1", "production", config.reject { _1 == "tier" }]]
+      puts JSON.generate(rows.map do |opt_in, environment, artifact|
+        ENV["LOWRAIL_SEALED"], ENV["RAILS_ENV"] = opt_in, environment
+        Lowrail::Manifest.new(artifact, "/tmp").compatible?
+      end)
+    RUBY
+    assert_equal [false, false, true, false, false, false, true, false], result
   end
 end

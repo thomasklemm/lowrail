@@ -40,6 +40,8 @@ module PassProbe
         controller = Object.const_get(unit.fetch("endpoint").fetch("controller"))
         entry = Lowrail::Endpoint.entries&.fetch([controller, unit.fetch("endpoint").fetch("action")], nil)
         entry && entry.id == unit.fetch("id")
+      when "sealed/link_to"
+        defined?(Lowrail::Sealed) && Lowrail::Sealed::ACTIVE[0] && Lowrail::Sealed.refusal.nil?
       else
         raise "no activation adapter for runtime pass #{unit.fetch('pass')}" if %w[runtime method model].include?(unit["kind"])
         # Source/call-site passes are delivered lazily. Zero route coverage is

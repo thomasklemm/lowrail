@@ -22,14 +22,23 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
     let mut env = "test".to_string();
     let mut passes = Selection::default();
+    let mut sealed = false;
+    let mut explicit_passes = false;
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
             "--env" => env = it.next().ok_or("--env needs a value")?.clone(),
-            "--passes" => passes = Selection::parse(it.next().ok_or("--passes needs a value")?)?,
+            "--passes" => { passes = Selection::parse(it.next().ok_or("--passes needs a value")?)?; explicit_passes = true; }
+            "--sealed" => sealed = true,
             _ if !a.starts_with('-') && app.is_none() => app = Some(PathBuf::from(a)),
             _ => return Err(format!("unexpected argument {a}")),
         }
+    }
+    if sealed {
+        if explicit_passes || env != "production" {
+            return Err("--sealed requires --env production and cannot be combined with --passes; see docs/sealed.md".into());
+        }
+        passes = Selection::sealed();
     }
     let app = app.ok_or("usage: lowrail build APP [--env test|production] [--passes default,+name,-name]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
@@ -64,6 +73,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
     let mut templates = BTreeMap::new();
     let mut units: Vec<Value> = Vec::new();
     let mut ledger: Vec<Value> = REGISTRY.iter().filter_map(|pass| {
+        if pass.sealed_only && passes.is_sealed() { return None; }
         quarantine_reason(pass.name).map(|reason| json!({"pass": pass.name, "outcome": reason}))
     }).collect();
     for t in &facts.templates {
@@ -168,6 +178,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String
         "templates": templates,
         "units": units,
         "typed_facts": typed_facts,
+        "tier": if passes.is_sealed() { Some("sealed-v1") } else { None },
     });
     let input_path = dir.join("units.json");
     write_atomic(&input_path, &serde_json::to_string_pretty(&input).unwrap())?;

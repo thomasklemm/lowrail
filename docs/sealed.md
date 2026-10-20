@@ -207,6 +207,64 @@ hurdle, not the complete deployment certificate or request gates. Route's
 initial incomplete −4,687-Ir price does not authorize its activation. No
 first-pilot request result is yet claimed.
 
+### Artifact acceptance and the first delivered slice
+
+```sh
+RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 LOWRAIL_BUILD_JIT=0 \
+  lowrail build APP --env production --sealed
+# At production boot, before Rails or certified method handles escape:
+RAILS_ENV=production LOWRAIL_SEALED=1 LOWRAIL=1 \
+  RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails server
+```
+
+`--sealed` selects registry entries with `sealed_only`, not every guarded
+opt-in pass and not a spelling prefix. It cannot combine with `--passes`.
+The manifest carries `tier: "sealed-v1"` and `rails_env: "production"`.
+Runtime acceptance additionally requires `LOWRAIL_SEALED=1`, production and
+only registered sealed-only units. A missing/unknown tier, missing opt-in,
+test environment or mixed old artifact refuses **the entire artifact before
+installing its Guard/Loader/pass state**. There is no test certificate bypass
+or hand-authored “clean” JSON flag. `seal-check` supplies diagnostic evidence;
+the production opt-in accepts all SEAL001–009 promises, including the SEAL009
+introspection exclusion. It is not a runtime enforcement mechanism.
+
+The first link slice is intentionally restricted to the production Ruby
+4.0.7 / Rails 8.1.4 blog. It accepts literal names and one literal `class`
+option only (8/9 source sites); route/URL conversion stays original and live.
+Unknown shapes, custom helpers and edited/stale sources refuse. Independent
+Rails-source pins and effective body/visibility signatures reject boot-time
+Ruby helper/primitive overrides; this is not a universal certificate for
+arbitrary native extensions or Ruby implementations. Cold factory and request
+entry bodies must actually deliver through the existing ISeq seam. An app
+whose certified bodies already escaped, or whose cold delivery cannot be
+witnessed, remains unoptimized rather than reinstalling handles.
+
+`TagHelper#tag_builder` registers only the result of its own stock constructor
+in a WeakKeyMap, inside its original body ISeq. `TagBuilder.new` and
+`#initialize` are not wrapped, aliased or replaced. Foreign builders (including
+reinitialized objects) refuse. Actual view-holder inspection uses the native
+ObjectSpace read rather than creating a singleton class on the receiver.
+Main-Ractor checks precede registry access; no universal Rails/Ractor support
+is claimed. Threads retain separate request authorization, restored in ensure
+by the original `Metal#dispatch` body ISeq. That runtime authorization seam
+can later use a trusted VM provider without regenerating template bodies.
+
+The render residue still consumes `PRE_CONTENT_STRINGS["a"]` and its default
+Proc live, and escapes live URLs with their original safety/encoding behavior.
+Frozen stock `TAG_TYPES` and literal-escaping dependencies are boot facts;
+mutable/custom type tables refuse. Configuration and model conversions are
+not folded. Residual URL/input and actual receiver checks remain: sealing does
+not authorize expanding an arbitrary object. A local fallback after URL
+conversion calls `content_tag` with the converted values, never `link_to` again.
+
+The separate guarded-pass audit reproduced `inertia/config_bind` with a
+suppressed `Hash.method_added` hook and changed `Hash#extract!`: warmed facts
+stay true and the shortcut misses the replacement. That pass is registered
+sealed-only too; old unmarked/mixed artifacts refuse, and its guarded selection
+records the SEAL001 reason. This is eligibility, not a new performance claim
+or a broadening of the blog link certificate. Its accepted request prices are
+mode-specific (−6.947% interpreter, **+16.339% YJIT**), so it is not promoted.
+
 ### Subsequent show endpoint: compiler phases
 
 After partial evaluation over certified facts, perform ordered, attributed

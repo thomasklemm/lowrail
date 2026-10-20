@@ -6,16 +6,21 @@ module Lowrail
   # names as aliases: emitted code and source certificates refer to them.
   module Passes
     REGISTRY = {
-      PreloadPlans: ["preload_plans", %w[active_record/preload_plans]],
-      Memo: ["memo", %w[memo/uri_join memo/sha256], :source],
-      DigestMemo: ["digest_memo", %w[digest/file_memo], :source],
+      PreloadPlans: {file: "preload_plans", passes: %w[active_record/preload_plans]},
+      Memo: {file: "memo", passes: %w[memo/uri_join memo/sha256], source: true},
+      DigestMemo: {file: "digest_memo", passes: %w[digest/file_memo], source: true},
       # This installer already subscribes to each model's Zeitwerk on_load.
-      ARInstantiate: ["ar_instantiate", %w[active_record/instantiate], :lazy],
-      ARPlans: ["ar_plans", %w[active_record/ar_plans]],
-      InertiaConfig: ["inertia_config", %w[inertia/config_bind]],
-      InertiaProps: ["inertia_props", %w[inertia/props], :source],
-      Endpoint: ["endpoint", %w[endpoint/action]]
+      ARInstantiate: {file: "ar_instantiate", passes: %w[active_record/instantiate], lazy: true},
+      ARPlans: {file: "ar_plans", passes: %w[active_record/ar_plans]},
+      InertiaConfig: {file: "inertia_config", passes: %w[inertia/config_bind], sealed_only: true},
+      InertiaProps: {file: "inertia_props", passes: %w[inertia/props], source: true},
+      Endpoint: {file: "endpoint", passes: %w[endpoint/action]},
+      Sealed: {file: "sealed", passes: %w[sealed/link_to], sealed_only: true}
     }.freeze
+
+    def self.sealed_only?(pass)
+      REGISTRY.values.any? { _1[:sealed_only] && _1.fetch(:passes).include?(pass) }
+    end
 
     def self.install(manifest)
       return if manifest.refusal_reason
@@ -29,18 +34,18 @@ module Lowrail
       end
       units = manifest.units
       selected_ids = ENV["LOWRAIL_UNITS"]&.split(",")&.map { Integer(_1) }
-      REGISTRY.each do |name, (file, passes, loading)|
-        selected = units.select { passes.include?(_1["pass"]) }
+      REGISTRY.each do |name, entry|
+        selected = units.select { entry.fetch(:passes).include?(_1["pass"]) }
         next if selected.empty?
         enabled = selected_ids ? selected.select { selected_ids.include?(_1["id"]) } : selected
         # Delivered source still calls its runtime to take the original arm.
         # Only runtime-only installers can be omitted during pass isolation.
-        next if enabled.empty? && loading != :source
-        require_relative file
+        next if enabled.empty? && !entry[:source]
+        require_relative entry.fetch(:file)
         runtime = const_get(name, false)
-        runtime.install(loading == :source ? selected : enabled)
+        runtime.install(entry[:source] ? selected : enabled)
         if runtime.respond_to?(:activate) && !enabled.empty?
-          receivers = loading == :lazy ? [] : enabled.flat_map { _1.fetch("facts").map { |fact| fact.fetch("receiver") } }
+          receivers = entry[:lazy] ? [] : enabled.flat_map { _1.fetch("facts").map { |fact| fact.fetch("receiver") } }
           receivers = receivers.uniq.reject { _1.start_with?("@") }
           after_initialize(runtime, receivers)
         end

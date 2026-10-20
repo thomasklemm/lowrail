@@ -253,6 +253,13 @@ with summed `count`, types with summed counts).
 
 Written by `lowrail build` (via `gem/exe/lowrail-compile`).
 
+Ordinary guarded manifests have no `tier`. `build --env production --sealed`
+adds `"tier": "sealed-v1"`; the runtime requires production in both the
+artifact and process, `LOWRAIL_SEALED=1`, and only registry `sealed_only` units.
+Unknown/missing tiers on sealed-only units and old mixed artifacts refuse as
+a whole before installing any pass. There is no test-certificate bypass.
+See [the separate contract](sealed.md#artifact-acceptance-and-the-first-delivered-slice).
+
 ```json
 {
   "format": 1,

@@ -84,6 +84,7 @@ module Lowrail
           "units" => units
         }
         manifest["rails_env"] = input["rails_env"] if input["rails_env"]
+        manifest["tier"] = input["tier"] if input["tier"]
         manifest["templates"] = templates unless templates.empty?
         warnings = []
         artifacts = files.map { |path, entry| [path, entry.fetch("iseq")] }

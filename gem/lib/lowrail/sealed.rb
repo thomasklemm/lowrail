@@ -1,0 +1,158 @@
+# frozen_string_literal: true
+
+module Lowrail
+  # The first sealed pilot is deliberately narrower than the contract: stock
+  # Rails 8.1.4 blog views, literal link names/classes, and live URL generation.
+  # No invalidation claim: production must honor SEAL001–009. Test processes
+  # refuse this delivery; seal-check observes their original executions.
+  module Sealed
+    PASS = "sealed/link_to"
+    ACTIVE = [false]
+    BUILDERS = ObjectSpace::WeakKeyMap.new
+    EPOCH = [0]
+    REQUEST = :__lowrail_sealed_request
+    ENCODING = String.instance_method(:encoding)
+    VALID = String.instance_method(:valid_encoding?)
+
+    class << self
+      attr_reader :refusal
+
+      # Parser IDs/source hashes are compilation metadata, not method code.
+      # Keep instructions, operands, locals, catches, paths and line events.
+      def signature(method, sequence: RubyVM::InstructionSequence.of(method)&.to_a)
+        clean = ->(value) do
+          return value unless Array === value
+          value = value.map { clean.call(_1) }
+          if value.first == "YARVInstructionSequence/SimpleDataFormat"
+            value[4] = value[4].reject { |key, _| %i[node_id node_ids code_location source_hash].include?(key) }
+          end
+          value
+        end
+        {"owner" => method.owner.name, "source_location" => method.source_location,
+          "parameters" => method.parameters.map { _1.map(&:to_s) },
+          "original_name" => method.original_name.to_s,
+          "iseq" => sequence && Manifest.digest.hexdigest(Marshal.dump(clean.call(sequence)))}
+      end
+
+      def install(units)
+        @unit = units.fetch(0)
+        @data = @unit.fetch("sealed")
+        @served = []
+        # Observe successful cold delivery, not a wrapper around a constructor.
+        @delivery = TracePoint.new(:return) do |event|
+          if event.method_id == :serve && event.self.equal?(Lowrail::Loader) && event.return_value
+            @served << event.binding.local_variable_get(:path)
+          end
+        end
+        @delivery.enable
+      end
+
+      def decline(reason)
+        @refusal = reason
+        ACTIVE[0] = false
+        Lowrail.debug("sealed refused: #{reason}")
+      end
+
+      def literal_state?
+        types = ActionView::Helpers::TagHelper::TAG_TYPES
+        blank = String::BLANK_RE
+        names = ERB::Util::SAFE_XML_TAG_NAME_REGEXP
+        native_escape = ERB::Util.method(:html_escape).super_method
+        ObjectSpace.internal_class_of(types).equal?(Hash) && types.frozen? &&
+          types.default.nil? && types.default_proc.nil? && types["class"].nil? && types["href"].nil? &&
+          ObjectSpace.internal_class_of(blank).equal?(Regexp) && blank.frozen? && blank == /\A[[:space:]]*\z/ &&
+          ObjectSpace.internal_class_of(names).equal?(Regexp) && names.frozen? &&
+          names.match?("class") && names.match?("href") && native_escape &&
+          native_escape.owner.equal?(ERB::Util.singleton_class) && native_escape.source_location.nil?
+      end
+
+      def activate
+        return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production"
+        return decline("unsupported Ruby/Rails") unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
+        return decline("unsupported application") unless Rails.application.class.name == "RealBlogR4::Application"
+        require "objspace"
+        return decline("actual-holder primitive unavailable") unless ObjectSpace.respond_to?(:internal_class_of)
+        require_relative "materialize"
+        errors = []
+        Materialize.run(app_root: Rails.root.to_s, measure: false, record: ->(where, error) { errors << where })
+        return decline("incomplete materialization") unless errors.empty?
+        return decline("stale sources") unless @data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha }
+        return decline("cold factory/entry delivery missing") unless @data.fetch("delivery").keys.all? { @served.include?(_1) }
+        controller = Lowrail.loaded_constant(@data.fetch("controller"))
+        return decline("controller missing") unless controller
+        @view_class = controller.view_context_class
+        @data.fetch("view_methods").each do |name, expected|
+          actual = @view_class.instance_method(name)
+          return decline("view method #{name}") unless signature(actual) == expected.fetch("signature") &&
+            visibility(@view_class, name) == expected.fetch("visibility")
+        end
+        @data.fetch("builder_methods").each do |name, expected|
+          holder = ActionView::Helpers::TagHelper::TagBuilder
+          return decline("builder method #{name}") unless signature(holder.instance_method(name)) == expected.fetch("signature") &&
+            visibility(holder, name) == expected.fetch("visibility")
+        end
+        @data.fetch("primitive_methods").each do |expected|
+          holder = Lowrail.loaded_constant(expected.fetch("holder"))
+          actual = expected["singleton"] ? holder.method(expected.fetch("method")) : holder.instance_method(expected.fetch("method"))
+          return decline("primitive #{expected['holder']}##{expected['method']}") unless signature(actual) == expected.fetch("signature")
+        end
+        @data.fetch("delivery").each_value do |expected|
+          holder = Lowrail.loaded_constant(expected.fetch("holder"))
+          return decline("edited body #{expected['method']}") unless holder &&
+            signature(holder.instance_method(expected.fetch("method"))) == expected.fetch("signature")
+        end
+        builder = ActionView::Helpers::TagHelper::TagBuilder
+        return decline("custom constructor") unless signature(builder.method(:new)) == @data.fetch("constructor")
+        return decline("custom literal tables") unless literal_state?
+        # This native read does not CREATE a singleton class (unlike
+        # #singleton_class). It also rejects preexisting private overrides and
+        # singleton prepends. It is main-Ractor-only; callers gate first.
+        @holder = ObjectSpace.method(:internal_class_of)
+        @epoch = defined?(Lowrail::Seal) ? Lowrail::Seal::EPOCH : EPOCH
+        require_relative "templates"
+        Templates.install(Lowrail.manifest.templates.merge(@data.fetch("templates")))
+        ACTIVE[0] = true
+        @refusal = nil
+      rescue StandardError, ScriptError => error
+        decline("#{error.class}: #{error.message.lines.first&.strip}")
+      ensure
+        @delivery&.disable
+      end
+
+      def visibility(holder, name)
+        holder.public_method_defined?(name) ? "public" : holder.protected_method_defined?(name) ? "protected" : "private"
+      end
+
+      # Called once at the real request entry. The entry body restores a prior
+      # token in ensure, including nested dispatch, exceptions and threads.
+      # Authorization stays behind this seam so a future trusted VM provider
+      # can replace test certification without regenerating template bodies.
+      def request_allowed?
+        Ractor.current.equal?(Ractor.main) && ACTIVE[0] && @epoch[0].zero?
+      end
+
+      def view?(view)
+        Ractor.current.equal?(Ractor.main) && ACTIVE[0] && Thread.current[REQUEST] &&
+          @epoch[0].zero? && @holder.call(view).equal?(@view_class)
+      end
+
+      def link?(view, url, html, css)
+        # Recheck diagnostic deopt after live conversion/URL code. It is NOT
+        # a structural VM epoch and cannot enforce the production promise.
+        return count(false) unless @epoch[0].zero? && String === url &&
+          ENCODING.bind_call(url) == Encoding::UTF_8 && VALID.bind_call(url) &&
+          html.size == 2 && html["class"] == css && html["href"].equal?(url)
+        count(BUILDERS.key?(view.send(:tag_builder)))
+      end
+
+      def count(ok)
+        Stats.count(@unit.fetch("id"), ok) if defined?(Stats) && Stats.enabled?
+        ok
+      end
+    end
+  end
+
+  module Passes
+    Sealed = Lowrail::Sealed
+  end
+end

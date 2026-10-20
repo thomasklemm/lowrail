@@ -20,7 +20,8 @@ pub fn cli(args: &[String]) -> Result<(), String> {
                     REGISTRY.iter().find(|p| p.name == name || p.alias == name)
                         .ok_or_else(|| format!("unknown pass {name}"))?.name
                 };
-                if let Some(reason) = quarantine_reason(canonical) {
+                if let Some(reason) = quarantine_reason(canonical)
+                    && !REGISTRY.iter().any(|p| p.name == canonical && p.sealed_only) {
                     return Err(format!("{canonical}: {reason}"));
                 }
                 if pass.replace(canonical).is_some() { return Err("specify --pass once".into()); }
