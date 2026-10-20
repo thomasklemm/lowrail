@@ -6,6 +6,7 @@ mod facts;
 mod lower;
 mod mcp;
 mod observe;
+mod passes;
 mod types;
 mod verify;
 

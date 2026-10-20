@@ -18,6 +18,20 @@ pass plugs in, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - One precise type model from static analysis (Prism, Rubydex), a real boot,
   and observed types, exposed through an MCP server and RBS/RBI generation.
 
+## Selecting build passes
+
+`lowrail build APP --passes default,+ar_instantiate,-view/link_to` starts
+with the default source passes, then applies comma-separated `+name`/`-name`
+modifiers in order. Names are the stable `area/name` identifiers in
+[the architecture](docs/ARCHITECTURE.md); short aliases include `link_to`,
+`path`, `uri_join`, `sha256`, `digest_memo`, `preload_plans`, `ar_instantiate`
+and `ar_plans`. `memo` selects both source memo passes.
+
+The existing `--memo`, `--digest-memo`, `--preload-plans`,
+`--ar-instantiate` and `--ar-plans` flags remain aliases. Command-line
+options are processed left to right; `--passes` resets to its list's
+selection. With no options, only `view/link_to` and `route/path` run.
+
 ## Complementary optimizations
 
 Lowrail only applies changes it can guard exactly. Some well-known speedups

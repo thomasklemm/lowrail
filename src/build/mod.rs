@@ -13,33 +13,28 @@ use serde_json::{Value, json};
 use crate::facts;
 use crate::lower::oracle::RubyOracle;
 use crate::lower::{memo, route, view};
+use crate::passes::{Builder, Kind, REGISTRY, Selection};
 
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
     let mut env = "test".to_string();
-    let mut preload = false;
-    let mut memo = false;
-    let mut ar_instantiate = false;
-    let mut ar_plans = false;
-    let mut digest_memo = false;
+    let mut passes = Selection::default();
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
             "--env" => env = it.next().ok_or("--env needs a value")?.clone(),
-            // Opt-in: measured slower on uncached Campfire (docs/passes/preload-plans.md).
-            "--preload-plans" => preload = true,
-            "--memo" => memo = true,
-            "--ar-instantiate" => ar_instantiate = true,
-            "--ar-plans" => ar_plans = true,
-            "--digest-memo" => digest_memo = true,
-            _ if app.is_none() => app = Some(PathBuf::from(a)),
+            "--passes" => passes = Selection::parse(it.next().ok_or("--passes needs a value")?)?,
+            "--preload-plans" | "--memo" | "--ar-instantiate" | "--ar-plans" | "--digest-memo" => {
+                passes.set(&a.trim_start_matches("--").replace('-', "_"), true)?;
+            }
+            _ if !a.starts_with('-') && app.is_none() => app = Some(PathBuf::from(a)),
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans] [--memo] [--ar-instantiate] [--ar-plans] [--digest-memo]")?;
+    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--passes default,+name,-name] [--preload-plans] [--memo] [--ar-instantiate] [--ar-plans] [--digest-memo]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
-    let report = build(&app, &env, preload, memo, digest_memo)?;
-    if ar_instantiate {
+    build(&app, &env, &passes)?;
+    if passes.contains("active_record/instantiate") {
         let status = Command::new("bundle")
             .args(["exec", "ruby"])
             .arg(facts::gem_dir().join("exe/lowrail-ar-instantiate-build"))
@@ -54,7 +49,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             return Err(format!("AR instantiate facts failed ({status})"));
         }
     }
-    if ar_plans {
+    if passes.contains("active_record/ar_plans") {
         let status = Command::new("bundle")
             .args(["exec", "ruby"])
             .arg(facts::gem_dir().join("exe/lowrail-ar-build"))
@@ -69,11 +64,14 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             return Err(format!("AR plan facts failed ({status})"));
         }
     }
-    println!("{report}");
+    let dir = app.join(".lowrail");
+    let manifest: Value = serde_json::from_slice(&std::fs::read(dir.join("manifest.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    let ledger: Vec<Value> = serde_json::from_slice(&std::fs::read(dir.join("ledger.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    println!("{}", summary(&ledger, manifest["units"].as_array().unwrap(), manifest["templates"].as_object().map_or(0, |t| t.len()), manifest["files"].as_object().map_or(0, |f| f.len()), &dir));
     Ok(())
 }
 
-pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool, digest_memo: bool) -> Result<String, String> {
+pub fn build(app: &Path, env: &str, passes: &Selection) -> Result<String, String> {
     let dir = app.join(".lowrail");
     let facts_path = dir.join("facts.json");
     if !facts_path.exists() {
@@ -107,29 +105,21 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool, digest_me
         let mut code = t.code.clone();
         let mut ids = Vec::new();
 
-        let unit = units.len();
-        if is_denied(&t.identifier, "view/link_to") {
-            ledger.push(denied_entry("template", &t.identifier, "view/link_to"));
-        } else {
-            let lowered = view::lower_template(&code, &locals, unit, &mut oracle);
-            record(&mut ledger, "template", &t.identifier, "view/link_to", &lowered.sites);
-            if lowered.lowered_count() > 0 {
-                units.push(unit_json(unit, "template", &t.identifier, "view/link_to", &lowered));
-                ids.push(unit);
-                code = lowered.code;
+        // Registry order lets routes see link_to's fast AND fallback branches.
+        for pass in passes.iter().filter(|p| matches!(p.builder, Builder::View | Builder::Route)) {
+            if is_denied(&t.identifier, pass.name) {
+                ledger.push(denied_entry("template", &t.identifier, pass.name));
+                continue;
             }
-        }
-
-        // Runs on the link_to output too, so route helpers inside its fast
-        // path are specialized as well.
-        let unit = units.len();
-        if is_denied(&t.identifier, "route/path") {
-            ledger.push(denied_entry("template", &t.identifier, "route/path"));
-        } else {
-            let lowered = route::lower(&code, &route::Mode::Template { locals: &locals }, unit, &mut oracle, &mut routes);
-            record(&mut ledger, "template", &t.identifier, "route/path", &lowered.sites);
+            let unit = units.len();
+            let lowered = match pass.builder {
+                Builder::View => view::lower_template(&code, &locals, unit, &mut oracle),
+                Builder::Route => route::lower(&code, &route::Mode::Template { locals: &locals }, unit, &mut oracle, &mut routes),
+                _ => unreachable!(),
+            };
+            record(&mut ledger, "template", &t.identifier, pass.name, &lowered.sites);
             if lowered.lowered_count() > 0 {
-                units.push(unit_json(unit, "template", &t.identifier, "route/path", &lowered));
+                units.push(unit_json(unit, "template", &t.identifier, pass.name, &lowered));
                 ids.push(unit);
                 code = lowered.code;
             }
@@ -151,34 +141,34 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool, digest_me
         let file = path.display().to_string();
         let mut code = original.clone();
         let before = units.len();
-        if is_denied(&file, "route/path") {
-            ledger.push(denied_entry("file", &file, "route/path"));
-        } else {
-            let unit = units.len();
-            let lowered = route::lower(&code, &route::Mode::RubyFile, unit, &mut oracle, &mut routes);
-            record(&mut ledger, "file", &file, "route/path", &lowered.sites);
-            if lowered.lowered_count() > 0 {
-                units.push(unit_json(unit, "file", &file, "route/path", &lowered));
-                code = lowered.code;
+        for pass in passes.iter().filter(|p| p.kind == Kind::Source && !matches!(p.builder, Builder::View)) {
+            if is_denied(&file, pass.name) {
+                ledger.push(denied_entry("file", &file, pass.name));
+                continue;
             }
-        }
-        if memo_enabled {
-            for (intrinsic, cache) in [(memo::Intrinsic::UriJoin, &mut memo_certificate), (memo::Intrinsic::Sha256, &mut digest_certificate)] {
-                let pass = intrinsic.pass();
-                if is_denied(&file, pass) {
-                    ledger.push(denied_entry("file", &file, pass));
-                } else {
-                    let unit = units.len();
+            let unit = units.len();
+            match pass.builder {
+                Builder::Route => {
+                    let lowered = route::lower(&code, &route::Mode::RubyFile, unit, &mut oracle, &mut routes);
+                    record(&mut ledger, "file", &file, pass.name, &lowered.sites);
+                    if lowered.lowered_count() > 0 {
+                        units.push(unit_json(unit, "file", &file, pass.name, &lowered));
+                        code = lowered.code;
+                    }
+                }
+                Builder::Memo(intrinsic) => {
+                    let cache = match intrinsic { memo::Intrinsic::UriJoin => &mut memo_certificate, memo::Intrinsic::Sha256 => &mut digest_certificate };
                     let lowered = memo::lower(&code, unit, &mut oracle, cache, intrinsic);
-                    record(&mut ledger, "file", &file, pass, &lowered.sites);
+                    record(&mut ledger, "file", &file, pass.name, &lowered.sites);
                     let sites = lowered.sites.iter().filter(|s| s.outcome == "lowered").count();
                     if sites > 0 {
                         let certificate = lowered.certificate.unwrap();
-                        units.push(json!({"id": unit, "kind": "file", "file": file, "pass": pass,
+                        units.push(json!({"id": unit, "kind": "file", "file": file, "pass": pass.name,
                             "sites": sites, "facts": certificate["facts"], "memo": certificate}));
                         code = lowered.code;
                     }
                 }
+                _ => unreachable!(),
             }
         }
         if units.len() == before { continue; }
@@ -201,7 +191,7 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool, digest_me
     let input_path = dir.join("units.json");
     write_atomic(&input_path, &serde_json::to_string_pretty(&input).unwrap())?;
     write_atomic(&dir.join("ledger.json"), &serde_json::to_string_pretty(&ledger).unwrap())?;
-    if digest_memo {
+    if passes.contains("digest/file_memo") {
         let status = Command::new("bundle")
             .args(["exec", "ruby"])
             .arg(facts::gem_dir().join("exe/lowrail-digest-build"))
@@ -230,7 +220,7 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool, digest_me
     if !status.success() {
         return Err("lowrail-compile failed".into());
     }
-    if !preload {
+    if !passes.contains("active_record/preload_plans") {
         return Ok(summary(&ledger, &units, templates.len(), files.len(), &dir));
     }
     let preload_status = Command::new("bundle")
@@ -250,7 +240,7 @@ pub fn build(app: &Path, env: &str, preload: bool, memo_enabled: bool, digest_me
 
 fn summary(ledger: &[Value], units: &[Value], templates: usize, files: usize, dir: &Path) -> String {
     let mut s = String::new();
-    for pass in ["view/link_to", "route/path", "memo/uri_join", "memo/sha256", "digest/file_memo"] {
+    for pass in REGISTRY.iter().map(|p| p.name) {
         let sites: Vec<&Value> = ledger.iter().filter(|l| l["pass"] == pass).collect();
         let lowered = sites.iter().filter(|l| l["outcome"] == "lowered").count();
         let n_units = units.iter().filter(|u| u["pass"] == pass).count();
