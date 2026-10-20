@@ -5,10 +5,11 @@ decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
 Working assumption: many small exact passes (each < 2 %) should **stack**.
-A planned `lowrail bench --passes SET` (immediate follow-up to migration 5)
-will measure a pass set as one layer against no-setup and a separate default
+`lowrail bench --passes SET --default-build DIR` (8db84d8) measures a pass set as one layer against no-setup and a separate default
 reference, and report the stacked effect next to the sum of individual
-expected effects, with uncertainty. Promotion to
+expected effects, with uncertainty. Real per-hit instruction budgets are
+still missing for most passes (`measurement_complete: false`); adapters are
+the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
@@ -18,7 +19,7 @@ stacked set as well as to single passes.
 |---|---|---|
 | Pass registry, single runtime-build boot, shared ledger (migration 1–3) | done | Behavior-equivalent; [build-pass-equivalence.json](build-pass-equivalence.json) |
 | Runtime `Lowrail::Passes` registry (migration 4) | in progress | Non-browser gates identical, request cost −0.02 % (noise). Cold require+setup +0.76 % once per boot from parsing the shared registry, not eager pass loading. Gated on browser counter attribution |
-| `lowrail bench APP --pass/--passes` (migration 5) | in progress | One shared method: fixed-heap Callgrind, A/A, actual JIT state, stale-build rejection ([bench.md](bench.md)) |
+| `lowrail bench APP --pass/--passes` (migration 5) | done (6f9e27a, 8db84d8) | One shared method: fixed-heap Callgrind, A/A, actual JIT state, stale-build rejection ([bench.md](bench.md)) |
 | SQL-trace differential in verify | done | Fixed seed, symmetric repeat controls |
 | Rails 8.1.4 framework suites as gate | done | [rails-suite.md](rails-suite.md); zero reproducible differences |
 | Ship `passes.rb` as precompiled ISeq | parked | Would remove most of the cold registry cost; only after migration 4 lands |
