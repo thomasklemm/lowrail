@@ -89,7 +89,7 @@ class ARInstantiateTest < Minitest::Test
     events = []
     subscription = ActiveSupport::Notifications.subscribe("instantiation.active_record") do |*args|
       payload = args.last
-      events << [payload[:class_name], payload[:record_count]]
+      events << [payload[:class_name], payload[:record_count], args.first.frozen?]
     end
     $casts = 0
     records = Post.order(:id).readonly.strict_loading.to_a
@@ -176,8 +176,8 @@ class ARInstantiateTest < Minitest::Test
       assert_equal 43, off["schema"]
       assert_equal ["left", "right", [false, true]], off["dispatch"]
       assert_equal "left!", off["new_subclass"]
-      assert_includes off["events"], ["Post", 2]
-      assert_includes off["events"], ["Vehicle", 2]
+      assert_includes off["events"], ["Post", 2, true]
+      assert_includes off["events"], ["Vehicle", 2, true]
       on = ruby_json(SCENARIO, chdir: dir, env: { "LOWRAIL" => "1", "LOWRAIL_STATS" => "" })
       assert_operator on.delete("hits"), :>, 0
       off.delete("hits")

@@ -70,7 +70,7 @@ module Lowrail
         # Include the replaced name so include/prepend/extend resets this unit.
         id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
         facts << { "receiver" => klass.name, "method" => "_load_from_sql", "singleton" => true,
-          "owner" => "#<Class:#{klass.name}>", "source_location" => "lowrail:ar_instantiate:#{klass.name}:1",
+          "owner" => "#<Class:#{klass.name}>", "source_location" => "lowrail:ar_instantiate:#{klass.name}:2",
           "visibility" => "public", "exact" => true }
         # Initialization, callbacks, type filtering and build_from_database
         # remain live. Alpha's builder construction also needs the facts above.

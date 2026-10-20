@@ -56,6 +56,7 @@ module Lowrail
 
       def source(id)
         <<~RUBY
+          # frozen_string_literal: true
           def _load_from_sql(result_set, &block)
             # Alpha's schema attributes are Ractor-local. Do not even read the
             # main Ractor's unshareable plan from a different Ractor.
