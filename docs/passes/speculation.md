@@ -86,12 +86,15 @@ snapshot alone cannot protect a later use after a callback mutates a fact.
 It needs a proven mutation-free region, effective revocation/deoptimization,
 or a residual check at the use. Exact semantics or refuse still applies.
 
-Guarded versus genuinely branch-elided default/all-opt-in request ceilings,
-per pass and per route, remain **pending**. The budget thread still owns
-`bench/pass.rb`, `request_pairs.rb` and `src/bench.rs`; its strict activation,
-build/JIT probes and off/off controls have not been weakened. No extrapolation
-from one micro to every route is substituted for these measurements.
-Campfire cached/uncached ceilings are supplementary and also pending.
+After the shared bench seam was released, guarded versus branch-elided blog
+requests pass the controls: **0.081% default / 0.194% all-opt-in** interpreter
+instructions are removed. Guard dispatch is not a large remaining opportunity
+on this measured K runtime. These are unsafe ablations, not native YJIT speed
+claims or exactness certification. See the request and single-pass results
+below; runtime structural guards remain, so this is not the ceiling for
+removing every runtime check. Campfire cached/uncached request ceilings remain
+unmeasured: its test corpus was prepared, but production authentication/assets
+were not, and the Rails 8.2 alpha was explicitly secondary to Rails 8.1.
 
 ## Measurement-only unsafe mode
 
@@ -115,10 +118,20 @@ skipped. `LOWRAIL_SPECULATE_KEEP=ar_epoch` restores only the existing
 instantiate epoch for attribution. There is still Ruby dispatch/cache-branch
 overhead: **this mode is not a measured zero-overhead guard ceiling**.
 
-Do not enable it on an entire future bench cohort: the worker seam must select
-only the unsafe layer and explicitly clear unsafe ENV in guarded/original/off
-workers, keeping every strict probe mandatory. That seam is not implemented
-while those files are owned elsewhere. No unsafe build is a support claim.
+`lowrail bench --speculate unguarded` now adds only an unsafe comparison layer;
+guarded/original/off workers explicitly clear both unsafe ENV variables.
+Ordinary strict preflight and activation/JIT probes remain mandatory, as do
+the unsafe layer's own probes, heap matching, A/A and end-of-run fingerprints.
+A disposable build recompiles generated source with fact guards elided while
+preserving live input predicates, literals, UTF-8 positions and source lines.
+Its manifest carries an incompatible `[LOWRAIL UNSAFE] ` Ruby-description
+marker: the ordinary loader declines it; only the ancestry-checked experiment
+accepts it. No unsafe build is a support claim.
+
+All units must be selected. A named pass over a mixed build is refused:
+eliding its siblings' disabled guards changes fallback dispatch, confounding
+the ablation. Build each isolated pass separately instead. Native timing and
+stacked/reference-build combinations are refused by this measurement mode.
 
 A census of the four Rails-8.1 app ledgers found **zero additional existing-pass
 sites refused solely because a true boot fact might change later**. Existing
@@ -127,6 +140,89 @@ are structural, unmodeled or presently ineligible (template context, scope/query
 certificates, options/argument shape, etc.). This is not a claim that a new,
 broader lowerer could find no additional sites. No false-at-boot fact was
 reclassified as eligible.
+
+## Guard-tax request ceilings
+
+Ruby 4.0.7, interpreter, six independent fixed-heap rounds, 50 warmups and
+N=0/50 windows, seed 41231. Positive is guarded minus unsafe work. Both total
+and GC-excluded instruction controls must accept; a failed control is retained,
+not retried to get green. All unit/route counts come from separate Stats-on
+probes, never the measured windows. This is request-level guard removal on
+the pinned K runtime **before** the pending residual-closure changes, not a
+prediction of a later, more exact guard's cost.
+
+The combined selection is the nine-pass set `all-opt-in,-endpoint`; the
+subsequent `endpoint/action` prototype is deliberately excluded. Runtime
+dispatch, data-dependent predicates and runtime structural checks remain.
+Consequently the all-opt-in result is the ceiling for **this fact/epoch
+ablation**, not a full zero-overhead runtime-pass ceiling. No extra sites are
+added by this mode; the existing-pass census above found zero eligible sites
+refused solely because true boot facts could later change.
+
+### Blog index, Rails 8.1.4
+
+`GET:/articles`; each row is its own build, not a mask over a mixed build.
+Total Ir/request and 95% CI, rounded to whole instructions:
+
+| Build | Guarded − unsafe Ir/request [95% CI] | % of guarded [95% CI] | Coverage / request | Controls |
+|---|---:|---:|---|---|
+| default | 6,931 [2,974, 8,531] | 0.081 [0.035, 0.099] | 10 completed routes | accept |
+| all-opt-in, excluding endpoint | 16,923 [11,049, 18,147] | 0.194 [0.127, 0.208] | 10 completed routes | accept |
+| route/path only | −121 [−5,414, 5,744] | −0.001 [−0.060, 0.063] | 4 completed routes | accept; unresolved from zero |
+| view/link_to only | 4,407 [390, 7,472] | 0.051 [0.005, 0.086] | 10 helper hits, no route units | accept |
+| active_record/instantiate only | 12,973 [10,904, 14,338] | 0.142 [0.119, 0.156] | 6 instantiate hits | accept |
+| active_record/preload_plans only | 5,096 [2,499, 8,972] | 0.055 [0.027, 0.097] | 1 hit / 1 fallback | accept |
+
+The default body jointly lowers a `link_to` and its route; isolated source
+builds therefore have different route coverage. Dividing the isolated helper
+ablation by ten gives **441 [39, 747] Ir/helper invocation**. The path-only
+estimate is **−30 [−1,354, 1,436] Ir/completed route**, unresolved from zero;
+do not replace it with a positive micro estimate. Other runtime and memo
+passes absent from this request have no attributed per-hit saving. Single-pass
+rows are not additive: they change the installed set, generated body and heap
+work. The combined build is the directly measured combined ceiling.
+
+GC-excluded savings, in the same row order, are 6,110 / 17,667 / −1,527 /
+3,285 / 11,884 / 7,245 Ir/request; full intervals, per-round slopes and
+provenance are retained in `speculation-ceilings.json`. Interpreter work is
+not convertible to native YJIT microseconds or a theoretical throughput gain.
+
+Initial path/link masks over a mixed build produced negative estimates;
+those are **invalid attribution**, not guard-tax results. They are retained
+as such, and the published CLI now rejects that selection. Earlier attempts
+without `SECRET_KEY_BASE_DUMMY=1` failed before benchmarking and provide no
+semantic or performance evidence.
+
+### Other corpus requests
+
+| App / Rails / GET route | Build | Guarded − unsafe Ir/request [95% CI] | % of guarded [95% CI] | Controls |
+|---|---|---:|---:|---|
+| PingCRM / 8.1.4 / `/organizations` | default | 1,416 [−6,980, 6,731] | 0.012 [−0.058, 0.056] | **reject**, GC-excluded A/A |
+| PingCRM / 8.1.4 / `/organizations` | all-opt-in, excluding endpoint | 22,398 [18,634, 33,301] | 0.189 [0.158, 0.281] | accept |
+| React Starter Kit / 8.1.4 / `/dashboard` | default | 779 [−2,446, 4,731] | 0.009 [−0.029, 0.055] | accept; unresolved from zero |
+| React Starter Kit / 8.1.4 / `/dashboard` | all-opt-in, excluding endpoint | 3,009 [−284, 6,625] | 0.036 [−0.003, 0.079] | accept; unresolved from zero |
+| Redprints CFP / 8.1.3 / `/proposals` | default | 2,840 [149, 7,428] | 0.019 [0.001, 0.050] | **reject**, total A/A |
+| Redprints CFP / 8.1.3 / `/proposals` | all-opt-in, excluding endpoint | 41,164 [33,398, 45,245] | 0.278 [0.225, 0.305] | accept |
+
+All three routes complete **zero source units** in these builds, so the
+default rows provide no per-hit source-guard tax. Rejected rows are retained,
+not credited as wins. All-opt-in counted hits are instantiate **12 / 2 / 21**
+and Inertia bind **5 / 5 / 4**, respectively; digest/preload/AR-reader units
+have zero hits. Those combined request deltas are not assigned to a particular
+runtime pass without a separate ablation. The Inertia shape/constant checks
+and other structural runtime checks still run. The all-opt-in GC-excluded
+savings are **20,837 / −361 / 42,517 Ir/request**; Starter's intervals include
+zero for both metrics. Redprints remains secondary pinned-8.1.3 evidence,
+not a claimed 8.1.4 measurement. No failed A/A row was rerun.
+
+Initial all-opt-in probes on PingCRM, Starter and Redprints correctly refuse
+an interpreter/JIT build mismatch: production boot enables YJIT, recording
+`Array#each` at `<internal:array>:219`, while interpreter workers observe a
+C method with nil source location. The mismatching Inertia fact makes
+`Guard.validate` false before measuring. Corrected builds use the already
+published `LOWRAIL_BUILD_JIT=0` hook; no activation check is weakened.
+All three corrected cohorts pass both A/A metrics and heap matching. They
+are new, changed-build experiments, not retries of the failed default controls.
 
 ## Unsafe break list
 
@@ -278,6 +374,30 @@ dispatch is 822/371 and K is 425/140 (interpreter/YJIT). Do not subtract numbers
 across those harnesses or call the entire old path per-fact validation.
 
 ### Callgrind attribution
+
+The old cached interpreter path's **822 Ir** has the following disjoint self
+costs, from the same fixed-heap cached/loop N=0/100,000 dumps. Each dump's
+self-cost sum is checked against its full Callgrind total before subtraction;
+inclusive call edges are not counted again. Round zero gives 822.005 Ir,
+consistent with the six-round estimate above.
+
+| Piece | Net Ir | Share | Function / largest source rows |
+|---|---:|---:|---|
+| VM opcode dispatch, array access and Ruby branch machinery | 482 | 58.6% | `vm_exec_core'2`; `insns.def:82` (23), `vm.inc:4681` (15), `vm_insnhelper.c:6123,6122` (14/12) |
+| Constant-path/cache and lexical-environment lookup | 131 | 15.9% | `rb_vm_opt_getconstant_path` 84 (`vm_insnhelper.c:6637,6618`: 24/20), `vm_env_cref` 47 (`:845,839,867`: 8/8/7) |
+| Receiver-cache hash lookup | 107 | 13.0% | `rb_hash_aref` 34, `rb_st_lookup` 56, `rb_ident_hash` 14, `rb_hash_start` 3; same principal source rows as the YJIT table |
+| Ruby method-frame setup and argument copy | 51 | 6.2% | `vm_call_iseq_setup_normal_0start_2params_4locals` 41, `__memcpy_avx_unaligned_erms` 10 |
+| Receiver class lookup and its builtin-call adapter | 33 | 4.0% | `builtin_inline_class_20` 24 (`kernel.rbinc:17,13`: 8/6), `vm_call_single_noarg_leaf_builtin` 9 |
+| VM interrupt checks | 18 | 2.2% | `rb_vm_check_ints`, chiefly `vm_core.h:2232,2269,2272` and `atomic.h:991` |
+| Epoch compare | **0** | 0% | no epoch compare on the cached method-fact path |
+
+Less than 0.006 Ir/check remains in amortized call-cache lookup/write-barrier
+costs. The 51-Ir method-entry share is not the entire cost of calling `ok?`:
+its Ruby instructions execute in the 482-Ir VM bucket too. The VM profile
+cannot split those into Ruby-level line costs without another overlapping
+isolation experiment. Unit array lookup is in that VM bucket, not an
+additional C-function share. Full interpreter function/line costs are in
+`speculation-ceilings.json`.
 
 The old cached YJIT path's net **371 Ir** decomposes into disjoint self costs:
 
@@ -449,6 +569,11 @@ identities with outcomes, per-layer counts and unstable/transient identity
 lists, the AR-epoch attribution control, per-round micro slopes, paired CIs,
 heap/A/A gates, full function/line attribution, refusal census and the constant
 matrix. It contains no app headers, SQL bodies or authentication fixtures.
+[speculation-ceilings.json](speculation-ceilings.json) adds sanitized request
+results, per-round instruction slopes, rejected/invalid attempts, manifest,
+runtime and harness fingerprints, completed-unit counts and the interpreter
+function/line attribution. Private raw response/heap/profiler dumps are not
+published as if they were sanitized reports.
 
 ```sh
 mise exec -- ruby bench/speculation_holes.rb
@@ -461,6 +586,11 @@ GUARD_JIT=1 GUARD_CASES=loop,constant_counter,constant_epoch \
 LOWRAIL_SPECULATE=unguarded mise exec -- script/rails-suite --out .lowrail/NEW-unsafe
 LOWRAIL_SPECULATE=unguarded LOWRAIL_SPECULATE_KEEP=ar_epoch \
   mise exec -- script/rails-suite --out .lowrail/NEW-epoch-only --suites activerecord
+# Interpreter runtime facts must be captured in interpreter mode too.
+LOWRAIL_BUILD_JIT=0 SECRET_KEY_BASE_DUMMY=1 RAILS_LOG_LEVEL=error mise exec -- \
+  target/debug/lowrail build .corpus/real-blog-r4 --env production --passes all-opt-in,-endpoint
+mise exec -- target/debug/lowrail bench .corpus/real-blog-r4 --pass default \
+  --path /articles --speculate unguarded --out /tmp/NEW-blog-guard-tax
 ```
 
 For the old-cache micro, use the archived pre-K runtime through
@@ -470,10 +600,27 @@ databases/assets/SSR, fixed seed 41231 and serial workers. Missing PostgreSQL
 connection ENV in one final PingCRM smoke attempt caused no outcomes; that
 attempt is not included as a passing gate or as an unsafe semantic break.
 
-Final normal-mode regression: from `gem/`, `mise exec -- ruby -S rake test`
-completes **91 tests / 1,564 assertions, zero failures/errors, six optional
-skips**. The focused guard regression remains **5 tests / 34 assertions**.
+At the initial study publication, from `gem/`, `mise exec -- ruby -S rake test`
+completed **91 tests / 1,564 assertions, zero failures/errors, six optional
+skips**. The focused guard regression was **5 tests / 34 assertions**.
 Counterexamples and the constant matrix reproduce exactly against retained
 JSON; the documented 34 identities are checked against the outcome map.
 Ordinary-process, production-verify and missing-experiment activation all
 refuse; explicit off controls clear unsafe ENV and do not load the experiment.
+
+At the unsafe-seam publication, the integration suite is **94 tests / 1,677
+assertions, one known failure, zero errors, six optional skips**. The sole
+failure is the intentionally red
+`ViewTest#test_default_link_to_observes_a_suppressed_redefinition_after_warmup`
+introduced in [the separate correctness regression](https://github.com/thomasklemm/lowrail/commit/5a15175).
+It reproduces a normal guarded-mode byte error: a real request subscriber
+suppresses `method_added` and redefines `link_to` after warmup; the stale
+lowered body omits all ten live-helper comments. Effective helper identity
+at use would catch it. It is a concrete instance of the pre-existing callback
+hole, **not one of the 34 unsafe AR errors**. Its separately owned fix is in
+progress; the final fresh gem run reproduces exactly that one failure, with
+all other tests passing. After integrating the shared YJIT stability gate,
+PassBench **15/139**, RequestPairs **10/68**, and Rust **33 unit plus three
+integration tests** pass. The interpreter measurement reports retain their
+original runtime/harness fingerprints; this integration does not relabel old
+measurements as newly executed cohorts.
