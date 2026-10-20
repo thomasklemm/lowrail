@@ -114,8 +114,12 @@ same 11 units and verifies 21/21 identical with 114 hits.
   advisory (run `PARALLEL_WORKERS=1` to gate). `LOWRAIL_SQL_TRACE=full`
   stores the lines, `=0` disables. When serial traces differ, verify runs
   `LOWRAIL=0` a second time and excludes tests whose traces already differ
-  between the two off runs (inlined sequence ids, time, randomness); it
-  reports how many. Campfire: 634 tests, 15,103 queries,
+  between the two off runs (inlined sequence ids, time, randomness). If
+  differences remain, the on run is repeated too, so only differences that
+  reproduce in both on runs against two agreeing off runs gate. On a large
+  private app (10,816 tests, serial) the off-repeat-only check still left
+  21 differences with every unit disabled, i.e. rare flakiness; the
+  symmetric check is the answer to that, not yet re-measured there. Campfire: 634 tests, 15,103 queries,
   identical; real-blog: 21 tests, 125 queries, identical.
 - **Build surface** (PLAN 9.4): `lowrail facts` materializes lazy
   surface before dumping (production eager load, attribute methods,

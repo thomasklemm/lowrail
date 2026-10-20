@@ -152,7 +152,7 @@ impl Report {
         let sql_diffs = self.sql_differences();
         if !self.unstable_sql.is_empty() {
             s.push_str(&format!(
-                "sql traces: {} tests excluded, their queries already differ between two LOWRAIL=0 runs\n",
+                "sql traces: {} tests excluded, their queries differ between two runs of the same mode\n",
                 self.unstable_sql.len()
             ));
         }
@@ -224,15 +224,23 @@ pub fn verify(app: &Path, cmd: &[String], seed: &[(String, String)]) -> Result<R
     if report.sql_gates() && !report.sql_differences().is_empty() {
         eprintln!("lowrail verify: SQL traces differ; control run with LOWRAIL=0");
         let control = run_labeled(app, cmd, &dir, "0-control", "0", &env)?;
-        report.unstable_sql = report
-            .off
-            .sql
-            .iter()
-            .filter(|(name, off)| control.sql.get(*name).map(|c| &c.0) != Some(&off.0))
-            .map(|(name, _)| name.clone())
-            .collect();
+        report.unstable_sql = unstable(&report.off, &control);
+        // A test that varies only now and then can agree in two off runs by
+        // chance. If differences remain, repeat the on run as well: only a
+        // difference both on runs agree on, against two agreeing off runs,
+        // counts as caused by Lowrail.
+        if !report.sql_differences().is_empty() {
+            eprintln!("lowrail verify: SQL traces still differ; control run with LOWRAIL=1");
+            let on_control = run_labeled(app, cmd, &dir, "1-control", "1", &env)?;
+            report.unstable_sql.extend(unstable(&report.on, &on_control));
+        }
     }
     Ok(report)
+}
+
+/// Tests whose own-thread SQL trace differs between two runs of one mode.
+fn unstable(a: &Run, b: &Run) -> BTreeSet<String> {
+    a.sql.iter().filter(|(name, x)| b.sql.get(*name).map(|y| &y.0) != Some(&x.0)).map(|(name, _)| name.clone()).collect()
 }
 
 /// Finds the units whose lowering changes outcomes: splits the unit set and
