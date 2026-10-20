@@ -20,6 +20,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let mut preload = false;
     let mut memo = false;
     let mut ar_instantiate = false;
+    let mut ar_plans = false;
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
@@ -28,11 +29,12 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             "--preload-plans" => preload = true,
             "--memo" => memo = true,
             "--ar-instantiate" => ar_instantiate = true,
+            "--ar-plans" => ar_plans = true,
             _ if app.is_none() => app = Some(PathBuf::from(a)),
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans] [--memo] [--ar-instantiate]")?;
+    let app = app.ok_or("usage: lowrail build APP [--env test|production] [--preload-plans] [--memo] [--ar-instantiate] [--ar-plans]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
     let report = build(&app, &env, preload, memo)?;
     if ar_instantiate {
@@ -48,6 +50,21 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             .map_err(|e| format!("AR instantiate facts: {e}"))?;
         if !status.success() {
             return Err(format!("AR instantiate facts failed ({status})"));
+        }
+    }
+    if ar_plans {
+        let status = Command::new("bundle")
+            .args(["exec", "ruby"])
+            .arg(facts::gem_dir().join("exe/lowrail-ar-build"))
+            .arg(app.join(".lowrail"))
+            .current_dir(&app)
+            .env_remove("RUBYOPT")
+            .env("RAILS_ENV", &env)
+            .env("LOWRAIL", "0")
+            .status()
+            .map_err(|e| format!("AR plan facts: {e}"))?;
+        if !status.success() {
+            return Err(format!("AR plan facts failed ({status})"));
         }
     }
     println!("{report}");

@@ -110,6 +110,11 @@ module Lowrail
         require_relative "lowrail/ar_instantiate"
         ARInstantiate.install(manifest)
       end
+      if manifest.units.any? { _1["pass"] == "active_record/ar_plans" }
+        require_relative "lowrail/ar_guard"
+        require_relative "lowrail/ar_plans"
+        ARPlans.install(manifest)
+      end
       true
     end
 

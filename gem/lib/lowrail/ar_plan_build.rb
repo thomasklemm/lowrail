@@ -1,0 +1,90 @@
+# frozen_string_literal: true
+
+require "json"
+require "digest"
+require_relative "ar_plan_facts"
+require_relative "ar_plans"
+
+module Lowrail
+  module ARPlanBuild
+    module_function
+
+    def run(dir)
+      path = File.join(dir, "manifest.json")
+      ledger_path = File.join(dir, "ledger.json")
+      manifest = JSON.parse(File.read(path))
+      ledger = JSON.parse(File.read(ledger_path))
+      manifest["units"].reject! { _1["pass"] == "active_record/ar_plans" }
+      ledger.reject! { _1["pass"] == "active_record/ar_plans" }
+      models, edges, facts = {}, {}, []
+      denied = File.file?(File.join(dir, "denylist.json")) && JSON.parse(File.read(File.join(dir, "denylist.json"))).any? { _1["pass"] == "active_record/ar_plans" }
+      ActiveRecord::Base.descendants.sort_by { _1.name.to_s }.each do |owner|
+        next if !owner.name || owner.abstract_class? || !owner.table_exists?
+        owner.reflect_on_all_associations.each do |reflection|
+          label = "#{owner.name}##{reflection.name}"
+          info, reason = ARPlanFacts.scope_info(reflection)
+          reason ||= ARPlanFacts.decline(reflection, info)
+          reason = "denylisted by verify --bisect" if denied
+          ledger << { "pass" => "active_record/ar_plans", "method" => label, "outcome" => reason || "eligible scoped reader" }
+          next if reason
+          [owner, reflection.klass].each do |model|
+            models[model.name] ||= PreloadFacts.model(model)
+            PreloadFacts::SCOPE_METHODS.each { facts << PreloadFacts.method_fact(model, _1, singleton: true) }
+            facts << PreloadFacts.method_fact(model, :_read_attribute)
+            [model.unscoped.class, model.send(:relation_delegate_class, ActiveRecord::AssociationRelation)].each do |relation|
+              %i[build_arel arel where where! order order! limit limit! select _select! build_where_clause].each {
+                # Rails deliberately disguises a model-specific relation's
+                # .name as its superclass. Guard the actual constant instead.
+                facts << PreloadFacts.method_fact(relation, _1).merge("receiver" => Module.instance_method(:name).bind_call(relation))
+              }
+            end
+          end
+          ARPlanFacts.bind_columns(reflection, info).each do |column|
+            type = reflection.klass.type_for_attribute(column)
+            type.class.ancestors.each do |holder|
+              next unless holder.name && ![Object, Kernel, BasicObject].include?(holder)
+              names = holder.instance_methods(false) + holder.private_instance_methods(false)
+              (names & PreloadFacts::TYPE_METHODS).each { facts << PreloadFacts.method_fact(holder, _1) }
+            end
+          end
+          edges[label] = { "owner" => owner.name, "name" => reflection.name.to_s,
+            "scope" => info, "reflection" => PreloadFacts.reflection(reflection) }
+        rescue StandardError => e
+          ledger << { "pass" => "active_record/ar_plans", "method" => label, "outcome" => "declined: #{e.class}: #{e.message.lines.first.strip}" }
+        end
+      end
+      unless edges.empty?
+        holders = [ActiveRecord::QueryMethods, ActiveRecord::Relation::WhereClause,
+          ActiveRecord::PredicateBuilder, ActiveRecord::TableMetadata, ActiveRecord::Relation,
+          ActiveRecord::Associations::AssociationScope, ActiveRecord::Associations::Association]
+        holders.concat(ObjectSpace.each_object(Module).select { _1.name&.start_with?("Arel::") })
+        holders.each do |holder|
+          names = holder.instance_methods(false) + holder.private_instance_methods(false) + holder.protected_instance_methods(false)
+          names.uniq.each do |name|
+            next if holder == ActiveRecord::Relation && %i[exec_main_query initialize_copy assert_modifiable!].include?(name)
+            next if holder == ActiveRecord::Associations::Association && name == :skip_statement_cache?
+            facts << PreloadFacts.method_fact(holder, name)
+          end
+        end
+        originals = %i[exec_main_query initialize_copy assert_modifiable!].map { PreloadFacts.method_fact(ActiveRecord::Relation, _1) }
+        originals << PreloadFacts.method_fact(ActiveRecord::Associations::Association, :skip_statement_cache?)
+        # Track these names for invalidation without asking Guard to match a
+        # framework definition hidden by our own prepend.
+        %i[exec_main_query initialize_copy assert_modifiable!].each { facts << PreloadFacts.method_fact(ARPlans::RelationHook, _1) }
+        facts << PreloadFacts.method_fact(ARPlans::AssociationHook, :skip_statement_cache?)
+        files = (facts + originals).filter_map { _1["source_location"]&.sub(/:\d+\z/, "") }
+        files.concat([__FILE__, ARPlanFacts.method(:scope_info).source_location.first,
+          ARPlans.method(:tag).source_location.first, PreloadFacts.method(:scope).source_location.first])
+        edges.each_value { files << _1.fetch("reflection").fetch("scope").first }
+        id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
+        manifest["units"] << { "id" => id, "kind" => "runtime", "file" => "active_record/ar_plans",
+          "pass" => "active_record/ar_plans", "facts" => facts.uniq,
+          "ar_plans" => { "edges" => edges, "models" => models, "originals" => originals,
+            "rails_version" => Rails.version, "sources" => files.uniq.to_h { [_1, Digest::SHA256.file(_1).hexdigest] } } }
+      end
+      Lowrail.write_json(path, manifest)
+      Lowrail.write_json(ledger_path, ledger)
+      warn "[lowrail] AR plans: #{edges.size} eligible scoped readers, #{ledger.count { _1["pass"] == "active_record/ar_plans" } - edges.size} refused"
+    end
+  end
+end
