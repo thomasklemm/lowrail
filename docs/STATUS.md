@@ -70,6 +70,15 @@ same 11 units and verifies 21/21 identical with 114 hits.
   See the [controlled instruction and GC diagnosis](bench.md) for the later
   default/instantiate comparison; no native YJIT request win is established.
   Keep it opt-in.
+- **Inertia configuration binding** ([contract and measurements](passes/inertia-config.md)),
+  opt-in `--passes default,+inertia/config_bind`: fresh controller-bound
+  configurations, live shallow-copied options, shared method facts and exact
+  ordered-schema/Hash-policy checks. Guarded bind micros save two objects
+  and about 3 µs per hit; JSON requests save 10/18/22 objects in the three
+  public apps. **Request speedup is unproven: native A/A control failed.**
+  Shared activation registration awaits runtime migration step 4; main alone
+  builds but does not activate this pass. The temporary local setup hook is
+  not published.
 - **Guarded memo** ([certificate/refusal details](passes/memo.md)), opt-in
   with `lowrail build --memo`: fresh-return SHA-256 string reuse, bounded by
   runtime keys and guarded implementation facts. Campfire **634 identical**,
