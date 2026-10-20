@@ -327,5 +327,18 @@ both its fast path and its fallback). Denylisted units appear as
 
 ## verify outcomes — `outcomes-<mode>.json`
 
-Written by the Minitest reporter (`LOWRAIL_OUTCOMES=path`):
+Written by the Minitest or RSpec reporter (`LOWRAIL_OUTCOMES=path`), both
+installed through `RUBYOPT=-rlowrail/setup`, without app/Gemfile changes:
 `{"tests": {"ArticleTest#test_x": {"result": "pass|fail|error|skip", "failure": "Class: first line"}}, "unit_hits": {"0": 12}}`.
+
+RSpec keys are `example.id` (file plus scoped example id), not descriptions,
+which can be duplicated. RSpec passed/failed/pending map to pass/fail/skip;
+failed expectations and unhandled exceptions both use RSpec's failed status.
+Failures include the exception class and full message (expectation messages
+often start with a blank line), with object addresses masked. Pending examples
+include their exception or skip reason; unexpectedly passing pending examples
+remain failures. Each RSpec process writes `path.<pid>`; Minitest also writes
+an aggregate `path` after its forked workers finish. Verify reads the aggregate
+when present, otherwise the per-process files, so hits are not counted twice.
+Use `lowrail verify APP -- bundle exec rspec --seed 12345` for RSpec; custom
+test commands are also accepted by `lowrail observe`.

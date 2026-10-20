@@ -28,6 +28,9 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     }
     let app = app.ok_or("usage: lowrail verify APP [--bisect] [-- TEST COMMAND...]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
+    if cmd.is_empty() {
+        return Err("test command must not be empty".into());
+    }
     let report = verify(&app, &cmd)?;
     println!("{}", report.render());
     if report.identical() {
@@ -197,10 +200,14 @@ fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&s
         .status()
         .map_err(|e| format!("running {}: {e}", cmd.join(" ")))?;
     let mut run = Run { seconds: started.elapsed().as_secs_f64(), exit_ok: status.success(), ..Default::default() };
-    // Parallel test workers write `outcomes-<mode>.json.<pid>`.
+    // Parallel test workers write `outcomes-<mode>.json.<pid>`. Minitest
+    // also writes a merged report: do not count its workers twice.
     for entry in std::fs::read_dir(dir).map_err(|e| e.to_string())?.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
         if !name.starts_with(&format!("outcomes-{mode}.json")) {
+            continue;
+        }
+        if out.is_file() && entry.path() != out {
             continue;
         }
         let data: Value = serde_json::from_str(&std::fs::read_to_string(entry.path()).map_err(|e| e.to_string())?)

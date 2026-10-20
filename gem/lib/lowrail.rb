@@ -53,7 +53,7 @@ module Lowrail
       env != "development"
     end
 
-    # Entry point used by lowrail/setup: stats and the Minitest reporter are
+    # Entry point used by lowrail/setup: stats and the outcome reporters are
     # independent of whether lowering is active (verify needs outcomes for
     # LOWRAIL=0 runs too).
     def boot(root: Dir.pwd)
@@ -64,6 +64,8 @@ module Lowrail
       if ENV["LOWRAIL_OUTCOMES"]
         require_relative "lowrail/minitest"
         Lowrail::Minitest.install(ENV["LOWRAIL_OUTCOMES"])
+        require_relative "lowrail/rspec"
+        Lowrail::RSpec.install(ENV["LOWRAIL_OUTCOMES"])
       end
       setup(root: root)
     rescue StandardError, ScriptError => e
