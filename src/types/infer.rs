@@ -160,6 +160,14 @@ impl Index {
 
 pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
     let classifier = facts::Classifier::new(facts);
+    // Template methods keep the template's source location, not a Ruby file.
+    // Their handler output is a different program with different line offsets;
+    // do not diagnose raw ERB/JS as invalid Ruby or infer bodies from it.
+    let templates: BTreeSet<&str> = facts
+        .templates
+        .iter()
+        .map(|t| t.identifier.as_str())
+        .collect();
     let mut indexes = BTreeMap::new();
     let mut bodies = BTreeMap::new();
     for module in &facts.modules {
@@ -168,6 +176,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             .as_deref()
             .and_then(split_location)
             && classifier.in_app(path)
+            && !templates.contains(path)
         {
             indexes
                 .entry(path.to_owned())
@@ -180,7 +189,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             else {
                 continue;
             };
-            if !classifier.in_app(path) {
+            if !classifier.in_app(path) || templates.contains(path) {
                 continue;
             }
             let index = indexes

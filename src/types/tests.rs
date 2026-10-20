@@ -153,3 +153,35 @@ fn prism_fixpoint_overrides_and_unsupported_control_flow() {
     }
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+fn template_source_locations_are_not_parsed_as_ruby() {
+    let dir = std::env::temp_dir().join(format!("lowrail-template-types-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let template = dir.join("index.html.erb");
+    let raw = dir.join("worker.js");
+    let invalid = dir.join("broken.rb");
+    std::fs::write(&template, "<h1><%= 42 %></h1>").unwrap();
+    std::fs::write(&raw, "self.addEventListener('fetch', () => {});").unwrap();
+    std::fs::write(&invalid, "def broken(").unwrap();
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,
+        "templates":[{"identifier":template}, {"identifier":raw}],
+        "modules":[
+            {"name":"Views", "const_source_location":format!("{}:1",template.display()),
+             "methods":[{"name":"render_index", "source_location":format!("{}:1",template.display())},
+                        {"name":"render_worker", "source_location":format!("{}:1",raw.display())}]},
+            {"name":"Broken", "methods":[{"name":"broken", "source_location":format!("{}:1",invalid.display())}]}
+        ]
+    })).unwrap();
+    let model = TypeModel::from_facts(&facts);
+    assert_eq!(
+        model.diagnostics,
+        [format!(
+            "cannot infer from invalid Ruby: {}",
+            invalid.display()
+        )]
+    );
+    assert!(model.lookup("Views#render_index").is_none());
+    assert!(model.lookup("Views#render_worker").is_none());
+    std::fs::remove_dir_all(dir).unwrap();
+}
