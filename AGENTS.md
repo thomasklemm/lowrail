@@ -23,6 +23,9 @@ Read [docs/PLAN.md](docs/PLAN.md) first.
 6. **Exact means exact mid-request too.** A check at entry does not cover
    code that the lowered region evaluates later (helper arguments,
    `to_param`, callbacks). Either certify each such boundary or refuse.
+7. **Preserve lazy loading.** Lowrail never forces loading of app/framework
+   constants or runs on_load hooks earlier than the app would; passes observe
+   already-loaded constants and subscribe to Zeitwerk/ActiveSupport on_load.
 
 ## Layout
 

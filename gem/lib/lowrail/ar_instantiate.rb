@@ -18,26 +18,38 @@ module Lowrail
       def activate
         require_relative "ar_guard"
         require "digest"
-        entries = @units.filter_map do |unit|
-          data = unit.fetch("ar_instantiate")
-          next unless Rails.version == data.fetch("rails_version")
-          next unless data.fetch("sources").all? { |p, sha| File.file?(p) && Digest::SHA256.file(p).hexdigest == sha }
-          klass = Object.const_get(data.fetch("model"))
-          next unless original_fact(klass.method(:_load_from_sql)) == data.fetch("original")
-          Entry.new(klass, unit)
-        rescue StandardError, ScriptError => e
-          Lowrail.debug("AR instantiate declined: #{e.class}: #{e.message}")
-          nil
-        end
-        entries.each do |entry|
-          klass = entry.klass
-          klass.instance_variable_set(:@_lowrail_instantiate, entry)
-          klass.singleton_class.class_eval(source(entry.id), "lowrail:ar_instantiate:#{klass.name}", 1)
-        rescue StandardError, ScriptError => e
-          Lowrail.debug("AR instantiate installation declined: #{e.class}: #{e.message}")
+        @units.each do |unit|
+          name = unit.fetch("ar_instantiate").fetch("model")
+          if Rails.respond_to?(:autoloaders) && Rails.application
+            Rails.autoloaders.each do |loader|
+              loader.on_load(name) { |klass| activate_model(klass, unit) }
+            end
+          end
+          # Even after initialization, forcing a model to load can run lazy
+          # framework hooks and change other models' callbacks/SQL. Observe
+          # existing constants only; Zeitwerk installs late models naturally.
+          klass = name.split("::").inject(Object) do |owner, part|
+            break if owner.autoload?(part) || !owner.const_defined?(part, false)
+            owner.const_get(part, false)
+          end
+          activate_model(klass, unit) if klass
         end
       rescue LoadError => e
         Lowrail.debug("AR instantiate unavailable: #{e.message}")
+      end
+
+      def activate_model(klass, unit)
+        data = unit.fetch("ar_instantiate")
+        return unless Rails.version == data.fetch("rails_version")
+        return unless data.fetch("sources").all? { |p, sha| File.file?(p) && Digest::SHA256.file(p).hexdigest == sha }
+        original = klass.method(:_load_from_sql)
+        original = original.super_method while original&.source_location&.first&.start_with?("lowrail:ar_instantiate:")
+        return unless original_fact(original) == data.fetch("original")
+        entry = Entry.new(klass, unit)
+        klass.instance_variable_set(:@_lowrail_instantiate, entry)
+        klass.singleton_class.class_eval(source(entry.id), "lowrail:ar_instantiate:#{klass.name}", 1)
+      rescue StandardError, ScriptError => e
+        Lowrail.debug("AR instantiate declined: #{e.class}: #{e.message}")
       end
 
       def original_fact(method)
