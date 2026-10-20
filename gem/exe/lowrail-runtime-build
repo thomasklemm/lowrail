@@ -9,7 +9,12 @@ output = $stdout.dup
 $stdout.reopen($stderr) # App initializers/loggers must not corrupt the JSON.
 ENV["LOWRAIL"] = "0"
 ENV["RAILS_ENV"] ||= "test"
+if ENV["LOWRAIL_BUILD_JIT"] == "0"
+  require File.expand_path("config/application", Dir.pwd)
+  Rails.application.config.yjit = false
+end
 require File.expand_path("config/environment", Dir.pwd)
+raise "runtime build unexpectedly enabled YJIT" if ENV["LOWRAIL_BUILD_JIT"] == "0" && RubyVM::YJIT.enabled?
 Rails.application.eager_load!
 require_relative "../lib/lowrail"
 results = request.fetch("builders").map do |builder|

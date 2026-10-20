@@ -27,6 +27,9 @@ module PassProbe
       when "active_record/ar_plans"
         defined?(Lowrail::ARPlans::AssociationHook) && ActiveRecord::Associations::Association < Lowrail::ARPlans::AssociationHook &&
           Lowrail::ARPlans.guard_ok? && Lowrail::ARPlans.instance_variable_get(:@plans)&.any?
+      when "digest/file_memo"
+        defined?(Lowrail::DigestMemo) && Lowrail::DigestMemo.instance_variable_get(:@units)&.key?(unit.fetch("id")) &&
+          Lowrail::DigestMemo.valid?(unit.fetch("id"))
       when "inertia/config_bind"
         defined?(Lowrail::Passes::InertiaConfig::Variant) &&
           InertiaRails::Configuration < Lowrail::Passes::InertiaConfig::Variant && Lowrail::Guard.validate(unit.fetch("id"))
@@ -54,7 +57,7 @@ if $PROGRAM_NAME == __FILE__
   require "json" # Activate the app's locked version, never a default gem before Bundler.
   Rails.application.eager_load!
   Rails.logger.level = :error
-  ActiveRecord::Base.logger = nil
+  ActiveRecord::Base.logger = nil if defined?(ActiveRecord::Base)
   raise "unexpected JIT mode" unless !!RubyVM::YJIT.enabled? == jit
   ids = ENV.fetch("BENCH_UNITS").split(",").map { Integer(_1) }
   units = PassProbe.active!(ids) if ENV["LOWRAIL"] == "1"

@@ -3,6 +3,7 @@
 require "optparse"
 require_relative "request_pairs"
 require_relative "stack_budget"
+require_relative "instruction_budget"
 require_relative "../gem/lib/lowrail"
 require_relative "../gem/lib/lowrail/manifest"
 
@@ -71,6 +72,12 @@ module PassBench
   def self.runtime_fingerprint(lib)
     Dir.glob(File.join(lib, "**/*.rb")).sort.to_h do |file|
       [file.delete_prefix(lib + "/"), Digest::SHA256.file(file).hexdigest]
+    end
+  end
+
+  def self.harness_fingerprint
+    Dir.glob(File.join(__dir__, "*.{rb,c}")).reject { _1.end_with?("_test.rb") }.sort.to_h do |file|
+      [File.basename(file), Digest::SHA256.file(file).hexdigest]
     end
   end
 
@@ -164,14 +171,16 @@ module PassBench
       lines << "\nUnpriced fallback units: #{stack.fetch(:unmodeled_fallback_unit_ids).join(',')}." unless stack.fetch(:unmodeled_fallback_unit_ids).empty?
       lines << "\nRemoved default passes (unmodeled reference work): #{stack.fetch(:removed_default_passes).join(',')}." unless stack.fetch(:removed_default_passes).empty?
       unless stack.fetch(:units).empty?
-        lines << "\n| Unit / model (#{stack.fetch(:metric)}) | Guard-included saved/hit [95% CI] | Completed hits/request | Expected saving/request [95% CI] |"
-        lines << "|---|---:|---:|---:|"
+        lines << "\n| Unit / model / count basis (#{stack.fetch(:metric)}) | Guard-included saved/count [95% CI] | Count/request | Completed/request | Expected saving/request [95% CI] |"
+        lines << "|---|---:|---:|---:|---:|"
         stack.fetch(:units).each do |unit|
-          cost, expected = unit.fetch(:saved_per_hit), unit.fetch(:expected_saved_per_request)
-          frequency = unit.fetch(:hits_per_request)
+          cost, expected = unit[:saved_per_hit] || unit.fetch(:saved_per_invocation), unit.fetch(:expected_saved_per_request)
+          frequency = unit[:hits_per_request] || unit.fetch(:invocations_per_request)
           frequency = RequestPairs.median(frequency) if frequency.is_a?(Array)
-          lines << format("| %d / %s | %+.3f [%+.3f, %+.3f] | %.3f | %+.3f [%+.3f, %+.3f] |",
-            unit.fetch(:id), unit[:model] || unit.fetch(:pass), cost.fetch(:median), *cost.fetch(:ci95), frequency,
+          completions = unit[:completed_hits_per_request] || unit[:hits_per_request] || 0
+          completions = RequestPairs.median(completions) if completions.is_a?(Array)
+          lines << format("| %d / %s / %s | %+.3f [%+.3f, %+.3f] | %.3f | %.3f | %+.3f [%+.3f, %+.3f] |",
+            unit.fetch(:id), unit[:model] || unit.fetch(:pass), unit.fetch(:count_kind), cost.fetch(:median), *cost.fetch(:ci95), frequency, completions,
             expected.fetch(:median), *expected.fetch(:ci95))
         end
       end
@@ -201,10 +210,11 @@ module PassBench
       if stacked
         raise "stacked mode needs --default-build DIR" unless options[:default_build]
         raise "stacked mode uses --budgets, not --micro-case/--model" if options[:micro_case] || options[:model]
+        raise "choose --budgets or --measure-budgets" if options[:budgets] && options[:measure_budgets]
         raise "stacked mode cannot combine other comparison layers" if
           %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].any? { ENV[_1] }
-      elsif options[:default_build] || options[:budgets]
-        raise "--default-build and --budgets require --passes"
+      elsif options[:default_build] || options[:budgets] || options[:measure_budgets]
+        raise "--default-build, --budgets and --measure-budgets require --passes"
       end
       counter = result.fetch(:counter)
       raise "counter must be callgrind or native" unless %w[callgrind native].include?(counter)
@@ -219,6 +229,8 @@ module PassBench
       result[:manifest_sha256] = Digest::SHA256.file(File.join(app, ".lowrail/manifest.json")).hexdigest
       result[:runtime_files_sha256] = runtime_fingerprint(lib)
       result[:runtime_fingerprint_sha256] = Digest::SHA256.hexdigest(JSON.generate(canonical(result.fetch(:runtime_files_sha256))))
+      result[:harness_files_sha256] = harness_fingerprint
+      result[:harness_fingerprint_sha256] = Digest::SHA256.hexdigest(JSON.generate(canonical(result.fetch(:harness_files_sha256))))
       result[:app] = File.basename(app)
       result[:lockfile_sha256] = Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest if File.file?(File.join(app, "Gemfile.lock"))
       result[:corpus_source] = File.read(File.join(app, ".lowrail-corpus-source")).strip if File.file?(File.join(app, ".lowrail-corpus-source"))
@@ -257,10 +269,13 @@ module PassBench
         Dir.mktmpdir("lowrail-bench-default") do |tmp|
           FileUtils.ln_s(reference, File.join(tmp, ".lowrail"))
           default_ids = reference_data.fetch("units").map { _1.fetch("id") }.join(",")
-          result[:default_coverage] = probe(app, out, env.merge("LOWRAIL_ROOT" => tmp, "LOWRAIL_UNITS" => default_ids,
+          result[:default_coverage] = probe(app, out, env.merge("LOWRAIL_ROOT" => tmp, "LOWRAIL_UNITS" => default_ids.empty? ? nil : default_ids,
             "BENCH_UNITS" => default_ids), route, "default-coverage")
         end
-        if options[:budgets]
+        if options[:measure_budgets]
+          result[:budget_input] = InstructionBudget.run(app, File.join(out, "budgets"), env, route, result, selected)
+          StackBudget.validate!(result.fetch(:budget_input), result, selected)
+        elsif options[:budgets]
           result[:budget_input] = JSON.parse(File.read(options.fetch(:budgets)))
           StackBudget.validate!(result.fetch(:budget_input), result, selected)
         end
@@ -322,6 +337,7 @@ module PassBench
       raise "default build changed during measurement" if stacked && reference_data != preflight(reference, lib)
       raise "extra build changed during measurement" if extra && extra_data != preflight(File.expand_path(extra), lib)
       raise "runtime changed during measurement" unless result.fetch(:runtime_files_sha256) == runtime_fingerprint(lib)
+      raise "benchmark harness changed during measurement" unless result.fetch(:harness_files_sha256) == harness_fingerprint
       if baseline
         preflight(File.join(app, ".lowrail"), baseline)
         raise "baseline runtime changed during measurement" unless result.fetch(:baseline_runtime_files_sha256) == runtime_fingerprint(baseline)
@@ -330,6 +346,8 @@ module PassBench
     rescue StandardError => error
       result[:error] = error.message
     ensure
+      generated = File.join(out, "budgets/budget.json")
+      result[:budget_input] ||= JSON.parse(File.read(generated)) if File.file?(generated)
       result[:measurement_complete] = !!(result[:status] == "accepted" && result[:counter] == "native" &&
         result[:micro] && result[:micro].fetch(:unmodeled_unit_ids).empty?)
       if result[:stack]
@@ -350,6 +368,7 @@ if $PROGRAM_NAME == __FILE__
   options = {}
   parser = OptionParser.new do |p|
     %w[pass passes default-passes default-build budgets path out counter micro-case model].each { |name| p.on("--#{name} VALUE") { options[name.tr('-', '_').to_sym] = _1 } }
+    p.on("--measure-budgets") { options[:measure_budgets] = true }
     p.on("--diagnostics") { options[:diagnostics] = true }
   end
   parser.parse!

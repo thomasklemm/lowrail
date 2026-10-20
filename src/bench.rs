@@ -33,12 +33,12 @@ pub fn cli(args: &[String]) -> Result<(), String> {
                 forwarded.push(arg.clone());
                 forwarded.push(it.next().ok_or_else(|| format!("{arg} needs a value"))?.clone());
             }
-            "--diagnostics" => forwarded.push(arg.clone()),
+            "--diagnostics" | "--measure-budgets" => forwarded.push(arg.clone()),
             _ if !arg.starts_with('-') && app.is_none() => app = Some(arg.clone()),
             _ => return Err(format!("unexpected argument {arg}")),
         }
     }
-    let app = app.ok_or("usage: lowrail bench APP (--pass NAME | --passes SET --default-build DIR) [--budgets JSON] [--path /path] [--out NEW_DIR]")?;
+    let app = app.ok_or("usage: lowrail bench APP (--pass NAME | --passes SET --default-build DIR) [--budgets JSON | --measure-budgets] [--path /path] [--out NEW_DIR]")?;
     match (pass, passes) {
         (Some(name), None) => forwarded.extend(["--pass".into(), name.into()]),
         (None, Some(names)) => {

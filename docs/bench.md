@@ -231,10 +231,175 @@ the default reference's removed work as unmodeled, not as an opt-in gain.
 Fallback-only units (for example Campfire's STI Room loads) are separately
 listed as unpriced; zero fast-path hits do not make their guards free. These
 also keep the budget partial, even if all successful-hit units have prices.
-The importer does not create instruction-micro adapters or convert old unguarded
-timings into valid inputs.
+The importer does not convert old unguarded timings into valid inputs.
 Nominal bootstrap CIs still understate independent run-to-run variance; inspect
 controls and repeat evidence before promotion, not just a narrow interval.
+
+#### Capturing genuine instruction budgets
+
+Add `--measure-budgets` instead of `--budgets FILE` to generate the input with
+the same fixed-heap Callgrind runner. This currently requires interpreter
+Callgrind and stacked mode, including for a default-only set:
+
+```sh
+BENCH_MICRO_ROUNDS=12 mise exec -- target/debug/lowrail bench "$app" \
+  --passes default --default-build /tmp/blog-default-build \
+  --measure-budgets --path /articles --out /tmp/blog-default-budget
+```
+
+The operation worker warms the real request and captures its actual receivers,
+arguments, locals, lexical scope and `CurrentAttributes`. Rails clears ambient
+request attributes after completion; replay restores the captured context
+outside each unit's measured windows. A memo may run before the controller
+populates `Current`, while a route runs afterwards; each retains its own
+context. Different contexts within one unit are refused rather than silently
+replayed under one snapshot. Live-request and
+replay completion counts must agree; returned values must also match the actual
+captured result, not just each other. Replay closures contain the guarded expression
+or original expression, not counting/capture wrappers. Route and link sites,
+`memo/uri_join`, `memo/sha256`, and `digest/file_memo` use this source capture;
+file captures must reproduce the delivered ISeq before instrumentation.
+Both direct guards and the newer receiver-class `Lowrail::K` prefix are parsed;
+the prefix remains in the measured expression, including hot and cold checks.
+Capture is installed after `config/boot` locks gems but before
+`config/application` can load targeted gem methods. Booting first would miss
+already-loaded methods such as `RailsVite::Manifest#version`.
+Instrumentation is worker-local and never modifies an app or its build.
+There is no TracePoint: constructing one would disable memo reuse. Nested
+route lowering is removed from the link operation price, then priced separately
+at its actual post-link request frequency, avoiding double-counting.
+
+`inertia/config_bind` replays the installed variant and its `super_method`
+against the real controller/configuration. Both arms use `Method#call`, so
+they pay the same dispatch adapter. The operation includes the
+variant's full guard; no runtime registry hook or private activation is added.
+Original/on values are compared before timing. Separate counted calls establish
+completed hits, and stats are restored before measurement.
+
+Runtime facts must be built for the measured JIT state too. On Ruby 4.0,
+enabling YJIT replaces native `Array#each` with an internal Ruby method;
+Inertia's exact constructor facts legitimately distinguish these. For an
+interpreter instruction build, use:
+
+```sh
+LOWRAIL_BUILD_JIT=0 RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 mise exec -- \
+  target/debug/lowrail build .corpus/react-starter-kit --env production \
+  --passes default,+inertia/config_bind
+```
+
+This optional runtime-builder hook disables `config.yjit` **before** boot,
+rejects a boot that nevertheless enabled YJIT, and certifies the actual methods.
+Unset behavior stays unchanged. It does not edit facts, mask a failed guard,
+or make interpreter and native-YJIT budgets interchangeable. Build a normal
+production manifest again before native measurement/deployment.
+
+All three arms boot the **same active build**; off_a/off_b replay original
+operations and on replays guarded operations. Six independent rounds are the
+minimum (`BENCH_MICRO_ROUNDS`); request rounds remain separately controlled.
+`BENCH_MICRO_ITERATIONS` defaults to 200 operation iterations per window,
+independent of whole-request `BENCH_REQUESTS`. Small operations need longer
+windows than requests; changing this count never relaxes the A/A gates.
+Every operation must pass both total and GC-excluded A/A gates, not just their
+aggregate. All five actual heap capacities must match under the existing gate.
+Raw windows, counts, controls and generated schema-1 input are saved under
+`budgets/`, including when rejected. The harness fingerprint is checked too.
+
+Successful guards are not necessarily completed specializations. If every
+captured invocation completes, the adapter reports instructions/hit. Otherwise
+it explicitly uses `count_kind: invocation`, `invocations_per_iteration` and
+aligned `invocations_per_request_samples`, while retaining separate
+`completed_hits_per_request_samples`. The resulting price includes guarded
+fallback attempts; it must not be labeled a completed-hit saving. A negative
+price remains a cost. The same importer accepts this explicit invocation basis
+and rejects completion counts exceeding invocation counts.
+If replay's completed/invoked mix differs from the actual warmed request,
+the unit is unmodeled with a reason: warming a captured cache input cannot
+stand in for genuine misses on changing request inputs.
+
+The context-validated blog default budget (Ruby 4.0.7, actual YJIT off,
+12 independent operation rounds, six request rounds, N=0/10 in both and
+50 warmups, runtime pinned to
+[491ea27](https://github.com/thomasklemm/lowrail/commit/491ea2771624464ff420672c0a8bcd8688d97346),
+before the K-prefix lowering) models all four exercised units. Guard-included savings are
+44,318 and 37,136 instructions/link hit (9 and 1 hits/request), and 10,448
+and 3,716/route hit (9 and 1). Their sum predicts **533,746**
+instructions/request [533,426, 534,239]; the request saves **538,901**
+[534,825, 542,234]. Measured minus expected is **+5,154** [918, 8,542],
+not zero: a useful additivity residual, not a fitted identity. Identical
+default/reference builds give +1,581 [−3,692, 3,798] saved instructions against
+one another, consistent with no incremental effect. Per-unit and request A/A
+and all heap gates pass. These N=10 measurements precede the separate default
+of 200 micro iterations; raw provenance retains their actual counts.
+
+The earlier six-round blog micro is retained **rejected**: aggregate A/A and
+heaps pass, but one link site's individual A/A interval exceeds the ±0.5% gate.
+The twelve-round experiment does not erase that result or imply that bootstrap
+intervals cover all independent run-to-run variance.
+
+A fresh K-prefix default build at
+[8e23fa2](https://github.com/thomasklemm/lowrail/commit/8e23fa23f25c213db02a1671a6efb65c31ab8aa4)
+also passes all per-unit/request A/A and heap gates: twelve micro rounds at
+N=200 predict **545,244** [544,575, 546,185] saved instructions/request;
+six request rounds at N=10 measure **548,821** [545,019, 551,180]. The
+residual is **+3,577** [−221, 6,048]. All four exercised units are modeled;
+this is a new measurement, not a replacement for the pre-K record above.
+
+Campfire uncached initially exposed why replay context is checked: its seven
+successful route guards complete **zero** optimized routes inside the request.
+Without restoring `CurrentAttributes`, a replay after executor cleanup would
+falsely complete them. That experiment is quarantined, not a hit budget.
+The corrected N=10, twelve-round experiment is also retained **rejected**:
+unit 16's GC-excluded A/A CI is [−0.552, +0.090]%, outside ±0.5%, although
+aggregate controls, the other units and heap capacities pass. This motivated
+decoupling micro iteration count from request count, not widening controls.
+
+With N=0/200 operation windows (twelve independent rounds) and N=0/10 request
+windows (six rounds), uncached Campfire default on the same pinned runtime passes every operation/request
+A/A and heap gate. The seven fallback attempts cost **195,151**
+[194,741, 196,175] instructions/request; the measured request cost is
+**197,068** [134,750, 283,036]. Signed measured saving minus expected saving
+is **−1,917** [−87,633, +60,169], consistent with the budget. Both completed
+hit counts stay zero. All exercised work is priced (`measurement_complete`
+true), but this is a measured default-route **cost**, not a route-speed claim.
+
+Starter `/dashboard`, `default,+inertia/config_bind`, uses a rebuilt interpreter
+certificate and the **real registry**, not the old private activation shim.
+Twelve operation replicates give **45,613** [45,535, 45,794] saved
+instructions/completed bind × **5 binds/request** = **228,067**
+[227,676, 228,971] expected. Six request replicates, N=0/10 and 50 warmups,
+save **230,259** [222,219, 234,287] against default. The residual is
+**+2,192** [−5,795, 6,060], consistent with the operation budget.
+Against no setup, saving is **226,699** [222,612, 235,344], residual
+**−1,368** [−5,596, 7,118]. All request/operation A/A and heap gates pass;
+`measurement_complete` is true. This is instruction-work evidence, **not a
+native-YJIT speed or automatic promotion claim**.
+
+The public `fixtures/digest-app` also exercises the real file-digest adapter:
+copy `public/vite-test/manifest.json` to `public/vite/manifest.json` for its
+production build, and use `HTTP_X_INERTIA: true` with
+`HTTP_X_INERTIA_VERSION` equal to that manifest's MD5. On runtime
+[8e23fa2](https://github.com/thomasklemm/lowrail/commit/8e23fa23f25c213db02a1671a6efb65c31ab8aa4),
+six micro rounds at N=200 and six request rounds at N=10 pass all A/A and heap
+gates. Seven completed hashes/request cost **12,215** [12,199, 12,246]
+instructions/hit: expected saving **−85,506** [−85,721, −85,393], measured
+**−84,891** [−87,087, −82,938] against default, residual **+615**
+[−1,526, +2,568]. The tiny asset manifest makes memo validation more expensive
+than hashing. This is complete **negative fixture evidence**, not a corpus
+speed claim. No digest site is lowered on the measured Campfire workload.
+
+The current-K Campfire `default,+memo,+digest_memo` capture confirms two
+`memo/sha256` completions/request, before the controller populates `Current`.
+Its twelve-round experiment is **rejected before request measurement**:
+aggregate and memo A/A plus heaps pass, but route units 21 and 59 have total
+A/A CIs [+0.0303, +0.1768]% and [+0.00795, +0.1240]%, excluding zero.
+There is no accepted measured-vs-expected memo-stack claim from that run.
+An earlier memo stack failed request A/A; neither is retried to green or
+silently counted as complete. URI joins on this workload retain 22 builder
+refusals (11 call certificates, 10 method certificates, one regexp timeout);
+there is no exercised URI-join or digest operation to price on Campfire.
+Sanitized scalar samples, unit counts, controls, runtime/harness fingerprints
+and accepted/rejected verdicts are retained in
+[`bench-cli-results.json`](bench-cli-results.json), under `genuine_budgets`.
 
 #### Stacked CLI validation
 
@@ -275,9 +440,9 @@ request context and stale budget fingerprints are also rejected by tests.
 Retained estimates, controls, heap bounds, per-model counts and round samples:
 [`bench-cli-results.json` → `stacked`](bench-cli-results.json).
 
-PingCRM/Starter `+inertia/config_bind` validation remains conditional on step
-4 publishing and activating the registry. This change edits no runtime files
-and does not bypass that pending activation with a private hook.
+That earlier AR batch preceded the runtime registry. Real-registry Starter
+`+inertia/config_bind` activation and its genuine budget are now validated
+above; the benchmark does not bypass activation with a private hook.
 
 ### Remaining per-pass adapters
 
@@ -291,10 +456,11 @@ new results use the shared controls. Still per-pass:
 
 | Pass/tool | Remaining work, not supplied by the shared driver |
 |---|---|
-| route/path, view/link_to | guarded emitted-operation micros and site-specific budgets; `routes.rb` explicitly excludes the call-site guard and is not imported as a guarded saving |
-| memo, digest | guarded micro adapters and completed-hit denominators; `memo_check.rb` and digest pass-specific fixtures remain diagnostic recipes |
+| route/path, view/link_to | shared `--measure-budgets` captures guarded emitted operations; `routes.rb` remains an unguarded diagnostic and is not imported as a guarded saving |
+| memo, digest | shared source capture supplies guarded replay and separate completion counts; cache population/eviction and changing inputs still require workload-specific interpretation; `memo_check.rb` and digest fixtures remain diagnostic recipes |
+| inertia/config_bind | shared real-controller variant/original replay; not a synthetic configuration or an unguarded builder timing |
 | preload | mixed-query/result budgets; format/cache request sweeps use the shared command per prepared path, and the narrow native micro uses its shared controls |
-| AR instantiate | per-model/row-shape budgets; `ar_instantiate_runs.rb` retains only the internal-cost/StackProf breakdown (not a pass gate), which the shared driver does not cover |
+| AR instantiate | per-model/row-shape budgets; do not apply one model's saving to another model or STI fallback; `ar_instantiate_runs.rb` retains only the internal-cost/StackProf breakdown (not a pass gate) |
 | AR plans | reader selection, completion frequency and cold/missing-attachment interpretation; `ar_plans_runs.rb` is a diagnostic implementation comparison, not an installed-pass gate |
 | new passes | attest runtime activation and add an operation adapter after defining a genuine completed-hit counter; shared request, rejection, A/A and report machinery needs no new copy |
 
@@ -306,8 +472,43 @@ worker. Register the operation in `PassBench.micro` and attest activation in
 `PassProbe.active!` if it is a runtime pass. The shared driver supplies the
 fresh workers, actual-JIT check, A/A, hit denominator and budget.
 
-There is **no generic callback/compiled-template fixed-heap instruction micro
-adapter yet**. Add that operation boundary to the shared Callgrind runner
+For an **instruction** operation adapter, use the existing shared seam rather
+than copying the heap/counter protocol:
+
+```ruby
+# Worker, after app boot, activation/JIT checks, warmup and untimed counting:
+windows = HeapWindows.windows(n, operation_ids)
+anchors = HeapWindows.run(windows) do |count, id|
+  count.times { operations.fetch(id).call }
+end
+# Print LOWRAIL_BENCH JSON: ruby, actual yjit, windows, heap_anchors,
+# and operations keyed by unit ID with invocation/completion metadata.
+
+# Driver, with independent off_a/off_b/on environments:
+RequestPairs.heap_instructions(environments, app, out, route, metadata,
+  worker: "your_worker.rb", requests: n)
+```
+
+Require `heap_windows.rb` and `ENV.fetch("BENCH_CALLGRIND_EXTENSION")` in the
+worker. `metadata` contains `seed`, `rounds` and an initially empty `workers`.
+The worker's `n` comes from the driver's `BENCH_REQUESTS`; the `requests:`
+keyword overrides its default without changing whole-request experiments.
+The worker path may be absolute (for a scratch experiment) or relative to
+`bench/`. Optional `HeapWindows.run(windows, prepare: callback)` calls
+`callback.call(unit_id)` before the full GCs and client window, for restoring
+ambient context without charging it to the operation.
+The driver provides the five pool floors and alternated total/GC-excluded
+phases, subtracts N−0, and retains per-unit metrics under each sample arm's
+`operations`. It enforces aggregate A/A and heap gates; additionally require
+**every unit's** total/GC-excluded A/A, as `instruction_budget.rb` does.
+Allocation/GC diagnostics sum the full windows for all operation IDs, not
+just the first. Zero-allocation comparisons retain absolute counts, with
+undefined percentage changes and GC-per-allocation rates encoded as `null`.
+Counters, capture wrappers and fallback-equivalence checks stay outside client
+windows. Experimental fixtures are diagnostics, not installed-pass coverage.
+
+There is **no built-in callback-chain/compiled-template operation adapter
+yet**. Add that operation boundary to the shared Callgrind runner
 (client windows, N−0 subtraction, independent rounds and the existing A/A
 gate), rather than introducing another timing protocol. Request instructions
 already use this method; the existing native micro is not an instruction

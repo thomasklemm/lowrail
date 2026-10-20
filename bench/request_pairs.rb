@@ -33,20 +33,24 @@ module RequestPairs
     result = layers.to_h do |layer|
       estimates = metrics.to_h do |metric|
         absolute = rounds.map { _1.fetch(layer).fetch(metric) }
-        delta = rounds.map { 100 * (_1.fetch(layer).fetch(metric).fdiv(_1.fetch("off_a").fetch(metric)) - 1) }
+        # Zero-allocation operations have an absolute count but no defined
+        # percentage change. Keep JSON finite instead of emitting 0/0.
+        relative = rounds.all? { _1.fetch("off_a").fetch(metric).positive? }
+        delta = rounds.map { 100 * (_1.fetch(layer).fetch(metric).fdiv(_1.fetch("off_a").fetch(metric)) - 1) } if relative
         if cohorts
           absolute = cohorts.map { |rows| median(rows.map { _1.fetch(layer).fetch(metric) }) }
           delta = cohorts.map do |rows|
             median(rows.map { 100 * (_1.fetch(layer).fetch(metric).fdiv(_1.fetch("off_a").fetch(metric)) - 1) })
-          end
+          end if relative
         end
-        [metric, { value: estimate(absolute, seed: seed), delta_pct: estimate(delta, seed: seed) }]
+        [metric, { value: estimate(absolute, seed: seed), delta_pct: delta && estimate(delta, seed: seed) }]
       end
       [layer, estimates]
     end
     controls = controls.to_h do |metric|
-      low, high = result.fetch("off_b").fetch(metric).fetch(:delta_pct).fetch(:ci95)
-      [metric, low <= 0 && high >= 0 && low >= -tolerance && high <= tolerance]
+      interval = result.fetch("off_b").fetch(metric).fetch(:delta_pct)&.fetch(:ci95)
+      low, high = interval
+      [metric, !!(interval && low <= 0 && high >= 0 && low >= -tolerance && high <= tolerance)]
     end
     { layers: result, aa: { pass: controls.values.all?, metrics: controls, tolerance_pct: tolerance } }
   end
@@ -137,7 +141,7 @@ module RequestPairs
       if (extra = ENV["BENCH_INSTANTIATE_DIR"])
         extra = File.expand_path(extra)
         extra_data = JSON.parse(File.read(File.join(extra, "manifest.json")))
-        raise "production --ar-instantiate build required" unless extra_data["rails_env"] == "production" &&
+        raise "production +ar_instantiate build required" unless extra_data["rails_env"] == "production" &&
           extra_data.fetch("units").any? { _1["pass"] == "active_record/instantiate" }
         certificates = extra_data.fetch("units").select { _1["pass"] == "active_record/instantiate" }
         raise "AR build sources changed; rebuild before measuring" unless certificates.all? do |unit|
@@ -251,8 +255,8 @@ module RequestPairs
     Integer(line.split.fetch(1))
   end
 
-  def self.heap_instructions(environments, app, out, route, metadata)
-    requests = Integer(ENV.fetch("BENCH_REQUESTS", "50"))
+  def self.heap_instructions(environments, app, out, route, metadata, worker: "heap_requests.rb",
+    requests: Integer(ENV.fetch("BENCH_REQUESTS", "50")))
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
     slots = ENV.fetch("BENCH_HEAP_SLOTS", "1000000,250000,100000,20000,10000").split(",").map { Integer(_1) }
     raise "positive requests/jobs and five positive pool floors required" unless
@@ -280,7 +284,7 @@ module RequestPairs
               "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension)
             ok = system(env, "valgrind", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
-              RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "heap_requests.rb"), route,
+              RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.expand_path(worker, __dir__), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
             raise "Callgrind failed: #{label}; inspect logs" unless ok
             result = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
@@ -291,20 +295,25 @@ module RequestPairs
             windows.each_with_index do |window, index|
               window["instructions"] = instruction_total("#{data}.#{index + 1}")
             end
-            metrics = %w[total no_gc].to_h do |mode|
-              empty, full = windows.select { _1.fetch("mode") == mode }.sort_by { _1.fetch("requests") }
-              count = full.fetch("instructions") - empty.fetch("instructions")
-              raise "nonpositive count for #{label}/#{mode}" unless count.positive?
-              ["instructions_#{mode}", count.fdiv(requests)]
+            operations = windows.group_by { _1["unit"] }.transform_values do |group|
+              %w[total no_gc].to_h do |mode|
+                empty, full = group.select { _1.fetch("mode") == mode }.sort_by { _1.fetch("requests") }
+                count = full.fetch("instructions") - empty.fetch("instructions")
+                raise "nonpositive count for #{label}/#{mode}" unless count.positive?
+                ["instructions_#{mode}", count.fdiv(requests)]
+              end
             end
-            full = windows.find { _1["mode"] == "total" && _1["requests"] == requests }
-            delta = full.fetch("after").to_h { |key, value| [key, value - full.fetch("before").fetch(key)] }
+            metrics = %w[instructions_total instructions_no_gc].to_h { |metric| [metric, operations.values.sum { _1.fetch(metric) }] }
+            metrics["operations"] = operations if result["operations"]
+            delta = windows.select { _1["mode"] == "total" && _1["requests"] == requests }.map do |full|
+              full.fetch("after").to_h { |key, value| [key, value - full.fetch("before").fetch(key)] }
+            end.reduce { |sum, values| sum.merge(values) { |_, a, b| a + b } }
             allocations = delta.fetch("total_allocated_objects")
             collections = delta.fetch("minor_gc_count") + delta.fetch("major_gc_count")
             metrics.merge!("allocations" => allocations.fdiv(requests),
               "minor_gc_per_request" => delta.fetch("minor_gc_count").fdiv(requests),
               "major_gc_per_request" => delta.fetch("major_gc_count").fdiv(requests),
-              "gc_per_1k_allocations" => 1000.0 * collections / allocations, "windows" => windows)
+              "gc_per_1k_allocations" => allocations.positive? ? 1000.0 * collections / allocations : nil, "windows" => windows)
             lock.synchronize { row[layer] = metrics; metadata.fetch(:workers)[label] = result }
           rescue ThreadError
             break
@@ -327,7 +336,8 @@ module RequestPairs
     end
     summary[:gc] = environments.keys.to_h do |layer|
       [layer, %w[minor_gc_per_request major_gc_per_request gc_per_1k_allocations].to_h do |metric|
-        [metric, estimate(samples.map { _1.fetch(layer).fetch(metric) }, seed: metadata.fetch(:seed))]
+        values = samples.map { _1.fetch(layer).fetch(metric) }
+        [metric, values.include?(nil) ? nil : estimate(values, seed: metadata.fetch(:seed))]
       end]
     end
     # Init slots are floors, not hard limits. Check actual capacities across

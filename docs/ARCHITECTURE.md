@@ -211,7 +211,11 @@ Steps 1–5 are implemented. Step 4 follows the base-cost work in
    uses a separate saved default build, the same no-setup/A/A/heap gates,
    and multi-unit/model `--budgets` input. It reports measured saving beside
    the summed individual expectations and a covariance-aware residual CI;
-   missing budgets remain unmodeled. See [stacked pass sets](bench.md#stacked-pass-sets).
+   missing budgets remain unmodeled. `--measure-budgets` captures real guarded
+   source operations and Inertia controller bindings, using shared fixed-heap
+   off/off/on windows and per-operation A/A controls. Guarded fallback attempts
+   are priced explicitly per invocation, never disguised as completed hits.
+   See [stacked pass sets](bench.md#stacked-pass-sets).
 
 ### Post-migration cleanup
 

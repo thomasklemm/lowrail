@@ -101,6 +101,53 @@ class RequestPairsTest < Minitest::Test
     assert_same value, weak[key]
   end
 
+  def test_operation_windows_sum_allocations_and_keep_zero_allocation_reports_finite
+    skip "Valgrind not installed" unless system("sh", "-c", "command -v valgrind >/dev/null")
+    saved = ENV.to_h.slice("BENCH_HEAP_SLOTS", "BENCH_JIT")
+    ENV.update("BENCH_HEAP_SLOTS" => "50000,10000,5000,2000,1000", "BENCH_JIT" => "0")
+    Dir.mktmpdir("lowrail-operation-window-test") do |dir|
+      script = File.join(dir, "operation.rb")
+      File.write(script, <<~RUBY)
+        require "json"
+        require #{File.expand_path("heap_windows", __dir__).dump}
+        require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
+        ids = ENV["EMPTY_ONLY"] ? [11] : [11, 12]
+        windows = HeapWindows.windows(Integer(ENV.fetch("BENCH_REQUESTS")), ids)
+        anchors = HeapWindows.run(windows) do |count, id|
+          checksum = 0
+          count.times do
+            checksum += 1
+            Object.new if id == 12
+          end
+        end
+        puts "LOWRAIL_BENCH " + JSON.generate(yjit: !!RubyVM::YJIT.enabled?, windows: windows,
+          heap_anchors: anchors, operations: ids.to_h { [_1, {}] })
+      RUBY
+      [false, true].each do |empty|
+        out = File.join(dir, empty ? "empty" : "mixed")
+        FileUtils.mkdir_p(out)
+        environments = %w[off_a off_b on].to_h { [_1, { "RUBYOPT" => nil, "EMPTY_ONLY" => empty ? "1" : nil }] }
+        capture_io do
+          RequestPairs.heap_instructions(environments, dir, out, "", { rounds: 1, seed: 1, workers: {} },
+            worker: script, requests: 1000)
+        end
+        samples = JSON.parse(File.read(File.join(out, "samples.json"))).fetch("samples").first
+        samples.each_value do |sample|
+          # Only unit 12 allocates: charging just the first window loses it.
+          assert_in_delta(empty ? 0 : 1, sample.fetch("allocations"), 0.05)
+          assert_equal(empty ? ["11"] : %w[11 12], sample.fetch("operations").keys.sort)
+        end
+        summary = JSON.parse(File.read(File.join(out, "summary.json")))
+        if empty
+          assert_nil summary.fetch("layers").fetch("off_a").fetch("allocations").fetch("delta_pct")
+          assert_nil summary.fetch("gc").fetch("off_a").fetch("gc_per_1k_allocations")
+        end
+      end
+    end
+  ensure
+    %w[BENCH_HEAP_SLOTS BENCH_JIT].each { ENV[_1] = saved[_1] } if saved
+  end
+
   def test_paired_bootstrap_removes_round_drift_but_not_a_real_effect
     rounds = 24.times.map do |i|
       value = 1000.0 + 50 * i

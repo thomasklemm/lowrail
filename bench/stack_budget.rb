@@ -6,10 +6,21 @@ require_relative "request_pairs"
 # is one independent replicate across ALL supplied operations/models; resample
 # that vector together to retain shared-control covariance.
 module StackBudget
+  def self.count_fields(entry)
+    case entry.fetch("count_kind", "hit")
+    when "hit" then %w[hits_per_iteration completed_hits_per_request_samples]
+    when "invocation" then %w[invocations_per_iteration invocations_per_request_samples]
+    else raise "unknown budget count kind"
+    end
+  end
+
   def self.validate!(data, result, units)
     raise "unsupported budget schema" unless data.fetch("schema_version") == 1
     %w[manifest_sha256 runtime_fingerprint_sha256 request_context_sha256 route].each do |key|
       raise "budget #{key} mismatch" unless data.fetch(key) == result.fetch(key.to_sym)
+    end
+    if data["harness_fingerprint_sha256"]
+      raise "budget harness mismatch" unless data.fetch("harness_fingerprint_sha256") == result.fetch(:harness_fingerprint_sha256)
     end
     raise "budget JIT mismatch" unless data.fetch("yjit") == result.fetch(:coverage).fetch("yjit")
     allowed = result.fetch(:counter) == "native" ? %w[wall_us cpu_us] : %w[instructions_total instructions_no_gc]
@@ -26,7 +37,8 @@ module StackBudget
         raise "budget model mismatch" unless entry.fetch("model") == unit.fetch("ar_instantiate").fetch("model")
       end
       raise "budget must include guard and provenance" unless entry.fetch("guard_included") == true && !entry.fetch("source").empty?
-      hits = entry.fetch("hits_per_iteration")
+      denominator, frequency_key = count_fields(entry)
+      hits = entry.fetch(denominator)
       raise "budget needs positive counted hits/iteration" unless hits.is_a?(Numeric) && hits.finite? && hits.positive?
       rows = entry.fetch("samples").map do |row|
         %w[off_a off_b on].to_h do |layer|
@@ -38,12 +50,17 @@ module StackBudget
       control = RequestPairs.summarize(rows, seed: 41231, tolerance: result.fetch(:counter) == "native" ? 2 : 0.5,
         metrics: [metric], controls: [metric])
       raise "budget unit #{unit.fetch('id')} A/A failed" unless control.fetch(:aa).fetch(:pass)
-      frequency = entry["completed_hits_per_request_samples"]
+      frequency = entry[frequency_key]
       if frequency
         raise "budget completion frequencies must align and be nonnegative" unless frequency.size == lengths.first &&
           frequency.all? { _1.is_a?(Numeric) && _1.finite? && _1 >= 0 }
-      elsif !%w[active_record/instantiate active_record/preload_plans active_record/ar_plans inertia/config_bind].include?(unit.fetch("pass"))
+      elsif entry["count_kind"] == "invocation" || !%w[active_record/instantiate active_record/preload_plans active_record/ar_plans inertia/config_bind].include?(unit.fetch("pass"))
         raise "source budgets need completed_hits_per_request_samples; guard hits are not completions"
+      end
+      if entry["count_kind"] == "invocation"
+        completions = entry.fetch("completed_hits_per_request_samples")
+        raise "completion counts must align and not exceed invocations" unless completions.size == frequency.size &&
+          completions.zip(frequency).all? { |completed, calls| completed.is_a?(Numeric) && completed.finite? && completed >= 0 && completed <= calls }
       end
     end
     data
@@ -55,9 +72,10 @@ module StackBudget
     units = budget ? budget.fetch("units") : []
     frequencies = result.fetch(:coverage).fetch("units").to_h { [_1.fetch("id"), _1.fetch("hits_per_request")] }
     contributions = units.to_h do |entry|
+      denominator, frequency_key = count_fields(entry)
       [entry.fetch("id"), entry.fetch("samples").each_with_index.map do |row, i|
-        saved = (row.fetch("off_a") - row.fetch("on")).fdiv(entry.fetch("hits_per_iteration"))
-        frequency = entry["completed_hits_per_request_samples"]&.fetch(i) || frequencies.fetch(entry.fetch("id"))
+        saved = (row.fetch("off_a") - row.fetch("on")).fdiv(entry.fetch(denominator))
+        frequency = entry[frequency_key]&.fetch(i) || frequencies.fetch(entry.fetch("id"))
         saved * frequency
       end]
     end
@@ -66,12 +84,18 @@ module StackBudget
       metric: budget && budget.fetch("metric"),
       removed_default_passes: default_passes - result.fetch(:passes, default_passes),
       unmodeled_unit_ids: frequencies.select { |id, n| n.positive? && !modeled.include?(id) }.keys,
-      unmodeled_fallback_unit_ids: result.fetch(:coverage).fetch("units").select { _1.fetch("fallbacks_per_request", 0).positive? }.map { _1.fetch("id") },
+      unmodeled_fallback_unit_ids: result.fetch(:coverage).fetch("units").select do |unit|
+        unit.fetch("fallbacks_per_request", 0).positive? && !units.any? { _1.fetch("id") == unit.fetch("id") && _1["count_kind"] == "invocation" }
+      end.map { _1.fetch("id") },
       units: units.map do |entry|
-        samples = entry.fetch("samples").map { (_1.fetch("off_a") - _1.fetch("on")).fdiv(entry.fetch("hits_per_iteration")) }
+        denominator, frequency_key = count_fields(entry)
+        invocation = entry["count_kind"] == "invocation"
+        samples = entry.fetch("samples").map { (_1.fetch("off_a") - _1.fetch("on")).fdiv(entry.fetch(denominator)) }
         { id: entry.fetch("id"), pass: entry.fetch("pass"), model: entry["model"], source: entry.fetch("source"),
-          guard_included: true, saved_per_hit: RequestPairs.estimate(samples, seed: seed),
-          hits_per_request: entry["completed_hits_per_request_samples"] || frequencies.fetch(entry.fetch("id")),
+          guard_included: true, count_kind: invocation ? "invocation" : "hit",
+          (invocation ? :saved_per_invocation : :saved_per_hit) => RequestPairs.estimate(samples, seed: seed),
+          (invocation ? :invocations_per_request : :hits_per_request) => entry[frequency_key] || frequencies.fetch(entry.fetch("id")),
+          completed_hits_per_request: entry["completed_hits_per_request_samples"],
           expected_saved_per_request: RequestPairs.estimate(contributions.fetch(entry.fetch("id")), seed: seed) }
       end }
     output[:comparisons] = { "no_setup" => "off_a", "default" => "default" }.to_h do |label, reference|

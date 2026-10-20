@@ -104,7 +104,16 @@ same 11 units and verifies 21/21 identical with 114 hits.
   reuse their existing operations with shared off/off/on controls and
   guard-included per-hit budgets. Versioned `result.json` and `table.md` are
   the pass-thread handoff. Request-only or partially modeled measurements do
-  not claim promotion; source/memo/digest micro adapters remain per-pass.
+  not claim promotion. `--measure-budgets` now replays real emitted guarded
+  route/link/memo/digest operations and real-controller Inertia bindings with
+  independent off/off/on workers, per-operation A/A and the shared heap gates.
+  Invocation budgets explicitly price guarded fallbacks without inventing hits.
+  Complete instruction budgets explain blog default, Campfire default and
+  Starter's opt-in binding effect. The current-K blog predicts/measures
+  545k/549k saved instructions/request; uncached Campfire instead pays about
+  195k for seven route attempts with zero completions. That default-route cost
+  needs a separate exact fix. The current-K memo stack is rejected on two
+  individual route A/A controls, not counted as a completed measurement.
   Fresh blog plus cached/uncached Campfire default and +instantiate instruction
   runs reproduce the base-cost result with both A/A and heap controls passing;
   the native guarded micro's failed A/A remains rejected. Exact numbers and
@@ -117,8 +126,9 @@ same 11 units and verifies 21/21 identical with 114 hits.
   explicitly unmodeled; this does not manufacture instruction micros.
   First default+AR stacks pass all instruction A/A/heap gates: blog **+0.588%**
   versus default, Campfire uncached **−0.066%** (CI crosses zero); no incremental
-  ≥2% win. Per-model instruction prices remain unmodeled, and the Inertia set
-  has not yet been measured with shared activation. See [stacked validation](bench.md#stacked-cli-validation).
+  ≥2% win. Per-model instruction prices remain unmodeled. See
+  [stacked validation](bench.md#stacked-cli-validation) and
+  [genuine operation budgets](bench.md#capturing-genuine-instruction-budgets).
   See [the protocol and remaining adapters](bench.md#shared-command-lowrail-bench).
 - **Boot facts** (`lowrail facts APP`): modules, methods with owner,
   source location, visibility and ISeq kind, models, controllers, routes and

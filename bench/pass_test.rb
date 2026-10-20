@@ -158,6 +158,167 @@ class PassBenchTest < Minitest::Test
     refute report[:comparisons]["default"]["wall_us"].key?(:sum_individual_expected_saved_per_request)
   end
 
+  def test_guarded_fallback_invocations_are_priced_without_inventing_fast_path_hits
+    units = [{ "id" => 7, "pass" => "route/path" }]
+    result = { manifest_sha256: "build", runtime_fingerprint_sha256: "runtime", request_context_sha256: "request",
+      route: "GET:/room", counter: "callgrind", passes: ["route/path"],
+      coverage: { "yjit" => false, "units" => [{ "id" => 7, "hits_per_request" => 5, "fallbacks_per_request" => 0 }] } }
+    entry = { "id" => 7, "pass" => "route/path", "count_kind" => "invocation", "guard_included" => true,
+      "source" => "synthetic arithmetic fixture, not corpus evidence", "invocations_per_iteration" => 7,
+      "invocations_per_request_samples" => [5] * 6, "completed_hits_per_request_samples" => [0] * 6,
+      "samples" => Array.new(6) { { "off_a" => 1000, "off_b" => 1000, "on" => 1007 } } }
+    budget = result.slice(:manifest_sha256, :runtime_fingerprint_sha256, :request_context_sha256, :route).transform_keys(&:to_s)
+      .merge("schema_version" => 1, "metric" => "instructions_total", "yjit" => false, "units" => [entry])
+    StackBudget.validate!(budget, result, units)
+    raw = { "samples" => Array.new(6) do
+      %w[off_a default stacked].to_h { [_1, { "instructions_total" => _1 == "off_a" ? 1000 : 1005, "instructions_no_gc" => 900 }] }
+    end }
+    report = StackBudget.report(raw, result, budget, ["route/path"], seed: 1)
+    modeled = report.fetch(:units).first
+    assert_equal(-1.0, modeled.fetch(:saved_per_invocation).fetch(:median))
+    refute modeled.key?(:saved_per_hit)
+    assert_equal [0] * 6, modeled.fetch(:completed_hits_per_request)
+    assert_equal(-5.0, report[:comparisons]["no_setup"]["instructions_total"][:sum_individual_expected_saved_per_request][:median])
+    assert_equal 0, report[:comparisons]["no_setup"]["instructions_total"][:measured_minus_expected][:median]
+    entry["completed_hits_per_request_samples"] = [6] * 6
+    assert_raises(RuntimeError) { StackBudget.validate!(budget, result, units) }
+  end
+
+  def test_source_replays_preserve_unicode_literal_policy_and_separate_nested_passes
+    script = <<~'RUBY'
+      require "operation_capture"
+      module Lowrail
+        K = [nil, nil]
+        def self.ok?(*args) = true
+      end
+      module OperationCapture
+        def self.record(key, context) = yield
+      end
+      units = [{"id" => 0, "pass" => "view/link_to"}, {"id" => 1, "pass" => "route/path"}]
+      code = %q[# frozen_string_literal: true
+      label = "café"; ((::Lowrail.ok?(0, self.class)) ? "link:#{((::Lowrail.ok?(1, self.class)) ? "route" : "original")}" : "fallback")
+      # trailing comment
+      ]
+      cached = code.gsub(/::Lowrail\.ok\?\((\d+), self\.class\)/) do
+        "(self.class.equal?(::Lowrail::K[#{$1}]) || #{$&})"
+      end
+      results = [[code, [nil, nil]], [cached, [nil, nil]], [cached, [Object, Object]]].map do |input, classes|
+        Lowrail::K.replace(classes)
+        source = OperationCapture::Source.new(input, "example.rb", units)
+        parent, child = source.specs
+        values = [eval(source.instrument), eval(source.expression(parent)), eval(source.original(parent)), eval(source.expression(child))]
+        {values: values, frozen: eval(source.literal_policy + source.original(parent)).frozen?}
+      end
+      puts JSON.generate(results)
+    RUBY
+    output, error, status = Open3.capture3(RbConfig.ruby, "-I#{__dir__}", "-e", script)
+    assert status.success?, error
+    expected = { "values" => ["link:route", "link:original", "fallback", "route"], "frozen" => true }
+    assert_equal [expected, expected, expected], JSON.parse(output)
+  end
+
+  def test_runtime_builder_uses_requested_jit_state_without_changing_the_default
+    Dir.mktmpdir("lowrail-build-jit") do |app|
+      FileUtils.mkdir_p(File.join(app, "config"))
+      File.write(File.join(app, "config/application.rb"), <<~RUBY)
+        module Rails
+          def self.application = (@app ||= self)
+          def self.config = (@config ||= Struct.new(:yjit).new(true))
+          def self.eager_load!; end
+        end
+      RUBY
+      File.write(File.join(app, "config/environment.rb"), <<~RUBY)
+        require_relative "application"
+        RubyVM::YJIT.enable if Rails.application.config.yjit
+        File.write("observed.json", JSON.generate(yjit: !!RubyVM::YJIT.enabled?))
+      RUBY
+      [nil, "0"].each do |mode|
+        output, error, status = Open3.capture3({ "RUBYOPT" => nil, "LOWRAIL_BUILD_JIT" => mode },
+          RbConfig.ruby, "--disable-yjit", File.expand_path("../gem/exe/lowrail-runtime-build", __dir__),
+          chdir: app, stdin_data: JSON.generate(builders: [], denied: []))
+        assert status.success?, error
+        assert_equal [], JSON.parse(output)
+        assert_equal(mode.nil?, JSON.parse(File.read(File.join(app, "observed.json"))).fetch("yjit"))
+      end
+      File.write(File.join(app, "config/environment.rb"), "require_relative 'application'; RubyVM::YJIT.enable\n")
+      _, error, status = Open3.capture3({ "RUBYOPT" => nil, "LOWRAIL_BUILD_JIT" => "0" },
+        RbConfig.ruby, "--disable-yjit", File.expand_path("../gem/exe/lowrail-runtime-build", __dir__),
+        chdir: app, stdin_data: JSON.generate(builders: [], denied: []))
+      refute status.success?
+      assert_includes error, "runtime build unexpectedly enabled YJIT"
+    end
+  end
+
+  def test_replay_keeps_live_request_fallbacks_lexical_constants_and_snapshotted_locals
+    script = <<~'RUBY'
+      require "operation_capture"
+      require "tmpdir"
+      module ActiveSupport
+        class CurrentAttributes
+          def self.descendants = [RequestCurrent]
+        end
+      end
+      class RequestCurrent
+        attr_accessor :attributes
+        def self.instance = (@instance ||= new)
+        def self.attributes = instance.attributes
+      end
+      module Lowrail
+        class << self
+          attr_accessor :manifest
+          def ok?(*args) = true
+        end
+        module Loader; end
+        module Templates
+          def self.entries = (@entries ||= {})
+        end
+        module Routes
+          def self.finish(value) = value
+        end
+      end
+      class View
+        TOKEN = "receiver"
+        def optimize_routes_generation? = RequestCurrent.attributes.empty?
+        def original = "original"
+      end
+      module Lexical
+        TOKEN = "lexical"
+        def self.context = View.new.instance_eval { suffix = "before"; binding }
+      end
+      Dir.mktmpdir do |dir|
+        File.write(File.join(dir, "units.json"), JSON.generate(files: []))
+        code = '((::Lowrail.ok?(0, self.class)) ? (optimize_routes_generation? ? ::Lowrail::Routes.finish(TOKEN + suffix) : original) : original)'
+        Lowrail.manifest = Struct.new(:templates, :files, :units, :dir).new(
+          {"context.rb" => {"code" => code}, "other.rb" => {"code" => code.sub("ok?(0,", "ok?(1,")}},
+          {}, [{"id" => 0, "pass" => "route/path"}, {"id" => 1, "pass" => "route/path"}], dir)
+        OperationCapture.install
+        RequestCurrent.instance.attributes = {host: "localhost"}
+        context = Lexical.context
+        OperationCapture.capture do
+          context.eval(Lowrail::Templates.entries.fetch("context.rb").fetch("code"))
+          RequestCurrent.instance.attributes = {}
+          context.eval(Lowrail::Templates.entries.fetch("other.rb").fetch("code"))
+        end
+        context.local_variable_set(:suffix, "after")
+        RequestCurrent.instance.attributes = {} # Rails executor cleanup
+        OperationCapture.restore_context(0)
+        pair = OperationCapture.records.fetch(0).first
+        fallback = pair.fetch(:counted).call
+        counts = [OperationCapture.request_completions[0], OperationCapture.completions[0]]
+        OperationCapture.restore_context(1)
+        other = OperationCapture.records.fetch(1).first.fetch(:counted).call
+        RequestCurrent.instance.attributes = {}
+        puts JSON.generate(fallback: fallback, completions: counts, other: other,
+          other_completions: [OperationCapture.request_completions[1], OperationCapture.completions[1]],
+          lexical_snapshot: pair.fetch(:expression).call)
+      end
+    RUBY
+    output, error, status = Open3.capture3(RbConfig.ruby, "-I#{__dir__}", "-e", script)
+    assert status.success?, error
+    assert_equal({ "fallback" => "original", "completions" => [0, 0], "other" => "lexicalbefore",
+      "other_completions" => [1, 1], "lexical_snapshot" => "lexicalbefore" }, JSON.parse(output))
+  end
+
   def test_jit_state_is_observed_after_application_boot_not_inferred_from_flags
     Dir.mktmpdir("lowrail-pass-jit") do |app|
       FileUtils.mkdir_p(File.join(app, "config"))
@@ -172,11 +333,6 @@ class PassBenchTest < Minitest::Test
           end
           def self.application = (@app ||= Application.new)
           def self.logger = (@logger ||= Struct.new(:level).new)
-        end
-        module ActiveRecord
-          class Base
-            def self.logger=(value); end
-          end
         end
       RUBY
       File.write(File.join(app, "config/environment.rb"), "require_relative 'application'; RubyVM::YJIT.enable\n")
