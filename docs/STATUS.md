@@ -118,8 +118,10 @@ same 11 units and verifies 21/21 identical with 114 hits.
   differences remain, the on run is repeated too, so only differences that
   reproduce in both on runs against two agreeing off runs gate. On a large
   private app (10,816 tests, serial) the off-repeat-only check still left
-  21 differences with every unit disabled, i.e. rare flakiness; the
-  symmetric check is the answer to that, not yet re-measured there. Campfire: 634 tests, 15,103 queries,
+  21 differences with every unit disabled, i.e. rare flakiness; with the
+  symmetric check the same control passes: exit 0, 288 of 10,816 tests
+  excluded as unstable (2.7 %, not SQL-gated), 0 remaining differences,
+  identical outcomes in all four runs. Campfire: 634 tests, 15,103 queries,
   identical; real-blog: 21 tests, 125 queries, identical.
 - **Build surface** (PLAN 9.4): `lowrail facts` materializes lazy
   surface before dumping (production eager load, attribute methods,
