@@ -132,7 +132,7 @@ module Lowrail
       end
 
       # A named-route helper: klass#name must be the method the application's
-      # route set defined for that route (its path helper module, compared by
+      # route set defined for that route (its path or URL helper module, compared by
       # identity, since it is anonymous), and the route must still have the
       # path, required parts and defaults the build specialized, with no
       # requirements and no glob (the shape OptimizedUrlHelper handles). Glob
@@ -143,7 +143,8 @@ module Lowrail
       def route_holds?(klass, name, route)
         return false unless defined?(::Rails) && ::Rails.respond_to?(:application) && (app = ::Rails.application)
         named = app.routes.named_routes
-        return false unless klass.instance_method(name).owner.equal?(named.path_helpers_module)
+        helpers = name.end_with?("_url") ? named.url_helpers_module : named.path_helpers_module
+        return false unless klass.instance_method(name).owner.equal?(helpers)
         r = named.get(route.fetch("name")) or return false
         r.path.spec.to_s == route.fetch("spec") &&
           r.required_parts.map(&:to_s) == route.fetch("parts") &&

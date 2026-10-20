@@ -1,6 +1,6 @@
 # Boot-first types and MCP (first iteration)
 
-Target: Ruby 4.0+ (development pins 4.0.7), Rails 8.1+.
+Target: Ruby 3.4+ (development pins 4.0.7), Rails 8.1+.
 
 ```sh
 script/corpus real-blog

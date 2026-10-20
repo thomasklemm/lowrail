@@ -85,9 +85,30 @@ bytes, encoding, frozen, html_safe, or exception class and message. Any
 difference refuses the helper. In a `class` body (not a module) the oracle
 also checks the helper resolves to the route set's method in that class.
 
+## `*_url` helpers
+
+Same shape as `*_path`, starting from `Lowrail::Routes.url_prefix(url_options,
+self)` instead of `prefix`. Rails ends `OptimizedUrlHelper#call` in
+`Http::URL.url_for(options)`: `path_for` with `:only_path`, else
+`build_host_url(host, port, protocol, options, path_for(options))`.
+`url_prefix` calls Rails' own private `build_host_url` with the script name
+as the path, so host/port/protocol normalization, `subdomain`/`domain`/
+`tld_length` and `user`/`password` are Rails' code, not a copy; the route
+path is appended afterwards. A missing or non-String host and an invalid
+protocol return nil, so the real helper raises after `to_param`, as Rails
+does. Route defaults with host-part keys are refused. Facts add
+`Http::URL.url_for/full_url_for/build_host_url/normalize_*` and require the
+helper to be the route set's URL helper module method. Probes add an
+`https://user.example.co.uk:8443` request context.
+
+Per call (real-blog, controller with an HTTPS request, YJIT, 3 runs):
+`article_url(article)` 4.6–5.1 → 2.6–3.0 µs, 24 → 16 allocations. Most of
+what remains is the controller's `url_options` hash, which Rails builds on
+every call.
+
 ## Refused (ledger reasons)
 
-`_url` helpers (full URL: host, port, protocol; not specialized), direct /
+Direct /
 resolve helpers (`CustomUrlHelper`, e.g. `rails_blob_path`), explicit
 receiver (`main_app.x_path`, `url_helpers.x_path`), options hash, arity ≠
 required parts (Rails recalls missing parts from the request), not in an
@@ -100,10 +121,11 @@ helper overridden in that class, probe mismatch.
 | App | Route sites lowered | Units | `lowrail verify` |
 |---|---|---|---|
 | real-blog (8.1.4) | 10/10 (9 template, 1 controller) | 6 | 21/21 identical; 110 hits across all 11 units (link_to + route) |
-| Campfire (8.2 alpha) | 57/162 (5 helper files, 28 templates) | 33 | 634/634 identical (2 skips both ways); 27/33 route units hit, 12140 hits, 0 fallbacks; the 6 others are templates no test renders |
+| Campfire (8.2 alpha) | 108/162 with `_url` (51 of them `_url`; 27 Ruby files, 32 templates) | 59 | 634/634 identical (2 skips both ways); 52 units hit, 13238 hits, 0 fallbacks |
 
-Campfire refusals: 62 `_url`, 18 direct helpers (`fresh_*`, `rails_blob_path`),
-10 arity, 8 options hash, 4 explicit receiver, 2 model methods named like
+Before `_url` (57/162): 33 units, 12140 hits. Campfire refusals now:
+18 direct helpers (`fresh_*`, `rails_blob_path`),
+17 arity, 11 options hash, 4 explicit receiver, 2 model methods named like
 route helpers (`Webhook#message_path`), 1 class-body call.
 
 real-blog HTML (production build, `bench/requests.rb` `BENCH_DUMP`, CSRF
@@ -156,5 +178,6 @@ request.
 - Ruby-file call sites without arguments rely on Prism's view of local
   variables; locals created by `eval`/`binding.local_variable_set` are not
   seen.
-- `_url` helpers are the largest refused group in Campfire (62 of 162);
-  they need `url_for`'s host/port/protocol logic proven the same way.
+- `direct`/`resolve` helpers (18 in Campfire) and arity mismatches
+  (Rails recalls parts from the request, 17) are now the largest refused
+  groups.

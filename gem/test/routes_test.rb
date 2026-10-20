@@ -40,6 +40,42 @@ class RoutesTest < Minitest::Test
                    "subclass" => nil, "new_string" => true }, out)
   end
 
+  # url_prefix + path must equal Rails' url_for for the same options; the
+  # cases Rails raises on return nil so the real helper raises.
+  def test_url_prefix_matches_rails_url_for
+    out = ruby_json(<<~'RUBY')
+      require "json"
+      require "active_support/core_ext/object/to_query"
+      require "action_dispatch"
+      require "lowrail"
+      require "lowrail/routes"
+      Routes = Struct.new(:relative_url_root)
+      T = Struct.new(:_routes)
+      t = T.new(Routes.new("/root/"))
+      cases = [
+        { host: "example.org" },
+        { host: "example.org", protocol: "https", port: 443 },
+        { host: "example.org", protocol: "http://", port: 8080, script_name: "/sub/" },
+        { host: "https://a.example.co.uk:9443" },
+        { host: "a.example.co.uk", subdomain: "api", tld_length: 2 },
+        { host: "a.example.org", domain: "other.net", protocol: "//" },
+        { host: "example.org", user: "u s", password: "p@w" },
+        { host: "example.org", only_path: true },
+        { host: "[::1]", port: 3000 }
+      ]
+      res = cases.map do |o|
+        want = ActionDispatch::Http::URL.url_for(o.merge(path: "/x/7", script_name: o[:script_name] || "/root/"))
+        pre = Lowrail::Routes.url_prefix(o, t)
+        [want, pre && (pre << "/x/7")]
+      end
+      declined = [{}, { host: nil }, { host: :sym }, { host: "x", protocol: "bad:proto:" }].map { Lowrail::Routes.url_prefix(_1, t) }
+      puts JSON.generate(res: res, declined: declined)
+    RUBY
+    out["res"].each { |want, have| assert_equal want, have }
+    assert_equal "https://a.example.co.uk:9443/root/x/7", out["res"][3][1]
+    assert_equal [nil, nil, nil, nil], out["declined"]
+  end
+
   def test_seg_skips_gsub_only_for_safe_ascii
     out = ruby_json(<<~'RUBY')
       require "json"
@@ -70,15 +106,16 @@ class RoutesTest < Minitest::Test
       Route = Struct.new(:spec_s, :required_parts, :defaults, :requirements) do
         def path = Struct.new(:spec, :requirements).new(spec_s, requirements)
       end
-      Named = Struct.new(:path_helpers_module, :routes) do
+      Named = Struct.new(:path_helpers_module, :routes, :url_helpers_module) do
         def get(name) = routes[name.to_sym]
       end
       $helpers = Module.new { def article_path(a) = "/articles/#{a}" } # anonymous, like a route set's
-      NAMED = Named.new($helpers, { article: Route.new("/articles/:id(.:format)", [:id], { controller: "articles" }, {}) })
+      $urls = Module.new { def article_url(a) = "http://x/articles/#{a}" }
+      NAMED = Named.new($helpers, { article: Route.new("/articles/:id(.:format)", [:id], { controller: "articles" }, {}) }, $urls)
       module Rails
         def self.application = Struct.new(:routes).new(Struct.new(:named_routes).new(NAMED))
       end
-      class ViewA; include $helpers; end
+      class ViewA; include $helpers; include $urls; end
       class ViewB; include $helpers; end
       class ViewC; def article_path(a) = "own"; end
       loc = $helpers.instance_method(:article_path).source_location.join(":")
@@ -86,12 +123,16 @@ class RoutesTest < Minitest::Test
                "visibility" => "public",
                "route" => { "name" => "article", "spec" => "/articles/:id(.:format)", "parts" => ["id"],
                             "defaults" => { controller: "articles" }.inspect } }
-      units = [{ "id" => 0, "kind" => "file", "file" => "/x.rb", "pass" => "route/path", "facts" => [fact] }]
+      # A *_url helper lives in the route set's URL helper module.
+      url_fact = fact.merge("method" => "article_url", "source_location" => $urls.instance_method(:article_url).source_location.join(":"))
+      units = [{ "id" => 0, "kind" => "file", "file" => "/x.rb", "pass" => "route/path", "facts" => [fact] },
+               { "id" => 1, "kind" => "file", "file" => "/x.rb", "pass" => "route/path", "facts" => [fact, url_fact] }]
       manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
                                          "files" => {}, "units" => units }, "/tmp")
       Lowrail::Guard.install(manifest)
       res = {}
       res[:a] = Lowrail.ok?(0, ViewA)
+      res[:url] = Lowrail.ok?(1, ViewA)
       res[:b] = Lowrail.ok?(0, ViewB)
       res[:c] = Lowrail.ok?(0, ViewC)             # own method, not the route set's
       res[:cached] = Lowrail::V[0].size
@@ -112,7 +153,7 @@ class RoutesTest < Minitest::Test
       res[:redefined] = Lowrail.ok?(0, ViewA)
       puts JSON.generate(res)
     RUBY
-    assert_equal({ "a" => true, "b" => true, "c" => false, "cached" => 3, "stale_cache" => true,
+    assert_equal({ "a" => true, "url" => true, "b" => true, "c" => false, "cached" => 3, "stale_cache" => true,
                    "spec_changed" => false, "requirements" => false, "restored" => true, "redefined" => false }, out)
   end
 end

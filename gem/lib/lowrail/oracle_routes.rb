@@ -24,6 +24,9 @@ module Lowrail
     # Keys of route defaults that would change what path_for does after the
     # merge with url_options (see Lowrail::Routes.prefix).
     OPTION_KEYS = %i[trailing_slash original_script_name script_name params anchor path only_path].freeze
+    # For `*_url` helpers route defaults with these keys would also change the
+    # host part; decline them rather than reason about the merge.
+    URL_KEYS = %i[host port protocol user password subdomain domain tld_length].freeze
 
     class << self
       def info(view, helper)
@@ -41,26 +44,26 @@ module Lowrail
         rescue NameError
           nil
         end
-        owner_ok = meth && meth.owner.equal?(named.path_helpers_module)
+        owner_ok = meth && meth.owner.equal?(kind == "url" ? named.url_helpers_module : named.path_helpers_module)
         out = {
           kind: kind, name: name.to_s,
           spec: route.path.spec.to_s,
           parts: route.required_parts.map(&:to_s),
           defaults: route.defaults.inspect,
-          option_defaults: (route.defaults.keys & OPTION_KEYS).map(&:to_s),
+          option_defaults: (route.defaults.keys & (kind == "url" ? OPTION_KEYS + URL_KEYS : OPTION_KEYS)).map(&:to_s),
           optimized: route.path.requirements.empty? && !route.path.spec.to_s.include?("*"),
-          owner_ok: kind == "path" ? !!owner_ok : nil,
+          owner_ok: !!owner_ok,
           source_location: meth&.source_location&.join(":"),
           visibility: visibility(view.class, helper)
         }
-        if kind == "path" && out[:optimized] && owner_ok
+        if out[:optimized] && owner_ok
           markers = route.required_parts.each_index.map { |i| format(MARKER, i) }
-          prefix = Routes.prefix(view.url_options, view)
+          prefix = kind == "url" ? Routes.url_prefix(view.url_options, view) : Routes.prefix(view.url_options, view)
           full = view.public_send(helper, *markers)
           if prefix && full.start_with?(prefix)
             out[:template] = full.delete_prefix(prefix)
           else
-            out[:template_error] = "could not split #{full.inspect} at the script name #{prefix.inspect}"
+            out[:template_error] = "could not split #{full.inspect} at the #{kind == "url" ? "URL prefix" : "script name"} #{prefix.inspect}"
           end
         end
         out
@@ -98,16 +101,16 @@ module Lowrail
         @contexts[controller_class] ||= begin
           base = yield
           list = [["oracle view", base]]
-          ["", "/sub/"].each do |script|
+          [["http://example.org/probe", ""], ["http://example.org/probe", "/sub/"], ["https://user.example.co.uk:8443/probe", ""]].each do |url, script|
             next unless controller_class.method_defined?(:view_context)
-            env = Rack::MockRequest.env_for("http://example.org/probe", "SCRIPT_NAME" => script)
+            env = Rack::MockRequest.env_for(url, "SCRIPT_NAME" => script)
             env["action_dispatch.routes"] = Rails.application.routes
             req = ActionDispatch::Request.new(env)
             c = controller_class.new
             c.set_request!(req)
             c.set_response!(controller_class.make_response!(req))
-            list << ["view (script #{script.inspect})", c.view_context]
-            list << ["controller (script #{script.inspect})", c]
+            list << ["view (#{url}, script #{script.inspect})", c.view_context]
+            list << ["controller (#{url}, script #{script.inspect})", c]
           end
           list
         end

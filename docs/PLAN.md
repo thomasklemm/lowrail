@@ -237,7 +237,7 @@ Inputs: M0 on real-blog, Campfire and ARGOS (`docs/m0/`), and Roundhouse's
 
 Decisions:
 
-1. **Lowrail stays "all apps, all gems, Ruby 4.0+".** Box-based route
+1. **Lowrail stays "all apps, all gems, Ruby 3.4+".** Box-based route
    replacement is an optional later mode for Ruby 4.1+, not the base design.
 2. **Passes are chosen by measured cost**, in this order:
    a. per-request work on boot-fixed inputs, memoized under a guard on its

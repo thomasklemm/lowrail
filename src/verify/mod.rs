@@ -48,6 +48,9 @@ pub fn cli(args: &[String]) -> Result<(), String> {
 pub struct Run {
     pub tests: BTreeMap<String, (String, String)>,
     pub unit_hits: BTreeMap<String, u64>,
+    /// Guard false: the original code ran. Not a failure, but a unit that only
+    /// falls back is a pass that does nothing (often a guard bug).
+    pub unit_fallbacks: BTreeMap<String, u64>,
     pub seconds: f64,
     pub exit_ok: bool,
 }
@@ -105,6 +108,12 @@ impl Report {
         s.push_str(&format!("fast-path hits: {hits} across {} units", self.on.unit_hits.len()));
         for (u, n) in &self.on.unit_hits {
             s.push_str(&format!("\n  unit {u}: {n}"));
+        }
+        let falls: u64 = self.on.unit_fallbacks.values().sum();
+        s.push_str(&format!("\nfallbacks: {falls} across {} units", self.on.unit_fallbacks.len()));
+        for (u, n) in &self.on.unit_fallbacks {
+            let only = if self.on.unit_hits.contains_key(u) { "" } else { " (never took the fast path)" };
+            s.push_str(&format!("\n  unit {u}: {n}{only}"));
         }
         s
     }
@@ -222,6 +231,11 @@ fn run_with(app: &Path, cmd: &[String], dir: &Path, mode: &str, extra_env: &[(&s
         if let Some(hits) = data["unit_hits"].as_object() {
             for (k, v) in hits {
                 *run.unit_hits.entry(k.clone()).or_default() += v.as_u64().unwrap_or(0);
+            }
+        }
+        if let Some(falls) = data["unit_fallbacks"].as_object() {
+            for (k, v) in falls {
+                *run.unit_fallbacks.entry(k.clone()).or_default() += v.as_u64().unwrap_or(0);
             }
         }
     }

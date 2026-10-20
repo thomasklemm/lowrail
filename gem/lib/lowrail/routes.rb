@@ -31,6 +31,26 @@ module Lowrail
         (o[:script_name] || t._routes.relative_url_root || "").to_s.chomp("/")
       end
 
+      # For `*_url` helpers: OptimizedUrlHelper#call ends in
+      # `ActionDispatch::Http::URL.url_for(options)`, which is path_for with
+      # :only_path, else full_url_for: `build_host_url(host, port, protocol,
+      # options, path_for(options))`. Returns what that builds for an empty
+      # route path (the caller appends the path), or nil to take the helper.
+      # build_host_url is Rails' own (private) method, so host/port/protocol,
+      # subdomain/domain/tld_length and user/password follow Rails exactly.
+      # Missing or non-String hosts and invalid protocols raise in Rails; here
+      # they return nil, so the helper raises after evaluating to_param as
+      # Rails does.
+      def url_prefix(o, t)
+        script = prefix(o, t) or return nil
+        return script if o[:only_path]
+        host = o[:host]
+        return nil unless host.instance_of?(::String)
+        ::ActionDispatch::Http::URL.send(:build_host_url, host, o[:port], o[:protocol], o, script)
+      rescue ::ArgumentError
+        nil
+      end
+
       # Journey::Router::Utils.escape_segment(p) is
       # `p.to_s.gsub(SEGMENT) { percent_encode }.force_encoding(US_ASCII)`.
       # An ASCII-only string without a character SEGMENT matches comes back

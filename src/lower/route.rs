@@ -57,7 +57,7 @@ const RAILS_DEPS: &[(&str, bool, &[&str])] = &[
     ("ActionDispatch::Journey::Route", false, &["format", "required_parts"]),
     ("ActionDispatch::Journey::Format", false, &["evaluate"]),
     ("ActionDispatch::Routing::RouteSet", false, &["find_script_name", "relative_url_root"]),
-    ("ActionDispatch::Http::URL", true, &["path_for"]),
+    ("ActionDispatch::Http::URL", true, &["path_for", "url_for", "full_url_for", "build_host_url", "normalize_protocol", "normalize_host", "normalize_port"]),
     ("ActionDispatch::Journey::Router::Utils", true, &["escape_segment"]),
     ("ActionDispatch::Journey::Router::Utils::UriEncoder", false, &["escape_segment", "escape"]),
 ];
@@ -377,8 +377,7 @@ fn arg_ranges(call: &ruby_prism::CallNode) -> Result<Vec<(usize, usize)>, String
 
 fn plan(code: &str, c: &Candidate, info: &Info, nested: bool, oracle: &mut dyn Oracle, cache: &mut Cache) -> Result<Prepared, String> {
     match info.kind.as_str() {
-        "path" => {}
-        "url" => return Err("_url helper: builds a full URL (host, port, protocol from url_options); not specialized".into()),
+        "path" | "url" => {}
         "custom" | "error" => return Err(info.reason.clone().unwrap_or_else(|| info.kind.clone())),
         other => return Err(format!("unknown helper kind {other}")),
     }
@@ -425,8 +424,9 @@ fn resolves_in(oracle: &mut dyn Oracle, cache: &mut Cache, class: &str, helper: 
         return r.clone();
     }
     let code = format!(
-        "begin; k = ::Object.const_get({}); o = k.instance_method(:{helper}).owner; o.equal?(::Rails.application.routes.named_routes.path_helpers_module) ? \"route\" : \"#{{k.name}}#{helper} is defined by #{{o.name || o.inspect}}, not the route set\"; rescue NameError => e; \"#{{e.class}}: #{{e.message[0, 120]}}\"; end",
-        ruby_str(class)
+        "begin; k = ::Object.const_get({}); o = k.instance_method(:{helper}).owner; o.equal?(::Rails.application.routes.named_routes.{module}) ? \"route\" : \"#{{k.name}}#{helper} is defined by #{{o.name || o.inspect}}, not the route set\"; rescue NameError => e; \"#{{e.class}}: #{{e.message[0, 120]}}\"; end",
+        ruby_str(class),
+        module = if helper.ends_with("_url") { "url_helpers_module" } else { "path_helpers_module" }
     );
     let r = match oracle.eval_string(&code) {
         Ok((s, _)) if s == "route" => None,
@@ -465,7 +465,7 @@ fn prepare_uncached(oracle: &mut dyn Oracle, helper: &str, info: &Info) -> Resul
     };
     let pieces = split_template(&template, info.parts.len())?;
     let temps: Vec<String> = (0..info.parts.len()).map(|i| arg_temp("p", i)).collect();
-    let inner = inner_expr(helper, &pieces, "p", &temps);
+    let inner = inner_expr(helper, &info.kind, &pieces, "p", &temps);
     let original = format!("{helper}({})", temps.join(", "));
     let temps_lit: Vec<String> = temps.iter().map(|t| ruby_str(t)).collect();
     let code = format!(
@@ -524,7 +524,8 @@ fn arg_temp(tag: &str, i: usize) -> String {
 /// The expression run after the class guard: Rails' own conditions for the
 /// optimized path, then the inline path, else the helper with the evaluated
 /// arguments.
-pub fn inner_expr(helper: &str, pieces: &[Piece], tag: &str, temps: &[String]) -> String {
+pub fn inner_expr(helper: &str, kind: &str, pieces: &[Piece], tag: &str, temps: &[String]) -> String {
+    let prefix_fn = if kind == "url" { "url_prefix" } else { "prefix" };
     let s = format!("__lr{tag}s");
     let p = |i: usize| format!("__lr{tag}p{i}");
     let mut conds = Vec::new();
@@ -532,7 +533,7 @@ pub fn inner_expr(helper: &str, pieces: &[Piece], tag: &str, temps: &[String]) -
         conds.push(format!("!(::Hash === {last} || ::ActionController::Parameters === {last})"));
     }
     conds.push("optimize_routes_generation?".to_string());
-    conds.push(format!("({s} = ::Lowrail::Routes.prefix(url_options, self))"));
+    conds.push(format!("({s} = ::Lowrail::Routes.{prefix_fn}(url_options, self))"));
     for (i, t) in temps.iter().enumerate() {
         conds.push(format!("::String === ({} = {t}.to_param)", p(i)));
         conds.push(format!("!{}.empty?", p(i)));
@@ -561,7 +562,7 @@ fn emit(code: &str, c: &Candidate, prepared: &Prepared, unit: usize, k: usize, t
     for (t, (s, e)) in temps.iter().zip(args) {
         body.push_str(&format!("{t} = {}; ", &code[*s..*e]));
     }
-    body.push_str(&inner_expr(&c.name, &prepared.pieces, &tag, &temps));
+    body.push_str(&inner_expr(&c.name, &prepared.info.kind, &prepared.pieces, &tag, &temps));
     format!("(({guard}) ? ({body}) : ({}))", text_of(code, c))
 }
 
@@ -584,7 +585,8 @@ mod tests {
             if let Some(rest) = code.strip_prefix("JSON.generate(::Lowrail::OracleRoutes.info(self, :") {
                 let helper = rest.trim_end_matches("))");
                 let route = |name: &str, spec: &str, parts: &[&str], template: &str| {
-                    serde_json::json!({"kind": "path", "name": name, "spec": spec, "parts": parts, "defaults": "{}",
+                    let kind = if helper.ends_with("_url") { "url" } else { "path" };
+                    serde_json::json!({"kind": kind, "name": name, "spec": spec, "parts": parts, "defaults": "{}",
                         "option_defaults": [], "optimized": true, "owner_ok": true, "source_location": "/rs.rb:334",
                         "visibility": "public", "template": template})
                     .to_string()
@@ -593,7 +595,7 @@ mod tests {
                     "articles_path" => route("articles", "/articles(.:format)", &[], "/articles"),
                     "article_path" => route("article", "/articles/:id(.:format)", &["id"], "/articles/LRHP0Q"),
                     "article_comment_path" => route("article_comment", "/articles/:article_id/comments/:id(.:format)", &["article_id", "id"], "/articles/LRHP0Q/comments/LRHP1Q"),
-                    "articles_url" => r#"{"kind":"url","name":"articles"}"#.into(),
+                    "articles_url" => route("articles", "/articles(.:format)", &[], "/articles"),
                     _ => r#"{"kind":"none"}"#.into(),
                 });
             }
@@ -625,7 +627,9 @@ mod tests {
         assert!(RB.lines().nth(7).unwrap().contains("two = article_comment_path(@article,"));
         assert!(outcome(14).starts_with("not inside an instance method"));
         assert!(outcome(17).starts_with("not inside an instance method"));
-        assert!(outcome(18).starts_with("_url helper"));
+        assert_eq!(outcome(18), "lowered");
+        // A _url helper starts from the host prefix instead of the script name.
+        assert!(out.code.contains("def url = ((::Lowrail.ok?(4, self.class)) ? ((optimize_routes_generation? && (__lr2s = ::Lowrail::Routes.url_prefix(url_options, self))) ? (__lr2s << \"/articles\") : articles_url()) : (articles_url))"), "{}", out.code);
         assert_eq!(out.sites.iter().filter(|s| s.helper == "logo_path").count(), 0, "custom helpers are not route sites");
         assert!(outcome(20).starts_with("options hash"));
         assert!(outcome(21).starts_with("0 positional argument(s), route has 1"));
@@ -639,11 +643,11 @@ mod tests {
             "@url = ((::Lowrail.ok?(4, self.class)) ? (__lr1a0 = @article; (!(::Hash === __lr1a0 || ::ActionController::Parameters === __lr1a0) && optimize_routes_generation? && (__lr1s = ::Lowrail::Routes.prefix(url_options, self)) && ::String === (__lr1p0 = __lr1a0.to_param) && !__lr1p0.empty?) ? (__lr1s << \"/articles/\" << ::Lowrail::Routes.seg(__lr1p0)) : article_path(__lr1a0)) : (article_path(@article)))"
         ), "{}", out.code);
         let route_deps: Vec<_> = out.deps.iter().filter(|d| d.route.is_some()).map(|d| d.method.clone()).collect();
-        assert_eq!(route_deps, vec!["article_path", "articles_path"]);
+        assert_eq!(route_deps, vec!["article_path", "articles_path", "articles_url"]);
         assert!(out.deps.iter().all(|d| d.route.is_none() || d.receiver == "@self"));
         assert!(out.deps.iter().any(|d| d.receiver == "ActionDispatch::Http::URL" && d.singleton && d.method == "path_for"));
         // One probe per helper, with the same inner expression shape.
-        assert_eq!(fake.probes.len(), 2);
+        assert_eq!(fake.probes.len(), 3);
         assert!(fake.probes.iter().any(|p| p.contains("__lrps << \\\"/articles/\\\" << ::Lowrail::Routes.seg(__lrpp0)")), "{:?}", fake.probes);
     }
 
