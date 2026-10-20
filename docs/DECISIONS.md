@@ -50,3 +50,20 @@ stacked set as well as to single passes.
 - Revisit Roundhouse for typed-IR ideas once the stacked-pass measurements
   exist, to compare what per-site lowering actually buys.
 - Spinel target: out of scope for now.
+
+## Stacking backlog
+
+Small exact savings (each < 2 %) that are worth revisiting once the large
+items are done, because they may add up. Shares are removable estimates or
+upper bounds per route, not measured request wins. Re-measure with
+`lowrail bench --passes SET` before building.
+
+| Item | Est. removable share | Certification needed | State |
+|---|---|---|---|
+| Route lowering under host/protocol `default_url_options` | ~0.3 % Campfire room (19 calls × ~2 µs) | base-AR `to_param`, attribute/type facts; generic script order | parked ([route-helpers.md](passes/route-helpers.md)) |
+| Template lookup | ≤ 0.42 % blog edit, ≤ 0.24 % Campfire, ≤ 0.23 % Redprints, ≤ 0.08 % PingCRM | filesystem-resolver epoch on `clear_cache`/`DetailsKey.clear`, live details/locals | parked ([erb.md](passes/erb.md)) |
+| Callback machinery (no-around chains) | 0.14–0.98 % across 11 routes | chain identity + set/skip/reset_callbacks epoch | parked; Rails main PR 59094 removes part upstream |
+| `inertia/config_bind` | 0.5–2.8 % on JSON routes (expected) | implemented, opt-in | opt-in; may become obsolete with inertiajs/inertia-rails#437 |
+| Fixed-shape serialization | 0–0.18 % PingCRM | exact key plan without extra allocations | parked (Alba key-plan prototype rejected) |
+| Literal tag attributes | 0–0.21 % blog, 0–0.08 % Campfire | folded into the tag/form component pass | in progress as part of candidate 4 |
+| Precompiled `passes.rb` | cold boot only (~0.37–0.40 M instructions once) | none | follow-up |
