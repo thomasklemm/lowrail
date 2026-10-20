@@ -5,8 +5,10 @@ decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
 Working assumption: many small exact passes (each < 2 %) should **stack**.
-`lowrail bench --passes SET` measures a pass set as one layer and reports the
-stacked effect next to the sum of individual expected effects. Promotion to
+A planned `lowrail bench --passes SET` (immediate follow-up to migration 5)
+will measure a pass set as one layer against no-setup and a separate default
+reference, and report the stacked effect next to the sum of individual
+expected effects, with uncertainty. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
