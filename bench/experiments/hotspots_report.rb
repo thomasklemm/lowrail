@@ -117,6 +117,127 @@ module HotspotReport
       selected.map { |key, values| "| `#{key.split("\t").last}` | #{cell(values.fetch('inclusive'))} | #{cell(values.fetch('self'))} |" }
   end
 
+  def self.detail_family(path)
+    if path.include?("/activesupport-")
+      family = case path
+      when /output_safety|core_ext\/erb\/util/ then "SafeBuffer / ERB::Util"
+      when /notifications|subscriber|event_reporter/ then "Notifications / Instrumenter / subscribers"
+      when /callbacks/ then "Callbacks"
+      when /hash_with_indifferent_access/ then "HashWithIndifferentAccess"
+      when /core_ext\/hash/ then "Hash core_ext"
+      when /active_support\/json|core_ext\/object\/json/ then "JSON / as_json / to_json"
+      when /inflector|core_ext\/string\/inflections/ then "Inflector"
+      when /current_attributes/ then "CurrentAttributes"
+      when /isolated_execution_state/ then "IsolatedExecutionState"
+      when /parameter_filter/ then "ParameterFilter"
+      when /message_(encryptor|verifier)|messages\/|key_generator/ then "Message crypto / serializer plumbing"
+      when /ordered_options/ then "OrderedOptions / InheritableOptions"
+      when /core_ext\/object\/blank/ then "blank? / presence"
+      when /core_ext\/object\/try|core_ext\/module\/delegation/ then "try / delegation"
+      else "Other ActiveSupport"
+      end
+      return ["AS", family]
+    end
+    family = case path
+    when /rack-[^\/]+\/lib\/rack\/mock_/ then "MockRequest / MockResponse (client)"
+    when /rack-[^\/]+\/lib\/rack\/headers/ then "Rack Headers"
+    when /rack-[^\/]+\/lib\/rack\/response/ then "Rack Response"
+    when /rack-[^\/]+\/lib\/rack\/(request|query_parser|utils)/ then "Rack Request / query / utils"
+    when /rack-[^\/]+\/lib\/rack\/(etag|conditional_get)/ then "Rack ETag / ConditionalGet"
+    when /rack-[^\/]+\/lib\/rack\/method_override/ then "Rack MethodOverride"
+    when /rack-[^\/]+\/lib\/rack\/(static|files)/ then "Rack Static / Files"
+    when /rack-session|action_dispatch\/middleware\/(cookies|session)/ then "Session / cookies (separate original bucket)"
+    when /action_dispatch\/middleware\/static/ then "Rails Static miss (separate original bucket)"
+    when /action_dispatch\/(journey|routing)/ then "Journey / routing (separate original bucket)"
+    when /action_dispatch\/http/ then "Rails Request / Response / HTTP headers"
+    when /action_dispatch\// then "Other ActionDispatch envelope"
+    when /rack-[^\/]+\/lib\/rack\// then "Other Rack middleware"
+    end
+    ["HTTP", family] if family
+  end
+
+  def self.details(inputs, output)
+    exports = inputs.flat_map { Dir[File.join(_1, "*", "details.json")] }.sort.map do |file|
+      dir = File.dirname(file)
+      coarse = shape(dir)
+      data = JSON.parse(File.read(File.join(dir, "samples.json")))
+      raw = JSON.parse(File.read(file))
+      raw.each_value do |worker|
+        worker.fetch("frames").each do |frame|
+          frame[0] = frame[0].sub(%r{.*/gems/}, "GEM/").sub(%r{.*?/\.corpus/[^/]+/}, "APP/")
+            .sub(%r{.*?/lib/ruby/\d+\.\d+\.\d+/}, "RUBY/")
+          frame[0] = "Benchmark client/seam" if frame[0].include?("/bench/")
+        end
+      end
+      rounds = data.fetch("samples").each_index.map do |round|
+        totals = Hash.new { |hash, key| hash[key] = [0, 0, 0, 0] }
+        denominator = 0
+        %w[trace_a trace_b].each do |arm|
+          key = "#{round}-#{arm}"
+          worker = data.fetch("workers").fetch(key)
+          indices = worker.fetch("windows").each_index.select { worker["windows"][_1]["mode"] == "total" }
+          empty, full = indices.sort_by { worker["windows"][_1]["requests"] }
+          denominator += worker["attribution"][full]["signals"] - worker["attribution"][empty]["signals"]
+          gc = worker["attribution"][full]["gc"] - worker["attribution"][empty]["gc"]
+          totals["method\tGC"][0] += gc
+          capture = raw.fetch(key)
+          capture.fetch("stacks").each do |ids, counts|
+            delta = counts[full] - counts[empty]
+            next if delta.zero?
+            frames = ids.map { capture.fetch("frames").fetch(_1) }
+            inside = frames.any? { |path, method, _| path.end_with?("/action_controller/metal/basic_implicit_render.rb") && method&.end_with?("#send_action") }
+            engine = frames.any? { |path, method, _| path.end_with?("/rails/engine.rb") && method == "Rails::Engine#call" }
+            client = !engine && frames.any? { |path, _, _| path.match?(%r{/rack/mock_(request|response)\.rb\z}) }
+            groups = frames.map do |path, method, _|
+              [["method", "#{path} :: #{method}"], ["file", path], detail_family(path)].compact.map { _1.join("\t") }
+            end
+            own = groups.first || ["method\tBenchmark client/seam"]
+            own.each do |group|
+              totals[group][0] += delta
+              totals[group][2] += delta if inside
+              totals[group][3] += delta if client
+            end
+            groups.flatten.uniq.each { totals[_1][1] += delta }
+          end
+        end
+        raise "detail self partition mismatch" unless totals.sum { |key, values| key.start_with?("method\t") ? values.first : 0 } == denominator
+        [denominator, totals.transform_values { _1.map { |count| 100.0 * count / denominator } }]
+      end
+      keys = rounds.flat_map { _1.last.keys }.uniq
+      keys |= ["AS\tSafeBuffer / ERB::Util", "AS\tCurrentAttributes", "AS\tJSON / as_json / to_json"]
+      groups = keys.to_h do |key|
+        values = rounds.map { _1.last.fetch(key, [0, 0, 0, 0]) }
+        [key, %w[self inclusive inside_action mock_phase].each_with_index.to_h { |kind, i| [kind, estimate(values.map { _1[i] })] }.merge("rounds" => values)]
+      end
+      { name: coarse.fetch("name"), accepted: coarse.fetch("accepted"), controls: coarse.fetch("sampler_controls"),
+        baseline_aa: coarse.fetch("baseline_aa_intervals"), heap_matched: coarse.fetch("heap_matched"),
+        fingerprint: coarse.fetch("fingerprint"), groups: groups, denominators: rounds.map(&:first),
+        frame_dictionary: raw.values.flat_map { _1.fetch("frames") }.uniq,
+        worker_logs: coarse.fetch("worker_logs"), preflight: coarse.fetch("preflight"),
+        details_sha256: Digest::SHA256.file(file).hexdigest,
+        provenance: JSON.parse(File.read(File.join(File.dirname(dir), "provenance.json"))) }
+    end
+    File.write(output, JSON.pretty_generate(shapes: exports) + "\n")
+    lines = ["## Source/method detail cohorts", "", "Separate finite cohorts; no replacement of the original accepted maps or borrowed controls.", ""]
+    exports.each do |shape|
+      lines += ["### #{shape[:name]}", "", "**#{shape[:accepted] ? 'Accepted' : 'REJECTED / diagnostic'}**. All shares below use the whole request denominator.", ""]
+      %w[AS HTTP].each do |axis|
+        lines += ["#### #{axis} self by source family", "", "| Family | Self % [95% CI] | Inside action/render self % | Mock-client/body-consumption phase self % |", "|---|---:|---:|---:|"]
+        shape[:groups].select { |key, _| key.start_with?(axis + "\t") }.sort_by { |_, value| -value["self"][:median] }.each do |key, value|
+          lines << "| #{key.split("\t").last} | #{cell(value['self'])} | #{cell(value['inside_action'])} | #{cell(value['mock_phase'])} |"
+        end
+        lines += [""]
+      end
+      lines += ["#### Top self methods", "", "| File :: method | Self % [95% CI] | Inclusive % [95% CI] | Inside action/render self % | Mock-client/body-consumption phase self % |", "|---|---:|---:|---:|---:|"]
+      shape[:groups].select { |key, _| key.start_with?("method\t") }.sort_by { |_, value| -value["self"][:median] }.first(12).each do |key, value|
+        lines << "| `#{key.split("\t").last}` | #{cell(value['self'])} | #{cell(value['inclusive'])} | #{cell(value['inside_action'])} | #{cell(value['mock_phase'])} |"
+      end
+      lines += [""]
+    end
+    File.write(output.sub(/\.json\z/, "-tables.md"), lines.join("\n") + "\n")
+    puts JSON.generate(shapes: exports.map { _1.slice(:name, :accepted) })
+  end
+
   def self.run(inputs, output)
     shapes = inputs.flat_map { Dir[File.join(File.expand_path(_1), "*", "sampler-controls.json")] }.sort.map { shape(File.dirname(_1)) }
       .sort_by { [%w[blog starter pingcrm redprints campfire].index(_1.fetch("app")), _1.fetch("name")] }
@@ -191,6 +312,11 @@ module HotspotReport
 end
 
 if $PROGRAM_NAME == __FILE__
+  if ARGV.first == "--detail"
+    ARGV.shift
+    HotspotReport.details(ARGV.drop(1), File.expand_path(ARGV.first))
+    exit
+  end
   abort "usage: hotspots_report.rb OUT.json INPUT_DIR..." if ARGV.size < 2
   HotspotReport.run(ARGV.drop(1), File.expand_path(ARGV.first))
 end

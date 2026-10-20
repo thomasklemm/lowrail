@@ -39,6 +39,16 @@ HotspotProbe.measure(3, 728193) { GC.start(full_mark: true, immediate_sweep: tru
 LowrailCallgrindBench.finish
 3.times { GC.start }
 result = HotspotProbe.results
+if HotspotProbe.respond_to?(:details)
+  detail = HotspotProbe.details
+  paths = detail.fetch("stacks").map do |ids, counts|
+    [ids.map { detail.fetch("frames").fetch(_1).first }, counts]
+  end
+  raise "detail export changed stack paths/counts" unless paths == result.fetch("stacks")
+  raise "detail method identity lost" unless detail.fetch("frames").any? do |path, method, line|
+    path == "hotspot-b.rb" && method == "Object#b" && line == 1
+  end
+end
 window = result.fetch("windows").fetch(2)
 raise "lost/delayed samples" unless window["issued"] == window["signals"] && window["lag_max_ir"] < 3277
 raise "invalid stack capture" unless window.values_at("empty", "truncated", "dropped") == [0, 0, 0]

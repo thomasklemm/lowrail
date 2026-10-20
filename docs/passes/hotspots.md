@@ -515,3 +515,231 @@ Equal weight per available primary app (blog, starter, pingcrm), then per measur
 | 12 | Events/logging | 2.23 [2.21, 2.24] |
 
 <!-- END GENERATED HOTSPOT TABLES -->
+
+## ActiveSupport / Rack method addendum
+
+The original accepted show/Starter JSON exports retain source-prefix groups,
+not Ruby method identities or their original source stacks. The Callgrind
+files contain MRI's native interpreter symbols, which cannot reconstruct
+those discarded identities. **No existing accepted cohort was relabeled or
+rerun as a replacement.** Two separately declared six-round detail cohorts
+export the same sampler's retained frame dictionary **after all windows**;
+sampling, requests, heap floors, Valgrind and controls are unchanged. Their
+independent verdicts and per-method round values are in
+[`hotspots-detail-results.json`](hotspots-detail-results.json). Raw frame/stack
+captures and logs remain with the private cohort outputs; the sanitized export
+contains frame locations, round denominators, method/family statistics and
+raw-capture/log digests, not cookies or bodies. This is the unavoidable new
+collection needed for the requested attribution, not a retry of a failed map.
+
+The source-family tables below include the **whole ActiveSupport gem**. The
+original “AS utilities/I18n/time” subsystem excludes separately classified
+buffers, callbacks, events, crypto and most JSON, and includes I18n/time gems;
+its 17–24% is therefore **not the total to which these rows should sum**.
+Likewise HTTP families separate Rails HTTP, Rack proper, mock client,
+session/cookies, static misses and routing; they are not a repartition of
+only the original 11–13% Rack subsystem. All shares still use the entire
+request envelope as denominator. Native primitives are charged to their
+nearest Ruby frame: a large digest or escape frame is not evidence that the
+same amount of Ruby interpretation can be removed.
+
+Both detail cohorts are **accepted**: ordinary and sampler A/A, all five
+heaps, both-arm fidelity, capture integrity and overflow checks pass. Ordinary
+total/no-GC A/A intervals are blog [−0.0162, +0.0651] / [−0.0374, +0.0382]%
+and Starter [−0.0908, +0.0498] / [−0.1015, +0.0600]%. The widest fidelity
+endpoints stay within ±0.095%, inside the separately defined ±0.5% limit. This does not
+change any original accepted/rejected verdict.
+
+### ActiveSupport self by file family
+
+Whole-request %, median [nominal 95% CI]; files are under `active_support/`.
+Related files are grouped explicitly, never inclusive-cost sums.
+
+| Source family / principal file or method | Blog show | Starter JSON |
+|---|---:|---:|
+| SafeBuffer / ERB::Util (`core_ext/string/output_safety.rb`, `core_ext/erb/util.rb`) | 5.76 [5.69, 5.97] | 0.00 [0.00, 0.00] |
+| `core_ext/object/blank.rb` (`blank?`, presence) | 3.16 [3.13, 3.21] | 0.51 [0.42, 0.64] |
+| `ordered_options.rb` (`InheritableOptions#initialize`, `OrderedOptions#method_missing`) | 2.02 [1.93, 2.06] | 1.45 [1.29, 1.59] |
+| Notifications / Instrumenter / subscribers | 1.57 [1.51, 1.65] | 1.23 [1.10, 1.35] |
+| Hash core_ext (`hash/slice.rb#extract!`, `hash/keys.rb` transforms) | 1.47 [1.39, 1.65] | 12.86 [12.64, 13.10] |
+| `callbacks.rb` (`run_callbacks`, filters) | 1.11 [1.10, 1.14] | 2.23 [1.93, 2.41] |
+| Message encryptor/verifier, messages/codec/metadata/rotator, key generator | 1.03 [0.98, 1.08] | 3.91 [3.63, 4.13] |
+| `isolated_execution_state.rb` | 0.96 [0.87, 1.09] | 1.53 [1.41, 1.73] |
+| `parameter_filter.rb` (`compile_filters!`, `value_for_key`) | 0.94 [0.90, 0.96] | 1.44 [1.37, 1.49] |
+| Inflector methods / string inflections | 0.83 [0.80, 0.86] | 0.59 [0.56, 0.70] |
+| `hash_with_indifferent_access.rb` | 0.65 [0.59, 0.72] | 0.52 [0.49, 0.59] |
+| JSON encoding + `core_ext/object/json.rb` (`as_json` / `to_json`) | 0.16 [0.13, 0.17] | 0.78 [0.77, 0.89] |
+| `current_attributes.rb` | 0.01 [0.00, 0.02] | 0.77 [0.74, 0.86] |
+| `core_ext/object/try.rb` / module delegation | 0.01 [0.00, 0.02] | 0.57 [0.54, 0.60] |
+| Other AS (including execution wrappers, logger/enumerable/cache residue) | 1.19 [1.16, 1.27] | 2.30 [2.21, 2.44] |
+
+The blog buffer family splits into ERB util **3.71 [3.62, 3.88]%** and
+SafeBuffer/output_safety **2.08 [1.96, 2.15]%** self. Those are source ownership,
+not the old index ≤1.51% removable/inclusive survey boundary. Its largest ERB
+methods are `xml_name_escape` **2.08 [2.06, 2.20]%** and `html_escape`
+**1.62 [1.55, 1.71]%**; retain live escaping and encoding behavior.
+Notifications' `fanout.rb` alone is **1.12 [1.01, 1.20]%** blog /
+**0.83 [0.76, 0.91]%** Starter; the rest of the family is not “empty Fanout”.
+Starter `Hash#symbolize_keys!` is **0.90 [0.85, 0.95]%**, and
+`CurrentAttributes#resolve_defaults` **0.34%**; see the existing default-tuple
+allocation row, not a new per-request cache. Its `message_encryptor.rb`
+**1.57 [1.39, 1.67]%** is crypto plumbing, not response JSON encoding.
+Every file/method, its definition location, inclusive/self and boundary
+subsets are in the numeric export; zero sampled work is not non-execution.
+
+### Rack and Rails HTTP self
+
+| Disjoint source family (broader than the original Rack subsystem) | Blog show | Starter JSON |
+|---|---:|---:|
+| Rack ETag / ConditionalGet | 4.90 [4.88, 4.97] | 0.93 [0.90, 1.01] |
+| Rack Request / query parser / Utils | 1.68 [1.60, 1.85] | 3.58 [3.44, 3.84] |
+| Rack Headers | 1.05 [0.95, 1.07] | 1.92 [1.79, 2.04] |
+| Rack Response | 0.43 [0.40, 0.47] | 0.86 [0.76, 0.88] |
+| Rack MethodOverride | 0.02 [0.01, 0.03] | 0.02 [0.01, 0.06] |
+| Other Rack middleware | 0.43 [0.38, 0.48] | 0.74 [0.67, 0.92] |
+| MockRequest / MockResponse **client** | 0.74 [0.69, 0.78] | 1.93 [1.91, 2.02] |
+| Rails Request / Response / HTTP headers | 2.13 [2.06, 2.20] | 4.04 [3.93, 4.13] |
+| Other ActionDispatch envelope | 0.68 [0.63, 0.73] | 1.21 [1.08, 1.33] |
+| Rails/Rack-session session and cookies (originally separate) | 0.90 [0.80, 1.01] | 2.23 [2.13, 2.41] |
+| Rails Static-file miss (originally separate) | 1.08 [1.07, 1.12] | 1.86 [1.84, 2.00] |
+| Journey / routing (originally separate) | 4.83 [4.73, 4.97] | 0.60 [0.57, 0.64] |
+
+Notable Rack method self costs:
+
+| Method | Blog show | Starter JSON |
+|---|---:|---:|
+| `Headers#[]=` | 0.63 [0.55, 0.70] | 1.18 [1.06, 1.32] |
+| `Headers#downcase_key` | 0.19 [0.17, 0.23] | 0.33 [0.29, 0.35] |
+| `Request::Env#get_header` | 0.46 [0.39, 0.58] | 0.72 [0.70, 0.78] |
+| `Request::Env#fetch_header` | 0.25 [0.24, 0.28] | 0.41 [0.36, 0.46] |
+| `Response#initialize` | 0.29 [0.25, 0.30] | 0.55 [0.44, 0.60] |
+| `Utils.set_cookie_header` | 0.16 [0.15, 0.20] | 0.47 [0.43, 0.61] |
+
+Starter `Utils.parse_cookies_header` is **0.50 [0.48, 0.54]%**, but its native
+URI decode descendants are charged to URI, not Rack (see the top-five table).
+Likewise `set_cookie_header` does not include its **2.56%** URI-escape self
+descendant. MockResponse's `identify_cookie_attributes` alone is
+**0.85 [0.77, 0.94]%** Starter, explicitly client work. `FileHandler#file_readable?`
+is **1.12 [1.03, 1.23]%** there, below Static's inclusive wrapper. Neither fixture
+has a sampled Rack::Static/Files source frame; Rails Static is the measured
+miss path, not evidence that static serving itself is free.
+
+### What “inside a sealed endpoint” means here
+
+For an explicit and reproducible boundary, “inside” means that the captured
+stack contains `ActionController::BasicImplicitRender#send_action`: action plus
+explicit/implicit rendering, below the controller filters and Rack stack.
+This is a **location**, not an assertion that an operation is certified or
+lowerable. The current sealed link/route slice is narrower still. Live SQL,
+escaping, tokens, events and crypto remain necessary inside that boundary.
+Method rows report the subset of whole-request self cost inside it; the rest
+is outside, not an additional saving. Middleware version/session checks,
+cookie response commit, ETag digesting, static misses and executor lifetimes
+cannot be credited to an action/render-only endpoint. A wider middleware
+endpoint would need its own design, evidence and contract.
+
+The export also marks stacks under `Rack::MockRequest`/`MockResponse` **without
+`Rails::Engine#call`**. That separates mock-client/body-consumption phase work
+from the app-stack phase; not every body-consumption operation is disposable
+test overhead. In particular mock cookie parsing and its descendants must
+not be sold as production-server savings.
+
+### Top five methods and levers
+
+Self and inside columns are whole-request %, not percentages of a method.
+The inside subset's interval is exported; a single median is shown here to
+keep the boundary and lever readable. These are **investigation levers**, not
+credited savings. “App” never permits a behavior change in Lowrail itself.
+
+| Blog show method (file) | Self % [95% CI] | Inside action/render self % | Lever / existing DECISIONS overlap |
+|---|---:|---:|---|
+| `Rack::ETag#digest_body` (`rack/etag.rb`) | 4.83 [4.79, 4.86] | 0.00 — outside | **App recommendation**: review validator/body policy; keep SHA/ETag by default. Outside existing endpoint/action and remaining controller/params/response interpretation budgets |
+| `TagBuilder#tag_options` (`action_view/helpers/tag_helper.rb`) | 3.77 [3.59, 4.04] | 3.77 — inside | **Upstream Rails**, then sealed component only if priced: Tag/form attribute component; Compiled form/literal-tag intermediates. The upstream append fusion does not remove all 3.77% |
+| `TagBuilder#tag_option` (same file) | 3.29 [3.16, 3.44] | 3.29 — inside | **Upstream Rails / sealed endpoint**: same tag/compiled-form rows, SafeBuffer/OutputBuffer interpretation; retain escaping and fresh output. Inclusive costs overlap the preceding row |
+| `String#blank?` (`active_support/core_ext/object/blank.rb`) | 2.88 [2.86, 2.94] | 2.83 — mostly inside | **Sealed endpoint**, only fixed caller/option interpretation; live string/encoding checks stay. Overlaps compiled form/tag and endpoint/action, not a generic blank-result cache |
+| `OpenSSL::HMAC.digest` (`openssl/hmac.rb`) | 2.26 [2.21, 2.38] | 2.26 — inside | **App recommendation / retain primitive**: token/security work is not a guarded-pass saving. Overlaps endpoint/action's explicit live token/CSRF residue, not its removable rendering structure |
+
+| Starter JSON method (file) | Self % [95% CI] | Inside action/render self % | Lever / existing DECISIONS overlap |
+|---|---:|---:|---|
+| `Hash#extract!` (`active_support/core_ext/hash/slice.rb`) | 11.60 [11.37, 11.82] | 4.10 — mixed, mostly outside | **Guarded pass / upstream Inertia** at the specific bind caller: inertia/config_bind and Inertia config extraction Hashes. All 5,458 signed net samples have bind_controller on stack; no generic Hash rewrite |
+| `Configuration#bind_controller` (`inertia_rails/configuration.rb`) | 3.19 [3.09, 3.42] | 1.17 — mixed, mostly outside | **Guarded pass / upstream Inertia**: same two rows. Inclusive **15.05 [14.94, 15.36]%** contains the extract! work; action-only sealing does not cover middleware invocations |
+| `URI._encode_uri_component` (`uri/common.rb`) | 2.56 [2.49, 2.65] | 0.00 — outside | **App recommendation / upstream library**: live cookie encoding from Rack Utils → CookieJar commit. Not the literal route-fresh-buffer or Journey row; no cookie-byte memo under boot facts |
+| `URI._decode_uri_component` (same file) | 2.01 [1.92, 2.05] | 0.00 — outside | **App recommendation / upstream library**: Rack cookie-header parsing → request CookieJar; preserve validation/encoding. Outside existing endpoint and fixed-shape serialization rows |
+| `PropsResolver#deep_transform_props` (`inertia_rails/props_resolver.rb`) | 1.40 [1.36, 1.49] | 1.40 — inside | **Guarded pass / sealed endpoint** only at certified prop traversal. Inertia prop tuple iteration, prop path scaffolding and metadata try-dispatch rows overlap; inclusive **22.24 [21.96, 22.40]%** includes live descendants, not 22% removable work. Existing props draft has no credited gain |
+
+### Serialization decision: do not promote the wrong pool
+
+Starter JSON's ActiveSupport share is **not mostly JSON encoding**. Its dominant
+method is `Hash#extract!`, reached from
+`InertiaRails::Configuration#initialize` → `bind_controller`; the recorded
+callers include Inertia middleware version/session checks and XSRF policy as
+well as rendering. The `Hash#extract!` self cost and `bind_controller` inclusive
+cost overlap; never add them. Prioritize the existing **`inertia/config_bind`**
+row and upstream [Inertia PR 437](https://github.com/inertiajs/inertia-rails/pull/437)
+(open, not merged when checked), preserving fresh configuration/options and
+live callable values. A self/inclusive map is not a measurement of that pass's
+gain, and interpreter Ir shares cannot replace the old native-time estimates.
+
+The parked **Fixed-shape serialization** row's **0–0.18% PingCRM** came from
+ten specific Jbuilder five-getter row extractions: an optimistic native-time
+estimate, not the whole JSON encoder or every app's serialization ceiling.
+The [candidate survey](../candidates.md#3-isolated-savings-and-request-arithmetic) records
+no matching Starter serializer and a losing Redprints Alba key-plan prototype.
+This addendum does not remeasure that PingCRM micro, so its old narrow estimate
+is neither invalidated nor newly certified. It must **not** be generalized to
+all Starter JSON, nor can the configuration-extraction pool justify un-parking
+serialization. Session serialization is separate from response-prop encoding;
+`as_json`, escaping and JSON gem work are not automatically fixed-shape work.
+
+### Rack 3.x/main: checked source, not assumed upgrade savings
+
+Both detailed fixtures already run **Rack 3.2.7**. Compare its tag commit
+[`70d2e10`](https://github.com/rack/rack/commit/70d2e1046789a70e240e01b9ac0b3ffc9b26d33f)
+with canonical main
+[`412b7e5`](https://github.com/rack/rack/commit/412b7e5250612e8b23095eee65ee3268addb4776):
+
+- `Headers#[]=`, `downcase_key` and the known-header cache hot path are
+  unchanged. The [common lowercase-header cache](https://github.com/rack/rack/commit/95d2f64a84a6010d5b1a5179a647b42cb53356d1)
+  is **already shipped** in the measured 3.2.7, not a new available saving.
+- `ETag#digest_body` is unchanged; main only removes a boot-time require in
+  that file. Body hashing is real, input-size-dependent SHA work after the
+  action/render boundary, not eliminated by a sealed template. Review the
+  app's validator policy if appropriate; do not silently omit ETags.
+- MockResponse cookie parsing is unchanged; main's forwarding-syntax cleanup
+  does not solve the measured parsing path, which is client-side anyway.
+- Main's [shape-friendly Request initialization](https://github.com/rack/rack/commit/2c1eb195eb0161b065a620b97c228c95336fad6b)
+  is a real upstream change, but no gain is measured here, and it does not
+  remove the cookie URI encoding/decoding or hot `Rack::Headers#[]=` path.
+  The `select_best_encoding` quadratic-algorithm fix is already in 3.2.7;
+  neither it nor a generic “Rack 3” upgrade is new credit for these GETs.
+- The sampled static miss belongs to **Rails** `ActionDispatch::FileHandler`,
+  not Rack::Static. Follow the existing **Upstream static miss candidates
+  (c/static)** decision and its Rails-main commits, not a Rack backport.
+  MethodOverride's GET path is tiny; this does not price POST parsing.
+
+**No newly upstream-solved Rack-main replacement for these dominant measured
+methods was established.** Favor existing Inertia/Rails upstream work and a
+measured sealed rendering slice; leave cookie/security/validator semantics
+live. The allocation pools remain those in [allocations.md](allocations.md),
+not new allocation measurements inferred from this profile.
+
+### Detail reproduction and checks
+
+Use the sampler/tool/environment already documented above, with new roots:
+
+```sh
+BENCH_JOBS=2 mise exec -- ruby bench/experiments/hotspots_detail.rb /tmp/NEW-detail-blog blog
+BENCH_JOBS=2 mise exec -- ruby bench/experiments/hotspots_detail.rb /tmp/NEW-detail-starter starter
+mise exec -- ruby bench/experiments/hotspots_report.rb --detail /tmp/detail-results.json \
+  /tmp/NEW-detail-blog /tmp/NEW-detail-starter
+```
+
+The two workers/study limit still means at most four simultaneous Callgrind
+workers. The post-window frame exporter passes the existing asymmetric
+instruction-weighting/recursive-stack/GC contract plus exact path/count and
+qualified-method/location recovery: **6,210 samples**, expected B inclusive
+**74.883%**, observed **75.137%**, maximum lag **30 Ir**, **236 GC samples**.
+The numeric reporter checks the full method-self partition in every round;
+inclusive recursion is deduplicated by method, not by frame ID. Shared-driver
+tests remain **11 / 82** and pass tests **16 / 157**, all green. No pass/runtime
+or allocation-census change accompanies the addendum.
