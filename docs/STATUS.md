@@ -41,6 +41,14 @@ live in the linked docs; numbers come from executed runs, dated.
   (`LOWRAIL_UNITS`) and writes `.lowrail/denylist.json`, which `build`
   honors. Checked with a fault injected into one real-blog unit: found in 4
   reruns, the rebuild skips that template.
+- **Build surface** (PLAN 9.4): `lowrail facts` materializes lazy
+  surface before dumping (production eager load, attribute methods,
+  relation delegation, lazy routes, view context classes, every template
+  compiled), captures every eval'd script (`TracePoint(:script_compiled)`,
+  `.lowrail/generated/`) and links methods to the exact generated `def`
+  (`--show Mod#meth`). `lowrail observe APP` records a test run
+  (definitions after boot, scripts, sampled argument/return classes) into
+  `.lowrail/observed.json` and diffs it against the facts.
 - **Types and MCP** (first iteration, other thread): boot-first types with
   provenance, RBS generation, stdio MCP server. See `docs/types.md`.
 
@@ -51,6 +59,36 @@ live in the linked docs; numbers come from executed runs, dated.
 | real-blog (Rails 8.1.4) | 9/9 `link_to` sites, 10/10 route sites (1 in a controller), 12 units including preload plans | 21/21 identical, 116 fast-path hits across all 12 units (2 preload hits) | 4 HTML routes byte-identical on/off (CSRF masked); request time within noise, allocs −1 to −6 %; `edit_article_path` 2.7 → 1.4 µs |
 | Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 57/162 route sites (62 refused `_url`), 35 units including preload plans | 634/634 identical (2 skips both ways), 27/33 route units hit, 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
 | ARGOS (private, Rails 8.1.4) | not built yet | — | M0 aggregates in `docs/m0/argos.md` |
+
+### Build surface (2026-10-20)
+
+Materialize, as added modules / methods / generated scripts per step after
+`config/environment` (real-blog 5210 / 36752 / 1155 at boot, Campfire 6840
+/ 49628 / 1602):
+
+| step | real-blog | Campfire |
+|---|---|---|
+| `eager_load!` | +1520 / +9114 / +693 | +791 / +2765 / +464 |
+| production eager load (Zeitwerk all, namespaces) | +726 / +4203 / +144 | +955 / +5895 / +174 |
+| models (schema, attribute methods) | +41 / +524 / +48 | +26 / +4110 / +266 |
+| relation delegation (speculative) | 0 | +0 / +6 / +6 |
+| lazy routes | +0 / +68 / 0 | +88 / +704 / +22 |
+| controllers (`view_context_class`) | +7 / +145 / +32 | +7 / +145 / +31 |
+| templates compiled | +1 / +30 / +28 | +2 / +154 / +104 |
+
+Generated scripts: real-blog 2096 (0.75 MB), Campfire 2664 (1.2 MB); methods
+compiled from one: 5657 / 8960; app-relevant methods with a linked
+generated `def`: 299 / 2840. Capture costs ~15–25 ms of hook time
+(boot +0.05 s on real-blog, within noise on Campfire's 2 s).
+
+Observed test run against the materialized facts: real-blog defines 9942
+methods after boot, Campfire 19524; all but 1438 / 4446 are in the facts
+(by name, generated `def` text, or template). The rest is test-only code
+(Minitest/Rails testing, fixtures, mocha, webmock, rexml, DRb), no app
+method; the only templates are Campfire's 8 exception-page templates,
+recompiled per rendered exception (80 methods). Suite overhead: definitions
+only +0.4 s real-blog (fixed cost), +3–4 % Campfire; with type sampling (16
+per method, 586 methods hooked) +3–6 %; uncapped sampling up to +9 %.
 
 ## Learned
 
@@ -69,6 +107,14 @@ live in the linked docs; numbers come from executed runs, dated.
    gains need many sites per request or framework paths per request
    (Campfire: CSP/importmap URL work 34.8 % inclusive on cached pages,
    Active Record dispatch and fragment keys when uncached).
+
+6. **Boot is not the whole app, but materialize nearly is.** In test env
+   `eager_load!` sees a quarter of what production eager load plus lazy
+   generation build (Campfire: 2765 of 13779 added methods). After
+   materialize, a full test run adds no app method; what it adds is test
+   machinery. Generated code is only meaningful per `def`: Active Support's
+   CodeGenerator shares method caches across models and batches them in
+   run-dependent order, so script digests differ while `def` texts match.
 
 ## Next
 
