@@ -65,6 +65,23 @@ class PreloadPlansTest < Minitest::Test
     Writer.reflect_on_association(:reflection_posts).define_singleton_method(:join_scopes) do |*args|
       super(*args) + [klass.where(title: Thread.current[:title])]
     end
+    if ENV["PRELOAD_PATCH"] == "batch"
+      module CustomBatch
+        def call
+          $build_wrapper_calls = ($build_wrapper_calls || 0) + 1
+          super
+        end
+      end
+      ActiveRecord::Associations::Preloader::Batch.prepend(CustomBatch)
+    elsif ENV["PRELOAD_PATCH"] == "association"
+      module CustomAssociation
+        def association(name)
+          $build_wrapper_calls = ($build_wrapper_calls || 0) + 1
+          super
+        end
+      end
+      Writer.prepend(CustomAssociation)
+    end
     a = Writer.create!(name: "A")
     b = Writer.create!(name: "B")
     x = a.posts.create!(title: "first", alternate_id: b.id)
@@ -92,6 +109,12 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(b.id), Writer.find(a.id), Writer.find(a.id)]
     result["root_loaders"] = preload.call(rows, { posts: :notes }).size
     result["nested"] = signature.call(rows)
+    result["available_false"] = preload.call([Writer.find(a.id)], :posts, available_records: false).size
+    custom_available = Object.new
+    def custom_available.flatten = []
+    result["available_custom"] = preload.call([Writer.find(a.id)], :posts, available_records: custom_available).size
+    result["associate_flag"] = ActiveRecord::Associations::Preloader.new(records: [Writer.find(a.id)],
+      associations: :posts, associate_by_default: "truthy").associate_by_default
     rows = [Writer.find(a.id)]
     preload.call(rows, { "posts" => :notes, posts: :writer })
     result["distinct_spec_keys"] = rows.first.posts.map { [_1.association(:notes).loaded?, _1.association(:writer).loaded?] }
@@ -239,6 +262,19 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(a.id)]
     preload.call(rows, :posts)
     result["reflection_change"] = rows.first.posts.map(&:title)
+    preload.call([Writer.find(a.id)], :other_posts)
+    old_post = Post
+    Object.send(:remove_const, :Post)
+    Object.const_set(:Post, Class.new(ActiveRecord::Base))
+    Post.table_name = "posts"
+    Post.unscoped # Generate the replacement's model-specific Relation class.
+    old_post.define_singleton_method(:scope_for_association) { |*| unscoped.where(title: "second") }
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :other_posts)
+    result["reloaded_target"] = rows.first.other_posts.map(&:title)
+    old_post.singleton_class.remove_method(:scope_for_association)
+    Object.send(:remove_const, :Post)
+    Object.const_set(:Post, old_post)
     preload.call([Writer.find(a.id)], :native_poly_posts)
     type = ActiveModel::Type::String
     original = type.instance_method(:serialize)
@@ -265,6 +301,7 @@ class PreloadPlansTest < Minitest::Test
     end)
     preload.call([Writer.find(a.id)], :other_posts)
     result["batch_change"] = $batch_calls
+    result["build_wrapper_calls"] = $build_wrapper_calls if ENV["PRELOAD_PATCH"]
     result["hits"] = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {}
     puts JSON.generate(result)
   RUBY
@@ -291,6 +328,9 @@ class PreloadPlansTest < Minitest::Test
       assert_equal off, stale
       assert_equal [7, 8], on["unit_ids"]
       assert_equal 1, on["root_loaders"]
+      assert_equal 1, on["available_false"]
+      assert_equal 1, on["available_custom"]
+      assert_equal "truthy", on["associate_flag"]
       assert_equal [[true, true], [true, true]], on["distinct_spec_keys"]
       assert_equal [2, [[true, true], [true, true]]], on["identity_spec"]
       assert_equal [true], on["snapshot_spec"]
@@ -320,8 +360,28 @@ class PreloadPlansTest < Minitest::Test
       assert_equal ["first"], on["module_change"]
       assert_equal ["third"], on["schema_reset"]
       assert_equal ["third"], on["reflection_change"]
+      assert_equal ["second"], on["reloaded_target"]
       assert_equal 1, on["batch_change"]
       assert_equal ["x1", "x2"], on["through"]
+    end
+  end
+
+  def test_preexisting_preloader_wrappers_are_not_bypassed
+    realpath_tmpdir do |dir|
+      File.write(File.join(dir, "scenario.rb"), SCENARIO)
+      %w[batch association].each do |patch|
+        runs = %w[0 1].map do |mode|
+          out, err, status = ruby(File.join(dir, "scenario.rb"), setup: false, chdir: dir,
+            env: { "RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL" => mode, "PRELOAD_PATCH" => patch,
+              "LOWRAIL_STATS" => File.join(dir, "wrapper-#{mode}") })
+          skip "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
+          assert status.success?, "#{err}\n#{out}"
+          JSON.parse(out.lines.last).tap { assert_empty _1.delete("hits") }
+        end
+        assert_equal runs.first, runs.last
+        assert_equal [7], runs.last["unit_ids"] if patch == "batch"
+        assert_operator runs.last["build_wrapper_calls"], :>, 10
+      end
     end
   end
 end

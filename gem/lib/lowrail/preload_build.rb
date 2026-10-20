@@ -17,8 +17,22 @@ module Lowrail
       manifest["units"].reject! { _1["pass"] == "active_record/preload_plans" }
       ledger.reject! { _1["pass"] == "active_record/preload_plans" }
       denied = JSON.parse(File.read(File.join(dir, "denylist.json"))) if File.file?(File.join(dir, "denylist.json"))
-      if Array(denied).any? { _1["pass"] == "active_record/preload_plans" }
-        ledger << { "pass" => "active_record/preload_plans", "outcome" => "denylisted by verify --bisect" }
+      reason = "denylisted by verify --bisect" if Array(denied).any? { _1["pass"] == "active_record/preload_plans" }
+      if defined?(ActiveRecord::Associations::Preloader)
+        preloader = ActiveRecord::Associations::Preloader
+        framework = Gem.loaded_specs.fetch("activerecord").full_gem_path + "/"
+        # Stable app wrappers are not equivalent to the Rails code we bypass.
+        # Recording their source as a fact would merely pin the wrong program.
+        [preloader, preloader::Batch, preloader::Branch].each do |mod|
+          (mod.instance_methods(false) + mod.private_instance_methods(false)).uniq.each do |name|
+            unless mod.instance_method(name).source_location&.first&.start_with?(framework)
+              reason ||= "non-certified #{mod.name}##{name}"
+            end
+          end
+        end
+      end
+      if reason
+        ledger << { "pass" => "active_record/preload_plans", "outcome" => reason }
         Lowrail.write_json(path, manifest)
         Lowrail.write_json(ledger_path, ledger)
         return
@@ -29,11 +43,12 @@ module Lowrail
         next if klass.abstract_class? || !klass.name || !klass.table_exists?
         klass.reflect_on_all_associations.each do |r|
           label = "#{klass.name}##{r.name}"
-          reason = PreloadFacts.decline(r)
+          reason = PreloadFacts.decline(r, klass)
           ledger << { "method" => label, "pass" => "active_record/preload_plans", "outcome" => reason || "eligible (tree checked at runtime)" }
           next if reason
           [klass, r.klass].each do |k|
             models[k.name] ||= PreloadFacts.model(k)
+            facts << PreloadFacts.method_fact(k, :association)
             PreloadFacts::SCOPE_METHODS.each do |name|
               facts << PreloadFacts.method_fact(k, name, singleton: true)
             end
@@ -43,9 +58,11 @@ module Lowrail
               facts << PreloadFacts.method_fact(k.unscoped.class, name)
             end
           end
-          %i[klass join_scopes join_primary_key join_foreign_key scope type collection?].each do |name|
+          PreloadFacts::REFLECTION_METHODS.each do |name|
             facts << PreloadFacts.method_fact(r.class, name)
           end
+          PreloadFacts::ASSOCIATION_METHODS.each { |name| facts << PreloadFacts.method_fact(r.association_class, name) }
+          facts << PreloadFacts.method_fact(r.association_class, :new, singleton: true)
           PreloadFacts.scope_types(r).each_value do |type|
             PreloadFacts::TYPE_METHODS.each { |name| facts << PreloadFacts.method_fact(type.class, name) }
             types[type.class.name] ||= PreloadFacts.type_methods(type.class)

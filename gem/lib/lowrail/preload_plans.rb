@@ -151,7 +151,7 @@ module Lowrail
 
       def initialize(owner, reflection, expected, models)
         @owner, @reflection, @target = owner, reflection, reflection.klass
-        raise ArgumentError, "uncertified association" if PreloadFacts.decline(reflection)
+        raise ArgumentError, "uncertified association" if PreloadFacts.decline(reflection, owner)
         raise ArgumentError, "reflection changed" unless PreloadFacts.reflection(reflection) == expected
         [owner, target].each do |k|
           raise ArgumentError, "schema changed" unless PreloadFacts.model(k) == models[k.name]
@@ -173,7 +173,8 @@ module Lowrail
       end
 
       def valid?
-        owner._reflect_on_association(reflection.name).equal?(reflection) &&
+        Object.const_get(owner.name).equal?(owner) && Object.const_get(target.name).equal?(target) &&
+          owner._reflect_on_association(reflection.name).equal?(reflection) &&
           reflection.klass.equal?(target) && [reflection.join_primary_key, reflection.join_foreign_key, reflection.type] == @keys &&
           owner.columns_hash.equal?(@columns[0]) && target.columns_hash.equal?(@columns[1]) &&
           owner.attribute_types.equal?(@types[0]) && target.attribute_types.equal?(@types[1]) &&
@@ -277,12 +278,13 @@ module Lowrail
 
     module Hook
       def initialize(records:, associations:, scope: nil, available_records: [], associate_by_default: true)
-        @lowrail_plan = if scope.nil? && (available_records.nil? || available_records.empty?) && associate_by_default
+        @lowrail_plan = if scope.nil? && (!available_records ||
+            (available_records.instance_of?(Array) && available_records.empty?)) && associate_by_default
           PreloadPlans.plan(records, associations)
         end
         return super unless @lowrail_plan
         @records, @associations, @scope = records, associations, scope
-        @available_records, @associate_by_default = [], true
+        @available_records, @associate_by_default = [], associate_by_default
       end
 
       def call

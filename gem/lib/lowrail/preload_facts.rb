@@ -5,8 +5,10 @@ module Lowrail
   # booted build helper and the runtime; deliberately separate from app facts.
   module PreloadFacts
     SCOPE_METHODS = %i[scope_for_association relation default_scoped build_default_scope
-      unscoped arel_table predicate_builder polymorphic_name table_name primary_key type_for_attribute].freeze
+      unscoped arel_table predicate_builder polymorphic_name table_name primary_key type_for_attribute _reflect_on_association].freeze
     RELATION_METHODS = %i[initialize initialize_copy spawn where where! merge! values_for_queries].freeze
+    REFLECTION_METHODS = %i[klass join_scopes join_primary_key join_foreign_key scope type collection? association_class].freeze
+    ASSOCIATION_METHODS = %i[initialize klass].freeze
     TYPE_METHODS = %i[serialize serialized? mutable? serializable? hash == limit precision scale].freeze
     module_function
 
@@ -86,7 +88,7 @@ module Lowrail
       end
     end
 
-    def decline(r)
+    def decline(r, owner = r&.active_record)
       return "missing reflection" unless r
       return "through association" if r.options[:through]
       return "polymorphic belongs_to" if r.polymorphic?
@@ -99,7 +101,14 @@ module Lowrail
       # An app can override these constructors to inject request state without
       # declaring any association/default scope. Such code is not certified.
       framework = %w[activerecord activemodel].map { Gem.loaded_specs.fetch(_1).full_gem_path + "/" }
-      return "custom reflection scope constructor" unless r.method(:join_scopes).source_location&.first&.start_with?(*framework)
+      return "custom reflection scope constructor" unless REFLECTION_METHODS.all? { |name|
+        r.method(name).source_location&.first&.start_with?(*framework)
+      }
+      return "custom association constructor" unless [owner, k].all? { |model|
+        model.instance_method(:association).source_location&.first&.start_with?(*framework)
+      } && r.association_class.method(:new).owner == Class && ASSOCIATION_METHODS.all? { |name|
+        r.association_class.instance_method(name).source_location&.first&.start_with?(*framework)
+      }
       return "custom scope constructor" unless SCOPE_METHODS.all? { |name|
         k.method(name).source_location&.first&.start_with?(*framework)
       }
