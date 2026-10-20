@@ -169,6 +169,36 @@ against arbitrary String subclass overrides or tracing. A Lowrail replacement
 would additionally certify `empty?`, `ascii_only?`, `getbyte`, regexp and
 encoding-map behavior, including callbacks and observational boundaries.
 
+### Sealed candidate #3, not a guardless backport
+
+The [design/fuzzer follow-up](string-blank.md) stops a guardless guarded-tier
+backport: 236,416 ordinary cases per Ruby target and Rails' 433 assertions
+agree, yet subclass primitive overrides, constant replacement and regexp
+observation differ. Normal VM dispatch correctly handles a later `blank?`
+redefinition; that one fact does not close the rest of the certificate.
+
+Owner decision: **third sealed candidate**, after link_to and config bind,
+with a micro budget of **−118,626 interpreter / −155,248 YJIT Ir** on show,
+zero objects (roughly 1.4% of the interpreter request, not a measured sealed
+request win). SEAL001 covers post-seal method/visibility/refinement changes;
+SEAL001/008 cover rebinding `BLANK_RE` and mutation of the encoding map, whose
+legitimate cache population needs an explicit live-policy boundary. SEAL009
+must accept edited ISeq/trace observations. Existing overrides are **not**
+excused as post-seal mutations: certify seal-time native String/Regexp/Integer
+dependencies and enumerate String subclasses with effective method owners
+for `ascii_only?`, `getbyte`, `match?` and `empty?`; refuse if overridden.
+Also inventory already-existing String-instance singleton overrides: a
+subclass-only scan misses those. No eigenclass creation is needed to inspect
+an existing effective method through captured native reflection. New unknown
+receivers must stay original unless the contract/certificate covers them.
+
+Build only **after** the central production TracePoint fix, the six additional
+sealed-only quarantines, and the sealed owner's published generic eligibility
+boundary. Reuse that tier/manifest mechanism; do not invent a third delivery
+path or a test-certificate override. Complete seal-time/actual-input refusal,
+installed framework and app/compat gates precede fresh finite show request
+cohorts. No runtime implementation or default change is in this design step.
+
 ## Protocol, invalid attempt, and retained evidence
 
 The [numeric export](next-levers-results.json) carries all finite verdicts,
@@ -213,7 +243,8 @@ warmup removes its one-time allocation; the equality threshold was not widened.
    Lowrail guard. The interpreter show opportunity is about 1.36% before a
    hypothetical Lowrail certificate, not the entire 2.88% self share. Keep
    the guarded Lowrail budget at zero until the full certificate is priced;
-   no new pass or local framework patch is warranted by this micro alone.
+   the guardless design is refused. Candidate #3 may proceed only under the
+   sealed prerequisites and seal-time override refusals above.
 2. **Config bind is the second sealed candidate, but hold promotion and
    deployment.** Its measured interpreter benefit already includes the
    existing checks; the missing suppressed-hook certificate would add cost
