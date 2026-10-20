@@ -132,11 +132,16 @@ each pass present in the manifest requires `lowrail/passes/<name>` and calls
    implementation (asymmetric inputs, a fact changed after boot).
 3. **Gate**: `lowrail verify` on all corpus apps: identical outcomes and SQL
    traces, hits where they genuinely occur, every fallback explained.
-4. **Measure** with `lowrail bench`: saved µs per hit × hits per request =
-   expected effect; then the measured request effect against an A/A control.
-5. **Promote** to `default: on` only if the expected effect is ≥ 2 % on some
-   corpus route, the measurement agrees, and nothing gets slower beyond
-   noise. Otherwise it stays opt-in with its numbers in `docs/passes/`.
+4. **Measure** with `lowrail bench`: saved µs or instructions per completed hit
+   (guard included) × hits per request = expected effect; then the measured
+   request effect against an A/A control. Keep metrics/JIT state comparable;
+   guard success alone is not necessarily a completed specialization. Partial
+   budgets and rejected controls are recorded, not promoted.
+5. **Promote** to `default: on` only if the expected effect, individually or
+   as a measured pass set, is ≥ 2 % on some corpus route, the measurement
+   agrees, and nothing gets slower beyond noise. Otherwise it stays opt-in
+   with its numbers in `docs/passes/`. Smaller passes may stack; do not demand
+   that each independently cross the threshold.
 
 Rules that apply to every pass: exact semantics or refuse; no data cached
 across requests; refusal reasons are recorded, never silent.
@@ -156,4 +161,12 @@ and `guard.rb` to land.
 4. `Lowrail::Passes` registry and one activation helper in the gem; move the
    seven passes behind it without changing their behavior (verify gates
    before/after must match, including hits per unit).
-5. `lowrail bench APP --pass NAME` wrapping `docs/bench.md`'s method.
+5. **Implemented:** `lowrail bench APP --pass NAME [--path /path]` wraps
+   `request_pairs.rb`, `callgrind.c` and optional `gc_requests.rb`, with
+   separate strict build/activation/JIT/coverage probes. Versioned JSON and a
+   short Markdown table carry controls, request effects and optional guarded
+   per-hit budgets. Existing AR/preload method micros share fresh-process
+   A/A orchestration; remaining operation adapters are listed in
+   [bench.md](bench.md#remaining-per-pass-adapters). Stacked `--passes` mode
+   with a separate default reference and an additivity budget is the
+   [immediate follow-up](bench.md#immediate-follow-up-stacked-pass-sets).

@@ -10,6 +10,21 @@ live in the linked docs; numbers come from executed runs, dated.
 Ruby 3.4+ (gemspec), developed on 4.0.7. real-blog on Ruby 3.4.11 builds the
 same 11 units and verifies 21/21 identical with 114 hits.
 
+- **Shared pass benchmark** (`lowrail bench APP --pass NAME [--path /path]`):
+  fixed-heap Callgrind primary, independent mandatory A/A controls, actual-JIT
+  attestation, general stale-build and activation rejection. Separate counted
+  probes keep stats outside measurement windows; AR/preload method micros
+  reuse their existing operations with shared off/off/on controls and
+  guard-included per-hit budgets. Versioned `result.json` and `table.md` are
+  the pass-thread handoff. Request-only or partially modeled measurements do
+  not claim promotion; source/memo/digest micro adapters remain per-pass.
+  Fresh blog plus cached/uncached Campfire default and +instantiate instruction
+  runs reproduce the base-cost result with both A/A and heap controls passing;
+  the native guarded micro's failed A/A remains rejected. Exact numbers and
+  run-to-run CI caveats are [recorded with the CLI validation](bench.md#cli-validation-against-the-base-cost-experiment).
+  Stacked `--passes`/additivity measurement is the immediate follow-up, not
+  implemented by treating today's selected/default layer as a stack report.
+  See [the protocol and remaining adapters](bench.md#shared-command-lowrail-bench).
 - **Boot facts** (`lowrail facts APP`): modules, methods with owner,
   source location, visibility and ISeq kind, models, controllers, routes and
   compiled template code. Prism classifies origins: real-blog has 13 source

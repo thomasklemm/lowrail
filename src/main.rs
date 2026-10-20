@@ -1,6 +1,7 @@
 //! Lowrail CLI. See docs/PLAN.md for the pipeline and docs/FORMATS.md for
 //! the files each step reads and writes.
 
+mod bench;
 mod build;
 mod facts;
 mod lower;
@@ -16,6 +17,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   parse FILE...        check that files parse with Prism
   facts APP            boot APP, write APP/.lowrail/facts.json, print a summary
   build APP            lower APP using its facts, write ISeqs + manifest
+  bench APP --pass NAME [--path PATH]  controlled pass/request measurements
   types APP [--rbs DIR] derive types from boot facts, optionally write RBS
   mcp APP              serve read-only type/fact tools over stdio
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes
@@ -28,6 +30,7 @@ fn main() -> ExitCode {
             "parse" => parse(rest),
             "facts" => facts::cli(rest),
             "build" => build::cli(rest),
+            "bench" => bench::cli(rest),
             "types" => types::cli(rest),
             "mcp" => mcp::cli(rest),
             "verify" => verify::cli(rest),

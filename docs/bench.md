@@ -6,6 +6,231 @@ setup described in the [Campfire M0](m0/campfire.md). Ruby 3.4+ is required;
 these runs use the repository's Ruby 4.0.7. **Callgrind instructions are the
 primary work metric; native YJIT CPU/wall time and allocations are secondary.**
 
+## Shared command: `lowrail bench`
+
+Migration step 5 uses the existing harness, not a second measurement method:
+
+```sh
+# Build once; bench never rebuilds or modifies the app's manifest.
+RAILS_LOG_LEVEL=error SECRET_KEY_BASE_DUMMY=1 mise exec -- \
+  target/debug/lowrail build .corpus/real-blog-r4 --env production
+mise exec -- target/debug/lowrail bench .corpus/real-blog-r4 \
+  --pass default --path /articles --out /tmp/blog-bench
+
+# A pass name or its Rust-registry alias selects only that pass's unit IDs.
+# Build with --passes default,+ar_instantiate first for this example.
+mise exec -- target/debug/lowrail bench .corpus/real-blog-r4 \
+  --pass ar_instantiate --path GET:/articles --out /tmp/blog-ar-bench \
+  --micro-case load_20 --model Article
+
+# Campfire fixture authentication remains private, as in the M0 setup.
+export BENCH_HEADERS="$(cat .corpus/campfire/tmp/m0/headers.json)"
+path=$(jq -r .room .corpus/campfire/tmp/m0/paths.json)
+CAMPFIRE_RESPONSE_CACHE_MB=0 mise exec -- target/debug/lowrail bench \
+  .corpus/campfire --pass default --path "$path" --out /tmp/campfire-uncached
+# Repeat with a NEW output directory and CAMPFIRE_RESPONSE_CACHE_MB unset
+# for the cached endpoint. No failed A/A run is retried to obtain a green run.
+```
+
+`--path` defaults to `/` and accepts `/path` or `VERB:/path`. It must return
+2xx, not an authentication redirect. `--out` defaults to `APP/tmp/lowrail-bench`
+and must not exist. `--pass default` measures **all units in the existing
+build**, including optional ones if present; named passes select their own
+IDs through `BENCH_UNITS` on the harness's enabled/default layer. Other layers
+stay intact. This is guard selection, not a rebuild: other emitted sites
+still pay their fallback guards. For a single-pass build without that cost,
+exclude the other passes at build time, e.g.
+`--passes default,-link_to,-path,+ar_instantiate`.
+`BENCH_INSTANTIATE_DIR` still adds a second complete build to a
+default/base-cost experiment. It too gets a strict activation probe.
+
+`BENCH_BASELINE_LIB=/absolute/archived/gem/lib` adds the existing same-manifest
+before-runtime instruction layer and `runtime_change_pct`. Use a source-only
+build with `--pass default`: named selection would otherwise compare different
+unit sets. The archived library gets its own strict preflight, activation/JIT
+probe and end-of-run fingerprint check. Optional GC diagnostics still describe
+the current runtime, not this instruction-only archived comparison.
+
+The default counter is fixed-heap Callgrind, interpreter, six fresh rounds;
+all heap/GC/window controls and bootstrap CIs below apply unchanged. The CLI
+rejects legacy heap mode and tolerance overrides. `--counter native` selects
+the existing YJIT CPU/wall experiment (at least five independent cohorts;
+one-boot diagnostics are refused); `--diagnostics` additionally
+runs `gc_requests.rb` through the existing GC driver. The same environment
+settings below control requests, warmup, cohorts, jobs, seed and pool floors.
+Do not run builds or other native benchmarks concurrently with a measurement.
+
+Before measuring, the command rejects incompatible Ruby/format/environment,
+changed source/templates, absent/corrupt ISeqs or loader contracts and changed
+pass certificates (including the library actually selected by
+`BENCH_LOWRAIL_LIB`). A separate warmed, counted process checks activation,
+loaded-file delivery, actual JIT state and per-unit hits/fallbacks. Runtime AR
+variants must actually be installed. Every measured request worker's **actual**
+JIT state is checked too; Ruby flags alone do not override production
+`config.yjit`. A second fingerprint check rejects concurrent build/source
+changes. None of these probes runs in a measured window. A zero-hit cached
+route is valid coverage evidence, not evidence that its pass improved anything.
+
+Outputs, also on rejection:
+
+- **`result.json`**, schema version 1, recursively sorted object keys: verdict,
+  pass selection, corpus/lock/runtime/manifest fingerprints, actual JIT state,
+  counted coverage, layered estimates, both A/A gates, heap checks and optional
+  micro/budget. Missing quantities are not invented; `measurement_complete`
+  is false for request-only, mixed-metric or partially modeled measurements.
+- **`table.md`** and the same short stdout table: total/GC-excluded instructions
+  (or CPU/wall µs), paired deltas/CIs, verdict and the per-hit budget if measured.
+  Copy this plus the relevant JSON into `docs/passes/`; include rejected controls.
+- Private `requests/` samples/client dumps and worker logs, optional
+  `diagnostics/`, and micro samples. Headers/cookies are never serialized by the
+  runner. Paths, app logs and heap diagnostics can still contain secrets; review
+  them before publishing. The CLI exits nonzero on a failed control or build.
+
+### Guard-included micros and expected effect
+
+`--micro-case CASE` reuses `ar_instantiate.rb`, `preload_paths.rb` or
+`ar_cached_reader.rb`, depending on the selected pass. `--model MODEL` is
+required for instantiate, e.g. `load_20`/`Article` or `load_20`/`Message`.
+Preload's `already_loaded_creator` is a narrow Campfire case; SQL readers use
+their exact output label (and `BENCH_READER=logo|avatar` where appropriate).
+Only operations with genuine completed hits are accepted, not component-only
+builder/epoch timings or zero-hit controls.
+
+Six randomized, fresh-process off/off/on native-YJIT rounds include the real
+method's guard and original fallback. Their A/A wall-time CI must contain zero
+and fit within ±2%. `BENCH_MICRO_ROUNDS` (minimum six) and
+`BENCH_MICRO_SECONDS` (default 0.5 per process/case) control the micro only.
+A separate counted micro obtains completed hits/iteration; each case must
+exercise exactly one selected unit. The tool subtracts paired off/on µs and
+divides by those hits, then multiplies by that **same unit's** independently
+counted request frequency. Savings are signed: a regression stays negative.
+Other hit units are listed as unmodeled rather than borrowing this unit's cost.
+
+Use `--counter native --micro-case ...` for a same-metric comparison of that
+expected µs/request with the measured request saving and its A/A control.
+Interpreter instructions cannot be converted into YJIT µs; the default run
+keeps these separate and cannot constitute a complete promotion measurement.
+Request-only acceptance is not pass promotion or a native speed claim.
+
+### Immediate follow-up: stacked pass sets
+
+The current CLI accepts `--pass NAME`, **not** `--passes`. Stacked measurement
+is the immediate follow-up, not a claim that every individual pass must save
+2% by itself. Many smaller passes may add up to a worthwhile set.
+
+The intended interface is `--passes default,+ar_instantiate,+inertia/config_bind`
+or `--passes all-opt-in`, against a build containing all requested units. It
+needs a **separate stacked layer alongside no-setup, default and independent
+A/A workers**. Reusing today's selected/default layer would erase the default
+comparison and make the result ambiguous. The output must show stacked saving
+against both references, the sum of comparable individual guard-included
+expected effects, the difference from that sum, and per-unit coverage/fallbacks
+to reveal overlap or interference. Missing budgets must remain unmodeled;
+µs/YJIT and interpreter instructions must not be added together. Controls keep
+their present gates. Native uncertainty must account for independent boots,
+not treat blocks from one worker as independent experiments.
+
+This also needs multi-operation/model budget input, whereas today's guarded
+micro adapter deliberately models one unit at a time. It is therefore a
+report/measurement-contract extension, not just another selector spelling.
+`--pass default` over an optional build does measure its complete enabled set
+against no setup, but does **not** provide the separate default reference or
+additivity report and must not be presented as that feature.
+
+### Remaining per-pass adapters
+
+The request branches of `ar_instantiate_runs.rb` and `ar_cached_runs.rb` now
+delegate to this command's Ruby entry point and produce its reports. Historical
+micro/breakdown entry points remain available as diagnostics. Still per-pass:
+
+| Pass/tool | Remaining work, not supplied by the shared driver |
+|---|---|
+| route/path, view/link_to | guarded emitted-operation micros and site-specific budgets; `routes.rb` explicitly excludes the call-site guard and is not imported as a guarded saving |
+| memo, digest | guarded micro adapters and completed-hit denominators; `memo_runs.rb`, `memo_check.rb` and digest pass-specific fixtures remain diagnostic recipes |
+| preload | mixed-query/result workloads and the legacy multi-format/cache `preload_runs.rb` sweep; the narrow micro already uses the shared controls |
+| AR instantiate | per-model/row-shape budgets; do not apply one model's saving to another model or STI fallback |
+| AR plans | reader selection, completion frequency and cold/missing-attachment interpretation; `ar_plans_runs.rb` is a diagnostic implementation comparison, not an installed-pass gate |
+| new passes | attest runtime activation and add an operation adapter after defining a genuine completed-hit counter; shared request, rejection, A/A and report machinery needs no new copy |
+
+For a new **native** operation adapter, retain the original method/fallback
+and guard in the timed operation. Write `BENCH_JSON` as rows with `case`/`us`
+(or `route`/`us_per_req`); snapshot `PassProbe.counts` before timing and attach
+`PassProbe.sample(iterations, before)` after timing for the separate counted
+worker. Register the operation in `PassBench.micro` and attest activation in
+`PassProbe.active!` if it is a runtime pass. The shared driver supplies the
+fresh workers, actual-JIT check, A/A, hit denominator and budget.
+
+There is **no generic callback/compiled-template fixed-heap instruction micro
+adapter yet**. Add that operation boundary to the shared Callgrind runner
+(client windows, N−0 subtraction, independent rounds and the existing A/A
+gate), rather than introducing another timing protocol. Request instructions
+already use this method; the existing native micro is not an instruction
+budget for it.
+
+### CLI validation against the base-cost experiment
+
+The migration replays all six published primary datasets through the shared
+summary code: default/instantiate medians and CIs agree to 1e−10, and the
+historical **before-cached A/A remains rejected**. This checks analysis
+compatibility; it is not a fresh application measurement.
+
+Fresh production runs use Ruby 4.0.7, the same corpus pins and fixed-heap
+six-round/50-request/50-warmup method. The archived after-runtime library
+matches every runtime digest in the published dataset. The new real-blog-r4
+lockfile is byte-identical to the original real-blog lockfile. Default and
+optional builds are held unchanged within each fresh comparison. The table
+compares total instruction deltas against no setup, in percent:
+
+| Route/layer | Published after median [95% CI] | Fresh CLI median [95% CI] | Point difference (percentage points) |
+|---|---:|---:|---:|
+| real-blog-r4 default | −5.959 [−5.983, −5.949] | −5.935 [−5.964, −5.901] | +0.024 |
+| real-blog-r4 +instantiate | −5.728 [−5.746, −5.681] | −5.669 [−5.699, −5.640] | +0.059 |
+| Campfire uncached default | +0.122 [+0.054, +0.151] | +0.098 [+0.072, +0.109] | −0.024 |
+| Campfire uncached +instantiate | −0.126 [−0.133, −0.102] | −0.116 [−0.142, −0.103] | +0.010 |
+| Campfire cached default | −0.045 [−0.110, +0.022] | −0.041 [−0.088, +0.049] | +0.004 |
+| Campfire cached +instantiate | +0.029 [−0.046, +0.081] | +0.051 [+0.028, +0.116] | +0.022 |
+
+All three fresh experiments pass total and GC-excluded A/A and all five heap
+capacity controls. These reproduce the base-cost result under an independent
+run-to-run comparison, **not** a requirement that a new point estimate fall
+inside an old narrow interval. Nominal six-round bootstrap CIs understate
+run-to-run variance; retain both intervals and the point differences rather
+than rerunning controls or widening their tolerance. This is an instruction
+result, not a YJIT latency claim.
+
+The native-YJIT `Article/load_20` micro also exercises the budget: exactly
+20 completed hits/iteration and 3 Article hits/request. The other 3
+Comment hits/request remain explicitly unmodeled. Its A/A is **rejected**:
++3.714% [−4.171, +17.045], outside ±2%. The diagnostic −0.258 µs/hit × 3 =
+−0.774 µs/request is therefore **not an accepted effect estimate**. No control
+was retried. Sanitized reports, exact comparisons, coverage and the failed
+micro are in [bench-cli-results.json](bench-cli-results.json).
+
+After pulling the shared archived-runtime seam, a current-runtime named
+`ar_instantiate` CLI run passes both instruction A/A and heap controls:
++0.588% [+0.559, +0.634] total, +0.587% [+0.577, +0.654] GC-excluded.
+This selection retains other emitted fallback guards; it is not the complete
+default/+instantiate comparison above. Its probe attests all 17 model variants,
+3 Article + 3 Comment hits/request and zero completed route specializations.
+`--diagnostics` completes three rounds/36 GC workers, all actually interpreter.
+The five-cohort native CLI check is correctly **rejected**: CPU A/A CI
+[−3.590, +4.760]%, wall [−3.610, +4.792]%, outside ±2%; all workers actually
+enable YJIT. It produces no accepted request saving or micro budget.
+
+The source-only `BENCH_BASELINE_LIB` CLI comparison also passes: both current
+and archived activation probes complete 10 route specializations/request;
+same-manifest current-versus-archived total change is +0.0037%
+[−0.0608, +0.0514], excluded −0.0289% [−0.0390, +0.0167]. This validates the
+wrapper against the pre-registry runtime on main, not the separately gated
+step-4 runtime refactor. Both A/A and heap controls pass. All of these reports
+are included in the sanitized JSON above; failed native controls are retained.
+
+Deliberately stale Ruby/format metadata and an invalid original-ISeq
+fingerprint in the real blog build are rejected before measurement; the
+manifest is restored afterward. A boot fixture that explicitly enables YJIT
+despite interpreter intent is rejected too. The probes require JSON only
+after Bundler locks the app's version (Campfire provides the real-app check).
+
 ## Primary: executed instructions
 
 ```sh

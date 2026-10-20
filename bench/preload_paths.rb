@@ -16,10 +16,12 @@ cases = {
   "already_loaded_creator" => -> { ActiveRecord::Associations::Preloader.new(records: loaded, associations: { creator: :avatar_attachment }).call },
   "account_first_control" => -> { Account.first }
 }
+cases.select! { |name, _| ENV.fetch("BENCH_CASES").split(",").include?(name) } if ENV["BENCH_CASES"]
 seconds = Float(ENV.fetch("BENCH_SECONDS", "3"))
 results = cases.map do |name, block|
   200.times { block.call }
   GC.start
+  hits = PassProbe.counts if defined?(PassProbe)
   before = GC.stat(:total_allocated_objects)
   n = 0
   started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -29,8 +31,10 @@ results = cases.map do |name, block|
     n += 1
   end
   elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
-  { route: name, us_per_req: elapsed / n * 1e6,
+  sample = { route: name, us_per_req: elapsed / n * 1e6,
     allocs_per_req: (GC.stat(:total_allocated_objects) - before).fdiv(n) }
+  sample.merge!(PassProbe.sample(n, hits)) if defined?(PassProbe)
+  sample
 end
 puts JSON.pretty_generate(results)
 File.write(ENV.fetch("BENCH_JSON"), JSON.pretty_generate(results))

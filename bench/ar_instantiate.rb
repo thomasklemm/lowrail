@@ -33,6 +33,7 @@ rows = []
 def measure(seconds, block)
   300.times { block.call }
   GC.start
+  hits = PassProbe.counts if defined?(PassProbe)
   before = GC.stat(:total_allocated_objects)
   n = 0
   start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -42,7 +43,9 @@ def measure(seconds, block)
     n += 1
   end
   elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
-  { us: elapsed * 1e6 / n, allocations: (GC.stat(:total_allocated_objects) - before).fdiv(n) }
+  sample = { us: elapsed * 1e6 / n, allocations: (GC.stat(:total_allocated_objects) - before).fdiv(n) }
+  sample.merge!(PassProbe.sample(n, hits)) if defined?(PassProbe)
+  sample
 end
 
 cases = {

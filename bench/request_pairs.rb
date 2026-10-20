@@ -158,7 +158,7 @@ module RequestPairs
         runtime_lib = layer == "before" ? baseline : lib
         env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
           "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => build_root,
-          "LOWRAIL_UNITS" => layer == "disabled" ? "" : nil,
+          "LOWRAIL_UNITS" => layer == "disabled" ? "" : (layer == "default" ? ENV["BENCH_UNITS"] : nil),
           "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil,
           "LOWRAIL_SHADOW" => nil,
           "RUBYOPT" => build_root ? "-I#{runtime_lib} -rlowrail/setup" : nil,

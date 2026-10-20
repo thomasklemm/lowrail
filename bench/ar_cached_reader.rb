@@ -39,6 +39,7 @@ abort "fixture missing" unless %w[avatar logo].include?(ENV["BENCH_READER"]) || 
 ActiveRecord::Base.uncached do
   1_000.times { read.call }
   GC.start
+  hits = PassProbe.counts if defined?(PassProbe)
   count = 0
   objects = GC.stat(:total_allocated_objects)
   started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -50,6 +51,7 @@ ActiveRecord::Base.uncached do
   rows = [{ route: name, calls: count,
     us_per_req: (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1e6 / count,
     allocs_per_req: (GC.stat(:total_allocated_objects) - objects).fdiv(count) }]
+  rows.first.merge!(PassProbe.sample(count, hits)) if defined?(PassProbe)
   File.write(ENV.fetch("BENCH_JSON"), JSON.pretty_generate(rows))
   puts JSON.pretty_generate(rows)
 end
