@@ -7,7 +7,8 @@ guarded by the boot facts they assume, falling back to the original code the
 moment a fact stops holding.
 
 Inspired by [Roundhouse](https://github.com/rubys/roundhouse). Status: planning
-and first vertical slice. See [docs/PLAN.md](docs/PLAN.md).
+and first vertical slice. See [docs/PLAN.md](docs/PLAN.md) and, for how a
+pass plugs in, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Goals
 
