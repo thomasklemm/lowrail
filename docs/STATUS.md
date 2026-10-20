@@ -44,6 +44,19 @@ same 11 units and verifies 21/21 identical with 114 hits.
   response-cache-disabled room +10.2%: not a general application-speed win,
   so it is opt-in (`lowrail build --preload-plans`) until it no longer
   slows real requests.
+- **AR SQL plans** ([survey, guards and measurements](passes/ar-plans.md)),
+  opt-in with `lowrail build --ar-plans`: fixed scoped-association readers
+  reuse Rails SQL builders/BindMaps; original relation loading, inverses,
+  preloading, strict loading and query cache remain live. Five non-system
+  corpus gates: **741 identical outcomes / 16,182 identical traced queries**.
+  Campfire has eight eligible readers, **677 genuine hits / 367 explained
+  scope/epoch fallbacks**; the other four apps have no eligible reader and
+  zero AR-plan hits. Source refusals are in the ledger. Guarded logo reads
+  save 21 objects but no measured time (79.14 → 90.66 µs); actual route
+  coverage predicts **under 0.2%** time change everywhere. Request medians
+  are noise-dominated, including 7–9% movement on zero-hit PingCRM controls.
+  Keep opt-in. Attribute dispatch was a guarded negative result; general
+  escaping app-chain plans remain unimplemented (SQL-only ceiling 21–22 µs).
 - **Guarded memo** ([certificate/refusal details](passes/memo.md)), opt-in
   with `lowrail build --memo`: fresh-return SHA-256 string reuse, bounded by
   runtime keys and guarded implementation facts. Campfire **634 identical**,
