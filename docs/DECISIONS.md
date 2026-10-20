@@ -13,6 +13,38 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## 512 MiB decision recheck (2026-10-20)
+
+The authorized finite remeasurement on the pinned brk512 tool is in
+[bench.md](bench.md#decision-critical-512-mib-remeasurement-2026-10-20), with
+old/new CIs, every control and the numeric export. **No optimization decision
+flips; nothing is reopened or promoted.** Historical rejections stay rejected.
+These findings cover the measured snapshot, not the subsequent runtime work
+integrated by the publication rebase; see the explicit provenance boundary.
+
+1. **Caller-side sections: stop holds.** The optimistic combined checks still
+   exceed the whole two-link budget by +3,607 Ir. No runtime pilot or widening.
+2. **Body-installed endpoint: stop holds.** Internal checks alone still lose
+   +4,419 Ir after subtracting unchanged-delivery overhead. A sealed contract
+   or VM epoch remains necessary, not a sufficient complete certificate.
+3. **Inertia props: opt-in/no promotion holds.** The final runtime regresses
+   interpreter Ir by +4.364% with accepted controls. Its one YJIT cohort is
+   rejected for non-flat measured windows in 5/36 workers; diagnostic +31.043%
+   is not an accepted regression magnitude. Both modes count 4 hits/request,
+   zero fallbacks. No rerun or clean-arm salvage.
+4. **Quarantine holds; one observation changes.** Current default remains
+   near off in magnitude: show −0.004% is unresolved, but index −0.062%
+   [−0.084, −0.052] is a small **resolved** saving, not literally “within noise.”
+   The fresh default has zero units; this is not restored source-pass credit.
+   The unsafe former-default saving was not remeasured. Keep quarantine and
+   the sealed-first decision; any sealed benefit still needs its own gate.
+5. **L2_events stays an upper bound.** Show −37.297% reproduces the large
+   interpreter ceiling with accepted controls. Unchanged assigns/observer/
+   mutation omissions still prevent semantic certification or promotion.
+6. **Shipped K holds.** The original runtime snapshots reproduce net
+   822.005 → 425.004 interpreter Ir/check and 371 → 140 YJIT. Both modes'
+   arm cohorts pass every control. Still no accepted request/native speed win.
+
 ## Architecture
 
 | Item | State | Why / evidence |
@@ -35,7 +67,7 @@ stacked set as well as to single passes.
 | Upstream VM-epoch proposal (ruby-core / JIT team) | held until the sealed pilot measures a request result | 534 Ir for two checkpoints vs 94,466 Ir of guards is an estimate, not an endpoint saving, and the epoch leaves holder/value/config/table gaps. A proposal needs a measured request win that the epoch would make safe without the sealed contract. Local draft only; no external post |
 | First sealed slice: reactivate the quarantined `view/link_to` and `route/path` arms under the contract | decided, before the show endpoint pilot | They delivered −5.995 % index / −0.987 % show Ir and lost them only to post-seal mutations (suppressed-hook redefinition, singleton `route.format` via `to_param`), which the contract forbids (SEAL001) and seal-check detects. Smallest end-to-end proof of the tier: existing generator, known numbers, known counterexamples as negative fixtures. Remaining non-epoch facts (builder receiver, config, mutable tables) stay checked or refused. Guarded-tier quarantine unchanged |
 | Two tiers: guarded (default) and sealed (opt-in) | decided; sealed tier in design | Caller-side certification costs more than it saves (0fbb909), and entry checks cannot cover mid-request mutation (45fd07a). The sealed tier trades an explicit app contract (no code/subscriber/config/route mutation after boot, among others) for ahead-of-time endpoints without per-call checks. Ruby cannot fully enforce the contract (suppressed hooks, captured `bind_call`), so `lowrail seal-check` verifies it with the app's own suite and reports `file:line` and a fix. Test stubs deopt the process and are not counted as failures. Guarded tier unchanged |
-| Body-installed endpoint specialization | being priced | Deliver the specialized body as the original method's own ISeq, so VM dispatch handles identity, visibility and redefinition. Guards only cover facts the body reads. Stop unless the two-link micro saves net of guards |
+| Body-installed endpoint specialization | stopped; sealed contract / VM epoch needed | Delivering the body's own ISeq removes the outer dispatch certificate, not the nested facts. Internal-method checks alone exceed the entire two-link budget: historical +4,720 Ir, pinned-brk512 recheck +4,419 [+4,337, +4,633]. Stop holds; no runtime implementation ([recheck](bench.md#decision-critical-512-mib-remeasurement-2026-10-20)) |
 | Ship `passes.rb` as precompiled ISeq | parked | Would remove most of the cold registry cost; only after migration 4 lands |
 
 ## Passes
@@ -48,7 +80,7 @@ stacked set as well as to single passes.
 | `active_record/instantiate` | parked | −38 % load-only on the Rails alpha; upstream fixed the builder (rails/rails@f126797d45), gain disappears on current main. Keep for the guard machinery, not for the win. First stacked measurement (blog `/articles`, fixed-heap): default+instantiate is **+0.59 % [+0.53, +0.60] instructions vs default**, i.e. a net cost on Rails 8.1. Parked: never part of a default set on 8.1; the builder should refuse where the per-row guard exceeds the saving |
 | AR plans, preload plans | opt-in | Expected effect < 0.2 %; zero Rails-suite reader/preload hits, being investigated (round 2) |
 | `inertia/config_bind` | opt-in | 5 → 3 objects/bind, expected 0.5–2.8 % on JSON routes; native A/A controls failed. Upstream PR inertiajs/inertia-rails#437 may make it obsolete; keep for older versions only |
-| `inertia/props` | opt-in experiment; no promotion | Ordinary-Hash tuple iteration only; original prop body/lexical scope and fallback retained, actual iterator/visibility checked at every traversal after app code. Five-app 779 outcomes and own-thread SQL identical, nonzero hits in all three Inertia apps. One cohort/mode: draft regresses interpreter +0.873% [+0.788, +0.956], YJIT +0.976% [+0.845, +1.068]; controls pass but both are rejected as final-runtime certification after safety fixes changed fingerprints. No replacement cohorts or credited gain ([contract and retained evidence](passes/props.md)) |
+| `inertia/props` | opt-in experiment; no promotion | Ordinary-Hash tuple iteration only; original prop body/lexical scope and fallback retained, actual iterator/visibility checked at every traversal after app code. Five-app 779 outcomes and own-thread SQL identical, nonzero hits in all three Inertia apps. Historical draft +0.873% interpreter / +0.976% YJIT cohorts stay rejected after safety fixes changed fingerprints ([retained evidence](passes/props.md)). One new final-runtime brk512 cohort/mode: interpreter +4.364% [+4.292, +4.462] accepted; YJIT diagnostic +31.043% rejected (5/36 non-flat workers). No credited gain or retry ([recheck](bench.md#decision-critical-512-mib-remeasurement-2026-10-20)) |
 | Whole compiled ERB specialization | surveyed; no pass | I18n epoch not closed; Campfire URLs have 7 valid guards but 0 completed lowerings/request. No credited saving; [profile and refusals](passes/erb.md) |
 | Literal-run ERB | rejected | 2 sites across five apps; two append calls saved per rendered layout do not justify a pass/guard ([survey](passes/erb.md)) |
 | Route pass with host/protocol `default_url_options` | parked | Widening the optimized predicate is not exact (`to_param` ordering counterexample); scalar-only args cover 1/4 Campfire path calls, base-AR `to_param` certification would cover 4/4, but the ceiling is ~0.3 % of an uncached room request (19 calls × ~2 µs). Revisit as a stacking item once per-hit route budgets exist ([route-helpers.md](passes/route-helpers.md)) |

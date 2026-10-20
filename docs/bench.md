@@ -100,6 +100,115 @@ manifest/binary SHA. This orb's script-built Callgrind SHA-256 is
 checks both preflight and worker warnings even when the tool exits 0;
 it fails without the fix. No old result was remeasured.
 
+### Decision-critical 512 MiB remeasurement (2026-10-20)
+
+This is a separately authorized **finite recheck**, not a replacement of the
+historical exports above. Measured checkout:
+[`d7d62ba`](https://github.com/thomasklemm/lowrail/commit/d7d62ba).
+**Publication boundary:** the final `pull --rebase` brought in subsequent
+runtime work. “Current default” and “final runtime” below mean this measured
+snapshot and its recorded fingerprints, **not certification of later main**.
+No extra cohort was added after that rebase.
+Ruby 4.0.7, Rails 8.1.4, production, the same corpus source pins and **identical
+lockfile hashes** as the originals: blog `570c9c31…8596`, Starter
+`e1819832…a2fb`. The blog uses its generated three-article/three-comment seed
+and precompiled assets; Starter uses `bench/inertia_setup.rb`'s disposable
+authenticated JSON `/dashboard` fixture. Cookies are regenerated locally,
+never copied into the report. Props source files match final
+[`c19ed7c`](https://github.com/thomasklemm/lowrail/commit/c19ed7c), not the
+pre-safety-fix runtime in the rejected historical cohorts.
+
+`script/bench-valgrind /tmp/vg` built source/patch pins above, with Callgrind
+binary SHA-256
+`5c05c41335b887309475b6ba4fc7d1484a1b6bd115c2989b18f06ba9448f3335`.
+`PATH=/tmp/vg/bin:$PATH`, `CPATH=/tmp/vg/include${CPATH:+:$CPATH}` and unlimited
+data limit apply throughout. Corpus/toolchain setup and app builds finish
+before launching cohorts.
+Fresh production artifacts include the post-`initialize!` activation change;
+props is rebuilt separately for interpreter and YJIT. Endpoint body delivery
+uses this checkout's compiler/loader, not an archived unsafe runtime.
+These are current-runtime decision checks, **not an isolated causal estimate
+of the tool change** (especially final props versus its pre-fix diagnostic).
+
+Each request comparison/mode runs once: six fresh-process rounds, seed 41231,
+unchanged five heap floors, both total/GC-excluded windows and the c9d2397
+observer/settling protocol, independent A/A required to contain zero within
+±0.5%, actual JIT-state checks and the full YJIT-flat gate. No failed worker
+or cohort is replaced. Two jobs per shared-driver invocation, at most two
+concurrent invocations: **maximum four Callgrind workers**, no native speed
+claim. Guard runtimes each get exactly one six-round arm cohort per mode,
+sequentially; they cannot share a runtime load path.
+
+The unmodified `endpoint_sections.rb` and `endpoint_bodies.rb` drivers use
+N=200 and their original captured two-link specimens; no unrelated operation
+is substituted. Props uses `lowrail bench --pass props --path /dashboard`,
+`--passes default,+props` at build time, N=50 and 50 initial warmup requests.
+The empty current default uses `request_pairs.rb` directly, N=50, on index and
+show: the CLI correctly refuses a zero-unit “accelerated” build. This checks
+**current default versus off**, not a new measurement of the lost unsafe
+default saving. Unlike the old quarantine cohort it uses c9d2397 settling.
+L2_events uses the unchanged `blog_ablation.rb` / `blog_eventful.rb` specimen
+with only `off_a`, `off_b`, `L2_events` and show selected through the same
+`RequestPairs.heap_instructions`, N=50. Its isolated eight body/all-header/SQL
+fixture pairs pass; known arbitrary-observer/assigns/mutation omissions stay.
+
+`guard_breakdown.rb` keeps its original `loop,cached` or `loop,inline` cases,
+N=100,000, 100,000-call warmup, independent loop/loop A/A and paired subtraction
+of each runtime's **own** empty loop. Pre-K `GUARD_LOWRAIL_LIB` is archived
+[`560bc64`](https://github.com/thomasklemm/lowrail/commit/560bc64), K is archived
+[`690f64d`](https://github.com/thomasklemm/lowrail/commit/690f64d). Measuring
+`cached` on today's runtime would not reproduce the old implementation.
+The guard driver also gets the shared heap-only tool preflight and a scan of
+every worker's combined stderr/stdout for either brk warning; the request
+driver retains its real-app preflight and per-worker refusal gate.
+
+The [numeric export](bench-brk512-results.json) retains all six samples per
+arm, both metric/control summaries, JIT observations, source/runtime/tool
+fingerprints, preflight and worker-log hashes, and the restricted orchestration
+sources. Raw Callgrind/heap logs and authentication remain private. CIs below
+are nominal round-bootstrap 95% intervals; changes/deficits are paired within
+round, not differences of displayed medians. **A/H/J/B** mean both A/A gates,
+all five heap checks, actual JIT/warmup/window checks, and preflight plus every
+worker's brk-log check, respectively. Historical acceptance never implies
+the old brk gate passed. Decisions are assessed in
+[DECISIONS.md](DECISIONS.md#512-mib-decision-recheck-2026-10-20).
+
+| Comparison | Historical stock-tool result [95% CI] | 512 MiB-tool result [95% CI] | New controls / verdict | Decision |
+|---|---|---|---|---|
+| Caller-side combined section checks, two show links | 93,649 vs 90,042 Ir; deficit **+3,607 [+3,441, +3,688]** | 93,649 vs 90,043 Ir; deficit **+3,607 [+3,589, +3,659]** | accepted; A/H/J/B pass | stop still holds |
+| Body-installed internal checks, two show links | 94,466 vs 89,729 Ir; deficit **+4,720 [+4,695, +4,814]** | 94,182 vs 89,741 Ir; deficit **+4,419 [+4,337, +4,633]** | accepted; A/H/J/B pass | stop still holds; sealed contract / VM epoch needed |
+| Starter JSON props, interpreter | draft **+0.873% [+0.788, +0.956]**, rejected final-runtime certification | final runtime **+4.364% [+4.292, +4.462]**; 5,121,108 → 5,345,304 Ir/request | accepted; A/H/J/B pass | no promotion still holds; larger regression |
+| Starter JSON props, YJIT | draft **+0.976% [+0.845, +1.068]**, rejected final-runtime certification | **diagnostic +31.043% [+30.772, +31.104]**; 3,265,733 → 4,279,981 Ir/request | **REJECTED J**, 5/36 workers non-flat; A/H/B pass | no accepted YJIT result; no promotion / no retry |
+| Current quarantined default vs off, blog index | −0.006% [−0.037, +0.013] | **−0.062% [−0.084, −0.052]** | accepted; A/H/J/B pass | quarantine holds; “within noise” observation changes |
+| Current quarantined default vs off, blog show | −0.004% [−0.033, +0.046] | **−0.004% [−0.086, +0.014]** | accepted; A/H/J/B pass | quarantine and unresolved-from-off observation hold |
+| L2_events show vs L0 | −37.287% [−37.316, −37.247] | **−37.297% [−37.323, −37.282]**; 8,748,023 → 5,484,235 Ir/request | accepted; A/H/J/B pass | large upper bound holds; not semantic certification |
+| Guard old cached → K, interpreter, net Ir/check | 822 → 425 | **822.005 [822.005, 822.005] → 425.004 [425.004, 425.004]** | both arm cohorts accepted; A/H/J/B pass | shipped K decision holds; no request-win claim |
+| Guard old cached → K, YJIT, net Ir/check | 371 → 140 | **371 [371, 371] → 140 [140, 140]** | both arm cohorts accepted; A/H/J/B pass | shipped K decision holds; no native-speed claim |
+
+**No optimization decision flips. Changed observation:** current default is
+still near off in magnitude, but index is **not statistically unresolved
+from off** in this cohort. Its small resolved saving is not credited to an
+accelerated source pass: the fresh default manifest has zero units. Show
+remains unresolved. This does not remeasure the unsafe pre-quarantine saving
+or justify reactivation. The body cost subtracts the measured unchanged-ISeq
+delivery increment, +2,782 [+2,635, +2,819] Ir, before pricing guards; that
+increment remains unattributed. Both endpoint prices still omit additional
+certificate work, not just its runtime implementation.
+
+Props' counted probes have **4 hits/request, 0 fallbacks** in both modes.
+All 36 YJIT workers reach the three-flat-window warmup, but `0-disabled`,
+`0-missing`, `1-disabled`, `1-off_a`, `3-off_b` compile respectively
+21 / 18 / 18 / 4 / 2 extra blocks inside a measured window (no extra ISeq or
+invalidation). **The whole cohort stays rejected**, even though the enabled
+arm is flat; no clean-arm salvage. The old two fingerprint-rejected cohorts
+also stay rejected. Deterministic guard costs yield point bootstrap intervals
+across six identical net slopes; that is not a universal uncertainty bound.
+
+The export audit independently recomputes raw-window slopes and paired
+estimates/CIs: **11 finite cohorts / 294 Callgrind workers; 10 accepted,
+one rejected (props YJIT); all eight distinct preflights and all worker brk
+checks clean**. No cohort was rerun, and no runtime/pass/default changed.
+
 ## Shared command: `lowrail bench`
 
 **Current quarantine:** the default selection is empty. A default-only build
