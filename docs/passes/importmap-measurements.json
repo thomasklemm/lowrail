@@ -1,0 +1,2813 @@
+{
+  "date": "2026-10-20",
+  "source_main": "035dce3613d5e44a9f1df1db8f81182374e807e7",
+  "patch_sha256": "8ff987046d197fd66f0894ecf9b6fc608cd82bb33fa35cac4a0fcc7fc7ee7d25",
+  "trace": {
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+    "yjit": true,
+    "regexp_timeout": 1.0,
+    "importmap_bytes": 7703,
+    "imports": 90,
+    "distinct_urls": 90,
+    "locations": [
+      "localhost/assets/"
+    ],
+    "nonce_generator": "nil",
+    "requests": {
+      "room": {
+        "requests": 20,
+        "calls_per_request": {
+          "URI::RFC3986_Parser#parse": 181.0,
+          "Importmap::Map#to_json": 1.0,
+          "InlineScriptHashes#script_locations": 1.0,
+          "inside script_locations: InlineScriptHashes#script_locations": 1.0,
+          "#<Class:JSON>#parse": 7.0,
+          "inside script_locations: #<Class:JSON>#parse": 1.0,
+          "#<Class:JSON::Ext::Parser>#parse": 7.0,
+          "inside script_locations: #<Class:JSON::Ext::Parser>#parse": 1.0,
+          "#<Class:URI>#join": 90.0,
+          "inside script_locations: #<Class:URI>#join": 90.0,
+          "URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#parse": 180.0,
+          "InlineScriptHashes#script_hashes": 1.0,
+          "#<Class:Digest::Class>#base64digest": 2.0,
+          "ActionDispatch::ContentSecurityPolicy#build": 1.0
+        }
+      },
+      "messages": {
+        "requests": 20,
+        "calls_per_request": {
+          "URI::RFC3986_Parser#parse": 181.0,
+          "Importmap::Map#to_json": 1.0,
+          "InlineScriptHashes#script_locations": 1.0,
+          "inside script_locations: InlineScriptHashes#script_locations": 1.0,
+          "#<Class:JSON>#parse": 7.0,
+          "inside script_locations: #<Class:JSON>#parse": 1.0,
+          "#<Class:JSON::Ext::Parser>#parse": 7.0,
+          "inside script_locations: #<Class:JSON::Ext::Parser>#parse": 1.0,
+          "#<Class:URI>#join": 90.0,
+          "inside script_locations: #<Class:URI>#join": 90.0,
+          "URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#parse": 180.0,
+          "InlineScriptHashes#script_hashes": 1.0,
+          "#<Class:Digest::Class>#base64digest": 2.0,
+          "ActionDispatch::ContentSecurityPolicy#build": 1.0
+        }
+      },
+      "sidebar": {
+        "requests": 20,
+        "calls_per_request": {
+          "URI::RFC3986_Parser#parse": 181.0,
+          "Importmap::Map#to_json": 1.0,
+          "InlineScriptHashes#script_locations": 1.0,
+          "inside script_locations: InlineScriptHashes#script_locations": 1.0,
+          "#<Class:JSON>#parse": 6.0,
+          "inside script_locations: #<Class:JSON>#parse": 1.0,
+          "#<Class:JSON::Ext::Parser>#parse": 6.0,
+          "inside script_locations: #<Class:JSON::Ext::Parser>#parse": 1.0,
+          "#<Class:URI>#join": 90.0,
+          "inside script_locations: #<Class:URI>#join": 90.0,
+          "URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#parse": 180.0,
+          "InlineScriptHashes#script_hashes": 1.0,
+          "#<Class:Digest::Class>#base64digest": 2.0,
+          "ActionDispatch::ContentSecurityPolicy#build": 1.0
+        }
+      },
+      "search": {
+        "requests": 20,
+        "calls_per_request": {
+          "URI::RFC3986_Parser#parse": 181.0,
+          "Importmap::Map#to_json": 1.0,
+          "InlineScriptHashes#script_locations": 1.0,
+          "inside script_locations: InlineScriptHashes#script_locations": 1.0,
+          "#<Class:JSON>#parse": 6.0,
+          "inside script_locations: #<Class:JSON>#parse": 1.0,
+          "#<Class:JSON::Ext::Parser>#parse": 6.0,
+          "inside script_locations: #<Class:JSON::Ext::Parser>#parse": 1.0,
+          "#<Class:URI>#join": 90.0,
+          "inside script_locations: #<Class:URI>#join": 90.0,
+          "URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#join": 90.0,
+          "inside script_locations: URI::RFC3986_Parser#parse": 180.0,
+          "InlineScriptHashes#script_hashes": 1.0,
+          "#<Class:Digest::Class>#base64digest": 2.0,
+          "ActionDispatch::ContentSecurityPolicy#build": 1.0
+        }
+      }
+    }
+  },
+  "micro": {
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+    "yjit": true,
+    "regexp_timeout": 1.0,
+    "importmap_bytes": 7703,
+    "imports": 90,
+    "distinct_urls": 90,
+    "locations": [
+      "localhost/assets/"
+    ],
+    "nonce_generator": "nil",
+    "baseline": {
+      "request": [
+        {
+          "cpu_us": 2816.186035,
+          "allocations": 6160.397
+        },
+        {
+          "cpu_us": 2741.3265379999993,
+          "allocations": 6160.518
+        },
+        {
+          "cpu_us": 2711.143057000001,
+          "allocations": 6160.79
+        },
+        {
+          "cpu_us": 2710.0603769999993,
+          "allocations": 6161.566
+        },
+        {
+          "cpu_us": 2711.278996000001,
+          "allocations": 6161.087
+        },
+        {
+          "cpu_us": 2716.7995660000024,
+          "allocations": 6161.316
+        },
+        {
+          "cpu_us": 2731.9736000000003,
+          "allocations": 6161.433
+        }
+      ],
+      "importmap_json": [
+        {
+          "cpu_us": 1.2843689999968433,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.14428999999793746,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.15027399999922864,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.14117899999988026,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.1436390000009169,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.140725999997926,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.1381789999967964,
+          "allocations": 1.0
+        }
+      ],
+      "json_parse": [
+        {
+          "cpu_us": 13.18715800000092,
+          "allocations": 93.07
+        },
+        {
+          "cpu_us": 12.97413599999686,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 12.789336000000873,
+          "allocations": 93.086
+        },
+        {
+          "cpu_us": 12.879372000000442,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 12.481279000002843,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 12.930010000001602,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 12.62501299999741,
+          "allocations": 93.071
+        }
+      ],
+      "uri_joins": [
+        {
+          "cpu_us": 741.7876809999981,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 826.2841390000019,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 782.5207380000023,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 796.3112569999993,
+          "allocations": 3070.045
+        },
+        {
+          "cpu_us": 750.4420329999988,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 752.5489140000019,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 753.2792940000022,
+          "allocations": 3070.03
+        }
+      ],
+      "script_locations": [
+        {
+          "cpu_us": 1156.8892919999953,
+          "allocations": 5335.931
+        },
+        {
+          "cpu_us": 1317.1701770000013,
+          "allocations": 5335.934
+        },
+        {
+          "cpu_us": 1230.6346629999964,
+          "allocations": 5335.946
+        },
+        {
+          "cpu_us": 1191.9282220000014,
+          "allocations": 5335.931
+        },
+        {
+          "cpu_us": 1328.675650000001,
+          "allocations": 5335.946
+        },
+        {
+          "cpu_us": 1265.453164,
+          "allocations": 5335.946
+        },
+        {
+          "cpu_us": 1278.9759009999955,
+          "allocations": 5336.002
+        }
+      ],
+      "script_hashes": [
+        {
+          "cpu_us": 37.72909399999946,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.72762499999749,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.79928400000421,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.46385300000077,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.443935000001204,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.601541000003124,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.77688100000154,
+          "allocations": 14.0
+        }
+      ],
+      "csp_build": [
+        {
+          "cpu_us": 6.101479000001574,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.13318799999496,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.233231000005389,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.135283999997854,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.1395399999947236,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.099609000005501,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.622059000003787,
+          "allocations": 30.0
+        }
+      ]
+    },
+    "candidate": {
+      "request": [
+        {
+          "cpu_us": 1592.4965219999976,
+          "allocations": 1681.013
+        },
+        {
+          "cpu_us": 1530.8260190000026,
+          "allocations": 1681.008
+        },
+        {
+          "cpu_us": 1599.4309379999975,
+          "allocations": 1680.914
+        },
+        {
+          "cpu_us": 1505.0130879999983,
+          "allocations": 1680.861
+        },
+        {
+          "cpu_us": 1501.5044500000058,
+          "allocations": 1680.928
+        },
+        {
+          "cpu_us": 1591.136695000003,
+          "allocations": 1680.788
+        },
+        {
+          "cpu_us": 1499.864512000002,
+          "allocations": 1680.932
+        }
+      ],
+      "importmap_json": [
+        {
+          "cpu_us": 0.14725100000134717,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.16056100000128026,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.13612000000051694,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.13630000000119935,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.13527800000190382,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.13639000000154056,
+          "allocations": 1.0
+        },
+        {
+          "cpu_us": 0.16756100000492324,
+          "allocations": 1.0
+        }
+      ],
+      "json_parse": [
+        {
+          "cpu_us": 12.909229999998217,
+          "allocations": 93.07
+        },
+        {
+          "cpu_us": 13.225503999997557,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 12.805794999998454,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 13.068861000000709,
+          "allocations": 93.086
+        },
+        {
+          "cpu_us": 13.037721000003442,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 12.90551099999959,
+          "allocations": 93.071
+        },
+        {
+          "cpu_us": 15.478555000001395,
+          "allocations": 93.071
+        }
+      ],
+      "uri_joins": [
+        {
+          "cpu_us": 769.2721899999952,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 768.2153919999947,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 773.2264549999996,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 747.369913,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 763.655086,
+          "allocations": 3070.03
+        },
+        {
+          "cpu_us": 772.7241030000016,
+          "allocations": 3070.086
+        },
+        {
+          "cpu_us": 802.9973110000057,
+          "allocations": 3070.045
+        }
+      ],
+      "script_locations": [
+        {
+          "cpu_us": 28.084684000006632,
+          "allocations": 52.0
+        },
+        {
+          "cpu_us": 26.514176999995694,
+          "allocations": 52.0
+        },
+        {
+          "cpu_us": 26.42242400000327,
+          "allocations": 52.0
+        },
+        {
+          "cpu_us": 26.554709999999208,
+          "allocations": 52.001
+        },
+        {
+          "cpu_us": 26.71264199999257,
+          "allocations": 52.016
+        },
+        {
+          "cpu_us": 26.544690999998014,
+          "allocations": 52.0
+        },
+        {
+          "cpu_us": 26.91028100001347,
+          "allocations": 52.0
+        }
+      ],
+      "script_hashes": [
+        {
+          "cpu_us": 37.25851700001215,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 38.72668600000395,
+          "allocations": 14.015
+        },
+        {
+          "cpu_us": 37.3698659999917,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.537722999995026,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 36.873790999990774,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 37.76146900000299,
+          "allocations": 14.0
+        },
+        {
+          "cpu_us": 38.066071999992346,
+          "allocations": 14.015
+        }
+      ],
+      "csp_build": [
+        {
+          "cpu_us": 5.205688000003761,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.332242000008591,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.359300999998595,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.265413000003605,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.174945000007369,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.211524999992889,
+          "allocations": 30.0
+        },
+        {
+          "cpu_us": 5.166755999994166,
+          "allocations": 30.0
+        }
+      ]
+    }
+  },
+  "bytes": {
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+    "yjit": true,
+    "regexp_timeout": 1.0,
+    "importmap_bytes": 7703,
+    "imports": 90,
+    "distinct_urls": 90,
+    "locations": [
+      "localhost/assets/"
+    ],
+    "nonce_generator": "nil",
+    "checks": {
+      "room": {
+        "bytes": 131792,
+        "comparisons": 3,
+        "html_identical": true,
+        "csp_identical": true
+      },
+      "messages": {
+        "bytes": 98162,
+        "comparisons": 3,
+        "html_identical": true,
+        "csp_identical": true
+      },
+      "sidebar": {
+        "bytes": 28442,
+        "comparisons": 3,
+        "html_identical": true,
+        "csp_identical": true
+      },
+      "search": {
+        "bytes": 43849,
+        "comparisons": 3,
+        "html_identical": true,
+        "csp_identical": true
+      }
+    }
+  },
+  "timeout_boundary": {
+    "original_error": "Regexp::TimeoutError",
+    "app_cache_reused": true
+  },
+  "profile": {
+    "raw_samples": 38892,
+    "script_locations_inclusive": 12608,
+    "inclusive_pct": 32.417977990332204
+  },
+  "instructions": {
+    "summary": {
+      "layers": {
+        "off_a": {
+          "instructions": {
+            "value": {
+              "median": 19766306.175,
+              "ci95": [
+                19760841.475,
+                19774573.84
+              ]
+            },
+            "delta_pct": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        "off_b": {
+          "instructions": {
+            "value": {
+              "median": 18146868.435,
+              "ci95": [
+                18016398.87,
+                19755606.42
+              ]
+            },
+            "delta_pct": {
+              "median": -8.167531944638517,
+              "ci95": [
+                -8.89108905317374,
+                -0.05413128232087949
+              ]
+            }
+          }
+        },
+        "app_fix": {
+          "instructions": {
+            "value": {
+              "median": 6151010.465,
+              "ci95": [
+                6111806.96,
+                6155355.52
+              ]
+            },
+            "delta_pct": {
+              "median": -68.88133569043029,
+              "ci95": [
+                -69.0925983565975,
+                -68.85074186852157
+              ]
+            }
+          }
+        }
+      },
+      "aa": {
+        "pass": false,
+        "metrics": {
+          "instructions": false
+        },
+        "tolerance_pct": 0.5
+      }
+    },
+    "metadata": {
+      "seed": 41231,
+      "rounds": 3,
+      "route": "GET:/rooms/486777696",
+      "app": "campfire",
+      "manifest_sha256": "a6d1464e3f15dbbc790b6874884b3848dae0b0809350fe2f07aea49b10f3eaa1",
+      "cache_mb": null,
+      "variant_app": "/home/user/workspace/repo/.corpus/campfire-importmap",
+      "workers": {
+        "0-empty-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-default-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-app_fix-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-off_b-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-default-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-off_a-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-disabled-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-off_a-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-missing-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-off_b-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-empty-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-app_fix-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-disabled-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "0-missing-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-missing-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-off_a-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-app_fix-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-disabled-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-off_b-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-off_a-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-empty-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-disabled-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-empty-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-missing-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-default-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-default-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-app_fix-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "1-off_b-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-off_a-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-disabled-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-app_fix-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-off_b-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-disabled-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-default-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-empty-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-off_a-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-app_fix-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-default-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-missing-0": {
+          "requests": 0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-empty-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-missing-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        },
+        "2-off_b-200": {
+          "requests": 200,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "yjit": false,
+          "compiled_iseqs": 0
+        }
+      },
+      "runtime_sha256": "41111083565c6c8f5629e4d06a53dbbd140bfc5a846ae12305d97aaafe29faff",
+      "counter": "callgrind",
+      "region": "after warmup and GC",
+      "requests": 200,
+      "yjit": false
+    },
+    "samples": [
+      {
+        "off_a": {
+          "instructions": 19760841.475,
+          "totals": {
+            "0": 3344,
+            "200": 3952171639
+          }
+        },
+        "off_b": {
+          "instructions": 18146868.435,
+          "totals": {
+            "200": 3629377031,
+            "0": 3344
+          }
+        },
+        "app_fix": {
+          "instructions": 6155355.52,
+          "totals": {
+            "0": 3344,
+            "200": 1231074448
+          }
+        }
+      },
+      {
+        "off_a": {
+          "instructions": 19766306.175,
+          "totals": {
+            "0": 3344,
+            "200": 3953264579
+          }
+        },
+        "off_b": {
+          "instructions": 19755606.42,
+          "totals": {
+            "0": 3344,
+            "200": 3951124628
+          }
+        },
+        "app_fix": {
+          "instructions": 6151010.465,
+          "totals": {
+            "200": 1230205437,
+            "0": 3344
+          }
+        }
+      },
+      {
+        "off_a": {
+          "instructions": 19774573.84,
+          "totals": {
+            "0": 3344,
+            "200": 3954918112
+          }
+        },
+        "off_b": {
+          "instructions": 18016398.87,
+          "totals": {
+            "0": 3344,
+            "200": 3603283118
+          }
+        },
+        "app_fix": {
+          "instructions": 6111806.96,
+          "totals": {
+            "200": 1222364736,
+            "0": 3344
+          }
+        }
+      }
+    ]
+  },
+  "native": {
+    "summary": {
+      "layers": {
+        "off_a": {
+          "cpu_us": {
+            "value": {
+              "median": 3219.8371424418638,
+              "ci95": [
+                2738.9119285714296,
+                3468.214584302331
+              ]
+            },
+            "delta_pct": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "wall_us": {
+            "value": {
+              "median": 3211.7161773255757,
+              "ci95": [
+                2735.4373508775584,
+                3464.295651162745
+              ]
+            },
+            "delta_pct": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "allocations": {
+            "value": {
+              "median": 6163.27034883721,
+              "ci95": [
+                6161.585526315789,
+                6163.6191860465115
+              ]
+            },
+            "delta_pct": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        "off_b": {
+          "cpu_us": {
+            "value": {
+              "median": 3125.194884236448,
+              "ci95": [
+                2867.284389534882,
+                3445.4843546511647
+              ]
+            },
+            "delta_pct": {
+              "median": -2.1067891958193585,
+              "ci95": [
+                -10.070556991838803,
+                15.164039022426369
+              ]
+            }
+          },
+          "wall_us": {
+            "value": {
+              "median": 3123.30039408885,
+              "ci95": [
+                2860.835697674702,
+                3441.5685232557357
+              ]
+            },
+            "delta_pct": {
+              "median": -2.1326577068394528,
+              "ci95": [
+                -10.038726082952914,
+                15.288636246299415
+              ]
+            }
+          },
+          "allocations": {
+            "value": {
+              "median": 6163.30701754386,
+              "ci95": [
+                6161.875,
+                6163.715116279071
+              ]
+            },
+            "delta_pct": {
+              "median": 0.0017922567446815307,
+              "ci95": [
+                -0.023252901800857595,
+                0.027155947512425005
+              ]
+            }
+          }
+        },
+        "app_fix": {
+          "cpu_us": {
+            "value": {
+              "median": 1518.3246083743852,
+              "ci95": [
+                1471.7041366279093,
+                1544.8501337719304
+              ]
+            },
+            "delta_pct": {
+              "median": -53.85060913132202,
+              "ci95": [
+                -54.37976633937485,
+                -43.43670963186628
+              ]
+            }
+          },
+          "wall_us": {
+            "value": {
+              "median": 1518.0649384232256,
+              "ci95": [
+                1469.9084505818603,
+                1544.392013158314
+              ]
+            },
+            "delta_pct": {
+              "median": -53.847797551512286,
+              "ci95": [
+                -54.39125410642687,
+                -43.38632115607106
+              ]
+            }
+          },
+          "allocations": {
+            "value": {
+              "median": 1681.1009852216748,
+              "ci95": [
+                1680.9331395348836,
+                1681.25
+              ]
+            },
+            "delta_pct": {
+              "median": -72.72146272273304,
+              "ci95": [
+                -72.72714410969846,
+                -72.71656645233818
+              ]
+            }
+          }
+        }
+      },
+      "aa": {
+        "pass": false,
+        "metrics": {
+          "cpu_us": false,
+          "wall_us": false
+        },
+        "tolerance_pct": 2.0
+      }
+    },
+    "cohorts": [
+      {
+        "seed": 41231,
+        "rounds": 8,
+        "requests_per_block": 228,
+        "manifest_sha256": "a6d1464e3f15dbbc790b6874884b3848dae0b0809350fe2f07aea49b10f3eaa1",
+        "runtime_sha256": "41111083565c6c8f5629e4d06a53dbbd140bfc5a846ae12305d97aaafe29faff",
+        "summary": {
+          "layers": {
+            "off_a": {
+              "cpu_us": {
+                "value": {
+                  "median": 2740.641870614032,
+                  "ci95": [
+                    2696.2778508771953,
+                    2769.575697368422
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 2735.4373508775584,
+                  "ci95": [
+                    2692.9226359644226,
+                    2763.60153947352
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6161.585526315789,
+                  "ci95": [
+                    6161.451754385965,
+                    6161.745614035088
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              }
+            },
+            "off_b": {
+              "cpu_us": {
+                "value": {
+                  "median": 3061.083296052636,
+                  "ci95": [
+                    3034.8352324561383,
+                    3099.6691907894738
+                  ]
+                },
+                "delta_pct": {
+                  "median": 11.190419876884627,
+                  "ci95": [
+                    7.850424694496594,
+                    14.342725884213126
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 3055.6418530707424,
+                  "ci95": [
+                    3032.8595000002533,
+                    3093.5649912285166
+                  ]
+                },
+                "delta_pct": {
+                  "median": 11.197117218289387,
+                  "ci95": [
+                    7.787927931283223,
+                    14.190594373842536
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6163.30701754386,
+                  "ci95": [
+                    6162.982456140351,
+                    6163.561403508772
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.027155947512425005,
+                  "ci95": [
+                    0.021639228504577446,
+                    0.03423948132526
+                  ]
+                }
+              }
+            },
+            "app_fix": {
+              "cpu_us": {
+                "value": {
+                  "median": 1544.8501337719304,
+                  "ci95": [
+                    1521.2234956140394,
+                    1556.3306929824555
+                  ]
+                },
+                "delta_pct": {
+                  "median": -43.43670963186628,
+                  "ci95": [
+                    -44.88383020871852,
+                    -41.90154443543834
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 1544.392013158314,
+                  "ci95": [
+                    1520.4735877199184,
+                    1555.0686096487384
+                  ]
+                },
+                "delta_pct": {
+                  "median": -43.38632115607106,
+                  "ci95": [
+                    -44.806182555264954,
+                    -41.873162920868076
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 1681.125,
+                  "ci95": [
+                    1681.0350877192982,
+                    1681.2236842105262
+                  ]
+                },
+                "delta_pct": {
+                  "median": -72.71656645233818,
+                  "ci95": [
+                    -72.717702177698,
+                    -72.71383837398768
+                  ]
+                }
+              }
+            }
+          },
+          "aa": {
+            "pass": false,
+            "metrics": {
+              "cpu_us": false,
+              "wall_us": false
+            },
+            "tolerance_pct": 2.0
+          }
+        },
+        "samples": [
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2763.60153947352,
+              "cpu_us": 2769.575697368422,
+              "allocations": 6161.3859649122805
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 3032.8595000002533,
+              "cpu_us": 3034.8352324561383,
+              "allocations": 6163.767543859649
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1525.337188596902,
+              "cpu_us": 1526.4840438596475,
+              "allocations": 1681.1447368421052
+            }
+          },
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2748.21821491207,
+              "cpu_us": 2750.6252017543857,
+              "allocations": 6161.763157894737
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 3036.362789473196,
+              "cpu_us": 3037.339934210522,
+              "allocations": 6162.951754385965
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1539.3504605265405,
+              "cpu_us": 1539.6398333333332,
+              "allocations": 1681.1184210526317
+            }
+          },
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2739.244868420979,
+              "cpu_us": 2741.9120789473695,
+              "allocations": 6161.517543859649
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 2691.678947367667,
+              "cpu_us": 2697.781179824566,
+              "allocations": 6163.491228070176
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1554.9466140354077,
+              "cpu_us": 1554.8613333333326,
+              "allocations": 1680.8377192982457
+            }
+          },
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2731.629833334138,
+              "cpu_us": 2739.371662280694,
+              "allocations": 6161.736842105263
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 3100.7315000004764,
+              "cpu_us": 3107.97055701754,
+              "allocations": 6163.083333333333
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1555.0686096487384,
+              "cpu_us": 1556.3306929824555,
+              "allocations": 1681.3201754385964
+            }
+          },
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2714.0150394731327,
+              "cpu_us": 2716.6097368421033,
+              "allocations": 6161.521929824561
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 3037.23948245673,
+              "cpu_us": 3041.44071929825,
+              "allocations": 6163.438596491228
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1708.614921052518,
+              "cpu_us": 1711.6088815789483,
+              "allocations": 1681.0350877192982
+            }
+          },
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2665.6079078941475,
+              "cpu_us": 2667.989052631579,
+              "allocations": 6161.745614035088
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 3112.0656184215113,
+              "cpu_us": 3116.3407894736833,
+              "allocations": 6163.175438596491
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1549.4335657900879,
+              "cpu_us": 1550.0604342105275,
+              "allocations": 1681.0657894736842
+            }
+          },
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2692.9226359644226,
+              "cpu_us": 2696.2778508771953,
+              "allocations": 6161.649122807017
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 3075.064364035522,
+              "cpu_us": 3082.997592105264,
+              "allocations": 6162.982456140351
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1520.4735877199184,
+              "cpu_us": 1521.2234956140394,
+              "allocations": 1681.1315789473683
+            }
+          },
+          {
+            "off_a": {
+              "requests": 228,
+              "wall_us": 2851.937394737298,
+              "cpu_us": 2856.480057017546,
+              "allocations": 6161.451754385965
+            },
+            "off_b": {
+              "requests": 228,
+              "wall_us": 3074.044223684755,
+              "cpu_us": 3080.725872807022,
+              "allocations": 6163.561403508772
+            },
+            "app_fix": {
+              "requests": 228,
+              "wall_us": 1514.6777105265005,
+              "cpu_us": 1515.6561052631594,
+              "allocations": 1681.2236842105262
+            }
+          }
+        ]
+      },
+      {
+        "seed": 41232,
+        "rounds": 8,
+        "requests_per_block": 203,
+        "manifest_sha256": "a6d1464e3f15dbbc790b6874884b3848dae0b0809350fe2f07aea49b10f3eaa1",
+        "runtime_sha256": "41111083565c6c8f5629e4d06a53dbbd140bfc5a846ae12305d97aaafe29faff",
+        "summary": {
+          "layers": {
+            "off_a": {
+              "cpu_us": {
+                "value": {
+                  "median": 2738.9119285714296,
+                  "ci95": [
+                    2668.6347339901517,
+                    2967.255379310341
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 2735.5546995070167,
+                  "ci95": [
+                    2664.745098522177,
+                    2959.8726600986793
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6161.741379310344,
+                  "ci95": [
+                    6161.448275862069,
+                    6161.862068965517
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              }
+            },
+            "off_b": {
+              "cpu_us": {
+                "value": {
+                  "median": 3125.194884236448,
+                  "ci95": [
+                    3072.100798029558,
+                    3304.446339901481
+                  ]
+                },
+                "delta_pct": {
+                  "median": 15.164039022426369,
+                  "ci95": [
+                    11.305366304564357,
+                    20.22494736986127
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 3123.30039408885,
+                  "ci95": [
+                    3067.893527094353,
+                    3292.533768472629
+                  ]
+                },
+                "delta_pct": {
+                  "median": 15.288636246299415,
+                  "ci95": [
+                    11.379574878812626,
+                    20.07815740415595
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6163.243842364533,
+                  "ci95": [
+                    6163.206896551724,
+                    6163.586206896552
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.02690253379985519,
+                  "ci95": [
+                    0.022544489391296274,
+                    0.030461722966212967
+                  ]
+                }
+              }
+            },
+            "app_fix": {
+              "cpu_us": {
+                "value": {
+                  "median": 1518.3246083743852,
+                  "ci95": [
+                    1500.3389064039409,
+                    1539.8376059113293
+                  ]
+                },
+                "delta_pct": {
+                  "median": -44.29688854771308,
+                  "ci95": [
+                    -47.0210199489686,
+                    -43.10323576814075
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 1518.0649384232256,
+                  "ci95": [
+                    1499.0715320199267,
+                    1538.89306896556
+                  ]
+                },
+                "delta_pct": {
+                  "median": -44.21927380012881,
+                  "ci95": [
+                    -46.944928981519716,
+                    -43.03174617449157
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 1681.1009852216748,
+                  "ci95": [
+                    1680.9679802955666,
+                    1681.2167487684728
+                  ]
+                },
+                "delta_pct": {
+                  "median": -72.71673449228744,
+                  "ci95": [
+                    -72.71820907455526,
+                    -72.71540407351384
+                  ]
+                }
+              }
+            }
+          },
+          "aa": {
+            "pass": false,
+            "metrics": {
+              "cpu_us": false,
+              "wall_us": false
+            },
+            "tolerance_pct": 2.0
+          }
+        },
+        "samples": [
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2959.8726600986793,
+              "cpu_us": 2967.255379310341,
+              "allocations": 6161.862068965517
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3404.452300492043,
+              "cpu_us": 3413.720901477833,
+              "allocations": 6163.68472906404
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1570.3625418719357,
+              "cpu_us": 1572.0216354679817,
+              "allocations": 1681.0935960591132
+            }
+          },
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2738.623088670165,
+              "cpu_us": 2746.4273300492637,
+              "allocations": 6161.847290640394
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3050.2667536938375,
+              "cpu_us": 3056.921,
+              "allocations": 6163.384236453202
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1538.89306896556,
+              "cpu_us": 1539.8376059113293,
+              "allocations": 1681.2167487684728
+            }
+          },
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2665.298448275208,
+              "cpu_us": 2668.6347339901517,
+              "allocations": 6161.871921182266
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3200.4412660104304,
+              "cpu_us": 3208.364704433497,
+              "allocations": 6163.261083743842
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1518.3739852207582,
+              "cpu_us": 1518.366812807881,
+              "allocations": 1681.0837438423646
+            }
+          },
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2973.0899556646727,
+              "cpu_us": 2979.6579704433534,
+              "allocations": 6161.862068965517
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3067.893527094353,
+              "cpu_us": 3072.100798029558,
+              "allocations": 6163.211822660099
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1475.490448275854,
+              "cpu_us": 1475.7353793103448,
+              "allocations": 1680.8423645320197
+            }
+          },
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2741.15385714319,
+              "cpu_us": 2743.5885812807846,
+              "allocations": 6161.330049261083
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3292.533768472629,
+              "cpu_us": 3304.446339901481,
+              "allocations": 6163.206896551724
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1517.7558916256933,
+              "cpu_us": 1518.2824039408893,
+              "allocations": 1680.92118226601
+            }
+          },
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2732.4863103438684,
+              "cpu_us": 2734.2352758620746,
+              "allocations": 6161.448275862069
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3150.253807881948,
+              "cpu_us": 3152.0719310344753,
+              "allocations": 6163.226600985222
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1499.0715320199267,
+              "cpu_us": 1500.3389064039409,
+              "allocations": 1681.1083743842364
+            }
+          },
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2658.087394089137,
+              "cpu_us": 2659.967467980299,
+              "allocations": 6161.635467980295
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3096.346980295753,
+              "cpu_us": 3098.317837438421,
+              "allocations": 6163.586206896552
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1535.4622019698168,
+              "cpu_us": 1537.0452857142789,
+              "allocations": 1681.3399014778324
+            }
+          },
+          {
+            "off_a": {
+              "requests": 203,
+              "wall_us": 2664.745098522177,
+              "cpu_us": 2671.523315270939,
+              "allocations": 6161.635467980295
+            },
+            "off_b": {
+              "requests": 203,
+              "wall_us": 3072.1408669943307,
+              "cpu_us": 3073.2102167487706,
+              "allocations": 6163.07881773399
+            },
+            "app_fix": {
+              "requests": 203,
+              "wall_us": 1507.4740098522939,
+              "cpu_us": 1511.0935221674877,
+              "allocations": 1681.1773399014778
+            }
+          }
+        ]
+      },
+      {
+        "seed": 41233,
+        "rounds": 8,
+        "requests_per_block": 172,
+        "manifest_sha256": "a6d1464e3f15dbbc790b6874884b3848dae0b0809350fe2f07aea49b10f3eaa1",
+        "runtime_sha256": "41111083565c6c8f5629e4d06a53dbbd140bfc5a846ae12305d97aaafe29faff",
+        "summary": {
+          "layers": {
+            "off_a": {
+              "cpu_us": {
+                "value": {
+                  "median": 3468.214584302331,
+                  "ci95": [
+                    3212.2654069767405,
+                    3714.832220930231
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 3464.295651162745,
+                  "ci95": [
+                    3209.172203489108,
+                    3712.973093023043
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6163.6191860465115,
+                  "ci95": [
+                    6163.232558139535,
+                    6164.075581395349
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              }
+            },
+            "off_b": {
+              "cpu_us": {
+                "value": {
+                  "median": 3445.4843546511647,
+                  "ci95": [
+                    3196.6583546511647,
+                    3615.8060290697686
+                  ]
+                },
+                "delta_pct": {
+                  "median": -2.3749351336205757,
+                  "ci95": [
+                    -6.843397642476168,
+                    3.3333022904174614
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 3441.5685232557357,
+                  "ci95": [
+                    3195.024052324909,
+                    3603.266098837086
+                  ]
+                },
+                "delta_pct": {
+                  "median": -2.426071607044772,
+                  "ci95": [
+                    -6.968748314907092,
+                    3.2622262921540246
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6163.715116279071,
+                  "ci95": [
+                    6163.46511627907,
+                    6163.941860465116
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0017922567446815307,
+                  "ci95": [
+                    -0.003961367237603763,
+                    0.006225968704121065
+                  ]
+                }
+              }
+            },
+            "app_fix": {
+              "cpu_us": {
+                "value": {
+                  "median": 1510.652502906973,
+                  "ci95": [
+                    1452.0830755813997,
+                    1624.905162790698
+                  ]
+                },
+                "delta_pct": {
+                  "median": -54.21503193259865,
+                  "ci95": [
+                    -60.41608148911084,
+                    -52.24990896498992
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 1507.309752907378,
+                  "ci95": [
+                    1451.725680233055,
+                    1622.2060174419144
+                  ]
+                },
+                "delta_pct": {
+                  "median": -54.16529910128204,
+                  "ci95": [
+                    -60.42308775888722,
+                    -52.340415558726704
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 1680.9331395348836,
+                  "ci95": [
+                    1680.6976744186047,
+                    1681.1220930232557
+                  ]
+                },
+                "delta_pct": {
+                  "median": -72.72714410969846,
+                  "ci95": [
+                    -72.7332407714829,
+                    -72.72494026715415
+                  ]
+                }
+              }
+            }
+          },
+          "aa": {
+            "pass": false,
+            "metrics": {
+              "cpu_us": false,
+              "wall_us": false
+            },
+            "tolerance_pct": 2.0
+          }
+        },
+        "samples": [
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3524.8561744189174,
+              "cpu_us": 3533.4929069767472,
+              "allocations": 6164.186046511628
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3639.844959301426,
+              "cpu_us": 3651.274906976742,
+              "allocations": 6163.941860465116
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1451.725680233055,
+              "cpu_us": 1452.0830755813997,
+              "allocations": 1680.5406976744187
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3712.973093023043,
+              "cpu_us": 3714.832220930231,
+              "allocations": 6164.075581395349
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3544.151313953302,
+              "cpu_us": 3546.365174418608,
+              "allocations": 6163.761627906977
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1463.1035988372787,
+              "cpu_us": 1463.5816220930224,
+              "allocations": 1681.1279069767443
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3855.916168604804,
+              "cpu_us": 3856.1020290697757,
+              "allocations": 6163.906976744186
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3587.207075580927,
+              "cpu_us": 3592.213633720939,
+              "allocations": 6163.970930232558
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1526.0525581396018,
+              "cpu_us": 1526.3962848837234,
+              "allocations": 1680.6976744186047
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3209.172203489108,
+              "cpu_us": 3212.2654069767405,
+              "allocations": 6163.587209302325
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3603.266098837086,
+              "cpu_us": 3615.8060290697686,
+              "allocations": 6163.860465116279
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1442.2351162791128,
+              "cpu_us": 1441.8553488372106,
+              "allocations": 1681.1220930232557
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3403.7351279065724,
+              "cpu_us": 3402.9362616279145,
+              "allocations": 6163.232558139535
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3338.9857325581693,
+              "cpu_us": 3344.6035348837213,
+              "allocations": 6163.616279069767
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1622.2060174419144,
+              "cpu_us": 1624.905162790698,
+              "allocations": 1680.9476744186047
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3225.1365058147157,
+              "cpu_us": 3231.164296511625,
+              "allocations": 6163.6511627906975
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3195.024052324909,
+              "cpu_us": 3196.6583546511647,
+              "allocations": 6163.668604651163
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1507.0537034886045,
+              "cpu_us": 1508.4367906976706,
+              "allocations": 1680.9186046511627
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3686.4806395349897,
+              "cpu_us": 3699.586325581394,
+              "allocations": 6163.28488372093
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3256.9176046520224,
+              "cpu_us": 3262.640151162787,
+              "allocations": 6163.441860465116
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1774.1049186053376,
+              "cpu_us": 1779.595680232557,
+              "allocations": 1680.8953488372092
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3185.789313952915,
+              "cpu_us": 3194.31587790698,
+              "allocations": 6162.761627906977
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3091.813656977212,
+              "cpu_us": 3097.346598837205,
+              "allocations": 6163.46511627907
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1507.5658023261515,
+              "cpu_us": 1512.8682151162755,
+              "allocations": 1681.0116279069769
+            }
+          }
+        ]
+      },
+      {
+        "seed": 41234,
+        "rounds": 8,
+        "requests_per_block": 172,
+        "manifest_sha256": "a6d1464e3f15dbbc790b6874884b3848dae0b0809350fe2f07aea49b10f3eaa1",
+        "runtime_sha256": "41111083565c6c8f5629e4d06a53dbbd140bfc5a846ae12305d97aaafe29faff",
+        "summary": {
+          "layers": {
+            "off_a": {
+              "cpu_us": {
+                "value": {
+                  "median": 3219.8371424418638,
+                  "ci95": [
+                    3143.775959302326,
+                    3378.2126686046495
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 3211.7161773255757,
+                  "ci95": [
+                    3135.9123023257994,
+                    3368.1988313964907
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6163.27034883721,
+                  "ci95": [
+                    6163.0988372093025,
+                    6163.4941860465115
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              }
+            },
+            "off_b": {
+              "cpu_us": {
+                "value": {
+                  "median": 2867.284389534882,
+                  "ci95": [
+                    2718.9572558139475,
+                    3122.922040697676
+                  ]
+                },
+                "delta_pct": {
+                  "median": -10.070556991838803,
+                  "ci95": [
+                    -18.46809720304866,
+                    -6.312676079252421
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 2860.835697674702,
+                  "ci95": [
+                    2715.9983488371477,
+                    3115.1050755815327
+                  ]
+                },
+                "delta_pct": {
+                  "median": -10.038726082952914,
+                  "ci95": [
+                    -18.51705811609078,
+                    -6.512953942401467
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6161.875,
+                  "ci95": [
+                    6161.6715116279065,
+                    6161.924418604651
+                  ]
+                },
+                "delta_pct": {
+                  "median": -0.023252901800857595,
+                  "ci95": [
+                    -0.028062743845369553,
+                    -0.019055650991040007
+                  ]
+                }
+              }
+            },
+            "app_fix": {
+              "cpu_us": {
+                "value": {
+                  "median": 1471.7041366279093,
+                  "ci95": [
+                    1464.9482383720942,
+                    1505.3401220930214
+                  ]
+                },
+                "delta_pct": {
+                  "median": -54.37976633937485,
+                  "ci95": [
+                    -55.55343937930986,
+                    -53.34252799915555
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 1469.9084505818603,
+                  "ci95": [
+                    1464.4785232555246,
+                    1503.231668604797
+                  ]
+                },
+                "delta_pct": {
+                  "median": -54.39125410642687,
+                  "ci95": [
+                    -55.58545653702116,
+                    -53.26086085914214
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 1681.25,
+                  "ci95": [
+                    1681.0232558139535,
+                    1681.3953488372092
+                  ]
+                },
+                "delta_pct": {
+                  "median": -72.72146272273304,
+                  "ci95": [
+                    -72.72348205407833,
+                    -72.72017220984395
+                  ]
+                }
+              }
+            }
+          },
+          "aa": {
+            "pass": false,
+            "metrics": {
+              "cpu_us": false,
+              "wall_us": false
+            },
+            "tolerance_pct": 2.0
+          }
+        },
+        "samples": [
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3639.116191860985,
+              "cpu_us": 3644.072395348838,
+              "allocations": 6163.191860465116
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 2772.353180233061,
+              "cpu_us": 2785.1107093023265,
+              "allocations": 6161.78488372093
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1466.632947673863,
+              "cpu_us": 1466.6491918604638,
+              "allocations": 1681.1976744186047
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3142.3071686044013,
+              "cpu_us": 3149.4372732558127,
+              "allocations": 6163.0988372093025
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 2696.987674418123,
+              "cpu_us": 2706.134703488373,
+              "allocations": 6161.924418604651
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1468.6873197671619,
+              "cpu_us": 1469.4478139534897,
+              "allocations": 1681.546511627907
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3333.2109593032346,
+              "cpu_us": 3334.838465116278,
+              "allocations": 6163.3488372093025
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 2715.9983488371477,
+              "cpu_us": 2718.9572558139475,
+              "allocations": 6161.889534883721
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1480.4304302325088,
+              "cpu_us": 1482.2209999999993,
+              "allocations": 1681.3023255813953
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3250.1772441859493,
+              "cpu_us": 3253.4488662790727,
+              "allocations": 6163.383720930233
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 2951.6545348833247,
+              "cpu_us": 2954.2243546511713,
+              "allocations": 6161.569767441861
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1471.1295813965587,
+              "cpu_us": 1473.960459302329,
+              "allocations": 1681.360465116279
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3135.9123023257994,
+              "cpu_us": 3143.775959302326,
+              "allocations": 6163.529069767442
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 2794.328697674711,
+              "cpu_us": 2799.7221918604596,
+              "allocations": 6161.558139534884
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1464.4785232555246,
+              "cpu_us": 1464.9482383720942,
+              "allocations": 1681.3953488372092
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3368.1988313964907,
+              "cpu_us": 3378.2126686046495,
+              "allocations": 6163.4941860465115
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3115.1050755815327,
+              "cpu_us": 3122.922040697676,
+              "allocations": 6162.0058139534885
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1518.2684593025103,
+              "cpu_us": 1518.3662383720905,
+              "allocations": 1680.7209302325582
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3131.2816279071653,
+              "cpu_us": 3132.597308139534,
+              "allocations": 6163.104651162791
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 2927.3426976746928,
+              "cpu_us": 2934.8465872093043,
+              "allocations": 6161.895348837209
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1526.0329069770855,
+              "cpu_us": 1528.4592441860434,
+              "allocations": 1681.139534883721
+            }
+          },
+          {
+            "off_a": {
+              "requests": 172,
+              "wall_us": 3173.255110465202,
+              "cpu_us": 3186.2254186046544,
+              "allocations": 6162.895348837209
+            },
+            "off_b": {
+              "requests": 172,
+              "wall_us": 3948.8013953484033,
+              "cpu_us": 3956.3576279069766,
+              "allocations": 6161.860465116279
+            },
+            "app_fix": {
+              "requests": 172,
+              "wall_us": 1458.2514476741867,
+              "cpu_us": 1463.621784883723,
+              "allocations": 1681.0232558139535
+            }
+          }
+        ]
+      },
+      {
+        "seed": 41235,
+        "rounds": 8,
+        "requests_per_block": 174,
+        "manifest_sha256": "a6d1464e3f15dbbc790b6874884b3848dae0b0809350fe2f07aea49b10f3eaa1",
+        "runtime_sha256": "41111083565c6c8f5629e4d06a53dbbd140bfc5a846ae12305d97aaafe29faff",
+        "summary": {
+          "layers": {
+            "off_a": {
+              "cpu_us": {
+                "value": {
+                  "median": 3361.98159482759,
+                  "ci95": [
+                    3228.0680057471263,
+                    3608.298425287355
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 3353.638764367431,
+                  "ci95": [
+                    3222.656206896746,
+                    3603.2807298847047
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6163.477011494253,
+                  "ci95": [
+                    6163.149425287356,
+                    6163.896551724138
+                  ]
+                },
+                "delta_pct": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                }
+              }
+            },
+            "off_b": {
+              "cpu_us": {
+                "value": {
+                  "median": 3278.0298477011484,
+                  "ci95": [
+                    3236.4373908045904,
+                    3369.751994252874
+                  ]
+                },
+                "delta_pct": {
+                  "median": -2.1067891958193585,
+                  "ci95": [
+                    -7.808733751551111,
+                    0.7330065263044805
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 3268.796189655697,
+                  "ci95": [
+                    3222.1003448285046,
+                    3367.6216264365885
+                  ]
+                },
+                "delta_pct": {
+                  "median": -2.1326577068394528,
+                  "ci95": [
+                    -7.758397467114375,
+                    0.58737276505898
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 6163.330459770115,
+                  "ci95": [
+                    6163.201149425287,
+                    6163.586206896552
+                  ]
+                },
+                "delta_pct": {
+                  "median": -0.002237778199959406,
+                  "ci95": [
+                    -0.005035140654219283,
+                    0.002704126590424849
+                  ]
+                }
+              }
+            },
+            "app_fix": {
+              "cpu_us": {
+                "value": {
+                  "median": 1538.8101666666666,
+                  "ci95": [
+                    1513.77158045977,
+                    1598.3380057471243
+                  ]
+                },
+                "delta_pct": {
+                  "median": -53.85060913132202,
+                  "ci95": [
+                    -57.04269641284261,
+                    -52.219126686693464
+                  ]
+                }
+              },
+              "wall_us": {
+                "value": {
+                  "median": 1535.823005746738,
+                  "ci95": [
+                    1511.9812126433067,
+                    1596.6595287354407
+                  ]
+                },
+                "delta_pct": {
+                  "median": -53.847797551512286,
+                  "ci95": [
+                    -57.03160637075043,
+                    -52.192862583073016
+                  ]
+                }
+              },
+              "allocations": {
+                "value": {
+                  "median": 1681.0545977011493,
+                  "ci95": [
+                    1680.9310344827586,
+                    1681.3333333333333
+                  ]
+                },
+                "delta_pct": {
+                  "median": -72.72611991029257,
+                  "ci95": [
+                    -72.72715405308381,
+                    -72.72077095581551
+                  ]
+                }
+              }
+            }
+          },
+          "aa": {
+            "pass": false,
+            "metrics": {
+              "cpu_us": false,
+              "wall_us": false
+            },
+            "tolerance_pct": 2.0
+          }
+        },
+        "samples": [
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3603.2807298847047,
+              "cpu_us": 3608.298425287355,
+              "allocations": 6164.126436781609
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3624.445419540666,
+              "cpu_us": 3626.88178735632,
+              "allocations": 6163.982758620689
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1611.6444482757538,
+              "cpu_us": 1612.4576494252835,
+              "allocations": 1681.1954022988505
+            }
+          },
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3739.847959769347,
+              "cpu_us": 3741.7648505747184,
+              "allocations": 6163.896551724138
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3367.6216264365885,
+              "cpu_us": 3369.751994252874,
+              "allocations": 6163.5114942528735
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1555.7906091957213,
+              "cpu_us": 1555.7052816091973,
+              "allocations": 1680.4827586206898
+            }
+          },
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3518.1032931046793,
+              "cpu_us": 3521.8688563218425,
+              "allocations": 6163.5344827586205
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3245.1548563219785,
+              "cpu_us": 3246.8554942528717,
+              "allocations": 6163.385057471264
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1511.6724712648104,
+              "cpu_us": 1512.8998965517217,
+              "allocations": 1680.971264367816
+            }
+          },
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3403.030390804763,
+              "cpu_us": 3409.7465862068957,
+              "allocations": 6163.33908045977
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3342.4830517249616,
+              "cpu_us": 3346.095385057477,
+              "allocations": 6163.206896551724
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1541.4290574703589,
+              "cpu_us": 1543.5973965517244,
+              "allocations": 1681.4655172413793
+            }
+          },
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3162.668367815644,
+              "cpu_us": 3168.153856321832,
+              "allocations": 6163.419540229885
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3292.4375229894154,
+              "cpu_us": 3301.1722586206843,
+              "allocations": 6163.586206896552
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1511.9812126433067,
+              "cpu_us": 1513.77158045977,
+              "allocations": 1681.3333333333333
+            }
+          },
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3222.656206896746,
+              "cpu_us": 3228.0680057471263,
+              "allocations": 6163.591954022989
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3126.257896550586,
+              "cpu_us": 3127.2688160919506,
+              "allocations": 6163.120689655172
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1530.2169540231175,
+              "cpu_us": 1534.0229367816091,
+              "allocations": 1681.0114942528735
+            }
+          },
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3304.247137930099,
+              "cpu_us": 3314.216603448285,
+              "allocations": 6162.850574712644
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3222.1003448285046,
+              "cpu_us": 3236.4373908045904,
+              "allocations": 6163.275862068966
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1596.6595287354407,
+              "cpu_us": 1598.3380057471243,
+              "allocations": 1681.0977011494253
+            }
+          },
+          {
+            "off_a": {
+              "requests": 174,
+              "wall_us": 3225.665683907596,
+              "cpu_us": 3231.202511494245,
+              "allocations": 6163.149425287356
+            },
+            "off_b": {
+              "requests": 174,
+              "wall_us": 3244.2814482752597,
+              "cpu_us": 3254.887436781612,
+              "allocations": 6163.201149425287
+            },
+            "app_fix": {
+              "requests": 174,
+              "wall_us": 1516.3411781606724,
+              "cpu_us": 1519.5903275862083,
+              "allocations": 1680.9310344827586
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

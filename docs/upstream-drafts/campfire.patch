@@ -1,0 +1,85 @@
+diff --git a/app/controllers/concerns/inline_script_hashes.rb b/app/controllers/concerns/inline_script_hashes.rb
+index 4577292..acae44f 100644
+--- a/app/controllers/concerns/inline_script_hashes.rb
++++ b/app/controllers/concerns/inline_script_hashes.rb
+@@ -7,6 +7,7 @@ module InlineScriptHashes
+   extend ActiveSupport::Concern
+ 
+   ENTRY_POINT_SCRIPT = %(import "application")
++  SCRIPT_LOCATIONS = ActiveSupport::Cache::MemoryStore.new(size: 1.megabyte, max_key_size: false)
+ 
+   included do
+     # With the policy turned off there's nothing to add to, so leave the
+@@ -35,13 +36,18 @@ module InlineScriptHashes
+     # after a redirect. Nothing under the asset directory redirects.
+     def script_locations(importmap)
+       assets = File.join(config.relative_url_root.to_s, Rails.application.config.assets.prefix, "")
+-
+-      JSON.parse(importmap)["imports"].values.map do |url|
+-        url = URI.join(request.base_url, url)
+-        origin = url.origin == request.base_url ? request.host_with_port : url.origin
+-        directory = url.path[0, url.path.rindex(assets) + assets.length] if url.path.include?(assets)
+-        "#{origin}#{directory || url.path}"
+-      end.uniq
++      base_url, host_with_port = request.base_url, request.host_with_port
++      # Cache derived locations, not the policy or resolver. Full input bytes
++      # distinguish hosts, deploys and config changes without stat/TTL guesses.
++      key = JSON.generate([ importmap, assets, base_url, host_with_port ])
++      SCRIPT_LOCATIONS.fetch(key) do
++        JSON.parse(importmap)["imports"].values.map do |url|
++          url = URI.join(base_url, url)
++          origin = url.origin == base_url ? host_with_port : url.origin
++          directory = url.path[0, url.path.rindex(assets) + assets.length] if url.path.include?(assets)
++          "#{origin}#{directory || url.path}"
++        end.uniq
++      end
+     end
+ 
+     def script_hashes(*scripts)
+diff --git a/test/integration/content_security_policy_test.rb b/test/integration/content_security_policy_test.rb
+index 7a3aaf6..22673e0 100644
+--- a/test/integration/content_security_policy_test.rb
++++ b/test/integration/content_security_policy_test.rb
+@@ -5,6 +5,42 @@ class ContentSecurityPolicyTest < ActionDispatch::IntegrationTest
+ 
+   setup { sign_in :david }
+ 
++  test "warm pages reuse resolved CSP locations" do
++    get root_url
++    follow_redirect! while response.redirect?
++    path, policy = request.path, response.headers["Content-Security-Policy"]
++    joins = 0
++    trace = TracePoint.new(:call) do |event|
++      joins += 1 if event.defined_class == URI.singleton_class && event.method_id == :join
++    end
++
++    trace.enable { get path }
++
++    assert_response :success
++    assert_equal policy, response.headers["Content-Security-Policy"]
++    assert_equal 0, joins, "a warm page must not parse every import URL again"
++  end
++
++  test "a same-length importmap change updates CSP locations" do
++    cookies.delete(:session_token)
++    map = Rails.application.importmap
++    begin
++      map.pin "csp-cache-control", to: "https://one.example.test/probe.js"
++      get new_session_url
++      assert_response :success
++      assert_includes response.headers["Content-Security-Policy"], "https://one.example.test/probe.js"
++
++      map.pin "csp-cache-control", to: "https://two.example.test/probe.js"
++      get new_session_url
++      assert_response :success
++      assert_includes response.headers["Content-Security-Policy"], "https://two.example.test/probe.js"
++      assert_not_includes response.headers["Content-Security-Policy"], "https://one.example.test/probe.js"
++    ensure
++      map.packages.delete("csp-cache-control")
++      map.send(:clear_cache)
++    end
++  end
++
+   test "enforcing policy allows exactly the inline scripts the page carries" do
+     get root_url
+     follow_redirect! while response.redirect?

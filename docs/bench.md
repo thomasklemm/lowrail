@@ -16,6 +16,14 @@ BENCH_COUNTER=callgrind mise exec -- ruby bench/request_pairs.rb \
 # BENCH_JIT=1 enables YJIT; interpreter is the controlled default.
 ```
 
+`BENCH_VARIANT_APP=/absolute/prepared/fork` adds an `app_fix` layer, with
+Lowrail off, to either the instruction or native experiment. It boots that
+checkout rather than loading a handwritten benchmark replacement. Keep its
+lockfile, assets, fixture database and authentication identical to baseline;
+the original A/A workers and gates remain mandatory. See the
+[Campfire importmap investigation](passes/importmap.md) for an example with
+**failed controls**, plus the method micro and actual HTML/CSP byte checks.
+
 Build production first (see below). Interpreter mode sets Rails' `config.yjit`
 to false before initialization: Rails otherwise enables it even when Ruby
 starts with `--disable-yjit`. Every worker reports its actual JIT state and

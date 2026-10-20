@@ -108,6 +108,10 @@ module RequestPairs
       FileUtils.mkdir_p(missing)
       layers = { "off_a" => nil, "off_b" => nil, "missing" => missing, "empty" => empty,
                  "disabled" => normal, "default" => normal }
+      # Compare an upstream app fix with the same independent A/A workers and
+      # measurement seam. This layer never loads Lowrail or the original build.
+      variant = File.expand_path(ENV["BENCH_VARIANT_APP"]) if ENV["BENCH_VARIANT_APP"]
+      layers["app_fix"] = nil if variant
       if (extra = ENV["BENCH_INSTANTIATE_DIR"])
         extra = File.expand_path(extra)
         extra_data = JSON.parse(File.read(File.join(extra, "manifest.json")))
@@ -120,7 +124,7 @@ module RequestPairs
       root = File.expand_path("..", __dir__)
       metadata = { seed: seed, rounds: rounds, route: route, app: File.basename(app),
         manifest_sha256: Digest::SHA256.file(source).hexdigest,
-        cache_mb: ENV["CAMPFIRE_RESPONSE_CACHE_MB"], workers: {} }
+        cache_mb: ENV["CAMPFIRE_RESPONSE_CACHE_MB"], variant_app: variant, workers: {} }
       lib = File.expand_path(ENV.fetch("BENCH_LOWRAIL_LIB", File.join(root, "gem/lib")))
       metadata[:runtime_sha256] = Digest::SHA256.file(File.join(lib, "lowrail.rb")).hexdigest
       layers.each do |layer, build_root|
@@ -132,9 +136,10 @@ module RequestPairs
           "BENCH_PIPE" => counter || diagnostic ? nil : "1",
           "BENCH_WARMUP" => ENV.fetch("BENCH_WARMUP", counter || diagnostic ? "50" : "400"),
           "BENCH_JSON" => nil, "BENCH_PROFILE" => nil, "BENCH_DUMP" => nil }
+        env["BENCH_WORKDIR"] = layer == "app_fix" ? variant : app
         environments[layer] = env
         next if counter || diagnostic
-        stdin, stdout, wait = Open3.popen2e(env, RbConfig.ruby, "--yjit", File.join(__dir__, "requests.rb"), route, chdir: app)
+        stdin, stdout, wait = Open3.popen2e(env, RbConfig.ruby, "--yjit", File.join(__dir__, "requests.rb"), route, chdir: env.fetch("BENCH_WORKDIR"))
         workers[layer] = { stdin: stdin, stdout: stdout, wait: wait, log: File.open(File.join(out, "#{layer}.log"), "w") }
         metadata[:workers][layer] = receive(workers.fetch(layer))
         warn "warm #{File.basename(app)} #{layer}"
@@ -216,7 +221,7 @@ module RequestPairs
             ok = system(env, "valgrind", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
               RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "requests.rb"), route,
-              chdir: app, out: File.join(out, "#{label}.log"), err: [:child, :out])
+              chdir: env.fetch("BENCH_WORKDIR", app), out: File.join(out, "#{label}.log"), err: [:child, :out])
             raise "Callgrind failed: #{label}; inspect logs" unless ok
             result = File.readlines(File.join(out, "#{label}.log")).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
@@ -263,7 +268,7 @@ module RequestPairs
         end
         log = File.join(out, "#{label}.log")
         ok = system(env, RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "gc_requests.rb"),
-          route, chdir: app, out: log, err: [:child, :out])
+          route, chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
         raise "GC diagnostic failed: #{label}; inspect logs" unless ok
         lines = File.readlines(log)
         worker = JSON.parse(lines.find { _1.start_with?("LOWRAIL_BENCH ") }.to_s.delete_prefix("LOWRAIL_BENCH "))
