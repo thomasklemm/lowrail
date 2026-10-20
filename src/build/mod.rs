@@ -139,7 +139,8 @@ pub fn build(app: &Path, env: &str, preload: bool) -> Result<String, String> {
     let input_path = dir.join("units.json");
     write_atomic(&input_path, &serde_json::to_string_pretty(&input).unwrap())?;
     write_atomic(&dir.join("ledger.json"), &serde_json::to_string_pretty(&ledger).unwrap())?;
-    let status = Command::new("ruby")
+    let status = Command::new("bundle")
+        .args(["exec", "ruby"])
         .arg(facts::gem_dir().join("exe/lowrail-compile"))
         .arg(&input_path)
         .current_dir(app)

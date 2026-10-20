@@ -112,10 +112,9 @@ module Lowrail
       end
       by_method.each_value(&:uniq!)
       @units_by_method = {}.merge!(by_method).freeze
-      @compile_option_ok = nil
     end
 
-    # Cheap checks done at setup. The compile-option fingerprint needs
+    # Cheap checks done at setup. The per-file loader fingerprint needs
     # SHA-256 and is checked lazily on the first lookup (see #iseq_for).
     def compatible?
       @format == FORMAT && Manifest.normalize(@ruby_description) == Manifest.normalize(RUBY_DESCRIPTION)
@@ -127,19 +126,17 @@ module Lowrail
 
     # Returns the ISeq binary path when the on-disk source still matches what
     # was lowered, else nil (the caller compiles the source normally).
-    def iseq_for(source_path)
+    def iseq_for(source_path, original: nil, compile_option: nil)
       entry = @files[source_path] or return nil
-      return nil unless compile_option_ok?
+      # Old builds have no loader contract: rebuild rather than assume their
+      # process-wide defaults describe the app's per-file compilation.
+      fingerprint = entry["original_iseq_sha256"] or return nil
+      return nil unless compile_option && compile_option == entry["compile_option"]
+      # The recipe alone cannot detect external source transforms or hijacks.
+      return nil unless original && fingerprint == Manifest.iseq_fingerprint(original)
       return nil unless File.file?(source_path)
       return nil unless Manifest.sha256_file(source_path) == entry.fetch("source_sha256")
       File.join(@dir, entry.fetch("iseq"))
-    end
-
-    def compile_option_ok?
-      return @compile_option_ok unless @compile_option_ok.nil?
-      @compile_option_ok = (@compile_option == Manifest.compile_option_fingerprint).tap do |ok|
-        Lowrail.debug("compile options differ from the build; not serving lowered files") unless ok
-      end
     end
 
     # YJIT and the parser are runtime choices that do not change the ISeq
@@ -148,15 +145,29 @@ module Lowrail
       desc.sub(/ \+YJIT( dev)?/, "").sub(/ \+ZJIT( dev)?/, "").sub(/ \+PRISM/, "").sub(/ \+MN/, "")
     end
 
-    def self.compile_option_fingerprint
-      require "digest"
-      opts = RubyVM::InstructionSequence.compile_option
-      Digest::SHA256.hexdigest(opts.sort_by { |k, _| k.to_s }.inspect)
+    def self.compile_option_fingerprint(opts = RubyVM::InstructionSequence.compile_option, overrides = nil)
+      sorted = opts.sort_by { |k, _| k.to_s }
+      sorted = [sorted, overrides.is_a?(Hash) ? overrides.sort_by { |k, _| k.to_s } : overrides] unless overrides.nil?
+      digest.hexdigest(sorted.inspect)
+    end
+
+    def self.iseq_fingerprint(iseq)
+      digest.hexdigest(iseq.to_binary)
     end
 
     def self.sha256_file(path)
+      digest.file(path).hexdigest
+    end
+
+    def self.digest
+      return ::Digest::SHA256 if defined?(::Digest::SHA256)
+      # Lazy default-gem activation must not change the compiler context of
+      # the app file that triggered it (Freezolite runs on nested requires).
+      options = RubyVM::InstructionSequence.compile_option
       require "digest"
-      Digest::SHA256.file(path).hexdigest
+      ::Digest::SHA256
+    ensure
+      RubyVM::InstructionSequence.compile_option = options if options
     end
   end
 end

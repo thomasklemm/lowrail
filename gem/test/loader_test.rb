@@ -41,11 +41,153 @@ class LoaderTest < Minitest::Test
     end
   end
 
+  REQUIRE_HOOKS_VERSIONS = Gem::Specification.find_all_by_name("require-hooks").map { _1.version.to_s }.uniq
+
+  POLICY = <<~'RUBY'
+    def install_loader(name)
+      case name
+      when "lowrail"
+        require "lowrail/setup"
+      when "bootsnap"
+        gem "bootsnap", ENV.fetch("BS")
+        require "bootsnap"
+        Bootsnap.setup(cache_dir: ENV.fetch("BOOTSNAP_CACHE_DIR") { File.join(Dir.pwd, "cache") },
+                       development_mode: false, load_path_cache: false,
+                       compile_cache_iseq: true, compile_cache_yaml: false)
+        if ENV["SELECTOR"]
+          Bootsnap::CompileCache::ISeq.compiler_selector = ->(path) {
+            Bootsnap::CompileCache::ISeq::FROZEN_STRING_LITERAL if path.start_with?(Dir.pwd)
+          }
+        end
+      when "freezolite"
+        gem "require-hooks", ENV.fetch("RH")
+        require "freezolite"
+        Freezolite.setup(patterns: ["#{Dir.pwd}/*.rb"], exclude_patterns: ["#{Dir.pwd}/outside.rb"])
+      end
+    end
+    ENV.fetch("ORDER", "bootsnap,freezolite").split(",").each { install_loader(_1) }
+  RUBY
+
+  FROZEN_SCRIPT = <<~'RUBY'
+    require "json"
+    require_relative "config/policy"
+    require_relative "app"
+    puts JSON.generate("compute" => Calc.new.compute(1), "frozen" => Calc.new.name.frozen?,
+                       "name" => Calc.new.name, "outside" => OUTSIDE, "explicit" => EXPLICIT,
+                       "loaded" => defined?(Lowrail::Stats) ? Lowrail::Stats.loaded_files : [])
+  RUBY
+
+  def frozen_app(dir)
+    suffix = "require_relative 'outside'\nrequire_relative 'explicit'\n"
+    build_app(dir, compile: false, lowered: LOWERED_SRC + suffix)
+    File.write(File.join(dir, "app.rb"), APP_SRC + suffix)
+    File.write(File.join(dir, "outside.rb"), "OUTSIDE = 'outside'.frozen?\n")
+    File.write(File.join(dir, "explicit.rb"), "# frozen_string_literal: false\nEXPLICIT = 'explicit'.frozen?\n")
+    FileUtils.mkdir_p(File.join(dir, "config"))
+    File.write(File.join(dir, "config/policy.rb"), POLICY)
+    File.write(File.join(dir, "config/environment.rb"), "require_relative 'policy'\nrequire_relative '../app'\n")
+    input = JSON.parse(File.read(File.join(dir, "units.json")))
+    input["rails_env"] = "test"
+    File.write(File.join(dir, "units.json"), JSON.generate(input))
+  end
+
+  def test_freezolite_and_bootsnap_in_every_order_with_cold_and_warm_caches
+    skip "freezolite/require-hooks not installed" if REQUIRE_HOOKS_VERSIONS.empty? || Gem::Specification.find_all_by_name("freezolite").empty?
+    REQUIRE_HOOKS_VERSIONS.product([nil] + BOOTSNAP_VERSIONS).each do |rh, bs|
+      realpath_tmpdir do |dir|
+        frozen_app(dir)
+        env = { "RUBYOPT" => "-I#{GEM_LIB}", "RH" => rh, "BS" => bs,
+                "RAILS_ENV" => "test", "LOWRAIL_STATS" => "" }
+        loaders = bs ? %w[lowrail bootsnap freezolite] : %w[lowrail freezolite]
+        loaders.permutation.each do |order|
+          # Keep the app's own loader order, even when Bootsnap hides a
+          # previously installed Freezolite. Lowrail must not "fix" the app
+          # into behaving differently from its LOWRAIL=0 baseline.
+          build_env = env.merge("ORDER" => (order - ["lowrail"]).join(","))
+          _, err, status = ruby(COMPILE, File.join(dir, "units.json"), chdir: dir, setup: false, env: build_env)
+          assert status.success?, err
+          assert_match(/compiled 1 file/, err)
+          FileUtils.rm_rf(File.join(dir, "cache-iseq"))
+          run_env = env.merge("ORDER" => order.join(","))
+          # Two active runs exercise a miss and a hit, then an off run proves
+          # neither one put lowered code into the app's Bootsnap cache.
+          %w[1 1 0].each do |mode|
+            result = ruby_json(FROZEN_SCRIPT, chdir: dir, setup: false, env: run_env.merge("LOWRAIL" => mode))
+            context = "require-hooks #{rh}, bootsnap #{bs}, #{order}, LOWRAIL=#{mode}"
+            assert_equal [mode == "1" ? "fast" : "orig", 2], result["compute"], context
+            assert_equal(bs.nil? || order.index("bootsnap") < order.index("freezolite"), result["frozen"], context)
+            assert_equal false, result["outside"], context
+            assert_equal false, result["explicit"], context
+            assert_equal(mode == "1" ? [File.join(dir, "app.rb")] : [], result["loaded"], context)
+          end
+        end
+      end
+    end
+  end
+
+  def test_bootsnap_per_file_compiler_options
+    BOOTSNAP_VERSIONS.select { Gem::Version.new(_1) >= Gem::Version.new("1.24.0") }.each do |bs|
+      realpath_tmpdir do |dir|
+        frozen_app(dir)
+        # This case uses Bootsnap's selector, not Freezolite or global options.
+        env = { "RUBYOPT" => "-I#{GEM_LIB}", "BS" => bs, "ORDER" => "bootsnap", "SELECTOR" => "1", "RAILS_ENV" => "test" }
+        _, err, status = ruby(COMPILE, File.join(dir, "units.json"), chdir: dir, setup: false, env: env)
+        assert status.success?, err
+        assert_match(/compiled 1 file/, err)
+        %w[lowrail,bootsnap bootsnap,lowrail].each do |order|
+          result = ruby_json(FROZEN_SCRIPT, chdir: dir, setup: false, env: env.merge("ORDER" => order))
+          assert_equal ["fast", 2], result["compute"]
+          assert_equal true, result["frozen"]
+          # Removing the per-file policy must reject the old lowered ISeq.
+          result = ruby_json(FROZEN_SCRIPT, chdir: dir, setup: false, env: env.merge("ORDER" => order, "SELECTOR" => nil))
+          assert_equal ["orig", 2], result["compute"]
+          assert_equal false, result["frozen"]
+        end
+      end
+    end
+  end
+
+  def test_source_transforms_are_not_bypassed
+    skip "freezolite/require-hooks not installed" if REQUIRE_HOOKS_VERSIONS.empty? || Gem::Specification.find_all_by_name("freezolite").empty?
+    realpath_tmpdir do |dir|
+      frozen_app(dir)
+      env = { "RUBYOPT" => "-I#{GEM_LIB}", "RH" => REQUIRE_HOOKS_VERSIONS.first, "ORDER" => "freezolite", "RAILS_ENV" => "test" }
+      _, err, status = ruby(COMPILE, File.join(dir, "units.json"), chdir: dir, setup: false, env: env)
+      assert status.success?, err
+      transform = <<~'RUBY'
+        RequireHooks.source_transform(patterns: [File.join(Dir.pwd, "app.rb")]) do |path, source|
+          (source || File.read(path)).sub('"calc"', '"transformed"')
+        end
+      RUBY
+      code = FROZEN_SCRIPT.sub('require_relative "app"', "#{transform}\nrequire_relative 'app'")
+      result = ruby_json(code, chdir: dir, setup: false, env: env.merge("ORDER" => "lowrail,freezolite"))
+      assert_equal ["orig", 2], result["compute"]
+      assert_equal "transformed", result["name"]
+      # The build must also decline source it has not analyzed, not compile
+      # lowerings from untransformed text over the loader's transformed code.
+      File.open(File.join(dir, "config/policy.rb"), "a") { _1.write(transform) }
+      _, err, status = ruby(COMPILE, File.join(dir, "units.json"), chdir: dir, setup: false, env: env)
+      assert status.success?, err
+      assert_match(/app loader transformed the source/, err)
+      assert_match(/compiled 0 file\(s\), 0 unit/, err)
+    end
+  end
+
   def test_coverage_disables_serving
     realpath_tmpdir do |dir|
       build_app(dir)
-      code = 'require "coverage"; Coverage.start; require "json"; require File.join(Dir.pwd, "app"); puts JSON.generate(Calc.new.compute(1))'
-      assert_equal ["orig", 2], ruby_json(code, chdir: dir)
+      code = <<~'RUBY'
+        require "coverage"
+        Coverage.start
+        require "json"
+        path = File.join(Dir.pwd, "app.rb")
+        require path
+        result = Calc.new.compute(1)
+        puts JSON.generate("result" => result, "lines" => Coverage.result.fetch(path))
+      RUBY
+      result = ruby_json(code, chdir: dir)
+      assert_equal ["orig", 2], result["result"]
+      assert_operator result["lines"].compact.sum, :>, 0, "the VM must still instrument the original source"
     end
   end
 

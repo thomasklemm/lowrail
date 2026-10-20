@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
+require_relative "compilation"
+
 module Lowrail
   # Hooks RubyVM::InstructionSequence.load_iseq, the seam Bootsnap uses.
   #
-  # Ordering with Bootsnap: Bootsnap's load_iseq does not call super, so
-  # whichever hook is prepended last wins. Lowrail must sit in front:
-  #   * Bootsnap first, Lowrail after (config/boot.rb order): plain prepend.
-  #   * Lowrail first (RUBYOPT=-rlowrail/setup), Bootsnap after: our
-  #     Module#prepend_features hook sees Bootsnap's prepend onto the
-  #     ISeq singleton class and prepends a fresh Lowrail hook in front of it.
-  # Files Lowrail does not serve fall through to the next hook (Bootsnap) and
-  # then to MRI (nil = compile the source).
+  # Let the app's loader produce the original ISeq first. Only an exact
+  # fingerprint match permits substitution; this includes per-file compiler
+  # options, source transforms, and warm Bootsnap caches. require-hooks evals
+  # inside load_iseq (returning an empty ISeq), so substitute at #eval too.
+  # Never substitute before serialization: Bootsnap must cache originals,
+  # including when the next process disables Lowrail or uses a newer build.
   #
   # While Coverage is running we serve nothing (like Bootsnap): binary ISeqs
   # carry no coverage counters, and coverage tools must see the source.
@@ -20,6 +20,9 @@ module Lowrail
 
       def install(manifest)
         @manifest = manifest
+        iseq_singleton.prepend(Compilation::Capture) unless iseq_singleton < Compilation::Capture
+        Compilation.hook_bootsnap
+        RubyVM::InstructionSequence.prepend(Evaluation) unless RubyVM::InstructionSequence < Evaluation
         prepend_hook
       end
 
@@ -31,13 +34,15 @@ module Lowrail
       def prepended_to(base, mod)
         return unless @manifest && base.equal?(iseq_singleton)
         return if mod.equal?(@hook)
+        Compilation.hook_bootsnap
         prepend_hook
       end
 
       # Returns a lowered ISeq for path, or nil to fall through.
-      def serve(path)
+      def serve(path, original: nil)
         return nil if defined?(::Coverage) && ::Coverage.respond_to?(:running?) && ::Coverage.running?
-        bin = @manifest.iseq_for(path) or return nil
+        options = Compilation.options_for(original)
+        bin = @manifest.iseq_for(path, original: original, compile_option: options) or return nil
         iseq = RubyVM::InstructionSequence.load_from_binary(File.binread(bin))
         Stats.loaded(path) if defined?(Stats)
         iseq
@@ -51,11 +56,26 @@ module Lowrail
       def prepend_hook
         hook = Module.new do
           def load_iseq(path)
-            ::Lowrail::Loader.serve(path) || (defined?(super) ? super : nil)
+            original = defined?(super) ? super : nil
+            return original unless ::Lowrail::Loader.manifest.lowered?(path)
+            return original if defined?(::Coverage) && ::Coverage.running?
+            original ||= RubyVM::InstructionSequence.compile_file(path)
+            ::Lowrail::Loader.serve(path, original: original) || original
           end
         end
         @hook = hook
         iseq_singleton.prepend(hook)
+      end
+    end
+
+    module Evaluation
+      def eval
+        loader = ::Lowrail::Loader
+        if loader.manifest.lowered?(absolute_path)
+          lowered = loader.serve(absolute_path, original: self)
+          return lowered.eval if lowered
+        end
+        super
       end
     end
   end

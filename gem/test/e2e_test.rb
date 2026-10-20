@@ -78,8 +78,27 @@ class E2ETest < Minitest::Test
   def test_compile_option_mismatch_is_noop
     realpath_tmpdir do |dir|
       build_app(dir)
-      edit_manifest(dir) { _1["compile_option"] = "0" * 64 }
-      assert_equal ["orig", 2], ruby_json(SCRIPT, chdir: dir)["compute"]
+      code = "RubyVM::InstructionSequence.compile_option = {frozen_string_literal: true}\n#{SCRIPT}"
+      assert_equal ["orig", 2], ruby_json(code, chdir: dir)["compute"]
+      # A later change must not reuse an earlier successful fingerprint.
+      code = "#{SCRIPT}\nRubyVM::InstructionSequence.compile_option = {frozen_string_literal: true}; load './app.rb'; puts JSON.generate(Calc.new.compute(1))"
+      assert_equal ["orig", 2], ruby_json(code, chdir: dir)
+      edit_manifest(dir) { _1["files"].each_value { |entry| entry.delete("original_iseq_sha256") } }
+      assert_equal ["orig", 2], ruby_json(SCRIPT, chdir: dir)["compute"], "old builds need a rebuild, not guessed options"
+    end
+  end
+
+  def test_options_are_checked_even_when_the_original_has_no_string_literals
+    realpath_tmpdir do |dir|
+      build_app(dir, compile: false, lowered: "VALUE = 'lowered'.frozen?\n")
+      File.write(File.join(dir, "app.rb"), "VALUE = 1\n")
+      _, err, status = ruby(COMPILE, File.join(dir, "units.json"), setup: false)
+      assert status.success?, err
+      code = 'require "json"; require File.join(Dir.pwd, "app"); puts JSON.generate(VALUE)'
+      assert_equal false, ruby_json(code, chdir: dir)
+      # The original ISeq bytes are identical under both policies, but the
+      # lowered source contains a string. Its recipe must still be guarded.
+      assert_equal 1, ruby_json("RubyVM::InstructionSequence.compile_option = {frozen_string_literal: true}; #{code}", chdir: dir)
     end
   end
 

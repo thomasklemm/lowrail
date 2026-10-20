@@ -78,7 +78,8 @@ class CompilerTest < Minitest::Test
       # The runtime parser reads what the compiler wrote.
       parsed = Lowrail::Manifest.load(File.join(out, "manifest.json"), out)
       assert parsed.compatible?
-      assert_equal File.join(out, entry["iseq"]), parsed.iseq_for(good)
+      assert_equal File.join(out, entry["iseq"]), parsed.iseq_for(good, original: RubyVM::InstructionSequence.compile_file(good),
+                                                              compile_option: Lowrail::Manifest.compile_option_fingerprint)
     end
   end
 

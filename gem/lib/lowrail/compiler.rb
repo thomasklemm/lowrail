@@ -5,23 +5,20 @@ require "digest"
 require "fileutils"
 require_relative "../lowrail"
 require_relative "manifest"
+require_relative "compilation"
 
 module Lowrail
   # Build step behind `gem/exe/lowrail-compile UNITS_JSON` (see
   # docs/FORMATS.md): compiles each lowered source to an ISeq binary as if it
   # were the original file, then atomically writes manifest.json.
   #
-  # Equivalence: `RubyVM::InstructionSequence.compile(src, path, path, 1)`
-  # with the source read as UTF-8 (what Bootsnap does) produces the same
-  # instructions as `compile_file_prism(path)`, the compiler that `require`
-  # and Bootsnap use on Ruby 3.4+/4.0: magic comments (frozen_string_literal,
-  # encoding, shareable_constant_value) are read by the parser from the
-  # source text, and compile options come from the current process, which is
-  # what the manifest fingerprint records. Verified by comparing `to_a` over
-  # ~430 Rails and app files (gem/test/compiler_test.rb keeps a sample). The
-  # one difference: top-level frames are labelled "<compiled>" instead of
-  # "<main>" (plain MRI says "<top (required)>"), which only shows in
-  # backtraces through a file's top-level code.
+  # Compilation observes the app's actual per-file compiler calls during a
+  # boot with a disposable Bootsnap cache. It replays process defaults AND
+  # explicit options on the lowered source, preserving magic comments too.
+  # Text compilation preserves compile_file's instructions (compiler_test.rb),
+  # except the top-level frame label: "<compiled>" instead of "<main>".
+  # The manifest guards both the compile recipe and the original ISeq, so a
+  # later loader policy or source transformation cannot bypass the check.
   #
   # A file that fails (missing, unreadable, syntax error, source changed since
   # lowering) is skipped with a warning and its units are dropped; this never
@@ -33,7 +30,9 @@ module Lowrail
     class << self
       def run(argv, err: $stderr)
         input = argv.first or (err.puts("usage: lowrail-compile UNITS_JSON"); return 2)
-        manifest = compile(JSON.parse(File.read(input)), err: err)
+        input = JSON.parse(File.read(input))
+        Compilation.boot(input) if input["rails_env"] && File.file?("config/environment.rb")
+        manifest = compile(input, err: err)
         err.puts "[lowrail] compiled #{manifest["files"].size} file(s), #{manifest["units"].size} unit(s)"
         0
       end
@@ -81,7 +80,15 @@ module Lowrail
           raise ArgumentError, "source changed since lowering (sha256 #{sha[0, 12]} != #{expected_sha[0, 12]})"
         end
         src = File.read(lowered, encoding: Encoding::UTF_8)
-        binary = RubyVM::InstructionSequence.compile(src, path, path, 1).to_binary
+        compilation = Compilation.files[path]
+        if Compilation.booted? && !compilation
+          raise ArgumentError, "app loader did not compile this file"
+        end
+        compilation ||= Compilation.original(path)
+        unless compilation.fetch(:source_sha256) == sha
+          raise ArgumentError, "app loader transformed the source; lower the transformed source first"
+        end
+        binary = Compilation.lowered(src, path, compilation).to_binary
         name = "#{Digest::SHA256.hexdigest(binary)}.bin"
         dest = File.join(iseq_dir, name)
         unless File.exist?(dest)
@@ -89,7 +96,9 @@ module Lowrail
           File.binwrite(tmp, binary)
           File.rename(tmp, dest)
         end
-        { "iseq" => "iseq/#{name}", "source_sha256" => sha }
+        { "iseq" => "iseq/#{name}", "source_sha256" => sha,
+          "original_iseq_sha256" => compilation.fetch(:iseq_sha256),
+          "compile_option" => compilation.fetch(:compile_option) }
       end
     end
   end
