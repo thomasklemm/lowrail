@@ -88,9 +88,10 @@ class ARInstantiateTest < Minitest::Test
       manifest["units"].each { |u| u["ar_instantiate"]&.fetch("sources")&.transform_values! { "stale" } }
       File.write("manifest.json", JSON.generate(manifest))
     end
-    # An empty selection now skips installation altogether, so there is no
-    # installed runtime plan to activate in that control.
-    Lowrail::ARInstantiate.activate if Lowrail.setup(root: Dir.pwd, dir: Dir.pwd)
+    # Late setup must activate immediately through the shared hook. Empty
+    # selections still skip installation and therefore have no fast paths.
+    ActiveSupport.run_load_hooks(:after_initialize)
+    Lowrail.setup(root: Dir.pwd, dir: Dir.pwd)
     events = []
     subscription = ActiveSupport::Notifications.subscribe("instantiation.active_record") do |*args|
       payload = args.last

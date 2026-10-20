@@ -1,7 +1,7 @@
 # Architecture: the pass contract
 
-Status: target design, 2026-10-20. Sections 1 and 2 describe the code as it is;
-section 3 is the contract every pass will follow; section 5 is the migration.
+Status: pass contract, 2026-10-20. Section 2 records the pre-migration wiring;
+section 3 is the contract; section 5 tracks its implementation.
 PLAN.md stays the "why"; this file is the "how a pass plugs in".
 
 ## 1. Pipeline
@@ -118,11 +118,32 @@ lowrail build APP [--env E] [--passes default,+ar_instantiate,-view/link_to]
 
 ### Runtime
 
-`Lowrail.setup` loads the manifest, installs `Guard` and `Loader`, then for
-each pass present in the manifest requires `lowrail/passes/<name>` and calls
-`install(units)`. One shared helper runs `activate` after Rails initializes
-(or immediately if it already has). Stats, hits and fallbacks go through
-`Lowrail.check`/`ok?` or `Stats.count(id, ok)` for every pass.
+`Lowrail.setup` loads the manifest, installs `Guard` and `Loader`, then hands
+it to `Lowrail::Passes`. The registry lazily requires each runtime present
+and calls `Lowrail::Passes::<Name>.install(units)` with only that runtime's
+units, preserving the original installation order. The two `memo/*` passes
+share one installer. Existing file paths and `Lowrail::<Name>` constants stay
+available, so generated Ruby and source-fact owners do not change.
+
+The opt-in `inertia/config_bind` pass uses `Passes::InertiaConfig` directly.
+Its builder-only publication preceded this registry; activation is now wired
+through the same helper, with separate integration gates in addition to the
+existing-pass before/after equivalence proof.
+
+One `Passes.after_initialize` helper schedules every runtime's `activate`
+through Active Support's `:after_initialize` hook, which also runs immediately
+after an already-completed initialization. Before Rails exists, one temporary
+TracePoint hands the queued runtimes to that hook in installation order.
+Installers contain no private Rails-activation callbacks.
+
+Source delivery remains eager: `Routes` supplies generated-code helpers and
+`Templates` attaches at Action View's compilation seam, before initializers
+can compile a template. `Passes` owns this wiring too; delivery is not delayed
+until Rails initializes. Memo tracing guards also install immediately. AR
+epoch hooks still attach to `:active_record`, independently of pass activation.
+Stats, hits and fallbacks retain `Lowrail.check`/`ok?` or `Stats.count(id, ok)`.
+Absent/incompatible/empty builds and empty selections return before loading
+the registry or installing delivery, invalidation or activation hooks.
 
 ## 4. A pass's lifecycle
 
@@ -148,9 +169,8 @@ across requests; refusal reasons are recorded, never silent.
 
 ## 5. Migration
 
-Steps 1–3 are implemented without changing runtime delivery or installation.
-Step 4 must wait for the base-cost work (`docs/bench.md`) in `lowrail.rb`
-and `guard.rb` to land.
+Steps 1–5 are implemented. Step 4 follows the base-cost work in
+`docs/bench.md`; guard, loader and statistics hot paths remain unchanged.
 
 1. Pass registry in Rust (`src/passes.rs`: name, kind, default, builder) and
    `--passes`; keep the old flags as aliases for one release.
@@ -158,9 +178,10 @@ and `guard.rb` to land.
    once and runs the selected builders; the existing `*_build.rb` files become
    builder functions returning `{units, ledger}`.
 3. Shared ledger schema with reason codes; `build` prints one refusal table.
-4. `Lowrail::Passes` registry and one activation helper in the gem; move the
-   seven passes behind it without changing their behavior (verify gates
-   before/after must match, including hits per unit).
+4. `Lowrail::Passes` registry and one activation helper in the gem; preserve
+   runtime installation, source delivery, guards and per-unit counters.
+   Before/after evidence is recorded in
+   [runtime-pass-equivalence.json](runtime-pass-equivalence.json).
 5. **Implemented:** `lowrail bench APP --pass NAME [--path /path]` wraps
    `request_pairs.rb`, `callgrind.c` and optional `gc_requests.rb`, with
    separate strict build/activation/JIT/coverage probes. Versioned JSON and a

@@ -9,22 +9,11 @@ module Lowrail
   # Only the Arel/SQL compilation in an internal, final scoped relation is reused.
   module ARPlans
     class << self
-      def install(manifest)
-        @unit = manifest.units.find { _1["pass"] == "active_record/ar_plans" }
+      def install(units)
+        @unit = units.find { _1["pass"] == "active_record/ar_plans" }
         return unless @unit
         AR.install
         @plans = {}.compare_by_identity
-        if defined?(ActiveSupport) && ActiveSupport.respond_to?(:on_load)
-          ActiveSupport.on_load(:after_initialize) { Lowrail::ARPlans.activate }
-        else
-          @boot = TracePoint.new(:end) do |tp|
-            if tp.self.is_a?(Class) && tp.self.name == "Rails::Application"
-              @boot.disable
-              ActiveSupport.on_load(:after_initialize) { Lowrail::ARPlans.activate }
-            end
-          end
-          @boot.enable
-        end
       end
 
       def activate
@@ -178,5 +167,9 @@ module Lowrail
         super
       end
     end
+  end
+
+  module Passes
+    ARPlans = Lowrail::ARPlans
   end
 end

@@ -890,3 +890,43 @@ as do Rust tests (30 unit, one types/MCP integration and two verification
 tests) and the benchmark's control tests (8 tests, 43 assertions, including
 the Valgrind regression). No hooks or facts were weakened. Hardware PMU
 counters and a validated native latency improvement remain unavailable.
+
+## Runtime registry cold cost
+
+The runtime-registry refactor keeps the same warmed request and guard
+implementations. A same-round fixed-heap comparison on real-blog uses
+`BENCH_BASELINE_LIB` to add an archived-runtime worker against the **same
+source-only manifest**. Six rounds × 50 requests, 50 warmups, interpreter
+mode: total instructions **−0.02090% [−0.05032, −0.00626]** and GC-excluded
+instructions **−0.01292% [−0.05570, +0.00183]**. Both independent A/A controls
+and all five heap capacities pass. The initial before-only A/A failure is
+retained, not used as evidence. The stats-off YJIT guard micro remains
+**662.482978 → 662.506856 instructions/check (+0.00360%)**. These are not
+native request-speed claims.
+
+Those request windows exclude boot. A separate cold probe brackets the
+first `require "lowrail/setup"` on the blog's unchanged 11-unit manifest,
+with statistics disabled. Six interleaved rounds each use independent
+before-a/b and after-a/b processes. All 24 have identical actual capacities
+in all five heap pools, unchanged through setup. The paired increase is
+**+0.758%**, about **0.37–0.40 million instructions paid once per boot**.
+Three segmented observations per runtime give this breakdown:
+
+| Cold phase | Before instructions | After instructions | Delta |
+|---|---:|---:|---:|
+| Require `lowrail.rb` | 2,052,121 | 1,663,981 | −388,140 |
+| Require `passes.rb` | 0 | 843,805 | +843,805 |
+| Source delivery and pass selection | 3,029,117 | 2,951,341 | −77,776 |
+| Manifest/Guard/Loader require, load and install | 47,116,759 | 47,107,789 | −8,970 |
+| Segmented net | | | +368,919 |
+
+Entries are medians; segment boundaries introduce different seams from the
+whole-setup probe, so their net is diagnostic, not an exact reconciliation.
+The loaded-feature audit contains only manifest, guard, compilation, loader,
+registry, routes, templates and setup: **no memo, digest, AR or Inertia runtime
+is required, installed or activated** for this source-only manifest. Static
+registry descriptors and six empty selections are not runtime plans. The
+increase is the cold load/compilation/definition of the registry and shared
+activation helper, not an eager-loading regression or a per-request tax.
+Shipping `passes.rb` as a precompiled ISeq is a possible follow-up; no such
+delivery change is included here.

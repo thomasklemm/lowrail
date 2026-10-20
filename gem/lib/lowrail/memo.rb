@@ -39,7 +39,7 @@ module Lowrail
     end
     module_function
 
-    def install(manifest)
+    def install(units)
       unless defined?(@tracing)
         @tracing = false
         TracePoint.singleton_class.prepend(TraceConstructors)
@@ -57,7 +57,7 @@ module Lowrail
         # ObjectSpace omits unshareable objects after multi-ractor mode starts.
         @tracing = true unless visible
       end
-      @units = manifest.units.select { _1["pass"].to_s.start_with?("memo/") }.to_h { [_1.fetch("id"), _1] }
+      @units = units.to_h { [_1.fetch("id"), _1] }
       @prepared = {}
     end
 
@@ -183,5 +183,9 @@ module Lowrail
         URI.const_get(:Schemes).singleton_class.const_get(:ReservedChars), URI.const_get(:Schemes).singleton_class.const_get(:EscapedChars),
         Encoding::UTF_8, Encoding::ASCII_8BIT, Encoding::US_ASCII]
     end
+  end
+
+  module Passes
+    Memo = Lowrail::Memo
   end
 end

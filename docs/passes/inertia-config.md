@@ -58,18 +58,14 @@ As with the existing Guard, hook-bypassing definition/visibility changes,
 native replacement, refinements and ISeq/tracing inspection remain boundaries.
 Concurrent mutation between guard and return is not transactional.
 
-**Activation registration pending:** the base-cost report lifted the runtime
-freeze while this experiment was finishing. Runtime migration step 4 owns
-registration and the shared after-initialize helper. The published
-`install(units)` only selects its unit; that helper must call `activate`.
-There is no pass-private on-load/TracePoint wrapper in the published pass.
-The local measurements used the temporary setup hook on local
-`exp/inertia-config`; the final corpus gates use an explicit after-initialize
-test shim after removing the private activation wrapper. Neither hook nor
-shim nor changes to the five formerly frozen runtime files are published
-here. The measured bind/guard bodies are unchanged. Until step 4 registers
-it, main builds this unit but does not activate it. Integrated shared-helper
-verification belongs to that pending registration, not the evidence below.
+**Shared activation is installed:** runtime migration step 4 registers this
+pass in `Lowrail::Passes`. `install(units)` only selects its unit; the shared
+after-initialize helper calls `activate`. There is no pass-private on-load
+or TracePoint wrapper. The original method measurements used a temporary
+setup hook, then an explicit after-initialize test shim. The integrated gates
+below use standard setup and the shared helper; the measured bind/guard
+bodies are unchanged. See [runtime equivalence](../runtime-pass-equivalence.json)
+for the original-shim replay and request-level attribution.
 
 ## Correctness gates
 
@@ -80,21 +76,22 @@ SSR and browser setup from [the Inertia M0](../m0/inertia.md).
 
 | App / suite | Identical outcomes | Identical ordered same-thread SQL | Binding hits | All-pass fallbacks |
 |---|---:|---:|---:|---:|
-| PingCRM, models + browser | 26 pass | 812 | 222 | 0 |
+| PingCRM, models + browser | 26 pass | 605 | 218 | 0 |
 | Redprints, default RSpec | 50 pass | 692 | 36 | 0 |
-| Redprints, explicit system RSpec | 12 pass | 260 | 216 | 0 |
-| Starter, RSpec including system | 36 pass | 264 | 44 | 0 |
+| Redprints, explicit system RSpec | 12 pass | 86 | 216 | 0 |
+| Starter, RSpec including system | 36 pass | 256 | 44 | 0 |
 | real-blog, default tests | 21 pass | 125 | 0: gem absent | 0 |
-| real-blog, browser | 2 pass | 55 | 0: gem absent | 0 |
-| Campfire, default tests | 634: 632 pass + 2 existing libvips skips | 15,108 | 0: gem absent | 0 |
-| Campfire, browser | 30 pass | 7,621 | 0: gem absent | 0 |
+| real-blog, browser | 2 pass | 4 | 0: gem absent | 0 |
+| Campfire, default tests | 634: 632 pass + 2 existing libvips skips | 15,053 | 0: gem absent | 0 |
+| Campfire, browser | 30 pass | 193 | 0: gem absent | 0 |
 
-That is **811 identical outcomes / 24,937 SQL events / 518 binding hits**.
-Other-thread SQL differences remain advisory: nine PingCRM browser tests and
-one Campfire default test plus 14 Campfire browser tests; their ordered
-own-thread traces match. The earlier hook-based run had 24,968 matched SQL
-events (Campfire 15,109 + 7,651) and 12 Campfire browser advisories; these are
-separate runs, not a SQL difference within either off/on pair. Commands are
+That is **811 identical outcomes / 17,014 ordered same-thread SQL events /
+514 binding hits**, zero fallbacks and no off-mode hits. The historical 222
+is an unattributed cohort that the original activation path does not reproduce.
+The original shim on the published runtime and two shared-helper runs each
+give PingCRM 218/0 with identical 68-request action distributions. Other-thread
+SQL remains advisory; the historical 24,937 and earlier 24,968 event counts
+included those threads and are not the strict own-thread count above. Commands are
 PingCRM `bin/rails test test/models test/system --seed 41231`, Redprints
 `bundle exec rspec --seed 41231` and `bundle exec rspec spec/system --seed
 41231`, Starter `bundle exec rspec --seed 41231`; negative controls use
@@ -154,9 +151,8 @@ From a prepared corpus app, production/YJIT, `LOWRAIL=0`:
 bundle exec ruby --yjit ../../bench/inertia_config.rb micro
 ```
 
-The standard-setup byte-check command below requires the pending shared
-activation registration; the local checks above supplied an after-initialize
-test shim instead. The micro activates the pass explicitly and works now.
+The standard-setup byte-check command below uses the shared activation helper;
+all 12 cases also pass through that path. The micro activates the pass explicitly.
 For byte checks, first build production with
 `--passes default,-view/link_to,-route/path,+inertia/config_bind` (only the
 binding pass), then run from the app with `LOWRAIL=1 LOWRAIL_STATS=/tmp/bind-stats` and

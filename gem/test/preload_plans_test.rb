@@ -106,7 +106,7 @@ class PreloadPlansTest < Minitest::Test
     end
     Lowrail.boot(root: dir)
     Lowrail.setup(root: dir, dir: dir) if ENV["LOWRAIL"] == "1"
-    Lowrail::PreloadPlans.activate if ENV["LOWRAIL"] == "1"
+    ActiveSupport.run_load_hooks(:after_initialize)
     result = { "unit_ids" => JSON.parse(File.read("manifest.json"))["units"].map { _1["id"] } }
     preload = ->(rows, spec, **opts) { ActiveRecord::Associations::Preloader.new(records: rows, associations: spec, **opts).call }
     signature = ->(rows) { rows.map { |r| [r.name, r.association(:posts).loaded?, r.posts.map { |p| [p.title, p.association(:notes).loaded?, p.notes.map(&:body), p.writer.equal?(r)] }] } }

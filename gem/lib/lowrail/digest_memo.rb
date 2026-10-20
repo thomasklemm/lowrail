@@ -10,8 +10,8 @@ module Lowrail
     IVAR = Kernel.instance_method(:instance_variable_get)
 
     class << self
-      def install(manifest)
-        @units = manifest.units.select { _1["pass"] == "digest/file_memo" }.to_h { [_1.fetch("id"), _1] }
+      def install(units)
+        @units = units.to_h { [_1.fetch("id"), _1] }
         @cache = {}
         @algorithms = {}
         @digest = @instance = nil
@@ -95,5 +95,9 @@ module Lowrail
         result
       end
     end
+  end
+
+  module Passes
+    DigestMemo = Lowrail::DigestMemo
   end
 end

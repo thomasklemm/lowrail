@@ -9,21 +9,10 @@ module Lowrail
     PASS = "active_record/instantiate"
 
     class << self
-      def install(manifest)
+      def install(units)
         require_relative "ar_guard"
         AR.install
-        @units = manifest.units.select { _1["pass"] == PASS }
-        if defined?(ActiveSupport) && ActiveSupport.respond_to?(:on_load)
-          ActiveSupport.on_load(:after_initialize) { Lowrail::ARInstantiate.activate }
-        else
-          @boot = TracePoint.new(:end) do |event|
-            if event.self.is_a?(Class) && event.self.name == "Rails::Application"
-              @boot.disable
-              ActiveSupport.on_load(:after_initialize) { Lowrail::ARInstantiate.activate }
-            end
-          end
-          @boot.enable
-        end
+        @units = units
       end
 
       def activate
@@ -138,5 +127,9 @@ module Lowrail
         false
       end
     end
+  end
+
+  module Passes
+    ARInstantiate = Lowrail::ARInstantiate
   end
 end

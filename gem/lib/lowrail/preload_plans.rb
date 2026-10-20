@@ -12,27 +12,14 @@ module Lowrail
     Execution = Struct.new(:roots, :loaders, :complete)
 
     class << self
-      def install(manifest)
-        unit = manifest.units.find { _1["pass"] == "active_record/preload_plans" }
+      def install(units)
+        unit = units.find { _1["pass"] == "active_record/preload_plans" }
         return unless unit
         @unit = unit.fetch("id")
         @facts = unit.fetch("preload_facts")
         @plans = {}
         @edges = {}
         @lock = Mutex.new
-        if defined?(ActiveSupport) && ActiveSupport.respond_to?(:on_load)
-          ActiveSupport.on_load(:after_initialize) { Lowrail::PreloadPlans.activate }
-          return
-        end
-        # ActiveSupport is not loaded yet when setup runs through RUBYOPT.
-        # TracePoint is removed at the first Rails boot, not on the hot path.
-        @boot = TracePoint.new(:end) do |tp|
-          if tp.self.is_a?(Class) && tp.self.name == "Rails::Application"
-            @boot.disable
-            ActiveSupport.on_load(:after_initialize) { Lowrail::PreloadPlans.activate }
-          end
-        end
-        @boot.enable
       end
 
       def activate
@@ -331,5 +318,9 @@ module Lowrail
         @lowrail_result&.roots&.dup || super
       end
     end
+  end
+
+  module Passes
+    PreloadPlans = Lowrail::PreloadPlans
   end
 end

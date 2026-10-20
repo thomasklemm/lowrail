@@ -21,7 +21,7 @@ class MemoTest < Minitest::Test
     manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION,
       "compile_option" => "", "files" => {}, "units" => [unit] }, "/tmp")
     Lowrail::Guard.install(manifest, Lowrail::Stats::STATE)
-    Lowrail::Memo.install(manifest)
+    Lowrail::Passes::Memo.install(manifest.units)
     def joined(base, relative)
       Lowrail::Memo.join(0, URI, base, relative) { |r, b, u| r.join(b, u) }
     end
@@ -132,7 +132,7 @@ class MemoTest < Minitest::Test
       raise "lost conversion" unless $conversions == 2
       # Same bytes and line counts do not make a stale implementation safe.
       cert["sources"].values.first["sha256"] = "0" * 64
-      Lowrail::Memo.install(manifest)
+      Lowrail::Passes::Memo.install(manifest.units)
       before = Lowrail::Stats.unit_hits.fetch("0")
       2.times { raise "fallback result" unless joined(base, "/stale").path == "/stale" }
       raise "stale source reused" unless before == Lowrail::Stats.unit_hits.fetch("0")
@@ -238,7 +238,7 @@ class MemoTest < Minitest::Test
       raise "did not resume after attach" unless Lowrail::Stats.unit_hits.fetch("0") > hits
       # A stale passive-hook implementation invalidates the certificate too.
       cert.fetch("sources").find { |path,_| path.end_with?("/rspec.rb") }.last["sha256"] = "0" * 64
-      Lowrail::Memo.install(manifest)
+      Lowrail::Passes::Memo.install(manifest.units)
       before = Lowrail::Stats.unit_hits.fetch("0")
       2.times { joined("https://one.test", "/x") }
       raise "stale reporter certificate" unless before == Lowrail::Stats.unit_hits.fetch("0")
@@ -263,7 +263,7 @@ class MemoTest < Minitest::Test
       raise "did not recover" unless calls == 4
       trace = TracePoint.trace(:call) {}
       trace.disable
-      Lowrail::Memo.install(manifest)
+      Lowrail::Passes::Memo.install(manifest.units)
       2.times { operation.call }
       raise "revived after tracing" unless calls == 6
       # Hooks installed in main must not raise in a foreign ractor.

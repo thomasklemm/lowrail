@@ -63,7 +63,7 @@ class ARPlansTest < Minitest::Test
     require "lowrail/guard"
     Lowrail::Guard.install(manifest, Lowrail::Stats::STATE)
     if ENV["LOWRAIL"] == "1"
-      Lowrail::ARPlans.install(manifest)
+      Lowrail::Passes::ARPlans.install(manifest.units)
       Lowrail::ARPlans.activate
     end
     result = {}

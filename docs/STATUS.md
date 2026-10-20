@@ -46,7 +46,7 @@ same 11 units and verifies 21/21 identical with 114 hits.
   First default+AR stacks pass all instruction A/A/heap gates: blog **+0.588%**
   versus default, Campfire uncached **−0.066%** (CI crosses zero); no incremental
   ≥2% win. Per-model instruction prices remain unmodeled, and the Inertia set
-  awaits step 4 activation. See [stacked validation](bench.md#stacked-cli-validation).
+  has not yet been measured with shared activation. See [stacked validation](bench.md#stacked-cli-validation).
   See [the protocol and remaining adapters](bench.md#shared-command-lowrail-bench).
 - **Boot facts** (`lowrail facts APP`): modules, methods with owner,
   source location, visibility and ISeq kind, models, controllers, routes and
@@ -116,9 +116,9 @@ same 11 units and verifies 21/21 identical with 114 hits.
   ordered-schema/Hash-policy checks. Guarded bind micros save two objects
   and about 3 µs per hit; JSON requests save 10/18/22 objects in the three
   public apps. **Request speedup is unproven: native A/A control failed.**
-  Shared activation registration awaits runtime migration step 4; main alone
-  builds but does not activate this pass. The temporary local setup hook is
-  not published.
+  Runtime migration step 4 installs shared activation: integrated gates have
+  **811 identical outcomes, 514 binding hits, zero fallbacks**, and all 12
+  HTML/JSON byte comparisons pass. No temporary setup hook is needed.
 - **Guarded memo** ([certificate/refusal details](passes/memo.md)), opt-in
   with `lowrail build --memo`: fresh-return SHA-256 string reuse, bounded by
   runtime keys and guarded implementation facts. Campfire **634 identical**,
@@ -282,6 +282,170 @@ Full gem suite from the repository root: **77 runs, 1418 assertions, 0 failures,
 0 errors, 3 skips** (optional minitest-mock and two tests expecting the separate
 `real-blog-r4` directory). Selection and unit/ledger merging have Rust tests;
 ledger normalization preserves detail, copies and survey metadata.
+
+### Runtime migration, step 4 (2026-10-20)
+
+`Lowrail::Passes` owns runtime selection and the single after-initialize
+helper. Each present runtime receives only its units; absent runtimes are
+not required. Source/template delivery and memo tracing remain eager; AR
+epochs retain their own Active Record load hook. Existing runtime constants
+and file paths remain available through aliases, preserving emitted code and
+fact owners. Guard, Loader, Stats and Templates bodies are unchanged.
+
+After integrating the stacked-benchmark and template-ledger publications,
+combined checks pass: `cargo test --locked` **31 unit + 3 integration**;
+`cd gem && rake test`
+**90 tests / 1,502 assertions**, zero failures/errors and six optional skips;
+all `bench/*_test.rb` **20 tests / 155 assertions**, zero failures/errors/skips.
+
+The shared helper was exercised through a real cold Rails initialization:
+two runtimes share one temporary TracePoint, activate in order, and leave
+the trace disabled. Registration after initialization activates immediately.
+Missing, incompatible and empty builds and empty selections load neither
+pass/delivery/invalidation hooks nor default gems.
+
+Serial `lowrail verify` before and after, seed 41231 and
+`PARALLEL_WORKERS=1`, uses freshly rebuilt manifests for each runtime source
+fingerprint. Both default and all-existing-pass builds have identical test
+outcomes, ordered own-thread SQL, unit IDs and ledger identities/multiplicities:
+
+| Corpus app (non-system + browser) | Identical outcomes per build | Own-thread SQL events per build |
+|---|---:|---:|
+| real-blog-r4 | 23 | 129 |
+| Campfire (Redis) | 664 (2 existing skips) | 15,246 |
+| PingCRM | 26 | 607 |
+| Redprints | 62 | 778 |
+| Starter Kit | 36 | 256 |
+| Total | 811 | 17,016 |
+
+The Starter's explicit one-test browser rerun is additional coverage, not
+counted twice here. All ten non-system per-unit hit/fallback maps are exact;
+seven browser maps are exact, with the three timing-dependent exceptions
+attributed below. All original counts, including differences, are retained in
+[runtime-pass-equivalence.json](runtime-pass-equivalence.json). Only checked
+source certificates and moved, byte-identical wrapper-definition locations
+are canonicalized; ledger details and ordered SQL are not masked.
+
+Framework L3 also matches exactly, including per-unit maps and
+duplicate-preserving shadow observations. SQLite AR: **9,240 outcomes,
+68,857 instantiation hits, 11,616 fallbacks**. Action View groups: **2,747 +
+242 + 173 outcomes**, with **118 AV-AR hits and zero fallbacks**. Manifests
+remain built in a separate off process; there are zero shadow mismatches.
+
+PingCRM's browser User-instantiation counter **85 → 83** is dispositioned
+as request-count variance, not a changed instantiation path. Old/old is
+**85/83** and new/new **83/83** at the same seed. Full instrumented browser
+runs have **83 hits and zero outside-action hits on both runtimes**, with
+identical counts and hit distributions for every controller action:
+
+| PingCRM action | Old requests / User hits | New requests / User hits |
+|---|---:|---:|
+| `UsersController#index` | 9 / 43 | 9 / 43 |
+| All other actions combined | 59 / 40 | 59 / 40 |
+
+The original extra pair is one authentication User load plus one
+`owner = false` filtered User load (one row each) in the deleted-user filter
+test. The test already sees the deleted user after selecting “With Trashed”
+and does not wait for the subsequent role filter. A teardown trace completed
+without that role request, including a half-second post-run observation.
+Ordered own-thread SQL and outcomes remain exact; other-thread SQL remains
+advisory, not silently promoted to a strict gate.
+
+Browser A/A controls (each pair uses the same runtime/code/seed; `H` is hits,
+`F` is fallbacks) retain the following nondeterministic counts:
+
+| App/build/unit | Old/old | New/new |
+|---|---:|---:|
+| Campfire default 32 H | 519 / 528 | 537 / 531 |
+| Campfire default 44 H | 34 / 35 | 39 / 31 |
+| Campfire default 58 H | 603 / 601 | 617 / 619 |
+| Campfire all 32 H | 516 / 540 | 540 / 537 |
+| Campfire all 45 H | 35 / 39 | 33 / 33 |
+| Campfire all 59 H | 597 / 621 | 623 / 615 |
+| Campfire all 62 H | 1,351 / 1,358 | 1,357 / 1,358 |
+| Campfire all 64 H | 286 / 290 | 284 / 284 |
+| Campfire all 70 H | 422 / 425 | 420 / 420 |
+| Campfire all 71 H | 307 / 311 | 305 / 305 |
+| Campfire all 73 F | 733 / 737 | 731 / 731 |
+| Campfire all 78 H | 622 / 634 | 628 / 627 |
+| Campfire all 79 H | 1,912 / 1,960 | 1,948 / 1,943 |
+| Campfire all 81 H | 431 / 439 | 427 / 427 |
+| PingCRM all 12 H | 85 / 83 | 83 / 83 |
+
+The default unit 58 shift is larger than its A/A spread, so A/A alone is
+**not** its disposition. Instrumented full browser runs attribute every
+watched hit/fallback to a controller action or background work and reconcile
+with global Stats totals. Per-request hit buckets are unchanged:
+
+| Campfire build/action | Old/new requests | Hits per request (old/new) |
+|---|---:|---|
+| Default `Rooms#show`, unit 58 | 93 / 93 | 1 / 1 |
+| Default `Users::Sidebars#show`, unit 32 | 180 / 180 | 3 / 3 |
+| Default `Users::Sidebars#show`, unit 58 | 180 / 180 | both `{2:110, 4:54, 6:16}` |
+| Default `Messages#update`, unit 44 | 37 / 34 | 1 / 1 |
+| All `Rooms#show`, unit 59 | 93 / 93 | 1 / 1 |
+| All `Users::Sidebars#show`, unit 32 | 174 / 180 | 3 / 3 |
+| All `Users::Sidebars#show`, unit 59 | 174 / 180 | `{2:108, 4:51, 6:15}` / `{2:112, 4:53, 6:15}` |
+| All `Messages#update`, unit 45 | 39 / 36 | 1 / 1 |
+
+Histogram entries mean `hits:request_count`, not an average. Four extra
+2-hit and two extra 4-hit sidebar requests explain the entire all-build
+unit 59 **+16**; default unit 58 totals are **625/625** in the attribution
+run. The three fewer low-count update requests each account for one
+RichText/Membership/Message/Session hit, two User/AR-plan hits and one Room
+fallback. Other actions and all watched background maps are exact, including
+316 background Room fallbacks; there are no outside-action route hits.
+Thus these are request-count/composition differences, not changed per-request
+specializations. No waits or corpus test semantics were changed to hide them.
+
+Inertia integration is separate from existing-pass equivalence: **811
+identical outcomes, 17,014 identical ordered own-thread SQL events, 514
+binding hits and zero fallbacks**, with empty off-mode counters. Hits are
+PingCRM **218**, Redprints **36 + 216**, Starter **44**; the other apps have no
+unit. All **12 production HTML/JSON byte comparisons** pass through standard
+shared activation, including live Starter SSR. Two new/new PingCRM runs
+both have **68 requests, 182 in-action + 36 outside bindings, zero fallbacks**,
+with identical full action histograms. Replaying the original activation
+shim on the archived published runtime gives the exact same distribution
+and **218/0**. The historical **222** is an unattributed cohort that the
+original activation path does not reproduce; an optional role-filter request
+is plausible but not proven for that untraced cohort. The pass stays opt-in;
+its failed native A/A controls remain failed.
+
+Fixed-heap blog `GET:/articles`, six interleaved rounds × 50 requests with
+50 warmups, compares the same source-only manifest against the archived
+pre-refactor library (`BENCH_BASELINE_LIB` in `bench/request_pairs.rb`).
+Both independent A/A instruction controls and all five heap capacities pass.
+Candidate/old-runtime total instructions: **−0.02090% [−0.05032, −0.00626]**;
+GC-excluded: **−0.01292% [−0.05570, +0.00183]**. Missing/empty/disabled
+layers remain within noise of off. No added request tax is observed.
+The initial before-only total A/A control failed and is retained, not used
+as equivalence evidence. These interpreter counts are not a native YJIT
+speed claim. The stats-disabled YJIT receiver-guard micro remains about
+663 instructions/check: **662.482978 → 662.506856 (+0.00360%)** over
+1.5 million checks; its implementation is unchanged.
+
+Cold `require + setup` is measured separately because request windows exclude
+boot. Six paired rounds with independent old/old and new/new workers and
+identical, unchanged capacities in all five heap pools show **+0.758%**, about
+**0.37–0.40 million instructions once per boot**, not per request. Three
+segmented observations per runtime attribute the cost as follows (medians;
+the extra segment seams mean their sum need not equal the whole-setup delta):
+
+| Cold phase | Before instructions | After instructions | Delta |
+|---|---:|---:|---:|
+| Require `lowrail.rb` | 2,052,121 | 1,663,981 | −388,140 |
+| Require `passes.rb` | 0 | 843,805 | +843,805 |
+| Source delivery and pass selection | 3,029,117 | 2,951,341 | −77,776 |
+| Manifest/Guard/Loader require, load and install | 47,116,759 | 47,107,789 | −8,970 |
+| Segmented net | | | +368,919 |
+
+The blog's 11 source units cause **zero runtime-pass requires, installs or
+activations**. Only the registry's static descriptors and empty selections
+are built for absent runtimes; the cost is loading/compiling the registry and
+shared helper, not eager pass state. A later option is shipping `passes.rb`
+as a precompiled ISeq; that is a follow-up, not part of this refactor. See
+[benchmark method](bench.md#runtime-registry-cold-cost) for the measurement boundary.
 
 ### Per-file loader policy (2026-10-20)
 

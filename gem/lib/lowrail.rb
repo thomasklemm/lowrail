@@ -98,32 +98,8 @@ module Lowrail
       require_relative "lowrail/loader"
       Guard.install(manifest, defined?(Stats) && Stats.enabled? ? Stats::STATE : G)
       Loader.install(manifest)
-      require_relative "lowrail/routes"
-      unless manifest.templates.empty?
-        require_relative "lowrail/templates"
-        Templates.install(manifest.templates)
-      end
-      if manifest.units.any? { _1["pass"] == "active_record/preload_plans" }
-        require_relative "lowrail/preload_plans"
-        PreloadPlans.install(manifest)
-      end
-      if manifest.units.any? { _1["pass"].to_s.start_with?("memo/") }
-        require_relative "lowrail/memo"
-        Memo.install(manifest)
-      end
-      if manifest.units.any? { _1["pass"] == "digest/file_memo" }
-        require_relative "lowrail/digest_memo"
-        DigestMemo.install(manifest)
-      end
-      if manifest.units.any? { _1["pass"] == "active_record/instantiate" }
-        require_relative "lowrail/ar_instantiate"
-        ARInstantiate.install(manifest)
-      end
-      if manifest.units.any? { _1["pass"] == "active_record/ar_plans" }
-        require_relative "lowrail/ar_guard"
-        require_relative "lowrail/ar_plans"
-        ARPlans.install(manifest)
-      end
+      require_relative "lowrail/passes"
+      Passes.install(manifest)
       true
     end
 

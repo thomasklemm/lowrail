@@ -24,8 +24,9 @@ module Lowrail
         Guard.install(manifest, Stats::STATE)
         { ARPlans => "active_record/ar_plans", PreloadPlans => "active_record/preload_plans",
           ARInstantiate => "active_record/instantiate" }.each do |runtime, pass|
-          next unless units.any? { _1["pass"] == pass }
-          runtime.install(manifest)
+          selected = units.select { _1["pass"] == pass }
+          next if selected.empty?
+          runtime.install(selected)
           runtime.activate
         end
       end
