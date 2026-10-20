@@ -34,6 +34,17 @@ module Lowrail
       end
     end
 
+    # Ordinary requests never check whether counters are enabled. Install
+    # counting only on opt-in, including when enabled after guard validation.
+    module ReceiverGuardCounts
+      def ok?(id, klass)
+        decision = super
+        ::Lowrail::Stats.count(id, decision)
+        decision
+      end
+      alias view_ok? ok?
+    end
+
     class << self
       def enabled? = !!@enabled
 
@@ -41,6 +52,7 @@ module Lowrail
         return if @enabled
         @enabled = true
         @loaded = []
+        Lowrail.singleton_class.prepend(ReceiverGuardCounts)
         Lowrail.singleton_class.class_eval do
           remove_method :check # replaced, not wrapped: no extra frame per call
           def check(id)

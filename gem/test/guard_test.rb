@@ -99,6 +99,38 @@ class GuardTest < Minitest::Test
     assert_equal({ "sum" => 6, "enabled" => true }, out)
   end
 
+  def test_per_class_cache_invalidation_and_late_stats_count_each_alias_once
+    out = ruby_json(<<~'RUBY')
+      require "json"
+      require "lowrail"
+      require "lowrail/manifest"
+      require "lowrail/guard"
+      require "lowrail/stats" # merely loading Stats must not start counting
+      class Base; def foo = 1; end
+      class A < Base; end
+      class B < Base; end
+      fact = { "receiver" => "@self", "method" => "foo", "owner" => "Base",
+        "source_location" => Base.instance_method(:foo).source_location.join(":"), "visibility" => "public" }
+      manifest = Lowrail::Manifest.new({ "format" => 1, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
+        "files" => {}, "units" => [{ "id" => 0, "facts" => [fact] }] }, "/tmp")
+      Lowrail::Guard.install(manifest)
+      states = [Lowrail.ok?(0, A), Lowrail.view_ok?(0, B)]
+      before = Lowrail::Stats.unit_hits
+      Lowrail::Stats.enable!
+      Lowrail::Stats.enable! # idempotent, including the alias's instrumentation
+      states.concat([Lowrail.ok?(0, A), Lowrail.view_ok?(0, B)])
+      class B; def foo = 2; end
+      states.concat([Lowrail.ok?(0, A), Lowrail.view_ok?(0, B)])
+      B.remove_method(:foo)
+      states << Lowrail.view_ok?(0, B)
+      puts JSON.generate(states: states, before: before, hits: Lowrail::Stats.unit_hits, misses: Lowrail::Stats.unit_fallbacks)
+    RUBY
+    assert_equal [true, true, true, true, true, false, true], out["states"]
+    assert_equal({}, out["before"])
+    assert_equal({ "0" => 4 }, out["hits"])
+    assert_equal({ "0" => 1 }, out["misses"])
+  end
+
   FACTS_SCRIPT = <<~'RUBY'
     require "json"
     require "lowrail"

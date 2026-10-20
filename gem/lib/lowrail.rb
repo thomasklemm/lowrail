@@ -142,7 +142,6 @@ module Lowrail
       cache = (V[id] ||= {}.compare_by_identity)
       s = cache[klass]
       s = cache[klass] = Guard.validate(id, klass: klass) if s.nil?
-      Stats.count(id, s) if defined?(Stats) && Stats.enabled?
       s
     end
     alias view_ok? ok?
