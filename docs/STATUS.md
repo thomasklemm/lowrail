@@ -33,7 +33,10 @@ same 11 units and verifies 21/21 identical with 114 hits.
   response-cache-disabled room +10.2%: not a general application-speed win,
   so it is opt-in (`lowrail build --preload-plans`) until it no longer
   slows real requests.
-- **Runtime gem**: `load_iseq` seam (composes with Bootsnap in either order),
+- **Runtime gem**: `load_iseq` / ISeq eval seams (composes with Bootsnap and
+  require-hooks/Freezolite in every installation order), per-file compiler
+  contracts captured from the booted app, unchanged-source/original-ISeq
+  fingerprints, and original-only Bootsnap caches ([survey and tests](loaders.md));
   template seam (lowered handler code while the source digest matches),
   guards that reset on every definition path and revalidate lazily
   (including stubs on single objects), per-view-class checks, env check,
@@ -64,7 +67,7 @@ same 11 units and verifies 21/21 identical with 114 hits.
 | Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 108/162 route sites (51 `_url`) | 634/634 identical (2 skips both ways), 13238 hits across 52 units, 0 fallbacks; with `--preload-plans` 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
 | ARGOS (private, Rails 8.1.4) | not built yet | — | M0 aggregates in `docs/m0/argos.md` |
 | PingCRM (Rails 8.1.4, Ruby 4.0.7) | 30/30 route sites, 4 route units + preload | 26/26 identical, 11 route + 7 preload hits | [Public Inertia M0](m0/inertia.md); seed 41231, browser suite included |
-| Redprints CFP (Rails 8.1.3, Ruby 4.0.7) | 25/27 route sites, 14 route units + preload | 62/62 identical, **zero hits: fallback only** (7 template fallbacks) | Runs without patches despite Ruby 3.4 pin; Freezolite/require-hooks delivery boundary in [M0](m0/inertia.md) |
+| Redprints CFP (Rails 8.1.3, Ruby 4.0.7) | 25/27 route sites, 14 route units; all 9 Ruby files delivered | 50/50 non-system + 12/12 browser outcomes identical; **zero hits: route guards still decline** (25 + 19 fallbacks) | Freezolite delivery fixed ([loader survey](loaders.md)); independent `RouteSet#find_script_name` guard fix pending |
 | React Starter Kit (Rails 8.1.4, Ruby 4.0.7) | 23/26 route sites, 8 route units + preload | 36/36 identical, 25 route hits across 7 units; no preload hits | [M0](m0/inertia.md) includes healthy SSR HTML and authenticated JSON |
 
 Public Inertia builds and `observe` completed on all three. Lowrail-off
@@ -73,6 +76,33 @@ not speedup claims. All three version digests are eager boot Strings: **zero
 digest calls across 400 traced requests/app**, unlike ARGOS's version proc.
 Configuration binding and serializer/prop descriptors are measured candidates;
 dynamic users, props, SQL and SSR output must remain per request.
+
+### Per-file loader policy (2026-10-20)
+
+Build captures the app's real compiler calls, including Freezolite's temporary
+defaults and Bootsnap's selected per-file options. Runtime requires the same
+recipe, original ISeq and source bytes before substituting lowered code;
+Bootsnap caches only originals. Installation-order and ecosystem details are
+in [loader composition](loaders.md). This is delivery/correctness work, not a
+speed claim.
+
+Executed on Ruby 4.0.7, using the `script/corpus` pins and seed 41231:
+
+- real-blog: build 11 units, verify 21/21 identical, 56 hits across all
+  11 units, 1 existing view fallback.
+- Campfire: verify 634/634 identical (2 skips both ways), 6913 hits across
+  52 units, zero fallbacks.
+- Redprints: build 14 units and compile all 9 Ruby files with its own
+  Freezolite policy. Non-system RSpec is 50/50 identical; browser RSpec is
+  12/12 identical. The remaining 25/19 fallbacks are route guards, not ISeq
+  refusal: mounted engines override `RouteSet#find_script_name`, invalidating
+  its current class-wide guard. No route fast-path support claim yet.
+
+The full gem suite passes: 57 runs, 1529 assertions, 3 skips. Ruby 3.4.11
+targeted compiler/loader/end-to-end tests pass: 19 runs, 465 assertions,
+1 skip. Rust tests pass (20 unit + 2 integration). The two loader-policy
+regressions fail on pre-fix main and pass with the fix; tests cover actual
+frozen-literal behavior and lowered-file delivery, not just process success.
 
 ### Build surface (2026-10-20)
 

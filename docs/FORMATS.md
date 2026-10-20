@@ -254,7 +254,10 @@ Written by `lowrail build` (via `gem/exe/lowrail-compile`).
   "ruby_description": "...",
   "compile_option": "<sha256 of sorted RubyVM::InstructionSequence.compile_option>",
   "rails_env": "test",                                  // units apply only in this env
-  "files": {"/abs/app/helpers/rooms_helper.rb": {"iseq": "iseq/<sha>.bin", "source_sha256": "..."}},
+  "files": {"/abs/app/helpers/rooms_helper.rb": {
+    "iseq": "iseq/<sha>.bin", "source_sha256": "...",
+    "compile_option": "<sha256 of this file's compiler defaults and explicit options>",
+    "original_iseq_sha256": "<sha256 of the app loader's original ISeq binary>"}},
   "templates": {"/abs/app/views/articles/_article.html.erb": {
     "source_sha256": "...", "code": "<lowered compiled ERB code>", "units": [0, 1]}},
   "units": [{
@@ -272,6 +275,23 @@ Written by `lowrail build` (via `gem/exe/lowrail-compile`).
   }]
 }
 ```
+
+File delivery requires all three per-file checks: unchanged source bytes,
+the same compiler recipe, and the same original ISeq from the **live loader
+chain**. The recipe hash uses the sorted process-default options and, when
+non-nil, the explicit per-call options (sorted if a Hash). Both are recorded
+at the actual compiler call, not when the loader finishes: Freezolite restores
+its temporary defaults after each load. Native Bootsnap cache hits record the
+selected compiler's options at `storage_to_output`; an opaque compiler whose
+recipe cannot be observed is not trusted. The original ISeq fingerprint
+additionally detects source transforms and bytecode hijacks. It alone would
+not detect option changes that affect only newly introduced lowered code.
+
+The top-level `compile_option` remains build-process metadata, not a file
+delivery guard. Older format-1 file entries lacking the per-file contract
+silently run original code until rebuilt; their template entries still work.
+Coverage always runs original source. See [loader composition](loaders.md)
+for the gem survey, installation-order behavior, and tested versions.
 
 Units: `kind` is `"template"` (code served through the template seam,
 `file` is the template identifier) or `"file"` (a Ruby file served through
@@ -300,10 +320,20 @@ the named route to still have that path spec, required parts and
  "units": [ ...as in manifest... ]}
 ```
 
-`lowrail-compile` compiles each lowered source with
-`RubyVM::InstructionSequence.compile(src, path, path, 1)` (path = original
-absolute path), writes binaries, then atomically writes `manifest.json`. A
-file is skipped (and its units dropped) when its current SHA-256 differs from
+`lowrail-compile` runs under `bundle exec ruby`, boots `config/environment`
+with `LOWRAIL=0` and the requested `rails_env`, and eager-loads the app while
+observing compiler calls for the target files. A temporary
+`BOOTSNAP_CACHE_DIR` prevents warm caches from hiding those calls and is
+removed afterwards; the app's existing cache is untouched. It then compiles
+each lowered source with the original path, parser, line, process defaults
+and explicit options, writes binaries, and atomically writes `manifest.json`.
+Defaults are restored after every compilation, including syntax errors.
+Without a Rails environment (standalone compiler fixtures), the recipe is
+the current process's `compile_file` policy.
+
+A file is skipped with a warning (and its units dropped) if the app did not
+visit an observable compiler, if its loader transformed the source before
+compiling (the current passes analyze disk source), or when its SHA-256 differs from
 `source_sha256` or, if given instead, from the SHA-256 of the `original` copy
 the pass lowered. `templates` and `rails_env` are copied to the manifest;
 template units need no compiled file.
