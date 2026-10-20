@@ -55,7 +55,8 @@ module Lowrail
         preloader = ActiveRecord::Associations::Preloader
         originals = PreloadPlans::Hook.instance_methods(false).map { |name| PreloadFacts.method_fact(preloader, name) }
         originals << PreloadFacts.method_fact(preloader, :initialize)
-        [preloader, preloader::Association, preloader::Association::LoaderQuery, preloader::Branch,
+        [preloader, preloader::Batch, preloader::Association, preloader::Association::LoaderQuery,
+         preloader::Association::LoaderRecords, preloader::Branch,
          ActiveRecord::Reflection::AssociationReflection, ActiveRecord::Relation, PreloadPlans::Hook].each do |mod|
           (mod.instance_methods(false) + mod.private_instance_methods(false)).uniq.each do |name|
             next if mod == preloader && originals.any? { _1["method"] == name.to_s }
@@ -64,6 +65,7 @@ module Lowrail
         end
         # Pin the implementation of private Rails APIs used by this pass.
         files = (facts + originals).filter_map { _1["source_location"]&.sub(/:\d+\z/, "") }.uniq
+        files << PreloadFacts.method(:decline).source_location.first
         edges.each_value { |e| files << e["scope"].first if e["scope"] }
         id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
         manifest["units"] << { "id" => id, "kind" => "runtime", "file" => "active_record/preload_plans",

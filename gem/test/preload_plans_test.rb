@@ -184,6 +184,15 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(a.id)]
     preload.call(rows, :posts)
     result["reflection_change"] = rows.first.posts.map(&:title)
+    $batch_calls = 0
+    ActiveRecord::Associations::Preloader::Batch.prepend(Module.new do
+      def call
+        $batch_calls += 1
+        super
+      end
+    end)
+    preload.call([Writer.find(a.id)], :other_posts)
+    result["batch_change"] = $batch_calls
     result["hits"] = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {}
     puts JSON.generate(result)
   RUBY
@@ -229,6 +238,7 @@ class PreloadPlansTest < Minitest::Test
       assert_equal ["first"], on["module_change"]
       assert_equal ["third"], on["schema_reset"]
       assert_equal ["third"], on["reflection_change"]
+      assert_equal 1, on["batch_change"]
       assert_equal ["x1", "x2"], on["through"]
     end
   end
