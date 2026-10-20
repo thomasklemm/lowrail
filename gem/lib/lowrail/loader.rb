@@ -20,6 +20,7 @@ module Lowrail
 
       def install(manifest)
         @manifest = manifest
+        @served = {}
         iseq_singleton.prepend(Compilation::Capture) unless iseq_singleton < Compilation::Capture
         Compilation.hook_bootsnap
         RubyVM::InstructionSequence.prepend(Evaluation) unless RubyVM::InstructionSequence < Evaluation
@@ -27,6 +28,10 @@ module Lowrail
       end
 
       def installed? = !@manifest.nil?
+
+      # Cold-delivery witness for sealed admission. Record at the successful
+      # source of truth, not through a VM-wide return observer or a wrapper.
+      def served?(path) = @served&.key?(path)
 
       def iseq_singleton = RubyVM::InstructionSequence.singleton_class
 
@@ -53,6 +58,7 @@ module Lowrail
         (@replacements ||= ObjectSpace::WeakKeyMap.new)[iseq] = true
         Stats.loaded(path) if defined?(Stats)
         JitDiagnostics.record(iseq, path, @manifest.units) if defined?(JitDiagnostics)
+        @served[path] = true
         iseq
       rescue StandardError => e
         Lowrail.refuse("#{path}: #{e.class}: #{e.message}; compiling original source")

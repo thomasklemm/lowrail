@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "../lowrail"
+require_relative "load_hooks"
 
 module Lowrail
   # Invalidation epochs for Active Record plans.
@@ -79,18 +80,9 @@ module Lowrail
         return if @install_requested
         @install_requested = true
         return hook! if Lowrail.loaded_constant("ActiveRecord::Base")
-        if defined?(::ActiveSupport) && ::ActiveSupport.respond_to?(:on_load)
-          ::ActiveSupport.on_load(:active_record) { Lowrail::AR.hook! }
-          return
-        end
-        # Under RUBYOPT Active Support is not loaded yet; wait for it. The
-        # TracePoint is removed as soon as the lazy-load hooks exist.
-        @wait = TracePoint.new(:end) do
-          next unless defined?(::ActiveSupport) && ::ActiveSupport.respond_to?(:on_load)
-          @wait.disable
+        LoadHooks.active_support do
           ::ActiveSupport.on_load(:active_record) { Lowrail::AR.hook! }
         end
-        @wait.enable
       end
 
       def hook!

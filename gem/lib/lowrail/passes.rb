@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "load_hooks"
+
 module Lowrail
   # Runtime installers, in the historical setup order. Source passes only
   # need delivery, except memo's per-site state. Keep the existing module
@@ -52,26 +54,18 @@ module Lowrail
       end
     end
 
-    # Active Support/Zeitwerk do not manage every framework autoload (the
-    # preloader, for example). Wait for natural class/module loading without
-    # resolving a single constant ourselves. The hook disables when ready.
+    # Native framework autoloads are not all managed by Zeitwerk. Wait for
+    # successful load completion, never for a partially defined class body.
     def self.when_loaded(names, &activate)
-      ready = -> { names.all? { Lowrail.loaded_constant(_1) } }
-      return activate.call if ready.call
-      trace = TracePoint.new(:end) do
-        next unless ready.call
-        trace.disable
-        activate.call
-      end
-      trace.enable
+      LoadHooks.when_loaded(names, &activate)
     end
 
     # on_load also runs immediately when the application already initialized.
-    # Under RUBYOPT neither Rails nor Active Support exists yet: one temporary
-    # TracePoint waits for Rails::Application, then hands off to the same hook.
+    # A global :return TracePoint leaves trace_leave instructions VM-wide even
+    # after disable. Target only initialize!: removal restores that local ISeq.
     def self.after_initialize(runtime, receivers = [])
       activate = -> { when_loaded(receivers) { runtime.activate } }
-      if defined?(::ActiveSupport) && ::ActiveSupport.respond_to?(:on_load)
+      LoadHooks.active_support do
         ::ActiveSupport.on_load(:after_initialize, yield: true) do |app|
           if !app.respond_to?(:initialized?) || app.initialized?
             activate.call
@@ -87,20 +81,9 @@ module Lowrail
               pending, @activations = @activations, []
               pending.each(&:call)
             end
-            @activation.enable
+            @activation.enable(target: app.method(:initialize!))
           end
         end
-      else
-        (@pending ||= []) << [runtime, receivers]
-        return if @boot&.enabled?
-        @boot = TracePoint.new(:end) do |event|
-          if event.self.is_a?(Class) && event.self.name == "Rails::Application"
-            @boot.disable
-            pending, @pending = @pending, []
-            pending.each { |entry| after_initialize(*entry) }
-          end
-        end
-        @boot.enable
       end
     end
   end

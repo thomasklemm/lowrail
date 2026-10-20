@@ -44,7 +44,7 @@ if ENV["TRACE_SHAPE"]
     JitStability.assert_mode!
     require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
     windows = HeapWindows.windows(Integer(ENV.fetch("BENCH_REQUESTS")))
-    observer = JitStability.method(:snapshot) if JitStability.enabled?
+    observer = JitStability.enabled? ? JitStability.method(:snapshot) : nil
     anchors = HeapWindows.run(windows, observe: observer) { |n, _| object.run(n) }
     puts "LOWRAIL_BENCH #{JSON.generate(metadata.merge(windows: windows, heap_anchors: anchors, ar_installed: 0))}"
   end

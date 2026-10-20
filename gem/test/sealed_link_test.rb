@@ -87,8 +87,18 @@ class SealedLinkTest < Minitest::Test
         end
         response = Rack::MockRequest.new(Rails.application).get("/articles", "HTTP_HOST" => "example.org")
         raise "request token leaked" if defined?(Lowrail::Sealed) && Thread.current[Lowrail::Sealed::REQUEST]
+        trace_exits = nil
+        if ENV["CHECK_YJIT_TRACE"]
+          raise "YJIT stats required" unless RubyVM::YJIT.runtime_stats&.key?(:exit_trace_leave)
+          request = Rack::MockRequest.new(Rails.application)
+          100.times { request.get("/articles", "HTTP_HOST" => "example.org") }
+          before = RubyVM::YJIT.runtime_stats.fetch(:exit_trace_leave)
+          raise "request failed" unless request.get("/articles", "HTTP_HOST" => "example.org").status == 200
+          trace_exits = RubyVM::YJIT.runtime_stats.fetch(:exit_trace_leave) - before
+        end
         puts JSON.generate(status: response.status, body: response.body, conversions: $conversions,
           events: events, metadata: metadata, hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks,
+          trace_exits: trace_exits,
           refusal: defined?(Lowrail::Sealed) && Lowrail::Sealed.refusal)
       RUBY
       %w[stock view builder].each do |receiver|
@@ -109,6 +119,14 @@ class SealedLinkTest < Minitest::Test
         assert_equal receiver == "stock" ? 0 : 1, sealed.fetch("fallbacks").fetch(link_unit, 0)
         assert_equal '<a class="one&quot;two" href="/target?x=&lt;&amp;q=&quot;">A&lt;&amp;</a>', sealed["body"] if receiver == "stock"
       end
+      # disasm normalizes trace_leave to leave, so a text search is vacuous.
+      # Exercise the executable VM state after real cold delivery/activation.
+      traced = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
+        "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "CHECK_YJIT_TRACE" => "1",
+        "RUBYOPT" => "#{SETUP_OPT} --yjit --yjit-stats=quiet"})
+      assert_nil traced["refusal"]
+      assert_operator traced.fetch("hits").fetch("0", 0), :>, 0
+      assert_equal 0, traced.fetch("trace_exits"), "boot observers must not patch unrelated request ISeqs"
       FileUtils.mkdir_p(File.join(dir, "config/initializers"))
       File.write(File.join(dir, "config/initializers/private_builder.rb"), <<~'RUBY')
         Rails.application.config.after_initialize do

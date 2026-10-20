@@ -37,14 +37,6 @@ module Lowrail
       def install(units)
         @unit = units.fetch(0)
         @data = @unit.fetch("sealed")
-        @served = []
-        # Observe successful cold delivery, not a wrapper around a constructor.
-        @delivery = TracePoint.new(:return) do |event|
-          if event.method_id == :serve && event.self.equal?(Lowrail::Loader) && event.return_value
-            @served << event.binding.local_variable_get(:path)
-          end
-        end
-        @delivery.enable
       end
 
       def decline(reason)
@@ -77,7 +69,7 @@ module Lowrail
         Materialize.run(app_root: Rails.root.to_s, measure: false, record: ->(where, error) { errors << where })
         return decline("incomplete materialization") unless errors.empty?
         return decline("stale sources") unless @data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha }
-        return decline("cold factory/entry delivery missing") unless @data.fetch("delivery").keys.all? { @served.include?(_1) }
+        return decline("cold factory/entry delivery missing") unless @data.fetch("delivery").keys.all? { Loader.served?(_1) }
         controller = Lowrail.loaded_constant(@data.fetch("controller"))
         return decline("controller missing") unless controller
         @view_class = controller.view_context_class
@@ -115,8 +107,6 @@ module Lowrail
         @refusal = nil
       rescue StandardError, ScriptError => error
         decline("#{error.class}: #{error.message.lines.first&.strip}")
-      ensure
-        @delivery&.disable
       end
 
       def visibility(holder, name)
