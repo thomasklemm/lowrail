@@ -1,5 +1,7 @@
 # Status
 
+Decisions on what to pursue, park or reject: [DECISIONS.md](DECISIONS.md).
+
 Living summary of what works, what was learned, and what is next. Details
 live in the linked docs; numbers come from executed runs, dated.
 
