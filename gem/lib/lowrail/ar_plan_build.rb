@@ -52,7 +52,8 @@ module Lowrail
             end
           end
           edges[label] = { "owner" => owner.name, "name" => reflection.name.to_s,
-            "scope" => info, "reflection" => PreloadFacts.reflection(reflection) }
+            "scope" => info, "reflection" => PreloadFacts.reflection(reflection),
+            "visitor" => reflection.klass.with_connection { |c| Module.instance_method(:name).bind_call(c.visitor.class) } }
         rescue StandardError => e
           ledger << { "pass" => "active_record/ar_plans", "method" => label, "outcome" => "declined: #{e.class}: #{e.message.lines.first.strip}" }
         end
@@ -62,6 +63,7 @@ module Lowrail
       end
       unless edges.empty?
         adapters = models.keys.map { Object.const_get(_1).with_connection(&:class) }.uniq
+        visitors = models.keys.map { Object.const_get(_1).with_connection { |c| c.visitor.class } }.uniq
         adapters.each do |adapter|
           # Arel visitors delegate quoting and compilation to the adapter.
           # Guard the concrete implementation, including inherited methods,
@@ -77,6 +79,9 @@ module Lowrail
           ActiveRecord::PredicateBuilder, ActiveRecord::TableMetadata, ActiveRecord::Relation,
           ActiveRecord::Associations::AssociationScope, ActiveRecord::Associations::Association]
         holders.concat(ObjectSpace.each_object(Module).select { _1.name&.start_with?("Arel::") })
+        # Include the live hierarchy even for visitors outside Arel's namespace.
+        holders.concat(visitors.flat_map { |visitor| visitor.ancestors.take_while { _1 != Object } })
+        holders.uniq!
         holders.each do |holder|
           names = holder.instance_methods(false) + holder.private_instance_methods(false) + holder.protected_instance_methods(false)
           names.uniq.each do |name|
@@ -95,7 +100,7 @@ module Lowrail
         files = (facts + originals).filter_map { _1["source_location"]&.sub(/:\d+\z/, "") }
         # Stable method definitions are not a purity certificate for an app's
         # replacement planner/visitor/quoter. Only the framework path is audited.
-        trusted = %w[activerecord activemodel activesupport].map { Gem.loaded_specs.fetch(_1).full_gem_path + "/" }
+        trusted = %w[activerecord activemodel activesupport].map { Gem.loaded_specs.fetch(_1).full_gem_path + "/lib/" }
         trusted.concat([__dir__ + "/", RbConfig::CONFIG.fetch("rubylibdir") + "/"])
         if (custom = files.find { !_1.start_with?(*trusted) })
           ledger.each do |entry|

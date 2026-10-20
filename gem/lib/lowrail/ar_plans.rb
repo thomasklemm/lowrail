@@ -33,7 +33,7 @@ module Lowrail
           reflection = owner._reflect_on_association(edge.fetch("name"))
           next unless reflection && PreloadFacts.reflection(reflection) == edge.fetch("reflection")
           next unless [owner, reflection.klass].all? { PreloadFacts.model(_1) == data.fetch("models").fetch(_1.name) }
-          @plans[reflection] = Plan.new(reflection, edge.fetch("scope"))
+          @plans[reflection] = Plan.new(reflection, edge.fetch("scope"), edge.fetch("visitor"))
         end
         ActiveRecord::Associations::Association.prepend(AssociationHook)
         ActiveRecord::Relation.prepend(RelationHook)
@@ -67,7 +67,7 @@ module Lowrail
     end
 
     class Plan
-      def initialize(reflection, scope_info)
+      def initialize(reflection, scope_info, visitor_name)
         @reflection, @owner, @model = reflection, reflection.active_record, reflection.klass
         @scope_info = scope_info
         raise ArgumentError, "uncertified scope" if ARPlanFacts.decline(reflection, scope_info)
@@ -77,6 +77,7 @@ module Lowrail
         @defaults = [@owner.default_scopes, @model.default_scopes]
         @role, @shard = @model.current_role, @model.current_shard
         @adapter = @model.with_connection(&:class)
+        @visitor = Object.const_get(visitor_name)
         # Metadata reads can materialize Rails' lazy schema/type state.
         @epochs = [AR.epoch(@owner), AR.epoch(@model)]
         @cache = {}.compare_by_identity
@@ -105,14 +106,19 @@ module Lowrail
       def execute(association, scope)
         @model.with_connection do |connection|
           return nil unless connection.instance_of?(@adapter)
+          visitor = connection.visitor
+          return nil unless visitor.instance_of?(@visitor) && visitor.singleton_methods.empty?
           cached = @lock.synchronize do
             cached = @cache[connection]
+            # A visitor swap is not a model epoch event. Never reuse SQL
+            # compiled by a different visitor, even on the same connection.
+            return nil if cached && !cached[3].equal?(visitor)
             if !cached || cached[0] != connection.prepared_statements
               # Same placeholder association scope used by Rails find_target.
               as = ActiveRecord::Associations::AssociationScope.create { ActiveRecord::StatementCache::Substitute.new }
               relation = association.send(:target_scope).merge!(as.scope(association))
               query, binds = connection.cacheable_query(ActiveRecord::StatementCache, relation.arel)
-              cached = @cache[connection] = [connection.prepared_statements, query, ActiveRecord::StatementCache::BindMap.new(binds)]
+              cached = @cache[connection] = [connection.prepared_statements, query, ActiveRecord::StatementCache::BindMap.new(binds), visitor]
             end
             cached
           rescue StandardError => e

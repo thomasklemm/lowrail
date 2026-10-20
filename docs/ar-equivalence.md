@@ -245,3 +245,39 @@ gate](rails-suite.md) also runs its general and PostgreSQL adapter cases.
 No Rails 8.2-alpha, application corpus or system-test run is claimed here.
 This provides more independent opportunities to falsify equivalence, not a
 universal support or speed claim.
+
+## Connection-identity audit (2026-10-20, Round 2)
+
+The opt-in SQL reader had a correctness bug: after warming a scoped reader,
+replacing the connection's visitor with a custom subclass could reuse SQL
+compiled by the old visitor. Method definitions on the original visitor class
+still matched. Strict shadow mode exposed the different SQL; without shadow
+the stale SQL could execute. This is separate from the runtime-registry refactor.
+
+Build now records the target's visitor class and certifies the actual visitor
+hierarchy, including classes outside `Arel::`. Runtime requires that exact
+class without singleton overrides and pins each cached statement to its visitor
+object. A changed visitor falls back; it is not recertified lazily. Prepared
+statement changes still rebuild their own cache entry. Older builds lacking the
+visitor fact decline silently and need rebuilding. Tests compare exact query
+events/rows for live method patches, custom visitor swaps, replacement nodes
+and rebuilt custom planners; the visitor-swap regression fails before the fix.
+
+An additional differential validation warmed each pass independently, then
+changed one input in a fresh process. Seven changes × three passes = **21
+off/on comparisons**: visitor subclass swap, visitor singleton patch, adapter
+subclass/new pool, same-adapter/new pool, reading role, another shard, and the
+public `unprepared_statement` window followed by restoration. The second
+SQLite database contains deliberately different `OTHER-<id>` titles. Compare
+exact rows, loaded associations, ordered SQL/binds and restoration, not just
+exception-free completion. Before: 20 identical, reader visitor-swap differs
+with two strict shadow mismatches. After: **21 identical, zero mismatches**.
+
+| Cached pass | Visitor / prepared statements | Pool / adapter / role / shard | Result |
+|---|---|---|---|
+| SQL reader | Exact visitor class/object; prepared flag remains a cache key | Connection-identity cache, adapter check, global connection epochs, per-call role/shard checks | Swapped visitors now fall back; other cases already identical |
+| Preload | Caches structural scopes/groups, not compiled SQL; fresh `where(...).load` goes through the live visitor/connection | Fresh Rails loaders use the current connection context; schema/reflection/type identities rechecked | Not affected in these seven cases; two warm and two subsequent completed preloads |
+| Instantiate | Consumes an already-executed `ActiveRecord::Result`; caches attributes, not SQL | Establish/remove/connects-to epochs invalidate; role/shard keeps Rails' live schema/builder behavior | Not affected; 40 warm hits, then 40 more, or 10 call-level fallbacks after pool/adapter replacement |
+
+This is a bounded identity audit, not a claim about arbitrary private-state
+mutation, every adapter, or concurrent connection replacement during a query.

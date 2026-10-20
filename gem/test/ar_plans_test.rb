@@ -124,13 +124,33 @@ class ARPlansTest < Minitest::Test
       Post.connection_pool.with_connection do |connection|
         connection.class.define_method(:quote_table_name) { |name| "[#{name}]" }
       end
+    when "visitor", "custom_visitor"
+      visitor = if ENV.fetch("CHANGE") == "custom_visitor"
+        Object.const_set(:CustomSqlVisitor, Class.new(Arel::Visitors::ToSql))
+      else
+        Arel::Visitors::ToSql
+      end
+      original = visitor.instance_method(:visit_Arel_Nodes_SelectStatement)
+      visitor.define_method(:visit_Arel_Nodes_SelectStatement) do |node, collector|
+        original.bind_call(self, node, collector) << " /* custom visitor */"
+      end
+      if ENV.fetch("CHANGE") == "custom_visitor"
+        Post.with_connection { _1.instance_variable_set(:@visitor, visitor.new(_1)) }
+      end
+    when "node"
+      original = Arel::Nodes.send(:remove_const, :Equality)
+      Arel::Nodes.const_set(:Equality, Class.new(original) do
+        def initialize(*args)
+          super
+        end
+      end)
     when "annotations"
       ActiveRecord.query_transformers = [->(sql, *) { sql + " /* live annotation */" }]
     end
     result["changed"] = read.call(a)
     ActiveSupport::Notifications.unsubscribe(subscription)
     ledger = JSON.parse(File.read(File.join(dir, "ledger.json")))
-    if ENV.fetch("CHANGE") == "adapter"
+    if %w[adapter visitor custom_visitor node].include?(ENV.fetch("CHANGE"))
       # A rebuilt manifest must not certify a boot-time replacement quoter
       # merely because its definition is stable.
       result["rebuilt_units"] = Lowrail::ARPlanBuild.build[:units].size
@@ -145,7 +165,7 @@ class ARPlansTest < Minitest::Test
     realpath_tmpdir do |dir|
       file = File.join(dir, "scenario.rb")
       File.write(file, SCENARIO)
-      %w[method association_method default_scope column attribute adapter annotations].each do |change|
+      %w[method association_method default_scope column attribute adapter visitor custom_visitor node annotations].each do |change|
         outputs = %w[0 1].map do |mode|
           out, err, status = ruby(file, dir, setup: false, env: { "LOWRAIL" => mode, "CHANGE" => change, "LOWRAIL_DEBUG" => "1", "RUBYLIB" => LowrailTest::GEM_LIB })
           assert status.success?, "#{change}: #{err}\n#{out}"
@@ -161,7 +181,7 @@ class ARPlansTest < Minitest::Test
         assert_equal [true, false, ["z"]], on.fetch("lazy")
         assert_equal ["a"], on.fetch("dynamic_changed")
         assert_equal "ActiveRecord::StrictLoadingViolationError", on.fetch("strict")
-        assert_equal 0, on.fetch("rebuilt_units") if change == "adapter"
+        assert_equal 0, on.fetch("rebuilt_units") if %w[adapter visitor custom_visitor node].include?(change)
         assert_equal [["z", true, false]], on.fetch("changed") if %w[method association_method default_scope].include?(change)
         assert on.fetch("events").any? { _1.last == true }, "query cache was not exercised"
         %w[dynamic clock negative].each do |name|
