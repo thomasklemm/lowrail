@@ -21,6 +21,7 @@ class PreloadPlansTest < Minitest::Test
       create_table(:writers) { |t| t.string :name }
       create_table(:posts) { |t| t.integer :writer_id; t.integer :alternate_id; t.string :title }
       create_table(:notes) { |t| t.integer :post_id; t.string :body }
+      create_table(:poly_posts) { |t| t.integer :owner_id; t.string :owner_type }
     end
     class Writer < ActiveRecord::Base
       has_many :posts, inverse_of: :writer
@@ -31,13 +32,31 @@ class PreloadPlansTest < Minitest::Test
       has_many :dependent_posts, ->(writer) { where(title: writer.name) }, class_name: "Post"
       has_many :custom_posts, class_name: "CustomPost", foreign_key: :writer_id
       has_many :reflection_posts, class_name: "Post", foreign_key: :writer_id
+      has_many :poly_posts, as: :owner
+      has_many :native_poly_posts, class_name: "NativePolyPost", as: :owner
     end
     class Post < ActiveRecord::Base
       belongs_to :writer, inverse_of: :posts
       has_many :notes, inverse_of: :post
+      after_find do
+        if Thread.current[:mutate_scope]
+          Note.send(:default_scope, -> { where(body: "x2") })
+          NativePolyPost.send(:default_scope, -> { where(owner_id: -1) })
+        end
+      end
     end
     class Note < ActiveRecord::Base
       belongs_to :post, inverse_of: :notes
+    end
+    class DynamicString < ActiveRecord::Type::String
+      def serialize(value) = Thread.current[:change_type] ? "changed" : super
+    end
+    class PolyPost < ActiveRecord::Base
+      belongs_to :owner, polymorphic: true
+      attribute :owner_type, DynamicString.new
+    end
+    class NativePolyPost < ActiveRecord::Base
+      self.table_name = "poly_posts"
     end
     class CustomPost < ActiveRecord::Base
       self.table_name = "posts"
@@ -52,6 +71,7 @@ class PreloadPlansTest < Minitest::Test
     y = a.posts.create!(title: "second")
     z = b.posts.create!(title: "third", alternate_id: a.id)
     x.notes.create!(body: "x1"); x.notes.create!(body: "x2"); z.notes.create!(body: "z1")
+    PolyPost.create!(owner: a)
     dir = Dir.pwd
     File.write("manifest.json", JSON.generate({format: 1, ruby_description: RUBY_DESCRIPTION,
       compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [{id: 7, facts: []}]}))
@@ -75,6 +95,12 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(a.id)]
     preload.call(rows, { "posts" => :notes, posts: :writer })
     result["distinct_spec_keys"] = rows.first.posts.map { [_1.association(:notes).loaded?, _1.association(:writer).loaded?] }
+    identity_spec = {}.compare_by_identity
+    identity_spec[+"posts"] = :notes
+    identity_spec[+"posts"] = :writer
+    rows = [Writer.find(a.id)]
+    identity_roots = preload.call(rows, identity_spec)
+    result["identity_spec"] = [identity_roots.size, rows.first.posts.map { [_1.association(:notes).loaded?, _1.association(:writer).loaded?] }]
     # Already loaded associations and unsaved collection targets survive.
     rows = [Writer.find(a.id), Writer.find(b.id)]
     rows.first.posts.load
@@ -104,6 +130,11 @@ class PreloadPlansTest < Minitest::Test
     rows.first.association(:posts).reset
     again = repeated.call
     result["repeat_call"] = [first.zip(again).all? { |x, y| x.equal?(y) }, rows.first.association(:posts).loaded?]
+    inspected = ActiveRecord::Associations::Preloader.new(records: [Writer.find(a.id)], associations: { posts: :notes })
+    roots = inspected.call
+    result["branch_state"] = [inspected.branches.all?(&:done?),
+      inspected.branches.flat_map(&:loaders).zip(roots).all? { |x, y| x.equal?(y) },
+      inspected.branches.first.children.all?(&:done?)]
     rows = [Writer.find(a.id), Writer.find(b.id)]
     queries = []
     subscription = ActiveSupport::Notifications.subscribe("sql.active_record") { |*args| queries << args.last[:sql] if args.last[:sql].start_with?("SELECT") }
@@ -133,6 +164,20 @@ class PreloadPlansTest < Minitest::Test
       rows.map { |r| [r.peers.map { |p| [p.name, p.association(:posts).loaded?, p.posts.map(&:title)] },
         r.posts.map { |p| [p.title, p.association(:writer).loaded?, p.writer.name] }] }
     end
+    rows = [Writer.find(a.id)]
+    Thread.current[:mutate_scope] = true
+    preload.call(rows, { posts: :notes, native_poly_posts: nil })
+    Thread.current[:mutate_scope] = nil
+    result["callback_scope"] = [rows.first.posts.map { _1.notes.map(&:body) }, rows.first.native_poly_posts.size]
+    Note.default_scopes = []
+    NativePolyPost.default_scopes = []
+    result["dynamic_type"] = [false, true].map do |change|
+      Thread.current[:change_type] = change
+      rows = [Writer.find(a.id)]
+      preload.call(rows, :poly_posts)
+      rows.first.poly_posts.size
+    end
+    Thread.current[:change_type] = nil
     Post.where(title: "second").scoping do
       rows = [Writer.find(a.id)]
       preload.call(rows, :posts)
@@ -189,6 +234,23 @@ class PreloadPlansTest < Minitest::Test
     rows = [Writer.find(a.id)]
     preload.call(rows, :posts)
     result["reflection_change"] = rows.first.posts.map(&:title)
+    preload.call([Writer.find(a.id)], :native_poly_posts)
+    type = ActiveModel::Type::String
+    original = type.instance_method(:serialize)
+    type.define_method(:serialize) { |value| value == "Writer" ? "changed" : original.bind_call(self, value) }
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :native_poly_posts)
+    result["type_method_change"] = rows.first.native_poly_posts.size
+    type.remove_method(:serialize)
+    # A superclass definition can change without changing the resolved
+    # String#serialize method. The serialized constant must not stay cached.
+    type = ActiveModel::Type::Value
+    original = type.instance_method(:serialize)
+    type.define_method(:serialize) { |value| value == "Writer" ? "changed" : original.bind_call(self, value) }
+    rows = [Writer.find(a.id)]
+    preload.call(rows, :native_poly_posts)
+    result["type_super_change"] = rows.first.native_poly_posts.size
+    type.define_method(:serialize, original)
     $batch_calls = 0
     ActiveRecord::Associations::Preloader::Batch.prepend(Module.new do
       def call
@@ -225,16 +287,22 @@ class PreloadPlansTest < Minitest::Test
       assert_equal [7, 8], on["unit_ids"]
       assert_equal 1, on["root_loaders"]
       assert_equal [[true, true], [true, true]], on["distinct_spec_keys"]
+      assert_equal [2, [[true, true], [true, true]]], on["identity_spec"]
       assert_equal [true], on["snapshot_spec"]
       assert_equal ["third", "unsaved"], on["loaded_unsaved"].last
       assert_equal ["first", "second", "new"], on["fresh"]
       assert_equal ["first", "second", "new"], on["private_scope"]
       assert_equal ["second"], on["inspected_scope"]
       assert_equal [true, false], on["repeat_call"]
+      assert_equal [true, true, true], on["branch_state"]
       assert_equal 1, on["grouped_queries"]
       assert_equal %w[writers posts writers], on["scheduling_queries"]
       assert_equal [%w[Writer Post], %w[Post Writer]], on["hash_order"]
       assert_equal ["Writer"], on["custom_name"]
+      assert_equal [[["x2"], [], []], 1], on["callback_scope"]
+      assert_equal [1, 0], on["dynamic_type"]
+      assert_equal 0, on["type_method_change"]
+      assert_equal 0, on["type_super_change"]
       assert_equal ["first", "second", "new"], on["current_scope"]
       %w[dynamic method_change default_scope].each { assert_equal ["second"], on[_1], _1 }
       assert_equal ["second"], on["custom_constructor"]

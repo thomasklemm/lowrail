@@ -23,7 +23,7 @@ module Lowrail
         Lowrail.write_json(ledger_path, ledger)
         return
       end
-      models, edges, facts = {}, {}, []
+      models, edges, types, facts = {}, {}, {}, []
       classes = defined?(ActiveRecord::Base) ? ActiveRecord::Base.descendants : []
       classes.sort_by { _1.name.to_s }.each do |klass|
         next if klass.abstract_class? || !klass.name || !klass.table_exists?
@@ -46,6 +46,10 @@ module Lowrail
           %i[klass join_scopes join_primary_key join_foreign_key scope type collection?].each do |name|
             facts << PreloadFacts.method_fact(r.class, name)
           end
+          PreloadFacts.scope_types(r).each_value do |type|
+            PreloadFacts::TYPE_METHODS.each { |name| facts << PreloadFacts.method_fact(type.class, name) }
+            types[type.class.name] ||= PreloadFacts.type_methods(type.class)
+          end
           edges[label] = PreloadFacts.reflection(r)
         rescue StandardError => e
           ledger << { "method" => label, "pass" => "active_record/preload_plans", "outcome" => "declined: #{e.class}" }
@@ -65,13 +69,14 @@ module Lowrail
         end
         # Pin the implementation of private Rails APIs used by this pass.
         files = (facts + originals).filter_map { _1["source_location"]&.sub(/:\d+\z/, "") }.uniq
+        files.concat(types.values.flat_map(&:values).flatten(1).map(&:first))
         files << PreloadFacts.method(:decline).source_location.first
         edges.each_value { |e| files << e["scope"].first if e["scope"] }
         id = (manifest["units"].map { _1.fetch("id") }.max || -1) + 1
         manifest["units"] << { "id" => id, "kind" => "runtime", "file" => "active_record/preload_plans",
           "pass" => "active_record/preload_plans", "facts" => facts.uniq,
           "preload_facts" => { "models" => models, "edges" => edges,
-            "originals" => originals,
+            "originals" => originals, "types" => types,
             "rails_version" => Rails.version, "sources" => files.uniq.to_h { [_1, Digest::SHA256.file(_1).hexdigest] } } }
       end
       Lowrail.write_json(path, manifest)

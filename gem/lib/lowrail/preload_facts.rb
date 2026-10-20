@@ -5,8 +5,9 @@ module Lowrail
   # booted build helper and the runtime; deliberately separate from app facts.
   module PreloadFacts
     SCOPE_METHODS = %i[scope_for_association relation default_scoped build_default_scope
-      unscoped arel_table predicate_builder polymorphic_name table_name primary_key].freeze
+      unscoped arel_table predicate_builder polymorphic_name table_name primary_key type_for_attribute].freeze
     RELATION_METHODS = %i[initialize initialize_copy spawn where where! merge! values_for_queries].freeze
+    TYPE_METHODS = %i[serialize serialized? mutable? serializable? hash == limit precision scale].freeze
     module_function
 
     def model(klass)
@@ -66,6 +67,25 @@ module Lowrail
       String === scope_name(r) || Symbol === s.binding.local_variable_get(:name)
     end
 
+    def scope_types(r)
+      columns = [r.type, ("name" if r.scope)].compact
+      columns.to_h { [_1, r.klass.type_for_attribute(_1)] }
+    end
+
+    # The resolved definition alone misses a patch below a method calling
+    # super (String#serialize -> Value#serialize). Preserve the whole chain.
+    def type_methods(klass)
+      TYPE_METHODS.to_h do |name|
+        m = klass.instance_method(name)
+        chain = []
+        while m && ![Object, Kernel, BasicObject].include?(m.owner)
+          chain << m.source_location
+          m = m.super_method
+        end
+        [name.to_s, chain.uniq] # Restoring a native alias may repeat a body.
+      end
+    end
+
     def decline(r)
       return "missing reflection" unless r
       return "through association" if r.options[:through]
@@ -78,13 +98,20 @@ module Lowrail
       return "default scope" unless k.default_scopes.empty?
       # An app can override these constructors to inject request state without
       # declaring any association/default scope. Such code is not certified.
-      framework = Gem.loaded_specs.fetch("activerecord").full_gem_path + "/"
-      return "custom reflection scope constructor" unless r.method(:join_scopes).source_location&.first&.start_with?(framework)
+      framework = %w[activerecord activemodel].map { Gem.loaded_specs.fetch(_1).full_gem_path + "/" }
+      return "custom reflection scope constructor" unless r.method(:join_scopes).source_location&.first&.start_with?(*framework)
       return "custom scope constructor" unless SCOPE_METHODS.all? { |name|
-        k.method(name).source_location&.first&.start_with?(framework)
+        k.method(name).source_location&.first&.start_with?(*framework)
       }
       return "custom relation constructor" unless RELATION_METHODS.all? { |name|
-        k.unscoped.class.instance_method(name).source_location&.first&.start_with?(framework)
+        k.unscoped.class.instance_method(name).source_location&.first&.start_with?(*framework)
+      }
+      # QueryAttribute memoizes serialized constant predicates inside a scope.
+      # An app type can depend on Current/time even with a literal scope.
+      return "non-certified scope type" unless scope_types(r).values.all? { |type|
+        [ActiveModel::Type::String, ActiveModel::Type::ImmutableString, ActiveRecord::Type::Text].include?(type.class) &&
+          type.singleton_methods.empty? &&
+          type_methods(type.class).values.all? { |chain| chain.all? { _1&.first&.start_with?(*framework) } }
       }
       # STI can introduce a different target/reflection partway through a tree.
       return "STI target" if k.columns_hash.key?(k.inheritance_column)

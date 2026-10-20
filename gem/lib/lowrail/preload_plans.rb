@@ -7,6 +7,7 @@ module Lowrail
   # LoaderRecords objects; the cached Relations are never executed themselves.
   module PreloadPlans
     Node = Struct.new(:edge, :children, :parent)
+    Execution = Struct.new(:roots, :loaders, :complete)
 
     class << self
       def install(manifest)
@@ -91,6 +92,8 @@ module Lowrail
           m = ActiveRecord::Associations::Preloader.instance_method(name)
           m = m.super_method while m && m.owner == Hook
           m == original
+        end && @facts.fetch("types").all? do |name, methods|
+          PreloadFacts.type_methods(Object.const_get(name)) == methods
         end
       end
 
@@ -107,7 +110,7 @@ module Lowrail
           a = spec.map { normalize(_1) }
           a.freeze if a.all?
         when Hash
-          return unless spec.instance_of?(Hash) && spec.singleton_methods.empty?
+          return unless spec.instance_of?(Hash) && spec.singleton_methods.empty? && !spec.compare_by_identity?
           a = spec.map { |k, v| [normalize(k), v.nil? ? [] : normalize(v)] }
           a.to_h.freeze if a.all? { |k, v| (Symbol === k || String === k) && v }
         when nil then [].freeze
@@ -227,22 +230,48 @@ module Lowrail
 
       def valid? = @steps && @nodes.all? { _1.edge.valid? }
 
+      # Restore per-call loaders on inspection or fallback. A partial run's
+      # unknown branches stay lazy, so Rails resolves their current metadata.
+      def bind_tree(tree, execution)
+        bind = lambda do |branches, nodes|
+          branches.zip(nodes).each do |branch, node|
+            if execution.complete || execution.loaders.key?(node)
+              branch.instance_variable_set(:@loaders, [execution.loaders[node]].compact)
+            end
+            bind.call(branch.children, node.children)
+          end
+        end
+        bind.call(tree.children, @roots)
+      end
+
       def call(records)
         loaders = {}.compare_by_identity
+        execution = Execution.new(nil, loaders, false)
         @steps.each do |groups|
-          groups.each do |nodes|
+          # Rails snapshots all scopes/groups in a frontier before querying.
+          # Callbacks may change facts for the next frontier, not that snapshot.
+          return execution unless PreloadPlans.guard_ok? && groups.all? { |nodes| nodes.all? { _1.edge.valid? } }
+          # Validate every owner class before any query in this frontier:
+          # a custom instantiator can change a later branch's schedule.
+          ready = groups.map do |nodes|
             active = nodes.filter_map do |node|
               owners = node.parent ? loaders[node.parent]&.preloaded_records : records
               next if !owners || owners.empty?
               # An STI subclass or custom instantiator appeared after planning.
-              return nil unless owners.all? { _1.instance_of?(node.edge.owner) }
+              return execution unless owners.all? { _1.instance_of?(node.edge.owner) }
               loaders[node] = node.edge.loader(owners)
             end
-            nodes.first.edge.query.load_records_in_batch(active) unless active.empty?
+            [nodes, active]
+          end
+          ready.each do |nodes, active|
+            next if active.empty?
+            nodes.first.edge.query.load_records_in_batch(active)
           end
         end
         PreloadPlans.hit
-        @roots.filter_map { loaders[_1] }
+        execution.roots = @roots.filter_map { loaders[_1] }
+        execution.complete = true
+        execution
       end
     end
 
@@ -257,8 +286,9 @@ module Lowrail
       end
 
       def call
-        if @lowrail_plan && PreloadPlans.guard_ok? && @lowrail_plan.valid? && (result = @lowrail_loaders || @lowrail_plan.call(records))
-          return @lowrail_loaders = result
+        if @lowrail_plan && PreloadPlans.guard_ok? && @lowrail_plan.valid?
+          @lowrail_result ||= @lowrail_plan.call(records)
+          return @lowrail_result.roots if @lowrail_result.complete
         end
         super
       end
@@ -268,14 +298,17 @@ module Lowrail
           @tree = ActiveRecord::Associations::Preloader::Branch.new(parent: nil, association: nil,
             children: @lowrail_plan.spec, associate_by_default: associate_by_default, scope: scope)
           @tree.preloaded_records = records
+          @lowrail_plan.bind_tree(@tree, @lowrail_result) if @lowrail_result
           # A caller preparing loaders before #call owns that Rails tree.
-          @lowrail_plan = nil unless @lowrail_loaders
+          unless @lowrail_result&.complete
+            @lowrail_plan = @lowrail_result = nil
+          end
         end
         super
       end
 
       def loaders
-        @lowrail_loaders || super
+        @lowrail_result&.roots || super
       end
     end
   end
