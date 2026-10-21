@@ -21,7 +21,7 @@ module Lowrail
     end
 
     class << self
-      def enabled? = %w[1 strict].include?(ENV["LOWRAIL_SHADOW"])
+      def enabled? = "1" == (value = ENV["LOWRAIL_SHADOW"]) || "strict" == value
       def counts = (@counts ||= Hash.new(0))
       def mismatches = (@mismatches ||= [])
 
