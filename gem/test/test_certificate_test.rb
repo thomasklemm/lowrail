@@ -431,9 +431,48 @@ class TestCertificateTest < Minitest::Test
     end
   end
 
+  def test_render_missing_or_mismatched_view_context_certificate_stays_original
+    with_render_certificate do |dir, boot|
+      path = File.join(dir, ".lowrail/manifest.json")
+      original = File.read(path)
+      boot = boot.dup
+      changed = boot.sub!('raise "not naturally admitted" unless Lowrail::TokenTag.admitted? && Lowrail::CollectionRender.admitted?',
+        'raise "invalid dispatch certificate admitted" if Lowrail::TokenTag.admitted? || Lowrail::CollectionRender.admitted?')
+      raise "admission assertion not found" unless changed
+      %w[missing mismatched].each do |mode|
+        manifest = JSON.parse(original)
+        manifest.fetch("units").each do |unit|
+          next unless (data = unit["verification_render"])
+          mode == "missing" ? data.delete("view_context") : data["view_context"] = {"owner" => "NotBasicObject"}
+        end
+        File.write(path, JSON.generate(manifest))
+        result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir))
+          original = view.method(:token_tag).super_method
+          tokens = [false, true].map do |fast|
+            probe = {view: view, builder: view.instance_variable_get(:@tag_builder), generated: 0, converted: 0}
+            Thread.current[:render_probe] = probe
+            output = fast ? view.send(:token_tag, nil, form_options: options) : original.call(nil, form_options: options)
+            Thread.current[:render_probe] = nil
+            [output, probe[:generated], probe[:converted]]
+          end
+          result = {tokens: tokens, collections: [false, true].map { render_collection.call(_1) },
+            render_ids: %w[sealed/token_tag sealed/collection_render].map { ids.fetch(_1) }, stats: Lowrail::Stats.snapshot}
+        RUBY
+        assert_equal result.fetch("tokens").first, result.fetch("tokens").last, mode
+        assert_equal [1, 1], result.fetch("tokens").last.drop(1)
+        assert_equal result.fetch("collections").first, result.fetch("collections").last, mode
+        reason = mode == "missing" ? "verification_render_observation_unknown" : "verification_render_view_context_dispatch_changed;_rebuild"
+        result.fetch("render_ids").each do |id|
+          assert_equal 0, result.dig("stats", "unit_hits").fetch(id, 0)
+          assert_equal [reason], result.dig("stats", "unit_refusals", id)
+        end
+      end
+    end
+  end
+
   def test_render_mutation_and_fork_authority_are_sticky_and_unit_local
     with_render_certificate do |dir, boot|
-      %w[method continuation table lexical size tier opt_in fork].each do |mutation|
+      %w[method continuation table lexical size dispatch tier opt_in fork].each do |mutation|
         result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir).merge("MUTATION" => mutation))
           before = Lowrail::Stats.snapshot
           case ENV.fetch("MUTATION")
@@ -479,6 +518,12 @@ class TestCertificateTest < Minitest::Test
           when "tier"
             ENV["RAILS_ENV"] = "production"
             restore = -> { ENV["RAILS_ENV"] = "test" }
+          when "dispatch"
+            holder = Lowrail::Sealed
+            saved = holder::VIEW_CONTEXT
+            holder.send(:remove_const, :VIEW_CONTEXT)
+            holder.const_set(:VIEW_CONTEXT, Kernel.instance_method(:itself))
+            restore = -> { holder.send(:remove_const, :VIEW_CONTEXT); holder.const_set(:VIEW_CONTEXT, saved) }
           when "opt_in"
             ENV["LOWRAIL_VERIFY_TEST"] = "0"
             restore = -> { ENV["LOWRAIL_VERIFY_TEST"] = "1" }
@@ -540,7 +585,7 @@ class TestCertificateTest < Minitest::Test
             assert_equal ["left/0/2", "right/1/2"], result.fetch("size_output"), "lookup precedes the live size callback"
             assert_equal ["left/7/2", "right/8/2"], result.fetch("collection").last
           end
-          expected = %w[tier opt_in].include?(mutation) ? [false, false] : %w[lexical size].include?(mutation) ? [true, false] : [false, true]
+          expected = %w[dispatch tier opt_in].include?(mutation) ? [false, false] : %w[lexical size].include?(mutation) ? [true, false] : [false, true]
           assert_equal expected, result.fetch("admitted"), mutation
           expected.each_with_index do |active, index|
             id = (4 + index).to_s

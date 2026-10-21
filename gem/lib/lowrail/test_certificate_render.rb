@@ -6,7 +6,6 @@ module Lowrail
   # Verification-only authority. Production RenderUnits::Admission and its
   # Seal epoch are never used by these installers.
   module TestCertificateRender
-    INSTANCE_EXEC = BasicObject.instance_method(:instance_exec)
     module_function
 
     def install
@@ -116,6 +115,7 @@ module Lowrail
           exact = native&.method(:exact_class?)
           @admission = {state: "pending", attempts: @admission.fetch(:attempts) + 1}.freeze
           return retire_render("actual-holder primitive changed") unless exact && Sealed.signature(exact) == @data.fetch("native_method")
+          return retire_render("view context dispatch changed; rebuild") unless Sealed.view_context_fact == @data.fetch("view_context")
           binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
           return retire_render("actual-holder binary not certified") unless @data.fetch("sources").key?(binary)
           return retire_render("source changed") unless @data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha }
@@ -180,6 +180,8 @@ module Lowrail
             ancestors.to_h { [_1, [:PartialIteration]] }.merge(Object => %i[ActionView PartialIteration],
               ActionView => %i[PartialIteration CollectionRenderer])
           end
+          constants[Lowrail] = [:Sealed]
+          constants[Sealed] = [:VIEW_CONTEXT]
           TestCertificate.watch(@unit.fetch("id"), holders, names: names.uniq, constants: constants)
           return unless TestCertificate.allowed?(@unit.fetch("id"), pending: true) && @epoch[0].zero?
           return unless TestCertificate.release_pending(@unit.fetch("id"))
@@ -223,22 +225,28 @@ module Lowrail
       # This test-only continuation rechecks its own epoch/policy AFTER them;
       # production keeps the independently reviewed render implementation.
       def render(view, form_options)
-        token = nil
-        if token != false && TestCertificateRender::INSTANCE_EXEC.bind_call(view) { defined?(protect_against_forgery?) && protect_against_forgery? }
-          token = view.form_authenticity_token(form_options: form_options.merge(authenticity_token: token)) if token == true || token.nil?
-          name = view.send(:request_forgery_protection_token).to_s
+        unit, id, epoch, holder, builder_class = self, @unit.fetch("id"), @epoch, @holder, @builder_class
+        Sealed::VIEW_CONTEXT.bind_call(view) do
+          unless defined?(protect_against_forgery?) && protect_against_forgery?
+            ok = TestCertificate.allowed?(id) && epoch[0].zero?
+            unit.count(ok)
+            TestCertificateRender.branch(ok ? "empty_fast" : "empty_retired")
+            next ""
+          end
+          token = form_authenticity_token(form_options: form_options.merge(authenticity_token: nil))
+          name = request_forgery_protection_token.to_s
           autocomplete = ActionView::Base.remove_hidden_field_autocomplete
           builder = TestCertificate::IVAR.bind_call(view, :@tag_builder)
-          unless TestCertificate.allowed?(@unit.fetch("id")) && @epoch[0].zero? &&
-              @holder.call(name, String) && @holder.call(token, String) && @holder.call(builder, @builder_class) &&
+          unless TestCertificate.allowed?(id) && epoch[0].zero? &&
+              holder.call(name, String) && holder.call(token, String) && holder.call(builder, builder_class) &&
               TestCertificate::IVAR.bind_call(builder, :@view_context).equal?(view)
-            count(false, "live token/name/builder or verification authority changed")
+            unit.count(false, "live token/name/builder or verification authority changed")
             TestCertificateRender.branch("continuation_fallback")
             attributes = {type: "hidden", name: name, value: token}
             attributes[:autocomplete] = "off" unless autocomplete
-            return view.send(:tag, :input, **attributes)
+            next tag(:input, **attributes)
           end
-          count(true)
+          unit.count(true)
           TestCertificateRender.branch("protected_fast")
           suffix = autocomplete ? "" : ' autocomplete="off"'
           name = ERB::Util.unwrapped_html_escape(name)
@@ -246,11 +254,6 @@ module Lowrail
           token = ERB::Util.unwrapped_html_escape(token)
           token = token.gsub('"', "&quot;") if token.include?('"')
           %(<input type="hidden" name="#{name}" value="#{token}"#{suffix} />).html_safe
-        else
-          ok = TestCertificate.allowed?(@unit.fetch("id")) && @epoch[0].zero?
-          count(ok)
-          TestCertificateRender.branch(ok ? "empty_fast" : "empty_retired")
-          ""
         end
       end
     end

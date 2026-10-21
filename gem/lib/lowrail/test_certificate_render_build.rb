@@ -24,6 +24,8 @@ module Lowrail
       return refusal.call("verification render holders not naturally available") unless context
       inventory = FormScaffoldInventory.check(verification_test: true)
       return refusal.call(inventory) if String === inventory
+      view_context = Sealed.view_context_fact
+      return refusal.call("custom view context dispatch; keep original") unless view_context
       controller = Lowrail.loaded_constant("ArticlesController")
       return refusal.call("natural view class changed during build-only audit") unless
         TestCertificate::IVAR.bind_call(controller, :@view_context_class).equal?(context.fetch(:view))
@@ -58,7 +60,7 @@ module Lowrail
         Sealed.signature(observer, sequence: expected.to_a) == Sealed.signature(observer)
       sources = [binary, source, *facts.flat_map { _1.fetch("chain").filter_map { |body| body.dig("source_location", 0) } }].uniq.select { File.file?(_1) }
       data = {"version" => 1, "native_method" => Sealed.signature(exact), "observer" => Sealed.signature(observer),
-        "methods" => facts, "sources" => sources.to_h { [_1, Manifest.sha256_file(_1)] }}
+        "view_context" => view_context, "methods" => facts, "sources" => sources.to_h { [_1, Manifest.sha256_file(_1)] }}
       {units: [{"pass" => pass, "kind" => "runtime", "target" => pass == TokenTag::PASS ? "ArticlesController#token_tag" :
         "ActionView::CollectionRenderer#collection_with_template", "facts" => [], "verification_render" => data}],
         files: [], ledger: [{"pass" => pass, "outcome" => "lowered", "reason" => "pending first complete original operation"}]}
