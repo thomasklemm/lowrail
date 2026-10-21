@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render README's current-results table from published, accepted exports."""
 
+from decimal import Decimal, ROUND_HALF_UP
 import json
 from pathlib import Path
 import subprocess
@@ -13,10 +14,20 @@ def lookup(data, path):
     return data
 
 
-def interval(value, decimals):
+def interval(value):
     if isinstance(value, dict):
         value = [value["median"], *value["ci95"]]
-    median, low, high = [f"{n:+.{decimals}f}".replace("-", "−") for n in value]
+    value = [Decimal(n) for n in value]
+    rounded = [n.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) for n in value]
+    # Keep a third decimal when rounding would conceal interval separation.
+    if (
+        any(bound != value[0] and shown == rounded[0]
+            for bound, shown in zip(value[1:], rounded[1:]))
+        or (value[1] > 0 and rounded[1] == 0)
+        or (value[2] < 0 and rounded[2] == 0)
+    ):
+        rounded = [n.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP) for n in value]
+    median, low, high = [f"{n:+f}".replace("-", "−") for n in rounded]
     return f"{median}% [{low}, {high}]"
 
 
@@ -33,13 +44,13 @@ rows = [
     "|---|---|---|---|---|---|",
 ]
 for entry in json.loads((root / "docs/results.json").read_text()):
-    data = json.loads((root / entry["source"]).read_text())
+    data = json.loads((root / entry["source"]).read_text(), parse_float=Decimal)
     if lookup(data, entry["accepted"]) != entry.get("accepted_value", True):
         sys.exit(f"Not accepted: {entry['source']}")
     if lookup(data, entry["revision_field"]) != entry["revision"]:
         sys.exit(f"Revision mismatch: {entry['source']}")
-    total = interval(lookup(data, entry["total"]), entry["decimals"])
-    no_gc = interval(lookup(data, entry["no_gc"]), entry["decimals"])
+    total = interval(lookup(data, entry["total"]))
+    no_gc = interval(lookup(data, entry["no_gc"]))
     rows.append(
         f"| {entry['date']} | [{entry['app_endpoint']}]({entry['report']}) | "
         f"{entry['ruby_rails']} | {entry['mode']}; {entry['tier']} | "

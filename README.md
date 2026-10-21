@@ -30,10 +30,12 @@ Both total and GC-excluded A/A, fixed-heap, brk and actual-mode gates pass.
 <!-- current-results:start -->
 | Date | App / endpoint | Ruby / Rails | Mode / tier | Ir Δ vs no Lowrail [95% interval] | Measured / published |
 |---|---|---|---|---|---|
-| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection; measured on pre-fix source; re-price pending | **Total −15.225536% [−15.253476, −15.205974]**; GC-excluded −15.254650% [−15.278100, −15.199984] | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
-| 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.156% [−10.219, −10.084]**; GC-excluded −10.161% [−10.254, −10.105] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
-| 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.403071% [+0.386235, +0.429585]**; GC-excluded +0.402000% [+0.380081, +0.421142] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
+| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection; measured on pre-fix source; re-price pending | **Total −15.23% [−15.25, −15.21]**; GC-excluded −15.25% [−15.28, −15.20] | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
+| 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.16% [−10.22, −10.08]**; GC-excluded −10.16% [−10.25, −10.11] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
+| 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.40% [+0.39, +0.43]**; GC-excluded +0.40% [+0.38, +0.42] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
 <!-- current-results:end -->
+
+Displayed values are rounded; exact values are in the linked JSON exports.
 
 The blog row includes the token-continuation safety fix; the earlier
 **−15.49%** is historical, valid only at
@@ -77,20 +79,27 @@ when scope or acceptance changes; retain superseded records as historical.
 
 ## How it works
 
-```
- your Rails app ──► lowrail facts  ──► boot facts (schema, routes, config,
- (source + boot)                       method table, templates, loaders)
-                         │
-                         ▼
-                   lowrail build   ──► .lowrail/  manifest + lowered ISeqs,
-                         │                        each with the guards it assumes
-                         ▼
- RUBYOPT=-rlowrail/setup ──► at boot: certify guards, install what is exact,
-                              refuse the rest (visibly), keep originals as fallback
-                         │
-                         ▼
-                   lowrail verify  ──► your own suite, Lowrail off vs on:
-                                       identical per-test outcomes + ordered SQL
+```text
+┌──────────────────────┐
+│   Your Rails app     │  source + boot
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐   boot facts: schema · routes · config ·
+│   lowrail facts      │──▶ method table · templates · loaders
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐   .lowrail/ manifest + lowered ISeqs,
+│   lowrail build      │──▶ each carrying the guards it assumes
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐   at boot: certify guards
+│ RUBYOPT=             │──▶   ├─ exact  ─▶ install lowered code
+│  -rlowrail/setup     │      └─ failed ─▶ keep original Rails
+└──────────┬───────────┘                  method (refusal visible)
+           ▼
+┌──────────────────────┐   your own suite, Lowrail off vs on:
+│   lowrail verify     │──▶ identical per-test outcomes + ordered SQL
+└──────────────────────┘
 ```
 
 The Rust CLI parses with [Prism](https://github.com/ruby/prism) and indexes
