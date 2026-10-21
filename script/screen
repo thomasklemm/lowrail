@@ -76,16 +76,27 @@ module NativeScreen
         [worker.fetch("arm"), {"requests" => row.fetch("requests"),
           "delta" => counter_delta(row.fetch("counts_before"), row.fetch("counts_after"))}]
       end
+      contrast = config["guard_backends"] ? "tokens_hooks" : "on_off"
+      effect = config["guard_backends"] ? wall.fetch("backend_comparisons").fetch(contrast) : wall.fetch(contrast)
+      aa_pass = wall.fetch("aa").fetch("ci95_pct").all? { _1.abs <= 2 }
+      jit_flat = measured.all? do |worker|
+        row = worker.fetch("routes").fetch(route)
+        before, after = row.fetch("jit_before"), row.fetch("jit_after")
+        !before.fetch("yjit") || %w[compiled_iseq_count compiled_block_count invalidation_count].all? do |key|
+          before.fetch("counters").key?(key) && before.fetch("counters")[key] == after.fetch("counters")[key]
+        end
+      end
       report.fetch("routes")[route] = {"wall_median_us" => wall, "aa_max_abs_round_spread_pct" => aa_spread,
         "screen_noise_floor_pct" => floor, "allocation_samples" => allocations, "coverage" => coverage,
         "other_metrics" => metrics.reject { |key, _| key == "median_us" },
         "gc_counts" => NativeBench.arms(config).to_h { |arm| [arm, measured.select { _1.fetch("arm") == arm }.map { _1.fetch("routes").fetch(route).fetch("gc_count") }] },
-        "clear_wall_win" => report.fetch("passed_exact") && wall.fetch("on_off").fetch("ci95_pct").last < -3 * floor}
+        "decision_contrast" => contrast, "aa_pass" => aa_pass, "jit_flat" => jit_flat,
+        "clear_wall_win" => report.fetch("passed_exact") && aa_pass && jit_flat && effect.fetch("ci95_pct").last < -3 * floor}
       puts "\n#{route}: A/A max |round delta| #{format('%.3f', aa_spread)}%; noise floor #{format('%.3f', floor)}%"
       puts "exact status/body/headers: #{exact.fetch(route).values.all? { _1.fetch('passed') } ? 'PASS' : 'FAIL (retained, no normalization)'}"
-      puts "wall medians us #{wall.fetch('arm_means').keys.join('/')}: #{wall.fetch('arm_means').values.map { format('%.2f', _1) }.join(' / ')}; paired on/off #{format('%+.3f', wall.fetch('on_off').fetch('delta_pct'))}%"
+      puts "wall medians us #{wall.fetch('arm_means').keys.join('/')}: #{wall.fetch('arm_means').values.map { format('%.2f', _1) }.join(' / ')}; paired #{contrast} #{format('%+.3f', effect.fetch('delta_pct'))}%; A/A gate #{aa_pass}; JIT flat #{jit_flat}"
       puts "allocations/request median [min,max]: #{allocations.map { |arm, row| "#{arm}=#{row.fetch('median')} [#{row.fetch('min')},#{row.fetch('max')}]" }.join('; ')}"
-      puts "GC ms/request off-A/off-B/on: #{metrics.fetch('gc_ms_per_request').fetch('arm_means').values.map { format('%.4f', _1) }.join(' / ')}; RSS KiB: #{metrics.fetch('rss_kib').fetch('arm_means').values.map(&:round).join(' / ')}"
+      puts "GC ms/request #{metrics.fetch('gc_ms_per_request').fetch('arm_means').keys.join('/')}: #{metrics.fetch('gc_ms_per_request').fetch('arm_means').values.map { format('%.4f', _1) }.join(' / ')}; RSS KiB: #{metrics.fetch('rss_kib').fetch('arm_means').values.map(&:round).join(' / ')}"
       puts "coverage deltas (separate workers): #{JSON.generate(coverage)}"
     end
     report["elapsed_s"] = NativeBench.clock - config.fetch("screen_started")

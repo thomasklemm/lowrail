@@ -72,4 +72,20 @@ class NativeBenchTest < Minitest::Test
     rss = NativeBench.summarize(workers).fetch("GET /example").fetch("rss_kib")
     assert_in_delta 250 + 1.0 / 6, rss.fetch("arm_means").fetch("off_a"), 1e-10
   end
+
+  def test_token_study_compares_backends_against_hooks_not_off
+    workers = 3.times.flat_map do |round|
+      {"off_a" => 100, "on" => 50, "tokens" => 60, "reflection" => 90, "off_b" => 101}.map do |arm, value|
+        {"round" => round, "arm" => arm, "coverage" => false, "boot_ms" => value,
+          "routes" => {"GET /x" => {"median_us" => value, "p90_us" => value,
+            "throughput_rps" => 1_000_000.0 / value, "allocations_per_request" => value,
+            "gc_ms_per_request" => 0, "rss_after_kib" => {"VmRSS" => value}}}}
+      end
+    end
+    row = NativeBench.summarize(workers).fetch("GET /x").fetch("median_us")
+    assert_in_delta(-50, row.fetch("on_off").fetch("delta_pct"), 1e-10)
+    assert_in_delta 20, row.fetch("backend_comparisons").fetch("tokens_hooks").fetch("delta_pct"), 1e-10
+    assert_in_delta 80, row.fetch("backend_comparisons").fetch("reflection_hooks").fetch("delta_pct"), 1e-10
+    assert_equal %w[off_a on tokens reflection off_b], NativeBench.arms("guard_backends" => true)
+  end
 end

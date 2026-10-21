@@ -265,6 +265,18 @@ class GuardTest < Minitest::Test
         guard = Lowrail::Guard::Methods.capture([[klass, :target]])
         GC.verify_compaction_references(double_heap: true, toward: :empty)
         results[:compaction] = mode == :hooks ? guard.nil? : guard.valid?
+        klass.class_eval { def target = 53 }
+        results[:compacted_invalidation] = mode == :hooks ? guard.nil? : !guard.valid?
+        if mode == :tokens
+          require "weakref"
+          pairs = Array.new(32) do
+            type = Class.new { def target = 71 }
+            [WeakRef.new(type), Lowrail::Guard::Methods.capture([[type, :target]])]
+          end
+          [false, true, false, true].each { GC.start(full_mark: _1, immediate_sweep: true) }
+          results[:collected] = pairs.any? { |ref, _| !ref.weakref_alive? } &&
+            pairs.all? { |ref, witness| ref.weakref_alive? || !witness.valid? }
+        end
         puts JSON.generate(mode: mode, results: results)
       RUBY
       assert_empty result.fetch("results").reject { |_, passed| passed }, backend

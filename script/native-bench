@@ -223,8 +223,12 @@ module NativeBench
         end
         aa = comparison(values.fetch("off_a"), values.fetch("off_b"))
         effect = comparison(values.fetch("off_a"), values.fetch("on"))
+        backends = %w[tokens reflection].select { values.key?(_1) }.to_h do |arm|
+          ["#{arm}_hooks", comparison(values.fetch("on"), values.fetch(arm))]
+        end
         next [metric, {"arm_means" => values.transform_values { _1.sum.fdiv(_1.size) }, "aa" => aa,
-          "on_off" => effect, "direction" => "unresolved_zero_baseline"}] unless aa["ci95_pct"] && effect["ci95_pct"]
+          "on_off" => effect, "backend_comparisons" => backends,
+          "direction" => "unresolved_zero_baseline"}] unless aa["ci95_pct"] && effect["ci95_pct"]
         # The complete A/A envelope is an empirical noise floor, not a claim
         # that a CI crossing zero proves equality. No filtered/clean reruns.
         floor = aa.fetch("ci95_pct").map(&:abs).max
@@ -235,7 +239,8 @@ module NativeBench
         else "unresolved_at_noise_floor"
         end
         [metric, {"arm_means" => values.transform_values { _1.sum.fdiv(_1.size) }, "aa" => aa,
-          "on_off" => effect, "aa_noise_floor_pct" => floor, "direction" => label}]
+          "on_off" => effect, "backend_comparisons" => backends,
+          "aa_noise_floor_pct" => floor, "direction" => label}]
       end]
     end
   end

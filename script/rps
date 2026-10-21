@@ -1,0 +1,406 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Real HTTP/Puma exploration. No application or Puma configuration rewrites.
+require File.expand_path("config/boot", Dir.pwd) if ARGV.first == "--server"
+require "optparse"
+require "net/http"
+require "shellwords"
+require "securerandom"
+load File.expand_path("screen", __dir__)
+
+module NativeRps
+  SCRIPT = File.expand_path(__FILE__)
+  OHA_SHA256 = "6fc16b5f9901fd2266b1a2b49b1689f76f91ddc7c96f2d0d08b161a870f7ef18"
+  module_function
+
+  def write(path, value)
+    File.write(path, JSON.pretty_generate(value), perm: 0o600)
+  end
+
+  # Only designated untimed samples enter the existing declared-entropy
+  # validator. Ordinary HTTP load always calls the unchanged Rack app directly.
+  class Samples
+    def initialize(app, config, directory)
+      @app, @config, @directory = app, config, directory
+    end
+
+    def call(env)
+      if env["HTTP_X_LOWRAIL_METRICS"] == @config.fetch("validation_key")
+        stats = GC.stat
+        snapshot = {"pid" => Process.pid, "gc" => stats.slice(:heap_live_slots, :old_objects,
+          :malloc_increase_bytes, :count, :minor_gc_count, :major_gc_count, :total_allocated_objects,
+          :time), "rss" => NativeBench.rss}
+        return [200, {"content-type" => "application/json"}, [JSON.generate(snapshot)]]
+      end
+      return @app.call(env) unless env["HTTP_X_LOWRAIL_VALIDATION"] == @config.fetch("validation_key")
+      seed, step = env.fetch("HTTP_X_LOWRAIL_SAMPLE").split("-", 2)
+      # Each Puma thread lazily allocates an instrumentation ID. Establish it
+      # before the warm sample, as an ordinary preceding request would; do not
+      # add this unrelated, non-output random site to the entropy policy.
+      ActiveSupport::Notifications.instrumenter
+      response, evidence = BlogProduction::Entropy.with(Integer(seed), "rps-#{step}", requests: 1,
+        wall_clock: true) do
+        status, headers, body = @app.call(env)
+        bytes = +""
+        begin
+          body.each { bytes << _1 }
+        ensure
+          body.close if body.respond_to?(:close)
+        end
+        [status, headers, bytes]
+      end
+      status, headers, bytes = response
+      digest = NativeBench.response_digest(Struct.new(:status, :headers, :body).new(status, headers, bytes))
+      NativeRps.write(File.join(@directory, "sample-#{Integer(seed)}-#{step}.json"), digest.merge(
+        "evidence" => {"passed" => evidence.fetch("errors").empty?, "entropy" => evidence},
+        "counts" => NativeBench.counts, "pid" => Process.pid))
+      [status, headers, [bytes]]
+    end
+  end
+
+  def server(config, state, arm, directory)
+    require_relative "../fixtures/corpus/blog_production"
+    if config.fetch("workload") == "lobsters"
+      require_relative "../bench/experiments/lobsters_native_validation"
+      LobstersNativeValidation.install(config.fetch("app"), policy: config.fetch("validation_policy"))
+    else
+      policy = JSON.parse(File.read(config.fetch("validation_policy")))
+      control = BlogProduction::Entropy.validate(config.fetch("app"), policy: policy)
+      raise control.fetch("reason") unless control.fetch("active")
+      BlogProduction::Entropy.install(policy)
+    end
+    block_link = config.fetch("workload") == "fizzy" && !config.fetch("exploration_only", false)
+    if block_link
+      require_relative "../bench/experiments/block_link_specimen"
+      BlockLinkSpecimen.install(app: config.fetch("app"), artifact: config.fetch("artifact"),
+        contexts: JSON.parse(File.read(config.fetch("contexts"))), arm: arm == "on" ? "on" : "off")
+    end
+    if config.fetch("workload") == "campfire"
+      require_relative "../bench/experiments/campfire_room_companion"
+      SecureRandom.singleton_class.prepend(CampfireRoomCompanion::SessionRandom)
+    end
+    require File.join(config.fetch("app"), "config/environment")
+    BlockLinkSpecimen.dependencies! if block_link
+    raise "production Ruby 4.0.7/Rails 8.1.4/YJIT required" unless RUBY_VERSION == "4.0.7" &&
+      Rails.version == "8.1.4" && Rails.env.production? && RubyVM::YJIT.enabled?
+    if config["exploration_setup"]
+      require config.fetch("exploration_setup")
+      NativeBench::Exploration.install(config: config, state: state, arm: arm)
+    end
+    require "rack/builder"
+    application = Rack::Builder.parse_file(File.join(config.fetch("app"), "config.ru"))
+    application = application.first if application.is_a?(Array)
+    # Preserve config.ru middleware (including Campfire's Deflater) and the
+    # app's config/puma.rb. Only the outer sample observer is harness code.
+    rackup = File.join(directory, "observed.ru")
+    $native_rps_app = Samples.new(application, config, directory)
+    File.write(rackup, "run $native_rps_app\n")
+    write(File.join(directory, "boot.json"), {"pid" => Process.pid, "ruby" => RUBY_DESCRIPTION, "rails" => Rails.version,
+      "jit" => NativeBench.jit, "refusal" => Lowrail.refusal_reason,
+      "stats_enabled" => !!(defined?(Lowrail::Stats) && Lowrail::Stats.enabled?),
+      "puma" => Gem.loaded_specs["puma"]&.version&.to_s})
+    puma_config = File.join(config.fetch("app"), "config/puma.rb")
+    if config["puma_setup"]
+      require config.fetch("puma_setup")
+      external_config = File.join(directory, "puma.rb")
+      File.write(external_config, "eval(File.read(#{puma_config.inspect}), binding, #{puma_config.inspect})\n" +
+        "::NativeRps::PumaSetup.configure(puma: self, config: #{config.inspect}, arm: #{arm.inspect})\n", perm: 0o600)
+      puma_config = external_config
+    end
+    require "puma/cli"
+    # Listener selection is a CLI override, not an app config patch. The
+    # upstream Lobsters production config otherwise binds /srv/.../puma.sock.
+    Puma::CLI.new(["-C", puma_config, "-e", "production", "-b",
+      "tcp://127.0.0.1:#{config.fetch('port')}", rackup]).run
+  end
+
+  class Client
+    attr_reader :cookies, :transport
+
+    def initialize(config, directory, seed = nil, phase = "cold")
+      @config, @directory, @seed, @phase, @cookies, @transport = config, directory, seed, phase, {}, []
+    end
+
+    def headers
+      {"Host" => @config.fetch("host"), "X-Forwarded-Proto" => "https",
+        "Origin" => "https://#{@config.fetch('host')}", "Sec-Fetch-Site" => "same-origin",
+        "Accept" => "text/html", "Accept-Encoding" => "identity",
+        "User-Agent" => "Mozilla/5.0 Firefox/140.0", "X-Request-Id" => "native-rps-fixture",
+        "Cookie" => @cookies.map { |key, value| "#{key}=#{value}" }.join("; ")}
+        .merge(@config.fetch("http_headers", {}))
+    end
+
+    def request(method, path, step, params = nil, extra_headers: {})
+      request = Net::HTTP.const_get(method.capitalize).new(path, headers.merge(extra_headers))
+      if @seed
+        request["X-Lowrail-Validation"] = @config.fetch("validation_key")
+        request["X-Lowrail-Sample"] = "#{@seed}-#{@phase}-#{step}"
+      end
+      request.set_form_data(params) if params
+      response = Net::HTTP.start("127.0.0.1", @config.fetch("port"), nil, open_timeout: 5, read_timeout: 30) { _1.request(request) }
+      Array(response.get_fields("set-cookie")).each do |cookie|
+        key, value = cookie.split(";", 2).first.split("=", 2)
+        @cookies[key] = value
+      end
+      @transport << {"step" => step, "status" => response.code.to_i,
+        "body_sha256" => Digest::SHA256.hexdigest(response.body.to_s),
+        "headers_sha256" => Digest::SHA256.hexdigest(JSON.generate(response.to_hash.sort.to_h))}
+      response
+    end
+
+    def login
+      return unless %w[campfire fizzy].include?(@config.fetch("workload"))
+      page = request("GET", "/session/new", "login-get")
+      raise "login page #{page.code}" unless page.code == "200"
+      token = page.body[/name="csrf-token" content="([^"]+)"/, 1] or raise "CSRF absent"
+      require "cgi"
+      login = if @config.fetch("workload") == "fizzy"
+        JSON.parse(File.read(File.join(@config.fetch("seed"), "login.json")))
+      else
+        JSON.parse(File.read(File.join(@config.fetch("seed"), "scenario.json"))).fetch("login")
+      end
+      response = request("POST", "/session", "login-post", login.merge("authenticity_token" => CGI.unescapeHTML(token)))
+      raise "natural login failed #{response.code}" unless response.code == "302" && @cookies.key?("session_token")
+    end
+  end
+
+  def load(config, client, duration, destination)
+    command = ["taskset", "-c", config.fetch("client_cpus"), config.fetch("oha"),
+      "--no-tui", "--output-format", "json", "--http-version", "1.1", "-r", "0", "-w",
+      "-t", "30s", "--disable-compression", "-c", config.fetch("concurrency").to_s, "-z", "#{duration}s"]
+    client.headers.each { |key, value| command.concat(["-H", "#{key}: #{value}"]) }
+    urls = config.fetch("paths").map { "http://127.0.0.1:#{config.fetch('port')}#{_1}" }
+    if urls.size == 1
+      command << urls.first
+    else
+      File.write(destination + ".urls", urls.join("\n") + "\n")
+      command.concat(["--urls-from-file", destination + ".urls"])
+    end
+    ok = system({"NO_COLOR" => "true"}, *command, out: destination, err: destination + ".stderr")
+    raise "oha failed: #{destination}" unless ok
+    report = JSON.parse(File.read(destination))
+    statuses, errors = report.fetch("statusCodeDistribution"), report.fetch("errorDistribution")
+    {"rps" => report.fetch("summary").fetch("requestsPerSec"),
+      "requests" => statuses.values.sum, "elapsed_s" => report.fetch("summary").fetch("total"),
+      "errors" => errors.values.sum + statuses.reject { |status, _| status == "200" }.values.sum,
+      "status_counts" => statuses, "transport_errors" => errors,
+      "latency_ms" => report.fetch("latencyPercentiles").slice("p50", "p90", "p99").transform_values { _1 * 1000 },
+      "raw_sha256" => Digest::SHA256.file(destination).hexdigest}
+  end
+
+  def summary(rows)
+    arms = NativeBench::ARMS.to_h { |arm| [arm, rows.select { _1.fetch("arm") == arm }] }
+    values = arms.transform_values { _1.map { |row| row.fetch("timed").fetch("rps") } }
+    aa = NativeBench.comparison(values.fetch("off_a"), values.fetch("off_b"))
+    {"aa" => aa, "aa_noise_floor_pct" => aa.fetch("ci95_pct").map(&:abs).max,
+      "aa_max_abs_round_pct" => aa.fetch("round_deltas_pct").map(&:abs).max,
+      "on_off" => NativeBench.comparison(values.fetch("off_a"), values.fetch("on")),
+      "median_rps" => values.transform_values { NativeBench.quantile(_1, 0.5) },
+      "median_latency_ms" => arms.transform_values { |records| %w[p50 p90 p99].to_h { |p| [p, NativeBench.quantile(records.map { _1.fetch("timed").fetch("latency_ms").fetch(p) }, 0.5)] } },
+      "errors" => rows.sum { _1.fetch("timed").fetch("errors") + _1.fetch("warmup").fetch("errors") }}
+  end
+
+  def exact_checks(rows)
+    [0, 1].to_h do |seed|
+      samples = rows.map { _1.fetch("samples").fetch(seed.to_s) }
+      fields = %w[status body_sha256 headers_sha256]
+      checks = fields.to_h { |field| [field, samples.map { _1.fetch(field) }.uniq.one?] }
+      controls = samples.all? { _1.fetch("evidence").fetch("passed") }
+      workflows = samples.map { _1.fetch("workflow") }
+      same_steps = workflows.map { _1.keys.sort }.uniq.one?
+      workflow_checks = workflows.first.keys.to_h do |step|
+        responses = workflows.filter_map { _1[step] }
+        [step, responses.all? { _1.fetch("evidence").fetch("passed") } &&
+          responses.map { _1.slice(*fields) }.uniq.one?]
+      end
+      [seed.to_s, {"passed" => controls && same_steps && checks.values.all? && workflow_checks.values.all?,
+        "controls_pass" => controls, "same_steps" => same_steps, "fields" => checks, "workflow" => workflow_checks}]
+    end
+  end
+
+  def samples(config, directory, phase)
+    [0, 1].to_h do |seed|
+      client = Client.new(config, directory, seed, phase)
+      client.login
+      config.fetch("paths").each_with_index do |path, index|
+        response = client.request("GET", path, "route#{index}")
+        raise "sample HTTP #{response.code}: #{path}" unless response.code == "200"
+      end
+      sample = JSON.parse(File.read(File.join(directory, "sample-#{seed}-#{phase}-route0.json")))
+      sample["workflow"] = Dir[File.join(directory, "sample-#{seed}-#{phase}-*.json")].sort.to_h do |path|
+        [File.basename(path).delete_prefix("sample-#{seed}-#{phase}-").delete_suffix(".json"), JSON.parse(File.read(path))]
+      end
+      write(File.join(directory, "transport-#{seed}-#{phase}.json"), client.transport)
+      [seed.to_s, sample]
+    end
+  end
+
+  def process_metrics(config, directory, boot)
+    master = boot.fetch("pid")
+    children = File.read("/proc/#{master}/task/#{master}/children").split.map(&:to_i)
+    expected = children.empty? ? [master] : children
+    records, attempts = {}, 0
+    client = Client.new(config, directory)
+    deadline = NativeBench.clock + 10
+    until (expected - records.keys).empty?
+      raise "incomplete Puma worker metrics: #{records.keys}/#{expected}" if NativeBench.clock > deadline
+      response = client.request("GET", config.fetch("paths").first, "metrics", extra_headers: {
+        "X-Lowrail-Metrics" => config.fetch("validation_key")})
+      raise "metrics HTTP #{response.code}" unless response.code == "200"
+      row = JSON.parse(response.body)
+      records[row.fetch("pid")] = row
+      attempts += 1
+    end
+    {"expected_pids" => expected, "attempts" => attempts, "workers" => records.values.sort_by { _1.fetch("pid") }}
+  end
+
+  def run(config, output)
+    config = {"rounds" => 10, "duration" => 20, "warmup_seconds" => 5, "concurrency" => 16,
+      "server_cpus" => "0-3", "client_cpus" => "4-7", "workers" => 4, "threads" => 1,
+      "port" => 25371}.merge(config)
+    raise "new output directory required" if File.exist?(output)
+    raise "unknown HTTP workload" unless %w[blog campfire fizzy lobsters].include?(config.fetch("workload"))
+    raise "positive durations/concurrency and >=2 rounds required" unless config.fetch("rounds") >= 2 &&
+      %w[duration warmup_seconds concurrency workers threads].all? { config.fetch(_1).positive? }
+    policy = {"blog" => "blog-entropy-controls.json", "campfire" => "campfire-entropy-controls.json",
+      "fizzy" => "fizzy-native-entropy.json", "lobsters" => "lobsters-rps-entropy.json"}.fetch(config.fetch("workload"))
+    config["validation_policy"] ||= File.join(NativeBench::ROOT, "fixtures/corpus", policy)
+    %w[app seed artifact oha validation_policy].each { config[_1] = File.realpath(config.fetch(_1)) }
+    config["paths"] ||= if config["path"]
+      [config.fetch("path")]
+    elsif config.fetch("workload") == "fizzy"
+      JSON.parse(File.read(File.join(config.fetch("seed"), "vector.json")))
+    elsif config.fetch("workload") == "lobsters"
+      ["/", "/s/enr7ye"]
+    else
+      raise "path or paths required"
+    end
+    raise "nonempty absolute GET paths required" unless config.fetch("paths").is_a?(Array) &&
+      !config.fetch("paths").empty? && config.fetch("paths").all? { _1.is_a?(String) && _1.start_with?("/") }
+    %w[exploration_setup puma_setup contexts].each { config[_1] = File.realpath(config[_1]) if config[_1] }
+    raise "dedicated disposable corpus app required" unless config.fetch("app").start_with?(File.join(NativeBench::ROOT, ".corpus/"))
+    raise "output outside app/seed required" if %w[app seed].any? { output.start_with?(config.fetch(_1) + "/") }
+    raise "pinned oha 1.14.0 Linux amd64 required" unless Digest::SHA256.file(config.fetch("oha")).hexdigest == OHA_SHA256
+    raise "dedicated disposable Redis acknowledgement required" if config.fetch("workload") == "campfire" && ENV["CAMPFIRE_DISPOSABLE_REDIS"] != "1"
+    config["host"] ||= %w[campfire fizzy].include?(config.fetch("workload")) ? "#{config.fetch('workload')}.example.invalid" : "localhost"
+    config["validation_key"] = SecureRandom.hex(24)
+    FileUtils.mkdir_p(output, mode: 0o700)
+    write(File.join(output, "config.json"), config)
+    require_relative "../fixtures/corpus/blog_production"
+    files = Dir[File.join(NativeBench::ROOT, "{gem/lib,bench,fixtures/corpus}/**/*.{rb,so,json}")] +
+      [SCRIPT, NativeBench::SCRIPT, config.fetch("app") + "/config/puma.rb", config.fetch("app") + "/config.ru",
+       config.fetch("gemfile", config.fetch("app") + "/Gemfile") + ".lock", config.fetch("validation_policy")] +
+      Dir[File.join(config.fetch("artifact"), "**/*")].select { File.file?(_1) } +
+      Dir[File.join(config.fetch("seed"), "**/*")].select { File.file?(_1) } +
+      config.fetch("exploration_sources", []) + config.values_at("exploration_setup", "puma_setup", "contexts").compact
+    files << File.join(NativeBench::ROOT, "docs/helper-census.json") if config.fetch("workload") == "fizzy" &&
+      !config.fetch("exploration_only", false)
+    pins = files.uniq.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
+    source_pin = BlogProduction::Entropy.source_pin(config.fetch("app"))
+    report = {"revision" => IO.popen(["git", "-C", NativeBench::ROOT, "rev-parse", "HEAD"], &:read).strip,
+      "source_sha256" => source_pin, "files_sha256" => pins, "rows" => [], "validation" => [],
+      "scope" => "orb HTTP/Puma baseline; exact Rack samples, not own-suite or DB-state certification"}
+    schedule = NativeBench::ARMS.map { ["validation", _1] } +
+      config.fetch("rounds").times.flat_map { |round| %w[off_a on off_b].rotate(round % 3).map { [round, _1] } }
+    report["schedule"] = schedule
+    write(File.join(output, "protocol.json"), report)
+    schedule.each do |round, arm|
+      coverage = round == "validation"
+      directory = File.join(output, "#{round}-#{arm}")
+      state = File.join(directory, "state")
+      FileUtils.mkdir_p(directory, mode: 0o700)
+      FileUtils.cp_r(config.fetch("seed"), state)
+      if config.fetch("workload") == "blog"
+        FileUtils.rm_rf(File.join(config.fetch("app"), "storage"))
+        FileUtils.cp_r(state, File.join(config.fetch("app"), "storage"))
+      end
+      FileUtils.rm_rf(File.join(config.fetch("app"), "tmp"))
+      if config.fetch("workload") == "campfire"
+        raise "Redis reset failed" unless system("redis-cli", "-p", "6379", "FLUSHDB", out: File::NULL)
+      end
+      env = NativeBench.environment(config, state).merge("LOWRAIL" => arm == "on" ? "1" : "0",
+        "LOWRAIL_STATS" => coverage ? "" : nil, "PORT" => config.fetch("port").to_s, "PIDFILE" => File.join(directory, "puma.pid"),
+        "WEB_CONCURRENCY" => config.fetch("workers").to_s, "RAILS_MAX_THREADS" => config.fetch("threads").to_s,
+        "RAILS_MIN_THREADS" => config.fetch("threads").to_s, "SOLID_QUEUE_IN_PUMA" => nil)
+      # Keep fixture secrets out of service commands/process listings.
+      env_file = File.join(directory, "environment.json")
+      write(env_file, env)
+      service = "rps-#{Process.pid}-#{round}-#{arm.tr('_', '-')}"
+      launcher = File.join(directory, "launch.rb")
+      File.write(launcher, "require 'json'\nJSON.parse(File.read(#{env_file.inspect})).each { |k,v| v ? ENV[k]=v : ENV.delete(k) }\nDir.chdir(#{config.fetch('app').inspect})\nexec(*#{["taskset", "-c", config.fetch("server_cpus"), RbConfig.ruby, "--yjit", "--disable-zjit", SCRIPT, "--server", File.join(output, "config.json"), state, arm, directory].inspect})\n", perm: 0o600)
+      begin
+        raise "service launch failed" unless system("amp", "orb", "service", "start", service, "--command", [RbConfig.ruby, launcher].shelljoin, out: File.join(directory, "service.log"), err: [:child, :out])
+        deadline = NativeBench.clock + 90
+        loop do
+          begin
+            path = %w[campfire fizzy].include?(config.fetch("workload")) ? "/session/new" : config.fetch("paths").first
+            response = Client.new(config, directory).request("GET", path, "ready")
+            break if response.code == "200"
+          rescue Errno::ECONNREFUSED, Net::OpenTimeout, Errno::ECONNRESET
+            # Readiness only, never a retried benchmark window.
+          end
+          raise "Puma not ready; inspect service #{service}" if NativeBench.clock > deadline
+          sleep 0.2
+        end
+        row = {"round" => round, "arm" => arm, "samples" => samples(config, directory, "cold"),
+          "boot" => JSON.parse(File.read(File.join(directory, "boot.json")))}
+        if coverage
+          report.fetch("validation") << row
+          write(File.join(output, "progress.json"), report)
+          if report.fetch("validation").size == 3
+            report["preflight_exact"] = exact_checks(report.fetch("validation"))
+            write(File.join(output, "preflight.json"), report.fetch("preflight_exact"))
+            raise "exact-output preflight failed; no timed load" unless config["diagnostic_load_on_exact_failure"] ||
+              report.fetch("preflight_exact").values.all? { _1.fetch("passed") }
+          end
+          next
+        end
+        checks = exact_checks(report.fetch("validation") + [row])
+        raise "exact-output sample failed; no timed load" unless config["diagnostic_load_on_exact_failure"] ||
+          checks.values.all? { _1.fetch("passed") }
+        client = Client.new(config, directory)
+        client.login # Timing cookies/entropy are natural, never companion-pinned.
+        warmup = load(config, client, config.fetch("warmup_seconds"), File.join(directory, "warmup.json"))
+        row["warm_samples"] = samples(config, directory, "warm")
+        warm_rows = report.fetch("rows").map { {"samples" => _1.fetch("warm_samples")} } + [{"samples" => row.fetch("warm_samples")}]
+        raise "warm exact-output sample failed; no timed load" unless config["diagnostic_load_on_exact_failure"] ||
+          exact_checks(warm_rows).values.all? { _1.fetch("passed") }
+        row["post_warmup_process_metrics"] = process_metrics(config, directory, row.fetch("boot"))
+        timed = load(config, client, config.fetch("duration"), File.join(directory, "timed.json"))
+        row["post_load_process_metrics"] = process_metrics(config, directory, row.fetch("boot"))
+        report.fetch("rows") << row.merge("warmup" => warmup, "timed" => timed)
+        write(File.join(output, "progress.json"), report)
+        raise "source/runtime/fixture drift" unless BlogProduction::Entropy.source_pin(config.fetch("app")) == source_pin &&
+          pins.all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha }
+        warn "rps #{round}-#{arm}: #{timed.fetch('rps').round(2)} RPS, #{timed.fetch('errors')} errors"
+      ensure
+        system("amp", "orb", "service", "stop", service, out: File.join(directory, "stop.log"), err: [:child, :out])
+      end
+    end
+    # All observed Rack status/body/header digests must match, not normalized.
+    report["exact"] = exact_checks(report.fetch("validation") + report.fetch("rows"))
+    report["warm_exact"] = exact_checks(report.fetch("rows").map { {"samples" => _1.fetch("warm_samples")} })
+    report["summary"] = summary(report.fetch("rows"))
+    report["passed"] = %w[exact warm_exact].all? { |key| report.fetch(key).values.all? { _1.fetch("passed") } } && report.fetch("summary").fetch("errors").zero?
+    write(File.join(output, "result.json"), report)
+    puts JSON.pretty_generate(report.slice("exact", "warm_exact", "summary", "passed"))
+    report
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  if ARGV.first == "--server"
+    _, config, state, arm, directory = ARGV
+    NativeRps.server(JSON.parse(File.read(config)), state, arm, directory)
+  else
+    options = {}
+    parser = OptionParser.new do |o|
+      o.banner = "usage: script/rps --config CONFIG.json --output NEW_DIRECTORY"
+      %w[config output].each { |key| o.on("--#{key} PATH") { options[key] = _1 } }
+    end
+    parser.parse!
+    abort parser.to_s unless options["config"] && options["output"] && ARGV.empty?
+    exit(NativeRps.run(JSON.parse(File.read(options.fetch("config"))), File.expand_path(options.fetch("output"))).fetch("passed") ? 0 : 2)
+  end
+end
