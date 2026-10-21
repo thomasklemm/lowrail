@@ -13,6 +13,10 @@ SOURCES = {
   "c_token" => "VMTokenNative.checks(n, token)", "cas" => "VMTokenNative.bumps(n)"
 }.freeze
 
+harness_head, status = Open3.capture2("git", "-C", File.expand_path("../..", __dir__), "rev-parse", "HEAD")
+raise "cannot identify benchmark harness revision" unless status.success?
+harness_head = harness_head.strip
+
 if (arm = ENV["TOKEN_COST_WORKER"])
   require ENV.fetch("TOKEN_COST_NATIVE")
   require ENV.fetch("BENCH_CALLGRIND_EXTENSION") if ENV["BENCH_CALLGRIND_EXTENSION"]
@@ -28,7 +32,8 @@ if (arm = ENV["TOKEN_COST_WORKER"])
     3.times { GC.start }
     t0 = Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID)
     token_operation(5_000_000, token, saved)
-    puts "NATIVE_COST #{JSON.generate(cpu_seconds: Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID) - t0)}"
+    puts "NATIVE_COST #{JSON.generate(cpu_seconds: Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID) - t0,
+      harness_head: harness_head)}"
     exit
   end
   warm = JitStability.warm { |n| token_operation(n, token, saved) } if RubyVM::YJIT.enabled?
@@ -36,7 +41,7 @@ if (arm = ENV["TOKEN_COST_WORKER"])
   anchors = HeapWindows.run(windows, observe: RubyVM::YJIT.enabled? ? JitStability.method(:snapshot) : nil) do |n|
     token_operation(n, token, saved)
   end
-  puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, yjit: RubyVM::YJIT.enabled?,
+  puts "LOWRAIL_BENCH #{JSON.generate(ruby: RUBY_DESCRIPTION, harness_head: harness_head, yjit: RubyVM::YJIT.enabled?,
     jit_warmup: warm, windows: windows, heap_anchors: anchors, ar_installed: 0)}"
   exit
 end
@@ -52,7 +57,7 @@ raise "extconf failed" unless system(RbConfig.ruby, "extconf.rb", chdir: out)
 raise "native build failed" unless system("make", chdir: out)
 extension = File.expand_path("vm_token_native.#{RbConfig::CONFIG.fetch('DLEXT')}", out)
 envs = SOURCES.keys.to_h { [_1, {"TOKEN_COST_WORKER" => _1, "TOKEN_COST_NATIVE" => extension, "RUBYOPT" => nil}] }
-metadata = {seed: 41231, rounds: 6, workers: {}, ruby: RUBY_DESCRIPTION,
+metadata = {seed: 41231, rounds: 6, workers: {}, ruby: RUBY_DESCRIPTION, harness_head: harness_head,
   sources: [__FILE__, source].to_h { [_1, Digest::SHA256.file(_1).hexdigest] }}
 if mode == "native"
   rng = Random.new(41231)
