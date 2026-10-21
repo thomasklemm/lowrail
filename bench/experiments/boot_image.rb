@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Research only: native boot/RSS screen, never loaded by the Lowrail gem.
+# Rejected research diagnostic, never loaded by the Lowrail gem. Do not use
+# this as an application preload: loader-policy counterexamples are known.
 # ruby boot_image.rb run CONFIG_JSON NEW_OUTPUT_DIRECTORY
 # CONFIG: app, path, env; optional before_boot (external credentials fixture).
 require "json"
@@ -14,8 +15,8 @@ module BootImage
   API = RubyVM::InstructionSequence
   module_function
 
-  def memory
-    File.readlines("/proc/self/smaps_rollup").filter_map do |line|
+  def memory(pid = "self")
+    File.readlines("/proc/#{pid}/smaps_rollup").filter_map do |line|
       key, value = line.split
       [key.delete_suffix(":"), value.to_i] if %w[Rss: Pss: Private_Dirty: Shared_Dirty:].include?(key)
     end.to_h
@@ -23,6 +24,8 @@ module BootImage
 
   def capture
     @files, @misses, @hits = {}, [], 0
+    @entry_ruby = RUBY_DESCRIPTION
+    @entry_load_path, @entry_gems = $LOAD_PATH.dup, gem_versions
     API.singleton_class.prepend(Capture)
   end
 
@@ -91,6 +94,17 @@ module BootImage
     Gem.loaded_specs.sort.to_h.transform_values { [_1.version.to_s, _1.full_gem_path] }
   end
 
+  def restore_database(config)
+    return unless config["lobsters_database"]
+    # ruby-bench restores this fixture after boot. Forking/thread connection
+    # replacement loses SQLite :memory:, so memory probes restore it there too.
+    file = SQLite3::Database.new(config.fetch("lobsters_database"))
+    backup = SQLite3::Backup.new(ActiveRecord::Base.connection.raw_connection, "main", file, "main")
+    backup.step(-1)
+    backup.finish
+    file.close
+  end
+
   def request(path)
     require "rack/mock"
     response = Rails.application.call(Rack::MockRequest.env_for("https://localhost#{path}",
@@ -112,9 +126,9 @@ module BootImage
     app_names = modules.filter_map do |name, mod|
       parent, _, key = name.rpartition("::")
       scope = parent.empty? ? Object : modules[parent]
-      next unless scope
+      next unless scope && key.match?(/\A[[:upper:]][[:alnum:]_]*\z/)
       source = Module.instance_method(:const_source_location).bind_call(scope, key, false)
-      name if source && source[0].start_with?(app + "/")
+      name if source&.first&.start_with?(app + "/")
     end
     modules.each do |name, mod|
       Module.instance_method(:constants).bind_call(mod, false).each do |key|
@@ -188,22 +202,12 @@ module BootImage
       Bootsnap.setup(cache_dir: ENV.fetch("BOOTSNAP_CACHE_DIR"), load_path_cache: true,
         compile_cache_iseq: false, compile_cache_yaml: true, compile_cache_json: true)
     end
-    @entry_ruby = RUBY_DESCRIPTION
-    @entry_load_path, @entry_gems = $LOAD_PATH.dup, gem_versions
     capture if mode == "capture"
     install(image, release: mode.end_with?("release")) if mode.start_with?("image")
     require File.join(ROOT, "gem/lib/lowrail/setup") if mode == "lowrail"
     load config["before_boot"] if config["before_boot"]
     require File.join(app, "config/environment")
-    # ruby-bench intentionally uses an in-memory DB; its benchmark restores
-    # the shipped database after initialization, without changing app config.
-    if config["lobsters_database"]
-      file = SQLite3::Database.new(config.fetch("lobsters_database"))
-      backup = SQLite3::Backup.new(ActiveRecord::Base.connection.raw_connection, "main", file, "main")
-      backup.step(-1)
-      backup.finish
-      file.close
-    end
+    restore_database(config)
     boot_finished = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     first = request(config.fetch("path"))
     first_finished = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -225,6 +229,68 @@ module BootImage
     File.write(output, JSON.pretty_generate(result))
   end
 
+  def puma(config, output)
+    FileUtils.mkdir_p(output)
+    worker(config.merge("census" => false), "plain", File.join(output, "boot.json"), "unused")
+    require "puma"
+    require "puma/configuration"
+    require "puma/launcher"
+    treatment = config.fetch("treatment")
+    app = lambda do |env|
+      restore_database(config) unless @puma_fixture_restored
+      @puma_fixture_restored = true
+      response = Rails.application.call(env)
+      # Memory-only instrumentation, not an exact-output test.
+      response[1]["x-boot-probe-pid"] = Process.pid.to_s
+      @puma_requests = (@puma_requests || 0) + 1
+      GC.start if @puma_requests == 10
+      response
+    end
+    options = Puma::Configuration.new do |server|
+      server.app(app)
+      server.workers(2)
+      server.threads(1, 1)
+      server.bind("unix://#{output}/puma.sock")
+      server.pidfile(File.join(output, "puma.pid"))
+      server.preload_app!
+      server.before_fork do
+        GC.start
+        GC.compact if treatment != "none"
+        Process.warmup if treatment == "warmup"
+        File.write(File.join(output, "master.pid"), Process.pid)
+      end
+      server.on_worker_boot do |index|
+        File.write(File.join(output, "worker-#{index}.pid"), Process.pid)
+      end
+    end
+    Puma::Launcher.new(options).run
+  end
+
+  def puma_sample(output, path)
+    require "socket"
+    100.times do
+      break if Dir[File.join(output, "worker-*.pid")].size == 2
+      sleep 0.1
+    end
+    counts, statuses = Hash.new(0), Hash.new(0)
+    200.times do
+      socket = UNIXSocket.new(File.join(output, "puma.sock"))
+      socket.write("GET #{path} HTTP/1.1\r\nHost: localhost\r\nX-Forwarded-Proto: https\r\nUser-Agent: Mozilla/5.0 Firefox/140.0\r\nAccept: text/html\r\nConnection: close\r\n\r\n")
+      headers = socket.read.split("\r\n\r\n", 2).first
+      socket.close
+      statuses[headers.lines.first.split[1]] += 1
+      pid = headers[/^x-boot-probe-pid: (\d+)/i, 1] or raise "worker header missing"
+      counts[pid] += 1
+      break if counts.size == 2 && counts.values.min >= 10
+    end
+    raise "both workers must warm" unless counts.size == 2 && counts.values.min >= 10
+    master = File.read(File.join(output, "master.pid")).strip
+    result = {"statuses" => statuses, "requests_by_worker" => counts,
+      "master" => memory(master), "workers" => counts.keys.map { memory(_1) }}
+    File.write(File.join(output, "memory.json"), JSON.pretty_generate(result))
+    puts JSON.generate(result)
+  end
+
   def run(config, output)
     output = File.expand_path(output)
     raise "new output directory required" if File.exist?(output)
@@ -233,10 +299,14 @@ module BootImage
     config_path = File.join(output, "config.json")
     File.write(config_path, JSON.generate(config), perm: 0o600)
     image = File.join(output, "image.marshal")
-    modes = %w[plain bootsnap lowrail capture image]
-    modes = config.fetch("modes", modes)
-    records = modes.flat_map do |mode|
-      Array.new(mode == "capture" ? 1 : config.fetch("samples", 3)) do |index|
+    modes = config.fetch("modes", %w[plain bootsnap lowrail capture image])
+    plan = []
+    plan << ["capture", 0] if modes.include?("capture")
+    plan << ["bootsnap", "prime"] if modes.any? { %w[bootsnap lowrail].include?(_1) || _1.start_with?("image_paths") }
+    config.fetch("samples", 3).times do |index|
+      modes.reject { _1 == "capture" }.rotate(index).each { plan << [_1, index] }
+    end
+    records = plan.map do |mode, index|
         path = File.join(output, "#{mode}-#{index}.json")
         env = config.fetch("env", {}).merge("LOWRAIL" => mode == "lowrail" ? "1" : "0",
           "LOWRAIL_ROOT" => config.fetch("app"), "RAILS_ENV" => "production", "RACK_ENV" => "production",
@@ -249,11 +319,13 @@ module BootImage
         if success
           result["boot_ms"] = (result.delete("boot_finished") - started) * 1000
           result["first_ms"] = (result.delete("first_finished") - started) * 1000
+          result["sample"] = index
           File.write(path, JSON.pretty_generate(result))
         end
-        puts JSON.generate(result.reject { |key, _| %w[census fork].include?(key) })
+        summary = result.reject { |key, _| %w[census fork first].include?(key) }
+        summary["status"] = result.dig("first", "status")
+        puts JSON.generate(summary)
         result
-      end
     end
     File.write(File.join(output, "results.json"), JSON.pretty_generate(records))
   end
@@ -264,6 +336,13 @@ if $PROGRAM_NAME == __FILE__
   case mode
   when "run" then BootImage.run(*arguments)
   when "worker" then BootImage.worker(JSON.parse(File.read(arguments.shift)), *arguments)
+  when "puma" then BootImage.puma(JSON.parse(File.read(arguments.shift)), File.expand_path(arguments.fetch(0)))
+  when "puma-sample" then BootImage.puma_sample(File.expand_path(arguments.fetch(0)), arguments.fetch(1))
+  when "puma-start"
+    config = JSON.parse(File.read(arguments.fetch(0)))
+    env = config.fetch("env").merge("RAILS_ENV" => "production", "RACK_ENV" => "production",
+      "LOWRAIL" => "0", "DISABLE_BOOTSNAP" => "1")
+    exec(env, RbConfig.ruby, "-rbundler/setup", File.expand_path(__FILE__), "puma", *arguments.map { File.expand_path(_1) })
   else abort "usage: boot_image.rb run CONFIG_JSON NEW_OUTPUT_DIRECTORY"
   end
 end
