@@ -13,6 +13,14 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Bet H: boot image killed; prefork warmup candidate (2026-10-21)
+
+Kill this Ruby-level whole-boot ISeq replay: four successful-page prototypes lose 8–13% startup time to warm Bootsnap and retain more RSS.
+A foreign `load_iseq` hook returns `"hooked"` stock versus `"ab"` with replay; snapshot agreement is not loader exactness.
+Early Article/Comment attribute generation adds 267 method rows; blanket app freezing changes mutation into FrozenError: both killed.
+Keep compact + `Process.warmup` only as a separate candidate: five two-worker Puma screens show 4.2–11.4% lower total PSS, n=1 each.
+No runtime/main promotion; CASA sign-in stays HTTP 500, full outputs/DB/own suites/Thermos remain unmet. [Tables, refusals and deferred pieces](boot-image.md).
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust
