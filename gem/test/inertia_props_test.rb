@@ -183,6 +183,7 @@ class InertiaPropsTest < Minitest::Test
   private
 
   def skip_unless_installed
-    skip "install supported inertia_rails versions" unless %w[3.21.2 3.22.0 3.23.0].all? { Gem::Specification.find_all_by_name("inertia_rails", _1).any? }
+    missing = %w[3.21.2 3.22.0 3.23.0].select { Gem::Specification.find_all_by_name("inertia_rails", _1).empty? }
+    missing_prerequisite "install inertia_rails #{missing.join(', ')} to run Inertia props tests" unless missing.empty?
   end
 end

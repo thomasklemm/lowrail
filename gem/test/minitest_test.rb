@@ -75,7 +75,7 @@ class MinitestPluginTest < Minitest::Test
   end
 
   def test_opt_in_load_census_observes_but_never_forces_autoloads
-    skip "Active Support and Zeitwerk are not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       FileUtils.mkdir_p(File.join(dir, "models"))
       late = File.join(dir, "models/census_late.rb")
@@ -138,7 +138,7 @@ class MinitestPluginTest < Minitest::Test
     begin
       require "active_support/testing/parallelization"
     rescue LoadError
-      skip "activesupport not installed"
+      missing_prerequisite "activesupport not installed"
     end
     realpath_tmpdir do |dir|
       build_app(dir)

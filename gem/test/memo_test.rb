@@ -221,7 +221,7 @@ class MemoTest < Minitest::Test
   end
 
   def test_passive_rspec_reporter_keeps_its_lifecycle_without_hiding_other_tracing
-    skip "rspec not installed" if Gem::Specification.find_all_by_name("rspec-core").empty?
+    missing_prerequisite "rspec not installed" if Gem::Specification.find_all_by_name("rspec-core").empty?
     prefix = "require 'lowrail/rspec'; Lowrail::RSpec.install('/unused-memo-report')\n"
     out = ruby_json(prefix + PRELUDE + <<~'RUBY')
       hook = Lowrail::RSpec.instance_variable_get(:@load_hook)
@@ -416,7 +416,7 @@ class MemoTest < Minitest::Test
         puts JSON.generate({ available: true, changed: first != second, digest_size: second.size })
       end
     RUBY
-    skip "install vite_ruby 3.11.1 and inertia_rails 3.23.0 for the public analogue" unless out.fetch("available")
+    missing_prerequisite "install vite_ruby 3.11.1 and inertia_rails 3.23.0 for the public analogue" unless out.fetch("available")
     assert_equal true, out.fetch("changed")
     assert_equal 40, out.fetch("digest_size")
   end

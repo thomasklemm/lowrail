@@ -24,7 +24,7 @@ class MaterializeTest < Minitest::Test
   end
 
   def setup
-    skip "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     @dir, @f = self.class.facts
     assert_kind_of Hash, @f, "lowrail-facts failed:\n#{@f}"
   end

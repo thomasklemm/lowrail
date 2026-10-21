@@ -77,7 +77,7 @@ class ARGuardTest < Minitest::Test
     realpath_tmpdir do |dir|
       File.write(File.join(dir, "scenario.rb"), SCENARIO)
       out, err, status = ruby("-I#{GEM_LIB}", "scenario.rb", chdir: dir, setup: false)
-      skip "install activerecord 8.1.4 and sqlite3 to run AR guard tests" if err.include?("Could not find 'activerecord'")
+      missing_prerequisite "install activerecord 8.1.4 and sqlite3 to run AR guard tests" if err.include?("Could not find 'activerecord'")
       assert status.success?, err
       r = JSON.parse(out.lines.last)
       assert r["hooked"], "installed through on_load"

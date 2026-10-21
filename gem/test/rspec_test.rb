@@ -24,7 +24,7 @@ class RSpecReporterTest < Minitest::Test
   RUBY
 
   def test_rubyopt_outcomes_with_and_without_lowering
-    skip "rspec not installed" if Gem::Specification.find_all_by_name("rspec-core").empty?
+    missing_prerequisite "rspec not installed" if Gem::Specification.find_all_by_name("rspec-core").empty?
     realpath_tmpdir do |dir|
       build_app(dir)
       File.write(File.join(dir, "sample_spec.rb"), SUITE)

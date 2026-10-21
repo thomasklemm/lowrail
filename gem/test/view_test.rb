@@ -49,8 +49,8 @@ class ViewTest < Minitest::Test
   # Quarantine is an explicit refusal, not accelerated-arm certification.
   # Keep the original failing request and require Rails' observable result.
   def test_default_link_to_observes_a_suppressed_redefinition_after_warmup
-    bin = File.expand_path("../../target/debug/lowrail", __dir__)
-    skip "cargo build and Rails/sqlite3/bcrypt are required" unless File.executable?(bin) && LowrailTest.rails_installed?
+    bin = lowrail_cli
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
         "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
@@ -176,8 +176,8 @@ class ViewTest < Minitest::Test
   private
 
   def default_fixture(extra)
-    bin = File.expand_path("../../target/debug/lowrail", __dir__)
-    skip "cargo build and Rails/sqlite3/bcrypt are required" unless File.executable?(bin) && LowrailTest.rails_installed?
+    bin = lowrail_cli
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir, {
         "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",

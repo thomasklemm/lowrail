@@ -7,8 +7,9 @@ class SealedLinkTest < Minitest::Test
   include LowrailTest
 
   def test_cold_opt_in_delivery_preserves_response_effects_and_refuses_foreign_receivers
-    bin = File.expand_path("../../target/debug/lowrail", __dir__)
-    skip "Ruby 4.0.7 and Rails/sqlite3 required" unless RUBY_VERSION == "4.0.7" && File.executable?(bin) && LowrailTest.rails_installed?
+    skip "sealed link fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
+    bin = lowrail_cli
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
         "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\ngem 'bootsnap'\n",

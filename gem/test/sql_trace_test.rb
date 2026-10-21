@@ -49,7 +49,7 @@ class SqlTraceTest < Minitest::Test
     path = File.join(dir, "outcomes.json")
     FileUtils.rm_f(Dir[File.join(dir, "outcomes.json*")])
     _out, err, status = ruby("item_test.rb", chdir: dir, env: { "LOWRAIL_OUTCOMES" => path }.merge(env))
-    skip "install activerecord 8.1.4 and sqlite3 to run SQL trace tests" if err.include?("Could not find 'activerecord'")
+    missing_prerequisite "install activerecord 8.1.4 and sqlite3 to run SQL trace tests" if err.include?("Could not find 'activerecord'")
     assert status.success?, err
     JSON.parse(File.read(path)).fetch("sql")
   end

@@ -7,10 +7,9 @@ class DigestMemoTest < Minitest::Test
 
   def test_public_lazy_version_fixture_is_sealed_only_and_test_mode_stays_original
     root = File.expand_path("..", GEM_ROOT)
-    binary = File.join(root, "target/debug/lowrail")
-    skip "build the Rust CLI to run the digest fixture" unless File.executable?(binary)
+    binary = lowrail_cli
     %w[rails rails_vite inertia_rails vite_ruby].each do |name|
-      skip "#{name} is not installed" if Gem::Specification.find_all_by_name(name).empty?
+      missing_prerequisite "#{name} is not installed" if Gem::Specification.find_all_by_name(name).empty?
     end
     Dir.mktmpdir("lowrail-digest-fixture") do |dir|
       fixture = File.join(root, "fixtures/digest-app")

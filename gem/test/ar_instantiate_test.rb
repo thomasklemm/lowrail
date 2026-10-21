@@ -169,7 +169,7 @@ class ARInstantiateTest < Minitest::Test
   RUBY
 
   def test_real_loading_matches_rails_across_mutation_and_overrides
-    skip "Rails is not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       off = ruby_json(SCENARIO, chdir: dir, env: { "LOWRAIL" => "0", "LOWRAIL_STATS" => "" })
       assert_equal [["left", 17, false, false, true, true], ["right", 29, false, false, true, true]], off["snapshot"]
@@ -201,7 +201,7 @@ class ARInstantiateTest < Minitest::Test
   end
 
   def test_early_setup_preserves_locale_and_lazy_model_loading
-    skip "Rails is not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       model = LowrailTest::RAILS_APP.fetch("app/models/widget.rb").sub(
         "enum :status", "BOOT_DATE = I18n.l(Date.new(1997, 2, 13))\n  belongs_to :peer, class_name: 'Widget', foreign_key: :id, optional: true\n  enum :status")

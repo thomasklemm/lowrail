@@ -175,7 +175,7 @@ class ARPlansTest < Minitest::Test
   RUBY
 
   def test_scoped_reader_preserves_rows_events_and_runtime_changes
-    skip "Rails unavailable" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       file = File.join(dir, "scenario.rb")
       File.write(file, SCENARIO)

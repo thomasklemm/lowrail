@@ -3,7 +3,7 @@
 # Unit test for the boot fact dumper on plain Ruby (no Rails needed):
 #   ruby -Igem/lib gem/test/facts_test.rb
 
-require "minitest/autorun"
+require_relative "test_helper"
 require "stringio"
 require "tmpdir"
 require "digest"

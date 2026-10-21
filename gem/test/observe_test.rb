@@ -56,7 +56,7 @@ class ObserveTest < Minitest::Test
   end
 
   def setup
-    skip "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     @dir, @o, @log, @status = self.class.observed_run
     assert @status.success?, @log
     refute_nil @o, "one observed-<pid>.json expected:\n#{@log}"

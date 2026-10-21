@@ -6,11 +6,11 @@ class FormScaffoldTest < Minitest::Test
   include LowrailTest
 
   def test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder
-    bin = File.expand_path("../../target/debug/lowrail", __dir__)
+    skip "sealed form fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
     corpus = File.join(CORPUS_ROOT, "real-blog-r4")
     checker = File.expand_path("../../bench/experiments/blog_endpoint_check.rb", __dir__)
-    skip "Ruby 4.0.7, built CLI and blog corpus required" unless RUBY_VERSION == "4.0.7" &&
-      File.executable?(bin) && File.file?(File.join(corpus, "config/environment.rb"))
+    skip "no #{corpus} (see script/corpus)" unless File.file?(File.join(corpus, "config/environment.rb"))
+    bin = lowrail_cli
     realpath_tmpdir do |dir|
       app = File.join(dir, "blog")
       FileUtils.mkdir_p(app)
@@ -18,7 +18,23 @@ class FormScaffoldTest < Minitest::Test
       (Dir.children(corpus) - %w[.git .lowrail tmp log node_modules]).each do |name|
         FileUtils.cp_r(File.join(corpus, name), app)
       end
+      FileUtils.mkdir_p(File.join(app, "storage"))
+      FileUtils.rm_f(Dir[File.join(app, "storage/production.sqlite3{,-wal,-shm}")])
       build_env = CLEAN_ENV.merge("RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL_BUILD_JIT" => "0")
+      # The corpus supplies source, not a pre-seeded production database.
+      # Prepare that cheap prerequisite only in this test's disposable copy.
+      out, err, status = ruby("-e", <<~'RUBY', chdir: app, setup: false, env: build_env)
+        require "./config/application"
+        Rails.application.config.yjit = false
+        require "./config/environment"
+        ActiveRecord::Schema.verbose = false
+        load "db/schema.rb"
+        3.times do |i|
+          Article.insert!({id: i + 1, title: "Article #{i}", body: "Article body #{i}"})
+          Comment.insert!({id: i + 1, article_id: i + 1, commenter: "Reader #{i}", body: "Comment #{i}"})
+        end
+      RUBY
+      assert status.success?, "#{out}\n#{err}"
       build = -> {
         out, err, status = Open3.capture3(build_env, bin, "build", app, "--env", "production", "--sealed")
         assert status.success?, "#{out}\n#{err}"

@@ -8,8 +8,8 @@ class CompilerTest < Minitest::Test
   include LowrailTest
 
   def test_public_build_keeps_boot_output_out_of_oracle_protocol
-    bin = File.expand_path("../../target/debug/lowrail", __dir__)
-    skip "cargo build and Rails/sqlite3/bcrypt are required" unless File.executable?(bin) && LowrailTest.rails_installed?
+    bin = lowrail_cli
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
         "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",

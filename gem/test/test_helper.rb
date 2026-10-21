@@ -113,6 +113,28 @@ module LowrailTest
     end
   RUBY
 
+  # Required local prerequisites may skip a developer's partial run, but
+  # must never silently remove coverage from a full gate.
+  def missing_prerequisite(reason)
+    message = "missing prerequisite: #{reason}"
+    flunk message if ENV["LOWRAIL_STRICT_GATES"] == "1"
+    skip message
+  end
+
+  def lowrail_cli
+    root = File.expand_path("..", GEM_ROOT)
+    binary = File.join(root, "target/debug/lowrail")
+    unless File.executable?(binary)
+      begin
+        out, err, status = Open3.capture3(CLEAN_ENV, "cargo", "build", "--locked", chdir: root)
+      rescue Errno::ENOENT
+        missing_prerequisite "install Cargo to build target/debug/lowrail"
+      end
+      assert status.success?, "cargo build --locked failed:\n#{err}\n#{out}"
+    end
+    binary
+  end
+
   RAILS_APP = {
     "config/environment.rb" => <<~'RUBY',
       require "logger"
@@ -210,4 +232,19 @@ module LowrailTest
   def realpath_tmpdir(&)
     Dir.mktmpdir("lowrail") { |d| yield File.realpath(d) }
   end
+
+  class GateSummary < Minitest::StatisticsReporter
+    def report
+      super
+      skipped = results.select(&:skipped?).sort_by { [_1.klass, _1.name] }
+      mode = ENV["LOWRAIL_STRICT_GATES"] == "1" ? "strict" : "normal"
+      io.puts "\nLowrail gate summary (#{mode}): #{skipped.size} named skips"
+      skipped.each { io.puts "  #{_1.klass}##{_1.name}: #{_1.failure.message}" }
+    end
+  end
 end
+
+def Minitest.plugin_lowrail_gates_init(options)
+  reporter << LowrailTest::GateSummary.new(options[:io], options)
+end
+Minitest.extensions << "lowrail_gates"

@@ -158,7 +158,7 @@ class SuppressedHooksTest < Minitest::Test
   RUBY
 
   def test_old_guarded_artifacts_follow_suppressed_mutations_and_production_sealed_units_hit
-    skip "Rails/sqlite3 and inertia_rails 3.23.0 required" unless LowrailTest.rails_installed? &&
+    missing_prerequisite "Rails/sqlite3/bcrypt and inertia_rails 3.23.0 required" unless LowrailTest.rails_installed? &&
       Gem::Specification.find_all_by_name("inertia_rails", "3.23.0").any?
     PASSES.each do |pass|
       realpath_tmpdir do |dir|

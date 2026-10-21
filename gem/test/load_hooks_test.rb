@@ -32,7 +32,7 @@ class LoadHooksTest < Minitest::Test
   end
 
   def test_bootstrap_and_targeted_completion_preserve_lazy_loading_and_jit_returns
-    skip "Rails is not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir)
       env = {"RUBYOPT" => "-I#{GEM_LIB} --yjit --yjit-stats=quiet", "RAILS_ENV" => "test"}

@@ -53,7 +53,7 @@ class JitDiagnosticsTest < Minitest::Test
   end
 
   def test_request_only_targeted_tracing_is_not_mislabeled_as_global
-    skip "Rack is not installed" if Gem::Specification.find_all_by_name("rack").empty?
+    missing_prerequisite "Rack is not installed" if Gem::Specification.find_all_by_name("rack").empty?
     realpath_tmpdir do |dir|
       FileUtils.mkdir_p(File.join(dir, "config"))
       File.write(File.join(dir, "config/environment.rb"), <<~'RUBY')

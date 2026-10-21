@@ -350,7 +350,7 @@ class PreloadPlansTest < Minitest::Test
           env: { "RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL" => mode, "LOWRAIL_UNITS" => units,
             "STALE_PRELOAD_SOURCE" => stale,
             "LOWRAIL_STATS" => File.join(dir, "stats-#{mode}") })
-        skip "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
+        missing_prerequisite "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
         assert status.success?, "#{err}\n#{out}"
         JSON.parse(out.lines.last)
       end
@@ -414,7 +414,7 @@ class PreloadPlansTest < Minitest::Test
           out, err, status = ruby(File.join(dir, "scenario.rb"), setup: false, chdir: dir,
             env: { "RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL" => mode, "PRELOAD_PATCH" => patch,
               "LOWRAIL_STATS" => File.join(dir, "wrapper-#{mode}") })
-          skip "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
+          missing_prerequisite "install activerecord 8.1.4 and sqlite3 to run preload integration tests" if err.include?("Could not find 'activerecord'")
           assert status.success?, "#{err}\n#{out}"
           JSON.parse(out.lines.last).tap do |result|
             assert_empty result.delete("hits")
@@ -429,7 +429,7 @@ class PreloadPlansTest < Minitest::Test
   end
 
   def test_inherited_singleton_getter_fact_names_its_real_owner
-    skip "Rails is not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     fact = ruby_json(<<~'RUBY')
       gem "activerecord", "~> 8.1.4"
       require "active_record"

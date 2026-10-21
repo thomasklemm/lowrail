@@ -74,7 +74,7 @@ class E2ETest < Minitest::Test
   end
 
   def test_late_rails_yjit_enable_reports_drift_and_keeps_fact_checks
-    skip "Rails is not installed" if Gem::Specification.find_all_by_name("railties").empty?
+    missing_prerequisite "railties is not installed" if Gem::Specification.find_all_by_name("railties").empty?
     realpath_tmpdir do |dir|
       units = default_units(dir)
       units[0]["facts"] << {"receiver" => "Array", "method" => "each", "singleton" => false,
@@ -130,7 +130,7 @@ class E2ETest < Minitest::Test
       assert r["loaded"]
       assert_equal ["fast", 2], r["compute"]
       assert_equal ["fast", "CALC"], r["label"]
-      skip "minitest/mock not available (minitest 6 without minitest-mock)" unless r["mock"]
+      missing_prerequisite "minitest/mock not available (install minitest-mock for minitest 6)" unless r["mock"]
       assert_equal ["orig", 11], r["compute_stubbed"], "a stubbed dependency must run the original body"
       assert_equal ["fast", 2], r["compute_after_stub"], "fast path must return after the stub"
       assert_equal ["orig", "STUB"], r["label_stubbed"], "an instance stub must disable the unit"

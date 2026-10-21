@@ -211,6 +211,6 @@ class InertiaConfigTest < Minitest::Test
 
   def skip_missing_inertia_versions(*versions)
     missing = versions.select { Gem::Specification.find_all_by_name("inertia_rails", _1).empty? }
-    skip "install inertia_rails #{missing.join(', ')} to run Inertia configuration tests" unless missing.empty?
+    missing_prerequisite "install inertia_rails #{missing.join(', ')} to run Inertia configuration tests" unless missing.empty?
   end
 end

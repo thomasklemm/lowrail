@@ -24,7 +24,7 @@ class LoaderTest < Minitest::Test
   RUBY
 
   def test_composes_with_bootsnap_in_both_orders
-    skip "bootsnap not installed" if BOOTSNAP_VERSIONS.empty?
+    missing_prerequisite "bootsnap not installed" if BOOTSNAP_VERSIONS.empty?
     BOOTSNAP_VERSIONS.each do |bs|
       %w[bootsnap_first lowrail_first].each do |order|
         realpath_tmpdir do |dir|
@@ -94,7 +94,7 @@ class LoaderTest < Minitest::Test
   end
 
   def test_freezolite_and_bootsnap_in_every_order_with_cold_and_warm_caches
-    skip "freezolite/require-hooks not installed" if REQUIRE_HOOKS_VERSIONS.empty? || Gem::Specification.find_all_by_name("freezolite").empty?
+    missing_prerequisite "freezolite/require-hooks not installed" if REQUIRE_HOOKS_VERSIONS.empty? || Gem::Specification.find_all_by_name("freezolite").empty?
     REQUIRE_HOOKS_VERSIONS.product([nil] + BOOTSNAP_VERSIONS).each do |rh, bs|
       realpath_tmpdir do |dir|
         frozen_app(dir)
@@ -128,7 +128,7 @@ class LoaderTest < Minitest::Test
   end
 
   def test_load_iseq_state_matches_off_during_build_and_cold_and_warm_delivery
-    skip "require-hooks/bootsnap not installed" if REQUIRE_HOOKS_VERSIONS.empty? || BOOTSNAP_VERSIONS.empty?
+    missing_prerequisite "require-hooks/bootsnap not installed" if REQUIRE_HOOKS_VERSIONS.empty? || BOOTSNAP_VERSIONS.empty?
     state = <<~'RUBY'
       def load_state
         method = RubyVM::InstructionSequence.method(:load_iseq) if RubyVM::InstructionSequence.respond_to?(:load_iseq)
@@ -200,7 +200,7 @@ class LoaderTest < Minitest::Test
   end
 
   def test_cached_hijacks_do_not_inherit_bootsnap_compiler_options
-    skip "require-hooks/bootsnap not installed" if REQUIRE_HOOKS_VERSIONS.empty? || BOOTSNAP_VERSIONS.empty?
+    missing_prerequisite "require-hooks/bootsnap not installed" if REQUIRE_HOOKS_VERSIONS.empty? || BOOTSNAP_VERSIONS.empty?
     REQUIRE_HOOKS_VERSIONS.product(BOOTSNAP_VERSIONS).each do |rh, bs|
       realpath_tmpdir do |dir|
         frozen_app(dir)
@@ -238,7 +238,7 @@ class LoaderTest < Minitest::Test
   end
 
   def test_source_transforms_are_not_bypassed
-    skip "freezolite/require-hooks not installed" if REQUIRE_HOOKS_VERSIONS.empty? || Gem::Specification.find_all_by_name("freezolite").empty?
+    missing_prerequisite "freezolite/require-hooks not installed" if REQUIRE_HOOKS_VERSIONS.empty? || Gem::Specification.find_all_by_name("freezolite").empty?
     realpath_tmpdir do |dir|
       frozen_app(dir)
       env = { "RUBYOPT" => "-I#{GEM_LIB}", "RH" => REQUIRE_HOOKS_VERSIONS.first, "ORDER" => "freezolite", "RAILS_ENV" => "test" }
