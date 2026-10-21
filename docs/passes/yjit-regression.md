@@ -864,6 +864,122 @@ GC; they bound work, **not wall time**. Uncapped quiet certification is
 unbounded, and JIT-to-JIT repetition may leave entry counters at 119 forever.
 Pending-entry census is a native-only research question, not a new gate or v4.
 
+### Bounded pending-entry census: useful warning, unsuitable admission predicate
+
+One native study covered all six arms × six rounds of the historical v3
+configuration, unchanged Ruby thresholds, N50, alternating phase order,
+10,000 rehearsal requests and the existing 20,000 certification cap.
+No Valgrind, timed cohort, compiler writes or app-setting changes. The
+historical `bench/` and Lowrail runtime sources were snapshotted from `88506d9`.
+Because current main's source pins cannot admit the old form artifact, the
+historical form builder and compiler freshly certified a **native-only**
+copy against those historical sources at their new paths: manifest
+`c0246ad56fd79ae834a4e8dfe600ce5c09fdb5d01755111972cbbba49a7be741`.
+Unused units/IDs 0–17 were retained, default selected only form unit 18,
+and a separate native check confirmed active historical form installation.
+This does not bypass stale-source gates, reuse a historical artifact against
+current runtime, or change the historical performance result.
+
+The [companion probe](../../bench/experiments/yjit_pending_entries.rb) reads
+the five named methods **immediately after certification**, then enumerates
+dumped internal ISeq bodies using the executable-pinned DWARF reader. The
+predicate is payload present, normal entry absent, and 0 < calls < threshold;
+the exceptional entry/counter is classified separately. All 36 configurations
+warn, including every counterpart of the 35 historically flat workers:
+
+| Native arm (six processes each) | Pending normal entries with payload | Pending exceptional entries with payload | All five named methods pending | Four native windows flat |
+|---|---:|---:|---:|---:|
+| off-A | 1,515–1,525 | 1 | 6/6 | 5/6 |
+| off-B | 1,516–1,527 | 1 | 5/6 | 6/6 |
+| missing | 1,521–1,525 | 1 | 6/6 | 5/6 |
+| empty | 1,517–1,523 | 1 | 6/6 | 6/6 |
+| disabled | 1,513–1,527 | 1 | 6/6 | 6/6 |
+| active historical form | 1,346–1,352 | 4 | 6/6 | 6/6 |
+
+**(a) Yes, with native-replay qualifications:** `0-off_b` flags all five
+at 119/120 before its windows. **(b) No, it does not stay quiet:** 35/36
+native configurations have all five pending; the remaining `5-off_b` has
+the four asset helpers installed at 120 but `sending?` pending at 119.
+Every process has many other pending entries. This is not a retrospective
+read of the old worker's memory or a prediction of Callgrind timing.
+
+All native warmups certify (35 at 2,000, one at 3,800; 73,800 certification
+requests total). 142/144 native windows are flat, all 144 GC-free. Native
+`4-missing / total / N50` adds 13 blocks in AR relation/merger paths.
+Native `4-off_a / no_gc / N50` adds 49 blocks, including the four named
+asset helpers; those four read 119/no-entry at certification and 120/entry
+after windows, while `sending?` stays 119. This further supports late entry
+installation in a real request diagnostic, **not** the historical trigger
+or exact 17-block event. The earlier total-only pattern is not a causal rule.
+Diagnostic census work itself allocates/compiles and disturbs heap/timing;
+none of these windows is promoted to a benchmark result.
+
+The first four companions completed and retained certification/final/worker
+records, but concatenated stdout/stderr records broke the driver's parser
+before it persisted exit statuses. Their statuses remain **unknown**, not
+invented successes. Parsing was corrected and the remaining 32 configurations
+ran once (exit 0, no timeout); no completed companion was rerun. Raw logs
+remain private. Combined native results SHA-256:
+`bf31cb61d4c847a278ea9026be719a322a7727290480e41329742a8695a22f41`.
+
+**Coverage limits matter.** Public `ObjectSpace.each_object(ISeq)` sees only
+273–418 wrappers here, versus 40,710–40,969 dumped internal ISeq slots.
+`InstructionSequence.of`/`each_child` materialize wrappers, and `each_child`
+can materialize original instruction arrays. Dumping includes internal
+ISeqs without forcing their lazy bodies, but its protected heap walk and
+`GC.disable` can finish an in-progress GC cycle. The dump allocates heavily;
+only JIT fields are read-only. Therefore this traversal belongs in a
+**native companion**, never the measured process. Read current-process
+addresses only while GC remains disabled; explicit GC/compaction by another
+thread can still invalidate them. Dumped slots are not a proof of request
+reachability, and unloaded/null bodies are unknown, not certified absent.
+The reader pins `/proc/self/exe`, not only the installation's `RbConfig.ruby`.
+
+The [bounded entry-path controls](../../bench/experiments/yjit_entry_paths.rb)
+also falsify sufficiency of a quiet pending-normal-entry census:
+
+| Ordinary native exercise, default small-app threshold 30 | Entry state before | New blocks / ISeqs / invalidations |
+|---|---|---:|
+| Omit a previously supplied optional argument | Normal entry installed, calls 30 | 3 / 0 / 0 |
+| Take the other branch | Normal entry installed, calls 30 | 1 / 0 / 0 |
+| Rescue ISeq's 30th exception entry | No normal entry/payload; exceptional calls 29 | 4 / 1 / 0 |
+
+The last control installs the **rescue child ISeq's** exception entry at
+29→30; the parent method's exception counter remains 0. A payload-only or
+method-only census misses it. Source additionally permits entry-guard-chain
+misses, JIT branch-stub/context versions and deferred blocks after normal
+entry installation. Normal threshold equality also has a coldness check;
+an absent pointer with count at/above threshold can mean a refused/cold entry,
+not pending work under the unchanged threshold. There is no non-null refusal
+sentinel. Do not force such states into an unsupported generic completion loop.
+
+**(c) No demonstrated cheap app-invisible completion.** More ordinary
+JIT-to-JIT requests need not advance interpreter counts. `Method#call` does,
+but needs real receivers/arguments, executes app code and can change state;
+calling arbitrary helpers this way is not a transparent warmup. Internal
+compiler calls require the correct live frame/PC/stack and mutate version
+state. There is no supported public force-entry API here. Waiting under a
+hard cap and refusing is safer than either forcing calls or excluding work,
+but the census would refuse **all 36** configurations, not cure them.
+
+**v4 proposal — UNIMPLEMENTED and parked.** The screen refuses all 36
+configurations and has no discriminating power in this study. Secondary
+YJIT repricing stops here; interpreter Ir remains the primary metric.
+The following proposal is retained as research context, not a method change
+or cohort declaration: retain every v3+log/A/A/heap/idle gate. If further
+secondary YJIT work is separately approved, first
+use symmetric native companions as a negative-admission screen for both
+normal and exceptional pending entries (including no-payload states), with
+the existing 20,000-request cap plus a separate 180-second process deadline;
+persist/refuse at either bound. Never treat an empty census as flatness proof
+or transplant this heap walk into measured workers. Add
+`compiled_iseq_entry` to future outside-window observations to catch initial
+prologue-only entry installs; it does **not** count every entry-chain miss,
+so complete attempt visibility remains an explicit prerequisite to claiming
+that route covered. Do not launch Callgrind while this admission screen
+refuses. No v4 implementation, compiler-exclusion relaxation, method change
+or cohort follows from this proposal.
+
 ## Reproduction and evidence
 
 [Numeric export](yjit-regression.json) retains per-arm estimates, all gate

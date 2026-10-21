@@ -1369,6 +1369,24 @@ explicit warmup GC calls; a hypothetical 40,000 cap permits 1,800,000 and
 43,200. Neither bounds wall time; uncapped quiet certification is unbounded.
 Pending-entry census remains native-only research, not v4 certification.
 
+The [bounded native census study](passes/yjit-regression.md#bounded-pending-entry-census-useful-warning-unsuitable-admission-predicate)
+now covers all 36 configurations. It flags all five named methods at 119/120
+before `0-off_b`'s windows, but **all 36 configurations warn**, including
+34 with four flat native windows. There are 1,346–1,527 pending normal
+entries with payload per process; 35/36 have all five named entries pending.
+Two native windows compile (including a no_gc window); 142/144 are flat.
+This is a companion diagnosis, not historical memory inspection or pricing.
+Wrapper-only ObjectSpace enumeration is incomplete; the full internal-ISeq
+dump changes GC/heap state and must stay out of measured workers. Optional
+argument/branch and rescue-entry controls also show the proposed predicate
+is not sufficient. No generic app-invisible completion API is demonstrated.
+Decision: **secondary YJIT repricing is parked; interpreter Ir remains the
+primary metric**. The v4 proposal is **UNIMPLEMENTED and parked**: its screen
+refuses all 36 configurations and has no discriminating power in this study.
+The retained proposal would keep all gates, use capped native negative
+admission (not a flatness proof), and strengthen entry/attempt visibility.
+No v4 implementation, compiler exclusion, method change or cohort follows.
+
 Warm the observer too: after heap preparation, an enabled observer gets 200
 untimed rounds of the **exact** `GC.stat_heap(pool, existing_hash)`,
 `GC.stat(existing_hash)` and JIT snapshot signatures used at the endpoints.
