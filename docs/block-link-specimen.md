@@ -1,7 +1,7 @@
 # Literal-class block links: design before pricing
 
-2026-10-21. **Design only. No runtime widening, specimen implementation or
-measurement in this slice.** The selected shape is a bare block `link_to`
+2026-10-21. **Bench-only design, not production admission or cohort approval.**
+No runtime widening or measurement. The selected shape is a bare block `link_to`
 with a sole literal String `class:` option. The [source census](helper-discovery.md)
 finds74 HTML-ERB sites: Fizzy23/CASA20 are the43 current boot/delivery
 opportunities; Writebook27 and Wikino4 remain excluded. These are not admitted
@@ -194,3 +194,92 @@ thresholds, cached-result borrowing, cherry-picking or additive extrapolation.
 Cold witness/setup costs are reported separately, not assumed free. Failure,
 unresolved provenance, no real warm hits or no supported saving means stop;
 neither a green correctness gate nor a numeric ceiling admits production.
+
+## Executed HTTP reachability (untimed)
+
+The [machine ledger](fizzy-link-reachability.json) records all18 successful
+production HTTP GETs following natural password/CSRF sign-in, Ruby4.0.7,
+Rails8.1.4, interpreter. Stock fragment/collection caching stays enabled.
+These are block-entry diagnostics, **not completed hits or admission**.
+
+| Route, in fixed vector order | Cold entries | Warm | Warm repeat |
+|---|---:|---:|---:|
+| /buckets |10|10|10|
+| /bubbles with fixture-derived filter params |11|8|8|
+| /account/users |2|2|2|
+| /workflows |2|2|2|
+| /notifications |1|1|1|
+| /buckets/:bucket/bubbles/:bubble |3|1|1|
+| **Whole vector** |**29 /23 identities**|**24 /19 identities**|**24 /19 identities**|
+
+Warm cache elision: `bubbles/_bubble.html.erb:33`,
+`bubbles/list/_bubble.html.erb:3,12` (one cold entry each),
+`comments/_body.html.erb:6` (two cold entries). The report carries actual
+cache/collection-hit events and per-route/per-site counts. The19 remaining
+identities are opportunities only; a first natural invocation may still
+refuse provenance, and the same partial may require multiple owner contexts.
+The earlier suggested route reachability is now observed, not assumed.
+
+Reproduce with the frozen corpus bundle and an isolated copy of Fizzy:
+
+```sh
+BUNDLE_GEMFILE=.corpus/fizzy-link/Gemfile BUNDLE_FROZEN=true \
+  mise exec ruby@4.0.7 -- bundle exec ruby \
+  bench/experiments/fizzy_link_fixture.rb .corpus/fizzy-link NEW_PRIVATE_STATE
+# Run `fizzy_link_http.rb serve APP STATE PORT` as a supervised orb service;
+# then `fizzy_link_http.rb probe APP STATE PORT`, and `report APP STATE`.
+```
+
+## Observation map required by sealed-owner review
+
+All seams below must be delivered **symmetrically, before natural loading**,
+from independently pinned stock sources with replacement ISeq evidence.
+An unavailable seam means refusal, not an extra helper call or inferred fact.
+Path/line TracePoint diagnostics above cannot supply any of this authority.
+
+| Fact | Exact natural seam/read | Acquisition time | Retained evidence |
+|---|---|---|---|
+| Entry view/controller and template | `_run`'s actual `self`, `method`, `template`, `locals`, `buffer`, `has_strict_locals`; already-populated template fields, effective compiled method | Before `public_send`, saved/restored as a stack across nested renders | Finite context key, actual holder identities, source/encoding/handler/compiler/body digests, locals/strict-locals scalars; no view/request |
+| Original block/site | Original `link_to` frame's `block`; `RubyVM::InstructionSequence.of(block)` associated with the already-compiled entry method's child ISeq tree | Entry, before any URL or block effects | Block ISeq digest and bytecode/code-location discriminator, not just file:line; no Proc or Binding |
+| Stock constructor actually used | The stock `tag_builder` factory's own `TagBuilder.new(self)` result, with effective native Class#new and initialize checked at that operation | Immediately after its natural return, before capture | Weak builder identity token plus verified constructor/body/holder evidence; class plus `@view_context` is insufficient |
+| Saved builder used for outer tag | Receiver evaluation in stock block `content_tag`, before the capture argument | Before block | Invocation-local saved receiver; weak provenance token only after completion |
+| Buffer actually used and raw-buffer restoration | Stock CaptureHelper's actual buffer receiver; OutputBuffer#capture's `old_buffer`, `new_buffer`, and assignment in ensure | Before yield; ensure on normal/unwind paths | Invocation-local identities, restoration boolean, class/encoding scalars; never reconstruct from final view ivars |
+| Post-capture dependencies | The **saved receiver** and its effective methods/visibility, actual converted Hash order/defaults, URL/content String/SafeBuffer state, current primitive/literal bindings | After normal capture, before any folded work | Predicate result for this invocation, unchanged epoch; a pre-block signature is not enough |
+| Successful whole-original witness | Normal completion of the outer original link including final tag assembly | Last operation before returning normally | One bounded context's terminal state; publication last after validation/epoch check |
+
+The finite manifest is closed before workers run. Unknown template,
+controller/view, handler/compiler, locals/strict-locals or block-ISeq contexts
+stay original; they cannot grow the inventory. Same-line calls and alternate
+locals/compiler contexts must not alias. Nested renders cannot rewrite the
+saved entry context. No constructor probes, resolver lookup, handler call,
+`Template#compiled_source`, view-context construction or compiler/cache
+warming may manufacture evidence. No retained Proc/view/request graph.
+
+Each context gets a try-lock and a terminal attempt budget. The entry
+decision is immutable: a call that chose original cannot become fast because
+a nested/concurrent invocation publishes. Only successful **whole original
+link completion**, validation and unchanged epoch publish admission. A
+capture success followed by tag-assembly failure is not a witness; neither
+are raise/throw/break/return. All first calls stay original.
+
+After URL conversion, refusal continues through live `content_tag`; after
+capture it calls the saved receiver's **live** `content_tag_string`, including
+any singleton override the block just installed. Never invoke an old captured
+UnboundMethod as fallback. Validate order/defaults of the actual converted
+Hash and encoding/safety without coercion/app dispatch. Preserve tag-options,
+content presence/escaping, live PRE_CONTENT_STRINGS lookup, interpolation
+order. Once normalization begins, only a saved-intermediate stock suffix is
+legal; restarting `content_tag_string` would repeat live work.
+
+Required asymmetric controls, in addition to ordinary capture/control flow:
+
+1. Replacing `@tag_builder` in the block does not replace the saved receiver.
+2. Adding `content_tag_string` to that saved receiver in the block invokes
+   the **new** method after capture, not its pre-block body.
+3. Replacing `output_buffer` and returning it produces an empty anchor;
+   old raw buffer is restored to `"old"`, replacement remains `"new+block"`.
+
+The existing native `exact_class?` is only holder evidence: no Proc/binding
+or constructor authority follows. The bench specimen must charge all seams,
+manifest selection, witness, post-live guards and fallback costs. This review
+accepts a direction, not a production certificate or measured cohort.

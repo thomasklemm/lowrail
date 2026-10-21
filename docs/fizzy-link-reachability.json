@@ -1,0 +1,513 @@
+{
+  "kind": "untimed_real_production_http_reachability_not_admission_or_price",
+  "ruby": "4.0.7",
+  "rails": "8.1.4",
+  "jit": "interpreter",
+  "revision": "6f1d200316ec3bae91d32c557d88647300807ee9",
+  "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+  "reporter_sources": {
+    "fizzy_link_http.rb": "aee546bdaa1e601e2c65455bb86b2c942a034f4f48204a4eb062a5c0079fbd6e",
+    "fizzy_link_fixture.rb": "2a396ed02e2c93509bb5b1ffe990ab2c5d26d16850732ea9bb79e22ce62b34ed"
+  },
+  "authentication": "natural GET /session/new, CSRF/password POST /session; per-process cookie jar",
+  "fixture": "external disposable upstream SQL fixture data; no test runtime in HTTP worker",
+  "cache_policy": "stock production caches retained across all 18 GETs; no cache clear or disable",
+  "limitations": [
+    "path/line b_call diagnostic, not block-ISeq or owner provenance",
+    "block entries, not completed or fast-path hits",
+    "no equivalence/SQL/effect/load claim from this reachability projection",
+    "probe harness was not yet frozen in a detached worktree"
+  ],
+  "requests": [
+    {
+      "phase": "cold",
+      "route": "/buckets",
+      "status": 200,
+      "sites": {
+        "app/views/buckets/index.html.erb:5": 1,
+        "app/views/buckets/_bucket.html.erb:2": 2,
+        "app/views/buckets/_bucket.html.erb:16": 2,
+        "app/views/buckets/_bucket.html.erb:20": 2,
+        "app/views/filters/_filter.html.erb:3": 1,
+        "app/views/filters/_filter.html.erb:17": 1,
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 10,
+      "all_link_to": 14,
+      "cache_evidence": []
+    },
+    {
+      "phase": "cold",
+      "route": "/bubbles?bucket_ids%5B%5D=693169840&bucket_ids%5B%5D=664343589&creator_ids%5B%5D=127326141&stage_ids%5B%5D=66287381",
+      "status": 200,
+      "sites": {
+        "app/views/bubbles/index.html.erb:9": 1,
+        "app/views/filters/_buckets.html.erb:21": 1,
+        "app/views/filters/_tags.html.erb:20": 1,
+        "app/views/filters/_assignees.html.erb:22": 1,
+        "app/views/filters/_creators.html.erb:23": 1,
+        "app/views/filters/_stages.html.erb:21": 1,
+        "app/views/filters/_settings.html.erb:20": 1,
+        "app/views/bubbles/_bubble.html.erb:33": 1,
+        "app/views/bubbles/list/_bubble.html.erb:3": 1,
+        "app/views/bubbles/list/_bubble.html.erb:12": 1,
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 11,
+      "all_link_to": 19,
+      "cache_evidence": []
+    },
+    {
+      "phase": "cold",
+      "route": "/account/users",
+      "status": 200,
+      "sites": {
+        "app/views/accounts/users/index.html.erb:5": 1,
+        "app/views/accounts/users/index.html.erb:18": 1
+      },
+      "block_entries": 2,
+      "all_link_to": 10,
+      "cache_evidence": []
+    },
+    {
+      "phase": "cold",
+      "route": "/workflows",
+      "status": 200,
+      "sites": {
+        "app/views/workflows/index.html.erb:13": 1,
+        "app/views/workflows/_workflow.html.erb:17": 1
+      },
+      "block_entries": 2,
+      "all_link_to": 7,
+      "cache_evidence": []
+    },
+    {
+      "phase": "cold",
+      "route": "/notifications",
+      "status": 200,
+      "sites": {
+        "app/views/notifications/index.html.erb:14": 1
+      },
+      "block_entries": 1,
+      "all_link_to": 5,
+      "cache_evidence": []
+    },
+    {
+      "phase": "cold",
+      "route": "/buckets/693169840/bubbles/613325334",
+      "status": 200,
+      "sites": {
+        "app/views/comments/_body.html.erb:6": 2,
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 3,
+      "all_link_to": 17,
+      "cache_evidence": [
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        }
+      ]
+    },
+    {
+      "phase": "warm",
+      "route": "/buckets",
+      "status": 200,
+      "sites": {
+        "app/views/buckets/index.html.erb:5": 1,
+        "app/views/buckets/_bucket.html.erb:2": 2,
+        "app/views/buckets/_bucket.html.erb:16": 2,
+        "app/views/buckets/_bucket.html.erb:20": 2,
+        "app/views/filters/_filter.html.erb:3": 1,
+        "app/views/filters/_filter.html.erb:17": 1,
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 10,
+      "all_link_to": 14,
+      "cache_evidence": []
+    },
+    {
+      "phase": "warm",
+      "route": "/bubbles?bucket_ids%5B%5D=693169840&bucket_ids%5B%5D=664343589&creator_ids%5B%5D=127326141&stage_ids%5B%5D=66287381",
+      "status": 200,
+      "sites": {
+        "app/views/bubbles/index.html.erb:9": 1,
+        "app/views/filters/_buckets.html.erb:21": 1,
+        "app/views/filters/_tags.html.erb:20": 1,
+        "app/views/filters/_assignees.html.erb:22": 1,
+        "app/views/filters/_creators.html.erb:23": 1,
+        "app/views/filters/_stages.html.erb:21": 1,
+        "app/views/filters/_settings.html.erb:20": 1,
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 8,
+      "all_link_to": 11,
+      "cache_evidence": [
+        {
+          "name": "render_collection.action_view",
+          "hit": null,
+          "cache_hits": 1,
+          "count": 1,
+          "identifier": "app/views/bubbles/_bubble.html.erb"
+        },
+        {
+          "name": "render_collection.action_view",
+          "hit": null,
+          "cache_hits": 1,
+          "count": 1,
+          "identifier": "app/views/bubbles/list/_bubble.html.erb"
+        }
+      ]
+    },
+    {
+      "phase": "warm",
+      "route": "/account/users",
+      "status": 200,
+      "sites": {
+        "app/views/accounts/users/index.html.erb:5": 1,
+        "app/views/accounts/users/index.html.erb:18": 1
+      },
+      "block_entries": 2,
+      "all_link_to": 10,
+      "cache_evidence": []
+    },
+    {
+      "phase": "warm",
+      "route": "/workflows",
+      "status": 200,
+      "sites": {
+        "app/views/workflows/index.html.erb:13": 1,
+        "app/views/workflows/_workflow.html.erb:17": 1
+      },
+      "block_entries": 2,
+      "all_link_to": 7,
+      "cache_evidence": []
+    },
+    {
+      "phase": "warm",
+      "route": "/notifications",
+      "status": 200,
+      "sites": {
+        "app/views/notifications/index.html.erb:14": 1
+      },
+      "block_entries": 1,
+      "all_link_to": 3,
+      "cache_evidence": [
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        },
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        }
+      ]
+    },
+    {
+      "phase": "warm",
+      "route": "/buckets/693169840/bubbles/613325334",
+      "status": 200,
+      "sites": {
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 1,
+      "all_link_to": 7,
+      "cache_evidence": [
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        },
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        },
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        }
+      ]
+    },
+    {
+      "phase": "warm_repeat",
+      "route": "/buckets",
+      "status": 200,
+      "sites": {
+        "app/views/buckets/index.html.erb:5": 1,
+        "app/views/buckets/_bucket.html.erb:2": 2,
+        "app/views/buckets/_bucket.html.erb:16": 2,
+        "app/views/buckets/_bucket.html.erb:20": 2,
+        "app/views/filters/_filter.html.erb:3": 1,
+        "app/views/filters/_filter.html.erb:17": 1,
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 10,
+      "all_link_to": 14,
+      "cache_evidence": []
+    },
+    {
+      "phase": "warm_repeat",
+      "route": "/bubbles?bucket_ids%5B%5D=693169840&bucket_ids%5B%5D=664343589&creator_ids%5B%5D=127326141&stage_ids%5B%5D=66287381",
+      "status": 200,
+      "sites": {
+        "app/views/bubbles/index.html.erb:9": 1,
+        "app/views/filters/_buckets.html.erb:21": 1,
+        "app/views/filters/_tags.html.erb:20": 1,
+        "app/views/filters/_assignees.html.erb:22": 1,
+        "app/views/filters/_creators.html.erb:23": 1,
+        "app/views/filters/_stages.html.erb:21": 1,
+        "app/views/filters/_settings.html.erb:20": 1,
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 8,
+      "all_link_to": 11,
+      "cache_evidence": [
+        {
+          "name": "render_collection.action_view",
+          "hit": null,
+          "cache_hits": 1,
+          "count": 1,
+          "identifier": "app/views/bubbles/_bubble.html.erb"
+        },
+        {
+          "name": "render_collection.action_view",
+          "hit": null,
+          "cache_hits": 1,
+          "count": 1,
+          "identifier": "app/views/bubbles/list/_bubble.html.erb"
+        }
+      ]
+    },
+    {
+      "phase": "warm_repeat",
+      "route": "/account/users",
+      "status": 200,
+      "sites": {
+        "app/views/accounts/users/index.html.erb:5": 1,
+        "app/views/accounts/users/index.html.erb:18": 1
+      },
+      "block_entries": 2,
+      "all_link_to": 10,
+      "cache_evidence": []
+    },
+    {
+      "phase": "warm_repeat",
+      "route": "/workflows",
+      "status": 200,
+      "sites": {
+        "app/views/workflows/index.html.erb:13": 1,
+        "app/views/workflows/_workflow.html.erb:17": 1
+      },
+      "block_entries": 2,
+      "all_link_to": 7,
+      "cache_evidence": []
+    },
+    {
+      "phase": "warm_repeat",
+      "route": "/notifications",
+      "status": 200,
+      "sites": {
+        "app/views/notifications/index.html.erb:14": 1
+      },
+      "block_entries": 1,
+      "all_link_to": 3,
+      "cache_evidence": [
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        },
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        }
+      ]
+    },
+    {
+      "phase": "warm_repeat",
+      "route": "/buckets/693169840/bubbles/613325334",
+      "status": 200,
+      "sites": {
+        "app/views/notifications/_tray.html.erb:6": 1
+      },
+      "block_entries": 1,
+      "all_link_to": 7,
+      "cache_evidence": [
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        },
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        },
+        {
+          "name": "cache_read.active_support",
+          "hit": true,
+          "cache_hits": null,
+          "count": null,
+          "identifier": null
+        }
+      ]
+    }
+  ],
+  "sites": {
+    "app/views/accounts/users/index.html.erb:18": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/accounts/users/index.html.erb:5": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/bubbles/_bubble.html.erb:33": {
+      "cold": 1,
+      "warm": 0,
+      "warm_repeat": 0
+    },
+    "app/views/bubbles/index.html.erb:9": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/bubbles/list/_bubble.html.erb:12": {
+      "cold": 1,
+      "warm": 0,
+      "warm_repeat": 0
+    },
+    "app/views/bubbles/list/_bubble.html.erb:3": {
+      "cold": 1,
+      "warm": 0,
+      "warm_repeat": 0
+    },
+    "app/views/buckets/_bucket.html.erb:16": {
+      "cold": 2,
+      "warm": 2,
+      "warm_repeat": 2
+    },
+    "app/views/buckets/_bucket.html.erb:2": {
+      "cold": 2,
+      "warm": 2,
+      "warm_repeat": 2
+    },
+    "app/views/buckets/_bucket.html.erb:20": {
+      "cold": 2,
+      "warm": 2,
+      "warm_repeat": 2
+    },
+    "app/views/buckets/index.html.erb:5": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/comments/_body.html.erb:6": {
+      "cold": 2,
+      "warm": 0,
+      "warm_repeat": 0
+    },
+    "app/views/filters/_assignees.html.erb:22": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/filters/_buckets.html.erb:21": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/filters/_creators.html.erb:23": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/filters/_filter.html.erb:17": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/filters/_filter.html.erb:3": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/filters/_settings.html.erb:20": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/filters/_stages.html.erb:21": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/filters/_tags.html.erb:20": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/notifications/_tray.html.erb:6": {
+      "cold": 3,
+      "warm": 3,
+      "warm_repeat": 3
+    },
+    "app/views/notifications/index.html.erb:14": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/workflows/_workflow.html.erb:17": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    },
+    "app/views/workflows/index.html.erb:13": {
+      "cold": 1,
+      "warm": 1,
+      "warm_repeat": 1
+    }
+  },
+  "totals": {
+    "cold": {
+      "block_entries": 29,
+      "identities": 23
+    },
+    "warm": {
+      "block_entries": 24,
+      "identities": 19
+    },
+    "warm_repeat": {
+      "block_entries": 24,
+      "identities": 19
+    }
+  }
+}
