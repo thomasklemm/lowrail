@@ -742,3 +742,80 @@ RPS, including the actual paired p99 change even if worse. This gate does
 not assert a latency win, complete DB/own-suite equivalence, production
 admission, or permission to publish a README price; the coordinator decides
 that separately. **Status at declaration: not started.**
+
+### Confirmatory result: throughput gate passes; p99 is higher
+
+Completed the **single** authorized twenty-round cohort at the published
+protocol/harness
+[`44a33c4`](https://github.com/thomasklemm/lowrail/commit/44a33c4967d27db5c91e8954c7736fd97d3e9da9),
+with runtime from main
+[`487bec5`](https://github.com/thomasklemm/lowrail/commit/487bec5065e7d9bec5d1b2df48831eb926e457cb).
+Main was fetched again immediately before launch; the token prefix/suffix
+allocation follow-up was not yet published. **Not a result for the later
+guard allocation change or token revision
+[b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c)**.
+No mid-cohort integration or retry. Stock mise Ruby, not token-fork Ruby.
+
+**A/A first:** mean RPS Δ **+0.372%**, paired 95% interval
+**[−1.235%, +2.181%]**. Maximum absolute round spread **9.700%**, retained.
+The control contains zero; ±2% resolution is still not established.
+Paired on/off RPS **+10.465% [+8.109%, +12.807%]**. Its lower bound 8.109%
+strictly exceeds the A/A upper bound 2.181%: **the predeclared scoped
+throughput decision passes**, subject to the stated fixture/source limits.
+
+| Metric | off-A | on | off-B | Paired on/off Δ [95% interval] |
+|---|---:|---:|---:|---:|
+| Median window RPS | 1,613.84 | 1,782.69 | 1,611.23 | **+10.465% [+8.109%, +12.807%]** |
+| Median window p50, ms | 9.219 | 8.354 | 9.150 | −8.667% [−11.035%, −6.167%] |
+| Median window p90, ms | 15.842 | 14.030 | 15.777 | −12.899% [−16.621%, −9.102%] |
+| Median window p99, ms | 26.023 | **29.921** | 26.022 | **+12.732% [+1.131%, +24.784%]** |
+
+**Not uniformly faster:** p99 increases despite higher throughput and lower
+p50/p90. Paired changes average within-round ratios, not ratios of the
+displayed medians. The p99 A/A band is [−7.942%, +4.044%]; all latency
+comparisons and per-round values are retained, not a pooled histogram or a
+new latency acceptance gate. Do not hide the tail tradeoff behind RPS.
+
+New GC/heap fields, descriptive medians across twenty servers per arm:
+
+| Four-worker process diagnostic | off-A | on | off-B |
+|---|---:|---:|---:|
+| Post-warmup heap live slots | 1,611,358 | 1,553,915.5 | 1,627,657 |
+| Post-warmup old objects | 1,262,202 | 1,279,601.5 | 1,236,404.5 |
+| Post-warmup malloc increase, bytes | 4,106,532.5 | 3,867,217.5 | 4,284,127 |
+| Post-warmup sum of process RSS, KiB | 718,628 | 715,390 | 719,692 |
+| Allocated objects / completion | 2,679.05 | **2,333.14** | 2,679.12 |
+| GC collections / 1,000 completions | 18.733 | **23.970** | 18.852 |
+| Minor / major GC per 1,000 completions | 17.872 / 0.907 | 22.567 / 1.247 | 17.950 / 0.732 |
+| GC milliseconds / 1,000 completions | 209.888 | **233.981** | 204.159 |
+
+Fewer allocated objects coexist with **more collections and more GC time**.
+These load-bracketing counters include metrics/background work; they are
+not deterministic thread-local request allocations. Gauges are non-atomic
+four-worker sums; RSS double-counts shared pages, not PSS/unique memory.
+No forced GC or heap tuning. **The snapshots do not establish why the GC
+frequency or p99 increased.** No per-metric noise-resolution claim is made.
+
+All **60 measured servers plus three coverage servers** pass both seeds'
+cold literal Rack status/body/header comparisons; all sixty also pass
+post-warmup comparisons. Coverage reaches all three units: the final
+on-worker snapshot has **1 form / 7 token / 1 collection hits**, zero
+fallbacks. Initial natural form/collection admissions retain their original
+request as designed. Timed counters stay off. All measured windows return
+HTTP 200 with **zero transport/status errors**: **2,000,031** timed and
+**389,982** warmup completions. Every measured server has both snapshots
+from all four stable worker PIDs (**480 worker snapshots**). No refusal,
+mode or input-pin drift. Elapsed **1,788.32 seconds (29.81 minutes)**.
+
+Independent Python audit reconciles every raw oha receipt, count/RPS/latency,
+both-seed cold/warm workflow, stable worker/PID/counter checks, arm medians,
+paired RPS **and latency** means and bootstrap endpoints. Ruby supplies only
+the seeded index stream for the independent bootstrap reconstruction.
+Original appendix sections are preserved; `rps_confirmatory_blog` adds the
+complete compacted export and private receipt SHA256
+`fd451fafae50e0ce6632d373f2941550937f3ed992c0147ac3d9bd88952caec6`.
+Artifact manifest SHA256
+`8623be97a7822f9f7eb78a07e0920fe51da5b4ff850c67856ece5e4e27e8fc4d`;
+unchanged original denylist. No pooling with the ten-round baseline,
+new own-suite/complete DB-state gate, Thermos promotion, Callgrind, main
+integration or README update. The coordinator retains the publication decision.
