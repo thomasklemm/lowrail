@@ -47,6 +47,12 @@ case "$name" in
     rev=af4dd9fd599c65e0e0fc1f614ee469f70156ddf5
     repo=https://github.com/basecamp/once-campfire
     sub=. ;;
+  campfire-r81)
+    # Newest pre-8.2-defaults source; separate fixture, never patch app config.
+    # Dependency-only Ruby 4.0.7 / Rails 8.1.4 overlay: docs/campfire-bench.md.
+    rev=02023b0f0cafc4d66e06e43be072cf4d6ca328fa
+    repo=https://github.com/basecamp/once-campfire
+    sub=. ;;
   pingcrm)
     # Public Inertia apps, main/HEAD on 2026-10-20. See docs/m0/inertia.md.
     rev=22464f822dcf59c4425993dd623780ad44497fda
