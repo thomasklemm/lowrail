@@ -2,26 +2,55 @@
 
 module Lowrail
   # Installed through RUBYOPT before Bundler, without activating RSpec (or
-  # any default gem). Attach an ordinary formatter once rspec/core loads.
+  # any default gem). RSpec owns configuration/formatter initialization.
   module RSpec
     def self.install(path)
       return if @path
       @path = path
-      return if attach
-      # Do not wrap Kernel#require: Bootsnap aliases that method and an
-      # inherited prepend would make its original-require alias recurse.
-      # This temporary hook disappears as soon as RSpec's API exists.
-      @load_hook = TracePoint.new(:end) { attach }
-      @load_hook.enable
+      Object.singleton_class.prepend(ConstHook)
+      watch
+      rspec = Lowrail.loaded_constant("RSpec")
+      rspec.configuration if rspec&.respond_to?(:configuration)
     end
 
-    def self.attach
-      return if @attached || !defined?(::RSpec::Core::Formatters) || !::RSpec.respond_to?(:configure)
-      @attached = true
-      @load_hook&.disable
+    def self.watch
+      rspec = Lowrail.loaded_constant("RSpec") or return
+      # rspec/support defines RSpec before rspec/core defines configuration.
+      # Do not make an unfinished framework appear ready to other gems.
+      hook = rspec.respond_to?(:configuration) ? ConfigurationHook : DefinitionHook
+      rspec.singleton_class.prepend(hook) unless rspec.singleton_class < hook
+    end
+
+    def self.attach(config)
       ::RSpec::Core::Formatters.register(Formatter, :example_started, :example_passed, :example_failed, :example_pending, :close)
-      ::RSpec.configure { |config| config.add_formatter(Formatter) }
-      true
+      config.add_formatter(Formatter) unless config.formatters.any?(Formatter)
+    end
+
+    module ConstHook
+      private
+
+      def const_added(name)
+        super
+        Lowrail::RSpec.watch if equal?(Object) && name == :RSpec
+      end
+    end
+
+    module DefinitionHook
+      private
+
+      def singleton_method_added(name)
+        super
+        Lowrail::RSpec.watch if name == :configuration
+      end
+    end
+
+    module ConfigurationHook
+      def configuration
+        # super finishes constructing and storing the configuration first.
+        # Use public formatter APIs, including after reset/clear_examples.
+        # Never wrap require: Bootsnap aliases it during its own boot.
+        super.tap { Lowrail::RSpec.attach(_1) }
+      end
     end
 
     class Formatter

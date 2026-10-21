@@ -50,6 +50,17 @@ class RSpecReporterTest < Minitest::Test
       assert_match(/PendingExampleFixedError/, outcomes[5]["failure"])
       assert_equal({}, off["unit_hits"])
       assert_equal({ "0" => 3 }, on["unit_hits"])
+      {"preloaded" => "", "support" => "", "reset" => "RSpec.reset", "clear" => "RSpec.clear_examples"}.each do |name, reset|
+        path = File.join(dir, "outcomes-#{name}.json")
+        prelude = name == "support" ? "require 'rspec/support'; raise 'premature configuration API' if RSpec.respond_to?(:configuration);" : ""
+        _out, err, status = ruby("-e", "#{prelude} require 'rspec/core'; RSpec.configuration; #{reset}; load 'sample_spec.rb'",
+          chdir: dir, env: {"LOWRAIL" => "1", "LOWRAIL_OUTCOMES" => path,
+            "RUBYOPT" => name == "preloaded" ? "-I#{GEM_LIB} -rrspec/core -rlowrail/setup" : SETUP_OPT})
+        assert_equal 1, status.exitstatus, err
+        data = JSON.parse(File.read(Dir["#{path}.*"].fetch(0)))
+        assert_equal on.fetch("tests"), data.fetch("tests"), name
+        assert_equal on.fetch("unit_hits"), data.fetch("unit_hits"), name
+      end
     end
   end
 
@@ -79,6 +90,27 @@ class RSpecReporterTest < Minitest::Test
         assert_equal seed.to_i, rng.fetch("seed")
         assert_equal "Kernel", rng.fetch("sources")
         assert_equal data.fetch("tests").keys.sort, rng.fetch("tests").sort
+      end
+    end
+  end
+
+  def test_preloaded_reporter_preserves_builtin_inventory_without_loading_rspec
+    realpath_tmpdir do |dir|
+      probe = <<~'RUBY'
+        require "lowrail/form_scaffold_inventory"
+        methods = {Array => %i[first last], Symbol => %i[to_s name], Object => %i[class]}
+        facts = methods.to_h do |type, names|
+          [type.name, names.to_h { [_1, Lowrail::FormScaffoldInventory.stock_fact(type.instance_method(_1))] }]
+        end
+        puts JSON.generate(facts: facts, rspec_loaded: !!defined?(::RSpec))
+      RUBY
+      plain = ruby_json(probe, chdir: dir)
+      assert_equal false, plain.fetch("rspec_loaded")
+      plain.fetch("facts").each_value { |methods| methods.each_value { refute_nil _1 } }
+      %w[0 1].each do |census|
+        reported = ruby_json(probe, chdir: dir, env: {"LOWRAIL_OUTCOMES" => File.join(dir, "outcomes"),
+          "LOWRAIL_VERIFY_LOADS" => census})
+        assert_equal plain, reported, "reporter/census=#{census} changed the VM builtin inventory"
       end
     end
   end

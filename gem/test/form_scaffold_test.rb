@@ -35,6 +35,21 @@ class FormScaffoldTest < Minitest::Test
         end
       RUBY
       assert status.success?, "#{out}\n#{err}"
+      inventory_probe = <<~'RUBY'
+        require "./config/application"
+        Rails.application.config.yjit = false
+        require "./config/environment"
+        require "lowrail/form_scaffold_inventory"
+        puts JSON.generate(Lowrail::FormScaffoldInventory.check)
+      RUBY
+      inventory_env = build_env.merge("LOWRAIL" => "0", "RUBYOPT" => SETUP_OPT)
+      inventory = ruby_json(inventory_probe, chdir: app, env: inventory_env)
+      assert_kind_of Hash, inventory, "plain form inventory must certify before comparing reporter preloads"
+      %w[0 1].each do |census|
+        reported = ruby_json(inventory_probe, chdir: app, env: inventory_env.merge(
+          "LOWRAIL_OUTCOMES" => File.join(dir, "inventory-outcomes"), "LOWRAIL_VERIFY_LOADS" => census))
+        assert_equal inventory, reported, "reporter/census=#{census} changed the complete form inventory"
+      end
       build = -> {
         out, err, status = Open3.capture3(build_env, bin, "build", app, "--env", "production", "--sealed")
         assert status.success?, "#{out}\n#{err}"
@@ -46,7 +61,8 @@ class FormScaffoldTest < Minitest::Test
       assert_equal "sealed-v1", artifact.fetch("tier")
       %w[none render_subscriber].each do |observer|
         output = File.join(dir, observer)
-        out, err, status = Open3.capture3(build_env.merge("LOWRAIL_SEALED" => "1", "LOWRAIL_FORM_CHECK" => "1"),
+        out, err, status = Open3.capture3(build_env.merge("LOWRAIL_SEALED" => "1", "LOWRAIL_FORM_CHECK" => "1",
+          "LOWRAIL_OUTCOMES" => File.join(dir, "form-outcomes")),
           RUBY, checker, app, output, observer, File.join(app, ".lowrail"))
         assert status.success?, "#{out}\n#{err}"
         assert_includes out, "192 isolated pairs identical"

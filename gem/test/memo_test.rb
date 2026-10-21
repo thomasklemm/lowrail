@@ -224,9 +224,7 @@ class MemoTest < Minitest::Test
     missing_prerequisite "rspec not installed" if Gem::Specification.find_all_by_name("rspec-core").empty?
     prefix = "require 'lowrail/rspec'; Lowrail::RSpec.install('/unused-memo-report')\n"
     out = ruby_json(prefix + PRELUDE + <<~'RUBY')
-      hook = Lowrail::RSpec.instance_variable_get(:@load_hook)
       2.times { joined("https://one.test", "/x") }
-      raise "disabled reporter" unless hook.enabled?
       hits = Lowrail::Stats.unit_hits.fetch("0", 0)
       raise "reporter prevented memo" unless hits > 0
       2.times do |phase|
@@ -238,18 +236,19 @@ class MemoTest < Minitest::Test
         2.times { joined("https://one.test", "/x") }
         require "rspec/core" if phase == 0
       end
-      raise "reporter did not attach" if hook.enabled?
+      attached = RSpec.configuration.formatters.any?(Lowrail::RSpec::Formatter)
+      raise "reporter did not attach" unless attached
       raise "did not resume after attach" unless Lowrail::Stats.unit_hits.fetch("0") > hits
-      # A stale passive-hook implementation invalidates the certificate too.
+      # A stale reporter implementation invalidates the certificate too.
       cert.fetch("sources").find { |path,_| path.end_with?("/rspec.rb") }.last["sha256"] = "0" * 64
       Lowrail::Passes::Memo.install(manifest.units)
       before = Lowrail::Stats.unit_hits.fetch("0")
       2.times { joined("https://one.test", "/x") }
       raise "stale reporter certificate" unless before == Lowrail::Stats.unit_hits.fetch("0")
-      puts JSON.generate({ hits: hits, reporter_disabled_after_attach: !hook.enabled? })
+      puts JSON.generate({ hits: hits, reporter_attached: attached })
     RUBY
     assert_operator out.fetch("hits"), :>, 0
-    assert_equal true, out.fetch("reporter_disabled_after_attach")
+    assert_equal true, out.fetch("reporter_attached")
   end
 
   def test_timeouts_and_preexisting_or_later_tracing_decline_reuse

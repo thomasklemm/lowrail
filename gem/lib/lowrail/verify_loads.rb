@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "load_hooks"
+
 module Lowrail
   # Opt-in verification observer, symmetric even with LOWRAIL=0. Never
   # constantize: inspecting an autoload must not itself execute that autoload.
@@ -15,18 +17,18 @@ module Lowrail
         @events = []
         @pid = Process.pid
         @seconds = 0.0
-        @trace = TracePoint.new(:end) do |event|
-          name = NAME.bind_call(event.self) if Module === event.self
-          if name == "ActiveSupport::LazyLoadHooks"
-            event.self.prepend(LoadHooks)
-            @active_support = true
-          elsif name == "Zeitwerk::Loader"
-            event.self.prepend(LoaderHooks)
-            @zeitwerk = true
-          end
-          @trace.disable if @active_support && @zeitwerk
+        ::Lowrail::LoadHooks.active_support do
+          Lowrail.loaded_constant("ActiveSupport::LazyLoadHooks").prepend(LoadHooks)
         end
-        @trace.enable
+        Object.singleton_class.prepend(ConstHook)
+        watch_zeitwerk
+      end
+
+      def watch_zeitwerk
+        zeitwerk = Lowrail.loaded_constant("Zeitwerk") or return
+        zeitwerk.singleton_class.prepend(LoaderDefinition) unless zeitwerk.singleton_class < LoaderDefinition
+        loader = Lowrail.loaded_constant("Zeitwerk::Loader") or return
+        loader.prepend(LoaderHooks) unless loader < LoaderHooks
       end
 
       def watch(loader)
@@ -77,6 +79,24 @@ module Lowrail
       def snapshot
         capture("after_suite")
         { "stages" => @snapshots, "snapshot_seconds" => @seconds }
+      end
+    end
+
+    module ConstHook
+      private
+
+      def const_added(name)
+        super
+        VerifyLoads.watch_zeitwerk if equal?(Object) && name == :Zeitwerk
+      end
+    end
+
+    module LoaderDefinition
+      private
+
+      def const_added(name)
+        super
+        VerifyLoads.watch_zeitwerk if name == :Loader
       end
     end
 

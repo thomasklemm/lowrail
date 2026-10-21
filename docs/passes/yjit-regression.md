@@ -591,6 +591,105 @@ threshold. If the app already booted with sticky tracing, disable is not a
 repair: restart without that global observer. Do not secretly probe by
 enabling a global hook (that poisons the process being diagnosed).
 
+## Reporter readiness and global tracing audit
+
+The RSpec reporter's waiting global `:end` hook was a second, distinct
+contamination source. Before the fix, the public RUBYOPT regression fails:
+all five form primitive fingerprints (`Array#first/#last`,
+`Symbol#to_s/#name`, `Object#class`) differ with outcomes reporting enabled,
+even though RSpec itself is never loaded. A fresh two-process `Symbol#to_s`
+probe isolates `opt_invokebuiltin_delegate_leave` off versus
+`opt_invokebuiltin_delegate` with the reporter. Minitest's own const/plugin
+attachment does not require tracing. Refusing the changed inventory was
+correct; no instruction normalization or certificate relaxation is needed.
+
+RSpec readiness now observes creation of the RSpec constant and the actual
+definition of its `configuration` API, then prepends that entrypoint. It
+does not make `rspec/support` alone appear configured. `super` must finish constructing
+**and storing** the configuration before public `Formatters.register` /
+`config.add_formatter` run. It does not wrap require, activate RSpec early,
+or use TracePoint. Attachment is idempotent per formatter list, including
+`RSpec.reset` and `clear_examples`; existing preloaded RSpec also works.
+The six-example outcome fixture retains distinct duplicate IDs and all
+pass/failure/error/skip/pending/fixed-pending outcomes, hits, and RNG
+attestation, including Bootsnap boot. Memo no longer exempts any reporter
+TracePoint from its tracing refusal.
+
+The opt-in `VerifyLoads` census had its own global `:end` readiness hook.
+It now uses existing ActiveSupport readiness plus Zeitwerk constant/setup
+hooks, without forcing autoloads. The same five primitive facts agree with
+reporter alone **and** reporter+census on both Rubies. On the primary Ruby,
+the real production blog's **complete** `FormScaffoldInventory.check` agrees
+in all three boots; 192 isolated form request pairs, both ordinary and with
+render subscribers, retain positive form hits and zero form fallbacks with
+the reporter preloaded. These are untimed correctness checks, not a new
+performance cohort. The inventory implementation is unchanged.
+
+Doctor's `--trace-check` additionally retains `builtin_dispatch` under the
+existing `return_tracing` report. It warns on unfused zero-argument VM
+delegates (`Symbol#to_s/#name`, `Object#class`), in interpreter as well as
+YJIT processes. Fresh controls on both targets distinguish off from active
+`:end`/`:class` hooks and from a builtin materialized under such a hook then
+inspected after disable. The native six-event probe also checks `:call`,
+`:return`, and `:script_compiled`: the first two unfuse `Symbol#to_s`, while
+script capture leaves it fused, matching off. No Callgrind run is needed
+for these observable ISeq differences.
+
+**Limitations:** this is shape evidence, not an API exposing active
+events/targets, historical event masks, or the responsible gem. Previous
+materialization and compiler options can affect the result; it is not a
+clean-VM certificate or a performance claim. Array's optional-argument
+methods legitimately contain an unfused arity-check delegate even off,
+so doctor does not use them as warning sentinels. Original return-counter
+unavailability remains explicit when YJIT/stats are absent; a separate
+positive builtin warning is still reported. Never enable tracing to probe
+an already booted app.
+
+### Inventory of all remaining tracing sites
+
+Audit scope: `TracePoint.new`/`.trace`, `set_trace_func`, `trace_var`, and
+enable sites throughout `gem/lib/` and `bench/`. A callback's own path or
+method filter **does not** make its enable targeted. The following is the
+complete remaining inventory, not merely the return-event subset.
+
+| File (under `gem/lib/lowrail/`) | Enable scope / disposition |
+|---|---|
+| `rspec.rb`, `verify_loads.rb` | Global `:end` hooks **removed**, replaced above. |
+| `passes.rb` | `:return` **targeted** at the app's `initialize!`; retain the already tested local completion boundary. |
+| `observe.rb` | `:call/:return` **targeted** per observed UnboundMethod; intentional profiling, not measured production. |
+| `script_capture.rb` | Global `:script_compiled`, build/facts/observe only; generated eval discovery needs all compilation events. Stopped after capture; fresh builtin control stays fused. Never installed by normal runtime setup. |
+| `seal.rb` | Global boot `:end/:return`, then global `:call/:c_call/:return/:c_return`, including re-enable after writing. Intentionally observes arbitrary mutations across the exercised suite in the **separate seal-check process**, never normal delivery or timing. Cannot certify a clean performance process. |
+| `memo.rb` | Intercepts TracePoint construction/activation and inspects tracing state to **refuse** reuse; creates/enables no trace. No special reporter exemption remains. |
+| `jit_diagnostics.rb`, `compilation.rb` | Inspect enabled state/ISeqs only; create/enable no trace. |
+| `jit_shapes.rb`, `seal_static.rb` | Recognize tracing/reflection in code to diagnose/refuse; do not execute tracing APIs. |
+
+All bench paths below are relative to `bench/`. Historical experiments are
+retained to reproduce their source-pinned records, **not** silently rewritten
+or re-scored. A retained global observer is not permission to reuse its
+process for a fresh clean-VM price; use targeted captures or a separate
+untimed companion first. This audit starts no measured cohort.
+
+| File | Enable scope / disposition |
+|---|---|
+| `callback_survey.rb` | `:call` **targeted** at `ActiveSupport::Callbacks#run_callbacks`; intentional untimed census. |
+| `heap_requests.rb` | `:line` **targeted** at the actual lowered body for the separate idle-operation companion. No global hook. |
+| `inertia_setup.rb` | Global `:call` for asset-digest positive control and request census; standalone corpus preparation exits, never a measured worker. |
+| `requests.rb` | Global `:call` only for explicit trace commands. `request_pairs.rb` sends these after all timed samples/profiles, then closes the workers. Never send another timed command to a traced process. |
+| `importmap.rb` | Global `:call/:c_call/:return` in standalone `trace` mode only; not the separate `micro`/correctness modes. Intentional method census, not timing. |
+| `experiments/yjit_request_probe.rb` | Global `:call` in the `YJIT_REQUEST_CENSUS` branch; prints counts and **exits before** windows. Native diagnosis only. |
+| `experiments/trace_stickiness.rb` | Deliberately global chosen event versus targeted `:return` arm: this is the causal contamination experiment itself. Its trace tax is the subject, not a clean production price. |
+| `experiments/endpoint_sections.rb` | Historical global `:call` link capture before cost windows. Retain only for its pinned diagnostic record; new clean-VM prices must replace/segregate capture. |
+| `experiments/sealed_helpers.rb` | Same historical global `:call` capture and limitation. Not the production sealed pass or its current request driver. |
+| `experiments/sealed_links.rb` | Same historical global `:call` capture; provenance variant additionally uses the next row's observer. No new clean-VM price on this factory as written. |
+| `experiments/sealed_provenance.rb` | Historical global `:return` delivery witness and global constructor `:call/:return/:c_call/:c_return` semantics probe. The former also contaminates its historical pricing caller; production now records delivery directly. Retain as historical evidence, not a current pricing seam. |
+| `experiments/endpoint_bodies.rb` | Historical global `:return` delivery witness, global `:line/:call/:c_call` contract observer (two enable sites), and global `:call` link capture. Contract events are intentionally global semantics evidence. The priced worker's boot/capture is contaminated and cannot price a clean production shape as written. |
+
+No additional runtime `set_trace_func` or `trace_var` invocation exists in
+these directories. No historical result was rerun, promoted or assigned a
+new score by this audit. Keep the earlier missing-liveness audit distinct
+from this tracing audit: an unproven hit is not proof of fallback pricing,
+and a traced specimen is not evidence about an untraced VM.
+
 ## Reproduction and evidence
 
 [Numeric export](yjit-regression.json) retains per-arm estimates, all gate

@@ -113,8 +113,8 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    Hash kwargs 482.965/1,194.136; mono/eight-class sends 546.965/696.090.
    Price the actual public signature instead of extrapolating these deltas.
 
-8. **Never enable a global return TracePoint in production, even briefly;
-   avoid hot `binding`/`eval`.** Disabling a global hook does not restore
+8. **Never use global TracePoints for production or reporter readiness;
+   avoid hot `binding`/`eval`.** Disabling a global return hook does not restore
    executable instruction shape on Ruby 4.0.7 or the 4.1 preview: the VM's
    historical mask remains set, including for future ISeqs. YJIT exits at
    `trace_leave`; disasm/to_a print bare `leave`, so use executable counters.
@@ -129,11 +129,19 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
    ZJIT's `NoTracePoint` patchpoints and environment-escape assumptions are
    invalidated by these operations
    ([`invariants.rs:454ff`](https://github.com/ruby/ruby/blob/2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1/zjit/src/invariants.rs#L454)).
-   Facts' script capture is build-only and stopped; Observe intentionally
-   samples into execution and is not a benchmark configuration. The RSpec
-   reporter's temporary `:end` TracePoint disables when RSpec attaches; a
-   Minitest-only diagnostic run can retain that waiting reporter hook. Such
-   verify diagnostics are not representative performance measurements.
+   Global `:end`/`:class` (also `:call`/`:return`) changes lazily materialized
+   VM builtin ISeqs from `opt_invokebuiltin_delegate_leave` to
+   `opt_invokebuiltin_delegate`. That shape can survive disable and must not
+   be normalized out of a certificate. RSpec now attaches through its public
+   configuration/formatter API; the load census uses AS readiness and
+   Zeitwerk constant/setup hooks. Neither enables a TracePoint. Both targets
+   preserve the five affected builtin facts; the primary's complete sealed
+   form inventory and cold hits are covered too.
+   [`doctor --trace-check`](passes/yjit-regression.md#reporter-readiness-and-global-tracing-audit)
+   reports selected builtin shapes as well as return counters, with explicit
+   limitations. Facts' global `:script_compiled` capture is build-only and
+   preserves the fused builtin in fresh-process controls. Observe intentionally
+   samples into execution and is not a benchmark configuration.
 
 9. **Mutate guard containers, not their constant bindings.** `G[id] = ...`,
    `K[id] = ...`, `V[id] = ...` change Arrays/Hash entries, not the `Lowrail::G`,

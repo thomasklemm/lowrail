@@ -16,6 +16,38 @@ module Lowrail
     # disabled global return hook can affect future ISeqs too; disasm hides it.
     # Do not enable tracing (or YJIT) to diagnose an already booted process.
     def sticky_tracing(request: nil)
+      report = return_tracing(request: request)
+      report["builtin_dispatch"] = builtin_dispatch
+      if report["builtin_dispatch"]["status"] == "warning"
+        report["status"] = "warning"
+        report["reason"] += " Unfused VM builtin dispatch observed: global :end/:class tracing at materialization is one cause; no event mask or guilty gem is identified."
+      end
+      report
+    end
+
+    def builtin_dispatch
+      # Zero-argument delegates only: Array#first/#last legitimately contain
+      # an unfused delegate in their arity check even in a clean process.
+      instructions = {Symbol => %i[to_s name], Object => %i[class]}.each_with_object({}) do |(type, names), result|
+        names.each do |name|
+          method = type.instance_method(name)
+          next unless method.source_location&.first&.start_with?("<internal:")
+          sequence = RubyVM::InstructionSequence.of(method)
+          next unless sequence
+          ops = sequence.to_a.last.grep(Array).map(&:first).select { _1.to_s.start_with?("opt_invokebuiltin") }
+          result["#{type.name}##{name}"] = ops.map(&:to_s) unless ops.empty?
+        end
+      end
+      unfused = instructions.select { |_, ops| ops.include?("opt_invokebuiltin_delegate") }.keys
+      {"status" => instructions.empty? ? "unavailable" : unfused.empty? ? "not_observed" : "warning",
+        "instructions" => instructions, "unfused" => unfused,
+        "scope" => "selected VM builtin shapes, not an active event/target census; prior materialization or compiler options can affect results; no clean-VM certificate"}
+    rescue StandardError => e
+      {"status" => "unavailable", "reason" => "#{e.class}: #{e.message.lines.first&.strip}"}
+    end
+    private_class_method :builtin_dispatch
+
+    def return_tracing(request:)
       report = {"status" => "unavailable", "leaf" => nil, "request" => nil,
         "scope" => "process-wide return counters; concurrent traced work may contribute; not a performance or clean-VM certificate"}
       return report.merge("reason" => "YJIT is not enabled; no interpreter inference") unless RubyVM::YJIT.enabled?
@@ -61,6 +93,7 @@ module Lowrail
     rescue StandardError => e
       report.merge("status" => "unavailable", "reason" => "#{e.class}: #{e.message.lines.first&.strip}")
     end
+    private_class_method :return_tracing
 
     def trace_leaf(value) = value * 7 + 13
     private_class_method :trace_leaf

@@ -82,4 +82,38 @@ class JitDiagnosticsTest < Minitest::Test
       assert_operator data.dig("request", "exit_trace_leave_delta"), :>, 0
     end
   end
+
+  def test_doctor_warns_about_end_and_class_builtin_shapes_without_claiming_an_event_census
+    realpath_tmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "config"))
+      File.write(File.join(dir, "config/environment.rb"), <<~'RUBY')
+        if ENV["TRACE_EVENT"] != "off"
+          $trace = TracePoint.new(ENV.fetch("TRACE_EVENT").to_sym) {}
+          $trace.enable
+          if ENV["DISABLE_TRACE"] == "1"
+            # Materialize under tracing, then keep that shape after disable.
+            RubyVM::InstructionSequence.of(Symbol.instance_method(:to_s))
+            $trace.disable
+          end
+        end
+      RUBY
+      %w[--disable-yjit --yjit].product(%w[off end class], %w[0 1]).each do |jit, event, disable|
+        output = File.join(dir, "trace.json")
+        out, err, status = ruby(File.join(GEM_ROOT, "exe/lowrail-doctor-trace"), output,
+          setup: false, chdir: dir, env: {"RUBYOPT" => "#{jit} --yjit-stats=quiet",
+            "TRACE_EVENT" => event, "DISABLE_TRACE" => disable})
+        assert status.success?, "#{jit}/#{event}/#{disable}: #{err}#{out}"
+        data = JSON.parse(File.read(output))
+        builtins = data.fetch("builtin_dispatch")
+        assert_equal(event == "off" ? "not_observed" : "warning", builtins.fetch("status"))
+        if event == "off"
+          assert_empty builtins.fetch("unfused")
+        else
+          assert_equal "warning", data.fetch("status")
+          assert_includes builtins.fetch("unfused"), "Symbol#to_s"
+          assert_includes data.fetch("reason"), "no event mask or guilty gem is identified"
+        end
+      end
+    end
+  end
 end
