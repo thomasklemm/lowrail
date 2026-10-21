@@ -328,7 +328,60 @@ Do not overlap with Ir or pool with native Rack screens. No forced GC or
 JIT-flat claim. Report A/A and p99 first; require zero errors, passing cold/warm
 exactness and the entire on/off RPS interval above **3 × the largest absolute
 A/A bound** for a clear throughput win. Otherwise unresolved, never retry.
-The RPS check has not run at this export checkpoint.
+
+### First RPS cohort: fallback overhead, not optimized throughput
+
+The complete frozen 30-server cohort is retained, including the bad window:
+
+| A/A RPS Δ [95%] | off-A / off-B / on median RPS | Paired on/off Δ [95%] |
+|---|---:|---:|
+| −0.776602% [−3.945440%, +2.307108%] | 397.44 / 394.19 / 368.15 | −8.302535% [−12.026323%, −5.096847%] |
+
+Median window p99 is **347.36 / 341.70 / 368.11 ms**, off-A/off-B/on.
+Both seeds pass cold and warm status/body/all-header workflows, but the on
+coverage snapshots have **zero hits, four fallbacks each**. This is a
+**fallback-overhead measurement, not optimized throughput**. The overall
+result is rejected: round 4 on records four `connection closed before message
+completed` transport errors. Every other on window and **all off windows**
+have zero errors; all warmups have zero errors. No non-200 response was
+recorded. No error cause is inferred from that distribution, and no worker
+is excluded to repair the result.
+
+### Verified fork boundary and bounded worker-local fix
+
+An untimed probe in actual forked Puma workers runs the original guard and
+logs every fact per call. Across four calls in two worker PIDs, **only
+connection identity and visitor identity fail**; the other **140 facts pass**.
+Puma also replaced the pool. Thus the original pre-fork binding is the actual
+refusal, not a guessed scope or reflection failure.
+
+The prototype now re-resolves SQL, bind layout, visitor and connection once
+on first eligible use after a PID change, under the **same database config**,
+exact SQLite adapter and prepared mode. Existing model/scope/method/visibility/
+reflection/association checks must pass first; the final connection/visitor
+identity guard is unchanged. Same-process reconnection/switching is not
+automatically admitted. This is one pinned connection per worker, not a
+general concurrent first-bind or multi-thread/per-connection certificate.
+
+`AR_GUARD_FORK=1 ... ar_request_sites_check.rb` boots and binds in the parent,
+forks, clears inherited connections in the child, and runs the unchanged
+positive/mutation matrix there. The old runtime fails on baseline **zero
+hits**; the fix passes **26 strict response/SQL comparisons**, including
+positive hits and restored controls. The ordinary unforked matrix passes
+another 26. Full DB checks still reject the named cache difference. A second
+real Puma probe has no failed facts, positive hits, zero fallbacks, and exact
+status/body/all-header login/GET workflows against the old probe, both seeds.
+
+This is a **post-price runtime change**. The interpreter price above remains
+scoped to `87c3c19` / `addf55e`; it is not a re-price of this worker-local fix.
+The coordinator authorized **one new** RPS cohort, same `b1e239f` harness and
+same predeclared settings/rule, after this verified refusal. The external
+`ar_request_rps.rb` runner adds only a pre-load coverage gate: both seed
+snapshots, then **every Puma worker PID**, must show positive bucket hits and
+zero fallbacks (bounded at 64 untimed requests on the separate coverage
+server). Otherwise stop before timed load. No shared harness/app/Puma source
+is changed, no error exclusions and no further retry. That cohort has not run
+at this checkpoint.
 
 ## Exactness evidence and its boundary
 

@@ -61,6 +61,28 @@ module ARSiteChecks
       require config.fetch("exploration_setup")
       NativeBench::Exploration.install(config: config, state: state, arm: arm)
       require_relative "fizzy_link_vector"
+      return cases(config, state, arm) unless ENV["AR_GUARD_FORK"] == "1"
+
+      reader, writer = IO.pipe
+      pid = fork do
+        reader.close
+        ActiveRecord::Base.connection_handler.clear_all_connections!
+        Marshal.dump(cases(config, state, arm).merge("forked" => true, "pid" => Process.pid), writer)
+        writer.close
+        exit! 0
+      end
+      writer.close
+      result = Marshal.load(reader)
+      _, status = Process.wait2(pid)
+      raise "forked guard worker failed" unless status.success? && result.fetch("pid") != Process.pid
+      result
+    ensure
+      reader&.close unless reader&.closed?
+      writer&.close unless writer&.closed?
+      Process.wait(pid) if pid && !status
+    end
+
+    def cases(config, state, arm)
       ActionView::Template.prepend(MidRequest)
       ActionView::Template::Handlers::ERB.prepend(SourceMismatch)
       app_pin = BlogProduction::Entropy.source_pin(config.fetch("app"))

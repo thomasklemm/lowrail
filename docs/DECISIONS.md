@@ -37,6 +37,14 @@ Six rounds, 18 workers, 72 dumps and 36 N=0 subtractions independently reconcile
 Accept only a branch prototype, bench-only, one route, not on main, not admission; login-cache expires_at and SolidCache created_at off/off remain named rejections.
 One unchanged-harness real-Puma check follows; no YJIT throughput, full DB-state, DirectSite own-suite or Thermos/main-integration claim ([evidence and JSON](ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry)).
 
+## Bet F: Puma fallback-only cohort and worker binding (2026-10-21)
+
+The first 30-server `/buckets` RPS cohort is fallback overhead, not optimized throughput: 397.44/394.19/368.15 off-A/off-B/on RPS, paired −8.30%, A/A [−3.95,+2.31]%; zero site hits.
+Retain all windows: four closed-connection transport errors occur in round4 on only; all off windows, other on windows and warmups have zero errors. Cold/warm exact workflows pass, overall result rejects.
+Actual untimed Puma workers fail only connection/visitor identity (140 other facts pass). Bind once after fork under the same DB config and all original facts; keep the final identity guard and same-process switching refusal.
+Old source fails the fork regression on zero hits; fixed forked/unforked matrices pass 52 strict response/SQL comparisons, and real Puma responses match both seeds with positive hits/zero fallbacks; cache DB rejection remains.
+Authorize one new unchanged-harness RPS cohort with the same rule, now admitting all four coverage worker PIDs only on positive hits/zero fallbacks; no further retry, no new Ir price, no main integration ([details](ar-callsite.md#verified-fork-boundary-and-bounded-worker-local-fix)).
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

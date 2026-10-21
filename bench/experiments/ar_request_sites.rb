@@ -99,9 +99,8 @@ module ARRequestSites
       raise "joined eager loads unsupported" if @template.eager_loading?
       model.with_connection do |connection|
         raise "SQLite prepared required" unless connection.instance_of?(ActiveRecord::ConnectionAdapters::SQLite3Adapter) && connection.prepared_statements
-        @connection, @visitor = connection, connection.visitor
-        @sql, binds, @preparable, @retryable = connection.send(:to_sql_and_binds, @template.arel)
-        @bind_map = ActiveRecord::StatementCache::BindMap.new(binds)
+        @database_config = connection.pool.db_config.configuration_hash.deep_dup
+        bind_connection(connection)
       end
       @model_facts = [model, *owners].uniq.map {
         [_1, _1.default_scopes.dup, _1.attribute_types, _1.current_role, _1.current_shard,
@@ -127,6 +126,13 @@ module ARRequestSites
       end
     end
 
+    def bind_connection(connection)
+      @connection, @visitor = connection, connection.visitor
+      @sql, binds, @preparable, @retryable = connection.send(:to_sql_and_binds, @template.arel)
+      @bind_map = ActiveRecord::StatementCache::BindMap.new(binds)
+      @process_id = Process.pid
+    end
+
     def eligible?(owner)
       valid = @owners.include?(owner.class) && owner.persisted? && owner.id.instance_of?(Integer) && owner.singleton_methods.empty? &&
         @readers.fetch(owner.class).all? { |name, method|
@@ -145,7 +151,17 @@ module ARRequestSites
       if valid
         association = owner.association(@association)
         valid &&= !association.loaded? && association.instance_variable_get(:@association_scope).nil? && association.singleton_methods.empty?
-        @model.with_connection { |connection| valid &&= connection.equal?(@connection) && connection.visitor.equal?(@visitor) && connection.prepared_statements }
+        @model.with_connection do |connection|
+          # Puma replaces pools after fork. Recompile once in the child, only
+          # after all model/scope/reflection/association facts still match.
+          # Never rebind a switched connection in the same process.
+          if valid && @process_id != Process.pid && connection.instance_of?(ActiveRecord::ConnectionAdapters::SQLite3Adapter) &&
+              connection.prepared_statements && connection.pool.db_config.configuration_hash == @database_config
+            bind_connection(connection)
+            ARRequestSites.count("#{@name}:worker_bind")
+          end
+          valid &&= connection.equal?(@connection) && connection.visitor.equal?(@visitor) && connection.prepared_statements
+        end
       end
       ARRequestSites.count("#{@name}:fallback") unless valid
       valid
