@@ -386,3 +386,168 @@ TagBuilder **already fixed upstream**, WhereClause **rejected**. No qualifying
 Rails fork branch/SHA or draft upstream PR exists. Only this survey, its
 inventory, benchmark sources and numeric evidence are delivered on the
 Lowrail `thomasklemm/rails-codegen-survey` branch.
+
+## Final bounded track: profile-driven query allocations
+
+**Reject; close the Rails track for now.** Allocation reductions alone did not
+produce the requested **1.15× YJIT** query-building improvement. This follow-up
+changes no Rails or Fizzy production code and makes no whole-request claim.
+It does not establish that all possible Active Record optimizations are exhausted.
+
+### Standalone reproduction and attribution
+
+[The standalone script](../bench/experiments/rails_query_allocations.rb) loads
+Fizzy's actual SQLite schema at the historical source pin above (SHA256
+`5417f9d264a0ad3b1423c64b7a5622bccb0dc6bee5267d5859ac99539d44aff9`)
+into an in-memory database. It defines only the associations, enum types and
+scopes needed by nine representative buckets/card-show query chains. It does
+not boot or patch Fizzy. Rails remains the measured main pin
+`5e732a78bf708e7f1d649de4b6ebf00d86daaabc`; Ruby remains master `5771bd7a3910`.
+
+The source chains come from `buckets_controller.rb:5–6`,
+`views/buckets/_bucket.html.erb:4`, `concerns/bucket_scoped.rb:7`,
+`bubbles_controller.rb:39`, `views/bubbles/show.html.erb:48–49`,
+`bubble/assignable.rb:16`, `bubble/messages.rb:5`, and
+`views/bubbles/_comments.html.erb:1–3`. The complex cards chain retains
+`where.missing(:pop)`, the published-or-own-draft OR, the association predicate,
+ordering and limit. Message scopes retain their two-column order and delegated
+type condition. Scalar identifiers are asymmetric; actual queries execute
+against rows that distinguish inaccessible buckets, other people's drafts,
+popped cards, inactive/system users and the wrong message type.
+
+This is a bounded **query-construction** study, not an HTTP replay or a complete
+page profile: authentication, saved-filter subgraphs, attachments, rendering,
+SQL execution and statement-cache lookup are outside the measured loops.
+`find`/`exists?` predicates are reproduced as fresh relations with their
+appropriate limits/projection, not claimed as measurements of those terminal
+APIs. Association proxies/base scopes are warmed and reused; each measured
+relation and its Arel are fresh. `build` stops at the relation; `arel` includes
+the deferred joins/node tree. No `.to_sql` or database work is timed.
+
+YJIT allocation attribution uses StackProf **0.2.28 object mode, interval 1**,
+500 builds/case, **zero missed samples** in all 18 cases. A separate
+ObjectSpace allocation trace, 100 builds/case with GC disabled only during
+capture, attributes inspectable objects to **allocation file:line**, rather
+than adding inclusive stack frames. The table sums one execution of each of
+the nine `arel` chains with equal weight. It is **not** a request-frequency
+weighting or a share of Bet-C CPU. ObjectSpace's inspectable, source-attributed
+objects need not equal the uninstrumented total allocation count below.
+
+| Allocation site in `activerecord/lib/` | Objects across nine chains | Interpretation / verdict |
+|---|---:|---|
+| `active_record/relation/where_clause.rb:29` | 84 | Merge result and predicate union; largest single source site. Prototype below. |
+| `active_record/relation/where_clause.rb:114` | 42 | Merge's extracted-attribute arrays, including empty clauses. Covered by the same prototype, not another extraction-loop rewrite. |
+| `active_record/relation.rb:99` | 28 | Relation copy / values duplication. Preserve independent mutable branches; no small replacement selected. |
+| `active_record/relation.rb:1342` | 25 | Public values snapshot. Removing the copy changes snapshot/aliasing behavior. |
+| `active_record/relation/predicate_builder.rb:144` | 25 | Hash expansion/flat_map. No second simple-attributes dispatch tree: #56635 was rejected for complexity without measurable speed. |
+| `active_record/relation/delegation.rb:140` | 23 | Relation-class construction. Not the earlier bmethod problem. |
+| `active_record/relation.rb:78` | 22 | Relation initialization's default values argument. Mutable relation state, not a shared literal. |
+| `arel/table.rb:91` | 22 | Attribute construction. General Arel attributes expose mutable fields; no global node cache proposed. |
+| `active_record/relation/spawn_methods.rb:47` | 21 | Merger construction. Not an allocation of a cached query result. |
+| `active_record/relation/merger.rb:164` | 21 | Empty extension forwarding; prior accepted upstream decision, below. Not prototyped. |
+| `arel/nodes/select_statement.rb:11` | 20 | Core + cores array. Together with `select_statement.rb:12`, `select_core.rb:11,16–20` and `join_source.rb:11`, the mutable SELECT skeleton accounts for 100 objects. No shared/frozen-array API change proposed. |
+| `active_record/relation/where_clause.rb:15` | 20 | Appending where clauses; broad mutable concatenation proposal already rejected in #56635. |
+| `active_record/relation/predicate_builder.rb:127` | 10 | Bind/query-attribute construction. Much smaller here than merging/lifecycle work; preserve type/mutable-value semantics. |
+
+Full site lists and all mode-specific samples are in
+[the numeric evidence](rails-query-allocations.json). StackProf frames and the
+earlier screens are retained in the query-allocation artifact bundle.
+
+### Prior work, then one prototype
+
+Open/closed issue and PR searches preceded the prototype. Existing merged
+[#59185](https://github.com/rails/rails/pull/59185),
+[#59239](https://github.com/rails/rails/pull/59239),
+[#59165](https://github.com/rails/rails/pull/59165) and
+[#59170](https://github.com/rails/rails/pull/59170) already remove the obvious
+duplicate normalization/empty-order/constant-node work. Open
+[#59212](https://github.com/rails/rails/pull/59212) already targets throwing
+away association scopes on the statement-cache reader path; this study does
+not duplicate that proposal or measure cached reader execution.
+
+Closed [#56635](https://github.com/rails/rails/pull/56635) tried a broad
+predicate fast path and mutable WHERE concatenation. Maintainer feedback says
+the complexity was not justified by throughput, while leaving room for small
+measured allocation reductions. We do not resubmit those changes. Searches
+for `merge_clauses`, WhereClause/empty/merge and having-clause allocations found
+no equivalent proposal for the experiment below; existing merge/unscope
+correctness [#53895](https://github.com/rails/rails/pull/53895) is unrelated.
+
+The second plausible site, skipping empty extension forwarding, was stopped
+at history review: [#57199](https://github.com/rails/rails/pull/57199) and
+[#57246](https://github.com/rails/rails/pull/57246) already considered this.
+Despite #57246's description mentioning a retained call-site guard, its actual
+merged diff **removes** it and puts the empty guard in `extending!` instead.
+[#58540](https://github.com/rails/rails/pull/58540) later removed unnecessary
+flatten work. We did not reverse the accepted design or prototype that site.
+
+The **only** prototype wraps the existing where/having merges in
+`Relation::Merger#merge_clauses` with a check that **both clauses are empty**.
+It leaves `from` replacement and every nonempty merge unchanged. Checking only
+the incoming clause would be wrong: the original union also deduplicates the
+existing predicates, even when the incoming clause is empty. Executed checks
+include that asymmetric duplicate-predicate case, left/right/conflicting
+conditions, `none`, nonempty HAVING and independent relation mutation.
+The overlay is research code in the standalone script, not a Rails patch.
+
+### Pinned measurements and rejection
+
+Three fresh process pairs per mode, CPU 0; middle pair reverses variant order.
+Ordinary GC, no profiler/TracePoint in timed workers; 2,000 warmup calls per
+case, five rotated 5,000-call samples. All **18 processes / 1,620 samples**
+completed and passed the executed smoke checks; all nine generated SQL
+statements match baseline. Sample durations span 23 ms–1.33 s; small timing
+differences are not strong evidence. Medians use all 15 samples per arm,
+not the best process. Cells below are **build / build+arel** throughput ratios,
+candidate divided by baseline:
+
+| Query chain | Interpreter | YJIT | ZJIT |
+|---|---:|---:|---:|
+| Buckets access join | 1.038 / 1.024 | 1.020 / 1.036 | 0.999 / 1.000 |
+| Buckets filters | 1.010 / 1.051 | 1.035 / 1.043 | 0.977 / 1.043 |
+| Buckets active cards + OR + order | 1.005 / 1.014 | **0.987 / 0.992** | 0.980 / 0.978 |
+| Card bucket access + id | 1.024 / 1.039 | 1.009 / 0.997 | 0.999 / 0.989 |
+| Card record + id | 1.045 / 1.013 | 1.004 / 1.025 | 1.007 / 0.978 |
+| Card active users | 1.018 / 1.027 | 1.017 / 1.001 | 0.988 / 0.992 |
+| Card assignment-existence relation | 1.053 / 1.035 | 0.984 / 1.005 | 0.979 / 0.986 |
+| Card ordered messages | 1.083 / 1.030 | 1.053 / 0.973 | 1.016 / 0.956 |
+| Card comments | 1.041 / 1.042 | 0.982 / 1.012 | 0.971 / 0.992 |
+
+Objects per query, **baseline → prototype**, again build / build+arel:
+
+| Query chain | Interpreter and ZJIT | YJIT |
+|---|---:|---:|
+| Buckets access join | 54→39 / 87→72 | 56→41 / 89→74 |
+| Buckets filters | 29→20 / 46→37 | 30→21 / 47→38 |
+| Buckets active cards | 183→174 / 285→276 | 186→177 / 288→279 |
+| Card bucket access + id | 69→54 / 105→90 | 72→57 / 108→93 |
+| Card record + id | 44→35 / 64→55 | 46→37 / 66→57 |
+| Card active users | 96→81 / 130→115 | 99→84 / 133→118 |
+| Card assignment relation | 66→57 / 88→79 | 68→59 / 90→81 |
+| Card ordered messages | 48→39 / 68→59 | 49→40 / 69→60 |
+| Card comments | 66→57 / 87→78 | 68→59 / 89→80 |
+
+Counts round amortized overhead below 0.003 object/call; unrounded values are
+retained. All modes save 9 or 15 objects/query. YJIT allocation reductions are
+4.8–30.0% for building and 3.1–19.1% including Arel, but its throughput is only
+**0.973–1.053×** overall. Every paired-process YJIT ratio is below 1.080×.
+Even the lowered 1.15× gate fails. No full Active Record suite, Thermos,
+production patch, fork commit/push or PR draft is warranted. The previous
+negative finding about extraction-loop fusion is separate from this result.
+
+Reproduce using the same component load paths as above:
+
+```sh
+export FIZZY_SCHEMA=/path/to/fizzy/db/schema.rb
+ruby --yjit bench/experiments/rails_query_allocations.rb profile > profile.json
+ruby --yjit bench/experiments/rails_query_allocations.rb trace > trace.json
+VARIANT=main taskset -c 0 ruby --yjit bench/experiments/rails_query_allocations.rb bench > main.json
+VARIANT=empty_clauses taskset -c 0 ruby --yjit bench/experiments/rails_query_allocations.rb bench > candidate.json
+```
+
+Repeat three process pairs with interpreter and `--zjit` as well, reversing
+the middle pair. All raw final and initial outputs are retained; no cohort
+was discarded or repeated until green. This closes the bounded Rails track
+without a candidate. The useful Lowrail direction remains specializing whole
+guarded/sealed query programs, not claiming every removable allocation buys
+request throughput.
