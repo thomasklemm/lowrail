@@ -476,11 +476,13 @@ orb numbers.
 ### Reusable orb protocol
 
 `script/rps --config CONFIG.json --output NEW_PRIVATE_DIRECTORY` supports
-the retained blog and Campfire GET fixtures. It starts production Puma
+the retained blog, Campfire, Fizzy and ruby-bench Lobsters GET fixtures. It starts production Puma
 **using the app's unchanged `config/puma.rb` and `config.ru`**, including
 Campfire's Deflater. No app config patch, server stub, response cache or
 in-process request timing. Services use `amp orb service start/stop` and are
 stopped even on a failed gate. Dedicated disposable app/DB/Redis only.
+The listener is selected by Puma's CLI (`-b tcp://127.0.0.1:PORT`), overriding
+Lobsters' upstream production Unix-socket path without changing its config.
 
 - Pinned external **oha 1.14.0**, Linux amd64 release binary SHA256
   `6fc16b5f9901fd2266b1a2b49b1689f76f91ddc7c96f2d0d08b161a870f7ef18`:
@@ -520,6 +522,18 @@ stopped even on a failed gate. Dedicated disposable app/DB/Redis only.
   DB state, async completion or the app's own suite. Timed requests have no
   validation header, seed or clock/RNG pin; their cookies come from a separate
   natural login. Public hit counters are off in every timed server.
+- Each measured server now records `post_warmup_process_metrics` (after warm
+  exact samples, before the timed load) and `post_load_process_metrics`.
+  A secret-header, untimed outer-Rack endpoint returns the serving PID,
+  `GC.stat` fields `heap_live_slots`, `old_objects`, `malloc_increase_bytes`,
+  total/minor/major collection counts, `total_allocated_objects`, GC `time`
+  in milliseconds, and RSS/high-water RSS in KiB. New HTTP connections sample
+  until every `/proc`-observed Puma worker has replied; missing workers fail
+  after ten seconds. These are per-process snapshots, not an atomic cluster
+  census, exclusive request counters, or proof of a GC cause. The tiny metrics
+  requests and background work also affect process counters; no forced GC.
+  They are outside oha's throughput/latency windows and never app GET samples.
+  Earlier baselines at `96b447f` do not contain these newly added metrics.
 
 Start with the existing native app/seed/rebuilt-artifact config, replacing
 its screening `rounds` value explicitly and adding:
@@ -538,6 +552,47 @@ For Campfire use `/rooms/486777696`, `campfire-entropy-controls.json`, the
 seed's existing secret (no blog secret override), and acknowledge the
 dedicated localhost Redis with `CAMPFIRE_DISPOSABLE_REDIS=1`.
 
+For **Fizzy**, use the existing `FizzyLinkFixture` seed (four SQLite DBs,
+`secret_key_base`, `login.json`, `vector.json`). No `path` is required: the
+default is all six entries in that vector, including `/buckets`. Natural
+`GET /session/new` → CSRF/password `POST /session` establishes real encrypted
+cookies for both exact samples and an independent native timing session.
+The default policy, `fixtures/corpus/fizzy-native-entropy.json`, is the
+unchanged existing companion (SHA256
+`190ec133a693e833e0c70a16a011bc0408677446debcf38941a2dd4d71400c6e`),
+not widened RNG/clock rules. Default bench-only block-link treatment requires
+the matching YJIT `artifact` and frozen `contexts`. Set `exploration_only: true`
+to skip **only** BlockLinkSpecimen installation for an external prototype;
+natural login and all exact checks remain mandatory.
+
+For **Lobsters**, use the shipped DB and set `gemfile` to
+`fixtures/corpus/lobsters-rps.Gemfile` (absolute path). Its original benchmark
+bundle comments out Puma: this dependency-only overlay adds **only Puma
+8.0.2** to the earlier Rails 8.1.4 / Minitest 5.27.0 overlay. No other locked
+gem changes. Overlay / lock SHA256:
+`649cc0156ca3f8a0e71d338bfdef9578e5acc8d35e29626a99c3ef72027aeebf` /
+`5ce0d79c7b151f67c30a1071bb168e412dfad4347fad4475d8fb213c22fda0f7`.
+Run `BUNDLE_GEMFILE="$PWD/fixtures/corpus/lobsters-rps.Gemfile" bundle install`
+after placing the unchanged ruby-bench tree at `.corpus/ruby-bench`.
+Default paths are `/` and `/s/enr7ye`. The existing `bfc682b`
+`LobstersNativeValidation.install` helper runs before boot, with the RPS
+policy's corresponding overlay/lock pins. **Those two dependency hashes are
+the only differences** in `lobsters-rps-entropy.json`; source, app lock,
+runtime, RNG sites and clock controls stay identical. Rack screens retain
+their original overlay/policy by default. No custom validation adapter is
+needed. Both seeds cover each actual HTTP route with the fixed request ID;
+native timed entropy stays unpinned. Its default public artifact has zero
+units: a delivery-overhead control, never a lowering win.
+
+All apps accept `paths: ["/route1", "/route2"]`; the existing single `path`
+input still works. Exact preflight and cold/warm checks visit **every route**
+in order (and both login steps where applicable), rejecting missing or extra
+workflow steps as well as byte/control differences. For multiple paths, oha
+uses `--urls-from-file`: the timed workload is an **aggregate uniform-random
+URL pool**, not the interpreter study's fixed six-GET iteration, per-route
+RPS, or a claimed production traffic mix. Run separate configs with one
+`path` for individual-route rates. Never pool the resulting different mixes.
+
 External prototypes may use the existing post-boot `exploration_setup` hook.
 An optional **external Puma setup** file is required in every arm, after the
 unchanged app Puma config is evaluated. It defines:
@@ -554,7 +609,101 @@ end
 
 Set `puma_setup` to its absolute path and list further dependencies in
 `exploration_sources`. The setup, app/Puma config, runtime, artifact, lock,
-seed and policies are hashed; any drift stops the run. Fizzy/Lobsters HTTP
-login/validation adapters are not yet implemented by this bounded first
-version; the existing Rack screen still supports them. Do not silently
-substitute unauthenticated/zero-hit HTTP routes for those studies.
+seed, contexts and policies are hashed; any drift stops the run. An exactness
+failure remains a refusal, including off/off: do not silently substitute an
+unauthenticated/zero-hit route or normalize a response to get timing data.
+
+### First real-Puma baselines: post-dispatch-fix main, ten rounds each
+
+Frozen harness
+[`96b447f`](https://github.com/thomasklemm/lowrail/commit/96b447f730fcba7e698ad76ae55c740de2fca82f),
+runtime from main
+[`cd82a5d`](https://github.com/thomasklemm/lowrail/commit/cd82a5df8aaa45c4a5b26fea3a63df39ae316650),
+including both published `view.send` dispatch fixes. Artifacts rebuilt in
+YJIT mode after those fixes; not the historical pre-fix certificates.
+Ten fresh-server rounds per app, **4 Puma workers × 1 thread**, c16,
+5-second warmups / 20-second send windows, rotated off-A/on/off-B. Blog
+then Campfire, never overlapping their load windows; no other benchmark
+workers in this orb. No discarded rounds, reruns or pooling with smoke or
+earlier Rack results. Exposed host: 8 logical CPUs / 4 cores, server CPUs
+0–3 on two exposed cores and oha CPUs 4–7 on the other two. No CPU quota;
+virtual host contention/governor/turbo are not controlled. Direct Puma,
+not the public Thruster/Docker/hardware/fixture topology.
+
+**A/A first** (paired-round RPS percentage differences, bootstrap 95%):
+
+| GET | Mean A/A Δ | A/A 95% band | Max absolute single-round spread |
+|---|---:|---:|---:|
+| Blog `/articles/1` | +0.800% | **[−0.992%, +2.763%]** | 6.738% |
+| Campfire `/rooms/486777696` | −1.404% | **[−3.674%, +1.033%]** | 7.141% |
+
+This design improves resolution relative to the Rack calibration but still
+does **not** establish ±2% RPS resolution. Do not replace the reported band
+with the smaller median absolute round difference.
+
+| GET | off-A median RPS | on median RPS | off-B median RPS | Paired on/off RPS Δ [95%] | Interpretation |
+|---|---:|---:|---:|---:|---|
+| Blog show | 1,646.06 | 1,806.34 | 1,671.43 | **+8.159% [+5.471%, +10.512%]** | Positive throughput direction beyond this A/A band; exploration only |
+| Campfire room | 257.22 | 263.60 | 259.47 | **+1.968% [−0.349%, +4.279%]** | Unresolved; no demonstrated throughput win |
+
+The paired estimate is the mean of ten within-round ratios, **not** the
+ratio of the displayed arm medians. Blog's point effect is 2.95× its A/A
+floor, just below the owner's approximate 3× screen rule. This is not a
+main-integration or README price, latency win, or broad app support claim.
+The tail latency does not uniformly improve:
+
+| App / arm | Median window p50, ms | p90, ms | p99, ms |
+|---|---:|---:|---:|
+| Blog off-A | 8.909 | 15.865 | 23.651 |
+| Blog on | 8.002 | 14.781 | 26.781 |
+| Blog off-B | 9.365 | 15.170 | 22.249 |
+| Campfire off-A | 15.205 | 220.647 | 524.385 |
+| Campfire on | 15.115 | 224.420 | 508.598 |
+| Campfire off-B | 15.339 | 233.934 | 518.749 |
+
+All **60 measured servers** and six separate coverage servers pass both
+seeds' cold Rack status/body/all-header checks; all 60 measured servers
+also pass both post-warmup seeds. Blog coverage completes 1 form / 7 token /
+1 collection unit; Campfire preserves the cold 103-hit map with two STI
+fallbacks. Public counters are off during load; all workers are production
+Ruby 4.0.7 / Rails 8.1.4 with startup YJIT, no activation refusals.
+**Zero non-200 responses or transport errors** in 1,026,181 blog and 155,668
+Campfire timed completions, plus 207,749 / 28,756 warmup completions.
+Elapsed 898.85 / 996.15 seconds respectively, including fresh server boots,
+sampling, warmups and shutdowns. These are not ten-minute screens.
+
+An independent Python audit reconciles every raw oha receipt hash, response
+count, RPS division by actual drained elapsed time, p50/p90/p99, all ten
+paired ratios, arm medians and complete two-seed cold/warm workflows.
+The [JSON appendix](native-bench.json) records `rps_baselines.blog` and
+`rps_baselines.campfire`, full rows/pins/receipt hashes. Repeated entropy
+traces are compacted to passed/errors/evidence hashes; complete private
+receipts remain pinned by their SHA256. No body/header normalization,
+own-suite run, complete DB-state gate, Thermos promotion, or hardware
+performance-counter claim. The post-warmup GC fields added subsequently
+are not retroactively invented for these frozen baselines.
+
+### HTTP adapter checks (not performance cohorts)
+
+`mise exec ruby@4.0.7 -- ruby bench/native_bench_test.rb`: **4 tests,
+64 assertions, zero failures/errors/skips**. Includes rejecting a missing
+or replaced route in either seed's exact workflow and the untimed GC endpoint.
+Two-round, c2, 1-second warmup/load CLI smokes complete on real Puma:
+
+| App | Exact GET routes | Measured servers | Warmup + timed HTTP 200s | Result |
+|---|---:|---:|---:|---|
+| Fizzy / Puma 6.5.0 | 6, including `/buckets`, plus natural login | 6 | 468 | Cold + warm exact both seeds, zero errors |
+| Lobsters / Puma 8.0.2 | `/`, `/s/enr7ye` | 6 | 1,529 | Cold + warm exact both seeds, zero errors |
+
+Every measured smoke server supplies all requested GC fields from all four
+worker PIDs both after warmup and after load. Independent Python checks
+reconcile raw oha receipts and every workflow's evidence. Original Lobsters
+Rack validation still passes with its original overlay/policy; a structural
+policy comparison confirms only the two RPS dependency hashes differ.
+These tiny smoke RPS figures are deliberately not interpreted or pooled
+with the baselines. The first Lobsters launch correctly fails before timing
+because its original bundle lacks Puma; the added dependency-only overlay
+resolves that startup failure without a source/config or entropy-rule edit.
+Private smoke result SHA256: Fizzy
+`f657bed732304f3cd95266d8456c692de6385da0bcf5049e549cf632ebec316a`;
+Lobsters `d7fd8e03163b38d1045f2f1930108d08e9a20d5d806b3c4826e72775543ac4e0`.

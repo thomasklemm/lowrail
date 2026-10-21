@@ -8,8 +8,9 @@ module LobstersNativeValidation
   POLICY = File.expand_path("../../fixtures/corpus/lobsters-native-entropy.json", __dir__)
   module_function
 
-  def install(app)
-    @control = BlogProduction::Entropy.validate(app, policy: JSON.parse(File.read(POLICY)))
+  def install(app, policy: POLICY)
+    @policy_path = policy
+    @control = BlogProduction::Entropy.validate(app, policy: JSON.parse(File.read(@policy_path)))
     raise @control.fetch("reason") unless @control.fetch("active")
     gemfile = ENV.fetch("BUNDLE_GEMFILE")
     raise "Lobsters dependency overlay mismatch" unless
@@ -21,6 +22,6 @@ module LobstersNativeValidation
   def validation_request(route:, seed:, request:)
     response, evidence = BlogProduction::Entropy.with(seed, route, requests: 1, wall_clock: true, &request)
     [response, {"passed" => evidence.fetch("errors").empty?, "control" => @control,
-      "entropy" => evidence, "policy_sha256" => Digest::SHA256.file(POLICY).hexdigest}]
+      "entropy" => evidence, "policy_sha256" => Digest::SHA256.file(@policy_path).hexdigest}]
   end
 end

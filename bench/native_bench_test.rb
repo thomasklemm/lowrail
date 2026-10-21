@@ -88,8 +88,30 @@ class NativeBenchTest < Minitest::Test
     login["headers_sha256"] = "headers"
     login.fetch("evidence")["passed"] = false
     refute NativeRps.exact_checks(rows).fetch("1").fetch("passed")
+    login.fetch("evidence")["passed"] = true
+    workflow = rows.last.fetch("samples").fetch("1").fetch("workflow")
+    route = workflow.delete("route")
+    refute NativeRps.exact_checks(rows).fetch("1").fetch("passed"), "missing route must fail"
+    workflow["different-route"] = route
+    refute NativeRps.exact_checks(rows).fetch("1").fetch("passed"), "replaced route must fail"
     rows.first.fetch("warmup")["errors"] = 3
     rows.last.fetch("timed")["errors"] = 2
     assert_equal 5, NativeRps.summary(rows).fetch("errors")
+  end
+
+  def test_http_metrics_are_untimed_process_snapshots_not_app_responses
+    app = ->(env) { [201, {}, ["ordinary response"]] }
+    wrapper = NativeRps::Samples.new(app, {"validation_key" => "test-key"}, nil)
+    assert_equal [201, {}, ["ordinary response"]], wrapper.call({})
+    assert_equal [201, {}, ["ordinary response"]], wrapper.call({"HTTP_X_LOWRAIL_METRICS" => "wrong-key"})
+    status, headers, body = wrapper.call({"HTTP_X_LOWRAIL_METRICS" => "test-key"})
+    assert_equal 200, status
+    assert_equal "application/json", headers.fetch("content-type")
+    snapshot = JSON.parse(body.join)
+    assert_equal Process.pid, snapshot.fetch("pid")
+    %w[heap_live_slots old_objects malloc_increase_bytes count minor_gc_count major_gc_count total_allocated_objects time].each do |field|
+      assert_kind_of Integer, snapshot.fetch("gc").fetch(field)
+    end
+    assert_operator snapshot.fetch("rss").fetch("VmRSS"), :>, 0
   end
 end
