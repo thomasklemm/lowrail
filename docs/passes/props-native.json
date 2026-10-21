@@ -1,0 +1,252 @@
+{
+  "measured": false,
+  "base_commit": "4b38be7e7973d22519f1d1201aa14c0d9e18955c",
+  "caveat": "Operation census only, not an Ir attribution or a speed result. Native binary hashes are orb-specific.",
+  "source_sha256": {
+    "gem/ext/lowrail_native/lowrail_native.c": "c6d69bf723c3f5c942d3ea1ebfbebe8ce17978b57fca86b2bd3338a7f70c2b10",
+    "gem/ext/lowrail_native/extconf.rb": "6835f5e878f1710e3c0e0e31bee97bd9b45fdf18710c36896a305d763ca01e20"
+  },
+  "native_binary_sha256": {
+    "4.0.7": "38f0f5b540a44e7e1c2597b04d0664b2e5ca194b65e736c50a1e506517a34f6a",
+    "4.1.0-preview1": "956dd758c2970ebba428365d87bd9832ee45affa423f6149656520e030972169"
+  },
+  "census": [
+    {
+      "group": "props_native",
+      "arm": "checks_original",
+      "guard_valid": true,
+      "operation_source": "::InertiaRails::PropsResolver.new({left: 11, right: {name: \"asymmetric\", age: 37}, list: [2, 5], empty: {}, flag: false}, evaluator: @evaluator).resolve",
+      "activation_delta": null,
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "operations": 1,
+      "entries": 2,
+      "authorizations": 2,
+      "c_calls": {
+        "BasicObject#equal?": 4,
+        "Hash#[]": 2,
+        "#<Class:Lowrail::Guard>#state": 2,
+        "Array#[]": 2,
+        "UnboundMethod#bind_call": 12,
+        "Kernel#singleton_class": 2,
+        "Module#public_method_defined?": 4,
+        "Module#instance_method": 4,
+        "UnboundMethod#==": 4
+      },
+      "measured": false
+    },
+    {
+      "group": "props_native",
+      "arm": "native_checks_original",
+      "guard_valid": true,
+      "operation_source": "::InertiaRails::PropsResolver.new({left: 11, right: {name: \"asymmetric\", age: 37}, list: [2, 5], empty: {}, flag: false}, evaluator: @evaluator).resolve",
+      "activation_delta": null,
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "operations": 1,
+      "entries": 2,
+      "authorizations": 2,
+      "c_calls": {
+        "BasicObject#equal?": 2,
+        "Hash#[]": 2,
+        "#<Class:Lowrail::Guard>#state": 2,
+        "Array#[]": 2,
+        "#<Class:Lowrail::Native>#plain_hash_iteration?": 2
+      },
+      "measured": false
+    },
+    {
+      "group": "props_native",
+      "arm": "checks_original",
+      "guard_valid": true,
+      "operation_source": "::InertiaRails::PropsResolver.new({left: 11, right: {name: \"asymmetric\", age: 37}, list: [2, 5], empty: {}, flag: false}, evaluator: @evaluator).resolve",
+      "activation_delta": null,
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "operations": 1,
+      "entries": 2,
+      "authorizations": 2,
+      "c_calls": {
+        "BasicObject#equal?": 4,
+        "Hash#[]": 2,
+        "#<Class:Lowrail::Guard>#state": 2,
+        "Array#[]": 2,
+        "UnboundMethod#bind_call": 12,
+        "Kernel#singleton_class": 2,
+        "Module#public_method_defined?": 4,
+        "Module#instance_method": 4,
+        "UnboundMethod#==": 4
+      },
+      "measured": false
+    },
+    {
+      "group": "props_native",
+      "arm": "native_checks_original",
+      "guard_valid": true,
+      "operation_source": "::InertiaRails::PropsResolver.new({left: 11, right: {name: \"asymmetric\", age: 37}, list: [2, 5], empty: {}, flag: false}, evaluator: @evaluator).resolve",
+      "activation_delta": null,
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "operations": 1,
+      "entries": 2,
+      "authorizations": 2,
+      "c_calls": {
+        "BasicObject#equal?": 2,
+        "Hash#[]": 2,
+        "#<Class:Lowrail::Guard>#state": 2,
+        "Array#[]": 2,
+        "#<Class:Lowrail::Native>#plain_hash_iteration?": 2
+      },
+      "measured": false
+    }
+  ],
+  "liveness": [
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "arm": "checks_original",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "arm": "each",
+      "guard_valid": true,
+      "hits": {},
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "arm": "native_checks_original",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "arm": "native_split",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "arm": "original",
+      "guard_valid": true,
+      "hits": {},
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "arm": "split",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "arm": "checks_original",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "arm": "each",
+      "guard_valid": true,
+      "hits": {},
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "arm": "native_checks_original",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "arm": "native_split",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "arm": "original",
+      "guard_valid": true,
+      "hits": {},
+      "fallbacks": {},
+      "pass": true
+    },
+    {
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "arm": "split",
+      "guard_valid": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true
+    }
+  ],
+  "lifetime": [
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "cases": 478,
+      "actual_jit": [
+        "interpreter"
+      ],
+      "shapes": [
+        "native_split",
+        "native_checks_original"
+      ],
+      "measured": false
+    },
+    {
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "cases": 478,
+      "actual_jit": [
+        "interpreter"
+      ],
+      "shapes": [
+        "native_split",
+        "native_checks_original"
+      ],
+      "measured": false
+    }
+  ],
+  "lifetime_sources_sha256": {
+    "bench/experiments/props_variant.rb": "e6be6f9060798195719536e3dab348ed6359f8bfaf88630a97530ba350ddcbeb",
+    "gem/test/inertia_props_test.rb": "9a7a5e30b8d6c9a697e6b0e411dc4d482d1168dbcae01857090eb41392cf0869",
+    "gem/lib/lowrail/inertia_props.rb": "2063023df8f23ef89c46abdfa448693166efdb1c5c0eb1d0546f64ffae4d8259",
+    "gem/lib/lowrail/inertia_props_build.rb": "15eae72432076a3b8f567737ac9e26d074ac152b5f10b174ad42a2833ce422e5",
+    "gem/lib/lowrail/guard.rb": "189ad92f5963f57bdd4d0528fbc9a4fcb2ae15db2e1aa2666210f4b86a74f3fc",
+    "gem/lib/lowrail/manifest.rb": "47da0de0660452d77d278b813bba25b5ed77c8ab4786db3814955c479faac31f",
+    "gem/lib/lowrail/stats.rb": "d1a7924403ddc296abab4fdd85ef8b18428d8a0632bab9a32d3e2683b6f0a311",
+    "gem/ext/lowrail_native/lowrail_native.c": "c6d69bf723c3f5c942d3ea1ebfbebe8ce17978b57fca86b2bd3338a7f70c2b10",
+    "gem/ext/lowrail_native/extconf.rb": "6835f5e878f1710e3c0e0e31bee97bd9b45fdf18710c36896a305d763ca01e20",
+    "gem/lib/lowrail/native/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/lowrail_native.so": "38f0f5b540a44e7e1c2597b04d0664b2e5ca194b65e736c50a1e506517a34f6a",
+    "gem/lib/lowrail/native/ruby-4.1.0-2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1-x86_64-linux/lowrail_native.so": "956dd758c2970ebba428365d87bd9832ee45affa423f6149656520e030972169"
+  }
+}

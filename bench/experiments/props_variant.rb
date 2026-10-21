@@ -7,6 +7,19 @@
 require "prism"
 
 module PropsVariant
+  # Pricing only: keep artifact/unit/main-Ractor admission and every recursive
+  # entry check. Replace only the actual-receiver reflection, not its lifetime.
+  def self.valid_native?(id, props)
+    return false unless ::Ractor.current.equal?(::Ractor.main)
+    ok = ::Lowrail::Passes::InertiaProps.active?(id) &&
+      (::Lowrail::Guard.state[id] || (::Lowrail::Guard.state[id] = ::Lowrail::Guard.validate(id))) &&
+      ::Lowrail::Native.plain_hash_iteration?(props)
+    ::Lowrail::Stats.count(id, !!ok) if defined?(::Lowrail::Stats) && ::Lowrail::Stats.enabled?
+    ok
+  rescue TypeError, NameError
+    false
+  end
+
   def self.source(original, shape:, id: 0)
     nodes = Lowrail::InertiaPropsBuild::Definitions.new
     Prism.parse(original).value.accept(nodes)
@@ -16,6 +29,10 @@ module PropsVariant
     header = definition.lines.first.chomp
     body = node.body.location.slice
     guard = "::Lowrail::Passes::InertiaProps.valid?(#{Integer(id)}, props)"
+    if shape.start_with?("native_")
+      guard = "::PropsVariant.valid_native?(#{Integer(id)}, props)"
+      shape = shape.delete_prefix("native_")
+    end
     replacement = case shape
     when "split"
       raise "fallback name collision" if original.include?("deep_transform_props_lowrail_original")
@@ -55,13 +72,16 @@ if $PROGRAM_NAME == __FILE__
   require "digest"
   require_relative "../jit_stability"
   mode, out = ARGV
-  abort "usage: props_variant.rb --check NEW_OUTDIR (BENCH_JIT=0|1)" unless mode == "--check" && out
+  abort "usage: props_variant.rb --check|--check-native NEW_OUTDIR (BENCH_JIT=0|1)" unless %w[--check --check-native].include?(mode) && out
+  shapes = mode == "--check-native" ? %w[native_split native_checks_original] : %w[split checks_original]
   out = File.expand_path(out)
   raise "output must be new" if File.exist?(out)
   FileUtils.mkdir_p(out, mode: 0o700)
   fixture_path = File.expand_path("../../gem/test/inertia_props_test.rb", __dir__)
   sources = [File.expand_path(__FILE__), fixture_path,
-    *Dir[File.expand_path("../../gem/lib/lowrail/{inertia_props*,guard,manifest,stats}.rb", __dir__)]
+    *Dir[File.expand_path("../../gem/lib/lowrail/{inertia_props*,guard,manifest,stats}.rb", __dir__)],
+    *Dir[File.expand_path("../../gem/ext/lowrail_native/*.{c,rb}", __dir__)],
+    *Dir[File.expand_path("../../gem/lib/lowrail/native/**/*.{so,bundle,dll}", __dir__)]
   ].to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
   fixture = File.read(fixture_path)
     .split("SCENARIO = <<~'RUBY'\n", 2).fetch(1).split("\n  RUBY", 2).first
@@ -135,7 +155,7 @@ if $PROGRAM_NAME == __FILE__
     cases.each_with_index do |condition, index|
       env = base.merge(condition)
       plain = run.call(env.merge("PLAIN" => "1"), "#{version}-#{index}-original")
-      %w[split checks_original].each do |shape|
+      shapes.each do |shape|
         actual = run.call(env.merge("PROPS_VARIANT" => shape), "#{version}-#{index}-#{shape}")
         keys = condition["RACTOR"] ? %w[result] : %w[result later calls controls mutations]
         keys.each { |key| raise "#{version}/#{condition}/#{shape}/#{key}" unless actual.fetch(key) == plain.fetch(key) }
@@ -163,7 +183,7 @@ if $PROGRAM_NAME == __FILE__
   end
   raise "specimen sources changed" unless sources.all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha }
   File.write(File.join(out, "verdict.json"), JSON.pretty_generate(ruby: RUBY_DESCRIPTION,
-    requested_jit: JitStability.mode, actual_jit: modes.uniq, sources: sources,
+    requested_jit: JitStability.mode, actual_jit: modes.uniq, shapes: shapes, sources: sources,
     cases: records.size, records: records, measured: false))
   puts "#{records.size} props variant cases passed (#{modes.uniq.join(', ')}); no measured cohort"
 end

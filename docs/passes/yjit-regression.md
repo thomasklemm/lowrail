@@ -584,6 +584,11 @@ measured saving. The earlier `public_method`/`unbind` shortcut can execute
 `respond_to_missing?` and is not an exact replacement. No freezing app inputs,
 weakened guards, runtime extension or new pricing run follows from this note.
 
+**Separately requested follow-up:** [native props predicate preparation](props-native.md)
+now implements the narrow non-callback query and records both-Ruby witnesses
+and an untimed operation census. It does not integrate the primitive into
+production props, price its remaining cost, or revise either cohort above.
+
 ### Admission-factory audit since format 2
 
 Exact searches of `bench/` manifest constructors/writers/readers and the

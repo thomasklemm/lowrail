@@ -181,10 +181,33 @@ request result or production reflection/delivery certificate.
 
 The earlier format-1 cohort remains **invalid fallback/incomplete-check
 pricing**, not a second accepted fast-path loss and not rescored. No guard is
-weakened and the existing opt-in pass is unchanged. A VM-owned non-callback
-dispatch certificate is a backlog question only, not an implementation or
-priced alternative. Config-bind YJIT stays on hold until its measurement
+weakened and the existing opt-in pass is unchanged. At this decision a VM-owned
+non-callback dispatch certificate was a backlog question only; the separately
+requested native preparation below does not revise this price. Config-bind
+YJIT stays on hold until its measurement
 method is accepted. [Pins, paired estimates, controls and backlog boundary](passes/yjit-regression.md#corrected-interpreter-pricing-stop-at-price).
+
+## Props native dispatch: witness and census before price (2026-10-21)
+
+Add `Lowrail::Native.plain_hash_iteration?` beside the optional actual-class
+primitive, **without production props integration**. It checks the actual
+ordinary Hash class, both iterator BASIC definitions and public visibility
+on every call, without Ruby callbacks or eigenclass materialization. Keep
+the outer main-Ractor, source/unit/fact admission and every recursive-entry
+check in the pricing specimen. The extension remains Ractor-unsafe, loads
+in both arms, and needs fresh native binaries/artifacts after this addition.
+
+Both Ruby targets witness overrides, visibility, suppressed hooks, aliases,
+undef, refinements and mid-traversal mutation; extra conservative refusals
+are documented. The untimed whole-resolver census replaces twelve reflective
+bind_call entries, four method comparisons and two class comparisons with
+two native predicate calls; outer admission remains. This is **not** a
+measured fraction of the old 30,483 Ir check cost. The undocumented MRI
+visibility API is feature-detected and version-witnessed, not a generic VM
+portability claim. No speed claim or new Callgrind cohort yet: request a
+separate finite interpreter price after the untimed gates and worker release.
+The old ordinary-def stop and invalid fallback cohort remain unchanged.
+[Boundary, refusals, census and reproduction](passes/props-native.md).
 
 ## Relocatable delivery (2026-10-20)
 

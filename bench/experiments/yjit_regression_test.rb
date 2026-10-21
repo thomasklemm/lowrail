@@ -11,14 +11,14 @@ require_relative "../../gem/lib/lowrail"
 class YjitRegressionTest < Minitest::Test
   SCRIPT = File.expand_path("yjit_regression.rb", __dir__)
 
-  def run_arm(arm, mode: "interpreter", prefix: "", worker: false)
+  def run_arm(arm, mode: "interpreter", prefix: "", worker: false, group: "props_variant")
     env = %w[RUBYOPT RUBY_YJIT_ENABLE RUBY_ZJIT_ENABLE LOWRAIL_STATS LOWRAIL_OUTCOMES LOWRAIL_UNITS
       LOWRAIL_JIT_DIAGNOSTICS YJIT_DIAG_LIVENESS].to_h { [_1, nil] }
     env["BENCH_JIT"] = mode
     # A missing counter extension is intentional: all exercised paths are
     # native admission probes or refusal BEFORE any measurement machinery.
     env["BENCH_CALLGRIND_EXTENSION"] = "/no-measured-window-permitted"
-    code = "#{prefix}\nARGV.replace([#{(worker ? '--worker' : '--liveness').dump}, 'props_variant', #{arm.dump}]); load #{SCRIPT.dump}"
+    code = "#{prefix}\nARGV.replace([#{(worker ? '--worker' : '--liveness').dump}, #{group.dump}, #{arm.dump}]); load #{SCRIPT.dump}"
     Open3.capture3(env, RbConfig.ruby, *JitStability.flags(mode),
       "-I#{File.expand_path('../../gem/lib', __dir__)}", "-e", code)
   end
@@ -58,6 +58,30 @@ class YjitRegressionTest < Minitest::Test
     assert_empty stdout
     assert_includes stderr, "micro artifact refused: unsupported manifest format"
     refute_includes stderr, "no-measured-window-permitted"
+  end
+
+  def test_native_pricing_requires_positive_native_authorizations
+    %w[native_split native_checks_original].each do |arm|
+      stdout, stderr, status = run_arm(arm, group: "props_native")
+      assert status.success?, stderr
+      result = JSON.parse(stdout)
+      assert result.fetch("guard_valid")
+      assert_equal({"0" => 20}, result.fetch("hits"))
+      assert_empty result.fetch("fallbacks")
+      assert result.fetch("pass")
+
+      stdout, stderr, status = run_arm(arm, group: "props_native", prefix: <<~RUBY)
+        require #{File.expand_path('../../gem/lib/lowrail', __dir__).dump}
+        Lowrail::Native.define_singleton_method(:plain_hash_iteration?) { |object| false }
+      RUBY
+      refute status.success?
+      assert_includes stderr, "untimed liveness failed"
+      result = JSON.parse(stdout)
+      assert result.fetch("guard_valid")
+      assert_empty result.fetch("hits")
+      assert_equal({"0" => 20}, result.fetch("fallbacks"))
+      refute result.fetch("pass")
+    end
   end
 
   def test_original_only_emission_cannot_pass_as_an_authorized_candidate
