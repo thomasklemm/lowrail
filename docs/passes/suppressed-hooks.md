@@ -133,11 +133,48 @@ frozen before format-2 integration; both full gem suites and Cargo then test
 the integrated publication tree. No claim about the unpublished TracePoint
 fix or a newly priced sealed runtime follows from these gates.
 
-The same frozen app driver is still completing default and all-opt-in controls
-for CASA, Writebook, Fizzy and CodeTriage. CASA default ordinary **2,992** and
+At publication the frozen app driver was still completing default and
+all-opt-in controls for CASA, Writebook, Fizzy and CodeTriage. CASA default ordinary **2,992** and
 browser **769** outcomes pass; own-thread SQL agrees after symmetric controls
 (47/5 unstable-query identities and 8 unstable load entries remain advisory).
 CASA all-opt-in ordinary also passes. All CASA manifests/maps are empty.
-Remaining browser/compat results are **pending**, not passed or silently skipped;
-their completion will be recorded separately. This early publication releases
+Remaining browser/compat results were **pending**, not passed or silently skipped;
+their completion is recorded below. This early publication released
 the six registry flags for dependent sealed/activation work, not a promotion.
+
+### Final compatibility controls (2026-10-21)
+
+That same sequential driver has now finished, without changing its frozen
+runtime, selections, seed or fixtures. Every default/all-opt-in manifest has
+**zero units**, and every hit/fallback map is `{}`. These are original-only
+setup/delivery controls, not accelerated support or pricing. SQL agreement
+below is per test after the verifier's symmetric same-mode controls, not an
+inference from equal totals. Raw query counts are retained where they differ.
+
+| App / suite | Off/on outcomes, both selections | Own-thread SQL default / all-opt-in | Strict load gate default / all-opt-in | Remaining advisories |
+|---|---|---|---|---|
+| CASA ordinary | 2,971 pass + 21 pending, identical | 126,101 off / 126,103 on; 126,103 each opt-in; controlled identities agree | pass / pass, 0 stable differences | 47 / 90 unstable SQL identities; 8 unstable load entries each |
+| CASA browser | 769 pass, identical | 62,268 each, both selections | pass / pass, 0 stable differences | 5 unstable SQL identities, 8 unstable loads each |
+| Writebook ordinary | 119 pass, identical | 8,028 each, both selections | pass / pass, 0 stable differences | 0 unstable SQL identities, 8 unstable loads each |
+| Writebook browser | 2 pass, identical | 217 each, both selections | pass / pass, 0 stable differences | 0 unstable SQL identities, 8 unstable loads each |
+| Fizzy ordinary | **117 pass + 7 errors**, identical | 5,322 each, both selections | pass / **refused, 18 stable differences** | 0 unstable SQL identities, 8 unstable loads each; baseline remains red |
+| CodeTriage ordinary | 222 pass, identical | 2,871 each, both selections | pass / pass, 0 stable differences | 2 / 3 unstable SQL identities; 24 unstable loads each |
+
+Fizzy's seven errors are `Current.reset_all` on an instance, originating at
+`test/test_helpers/session_test_helper.rb:22`, in both off/on and their
+same-mode controls. Default verify exits zero because the error identities
+agree; that is **not a green app baseline**. All-opt-in additionally exits
+one on its strict load gate: 18 surviving differences reorder load events
+349–357 (including `active_job_arguments`, `QrCodeLink`, `ApplicationJob` and
+`Turbo::Streams::BroadcastStreamJob`). Its per-test outcomes and own-thread
+SQL still agree, and no pass is selected. The verifier labels this a
+setup/source-delivery or combined-pass boundary; no individual culprit is
+proved. The archived manifest embedded in that report is **format 1, files
+`{}`, units `[]`, passes `{}`**: this is already post-quarantine, but before
+format-2 and the later tracing/loader changes. Do not relabel it as an active
+AR/config-pass experiment or attribute it to a single later change. Do not
+suppress the load differences, retry until green or claim Fizzy support.
+Redprints' earlier strict-load refusal also remains red.
+
+No compatibility result is pending now. These historical controls do not
+validate the later production TracePoint changes or any sealed acceleration.
