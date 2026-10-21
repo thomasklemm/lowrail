@@ -25,7 +25,7 @@ upgrade without being an exact Lowrail replacement relative to 8.1.4.
 | `empty?` | Both bodies call it first and preserve its truthiness/early return. It may run app code before any later check; do not assume it is native or nonmutating. |
 | Actual receiver `ascii_only?` and `getbyte` | **No.** Newly observable dynamic calls, including subclasses/singletons/private methods and exceptions. Replacing the containing method's ISeq does not make these native. Captured native calls would instead bypass overrides; that is another behavior change. |
 | `String::BLANK_RE` | **No.** The regexp literal is frozen, but its constant binding is not. Both definitions resolve it live; only the old body does so for nonempty ASCII. Delivering it in the same file does not prohibit later replacement. |
-| `Regexp#match?` and regexp policy | **No.** A frozen regexp does not freeze its class method table. The old ASCII path invokes it; the new path does not. Wrappers/events and exceptions are observable. Global/per-regexp timeout policy also needs consideration; the probe does not claim a quantified timeout difference. |
+| `Regexp#match?` and regexp policy | **No.** A frozen regexp does not freeze its class method table. The old ASCII path invokes it; the new path does not. Wrappers/events and timeout exceptions are observable. Both global and per-Regexp timeouts need independent nil checks; the reproduced counterexamples below use ordinary native Strings. |
 | `String::ENCODED_BLANKS`, `Concurrent::Map#[]`, default block | Mutable map, not a frozen constant value. Non-ASCII fallback retains the live lookup; it depends on current `encoding` dispatch and encoding compatibility errors. No certificate may replace it by a boot snapshot. |
 | `Regexp.new`, `BLANK_RE.source/options`, String `encode`, `Regexp::FIXEDENCODING`, `Encoding::CompatibilityError` | Live dependencies of the retained map/default/rescue path. Same source establishes the initial definitions, not immutability. Callback changes before/during that path must remain observable. |
 | Integer comparisons, equality and `+` in the new byte loop | New Ruby method-dispatch dependencies. Native results alone do not certify unmodified Integer operations. |
@@ -95,6 +95,54 @@ input path unless the contract actually certifies them. Encoding-map cache
 population remains live and needs an explicit policy, not an indiscriminate
 freeze of that working framework cache. The [main report](next-levers.md#sealed-candidate-3-not-a-guardless-backport)
 records the sequence; no new delivery tier is proposed.
+
+### Timeout policy: refuse, including in sealed mode
+
+Further probes on **both 4.0.7 and 4.1-preview1** hold a timeout policy fixed
+before either body runs. With global `Regexp.timeout = 0.000001`, one million
+ASCII spaces make 8.1.4 raise `Regexp::TimeoutError` while main returns true;
+replacing the final space by `x` makes old raise/main return false. The same
+disagreement occurs at 0.001 seconds on 4.0.7. Nil-timeout controls agree.
+There is no subclass override or post-seal mutation to excuse. Ordinary
+exceptions are not excluded by SEAL009.
+
+Global nil alone is insufficient: with it nil, a **frozen** replacement
+`BLANK_RE` with identical source/options but `timeout: 0.000001` gives the
+same old-exception/new-true result on both Rubies. A Regexp's local timeout
+is set at creation; neither target exposes an instance `timeout=` setter.
+The audit retains these three timeout counterexamples permanently.
+
+Decision: **build refusal**, not a second old-body path. Certify native getter
+identities and require global `Regexp.timeout.nil?`, `BLANK_RE.timeout.nil?`
+and nil local timeouts on every already-cached `ENCODED_BLANKS` Regexp, with
+the original map/default factory so future entries preserve that policy.
+Do not disable an app's timeout to manufacture eligibility or a benchmark.
+
+Post-seal policy remains a separate gap. `memo/uri_join` calls a captured
+native global timeout getter **on every entry**, so nil → nonnil resumes the
+original operation even without an invalidation hook. That is a live runtime
+check, not seal detection. The proposed wrapper-free blank body has no such
+check. With `Regexp` and `String` explicitly inventoried, a public
+`Seal.install` / `activate` / test checkpoint probe sets the global timeout
+after sealing and observes **epoch 0 → 0, empty ledger** on both targets.
+The current detector neither traces this setter nor snapshots its value.
+Record this as an additional **SEAL005/008 policy-detection gap**, not a
+passed certificate. Closing it must retain all existing nil/refusal and
+subclass/constant/regexp/encoding boundaries.
+
+Actual boot observations, Ruby 4.0.7, lowering off (not support claims):
+
+| Apps / boot environment | Global timeout | `BLANK_RE.timeout` | Cached encoded regexps |
+|---|---|---|---|
+| Blog, Campfire, PingCRM, Redprints, Starter / production | **1.0 s each** | nil each | empty where inspected (Campfire/PingCRM/Redprints/Starter) |
+| CASA, Fizzy, CodeTriage / test | **1.0 s each** | nil each | empty |
+| Writebook / test | nil | nil | empty |
+
+These are real `config/environment` boots; CASA explicitly uses the overlay's
+Ruby 4.0.7 rather than its stale 4.0.6 mise pin. The four compatibility rows
+are test-environment facts only, not production certificates. In particular,
+the priced blog show is **ineligible under the nil-global-timeout refusal**.
+No new request cohort starts and no Lowrail request saving is credited.
 
 Reproduce with the pinned main file downloaded to a scratch path:
 

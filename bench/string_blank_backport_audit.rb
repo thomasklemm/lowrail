@@ -106,6 +106,28 @@ String.const_set(:BLANK_RE, /\Anever\z/)
 probes[:replaced_blank_re] = [original, candidate].map { outcome(_1, " ") }
 String.send(:remove_const, :BLANK_RE)
 String.const_set(:BLANK_RE, regexp)
+begin
+  # Already-existing policy, ordinary native Strings: no suppressed hook or
+  # post-seal method/constant mutation can explain away a skipped exception.
+  timeout = Regexp.timeout
+  Regexp.timeout = 0.000001
+  [" " * 1_000_000, " " * 999_999 + "x"].each_with_index do |text, i|
+    probes["preexisting_timeout_#{i}"] = [original, candidate].map { outcome(_1, text) }
+  end
+ensure
+  Regexp.timeout = timeout
+end
+begin
+  timeout = Regexp.timeout
+  Regexp.timeout = nil
+  String.send(:remove_const, :BLANK_RE)
+  String.const_set(:BLANK_RE, Regexp.new(regexp.source, regexp.options, timeout: 0.000001).freeze)
+  probes[:preexisting_regexp_timeout] = [original, candidate].map { outcome(_1, " " * 1_000_000) }
+ensure
+  String.send(:remove_const, :BLANK_RE)
+  String.const_set(:BLANK_RE, regexp)
+  Regexp.timeout = timeout
+end
 events = []
 saved_match = Regexp.instance_method(:match?)
 Regexp.define_singleton_method(:method_added) { |_| }

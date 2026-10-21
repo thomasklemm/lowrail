@@ -192,6 +192,18 @@ subclass-only scan misses those. No eigenclass creation is needed to inspect
 an existing effective method through captured native reflection. New unknown
 receivers must stay original unless the contract/certificate covers them.
 
+**Timeout refusal also applies to sealed mode.** Native million-byte ASCII
+inputs reproduce old `Regexp::TimeoutError` versus main true/false on both
+Ruby targets under a preexisting global timeout; a frozen same-source Regexp
+with a local timeout reproduces it even with global nil. Require independent
+nil checks on global policy, `BLANK_RE` and cached encoding regexps; do not
+disable timeout policy or add a second old-body path. The current seal
+detector misses a post-seal global setter (epoch 0 → 0, empty ledger), whereas
+URI memo performs a live per-call check. This is a recorded SEAL005/008 gap.
+All five core apps actually boot production with global timeout **1.0 s**,
+so the proposed refusal excludes the priced blog workload. The micro budget
+is not an eligible request win; see the [facts and probes](string-blank.md#timeout-policy-refuse-including-in-sealed-mode).
+
 Build only **after** the central production TracePoint fix, the six additional
 sealed-only quarantines, and the sealed owner's published generic eligibility
 boundary. Reuse that tier/manifest mechanism; do not invent a third delivery
@@ -243,8 +255,9 @@ warmup removes its one-time allocation; the equality threshold was not widened.
    Lowrail guard. The interpreter show opportunity is about 1.36% before a
    hypothetical Lowrail certificate, not the entire 2.88% self share. Keep
    the guarded Lowrail budget at zero until the full certificate is priced;
-   the guardless design is refused. Candidate #3 may proceed only under the
-   sealed prerequisites and seal-time override refusals above.
+   the guardless design is refused. Candidate #3 additionally needs nil-timeout
+   eligibility and policy detection; the actual five production app policies
+   currently refuse it. Do not change those policies to create a win.
 2. **Config bind is the second sealed candidate, but hold promotion and
    deployment.** Its measured interpreter benefit already includes the
    existing checks; the missing suppressed-hook certificate would add cost
