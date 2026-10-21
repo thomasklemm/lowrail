@@ -25,7 +25,7 @@ remain diagnostics rather than invented RBS constants. Blog and Wikino parse
 and validate with RBS; this is tooling, not lowering support or speed evidence.
 [Contract and bounded checks](types.md#rbs-output).
 
-## Proposed sealed verification: external production scenarios (2026-10-21)
+## Sealed verification: external production scenarios, first slice rejected (2026-10-21)
 
 The two-example production probes are not whole-suite active coverage. Compare
 suite-derived production replay, a separately certified production/test seam
@@ -33,9 +33,14 @@ and an external scenario driver. Recommend the driver with isolated state,
 real request/job workers, original behavioral assertions, exact effects,
 strict loads and per-unit hit/refusal accounting. A replay cannot prove all
 inputs or close mid-request certification gaps. Keep production admission,
-Bundlebun refusal and existing verify gates unchanged. **Proposal only: no
-runner, test bypass or new gate implemented**, pending design acceptance.
-[Trade-offs, costs and bounded first step](sealed-verification.md).
+Bundlebun refusal and existing verify gates unchanged. **Option C accepted**;
+the first two-GET blog Rack-boundary runner restores four databases and runs
+sequential production/YJIT off/off/on workers, outside the test runtime.
+Its raw off/off comparison rejects natural response entropy; no exclusions
+or support claim. Retain the cold 14-off/3-on SQL and extra load-hook findings,
+and the unattributed form-inventory refusal. Wider request/job replay and
+visible pinned entropy companions remain follow-ups, not implemented gates.
+[Trade-offs, results, hits/refusals and explicit uncovered IDs](sealed-verification.md).
 
 ## One read-only explanation surface (2026-10-21)
 

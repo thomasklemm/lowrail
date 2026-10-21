@@ -1,7 +1,8 @@
-# Verifying sealed production behavior — proposal
+# Verifying sealed production behavior
 
-2026-10-21. **Design only; no runner, admission change or new gate implemented.**
-No measured cohorts. Recommendation: run suite-derived behavioral scenarios
+2026-10-21. **Option C accepted; bounded blog slice implemented below.**
+The wider request/job design remains a proposal, not a new admission gate.
+No measured cohorts. Run suite-derived behavioral scenarios
 through an **external driver against cold, real production off/on processes**.
 Use captured replay where it is faithful, adapters where the suite depends
 on process-local test machinery, and an explicit uncovered ledger everywhere
@@ -219,7 +220,7 @@ restore, failed capture controls, missing worker reports or an empty scenario
 set must not yield a passing sealed-coverage headline. Coverage is always
 unit-and-scenario-specific, not “all gems supported.”
 
-Suggested first implementation scope, **not authorization here**: the blog's
+Suggested wider implementation scope, **not implemented by the two-GET slice**: the blog's
 entire mapped controller/request behavior (create/invalid create/show/edit/
 update/invalid update/destroy, comments, redirects, validation errors and
 form/security round trips), plus its queued broadcast jobs. Carry every
@@ -228,3 +229,132 @@ by those scenarios. Prove the harness detects an altered response, changed bind
 value, lost/duplicated job/effect, real load reorder and zero-hit activation
 refusal. Only then expand to Wikino/RubyToolbox and framework-specific queues.
 Do not start performance measurements as part of this correctness work.
+
+## First blog slice: raw comparison rejected (2026-10-21)
+
+Run from the Lowrail checkout, with Ruby 4.0.7 and a release CLI:
+
+```sh
+mise exec -- ruby script/blog-production-verify run \
+  .corpus/real-blog-r4 .lowrail/private/blog-production-NEW
+```
+
+The output directory must not exist. The runner copies the app, **not its
+databases**, into a private disposable directory. It prepares all four stock
+SQLite schemas and two articles/comments from the suite's YAML fixtures,
+with explicit IDs and committed fixture timestamps (not a clock stub).
+It builds one sealed artifact with `--env production --jit yjit`, then restores
+the same closed primary/cache/queue/cable database snapshot before each of
+three **sequential cold workers: off1, off2, on**. Bootsnap tmp caches are
+removed before each worker. Each worker starts with `--yjit`, real production
+initialization/middleware and the normal production adapters. No Minitest,
+RSpec, outcome reporter, time/random stub or foreign-repository edit is used.
+
+This is a **Rack boundary**, not a Puma/HTTP transport test: the external
+driver runs the assertions after each worker has executed the two GETs using
+`Rack::MockRequest`. Index is cold; show follows it in the same process.
+No writes, background job drain, browser/JS, streaming or external-service
+claim. SQL from other threads during requests is labeled, not silently merged
+into own-thread SQL; background work outside those windows is uncovered.
+
+The report preserves status, all headers, body bytes/encoding, ordered actual
+SQL and already-cast bind **values**, cache/row counts and request/other-thread
+origin. It does not recast binds or invoke a lazy cached-bind Proc; unavailable
+capture is a rejection. Logical snapshots include all four database schemas,
+table rows, sequences and non-DB storage-file hashes. Cold/scenario load
+censuses reuse `VerifyLoads`; actual `$LOADED_FEATURES` order is also compared,
+excluding only Lowrail's own runtime files. The shared setup/observers are
+declared: a true no-gem observer-transparency control remains missing.
+
+`report.json` lists source/lock/artifact/snapshot hashes, original test IDs,
+oracles, every unit's per-scenario hits/fallbacks, runtime refusals, JIT modes,
+uncovered IDs and limitations; `explain.log` comes from the existing CLI reader,
+not another facts/manifest parser. Missing scenarios, capture failures,
+off/off variation, any actual difference or zero total hits cannot produce
+a passing sealed-coverage status. Only a successful finite scenario comparison
+could be reported as such; it would still not certify SEAL001–009 or all inputs.
+
+### Recorded result and unresolved findings
+
+One sequence at [the published pre-run head](https://github.com/thomasklemm/lowrail/commit/5ff3be61c20bb0612816ca9cfbf094eef8a5f4a2),
+private evidence `.lowrail/private/blog-production-c1/{off1,off2,on,prepare,report}.json`
+and build/explain/worker logs. Lock SHA256
+`570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596`;
+controller-test source SHA256
+`36c63346d820223f9d03450a19132de27c058e9181bea0d0c5e9cedc2b1abaa2`.
+The generated app has no separate Git revision; the report hashes its source
+files instead of attributing the containing Lowrail repository's revision to it.
+
+* **Exit 1, `rejected_off_control`; no support/certification claim.** Both
+  original scenario assertions pass in all three workers (six executions).
+* Raw unpinned off/off responses differ: CSRF meta/form tokens, signed Turbo
+  stream names, cookies, ETag and `x-runtime`. `SECRET_KEY_BASE_DUMMY=1` also
+  generates independent worker secrets; it is **not** a fixed deployment-secret
+  control. Fresh sessions and real clocks/randomness are intentional in this
+  retained raw run. Caller-supplied request IDs are the scenario IDs.
+  No response field is stripped or normalized. Future declared, pinned entropy
+  companions must remain visibly separate and retain this raw rejection.
+* Off/off SQL, loads and effects agree. Each arm's initial logical state equals
+  the prepared snapshot, and both GETs leave it unchanged, including queue,
+  cache, cable and storage. There are no SQL/value capture errors.
+* Off/on cold index SQL is **14 versus 3**, including the omitted SQLite
+  version/schema queries; show is **2 versus 2** with identical SQL/binds.
+  Cold on-only loads include `ActionController::API`, `objspace` and **12 extra
+  hook events**, including `before_eager_load` and `action_controller_api`.
+  These are findings to explain, **not exclusions**, and one on run is not a
+  repeated stable/unstable classification. Sealed activation calls Materialize;
+  neither that observation nor passing responses waives invariant 7.
+* Build facts retain six missing-table skips for uninstalled ActionMailbox,
+  ActionText and ActiveStorage schema; no coverage claim for those models.
+
+| Unit | Pass / target | Index hits / fallbacks | Show hits / fallbacks |
+|---|---|---:|---:|
+| 0 | active_record/preload_plans | 1 / 1 | 0 / 0 |
+| 1 | active_record/instantiate — Article | 2 / 0 | 1 / 0 |
+| 2 | active_record/instantiate — Comment | 2 / 0 | 1 / 0 |
+| 18 | sealed/link_to — ArticlesController | 5 / 0 | 2 / 0 |
+| 19 | sealed/form_scaffold | 0 / 0 | 0 / 0 |
+| 3–17 | SolidCable/Cache/Queue instantiate variants | 0 / 0 each | 0 / 0 each |
+
+Form unit 19 reports `boot inventory changed; rebuild` under this observer;
+a separate, no-observer diagnostic boot activates the same artifact. **Cause
+unattributed**: await the independently owned tracing fix on origin/main, then
+rerun before attributing it. Link and artifact admission report no refusal.
+Recorded hits are exercised-path evidence, **not** an accepted equivalence gate.
+
+### Explicit uncovered denominator
+
+Mapped IDs: `ArticlesControllerTest#test_should_get_index` and
+`ArticlesControllerTest#test_should_show_article`. Of 21 ordinary suite IDs,
+19 are **not ported**, plus both active system tests below. These are not
+passes inferred from HTTP status or zero hits:
+
+```text
+ArticlesControllerTest#test_should_get_new
+ArticlesControllerTest#test_should_create_article
+ArticlesControllerTest#test_should_not_create_article_with_invalid_params
+ArticlesControllerTest#test_should_get_edit
+ArticlesControllerTest#test_should_update_article
+ArticlesControllerTest#test_should_not_update_article_with_invalid_params
+ArticlesControllerTest#test_should_destroy_article
+CommentsControllerTest#test_should_create_comment
+CommentsControllerTest#test_should_not_create_comment_with_invalid_params
+CommentsControllerTest#test_should_destroy_comment
+ArticleTest#test_creates_an_article_with_valid_attributes
+ArticleTest#test_validates_title_presence
+ArticleTest#test_validates_body_minimum_length
+ArticleTest#test_destroys_comments_when_article_is_destroyed
+CommentTest#test_creates_a_comment_on_an_article
+CommentTest#test_belongs_to_article_association
+CommentTest#test_requires_commenter
+CommentTest#test_requires_body
+CommentTest#test_requires_valid_article
+ArticlesSystemTest#test_full_article_lifecycle
+ArticlesSystemTest#test_article_with_comments
+```
+
+The inventory reads this fixture's source-declared Rails `test` blocks; it does
+not claim dynamic test discovery. Comparator regressions reject an altered
+body/header, changed bind value, reordered SQL/load events, duplicated effect,
+missing scenario, failed capture and zero-hit run, and distinguish off/off
+rejection from a Lowrail-attributed difference. No measured cohorts were run.

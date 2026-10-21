@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Bundler must choose default-gem versions before the runner requires JSON.
+require File.expand_path("config/boot", Dir.pwd) if ARGV.first == "worker"
+require_relative "../fixtures/corpus/blog_production"
+
+if ARGV.shift == "worker"
+  BlogProduction.worker(*ARGV)
+else
+  abort "usage: script/blog-production-verify run BLOG NEW_OUTPUT_DIRECTORY" unless ARGV.size == 2
+  exit(BlogProduction.run(*ARGV) ? 0 : 1)
+end
