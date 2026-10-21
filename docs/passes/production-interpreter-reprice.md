@@ -28,9 +28,11 @@ and one-slot metadata. Both complete sources are in the
 [numeric export](production-interpreter-reprice-results.json).
 
 No YJIT component or idle companion ran in this cohort. The JIT-specific idle
-control is not applicable, not an executed pass. Witness, guards, dispatch,
-original continuation and all three production units remain charged; statistics
-are off inside counter workers. No production/default/quarantine code changed.
+control is not applicable, not an executed pass. All actual warm-request guard,
+witness-state, dispatch and original-continuation work remains charged;
+statistics are off inside counter workers. One-time admission/witness work is
+outside these warm windows, not a cold-latency estimate. No production/default/
+quarantine code changed.
 
 ## Result
 

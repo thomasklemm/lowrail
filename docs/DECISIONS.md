@@ -90,13 +90,23 @@ entry/two blocks and **408 log bytes**. No extension, retry, exclusions,
 Callgrind/timing cohort or new price. Flat windows do not rescue warmup.
 
 Retained logs show the same extra entry in every off/on worker, but earlier
-in off; production phase timing is asymmetric. A periodic/reaper-triggered
-threshold crossing is a hypothesis, not a recorded caller/count. The v2 note
-proposes K=10 consecutive quiet intervals under request/time caps, explicitly
-unimplemented/unexecuted. This guarantees only the observed quiet-prefix
-predicate on successful completion, not termination, future flatness or A/A.
-`835cf16` stays parked; no YJIT stage 2. A separately authorized interpreter-only
-reprice uses the previously accepted method, not this candidate.
+in off; production phase timing is asymmetric. The subsequently authorized
+scratch-only native diagnostic establishes the **on** mechanism: actual
+20-second `AR Pool Reaper`, ten normal-path calls per tick, count 91→101→111;
+third tick's `keep_alive → sequential_maintenance → discarded?` crosses
+119→120 and installs the normal entry while the request count stays fixed
+at 12,050. One off/one on process only; the off recorder missed its startup
+stop and was not rerun. Off caller provenance is unavailable, not inferred.
+
+V2 now requires K=10 quiet intervals **inside each Valgrind worker**, plus an
+80-second quiet minimum for these frequencies, under preregistered request/time
+caps; native calibration is not a certificate. Actual windows must be flat.
+A proposed zero-reaper-work window-envelope bound needs a validated all-thread
+attribution adapter: merely enabling separate-thread Callgrind dumps would
+lose other threads at the current client endpoints. The adapter and v2 remain
+unimplemented/unexecuted, pending owner review. Quiet is not compiler closure
+or guaranteed A/A. `835cf16` stays parked; no YJIT stage 2. The separately
+accepted interpreter re-price does not rescue this candidate.
 [Method, exact-SHA export, causal limits and design-only v2](passes/production-yjit-method.md).
 
 ## Combined specimen must pass its own cold gate (2026-10-21)

@@ -1,6 +1,8 @@
 # Production form/token/collection: untimed YJIT method review
 
-**Stage 1 only. No Callgrind or timing cohort is authorized or launched.**
+**YJIT stage 1 only. No YJIT Callgrind or timing cohort is authorized or launched.**
+The separately authorized [interpreter re-price](production-interpreter-reprice.md)
+is complete; it does not execute this method or rescue its rejection.
 The specimen is the current public production artifact, exactly
 `sealed/form_scaffold`, `sealed/token_tag`, `sealed/collection_render`, on
 **BlogShowGetOnly GET /articles/1**, Ruby 4.0.7 / Rails 8.1.4. No link, AR,
@@ -159,9 +161,9 @@ every worker. All six eventually show the same additional indices 0/3:
 Thus the **compilation exists in both off/on**, but its phase is not symmetric.
 It is not an on-only new dependency. A fixed request count is an unreliable
 surrogate for the normal-entry counter or elapsed-time/background execution.
-These log events do not identify the thread, caller, threshold count or
-entry-chain reason; do not assert that the reaper caused this particular
-installation, or transplant the historical 119/120 observation as its count.
+Those original log events do not identify the thread, caller, threshold count
+or entry-chain reason. The separate diagnostic below now establishes the on
+mechanism, not retroactive caller provenance for all six original processes.
 
 Rails 8.1.4's [method](https://github.com/rails/rails/blob/v8.1.4/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb#L577-L579)
 is only `@connections.nil?`, not a deferred expensive method body. Real callers
@@ -176,37 +178,127 @@ The **hypothesis** is that optimized request-call topology leaves an entry
 pending until a different, possibly periodic caller advances it. The logs
 prove the delayed installation and phase asymmetry, not that mechanism.
 
-If a causal account rather than a conservative gate is required, a future,
-separately approved **native diagnostic only** must retain effective pool
-frequencies, thread/caller, per-entry counter and elapsed time at the actual
-transition. No new diagnostic was run for this note. No forced helper calls,
-reaper/config changes, compiler mutation or tracing in a price worker.
+### Authorized scratch-only caller diagnostic
 
-### Proposed bounded rule, for review only
+After the interpreter re-price, exactly **one off and one on native YJIT
+process** used the retained local `f34a35c` runtime and its original certified
+YJIT artifact (`822ec9f…`). Both executed the preregistered 50 initial requests,
+200×50, 10×200, GC between batches, then idle to a fixed 90-second observation
+horizon; 180-second process cap, 190-second external timeout. This is a separate
+scratch workload, not the complete shared heap/idle worker, a candidate retry,
+a flatness pass or a price. The [caller export](production-yjit-caller-results.json)
+retains exact source/binary/artifact identities, recorder source as inert data,
+all events, missing observations and both final records. No Valgrind or slot.
 
-Retain exact mode/artifact/cold/heap/log/window/idle/provenance controls. After
-the same 10,000 rehearsal requests, sample all eight fields every **200 ordinary
-requests plus the original N0/GC seam**. Stop successfully only after **K=10
-consecutive quiet intervals**; reset that streak on any change. Record every
-interval and the reached request index, not just the final quiet prefix.
-Cap certification at **20,000 requests** and the complete warmup at **180
-seconds**, whichever comes first; cap/missing field means refusal. No extension,
-second process, counter exclusion or alternate parameter after seeing results.
-Every off-A/off-B/on worker must reach quiet independently; no transplanting
-one arm's warmup length or declaring the other arm warm by symmetry. If any
-worker refuses, the declared candidate/cohort rejects in full.
+Hardware data watches observed the real ISeq's normal-entry count and installed
+pointer; hardware execution breakpoints observed the installed normal entry and
+the reaper's natural sleep. Ruby caller/thread frames were read from stopped VM
+memory. No target wrapper/TracePoint, forced helper call, compiler write, app
+configuration change or Binding inspection. Debugger stops perturb scheduling;
+event clocks locate causes, **not** performance. The recorder is absent from
+every priced artifact and all runtime/harness files used in a counter worker.
 
-This **constructs an observed quiet prefix on successful completion**, not
-guaranteed termination, compiler closure or a flat future window. It resembles
-the parked v3's bounded quiet mechanism and is **not evidence that v3's
-pending-entry/branch/exception problems are solved**. In particular a quiet
-prefix can precede a later reaper wake or an entry stuck below threshold.
-All actual windows must still be flat and both A/A intervals must pass;
-otherwise refuse. A/A may be **expected under the controls, never guaranteed**.
-Do not derive a fixed 12,400- or 14,000-request rule from this single observed
-transition: a time/caller-driven event need not repeat at that request index.
+**On evidence:** boot count 12, threshold 120; the request phase leaves the
+normal-entry count at **91**. Primary/cable/queue/cache all retain their actual
+**20-second** reaper frequency. One `AR Pool Reaper` thread contributes **10
+normal-path invocations per tick**: four WeakRef-filter dispatches, reap, flush,
+prepopulate, and three sequential-maintenance checks. Its counts are:
 
-**No YJIT stage 2, v2 execution or cohort follows from this note.** The owner
-must review the causal-evidence gap and whether an additional native-only
-diagnostic is worth doing before authorizing anything further. `835cf16`
-remains parked; interpreter Ir remains primary.
+| Reaper tick | Normal-entry increments | Installed normal-entry executions | Distinct observed normal-path calls |
+|---|---:|---:|---:|
+| 1 | 92–101 (10) | 0 | 10 |
+| 2 | 102–111 (10) | 0 | 10 |
+| 3 | 112–120 (9) | 2 | 10 |
+| 4 | none | 10 | 10 |
+
+The third tick's `keep_alive → sequential_maintenance → synchronize →
+discarded?` call crosses **119→120**, then installs the normal entry on the
+**same reaper thread**. The request count is fixed at **12,050**, phase idle;
+installation is about 59.3 seconds after recorder start. The compile log adds
+the same indices 0/3. This is a **periodic caller crossing a call-count
+threshold**, not a lazy request-400 branch or a new ISeq. The source-pinned Ruby
+[entry path](https://github.com/ruby/ruby/blob/229531a6cfbf07e3caef30dbac24a2a3f3fed482/vm.c#L521-L528)
+immediately [executes the installed function](https://github.com/ruby/ruby/blob/229531a6cfbf07e3caef30dbac24a2a3f3fed482/vm.c#L561-L571)
+on the triggering invocation: tick 3 observes that call twice, not eleven
+distinct calls. Direct JIT-to-JIT entries are outside this normal-entry counter
+and recorder; these are not total application call counts. All 108 increments
+13–120 are retained. One early request-1/call-20 stack read is unavailable;
+the counter and every reaper/installation context remain recorded.
+
+**Off limit/failure:** `handle SIGSTOP … noprint` also disabled GDB's stop, so
+the off app completed without an installed recorder. GDB subsequently errored
+at the edited command-file cursor. The signal setting was corrected for the
+one on process; **the off process was not rerun**. Its final count/entry is
+120/installed, but there is no off caller/tick provenance. The original six
+logs still show this extra compilation in both arms, early in off and late in
+on; identical caller/topology in off is **not established**. Both native apps
+finish 12,050 requests, and on ends with all three admissions active. No speed,
+full observation or equivalence claim follows from these diagnostic processes.
+
+### Revised bounded rule — inside each Valgrind worker, design only
+
+The native-calibrated **10 quiet 200-request intervals / 180 seconds** proposal
+above is superseded, not executed or extended until green. A 20-second reaper
+clock advances at different request indices under Valgrind and across off/on.
+Neither native completion nor a fixed request index certifies a priced worker.
+
+Proposed preregistration for a separately reviewed candidate:
+
+1. Retain exact mode/artifact/cold/heap/log/window/idle/provenance and both A/A
+   controls. Start from the common initial-50/heap/idle preparation, **not a
+   native-derived 10,000-request certificate**. Sample all eight fields after
+   each 200 ordinary requests plus the original N0/GC seam **inside the actual
+   Valgrind process**. Reset quiet on any field change.
+2. Require **K=10 consecutive quiet intervals AND a quiet elapsed span of at
+   least four times the largest observed reaper frequency (80 seconds here)**.
+   That is an elapsed minimum, not proof that four ticks actually completed.
+   No sleeping to avoid a future window, threshold change, reaper suppression
+   or forced method calls. Each off-A/off-B/on worker must reach this itself.
+   Record every interval, reached request index, actual elapsed span, effective
+   frequencies and all counters/log sizes. No native transplantation.
+3. Preregister **20,000 warmup requests / 3,600 seconds per worker**, whichever
+   comes first, as hard limits appropriate to the instrumented process, not
+   a rescaling after observing a failed run. Cap, missing field or worker failure
+   rejects the entire finite cohort; no retry, extension or selected subset.
+   These new bounds need owner review before implementation or execution.
+4. Require all eight observations flat across **every actual N0/N50 window**
+   and its conservative endpoint envelope in that same process. Pending normal
+   entries, other callers/branches/exceptions and late background compilation
+   can still invalidate a quiet prefix. Keep compiler work charged; reject it,
+   never subtract or exclude it. `835cf16` remains parked.
+
+### Background work: attribution prerequisite and symmetric bound
+
+JIT flatness does **not** say that the reaper did no already-compiled work.
+The conservative proposed bound is **zero reaper-thread work in the envelope
+of every window**, in every arm including N0. An overlap, unavailable thread
+identity, new/unmapped thread or unavailable exact counter rejects the **whole
+cohort**. Do not move/repeat a window to dodge a tick or drop its Ir afterward.
+This policy can reject a perfectly correct specimen; that is a reported result,
+not a reason to weaken the rule. Keep the primary Ir total process-wide, with
+all background and observer work charged. No main-thread-only speed claim.
+
+This needs an independently validated **bench-only all-thread attribution
+adapter**, not the scratch native recorder in a price worker. The existing
+Linux CPU endpoints are too coarse to prove zero short reaper work. Simply
+adding `--separate-threads=yes` to the current worker is also **incorrect**:
+Callgrind's [client dump/zero requests](https://valgrind.org/docs/manual/cl-manual.html#cl-manual.clientrequests)
+then cover only the issuing thread, while external monitor dumps cover all
+threads. Before any cohort approval, an adapter must establish stable
+Ruby/LWP/Valgrind thread mapping and all-thread reset/dump envelope semantics,
+retain every thread's costs, and demonstrate that background-only work is
+detected without losing it from the primary total. An external monitor scrape
+may conservatively bracket the real counter endpoints, but may not be treated
+as an exact endpoint or used to erase work. Missing capability means refusal.
+**No such adapter was implemented or executed here.** No production method or
+app config change is proposed; any additional runtime seam needs prior approval.
+
+The successful stop condition constructs only an **observed quiet prefix**,
+not termination, pending-entry closure, future flatness or symmetry of ticks.
+A/A may be **expected only conditionally**, never guaranteed. The same reaper
+tick is wall-clock driven in all arms, and equal tick counts would not alone
+prove equal work or clean windows. The zero-overlap attribution prerequisite
+is additional to both statistical A/A intervals, not a replacement for them.
+
+**Stop for owner review. No YJIT v2 execution, measurement cohort or further
+native retry is authorized by this note.** Interpreter Ir remains primary.

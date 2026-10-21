@@ -47778,7 +47778,8 @@
     "peer_process_or_window_overlaps": 0,
     "all_windows_no_minor_or_major_gc": true,
     "migration_counts": "unavailable; endpoint CPU is not migration proof",
-    "jit_idle_companion": "not applicable, not run"
+    "jit_idle_companion": "not applicable, not run",
+    "self_cost_rows_reconciled": 72
   },
   "dumps": {
     "0-off_a.callgrind.1": {
@@ -48117,5 +48118,11 @@
   "worker": {
     "source": "# frozen_string_literal: true\n\n# Symmetric, untimed provenance only. The pinned shared worker owns all work,\n# warming, counter endpoints, heap gates and placement observations.\nrequire \"json\"\nrequire \"digest\"\nrequire \"open3\"\npins_path = ENV.fetch(\"PRODUCTION_COHORT_PINS\")\npins_sha = Digest::SHA256.file(pins_path).hexdigest\nraise \"cohort pins changed\" unless pins_sha == ENV.fetch(\"PRODUCTION_COHORT_PINS_SHA256\")\npins = JSON.parse(File.read(pins_path))\ncheck = -> {\n  revision, status = Open3.capture2(\"/usr/bin/git\", \"-C\", pins.fetch(\"harness_root\"), \"rev-parse\", \"HEAD\")\n  clean, clean_status = Open3.capture2(\"/usr/bin/git\", \"-C\", pins.fetch(\"harness_root\"), \"status\", \"--porcelain\")\n  raise \"detached harness revision/cleanliness changed\" unless status.success? && clean_status.success? &&\n    revision.strip == pins.fetch(\"revision\") && clean.empty?\n  pins.fetch(\"files_sha256\").each do |file, expected|\n    raise \"source changed: #{file}\" unless Digest::SHA256.file(file).hexdigest == expected\n  end\n  {revision: revision.strip, harness_clean: true, harness_map_sha256: pins.fetch(\"harness_map_sha256\"),\n    pins_sha256: pins_sha, worker_sha256: Digest::SHA256.file(__FILE__).hexdigest, pid: Process.pid,\n    ruby: RUBY_DESCRIPTION}\n}\nputs \"PRODUCTION_COHORT_PIN #{JSON.generate(check.call)}\"\n$stdout.flush\nload File.join(pins.fetch(\"harness_root\"), \"bench/heap_requests.rb\")\nruntimes = %w[Lowrail::FormScaffold Lowrail::TokenTag Lowrail::CollectionRender]\nstate = runtimes.to_h do |name|\n  runtime = Lowrail.loaded_constant(name)\n  [name, {admission: runtime.admission, refusal: runtime.refusal}]\nend\nraise \"production admission failed\" if ENV[\"LOWRAIL\"] == \"1\" &&\n  state.values.any? { _1.fetch(:admission)&.fetch(:state) != \"active\" || _1.fetch(:refusal) }\nputs \"PRODUCTION_COHORT_FINAL #{JSON.generate(check.call.merge(runtime_state: state))}\"\n",
     "sha256": "c47b1adb13b8af544744bd20eb21e206481c26d6a359a452fd329458b865ed78"
+  },
+  "raw_evidence_archive": {
+    "workspace_path": "/home/user/workspace/repo/.amp/in/artifacts/production-interpreter-reprice-553e7aa.tar.gz",
+    "sha256": "b7d1fc7f11a15da29cbcdb739d2607f9523ba79866491a98c3b0081975fcd4dd",
+    "bytes": 15560947,
+    "contents": "All raw cohort dumps/logs/pins/results and pre/post correctness workers; retained data export, not another execution."
   }
 }
