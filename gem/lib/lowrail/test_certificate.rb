@@ -5,7 +5,8 @@ module Lowrail
   # effectful seal nor resets its process-wide epoch or diagnostic ledger.
   module TestCertificate
     TIER = "sealed-test-v1"
-    PASSES = %w[active_record/instantiate sealed/link_to sealed/form_scaffold].freeze
+    RENDER_PASSES = %w[sealed/token_tag sealed/collection_render].freeze
+    PASSES = (%w[active_record/instantiate sealed/link_to sealed/form_scaffold] + RENDER_PASSES).freeze
     UNOBSERVED = {
       "sealed/link_to" => "verification_literal_table_observer_unavailable",
       "sealed/form_scaffold" => "verification_form_config_schema_translation_observer_unavailable"
@@ -19,7 +20,7 @@ module Lowrail
     MUTATIONS = %i[method_added method_removed method_undefined singleton_method_added
       singleton_method_removed singleton_method_undefined include prepend extend append_features
       prepend_features extend_object alias_method define_method define_singleton_method remove_method
-      undef_method public protected private public_class_method private_class_method const_set remove_const
+      undef_method public protected private public_class_method private_class_method const_set remove_const const_added
       autoload class_eval module_eval instance_eval instance_variable_set remove_instance_variable
       reset_column_information reload_schema_from_cache initialize_load_schema_monitor
       default_scope attribute enum serialize store_accessor []= store clear replace delete delete_if keep_if
@@ -56,6 +57,8 @@ module Lowrail
           @bootsnap = nil
         end
         @boot_observer.enable
+        require_relative "test_certificate_render"
+        TestCertificateRender.observe_operations
       end
 
       # Only explicitly selected, non-secret policy inputs, through core
@@ -117,6 +120,10 @@ module Lowrail
         @certificate = manifest.verification_test
         @models = manifest.units.filter_map { |unit| [unit.dig("ar_instantiate", "model"), unit.fetch("id")] if unit["ar_instantiate"] }.to_h
         @pending = @models.values.to_h { [_1, "verification_attribute_generation_pending"] }
+        manifest.units.each do |unit|
+          @pending[unit.fetch("id")] = "verification_original_operation_pending" if RENDER_PASSES.include?(unit.fetch("pass"))
+        end
+        @epochs = manifest.units.to_h { [_1.fetch("id"), [0]] }
         @generated = ObjectSpace::WeakMap.new
         @generation_source = @certificate.fetch("runtime_sources", {}).keys.find { _1.end_with?("/active_record/attribute_methods.rb") }
         require_relative "stats"
@@ -146,7 +153,7 @@ module Lowrail
             # Method callbacks run after definition, before app callback code.
             if %i[return c_return].include?(event.event) ||
                 %i[method_added method_removed method_undefined singleton_method_added
-                  singleton_method_removed singleton_method_undefined].include?(event.method_id)
+                  singleton_method_removed singleton_method_undefined const_added].include?(event.method_id)
               unchanged?(id, snapshot)
             elsif watched &&
                 %i[instance_variable_set remove_instance_variable const_set remove_const autoload
@@ -154,6 +161,10 @@ module Lowrail
                   default_scope attribute enum serialize store_accessor].include?(event.method_id)
               # Opaque writes can restore a hoisted cache without a method
               # callback. Retire before them; never silently reauthorize.
+              # Render units name their constant closure explicitly. Check
+              # those bindings on completion/const_added and before each use,
+              # rather than retiring for unrelated framework lazy constants.
+              next if snapshot[:constants] && %i[const_set remove_const autoload].include?(event.method_id)
               retire(id, "dependent_state_mutation:#{event.method_id}")
             end
           end
@@ -177,12 +188,18 @@ module Lowrail
           IVAR.bind_call(event.self, :@schema_loaded) == true &&
           IVAR.bind_call(event.self, :@attribute_methods_generated) == true
         @generated[event.self] = true
+        release_pending(id)
+      end
+
+      def release_pending(id)
+        return false if @status == "refused" || @refusals.key?(id) || !@pending.key?(id)
         @pending.delete(id)
         # A counting guard may already have cached the pending false result.
         # This is first authorization, not revival of a retired decision; no
         # hit/deopt counter or process-wide Seal epoch/ledger is reset.
         G[id] = nil; K[id] = Lowrail.const_get(:NO_RECEIVER, false); V[id] = nil
         Stats::STATE[id] = nil
+        true
       end
 
       # Called by the real reporter only after normal helper loading and the
@@ -205,17 +222,19 @@ module Lowrail
       def active?
         return false unless @manifest
         forked! unless @pid == Process.pid
-        @status == "active" && ENV["RAILS_ENV"] == "test"
+        return false unless @status == "active"
+        (ENV["RAILS_ENV"] == "test" && ENV["LOWRAIL_SEALED"] == "1" && requested?) ||
+          refuse_all("verification_policy_or_source_drift")
       end
 
-      def allowed?(id)
+      def allowed?(id, pending: false)
         return false unless active? && !@refusals.key?(id)
         return refuse_all("verification_policy_or_source_drift") unless certificate(@root) == @certificate
         unit = @manifest.units.find { _1.fetch("id") == id }
         reason = unit && UNOBSERVED[unit.fetch("pass")]
         return retire(id, reason) if reason
+        return false if @pending.key?(id) && !pending
         if (model = unit&.dig("ar_instantiate", "model"))
-          return false if @pending.key?(id)
           klass = Lowrail.loaded_constant(model)
           return retire(id, "verification_attribute_generation_invalidated") unless klass && @generated[klass] &&
             IVAR.bind_call(klass, :@schema_loaded) == true && IVAR.bind_call(klass, :@attribute_methods_generated) == true
@@ -224,22 +243,24 @@ module Lowrail
         return true unless snapshot
         unchanged?(id, snapshot)
       rescue StandardError, ScriptError
-        retire(id, "verification_observation_unknown")
+        refuse_all("verification_observation_unknown")
       end
 
-      def watch(id, holders)
+      def epoch(id) = @epochs.fetch(id)
+
+      def watch(id, holders, names: nil, constants: nil)
         return if @snapshots.key?(id)
-        holders = holders.compact.uniq
+        holders = (holders + (constants || {}).keys).compact.uniq
         chains = holders.flat_map { SealSnapshot::ANCESTORS.bind_call(_1) }.uniq
         unit = @manifest.units.find { _1.fetch("id") == id }
-        names = unit.fetch("facts").map { _1.fetch("method").to_sym }.uniq
-        @snapshots[id] = {holders: holders + chains, names: names,
-          states: chains.to_h { [_1, method_state(_1, names)] }}
+        names ||= unit.fetch("facts").map { _1.fetch("method").to_sym }.uniq
+        @snapshots[id] = {holders: holders + chains, names: names, constants: constants,
+          states: chains.to_h { [_1, method_state(_1, names, constants&.fetch(_1, []) || [])] }}
       end
 
       def unchanged?(id, snapshot)
         snapshot[:states].each do |holder, before|
-          after = method_state(holder, snapshot.fetch(:names))
+          after = method_state(holder, snapshot.fetch(:names), snapshot[:constants]&.fetch(holder, []) || [])
           return retire(id, "dependent_method_or_ancestor_drift") unless SealSnapshot.diff(before, after).empty?
         end
         true
@@ -247,22 +268,28 @@ module Lowrail
 
       # Do not enumerate/read unrelated constants (deprecated bindings can
       # themselves emit warnings). Named dependencies are resolved without
-      # autoloading by each existing pass's admission check. Only named method
-      # assumptions are folded; unrelated methods and notification subscribers
-      # remain live. Snapshot every holder in the lookup chain, not just its
-      # first owner, so a changed super body/visibility/ancestry also retires.
-      def method_state(holder, names)
+      # autoloading by each pass's admission check. Render units also name their
+      # constant bindings and lookup absences; AR folds no constant state.
+      # Snapshot every holder in the lookup chain, including super bodies.
+      def method_state(holder, names, constant_names = [])
         methods = {}
         {"public" => SealSnapshot::PUBLIC, "protected" => SealSnapshot::PROTECTED,
           "private" => SealSnapshot::PRIVATE}.each do |visibility, getter|
           (getter.bind_call(holder, false) & names).each { methods[_1] = [visibility, SealSnapshot::METHOD.bind_call(holder, _1)] }
         end
-        {ancestors: SealSnapshot::ANCESTORS.bind_call(holder), methods: methods, constants: {}}
+        constants = constant_names.filter_map do |name|
+          next unless SealSnapshot::DEFINED.bind_call(holder, name, false)
+          path = SealSnapshot::AUTOLOAD.bind_call(holder, name, false)
+          [name, path ? [:autoload, path.dup.freeze] :
+            [:value, SealSnapshot::CONSTANT.bind_call(holder, name, false), SealSnapshot::CONSTANT_SOURCE.bind_call(holder, name, false)]]
+        end.to_h
+        {ancestors: SealSnapshot::ANCESTORS.bind_call(holder), methods: methods, constants: constants}
       end
 
       def retire(id, reason)
         @pending&.delete(id)
         unless @refusals.key?(id)
+          @epochs&.fetch(id)&.then { _1[0] += 1 }
           @deopts[id] = @deopts.fetch(id, 0) + 1 if @snapshots.key?(id)
           @refusals[id] = [reason]
         end
@@ -297,6 +324,7 @@ module Lowrail
           end
           FormScaffold.instance_variable_set(:@admission, {state: "refused", reason: "verification authority retired"}.freeze)
         end
+        TestCertificateRender.revoke if defined?(TestCertificateRender)
         @manifest&.units&.each do |unit|
           name = unit.dig("ar_instantiate", "model")
           type = name && Lowrail.loaded_constant(name)
@@ -321,7 +349,8 @@ module Lowrail
       def evidence
         active? if @pid
         {"state" => @status, "pid" => Process.pid, "unit_deopts" => @deopts.transform_keys(&:to_s),
-          "unit_refusals" => @refusals.transform_keys(&:to_s), "unit_pending" => (@pending || {}).transform_keys(&:to_s)}
+          "unit_refusals" => @refusals.transform_keys(&:to_s), "unit_pending" => (@pending || {}).transform_keys(&:to_s),
+          "token_branches" => TestCertificateRender.branches}
       end
     end
 

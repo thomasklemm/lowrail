@@ -47,7 +47,8 @@ Dir.mktmpdir("lowrail-test-browser") do |scratch|
       end.sort_by { _1.fetch("name") }
       File.write(ENV.fetch("LOWRAIL_SUITE_STATE"), JSON.generate({
         "eager_load" => ivar.bind_call(config, :@eager_load),
-        "rake_eager_load" => ivar.bind_call(config, :@rake_eager_load), "models" => models}))
+        "rake_eager_load" => ivar.bind_call(config, :@rake_eager_load), "models" => models,
+        "token_branches" => Lowrail::TestCertificateRender.branches}))
     end
   RUBY
   base = {"RAILS_ENV" => "test", "RACK_ENV" => nil, "PARALLEL_WORKERS" => "1", "MT_CPU" => "1",

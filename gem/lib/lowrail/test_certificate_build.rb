@@ -16,9 +16,16 @@ module Lowrail
       at_exit do
         BuildJit.check(request.fetch("certification_jit"))
         certificate = TestCertificate.certificate(Dir.pwd)
+        require_relative "test_certificate_render_build"
+        natural_render = TestCertificateRenderBuild.capture
         results = [{units: [], ledger: [], verification_test: certificate}]
         request.fetch("builders").each do |builder|
           name = builder.fetch("module")
+          if %w[TokenTagBuild CollectionRenderBuild].include?(name)
+            pass = name == "TokenTagBuild" ? TokenTag::PASS : CollectionRender::PASS
+            results << TestCertificateRenderBuild.build(pass, context: natural_render.fetch(pass), denied: request.fetch("denied"))
+            next
+          end
           unless %w[ARInstantiateBuild SealedBuild FormScaffoldBuild].include?(name)
             results << {units: [], ledger: [{"pass" => name, "outcome" => "refused",
               "reason" => "verification-only passive certificate not implemented for this pass"}]}

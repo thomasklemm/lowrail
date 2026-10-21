@@ -133,7 +133,8 @@ module Lowrail
         unless ENV["LOWRAIL_SEALED"] == "1" && TestCertificate.requested? && ENV["RAILS_ENV"] == "test" &&
             @rails_env == "test" && ENV["PARALLEL_WORKERS"] == "1" &&
             @verification_test&.dig("version") == 1 && @verification_test["mode"] == "verification-only" &&
-            @units.all? { TestCertificate::PASSES.include?(_1["pass"]) }
+            @units.all? { |unit| TestCertificate::PASSES.include?(unit["pass"]) &&
+              (!TestCertificate::RENDER_PASSES.include?(unit["pass"]) || unit.dig("verification_render", "version") == 1) }
           @refusal_reason = "verification-only artifact requires test, LOWRAIL_SEALED=1 LOWRAIL_VERIFY_TEST=1, explicit PARALLEL_WORKERS=1 and a supported passive certificate"
         end
       elsif data["tier"] || sealed_units

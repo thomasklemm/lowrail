@@ -257,6 +257,179 @@ class TestCertificateTest < Minitest::Test
     end
   end
 
+  def test_render_certificate_keeps_live_token_continuations_and_collection_iteration
+    with_render_certificate do |dir, boot|
+      result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir))
+        original = view.method(:token_tag).super_method
+        builder = view.instance_variable_get(:@tag_builder)
+        Lowrail::Sealed::EPOCH[0] = 97 # Never borrowed or reset by verification.
+        replacement = Class.new(ActionView::Helpers::TagHelper::TagBuilder) do
+          def tag_options(*) = ' data-probe="late-builder"'
+        end.new(view)
+        token_id = ids.fetch("sealed/token_tag")
+        tokens = [replacement, builder].map do |chosen|
+          before = Lowrail::Stats.snapshot
+          outputs = [false, true].map do |fast|
+            view.instance_variable_set(:@tag_builder, builder)
+            probe = {view: view, builder: chosen, generated: 0, converted: 0}
+            Thread.current[:render_probe] = probe
+            output = fast ? view.send(:token_tag, nil, form_options: options) : original.call(nil, form_options: options)
+            Thread.current[:render_probe] = nil
+            [output, probe[:generated], probe[:converted]]
+          end
+          after = Lowrail::Stats.snapshot
+          {outputs: outputs, hits: after.fetch("unit_hits").fetch(token_id, 0) - before.fetch("unit_hits").fetch(token_id, 0),
+            fallbacks: after.fetch("unit_fallbacks").fetch(token_id, 0) - before.fetch("unit_fallbacks").fetch(token_id, 0)}
+        end
+        rendered = [false, true].map do |fast|
+          events.clear
+          output = render_collection.call(fast)
+          {output: output, events: events.dup}
+        end
+        layout = Object.new
+        layout.define_singleton_method(:render) { |*args, &block| "wrapped:#{block.call}" }
+        layouts = [false, true].map { render_collection.call(_1, layout) }
+        # Unrelated live rows/subscribers and a new unknown view are not a
+        # mutation of the accepted holder. A foreign input stays local.
+        subscriber = ActiveSupport::Notifications.subscribe("render_partial.action_view") { |*| }
+        Article.first.update!(title: "live data")
+        ActiveSupport::Notifications.unsubscribe(subscriber)
+        foreign = ActionView::Base.empty
+        foreign_output = foreign.send(:token_tag, false, form_options: options)
+        render_collection.call(true)
+        result = {tokens: tokens, rendered: rendered, layouts: layouts, foreign: foreign_output,
+          production_epoch: Lowrail::Sealed::EPOCH[0],
+          admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
+      RUBY
+      foreign, restored = result.fetch("tokens")
+      assert_equal '<input data-probe="late-builder" />', foreign.fetch("outputs").first.first
+      [foreign, restored].each do |record|
+        assert_equal record.fetch("outputs").first, record.fetch("outputs").last
+        assert_equal [1, 1], record.fetch("outputs").first.drop(1), "live generation and conversion once, never replayed"
+      end
+      assert_equal [0, 1], foreign.values_at("hits", "fallbacks")
+      assert_equal [1, 0], restored.values_at("hits", "fallbacks")
+      assert_equal result.fetch("rendered").first, result.fetch("rendered").last
+      assert_equal ["left/0/2", "right/1/2"], result.dig("rendered", 0, "output")
+      assert_equal ["size", "iterator", "left", "right"], result.dig("rendered", 0, "events")
+      assert_equal [["wrapped:left/0/2", "wrapped:right/1/2"]] * 2, result.fetch("layouts")
+      assert_equal "", result.fetch("foreign")
+      assert_equal 97, result.fetch("production_epoch")
+      assert_equal [true, true], result.fetch("admitted")
+      assert_empty result.dig("stats", "unit_deopts")
+    end
+  end
+
+  def test_render_mutation_and_fork_authority_are_sticky_and_unit_local
+    with_render_certificate do |dir, boot|
+      %w[method continuation table lexical tier opt_in fork].each do |mutation|
+        result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir).merge("MUTATION" => mutation))
+          before = Lowrail::Stats.snapshot
+          case ENV.fetch("MUTATION")
+          when "method"
+            holder = ActionView::Helpers::TagHelper::TagBuilder
+            saved = holder.instance_method(:tag_option)
+            holder.define_method(:tag_option) { |*args| saved.bind_call(self, *args) }
+            restore = -> { holder.define_method(:tag_option, saved); holder.send(:private, :tag_option) }
+          when "continuation"
+            holder = ActionView::Helpers::TagHelper::TagBuilder
+            saved = holder.instance_method(:tag_options)
+            probe = {view: view, builder: view.instance_variable_get(:@tag_builder), generated: 0, converted: 0,
+              mutate: -> { holder.define_method(:tag_options) { |*| ' data-probe="mutated"' } }}
+            Thread.current[:render_probe] = probe
+            fast_output = view.send(:token_tag, nil, form_options: options)
+            generation = probe[:generated]
+            probe[:mutate] = nil
+            original_output = view.method(:token_tag).super_method.call(nil, form_options: options)
+            token_pair = [original_output, fast_output]
+            Thread.current[:render_probe] = nil
+            restore = -> { holder.define_method(:tag_options, saved) }
+          when "table"
+            holder = ActionView::Helpers::TagHelper
+            saved = holder::TAG_TYPES
+            holder.send(:remove_const, :TAG_TYPES)
+            holder.const_set(:TAG_TYPES, saved.merge(name: :boolean).freeze)
+            restore = -> { holder.send(:remove_const, :TAG_TYPES); holder.const_set(:TAG_TYPES, saved) }
+          when "lexical"
+            holder = ActionView::CollectionRenderer
+            holder.const_set(:PartialIteration, Class.new(ActionView::PartialIteration) do
+              def index = super + 7
+            end)
+            restore = -> { holder.send(:remove_const, :PartialIteration) }
+          when "tier"
+            ENV["RAILS_ENV"] = "production"
+            restore = -> { ENV["RAILS_ENV"] = "test" }
+          when "opt_in"
+            ENV["LOWRAIL_VERIFY_TEST"] = "0"
+            restore = -> { ENV["LOWRAIL_VERIFY_TEST"] = "1" }
+          when "fork"
+            reader, writer = IO.pipe
+            pid = fork do
+              reader.close
+              initial = Lowrail::Stats.snapshot
+              outputs = [view.send(:token_tag, nil, form_options: options), render_collection.call(true)]
+              Lowrail::TestCertificate.test_initialized!
+              writer.write(JSON.generate(initial: initial, outputs: outputs, stats: Lowrail::Stats.snapshot,
+                admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?]))
+              writer.close
+              exit! 0
+            end
+            writer.close
+            child = JSON.parse(reader.read)
+            Process.wait(pid)
+            raise "child failed" unless $?.success?
+            result = {before: before, child: child,
+              admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?]}
+            exit
+          end
+          # Both paths still produce the original result after a mutation.
+          original = view.method(:token_tag).super_method
+          if %w[method table].include?(ENV.fetch("MUTATION"))
+            Thread.current[:render_probe] = {view: view, builder: view.instance_variable_get(:@tag_builder), generated: 0, converted: 0}
+          end
+          token_pair ||= [original.call(nil, form_options: options), view.send(:token_tag, nil, form_options: options)]
+          Thread.current[:render_probe] = nil
+          collection_pair = [render_collection.call(false), render_collection.call(true)]
+          restore.call
+          Lowrail::TestCertificate.test_initialized!
+          view.send(:token_tag, nil, form_options: options)
+          render_collection.call(true)
+          result = {before: before, token: token_pair, collection: collection_pair,
+            generation: generation, admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
+        RUBY
+        if mutation == "fork"
+          assert_equal [true, true], result.fetch("admitted")
+          child = result.fetch("child")
+          assert_empty child.dig("initial", "unit_hits")
+          assert_empty child.dig("initial", "unit_fallbacks")
+          assert_equal [false, false], child.fetch("admitted")
+          assert_equal ["", ["left/0/2", "right/1/2"]], child.fetch("outputs")
+          assert_empty child.dig("stats", "unit_hits")
+          %w[4 5].each do |id|
+            assert_equal 1, child.dig("stats", "unit_deopts", id)
+            assert_equal ["verification_unexpected_pid_original_only"], child.dig("stats", "unit_refusals", id)
+          end
+        else
+          assert_equal result.fetch("token").first, result.fetch("token").last, mutation
+          assert_equal result.fetch("collection").first, result.fetch("collection").last, mutation
+          if mutation == "continuation"
+            assert_equal '<input data-probe="mutated" />', result.fetch("token").last
+            assert_equal 1, result.fetch("generation"), "mutation must not replay live generation"
+          end
+          expected = %w[tier opt_in].include?(mutation) ? [false, false] : mutation == "lexical" ? [true, false] : [false, true]
+          assert_equal expected, result.fetch("admitted"), mutation
+          expected.each_with_index do |active, index|
+            id = (4 + index).to_s
+            assert_equal(active ? 0 : 1, result.dig("stats", "unit_deopts").fetch(id, 0), mutation)
+            next if active
+            assert_equal result.dig("before", "unit_hits", id), result.dig("stats", "unit_hits", id), mutation
+            refute_empty result.dig("stats", "unit_refusals", id), mutation
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def certificate_env(dir)
@@ -300,6 +473,86 @@ class TestCertificateTest < Minitest::Test
         puts JSON.generate(units.map { _1.dig("ar_instantiate", "model") })
       RUBY
       assert_equal ["Widget"], built
+      yield dir, boot
+    end
+  end
+
+  def with_render_certificate
+    missing_prerequisite "render certificate requires Ruby 4.0.7" unless RUBY_VERSION == "4.0.7"
+    corpus = File.join(CORPUS_ROOT, "real-blog-r4")
+    missing_prerequisite "no #{corpus} (see script/corpus)" unless File.file?(File.join(corpus, "test/test_helper.rb"))
+    realpath_tmpdir do |dir|
+      (Dir.children(corpus) - %w[.git .lowrail tmp log node_modules storage]).each { FileUtils.cp_r(File.join(corpus, _1), dir) }
+      FileUtils.mkdir_p(File.join(dir, "storage"))
+      out, err, status = Open3.capture3(CLEAN_ENV.merge(certificate_env(dir)).merge("LOWRAIL" => "0"),
+        lowrail_cli, "build", dir, "--sealed", "--verify-test", "--env", "test", "--jit", "interpreter", chdir: dir)
+      assert status.success?, "#{out}\n#{err}"
+      FileUtils.cp_r(File.join(dir, ".lowrail/verification-test/.", "."), File.join(dir, ".lowrail"))
+      manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
+      assert_equal %w[active_record/instantiate active_record/instantiate sealed/link_to sealed/form_scaffold
+        sealed/token_tag sealed/collection_render], manifest.fetch("units").map { _1.fetch("pass") }
+      boot = <<~'RUBY'
+        require "json"
+        result = nil
+        at_exit { puts JSON.generate(result) if result }
+        require "./config/boot"
+        require "./config/application"
+        module LiveTokenProbe
+          def protect_against_forgery?
+            Thread.current[:render_probe] ? true : super
+          end
+          def form_authenticity_token(**options)
+            probe = Thread.current[:render_probe]
+            return super unless probe
+            probe[:generated] += 1
+            probe[:view].instance_variable_set(:@tag_builder, probe[:builder])
+            probe[:mutate]&.call
+            'value<&" Ω'
+          end
+          def request_forgery_protection_token
+            probe = Thread.current[:render_probe]
+            return super unless probe
+            name = Object.new
+            name.define_singleton_method(:to_s) { probe[:converted] += 1; 'name<&" Ω' }
+            name
+          end
+        end
+        ActiveSupport.on_load(:action_controller) { prepend LiveTokenProbe }
+        require "./test/test_helper"
+        Minitest.parallel_executor.start
+        Lowrail::TestCertificate.test_initialized!
+        raise "authority before original operation" if Lowrail::TokenTag.admitted? || Lowrail::CollectionRender.admitted?
+        ActiveRecord::FixtureSet.create_fixtures(Rails.root.join("test/fixtures"), %w[articles comments])
+        require "rack/mock"
+        view = nil
+        trace = TracePoint.new(:call) { |event| view = event.self }
+        trace.enable(target: Lowrail::TokenTag::Variant.instance_method(:token_tag))
+        request = Rack::MockRequest.new(Rails.application)
+        2.times { raise "request failed" unless request.get("/articles/#{Article.first.id}", "HTTP_HOST" => "www.example.com").status == 200 }
+        trace.disable
+        raise "not naturally admitted" unless Lowrail::TokenTag.admitted? && Lowrail::CollectionRender.admitted?
+        ids = Lowrail.manifest.units.to_h { [_1.fetch("pass"), _1.fetch("id").to_s] }
+        options = {action: "/articles/1/comments", method: "post"}
+        events = []
+        iterator = Object.new
+        iterator.define_singleton_method(:size) { events << "size"; 2 }
+        iterator.define_singleton_method(:each_with_info) do
+          events << "iterator"
+          [["left", ["shared", :item, :item_counter, :item_iteration]], ["right", ["shared", :item, :item_counter, :item_iteration]]]
+        end
+        template = Object.new
+        template.define_singleton_method(:render) do |_view, locals, implicit_locals:|
+          events << locals.fetch(:item)
+          "#{locals.fetch(:item)}/#{locals.fetch(implicit_locals.first)}/#{locals.fetch(implicit_locals.last).size}"
+        end
+        render_collection = ->(fast, layout = nil) do
+          renderer = ActionView::CollectionRenderer.allocate
+          renderer.instance_variable_set(:@locals, {})
+          method = renderer.method(:collection_with_template)
+          method = method.super_method unless fast
+          method.call(view, template, layout, iterator).map(&:body)
+        end
+      RUBY
       yield dir, boot
     end
   end

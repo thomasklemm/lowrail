@@ -3,6 +3,7 @@
 require_relative "test_certificate"
 require_relative "ar_instantiate"
 require_relative "form_scaffold"
+require_relative "test_certificate_render"
 
 module Lowrail
   # These seams exist only for explicit test verification. Default and
@@ -11,12 +12,14 @@ module Lowrail
     module_function
 
     def install(manifest)
+      TestCertificateRender.install
       selected = ENV["LOWRAIL_UNITS"]&.split(",")&.map { Integer(_1) }
       manifest.units.group_by { _1.fetch("pass") }.each do |pass, units|
         units = units.select { selected.include?(_1.fetch("id")) } if selected
         next if units.empty?
         runtime = {"active_record/instantiate" => ARInstantiate, "sealed/link_to" => Sealed,
-          "sealed/form_scaffold" => FormScaffold}.fetch(pass)
+          "sealed/form_scaffold" => FormScaffold, "sealed/token_tag" => TokenTag,
+          "sealed/collection_render" => CollectionRender}.fetch(pass)
         runtime.install(units)
         if pass == "sealed/link_to"
           require_relative "templates"
