@@ -89,10 +89,17 @@ compare **Lowrail**, not interpreter versus YJIT.
 - **Lobsters:** ruby-bench pin above, exact shipped 41 MB production SQLite DB,
   SHA256 `d9817ef63aed4989d504d26e341b33d163448cb123f10981082718876227a820`;
   1,003 users / 11,000 stories / 26,638 comments / 183 tags. Same external
-  dependency-only wrapper as the hotspot study: Rails 8.1.4, Minitest 5.27.0.
+  dependency-only wrapper as the hotspot study: Rails 8.1.4, Minitest 5.27.0,
+  published at [28e4af5](https://github.com/thomasklemm/lowrail/commit/28e4af5eb3bc03f0e9a2dd89ae669a6c5f8e2af3),
+  `fixtures/corpus/lobsters.Gemfile` and its lock. Exact SHA256 values are
+  `6308f24386e443332c5663aba64fa7b6eae931b8d1de0b0a04eed4f031873fd3` /
+  `105a3c0f736082a5714e1db0feb48dc96addb87dd9050051fc8b3d85e4f35fcf`.
   Do not load its historical schema (`unsigned` fails on SQLite). Four public
   anonymous GETs `/newest`, `/active`, `/recent`, `/hottest`, not the historical
-  authenticated 114-request vector. The expected zero-unit artifact is a
+  authenticated 114-request vector. The hotspot study instead visits `/`,
+  `/newest`, `/comments`, `/u`, `/s/enr7ye`, `/hottest` (last JSON): same fixture
+  family, **different route vector**, so its profile and these native timings
+  must not be pooled. The expected zero-unit artifact is a
   Lowrail startup/delivery overhead control, not a lowering opportunity.
 
 ## Reuse
@@ -154,8 +161,8 @@ README performance number still require all owner gates and Thermos review.
 
 New ideas use [`script/screen`](../script/screen), not a twelve-round price
 cohort. The already-running Campfire cohort is retained; the owner canceled
-the queued twelve-round Fizzy and Lobsters cohorts after seeing its noise. A screen
-is for killing/promoting an idea, never a README price or support claim.
+the queued twelve-round Fizzy and Lobsters cohorts after seeing its noise.
+A screen is for killing/promoting an idea, never a README price or support claim.
 
 ```sh
 CAMPFIRE_DISPOSABLE_REDIS=1 mise exec ruby@4.0.7 -- script/screen \
@@ -163,6 +170,13 @@ CAMPFIRE_DISPOSABLE_REDIS=1 mise exec ruby@4.0.7 -- script/screen \
   --config PRIVATE_CONFIG.json --output NEW_PRIVATE_DIRECTORY \
   --exploration-setup /absolute/exploration.rb
 ```
+
+**Recommendation:** keep the short defaults for exactness/allocation screening
+and only coarse wall direction. They cannot certify 1–5% native effects in
+this orb. The single longer calibration below used 6.89 minutes and still
+missed the ±2% A/A target; do not spend twelve-round cohorts chasing it or
+repeat the calibration until green. Use exact output plus allocation evidence
+to prioritize small bets; an inconclusive wall screen is not proof of no gain.
 
 The native config supplies `workload`, `seed`, `artifact`, and optional
 `gemfile`, `contexts`, `exploration_sources` and `headers`. All fixture/artifact
@@ -341,11 +355,82 @@ now uses floating-point means; its regression test fails on the old code.
    smoke has a 20.61–26.94% A/A spread and raw entropy rejection, not evidence
    of equality or a lowering win. A fixed larger calibration is recorded
    separately, not pooled or rerun until green.
-4. **Not measured:** Fizzy's long cohort canceled; blog waits for the published
-   production `view.send` fix SHA. No pre-fix native speed number is promoted.
-   Fizzy's accepted interpreter instruction increase is not a YJIT result.
+4. **Not measured here:** Fizzy's long cohort canceled. The published production
+   dispatch fixes
+   [1c99962](https://github.com/thomasklemm/lowrail/commit/1c99962e3f8d83dc0c303c2a403f9453249182e0)
+   and [62f8a6b](https://github.com/thomasklemm/lowrail/commit/62f8a6bbbecabb21df218a01b121299fee726eff)
+   require rebuilt view-context certificates; the coordinator assigned the
+   corrected blog screen/re-price to the sealed thread, not another cohort
+   here. No pre-fix native speed number is promoted. Fizzy's accepted
+   interpreter instruction increase is not a YJIT result.
 
 The completed full CLI smoke took 53.94 seconds for two Lobsters routes and
 correctly exited 2 for unnormalized raw entropy inequality. It verifies the
 tool's refusal path, not a prototype win. The larger calibration below is
 the single owner-requested settings experiment, not an optimization variant.
+
+### One-shot Lobsters A/A calibration: ±2% target not reached
+
+Frozen harness
+[`bfc682b`](https://github.com/thomasklemm/lowrail/commit/bfc682b97dbebdb1082d4f54e8ed426e7ff27c27),
+same pinned ruby-bench source/shipped DB and external dependency overlay.
+No other benchmark worker ran in this orb. Governor/turbo/virtual host
+contention remain outside our control. Protocol selected **once**, before
+measurement: three off-A/on/off-B rounds, CPU 2, 1,000 full-request warmups
+and 4,000 samples per timed worker, one GET `/` only. Twelve workers total
+including three coverage workers. No outliers removed, alternate statistic
+selected after seeing data, worker salvage, or retry-to-green.
+
+```sh
+mise exec ruby@4.0.7 -- script/screen \
+  "$PWD/.corpus/ruby-bench/benchmarks/lobsters" / \
+  --config LOBSTERS_NATIVE_CONFIG.json --output NEW_PRIVATE_DIRECTORY \
+  --exploration-setup /absolute/lobsters-validation-setup.rb \
+  --warmup 1000 --samples 4000 --cpu 2
+```
+
+The setup delegates to `LobstersNativeValidation` as shown above; config sets
+the fixed request ID and pins the policy/helper in `exploration_sources`.
+Timed requests use native, unpinned entropy, with the same installed observer
+wrappers in all arms. It is not a no-observer ruby-bench price.
+
+**A/A first:** paired median differences are **+4.3423%, −1.4690%, −1.1197%**.
+Mean +0.5845%; bootstrap 95% interval **[−1.4690%, +4.3423%]**; maximum absolute
+round spread and screen noise floor **4.3423%**. Median absolute round
+difference 1.4690% is **not** an acceptable replacement for the full band:
+that would hide the retained +4.3423% round. The ±2% target fails.
+
+| Metric | off-A | off-B | on |
+|---|---:|---:|---:|
+| Mean worker median, ms | 7.2657 | 7.3067 | 7.3519 |
+| Mean worker p90, ms | 9.6539 | 9.9229 | 9.7670 |
+| Serial throughput, req/s | 132.76 | 130.79 | 130.34 |
+| Integer allocation median/request | 14,188 | 14,188 | 14,188 |
+| Allocation sample min…max | 14,178…14,273 | 14,178…14,277 | 14,178…14,275 |
+| GC ms/request | 0.5374 | 0.5287 | 0.5339 |
+| Post-window RSS, KiB | 179,076.00 | 178,909.33 | 178,873.33 |
+| Boot, ms | 2,745.67 | 2,824.14 | 2,840.54 |
+
+Elapsed **413.29 seconds (6.89 minutes)**. On/off median +1.2349%
+[−1.9638%, +3.0077%], unresolved; public artifact has **zero units and zero
+hits**, so no prototype win is claimed. Both validation seeds match actual
+status/body/all headers across **all twelve fresh workers**, with no entropy
+errors; seed 0 and seed 1 produce different bodies as expected. All workers
+run production Ruby 4.0.7/Rails 8.1.4/YJIT on CPU 2, no refusals, immutable
+captured pins. All nine timing workers have some nonflat JIT activity.
+
+Independent Python audit recalculates all **36,000** timed samples' worker
+median/p90/throughput, paired ratios/means, exact three-round bootstrap
+endpoints, integer allocation ranges and all seed/worker output/control
+evidence. The [JSON appendix](native-bench.json) retains this as
+`calibrations.lobsters_aa`, separately from Campfire and earlier smoke.
+Native hardware instructions remain unavailable (ENOENT); no Callgrind run.
+
+**Decision:** larger warmup/sample settings improved this observed `/` A/A
+floor from the initial smoke's 26.94% to 4.34%, but did **not** demonstrate
+±2% resolution within the ten-minute budget. This is evidence about these
+settings on this orb, not proof that no conceivable native method can do
+better. There is no measured ±2% recommendation to publish. Prefer cheap
+exactness/allocation screens and report wall as coarse/unresolved for small
+bets; a tighter wall claim needs an independently justified environment or
+predeclared method, not selective deletion or another run until green.
