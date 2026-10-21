@@ -534,7 +534,10 @@ Run the saved measurement driver only after compilation ends. Repeatability
 means same inputs/protocol and inspected differences, not identical wall/RSS
 or path-dependent snapshot hashes on another machine.
 
-## 5. Proposed authorization queue — nothing opened yet
+## 5. Proposed authorization queue — research snapshot
+
+These were proposals at the initial snapshot. The authorized actions and
+actual publication record are in section 6; the other proposals remain deferred.
 
 | Order | Concrete proposed upstream action | Scope / stop condition |
 |---|---|---|
@@ -549,3 +552,46 @@ upstream APIs: begin with advisory graph/source candidates, compare them to
 boot facts with explicit disagreement records, and retain exact-or-refuse
 admission. Contributing useful static analysis is worthwhile; confusing its
 answers with runtime certificates would reverse Lowrail's design.
+
+## 6. Authorized upstream comments — 2026-10-21
+
+Posted exactly two comments, in the authorized order, on existing upstream
+items. No new issue, PR, fork or formal review verdict was created; these
+comments add no new open issue/PR to the two-item limit.
+
+| Posted (UTC) | Comment | Scope |
+|---|---|---|
+| 17:32:04 | [Prism 2 test evidence on #1078](https://github.com/Shopify/rubydex/pull/1078#issuecomment-6322357629) | Exact head and comparison revision, library-only 1,157 + 12 passes, nine matching non-diagnostic graph projections, and the five documented slash-warning removals; commands, pinned inputs/driver and explicit source-only limits. No approval, merge-gate or request-speed claim |
+| 17:32:17 | [Opt-in namespace discussion on #997](https://github.com/Shopify/rubydex/issues/997#issuecomment-6322362044) | Runnable Zeitwerk oracle, observed static declaration distinction with a caller-supplied synthetic namespace, and a question about an explicitly enabled external adapter. Ordinary inherited Ruby lookup stays correct; no default path guesses, early autoloading or gem-specific resolver behavior is proposed |
+
+Before posting, both final texts passed independent Thermos correctness and
+maintainability reviews, oracle review, and a check against Rubydex's
+CONTRIBUTING/AGENTS guidance, architecture, Ruby behavior documentation and
+the existing #997 maintainer response. The maintainability review narrowed
+the namespace claim to declaration presence/absence, rather than asserting
+a definition-to-declaration join not shown directly by the saved projection.
+The projection build recipe now pins its target directory explicitly.
+
+Fresh checks before publication: the exact #1078 head again passed
+`cargo test --locked --manifest-path PR_WORKTREE/rust/Cargo.toml --lib`
+(1,157 Rubydex + 12 rubydex-sys; zero failures), and the exact Ruby snippet
+in the #997 comment ran on Ruby 4.0.7 / Zeitwerk 2.8.3 with the three distinct
+namespace/worker names shown there. The nine-app results are the recorded
+research dataset, not a newly rerun corpus or request benchmark.
+
+GitHub read-back confirmed each posted body exactly matched its reviewed
+draft. SHA256 of the posted bodies:
+
+- #1078: `b7ff1651e4e420e27f446ad9b8f5147e1db1a8a295b8cf4b6560b1b136309192`
+- #997: `e269bb7cb12d0e4894a7e3b96e2d206de7448637a1b1a3b2698ba289f8c2bf17`
+
+As of **17:33:05 UTC**, neither comment had received a response; #1078 had
+no submitted reviews. That is a point-in-time observation, not maintainer
+acceptance. Event-based discussion subscriptions were attempted but are
+unavailable because the Amp GitHub App cannot access `Shopify/rubydex`;
+no active listener or future monitoring is claimed.
+
+The Concern/DSL and RBS type-retention proposals, all new issues/forks/PRs,
+and any implementation remain deferred pending separate authorization.
+Lowrail's runtime, admission code, Cargo requirements and Rubydex pin were
+not changed by this follow-up.
