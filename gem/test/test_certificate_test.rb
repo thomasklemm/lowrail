@@ -180,7 +180,7 @@ class TestCertificateTest < Minitest::Test
 
   def test_real_config_builder_bootsnap_and_method_mutations_retire_stickily
     with_runtime_certificate do |dir, boot|
-      %w[config builder bootsnap method schema].each do |mutation|
+      %w[config builder bootsnap method schema suite_mode].each do |mutation|
         result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir).merge("MUTATION" => mutation))
           query = -> { Widget.find_by_sql("SELECT * FROM widgets ORDER BY id").map(&:name) }
           Lowrail::TestCertificate.test_initialized!
@@ -210,6 +210,10 @@ class TestCertificateTest < Minitest::Test
           when "schema"
             Widget.reset_column_information
             restore = -> { Widget.first } # Natural rebuilding cannot revive.
+          when "suite_mode"
+            old = ENV["LOWRAIL_VERIFY_TEST_DIRECT"]
+            ENV["LOWRAIL_VERIFY_TEST_DIRECT"] = "1"
+            restore = -> { ENV["LOWRAIL_VERIFY_TEST_DIRECT"] = old }
           end
           after = query.call
           restore.call
@@ -227,7 +231,8 @@ class TestCertificateTest < Minitest::Test
         assert_equal 1, result.dig("stats", "unit_deopts", "0"), mutation
         expected = {"config" => "verification_policy_mutation:eager_load=",
           "builder" => "verification_attributes_builder_replaced", "bootsnap" => "verification_bootsnap_policy_mutation",
-          "method" => "dependent_method_or_ancestor_drift", "schema" => "dependent_state_mutation:reset_column_information"}
+          "method" => "dependent_method_or_ancestor_drift", "schema" => "dependent_state_mutation:reset_column_information",
+          "suite_mode" => "verification_policy_or_source_drift"}
         assert_equal [expected.fetch(mutation)], result.dig("stats", "unit_refusals", "0"), mutation
       end
     end

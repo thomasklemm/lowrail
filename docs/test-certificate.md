@@ -1,7 +1,8 @@
-# Verification-only test certificate: isolated review slice
+# Verification-only test certificate: AR-only own-suite coverage
 
-2026-10-21. **Local review implementation, not production admission or main
-integration approval.** The requested 20-unit own-suite coverage is not complete:
+2026-10-21. The reviewed AR-only tier was published in
+[985297a](https://github.com/thomasklemm/lowrail/commit/985297a4d50bab735f0c1c59fbfed4d0a96738f1).
+**This is not production admission.** The requested 20-unit own-suite coverage is not complete:
 two AR units execute; link/form and the remaining production units are gaps.
 No app source, production artifact, seal epoch, pricing adapter or benchmark
 cohort was changed. Fizzy's documented pinned red-but-identical baseline stays
@@ -135,9 +136,9 @@ Full records and **every artifact unit**, including zero hits/refusals, are in
 
 Actual `eager_load` is **false in both CI modes**: the original test command's
 Rake preparation installs Rails' before-initialize override
-`config.eager_load = config.rake_eager_load` (false). Directly requiring the
-environment with CI=1 gives true, but is not the unchanged own-suite command.
-Nothing forces it true here. True eager-load execution remains uncovered.
+`config.eager_load = config.rake_eager_load` (false). These historical default
+invocations did not cover true eager loading. The explicit-path invocation
+below closes that execution gap without editing the app's configuration.
 
 Per on arm (cold/warm and both CI modes agree):
 
@@ -156,6 +157,91 @@ unsupported pass families are explicit build-ledger refusals. In particular,
 `verification-only passive certificate not implemented for this pass`; they
 produce no artifact unit or H/F/D coverage. No claim follows for those missing
 units or for production execution.
+
+## Documented explicit-path invocation: actual eager loading
+
+Rails 8.1.4's `TestCommand#perform` calls `test:prepare` when the CLI has no
+explicit test path/name. In this generated blog, tailwindcss-rails 4.6.0
+enhances that task: **`test:prepare → tailwindcss:build → environment`**.
+Rails' `environment` task registers a `before_initialize` hook that assigns
+`config.eager_load = config.rake_eager_load`. It runs after `test.rb` selected
+`ENV["CI"].present?`, replacing true with the default false. This is the
+[documented Rake eager-loading policy](https://guides.rubyonrails.org/v8.1/autoloading_and_reloading_constants.html#eager-loading),
+not a Lowrail setting. Changing `rake_eager_load` would require changing app
+configuration; this task does not do that.
+
+Rails also [documents explicit file/directory arguments](https://guides.rubyonrails.org/v8.1/command_line.html#running-tests).
+`CI=1 PARALLEL_WORKERS=1 bin/rails test test/ --seed 41231` skips that Rake
+preparation in the suite process, preserving the app's own `eager_load=true`.
+An original off probe ran all 23 tests / 68 assertions successfully; their
+identities are exactly the union of the 21 ordinary and two system identities.
+An explicit `test/` includes system tests, unlike the no-path default.
+
+Set `LOWRAIL_VERIFY_TEST_DIRECT=1` when building the verification artifact to
+use this invocation for both passive discovery and original compiler capture.
+The mode is opt-in and is bound into the certificate policy alongside the
+**observed** eager flag, executor and Bootsnap policy; the flag itself is not
+an eager-loading witness. The default invocation is unchanged. A mode change
+after authorization retires authority stickily, including after restoration.
+
+Reproduce the direct matrix with:
+
+```sh
+script/blog-test-certificate APP NEW_RESULTS_DIR CHROME_BINARY --direct
+```
+
+The runner first executes the public `db:test:prepare test:prepare` tasks
+**off, in a separate process**, so database and Tailwind preparation are not
+lost but their Rake boot cannot alter the suite process. Discovery/compiler
+capture use `test/`; the matrix supplies the ordinary files explicitly and
+`test/system/` separately. App config, tests and system driver are unchanged.
+Every suite process has the same passive state observer off/on. It reads raw
+policy and enumerates already-existing named AR subclasses after the suite;
+it never loads a holder or generates schema/attribute methods.
+
+The direct 12 arms and a fresh default-mode 12-arm control retain exact
+identity/outcome, every-unit H/F/D/refusal and natural-holder inventories in
+[test-certificate-eager-results.json](test-certificate-eager-results.json).
+Both modes use off / on-cold / on-warm, seed 41231 and explicit worker 1.
+All 24 exits are zero and all identities/outcomes match, after reconciliation
+with upstream's production token continuation fix and documentation. The
+reconciled base and exact changed-source digests are in the result record.
+The direct true-eager arms still authorize **only Article and Comment**:
+
+| Invocation / CI | Actual eager flag | Ordinary / system identities | On Article H/F/D (ordinary; system) | On Comment H/F/D (ordinary; system) |
+|---|---|---|---|---|
+| Default / unset or 1 | false | 21 / 2 | 30/1/0; 18/1/0 | 9/1/0; 8/1/0 |
+| Explicit paths / unset | false | 21 / 2 | 30/1/0; 18/1/0 | 9/1/0; 8/1/0 |
+| Explicit paths / 1 | true | 21 / 2 | 30/1/0; 18/1/0 | 9/1/0; 8/1/0 |
+
+All off counters are zero. Link remains 0/23/0 ordinary and 0/43/0 system;
+form remains 0/1/0 and 0/6/0, with the same explicit observer refusals. Token,
+collection and preload remain pass-level refusals with no artifact units.
+There is no production or speed claim and no parallel-worker coverage.
+
+True eager loading changes the available holders, **not schema readiness**:
+the named AR subclass inventory grows from 3 to 31 (including framework/gem
+models). Only Article/Comment have naturally generated attributes and loaded
+schema. The true-eager build ledger records 23 concrete AR candidates: two
+lowered, 21 refused for `schema/attribute methods not naturally available`.
+The other eager-loaded classes do not become eligible merely by existing.
+
+A negative control keeps `LOWRAIL_VERIFY_TEST_DIRECT=1` but runs a true-eager
+artifact through the no-path Rake-backed command. The actual false eager
+policy refuses with `verification_config_or_source_set_mismatch` for every
+unit: 21 original passing identities, zero hits. A mode mutation/restoration
+also has a public sticky-retirement regression. Reconciled checks:
+`cargo test --locked` passes 39 + 1 + 8; the affected gem run passes 50 tests /
+775 assertions, with the same six named prerequisite skips listed below.
+
+An earlier prepared direct attempt had **one on-only system-test timeout** in
+the final CI=1 warm arm, while affected gem checks ran concurrently. Capybara
+could not find `My First Article`; the captured page subsequently contains
+that link, and the index response took 2.092 seconds. A navigation/wait race
+is a hypothesis, not an established cause. The failed attempt's exact
+outcomes/counters remain in the results JSON. After reconciliation, the full
+matrices above ran sequentially after gem checks, without changing app code,
+test code, driver configuration or timeouts; no failure was normalized away.
 
 The previous review slice had one hit then one sticky deopt per AR unit,
 from natural attribute generation. Delaying authorization alone preserved
@@ -226,10 +312,8 @@ the app's system-test driver and test sources remain unchanged. The runner
 refuses an existing result directory and fails on missing/empty outcomes,
 nonzero suite exits, any exact outcome difference, or an on arm with zero hits.
 
-**Review decision still needed:** the two-unit evidence is useful but does not
-close the link/form/20-unit contract gap. Do not merge or publish this tier as
-full sealed own-suite coverage. The sealed owner authorized isolated
-reconciliation/retesting, not main integration or a push. The current patch and
-rebased evidence need that separate integration decision. Token/collection test
-admission needs its own complete passive design and review. True eager loading
-and parallel workers remain uncovered.
+The approved AR-only publication and actual eager-loading evidence do not close
+the link/form/20-unit contract gap. Do not describe this tier as full sealed
+own-suite coverage. Token/collection test admission remains a separate design,
+implementation and review; production witnesses do not certify test state.
+Parallel workers remain uncovered.

@@ -33,7 +33,7 @@ module Lowrail
         BuildJit.check(request.fetch("certification_jit"))
         output.puts(JSON.generate(results))
       end
-      ARGV.replace(["test", "--seed", "41231"])
+      ARGV.replace(TestCertificate.suite_arguments)
       load File.expand_path("bin/rails")
     end
   end

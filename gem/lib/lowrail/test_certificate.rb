@@ -32,6 +32,13 @@ module Lowrail
 
       def requested? = ENV["LOWRAIL_VERIFY_TEST"] == "1"
 
+      # Explicit directory arguments are a documented Rails test invocation.
+      # They skip Rake preparation, preserving the app's own CI eager policy.
+      # Opt-in only; this neither sets config nor calls eager_load! itself.
+      def suite_arguments
+        ["test", *(ENV["LOWRAIL_VERIFY_TEST_DIRECT"] == "1" ? ["test/"] : []), "--seed", "41231"]
+      end
+
       # Observe the real setup call, before Bootsnap is loaded. Cache directory
       # contents/temperature are never an authority. Unknown effective policy
       # is a refusal, not an excuse to disable Bootsnap or warm the app.
@@ -85,6 +92,7 @@ module Lowrail
         raise ArgumentError, "verification_eager_load_unknown" unless [true, false].include?(values["eager_load"])
         raise ArgumentError, "verification_cache_store_unsupported" unless [:null_store, :memory_store].include?(IVAR.bind_call(config, :@cache_store))
         {"environment" => "test", "config" => values, "workers" => 1, "forks" => false,
+          "suite_mode" => ENV["LOWRAIL_VERIFY_TEST_DIRECT"] == "1" ? "explicit_paths" : "default",
           "ci" => ENV["CI"], "bootsnap" => @bootsnap,
           "bootsnap_version" => Gem.loaded_specs.fetch("bootsnap").version.to_s,
           "compile_option" => Manifest.compile_option_fingerprint, "jit" => Lowrail.jit_mode}

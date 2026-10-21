@@ -56,7 +56,7 @@ module Lowrail
             FileUtils.remove_entry(cache)
           end
         end
-        ARGV.replace(["test", "--seed", "41231"])
+        ARGV.replace(TestCertificate.suite_arguments)
         load File.expand_path("bin/rails")
       end
 

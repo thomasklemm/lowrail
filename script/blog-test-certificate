@@ -10,8 +10,10 @@ require "rbconfig"
 require "tmpdir"
 require "shellwords"
 
-app, out, chrome = ARGV
-abort "usage: script/blog-test-certificate APP NEW_RESULTS_DIR CHROME_BINARY" unless app && out && chrome
+app, out, chrome, mode = ARGV
+abort "usage: script/blog-test-certificate APP NEW_RESULTS_DIR CHROME_BINARY [--direct]" unless
+  app && out && chrome && [nil, "--direct"].include?(mode) && ARGV.size <= 4
+direct = mode == "--direct"
 app, out, chrome = [app, out, chrome].map { File.expand_path(_1) }
 abort "results directory must not exist" if File.exist?(out)
 abort "Ruby 4.0.7 required" unless RUBY_VERSION == "4.0.7"
@@ -21,17 +23,48 @@ cli = File.join(root, "target/debug/lowrail")
 abort "cargo build --locked first" unless File.executable?(cli)
 FileUtils.mkdir_p(out)
 summary = {"ruby" => RUBY_DESCRIPTION, "workers" => 1, "seed" => 41231,
+  "invocation" => direct ? "explicit_paths" : "default",
   "scope" => "unchanged own suites; no speed/production/parallel claim", "cases" => {}}
 Dir.mktmpdir("lowrail-test-browser") do |scratch|
   wrapper = File.join(scratch, "chrome")
   File.write(wrapper, "#!/bin/sh\nexec #{Shellwords.escape(chrome)} --no-sandbox --disable-dev-shm-usage \"$@\"\n")
   File.chmod(0o755, wrapper)
+  observer = File.join(scratch, "state.rb")
+  # Diagnostic only, symmetric off/on, after the original suite. Core reads
+  # enumerate already-existing classes; no app getter, autoload or schema call.
+  File.write(observer, <<~'RUBY')
+    at_exit do
+      ivar = Kernel.instance_method(:instance_variable_get)
+      name = Module.instance_method(:name)
+      subclass = Module.instance_method(:<)
+      app = ivar.bind_call(Lowrail.loaded_constant("Rails"), :@application)
+      config = ivar.bind_call(app, :@config)
+      base = Lowrail.loaded_constant("ActiveRecord::Base")
+      models = ObjectSpace.each_object(Class).filter_map do |type|
+        next unless base && subclass.bind_call(type, base) && (label = name.bind_call(type))
+        {"name" => label, "schema_loaded" => ivar.bind_call(type, :@schema_loaded),
+          "attributes_generated" => ivar.bind_call(type, :@attribute_methods_generated)}
+      end.sort_by { _1.fetch("name") }
+      File.write(ENV.fetch("LOWRAIL_SUITE_STATE"), JSON.generate({
+        "eager_load" => ivar.bind_call(config, :@eager_load),
+        "rake_eager_load" => ivar.bind_call(config, :@rake_eager_load), "models" => models}))
+    end
+  RUBY
   base = {"RAILS_ENV" => "test", "RACK_ENV" => nil, "PARALLEL_WORKERS" => "1", "MT_CPU" => "1",
     "LOWRAIL_BUILD_JIT" => nil, "RUBY_YJIT_ENABLE" => nil, "RUBY_ZJIT_ENABLE" => nil,
-    "RUBYOPT" => "-I#{root}/gem/lib -rlowrail/setup", "LOWRAIL_SEALED" => "1", "LOWRAIL_VERIFY_TEST" => "1",
+    "RUBYOPT" => "-I#{root}/gem/lib -rlowrail/setup -rjson -r#{observer}",
+    "LOWRAIL_SEALED" => "1", "LOWRAIL_VERIFY_TEST" => "1", "LOWRAIL_VERIFY_TEST_DIRECT" => direct ? "1" : nil,
     "LOWRAIL_SQL_TRACE" => "0", "LOWRAIL_UNITS" => nil, "LOWRAIL_DEBUG" => nil,
-    "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_STATS" => nil, "LOWRAIL_DIR" => nil,
+    "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_STATS" => nil, "LOWRAIL_DIR" => nil, "LOWRAIL_SUITE_STATE" => nil,
     "SE_BROWSER_PATH" => wrapper, "SE_CACHE_PATH" => File.join(out, "selenium")}
+  if direct
+    # The public preparation task runs off in another process. Its Rake boot
+    # cannot overwrite the later test process's app-owned eager policy.
+    prepared = system(base.merge("RUBYOPT" => nil, "LOWRAIL" => "0"), RbConfig.ruby,
+      "bin/rails", "db:test:prepare", "test:prepare", chdir: app,
+      out: File.join(out, "prepare.log"), err: [:child, :out])
+    abort "separate database/test preparation failed" unless prepared
+  end
   [["ci-unset", nil], ["ci-1", "1"]].each do |label, ci|
     env = base.merge("CI" => ci)
     build_log = File.join(out, "#{label}-build.log")
@@ -42,20 +75,31 @@ Dir.mktmpdir("lowrail-test-browser") do |scratch|
     artifact = File.join(out, "#{label}-artifact")
     FileUtils.cp_r(File.join(app, ".lowrail/verification-test"), artifact)
     manifest = JSON.parse(File.read(File.join(artifact, "manifest.json")))
+    expected_eager = direct && ci == "1"
+    abort "unexpected artifact eager policy" unless manifest.dig("verification_test", "policy", "config", "eager_load") == expected_eager
     %w[test test:system].each do |suite|
       key = "#{label}-#{suite.tr(':', '-')}"
-      cell = {"eager_load" => manifest.dig("verification_test", "policy", "config", "eager_load"), "runs" => {}}
+      arguments = if direct
+        suite == "test" ? ["test", *(Dir.glob("test/**/*_test.rb", base: app).sort -
+          Dir.glob("test/{system,dummy,fixtures}/**/*_test.rb", base: app))] : ["test", "test/system/"]
+      else
+        [suite]
+      end
+      cell = {"eager_load" => expected_eager, "command" => ["bin/rails", *arguments, "--seed", "41231"], "runs" => {}}
       summary["cases"][key] = cell
       %w[off on-cold on-warm].each do |arm|
         path = File.join(out, "#{key}-#{arm}.json")
         cache = File.join(out, "#{key}-#{arm == 'off' ? 'off' : 'on'}-bootsnap")
-        command = [RbConfig.ruby, "bin/rails", suite, "--seed", "41231"]
+        command = [RbConfig.ruby, *cell.fetch("command")]
         system(env.merge("LOWRAIL" => arm == "off" ? "0" : "1", "LOWRAIL_DIR" => artifact,
           "LOWRAIL_ROOT" => app, "LOWRAIL_OUTCOMES" => path, "LOWRAIL_STATS" => path + ".stats",
-          "BOOTSNAP_CACHE_DIR" => cache), *command, chdir: app, out: path + ".log", err: [:child, :out])
+          "LOWRAIL_SUITE_STATE" => path + ".state", "BOOTSNAP_CACHE_DIR" => cache),
+          *command, chdir: app, out: path + ".log", err: [:child, :out])
         status = $?.exitstatus
         data = File.file?(path) ? JSON.parse(File.read(path)) : nil
+        state = File.file?(path + ".state") ? JSON.parse(File.read(path + ".state")) : nil
         cell["runs"][arm] = {"exit" => status, "outcomes" => data&.fetch("tests"),
+          "natural_state" => state,
           "verification_test" => data&.fetch("verification_test", nil),
           "units" => manifest.fetch("units").map do |unit|
             id = unit.fetch("id").to_s
@@ -81,7 +125,8 @@ Dir.mktmpdir("lowrail-test-browser") do |scratch|
 end
 passed = summary.fetch("cases").values.all? do |cell|
   cell.fetch("on_only_differences").values.all?(&:empty?) &&
-    cell.fetch("runs").values.all? { _1["exit"] == 0 && _1["outcomes"] && !_1["outcomes"].empty? } &&
+    cell.fetch("runs").values.all? { _1["exit"] == 0 && _1["outcomes"] && !_1["outcomes"].empty? &&
+      _1.dig("natural_state", "eager_load") == cell.fetch("eager_load") } &&
     cell.fetch("optimized_execution").values.all?
 end
 exit(passed ? 0 : 1)
