@@ -984,7 +984,7 @@ The full counter history, including unsuccessful warmups, is retained.
 
 This is a **new measurement method**, declared before its one finite off/off
 A/A validation. Old rejected cohorts remain rejected and are never re-scored.
-Validation is pending; no pass/default promotion follows from this declaration.
+The single validation below passes; this is not a pass/default promotion.
 The declared validation is Ruby 4.0.7 / Rails 8.1.4 blog `GET:/articles/1`,
 two identical no-setup/off arms, six fresh-process rounds, seed 41231, N=50,
 alternating total/no-GC phase order, the existing 1,000,000 / 250,000 / 100,000 /
@@ -1059,6 +1059,37 @@ The main pre-window timing gate still cannot be rescued by a companion.
 actual ages/timeouts, conservative bounds, companion counts and symmetry.
 No compiler freezing, call-threshold change, app setting change, filtering,
 retry-until-flat or tolerance relaxation is part of v2.
+
+**One finite off/off validation, 2026-10-21: accepted.** Measured and
+predeclared published head
+[`2b57bc8`](https://github.com/thomasklemm/lowrail/commit/2b57bc84ccebd990918743d70033e1b16d4ffdce),
+not the later form-operation adapter or collection micro. Two identical
+`LOWRAIL=0`, no-setup arms, six fresh-process rounds; the two-arm schedule
+uses at most two of the four reserved Callgrind workers. No retry or changed
+setting. Full source/fixture pins match before/after. The
+[numeric export](bench-yjit-v2.json) retains method/tool/source pins, complete
+warmup histories, measured counters, timestamps, conservative timing bounds
+and explicitly separate companion evidence. Raw data and responses stay private.
+
+| Control | Result |
+|---|---|
+| Total Ir A/A, off-B vs off-A | **+0.0147% [−0.1192, +0.0717]**, passes unchanged ±0.5% gate, contains zero |
+| GC-excluded Ir A/A | **+0.0460% [−0.1064, +0.1082]**, passes the same gate |
+| JIT mode / warmup / measured flatness | **12/12 workers, 48/48 windows pass**; convergence at 2,200–10,600 requests, ten quiet batches; no changed/missing measured counter |
+| Heap / brk / measured GC | **pass**; fixed pools matched, no overflow; 48/48 windows have zero minor/major/compaction deltas |
+| Main pre-window timing | **48/48 pass**; conservative request-start gap 0.0187–1.3993 s, actual connection age 0.0110–0.5599 s, unchanged timeout 2 s |
+| Whole-window timing bound | **24/48 prove absence**, all N=0; **24/48 require the declared companion fallback**, all N=50; whole-window duration 0.0814–6.3479 s |
+| Separate untimed companions | **48 zero window counts**, symmetric in every round/arm; every companion's idle-boundary exercise count is 1 |
+
+This validates **one blog-show off/off cohort** under v2, not universal
+flatness, a pass saving or native latency. In particular the 24 long windows
+have **no exact measured-path-count proof**; their zero counts are companion
+observations only. Future pass comparisons keep the strict per-window JIT,
+A/A, heap/brk and timing/symmetry gates and may still reject. No historical
+config/link cohort is re-scored or used as a newly accepted speed claim.
+Benchmark tests: 4.0.7 **15/166**, 4.1-preview1 **15/180**, no failures/errors/
+skips; final upstream rebase also passed the five focused gate tests, **89
+assertions** on each VM. No app/runtime/default or timeout policy changed.
 
 Warm the observer too: after heap preparation, an enabled observer gets 200
 untimed rounds of the **exact** `GC.stat_heap(pool, existing_hash)`,
