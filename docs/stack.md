@@ -45,7 +45,7 @@ sign: objects saved by retaining that component in the full stack.
 | Existing sealed form scaffold | Blog show, retained fixture only | −378 objects/request | −378; 1 hit/request | +378 | Favorable screen, provisional: active own-suite gap retained |
 | Existing sealed token tag | Blog show, retained fixture only | +32 objects/request | +32; 4 hits/request | −32 | Excluded on Blog by deterministic cost; live-token continuations retained |
 | Existing sealed collection render | Blog show, retained fixture only | 0 objects/request | 0; 1 hit/request | 0 | Allocation tie, no win credit; active own-suite gap retained |
-| Existing sealed AR instantiation | Blog active; Lobsters warmed vector has zero hits; Campfire/Fizzy retesting | Blog 0; Campfire/Fizzy pre-fix excesses superseded pending corrected screens | Blog 0; 3 hits/request | Blog 0 | Blog tie, no win credit; Campfire/Fizzy final exclusion undecided |
+| Existing sealed AR instantiation | Blog / Campfire / Fizzy active; Lobsters warmed vector has zero hits | Blog 0; Campfire near tie; Fizzy filtered/users/show +18/+10/+37 | Blog 0; 3 hits/request | Blog 0 | Fizzy excluded by deterministic cost; Campfire unadmitted (near tie, exactness RED); Blog/Lobsters no win credit |
 | Props `frozen_split` (`dd844dd`) | None of these four apps use Inertia | Isolated interpreter micro −0.460571% Ir, not request credit | — | — | Excluded: frozen-holder tier not implemented; do not freeze app holders to admit it |
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
@@ -150,6 +150,16 @@ does not fix heap layout across artifacts, so neither these measurements nor
 cross-artifact differences establish GC synergy. Every case's GC counts/time,
 native wall, RSS and coverage remain in the export.
 
+**Retained-heap question, unmeasured:** the shared worker records allocation
+counts, GC counts/time and RSS, but not a post-warmup `GC.stat` snapshot.
+`heap_live_slots`, `old_objects` and `malloc_increase_bytes` are therefore
+unavailable for every arm in this retained batch. A larger retained artifact
+heap or earlier GC trigger could explain more collections despite fewer
+objects/request, but neither is established by these data. Do not infer heap
+occupancy from RSS or attribute the extra collections to a proven cause.
+No new cohort is run to fill this gap. Collection-only and AR-only each save
+zero objects/request on this route, despite their active hits.
+
 All favorable results remain **provisional** until active own-suite coverage
 and the unchanged admission gates exist. No whole-stack price is requested.
 
@@ -174,9 +184,38 @@ correctness diagnosis follows. All wall effects are unresolved against A/A.
 The coordinator identified `ARShadow.enabled?`'s per-call `%w[1 strict]`
 Array as an existing main allocation bug; its allocation-free correction is
 published at `acc130d`. The caller exists on the measured per-row path;
-these excesses approximately track hits. **Exclusion is provisional**, not a
-final AR negative: the corrected retest is running, without a local duplicate
-implementation. Retain this entire superseded screen, including exactness RED.
+these excesses approximately track hits. The corrected retest below replaces
+the provisional cost exclusion, without a local duplicate implementation.
+Retain this entire superseded screen, including exactness RED.
+
+### Corrected Campfire AR: old penalty gone, no admitted win
+
+Rebuilt all 19 units normally against the disposable fixture on `acc130d`;
+same three-round 200/300 screen, four GETs and natural guarded hits.
+
+| Route | Off-A / off-B / on allocation medians | AR hits / request | Two-seed exact response |
+|---|---|---:|---|
+| room | 15,527 / 15,527 / 15,527 | 52 | FAIL |
+| pagination | 6,810 / 6,811 / 6,810 | 46 | FAIL |
+| sidebar | 9,109 / 9,110 / 9,109.5 | 8 | PASS |
+| search | 8,126 / 8,125 / 8,125 | 19 | FAIL |
+
+Medians are computed from integer observations; an even pooled sample can
+have a half-object median. The former +51/+46/+8/+19 medians are **not a
+current-source cost claim**. Room now ties exactly; other medians lie within
+one object of the two controls. Small mean-allocation differences and their
+A/A spread remain in the export; do not promote a one-object median shift
+to a stable deterministic reduction. Room's paired mean allocation interval
+straddles zero. Pagination/sidebar mean excesses are below one object/request
+against off-A, while search saves below one, with comparable A/A variation.
+
+Whole screen exits 2: room/pagination/search retain off/off body/header
+differences, sidebar passes. DB completion remains uncovered; Room STI still
+falls back naturally (room 2, pagination/search 1 per request). Native wall
+changes −0.88%/+1.23%/+1.13%/−1.91% remain inside A/A spreads
+1.64%/3.01%/2.30%/5.23%. **No admitted component or price:** this is near-tie
+allocation evidence with unresolved correctness boundaries, not a final
+negative based on the removed shadow penalty and not a cross-app win.
 
 ### Fizzy AR: superseded pre-shadow-fix exclusion screen
 
@@ -196,8 +235,37 @@ than selecting the baseline that makes the effect larger.
 The whole screen exits 2: retained exactness failures include off/off
 differences, not a diagnosed candidate-specific failure. DB effects remain
 uncovered. Some allocation excesses exceed the counted AR hits; the known
-shadow-predicate allocation cannot explain all of them. All six will be
-retested on `acc130d` before final exclusion. No latency claim.
+shadow-predicate allocation cannot explain all of them. The corrected retest
+below supersedes these cost observations. No latency claim.
+
+### Corrected Fizzy AR: residual cost excludes it on this app
+
+Rebuilt the 45-unit public artifact using the original disposable fixture's
+environment and DB, then screened all six GETs on `acc130d`, same three-round
+200/300 protocol. No app/config patch or block-link specimen.
+
+| Route | Off-A / off-B / on allocation medians | On minus either off median | Two-seed exact response |
+|---|---|---:|---|
+| buckets | 9,065 / 9,065 / 9,065 | 0 | PASS |
+| filtered bubbles | 22,518 / 22,518 / 22,536 | +18 | FAIL |
+| account users | 5,588 / 5,588 / 5,598 | +10 | PASS |
+| workflows | 3,825 / 3,825 / 3,825 | 0 | PASS |
+| notifications | 3,805 / 3,805 / 3,805 | 0 | FAIL |
+| bubble show | 18,338 / 18,338 / 18,375 | +37 | FAIL |
+
+The allocation-free shadow fix removes a real penalty, but not all AR cost.
+Account users independently passes both-seed actual response checks and
+retains +10 median objects/request; its paired mean interval is
++0.160% to +0.170%. That positive deterministic cost alone excludes this
+component from the Fizzy stack, without depending on the failed routes.
+Filtered/show mean intervals are also positive. Counted hits remain
+11/45/6/7/4/43 per request, with no fallback in these probes.
+
+Whole screen exits 2: filtered/notifications/show retain body/header
+differences off/off too. DB effects remain uncovered. These refusals are not
+normalized away or diagnosed as candidate-specific errors. No native latency
+win is claimed; show records +6.06% paired wall against 1.79% A/A, but fails
+exactness and is not an accepted price. Pre-fix data remain intact above.
 
 ### Lobsters AR: warm-cache zero credit
 
@@ -219,10 +287,17 @@ mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
   .lowrail/stack/screen-*
 ```
 
-Corrected Blog attribution and initial four-app screens are complete;
-post-shadow-fix Campfire/Fizzy retests are pending. Blog's signed allocation
-effects are additive, not all beneficial. No cross-app win, native latency
-gain, GC synergy or supported component is claimed.
+Corrected Blog attribution, initial four-app screens and post-shadow-fix
+Campfire/Fizzy retests are complete: **15 retained screens**. Blog's signed
+allocation effects are additive, not all beneficial. There is no admitted
+multi-component stack across apps. Token is excluded on Blog; existing AR is
+excluded on Fizzy; Campfire offers no clear reduction and retains exactness
+gaps; Lobsters' cached vector provides no active credit. Form's favorable
+Blog request reduction stays provisional until active own suites exist.
+Bet F's guarded published candidate is still pending and is not integrated.
+No cross-app win, native latency gain, GC synergy or supported component is
+claimed. Shared screen tests pass 2 tests / 39 assertions; imported dispatch
+regressions pass form 2/202 and link 2/162; shadow-predicate regression 1/4.
 Propose at most **one** whole-stack Callgrind/README price to the coordinator
 only after a clear screen (>3× A/A wall noise or solid deterministic reduction)
 and the correctness/admission boundaries are resolved. No Callgrind is launched

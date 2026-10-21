@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Stack AR retest: Fizzy excluded, Campfire near tie (2026-10-21)
+
+Rerun existing public AR artifacts after main's allocation-free shadow fix; retain pre-fix screens as superseded evidence, not deleted results.
+Campfire room now ties at 15,527 objects/request, other medians within one object of controls; no clear reduction, three routes retain off/off exactness failures.
+Fizzy account users passes both-seed response checks yet costs +10 objects/request; filtered/show cost +18/+37, excluding existing AR on Fizzy by the deterministic gate.
+Lobsters' warmed vector has zero AR hits and zero allocation savings; Blog AR-only and collection-only also save zero despite active hits.
+No admitted multi-component stack or price request; active own-suite and DB/completion gaps stay named. [Fifteen retained screens and attribution](stack.md).
+
 ## Stack screen: exclude Blog token, not the form win (2026-10-21)
 
 Corrected public builds include sealed dispatch fixes and allocation-free shadow checks; nine Blog selections pass two-seed response and DB comparisons.
