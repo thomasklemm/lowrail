@@ -113,7 +113,7 @@ class ManifestTest < Minitest::Test
       end
       puts JSON.generate(rows)
     RUBY
-    assert_equal 27, result.size
+    assert_equal 33, result.size
     assert_equal [[false, true, false, false]], result.uniq
   end
 end

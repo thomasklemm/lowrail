@@ -104,6 +104,24 @@ The scheduling/counter prerequisite is separate: the actual Callgrind
 stub, outside slots/cohorts. Affinity/CPU/overlap observations remain symmetric
 and outside window endpoints; unavailable migration counters remain null.
 
+### Broader validation and a caught integration regression
+
+The first full primary suite recorded **173 tests / 5,918 assertions, three
+failures, zero errors, two named Rails-checkout/bundle skips**. One failure is
+the unchanged all-sealed cold-ancestry gate. The others were not dismissed:
+the old-artifact test's explicit matrix grows from 27 to 33 cases for the two
+new sealed pass IDs, and the new observer had allocated an extra initialization
+TracePoint that correctly retired memo's tracing-sensitive fast path.
+
+Clean main passes the same production-activation regression (1/91); the draft
+fails it, and the corrected observer plus manifest matrix pass **8/178**. The
+observer now uses Rails' existing `after_initialize` load hook directly: it
+needs completed Zeitwerk aliasing, not a new initialized-app TracePoint.
+Memo's conservative trace policy and all guarded passes are unchanged. The
+dedicated Rails report rerun passes **3/17**, zero skips. The final affected
+suite and published source/artifact pins are recorded in the numeric export;
+the original failed run remains reported, not relabeled green.
+
 ## One proposed production cohort — awaiting authorization
 
 **Not started; no slots used or reserved.** After publication and the final

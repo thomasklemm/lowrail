@@ -11,15 +11,17 @@ module Lowrail
 
     def self.observe
       require_relative "load_hooks"
-      require_relative "passes"
       LoadHooks.active_support do
         ::ActiveSupport.on_load(:action_view) do
           require_relative "form_scaffold_inventory"
           helper = Lowrail.loaded_constant("ActionView::Helpers::UrlHelper")
           helper.prepend(TokenTag::Variant) if helper && !(helper < TokenTag::Variant)
         end
+        # This seam needs only Zeitwerk's completed require aliasing, not a
+        # certified initialized app. Do not allocate an initialize! TracePoint:
+        # even a disabled targeted trace correctly retires sealed memo units.
+        ::ActiveSupport.on_load(:after_initialize) { ::Lowrail::RenderUnits.activate }
       end
-      Passes.after_initialize(self)
     end
 
     def self.activate
