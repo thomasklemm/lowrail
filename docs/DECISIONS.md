@@ -13,14 +13,13 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
-## Bet D: always-on method TracePoint rejected (2026-10-21)
+## Bet D: authoritative method epoch killed (2026-10-21)
 
-Reject the live `:call/:c_call/:raise` method tripwire as a production detector.
-Six-round native YJIT blog show: off-A/off-B/on/tripwire 2.961/2.977/2.446/13.560 ms;
-tripwire adds **454.306%** [429.296, 478.032], versus A/A +0.598% [-2.803, 4.284].
-It adds 71.326 objects/request too; any guard saving is dwarfed. No Callgrind or README claim.
-Singleton-seal improvement has concrete visibility/saved-ancestry holes; not an authoritative epoch.
-See [contract proposal and evidence](freeze-mode-proposal.md); main and production admission unchanged.
+Kill the always-on TracePoint: native YJIT blog on 2.446 → 13.560 ms/request, **5.54×** (+454.306% [429.296, 478.032]); A/A +0.598% [-2.803, 4.284].
+It adds 71.326 objects/request; detection costs dwarf any guard saving. No Callgrind or README performance claim.
+Kill singleton-seal as an authoritative epoch: visibility, saved `prepend_features`, suppressed instance callbacks/subclasses and pre-existing refinements remain holes.
+`FrozenError` is an irreversible compatibility break, **not a fallback**; the cheaper detector cannot authorize guard removal.
+Keep the [hole table, contract draft and probes](freeze-mode-proposal.md) as a negative result; skip further census/screens, no main integration or production admission.
 
 ## Prism 2 adoption and target grammar (2026-10-21)
 
