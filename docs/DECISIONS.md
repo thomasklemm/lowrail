@@ -4,6 +4,34 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Production sealed helper dispatch safety (2026-10-21)
+
+Production token admission did not refuse an existing view `send` override
+or a private live generator. Stock Rails calls those helpers implicitly;
+the specialization used `view.send` and a public generator call. Reproduced
+before a fix: wrong CSRF name with generation/conversion/send counts 1/0/1
+versus stock 1/1/0, and a private generator raising `NoMethodError` instead
+of generating once. Both were admitted, not post-seal mutations.
+
+Use a captured, independently stock-certified `BasicObject#instance_exec`
+to run actual implicit calls on the actual view. It bypasses view-defined
+`send`, `__send__`, `public_send`, `method` and `instance_exec`, while retaining
+private/protected and `method_missing` dispatch, stock `defined?` semantics,
+live ordering and saved-value continuation. Apply the same mechanism to the
+form's builder/buffer/URL/token boundaries. Keep the named route's original
+explicit `public_send` with a newly constructed String name and its live app
+override effects; polymorphic routing does not call that helper implicitly.
+Collection's existing implicit renderer calls need no change. Test admission
+remains a separate, unpublished review and will consume this one primitive.
+
+**The accepted −15.225536% was measured at
+[`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
+which had this dispatch defect. It remains a price for that exact source and
+specimen only, not the fixed runtime.** No re-price, YJIT cohort or slot is
+authorized by this fix. Default/quarantine/guarded passes are unchanged;
+YJIT seam work stays paused and `835cf16` parked.
+[Dispatch sweep and correctness gates](passes/sealed-production.md#helper-dispatch-safety).
+
 Working assumption: many small exact passes (each < 2 %) should **stack**.
 `lowrail bench --passes SET --default-build DIR` (8db84d8) measures a pass set as one layer against no-setup and a separate default
 reference, and report the stacked effect next to the sum of individual

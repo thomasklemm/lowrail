@@ -73,6 +73,7 @@ module Lowrail
       return "missing actual-holder primitive; keep original" unless native
       exact = native.method(:exact_class?)
       return "actual-holder primitive changed; rebuild" unless Sealed.signature(exact) == passive.fetch("native_method")
+      return "view context dispatch changed; rebuild" unless Sealed.view_context_fact == passive.fetch("view_context")
       return "unknown form block holder; keep original" unless exact.call(block, Proc)
       binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
       return "actual-holder binary not certified; rebuild" unless data.fetch("sources").key?(binary)

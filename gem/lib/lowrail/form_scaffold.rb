@@ -122,10 +122,11 @@ module Lowrail
         # Acquire the real builder before checking the values any live factory
         # could affect. Never create its singleton class or inspect only public
         # singleton methods. Foreign/reinitialized contexts stay original.
-        builder = view.send(:tag_builder)
+        builder = Sealed::VIEW_CONTEXT.bind_call(view) { tag_builder }
         return count(false, "unknown builder/context") unless @holder.call(builder, @builder_class) &&
           @ivars.bind_call(builder, :@view_context).equal?(view)
-        return count(false, "unknown output buffer") unless @holder.call(view.output_buffer, @buffer_class)
+        buffer = Sealed::VIEW_CONTEXT.bind_call(view) { output_buffer }
+        return count(false, "unknown output buffer") unless @holder.call(buffer, @buffer_class)
         return count(false, "non-English locale") unless I18n.locale == :en
         return count(false, "nonblank/error/persisted form model") unless article.persisted? && !child.persisted? &&
           child.commenter.nil? && child.body.nil? && child.errors.empty?
@@ -139,21 +140,27 @@ module Lowrail
       end
 
       def render(view, article)
-        path = view.article_comments_path(article)
-        fields = %(
+        table = @table
+        Sealed::VIEW_CONTEXT.bind_call(view) do
+          # PolymorphicRoutes uses an explicit public_send with a newly
+          # constructed String name. Unlike the implicit helpers below,
+          # that dispatch (including an app override) must remain live.
+          path = view.public_send(+"article_comments_path", article)
+          fields = %(
   <div>
-    <label class="block font-medium" for="comment_commenter">#{@table[:label]}Commenter</label>
+    <label class="block font-medium" for="comment_commenter">#{table[:label]}Commenter</label>
     <input class="block w-full border rounded p-2" type="text" name="comment[commenter]" id="comment_commenter" />
   </div>
   <div>
-    <label class="block font-medium" for="comment_body">#{@table[:label]}Body</label>
-    <textarea rows="3" class="block w-full border rounded p-2" name="comment[body]" id="comment_body">#{@table["textarea"]}</textarea>
+    <label class="block font-medium" for="comment_body">#{table[:label]}Body</label>
+    <textarea rows="3" class="block w-full border rounded p-2" name="comment[body]" id="comment_body">#{table["textarea"]}</textarea>
   </div>
   <input type="submit" name="commit" value="Add Comment" class="bg-blue-600 text-white px-4 py-2 rounded" data-disable-with="Add Comment" />
 )
-        path = view.url_for(path)
-        token = view.send(:token_tag, nil, form_options: {action: path, method: "post"})
-        %(<form class="space-y-4" action="#{ERB::Util.html_escape(path)}" accept-charset="UTF-8" method="post">#{token}#{fields}</form>).html_safe
+          path = url_for(path)
+          token = token_tag(nil, form_options: {action: path, method: "post"})
+          %(<form class="space-y-4" action="#{ERB::Util.html_escape(path)}" accept-charset="UTF-8" method="post">#{token}#{fields}</form>).html_safe
+        end
       end
     end
   end

@@ -12,6 +12,112 @@ The separately authorized [corrected-source re-price](production-interpreter-rep
 at `553e7aa` is **−15.23% total interpreter Ir [−15.25, −15.21]**, with both
 A/A controls and pre/post correctness gates passing. No YJIT price is claimed.
 
+## Helper dispatch safety
+
+**The −15.225536% measured source `553e7aa` had this defect. That number is
+not a price for the dispatch fix.** A public production artifact admitted
+both a private effective-view generator and an existing view `send` override.
+Stock implicit calls generated/converted once; the former fast path raised
+`NoMethodError`, or emitted the wrong CSRF name with generation/conversion/send
+counts **1/0/1 instead of 1/1/0**. Installation was during `after_initialize`,
+before `initialized?` and before the first witness, not post-seal mutation.
+
+The shared `Sealed::VIEW_CONTEXT` captures core
+`BasicObject.instance_method(:instance_exec)`. `UnboundMethod#bind_call(view)`
+runs Ruby blocks with the actual view as `self`; helpers that Rails calls
+implicitly remain actual implicit calls, not reflective/public substitutes.
+The named route is different: stock polymorphic routing uses explicit
+`recipient.public_send(method_string, article)`. Keep that explicit call and
+its live override effects, String argument and public visibility restriction.
+The other helper calls preserve private/protected visibility,
+`method_missing`'s private-call flag, `respond_to_missing?`/`defined?` behavior,
+live ordering, and the saved-value tag continuation. Capturing the core method
+also bypasses a view's own `instance_exec` override. Unit/epoch/holder/table
+state is retained in local variables, not read from the view after switching
+`self`. No view/request/block is retained by admission. Build independently
+requires native owner `BasicObject`, original name `instance_exec`, no Ruby
+source location and no ISeq; both form and render certificates pin its
+signature, and runtime admission checks the same captured method. A changed capture
+refuses as `view context dispatch changed; rebuild`.
+
+### Reviewed token/form/collection call list
+
+| Former operation | Verdict |
+|---|---|
+| Token `view.send(:protect_against_forgery?)` | Real implicit call, with Rails' original `defined?` prefix restored |
+| Token `view.form_authenticity_token(...)` | Real implicit call; private/protected and missing-method generation allowed |
+| Token `view.send(:request_forgery_protection_token).to_s` | Real implicit helper call, then live conversion exactly once |
+| Token continuation `view.send(:tag, :input, **attributes)` | Real implicit call with saved values; never regenerate/reconvert |
+| Form validity `view.send(:tag_builder)` | Real implicit call through the same captured context |
+| Form validity `view.output_buffer` | Real implicit call through the same captured context |
+| Form rendering `view.article_comments_path(article)` | Preserve stock routing's explicit `view.public_send(+"article_comments_path", article)`, not an fcall; private routes remain private and live `public_send` effects remain observable |
+| Form rendering `view.url_for(path)` | Real implicit call, like stock `html_options_for_form` |
+| Form rendering `view.send(:token_tag, ...)` | Real implicit call; composes with token observer/fallback |
+| Collection renderer | No reflective view dispatch; existing implicit `build_rendered_template` already runs on the actual renderer. Stock explicit `current.render(view, ...)` remains explicit |
+| Admission `view_class.instance_method(:_routes).bind_call(view)` | Retain: read-only stock-getter witness, body independently certified before the call; it is not a live-helper substitution |
+| `view.method`, `view.__send__` | None in these production runtime/admission paths; the route's original `public_send` is deliberately retained |
+| Separate `Sealed.link?`: `view.send(:tag_builder)` | Existing reflective-dispatch debt, retained outside this token/form/collection fix; **not** certified safe by this review |
+
+The three `view.send` calls in `FormScaffoldInventory.check` (builder default,
+UTF-8 policy, content-exfiltration policy), and compiler/template reflection
+in `FormScaffoldBuild`/inventory, remain **build-only** synthetic probes. They
+do not authorize reflective dispatch during requests. Type/Module `.method`
+reads in admission check certificate bodies, never invoke a helper on a view.
+The separate sealed link pass, default/quarantine and guarded passes are not
+changed by this sweep.
+
+The kept production regression uses four fresh boot modes: private, protected,
+ordinary public (`reflective`), and missing-method generator, each with the hostile reflective
+overrides installed before the first witness. It compares literal and
+non-String saved-value continuations with the saved stock method, including
+once-only generation/conversion and missing-method private-call flags. The
+hostile view overrides `send`, `__send__`, `public_send`, `method` and
+`instance_exec`; none may intercept an implicit helper. Whole warmed requests additionally
+exercise the form/collection path under those conditions. Rails' original
+`_run` public template dispatch and polymorphic public route dispatch are
+retained, not trapped as implicit helper calls.
+Private/protected modes also restrict the effective `output_buffer` getter;
+the stock-private `tag_builder` remains private in every mode.
+An override of `__send__` alone was not the old defect; including it prevents
+the tempting but incorrect fix of replacing `send` with `__send__`.
+
+Source changes: `sealed.rb` (shared core capture), `render_units.rb` (live
+token dispatch and captured-method check), `render_units_build.rb` (capture
+certificate), `form_scaffold.rb` (form dispatch), `form_scaffold_build.rb`
+(capture certificate), `form_scaffold_admission.rb` (capture check). These six
+source pins change. The artifact still delivers **zero files and zero template
+ISeqs**: three passive unit certificates change, not app/template source bytes.
+No new price, YJIT run, Callgrind slot or test-tier integration follows.
+
+### Dispatch-fix validation
+
+Ruby 4.0.7, Rails 8.1.4, strict gates and the retained production fixture:
+app source `86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf`,
+lock `570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596`.
+
+- `ruby -Igem/lib -Igem/test gem/test/form_scaffold_test.rb`:
+  **2 tests / 201 assertions, zero failures/errors/skips**. This executes
+  the public artifact build, both seeded cold off/off/on sequences, both
+  **192-pair** status/body/all-header/SQL/event/assign controls and native/deopt
+  checks, plus the dispatch and existing continuation regressions.
+- `ruby -Igem/lib -Igem/test gem/test/test_certificate_test.rb --seed 19811`:
+  **7 / 118, zero failures/errors/skips** on the source-frozen final fix.
+- `cargo test --locked`: **39 + 2 + 8 passed**, none failed or ignored.
+- A native-capture diagnostic accepts stock `instance_exec` and refuses both
+  a captured native `__send__` and a Ruby replacement. No app code executes
+  through those rejected captures.
+
+The regression failed first on unchanged main. Earlier whole-request probe
+mistakes (the layout adds a fifth CSRF generation/conversion, and its bare
+missing-method vcall raises `NameError`, not `NoMethodError`) are retained in
+the local validation log, not changes to the production contract. One
+certificate run had two hit-count failures while runtime edits overlapped.
+Its exact refusal was not captured, so source drift is not asserted as proven
+cause. Clean main at the same seed passes **7 / 118**; both the diagnostic
+source-frozen run and the final uninstrumented run pass **7 / 118**. Final
+runtime/test hashes are checked unchanged across the production/certificate
+run. No failed result is suppressed or used as price evidence.
+
 ## What is certified
 
 Both units use a first **natural original operation** as their witness. The

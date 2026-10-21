@@ -9,6 +9,7 @@ live in the linked docs; numbers come from executed runs, dated.
 
 | Area | State |
 |---|---|
+| Production dispatch safety | Sealed token's preexisting private-helper / reflective-send P1 fixed with captured stock `BasicObject#instance_exec` fcalls; same primitive covers form helpers, collection unchanged. **−15.225536% remains the price of defective source [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65), not this fix**. No new price; YJIT seam paused, `835cf16` parked. [Sweep and gates](passes/sealed-production.md#helper-dispatch-safety) |
 | Default build | lowers nothing: `view/link_to` and `route/path` quarantined (45fd07a); five-app manifests have 0 units |
 | Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; hook-free delivery preserves loader selection; Redprints' strict load census passes with targeted Bundlebun refusal, **0 hits** ([compatibility report](compat.md)) |
 | Opt-in passes | guarded selection: only props + endpoint; seven cached-fact passes sealed-only after suppressed-hook audit; see [DECISIONS](DECISIONS.md#passes) |

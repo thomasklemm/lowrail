@@ -13,6 +13,10 @@ module Lowrail
     REQUEST = :__lowrail_sealed_request
     ENCODING = String.instance_method(:encoding)
     VALID = String.instance_method(:valid_encoding?)
+    # Run live helper calls as fcalls on the view, without invoking any of
+    # its overridable send/__send__/instance_exec methods. Build certificates
+    # independently require this captured core body to be stock.
+    VIEW_CONTEXT = BasicObject.instance_method(:instance_exec)
 
     class << self
       attr_reader :refusal
@@ -32,6 +36,12 @@ module Lowrail
           "parameters" => method.parameters.map { _1.map(&:to_s) },
           "original_name" => method.original_name.to_s,
           "iseq" => sequence && Manifest.digest.hexdigest(Marshal.dump(clean.call(sequence)))}
+      end
+
+      def view_context_fact
+        return unless VIEW_CONTEXT.owner.equal?(BasicObject) && VIEW_CONTEXT.original_name == :instance_exec &&
+          VIEW_CONTEXT.source_location.nil? && RubyVM::InstructionSequence.of(VIEW_CONTEXT).nil?
+        signature(VIEW_CONTEXT)
       end
 
       def install(units)

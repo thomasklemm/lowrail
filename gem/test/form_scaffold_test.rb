@@ -148,6 +148,141 @@ class FormScaffoldTest < Minitest::Test
       assert_equal [1, 0], restored.values_at("hits", "fallbacks"), "a foreign input must not retire the unit"
       assert replaced.fetch("admitted")
 
+      # Helpers are live fcall boundaries, not public/reflective sends. Install
+      # these before the first natural witness, not as post-seal mutations.
+      dispatches = %w[private protected reflective method_missing].map do |mode|
+        ruby_json(<<~'RUBY', chdir: app, env: boot_env.merge("DISPATCH_CASE" => mode))
+          require "./config/application"
+          Rails.application.config.yjit = false
+          module LiveDispatchHelpers
+            def protect_against_forgery? = !!Thread.current[:dispatch_probe]
+            def form_authenticity_token(**)
+              probe = Thread.current.fetch(:dispatch_probe)
+              probe[:generated] += 1
+              probe.fetch(:value)
+            end
+            def request_forgery_protection_token = Thread.current.fetch(:dispatch_probe).fetch(:name)
+            def method_missing(name, *args, **kwargs, &block)
+              return super unless name == :form_authenticity_token
+              begin
+                super
+              rescue NameError => error
+                probe = Thread.current.fetch(:dispatch_probe)
+                # csrf_meta_tags uses a bare vcall (NameError); token_tag's
+                # keyword fcall reports NoMethodError#private_call?.
+                probe[:private_calls] << error.private_call? if NoMethodError === error
+                probe[:generated] += 1
+                probe.fetch(:value)
+              end
+            end
+            def respond_to_missing?(name, include_private = false)
+              name == :form_authenticity_token || super
+            end
+          end
+          module ReflectiveDispatchTrap
+            %i[send public_send __send__ instance_exec method].each do |dispatch|
+              define_method(dispatch) do |*args, **kwargs, &block|
+                if (probe = Thread.current[:dispatch_probe]) && dispatch == :public_send && args.first == "article_comments_path"
+                  probe[:routes] << [args.first.class.name, args.first.frozen?, args.fetch(1).id]
+                  return "/live-public-route"
+                end
+                # Rails' real _run uses public_send for its compiled template.
+                # Trap only helper dispatch, not that original boundary.
+                if (probe = Thread.current[:dispatch_probe]) && (dispatch == :instance_exec ||
+                    %i[protect_against_forgery? form_authenticity_token request_forgery_protection_token
+                       tag tag_builder output_buffer article_comments_path url_for token_tag].include?(args.first))
+                  probe[:intercepted] << dispatch.to_s
+                  raise "app #{dispatch} intercepted a helper"
+                end
+                super(*args, **kwargs, &block)
+              end
+            end
+          end
+          mode = ENV.fetch("DISPATCH_CASE")
+          installed_before_boot = false
+          Rails.application.config.after_initialize do
+            klass = ArticlesController.view_context_class
+            case mode
+            when "private", "protected"
+              LiveDispatchHelpers.send(mode, :form_authenticity_token)
+              klass.send(mode, :output_buffer)
+            when "method_missing"
+              LiveDispatchHelpers.send(:undef_method, :form_authenticity_token)
+            end
+            klass.prepend(LiveDispatchHelpers)
+            klass.prepend(ReflectiveDispatchTrap)
+            installed_before_boot = !Rails.application.initialized? && Lowrail::TokenTag.admission.fetch(:attempts).zero?
+          end
+          require "./config/environment"
+          require "rack/mock"
+          view = nil
+          trace = TracePoint.new(:call) { |event| view = event.self }
+          trace.enable(target: Lowrail::TokenTag::Variant.instance_method(:token_tag))
+          status = Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on").status
+          trace.disable
+          original = view.method(:token_tag).super_method
+          invoke = Kernel.instance_method(:send)
+          id = Lowrail.manifest.units.find { _1.fetch("pass") == "sealed/token_tag" }.fetch("id").to_s
+          before = Lowrail::Stats.unit_hits.fetch(id, 0)
+          options = {action: "/articles/1/comments", method: "post"}
+          records = ["live-token", ["left<&", 'right"']].map do |value|
+            [false, true].map do |fast|
+              probe = {value: value, generated: 0, converted: 0, private_calls: [], intercepted: []}
+              name = Object.new
+              name.define_singleton_method(:to_s) { probe[:converted] += 1; 'actual-csrf<&"' }
+              probe[:name] = name
+              Thread.current[:dispatch_probe] = probe
+              begin
+                output = fast ? invoke.bind_call(view, :token_tag, nil, form_options: options) : original.call(nil, form_options: options)
+                {output: output, generated: probe[:generated], converted: probe[:converted],
+                  private_calls: probe[:private_calls], intercepted: probe[:intercepted]}
+              rescue StandardError => error
+                {error: error.class.name, message: error.message.lines.first.strip}
+              ensure
+                Thread.current[:dispatch_probe] = nil
+              end
+            end
+          end
+          literal_hits = Lowrail::Stats.unit_hits.fetch(id, 0) - before
+          probe = {value: "live-token", generated: 0, converted: 0, private_calls: [], intercepted: [], routes: []}
+          name = Object.new
+          name.define_singleton_method(:to_s) { probe[:converted] += 1; "whole-request-csrf" }
+          probe[:name] = name
+          before = Lowrail::Stats.unit_hits.dup
+          Thread.current[:dispatch_probe] = probe
+          begin
+            response = Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
+          ensure
+            Thread.current[:dispatch_probe] = nil
+          end
+          hot = {status: response.status, fields: response.body.scan('name="whole-request-csrf"').size,
+            generated: probe[:generated], converted: probe[:converted], intercepted: probe[:intercepted],
+            routes: probe[:routes], action: response.body.include?('action="/live-public-route"'),
+            hits: Lowrail.manifest.units.to_h { [_1.fetch("pass"), Lowrail::Stats.unit_hits.fetch(_1.fetch("id").to_s, 0) - before.fetch(_1.fetch("id").to_s, 0)] }}
+          puts JSON.generate(mode: mode, installed_before_boot: installed_before_boot, status: status,
+            admitted: Lowrail::TokenTag.admitted?, records: records, hits: literal_hits, hot: hot)
+        RUBY
+      end
+      dispatches.each do |record|
+        assert record.fetch("installed_before_boot")
+        assert_equal 200, record.fetch("status")
+        assert record.fetch("admitted"), record.fetch("mode")
+        record.fetch("records").each do |left, right|
+          assert_equal left, right, record.fetch("mode")
+          assert_equal [1, 1], left.values_at("generated", "converted")
+          assert_empty left.fetch("intercepted")
+          assert_equal [true], left.fetch("private_calls") if record.fetch("mode") == "method_missing"
+        end
+        assert_equal 1, record.fetch("hits"), "one literal hit, one original tag continuation"
+        hot = record.fetch("hot")
+        # Four hidden fields plus the layout's stock csrf_meta_tags pair.
+        assert_equal [200, 4, 5, 5], hot.values_at("status", "fields", "generated", "converted"), record.fetch("mode")
+        assert_empty hot.fetch("intercepted")
+        assert_equal [["String", false, 1]], hot.fetch("routes"), "retain stock explicit public route dispatch"
+        assert hot.fetch("action")
+        assert_equal({"sealed/form_scaffold" => 1, "sealed/token_tag" => 4, "sealed/collection_render" => 1}, hot.fetch("hits"))
+      end
+
       bad = Marshal.load(Marshal.dump(manifest))
       bad.fetch("units").reject { _1["pass"] == "sealed/form_scaffold" }.each { _1.fetch("data").fetch("observer")["iseq"] = "changed" }
       File.write(manifest_path, JSON.generate(bad))
