@@ -134,6 +134,27 @@ class FormScaffoldTest < Minitest::Test
       RUBY
       assert_equal({"blank" => [1, 0], "nonblank" => [0, 1], "errors" => [0, 1], "singleton" => [0, 1],
         "persisted" => [0, 1], "builder" => [0, 1], "locale" => [0, 1], "deopt" => [0, 1], "live_table" => [1, 0]}, replay)
+      # rails new derives the namespace from the destination basename; a
+      # copied corpus need not have the namespace of its current directory.
+      application = File.join(app, "config/application.rb")
+      source = File.read(application)
+      renamed = source.sub(/^module [A-Z]\w*$/, "module RenamedFormFixture")
+      refute_equal source, renamed
+      File.write(application, renamed)
+      renamed_form = build.call.fetch("units").find { _1["pass"] == "sealed/form_scaffold" }
+      refute_nil renamed_form, File.read(File.join(app, ".lowrail/ledger.json"))
+      assert_equal "RenamedFormFixture::Application", renamed_form.fetch("data").fetch("inventory").fetch("application_class")
+      renamed_result = ruby_json(<<~'RUBY', chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
+        require "./config/application"
+        Rails.application.config.yjit = false
+        require "./config/environment"
+        require "rack/mock"
+        response = Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
+        id = Lowrail.manifest.units.find { _1["pass"] == "sealed/form_scaffold" }.fetch("id").to_s
+        puts JSON.generate(application: Rails.application.class.name, status: response.status,
+          hits: Lowrail::Stats.unit_hits.fetch(id, 0), fallbacks: Lowrail::Stats.unit_fallbacks.fetch(id, 0))
+      RUBY
+      assert_equal({"application" => "RenamedFormFixture::Application", "status" => 200, "hits" => 1, "fallbacks" => 0}, renamed_result)
       # Same literal form and model, but a builder that adds observable output.
       # The public build must explain its refusal, not certify the customized
       # framework body or rely on a test-only installer.

@@ -21,7 +21,7 @@ module Lowrail
 
     def check
       return "requires production Ruby 4.0.7 / Rails 8.1.4 blog" unless ENV["RAILS_ENV"] == "production" &&
-        RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4" && Rails.application.class.name == "RealBlogR4::Application"
+        RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
       return "eager-loaded targets required; keep lazy applications original" unless Rails.application.config.eager_load &&
         %w[Article Comment ArticlesController].all? { Lowrail.loaded_constant(_1) }
       @roots = STOCK.keys.to_h { |name| [name, Gem.loaded_specs.fetch(name).full_gem_path] }
@@ -172,7 +172,8 @@ module Lowrail
           [method_name.to_s, fact]
         end
       end
-      {"methods" => facts, "form_config" => {"ids" => true, "remote" => false, "utf8" => false},
+      {"application_class" => Rails.application.class.name,
+        "methods" => facts, "form_config" => {"ids" => true, "remote" => false, "utf8" => false},
         "columns" => %w[commenter body].to_h { [_1, [Comment.columns_hash.fetch(_1).sql_type, Comment.column_defaults.fetch(_1)]] }}
     rescue StandardError, ScriptError => error
       "inventory: #{error.class}: #{error.message.lines.first&.strip}"
