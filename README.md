@@ -1,50 +1,99 @@
 # Lowrail
 
-Lowrail boots a Rails application, learns what is fixed after boot, and
-delivers specialized Ruby for the parts it can prove equivalent, as MRI
-instruction sequences. The real Rails and every gem keep running. Anything
-Lowrail cannot prove stays the app's own code, and every refusal is recorded
-with its reason.
+**Make an existing Rails app faster without rewriting it, and prove that
+nothing changed.**
 
-Inspired by [Roundhouse](https://github.com/rubys/roundhouse), with a
-different bet: keep the real framework, lower only what can be guarded
-exactly, and measure every claim. See [docs/PLAN.md](docs/PLAN.md) for the
-why and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how a pass plugs in.
+Lowrail boots your Rails application, learns what is fixed after boot (schema,
+routes, config, method definitions, templates), and delivers specialized Ruby
+for the parts it can prove equivalent, as MRI instruction sequences (ISeqs).
+The real Rails and every gem keep running. Anything Lowrail cannot prove stays
+your app's own code, and every refusal is recorded with its reason.
 
-## Status (2026-10-20)
+It is deeply inspired by [Roundhouse](https://github.com/rubys/roundhouse) by
+Sam Ruby, which transpiles Rails apps into standalone programs in many
+languages and types them without annotations. Lowrail makes a different bet:
+keep the real framework, target only lowered Ruby, lower only what can be
+guarded exactly, and measure every claim. See [Acknowledgements](#acknowledgements)
+for the other projects we learned from.
 
-**Research prototype. No production speedup today.**
+> **Research prototype.** Lowrail is not published as a gem and gives no
+> production speedup by default today. Use it on a copy of your app or in CI.
 
-- **Correctness machinery works.** `lowrail verify` runs an app's own suite
-  with Lowrail off and on and compares per-test outcomes and ordered SQL.
-  The pinned Rails 8.1.4 framework suites are a standing gate
-  ([rails-suite.md](docs/rails-suite.md)). Five original corpus apps retain
-  identical outcomes/SQL. The expanded [gem-breadth corpus](docs/compat.md)
-  found and fixed early-autoload bugs. Hook-free delivery preserves
-  require-hooks' adapter; Redprints passes the strict load census only by
-  refusing Bundlebun delivery/activation. Its current eligible target is
-  14 props hits, still unmet; the pre-quarantine 277-hit target is obsolete.
-  No universal support claim follows from the green outcome comparisons.
-- **The default build lowers nothing.** The two former default passes,
-  `view/link_to` and `route/path`, are quarantined. Warmed apps could
-  observe stale helpers when code changed mid-request
-  ([counterexamples](docs/passes/endpoint.md#source-arm-quarantine)). That cost
-  the blog about 6 % on `/articles`, and we accept the loss.
-- **Guarded opt-in passes** are [`inertia/props`](docs/passes/props.md) and
-  the conservative `endpoint/action` slice; neither has an accepted
-  whole-request win. Memo, digest memo, AR plans, preload plans and
-  `inertia/config_bind` are now **sealed-only**: suppressed mutation hooks
-  defeat their cached facts ([audit](docs/passes/suppressed-hooks.md)).
-- **Where speed could come from is measured.** On the blog, rendering is
-  25–34 % of a request, events 3–4 %, routing and middleware about 2 %.
-  Handwritten endpoint ceilings are −26 % (index) and −37 % (show) with
-  events kept. They are upper bounds, not delivered results
-  ([layer study](docs/passes/layer-ceiling.md)). Checking from the call site
-  costs more than the work it saves
-  ([cost gate](docs/passes/endpoint.md#show-section-cost-gate-stop-before-runtime-implementation)).
-- **Types and MCP work.** `lowrail types` and `lowrail mcp` serve boot facts,
-  typed facts (proven, static or observed), refusal reasons and the last
-  verify hits ([types.md](docs/types.md)).
+## How it works
+
+```
+ your Rails app ──► lowrail facts  ──► boot facts (schema, routes, config,
+ (source + boot)                       method table, templates, loaders)
+                         │
+                         ▼
+                   lowrail build   ──► .lowrail/  manifest + lowered ISeqs,
+                         │                        each with the guards it assumes
+                         ▼
+ RUBYOPT=-rlowrail/setup ──► at boot: certify guards, install what is exact,
+                              refuse the rest (visibly), keep originals as fallback
+                         │
+                         ▼
+                   lowrail verify  ──► your own suite, Lowrail off vs on:
+                                       identical per-test outcomes + ordered SQL
+```
+
+The Rust CLI parses with [Prism](https://github.com/ruby/prism) and indexes
+with [Rubydex](https://github.com/Shopify/rubydex). The Ruby gem in `gem/` is
+the runtime that boots the app, certifies facts and installs lowered code.
+
+## Quick start
+
+Requirements: a Rust toolchain, Ruby 4.0.7 (pinned in `mise.toml`), and a
+Rails 8.1 app whose test suite passes.
+
+```sh
+git clone https://github.com/thomasklemm/lowrail && cd lowrail
+cargo build --release                       # CLI at target/release/lowrail
+(cd gem && mise exec -- rake compile)       # optional native predicate
+
+lowrail doctor path/to/app                  # boot, JIT mode, tracing checks
+lowrail facts  path/to/app                  # what Lowrail learns at boot
+lowrail build  path/to/app                  # writes path/to/app/.lowrail/
+lowrail verify path/to/app                  # your suite off vs on
+lowrail explain path/to/app                 # what was lowered, refused and why
+lowrail types --rbs path/to/app             # RBS with per-slot evidence
+```
+
+Run your app with the runtime loaded, without Gemfile changes:
+
+```sh
+RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails test
+```
+
+`LOWRAIL=0` disables it, `LOWRAIL_DEBUG=1` prints refusals. A missing, stale
+or incompatible build is a silent no-op. More options are in the
+[reference](#reference) below.
+
+## Status (2026-10-21)
+
+- **Correctness machinery works.** `lowrail verify` compares per-test outcomes
+  and ordered SQL with Lowrail off and on. The pinned Rails 8.1.4 framework
+  suites are a standing gate ([rails-suite.md](docs/rails-suite.md)). Real apps
+  including Fizzy, Writebook, CASA, CodeTriage, Wikino, RubyToolbox and Fat
+  Free CRM keep identical outcomes ([compat.md](docs/compat.md)). Green
+  comparisons are not a universal support claim.
+- **The default build lowers nothing.** Every guarded specialization tried so
+  far was either unsafe under mid-request mutation or its guard cost more than
+  it saved; for example the guarded props variant loses 22.6 % because its
+  checks cost 6.9× the saving ([DECISIONS](docs/DECISIONS.md)).
+- **The sealed tier (opt-in, production only) has measured wins** in
+  interpreter instruction counts: the new-comment form scaffold −14.5 % per
+  show request and `inertia/config_bind` −10.2 % per JSON request, plus
+  isolated operations (hidden tokens −11.1 %, collection fusion −9.9 %).
+  Admission must be passive, so the form is currently refused until passive
+  activation lands; `link_to` admits again through the native predicate
+  ([sealed-verification.md](docs/sealed-verification.md)).
+- **YJIT measurement is not yet trustworthy.** Late JIT compilation in
+  unrelated framework code rejects whole-request YJIT cohorts, including
+  Lowrail-off arms ([bench.md](docs/bench.md)).
+- **Types and MCP work.** `lowrail types`, `lowrail explain` and
+  `lowrail mcp` serve boot facts, per-slot types (proven, static, observed or
+  unknown), refusal reasons and recorded hits ([types.md](docs/types.md)).
 
 Every pursued, parked and rejected idea is in
 [docs/DECISIONS.md](docs/DECISIONS.md). Dated evidence is in
@@ -58,7 +107,7 @@ further:
 | Tier | Who | Promise | State |
 |---|---|---|---|
 | **guarded** (default) | any Rails app, any gem | identical test outcomes; specializations guarded and refused when not exact | works; currently lowers nothing by default |
-| **sealed** (opt-in) | apps that accept a contract: no code, subscriber, config or route mutation after boot, among others | compile endpoints ahead of time without per-call checks; `lowrail seal-check` runs the app's suite and lists every violation with `file:line` and the code change that fixes it | being designed ([decision](docs/DECISIONS.md#architecture)) |
+| **sealed** (opt-in) | apps that accept a contract: no code, subscriber, config or route mutation after boot, among others | compile endpoints ahead of time without per-call checks; `lowrail seal-check` runs the app's suite and lists every violation with `file:line` and the code change that fixes it | opt-in research: measured interpreter wins; admission must be passive ([sealed.md](docs/sealed.md), [decision](docs/DECISIONS.md#architecture)) |
 
 Apps that do not meet the sealed contract still run in the guarded tier. The
 tooling explains why and what to change.
@@ -73,10 +122,9 @@ tooling explains why and what to change.
 
 How to read and reproduce measurements: [docs/bench.md](docs/bench.md).
 
-## Usage
+## Reference
 
-Lowrail is not published as a gem. Use it from a checkout, on a disposable
-copy of your app or in CI. Do not use it in production yet.
+All commands, from a checkout:
 
 ```sh
 # 1. Toolchain: a Rust toolchain and the Ruby pinned in mise.toml
@@ -189,3 +237,46 @@ decision, and Lowrail works next to them:
 | [types.md](docs/types.md) | typed facts, MCP and RBS |
 | [docs/passes/](docs/passes/) | one study per pass or idea |
 | [rails-suite.md](docs/rails-suite.md), [ar-equivalence.md](docs/ar-equivalence.md) | framework-suite and Active Record gates |
+
+## Acknowledgements
+
+Lowrail stands on other people's work. Thank you to the authors and
+maintainers of:
+
+- [Roundhouse](https://github.com/rubys/roundhouse) (Sam Ruby): the
+  inspiration for this project, its lowering pipeline and unsupported-code
+  ledger, whole-program typing without annotations, the MCP tools, and the
+  real-blog fixture we still use as our first corpus app.
+- [Prism](https://github.com/ruby/prism) and its `ruby-prism` crate (Kevin
+  Newton and the Ruby core team): parsing.
+- [Rubydex](https://github.com/Shopify/rubydex) (Shopify): code indexing and
+  its arena/typed-ID design.
+- [Ruby](https://github.com/ruby/ruby), YJIT and ZJIT: the VM, `RubyVM::InstructionSequence`
+  and the JITs we measure under.
+- [Rails](https://github.com/rails/rails), [Zeitwerk](https://github.com/fxn/zeitwerk)
+  and [Bootsnap](https://github.com/rails/bootsnap): the framework, loader and
+  cache Lowrail has to stay exact with.
+- Loader prior art: [require-hooks](https://github.com/ruby-next/require-hooks)
+  and [Ruby Next](https://github.com/ruby-next/ruby-next) (Vladimir Dementyev),
+  [Yomikomu](https://github.com/ko1/yomikomu) (Koichi Sasada),
+  [Vernacular](https://github.com/kddnewton/vernacular) (Kevin Newton),
+  [Tapioca](https://github.com/Shopify/tapioca) and
+  [Freezolite](https://github.com/ruby-next/freezolite) ([loaders.md](docs/loaders.md)).
+- [Inertia Rails](https://github.com/inertiajs/inertia-rails),
+  [Herb](https://github.com/marcoroth/herb) and
+  [ReActionView](https://github.com/marcoroth/reactionview).
+- The open-source apps in our corpus: [Campfire](https://github.com/basecamp/once-campfire),
+  [Fizzy](https://github.com/basecamp/fizzy), [Writebook](https://github.com/basecamp/writebook),
+  [CASA](https://github.com/rubyforgood/casa), [CodeTriage](https://github.com/codetriage/codetriage),
+  [PingCRM](https://github.com/ledermann/pingcrm),
+  [Redprints CFP](https://github.com/evilmartians/redprints-cfp),
+  [Inertia React starter kit](https://github.com/inertia-rails/react-starter-kit),
+  [Wikino](https://github.com/wikinoapp/wikino),
+  [RubyToolbox](https://github.com/rubytoolbox/rubytoolbox) and
+  [Fat Free CRM](https://github.com/fatfreecrm/fat_free_crm).
+- [Valgrind](https://valgrind.org/)'s Callgrind, which makes our instruction
+  counts reproducible.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
