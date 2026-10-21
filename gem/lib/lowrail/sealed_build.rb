@@ -244,7 +244,7 @@ module Lowrail
           next
         end
         start = node.location.start_offset - wrapper.bytesize
-        output[start...node.location.end_offset - wrapper.bytesize] = replacement
+        output[start...node.location.end_offset - wrapper.bytesize] = replacement.b
         sites << {"helper" => "link_to", "line" => node.location.start_line, "outcome" => "lowered"}
       end
       [output.force_encoding(source.encoding), sites]

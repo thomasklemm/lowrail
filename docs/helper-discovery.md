@@ -40,9 +40,10 @@ exactly three arguments, exactly one literal Symbol `class:` option with
 a literal String value, target arbitrary, no splat/forwarding**. CASA has
 three additional matches in Ruby helpers, CodeTriage five in Slim, Wikino one
 in a component. None counts toward the HTML-ERB gate. CASA29 + Fizzy1 are
-syntax/delivery bounds, not admitted units. An unchanged `SealedBuild.lower`
-check actually lowers **CASA27**, Fizzy1, blog8; two CASA templates expose the
-separate encoding defect below.
+syntax/delivery bounds, not admitted units. Before the encoding fix below,
+`SealedBuild.lower` lowered CASA27, Fizzy1, blog8. With the independent
+byte-splice fix CASA lowers **29/29**, including both Devise templates;
+admission remains unchanged.
 
 Pins match the existing [compatibility corpus](compat.md) and
 [seven-app eligibility probe](sealed-verification.md#real-app-get-eligibility-after-passive-form-activation),
@@ -240,10 +241,14 @@ mise exec ruby@4.0.7 -- ruby -Igem/lib -raction_view -rlowrail/sealed_build -e '
 
 This exits1 at the splice, not at parse/shape rejection; an ASCII name
 control lowers. Builder exception/refusal is correct but this is a **real
-lowerer defect**, reducing CASA29 delivery shapes to27 before admission.
-The coordinator authorized an independent fix/regression commit after this
-publication: byte-correct encoding-preserving splicing, with multibyte
-content around the replacement. No shape or admission widening follows.
+lowerer defect**, formerly reducing CASA29 delivery shapes to27 before
+admission. The independent fix inserts `replacement.b` into the byte buffer
+and restores the original source encoding as before. The new regression
+failed with that exact error before the fix, then passes with multibyte
+content around two link sites and independently expected rendered output.
+The complete sealed-link suite passes: two tests / 140 assertions / no skips.
+All CASA HTML-ERB files lower and compile; **29/29** candidate sites now lower,
+including both UTF-8 Devise templates. No shape or admission widening follows.
 
 ## Reproduce the census
 

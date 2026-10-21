@@ -6,6 +6,24 @@ require "lowrail"
 class SealedLinkTest < Minitest::Test
   include LowrailTest
 
+  def test_lowering_preserves_multibyte_source_around_repeated_link_sites
+    require "action_view"
+    require "lowrail/sealed_build"
+    source = <<~'RUBY'
+      ["•", link_to("← Back", "/one?x=<&", class: "naïve"),
+        "中", link_to("次へ", "/two", class: "second"), "終"]
+    RUBY
+    lowered, sites = Lowrail::SealedBuild.lower(source)
+    assert_equal source.encoding, lowered.encoding
+    assert lowered.valid_encoding?
+    assert_equal 2, sites.count { _1["outcome"] == "lowered" }
+    expected = ["•", '<a class="naïve" href="/one?x=&lt;&amp;">← Back</a>',
+      "中", '<a class="second" href="/two">次へ</a>', "終"]
+    view = ActionView::Base.empty
+    assert_equal expected, view.instance_eval(source)
+    assert_equal expected, view.instance_eval(lowered)
+  end
+
   def test_cold_opt_in_delivery_preserves_response_effects_and_refuses_foreign_receivers
     skip "sealed link fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
     bin = lowrail_cli
