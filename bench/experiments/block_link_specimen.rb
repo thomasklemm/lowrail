@@ -88,7 +88,7 @@ module BlockLinkSpecimen
       Thread.current[THREAD_LINK] = call
       return call unless block && html.nil? && exact(block, Proc) && exact(options, Hash) && KEYS.bind_call(options) == [:class]
       sequence = RubyVM::InstructionSequence.of(block)
-      return call unless sequence && (site = @catalog[[sequence.absolute_path, sequence.first_lineno]])
+      return call unless sequence && (site = @catalog[[sequence.path, sequence.first_lineno]])
       call[:site] = "#{site.fetch('file')}:#{site.fetch('line')}"
       count(call, "entries")
       entry = Thread.current[THREAD_TEMPLATE]
