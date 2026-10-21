@@ -13,6 +13,22 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Bet F: kill final-relation + lean request tier (2026-10-21)
+
+Kill this request-level candidate: Fizzy six GETs change −87 to +15 objects;
+Lobsters front/story change 0/−8; Campfire room changes 15,515→15,399 (−116).
+Campfire pagination adds 30 objects; body/header controls still reject there and on three Fizzy routes.
+Native wall controls are too wide for a win claim; this is an allocation-driven decision, not a latency finding.
+The 107–115-object DirectSite micro saves a different chain-construction seam, not lean synergy; one request-level pivot is authorized ([evidence](ar-callsite.md)).
+
+## Bet F: retain guarded bucket chain, remove EventSummary (2026-10-21)
+
+Fizzy buckets DirectSite survives effective-method/visibility/scope/reflection guards: 9,084→8,499 objects/request (−585, −6.44%), disjoint ranges; exact responses and strict SQL metadata both seeds.
+EventSummary was the only detail program: guarded +85.5 objects with 3 hits/3 fallbacks per request. Remove it; the final detail control is flat (18,365→18,358), zero site hits, still response-rejected.
+Fix the real bind-name encoding gap (`creator_id`: stock UTF-8 vs Symbol-derived US-ASCII) using the reflection key; never relax the typed digest. All 26 directed response/SQL guard comparisons pass.
+Wall +8.19% is unresolved against 14.19% A/A; SolidCache created_at off/off remains an accepted rejection, not a whole-DB certificate.
+Authorize only the single guarded buckets interpreter cohort under the predeclared rule and one shared RPS check; branch only, no main admission ([evidence](ar-callsite.md)).
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

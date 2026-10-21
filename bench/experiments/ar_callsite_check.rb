@@ -34,6 +34,10 @@ class FSpecialPost < FPost; end
 class FScopedPost < FPost
   default_scope { where(status: :live) }
 end
+class FConstrainedPost < FPost
+  self.inheritance_column = :_disabled_type
+  query_constraints :writer_id, :id
+end
 
 FWriter.insert_all!([{id: 1, name: "Z"}, {id: 2, name: "A"}])
 FPost.insert_all!([
@@ -87,7 +91,8 @@ cases.concat([
   -> { FPost.select(:id, :title).where(writer_id: 1).to_a },
   -> { FPost.joins(:writer).where(f_writers: {name: "A"}).to_a },
   -> { FPost.includes(:writer).where(f_writers: {name: "Z"}).to_a },
-  -> { FPost.select("id, 9 AS extra").where(status: :live).readonly.strict_loading.to_a }])
+  -> { FPost.select("id, 9 AS extra").where(status: :live).readonly.strict_loading.to_a },
+  -> { [FConstrainedPost.find_by!(writer_id: 2, id: 4).reload] }])
 
 checked = 0
 cases.each_with_index do |call, index|

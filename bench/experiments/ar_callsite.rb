@@ -253,7 +253,30 @@ end
 # The shared native harness calls this symmetrically after natural Rails boot.
 module NativeBench
   module Exploration
+    def self.sql_value(value)
+      case value
+      when Array then value.map { sql_value(_1) }
+      when Symbol then {"type" => "Symbol", "value" => value.to_s}
+      else BlogProduction.value(value)
+      end
+    end
+
     def self.install(config:, state:, arm:)
+      @config, @state = config, state
+      @validation_drivers = {}
+      require_relative "../../fixtures/corpus/blog_production"
+      if config["lobsters_validation"]
+        # Shared bet-A dependency, pinned in exploration_sources; not vendored
+        # or reimplemented here. It checks the dependency overlay as well.
+        require config.fetch("lobsters_validation")
+        LobstersNativeValidation.install(config.fetch("app"))
+      elsif config["ar_entropy_policy"]
+        require_relative "../../fixtures/corpus/blog_entropy"
+        @entropy = BlogProduction::Entropy.validate(config.fetch("app"),
+          policy: JSON.parse(File.read(config.fetch("ar_entropy_policy"))))
+        raise @entropy.fetch("reason") unless @entropy.fetch("active")
+        BlogProduction::Entropy.install(@entropy.fetch("policy"))
+      end
       ARCallsite.install(sql: config.fetch("ar_sql", true), lean: config.fetch("ar_lean", true))
       ARCallsite.enabled = arm == "on"
       ARCallsite.counting = ENV.key?("LOWRAIL_STATS")
@@ -264,10 +287,54 @@ module NativeBench
         ActiveSupport::Notifications.subscribe("sql.active_record") do |*args|
           payload = args.last
           @sql_count += 1
-          @sql_digest << Marshal.dump([payload[:sql].b, payload[:name],
-            payload[:binds].map { Lowrail::ARShadow.bind(_1) }, !!payload[:cached]])
+          @sql_digest << JSON.generate(sql_value([payload[:sql].b, payload[:name],
+            payload[:binds].map { _1.respond_to?(:value_for_database) ? Lowrail::ARShadow.bind(_1) : [_1.class.name, _1] }, !!payload[:cached]]))
         end
       end
+    end
+
+    # Separate, untimed entropy companions. Timed route closures remain natural
+    # and unpinned. Each seed logs in naturally inside its first companion and
+    # retains that session; repeated logins would hit the app's rate limiter.
+    def self.validation_request(route:, seed:, request:)
+      if @config["lobsters_validation"]
+        return LobstersNativeValidation.validation_request(route: route, seed: seed, request: request)
+      end
+      return [request.call, {"passed" => true, "control" => "raw"}] unless @entropy
+      events = []
+      subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*args|
+        payload = args.last
+        events << [payload[:sql].b, payload[:name],
+          payload[:binds].map { _1.respond_to?(:value_for_database) ? Lowrail::ARShadow.bind(_1) : [_1.class.name, _1] }, !!payload[:cached]]
+      end
+      driver = @validation_drivers[seed]
+      requests = driver ? 1 : {"campfire" => 4, "fizzy" => 3}.fetch(@config.fetch("workload"))
+      response, evidence = BlogProduction::Entropy.with(seed, route, requests: requests, wall_clock: true) do
+        case @config.fetch("workload")
+        when "campfire"
+          unless driver
+            driver = @validation_drivers[seed] = CampfireScenario::Driver.new(@state, record: false, validate: true)
+            driver.login
+            driver.prepare_post
+          end
+          driver.run(route)
+        when "fizzy"
+          unless driver
+            driver = @validation_drivers[seed] = FizzyLinkVector::Driver.new(@state, record: false)
+            driver.login
+          end
+          driver.request("GET", route.delete_prefix("GET "))
+        else
+          request.call
+        end
+      end
+      [response, evidence.merge("passed" => evidence.fetch("errors").empty?,
+        "control" => "source-pinned untimed entropy companion; timed entropy untouched",
+        # Marshal additionally encodes object aliasing, which is not SQL/bind
+        # data. The existing value capture preserves every byte and encoding.
+        "sql_events" => events.size, "sql_sha256" => Digest::SHA256.hexdigest(JSON.generate(sql_value(events))))]
+    ensure
+      ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber
     end
 
     def self.counts
