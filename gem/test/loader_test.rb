@@ -378,6 +378,11 @@ class LoaderTest < Minitest::Test
             expected = mode == "1" ? active_result : "orig"
             assert_equal [[expected, 2], 0], ruby_json(code, chdir: dir, setup: false,
                                                     env: { "RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL" => mode })
+            if policy.equal?(translator)
+              explicit = code.sub('require_relative "app"', 'RubyVM::InstructionSequence.compile_file(File.join(Dir.pwd, "app.rb")).eval')
+              assert_equal [["orig", 2], 0], ruby_json(explicit, chdir: dir, setup: false,
+                                                     env: { "RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL" => mode })
+            end
           end
         end
       end

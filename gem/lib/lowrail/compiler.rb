@@ -159,14 +159,36 @@ module Lowrail
           raise ArgumentError, "app loader transformed the source; lower the transformed source first"
         end
         fingerprint = compilation.fetch(:iseq_sha256)
+        native_fingerprint = compilation[:native_iseq_sha256]
         if target != path
           original = File.read(path, encoding: Encoding::UTF_8)
           replay = Compilation.lowered(original, path, compilation)
-          unless compilation[:portable_iseq_sha256] &&
+          native = compilation[:native_iseq]&.to_a
+          if native
+            native_replay = replay.to_a
+            native_replay[5], native_replay[8] = native.values_at(5, 8)
+          end
+          native_original = fingerprint == native_fingerprint
+          reproducible = if native_original
+            native_replay == native
+          else
+            compilation[:portable_iseq_sha256] &&
               Manifest.iseq_fingerprint(replay, portable: true) == compilation[:portable_iseq_sha256]
+          end
+          unless reproducible
             raise ArgumentError, "target-root recipe cannot reproduce the original ISeq (including nested frame labels)"
           end
-          fingerprint = Manifest.iseq_fingerprint(Compilation.lowered(original, target, compilation), portable: true)
+          target_original = Compilation.lowered(original, target, compilation)
+          fingerprint = Manifest.iseq_fingerprint(target_original, portable: true)
+          native_fingerprint = nil
+          if native && native_replay == native
+            # Prove the entire original before transferring its native root
+            # header. Keep entry line 0; never normalize it to API line 1.
+            target_native = target_original.to_a
+            target_native[5], target_native[8] = native.values_at(5, 8)
+            native_fingerprint = Manifest.portable_iseq_fingerprint(target_native)
+            fingerprint = native_fingerprint if native_original
+          end
         end
         binary = Compilation.lowered(src, target, compilation).to_binary
         name = "#{Digest::SHA256.hexdigest(binary)}.bin"
@@ -181,9 +203,7 @@ module Lowrail
           "lowered_sha256" => Digest::SHA256.hexdigest(src.b), "iseq_sha256" => Digest::SHA256.hexdigest(binary),
           "original_iseq_sha256" => fingerprint, "portable_fingerprint" => target != path,
           "compile_option" => compilation.fetch(:compile_option) }
-        if target == path && compilation[:native_iseq_sha256]
-          entry["native_iseq_sha256"] = compilation[:native_iseq_sha256]
-        end
+        entry["native_iseq_sha256"] = native_fingerprint if native_fingerprint
         entry
       end
     end

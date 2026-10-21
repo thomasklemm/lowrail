@@ -24,6 +24,14 @@ reason rather than silently delivering zero hits. Preserve the independent
 sealed-tier admission and quarantine. [Loader contract](loaders.md#deploy-paths),
 [reported costs and copied-app checks](ruby-4.1.md#relocation-follow-up).
 
+Same-root native delivery checks the observed binary without normalization.
+Target-root delivery uses a separate portable certificate, derived only after
+the complete source replay matches the observed ISeq with its native root
+label and entry line restored. Only known root labels normalize; entry line 0,
+nested frames, operands and strings remain exact. Existing translators decline
+native, cache and eval substitution rather than assuming that their unchanged
+original proves how they would treat newly introduced instructions.
+
 ## 512 MiB decision recheck (2026-10-20)
 
 The authorized finite remeasurement on the pinned brk512 tool is in

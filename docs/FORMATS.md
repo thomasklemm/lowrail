@@ -320,9 +320,9 @@ Registered require-hooks hijacks therefore cannot borrow the selected
 Bootsnap compiler's recipe: their warm cached bytecode runs unchanged when
 the actual compilation policy is no longer observable.
 
-Native compilation is observed at `translate`, without runtime recompilation
-or binary normalization. Standalone builds may also record an optional
-`native_iseq_sha256`, captured before evaluation through a guarded native
+Same-root native compilation is observed at `translate`, without runtime
+recompilation or binary normalization. Standalone builds may also record an
+optional `native_iseq_sha256`, captured before evaluation through a guarded native
 load: native and explicit compiler APIs have different top-level labels.
 Either complete binary fingerprint is accepted under the same recorded
 recipe and unchanged source digest. A missing native certificate safely
@@ -334,8 +334,13 @@ rebuild reason; Rust can still read same-root format-1 facts. File delivery also
 validates the lowered source and binary digests. `iseq_root` is the required
 runtime root for a file-binary artifact; `build_root` is provenance, never a
 lookup root. For `--target-root`, `portable_fingerprint` selects the full
-`ISeq#to_a` Marshal digest, normalizing **only** the root `<main>`/`<compiled>`
-label; operands, nested frame labels, paths and literal Strings are preserved.
+`ISeq#to_a` Marshal digest, normalizing **only** the known root `<main>`,
+`<compiled>` and `<top (required)>` labels; operands, nested frame labels,
+paths, entry lines and literal Strings are preserved. Optional
+`native_iseq_sha256` then uses this same portable representation, derived
+only when the entire original replay matches the observed native ISeq after
+restoring its root label and entry line. The native entry line remains 0;
+it is not normalized to the compiler API's 1.
 The build must first reproduce the observed original under that rule. Other
 serialization versions or changed nested frames refuse instead of being
 normalized away. Same-root file builds retain the original binary fingerprint.

@@ -39,9 +39,9 @@ original ISeq fingerprint and disk digest:
   callback handles plain require/load when no loader returns bytecode. Only
   tracked top-level file ISeqs are eligible, never method/block/eval ISeqs.
   Build observes the complete native binary, including its different
-  top-level label; runtime checks that actual binary without recompilation
-  or fingerprint normalization. Standalone builds can obtain an additional
-  native fingerprint by stopping the native C load at `translate`, before
+  top-level label; same-root delivery checks that actual binary without
+  recompilation or fingerprint normalization. Standalone builds can obtain
+  an additional native fingerprint by stopping the native C load at `translate`, before
   evaluation or `script_compiled`. This is never attempted through existing
   load hooks, translators, warning callbacks or active TracePoints. Existing
   translators retain the runtime boundary in either order. Custom warning
@@ -57,7 +57,10 @@ original ISeq fingerprint and disk digest:
   remain owned by require-hooks, not reconstructed by Lowrail.
 
 Unknown recipes, changed source/transforms, missing or broken binaries, and
-active Coverage retain original code. Digest is still loaded lazily, but
+active Coverage retain original code. A foreign `translate` callback declines
+all three delivery sites, including explicit eval and cached output: an
+unchanged original cannot prove its policy for newly introduced instructions.
+Digest is still loaded lazily, but
 its nested requires preserve the active compile defaults. Runtime native
 compilation occurs exactly once: certification must not call compiler
 wrappers or re-emit source warnings. The app file is **never evaluated twice**.
@@ -65,6 +68,13 @@ No compiler/delivery hooks are installed for manifests without source files.
 Unobserved inner compiler wrappers cannot inherit an outer default-options
 snapshot. Old artifacts without the observed native fingerprint safely miss
 native delivery until rebuilt; API/cache delivery retains its own certificate.
+
+Deploy-root builds retain the relocatable format's separate portable
+certificate: only the known native/file/text root label is normalized in the
+complete `ISeq#to_a` digest. The build must reproduce the observed original,
+including its native entry line 0 rather than API line 1; different nested
+frame labels still refuse. A deploy-root native certificate is derived only
+after that complete replay matches, never by reusing the same-root binary hash.
 
 A require-hooks bytecode hijack can use options unrelated to Bootsnap's
 selected compiler. Its warm cached binary does not prove that recipe, even

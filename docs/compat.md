@@ -54,6 +54,13 @@ Ruby-version overlays were retried on 4.0.7 **without Lowrail**:
 
 ## Results
 
+The hit-bearing tables below record the pre-quarantine activation/delivery
+cohorts. The subsequent six-pass quarantine removes memo, digest, AR and config
+candidates from guarded `all-opt-in`; those historical hits are not current
+support claims. The loader's synthetic matrix still exercises real lowered
+delivery independently of pass eligibility. Final integrated checks are
+reported separately, without reactivating sealed-only passes in test apps.
+
 Commands use `RAILS_ENV=test`, seed **41231**, one Minitest worker, strict AR
 shadow checking through verify, and **`LOWRAIL_VERIFY_LOADS=1`**. First run
 the app's own suite with `LOWRAIL=0` and no Lowrail preload. Then collect

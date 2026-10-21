@@ -81,7 +81,10 @@ module Lowrail
         record(path, File.read(path, encoding: Encoding::UTF_8), defaults, nil, :compile, 1,
                api.compile_file(path))
         compilation = files.fetch(path)
-        compilation[:native_iseq_sha256] = Digest::SHA256.hexdigest(native.to_binary) if native
+        if native
+          compilation[:native_iseq] = native
+          compilation[:native_iseq_sha256] = Digest::SHA256.hexdigest(native.to_binary)
+        end
         compilation
       end
 
@@ -96,6 +99,13 @@ module Lowrail
         warning.owner.equal?(Warning) && warning.source_location.nil?
       end
 
+      def native_translation?
+        api = RubyVM::InstructionSequence
+        return true unless api.respond_to?(:translate, true)
+        translator = api.method(:translate)
+        translator.owner.equal?(Capture) && !translator.super_method
+      end
+
       # Standalone builds have no app boot to observe. Obtain the native root
       # ISeq by aborting MRI's load at translate, before evaluation or the
       # script_compiled event. Never attempt this through an app's loader,
@@ -105,8 +115,7 @@ module Lowrail
         return if api.respond_to?(:load_iseq, true) || !Kernel.method(:load).source_location.nil? || !native_warnings?
         return if ObjectSpace.each_object(TracePoint).any?(&:enabled?)
         api.singleton_class.prepend(Capture) unless api.singleton_class < Capture
-        translator = api.method(:translate)
-        return unless translator.owner.equal?(Capture) && !translator.super_method
+        return unless native_translation?
         previous = Thread.current[:lowrail_native_compilation]
         capture = [[path, File.realpath(path)], Object.new]
         begin
@@ -151,6 +160,9 @@ module Lowrail
           defaults = RubyVM::InstructionSequence.compile_option
           if Compilation.booted?
             Compilation.record(path, File.read(path, encoding: Encoding::UTF_8), defaults, nil, :compile, 1, iseq)
+            compilation = Compilation.files.fetch(path)
+            compilation[:native_iseq] = iseq
+            compilation[:native_iseq_sha256] = compilation.fetch(:iseq_sha256)
             iseq
           else
             Compilation.record_options(iseq, defaults, nil)

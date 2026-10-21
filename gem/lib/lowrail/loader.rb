@@ -46,6 +46,9 @@ module Lowrail
         # The eval seam must not validate our replacement as an original.
         return nil if original && @replacements&.key?(original)
         return nil if defined?(::Coverage) && ::Coverage.respond_to?(:running?) && ::Coverage.running?
+        # A foreign translator can treat newly introduced instructions
+        # differently even when it left the original ISeq unchanged.
+        return nil unless Compilation.native_translation?
         options = Compilation.options_for(original)
         bin = @manifest.iseq_for(path, original: original, compile_option: options) or return nil
         binary = File.binread(bin)

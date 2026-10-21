@@ -194,12 +194,16 @@ module Lowrail
 
     def self.iseq_fingerprint(iseq, portable: false)
       return digest.hexdigest(iseq.to_binary) unless portable
-      data = iseq.to_a
-      unless data[0] == "YARVInstructionSequence/SimpleDataFormat" && data[1] == 4 && %w[<main> <compiled>].include?(data[5])
+      portable_iseq_fingerprint(iseq.to_a)
+    end
+
+    def self.portable_iseq_fingerprint(data)
+      unless data[0] == "YARVInstructionSequence/SimpleDataFormat" && data[1] == 4 &&
+          ["<main>", "<compiled>", "<top (required)>"].include?(data[5])
         raise ArgumentError, "unsupported target-root ISeq serialization"
       end
-      # Only the top-level frame label differs between compile_file and text
-      # compilation. Preserve every operand, nested ISeq and literal string.
+      # Normalize only the known root labels of native, file and text
+      # compilation. Preserve entry lines, operands, nested ISeqs and strings.
       data[5] = "<top>"
       digest.hexdigest(Marshal.dump(data))
     end
