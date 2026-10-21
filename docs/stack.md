@@ -47,7 +47,7 @@ synergy. Do not sum isolated micro results or mix fixtures/modes.
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
 | E subset callbacks | None admitted | Blog show/index: zero objects saved in E's corrected exact screen | — | — | Coordinator killed: no deterministic saving, wall unresolved; census retained |
-| F AR callsite compile | None admitted | F's request screens include Fizzy +9/+15 objects on two routes; Lobsters story −8, front zero | — | — | No admitted candidate: incomplete exactness/own-suite gates; micros not additive request credit |
+| F AR callsite compile | None admitted | Preliminary DirectSite Fizzy buckets 9,085 → 8,323 (−8.39%); not integrated | — | — | Await published guarded SHA and rescreen; earlier micros are not additive request credit |
 | G framework fold | None admitted | — | — | — | Closed: notification/CSP elisions fail exactness in all four boots; no remaining qualifying slice |
 | H boot image | None admitted | — | — | — | Await successful boot screen and correctness gates |
 | Fizzy bench block-link | None | +0.403071% interpreter Ir (`8385e0c`) | — | — | Excluded: deterministic loss and no production admission |
@@ -62,8 +62,10 @@ duplicate their implementation work.
   `b1dd980b6689bf2b3912691e527d74e0b7699fb32cb53169791c24879f0c0a99`;
   source `86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf`;
   lock `570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596`.
-  Fresh `BlogShowGetOnly` data, not an old job-bearing seed. Initial runtime
-  is before the pending `view.send` correction; any such numbers are pre-fix.
+  Fresh `BlogShowGetOnly` data, not an old job-bearing seed. Initial numbers
+  are pre-dispatch-fix. The published corrections through `62f8a6b` are now
+  integrated on the exploration branch; nine fresh public builds are ready
+  for corrected full/alone/leave-one-out screens.
 - **Campfire r81:** `02023b0f0cafc4d66e06e43be072cf4d6ca328fa`, dependency-only
   Rails 8.1.4 overlay, original `CampfireScenario` fixtures and authentication,
   dedicated disposable Redis. Room STI rows remain original. Queued POST
@@ -130,6 +132,38 @@ these excesses approximately track hits. **Exclusion is provisional**, not a
 final AR negative: rerun on the published correction, without a local duplicate
 implementation. Retain this entire original screen, including exactness RED.
 
+### Fizzy AR: provisional exclusion before the shadow allocation fix
+
+Same 200/300 protocol, six original GETs, 45 normally built AR units.
+The two off controls sometimes differ by one object, so show both rather
+than selecting the baseline that makes the effect larger.
+
+| Route | Off-A / off-B / on objects | AR hits / request | Two-seed exact response |
+|---|---|---:|---|
+| buckets | 9,066 / 9,065 / 9,076 | 11 | PASS |
+| filtered bubbles | 22,518 / 22,518 / 22,582 | 45 | FAIL |
+| account users | 5,588 / 5,588 / 5,603 | 6 | PASS |
+| workflows | 3,825 / 3,825 / 3,832 | 7 | PASS |
+| notifications | 3,805 / 3,805 / 3,809 | 4 | FAIL |
+| bubble show | 18,339 / 18,338 / 18,418 | 43 | FAIL |
+
+The whole screen exits 2: retained exactness failures include off/off
+differences, not a diagnosed candidate-specific failure. DB effects remain
+uncovered. Some allocation excesses exceed the counted AR hits; the known
+shadow-predicate allocation cannot explain all of them. Rerun all six after
+the published fix before deciding final exclusion. No latency claim.
+
+### Lobsters AR: warm-cache zero credit
+
+Same 200/300 protocol, 24 normally built AR units. `/newest`, `/active`,
+`/recent`, `/hottest` pass actual two-seed status/body/all-header checks;
+logical DB snapshots are unchanged and identical across arms/seeds/rounds.
+Off-A/off-B/on allocation medians are identical on each route: respectively
+14,359, 1,437, 1,423 and 14,866 objects/request. Every measured route has
+**zero AR fast-path hits** in the separate warm probe. This is a cached-path
+control, not active-unit certification or an AR win. Native wall changes
+(−1.07% to −1.87%) remain inside A/A spreads (2.02% to 4.84%).
+
 Sanitized raw evidence, GC counts/time, RSS, per-unit coverage and all refused
 comparisons: [stack-results.json](stack-results.json). Private fixture secrets,
 response bodies/cookies and raw app logs are excluded. Export with:
@@ -139,7 +173,8 @@ mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
   .lowrail/stack/screen-*
 ```
 
-Cross-app AR screens and standalone/leave-one-out attribution are pending.
+Corrected Blog standalone/leave-one-out attribution and post-shadow-fix
+Campfire/Fizzy retests are pending; initial four-app screens are complete.
 No additive interaction, cross-app win, native latency gain or supported
 component is claimed yet.
 Propose at most **one** whole-stack Callgrind/README price to the coordinator
