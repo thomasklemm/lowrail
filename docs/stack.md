@@ -50,7 +50,7 @@ sign: objects saved by retaining that component in the full stack.
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
 | E subset callbacks | None admitted | Blog show/index: zero objects saved in E's corrected exact screen | — | — | Coordinator killed: no deterministic saving, wall unresolved; census retained |
-| F AR callsite compile | None admitted; guarded buckets candidate published | F's guarded screen: 9,084 → 8,499 (−6.44%); not locally integrated yet | — | — | Published `addf55e`; local screen queued after AR allocation diagnosis, guards retained |
+| F AR callsite compile | Fizzy buckets only; no admitted app | Local 9,072 / 9,072 → 8,500 (−572, −6.31%) | −572; sole applicable candidate, not a multi-component test | +572 against the measured off controls | Favorable guarded response screen, provisional; DB/SQL cold-state and active own-suite gates remain open |
 | G framework fold | None admitted | — | — | — | Closed: notification/CSP elisions fail exactness in all four boots; no remaining qualifying slice |
 | H boot image | None admitted | — | — | — | Await successful boot screen and correctness gates |
 | Fizzy bench block-link | None | +0.403071% interpreter Ir (`8385e0c`) | — | — | Excluded: deterministic loss and no production admission |
@@ -159,6 +159,8 @@ objects/request, but neither is established by these data. Do not infer heap
 occupancy from RSS or attribute the extra collections to a proven cause.
 No new cohort is run to fill this gap. Collection-only and AR-only each save
 zero objects/request on this route, despite their active hits.
+The later `script/rps` at `b1e239f` records these three post-warmup heap fields
+for future runs; it cannot supply them retroactively for this screen batch.
 
 All favorable results remain **provisional** until active own-suite coverage
 and the unchanged admission gates exist. No whole-stack price is requested.
@@ -309,6 +311,64 @@ request-level saving promise. The coordinator owns assignment and the usual
 correctness/Thermos gates. No runtime fix or follow-up screen is landed here;
 existing AR remains excluded on Fizzy pending that independently gated work.
 
+### Guarded F DirectSite: a second app-specific candidate, not synergy
+
+Imported F's three experiment/check sources unchanged from `addf55e`;
+`ar_request_sites.rb` SHA256 is
+`e313ae13363783705471e8a3b57a44d84eea97ab31dc146d338317504b1f37e1`
+and `ar_callsite.rb` is
+`37529c994b613e840caf25254d5ff0d852cb305fffb76608855ac3ae1bd52ca5`.
+Retained all fallback guards, source pins and F's existing pinned entropy
+companions. Only the bucket program is enabled; EventSummary stays removed.
+Normally built a **zero-unit** public YJIT artifact with per-model denylists,
+including generated HABTM model names found by the build. No manifest pruning
+or existing AR units, app/config edits, frozen holders or block-link specimen.
+
+Same three-round 200/300 screen, CPU 2, all six original GETs. This F-alone
+selection is the entire applicable Fizzy candidate stack at this checkpoint:
+sealed form is Blog-only and existing AR is excluded. Removing the only
+component is the measured off controls; it is not a separate multi-component
+interaction or evidence of additive/superadditive savings.
+
+| Route | Off-A / off-B / on allocation medians | DirectSite hits / request | Two-seed exact response |
+|---|---|---:|---|
+| buckets | 9,072 / 9,072 / 8,500 | 2 | PASS |
+| filtered bubbles | 22,543 / 22,543 / 22,543 | 0 | FAIL |
+| account users | 5,596 / 5,596 / 5,593 | 0 | PASS |
+| workflows | 3,826 / 3,826 / 3,826 | 0 | PASS |
+| notifications | 3,807 / 3,807 / 3,807 | 0 | FAIL |
+| bubble show | 18,361.5 / 18,361 / 18,359 | 0 | FAIL |
+
+Buckets saves **572 median objects/request (−6.31%)** against either control;
+on [8,487,8,654] does not overlap off-A [9,061,9,218] or off-B
+[9,061,9,227]. The counted probe has 20 guarded hits over 10 requests,
+zero bucket fallbacks, and 200 SQL events in every arm. No reduction is
+attributed to non-bucket routes with zero hits. The raw allocation means,
+ranges and controls differ from F's separate −585 screen; do not mix runs.
+
+Native paired wall is −4.67% versus **3.46% A/A spread**, unresolved under
+the screen policy. Bucket GC counts are off-A [11,9,9], off-B [12,10,9], on
+[10,9,12]; GC ms/request 0.430/0.437/0.445 and RSS KiB
+233,925/232,960/231,663. No fewer-GC or latency claim. All six routes' GC,
+RSS, boot and wall results are retained, not only the favorable row.
+
+The whole screen exits **2**: filtered/notifications/show retain exactness
+differences in off/off too. The three other routes pass actual status, body
+and every-header digest checks for both seeds in all rounds. Complete DB
+equivalence is not established by this request screen.
+
+F's directed check was also run unchanged, including warm baseline, eleven
+mutation/fallback/restoration controls, 13 cases × two seeds. All response
+triples agree, and warm/mutation SQL comparisons agree. The initial baseline
+SQL and primary/cache DB comparisons fail, including off/off, so the overall
+check exits **2**, not green. Read-only final primary DB comparison found
+only `sessions.created_at`/`updated_at` differences (five rows per arm);
+cache differences remain a named refusal. [Sanitized controls, hashes and
+hit/fallback deltas](stack-directsite-controls.json) exclude raw binds,
+entropy traces, cookies and response bodies. These are finite request and
+fallback controls, not a general method/purity/mid-request certificate,
+whole-DB gate or active own-suite proof. No main admission or stack price.
+
 ### Lobsters AR: warm-cache zero credit
 
 Same 200/300 protocol, 24 normally built AR units. `/newest`, `/active`,
@@ -330,14 +390,14 @@ mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
 ```
 
 Corrected Blog attribution, initial four-app screens and post-shadow-fix
-Campfire/Fizzy retests are complete: **15 retained screens**. Blog's signed
+Campfire/Fizzy retests plus guarded F are complete: **16 retained screens**. Blog's signed
 allocation effects are additive, not all beneficial. There is no admitted
 multi-component stack across apps. Token is excluded on Blog; existing AR is
 excluded on Fizzy; Campfire offers no clear reduction and retains exactness
 gaps; Lobsters' cached vector provides no active credit. Form's favorable
 Blog request reduction stays provisional until active own suites exist.
-Bet F's guarded `addf55e` is published; local screening is queued with existing
-AR excluded on Fizzy. Sealed form applies only to the certified Blog fixture,
+Bet F's guarded `addf55e` now has a favorable local buckets allocation screen,
+with existing AR excluded on Fizzy. Sealed form applies only to the certified Blog fixture,
 not Fizzy; do not force a cross-app form/DirectSite combination.
 No cross-app win, native latency gain, GC synergy or supported component is
 claimed. Shared screen tests pass 2 tests / 39 assertions; imported dispatch

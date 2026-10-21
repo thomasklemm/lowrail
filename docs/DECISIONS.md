@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Stack F screen: guarded buckets reduction, still provisional (2026-10-21)
+
+Imported F's guarded `addf55e` unchanged; existing AR excluded, normal zero-unit artifact, six Fizzy GETs, no app/config edits.
+Buckets allocation medians are 9,072 / 9,072 off versus 8,500 on (−572, −6.31%), both-seed actual response equality, two guarded hits/request, zero fallbacks.
+Other routes have no DirectSite hits; filtered/notifications/show retain off/off exactness failures, whole screen exits 2; no wall or GC synergy claim.
+All 13 directed cases × two seeds match responses; cold SQL and primary/cache DB differences keep the full control gate red and active own suites remain open.
+This is the only applicable Fizzy candidate, not a form combination or multi-component synergy; no main admission or stack price. [Evidence and refusals](stack.md#guarded-f-directsite-a-second-app-specific-candidate-not-synergy).
+
 ## Stack AR retest: Fizzy excluded, Campfire near tie (2026-10-21)
 
 Rerun existing public AR artifacts after main's allocation-free shadow fix; retain pre-fix screens as superseded evidence, not deleted results.

@@ -1,0 +1,2204 @@
+{
+  "format": 1,
+  "scope": "Directed guarded DirectSite response/fallback controls, not a passing DB or own-suite gate",
+  "upstream_runtime": "addf55e00b080d2627503b7f10a74bbe68e17ed1",
+  "passed": false,
+  "checks": {
+    "baseline": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": false,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": false,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "warm_baseline": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "changed_scope": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "added_default_scope": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "current_scope": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "global_scope": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "reflection_changed": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "association_loaded": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "unexpected_receiver": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "model_method_private": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "relation_method_changed": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "source_pin_mismatch": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    },
+    "restored": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": false,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "passed": false
+      }
+    }
+  },
+  "workers": {
+    "off_a": {
+      "arm": "off_a",
+      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "cases": {
+        "baseline": {
+          "0": {
+            "status": 200,
+            "body_sha256": "58e4a95ed361bda6cbed08eead4b712baf816aca19a5bbb2cded25884350d355",
+            "headers_sha256": "cad11dbd9d932c3dcaf4f1ba6b72cfd9d3f6304328d5e6f88461d3fbcb09a74f",
+            "db_sha256": "dd93e68844dc6176b339f93c847c81c238d5a5c10de9f44b9f37de7193283245",
+            "db_components_sha256": {
+              "primary": "b71461701e1f48511962856beddc2e3656428f2c35ca806c1f20cfa5d970b1a8",
+              "cache": "c814b9ddc6b43031dadfd5a18b6ff634842feade97eee13b7c6efc1dea7d7a46",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 30,
+              "sql_sha256": "97374e278ccdc5d08219147f36c81e92b6b1f962bc5b26abc35dcb1d47e0d63d"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "94bf2545e7bc750bda6e9e8a4075000c77734e457a755066380c1c297c0d80d7",
+            "headers_sha256": "202d0f024a3b4cbb2cc90a9efc3971bd281f4b721c370bd003c028ce947e3967",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 30,
+              "sql_sha256": "d8e9212542a2af7bbd3b09dfe1e5c4120317b4d681258d4d59c2f5129a508f9b"
+            }
+          }
+        },
+        "warm_baseline": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "65e936c5f620578980122b3541784ba71d95cfeff3ef3bcde4da269a3c199ae4",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "9df97cdf3d3a3402b28980bd7634e41338e5aa97fc4f5eb50e5e063ba80b27f2",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "changed_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "46c0662fde98bd24fd2086cf552577f63ad446dc4f58f85403a7099dbbd8c914",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "b1ea2f7fd0349d0435d0913943e3e698cdc8c0baaa3fccb99568047f5acd7964"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "4f404986e491be9036c26d75586de89794f474361ab9e3afe24433050d529a2b",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "e77c9fe60e23d32e8f425329348d7f07bf30e0c0560fa92dec7a88535225bf0f"
+            }
+          }
+        },
+        "added_default_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "437b2079e925e74bdd59b316358bdb249d3c2336d342afd227d0dcf7ee6e84a1",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "de244e10c3e943bb26526a82e4480474f942c2fd6b7d84745766c7c1fa20745b"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "4a3df6132fe4f66de704f20ec426db713ef6689f446ff89662e8d94b1c1ab47f",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "00247d6c1835784644834797ef1b41434fab188b8fe5f3392dfcf7a21ee674f6"
+            }
+          }
+        },
+        "current_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "7ff97412d4c7c2373f17a48953f64258b107cbe67bab77c8a3b5af03e278010b",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "72796798f2a6554193ecca3ec993e098719cb82ff277af3ee4a69666067b90a7",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "global_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "197f144366e8ef924aa1f8412f7c691fb9939c9a51b48b081085176729a67e84",
+            "headers_sha256": "493a652ac4bdc7d2a8767637a4a90f3c66fdea473d8b78f30fb634b44c98b80c",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "bdeb20d201344007e1d04a841840699f4287746cae21d434828c086fe165012b"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "5022faaef6bc0147ca91982271c76fa45eef7585c2677ab74c5dd4c6ef630672",
+            "headers_sha256": "d1b5bf85d50ed1e4eeb3470d9334d0a546a5ca27bbbc4d46d88a435ea4460f45",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "d5014bfc702c452327376227beef41c71955f5dbee18e4d52829bef272358ace"
+            }
+          }
+        },
+        "reflection_changed": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "af25f0cc4448ee1a39cb29f619e1275eba9b832fd37399c0b72719fa67a605bb",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "cd9b48ad63656bc10a29728eddff458ee22109fee5e81aeabbd6d58e71454e61"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "72b4b7d89d00ba64f4f46d86d0e2cb4c3ed2ac701b9040b1af0a4c1b5552ee80",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "84063f71c47c61518b0cfa0a02ddde79c0e05054b63bd1aed4d1d53d5fddc088"
+            }
+          }
+        },
+        "association_loaded": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "4d751c8ead27c1897a075d277c5631efed429a08787c3641b0dddb22516781f9",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "229eea2ff049fb1fa042da5a7e6e5ce8a76180d1080104ae81b30950f242b0f8",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "unexpected_receiver": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "c4a537b0cb09a832014c244d39d8c73605afbe1155d7891424a2aff1a6a5d06f",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "cd11cf0fa0abd450b9496a9d2694f3e9358db9ce4df1f604dc6483ff8e258b5d",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "model_method_private": {
+          "0": {
+            "status": 500,
+            "body_sha256": "ef38a03155fab5fa59fe6c823f948893fe260204a87860c55522cdeb5672c959",
+            "headers_sha256": "fac7487aa1e86513e9eb2578a2ec896750152f24961069129f1906e85b5fcd6b",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 3,
+              "sql_sha256": "babf8badb5fa1527ccf26560344dad39ea316aa57bdb0c9f1d1c3aaa3d7ff741"
+            }
+          },
+          "1": {
+            "status": 500,
+            "body_sha256": "ef38a03155fab5fa59fe6c823f948893fe260204a87860c55522cdeb5672c959",
+            "headers_sha256": "fac7487aa1e86513e9eb2578a2ec896750152f24961069129f1906e85b5fcd6b",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 3,
+              "sql_sha256": "98004b992f7bacd982c9272fba5d884bcfddd75de3e18d0206ccd4d9e7b58052"
+            }
+          }
+        },
+        "relation_method_changed": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "8601302ba101945bf17e3adb8452516439063515c9b64958b80f8b96fe97298c",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "53528d835a2ecc9efde47b65d2cd12c899942511a7bd9e26f31b037784af1c73",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "source_pin_mismatch": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "a3f47c24331f57bcffc6d860c0a1973d0623e113ff02ba7ad7aff86f8650e64c",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "0aabc69490533fd1b7415b8631200d9185a065533131c363c8d614425a9b4749",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "restored": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "5c55226e67f9d3c686fdcbc02a1d87f0bf116c4c7144e7061259992abf33b14a",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "4300949f012001df357084f84eebdb6cf2a8f63bc8f1c39503b7205d8bfbf300",
+            "db_sha256": "1e76c5a40fe637040a8614bfd49b8755198946deda9c3bfe056e5789c038a36a",
+            "db_components_sha256": {
+              "primary": "f1f72f6ff1621d8a8c61ec115c49ca62a7006ba6e3d31f2152e74c1dc638fc05",
+              "cache": "80c4b8ac5f250604c5e2a0c14aab0d2677a03d255217409ddb14966f429d58d1",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        }
+      }
+    },
+    "off_b": {
+      "arm": "off_b",
+      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "cases": {
+        "baseline": {
+          "0": {
+            "status": 200,
+            "body_sha256": "58e4a95ed361bda6cbed08eead4b712baf816aca19a5bbb2cded25884350d355",
+            "headers_sha256": "cad11dbd9d932c3dcaf4f1ba6b72cfd9d3f6304328d5e6f88461d3fbcb09a74f",
+            "db_sha256": "a68529917bc9005f09e67ba78b563562c8c12827aa8b1c8a431b3381a3056386",
+            "db_components_sha256": {
+              "primary": "d6854e80fe0b56fbfbe4203b911027f931c05f4765811c699a92363bccd21524",
+              "cache": "bb6ff42604c7525d3f06e2b6d34318d448b67be978969e1ab8870f87dd855e51",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 35,
+              "sql_sha256": "c58461e96edda720870083dccf8a6724bb457bef2c415d7c8725ed728cb0ff37"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "94bf2545e7bc750bda6e9e8a4075000c77734e457a755066380c1c297c0d80d7",
+            "headers_sha256": "202d0f024a3b4cbb2cc90a9efc3971bd281f4b721c370bd003c028ce947e3967",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 30,
+              "sql_sha256": "0748736d857f1ccfe59c2108db3f80849103774ae96a03dc30a6b2a60f9dfab2"
+            }
+          }
+        },
+        "warm_baseline": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "65e936c5f620578980122b3541784ba71d95cfeff3ef3bcde4da269a3c199ae4",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "9df97cdf3d3a3402b28980bd7634e41338e5aa97fc4f5eb50e5e063ba80b27f2",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "changed_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "46c0662fde98bd24fd2086cf552577f63ad446dc4f58f85403a7099dbbd8c914",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "b1ea2f7fd0349d0435d0913943e3e698cdc8c0baaa3fccb99568047f5acd7964"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "4f404986e491be9036c26d75586de89794f474361ab9e3afe24433050d529a2b",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "e77c9fe60e23d32e8f425329348d7f07bf30e0c0560fa92dec7a88535225bf0f"
+            }
+          }
+        },
+        "added_default_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "437b2079e925e74bdd59b316358bdb249d3c2336d342afd227d0dcf7ee6e84a1",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "de244e10c3e943bb26526a82e4480474f942c2fd6b7d84745766c7c1fa20745b"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "4a3df6132fe4f66de704f20ec426db713ef6689f446ff89662e8d94b1c1ab47f",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "00247d6c1835784644834797ef1b41434fab188b8fe5f3392dfcf7a21ee674f6"
+            }
+          }
+        },
+        "current_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "7ff97412d4c7c2373f17a48953f64258b107cbe67bab77c8a3b5af03e278010b",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "72796798f2a6554193ecca3ec993e098719cb82ff277af3ee4a69666067b90a7",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "global_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "197f144366e8ef924aa1f8412f7c691fb9939c9a51b48b081085176729a67e84",
+            "headers_sha256": "493a652ac4bdc7d2a8767637a4a90f3c66fdea473d8b78f30fb634b44c98b80c",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "bdeb20d201344007e1d04a841840699f4287746cae21d434828c086fe165012b"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "5022faaef6bc0147ca91982271c76fa45eef7585c2677ab74c5dd4c6ef630672",
+            "headers_sha256": "d1b5bf85d50ed1e4eeb3470d9334d0a546a5ca27bbbc4d46d88a435ea4460f45",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "d5014bfc702c452327376227beef41c71955f5dbee18e4d52829bef272358ace"
+            }
+          }
+        },
+        "reflection_changed": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "af25f0cc4448ee1a39cb29f619e1275eba9b832fd37399c0b72719fa67a605bb",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "cd9b48ad63656bc10a29728eddff458ee22109fee5e81aeabbd6d58e71454e61"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "72b4b7d89d00ba64f4f46d86d0e2cb4c3ed2ac701b9040b1af0a4c1b5552ee80",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "84063f71c47c61518b0cfa0a02ddde79c0e05054b63bd1aed4d1d53d5fddc088"
+            }
+          }
+        },
+        "association_loaded": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "4d751c8ead27c1897a075d277c5631efed429a08787c3641b0dddb22516781f9",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "229eea2ff049fb1fa042da5a7e6e5ce8a76180d1080104ae81b30950f242b0f8",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "unexpected_receiver": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "c4a537b0cb09a832014c244d39d8c73605afbe1155d7891424a2aff1a6a5d06f",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "cd11cf0fa0abd450b9496a9d2694f3e9358db9ce4df1f604dc6483ff8e258b5d",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "model_method_private": {
+          "0": {
+            "status": 500,
+            "body_sha256": "ef38a03155fab5fa59fe6c823f948893fe260204a87860c55522cdeb5672c959",
+            "headers_sha256": "fac7487aa1e86513e9eb2578a2ec896750152f24961069129f1906e85b5fcd6b",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 3,
+              "sql_sha256": "babf8badb5fa1527ccf26560344dad39ea316aa57bdb0c9f1d1c3aaa3d7ff741"
+            }
+          },
+          "1": {
+            "status": 500,
+            "body_sha256": "ef38a03155fab5fa59fe6c823f948893fe260204a87860c55522cdeb5672c959",
+            "headers_sha256": "fac7487aa1e86513e9eb2578a2ec896750152f24961069129f1906e85b5fcd6b",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 3,
+              "sql_sha256": "98004b992f7bacd982c9272fba5d884bcfddd75de3e18d0206ccd4d9e7b58052"
+            }
+          }
+        },
+        "relation_method_changed": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "8601302ba101945bf17e3adb8452516439063515c9b64958b80f8b96fe97298c",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "53528d835a2ecc9efde47b65d2cd12c899942511a7bd9e26f31b037784af1c73",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "source_pin_mismatch": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "a3f47c24331f57bcffc6d860c0a1973d0623e113ff02ba7ad7aff86f8650e64c",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "0aabc69490533fd1b7415b8631200d9185a065533131c363c8d614425a9b4749",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "restored": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "5c55226e67f9d3c686fdcbc02a1d87f0bf116c4c7144e7061259992abf33b14a",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "4300949f012001df357084f84eebdb6cf2a8f63bc8f1c39503b7205d8bfbf300",
+            "db_sha256": "9037f55a6bfeaabd0b42bac44fd9f1a52b312150a60ccd48f5c854a25ae3dda5",
+            "db_components_sha256": {
+              "primary": "0caae3cf29f35a9511b3114ee0a1869078b58c92ca6d9dcbfdd4a2ba4069bc39",
+              "cache": "4f0532857ec09a7e5b48d2c5e06452f11ccd282b3f5d1e63173af090b86a498c",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {},
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        }
+      }
+    },
+    "on": {
+      "arm": "on",
+      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "cases": {
+        "baseline": {
+          "0": {
+            "status": 200,
+            "body_sha256": "58e4a95ed361bda6cbed08eead4b712baf816aca19a5bbb2cded25884350d355",
+            "headers_sha256": "cad11dbd9d932c3dcaf4f1ba6b72cfd9d3f6304328d5e6f88461d3fbcb09a74f",
+            "db_sha256": "61e78dc296644746536145cedc51b772449730cf081f8f54301b1e5e8d98b6b9",
+            "db_components_sha256": {
+              "primary": "945b759e65bb10d3809dd444dda2a62fc0edfab20e1a82898e77adac35bdab7a",
+              "cache": "d45e4bbb3d46bf13afa6aa5345846a75247817e4b762fb691298bdcdeef7caff",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 2,
+              "bucket:hit": 2
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 30,
+              "sql_sha256": "f84d696c611aea2c14c635e902b38c5c5c04ef8079b8b31eebfc0b12e7a95c92"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "94bf2545e7bc750bda6e9e8a4075000c77734e457a755066380c1c297c0d80d7",
+            "headers_sha256": "202d0f024a3b4cbb2cc90a9efc3971bd281f4b721c370bd003c028ce947e3967",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 2,
+              "bucket:hit": 2
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 30,
+              "sql_sha256": "3e797b4fb53c6bdcbe51f8a055399990e64037ab955d339d43cb86fa80a9783c"
+            }
+          }
+        },
+        "warm_baseline": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "65e936c5f620578980122b3541784ba71d95cfeff3ef3bcde4da269a3c199ae4",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 2,
+              "bucket:hit": 2
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "9df97cdf3d3a3402b28980bd7634e41338e5aa97fc4f5eb50e5e063ba80b27f2",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 2,
+              "bucket:hit": 2
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "changed_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "46c0662fde98bd24fd2086cf552577f63ad446dc4f58f85403a7099dbbd8c914",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "b1ea2f7fd0349d0435d0913943e3e698cdc8c0baaa3fccb99568047f5acd7964"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "4f404986e491be9036c26d75586de89794f474361ab9e3afe24433050d529a2b",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "e77c9fe60e23d32e8f425329348d7f07bf30e0c0560fa92dec7a88535225bf0f"
+            }
+          }
+        },
+        "added_default_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "437b2079e925e74bdd59b316358bdb249d3c2336d342afd227d0dcf7ee6e84a1",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "de244e10c3e943bb26526a82e4480474f942c2fd6b7d84745766c7c1fa20745b"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "4a3df6132fe4f66de704f20ec426db713ef6689f446ff89662e8d94b1c1ab47f",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "00247d6c1835784644834797ef1b41434fab188b8fe5f3392dfcf7a21ee674f6"
+            }
+          }
+        },
+        "current_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "7ff97412d4c7c2373f17a48953f64258b107cbe67bab77c8a3b5af03e278010b",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "72796798f2a6554193ecca3ec993e098719cb82ff277af3ee4a69666067b90a7",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "global_scope": {
+          "0": {
+            "status": 200,
+            "body_sha256": "197f144366e8ef924aa1f8412f7c691fb9939c9a51b48b081085176729a67e84",
+            "headers_sha256": "493a652ac4bdc7d2a8767637a4a90f3c66fdea473d8b78f30fb634b44c98b80c",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "bdeb20d201344007e1d04a841840699f4287746cae21d434828c086fe165012b"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "5022faaef6bc0147ca91982271c76fa45eef7585c2677ab74c5dd4c6ef630672",
+            "headers_sha256": "d1b5bf85d50ed1e4eeb3470d9334d0a546a5ca27bbbc4d46d88a435ea4460f45",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "d5014bfc702c452327376227beef41c71955f5dbee18e4d52829bef272358ace"
+            }
+          }
+        },
+        "reflection_changed": {
+          "0": {
+            "status": 200,
+            "body_sha256": "c4339898b896cd0b4583f8c1c731a74ee2963b65f3005a291a6f2bb15a7b5aa8",
+            "headers_sha256": "af25f0cc4448ee1a39cb29f619e1275eba9b832fd37399c0b72719fa67a605bb",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "cd9b48ad63656bc10a29728eddff458ee22109fee5e81aeabbd6d58e71454e61"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "e81949282a0301627fa69bad5c2f5044a3cc7a6c6c7a188c925a51a547a1689a",
+            "headers_sha256": "72b4b7d89d00ba64f4f46d86d0e2cb4c3ed2ac701b9040b1af0a4c1b5552ee80",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "84063f71c47c61518b0cfa0a02ddde79c0e05054b63bd1aed4d1d53d5fddc088"
+            }
+          }
+        },
+        "association_loaded": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "4d751c8ead27c1897a075d277c5631efed429a08787c3641b0dddb22516781f9",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "229eea2ff049fb1fa042da5a7e6e5ce8a76180d1080104ae81b30950f242b0f8",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "unexpected_receiver": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "c4a537b0cb09a832014c244d39d8c73605afbe1155d7891424a2aff1a6a5d06f",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "cd11cf0fa0abd450b9496a9d2694f3e9358db9ce4df1f604dc6483ff8e258b5d",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "model_method_private": {
+          "0": {
+            "status": 500,
+            "body_sha256": "ef38a03155fab5fa59fe6c823f948893fe260204a87860c55522cdeb5672c959",
+            "headers_sha256": "fac7487aa1e86513e9eb2578a2ec896750152f24961069129f1906e85b5fcd6b",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 2
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 3,
+              "sql_sha256": "babf8badb5fa1527ccf26560344dad39ea316aa57bdb0c9f1d1c3aaa3d7ff741"
+            }
+          },
+          "1": {
+            "status": 500,
+            "body_sha256": "ef38a03155fab5fa59fe6c823f948893fe260204a87860c55522cdeb5672c959",
+            "headers_sha256": "fac7487aa1e86513e9eb2578a2ec896750152f24961069129f1906e85b5fcd6b",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 2
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 3,
+              "sql_sha256": "98004b992f7bacd982c9272fba5d884bcfddd75de3e18d0206ccd4d9e7b58052"
+            }
+          }
+        },
+        "relation_method_changed": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "8601302ba101945bf17e3adb8452516439063515c9b64958b80f8b96fe97298c",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "53528d835a2ecc9efde47b65d2cd12c899942511a7bd9e26f31b037784af1c73",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 4
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "source_pin_mismatch": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "a3f47c24331f57bcffc6d860c0a1973d0623e113ff02ba7ad7aff86f8650e64c",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 0,
+              "bucket:source_mismatch": 1
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "0aabc69490533fd1b7415b8631200d9185a065533131c363c8d614425a9b4749",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 0,
+              "bucket:hit": 0,
+              "bucket:fallback": 0,
+              "bucket:source_mismatch": 0
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        },
+        "restored": {
+          "0": {
+            "status": 200,
+            "body_sha256": "d83cafb9034790e2e0c3d9be4e9cf7a16ecfc3691172898e6067f25d69ee8e19",
+            "headers_sha256": "5c55226e67f9d3c686fdcbc02a1d87f0bf116c4c7144e7061259992abf33b14a",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 1,
+              "bucket:shadow": 2,
+              "bucket:hit": 2,
+              "bucket:fallback": 0,
+              "bucket:source_mismatch": 0
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            }
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "eef9115380c0077639af4d7494a81832e279477ef3001b57b10273d424fc5d6b",
+            "headers_sha256": "4300949f012001df357084f84eebdb6cf2a8f63bc8f1c39503b7205d8bfbf300",
+            "db_sha256": "224b071e789c88b881820ced8fb96621d176f36bd0244d7240ab1ca967b75f6c",
+            "db_components_sha256": {
+              "primary": "27534451223823021adaca4bd04b353f3606dc7ed6596a3911e5810e1d1488ac",
+              "cache": "f753f7703fd9b7f546f5b768a87d4e014cb1c68dd9cc8c314703b045e992ad94",
+              "queue": "f4a8ac4c4e909daaec9c4f121b4736be00371f27c7db5b202a30d0843247d362",
+              "cable": "5480da0165bd0846f99a75422197fa9687e260eb6c9b2fd92ee10f17f088dd9b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:shadow": 2,
+              "bucket:hit": 2,
+              "bucket:fallback": 0,
+              "bucket:source_mismatch": 0
+            },
+            "evidence": {
+              "passed": true,
+              "errors": [],
+              "sql_events": 20,
+              "sql_sha256": "6f56cb320dfb7264a27782c32b1e9d09f3386f6a204a36ab7db8f7c390599ca0"
+            }
+          }
+        }
+      }
+    }
+  },
+  "raw_result_sha256": "ec926fc3478db07123f96a00f30ca5bff39fcb15b2e74cde828cfe1f7b72803b",
+  "final_primary_comparison": {
+    "scope": "Read-only final directed-control worker DB comparison, no values exported",
+    "changed_primary_tables": [
+      {
+        "table": "sessions",
+        "rows": [
+          5,
+          5,
+          5
+        ],
+        "different_columns": [
+          "created_at",
+          "updated_at"
+        ]
+      }
+    ]
+  }
+}
