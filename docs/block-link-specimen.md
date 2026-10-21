@@ -692,3 +692,161 @@ rule, all inputs/tool/native pins, actual caller source, every worker/window/
 site map, all raw dump/log digests and the independent reconciliation. The
 earlier [N=50 export](fizzy-link-ir-invalid.json) remains **INVALID diagnostic
 data only**, not a price/direction claim or a sample pooled into this result.
+
+## Why this specimen loses: offline attribution, not another cohort
+
+**Production widening is PARKED.** No further block-link cohort is running.
+The following analyzes only the existing accepted N=10 dumps from the frozen
+harness above. It does not change the result, cold RED status, named accepted
+off/off rejections or uncovered payload/assign, lazy-bind and SolidCache
+completion gaps. It is not a new screen or a new causal experiment.
+
+### What the dumps can and cannot identify
+
+The dumps have native C function symbols and `positions: line; events: Ir`,
+not interpreted Ruby method, ISeq or ERB-site frames. `link_to`,
+`content_tag_string` and `BlockLinkSpecimen` have no distinct function symbols.
+Therefore **saved Ir and added Ir per site are unavailable**. Dividing net
+request Ir by 24 would not recover either quantity, or separate guards from
+rendering. Nor does a reduction in one native function establish which Ruby
+call removed it. Do not assign a common average to asymmetric sites.
+
+The [offline analyzer](../bench/experiments/block_link_attribution.rb) resolves
+compressed function/object IDs separately in each dump, combines recursion
+clones of the same native symbol, excludes inclusive `calls=` cost rows,
+and checks every input digest, all 72 self-cost totals and window values.
+It subtracts each worker's N=0 from N=10, then sums six rounds and divides
+by 60 vectors. This **arithmetic-mean decomposition** is additive; it is not
+the accepted result's median paired percentage. Both modes reconcile to the
+original six per-round differences. Zero-delta functions in both comparisons
+are omitted from the [complete changed-function export](fizzy-link-attribution.json).
+
+Selected native **self-cost** differences, Ir per six-GET vector, rounded:
+
+| Native function | Total on − off A | No-GC on − off A | Total off B − off A |
+|---|---:|---:|---:|
+| `vm_exec_core` | +632,361 | +632,815 | +618 |
+| `vm_call_cfunc_with_frame_` | +356,469 | +356,627 | +218 |
+| `invoke_block_from_c_bh` | +149,624 | +149,738 | +104 |
+| `vm_callee_setup_block_arg` | +116,800 | +116,827 | +25 |
+| `rb_data_typed_object_zalloc` | +109,061 | +109,084 | +23 |
+| `mnew_internal` | +101,088 | +101,088 | 0 |
+| `search_method_protect` | +98,252 | +98,256 | +4 |
+| `method_eq` | +78,576 | +78,576 | 0 |
+| `check_definition_visibility` | +49,680 | +49,680 | 0 |
+| `match_at` | −40,742 | −39,317 | +951 |
+| `str_buf_cat4.part.0` | −27,280 | −26,547 | +488 |
+| `rb_str_buf_append` | −14,006 | −13,754 | +176 |
+| **All native functions, including those not shown** | **+2,768,662** | **+2,705,026** | **−96,792** |
+
+VM dispatch is the largest visible positive bucket. Reflection-specific
+increases with almost no A/A change fit the source diagnosis below, but this
+profile cannot causally assign all VM dispatch/allocation cost to the scan.
+The separate total/no-GC executions are not a decomposition of GC savings.
+The no-GC all-function A/A mean is −103,928 Ir/vector. Selected reflection
+rows are not the whole A/A noise floor: for example, total `ar_update`
+contributes −44,755 A/A Ir/vector. N10-minus-N0 function costs can be negative.
+
+### Work per completed warm hit
+
+| Component | Off versus on | Work and what remains live |
+|---|---|---|
+| Template/context | Common | Natural template seam reads source/compiler/locals/ISeq facts, audits six compiler methods, computes signatures/digests and disk SHA; frequency is template entry, not one per link. Never attribute all of this common work to the net on increase. |
+| Link/site observation | Common per selected call | Original Proc ISeq/child association, descriptor merge, JSON/SHA key, entry eligibility snapshot, request-local call record and entries counter. |
+| Capture/witness observations | Common | Saved builder, actual capture receiver, raw-buffer swap/restoration, completion seams. URL/options conversion, validation, builder selection, capture and the entire original block remain live once. |
+| First-original admission | Outside warm windows | One bounded attempt, validation and publication after whole-link completion; not repeated on each warm hit. |
+| Dependency scan | **On-only after capture** | **40** `instance_method` identity comparisons plus 40 visibility checks; native-holder bound Method and two escaping bound Method comparisons add three. Literal checking additionally inspects the `html_escape` native super-method chain: the informal “44-method scan” is **43 identity comparisons plus that chain observation**, not 44 instance-method entries. Six private methods make visibility use 46 public/protected queries. |
+| Literal state | On-only | Frozen/exact TAG_TYPES and two Regexp checks, Hash defaults/class/href entries, two XML-name matches, native escape owner/location. This is one `literal_state?` per completed hit, not preescaped CSS. |
+| Remaining guards | On-only | Ractor/epoch, saved owner holders and weak constructor token, actual saved builder/view relation, buffer receiver/restoration, converted Hash order/defaults/class, URL and content exact holders/UTF-8 validity. Saved receiver is revalidated **after** the live block. |
+| Specialized suffix | On instead of stock suffix | Still escapes CSS and URL, tests quotes, conditionally escapes content, reads live PRE_CONTENT_STRINGS and allocates fresh safe output. It does **not** remove the block, capture, route generation or CSS escaping. |
+| Stock work removed | Off-only | One `content_tag_string`, one `tag_options`, two `tag_option` calls; empty/options and per-key blank/type/value dispatch, two XML-name escapes, two generic per-attribute interpolations and output concatenations. Only outer tag/class/href shape is fixed. |
+| Counters | Both, not identical | Entries and completion in both; off also constructs/increments its fallback-reason counter in `link_leave`. On's completed-hit counter is charged. This small off-only cost cannot explain an on slowdown. |
+
+Thus the **hypothesis**, not a measured component price, is that the repeated
+reflection/visibility/literal machinery dominates the small stock suffix it
+replaces. The 24-hit vector does 960 instance-method comparisons, 960
+visibility calls (960 public + 144 protected = 1104 method-defined queries), 72 further bound-Method
+comparisons and 24 literal/native-chain checks, while removing only 96 stock
+suffix calls. Native `mnew_internal`, `method_eq` and visibility increases
+support that hypothesis; shared VM self costs cannot prove its percentage.
+These are separately source-audited operation counts, not observations
+recovered from native symbols; the dump analyzer does not own a second copy
+of the dependency list or a per-operation cost model.
+
+### Per-site ledger, not invented per-site prices
+
+Paths below are under `app/views/`. `Scan` is instance-method identity
+comparisons **and separately visibility checks**, per vector (40 each/hit).
+`Removed` is stock suffix calls (four/hit). Each hit still pays the remaining
+guards, literal check, three bound-Method comparisons and specialized suffix.
+Both Ir columns are unavailable for every exercised site. Four cache-elided
+sites have no on-only scan or removed suffix in these warm windows; their
+zeros do not mean a zero-cost general specialization.
+
+| Site | Hits/vector | Hits/N10 | Scan | Removed | Saved Ir | Added Ir |
+|---|---:|---:|---:|---:|---|---|
+| `buckets/index.html.erb:5` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `buckets/_bucket.html.erb:2` | 2 | 20 | 80 | 8 | unavailable | unavailable |
+| `buckets/_bucket.html.erb:16` | 2 | 20 | 80 | 8 | unavailable | unavailable |
+| `buckets/_bucket.html.erb:20` | 2 | 20 | 80 | 8 | unavailable | unavailable |
+| `filters/_filter.html.erb:3` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `filters/_filter.html.erb:17` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `notifications/_tray.html.erb:6` | 3 | 30 | 120 | 12 | unavailable | unavailable |
+| `bubbles/index.html.erb:9` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `filters/_buckets.html.erb:21` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `filters/_tags.html.erb:20` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `filters/_assignees.html.erb:22` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `filters/_creators.html.erb:23` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `filters/_stages.html.erb:21` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `filters/_settings.html.erb:20` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `bubbles/_bubble.html.erb:33` | 0 | 0 | 0 | 0 | 0 observed | 0 on-only |
+| `bubbles/list/_bubble.html.erb:3` | 0 | 0 | 0 | 0 | 0 observed | 0 on-only |
+| `bubbles/list/_bubble.html.erb:12` | 0 | 0 | 0 | 0 | 0 observed | 0 on-only |
+| `accounts/users/index.html.erb:5` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `accounts/users/index.html.erb:18` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `workflows/index.html.erb:13` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `workflows/_workflow.html.erb:17` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `notifications/index.html.erb:14` | 1 | 10 | 40 | 4 | unavailable | unavailable |
+| `comments/_body.html.erb:6` | 0 | 0 | 0 | 0 | 0 observed | 0 on-only |
+| **Total / 19 exercised identities** | **24** | **240** | **960** | **96** | **unavailable** | **unavailable** |
+
+### Is there a cheaper exact design?
+
+- **Request-scoped scan:** at most six complete scans instead of 24 in this
+  vector, but unsafe alone: URL conversion or the original block can change
+  an effective dependency before the saved receiver's suffix runs. Keep the
+  original suffix whenever a complete invalidation proof is unavailable.
+  Per-hit object/encoding/options/buffer checks remain necessary even with
+  a sound structural epoch. Common context/digest work does not disappear.
+- **Cheap mutation epoch / bet D singleton freezing:** a plausible way to
+  amortize structural checks, **not established by existing Guard hooks**.
+  Visibility changes, saved ancestry primitives, suppressed object callbacks
+  and refinements need detection or refusal. Freezing holder eigenclasses
+  only prevents one way to replace callbacks; it does not close those holes.
+  No permission follows to freeze app objects or change app semantics.
+- **Drop low-value sites:** hit multiplicity is not net value. A one-hit site
+  has the same scan but may have different stock content. These dumps cannot
+  identify which site's saving exceeds its checks. Dropping the four warm
+  zero sites changes no measured hits; dropping arbitrary exercised sites
+  would not be evidence-driven and changes the preregistered mix.
+
+Next is at most one **branch-only** improvement attempt and cheap screen,
+not another price. First prove its invalidation/fallback boundary; a zero-hit
+original-only comparison is not an improvement. New screen-first policy:
+exact output, allocations and short native YJIT alternating wall samples;
+one failed improvement means stop. No new Callgrind cohort without a clear
+screen win and the coordinator's separate decision.
+
+Reproduce the offline analysis (no Valgrind invocation):
+
+```sh
+mise exec ruby@4.0.7 -- ruby bench/experiments/block_link_attribution.rb \
+  docs/fizzy-link-ir-n10.json "$EXISTING_N10_DUMP_DIR" "$NEW_JSON"
+```
+
+Validation: all 72 digest/self-total/window checks and both aggregate
+on/off and A/A decompositions pass. A separate scratch asymmetric synthetic dump checks inclusive
+cost exclusion, compressed cross-object IDs, recursion merging and refusal
+of corrupt totals; that validation fixture was not added to the runtime or
+kept test suite. A separate Prism read of the actual dependency array finds 40 entries;
+no runtime witness, app or frozen harness is modified by this analysis.
