@@ -75,6 +75,7 @@ module Lowrail
           "sql" => SqlTrace.snapshot }
         data["jit_diagnostics"] = [JitDiagnostics.snapshot] if defined?(JitDiagnostics)
         data["verify_loads"] = VerifyLoads.snapshot if defined?(VerifyLoads)
+        data["companion_rng"] = SqlTrace.companion_rng if ENV["LOWRAIL_COMPANION_SEED"]
         data
       end
     end
@@ -155,6 +156,7 @@ module Lowrail
         (merged["ruby_descriptions"] ||= []) << data["ruby"] if data["ruby"]
         (merged["jit_modes"] ||= []).concat(data["jit_modes"]) if data["jit_modes"]
         (merged["jit_diagnostics"] ||= []).concat(data["jit_diagnostics"]) if data["jit_diagnostics"]
+        (merged["companion_rng"] ||= []).concat(data["companion_rng"]) if data["companion_rng"]
         if (loads = data["verify_loads"])
           target = (merged["verify_loads"] ||= { "stages" => {}, "snapshot_seconds" => 0.0 })
           target["snapshot_seconds"] += loads.fetch("snapshot_seconds")

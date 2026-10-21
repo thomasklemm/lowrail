@@ -644,5 +644,59 @@ controls appear in the **known app nondeterminism: SQL** section, including
 unobserved ones, with off/on digest/counts, differing/pinned counts, mechanism
 and each variant's evidence. JSON retains raw traces and `report.known_app_sql`.
 No SQL normalization, global repeat relaxation or automatic RNG seeding is
-introduced. [CRM's first three controls](../fixtures/corpus/fat-free-crm-load-controls.json)
+introduced by these lists. [CRM's controls](../fixtures/corpus/fat-free-crm-load-controls.json)
 retain the rejected original cohort and [off-only/diagnostic evidence](../fixtures/corpus/fat-free-crm-sql-evidence.json).
+
+### Declared RNG companions
+
+`verify APP --load-controls FILE --companion-seeds 0,1 -- TEST COMMAND...`
+explicitly adds **two distinct** Kernel-RNG seed pairs, off then on, after
+the ordinary **unseeded** verifier and its unchanged finite repeat controls.
+Nothing seeds the ordinary gate. The pinned control file must also declare
+the app's RNG sources, each with mechanism and evidence:
+
+```json
+{
+  "rng_sources": [
+    {"name": "Kernel", "origin": "Bare sample in a factory", "evidence": "evidence.json#kernel"},
+    {"name": "FFaker::Random", "origin": "Factory attributes use FFaker", "evidence": "evidence.json#ffaker"}
+  ]
+}
+```
+
+These declarations share the revision/effective-lock/clean-source pins and
+before/after validation above. Missing declarations or changed pins make
+companions inactive, never permission to accept unseeded differences.
+Kernel is required. The registered adapters are `Kernel.srand(seed)` and
+`FFaker::Random.seed = seed`; unknown or duplicate sources reject the
+configuration. No arbitrary app
+code is evaluated. App RNG constants must **already be loaded** at the first
+example; the observer never requires or autoloads them to seed a companion.
+
+The RSpec/Minitest reporters seed **before every example**, before its hooks,
+and attest the seed, sources and test ids in `companion_rng`. The CLI checks
+those attestations, nonempty equal whole-suite test identities, successful
+commands, identical per-test outcomes and **all ordered own-thread SQL
+digest/count maps**, including missing traces. No SQL repeat-noise exclusions,
+pinned SQL variants or multi-worker advisory exemptions apply to companions.
+Any companion difference rejects the entire verify. Other-thread SQL remains
+advisory; loads retain their ordinary gate and are **not** covered by RNG policy.
+
+Only when both complete pairs pass and the unseeded outcomes agree can raw
+unseeded SQL differences be classified **RNG-dependent, companion-verified**.
+The report always prints their count/test ids and both companion results,
+RNG declarations and evidence. JSON retains the original runs and noise sets,
+the pre-classification `unseeded_identical`/`unseeded_sql_differences`, every
+companion run and any rejection, under `report.companions`. The classification
+does not claim that the raw unseeded queries were identical. Without this
+explicit option, the existing unseeded policy is unchanged.
+
+### Inspect-style constant names
+
+The opt-in census elides only `:0x<hex>` address tokens immediately before
+`>` in module names beginning `#<`, for example
+`#<#<Class:0x123>:0x456>::Coercible::Array` becomes
+`#<#<Class:0x?>:0x?>::Coercible::Array`. Named constant suffixes stay literal.
+No other census fields, source paths, hook names, event indexes or order are
+normalized. This fixes process-address identity noise; it is not a pinned
+app-load exemption. A real A/B load reorder still fails.

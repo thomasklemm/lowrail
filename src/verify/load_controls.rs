@@ -39,6 +39,14 @@ impl SqlEntry {
     }
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Rng {
+    pub name: String,
+    pub evidence: String,
+    pub origin: String,
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Controls {
@@ -48,12 +56,15 @@ struct Controls {
     entries: Vec<Entry>,
     #[serde(default)]
     sql_entries: Vec<SqlEntry>,
+    #[serde(default)]
+    rng_sources: Vec<Rng>,
 }
 
 #[derive(Default)]
 pub struct Pinned {
     pub loads: BTreeMap<String, Entry>,
     pub sql: BTreeMap<String, SqlEntry>,
+    pub rng_sources: Vec<Rng>,
 }
 
 pub fn load(app: &Path, path: &Path) -> Result<Pinned, String> {
@@ -123,6 +134,18 @@ pub fn load(app: &Path, path: &Path) -> Result<Pinned, String> {
         if pinned.sql.insert(entry.test.clone(), entry).is_some() {
             return Err("duplicate SQL control test".into());
         }
+    }
+    let mut names = std::collections::BTreeSet::new();
+    for rng in controls.rng_sources {
+        if !matches!(rng.name.as_str(), "Kernel" | "FFaker::Random")
+            || rng.origin.trim().is_empty() || !names.insert(rng.name.clone()) {
+            return Err(format!("invalid or duplicate RNG source: {}", rng.name));
+        }
+        check_evidence(path, &rng.evidence)?;
+        pinned.rng_sources.push(rng);
+    }
+    if !pinned.rng_sources.is_empty() && !names.contains("Kernel") {
+        return Err("companion RNG sources must declare Kernel".into());
     }
     Ok(pinned)
 }

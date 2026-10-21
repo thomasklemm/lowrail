@@ -38,6 +38,12 @@ module Lowrail
 
       def snapshot = tests.dup
 
+      def companion_rng
+        return [] unless ENV["LOWRAIL_COMPANION_SEED"]
+        [{ "seed" => Integer(ENV.fetch("LOWRAIL_COMPANION_SEED")),
+           "sources" => ENV.fetch("LOWRAIL_COMPANION_RNGS"), "tests" => (@seeded_tests || {}).keys }]
+      end
+
       def hook_minitest
         return if @minitest_hooked || !enabled? || !defined?(::Minitest::Test)
         @minitest_hooked = true
@@ -45,6 +51,7 @@ module Lowrail
       end
 
       def start(key)
+        seed_companion(key) if ENV["LOWRAIL_COMPANION_SEED"]
         VerifyLoads.capture("first_test") if defined?(VerifyLoads)
         return unless enabled? && subscribe
         hook_rails
@@ -100,6 +107,25 @@ module Lowrail
       end
 
       private
+
+      # Only an explicitly requested companion, in both arms. No require or
+      # constantize: a declared RNG must already exist when the test starts.
+      def seed_companion(key)
+        seed = Integer(ENV.fetch("LOWRAIL_COMPANION_SEED"))
+        ENV.fetch("LOWRAIL_COMPANION_RNGS").split(",").each do |source|
+          case source
+          when "Kernel" then Kernel.srand(seed)
+          when "FFaker::Random"
+            rng = Lowrail.loaded_constant("FFaker::Random") or raise "companion RNG not loaded: #{source}"
+            rng.seed = seed
+          else raise "unknown companion RNG: #{source}"
+          end
+        end
+        if @seeded_pid != Process.pid
+          @seeded_tests, @seeded_pid = {}, Process.pid
+        end
+        @seeded_tests[key] = true
+      end
 
       # Once the classes exist (they load lazily, so this is retried per test).
       def hook_rails

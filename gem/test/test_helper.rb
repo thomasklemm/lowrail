@@ -18,6 +18,7 @@ module LowrailTest
   SETUP_OPT = "-I#{GEM_LIB} -rlowrail/setup"
   # Variables a developer's shell might carry into the subprocesses.
   CLEAN_ENV = %w[LOWRAIL LOWRAIL_ROOT LOWRAIL_DIR LOWRAIL_STATS LOWRAIL_OUTCOMES LOWRAIL_DEBUG LOWRAIL_JIT_DIAGNOSTICS RUBYOPT
+                 LOWRAIL_COMPANION_SEED LOWRAIL_COMPANION_RNGS
                  LOWRAIL_BUILD_JIT RUBY_YJIT_ENABLE RUBY_ZJIT_ENABLE RAILS_ENV RACK_ENV BUNDLE_GEMFILE].to_h { [_1, nil] }.merge("LOWRAIL_SHADOW" => "strict")
 
   # The sample app used by the end-to-end and guard tests. Unit 0 assumes

@@ -85,6 +85,8 @@ class MinitestPluginTest < Minitest::Test
         require "minitest/autorun"
         require "active_support/lazy_load_hooks"
         require "zeitwerk"
+        $anonymous_census = Class.new(Module).new
+        $anonymous_census.module_eval("module Coercible; class Array; TOKEN = 19; end; end")
         loader = Zeitwerk::Loader.new
         loader.push_dir(File.join(Dir.pwd, "models"))
         loader.setup
@@ -109,6 +111,9 @@ class MinitestPluginTest < Minitest::Test
         assert_includes last.fetch("zeitwerk_paths"), late
         assert last.fetch("on_load_hooks").any? { _1.start_with?("census_probe\t") }
         refute_includes last.fetch("constants"), "Untouched"
+        assert_includes first.fetch("constants"), "#<#<Class:0x?>:0x?>::Coercible::Array"
+        assert_includes last.fetch("constants"), "#<#<Class:0x?>:0x?>::Coercible::Array::TOKEN"
+        refute last.fetch("constants").any? { _1.match?(/:0x\h+>/) }, "inspect-style process addresses are not load identities"
         assert_operator census.fetch("snapshot_seconds"), :>, 0
       end
     end

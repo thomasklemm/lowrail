@@ -10,6 +10,7 @@ use std::time::Instant;
 
 use serde_json::Value;
 
+mod companions;
 mod load_controls;
 
 pub fn cli(args: &[String]) -> Result<(), String> {
@@ -18,6 +19,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let mut observe_types = false;
     let mut observe_overhead = false;
     let mut load_controls = None;
+    let mut companion_seeds = None;
     let mut cmd: Vec<String> = vec!["bin/rails".into(), "test".into()];
     let mut it = args.iter();
     while let Some(a) = it.next() {
@@ -26,6 +28,15 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             "--observe-types" => observe_types = true,
             "--observe-overhead" => { observe_types = true; observe_overhead = true; }
             "--load-controls" => load_controls = Some(PathBuf::from(it.next().ok_or("--load-controls needs a JSON file")?)),
+            "--companion-seeds" => {
+                let seeds = it.next().ok_or("--companion-seeds needs two distinct integers, e.g. 0,1")?
+                    .split(',').map(|s| s.parse::<u64>()).collect::<Result<Vec<_>, _>>()
+                    .map_err(|_| "--companion-seeds needs two distinct nonnegative integers")?;
+                if seeds.len() != 2 || seeds[0] == seeds[1] {
+                    return Err("--companion-seeds requires exactly two distinct seeds".into());
+                }
+                companion_seeds = Some(seeds);
+            }
             "--" => {
                 cmd = it.by_ref().cloned().collect();
                 break;
@@ -34,7 +45,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail verify APP [--bisect] [--observe-types|--observe-overhead] [--load-controls FILE] [-- TEST COMMAND...]")?;
+    let app = app.ok_or("usage: lowrail verify APP [--bisect] [--observe-types|--observe-overhead] [--load-controls FILE] [--companion-seeds 0,1] [-- TEST COMMAND...]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
     if cmd.is_empty() {
         return Err("test command must not be empty".into());
@@ -52,10 +63,24 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let seed = seed_env(&cmd);
     let mut report = verify(&app, &cmd, &seed, observe_types, pinned)?;
     // Do not retain an exemption if the suite changed either pin.
-    if let Some(path) = &load_controls {
-        let pinned = load_controls::load(&app, path)?;
-        report.known_app_loads = pinned.loads;
-        report.known_app_sql = pinned.sql;
+    let pinned = match &load_controls {
+        Some(path) => load_controls::load(&app, path)?,
+        None => load_controls::Pinned::default(),
+    };
+    report.known_app_loads = pinned.loads;
+    report.known_app_sql = pinned.sql;
+    if let Some(seeds) = &companion_seeds {
+        report.companions = Some(companions::run(&app, &cmd, &seed, seeds, pinned.rng_sources, &report)?);
+        if let Some(path) = &load_controls {
+            let pinned = load_controls::load(&app, path)?;
+            report.known_app_loads = pinned.loads;
+            report.known_app_sql = pinned.sql;
+            let companions = report.companions.as_mut().unwrap();
+            if serde_json::to_value(&pinned.rng_sources).unwrap() != serde_json::to_value(&companions.rng_sources).unwrap() {
+                companions.inactive_reason = Some("RNG declaration or app/lock pin changed during companions".into());
+                companions.verified_sql.clear();
+            }
+        }
     }
     if !report.load_differences().is_empty() {
         report.load_culprit_passes = bisect_load_passes(&app, &cmd, &manifest, &report, &seed)?;
@@ -112,6 +137,8 @@ pub struct Run {
     pub jit_diagnostics: Vec<Value>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub jit_modes: Vec<Value>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub companion_rng: Vec<Value>,
     #[serde(skip_serializing_if = "BTreeSet::is_empty")]
     pub loads: BTreeSet<String>,
     pub load_snapshot_seconds: f64,
@@ -133,6 +160,7 @@ pub struct Report {
     pub known_app_loads: BTreeMap<String, load_controls::Entry>,
     /// Closed, proved whole-trace variants, not blanket per-test exclusions.
     pub known_app_sql: BTreeMap<String, load_controls::SqlEntry>,
+    pub companions: Option<companions::Companions>,
     pub load_culprit_passes: Vec<String>,
 }
 
@@ -161,6 +189,7 @@ impl Report {
             // A reviewed SQL control may not be broadened by this run's
             // ordinary per-test noise classifier: unknown variants still fail.
             .filter(|(name, _)| self.known_app_sql.contains_key(*name) || !self.unstable_sql.contains(*name))
+            .filter(|(name, _)| !self.companions.as_ref().is_some_and(|c| c.passed() && c.verified_sql.contains(*name)))
             .filter_map(|(name, off)| match self.on.sql.get(name) {
                 Some(on) if on != off && !self.known_app_sql.get(name).is_some_and(|entry| entry.allows(off) && entry.allows(on)) =>
                     Some(format!("{name}: {} → {} queries", off.1, on.1)),
@@ -200,6 +229,7 @@ impl Report {
             && (!self.sql_gates() || self.sql_differences().is_empty())
             && self.load_differences().is_empty()
             && self.off.exit_ok == self.on.exit_ok
+            && self.companions.as_ref().is_none_or(companions::Companions::passed)
     }
 
     pub fn render(&self) -> String {
@@ -236,7 +266,11 @@ impl Report {
         }
         if sql_diffs.is_empty() {
             let queries: u64 = self.off.sql.values().map(|v| v.1).sum();
-            s.push_str(&format!("sql traces: identical for {traced} tests ({queries} queries)\n"));
+            if self.companions.as_ref().is_some_and(|c| !c.verified_sql.is_empty()) {
+                s.push_str(&format!("sql traces: no rejecting differences for {traced} tests ({queries} off queries); raw RNG-dependent differences reported below\n"));
+            } else {
+                s.push_str(&format!("sql traces: identical for {traced} tests ({queries} queries)\n"));
+            }
         } else {
             let note = if self.sql_gates() {
                 ""
@@ -317,6 +351,7 @@ impl Report {
         if diagnostics > 0 {
             s.push_str(&format!("\nJIT diagnostics: {diagnostics} process snapshots in last.json (not per-ISeq counters; not a gate)"));
         }
+        if let Some(companions) = &self.companions { s.push_str(&companions.render()); }
         s
     }
 }
@@ -553,6 +588,8 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         .env("LOWRAIL_OUTCOMES", &out)
         .env("LOWRAIL_STATS", "") // counts on; hits come via LOWRAIL_OUTCOMES, no extra stats file
         .env_remove("LOWRAIL_OBSERVE")
+        .env_remove("LOWRAIL_COMPANION_SEED")
+        .env_remove("LOWRAIL_COMPANION_RNGS")
         .envs(extra_env.iter().copied())
         .status()
         .map_err(|e| format!("running {}: {e}", cmd.join(" ")))?;
@@ -580,6 +617,9 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         }
         if let Some(modes) = data["jit_modes"].as_array() {
             run.jit_modes.extend(modes.iter().cloned());
+        }
+        if let Some(rng) = data["companion_rng"].as_array() {
+            run.companion_rng.extend(rng.iter().cloned());
         }
         if let Some(stages) = data["verify_loads"]["stages"].as_object() {
             run.load_snapshot_seconds += data["verify_loads"]["snapshot_seconds"].as_f64().unwrap_or(0.0);

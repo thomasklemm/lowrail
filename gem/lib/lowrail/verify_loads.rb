@@ -53,6 +53,10 @@ module Lowrail
         ObjectSpace.each_object(Module) do |mod|
           name = NAME.bind_call(mod)
           next if !name || name == "Lowrail" || name.start_with?("Lowrail::")
+          # Anonymous parents can give named descendants inspect-style names
+          # (#<#<Class:0x...>:0x...>::Coercible). Only their address tokens
+          # vary by process. Keep every constant suffix and all event order.
+          name = name.gsub(/(?<=:)0x\h+(?=>)/, "0x?") if name.start_with?("#<")
           CONSTANTS.bind_call(mod, false).each do |key|
             next if AUTOLOAD.bind_call(mod, key)
             constants << (name == "Object" ? key.to_s : "#{name}::#{key}")

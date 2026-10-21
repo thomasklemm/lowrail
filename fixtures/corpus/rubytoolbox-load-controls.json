@@ -1,0 +1,314 @@
+{
+  "format": 1,
+  "source_revision": "3438c25712e522957dfc787fb78f09e68269baed",
+  "lock_sha256": "9cd33318bc2ea51fdf7244a6fdd6d4a7ec545e4946706ae0c81c73ba525f6fbd",
+  "entries": [],
+  "sql_entries": [
+    {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:1:1]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "117e9d2f63d97e47817c51e84b598c4ce586090f05e1f97e78f7af0dc3de54a0",
+          "count": 46,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/0"
+        },
+        {
+          "digest": "d7adbbbd7935e9d99f2a53e2e5c2c8c95cfe0a35a805b6e4fb975e774c87cbbf",
+          "count": 46,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/0"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:1:2]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "baf2bc6175922b5ff2432896695086694b7c084b1d15be6b1263c6f9c9d74887",
+          "count": 66,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/1"
+        },
+        {
+          "digest": "adfb387fda211294dca12202a38c057ac7fc3404de24dcab8d0fafacb8b2b9b2",
+          "count": 66,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/1"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:2:1]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/2"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/2"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:2:2]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/3"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/3"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:2:3]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/4"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/4"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:1]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "674a6b768923112f7966bbebd67ed3fe49f707a019a3f8787f77fc19248b6388",
+          "count": 42,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/5"
+        },
+        {
+          "digest": "ed0f7b714faea3138fc8765ff3ff47e158bccdf586c4895332e2c9a546d6f000",
+          "count": 42,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/5"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:2]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "17f68fc99fc7593a965c93c58c7db267e535f7e00f907d74fbed70205a4cdefe",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/6"
+        },
+        {
+          "digest": "10286bc7853aba53f65503782930d6ef88444efdc212bab64fd35896106a33e9",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/6"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:3]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/7"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/7"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:4]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "84b67ea463f062d7a8ed990bef96574391f87d2686b0879b554005bbeaf41777",
+          "count": 18,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/8"
+        },
+        {
+          "digest": "89663f50b813b63408b7974807db96629a2a8a35dcab339ebf20849da96727cd",
+          "count": 18,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/8"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:5]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/9"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/9"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:6]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/10"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/10"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:7]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/11"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/11"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:8:1]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/12"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/12"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:8:2]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/13"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/13"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:8:3]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/14"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/14"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:2:1]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/15"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/15"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:2:2]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/16"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/16"
+        }
+      ]
+    },
+    {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:2:3]",
+      "identity": "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+      "origin": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+      "variants": [
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/17"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence": "rubytoolbox-sql-evidence.json#variants/17"
+        }
+      ]
+    }
+  ]
+}

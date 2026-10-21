@@ -52,4 +52,34 @@ class RSpecReporterTest < Minitest::Test
       assert_equal({ "0" => 3 }, on["unit_hits"])
     end
   end
+
+  def test_declared_companion_reseeds_before_each_example_and_attests_the_tests
+    missing_prerequisite "rspec not installed" if Gem::Specification.find_all_by_name("rspec-core").empty?
+    realpath_tmpdir do |dir|
+      File.write(File.join(dir, "sample_spec.rb"), <<~'RUBY')
+        require "rspec/autorun"
+        RSpec.describe "per-example RNG" do
+          2.times do
+            it("starts at the declared seed") do
+              seed = Integer(ENV.fetch("LOWRAIL_COMPANION_SEED"))
+              random = Random.new(seed)
+              expect(Array.new(4) { rand(100_000) }).to eq(Array.new(4) { random.rand(100_000) })
+            end
+          end
+        end
+      RUBY
+      %w[0 1].each do |seed|
+        path = File.join(dir, "outcomes-#{seed}.json")
+        _out, err, status = ruby("sample_spec.rb", chdir: dir, env: {
+          "LOWRAIL_OUTCOMES" => path, "LOWRAIL_COMPANION_SEED" => seed, "LOWRAIL_COMPANION_RNGS" => "Kernel" })
+        assert status.success?, err
+        data = JSON.parse(File.read(Dir["#{path}.*"].fetch(0)))
+        assert_equal 2, data.fetch("tests").size
+        rng = data.fetch("companion_rng").fetch(0)
+        assert_equal seed.to_i, rng.fetch("seed")
+        assert_equal "Kernel", rng.fetch("sources")
+        assert_equal data.fetch("tests").keys.sort, rng.fetch("tests").sort
+      end
+    end
+  end
 end

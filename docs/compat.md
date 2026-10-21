@@ -32,12 +32,14 @@ resolved changes, including platforms, are in the patches rather than an
 unbounded `bundle update`. Assets use the apps' own build commands. CASA's
 Node pin is 24.22.0; PostgreSQL and Redis are local disposable services.
 
-**Remaining breadth gaps:** no accepted new baseline exercises Ransack,
-PaperTrail, Kaminari, Sorbet runtime or dry-rb. CanCanCan exists in the
-original PingCRM corpus, but its one-test suite records no fast-path hits;
-presence is not coverage. Sidekiq is present in CodeTriage and exercised
-through the app's test adapter, not against a production worker deployment.
-Do not turn gem presence into a support claim for every gem feature.
+**Round-1 gaps:** these first four baselines do not exercise Ransack,
+PaperTrail, Kaminari, Sorbet runtime or dry-rb. [Round 2 below](#gem-breadth-round-2--2026-10-21)
+adds real apps for all of these except Kaminari, with explicitly bounded
+coverage. CanCanCan exists in the original PingCRM corpus, but its one-test
+suite records no fast-path hits; presence is not coverage. Sidekiq is present
+in CodeTriage and exercised through the app's test adapter, not against a
+production worker deployment. Do not turn gem presence into a support claim
+for every gem feature.
 
 ### Rejected candidates
 
@@ -515,6 +517,182 @@ are still reported. This is not a green full-subset support claim and does
 not erase either rejected cohort. Cargo: **42 pass**; the new CLI regression
 fails before SQL controls exist and checks allowed variants, unknown digest,
 an added unlisted query in the same example, wrong count and lock mismatch.
+
+## Gem breadth round 2 — 2026-10-21
+
+Three **real open-source Rails 8.x apps**, not rails-new substitutes, cover
+the requested six gem families. All tracked app implementation and tests
+remain unchanged. Dependency wrappers live outside the app. These are
+sequential, bounded correctness runs, **not measured cohorts or full-suite
+support claims**.
+
+| App / source pin | Tested Rails | Gem boundaries exercised |
+|---|---|---|
+| [Wikino](https://github.com/wikinoapp/wikino/commit/25255d2d6c808df6672e293661ea797a76c6d2a9), `rails/` | 8.0.5.1 | sorbet-runtime 0.5.12435, ViewComponent 4.12.0 |
+| [RubyToolbox](https://github.com/rubytoolbox/rubytoolbox/commit/3438c25712e522957dfc787fb78f09e68269baed) | 8.1.4 | dry-struct 1.8.1, dry-types 1.9.1, Sidekiq 8.1.7 |
+| [Fat Free CRM](https://github.com/fatfreecrm/fat_free_crm/commit/91595c40a6baaa70512296157aab4bd56009e9b5) | 8.0.5 | PaperTrail 16.0.0, Ransack 4.4.1 |
+
+**Mode, all three apps and every selection:** Ruby 4.0.7, build `--jit yjit`,
+startup `RUBY_YJIT_ENABLE=1`; actual admission/current/certification all
+`yjit`, no whole-artifact JIT refusal. Test selections use `RAILS_ENV=test`;
+sealed selections use `--sealed --env production`, `RAILS_ENV=production`
+and `LOWRAIL_SEALED=1`. Default/all-opt-in select zero units and record their
+quarantine/unsupported reasons in the ledger; zero hits are **not support**.
+
+The test commands keep the same subset, environment and seed 41231 in every
+arm. Wikino: components/forms/models/records/policies/services, **275 examples,
+2,467 queries**, default and all-opt-in identical, **0 hits / 0 fallbacks**,
+**0 stable / 0 unstable** in the refreshed census (previously 8 inspect-address
+identities). Its external Gemfile uses unicode-emoji 4.3.0, rqrcode_core 2.1.0,
+rqrcode 3.1.1, ffi 1.17.4, pg 1.6.3 and test VCR 6.4.0; effective lock SHA256
+`fe5ff605f98e9fedcecef6927188efcd78337932f11de0e65cf7b9027aceb319`.
+PostgreSQL 18 is required for the app's schema. RubyToolbox uses its original
+lock, SHA256 `9cd33318bc2ea51fdf7244a6fdd6d4a7ec545e4946706ae0c81c73ba525f6fbd`;
+CRM's external lock and SQLite configuration are recorded above.
+
+### RubyToolbox: order seed, observer identity and closed SQL variants
+
+The **565 model/job/service/lib examples are a subset**, not the whole
+suite. Its first plain exit 2 is SimpleCov's whole-app coverage threshold
+applied to this subset: retained as a coverage artifact, **not** a Lowrail
+result. Later symmetric subset runs explicitly use `SKIP_COVERAGE=1`.
+
+The verifier originally overrode command `--seed 41231` through RSpec's
+later-parsed `SPEC_OPTS`. The published seed fix makes the explicit command
+win while preserving other options. Fresh fixed-seed runs still have **736
+unstable constant entries**, so those entries were **not test-order noise**.
+Four exact-config off-only full-subset controls give **368 differing constant
+identities in a pair / 736 in their union**, with no load-event difference.
+Their names are dry-types descendants of anonymous Module subclasses, e.g.
+`#<#<Class:0x...>:0x...>::Coercible::Array`. The census now elides only inspect
+addresses there, never paths, event indexes or ordering. The strengthened
+observer regression fails on the old census and passes with the correction;
+the CLI regression still rejects a real A/B reorder.
+
+The same four off-only controls reproduce **both full digest/count variants
+of all 18 truncation-order identities**, twice each. `spec/rails_helper.rb:118`
+calls DatabaseCleaner for the clean-database examples. For each identity,
+the only different trace line is the **same table set in a different order**
+inside TRUNCATE. No SQL normalization or blanket example exclusion:
+[18 pinned closed controls](../fixtures/corpus/rubytoolbox-load-controls.json),
+[exact queries, off-only hashes and observations](../fixtures/corpus/rubytoolbox-sql-evidence.json).
+Fresh default and all-opt-in verifies with those controls pass **565/565**,
+**0 hits / 0 fallbacks**, **0 stable / 0 unstable loads**. Off query counts are
+5,450 / 5,441; 18 known SQL identities differ visibly in each run, with
+14 / 12 other SQL-noisy identities advisory. The original rejection stays.
+
+### CRM: stop list growth; require exact two-seed companions
+
+The two subsequently approved identities are now included in the five-entry
+closed list: Dropbox 37/42 comes from bare lead-factory status `sample` at
+`lead_factories.rb:19`, then `Dropbox#attach:171` new→contacted; opportunity
+45/46 uses the already observed won/revenue branch. Each allowed complete
+trace is observed off-only, and diagnostic seed 0/1 off/off/on/on traces
+agree. [Follow-up evidence](../fixtures/corpus/fat-free-crm-sql-evidence.json#followup)
+also retains an invalid on attempt that accidentally used the production
+artifact; that refused attempt is not counted as seeding evidence.
+
+A fresh five-control ordinary default verify still rejects **one new**
+opportunity identity `[1:10:1:2:1]`, 44→45, at the same won callback. Do not
+keep adding exemptions until a random suite turns green. The explicit,
+pinned [two-seed companion policy](FORMATS.md#declared-rng-companions) instead
+declares **Kernel and FFaker::Random** with evidence, seeds both before every
+example, and compares **all** own-thread SQL and outcomes without SQL list,
+repeat-noise or multi-worker exemptions. Loads remain independent.
+
+The first new default verify passes both complete **497-example** companions:
+seed 0 **13,451 queries**, seed 1 **13,467 queries**, exactly equal off/on
+within each seed, all outcomes pass, **0 hits / 0 fallbacks**. The ordinary
+unseeded traces remain **13,443 / 13,434 queries**, with **23 raw differing
+tests visibly classified RNG-dependent, companion-verified**, not claimed
+identical. There are **0 stable / 0 unstable loads** in this new run. Both
+original default/all-opt-in rejections and the five-control rejection are
+retained. After refreshing main, new default **and all-opt-in** runs each
+pass both 497-example companions with those same exact seed-specific query
+counts. Their unseeded gates still reject **two SQL identities each before
+companion classification**: raw totals 13,436/13,444 (default) and
+13,445/13,444 (all-opt-in), with **20 / 16** raw differences visibly
+companion-verified, respectively. Both selections retain **0 hits / 0
+fallbacks**, **0 stable / 0 unstable loads**. No RNG hook runs in the ordinary
+gate or is added to the app.
+
+### Sealed production probes: bounded non-vacuous coverage
+
+The apps' suites require test mode. The shared
+[production probe](../fixtures/corpus/breadth_production_spec.rb) is therefore
+an explicitly separate **two-example smoke/contract probe**, not their suites.
+It asserts production/YJIT mode, real own-thread SQL, and app/gem behavior:
+Wikino renders the real typed ViewComponent and retains Sorbet's TypeError;
+RubyToolbox retains real dry-struct coercions/errors and class-body Sidekiq
+retry/lock options; CRM retains PaperTrail registration and the app's Ransack
+scope. None forces model loading just to manufacture activation or hits.
+
+| App / selection / mode | Outcomes | Own-thread SQL | Hits / fallbacks | Stable / unstable loads |
+|---|---|---|---|---|
+| Wikino sealed production / YJIT | 2 pass, identical | 3, identical | **1 preload / 0** | **0 / 0** |
+| RubyToolbox sealed production / YJIT | 2 pass, identical | 2, identical | **1 instantiate / 0** | **0 / 0** |
+| CRM sealed production / YJIT | 2 pass, identical | 7, identical | **0 / 0** | **0 / 0** |
+
+Only the hit-bearing probes provide active breadth coverage, and only for
+these exercised paths. CRM's eligible plans were not exercised as fast paths;
+its unaudited Rails 8.0 instantiate implementation remains a ledger refusal,
+**not a support claim**. Initial CRM production probes against an empty DB
+failed in both arms; the corrected isolated schema-only probe is a new run,
+not a hidden repair of the failed evidence. Sidekiq worker deployment is not
+covered. These refreshed production runs retain the earlier hit counts;
+the old address-bearing censuses were 8 / 736 / 8 unstable identities,
+respectively. No performance claim or measured cohort is made.
+
+**Fizzy mode-mismatch follow-up:** the new all-opt-in matching-YJIT build/run
+has null admission refusal, the same **124 outcomes (117 pass, seven app
+errors), 5,322 queries, 0 hits / 0 fallbacks**, **0 stable / 0 other unstable
+loads** after the observer correction (8 in the previous matching-mode run),
+with the 18 pinned race identities still visible (9 observed,
+0 differing in this pair). This is a new run, separate from the earlier
+**built-YJIT/startup-interpreter mode-mismatch refusal**. Neither the baseline
+errors nor zero-hit/no-support classification changes.
+
+**Repository checks:** Cargo **43 pass**, plus the owned gem reporter/SQL/census
+tests **9 tests / 128 assertions, green** on refreshed main. The full earlier
+gem run is **147 tests / 6,390 assertions, one pre-existing FormScaffoldTest
+inventory failure**. After the sealed thread's inventory correction, that
+test progresses to a different existing fixture/checker mismatch: the off-only
+worker raises `wrong app` at `bench/experiments/blog_endpoint_check.rb:63`
+(requires `RealBlogR4::Application`; this corpus is `RealBlog::Application`).
+The retained off log SHA256 is
+`013b18a0830e23cc1742305f3a7434f2cf3378f7a2224fa56ac21c1576c88d6f`.
+This remains with the sealed owner; no checker, app identity or unrelated
+test was relaxed. Raw runs, rejected/invalid attempts and the off log remain
+under `.lowrail/private/breadth-evidence/`; no app source is changed.
+
+For repeatable dependency-only setup, the tested wrapper/lock copies are
+[Wikino](../fixtures/corpus/wikino.Gemfile) and
+[CRM](../fixtures/corpus/fat-free-crm.Gemfile), adjacent to their exact locks;
+both pass frozen `bundle check`. Fetch the app revisions above to
+`.corpus/wikino` / `.corpus/fat-free-crm`; the wrappers reference their original
+Gemfiles, not copies with patched app code. Use `BUNDLE_GEMFILE` pointing to
+the wrapper's absolute path. RubyToolbox uses its unchanged app Gemfile.
+Supply isolated databases and the app's required production dummy settings.
+Refresh `lowrail facts APP` when changing Rails environment, then build with
+the matching mode before verifying:
+
+```sh
+# Common: RUBY_YJIT_ENABLE=1 LOWRAIL_VERIFY_LOADS=1, Ruby 4.0.7.
+# Test-mode commands from the repo root; verify runs the command in APP.
+lowrail verify .corpus/wikino/rails -- bundle exec rspec --seed 41231 \
+  spec/components spec/forms spec/models spec/records spec/policies spec/services
+# RubyToolbox also needs SKIP_COVERAGE=1 (explicit subset).
+lowrail verify .corpus/rubytoolbox --load-controls fixtures/corpus/rubytoolbox-load-controls.json \
+  -- bundle exec rspec --seed 41231 spec/models spec/jobs spec/services spec/lib
+lowrail verify .corpus/fat-free-crm --load-controls fixtures/corpus/fat-free-crm-load-controls.json \
+  --companion-seeds 0,1 -- bundle exec rspec --seed 41231 spec/models spec/lib
+# Production, separate from the above suites; LOWRAIL_COMPAT_APP is
+# wikino, rubytoolbox or fat-free-crm. Set RAILS_ENV=production,
+# LOWRAIL_SEALED=1 and matching database/wrapper before facts/build/verify.
+lowrail build APP --sealed --env production --jit yjit
+lowrail verify APP -- bundle exec rspec --options /dev/null --seed 41231 \
+  "$PWD/fixtures/corpus/breadth_production_spec.rb"
+```
 
 ## Reproduction
 

@@ -1,0 +1,574 @@
+{
+  "format": 1,
+  "source_revision": "3438c25712e522957dfc787fb78f09e68269baed",
+  "lock_sha256": "9cd33318bc2ea51fdf7244a6fdd6d4a7ec545e4946706ae0c81c73ba525f6fbd",
+  "lowrail_base_revision": "e84ff0a444aa513683a4e4e03d3a9a80369a1c26",
+  "configuration": {
+    "RAILS_ENV": "test",
+    "RUBY_YJIT_ENABLE": "1",
+    "LOWRAIL": "0",
+    "LOWRAIL_VERIFY_LOADS": "1",
+    "SKIP_COVERAGE": "1",
+    "command": "bundle exec rspec --seed 41231 --format progress spec/models spec/jobs spec/services spec/lib",
+    "runtime": "disabled; symmetric Lowrail outcome reporter and census remain loaded"
+  },
+  "mechanism": "spec/rails_helper.rb:118 calls DatabaseCleaner.clean_with(:truncation) for clean_database examples. No ORDER BY governs the database table discovery order. Four unmodified LOWRAIL=0 full-subset controls reproduce both complete trace digests: same table set, different TRUNCATE list order. No SQL normalization.",
+  "raw_evidence_directory": ".lowrail/private/breadth-evidence/",
+  "runs": [
+    {
+      "file": "rubytoolbox-exact-off-1.json.312998",
+      "sha256": "511e1afd44bb2df089e9273d1f06ada29b810292174508635101be7ac3f3ed4b",
+      "outcomes": 565,
+      "all_pass": true
+    },
+    {
+      "file": "rubytoolbox-exact-off-2.json.313058",
+      "sha256": "be8cd0e87d1040295f5c3b7d4b1cfbf4dc203d9bb1fae1c0bd64eb0883879f0a",
+      "outcomes": 565,
+      "all_pass": true
+    },
+    {
+      "file": "rubytoolbox-exact-off-3.json.313119",
+      "sha256": "1b1d88dd12867cb0e8872db5eddc0403654ef5594fef34761f03672c3a9365d6",
+      "outcomes": 565,
+      "all_pass": true
+    },
+    {
+      "file": "rubytoolbox-exact-off-4.json.313194",
+      "sha256": "ba7b9f9407beb827032be51634c0f6c9945ca14c81f5cdfecd8e8d65366e7b5e",
+      "outcomes": 565,
+      "all_pass": true
+    }
+  ],
+  "variants": {
+    "0": {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:1:1]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "117e9d2f63d97e47817c51e84b598c4ce586090f05e1f97e78f7af0dc3de54a0",
+          "count": 46,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "117e9d2f63d97e47817c51e84b598c4ce586090f05e1f97e78f7af0dc3de54a0",
+          "count": 46,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "d7adbbbd7935e9d99f2a53e2e5c2c8c95cfe0a35a805b6e4fb975e774c87cbbf",
+          "count": 46,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "d7adbbbd7935e9d99f2a53e2e5c2c8c95cfe0a35a805b6e4fb975e774c87cbbf",
+          "count": 46,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "1": {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:1:2]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "baf2bc6175922b5ff2432896695086694b7c084b1d15be6b1263c6f9c9d74887",
+          "count": 66,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "baf2bc6175922b5ff2432896695086694b7c084b1d15be6b1263c6f9c9d74887",
+          "count": 66,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "adfb387fda211294dca12202a38c057ac7fc3404de24dcab8d0fafacb8b2b9b2",
+          "count": 66,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "adfb387fda211294dca12202a38c057ac7fc3404de24dcab8d0fafacb8b2b9b2",
+          "count": 66,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "2": {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:2:1]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "3": {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:2:2]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "4": {
+      "test": "./spec/jobs/category_ranking_job_spec.rb[1:2:3]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "e148d6eae7047e6af2eee1b2eba8dd862a460565110ca3d848f830bb1211457e",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "ad6755823bc7048582d2dfaeb1e85370484939f94dfba57cda928807bcf71ae2",
+          "count": 36,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "5": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:1]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "674a6b768923112f7966bbebd67ed3fe49f707a019a3f8787f77fc19248b6388",
+          "count": 42,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "674a6b768923112f7966bbebd67ed3fe49f707a019a3f8787f77fc19248b6388",
+          "count": 42,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "ed0f7b714faea3138fc8765ff3ff47e158bccdf586c4895332e2c9a546d6f000",
+          "count": 42,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "ed0f7b714faea3138fc8765ff3ff47e158bccdf586c4895332e2c9a546d6f000",
+          "count": 42,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "6": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:2]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "17f68fc99fc7593a965c93c58c7db267e535f7e00f907d74fbed70205a4cdefe",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "17f68fc99fc7593a965c93c58c7db267e535f7e00f907d74fbed70205a4cdefe",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "10286bc7853aba53f65503782930d6ef88444efdc212bab64fd35896106a33e9",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "10286bc7853aba53f65503782930d6ef88444efdc212bab64fd35896106a33e9",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "7": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:3]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "8": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:4]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "84b67ea463f062d7a8ed990bef96574391f87d2686b0879b554005bbeaf41777",
+          "count": 18,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "84b67ea463f062d7a8ed990bef96574391f87d2686b0879b554005bbeaf41777",
+          "count": 18,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "89663f50b813b63408b7974807db96629a2a8a35dcab339ebf20849da96727cd",
+          "count": 18,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "89663f50b813b63408b7974807db96629a2a8a35dcab339ebf20849da96727cd",
+          "count": 18,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "9": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:5]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "10": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:6]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "11": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:7]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "7deb8a0ce25dccf12a928e61d3a298afe422e43812e2972b36ff9741aac32e47",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "b7239f377c3a55e616cb303ac858dc224df64112950504ad6e0991a40b66575d",
+          "count": 32,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "12": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:8:1]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "13": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:8:2]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "14": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:1:8:3]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "ac20a74dea31a584898e815938a98a59affae00774cc8e6ffa72b0cef71b1b9e",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "f2960c0f7c2cd1eb0aea483877c9ce4c8f10143f833b9e31c0229e52e4eb70c8",
+          "count": 33,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "15": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:2:1]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "16": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:2:2]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    },
+    "17": {
+      "test": "./spec/jobs/project_score_job_spec.rb[1:2:3]",
+      "only_differing_lines": [
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"categories\", \"active_storage_variant_records\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0",
+        "\tTRUNCATE TABLE \"categorizations\", \"category_groups\", \"active_storage_attachments\", \"active_storage_blobs\", \"active_storage_variant_records\", \"categories\", \"database_exports\", \"github_ignores\", \"github_readmes\", \"github_repos\", \"rubygem_advisories\", \"rubygem_code_statistics\", \"rubygem_dependencies\", \"rubygem_download_stats\", \"rubygem_trends\", \"rubygems\", \"projects\" RESTART IDENTITY restrict;\t\t\t0"
+      ],
+      "observations": [
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-1.json.312998"
+        },
+        {
+          "digest": "bb8c70355efebda1ab2d2236ba019d31715170dd8d2445099af95e40134f7d55",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-2.json.313058"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-3.json.313119"
+        },
+        {
+          "digest": "b37495681cf08383bb4655fdfff9de2ad60f733bfcefd304e7ddea461e63e464",
+          "count": 8,
+          "evidence_file": "rubytoolbox-exact-off-4.json.313194"
+        }
+      ]
+    }
+  },
+  "address_identity": {
+    "first_two_constant_symmetric_difference": 368,
+    "four_run_constant_union": 736,
+    "event_changes": 0,
+    "example": "#<#<Class:0x00007f4df5a117c0>:0x00007f4df5a11860>::Coercible::Array",
+    "mechanism": "dry-types named descendants of anonymous Module subclasses embed two inspect addresses in Module#name; the actual events are identical."
+  }
+}

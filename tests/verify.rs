@@ -275,3 +275,64 @@ fn verify_limits_pinned_sql_controls_to_observed_whole_trace_variants() {
     }
     std::fs::remove_dir_all(app).unwrap();
 }
+
+#[test]
+fn verify_rng_companions_require_pins_attestation_and_exact_whole_suite_pairs() {
+    let app = std::env::temp_dir().join(format!("lowrail-verify-companions-{}", std::process::id()));
+    std::fs::create_dir_all(app.join(".lowrail")).unwrap();
+    std::fs::write(app.join("Gemfile.lock"), "hello").unwrap();
+    for args in [vec!["init", "-q"], vec!["add", "Gemfile.lock"], vec!["commit", "-qm", "fixture"]] {
+        assert!(Command::new("git").args(args).current_dir(&app)
+            .env("GIT_AUTHOR_NAME", "Thomas Klemm").env("GIT_AUTHOR_EMAIL", "github@tklemm.eu")
+            .env("GIT_COMMITTER_NAME", "Thomas Klemm").env("GIT_COMMITTER_EMAIL", "github@tklemm.eu")
+            .status().unwrap().success());
+    }
+    let head = Command::new("git").args(["rev-parse", "HEAD"]).current_dir(&app).output().unwrap();
+    let revision = String::from_utf8(head.stdout).unwrap().trim().to_string();
+    std::fs::write(app.join(".lowrail/evidence.json"), "{}").unwrap();
+    let script = r#"
+      digest="unseeded-$LOWRAIL"; attestation=''; extra=''; result=pass; order='0\tload\tA\ta.rb","1\tload\tB\tb.rb'
+      if [ -n "${LOWRAIL_COMPANION_SEED-}" ]; then
+        digest="seeded-$LOWRAIL_COMPANION_SEED"
+        attestation=$(printf ',"companion_rng":[{"seed":%s,"sources":"%s","tests":["a"]}]' "$LOWRAIL_COMPANION_SEED" "$LOWRAIL_COMPANION_RNGS")
+        if [ "$LOWRAIL" = 1 ] && [ "$LOWRAIL_COMPANION_SEED" = 1 ]; then
+          case "$1" in sql) digest=wrong;; missing) extra=missing;; outcomes) result=fail;; esac
+        fi
+        if [ "$1" = missing_both ]; then extra=missing; fi
+        if [ "$1" = unattested ]; then attestation=''; fi
+      fi
+      if [ "$LOWRAIL" = 1 ] && [ "$1" = loads ]; then order='0\tload\tB\tb.rb","1\tload\tA\ta.rb'; fi
+      sql=$(printf '"a":{"digest":"%s","n":1}' "$digest")
+      if [ "$extra" = missing ]; then sql=''; fi
+      printf '{"tests":{"a":{"result":"%s"}},"sql":{%s},"verify_loads":{"snapshot_seconds":0,"stages":{"first_test":{},"after_suite":{"load_events":["%s"]}}}%s}' "$result" "$sql" "$order" "$attestation" > "$LOWRAIL_OUTCOMES"
+    "#;
+    for case in ["allowed", "sql", "outcomes", "missing", "missing_both", "unattested", "loads", "undeclared", "lock"] {
+        std::fs::write(app.join("Gemfile.lock"), if case == "lock" { "changed" } else { "hello" }).unwrap();
+        let controls = app.join(".lowrail/controls.json");
+        let sources = if case == "undeclared" { serde_json::json!([]) } else {
+            serde_json::json!([{"name":"Kernel","evidence":"evidence.json","origin":"sample uses unseeded Kernel RNG"}])
+        };
+        std::fs::write(&controls, serde_json::json!({"format":1,"source_revision":revision,
+            "lock_sha256":"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+            "entries":[],"rng_sources":sources}).to_string()).unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_lowrail"))
+            .args(["verify", app.to_str().unwrap(), "--load-controls", controls.to_str().unwrap(),
+                "--companion-seeds", "0,1", "--", "sh", "-c", script, "sh", case])
+            .env("LOWRAIL_COMPANION_SEED", "991").env("LOWRAIL_COMPANION_RNGS", "Kernel")
+            .env_remove("BUNDLE_GEMFILE").output().unwrap();
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert_eq!(output.status.success(), case == "allowed", "{case}: {stdout}\n{}", String::from_utf8_lossy(&output.stderr));
+        let last: serde_json::Value = serde_json::from_slice(&std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
+        assert_eq!(last["report"]["off"]["sql"]["a"][0], "unseeded-0");
+        assert_eq!(last["report"]["on"]["sql"]["a"][0], "unseeded-1");
+        if case == "allowed" {
+            assert!(stdout.contains("RNG-dependent, companion-verified: 1 unseeded SQL differences"), "{stdout}");
+            assert_eq!(last["report"]["companions"]["pairs"].as_array().unwrap().len(), 2);
+            assert_eq!(last["report"]["companions"]["unseeded_identical"], false);
+            assert_eq!(last["report"]["companions"]["unseeded_sql_differences"], serde_json::json!(["a: 1 → 1 queries"]));
+        } else if matches!(case, "lock" | "undeclared") {
+            assert!(stdout.contains("inactive: missing pinned RNG declaration"), "{stdout}");
+        }
+    }
+    std::fs::remove_dir_all(app).unwrap();
+}
