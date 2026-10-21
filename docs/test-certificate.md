@@ -103,11 +103,22 @@ entries must never enter this tier through `Selection::sealed` implicitly.
 The passive TracePoint, boot-policy capture and natural form seam are installed
 in both explicit off/on arms. Fast-path installers are on-only. Complete
 production cold-ancestry gates are **not** replaced by outcome equality here;
-their known all-sealed Template/Preloader failures remain failures. This branch
-must be reconciled with the sealed owner's separately owned registry/setup/
-stats/form-admission boundary before any integration.
+their known all-sealed Template/Preloader failures remain failures. Reconciliation
+retains the published registry/setup/stats wiring and exact form token-observer
+certificate/source pins. `form_scaffold_admission.rb`, `render_units.rb` and
+`render_units_build.rb` are byte-identical to the upstream base. Production
+token/collection installers do not enter the verification-only allowlist.
 
 ## Executed own-suite matrix
+
+Reconciled onto upstream
+[0dcd595](https://github.com/thomasklemm/lowrail/commit/0dcd59563b7d52a614bb86ba5e4e79aea65e93a3),
+including the production passive admission, encoding fix and published pricing
+documentation. The matrix was rerun after the final rebase. The local code head
+was `3b1ebe2e70603cfb152bd9cd0098c046ba2e36ac`; the subsequent review-record commit
+changes only these docs/results. The affected gem checks ran on the identical
+runtime/test/runner bytes before the final docs-only upstream rebase; an exact
+non-docs tree comparison confirmed no source changed.
 
 Ruby 4.0.7, Rails 8.1.4, original public generated blog, seed 41231,
 `PARALLEL_WORKERS=1`. Each row runs off, on-cold and on-warm, comparing exact
@@ -140,8 +151,11 @@ Per on arm (cold/warm and both CI modes agree):
 Off counters are all zero. Discovery produces four candidates, not the prior
 20-unit production artifact: the other 15 production AR holders/caches were not
 naturally discovered, and preload has no passive test certificate. Other
-unsupported pass families are explicit build-ledger refusals. No claim follows
-for those missing units or for production execution.
+unsupported pass families are explicit build-ledger refusals. In particular,
+`PreloadBuild`, `TokenTagBuild` and `CollectionRenderBuild` each record
+`verification-only passive certificate not implemented for this pass`; they
+produce no artifact unit or H/F/D coverage. No claim follows for those missing
+units or for production execution.
 
 The previous review slice had one hit then one sticky deopt per AR unit,
 from natural attribute generation. Delaying authorization alone preserved
@@ -184,10 +198,22 @@ obtain the improved liveness above.
   and intermediate conservative retirements did not demonstrate sustained
   optimized execution; the current nonzero-hit, zero-deopt matrix above does.
 - `cargo test --locked`: 39 unit + 1 types MCP + 8 verify pass.
-- Affected gem tests: 48 runs, 760 assertions, zero failures/errors, five named
-  prerequisite skips (canonical corpus form fixture; require-hooks/freezolite
-  loader integrations). Those integrations are not claimed as covered; actual
+- Affected gem tests: 50 runs, 765 assertions, zero failures/errors, six named
+  prerequisite skips. The five earlier integration gaps remain; the new
+  production token/collection corpus test also skips for the same missing
+  canonical fixture. Those integrations are not claimed as covered; actual
   blog Bootsnap cold/warm runs above completed. No Callgrind or measurements.
+
+The named prerequisite gaps are:
+
+| Test | Missing prerequisite |
+|---|---|
+| `FormScaffoldTest#test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder` | `.corpus/real-blog-r4` |
+| `LoaderTest#test_cached_hijacks_do_not_inherit_bootsnap_compiler_options` | require-hooks/Bootsnap integration gems |
+| `LoaderTest#test_freezolite_and_bootsnap_in_every_order_with_cold_and_warm_caches` | freezolite/require-hooks integration gems |
+| `LoaderTest#test_load_iseq_state_matches_off_during_build_and_cold_and_warm_delivery` | require-hooks/Bootsnap integration gems |
+| `LoaderTest#test_source_transforms_are_not_bypassed` | freezolite/require-hooks integration gems |
+| `FormScaffoldTest#test_passive_production_token_and_collection_public_artifact` (new upstream test) | Same `.corpus/real-blog-r4` fixture |
 
 Run the public fork, liveness, policy and sticky mutation regressions with
 `ruby -Igem/lib:gem/test gem/test/test_certificate_test.rb`. They generate a
@@ -202,11 +228,8 @@ nonzero suite exits, any exact outcome difference, or an on arm with zero hits.
 
 **Review decision still needed:** the two-unit evidence is useful but does not
 close the link/form/20-unit contract gap. Do not merge or publish this tier as
-full sealed own-suite coverage. Sealed-owner admission review and the shared
-file boundary precede any main integration. The production token/collection
-boundary is now published in
-[ae025b0](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
-but was not imported into this isolated branch. After admission-owner approval,
-rebase onto current origin/main and rerun the complete matrix on that rebased
-head before any main integration. True eager loading and parallel workers
-remain uncovered.
+full sealed own-suite coverage. The sealed owner authorized isolated
+reconciliation/retesting, not main integration or a push. The current patch and
+rebased evidence need that separate integration decision. Token/collection test
+admission needs its own complete passive design and review. True eager loading
+and parallel workers remain uncovered.
