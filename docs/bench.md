@@ -1187,6 +1187,150 @@ never exact measured aged-path counts. No app, timeout or YJIT setting changes;
 no pass promotion or renewed YJIT measurement authorization follows from native
 checks. Old rejected config/link/form cohorts stay rejected.
 
+#### v3 result: one finite six-arm cohort rejected
+
+The declared cohort ran unchanged on
+[`86672e5`](https://github.com/thomasklemm/lowrail/commit/86672e5411f8c0af881ecabd2852925a7536b444),
+Ruby 4.0.7 / Rails 8.1.4, seed 41231, six rounds, N=50, at most four
+Callgrind workers, without retry or early stop. It used the fresh disposable
+app's YJIT artifact `b68764be83bb60ee000f89d67f80e5425cffbe769bb25d10e64dd5ad7d1956cf`;
+the canonical interpreter artifact and retained `2bd964cf…` diagnosis artifact
+were not rebuilt. The later form source-root release on `411eb71` is not part
+of this run. A refused missing-parent-RAILS_ENV launch ran **zero windows** and
+is retained separately; the corrected launch is the sole measured cohort.
+
+**Rejected, not a YJIT performance result.** All 36 workers certify in
+2,000–16,000 requests, with no cap exhaustion. Every pool endpoint retains
+exactly 611/306/246/99/100 eden pages, without widening the one-page slot
+gate. A/A passes: total **+0.064310% [−0.050859,+0.205778]**, excluded
+**−0.044404% [−0.123620,+0.146327]**. Strict heap, brk and native
+idle-companion/symmetry controls pass. Fixture, canonical artifact, runtime
+and harness pins are unchanged at completion. The [numeric export](bench-yjit-v3.json)
+retains complete worker warmup/rehearsal histories, every window's
+counters/pages/timestamps and preceding gaps, source/tool pins and native
+diagnostic summaries. Three of 144 windows fail the unchanged compilation gate:
+
+| Arm | Total/N0 | Total/N50 | no_gc/N0 | no_gc/N50 |
+|---|---|---|---|---|
+| off-A | all six flat | all six flat | all six flat | all six flat |
+| off-B | all six flat | round 1: +9 blocks; other five flat | all six flat | all six flat |
+| missing | all six flat | all six flat | all six flat | all six flat |
+| empty | all six flat | round 3: +45 blocks; other five flat | all six flat | all six flat |
+| disabled | all six flat | round 0: +15 blocks; other five flat | all six flat | all six flat |
+| active form default | all six flat | all six flat | all six flat | all six flat |
+
+Rounds are zero-based. All 144 windows have zero GC segments; all three
+events have zero new ISeqs and invalidations. In particular **all 72 no_gc
+windows and all 72 N0 windows are flat**. The total-only pattern is an
+observation, not a lead or attribution at this event count.
+
+The Ruby total/no_gc path is identical: same collect/settle, observers,
+workload Proc, two-argument callback and loop. Only the C client's
+`exclude_gc` flag differs; it toggles collection on GC ENTER/EXIT, which
+never occurs in these windows. Rehearsal runs 200 N50/N0 cycles through
+the same Ruby workload/GC/counter path; neither C START/DUMP variant is
+rehearsed, deliberately preserving dump indexing. Even rounds run total
+first, odd rounds no_gc first: the failed total/N50 is earlier in round 0,
+later in rounds 1/3. Each N50 follows its own N0 and the same collect/settle.
+No total-only Ruby helper or uniquely long pause was found. Full per-window
+gap/duration data are retained; no certification-end timestamp exists for
+the first window, so its preceding gap is unknown, not invented.
+
+Three untimed disabled-arm compile-log diagnostics do **not** reproduce the
+failed windows: ordinary native certifies at 2,000, native padded to the
+failed window's 0.11513955102 s/request at 2,200, and `--tool=none` at 3,200;
+all four windows are flat in each. Native padding identifies genuine
+background Reaper / `sequential_maintenance` / delegate compilation during
+preparation around 600/800 s, **not the identities of +15/+9/+45**.
+
+All four configured blog pools have reaping 20 s, idle timeout 300 s,
+keepalive 600 s, maximum age Infinity; only primary is connected. Rails
+sleeps after maintenance, so ticks drift: birth time + k × period cannot
+predict their overlap with old windows. Callgrind's global START/STOP and
+default shared thread tables mean the parsed trailing `totals:` can include
+background threads; they are not request-thread-only counts. YJIT counters
+are process-global too. No retained Reaper activity endpoints establish
+which rejected window contained a maintenance pass.
+
+A separate traced companion validates the proposed hook-free `/proc` proxy,
+not an in-window hook: native observed two passes with +1 voluntary switch
+each; Nulgrind observed +1 and +92. Idle intervals had zero switches/runtime
+movement. Under Valgrind, switches are **not a tick count**. If used later,
+any positive Reaper-task switch/runtime delta means only **background
+activity present**; false positives cost windows. Zero is evidence, not
+proof of inactivity. Late blocks with zero activity would remain unexplained
+by that mechanism. No Reaper gate, separate-thread accounting or v4 cure is
+declared here. **The late-window cause remains open.**
+
+#### v3 + compile log: diagnostic addition, not a cure
+
+Declared after the finite v3 result, before the next cohort. Opt in with
+`BENCH_YJIT_LOG=1` and `BENCH_JIT=yjit` (or `1`) on fixed-heap Callgrind.
+The driver passes Ruby 4.0.7 `--yjit-log=OUT/ROUND-ARM.yjit.log` to **every
+measured arm**, retaining each entire file and its SHA-256. No rotation,
+memory-only log, window deletion, retry or relaxed gate. The next authorized
+cohort is the sealed thread's form-only show run with its separately pinned
+`411eb71` artifact/runtime, not another validation cohort. If all gates pass,
+it counts; otherwise the files supply late-site identities. The old rejected
+cohort is not re-scored.
+
+Ruby initializes its fixed 1,024-entry Rust ring and output file at boot.
+In file mode every attempted block compilation is synchronously written and
+flushed **as it happens**, in addition to updating that ring. A long warmup
+may wrap the ring but cannot discard file entries; the native control file
+retains 43,478 lines. Do not use `--yjit-log=quiet` / `RubyVM::YJIT.log` as
+the retained stream. There is no log callback on flat execution. The source
+does not change call thresholds, app configuration or JIT codegen policy
+([pinned Ruby logging source](https://github.com/ruby/ruby/blob/229531a6cf/yjit/src/log.rs),
+[compilation call site](https://github.com/ruby/ruby/blob/229531a6cf/yjit/src/core.rs)).
+
+Qualification: a log line precedes possible abandoned/failed compilation,
+while `compiled_block_count` counts installed blocks. A failed attempt can
+write without moving any of the three old counters. Consequently logged
+snapshots additionally retain **`compile_log_bytes`** outside the measured
+region, during rehearsal/certification and at every window endpoint. Growth
+or a missing byte counter rejects a logged window even if installed-block
+counters are flat. This only strengthens acceptance; it never certifies
+logging work as steady-state instructions.
+
+Outside-region `jit_log_start_realtime_ns` / `jit_log_end_realtime_ns` place
+the file's Unix-realtime ISeq/location/bytecode-index entries into conservative
+window envelopes. Byte offsets also identify the exact file slice between
+snapshots independently of wall-clock adjustment. The builtin log has no
+thread/request IDs; none are inferred or required. Logs contain attempts,
+not a one-to-one list of installed blocks. All existing A/A, JIT, heap,
+brk, activation and idle-boundary gates remain. Native idle companions remain
+separate controls, not an exact measured-path census.
+
+Before relying on this addition, one untimed native log-off/log-on pair on
+the pinned disabled specimen both certified at 2,000 after 200 rehearsals,
+retained 2,178 anchors and the identical explicit page targets, and had four
+flat windows. Preparation was not bit-identical: log-on minus log-off had
+five fewer live pool-0 slots (other pools equal), 39 fewer allocated objects
+to that point, and 269 rather than 270 pre-fill pool-0 pages; post-fill targets
+were identical. These are observations, not noise to subtract or a claim of
+universal equivalence. A further native real-app check of the diagnostic
+observer certifies at 2,000 with no byte growth or counter changes in any
+window. Kept no-app native checks cover both log-off and log-on, explicit
+pages, zero post-certification compilation, and realtime envelopes. A gate
+regression rejects byte growth with flat installed-block counters.
+
+Driver flags for the next authorized form cohort, with its own fresh output
+directory and correctly pinned artifact/runtime:
+
+```sh
+PATH="/tmp/vg/bin:$PATH" CPATH="/tmp/vg/include${CPATH:+:$CPATH}" \
+RAILS_ENV=production LOWRAIL_SEALED=1 SECRET_KEY_BASE_DUMMY=1 \
+BENCH_JIT=yjit BENCH_YJIT_LOG=1 BENCH_JOBS=4 \
+BENCH_ROUNDS=6 BENCH_REQUESTS=50 BENCH_SEED=41231 \
+ruby bench/pass.rb "$APP" --pass sealed/form_scaffold \
+  --path /articles/1 --counter callgrind --out "$NEW_OUT"
+```
+
+Use the repository-pinned Ruby. Parent `RAILS_ENV` must explicitly match
+the manifest; preflight now rejects missing/mismatched values **before
+manifest activation or setup**, rather than silently defaulting them.
+
 Warm the observer too: after heap preparation, an enabled observer gets 200
 untimed rounds of the **exact** `GC.stat_heap(pool, existing_hash)`,
 `GC.stat(existing_hash)` and JIT snapshot signatures used at the endpoints.

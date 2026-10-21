@@ -76,6 +76,7 @@ module HeapWindows
     anchors = prepare_heap
     observe_pools = ->(pools) { pools.each { |pool, stats| GC.stat_heap(pool, stats) } }
     clock = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) } if idle_connections
+    realtime = -> { Process.clock_gettime(Process::CLOCK_REALTIME, :nanosecond) } if ENV["BENCH_YJIT_LOG_FILE"]
     # Warm the exact observation signatures, not just the workload. Ruby's
     # two-argument stat_heap wrapper can otherwise compile inside the gate.
     if observe
@@ -84,6 +85,7 @@ module HeapWindows
         GC.stat(windows.first.fetch(:before))
         observe.call
         clock&.call
+        realtime&.call
         idle_connections&.call
       end
     end
@@ -100,6 +102,7 @@ module HeapWindows
         window[:idle_connections] = idle_connections.call
         window[:wall_start_ns] = clock.call
       end
+      window[:jit_log_start_realtime_ns] = realtime.call if realtime
       window[:jit_before] = observe.call if observe
       observe_pools.call(window[:pools_before])
       GC.stat(window[:before])
@@ -110,6 +113,7 @@ module HeapWindows
       observe_pools.call(window[:pools_after])
       window[:wall_end_ns] = clock.call if clock
       window[:jit_after] = observe.call if observe
+      window[:jit_log_end_realtime_ns] = realtime.call if realtime
       window[:gc_segments] = segments
     end
     anchors.size

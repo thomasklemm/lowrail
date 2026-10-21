@@ -368,9 +368,12 @@ module RequestPairs
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
     slots = HeapWindows.floors
     raise "positive requests/jobs required" unless requests.positive? && jobs.positive?
+    jit = JitStability.mode
+    compile_log = ENV["BENCH_YJIT_LOG"] == "1"
+    raise "BENCH_YJIT_LOG must be 1 when set" unless ENV["BENCH_YJIT_LOG"].nil? || compile_log
+    raise "compile logging requires BENCH_JIT=1/yjit" if compile_log && jit != "yjit"
     floors = slots.each_with_index.to_h { |count, pool| ["RUBY_GC_HEAP_#{pool}_INIT_SLOTS", count.to_s] }
     metadata[:valgrind] = valgrind_preflight(out, floors, app: app, env: environments.fetch("off_a"))
-    jit = JitStability.mode
     jit_flags = JitStability.flags(jit)
     if ENV["BENCH_JIT_CALL_THRESHOLD"]
       threshold = Integer(ENV.fetch("BENCH_JIT_CALL_THRESHOLD"))
@@ -381,6 +384,7 @@ module RequestPairs
     extension = compile_counter_extension(out)
     metadata.merge!(counter: "callgrind", heap_mode: "fixed", heap_slots: slots,
       region: "after warmup and three full GCs", requests: requests, requested_yjit: jit == "yjit", requested_jit: jit)
+    metadata[:jit_compile_log] = { kind: "full_file", clock: "CLOCK_REALTIME", flat_counter: "compile_log_bytes" } if compile_log
     samples = []
     rng = Random.new(metadata.fetch(:seed))
     metadata.fetch(:rounds).times do |round|
@@ -395,17 +399,20 @@ module RequestPairs
             label = "#{round}-#{layer}"
             data = File.join(out, "#{label}.callgrind")
             log = File.join(out, "#{label}.log")
+            jit_log = File.join(out, "#{label}.yjit.log") if compile_log
+            worker_jit_flags = compile_log ? jit_flags + ["--yjit-log=#{jit_log}"] : jit_flags
             env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
               "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension,
-              "BENCH_IDLE_CENSUS" => nil)
+              "BENCH_IDLE_CENSUS" => nil, "BENCH_YJIT_LOG_FILE" => jit_log)
             ok = system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
-              RbConfig.ruby, *jit_flags, File.expand_path(worker, __dir__), route,
+              RbConfig.ruby, *worker_jit_flags, File.expand_path(worker, __dir__), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
             check_valgrind_log!(out, label)
             raise "Callgrind failed: #{label}; inspect logs" unless ok
             result = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
+            result["jit_compile_log"] = { "path" => File.basename(jit_log), "sha256" => Digest::SHA256.file(jit_log).hexdigest } if compile_log
             raise "AR build did not activate" if layer == "instantiate" && result.fetch("ar_installed").zero?
             windows = result.fetch("windows")
             windows.each_with_index do |window, index|
@@ -453,7 +460,7 @@ module RequestPairs
         log = File.join(out, "#{name}-idle-census.log")
         env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
           "BENCH_PHASE_ORDER" => (round.to_i % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension,
-          "BENCH_IDLE_CENSUS" => "1")
+          "BENCH_IDLE_CENSUS" => "1", "BENCH_YJIT_LOG_FILE" => nil)
         ok = system(env, RbConfig.ruby, *jit_flags, File.expand_path(worker, __dir__), route,
           chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
         raise "Idle companion failed: #{name}; inspect #{log}" unless ok

@@ -52,18 +52,27 @@ class RequestPairsTest < Minitest::Test
         warmup: -> { warm = JitStability.warm(&operation) }, &operation)
       puts JSON.generate(warmup: warm, windows: windows, pages: HeapWindows.page_targets)
     RUBY
-    text, status = Open3.capture2e({ "RUBYOPT" => nil, "BENCH_JIT" => "yjit", "BENCH_JIT_WINDOW" => "200",
-      "BENCH_JIT_MAX_WARMUP" => "20000", "BENCH_HEAP_SLOTS" => nil }, RbConfig.ruby,
-      "--yjit", "--disable-zjit", "-r", File.expand_path("jit_stability", __dir__), "-e", program)
-    assert status.success?, text
-    result = JSON.parse(text)
-    assert result.dig("warmup", "stable"), result.fetch("warmup").inspect
-    certified = result.fetch("warmup").fetch("history").last.fetch("counters")
-    result.fetch("windows").each do |window|
-      assert_equal certified, window.fetch("jit_before"), "no harness compilation after certification"
-      assert_equal window.fetch("jit_before"), window.fetch("jit_after"), window.slice("mode", "requests").inspect
-      %w[pools_before pools_after].each do |endpoint|
-        assert_equal result.fetch("pages"), window.fetch(endpoint).transform_values { _1.fetch("heap_eden_pages") }
+    Dir.mktmpdir("lowrail-native-log") do |dir|
+      [nil, File.join(dir, "compile.log")].each do |log|
+        flags = log ? ["--yjit-log=#{log}"] : []
+        text, error, status = Open3.capture3({ "RUBYOPT" => nil, "BENCH_JIT" => "yjit", "BENCH_JIT_WINDOW" => "200",
+          "BENCH_JIT_MAX_WARMUP" => "20000", "BENCH_HEAP_SLOTS" => nil, "BENCH_YJIT_LOG_FILE" => log }, RbConfig.ruby,
+          "--yjit", "--disable-zjit", *flags, "-r", File.expand_path("jit_stability", __dir__), "-e", program)
+        assert status.success?, text + error
+        result = JSON.parse(text)
+        assert result.dig("warmup", "stable"), result.fetch("warmup").inspect
+        certified = result.fetch("warmup").fetch("history").last.fetch("counters")
+        result.fetch("windows").each do |window|
+          assert_equal certified, window.fetch("jit_before"), "no harness compilation after certification"
+          assert_equal window.fetch("jit_before"), window.fetch("jit_after"), window.slice("mode", "requests").inspect
+          if log
+            assert_operator window.fetch("jit_before").fetch("compile_log_bytes"), :>, 0
+            assert_operator window.fetch("jit_log_end_realtime_ns"), :>=, window.fetch("jit_log_start_realtime_ns")
+          end
+          %w[pools_before pools_after].each do |endpoint|
+            assert_equal result.fetch("pages"), window.fetch(endpoint).transform_values { _1.fetch("heap_eden_pages") }
+          end
+        end
       end
     end
   end
@@ -119,6 +128,16 @@ class RequestPairsTest < Minitest::Test
       worker["jit_warmup"]["consecutive_flat_windows"] = 2
       refute JitStability.control({ "worker" => worker }, requested: jit).fetch(:pass)
     end
+    counters = %w[compiled_iseq_count compiled_block_count invalidation_count].to_h { [_1, 17] }
+    logged = { "yjit" => true, "jit_compile_log" => { "path" => "compile.log" },
+      "jit_warmup" => { "stable" => true, "consecutive_flat_windows" => 3 },
+      "windows" => [{ "jit_before" => counters.merge("compile_log_bytes" => 100),
+        "jit_after" => counters.merge("compile_log_bytes" => 200) }] }
+    refute JitStability.control({ "worker" => logged }, requested: "yjit").fetch(:pass), "failed compile attempts must not hide behind flat installed-block counters"
+    logged["windows"][0]["jit_after"]["compile_log_bytes"] = 100
+    assert JitStability.control({ "worker" => logged }, requested: "yjit").fetch(:pass)
+    logged["windows"][0]["jit_before"].delete("compile_log_bytes")
+    refute JitStability.control({ "worker" => logged }, requested: "yjit").fetch(:pass)
   end
 
   def test_partial_zjit_flatness_never_substitutes_for_missing_invalidation_proof

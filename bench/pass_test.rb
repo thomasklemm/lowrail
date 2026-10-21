@@ -4,6 +4,15 @@ require "minitest/autorun"
 require_relative "pass"
 
 class PassBenchTest < Minitest::Test
+  def setup
+    @rails_env = ENV["RAILS_ENV"]
+    ENV["RAILS_ENV"] = "production"
+  end
+
+  def teardown
+    ENV["RAILS_ENV"] = @rails_env
+  end
+
   def manifest
     { "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
       "rails_env" => "production", "compile_option" => {}, "units" => [], "files" => {}, "templates" => {} }
@@ -21,6 +30,21 @@ class PassBenchTest < Minitest::Test
       assert_includes File.read(File.join(out, "table.md")), "rejected"
       yield result
     end
+  end
+
+  def test_parent_environment_must_match_the_artifact_before_setup
+    [nil, "", "development", "test"].each do |value|
+      ENV["RAILS_ENV"] = value
+      run_rejection(manifest.merge("tier" => "sealed-v1")) do |result|
+        assert_includes result.fetch("error"), 'artifact rails_env="production"'
+        assert_includes result.fetch("error"), "parent RAILS_ENV=#{value.inspect}"
+        assert_includes result.fetch("error"), "set RAILS_ENV explicitly"
+        refute result.key?("coverage")
+        assert ENV["RAILS_ENV"] == value, "preflight must not silently default the parent environment"
+      end
+    end
+    ENV["RAILS_ENV"] = "production"
+    run_rejection(manifest) { assert_includes _1.fetch("error"), "no units" }
   end
 
   def test_stale_manifest_is_a_rejected_measurement_not_a_silent_noop

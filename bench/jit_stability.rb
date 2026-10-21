@@ -46,7 +46,12 @@ module JitStability
     jit = actual
     stats = jit == "zjit" ? RubyVM::ZJIT.stats : RubyVM::YJIT.runtime_stats
     # A missing invalidation count is unknown, not a zero inferred from time.
-    counters(jit).to_h { |key| [key, stats[key]] }
+    result = counters(jit).to_h { |key| [key, stats[key]] }
+    # Failed compilation attempts can log without installing a counted block.
+    if (path = ENV["BENCH_YJIT_LOG_FILE"])
+      result[:compile_log_bytes] = File.size(path)
+    end
+    result
   end
 
   def self.warm(rehearsal_requests: 50, &workload)
@@ -91,6 +96,7 @@ module JitStability
       actual = actual(worker)
       enabled = actual != "interpreter"
       keys = counters(actual)
+      keys = keys + [:compile_log_bytes] if worker["jit_compile_log"]
       warm = worker["jit_warmup"]
       required = warm ? [3, warm.fetch("required_flat_windows", 3)].max : 3
       warm_ok = !enabled || !!(warm && warm.fetch("stable") && warm.fetch("consecutive_flat_windows") >= required)

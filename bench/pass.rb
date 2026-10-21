@@ -12,6 +12,10 @@ module PassBench
   def self.preflight(dir, lib, root:, unsafe: false)
     path = File.join(dir, "manifest.json")
     data = JSON.parse(File.read(path))
+    expected_env = data.fetch("rails_env")
+    unless ENV["RAILS_ENV"] == expected_env
+      raise "RAILS_ENV mismatch: artifact rails_env=#{expected_env.inspect}, parent RAILS_ENV=#{ENV['RAILS_ENV'].inspect}; set RAILS_ENV explicitly before measuring"
+    end
     checked = data
     if unsafe
       raise "unsafe snapshot marker missing" unless data.fetch("ruby_description").start_with?("[LOWRAIL UNSAFE] ")
