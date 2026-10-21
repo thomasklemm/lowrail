@@ -13,6 +13,25 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Combined specimen must pass its own cold gate (2026-10-21)
+
+Form+token+collection is a single whole-request interpreter experiment, not
+the arithmetic sum of isolated prices. The combined cold gate now checks all
+Lowrail loaded features **in actual order**, as well as complete ancestry,
+owners/source locations, SQL streams and post-exit effects. It exposed on-only
+`compilation.rb`, `loader.rb` and `routes.rb`; explicit sealed setup now defines
+those helpers symmetrically, without installing their hooks in the off arm.
+No guarded/default path or invalidation guard changes.
+
+Both declared seeded off/off/on comparisons pass; raw entropy remains a
+rejected off control. The artifact has one form unit and zero files/templates,
+with neither known asymmetric Template/Preloader chain. Both 192-pair controls
+record form104/token281/collection104, and 50 warm requests record 50/200/50,
+all with zero fallbacks. This admits **pricing only**, not production token or
+collection support. Publish and pin before one finite six-round interpreter
+cohort, at most two workers; no retry-to-green, filter stage or additive claim.
+[Protocol, pins and retained failures](passes/sealed-combined.md).
+
 ## Passive form admission, not runtime recertification (2026-10-21)
 
 Use the first **natural, wholly original** certified form render as a read-only

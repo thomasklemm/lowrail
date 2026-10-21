@@ -171,7 +171,8 @@ module BlogProduction
     {"databases" => databases, "storage_files" => files.sort.to_h { [_1.delete_prefix(root + "/"), Digest::SHA256.file(_1).hexdigest] }}
   end
 
-  def self.worker(phase, destination, entropy_seed = nil)
+  def self.worker(phase, destination, entropy_seed = nil, expected_jit: "yjit")
+    raise "unknown requested cold-worker JIT mode" unless %w[yjit interpreter].include?(expected_jit)
     control = Entropy.validate(Dir.pwd) if phase == "entropy-pin" || entropy_seed
     if phase == "entropy-pin"
       File.write(destination, JSON.pretty_generate(control))
@@ -182,6 +183,7 @@ module BlogProduction
     require "lowrail/verify_loads"
     Lowrail::VerifyLoads.install
     require File.expand_path("config/application")
+    Rails.application.config.yjit = false if expected_jit == "interpreter"
     seam_trace = TracePoint.new(:call) { capture_form_seam(_1.self) }
     seam_trace.enable(target: Lowrail::FormScaffold::Variant.instance_method(:form_with))
     events, boot_events, late_events, sql_stream, errors = [], [], [], [], []
@@ -216,7 +218,8 @@ module BlogProduction
       end
     end
     require File.expand_path("config/environment")
-    raise "production/YJIT required" unless Rails.env.production? && Lowrail.jit_mode == "yjit"
+    required_mode = expected_jit == "yjit" ? "YJIT" : expected_jit
+    raise "production/#{required_mode} required" unless Rails.env.production? && Lowrail.jit_mode == expected_jit
     if phase == "prepare"
       ActiveRecord::Schema.verbose = false
       DATABASES.zip(%w[schema cache_schema queue_schema cable_schema], %w[primary cache queue cable]).each do |_, schema, connection|

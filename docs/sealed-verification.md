@@ -8,6 +8,36 @@ Use captured replay where it is faithful, adapters where the suite depends
 on process-local test machinery, and an explicit uncovered ledger everywhere
 else. Do not admit a production artifact into `RAILS_ENV=test` to get hits.
 
+## Combined interpreter artifact: independent cold gate
+
+The [combined pricing study](passes/sealed-combined.md) reuses the complete
+cold comparator with an explicit `expected_jit: "interpreter"` worker keyword.
+Default workers still require actual production/YJIT; neither mode is forged.
+All breadth fields, late SQL/SQL stream, driver-source hashes and parent-read
+exit effects remain compared. The combined companion additionally records
+every Lowrail feature **in load order**, plus Template/Preloader chains even
+though neither pass is selected. No filtering or normalization.
+
+Both declared seeded off/off/on sequences pass for cold boot, index, original
+show and natural repeated show. Full inherited ancestry, owners/source
+locations and feature order agree; zero boot SQL/capture errors. Neither
+`Templates::CompiledSource` nor `PreloadPlans::Hook` occurs. Form hits are
+0/0/1; the warm repeated show has token4/collection1. Raw unpinned workers
+remain `rejected_off_control`, not a support pass.
+
+The stronger feature gate exposed on-only `compilation.rb`, `loader.rb` and
+`routes.rb`, corrected by loading their definitions symmetrically under the
+explicit sealed opt-in. This installs no compiler/eval/route hook in the off
+arm and changes no guarded/default behavior. The existing all-sealed artifact
+still has its real Template/Preloader ancestry and installer-feature failures;
+that scope is not certified or normalized by the isolated passing gate.
+
+192+192 exact paired controls record form104/token281/collection104 each;
+50 separate native warm requests record 50/200/50, all zero fallbacks.
+The artifact contains only one form unit, no delivered files/templates.
+Token and collection remain pricing specimens, not production certificates.
+No combined speed claim precedes the single finite pinned cohort.
+
 ## Passive form v1 review gates
 
 Untimed review on base

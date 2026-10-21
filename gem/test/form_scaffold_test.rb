@@ -108,7 +108,7 @@ class FormScaffoldTest < Minitest::Test
         helper = ActionView::Helpers::FormHelper
         metadata = [helper.instance_method(:form_with).owner.name,
           helper.instance_method(:form_with).source_location, helper.ancestors.map(&:name)]
-        features = $LOADED_FEATURES.grep(%r{/lowrail/form_scaffold[^/]*\.rb\z}).sort
+        features = $LOADED_FEATURES.grep(%r{/lowrail/(?:form_scaffold[^/]*|compilation|loader|routes)\.rb\z})
         # Hold the single witness while the other seven requests finish. This
         # forces calls to straddle publication instead of hoping for a race.
         entered, release, done = Queue.new, Queue.new, Queue.new

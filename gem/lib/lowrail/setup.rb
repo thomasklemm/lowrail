@@ -22,6 +22,10 @@ end
 # both arms, including LOWRAIL=0. It observes AS's existing load boundary;
 # guarded/default startup and applications that never render a form stay put.
 if ENV["LOWRAIL_SEALED"] == "1"
+  # Define the delivery helpers symmetrically, without installing a compiler,
+  # eval or route hook. Merely enabling an artifact must not add loaded files.
+  require_relative "loader"
+  require_relative "routes"
   require_relative "form_scaffold"
   Lowrail::FormScaffold.observe_forms
 end
