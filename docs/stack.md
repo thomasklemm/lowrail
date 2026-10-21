@@ -50,7 +50,7 @@ sign: objects saved by retaining that component in the full stack.
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
 | E subset callbacks | None admitted | Blog show/index: zero objects saved in E's corrected exact screen | — | — | Coordinator killed: no deterministic saving, wall unresolved; census retained |
-| F AR callsite compile | None admitted | Preliminary DirectSite Fizzy buckets 9,085 → 8,323 (−8.39%); not integrated | — | — | Await published guarded SHA and rescreen; earlier micros are not additive request credit |
+| F AR callsite compile | None admitted; guarded buckets candidate published | F's guarded screen: 9,084 → 8,499 (−6.44%); not locally integrated yet | — | — | Published `addf55e`; local screen queued after AR allocation diagnosis, guards retained |
 | G framework fold | None admitted | — | — | — | Closed: notification/CSP elisions fail exactness in all four boots; no remaining qualifying slice |
 | H boot image | None admitted | — | — | — | Await successful boot screen and correctness gates |
 | Fizzy bench block-link | None | +0.403071% interpreter Ir (`8385e0c`) | — | — | Excluded: deterministic loss and no production admission |
@@ -267,6 +267,48 @@ normalized away or diagnosed as candidate-specific errors. No native latency
 win is claimed; show records +6.06% paired wall against 1.79% A/A, but fails
 exactness and is not an accepted price. Pre-fix data remain intact above.
 
+### Bounded Fizzy AR allocation diagnosis: avoidable guard scratch
+
+No new cohort. Reused the pinned seed, public AR artifact, original native
+driver/login and 200 six-GET warmups in separate off/on workers. Adapted
+`bench/experiments/allocations.rb`'s ObjectSpace generation census to one
+request per target, with GC disabled only during tracing/enumeration so
+dead objects cannot disappear. No runtime/app/config replacement. Counters
+remain disabled; exact two-seed validation is outside the allocation trace.
+A separate untimed TracePoint return observer records the actual caller and
+match count, not a method override. [Full callsite counts and stacks](stack-ar-allocation-trace.json).
+
+- **Account users cause:** its three `Account::UsersAssociationExtension`
+  proxy extensions reach `Guard.note_extend` → `Guard.names_of`, whose
+  `@names.each_key.select` allocates three empty Arrays and three Enumerators
+  at `gem/lib/lowrail/guard.rb:103` despite matching no tracked method.
+- **Show cause:** event-summary assignee resolution creates twelve proxies
+  with the same extension, causing twelve empty Arrays and twelve
+  Enumerators at the same guard line; this is invalidation scratch, not an
+  inherent per-record construction cost.
+
+All 3/12 observed name scans return zero matches. The index has three tracked
+names. Original Rails row-object and payload/column Hash allocations merely
+move to generated source locations and balance; do not count those relocated
+objects as extra. The census totals are users 5,600 → 5,616 and show
+18,357 → 18,392, **diagnostic totals, not replacement screen estimates**.
+Native URI encoding contributes +8/−1 String differences; ObjectSpace leaves
+an explicit +2/+12 VM-internal residual unassigned. Users remains response
+exact for both seeds; show's existing exactness rejection stays red.
+
+**Proposed, not landed:** in the small-index branch collect matching names
+with a direct `@names.each_key` block and allocate the result Array lazily
+only on the first match; let the two internal callers skip a nil no-match
+result. Preserve collect-before-reset ordering, both visibility predicates,
+all invalidation/override effects and the existing large-index branch.
+A standalone selector sketch with the real three-name index allocates
+30,001 versus **zero** objects over 10,000 no-match calls; public, private
+and inherited match-selection controls agree. This corroborates three
+avoidable objects per empty scan (9/36 per observed route), not a precise
+request-level saving promise. The coordinator owns assignment and the usual
+correctness/Thermos gates. No runtime fix or follow-up screen is landed here;
+existing AR remains excluded on Fizzy pending that independently gated work.
+
 ### Lobsters AR: warm-cache zero credit
 
 Same 200/300 protocol, 24 normally built AR units. `/newest`, `/active`,
@@ -294,7 +336,9 @@ multi-component stack across apps. Token is excluded on Blog; existing AR is
 excluded on Fizzy; Campfire offers no clear reduction and retains exactness
 gaps; Lobsters' cached vector provides no active credit. Form's favorable
 Blog request reduction stays provisional until active own suites exist.
-Bet F's guarded published candidate is still pending and is not integrated.
+Bet F's guarded `addf55e` is published; local screening is queued with existing
+AR excluded on Fizzy. Sealed form applies only to the certified Blog fixture,
+not Fizzy; do not force a cross-app form/DirectSite combination.
 No cross-app win, native latency gain, GC synergy or supported component is
 claimed. Shared screen tests pass 2 tests / 39 assertions; imported dispatch
 regressions pass form 2/202 and link 2/162; shadow-predicate regression 1/4.
