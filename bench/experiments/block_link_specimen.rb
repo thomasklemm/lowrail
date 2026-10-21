@@ -13,6 +13,7 @@ module BlockLinkSpecimen
   KEYS = Hash.instance_method(:keys)
   EPOCH = [0]
   BUILDERS = ObjectSpace::WeakKeyMap.new
+  VIEWS = ObjectSpace::WeakKeyMap.new
   THREAD_TEMPLATE = :__bench_block_link_template
   THREAD_LINK = :__bench_block_link_call
 
@@ -54,11 +55,15 @@ module BlockLinkSpecimen
       cached_view = ivar(controller_class, :@view_context_class)
       return entry.merge!(reason: "unnatural view/compiler context") unless sequence && exact(view, cached_view) &&
         ivar(template, :@compiled) && ivar(template, :@handler).equal?(ActionView::Template::Handlers::ERB) && exact(source, String)
+      keys, template_locals, strict_locals = KEYS.bind_call(locals), ivar(template, :@locals), ivar(template, :@strict_locals)
+      return entry.merge!(reason: "unsupported locals metadata") unless keys.all? { Symbol === _1 || exact(_1, String) } &&
+        exact(template_locals, Array) && template_locals.all? { exact(_1, String) } &&
+        (strict_locals.nil? || exact(strict_locals, String))
       descriptor = {"controller" => controller_class.name, "file" => path.delete_prefix(@app + "/"),
         "source_sha256" => Digest::SHA256.hexdigest(source), "source_encoding" => source.encoding.name,
         "disk_sha256" => Digest::SHA256.file(path).hexdigest,
-        "template_locals" => ivar(template, :@locals), "locals" => KEYS.bind_call(locals).map(&:to_s),
-        "strict" => strict, "strict_locals" => ivar(template, :@strict_locals),
+        "template_locals" => template_locals.map(&:dup), "locals" => keys.map { Symbol === _1 ? _1.name : _1.dup },
+        "strict" => strict, "strict_locals" => strict_locals&.dup,
         "compiled_body" => signature(sequence, method_name), "compile_options" => RubyVM::InstructionSequence.compile_option}
       # All instance/Proc/template references live ONLY on this invocation stack.
       entry.merge!(reason: nil, descriptor: descriptor, sequence: sequence, method_name: method_name,
@@ -123,7 +128,10 @@ module BlockLinkSpecimen
     end
 
     def builder_created(view, builder, stock)
-      BUILDERS[builder] = klass(view) if stock && exact(builder, ActionView::Helpers::TagHelper::TagBuilder)
+      if stock && exact(builder, ActionView::Helpers::TagHelper::TagBuilder)
+        token = VIEWS[view] ||= Object.new
+        BUILDERS[builder] = [klass(view), token]
+      end
     end
 
     def capture_begin(view, builder, block, name, options, escape)
@@ -192,7 +200,12 @@ module BlockLinkSpecimen
 
     def predicate(call, builder, content, options, escape)
       return "seal/holder/dependency changed" unless Ractor.current.equal?(Ractor.main) && EPOCH[0] == call[:epoch] && EPOCH[0].zero? && dependencies?
-      return "foreign saved builder" unless exact(builder, ActionView::Helpers::TagHelper::TagBuilder) && BUILDERS[builder].equal?(call[:entry][:view_holder])
+      return "owner holder changed" if call[:state] && call[:state][:holders] &&
+        call[:state][:holders] != call[:entry].values_at(:view_holder, :controller_holder, :compiled_holder)
+      token = BUILDERS[builder]
+      return "foreign saved builder" unless exact(builder, ActionView::Helpers::TagHelper::TagBuilder) && token &&
+        token[0].equal?(call[:entry][:view_holder]) && token[1].equal?(VIEWS[call[:view]]) &&
+        ivar(builder, :@view_context).equal?(call[:view])
       return "buffer provenance/restoration unavailable" unless call[:capture_completed] && call[:restored] && exact(call[:buffer], ActionView::OutputBuffer)
       return "converted options not exact class/href ordered hash" unless exact(options, Hash) &&
         options.default.nil? && options.default_proc.nil? && options.keys == ["class", "href"] &&
@@ -233,6 +246,7 @@ module BlockLinkSpecimen
       reason = predicate(call, call[:builder], nil, call[:options], true)
       state = call.fetch(:state)
       state[:reason] = reason
+      state[:holders] = call[:entry].values_at(:view_holder, :controller_holder, :compiled_holder) unless reason
       # Last publication, only after WHOLE original link returned normally.
       state[:state] = reason ? "refused" : "active"
     end
@@ -254,7 +268,7 @@ module BlockLinkSpecimen
     end
 
     def report
-      {counts: @counts, contexts: @contexts.transform_values { _1.reject { |key, _| key == :lock } },
+      {counts: @counts, contexts: @contexts.transform_values { _1.reject { |key, _| %i[lock holders].include?(key) } },
         discovered: @discovered.values, epoch: EPOCH[0]}
     end
   end

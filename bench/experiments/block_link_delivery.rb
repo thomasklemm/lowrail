@@ -66,14 +66,22 @@ module BlockLinkDelivery
       File.write(lowered, data.fetch("code"))
       {"path" => path, "lowered" => lowered, "source_sha256" => data.fetch("sha256")}
     end
-    # Compile only. This process never boots the app or manufactures templates.
-    manifest = Lowrail::Compiler.compile({"app_root" => app, "out" => destination, "rails_env" => "production",
+    input = {"app_root" => app, "out" => destination, "rails_env" => "production",
       "certification_jit" => "interpreter", "files" => files,
-      "units" => files.map.with_index { |file, id| {"id" => id, "kind" => "file", "pass" => "bench/block_link", "file" => file.fetch("path"), "facts" => []} }})
+      "units" => files.map.with_index { |file, id| {"id" => id, "kind" => "file", "pass" => "bench/block_link", "file" => file.fetch("path"), "facts" => []} }}
+    # Disposable BUILD process: observe the app's real per-file compiler
+    # recipes during original production boot. No template renders/handlers.
+    Dir.chdir(app) do
+      Lowrail::Compilation.boot(input) do
+        require File.join(app, "config/application")
+        Rails.application.config.yjit = false
+      end
+    end
+    manifest = Lowrail::Compiler.compile(input)
     expected = {}
     files.each do |file|
       path = file.fetch("path")
-      sequence = RubyVM::InstructionSequence.compile(File.read(file.fetch("lowered")), path, path, 1)
+      sequence = Lowrail::Compilation.lowered(File.read(file.fetch("lowered")), path, Lowrail::Compilation.files.fetch(path))
       visit = lambda do |child|
         expected[JSON.generate([path, child.label, child.first_lineno])] = Lowrail::Sealed.signature(
           Object.instance_method(:instance_variable_get), sequence: child.to_a).fetch("iseq")
