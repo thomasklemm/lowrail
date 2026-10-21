@@ -537,3 +537,128 @@ measurements and a Rails behavior test for the non-obvious yield obligation.
 No Rails commit message or PR description was prepared after this no-go.
 The scripts and this findings record are the only delivered Lowrail changes;
 there is no new Rails optimization to merge or monitor.
+
+## Action View tag/navigation helper audit (2026-10-21)
+
+**Delivered:** [rails/rails#59244](https://github.com/rails/rails/pull/59244),
+“Avoid copying nested Symbol attribute keys.” The owner explicitly authorized
+this worker to open one PR after the gates; that scoped authorization supersedes
+the earlier coordinator-only publication rule for this investigation only.
+There were zero open Thomas Rails PRs immediately before creation.
+
+The fork branch is `thomasklemm/nested-tag-symbol-keys`, one clean
+[commit](https://github.com/thomasklemm/rails/commit/7ec66455606753caa76950922f969ad7f7fd1c6c)
+directly on freshly fetched canonical Rails main
+[`a5545972e7`](https://github.com/rails/rails/commit/a5545972e7fc2a17062b46b31e1fba99eea85a49).
+Author and committer are Thomas Klemm `<github@tklemm.eu>`, with no Amp or
+co-author trailer; local stored message and GitHub commit metadata were checked.
+Fork main was not changed. No excluded application or gem was modified.
+
+### What remained after the upstream fixes
+
+Open/closed PR and issue searches covered the named tag, content, navigation,
+remote-option, validation, URL, escaping and Symbol-conversion methods; relevant
+diffs and recent canonical-main history were read. Negative searches are not
+proof of universal absence of overlap.
+
+| Area | Upstream evidence / disposition |
+| --- | --- |
+| Attribute buffers and flat/boolean Symbol keys | Already [#59117](https://github.com/rails/rails/pull/59117). Open [#57999](https://github.com/rails/rails/pull/57999) is an overlapping older buffer rewrite, not another opportunity to submit that transformation. Both are linked in the new PR. |
+| Nested data/aria/custom-prefix Symbol keys | `append_prefix_tag_option` still called `key.to_s.dasherize`; replace only that Symbol conversion with `name`, using the adjacent appenders' idiom. One fewer object per processed Symbol key, no memoization or helper inlining. [#59224](https://github.com/rails/rails/pull/59224) uses the idiom elsewhere but does not touch this hunk. **Submitted.** |
+| `button_to` token/scaffold work | CSRF allocation changes already [#59106](https://github.com/rails/rails/pull/59106); token generation, form policy and live helpers remain unchanged. |
+| Record `url_for` and polymorphic dispatch | Already [#59107](https://github.com/rails/rails/pull/59107) and [#59058](https://github.com/rails/rails/pull/59058). String URLs already return the input. No bypass of `url_for` overrides. |
+| `content_tag_string` / TagBuilder buffers | Open [#54042](https://github.com/rails/rails/pull/54042) changes nested-buffer APIs, not a behavior-preserving allocation cleanup. No capture/output-buffer rewrite submitted. |
+| Quote escaping | The quote replacement remains necessary even after HTML escaping: a SafeBuffer attribute containing `"` still needs `&quot;`. The control records this output. No skipping based on the original value's class/safety. |
+| Navigation option conversion and `url_target` | No proven additional unconditional change. Keep live helper/`respond_to?` evaluation, remote deletions, fresh normalized option Hashes and mutation order. A control records a name's `respond_to?` mutating options before URL generation. |
+| HTML5 name validation | No changed validation or accepted-name set. Closed/unmerged [#56916](https://github.com/rails/rails/pull/56916) is not revived as an optimization. |
+
+### Measurements and reproduction
+
+[Standalone benchmark](../bench/upstream/actionview_helpers.rb),
+[behavior controls](../bench/upstream/actionview_helper_controls.rb), and
+[published PR body with the exact embedded script](upstream/actionview-tag-symbol-keys-pr.md).
+Ruby **4.0.7**, Rails 8.2.0.alpha, benchmark-ips **2.15.1**, x86_64 Linux,
+stock Rails without Lowrail. Separate processes ran serially, interpreter then
+YJIT, before then after within each mode. Each case used 1 s warmup / 3 s
+measurement; allocation counts cover 20,000 warmed operations with GC enabled.
+
+| Operation | Objects/op before → after, both modes | Interpreter k i/s before → after | YJIT k i/s before → after |
+| --- | ---: | ---: | ---: |
+| Scalar tag | 7 → 7 | 227.755 ±6.0% → 231.145 ±4.5% | 317.331 ±2.8% → 313.634 ±6.8% |
+| Three Symbol data keys | 17 → 14 | 114.447 ±7.7% → 115.129 ±4.6% | 155.123 ±14.0% → 177.874 ±6.3% |
+| Three String data keys | 14 → 14 | 120.388 ±1.4% → 117.055 ±4.7% | 176.761 ±8.0% → 171.200 ±10.3% |
+| Two Symbol aria keys | 18 → 16 | 114.173 ±1.9% → 115.149 ±2.7% | 168.643 ±16.8% → 187.148 ±4.9% |
+| Link with three data keys | 19 → 16 | 86.462 ±4.3% → 82.594 ±4.5% | 138.562 ±10.6% → 147.735 ±4.5% |
+| GET button with three data keys | 27 → 24 | 40.661 ±6.1% → 39.148 ±10.9% | 83.692 ±7.5% → 78.391 ±4.8% |
+| Record URL control | 9 → 9 | 139.010 ±5.3% → 141.385 ±0.6% | 309.185 ±9.6% → 305.511 ±7.2% |
+| String URL control | 0 → 0 | 10,568 ±2.5% → 11,788 ±5.0% | 26,905 ±11.9% → 28,517 ±8.5% |
+
+**Allocation-only admission, not a speed claim.** Interpreter link/button point
+estimates decline about 4.5% / 3.7%, and the YJIT button estimate declines about
+6.3%. The ± values are within-run standard deviations, not confidence intervals
+or proof of equality. Runtime neutrality and a stable speedup are unresolved;
+no request, instruction-count or JIT-flat claim is made. All final cases are
+reported, including unaffected controls, rather than selected for good timing.
+
+Retained setup history: an initial partial benchmark used an invalid routing
+fixture; preflight checks were added, proper class-level route-helper inclusion
+and explicit Active Support JSON loading fixed setup. An initial complete
+cohort overlapped a Git history scan during YJIT and was not used for admission.
+The final entire four-process cohort above ran with no concurrent review,
+suite, install or history search. It was not rerun to improve a selected result.
+
+### Correctness, independent reviews and delivery boundary
+
+Both clean main and the exact candidate pass the full Action View component:
+**2,901 runs / 6,865 assertions; 249 / 338; 173 / 334**, zero failures,
+errors or skips in every group. From `actionview/`, Ruby 4.0.7:
+`BUNDLE_ONLY=default:test:rubocop:cable:db PARALLEL_WORKERS=1 SEED=41231
+bundle exec rake test`. Candidate RuboCop: **one file, no offenses**.
+The two retained Ruby scripts also pass Rails RuboCop. After their lint-only
+edits, all snapshots still match; the benchmark's compiled ISeq equals the
+executed/published script's ISeq exactly.
+One accidental root-level baseline task hit the known excluded-`sdoc` load
+error; the proper component-local baseline then passed. No source, assertion
+or skip was changed to get green results. This is not a hosted CI claim.
+
+The standalone controls compare **3,049 identical snapshots** of bytes,
+encoding, output class/safety/frozen state or exception class/message, including
+2,992 SafeBuffer results, 40 ArgumentErrors and 16 encoding errors, plus one
+options-mutation Hash. Coverage includes nil/false/true, Symbols, numeric and
+custom values, SafeBuffer, String subclass keys, data/aria/custom-prefix hashes,
+blank/dangerous names, escape on/off, invalid encodings, a TagBuilder subclass,
+`safe_join`, and live non-mutating String/Inflector overrides. This is bounded
+evidence, not universal input or thread-interleaving coverage.
+
+**Thermos correctness and maintainability, oracle, and Rails conventions checks
+are complete with no remaining confirmed blocker.** The correctness reviewer
+also exercised conversion order, caller non-mutation, unusual Symbol encodings
+and eight threads × 200 renders; this is a bounded smoke test, not a new
+concurrency guarantee. The final oracle checked the complete benchmark table
+against all four logs and accepted the allocation-only rationale while leaving
+runtime trade-offs unresolved. Its requested receiver-state disclosure and
+baseline pin were added to the PR. Style review confirmed the focused commit,
+Rails template, embedded script/results and the absence of a required CHANGELOG
+or new VM-allocation test for this implementation-only refactor.
+
+A preliminary maintainability blocker was investigated, not ignored:
+`Symbol#name` passes a shared frozen receiver into `dasherize`, unlike the fresh
+mutable String from `to_s`. An intentionally in-place `tr!` override therefore
+raises only after the change for Symbol keys. But that override already fails
+on clean Rails for ordinary frozen Hash String keys, existing frozen inflection
+test fixtures, and TagBuilder's `called.name.dasherize` custom-tag path.
+The reviewer withdrew the blocker after checking this established input
+contract. Both non-mutating String and Inflector overrides remain live and
+produce identical tested outputs. An override inspecting receiver identity or
+`frozen?` can still distinguish the implementations; that arbitrary observation
+is not claimed equivalent. No compatibility `dup` or inflection bypass was added.
+
+PR head is
+[`7ec6645560`](https://github.com/thomasklemm/rails/commit/7ec66455606753caa76950922f969ad7f7fd1c6c).
+At the first post-open check there were no reviews; hosted Buildkite Rails/docs
+and Docker checks were pending/in progress, not passed gates. Automatic comment
+and exact-head CI subscription attempts both failed because the Amp GitHub App
+cannot access `rails/rails`; no automatic monitoring is claimed. No public
+review reply, follow-up push, workflow rerun, merge or deployment is authorized.
+Report subsequent findings to the coordinator; each further Rails push needs
+its approval.
