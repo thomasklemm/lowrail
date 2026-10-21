@@ -86,6 +86,8 @@ class NativeBenchTest < Minitest::Test
     assert_in_delta(-50, row.fetch("on_off").fetch("delta_pct"), 1e-10)
     assert_in_delta 20, row.fetch("backend_comparisons").fetch("tokens_hooks").fetch("delta_pct"), 1e-10
     assert_in_delta 80, row.fetch("backend_comparisons").fetch("reflection_hooks").fetch("delta_pct"), 1e-10
+    assert_equal "tokens_hooks", row.fetch("direction_contrast")
+    assert_equal "higher_than_noise_floor", row.fetch("direction")
     assert_equal %w[off_a on tokens reflection off_b], NativeBench.arms("guard_backends" => true)
   end
 end

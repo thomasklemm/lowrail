@@ -8,6 +8,7 @@ require_relative "ar_request_sites"
 module NativeBench::Exploration
   class << self
     alias_method :install_direct_site, :install
+    alias_method :direct_site_counts, :counts
 
     def install(config:, state:, arm:)
       ENV["LOWRAIL_GUARD_BACKEND"] = arm == "on" ? "tokens" : "reflection"
@@ -15,6 +16,12 @@ module NativeBench::Exploration
       raise "RPS causal contrast requires an empty public artifact" unless manifest.fetch("units").empty?
       raise "RPS token backend missing" unless arm != "on" || Lowrail::Guard::Methods.backend == :tokens
       install_direct_site(config: config, state: state, arm: "on")
+    end
+
+    def counts
+      direct_site_counts.merge("lookup_backends" => ARRequestSites.sites.transform_values {
+        _1.instance_variable_get(:@method_guard) ? "tokens" : "reflection"
+      })
     end
   end
 end
