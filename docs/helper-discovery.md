@@ -226,10 +226,10 @@ production boot; the Rails-version domain is a separate later item.
 CASA app/views/devise/passwords/edit.html.erb:39 and new.html.erb:40 each have
 an otherwise accepted link_to "← Back to sign in", target, class: literal.
 File source, Erubi output and Prism name literal are **UTF-8**, with non-ASCII
-bytes. Class is ASCII-compatible UTF-8. SealedBuild.lower creates
+bytes. Class is ASCII-compatible UTF-8. The old SealedBuild.lower created
 output=source.b.dup (**BINARY/ASCII-8BIT**), then inserts a UTF-8 replacement
 containing the name at gem/lib/lowrail/sealed_build.rb:247. The byte-offset
-splice raises Encoding::CompatibilityError before final force_encoding.
+splice raised Encoding::CompatibilityError before final force_encoding.
 
 Minimal reproduction, no app/boot:
 
@@ -239,8 +239,8 @@ mise exec ruby@4.0.7 -- ruby -Igem/lib -raction_view -rlowrail/sealed_build -e '
 '
 ```
 
-This exits1 at the splice, not at parse/shape rejection; an ASCII name
-control lowers. Builder exception/refusal is correct but this is a **real
+Before the fix this exited1 at the splice, not at parse/shape rejection;
+it now exits0. An ASCII name control also lowers. This was a **real
 lowerer defect**, formerly reducing CASA29 delivery shapes to27 before
 admission. The independent fix inserts `replacement.b` into the byte buffer
 and restores the original source encoding as before. The new regression
@@ -249,6 +249,15 @@ content around two link sites and independently expected rendered output.
 The complete sealed-link suite passes: two tests / 140 assertions / no skips.
 All CASA HTML-ERB files lower and compile; **29/29** candidate sites now lower,
 including both UTF-8 Devise templates. No shape or admission widening follows.
+
+## Selected next candidate, design only
+
+The coordinator selected shape2: literal-class block links, **43 present
+boot/delivery opportunities (Fizzy23, CASA20)**, not admitted support. The
+capture/buffer/block-provenance certificate and a single pricing-only Fizzy
+cohort are proposed in [block-link-specimen.md](block-link-specimen.md).
+Neither production implementation nor a cohort is run here. Shapes1/3 remain
+ledgered; Writebook stays red and Wikino outside the audited Rails domain.
 
 ## Reproduce the census
 
