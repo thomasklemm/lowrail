@@ -35,6 +35,53 @@ module Lowrail
     SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
     ARRAY_EACH = Array.instance_method(:each)
 
+    # Extra lookup witnesses for the fork experiment. These do not replace
+    # receiver/value checks, the sealed promise, or continuation guards. Stock
+    # Ruby takes the existing path; reflection is an explicit pricing control.
+    class Methods
+      LOOKUP = Module.instance_method(:instance_method)
+      PUBLIC = Module.instance_method(:public_method_defined?)
+      PROTECTED = Module.instance_method(:protected_method_defined?)
+      SAME = UnboundMethod.instance_method(:==)
+
+      def self.backend
+        requested = ENV.fetch("LOWRAIL_GUARD_BACKEND", "auto")
+        raise ArgumentError, "unknown guard backend: #{requested}" unless %w[auto hooks tokens reflection].include?(requested)
+        return :reflection if requested == "reflection"
+        return :hooks if requested == "hooks"
+        defined?(Native) && Native.respond_to?(:method_tokens) ? :tokens : :hooks
+      end
+
+      def self.capture(entries)
+        mode = backend
+        new(entries, mode) unless mode == :hooks
+      end
+
+      def initialize(entries, mode)
+        tokens, reflected = mode == :tokens ? entries.uniq.partition { Class === _1.first } : [[], entries.uniq]
+        @token_check = Native.method(:method_tokens_valid?) if mode == :tokens
+        @tokens = Native.method_tokens(tokens) if mode == :tokens
+        # Modules have no callcache lookup API. Keep public reflection for
+        # those dependencies instead of silently dropping their certificate.
+        @reflected = reflected.map { |holder, name| [holder, name, LOOKUP.bind_call(holder, name), visibility(holder, name)] }
+      end
+
+      def valid?
+        return false if @token_check && (!@tokens || !@token_check.call(@tokens))
+        @reflected.all? do |holder, name, method, visibility|
+          SAME.bind_call(LOOKUP.bind_call(holder, name), method) && visibility(holder, name) == visibility
+        end
+      rescue NameError
+        false
+      end
+
+      private
+
+      def visibility(holder, name)
+        PUBLIC.bind_call(holder, name) ? :public : PROTECTED.bind_call(holder, name) ? :protected : :private
+      end
+    end
+
     class << self
       attr_reader :manifest, :state
 

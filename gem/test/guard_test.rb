@@ -231,4 +231,44 @@ class GuardTest < Minitest::Test
       refute r[k], "#{k} should not hold"
     end
   end
+
+  def test_optional_method_witnesses_detect_suppressed_changes
+    %w[auto reflection].each do |backend|
+      env = {"RUBYOPT" => "-I#{GEM_LIB}", "LOWRAIL_GUARD_BACKEND" => backend}
+      result = ruby_json(<<~'RUBY', setup: false, env: env)
+        require "json"
+        require "lowrail"
+        require "lowrail/guard"
+        mode = Lowrail::Guard::Methods.backend
+        results = %i[redefine private protected remove undef prepend].to_h do |mutation|
+          klass = Class.new do
+            def self.method_added(*) = nil
+            def target = 17
+          end
+          guard = Lowrail::Guard::Methods.capture([[klass, :target]])
+          next [mutation, guard.nil?] if mode == :hooks
+          before = guard.valid?
+          case mutation
+          when :redefine then klass.class_eval { def target = 37 }
+          when :private, :protected then klass.send(mutation, :target)
+          when :remove then klass.remove_method(:target)
+          when :undef then klass.undef_method(:target)
+          when :prepend then klass.prepend(Module.new { def target = 53 })
+          end
+          [mutation, before && !guard.valid?]
+        end
+        mod = Module.new { def target = 17 }
+        guard = Lowrail::Guard::Methods.capture([[mod, :target]])
+        mod.module_eval { def target = 37 }
+        results[:module] = mode == :hooks ? guard.nil? : !guard.valid?
+        klass = Class.new { def target = 17 }
+        guard = Lowrail::Guard::Methods.capture([[klass, :target]])
+        GC.verify_compaction_references(double_heap: true, toward: :empty)
+        results[:compaction] = mode == :hooks ? guard.nil? : guard.valid?
+        puts JSON.generate(mode: mode, results: results)
+      RUBY
+      assert_empty result.fetch("results").reject { |_, passed| passed }, backend
+      assert_equal "reflection", result.fetch("mode") if backend == "reflection"
+    end
+  end
 end

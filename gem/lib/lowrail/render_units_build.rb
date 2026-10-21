@@ -46,7 +46,7 @@ module Lowrail
         end
       end
       sources = [__FILE__, File.join(__dir__, "render_units.rb"), File.join(__dir__, "setup.rb"),
-        File.join(__dir__, "form_scaffold_inventory.rb"), File.join(__dir__, "sealed.rb"), binary,
+        File.join(__dir__, "form_scaffold_inventory.rb"), File.join(__dir__, "sealed.rb"), File.join(__dir__, "guard.rb"), binary,
         Rails.root.join("Gemfile.lock").to_s, *Dir[Rails.root.join("{app,config,lib}/**/*.{rb,yml,erb}")],
         *facts.filter_map { _1.dig("body", "source_location", 0) }].uniq.select { File.file?(_1) }
       observer = pass == TokenTag::PASS ? TokenTag::Variant.instance_method(:token_tag) :

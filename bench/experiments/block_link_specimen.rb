@@ -186,7 +186,7 @@ module BlockLinkSpecimen
     def dependencies!
       builder = ActionView::Helpers::TagHelper::TagBuilder
       @constructor, @initialize = builder.method(:new), builder.instance_method(:initialize)
-      @dependencies = [
+      dependencies = [
         [ActionView::Helpers::UrlHelper, %i[link_to convert_options_to_data_attributes url_target]],
         [ActionView::Helpers::TagHelper, %i[content_tag tag_builder ensure_valid_html5_tag_name]],
         [ActionView::Helpers::CaptureHelper, %i[capture]], [ActionView::OutputBuffer, %i[capture]],
@@ -194,7 +194,11 @@ module BlockLinkSpecimen
         [String, %i[to_s empty? size == match? include? gsub << +@ encoding valid_encoding? blank? present? html_safe? html_safe]],
         [ActiveSupport::SafeBuffer, %i[to_s html_safe? present? blank?]],
         [Hash, %i[each_pair empty? blank? [] size keys default default_proc]], [Regexp, %i[match?]]
-      ].flat_map { |holder, names| names.map { |name| [holder, name, holder.instance_method(name), Lowrail::Sealed.visibility(holder, name)] } }
+      ].flat_map { |holder, names| names.map { |name| [holder, name] } }
+      @method_guard = Lowrail::Guard::Methods.capture(dependencies +
+        [[builder.singleton_class, :new], [Lowrail::Native.singleton_class, :exact_class?]] +
+        %i[unwrapped_html_escape xml_name_escape].map { [ERB::Util.singleton_class, _1] })
+      @dependencies = dependencies.map { |holder, name| [holder, name, holder.instance_method(name), Lowrail::Sealed.visibility(holder, name)] }
       # Read build-time ISeq evidence. No runtime compilation, handler/resolver
       # invocation or warming is allowed to manufacture the witness.
       @expected = JSON.parse(File.read(File.join(@artifact, "expected-methods.json")))
@@ -210,6 +214,7 @@ module BlockLinkSpecimen
       raise "cold seams not delivered" unless delivered.all? { Lowrail::Loader.served?(_1) }
       @escaping = %i[unwrapped_html_escape xml_name_escape].map { |name| [name, ERB::Util.method(name)] }
       @escaping.each { |_, method| audit_method!(method) }
+      raise "method lookup changed during certification" if @method_guard && !@method_guard.valid?
       @dependencies
     end
 
@@ -231,6 +236,7 @@ module BlockLinkSpecimen
     end
 
     def dependencies?
+      return @method_guard.valid? && Lowrail::Sealed.literal_state?(exact_class: @holder) if @method_guard
       @dependencies && Lowrail::Native.method(:exact_class?) == @holder &&
         @dependencies.all? { |holder, name, method, visibility|
         holder.instance_method(name) == method && Lowrail::Sealed.visibility(holder, name) == visibility

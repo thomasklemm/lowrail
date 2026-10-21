@@ -111,6 +111,7 @@ module Lowrail
         return count(false, "foreign Ractor") unless Ractor.current.equal?(Ractor.main)
         return count(false, "activation refused") unless @active
         return count(false, "seal epoch changed") unless @epoch[0].zero?
+        return count(false, "method lookup changed") if @method_guard && !@method_guard.valid?
         return count(false, "unknown form site/options") unless scope.nil? && url.nil? && format.nil? &&
           @holder.call(model, Array) && model.size == 2 && options == {class: "space-y-4"} &&
           block && @holder.call(block, Proc) && BLOCK_SOURCE.bind_call(block) == @site.fetch("source_location")

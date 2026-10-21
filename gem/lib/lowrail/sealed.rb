@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "guard"
+
 module Lowrail
   # The first sealed pilot is deliberately narrower than the contract: stock
   # Rails 8.1.4 blog views, literal link names/classes, and live URL generation.
@@ -93,6 +95,14 @@ module Lowrail
         return decline("controller missing") unless controller
         @view_class = controller.instance_variable_get(:@view_context_class)
         return decline("view context class not already materialized; keep original") unless @view_class
+        builder = ActionView::Helpers::TagHelper::TagBuilder
+        entries = @data.fetch("view_methods").keys.map { [@view_class, _1] } +
+          @data.fetch("builder_methods").keys.map { [builder, _1] } +
+          (@data.fetch("primitive_methods") + @data.fetch("delivery").values).map do |entry|
+            holder = Lowrail.loaded_constant(entry.fetch("holder"))
+            [entry["singleton"] ? holder.singleton_class : holder, entry.fetch("method")]
+          end + [[builder.singleton_class, :new]]
+        @method_guard = Guard::Methods.capture(entries)
         @data.fetch("view_methods").each do |name, expected|
           actual = @view_class.instance_method(name)
           return decline("view method #{name}") unless signature(actual) == expected.fetch("signature") &&
@@ -122,6 +132,7 @@ module Lowrail
         @epoch = defined?(Lowrail::Seal) ? Lowrail::Seal::EPOCH : EPOCH
         require_relative "templates"
         Templates.install(Lowrail.manifest.templates.merge(@data.fetch("templates")))
+        return decline("method lookup changed during admission") if @method_guard && !@method_guard.valid?
         ACTIVE[0] = true
         @refusal = nil
       rescue StandardError, ScriptError => error
@@ -142,18 +153,18 @@ module Lowrail
         # after initialize!. Retry at the existing request entry, without
         # forcing any loading or warming an application cache.
         activate unless ACTIVE[0]
-        ACTIVE[0] && @epoch[0].zero?
+        ACTIVE[0] && @epoch[0].zero? && (!@method_guard || @method_guard.valid?)
       end
 
       def view?(view)
         Ractor.current.equal?(Ractor.main) && ACTIVE[0] && Thread.current[REQUEST] &&
-          @epoch[0].zero? && @holder.call(view, @view_class)
+          @epoch[0].zero? && (!@method_guard || @method_guard.valid?) && @holder.call(view, @view_class)
       end
 
       def link?(view, url, html, css)
         # Recheck diagnostic deopt after live conversion/URL code. It is NOT
         # a structural VM epoch and cannot enforce the production promise.
-        return count(false) unless @epoch[0].zero? && String === url &&
+        return count(false) unless @epoch[0].zero? && (!@method_guard || @method_guard.valid?) && String === url &&
           ENCODING.bind_call(url) == Encoding::UTF_8 && VALID.bind_call(url) &&
           html.size == 2 && html["class"] == css && html["href"].equal?(url)
         count(BUILDERS.key?(VIEW_CONTEXT.bind_call(view) { tag_builder }))

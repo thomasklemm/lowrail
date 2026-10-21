@@ -46,6 +46,12 @@ module Lowrail
       view_class = controller && IVAR.bind_call(controller, :@view_context_class)
       return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("application_class")
+      entries = data.fetch("methods").map do |entry|
+        type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))
+        [entry["singleton"] ? type.singleton_class : type, entry.fetch("method")]
+      end
+      entries << [native.singleton_class, :exact_class?]
+      method_guard = Guard::Methods.capture(entries)
       data.fetch("methods").each do |entry|
         type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))
         return "dependency #{entry['holder']} not already loaded; keep original" unless type
@@ -60,7 +66,8 @@ module Lowrail
         return "visibility #{entry['holder']}##{entry['method']} changed; rebuild" if expected["visibility"] &&
           Sealed.visibility(type, entry.fetch("method")) != expected.fetch("visibility")
       end
-      {holder: exact, view_class: view_class}
+      return "method lookup changed during admission; keep original" if method_guard && !method_guard.valid?
+      {holder: exact, view_class: view_class, method_guard: method_guard}
     end
 
     module Admission
@@ -165,6 +172,7 @@ module Lowrail
 
       def valid?(view, token, options)
         return count(false, "seal epoch changed or foreign Ractor") unless Ractor.current.equal?(Ractor.main) && @epoch[0].zero?
+        return count(false, "method lookup changed") if @method_guard && !@method_guard.valid?
         return count(false, "explicit token or unknown options") unless token.nil? && @holder.call(options, Hash) &&
           options.size == 2 && options.key?(:action) && options.key?(:method)
         builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
@@ -174,7 +182,7 @@ module Lowrail
       end
 
       def render(view, options)
-        unit, epoch, holder, builder_class = self, @epoch, @holder, @builder_class
+        unit, epoch, holder, builder_class, method_guard = self, @epoch, @holder, @builder_class, @method_guard
         Sealed::VIEW_CONTEXT.bind_call(view) do
           unless defined?(protect_against_forgery?) && protect_against_forgery?
             unit.count(true)
@@ -184,7 +192,7 @@ module Lowrail
           name = request_forgery_protection_token.to_s
           remove_autocomplete = ActionView::Base.remove_hidden_field_autocomplete
           builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
-          unless epoch[0].zero? && holder.call(name, String) && holder.call(value, String) &&
+          unless epoch[0].zero? && (!method_guard || method_guard.valid?) && holder.call(name, String) && holder.call(value, String) &&
               holder.call(builder, builder_class) && RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
             # Continue AFTER live generation/conversion. Re-entering token_tag
             # would generate/mask a token twice and replay app-defined effects.
@@ -249,6 +257,7 @@ module Lowrail
 
       def valid?(renderer, view, template, layout)
         return count(false, "seal epoch changed or foreign Ractor") unless Ractor.current.equal?(Ractor.main) && @epoch[0].zero?
+        return count(false, "method lookup changed") if @method_guard && !@method_guard.valid?
         count(template && !layout && @holder.call(renderer, @renderer_class) && @holder.call(view, @view_class),
           "unknown renderer/view holder, missing template or layout")
       end

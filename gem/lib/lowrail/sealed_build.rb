@@ -171,7 +171,7 @@ module Lowrail
       }
       files = [{path: factory_file, original: factory_source, parts: [factory_code]},
         {path: dispatch_file, original: dispatch_source, parts: [dispatch_code]}]
-      sources = [__FILE__, File.join(__dir__, "sealed.rb"), File.join(__dir__, "templates.rb"), native_file,
+      sources = [__FILE__, File.join(__dir__, "sealed.rb"), File.join(__dir__, "templates.rb"), File.join(__dir__, "guard.rb"), native_file,
         *VIEW.map { view_class.instance_method(_1).source_location&.first },
         *BUILDER.map { builder.instance_method(_1).source_location&.first },
         *ruby_primitives.map { _1.source_location.first }, dispatch_file,

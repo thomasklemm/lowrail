@@ -83,6 +83,24 @@ module Lowrail
       return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("inventory").fetch("application_class")
 
+      entries = data.fetch("inventory").fetch("methods").flat_map do |target, facts|
+        if target == "template_compiler"
+          [[Lowrail.loaded_constant("ActionView::Template"), :compiled_source]]
+        else
+          singleton = target.end_with?(".singleton", ".new")
+          name = target.delete_suffix(".singleton").delete_suffix(".new")
+          type = name == "view" ? view_class : Lowrail.loaded_constant(name)
+          names = target.end_with?(".new") ? ["new"] : facts.keys
+          names.map { [singleton ? type.singleton_class : type, _1] }
+        end
+      end
+      entries.concat(passive.fetch("readers").keys.map do |target|
+        name, method_name = target.split(".", 2)
+        [Lowrail.loaded_constant(name).singleton_class, method_name]
+      end)
+      entries << [native.singleton_class, :exact_class?]
+      method_guard = Guard::Methods.capture(entries)
+
       data.fetch("inventory").fetch("methods").each do |name, expected|
         if name == "template_compiler"
           type = Lowrail.loaded_constant("ActionView::Template")
@@ -210,9 +228,11 @@ module Lowrail
       return "custom ERB handler; keep original" unless exact.call(ivar(template, :@handler), Lowrail.loaded_constant("ActionView::Template::Handlers::ERB"))
       sequence = RubyVM::InstructionSequence.of(block)
       return "natural form body differs; rebuild" unless sequence && block_signature(sequence, ivar(template, :@method_name)) == passive.fetch("block_iseq")
+      return "method lookup changed during admission; keep original" if method_guard && !method_guard.valid?
       {holder: exact, view_class: view_class, article_class: article, model_class: comment,
         form_class: builder, builder_class: Lowrail.loaded_constant("ActionView::Helpers::TagHelper::TagBuilder"),
-        buffer_class: Lowrail.loaded_constant("ActionView::OutputBuffer"), table: ActionView::Helpers::TagHelper::PRE_CONTENT_STRINGS}.freeze
+        buffer_class: Lowrail.loaded_constant("ActionView::OutputBuffer"), table: ActionView::Helpers::TagHelper::PRE_CONTENT_STRINGS,
+        method_guard: method_guard}.freeze
     rescue StandardError, ScriptError => error
       "passive admission: #{error.class}: #{error.message.lines.first&.strip}; keep original"
     end
