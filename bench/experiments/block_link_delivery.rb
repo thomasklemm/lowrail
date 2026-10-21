@@ -16,6 +16,14 @@ module BlockLinkDelivery
     "helpers/tag_helper.rb" => "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
     "helpers/capture_helper.rb" => "9cc89ba1f287b09e79569f61500e2652d9d169a962e7ea6217a3f1920cbda76b"
   }.freeze
+  AUDIT = {
+    "actionview:lib/action_view/template.rb" => "defe875aa54871a597eb37c846636cce70ba782d61bb39cd8e5332acbda0a3c6",
+    "actionview:lib/action_view/template/handlers/erb.rb" => "1eb6d4ba4690103fc161eb9d5ef7d79d4b977cc04bbbfa3482e17270c2ef988d",
+    "actionview:lib/action_view/template/handlers/erb/erubi.rb" => "a8f9d22dfce5478e89815c96a9b2035ca7c2dd0fbabe4774b2e30f0e9f99bf49",
+    "activesupport:lib/active_support/core_ext/object/blank.rb" => "203eefc5b094f4a0f5bf68b4c34198891127f52ed7825e146c2fa089a46f8ec7",
+    "activesupport:lib/active_support/core_ext/erb/util.rb" => "1e348e9c8840caa9942691a290e0424c1755256b03a90eb96a094bbf86ff368f",
+    "activesupport:lib/active_support/core_ext/string/output_safety.rb" => "8d8c461dbcd14db6b894671a1ec53b03c39637a67c27222e7d22bbe3c2f411d6"
+  }.freeze
 
   module_function
 
@@ -79,9 +87,18 @@ module BlockLinkDelivery
     end
     manifest = Lowrail::Compiler.compile(input)
     expected = {}
-    files.each do |file|
+    sequences = files.to_h do |file|
       path = file.fetch("path")
-      sequence = Lowrail::Compilation.lowered(File.read(file.fetch("lowered")), path, Lowrail::Compilation.files.fetch(path))
+      [path, Lowrail::Compilation.lowered(File.read(file.fetch("lowered")), path, Lowrail::Compilation.files.fetch(path))]
+    end
+    audit_sources = AUDIT.to_h do |key, pin|
+      gem_name, relative = key.split(":", 2)
+      path = File.join(Gem.loaded_specs.fetch(gem_name).full_gem_path, relative)
+      raise "audit source pin mismatch #{relative}" unless Digest::SHA256.file(path).hexdigest == pin
+      sequences[path] = RubyVM::InstructionSequence.compile(File.read(path), path, path, 1)
+      [path, pin]
+    end
+    sequences.each do |path, sequence|
       visit = lambda do |child|
         expected[JSON.generate([path, child.label, child.first_lineno])] = Lowrail::Sealed.signature(
           Object.instance_method(:instance_variable_get), sequence: child.to_a).fetch("iseq")
@@ -90,6 +107,7 @@ module BlockLinkDelivery
       visit.call(sequence)
     end
     File.write(File.join(destination, "expected-methods.json"), JSON.generate(expected))
+    File.write(File.join(destination, "audit-sources.json"), JSON.generate(audit_sources))
     manifest
   end
 end

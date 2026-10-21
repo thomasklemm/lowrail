@@ -50,7 +50,7 @@ module BlockLinkSpecimen
       path = ivar(template, :@identifier)
       compiled = METHOD.bind_call(view, method_name)
       sequence = RubyVM::InstructionSequence.of(compiled)
-      controller = ivar(view, :@controller)
+      controller = ivar(view, :@_controller)
       controller_class = klass(controller)
       cached_view = ivar(controller_class, :@view_context_class)
       return entry.merge!(reason: "unnatural view/compiler context") unless sequence && exact(view, cached_view) &&
@@ -64,7 +64,8 @@ module BlockLinkSpecimen
         "disk_sha256" => Digest::SHA256.file(path).hexdigest,
         "template_locals" => template_locals.map(&:dup), "locals" => keys.map { Symbol === _1 ? _1.name : _1.dup },
         "strict" => strict, "strict_locals" => strict_locals&.dup,
-        "compiled_body" => signature(sequence, method_name), "compile_options" => RubyVM::InstructionSequence.compile_option}
+        "compiled_body" => signature(sequence, method_name), "compile_options" => RubyVM::InstructionSequence.compile_option,
+        "compiler_methods" => compiler_facts}
       # All instance/Proc/template references live ONLY on this invocation stack.
       entry.merge!(reason: nil, descriptor: descriptor, sequence: sequence, method_name: method_name,
         view_holder: cached_view, compiled_holder: compiled.owner, controller_holder: controller_class)
@@ -92,7 +93,7 @@ module BlockLinkSpecimen
       call[:site] = "#{site.fetch('file')}:#{site.fetch('line')}"
       count(call, "entries")
       entry = Thread.current[THREAD_TEMPLATE]
-      return refuse(call, "unknown entry context") unless entry && entry[:view].equal?(view) && !entry[:reason] && child?(entry[:sequence], sequence)
+      return refuse(call, "unknown entry context: #{entry && entry[:reason]}") unless entry && entry[:view].equal?(view) && !entry[:reason] && child?(entry[:sequence], sequence)
       css = FETCH.bind_call(options, :class)
       return refuse(call, "nonliteral class value") unless exact(css, String) && css.encoding == Encoding::UTF_8 && css.valid_encoding?
       descriptor = entry[:descriptor].merge("site" => call[:site], "block" => signature(sequence, entry[:method_name]),
@@ -173,22 +174,43 @@ module BlockLinkSpecimen
         [ActionView::Helpers::TagHelper, %i[content_tag tag_builder ensure_valid_html5_tag_name]],
         [ActionView::Helpers::CaptureHelper, %i[capture]], [ActionView::OutputBuffer, %i[capture]],
         [builder, %i[initialize content_tag_string tag_options tag_option]],
-        [String, %i[to_s empty? size == match? include? gsub encoding valid_encoding? blank? present? html_safe? html_safe]],
-        [Hash, %i[each_pair empty? [] size keys default default_proc]], [Regexp, %i[match?]]
+        [String, %i[to_s empty? size == match? include? gsub << +@ encoding valid_encoding? blank? present? html_safe? html_safe]],
+        [ActiveSupport::SafeBuffer, %i[to_s html_safe? present? blank?]],
+        [Hash, %i[each_pair empty? blank? [] size keys default default_proc]], [Regexp, %i[match?]]
       ].flat_map { |holder, names| names.map { |name| [holder, name, holder.instance_method(name), Lowrail::Sealed.visibility(holder, name)] } }
       # Read build-time ISeq evidence. No runtime compilation, handler/resolver
       # invocation or warming is allowed to manufacture the witness.
-      expected = JSON.parse(File.read(File.join(@artifact, "expected-methods.json")))
+      @expected = JSON.parse(File.read(File.join(@artifact, "expected-methods.json")))
+      audits = JSON.parse(File.read(File.join(@artifact, "audit-sources.json")))
+      raise "audit source changed" unless audits.all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha }
       delivered = BlockLinkDelivery::STOCK.keys.map { Gem.loaded_specs.fetch("actionview").full_gem_path + "/lib/action_view/#{_1}" }
-      @dependencies.each do |_, name, method, _|
-        next unless (path, line = method.source_location) && delivered.include?(path)
-        digest = expected.fetch(JSON.generate([path, name.to_s, line]))
-        raise "effective stock body differs: #{name}" unless digest == Lowrail::Sealed.signature(method).fetch("iseq")
+      @dependencies.each do |_, name, method, visibility|
+        expected_visibility = %i[convert_options_to_data_attributes url_target tag_builder ensure_valid_html5_tag_name initialize tag_option].include?(name) ? "private" : "public"
+        raise "nonstock visibility #{name}" unless visibility == expected_visibility
+        audit_method!(method)
       end
       raise "native holder unavailable" unless defined?(Lowrail::Native) && Lowrail::Native.method(:exact_class?).source_location.nil?
       raise "cold seams not delivered" unless delivered.all? { Lowrail::Loader.served?(_1) }
       @escaping = %i[unwrapped_html_escape xml_name_escape].map { |name| [name, ERB::Util.method(name)] }
+      @escaping.each { |_, method| audit_method!(method) }
       @dependencies
+    end
+
+    def audit_method!(method)
+      return unless (location = method.source_location)
+      path, line = location
+      digest = @expected.fetch(JSON.generate([path, method.original_name.to_s, line]))
+      raise "effective stock body differs: #{method.original_name}" unless digest == Lowrail::Sealed.signature(method).fetch("iseq")
+    end
+
+    def compiler_facts
+      handler = Lowrail.loaded_constant("ActionView::Template::Handlers::ERB")
+      engine = Lowrail.loaded_constant("ActionView::Template::Handlers::ERB::Erubi")
+      raise "compiler not naturally available" unless handler && engine
+      methods = [METHOD.bind_call(handler, :call), handler.instance_method(:call), engine.instance_method(:initialize),
+        *%i[compiled_source compile! encode!].map { ActionView::Template.instance_method(_1) }]
+      methods.each { audit_method!(_1) }
+      methods.map { Lowrail::Sealed.signature(_1) }
     end
 
     def dependencies?
@@ -222,6 +244,9 @@ module BlockLinkSpecimen
       reason = predicate(call, builder, content, options, escape)
       call[:reason] = reason if reason
       !reason
+    rescue StandardError => error
+      call[:reason] = "post-capture observation unavailable: #{error.class}"
+      false
     end
 
     def render(call, content, options)
@@ -249,6 +274,8 @@ module BlockLinkSpecimen
       state[:holders] = call[:entry].values_at(:view_holder, :controller_holder, :compiled_holder) unless reason
       # Last publication, only after WHOLE original link returned normally.
       state[:state] = reason ? "refused" : "active"
+    rescue StandardError => error
+      call[:state].merge!(state: "refused", reason: "original observation unavailable: #{error.class}") if call[:witness]
     end
 
     def link_leave(call)
