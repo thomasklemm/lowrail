@@ -21,23 +21,26 @@ for the other projects we learned from.
 
 ## Current results (2026-10-21)
 
-**Accepted warm-request instruction results, including increases—not latency or throughput claims.**
+**Warm-request instruction results, including increases and historical records—not latency or throughput claims.**
 **Ir instructions, not latency · no YJIT claim yet · opt-in research, not default**.
 Blog and Starter each cover one endpoint/fixture in the sealed tier; Fizzy
 covers a fixed six-GET vector in a bench-only specimen, not production admission.
-Both total and GC-excluded A/A, fixed-heap, brk and actual-mode gates pass.
+Current prices pass total and GC-excluded A/A, fixed-heap, brk and actual-mode
+gates. Blog has no current-source price after its post-fix A/A rejection.
 
 <!-- current-results:start -->
 | Date | App / endpoint | Ruby / Rails | Mode / tier | Ir Δ vs no Lowrail [95% interval] | Measured / published |
 |---|---|---|---|---|---|
-| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection; measured on pre-fix source; re-price pending | **Total −15.23% [−15.25, −15.21]**; GC-excluded −15.25% [−15.28, −15.20] | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
+| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection; historical pre-fix record, no current price | **No current price:** −15.23% was measured on pre-fix source [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65); the post-fix re-price cohort was rejected on its preregistered no-GC A/A gate ([673b1cc](https://github.com/thomasklemm/lowrail/commit/673b1cc3cbbb341a6956e027e54bc2a18049bde0)) | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
 | 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.16% [−10.22, −10.08]**; GC-excluded −10.16% [−10.25, −10.11] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
 | 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.40% [+0.39, +0.43]**; GC-excluded +0.40% [+0.38, +0.42] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
 <!-- current-results:end -->
 
 Displayed values are rounded; exact values are in the linked JSON exports.
 
-The blog row includes the token-continuation safety fix; the earlier
+The historical blog record includes the token-continuation safety fix but
+predates the dispatch fixes; its post-fix attempt is not an accepted price.
+The earlier
 **−15.49%** is historical, valid only at
 [`ae025b0`](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
 not the corrected source. [Protocol and historical records](docs/bench.md#current-accepted-request-results).

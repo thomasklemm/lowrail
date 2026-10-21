@@ -51,10 +51,18 @@ for entry in json.loads((root / "docs/results.json").read_text()):
         sys.exit(f"Revision mismatch: {entry['source']}")
     total = interval(lookup(data, entry["total"]))
     no_gc = interval(lookup(data, entry["no_gc"]))
+    price = f"**Total {total}**; GC-excluded {no_gc}"
+    if "historical" in entry:
+        historical = entry["historical"]
+        price = (
+            f"**No current price:** {total.split(' [')[0]} was "
+            f"{historical['reason']} {commit(entry['revision'])}; "
+            f"{historical['follow_up']} ({commit(historical['publication'])})"
+        )
     rows.append(
         f"| {entry['date']} | [{entry['app_endpoint']}]({entry['report']}) | "
         f"{entry['ruby_rails']} | {entry['mode']}; {entry['tier']} | "
-        f"**Total {total}**; GC-excluded {no_gc} | "
+        f"{price} | "
         f"{commit(entry['revision'])} / {commit(entry['publication'])}; [JSON]({entry['source']}) |"
     )
 readme = root / "README.md"
