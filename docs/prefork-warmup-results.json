@@ -12,8 +12,8 @@
     "forced_worker_gc_at_request": 10,
     "bootsnap": false,
     "yjit": true,
-    "rps_status": "Blog/Campfire/Fizzy cohorts complete, no aggregate loss beyond A/A; Lobsters running on published b1e239f adapters; see prefork-rps-results.json",
-    "exact_output_status": "memory trees check HTTP status only; separate Blog/Campfire/Fizzy RPS cold/warm two-seed status/body/all-header checks pass; no own-suite/DB-state admission"
+    "rps_status": "all four single cohorts complete; no resolved gain/loss beyond A/A, non-inferiority unproven; parked memory candidate only; see prefork-rps-results.json",
+    "exact_output_status": "memory trees check HTTP status only; all four separate RPS cold/warm two-seed status/body/all-header checks pass; no own-suite/DB-state admission"
   },
   "apps": {
     "blog": {

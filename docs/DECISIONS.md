@@ -23,10 +23,10 @@ No runtime/main promotion; CASA sign-in stays HTTP 500, full outputs/DB/own suit
 
 ## Bet H bounded prefork follow-up (2026-10-21)
 
-Keep branch-only candidate: 36 fresh Puma trees, warmup lower PSS than both off controls in all three rounds on Blog/Campfire/Fizzy/Lobsters; zero 5xx/1,035 responses.
+Park as branch-only memory candidate: 36 fresh Puma trees, warmup lower PSS than both off controls in all three rounds on Blog/Campfire/Fizzy/Lobsters; zero 5xx/1,035 responses.
 Median total PSS MiB off→warmup: 250.5→240.3 / 288.7→267.2 / 260.6→245.0 / 440.0→395.8; extra first response 0.15–0.36 s; opt-in helper never runs automatically.
-Blog/Campfire real-Puma RPS +6.09% [+3.00,+9.05] / +1.11% [−0.92,+3.29], A/A floors 4.94% / 4.64%; no detected loss beyond A/A, no resolved gain or non-inferiority proof.
-Three completed apps pass cold/warm two-seed status/body/all-header gates with zero load errors; Fizzy RPS −0.44% [−2.38,+1.52] inside A/A floor 4.99%, higher GC-time proxy retained; Lobsters running on published adapters.
+Four single RPS cohorts complete: Blog/Campfire/Fizzy/Lobsters +6.09% / +1.11% / −0.44% / −2.18%; no resolved gain/loss beyond A/A, not non-inferiority. Lobsters interval [−4.32,+0.34] crosses its 2.51% A/A floor on the loss side.
+All cold/warm two-seed status/body/all-header gates pass, 120 load windows, zero errors; biased/outlier controls retained. Fizzy/Lobsters GC-time proxies increase; Lobsters post-load worker RSS loses its advantage and median window p99 rises 70.7→123.6 ms.
 No main/runtime promotion: full outputs/DB state, constants/method/features, own suites and Thermos remain unmet. [Tables and sanitized records](boot-image.md#bounded-follow-up-explicit-puma-warmup).
 
 ## Prism 2 adoption and target grammar (2026-10-21)

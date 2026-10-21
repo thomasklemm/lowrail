@@ -327,38 +327,60 @@ round and −6.22% on/off round remain in the export, not excluded or rerun.
 Timing is an aggregate uniform-random six-URL pool, **not** the interpreter
 study's fixed-vector price or per-route throughput.
 
-Lobsters uses the unchanged shipped DB (SHA256 `d9817ef6…`), `/` plus
+**Lobsters complete:** unchanged shipped DB (SHA256 `d9817ef6…`), `/` plus
 `/s/enr7ye`, and absolute `fixtures/corpus/lobsters-rps.Gemfile` from the pinned
 harness. This dependency-only overlay adds Puma **8.0.2** to the prior overlay;
 only the corresponding overlay/lock hashes change in its validator policy,
-not entropy rules. Its cohort is running; no result yet.
+not entropy rules. Timing is an aggregate uniform-random two-URL pool.
+A/A **−0.42% [−2.51%, +1.76%]**, floor **2.51%**; warmup/off
+**−2.18% [−4.32%, +0.34%]**. This negative estimate is unresolved, not proof
+of non-regression: the loss-side interval extends beyond the A/A floor.
+It does not trigger the declared resolved-loss kill rule. Median off-A / on /
+off-B is **503.1 / 483.2 / 493.8 RPS**. All cold/warm two-seed exact workflows
+pass, eleven on hooks complete, **289,608 timed + 52,164 warmup HTTP200**,
+zero errors. Median window p99 is **70.7 / 123.6 / 70.2 ms**: retain the
+warmup arm's worse tail rather than treating an unresolved RPS result as safety.
 
 | App | A/A paired RPS Δ [95% interval] | A/A floor | Warmup/off RPS Δ [95% interval] | Decision |
 |---|---:|---:|---:|---|
 | Blog | −0.10% [−4.32%, +4.94%] | 4.94% | +6.09% [+3.00%, +9.05%] | No detected loss; gain unresolved against A/A |
 | Campfire | −2.54% [−4.64%, −0.51%] | 4.64% | +1.11% [−0.92%, +3.29%] | No detected loss; unresolved; off/off bias retained |
 | Fizzy | −1.65% [−4.99%, +1.06%] | 4.99% | −0.44% [−2.38%, +1.52%] | No aggregate loss beyond A/A; unresolved |
-| Lobsters | — | — | — | Running, published adapter unblocked |
+| Lobsters | −0.42% [−2.51%, +1.76%] | 2.51% | −2.18% [−4.32%, +0.34%] | Negative, unresolved; non-regression not established |
 
-None of the completed cohorts triggers the owner's kill rule. Keep the repeatable
-PSS saving as a **candidate**, charging **0.15–0.36 seconds** extra first-response
+**Bounded follow-up closed:** all four single cohorts completed, no reruns or
+remaining adapter blockers. **1,560,393 timed + 296,975 warmup HTTP200**, zero
+load/transport errors; all 132 cold-server and 120 warm-server exact workflows
+pass both seeds, all 44 on-arm master hooks complete. None of the whole-cohort
+intervals establishes a regression beyond A/A, but none resolves a speed win
+against A/A either. Keep the repeatable short-screen PSS saving as a **parked
+memory candidate only**, charging **0.15–0.36 seconds** extra first-response
 time in the memory screen. The coarse/biased A/A controls do not establish a
 published speed win or formal throughput non-inferiority. `passed:true` in the
 RPS export means exact samples and zero load errors, not a speed/control pass.
-The last RPS check uses bet A's actual HTTP adapter, not substituted login/
+All RPS checks use bet A's actual HTTP adapters, not substituted login/
 empty pages or in-process Rack timings. Full outputs/DB state, app own suites,
 constant/method/feature-table equality after warmup and Thermos have **not**
 been established. Nothing is promoted to main or enabled automatically.
 
 The newer harness also captures all four workers' GC/RSS after warmup and
-after load; all 30 Fizzy servers supply complete snapshots. Median mean-worker
-RSS after load off-A / on / off-B is **244.3 / 237.3 / 243.4 MiB**. The sum of
-workers' GC-time deltas divided by timed responses is **0.620 / 0.929 / 0.629
-ms/response**: the warmup arm's proxy is higher, not hidden as a memory win.
+after load; all 60 Fizzy/Lobsters servers supply complete snapshots. Each row
+below is the median across ten servers of the mean worker RSS, or summed
+workers' GC-time deltas divided by that server's timed response count.
+
+| App | Post-load worker RSS off-A / warmup / off-B, MiB | GC-time proxy off-A / warmup / off-B, ms/response |
+|---|---:|---:|
+| Fizzy | 244.3 / 237.3 / 243.4 | 0.620 / 0.929 / 0.629 |
+| Lobsters | 199.7 / 200.4 / 200.2 | 0.611 / 0.996 / 0.630 |
+
+Both warmup arms' GC-time proxies are higher; Lobsters' post-load worker RSS
+does **not** retain a saving. These costs are not hidden as a memory win.
 These snapshots include background and untimed metrics-request work, are not
 exclusive request counters, do not measure PSS, and do not prove causality or
-long-lived capacity. All captured GC fields remain in the JSON; the older
-Blog/Campfire cohorts have no such snapshots and are not backfilled.
+long-lived capacity. Four-worker RPS RSS and two-worker short-screen PSS are
+different experiments and must not be pooled. All captured GC fields remain
+in the JSON; the older Blog/Campfire cohorts have no such snapshots and are
+not backfilled.
 
 ## Reproduction and retained boundaries
 

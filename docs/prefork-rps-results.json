@@ -8606,10 +8606,6040 @@
           }
         }
       ]
+    },
+    "lobsters": {
+      "harness_commit": "b1e239f5bfcd2354166aeabddf1e6cc7a605fcaf",
+      "source_sha256": "2881d82b58431b16075cf149555f4d22ef4148bc74acff0a8871609f8a7ae6e2",
+      "protocol": {
+        "rounds": 10,
+        "duration": 20,
+        "warmup_seconds": 5,
+        "workers": 4,
+        "threads": 1,
+        "concurrency": 16,
+        "server_cpus": "0-3",
+        "client_cpus": "4-7",
+        "paths": [
+          "/",
+          "/s/enr7ye"
+        ]
+      },
+      "passed": true,
+      "preflight_exact": {
+        "0": {
+          "passed": true,
+          "controls_pass": true,
+          "same_steps": true,
+          "fields": {
+            "status": true,
+            "body_sha256": true,
+            "headers_sha256": true
+          },
+          "workflow": {
+            "route0": true,
+            "route1": true
+          }
+        },
+        "1": {
+          "passed": true,
+          "controls_pass": true,
+          "same_steps": true,
+          "fields": {
+            "status": true,
+            "body_sha256": true,
+            "headers_sha256": true
+          },
+          "workflow": {
+            "route0": true,
+            "route1": true
+          }
+        }
+      },
+      "exact": {
+        "0": {
+          "passed": true,
+          "controls_pass": true,
+          "same_steps": true,
+          "fields": {
+            "status": true,
+            "body_sha256": true,
+            "headers_sha256": true
+          },
+          "workflow": {
+            "route0": true,
+            "route1": true
+          }
+        },
+        "1": {
+          "passed": true,
+          "controls_pass": true,
+          "same_steps": true,
+          "fields": {
+            "status": true,
+            "body_sha256": true,
+            "headers_sha256": true
+          },
+          "workflow": {
+            "route0": true,
+            "route1": true
+          }
+        }
+      },
+      "warm_exact": {
+        "0": {
+          "passed": true,
+          "controls_pass": true,
+          "same_steps": true,
+          "fields": {
+            "status": true,
+            "body_sha256": true,
+            "headers_sha256": true
+          },
+          "workflow": {
+            "route0": true,
+            "route1": true
+          }
+        },
+        "1": {
+          "passed": true,
+          "controls_pass": true,
+          "same_steps": true,
+          "fields": {
+            "status": true,
+            "body_sha256": true,
+            "headers_sha256": true
+          },
+          "workflow": {
+            "route0": true,
+            "route1": true
+          }
+        }
+      },
+      "summary": {
+        "aa": {
+          "delta_pct": -0.4206007374025356,
+          "ci95_pct": [
+            -2.5107571544983847,
+            1.7572843269225782
+          ],
+          "round_deltas_pct": [
+            1.877981262074191,
+            -0.3200279778037052,
+            -0.1194215769742657,
+            6.482444708139945,
+            -2.4904147175046965,
+            -6.0880306865551574,
+            -2.2224719157833306,
+            -0.15360292194054326,
+            3.144790320424118,
+            -4.317253868101911
+          ],
+          "median_abs_round_delta_pct": 2.3564433166440137
+        },
+        "aa_noise_floor_pct": 2.5107571544983847,
+        "aa_max_abs_round_pct": 6.482444708139945,
+        "on_off": {
+          "delta_pct": -2.1821832535162824,
+          "ci95_pct": [
+            -4.323300914896087,
+            0.3398255457027302
+          ],
+          "round_deltas_pct": [
+            -3.4042898803811505,
+            -3.5831740604947093,
+            -4.4057344300598045,
+            -1.5073797304414605,
+            -4.8892117943918345,
+            -5.440057928725972,
+            -3.4882998890531147,
+            5.296843268105489,
+            5.027470283917768,
+            -5.427998373638032
+          ],
+          "median_abs_round_delta_pct": 4.6474731122258195
+        },
+        "median_rps": {
+          "off_a": 503.06089394972344,
+          "off_b": 493.8063182011407,
+          "on": 483.18027718172925
+        },
+        "median_latency_ms": {
+          "off_a": {
+            "p50": 31.3865405,
+            "p90": 49.104760999999996,
+            "p99": 70.6980665
+          },
+          "off_b": {
+            "p50": 31.286799000000002,
+            "p90": 45.5704865,
+            "p99": 70.171406
+          },
+          "on": {
+            "p50": 30.599559499999998,
+            "p90": 50.2175835,
+            "p99": 123.60208
+          }
+        },
+        "errors": 0
+      },
+      "hooks": {
+        "off_a": {
+          "n": 11,
+          "completed": 0,
+          "median_ms": 0.007041000571916811
+        },
+        "on": {
+          "n": 11,
+          "completed": 11,
+          "median_ms": 255.2349489997141
+        },
+        "off_b": {
+          "n": 11,
+          "completed": 0,
+          "median_ms": 0.006850000318081584
+        }
+      },
+      "process_metrics_medians": {
+        "off_a": {
+          "post_warmup_worker_rss_mib": 198.69580078125,
+          "post_load_worker_rss_mib": 199.6708984375,
+          "gc_ms_per_timed_response": 0.610535275700629
+        },
+        "on": {
+          "post_warmup_worker_rss_mib": 196.81640625,
+          "post_load_worker_rss_mib": 200.400390625,
+          "gc_ms_per_timed_response": 0.9963782888201898
+        },
+        "off_b": {
+          "post_warmup_worker_rss_mib": 198.68212890625,
+          "post_load_worker_rss_mib": 200.17578125,
+          "gc_ms_per_timed_response": 0.6302172392452159
+        }
+      },
+      "timing_rows": [
+        {
+          "round": 0,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 379.6431868666493,
+            "requests": 1921,
+            "elapsed_s": 5.06001442,
+            "errors": 0,
+            "status_counts": {
+              "200": 1921
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 35.118539999999996,
+              "p90": 66.676957,
+              "p99": 221.33635600000002
+            },
+            "raw_sha256": "feaea2fce73617c34ebdda18c2f55fe6c08f365deb421aeff93f37ec205faeaa"
+          },
+          "timed": {
+            "rps": 513.8309728473816,
+            "requests": 10303,
+            "elapsed_s": 20.051340897,
+            "errors": 0,
+            "status_counts": {
+              "200": 10303
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 28.216107,
+              "p90": 49.374123,
+              "p99": 75.732019
+            },
+            "raw_sha256": "b46ae72d0d336bd66e2590c4d7d8cfa1c0f13a2793b1c953074b9025bdb03cfd"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              111894,
+              111899,
+              111903,
+              111908
+            ],
+            "attempts": 16,
+            "workers": [
+              {
+                "pid": 111894,
+                "gc": {
+                  "heap_live_slots": 514751,
+                  "old_objects": 366782,
+                  "malloc_increase_bytes": 421853,
+                  "count": 50,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5744860,
+                  "time": 711
+                },
+                "rss": {
+                  "VmHWM": 201156,
+                  "VmRSS": 201156
+                }
+              },
+              {
+                "pid": 111899,
+                "gc": {
+                  "heap_live_slots": 462961,
+                  "old_objects": 369838,
+                  "malloc_increase_bytes": 959742,
+                  "count": 50,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5786456,
+                  "time": 634
+                },
+                "rss": {
+                  "VmHWM": 202684,
+                  "VmRSS": 202684
+                }
+              },
+              {
+                "pid": 111903,
+                "gc": {
+                  "heap_live_slots": 455328,
+                  "old_objects": 371768,
+                  "malloc_increase_bytes": 1212935,
+                  "count": 52,
+                  "minor_gc_count": 46,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6111670,
+                  "time": 655
+                },
+                "rss": {
+                  "VmHWM": 207328,
+                  "VmRSS": 207328
+                }
+              },
+              {
+                "pid": 111908,
+                "gc": {
+                  "heap_live_slots": 466236,
+                  "old_objects": 371077,
+                  "malloc_increase_bytes": 1168538,
+                  "count": 53,
+                  "minor_gc_count": 47,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6188113,
+                  "time": 659
+                },
+                "rss": {
+                  "VmHWM": 203200,
+                  "VmRSS": 203200
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              111894,
+              111899,
+              111903,
+              111908
+            ],
+            "attempts": 169,
+            "workers": [
+              {
+                "pid": 111894,
+                "gc": {
+                  "heap_live_slots": 520664,
+                  "old_objects": 366873,
+                  "malloc_increase_bytes": 4287944,
+                  "count": 191,
+                  "minor_gc_count": 174,
+                  "major_gc_count": 17,
+                  "total_allocated_objects": 28564034,
+                  "time": 2688
+                },
+                "rss": {
+                  "VmHWM": 209224,
+                  "VmRSS": 209224
+                }
+              },
+              {
+                "pid": 111899,
+                "gc": {
+                  "heap_live_slots": 467741,
+                  "old_objects": 366915,
+                  "malloc_increase_bytes": 431568,
+                  "count": 197,
+                  "minor_gc_count": 184,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 29206070,
+                  "time": 2386
+                },
+                "rss": {
+                  "VmHWM": 204096,
+                  "VmRSS": 204096
+                }
+              },
+              {
+                "pid": 111903,
+                "gc": {
+                  "heap_live_slots": 530446,
+                  "old_objects": 368271,
+                  "malloc_increase_bytes": 13057686,
+                  "count": 197,
+                  "minor_gc_count": 188,
+                  "major_gc_count": 9,
+                  "total_allocated_objects": 29486065,
+                  "time": 2083
+                },
+                "rss": {
+                  "VmHWM": 217412,
+                  "VmRSS": 217412
+                }
+              },
+              {
+                "pid": 111908,
+                "gc": {
+                  "heap_live_slots": 493027,
+                  "old_objects": 367921,
+                  "malloc_increase_bytes": 6971531,
+                  "count": 197,
+                  "minor_gc_count": 186,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 29162895,
+                  "time": 2240
+                },
+                "rss": {
+                  "VmHWM": 208220,
+                  "VmRSS": 208220
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 0,
+          "arm": "on",
+          "warmup": {
+            "rps": 366.2215105308261,
+            "requests": 1843,
+            "elapsed_s": 5.032473372,
+            "errors": 0,
+            "status_counts": {
+              "200": 1843
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 32.434365,
+              "p90": 77.508011,
+              "p99": 213.973095
+            },
+            "raw_sha256": "ca07bef1f81f4550bcaf58bebb10b0c37fccb5d1c501c0f55c838cf44434b930"
+          },
+          "timed": {
+            "rps": 496.3386770364742,
+            "requests": 9956,
+            "elapsed_s": 20.058884106,
+            "errors": 0,
+            "status_counts": {
+              "200": 9956
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 29.454499,
+              "p90": 51.245492,
+              "p99": 125.33386899999999
+            },
+            "raw_sha256": "3a3cf3ef90180910d8ee1c683b07175a135af1b57b3b7075c3fb9cbef2d06f6d"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              112529,
+              112534,
+              112539,
+              112547
+            ],
+            "attempts": 71,
+            "workers": [
+              {
+                "pid": 112529,
+                "gc": {
+                  "heap_live_slots": 485202,
+                  "old_objects": 367964,
+                  "malloc_increase_bytes": 5349196,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 6064884,
+                  "time": 1097
+                },
+                "rss": {
+                  "VmHWM": 204736,
+                  "VmRSS": 204736
+                }
+              },
+              {
+                "pid": 112534,
+                "gc": {
+                  "heap_live_slots": 461686,
+                  "old_objects": 367992,
+                  "malloc_increase_bytes": 1961790,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5970527,
+                  "time": 1095
+                },
+                "rss": {
+                  "VmHWM": 198668,
+                  "VmRSS": 198668
+                }
+              },
+              {
+                "pid": 112539,
+                "gc": {
+                  "heap_live_slots": 521652,
+                  "old_objects": 368153,
+                  "malloc_increase_bytes": 6876724,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 6045730,
+                  "time": 1102
+                },
+                "rss": {
+                  "VmHWM": 200756,
+                  "VmRSS": 200756
+                }
+              },
+              {
+                "pid": 112547,
+                "gc": {
+                  "heap_live_slots": 417800,
+                  "old_objects": 366688,
+                  "malloc_increase_bytes": 4911305,
+                  "count": 44,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5690050,
+                  "time": 1086
+                },
+                "rss": {
+                  "VmHWM": 200036,
+                  "VmRSS": 200036
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              112529,
+              112534,
+              112539,
+              112547
+            ],
+            "attempts": 42,
+            "workers": [
+              {
+                "pid": 112529,
+                "gc": {
+                  "heap_live_slots": 448023,
+                  "old_objects": 368030,
+                  "malloc_increase_bytes": 1966052,
+                  "count": 137,
+                  "minor_gc_count": 102,
+                  "major_gc_count": 35,
+                  "total_allocated_objects": 28701702,
+                  "time": 3722
+                },
+                "rss": {
+                  "VmHWM": 208608,
+                  "VmRSS": 208608
+                }
+              },
+              {
+                "pid": 112534,
+                "gc": {
+                  "heap_live_slots": 494597,
+                  "old_objects": 368015,
+                  "malloc_increase_bytes": 1235084,
+                  "count": 139,
+                  "minor_gc_count": 105,
+                  "major_gc_count": 34,
+                  "total_allocated_objects": 29080551,
+                  "time": 3594
+                },
+                "rss": {
+                  "VmHWM": 202644,
+                  "VmRSS": 202644
+                }
+              },
+              {
+                "pid": 112539,
+                "gc": {
+                  "heap_live_slots": 478823,
+                  "old_objects": 367821,
+                  "malloc_increase_bytes": 2384093,
+                  "count": 138,
+                  "minor_gc_count": 104,
+                  "major_gc_count": 34,
+                  "total_allocated_objects": 28994420,
+                  "time": 3695
+                },
+                "rss": {
+                  "VmHWM": 205600,
+                  "VmRSS": 205600
+                }
+              },
+              {
+                "pid": 112547,
+                "gc": {
+                  "heap_live_slots": 515115,
+                  "old_objects": 366970,
+                  "malloc_increase_bytes": 2459841,
+                  "count": 135,
+                  "minor_gc_count": 100,
+                  "major_gc_count": 35,
+                  "total_allocated_objects": 27713745,
+                  "time": 3746
+                },
+                "rss": {
+                  "VmHWM": 204580,
+                  "VmRSS": 204580
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 0,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 376.92332117706394,
+            "requests": 1904,
+            "elapsed_s": 5.051425298,
+            "errors": 0,
+            "status_counts": {
+              "200": 1904
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 32.109892,
+              "p90": 67.71277400000001,
+              "p99": 217.494876
+            },
+            "raw_sha256": "aaf326017d48a67a4cd56b1e446feafbb54e60312201197d9e4e6375725aa235"
+          },
+          "timed": {
+            "rps": 523.480622236189,
+            "requests": 10493,
+            "elapsed_s": 20.044677022,
+            "errors": 0,
+            "status_counts": {
+              "200": 10493
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 29.158503,
+              "p90": 43.378039,
+              "p99": 64.963696
+            },
+            "raw_sha256": "d45c3cdc99a4de46c29cb5be65f8671480f8b47aae9fee067e461306f0a285da"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              113187,
+              113192,
+              113197,
+              113205
+            ],
+            "attempts": 15,
+            "workers": [
+              {
+                "pid": 113187,
+                "gc": {
+                  "heap_live_slots": 464371,
+                  "old_objects": 366773,
+                  "malloc_increase_bytes": 805673,
+                  "count": 49,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 9,
+                  "total_allocated_objects": 5588217,
+                  "time": 844
+                },
+                "rss": {
+                  "VmHWM": 201988,
+                  "VmRSS": 201988
+                }
+              },
+              {
+                "pid": 113192,
+                "gc": {
+                  "heap_live_slots": 492274,
+                  "old_objects": 368166,
+                  "malloc_increase_bytes": 1972339,
+                  "count": 52,
+                  "minor_gc_count": 45,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 6174067,
+                  "time": 725
+                },
+                "rss": {
+                  "VmHWM": 207144,
+                  "VmRSS": 207144
+                }
+              },
+              {
+                "pid": 113197,
+                "gc": {
+                  "heap_live_slots": 448806,
+                  "old_objects": 367095,
+                  "malloc_increase_bytes": 1134804,
+                  "count": 50,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5803951,
+                  "time": 701
+                },
+                "rss": {
+                  "VmHWM": 202516,
+                  "VmRSS": 202516
+                }
+              },
+              {
+                "pid": 113205,
+                "gc": {
+                  "heap_live_slots": 490515,
+                  "old_objects": 370133,
+                  "malloc_increase_bytes": 2108983,
+                  "count": 52,
+                  "minor_gc_count": 45,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 6118306,
+                  "time": 718
+                },
+                "rss": {
+                  "VmHWM": 203256,
+                  "VmRSS": 203256
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              113187,
+              113192,
+              113197,
+              113205
+            ],
+            "attempts": 26,
+            "workers": [
+              {
+                "pid": 113187,
+                "gc": {
+                  "heap_live_slots": 471051,
+                  "old_objects": 366864,
+                  "malloc_increase_bytes": 487488,
+                  "count": 191,
+                  "minor_gc_count": 177,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 28734041,
+                  "time": 2399
+                },
+                "rss": {
+                  "VmHWM": 203472,
+                  "VmRSS": 203472
+                }
+              },
+              {
+                "pid": 113192,
+                "gc": {
+                  "heap_live_slots": 466655,
+                  "old_objects": 368206,
+                  "malloc_increase_bytes": 2876943,
+                  "count": 204,
+                  "minor_gc_count": 193,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 30494315,
+                  "time": 2225
+                },
+                "rss": {
+                  "VmHWM": 209140,
+                  "VmRSS": 209140
+                }
+              },
+              {
+                "pid": 113197,
+                "gc": {
+                  "heap_live_slots": 502309,
+                  "old_objects": 366964,
+                  "malloc_increase_bytes": 2972209,
+                  "count": 201,
+                  "minor_gc_count": 191,
+                  "major_gc_count": 10,
+                  "total_allocated_objects": 30210337,
+                  "time": 2144
+                },
+                "rss": {
+                  "VmHWM": 204020,
+                  "VmRSS": 204020
+                }
+              },
+              {
+                "pid": 113205,
+                "gc": {
+                  "heap_live_slots": 469732,
+                  "old_objects": 367887,
+                  "malloc_increase_bytes": 568019,
+                  "count": 199,
+                  "minor_gc_count": 187,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 29793999,
+                  "time": 2296
+                },
+                "rss": {
+                  "VmHWM": 205040,
+                  "VmRSS": 205040
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 1,
+          "arm": "on",
+          "warmup": {
+            "rps": 377.03811990138587,
+            "requests": 1917,
+            "elapsed_s": 5.084366537,
+            "errors": 0,
+            "status_counts": {
+              "200": 1917
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 32.044731999999996,
+              "p90": 84.50212499999999,
+              "p99": 203.411381
+            },
+            "raw_sha256": "78830e920924cbe7dd8e823d4cd60b64b3110d1508a55925841ff45f709bea3d"
+          },
+          "timed": {
+            "rps": 518.4912917603286,
+            "requests": 10393,
+            "elapsed_s": 20.044695379,
+            "errors": 0,
+            "status_counts": {
+              "200": 10393
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 26.129548,
+              "p90": 49.457181000000006,
+              "p99": 117.466774
+            },
+            "raw_sha256": "edf0220d37c2444c1969390d9c510e7ee3df1d7f9fb47853ae9f61d1bdbd45a7"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              113312,
+              113317,
+              113321,
+              113326
+            ],
+            "attempts": 7,
+            "workers": [
+              {
+                "pid": 113312,
+                "gc": {
+                  "heap_live_slots": 488885,
+                  "old_objects": 366818,
+                  "malloc_increase_bytes": 3241784,
+                  "count": 46,
+                  "minor_gc_count": 34,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 6248625,
+                  "time": 1037
+                },
+                "rss": {
+                  "VmHWM": 197004,
+                  "VmRSS": 197004
+                }
+              },
+              {
+                "pid": 113317,
+                "gc": {
+                  "heap_live_slots": 463068,
+                  "old_objects": 368207,
+                  "malloc_increase_bytes": 1939963,
+                  "count": 47,
+                  "minor_gc_count": 34,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 6510154,
+                  "time": 1148
+                },
+                "rss": {
+                  "VmHWM": 204128,
+                  "VmRSS": 204128
+                }
+              },
+              {
+                "pid": 113321,
+                "gc": {
+                  "heap_live_slots": 491022,
+                  "old_objects": 367906,
+                  "malloc_increase_bytes": 3040378,
+                  "count": 47,
+                  "minor_gc_count": 34,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 6415811,
+                  "time": 1137
+                },
+                "rss": {
+                  "VmHWM": 199160,
+                  "VmRSS": 199160
+                }
+              },
+              {
+                "pid": 113326,
+                "gc": {
+                  "heap_live_slots": 459922,
+                  "old_objects": 366696,
+                  "malloc_increase_bytes": 2771799,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5935744,
+                  "time": 1047
+                },
+                "rss": {
+                  "VmHWM": 198104,
+                  "VmRSS": 198104
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              113312,
+              113317,
+              113321,
+              113326
+            ],
+            "attempts": 20,
+            "workers": [
+              {
+                "pid": 113312,
+                "gc": {
+                  "heap_live_slots": 438309,
+                  "old_objects": 366915,
+                  "malloc_increase_bytes": 163946,
+                  "count": 142,
+                  "minor_gc_count": 106,
+                  "major_gc_count": 36,
+                  "total_allocated_objects": 29575480,
+                  "time": 3710
+                },
+                "rss": {
+                  "VmHWM": 200792,
+                  "VmRSS": 200792
+                }
+              },
+              {
+                "pid": 113317,
+                "gc": {
+                  "heap_live_slots": 604768,
+                  "old_objects": 368312,
+                  "malloc_increase_bytes": 8283947,
+                  "count": 139,
+                  "minor_gc_count": 106,
+                  "major_gc_count": 33,
+                  "total_allocated_objects": 29560399,
+                  "time": 3587
+                },
+                "rss": {
+                  "VmHWM": 208472,
+                  "VmRSS": 208472
+                }
+              },
+              {
+                "pid": 113321,
+                "gc": {
+                  "heap_live_slots": 606771,
+                  "old_objects": 367966,
+                  "malloc_increase_bytes": 7833763,
+                  "count": 143,
+                  "minor_gc_count": 107,
+                  "major_gc_count": 36,
+                  "total_allocated_objects": 29985732,
+                  "time": 3725
+                },
+                "rss": {
+                  "VmHWM": 203396,
+                  "VmRSS": 203396
+                }
+              },
+              {
+                "pid": 113326,
+                "gc": {
+                  "heap_live_slots": 417421,
+                  "old_objects": 366828,
+                  "malloc_increase_bytes": 1115389,
+                  "count": 141,
+                  "minor_gc_count": 107,
+                  "major_gc_count": 34,
+                  "total_allocated_objects": 29341996,
+                  "time": 3535
+                },
+                "rss": {
+                  "VmHWM": 201652,
+                  "VmRSS": 201652
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 1,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 412.3437812789633,
+            "requests": 2078,
+            "elapsed_s": 5.039484271,
+            "errors": 0,
+            "status_counts": {
+              "200": 2078
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 32.167625,
+              "p90": 57.264548,
+              "p99": 206.467895
+            },
+            "raw_sha256": "f447f27ec87f069edb9f8fe8094c975a788023e19309a10f3867f84ca4ce4a27"
+          },
+          "timed": {
+            "rps": 536.0391918403278,
+            "requests": 10742,
+            "elapsed_s": 20.0395795,
+            "errors": 0,
+            "status_counts": {
+              "200": 10742
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 29.120564,
+              "p90": 44.671557,
+              "p99": 56.073783
+            },
+            "raw_sha256": "0fbd2b434c0dcc0ea2942d4dc7821de09465112647ddf7c8ef7e47fab9475759"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              113966,
+              113971,
+              113980,
+              113989
+            ],
+            "attempts": 39,
+            "workers": [
+              {
+                "pid": 113966,
+                "gc": {
+                  "heap_live_slots": 453733,
+                  "old_objects": 371384,
+                  "malloc_increase_bytes": 1748096,
+                  "count": 63,
+                  "minor_gc_count": 57,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6497068,
+                  "time": 662
+                },
+                "rss": {
+                  "VmHWM": 201072,
+                  "VmRSS": 201072
+                }
+              },
+              {
+                "pid": 113971,
+                "gc": {
+                  "heap_live_slots": 440462,
+                  "old_objects": 367088,
+                  "malloc_increase_bytes": 195974,
+                  "count": 57,
+                  "minor_gc_count": 50,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5943332,
+                  "time": 710
+                },
+                "rss": {
+                  "VmHWM": 199992,
+                  "VmRSS": 199992
+                }
+              },
+              {
+                "pid": 113980,
+                "gc": {
+                  "heap_live_slots": 480271,
+                  "old_objects": 369389,
+                  "malloc_increase_bytes": 3150173,
+                  "count": 63,
+                  "minor_gc_count": 57,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6638028,
+                  "time": 663
+                },
+                "rss": {
+                  "VmHWM": 204832,
+                  "VmRSS": 204832
+                }
+              },
+              {
+                "pid": 113989,
+                "gc": {
+                  "heap_live_slots": 478140,
+                  "old_objects": 368072,
+                  "malloc_increase_bytes": 2607387,
+                  "count": 58,
+                  "minor_gc_count": 52,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6044195,
+                  "time": 634
+                },
+                "rss": {
+                  "VmHWM": 199484,
+                  "VmRSS": 199484
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              113966,
+              113971,
+              113980,
+              113989
+            ],
+            "attempts": 25,
+            "workers": [
+              {
+                "pid": 113966,
+                "gc": {
+                  "heap_live_slots": 476143,
+                  "old_objects": 376590,
+                  "malloc_increase_bytes": 1469243,
+                  "count": 265,
+                  "minor_gc_count": 259,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 30942053,
+                  "time": 1989
+                },
+                "rss": {
+                  "VmHWM": 201568,
+                  "VmRSS": 201568
+                }
+              },
+              {
+                "pid": 113971,
+                "gc": {
+                  "heap_live_slots": 439844,
+                  "old_objects": 366963,
+                  "malloc_increase_bytes": 1782341,
+                  "count": 236,
+                  "minor_gc_count": 228,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 30363643,
+                  "time": 2057
+                },
+                "rss": {
+                  "VmHWM": 200728,
+                  "VmRSS": 200728
+                }
+              },
+              {
+                "pid": 113980,
+                "gc": {
+                  "heap_live_slots": 474208,
+                  "old_objects": 371889,
+                  "malloc_increase_bytes": 1265236,
+                  "count": 256,
+                  "minor_gc_count": 250,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 31253541,
+                  "time": 1974
+                },
+                "rss": {
+                  "VmHWM": 206032,
+                  "VmRSS": 206032
+                }
+              },
+              {
+                "pid": 113989,
+                "gc": {
+                  "heap_live_slots": 504348,
+                  "old_objects": 368216,
+                  "malloc_increase_bytes": 3185586,
+                  "count": 240,
+                  "minor_gc_count": 234,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 30711630,
+                  "time": 1914
+                },
+                "rss": {
+                  "VmHWM": 200408,
+                  "VmRSS": 200408
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 1,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 395.6898415271853,
+            "requests": 1993,
+            "elapsed_s": 5.036773227,
+            "errors": 0,
+            "status_counts": {
+              "200": 1993
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 32.574812,
+              "p90": 58.430821,
+              "p99": 223.912094
+            },
+            "raw_sha256": "636149204b9b92edb58ef7b19788e18dc10ccba3ca0a2b35645abc75547dd529"
+          },
+          "timed": {
+            "rps": 537.7601748533447,
+            "requests": 10783,
+            "elapsed_s": 20.051689404,
+            "errors": 0,
+            "status_counts": {
+              "200": 10783
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 28.90869,
+              "p90": 42.452701000000005,
+              "p99": 53.23523
+            },
+            "raw_sha256": "9e9989cc7947f9914d1f27a2eabeb9c19153f45cb87de537556d2e459d9dde55"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              114132,
+              114137,
+              114142,
+              114150
+            ],
+            "attempts": 16,
+            "workers": [
+              {
+                "pid": 114132,
+                "gc": {
+                  "heap_live_slots": 486164,
+                  "old_objects": 369951,
+                  "malloc_increase_bytes": 2462122,
+                  "count": 58,
+                  "minor_gc_count": 52,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6059989,
+                  "time": 633
+                },
+                "rss": {
+                  "VmHWM": 199112,
+                  "VmRSS": 199112
+                }
+              },
+              {
+                "pid": 114137,
+                "gc": {
+                  "heap_live_slots": 454805,
+                  "old_objects": 370429,
+                  "malloc_increase_bytes": 1888182,
+                  "count": 61,
+                  "minor_gc_count": 55,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6322024,
+                  "time": 653
+                },
+                "rss": {
+                  "VmHWM": 199680,
+                  "VmRSS": 199680
+                }
+              },
+              {
+                "pid": 114142,
+                "gc": {
+                  "heap_live_slots": 455024,
+                  "old_objects": 368057,
+                  "malloc_increase_bytes": 200136,
+                  "count": 57,
+                  "minor_gc_count": 51,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5954059,
+                  "time": 627
+                },
+                "rss": {
+                  "VmHWM": 199880,
+                  "VmRSS": 199880
+                }
+              },
+              {
+                "pid": 114150,
+                "gc": {
+                  "heap_live_slots": 456881,
+                  "old_objects": 371448,
+                  "malloc_increase_bytes": 664190,
+                  "count": 62,
+                  "minor_gc_count": 56,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6496714,
+                  "time": 663
+                },
+                "rss": {
+                  "VmHWM": 204356,
+                  "VmRSS": 204356
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              114132,
+              114137,
+              114142,
+              114150
+            ],
+            "attempts": 57,
+            "workers": [
+              {
+                "pid": 114132,
+                "gc": {
+                  "heap_live_slots": 452115,
+                  "old_objects": 370307,
+                  "malloc_increase_bytes": 4555936,
+                  "count": 242,
+                  "minor_gc_count": 236,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 30309243,
+                  "time": 1920
+                },
+                "rss": {
+                  "VmHWM": 202652,
+                  "VmRSS": 202652
+                }
+              },
+              {
+                "pid": 114137,
+                "gc": {
+                  "heap_live_slots": 452414,
+                  "old_objects": 370745,
+                  "malloc_increase_bytes": 394446,
+                  "count": 257,
+                  "minor_gc_count": 251,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 30818503,
+                  "time": 1985
+                },
+                "rss": {
+                  "VmHWM": 200908,
+                  "VmRSS": 200908
+                }
+              },
+              {
+                "pid": 114142,
+                "gc": {
+                  "heap_live_slots": 441419,
+                  "old_objects": 366789,
+                  "malloc_increase_bytes": 788334,
+                  "count": 234,
+                  "minor_gc_count": 227,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 30142769,
+                  "time": 1981
+                },
+                "rss": {
+                  "VmHWM": 200316,
+                  "VmRSS": 200316
+                }
+              },
+              {
+                "pid": 114150,
+                "gc": {
+                  "heap_live_slots": 452513,
+                  "old_objects": 372019,
+                  "malloc_increase_bytes": 2856511,
+                  "count": 247,
+                  "minor_gc_count": 241,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 30746100,
+                  "time": 1941
+                },
+                "rss": {
+                  "VmHWM": 205932,
+                  "VmRSS": 205932
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 2,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 380.4467447837458,
+            "requests": 1917,
+            "elapsed_s": 5.038812991,
+            "errors": 0,
+            "status_counts": {
+              "200": 1917
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 34.850664,
+              "p90": 64.207677,
+              "p99": 222.332749
+            },
+            "raw_sha256": "1780d31092504feb6c9fd43792d52155721bf02b2f9b4fcf061ec924b5d8043d"
+          },
+          "timed": {
+            "rps": 507.84197371527756,
+            "requests": 10172,
+            "elapsed_s": 20.029852841,
+            "errors": 0,
+            "status_counts": {
+              "200": 10172
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 30.044922000000003,
+              "p90": 44.219721,
+              "p99": 75.218028
+            },
+            "raw_sha256": "5ce91c087b4cb8c40ac4825ec1c97b0d95fa57e7dd2740b0f877bed628c36f26"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              115300,
+              115305,
+              115310,
+              115319
+            ],
+            "attempts": 11,
+            "workers": [
+              {
+                "pid": 115300,
+                "gc": {
+                  "heap_live_slots": 515891,
+                  "old_objects": 368924,
+                  "malloc_increase_bytes": 3113077,
+                  "count": 49,
+                  "minor_gc_count": 42,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5684416,
+                  "time": 687
+                },
+                "rss": {
+                  "VmHWM": 202248,
+                  "VmRSS": 202248
+                }
+              },
+              {
+                "pid": 115305,
+                "gc": {
+                  "heap_live_slots": 503745,
+                  "old_objects": 369446,
+                  "malloc_increase_bytes": 2516658,
+                  "count": 54,
+                  "minor_gc_count": 48,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6511059,
+                  "time": 655
+                },
+                "rss": {
+                  "VmHWM": 206868,
+                  "VmRSS": 206868
+                }
+              },
+              {
+                "pid": 115310,
+                "gc": {
+                  "heap_live_slots": 506921,
+                  "old_objects": 368400,
+                  "malloc_increase_bytes": 2866671,
+                  "count": 53,
+                  "minor_gc_count": 47,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6362411,
+                  "time": 639
+                },
+                "rss": {
+                  "VmHWM": 202416,
+                  "VmRSS": 202416
+                }
+              },
+              {
+                "pid": 115319,
+                "gc": {
+                  "heap_live_slots": 495222,
+                  "old_objects": 366674,
+                  "malloc_increase_bytes": 2633224,
+                  "count": 49,
+                  "minor_gc_count": 41,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 5693439,
+                  "time": 766
+                },
+                "rss": {
+                  "VmHWM": 201176,
+                  "VmRSS": 201176
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              115300,
+              115305,
+              115310,
+              115319
+            ],
+            "attempts": 28,
+            "workers": [
+              {
+                "pid": 115300,
+                "gc": {
+                  "heap_live_slots": 457612,
+                  "old_objects": 366864,
+                  "malloc_increase_bytes": 1317014,
+                  "count": 193,
+                  "minor_gc_count": 180,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 28744131,
+                  "time": 2335
+                },
+                "rss": {
+                  "VmHWM": 203900,
+                  "VmRSS": 203900
+                }
+              },
+              {
+                "pid": 115305,
+                "gc": {
+                  "heap_live_slots": 513932,
+                  "old_objects": 368206,
+                  "malloc_increase_bytes": 1222465,
+                  "count": 199,
+                  "minor_gc_count": 188,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 29633707,
+                  "time": 2234
+                },
+                "rss": {
+                  "VmHWM": 208028,
+                  "VmRSS": 208028
+                }
+              },
+              {
+                "pid": 115310,
+                "gc": {
+                  "heap_live_slots": 462623,
+                  "old_objects": 366737,
+                  "malloc_increase_bytes": 412003,
+                  "count": 197,
+                  "minor_gc_count": 181,
+                  "major_gc_count": 16,
+                  "total_allocated_objects": 29367028,
+                  "time": 2610
+                },
+                "rss": {
+                  "VmHWM": 203832,
+                  "VmRSS": 203832
+                }
+              },
+              {
+                "pid": 115319,
+                "gc": {
+                  "heap_live_slots": 465788,
+                  "old_objects": 366969,
+                  "malloc_increase_bytes": 1721973,
+                  "count": 192,
+                  "minor_gc_count": 176,
+                  "major_gc_count": 16,
+                  "total_allocated_objects": 28689045,
+                  "time": 2550
+                },
+                "rss": {
+                  "VmHWM": 203112,
+                  "VmRSS": 203112
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 2,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 373.2754277109066,
+            "requests": 1881,
+            "elapsed_s": 5.039174455,
+            "errors": 0,
+            "status_counts": {
+              "200": 1881
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 33.612963,
+              "p90": 69.694863,
+              "p99": 219.259969
+            },
+            "raw_sha256": "257f36d99cc719633cd8b21ef1aa2361136465427ebb347e87d6092748a5269d"
+          },
+          "timed": {
+            "rps": 508.44917173427524,
+            "requests": 10199,
+            "elapsed_s": 20.059035528,
+            "errors": 0,
+            "status_counts": {
+              "200": 10199
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 25.426698000000002,
+              "p90": 58.945513,
+              "p99": 79.356712
+            },
+            "raw_sha256": "6b3eaf2290a2fa2e133e4c7715ff1b71cab339748be812fa6c404389f287e4e7"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              116025,
+              116030,
+              116034,
+              116044
+            ],
+            "attempts": 111,
+            "workers": [
+              {
+                "pid": 116025,
+                "gc": {
+                  "heap_live_slots": 488909,
+                  "old_objects": 367110,
+                  "malloc_increase_bytes": 777788,
+                  "count": 51,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 5857835,
+                  "time": 806
+                },
+                "rss": {
+                  "VmHWM": 203240,
+                  "VmRSS": 203240
+                }
+              },
+              {
+                "pid": 116030,
+                "gc": {
+                  "heap_live_slots": 506600,
+                  "old_objects": 367948,
+                  "malloc_increase_bytes": 2788786,
+                  "count": 51,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 5946989,
+                  "time": 813
+                },
+                "rss": {
+                  "VmHWM": 202140,
+                  "VmRSS": 202140
+                }
+              },
+              {
+                "pid": 116034,
+                "gc": {
+                  "heap_live_slots": 499123,
+                  "old_objects": 370473,
+                  "malloc_increase_bytes": 4891076,
+                  "count": 53,
+                  "minor_gc_count": 46,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 6131064,
+                  "time": 752
+                },
+                "rss": {
+                  "VmHWM": 210336,
+                  "VmRSS": 210336
+                }
+              },
+              {
+                "pid": 116044,
+                "gc": {
+                  "heap_live_slots": 529791,
+                  "old_objects": 368105,
+                  "malloc_increase_bytes": 12648504,
+                  "count": 49,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5757227,
+                  "time": 640
+                },
+                "rss": {
+                  "VmHWM": 208892,
+                  "VmRSS": 208892
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              116025,
+              116030,
+              116034,
+              116044
+            ],
+            "attempts": 61,
+            "workers": [
+              {
+                "pid": 116025,
+                "gc": {
+                  "heap_live_slots": 521350,
+                  "old_objects": 366944,
+                  "malloc_increase_bytes": 408246,
+                  "count": 195,
+                  "minor_gc_count": 177,
+                  "major_gc_count": 18,
+                  "total_allocated_objects": 29103865,
+                  "time": 2763
+                },
+                "rss": {
+                  "VmHWM": 205096,
+                  "VmRSS": 205096
+                }
+              },
+              {
+                "pid": 116030,
+                "gc": {
+                  "heap_live_slots": 460849,
+                  "old_objects": 368021,
+                  "malloc_increase_bytes": 4415435,
+                  "count": 193,
+                  "minor_gc_count": 182,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 28763265,
+                  "time": 2258
+                },
+                "rss": {
+                  "VmHWM": 205256,
+                  "VmRSS": 205256
+                }
+              },
+              {
+                "pid": 116034,
+                "gc": {
+                  "heap_live_slots": 462256,
+                  "old_objects": 368211,
+                  "malloc_increase_bytes": 2897116,
+                  "count": 197,
+                  "minor_gc_count": 185,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 29230579,
+                  "time": 2316
+                },
+                "rss": {
+                  "VmHWM": 212568,
+                  "VmRSS": 212568
+                }
+              },
+              {
+                "pid": 116044,
+                "gc": {
+                  "heap_live_slots": 456204,
+                  "old_objects": 367748,
+                  "malloc_increase_bytes": 505406,
+                  "count": 188,
+                  "minor_gc_count": 171,
+                  "major_gc_count": 17,
+                  "total_allocated_objects": 28347725,
+                  "time": 2656
+                },
+                "rss": {
+                  "VmHWM": 210216,
+                  "VmRSS": 205964
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 2,
+          "arm": "on",
+          "warmup": {
+            "rps": 351.916457987861,
+            "requests": 1774,
+            "elapsed_s": 5.040969127,
+            "errors": 0,
+            "status_counts": {
+              "200": 1774
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 36.126238,
+              "p90": 78.934598,
+              "p99": 234.254707
+            },
+            "raw_sha256": "7b2c43c94a3dccb443b4be8e442f9d2862ad22c04d7f9f80b02c5883a4ab9f80"
+          },
+          "timed": {
+            "rps": 486.04825151582435,
+            "requests": 9741,
+            "elapsed_s": 20.041220125,
+            "errors": 0,
+            "status_counts": {
+              "200": 9741
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 30.088449,
+              "p90": 45.605799000000005,
+              "p99": 116.127464
+            },
+            "raw_sha256": "814e59b999f2719212eb0f425fcfc56a96f6c045f92221753af7cf6feadb86bd"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              116168,
+              116173,
+              116177,
+              116183
+            ],
+            "attempts": 50,
+            "workers": [
+              {
+                "pid": 116168,
+                "gc": {
+                  "heap_live_slots": 524928,
+                  "old_objects": 367985,
+                  "malloc_increase_bytes": 2041209,
+                  "count": 42,
+                  "minor_gc_count": 31,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5898406,
+                  "time": 1040
+                },
+                "rss": {
+                  "VmHWM": 207812,
+                  "VmRSS": 207812
+                }
+              },
+              {
+                "pid": 116173,
+                "gc": {
+                  "heap_live_slots": 477689,
+                  "old_objects": 366702,
+                  "malloc_increase_bytes": 1703152,
+                  "count": 41,
+                  "minor_gc_count": 30,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5509201,
+                  "time": 1032
+                },
+                "rss": {
+                  "VmHWM": 201216,
+                  "VmRSS": 201216
+                }
+              },
+              {
+                "pid": 116177,
+                "gc": {
+                  "heap_live_slots": 476876,
+                  "old_objects": 367884,
+                  "malloc_increase_bytes": 4306329,
+                  "count": 42,
+                  "minor_gc_count": 30,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5854340,
+                  "time": 1120
+                },
+                "rss": {
+                  "VmHWM": 201860,
+                  "VmRSS": 201860
+                }
+              },
+              {
+                "pid": 116183,
+                "gc": {
+                  "heap_live_slots": 497463,
+                  "old_objects": 367984,
+                  "malloc_increase_bytes": 3160719,
+                  "count": 42,
+                  "minor_gc_count": 30,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5797556,
+                  "time": 1133
+                },
+                "rss": {
+                  "VmHWM": 200044,
+                  "VmRSS": 200044
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              116168,
+              116173,
+              116177,
+              116183
+            ],
+            "attempts": 43,
+            "workers": [
+              {
+                "pid": 116168,
+                "gc": {
+                  "heap_live_slots": 525574,
+                  "old_objects": 368236,
+                  "malloc_increase_bytes": 547962,
+                  "count": 128,
+                  "minor_gc_count": 110,
+                  "major_gc_count": 18,
+                  "total_allocated_objects": 28727131,
+                  "time": 2513
+                },
+                "rss": {
+                  "VmHWM": 210124,
+                  "VmRSS": 210124
+                }
+              },
+              {
+                "pid": 116173,
+                "gc": {
+                  "heap_live_slots": 520114,
+                  "old_objects": 366968,
+                  "malloc_increase_bytes": 2481792,
+                  "count": 127,
+                  "minor_gc_count": 99,
+                  "major_gc_count": 28,
+                  "total_allocated_objects": 27374076,
+                  "time": 3316
+                },
+                "rss": {
+                  "VmHWM": 204548,
+                  "VmRSS": 204548
+                }
+              },
+              {
+                "pid": 116177,
+                "gc": {
+                  "heap_live_slots": 440877,
+                  "old_objects": 367928,
+                  "malloc_increase_bytes": 1756576,
+                  "count": 125,
+                  "minor_gc_count": 95,
+                  "major_gc_count": 30,
+                  "total_allocated_objects": 27201725,
+                  "time": 3437
+                },
+                "rss": {
+                  "VmHWM": 205072,
+                  "VmRSS": 205072
+                }
+              },
+              {
+                "pid": 116183,
+                "gc": {
+                  "heap_live_slots": 528402,
+                  "old_objects": 368044,
+                  "malloc_increase_bytes": 6745822,
+                  "count": 128,
+                  "minor_gc_count": 98,
+                  "major_gc_count": 30,
+                  "total_allocated_objects": 27757968,
+                  "time": 3474
+                },
+                "rss": {
+                  "VmHWM": 203520,
+                  "VmRSS": 203520
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 3,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 333.0341984654908,
+            "requests": 1682,
+            "elapsed_s": 5.050532371,
+            "errors": 0,
+            "status_counts": {
+              "200": 1682
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 40.177326,
+              "p90": 82.64236,
+              "p99": 239.20421
+            },
+            "raw_sha256": "7fbf7b934bf78a514e1da92c9d5bbe61af2c7e0eee8752ecaa500795a9179b0d"
+          },
+          "timed": {
+            "rps": 470.5007062310868,
+            "requests": 9433,
+            "elapsed_s": 20.048854072,
+            "errors": 0,
+            "status_counts": {
+              "200": 9433
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 34.967326,
+              "p90": 50.338261,
+              "p99": 80.175566
+            },
+            "raw_sha256": "25a099b99e6fc78744395417e75efa4cab8da31dcc172cac9192df357f57109a"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              116292,
+              116297,
+              116302,
+              116310
+            ],
+            "attempts": 13,
+            "workers": [
+              {
+                "pid": 116292,
+                "gc": {
+                  "heap_live_slots": 506803,
+                  "old_objects": 370474,
+                  "malloc_increase_bytes": 690221,
+                  "count": 50,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5695543,
+                  "time": 805
+                },
+                "rss": {
+                  "VmHWM": 207496,
+                  "VmRSS": 207496
+                }
+              },
+              {
+                "pid": 116297,
+                "gc": {
+                  "heap_live_slots": 513163,
+                  "old_objects": 367945,
+                  "malloc_increase_bytes": 3219329,
+                  "count": 48,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 5526890,
+                  "time": 875
+                },
+                "rss": {
+                  "VmHWM": 203132,
+                  "VmRSS": 203132
+                }
+              },
+              {
+                "pid": 116302,
+                "gc": {
+                  "heap_live_slots": 507795,
+                  "old_objects": 368852,
+                  "malloc_increase_bytes": 3438209,
+                  "count": 48,
+                  "minor_gc_count": 41,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5498576,
+                  "time": 785
+                },
+                "rss": {
+                  "VmHWM": 203400,
+                  "VmRSS": 203400
+                }
+              },
+              {
+                "pid": 116310,
+                "gc": {
+                  "heap_live_slots": 464121,
+                  "old_objects": 369846,
+                  "malloc_increase_bytes": 481603,
+                  "count": 46,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5102827,
+                  "time": 680
+                },
+                "rss": {
+                  "VmHWM": 201724,
+                  "VmRSS": 201724
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              116292,
+              116297,
+              116302,
+              116310
+            ],
+            "attempts": 25,
+            "workers": [
+              {
+                "pid": 116292,
+                "gc": {
+                  "heap_live_slots": 500266,
+                  "old_objects": 368204,
+                  "malloc_increase_bytes": 2698684,
+                  "count": 178,
+                  "minor_gc_count": 164,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 26294427,
+                  "time": 2533
+                },
+                "rss": {
+                  "VmHWM": 208484,
+                  "VmRSS": 208484
+                }
+              },
+              {
+                "pid": 116297,
+                "gc": {
+                  "heap_live_slots": 521604,
+                  "old_objects": 368032,
+                  "malloc_increase_bytes": 1857029,
+                  "count": 181,
+                  "minor_gc_count": 166,
+                  "major_gc_count": 15,
+                  "total_allocated_objects": 26850729,
+                  "time": 2632
+                },
+                "rss": {
+                  "VmHWM": 205196,
+                  "VmRSS": 205196
+                }
+              },
+              {
+                "pid": 116302,
+                "gc": {
+                  "heap_live_slots": 461036,
+                  "old_objects": 369136,
+                  "malloc_increase_bytes": 67865,
+                  "count": 188,
+                  "minor_gc_count": 180,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 27378607,
+                  "time": 2076
+                },
+                "rss": {
+                  "VmHWM": 204396,
+                  "VmRSS": 204396
+                }
+              },
+              {
+                "pid": 116310,
+                "gc": {
+                  "heap_live_slots": 446830,
+                  "old_objects": 366726,
+                  "malloc_increase_bytes": 1588664,
+                  "count": 180,
+                  "minor_gc_count": 171,
+                  "major_gc_count": 9,
+                  "total_allocated_objects": 26759584,
+                  "time": 2118
+                },
+                "rss": {
+                  "VmHWM": 203020,
+                  "VmRSS": 203020
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 3,
+          "arm": "on",
+          "warmup": {
+            "rps": 333.1595103700726,
+            "requests": 1678,
+            "elapsed_s": 5.036626444,
+            "errors": 0,
+            "status_counts": {
+              "200": 1678
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 40.361749,
+              "p90": 94.921039,
+              "p99": 231.863359
+            },
+            "raw_sha256": "ddf82963358d3c9546679a19b20f409a0d7b5d3438213c8390152a86fc4165d6"
+          },
+          "timed": {
+            "rps": 463.40847395377546,
+            "requests": 9289,
+            "elapsed_s": 20.044950669,
+            "errors": 0,
+            "status_counts": {
+              "200": 9289
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 31.11067,
+              "p90": 50.464554,
+              "p99": 125.805803
+            },
+            "raw_sha256": "2a1bfc7130afc5441aba2824b16f95ef3fe0845350742c05f076392ad21d11f9"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              116968,
+              116973,
+              116977,
+              116983
+            ],
+            "attempts": 17,
+            "workers": [
+              {
+                "pid": 116968,
+                "gc": {
+                  "heap_live_slots": 472089,
+                  "old_objects": 367735,
+                  "malloc_increase_bytes": 2781481,
+                  "count": 44,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5387567,
+                  "time": 1146
+                },
+                "rss": {
+                  "VmHWM": 198632,
+                  "VmRSS": 198632
+                }
+              },
+              {
+                "pid": 116973,
+                "gc": {
+                  "heap_live_slots": 595038,
+                  "old_objects": 367472,
+                  "malloc_increase_bytes": 7422988,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5757068,
+                  "time": 1162
+                },
+                "rss": {
+                  "VmHWM": 203972,
+                  "VmRSS": 203972
+                }
+              },
+              {
+                "pid": 116977,
+                "gc": {
+                  "heap_live_slots": 547998,
+                  "old_objects": 367892,
+                  "malloc_increase_bytes": 5407387,
+                  "count": 46,
+                  "minor_gc_count": 34,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5914504,
+                  "time": 1167
+                },
+                "rss": {
+                  "VmHWM": 200432,
+                  "VmRSS": 200432
+                }
+              },
+              {
+                "pid": 116983,
+                "gc": {
+                  "heap_live_slots": 604695,
+                  "old_objects": 367996,
+                  "malloc_increase_bytes": 9484116,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5765060,
+                  "time": 1159
+                },
+                "rss": {
+                  "VmHWM": 200532,
+                  "VmRSS": 200532
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              116968,
+              116973,
+              116977,
+              116983
+            ],
+            "attempts": 88,
+            "workers": [
+              {
+                "pid": 116968,
+                "gc": {
+                  "heap_live_slots": 534755,
+                  "old_objects": 367825,
+                  "malloc_increase_bytes": 5783657,
+                  "count": 130,
+                  "minor_gc_count": 97,
+                  "major_gc_count": 33,
+                  "total_allocated_objects": 26935168,
+                  "time": 3705
+                },
+                "rss": {
+                  "VmHWM": 202688,
+                  "VmRSS": 202688
+                }
+              },
+              {
+                "pid": 116973,
+                "gc": {
+                  "heap_live_slots": 559509,
+                  "old_objects": 367574,
+                  "malloc_increase_bytes": 290240,
+                  "count": 130,
+                  "minor_gc_count": 99,
+                  "major_gc_count": 31,
+                  "total_allocated_objects": 26888496,
+                  "time": 3601
+                },
+                "rss": {
+                  "VmHWM": 207972,
+                  "VmRSS": 207972
+                }
+              },
+              {
+                "pid": 116977,
+                "gc": {
+                  "heap_live_slots": 492214,
+                  "old_objects": 367945,
+                  "malloc_increase_bytes": 6863199,
+                  "count": 131,
+                  "minor_gc_count": 97,
+                  "major_gc_count": 34,
+                  "total_allocated_objects": 26945742,
+                  "time": 3809
+                },
+                "rss": {
+                  "VmHWM": 205004,
+                  "VmRSS": 205004
+                }
+              },
+              {
+                "pid": 116983,
+                "gc": {
+                  "heap_live_slots": 480676,
+                  "old_objects": 368127,
+                  "malloc_increase_bytes": 8337234,
+                  "count": 131,
+                  "minor_gc_count": 100,
+                  "major_gc_count": 31,
+                  "total_allocated_objects": 27093168,
+                  "time": 3612
+                },
+                "rss": {
+                  "VmHWM": 204908,
+                  "VmRSS": 204908
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 3,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 348.897989317618,
+            "requests": 1758,
+            "elapsed_s": 5.038722073,
+            "errors": 0,
+            "status_counts": {
+              "200": 1758
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 37.16431,
+              "p90": 67.90623699999999,
+              "p99": 246.05337999999998
+            },
+            "raw_sha256": "98b76fb05d27a9056d97a5120cc050dfcb2fc796052026c6de9c0404fd50cc71"
+          },
+          "timed": {
+            "rps": 501.000654363925,
+            "requests": 10034,
+            "elapsed_s": 20.027917953,
+            "errors": 0,
+            "status_counts": {
+              "200": 10034
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 30.849449,
+              "p90": 44.628807,
+              "p99": 62.506634000000005
+            },
+            "raw_sha256": "b0ab43b3576f6eaa46b1a730111b12c36a5919bb21183de9fa0ce50617260acd"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              117091,
+              117096,
+              117105,
+              117114
+            ],
+            "attempts": 18,
+            "workers": [
+              {
+                "pid": 117091,
+                "gc": {
+                  "heap_live_slots": 475707,
+                  "old_objects": 367539,
+                  "malloc_increase_bytes": 2414930,
+                  "count": 47,
+                  "minor_gc_count": 41,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5390399,
+                  "time": 632
+                },
+                "rss": {
+                  "VmHWM": 201668,
+                  "VmRSS": 201668
+                }
+              },
+              {
+                "pid": 117096,
+                "gc": {
+                  "heap_live_slots": 469759,
+                  "old_objects": 373674,
+                  "malloc_increase_bytes": 511705,
+                  "count": 53,
+                  "minor_gc_count": 47,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6163993,
+                  "time": 680
+                },
+                "rss": {
+                  "VmHWM": 207060,
+                  "VmRSS": 207060
+                }
+              },
+              {
+                "pid": 117105,
+                "gc": {
+                  "heap_live_slots": 463616,
+                  "old_objects": 366504,
+                  "malloc_increase_bytes": 895944,
+                  "count": 47,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5351814,
+                  "time": 722
+                },
+                "rss": {
+                  "VmHWM": 202404,
+                  "VmRSS": 202404
+                }
+              },
+              {
+                "pid": 117114,
+                "gc": {
+                  "heap_live_slots": 469328,
+                  "old_objects": 370887,
+                  "malloc_increase_bytes": 719146,
+                  "count": 50,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5734821,
+                  "time": 662
+                },
+                "rss": {
+                  "VmHWM": 203512,
+                  "VmRSS": 203512
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              117091,
+              117096,
+              117105,
+              117114
+            ],
+            "attempts": 12,
+            "workers": [
+              {
+                "pid": 117091,
+                "gc": {
+                  "heap_live_slots": 464155,
+                  "old_objects": 366763,
+                  "malloc_increase_bytes": 542089,
+                  "count": 189,
+                  "minor_gc_count": 181,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 28254697,
+                  "time": 2003
+                },
+                "rss": {
+                  "VmHWM": 203440,
+                  "VmRSS": 203440
+                }
+              },
+              {
+                "pid": 117096,
+                "gc": {
+                  "heap_live_slots": 466292,
+                  "old_objects": 374234,
+                  "malloc_increase_bytes": 471004,
+                  "count": 203,
+                  "minor_gc_count": 197,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 29173150,
+                  "time": 1909
+                },
+                "rss": {
+                  "VmHWM": 208856,
+                  "VmRSS": 208856
+                }
+              },
+              {
+                "pid": 117105,
+                "gc": {
+                  "heap_live_slots": 467788,
+                  "old_objects": 366797,
+                  "malloc_increase_bytes": 1485024,
+                  "count": 187,
+                  "minor_gc_count": 171,
+                  "major_gc_count": 16,
+                  "total_allocated_objects": 27837726,
+                  "time": 2647
+                },
+                "rss": {
+                  "VmHWM": 204100,
+                  "VmRSS": 204100
+                }
+              },
+              {
+                "pid": 117114,
+                "gc": {
+                  "heap_live_slots": 463627,
+                  "old_objects": 367931,
+                  "malloc_increase_bytes": 316233,
+                  "count": 190,
+                  "minor_gc_count": 181,
+                  "major_gc_count": 9,
+                  "total_allocated_objects": 28083342,
+                  "time": 2111
+                },
+                "rss": {
+                  "VmHWM": 204772,
+                  "VmRSS": 204772
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 4,
+          "arm": "on",
+          "warmup": {
+            "rps": 365.9162803589661,
+            "requests": 1845,
+            "elapsed_s": 5.042136956,
+            "errors": 0,
+            "status_counts": {
+              "200": 1845
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 33.102983,
+              "p90": 81.245712,
+              "p99": 214.705947
+            },
+            "raw_sha256": "55c45d08a9723ccace57345e58b8da494b713669f57d5fb9deb18be13cc06441"
+          },
+          "timed": {
+            "rps": 495.36563718667327,
+            "requests": 9930,
+            "elapsed_s": 20.045799011,
+            "errors": 0,
+            "status_counts": {
+              "200": 9930
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 29.838141,
+              "p90": 52.510174,
+              "p99": 123.974791
+            },
+            "raw_sha256": "52286e3c303942509165fc3a4109f50bbdaa59e0d3d6e86602927911c04cbfa4"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              117738,
+              117743,
+              117747,
+              117751
+            ],
+            "attempts": 47,
+            "workers": [
+              {
+                "pid": 117738,
+                "gc": {
+                  "heap_live_slots": 492467,
+                  "old_objects": 367996,
+                  "malloc_increase_bytes": 4397178,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 6038725,
+                  "time": 1145
+                },
+                "rss": {
+                  "VmHWM": 205916,
+                  "VmRSS": 205916
+                }
+              },
+              {
+                "pid": 117743,
+                "gc": {
+                  "heap_live_slots": 568099,
+                  "old_objects": 366651,
+                  "malloc_increase_bytes": 7186757,
+                  "count": 44,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5694305,
+                  "time": 1132
+                },
+                "rss": {
+                  "VmHWM": 200684,
+                  "VmRSS": 200684
+                }
+              },
+              {
+                "pid": 117747,
+                "gc": {
+                  "heap_live_slots": 490971,
+                  "old_objects": 367835,
+                  "malloc_increase_bytes": 6907011,
+                  "count": 46,
+                  "minor_gc_count": 34,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 6059395,
+                  "time": 1157
+                },
+                "rss": {
+                  "VmHWM": 201592,
+                  "VmRSS": 201592
+                }
+              },
+              {
+                "pid": 117751,
+                "gc": {
+                  "heap_live_slots": 452096,
+                  "old_objects": 367985,
+                  "malloc_increase_bytes": 1615023,
+                  "count": 45,
+                  "minor_gc_count": 33,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5857055,
+                  "time": 1165
+                },
+                "rss": {
+                  "VmHWM": 199812,
+                  "VmRSS": 199812
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              117738,
+              117743,
+              117747,
+              117751
+            ],
+            "attempts": 22,
+            "workers": [
+              {
+                "pid": 117738,
+                "gc": {
+                  "heap_live_slots": 505876,
+                  "old_objects": 368081,
+                  "malloc_increase_bytes": 3092319,
+                  "count": 134,
+                  "minor_gc_count": 106,
+                  "major_gc_count": 28,
+                  "total_allocated_objects": 29005509,
+                  "time": 3280
+                },
+                "rss": {
+                  "VmHWM": 209156,
+                  "VmRSS": 209156
+                }
+              },
+              {
+                "pid": 117743,
+                "gc": {
+                  "heap_live_slots": 534767,
+                  "old_objects": 366906,
+                  "malloc_increase_bytes": 4671731,
+                  "count": 135,
+                  "minor_gc_count": 103,
+                  "major_gc_count": 32,
+                  "total_allocated_objects": 28185793,
+                  "time": 3594
+                },
+                "rss": {
+                  "VmHWM": 203708,
+                  "VmRSS": 203708
+                }
+              },
+              {
+                "pid": 117747,
+                "gc": {
+                  "heap_live_slots": 564284,
+                  "old_objects": 367926,
+                  "malloc_increase_bytes": 7457594,
+                  "count": 136,
+                  "minor_gc_count": 104,
+                  "major_gc_count": 32,
+                  "total_allocated_objects": 28367164,
+                  "time": 3643
+                },
+                "rss": {
+                  "VmHWM": 206084,
+                  "VmRSS": 206084
+                }
+              },
+              {
+                "pid": 117751,
+                "gc": {
+                  "heap_live_slots": 513468,
+                  "old_objects": 368022,
+                  "malloc_increase_bytes": 887618,
+                  "count": 135,
+                  "minor_gc_count": 103,
+                  "major_gc_count": 32,
+                  "total_allocated_objects": 28200536,
+                  "time": 3619
+                },
+                "rss": {
+                  "VmHWM": 202972,
+                  "VmRSS": 202972
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 4,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 354.04180919807266,
+            "requests": 1786,
+            "elapsed_s": 5.044601947,
+            "errors": 0,
+            "status_counts": {
+              "200": 1786
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 37.315201,
+              "p90": 73.669364,
+              "p99": 238.368984
+            },
+            "raw_sha256": "3d0857619115f819f06ac59429e36d2e885f59e41250609df46485382d8dcc95"
+          },
+          "timed": {
+            "rps": 507.8592950029131,
+            "requests": 10180,
+            "elapsed_s": 20.044922088,
+            "errors": 0,
+            "status_counts": {
+              "200": 10180
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 30.610941,
+              "p90": 44.723486,
+              "p99": 57.436067
+            },
+            "raw_sha256": "7cac16c533d14a6abc6e0cffecb77a8b4df582b5f4b7e1114f339601633c8834"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              117879,
+              117882,
+              117885,
+              117888
+            ],
+            "attempts": 16,
+            "workers": [
+              {
+                "pid": 117879,
+                "gc": {
+                  "heap_live_slots": 451286,
+                  "old_objects": 371311,
+                  "malloc_increase_bytes": 636658,
+                  "count": 59,
+                  "minor_gc_count": 53,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5996715,
+                  "time": 677
+                },
+                "rss": {
+                  "VmHWM": 204268,
+                  "VmRSS": 204268
+                }
+              },
+              {
+                "pid": 117882,
+                "gc": {
+                  "heap_live_slots": 447033,
+                  "old_objects": 370959,
+                  "malloc_increase_bytes": 1036200,
+                  "count": 56,
+                  "minor_gc_count": 50,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5732239,
+                  "time": 653
+                },
+                "rss": {
+                  "VmHWM": 200152,
+                  "VmRSS": 200152
+                }
+              },
+              {
+                "pid": 117885,
+                "gc": {
+                  "heap_live_slots": 477223,
+                  "old_objects": 370876,
+                  "malloc_increase_bytes": 1802133,
+                  "count": 54,
+                  "minor_gc_count": 48,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5399636,
+                  "time": 638
+                },
+                "rss": {
+                  "VmHWM": 199808,
+                  "VmRSS": 199808
+                }
+              },
+              {
+                "pid": 117888,
+                "gc": {
+                  "heap_live_slots": 458025,
+                  "old_objects": 367939,
+                  "malloc_increase_bytes": 1115807,
+                  "count": 53,
+                  "minor_gc_count": 47,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5396919,
+                  "time": 626
+                },
+                "rss": {
+                  "VmHWM": 198952,
+                  "VmRSS": 198952
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              117879,
+              117882,
+              117885,
+              117888
+            ],
+            "attempts": 21,
+            "workers": [
+              {
+                "pid": 117879,
+                "gc": {
+                  "heap_live_slots": 494223,
+                  "old_objects": 371466,
+                  "malloc_increase_bytes": 3788103,
+                  "count": 237,
+                  "minor_gc_count": 231,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 28912066,
+                  "time": 1975
+                },
+                "rss": {
+                  "VmHWM": 205544,
+                  "VmRSS": 205544
+                }
+              },
+              {
+                "pid": 117882,
+                "gc": {
+                  "heap_live_slots": 450150,
+                  "old_objects": 373363,
+                  "malloc_increase_bytes": 369308,
+                  "count": 237,
+                  "minor_gc_count": 231,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 28836224,
+                  "time": 1975
+                },
+                "rss": {
+                  "VmHWM": 200828,
+                  "VmRSS": 200828
+                }
+              },
+              {
+                "pid": 117885,
+                "gc": {
+                  "heap_live_slots": 468376,
+                  "old_objects": 371194,
+                  "malloc_increase_bytes": 2120719,
+                  "count": 229,
+                  "minor_gc_count": 223,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 28362041,
+                  "time": 1923
+                },
+                "rss": {
+                  "VmHWM": 200760,
+                  "VmRSS": 200760
+                }
+              },
+              {
+                "pid": 117888,
+                "gc": {
+                  "heap_live_slots": 488153,
+                  "old_objects": 368090,
+                  "malloc_increase_bytes": 187100,
+                  "count": 228,
+                  "minor_gc_count": 222,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 28638117,
+                  "time": 1904
+                },
+                "rss": {
+                  "VmHWM": 199864,
+                  "VmRSS": 199864
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 4,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 328.0706782386016,
+            "requests": 1655,
+            "elapsed_s": 5.044644675,
+            "errors": 0,
+            "status_counts": {
+              "200": 1655
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 35.957309,
+              "p90": 94.96162700000001,
+              "p99": 249.872574
+            },
+            "raw_sha256": "cb3bc133c6e8ad57184bc5a72731ebd8dc18ccc7531e644e0414d0839a79e49c"
+          },
+          "timed": {
+            "rps": 520.8301250913871,
+            "requests": 10447,
+            "elapsed_s": 20.058363556,
+            "errors": 0,
+            "status_counts": {
+              "200": 10447
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 31.576082,
+              "p90": 46.682966,
+              "p99": 60.775957999999996
+            },
+            "raw_sha256": "5376a483297bf073996b33dcb3eef65390428d4763069d1f0d44d2d9439c86ef"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              118007,
+              118012,
+              118017,
+              118025
+            ],
+            "attempts": 29,
+            "workers": [
+              {
+                "pid": 118007,
+                "gc": {
+                  "heap_live_slots": 487873,
+                  "old_objects": 369019,
+                  "malloc_increase_bytes": 2224369,
+                  "count": 52,
+                  "minor_gc_count": 46,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5373904,
+                  "time": 677
+                },
+                "rss": {
+                  "VmHWM": 200568,
+                  "VmRSS": 200568
+                }
+              },
+              {
+                "pid": 118012,
+                "gc": {
+                  "heap_live_slots": 491242,
+                  "old_objects": 371329,
+                  "malloc_increase_bytes": 3123523,
+                  "count": 53,
+                  "minor_gc_count": 47,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5479250,
+                  "time": 679
+                },
+                "rss": {
+                  "VmHWM": 200468,
+                  "VmRSS": 200468
+                }
+              },
+              {
+                "pid": 118017,
+                "gc": {
+                  "heap_live_slots": 508023,
+                  "old_objects": 369324,
+                  "malloc_increase_bytes": 4461944,
+                  "count": 51,
+                  "minor_gc_count": 45,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5256240,
+                  "time": 666
+                },
+                "rss": {
+                  "VmHWM": 201464,
+                  "VmRSS": 201464
+                }
+              },
+              {
+                "pid": 118025,
+                "gc": {
+                  "heap_live_slots": 454479,
+                  "old_objects": 370280,
+                  "malloc_increase_bytes": 1509864,
+                  "count": 52,
+                  "minor_gc_count": 45,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5282724,
+                  "time": 775
+                },
+                "rss": {
+                  "VmHWM": 204544,
+                  "VmRSS": 204544
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              118007,
+              118012,
+              118017,
+              118025
+            ],
+            "attempts": 18,
+            "workers": [
+              {
+                "pid": 118007,
+                "gc": {
+                  "heap_live_slots": 456907,
+                  "old_objects": 371633,
+                  "malloc_increase_bytes": 244825,
+                  "count": 230,
+                  "minor_gc_count": 224,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 28927208,
+                  "time": 1975
+                },
+                "rss": {
+                  "VmHWM": 201696,
+                  "VmRSS": 201696
+                }
+              },
+              {
+                "pid": 118012,
+                "gc": {
+                  "heap_live_slots": 485925,
+                  "old_objects": 367777,
+                  "malloc_increase_bytes": 2341147,
+                  "count": 230,
+                  "minor_gc_count": 223,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 29271823,
+                  "time": 2072
+                },
+                "rss": {
+                  "VmHWM": 201652,
+                  "VmRSS": 201652
+                }
+              },
+              {
+                "pid": 118017,
+                "gc": {
+                  "heap_live_slots": 448931,
+                  "old_objects": 368081,
+                  "malloc_increase_bytes": 1629106,
+                  "count": 219,
+                  "minor_gc_count": 212,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 28289228,
+                  "time": 2013
+                },
+                "rss": {
+                  "VmHWM": 202324,
+                  "VmRSS": 202324
+                }
+              },
+              {
+                "pid": 118025,
+                "gc": {
+                  "heap_live_slots": 505600,
+                  "old_objects": 370782,
+                  "malloc_increase_bytes": 3432347,
+                  "count": 221,
+                  "minor_gc_count": 213,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 28298524,
+                  "time": 2109
+                },
+                "rss": {
+                  "VmHWM": 206000,
+                  "VmRSS": 206000
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 5,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 357.81809214618596,
+            "requests": 1803,
+            "elapsed_s": 5.038873214,
+            "errors": 0,
+            "status_counts": {
+              "200": 1803
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 37.042706,
+              "p90": 72.97034199999999,
+              "p99": 230.13103700000002
+            },
+            "raw_sha256": "471b584552b9512ea930807019989147f3905bf3432f5fa272ace9f5211d26f0"
+          },
+          "timed": {
+            "rps": 485.25038517336554,
+            "requests": 9730,
+            "elapsed_s": 20.051503919,
+            "errors": 0,
+            "status_counts": {
+              "200": 9730
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 33.312076000000005,
+              "p90": 50.070678,
+              "p99": 75.167977
+            },
+            "raw_sha256": "a1477163dece29e0e6f5f64087e051f49dbd16c69a065c34338584e8cd294960"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              118670,
+              118675,
+              118680,
+              118689
+            ],
+            "attempts": 68,
+            "workers": [
+              {
+                "pid": 118670,
+                "gc": {
+                  "heap_live_slots": 464935,
+                  "old_objects": 366663,
+                  "malloc_increase_bytes": 1669206,
+                  "count": 47,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5287022,
+                  "time": 760
+                },
+                "rss": {
+                  "VmHWM": 202132,
+                  "VmRSS": 202132
+                }
+              },
+              {
+                "pid": 118675,
+                "gc": {
+                  "heap_live_slots": 520268,
+                  "old_objects": 368576,
+                  "malloc_increase_bytes": 8699136,
+                  "count": 51,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5985954,
+                  "time": 800
+                },
+                "rss": {
+                  "VmHWM": 212060,
+                  "VmRSS": 212060
+                }
+              },
+              {
+                "pid": 118680,
+                "gc": {
+                  "heap_live_slots": 508878,
+                  "old_objects": 369102,
+                  "malloc_increase_bytes": 5003155,
+                  "count": 48,
+                  "minor_gc_count": 41,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5491647,
+                  "time": 779
+                },
+                "rss": {
+                  "VmHWM": 202192,
+                  "VmRSS": 202192
+                }
+              },
+              {
+                "pid": 118689,
+                "gc": {
+                  "heap_live_slots": 470152,
+                  "old_objects": 373328,
+                  "malloc_increase_bytes": 975722,
+                  "count": 52,
+                  "minor_gc_count": 46,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 6059172,
+                  "time": 723
+                },
+                "rss": {
+                  "VmHWM": 203776,
+                  "VmRSS": 203776
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              118670,
+              118675,
+              118680,
+              118689
+            ],
+            "attempts": 57,
+            "workers": [
+              {
+                "pid": 118670,
+                "gc": {
+                  "heap_live_slots": 499199,
+                  "old_objects": 366912,
+                  "malloc_increase_bytes": 4565476,
+                  "count": 180,
+                  "minor_gc_count": 167,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 26729477,
+                  "time": 2408
+                },
+                "rss": {
+                  "VmHWM": 205072,
+                  "VmRSS": 205072
+                }
+              },
+              {
+                "pid": 118675,
+                "gc": {
+                  "heap_live_slots": 466775,
+                  "old_objects": 368238,
+                  "malloc_increase_bytes": 4206391,
+                  "count": 195,
+                  "minor_gc_count": 185,
+                  "major_gc_count": 10,
+                  "total_allocated_objects": 28849784,
+                  "time": 2262
+                },
+                "rss": {
+                  "VmHWM": 212760,
+                  "VmRSS": 212016
+                }
+              },
+              {
+                "pid": 118680,
+                "gc": {
+                  "heap_live_slots": 496738,
+                  "old_objects": 367084,
+                  "malloc_increase_bytes": 2075772,
+                  "count": 184,
+                  "minor_gc_count": 170,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 27245519,
+                  "time": 2539
+                },
+                "rss": {
+                  "VmHWM": 203964,
+                  "VmRSS": 203964
+                }
+              },
+              {
+                "pid": 118689,
+                "gc": {
+                  "heap_live_slots": 469268,
+                  "old_objects": 367981,
+                  "malloc_increase_bytes": 1700950,
+                  "count": 189,
+                  "minor_gc_count": 179,
+                  "major_gc_count": 10,
+                  "total_allocated_objects": 28156149,
+                  "time": 2263
+                },
+                "rss": {
+                  "VmHWM": 204592,
+                  "VmRSS": 204592
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 5,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 356.13963897865636,
+            "requests": 1792,
+            "elapsed_s": 5.031734196,
+            "errors": 0,
+            "status_counts": {
+              "200": 1792
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 36.101477,
+              "p90": 69.52312099999999,
+              "p99": 207.279044
+            },
+            "raw_sha256": "71612a16917e4a0bfc8bda92bbea46a300f466cd2aea886eb57c674b3b70ba75"
+          },
+          "timed": {
+            "rps": 516.7077090607821,
+            "requests": 10353,
+            "elapsed_s": 20.036472881,
+            "errors": 0,
+            "status_counts": {
+              "200": 10353
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 28.809195,
+              "p90": 48.835399,
+              "p99": 63.71873
+            },
+            "raw_sha256": "5ae2123973a06923b050a20489bb0bb22013c769b5b2a72b4ebd4db003d38066"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              118792,
+              118797,
+              118801,
+              118810
+            ],
+            "attempts": 85,
+            "workers": [
+              {
+                "pid": 118792,
+                "gc": {
+                  "heap_live_slots": 454928,
+                  "old_objects": 370325,
+                  "malloc_increase_bytes": 688835,
+                  "count": 55,
+                  "minor_gc_count": 49,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5671851,
+                  "time": 641
+                },
+                "rss": {
+                  "VmHWM": 197928,
+                  "VmRSS": 197928
+                }
+              },
+              {
+                "pid": 118797,
+                "gc": {
+                  "heap_live_slots": 451232,
+                  "old_objects": 369586,
+                  "malloc_increase_bytes": 1326237,
+                  "count": 57,
+                  "minor_gc_count": 51,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5981094,
+                  "time": 656
+                },
+                "rss": {
+                  "VmHWM": 204164,
+                  "VmRSS": 204164
+                }
+              },
+              {
+                "pid": 118801,
+                "gc": {
+                  "heap_live_slots": 497014,
+                  "old_objects": 368554,
+                  "malloc_increase_bytes": 11519683,
+                  "count": 53,
+                  "minor_gc_count": 47,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5460924,
+                  "time": 635
+                },
+                "rss": {
+                  "VmHWM": 207248,
+                  "VmRSS": 207248
+                }
+              },
+              {
+                "pid": 118810,
+                "gc": {
+                  "heap_live_slots": 508710,
+                  "old_objects": 367110,
+                  "malloc_increase_bytes": 3838402,
+                  "count": 50,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5167343,
+                  "time": 699
+                },
+                "rss": {
+                  "VmHWM": 199096,
+                  "VmRSS": 199096
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              118792,
+              118797,
+              118801,
+              118810
+            ],
+            "attempts": 52,
+            "workers": [
+              {
+                "pid": 118792,
+                "gc": {
+                  "heap_live_slots": 458788,
+                  "old_objects": 372806,
+                  "malloc_increase_bytes": 2253050,
+                  "count": 232,
+                  "minor_gc_count": 226,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 29361583,
+                  "time": 1904
+                },
+                "rss": {
+                  "VmHWM": 200092,
+                  "VmRSS": 200092
+                }
+              },
+              {
+                "pid": 118797,
+                "gc": {
+                  "heap_live_slots": 449761,
+                  "old_objects": 370167,
+                  "malloc_increase_bytes": 490887,
+                  "count": 228,
+                  "minor_gc_count": 222,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 29384688,
+                  "time": 1903
+                },
+                "rss": {
+                  "VmHWM": 205684,
+                  "VmRSS": 205684
+                }
+              },
+              {
+                "pid": 118801,
+                "gc": {
+                  "heap_live_slots": 449348,
+                  "old_objects": 366819,
+                  "malloc_increase_bytes": 5163386,
+                  "count": 223,
+                  "minor_gc_count": 216,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 28636321,
+                  "time": 1986
+                },
+                "rss": {
+                  "VmHWM": 207952,
+                  "VmRSS": 203492
+                }
+              },
+              {
+                "pid": 118810,
+                "gc": {
+                  "heap_live_slots": 468675,
+                  "old_objects": 367233,
+                  "malloc_increase_bytes": 1569105,
+                  "count": 220,
+                  "minor_gc_count": 213,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 28692660,
+                  "time": 1958
+                },
+                "rss": {
+                  "VmHWM": 200048,
+                  "VmRSS": 200048
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 5,
+          "arm": "on",
+          "warmup": {
+            "rps": 365.74755793022484,
+            "requests": 1848,
+            "elapsed_s": 5.052665315,
+            "errors": 0,
+            "status_counts": {
+              "200": 1848
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 34.113678,
+              "p90": 78.38104899999999,
+              "p99": 220.897268
+            },
+            "raw_sha256": "19f8eec076a187c29c07c07ff6006f93073c8583669b980788f3681404362fdc"
+          },
+          "timed": {
+            "rps": 488.5985103656827,
+            "requests": 9790,
+            "elapsed_s": 20.036901039,
+            "errors": 0,
+            "status_counts": {
+              "200": 9790
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 31.785976,
+              "p90": 48.944798999999996,
+              "p99": 123.229369
+            },
+            "raw_sha256": "70031401fbd3390b30f74e3cfe2dffd213748e218cd6fd975cf02532b1a7bea9"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              119487,
+              119492,
+              119496,
+              119501
+            ],
+            "attempts": 10,
+            "workers": [
+              {
+                "pid": 119487,
+                "gc": {
+                  "heap_live_slots": 469408,
+                  "old_objects": 367601,
+                  "malloc_increase_bytes": 2673553,
+                  "count": 43,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 6096983,
+                  "time": 1033
+                },
+                "rss": {
+                  "VmHWM": 204780,
+                  "VmRSS": 204780
+                }
+              },
+              {
+                "pid": 119492,
+                "gc": {
+                  "heap_live_slots": 428993,
+                  "old_objects": 366817,
+                  "malloc_increase_bytes": 734686,
+                  "count": 42,
+                  "minor_gc_count": 31,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5809157,
+                  "time": 1016
+                },
+                "rss": {
+                  "VmHWM": 200296,
+                  "VmRSS": 200296
+                }
+              },
+              {
+                "pid": 119496,
+                "gc": {
+                  "heap_live_slots": 450483,
+                  "old_objects": 367998,
+                  "malloc_increase_bytes": 2142890,
+                  "count": 43,
+                  "minor_gc_count": 31,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5927424,
+                  "time": 1111
+                },
+                "rss": {
+                  "VmHWM": 200324,
+                  "VmRSS": 200324
+                }
+              },
+              {
+                "pid": 119501,
+                "gc": {
+                  "heap_live_slots": 488495,
+                  "old_objects": 367860,
+                  "malloc_increase_bytes": 150732,
+                  "count": 43,
+                  "minor_gc_count": 31,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 6046849,
+                  "time": 1114
+                },
+                "rss": {
+                  "VmHWM": 202400,
+                  "VmRSS": 202400
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              119487,
+              119492,
+              119496,
+              119501
+            ],
+            "attempts": 68,
+            "workers": [
+              {
+                "pid": 119487,
+                "gc": {
+                  "heap_live_slots": 579130,
+                  "old_objects": 367853,
+                  "malloc_increase_bytes": 9794841,
+                  "count": 127,
+                  "minor_gc_count": 98,
+                  "major_gc_count": 29,
+                  "total_allocated_objects": 27712455,
+                  "time": 3377
+                },
+                "rss": {
+                  "VmHWM": 209452,
+                  "VmRSS": 209452
+                }
+              },
+              {
+                "pid": 119492,
+                "gc": {
+                  "heap_live_slots": 535632,
+                  "old_objects": 367097,
+                  "malloc_increase_bytes": 4472147,
+                  "count": 129,
+                  "minor_gc_count": 104,
+                  "major_gc_count": 25,
+                  "total_allocated_objects": 28331619,
+                  "time": 3045
+                },
+                "rss": {
+                  "VmHWM": 202792,
+                  "VmRSS": 202792
+                }
+              },
+              {
+                "pid": 119496,
+                "gc": {
+                  "heap_live_slots": 627320,
+                  "old_objects": 368027,
+                  "malloc_increase_bytes": 9388217,
+                  "count": 129,
+                  "minor_gc_count": 97,
+                  "major_gc_count": 32,
+                  "total_allocated_objects": 27778683,
+                  "time": 3607
+                },
+                "rss": {
+                  "VmHWM": 204384,
+                  "VmRSS": 204384
+                }
+              },
+              {
+                "pid": 119501,
+                "gc": {
+                  "heap_live_slots": 555885,
+                  "old_objects": 367908,
+                  "malloc_increase_bytes": 9636954,
+                  "count": 129,
+                  "minor_gc_count": 102,
+                  "major_gc_count": 27,
+                  "total_allocated_objects": 28277993,
+                  "time": 3213
+                },
+                "rss": {
+                  "VmHWM": 205796,
+                  "VmRSS": 205796
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 6,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 358.7845993296526,
+            "requests": 1810,
+            "elapsed_s": 5.044809625,
+            "errors": 0,
+            "status_counts": {
+              "200": 1810
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 35.522393,
+              "p90": 72.218975,
+              "p99": 214.446403
+            },
+            "raw_sha256": "7a96abea54e58c333bef67d7891bb3cf040aeb5c4e568ede87af43d9864e5525"
+          },
+          "timed": {
+            "rps": 497.6726161651716,
+            "requests": 9970,
+            "elapsed_s": 20.033250125,
+            "errors": 0,
+            "status_counts": {
+              "200": 9970
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 31.196998999999998,
+              "p90": 44.950822,
+              "p99": 65.664114
+            },
+            "raw_sha256": "6dff5e5377ffced4b5372bc3d399c91053e5f18eb0102f72c2d18c0dbcb5c53f"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              119629,
+              119633,
+              119638,
+              119642
+            ],
+            "attempts": 58,
+            "workers": [
+              {
+                "pid": 119629,
+                "gc": {
+                  "heap_live_slots": 461349,
+                  "old_objects": 373831,
+                  "malloc_increase_bytes": 2652686,
+                  "count": 51,
+                  "minor_gc_count": 45,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5861691,
+                  "time": 702
+                },
+                "rss": {
+                  "VmHWM": 203204,
+                  "VmRSS": 203204
+                }
+              },
+              {
+                "pid": 119633,
+                "gc": {
+                  "heap_live_slots": 467370,
+                  "old_objects": 367074,
+                  "malloc_increase_bytes": 2181578,
+                  "count": 48,
+                  "minor_gc_count": 41,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5481018,
+                  "time": 747
+                },
+                "rss": {
+                  "VmHWM": 202856,
+                  "VmRSS": 202856
+                }
+              },
+              {
+                "pid": 119638,
+                "gc": {
+                  "heap_live_slots": 464520,
+                  "old_objects": 371701,
+                  "malloc_increase_bytes": 388771,
+                  "count": 51,
+                  "minor_gc_count": 45,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5849970,
+                  "time": 695
+                },
+                "rss": {
+                  "VmHWM": 207076,
+                  "VmRSS": 207076
+                }
+              },
+              {
+                "pid": 119642,
+                "gc": {
+                  "heap_live_slots": 501582,
+                  "old_objects": 370020,
+                  "malloc_increase_bytes": 5098610,
+                  "count": 51,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5956246,
+                  "time": 772
+                },
+                "rss": {
+                  "VmHWM": 204544,
+                  "VmRSS": 204544
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              119629,
+              119633,
+              119638,
+              119642
+            ],
+            "attempts": 48,
+            "workers": [
+              {
+                "pid": 119629,
+                "gc": {
+                  "heap_live_slots": 469085,
+                  "old_objects": 368053,
+                  "malloc_increase_bytes": 2665335,
+                  "count": 189,
+                  "minor_gc_count": 175,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 28034074,
+                  "time": 2503
+                },
+                "rss": {
+                  "VmHWM": 205180,
+                  "VmRSS": 205180
+                }
+              },
+              {
+                "pid": 119633,
+                "gc": {
+                  "heap_live_slots": 468272,
+                  "old_objects": 366754,
+                  "malloc_increase_bytes": 3454607,
+                  "count": 189,
+                  "minor_gc_count": 176,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 28159224,
+                  "time": 2401
+                },
+                "rss": {
+                  "VmHWM": 205108,
+                  "VmRSS": 205108
+                }
+              },
+              {
+                "pid": 119638,
+                "gc": {
+                  "heap_live_slots": 505602,
+                  "old_objects": 374158,
+                  "malloc_increase_bytes": 1252967,
+                  "count": 197,
+                  "minor_gc_count": 191,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 28391623,
+                  "time": 1896
+                },
+                "rss": {
+                  "VmHWM": 208304,
+                  "VmRSS": 208304
+                }
+              },
+              {
+                "pid": 119642,
+                "gc": {
+                  "heap_live_slots": 474095,
+                  "old_objects": 367751,
+                  "malloc_increase_bytes": 1309754,
+                  "count": 193,
+                  "minor_gc_count": 180,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 28761495,
+                  "time": 2479
+                },
+                "rss": {
+                  "VmHWM": 205708,
+                  "VmRSS": 205708
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 6,
+          "arm": "on",
+          "warmup": {
+            "rps": 337.63647506221616,
+            "requests": 1710,
+            "elapsed_s": 5.064618684,
+            "errors": 0,
+            "status_counts": {
+              "200": 1710
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 37.823324,
+              "p90": 89.21399600000001,
+              "p99": 231.678261
+            },
+            "raw_sha256": "d2175b7d987ef9151fa8d3a9379fc0c559f24c592b30ebbf99682d2325dd8a6e"
+          },
+          "timed": {
+            "rps": 480.31230284763416,
+            "requests": 9646,
+            "elapsed_s": 20.082766864,
+            "errors": 0,
+            "status_counts": {
+              "200": 9646
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 29.755674,
+              "p90": 46.707049,
+              "p99": 122.428608
+            },
+            "raw_sha256": "bef672a5a18cfc85cc72b7fc4428a15724321c41c49581a046aa0ed493dbe2be"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              119752,
+              119756,
+              119761,
+              119766
+            ],
+            "attempts": 11,
+            "workers": [
+              {
+                "pid": 119752,
+                "gc": {
+                  "heap_live_slots": 478817,
+                  "old_objects": 367733,
+                  "malloc_increase_bytes": 2094350,
+                  "count": 45,
+                  "minor_gc_count": 34,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 6079402,
+                  "time": 1118
+                },
+                "rss": {
+                  "VmHWM": 205340,
+                  "VmRSS": 205340
+                }
+              },
+              {
+                "pid": 119756,
+                "gc": {
+                  "heap_live_slots": 458504,
+                  "old_objects": 366649,
+                  "malloc_increase_bytes": 159864,
+                  "count": 43,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5388003,
+                  "time": 1085
+                },
+                "rss": {
+                  "VmHWM": 200136,
+                  "VmRSS": 200136
+                }
+              },
+              {
+                "pid": 119761,
+                "gc": {
+                  "heap_live_slots": 466917,
+                  "old_objects": 368005,
+                  "malloc_increase_bytes": 2863084,
+                  "count": 43,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5400542,
+                  "time": 1091
+                },
+                "rss": {
+                  "VmHWM": 199640,
+                  "VmRSS": 199640
+                }
+              },
+              {
+                "pid": 119766,
+                "gc": {
+                  "heap_live_slots": 542119,
+                  "old_objects": 367665,
+                  "malloc_increase_bytes": 553545,
+                  "count": 44,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5541388,
+                  "time": 1174
+                },
+                "rss": {
+                  "VmHWM": 200192,
+                  "VmRSS": 200192
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              119752,
+              119756,
+              119761,
+              119766
+            ],
+            "attempts": 13,
+            "workers": [
+              {
+                "pid": 119752,
+                "gc": {
+                  "heap_live_slots": 450173,
+                  "old_objects": 367772,
+                  "malloc_increase_bytes": 1209895,
+                  "count": 131,
+                  "minor_gc_count": 103,
+                  "major_gc_count": 28,
+                  "total_allocated_objects": 28067568,
+                  "time": 3388
+                },
+                "rss": {
+                  "VmHWM": 207764,
+                  "VmRSS": 207764
+                }
+              },
+              {
+                "pid": 119756,
+                "gc": {
+                  "heap_live_slots": 424600,
+                  "old_objects": 366924,
+                  "malloc_increase_bytes": 1544058,
+                  "count": 131,
+                  "minor_gc_count": 100,
+                  "major_gc_count": 31,
+                  "total_allocated_objects": 27414723,
+                  "time": 3520
+                },
+                "rss": {
+                  "VmHWM": 203636,
+                  "VmRSS": 203636
+                }
+              },
+              {
+                "pid": 119761,
+                "gc": {
+                  "heap_live_slots": 508590,
+                  "old_objects": 368080,
+                  "malloc_increase_bytes": 3794194,
+                  "count": 129,
+                  "minor_gc_count": 97,
+                  "major_gc_count": 32,
+                  "total_allocated_objects": 26810943,
+                  "time": 3629
+                },
+                "rss": {
+                  "VmHWM": 203508,
+                  "VmRSS": 203508
+                }
+              },
+              {
+                "pid": 119766,
+                "gc": {
+                  "heap_live_slots": 553049,
+                  "old_objects": 367755,
+                  "malloc_increase_bytes": 387439,
+                  "count": 132,
+                  "minor_gc_count": 98,
+                  "major_gc_count": 34,
+                  "total_allocated_objects": 27357302,
+                  "time": 3736
+                },
+                "rss": {
+                  "VmHWM": 203516,
+                  "VmRSS": 203516
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 6,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 363.8581690078651,
+            "requests": 1834,
+            "elapsed_s": 5.040425518,
+            "errors": 0,
+            "status_counts": {
+              "200": 1834
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 31.75828,
+              "p90": 75.36443600000001,
+              "p99": 217.234969
+            },
+            "raw_sha256": "844e7295de26abdd4a111bafef82cf11d53414db4a220e1190ca15b80ef013e3"
+          },
+          "timed": {
+            "rps": 486.6119820383565,
+            "requests": 9757,
+            "elapsed_s": 20.050883168,
+            "errors": 0,
+            "status_counts": {
+              "200": 9757
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 31.724149,
+              "p90": 46.417487,
+              "p99": 73.98308800000001
+            },
+            "raw_sha256": "3d8f7c9bd5f06dd9d5af94245b461d8999b662efe7efd0980690eb459976f6ec"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              120417,
+              120422,
+              120428,
+              120436
+            ],
+            "attempts": 25,
+            "workers": [
+              {
+                "pid": 120417,
+                "gc": {
+                  "heap_live_slots": 470320,
+                  "old_objects": 369019,
+                  "malloc_increase_bytes": 1109611,
+                  "count": 50,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5763489,
+                  "time": 680
+                },
+                "rss": {
+                  "VmHWM": 203000,
+                  "VmRSS": 203000
+                }
+              },
+              {
+                "pid": 120422,
+                "gc": {
+                  "heap_live_slots": 499774,
+                  "old_objects": 370478,
+                  "malloc_increase_bytes": 2003148,
+                  "count": 51,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5964645,
+                  "time": 793
+                },
+                "rss": {
+                  "VmHWM": 207136,
+                  "VmRSS": 207136
+                }
+              },
+              {
+                "pid": 120428,
+                "gc": {
+                  "heap_live_slots": 499496,
+                  "old_objects": 369877,
+                  "malloc_increase_bytes": 806247,
+                  "count": 49,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5568520,
+                  "time": 674
+                },
+                "rss": {
+                  "VmHWM": 202100,
+                  "VmRSS": 202100
+                }
+              },
+              {
+                "pid": 120436,
+                "gc": {
+                  "heap_live_slots": 456444,
+                  "old_objects": 367425,
+                  "malloc_increase_bytes": 2416460,
+                  "count": 49,
+                  "minor_gc_count": 42,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5627488,
+                  "time": 765
+                },
+                "rss": {
+                  "VmHWM": 201816,
+                  "VmRSS": 201816
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              120417,
+              120422,
+              120428,
+              120436
+            ],
+            "attempts": 6,
+            "workers": [
+              {
+                "pid": 120417,
+                "gc": {
+                  "heap_live_slots": 478004,
+                  "old_objects": 367755,
+                  "malloc_increase_bytes": 1484103,
+                  "count": 191,
+                  "minor_gc_count": 181,
+                  "major_gc_count": 10,
+                  "total_allocated_objects": 28557207,
+                  "time": 2214
+                },
+                "rss": {
+                  "VmHWM": 204428,
+                  "VmRSS": 204428
+                }
+              },
+              {
+                "pid": 120422,
+                "gc": {
+                  "heap_live_slots": 463748,
+                  "old_objects": 368191,
+                  "malloc_increase_bytes": 395841,
+                  "count": 189,
+                  "minor_gc_count": 176,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 27769610,
+                  "time": 2487
+                },
+                "rss": {
+                  "VmHWM": 208764,
+                  "VmRSS": 208764
+                }
+              },
+              {
+                "pid": 120428,
+                "gc": {
+                  "heap_live_slots": 473698,
+                  "old_objects": 370220,
+                  "malloc_increase_bytes": 425681,
+                  "count": 182,
+                  "minor_gc_count": 176,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 26631051,
+                  "time": 1845
+                },
+                "rss": {
+                  "VmHWM": 203336,
+                  "VmRSS": 203336
+                }
+              },
+              {
+                "pid": 120436,
+                "gc": {
+                  "heap_live_slots": 493407,
+                  "old_objects": 367062,
+                  "malloc_increase_bytes": 2724438,
+                  "count": 185,
+                  "minor_gc_count": 171,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 27726724,
+                  "time": 2506
+                },
+                "rss": {
+                  "VmHWM": 203840,
+                  "VmRSS": 203840
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 7,
+          "arm": "on",
+          "warmup": {
+            "rps": 348.7366478550708,
+            "requests": 1760,
+            "elapsed_s": 5.046788202,
+            "errors": 0,
+            "status_counts": {
+              "200": 1760
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 34.13055,
+              "p90": 85.960461,
+              "p99": 238.852534
+            },
+            "raw_sha256": "9fbd69295d250e6a25b4226a250897776bbbd9c77b89ede4c8c6298682fa9a56"
+          },
+          "timed": {
+            "rps": 444.2101919513974,
+            "requests": 8925,
+            "elapsed_s": 20.091839768,
+            "errors": 0,
+            "status_counts": {
+              "200": 8925
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 34.309148,
+              "p90": 54.178360000000005,
+              "p99": 133.615226
+            },
+            "raw_sha256": "fef4ce87454a07980a263adeb1817f5e5000822858e10b31c40ac66bae185e70"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              120540,
+              120545,
+              120550,
+              120558
+            ],
+            "attempts": 13,
+            "workers": [
+              {
+                "pid": 120540,
+                "gc": {
+                  "heap_live_slots": 530984,
+                  "old_objects": 367999,
+                  "malloc_increase_bytes": 5837532,
+                  "count": 47,
+                  "minor_gc_count": 35,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5964179,
+                  "time": 1143
+                },
+                "rss": {
+                  "VmHWM": 204936,
+                  "VmRSS": 204936
+                }
+              },
+              {
+                "pid": 120545,
+                "gc": {
+                  "heap_live_slots": 479380,
+                  "old_objects": 368016,
+                  "malloc_increase_bytes": 2562499,
+                  "count": 47,
+                  "minor_gc_count": 35,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5805237,
+                  "time": 1132
+                },
+                "rss": {
+                  "VmHWM": 199616,
+                  "VmRSS": 199616
+                }
+              },
+              {
+                "pid": 120550,
+                "gc": {
+                  "heap_live_slots": 506521,
+                  "old_objects": 366846,
+                  "malloc_increase_bytes": 3888764,
+                  "count": 44,
+                  "minor_gc_count": 32,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5092678,
+                  "time": 1138
+                },
+                "rss": {
+                  "VmHWM": 198452,
+                  "VmRSS": 198452
+                }
+              },
+              {
+                "pid": 120558,
+                "gc": {
+                  "heap_live_slots": 539905,
+                  "old_objects": 367692,
+                  "malloc_increase_bytes": 961938,
+                  "count": 48,
+                  "minor_gc_count": 35,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 5919802,
+                  "time": 1219
+                },
+                "rss": {
+                  "VmHWM": 200116,
+                  "VmRSS": 200116
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              120540,
+              120545,
+              120550,
+              120558
+            ],
+            "attempts": 6,
+            "workers": [
+              {
+                "pid": 120540,
+                "gc": {
+                  "heap_live_slots": 516046,
+                  "old_objects": 368065,
+                  "malloc_increase_bytes": 3534095,
+                  "count": 126,
+                  "minor_gc_count": 95,
+                  "major_gc_count": 31,
+                  "total_allocated_objects": 25782547,
+                  "time": 3645
+                },
+                "rss": {
+                  "VmHWM": 208200,
+                  "VmRSS": 208200
+                }
+              },
+              {
+                "pid": 120545,
+                "gc": {
+                  "heap_live_slots": 426662,
+                  "old_objects": 368025,
+                  "malloc_increase_bytes": 760678,
+                  "count": 129,
+                  "minor_gc_count": 96,
+                  "major_gc_count": 33,
+                  "total_allocated_objects": 25934797,
+                  "time": 3714
+                },
+                "rss": {
+                  "VmHWM": 202476,
+                  "VmRSS": 202476
+                }
+              },
+              {
+                "pid": 120550,
+                "gc": {
+                  "heap_live_slots": 505453,
+                  "old_objects": 366940,
+                  "malloc_increase_bytes": 173194,
+                  "count": 126,
+                  "minor_gc_count": 94,
+                  "major_gc_count": 32,
+                  "total_allocated_objects": 24853352,
+                  "time": 3676
+                },
+                "rss": {
+                  "VmHWM": 201660,
+                  "VmRSS": 201660
+                }
+              },
+              {
+                "pid": 120558,
+                "gc": {
+                  "heap_live_slots": 626899,
+                  "old_objects": 367964,
+                  "malloc_increase_bytes": 8356363,
+                  "count": 130,
+                  "minor_gc_count": 98,
+                  "major_gc_count": 32,
+                  "total_allocated_objects": 26394309,
+                  "time": 3688
+                },
+                "rss": {
+                  "VmHWM": 204124,
+                  "VmRSS": 204124
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 7,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 285.076914468661,
+            "requests": 1443,
+            "elapsed_s": 5.061791842,
+            "errors": 0,
+            "status_counts": {
+              "200": 1443
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 44.984339,
+              "p90": 84.33770799999999,
+              "p99": 261.578859
+            },
+            "raw_sha256": "a149a30ab243e3f039ce6c4f18f5b87a7fb6fde1f5dee736becca1e470693973"
+          },
+          "timed": {
+            "rps": 421.2166845189246,
+            "requests": 8445,
+            "elapsed_s": 20.049063369,
+            "errors": 0,
+            "status_counts": {
+              "200": 8445
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 37.145351,
+              "p90": 49.290253,
+              "p99": 66.359724
+            },
+            "raw_sha256": "45a5c44b085a2ca0a3496aad612331815f1c94354eb48934ce6e052dc19f17dd"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              121187,
+              121192,
+              121201,
+              121210
+            ],
+            "attempts": 16,
+            "workers": [
+              {
+                "pid": 121187,
+                "gc": {
+                  "heap_live_slots": 450298,
+                  "old_objects": 368968,
+                  "malloc_increase_bytes": 192882,
+                  "count": 50,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4426491,
+                  "time": 677
+                },
+                "rss": {
+                  "VmHWM": 198584,
+                  "VmRSS": 198584
+                }
+              },
+              {
+                "pid": 121192,
+                "gc": {
+                  "heap_live_slots": 441227,
+                  "old_objects": 367902,
+                  "malloc_increase_bytes": 1891455,
+                  "count": 52,
+                  "minor_gc_count": 46,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4859558,
+                  "time": 689
+                },
+                "rss": {
+                  "VmHWM": 198348,
+                  "VmRSS": 198348
+                }
+              },
+              {
+                "pid": 121201,
+                "gc": {
+                  "heap_live_slots": 450421,
+                  "old_objects": 370919,
+                  "malloc_increase_bytes": 408498,
+                  "count": 57,
+                  "minor_gc_count": 51,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5166566,
+                  "time": 697
+                },
+                "rss": {
+                  "VmHWM": 202152,
+                  "VmRSS": 202152
+                }
+              },
+              {
+                "pid": 121210,
+                "gc": {
+                  "heap_live_slots": 446653,
+                  "old_objects": 371182,
+                  "malloc_increase_bytes": 962544,
+                  "count": 58,
+                  "minor_gc_count": 52,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5058621,
+                  "time": 694
+                },
+                "rss": {
+                  "VmHWM": 198948,
+                  "VmRSS": 198948
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              121187,
+              121192,
+              121201,
+              121210
+            ],
+            "attempts": 30,
+            "workers": [
+              {
+                "pid": 121187,
+                "gc": {
+                  "heap_live_slots": 450040,
+                  "old_objects": 371392,
+                  "malloc_increase_bytes": 1639383,
+                  "count": 228,
+                  "minor_gc_count": 222,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 23608829,
+                  "time": 2013
+                },
+                "rss": {
+                  "VmHWM": 200012,
+                  "VmRSS": 200012
+                }
+              },
+              {
+                "pid": 121192,
+                "gc": {
+                  "heap_live_slots": 469425,
+                  "old_objects": 368473,
+                  "malloc_increase_bytes": 1876722,
+                  "count": 221,
+                  "minor_gc_count": 215,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 24576179,
+                  "time": 1989
+                },
+                "rss": {
+                  "VmHWM": 199760,
+                  "VmRSS": 199760
+                }
+              },
+              {
+                "pid": 121201,
+                "gc": {
+                  "heap_live_slots": 449848,
+                  "old_objects": 371461,
+                  "malloc_increase_bytes": 2317748,
+                  "count": 230,
+                  "minor_gc_count": 224,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 23912392,
+                  "time": 2015
+                },
+                "rss": {
+                  "VmHWM": 204256,
+                  "VmRSS": 204256
+                }
+              },
+              {
+                "pid": 121210,
+                "gc": {
+                  "heap_live_slots": 457121,
+                  "old_objects": 371344,
+                  "malloc_increase_bytes": 1011808,
+                  "count": 249,
+                  "minor_gc_count": 243,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 24221598,
+                  "time": 2070
+                },
+                "rss": {
+                  "VmHWM": 199960,
+                  "VmRSS": 199960
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 7,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 286.5701135851735,
+            "requests": 1449,
+            "elapsed_s": 5.056354209,
+            "errors": 0,
+            "status_counts": {
+              "200": 1449
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 45.266996,
+              "p90": 87.676465,
+              "p99": 253.01634499999997
+            },
+            "raw_sha256": "26831002bf784abed3961efef05464f18c1f601f2b719405252ed87e768eef08"
+          },
+          "timed": {
+            "rps": 421.8646809955689,
+            "requests": 8454,
+            "elapsed_s": 20.039601277,
+            "errors": 0,
+            "status_counts": {
+              "200": 8454
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 38.974574,
+              "p90": 56.993057,
+              "p99": 78.182366
+            },
+            "raw_sha256": "21e11af068eab1de1599a2349436e5a7c6307f2b2e5f630d5bdc6cbbf1d3afcc"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              121327,
+              121332,
+              121337,
+              121346
+            ],
+            "attempts": 9,
+            "workers": [
+              {
+                "pid": 121327,
+                "gc": {
+                  "heap_live_slots": 434750,
+                  "old_objects": 368870,
+                  "malloc_increase_bytes": 582946,
+                  "count": 49,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4818671,
+                  "time": 675
+                },
+                "rss": {
+                  "VmHWM": 200276,
+                  "VmRSS": 200276
+                }
+              },
+              {
+                "pid": 121332,
+                "gc": {
+                  "heap_live_slots": 445251,
+                  "old_objects": 371327,
+                  "malloc_increase_bytes": 513765,
+                  "count": 54,
+                  "minor_gc_count": 48,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5345729,
+                  "time": 692
+                },
+                "rss": {
+                  "VmHWM": 204220,
+                  "VmRSS": 204220
+                }
+              },
+              {
+                "pid": 121337,
+                "gc": {
+                  "heap_live_slots": 475794,
+                  "old_objects": 368965,
+                  "malloc_increase_bytes": 1948101,
+                  "count": 48,
+                  "minor_gc_count": 42,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4782726,
+                  "time": 652
+                },
+                "rss": {
+                  "VmHWM": 199052,
+                  "VmRSS": 199052
+                }
+              },
+              {
+                "pid": 121346,
+                "gc": {
+                  "heap_live_slots": 439161,
+                  "old_objects": 369208,
+                  "malloc_increase_bytes": 332683,
+                  "count": 49,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4869508,
+                  "time": 677
+                },
+                "rss": {
+                  "VmHWM": 199564,
+                  "VmRSS": 199564
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              121327,
+              121332,
+              121337,
+              121346
+            ],
+            "attempts": 54,
+            "workers": [
+              {
+                "pid": 121327,
+                "gc": {
+                  "heap_live_slots": 476365,
+                  "old_objects": 369163,
+                  "malloc_increase_bytes": 1565123,
+                  "count": 191,
+                  "minor_gc_count": 185,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 23769542,
+                  "time": 1873
+                },
+                "rss": {
+                  "VmHWM": 201816,
+                  "VmRSS": 201816
+                }
+              },
+              {
+                "pid": 121332,
+                "gc": {
+                  "heap_live_slots": 461069,
+                  "old_objects": 374642,
+                  "malloc_increase_bytes": 1817535,
+                  "count": 204,
+                  "minor_gc_count": 198,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 24149749,
+                  "time": 1895
+                },
+                "rss": {
+                  "VmHWM": 205488,
+                  "VmRSS": 205488
+                }
+              },
+              {
+                "pid": 121337,
+                "gc": {
+                  "heap_live_slots": 498470,
+                  "old_objects": 369275,
+                  "malloc_increase_bytes": 6306935,
+                  "count": 189,
+                  "minor_gc_count": 183,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 23855288,
+                  "time": 1838
+                },
+                "rss": {
+                  "VmHWM": 203828,
+                  "VmRSS": 203828
+                }
+              },
+              {
+                "pid": 121346,
+                "gc": {
+                  "heap_live_slots": 461812,
+                  "old_objects": 372485,
+                  "malloc_increase_bytes": 1727921,
+                  "count": 196,
+                  "minor_gc_count": 190,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 24575765,
+                  "time": 1878
+                },
+                "rss": {
+                  "VmHWM": 201012,
+                  "VmRSS": 201012
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 8,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 309.7585524577377,
+            "requests": 1571,
+            "elapsed_s": 5.071692089,
+            "errors": 0,
+            "status_counts": {
+              "200": 1571
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 39.091018999999996,
+              "p90": 85.72191099999999,
+              "p99": 262.18267000000003
+            },
+            "raw_sha256": "6ee2d6dbc721d483e803e1358a088dd5771d5616b7a3b7feb99a0bbde4e4b911"
+          },
+          "timed": {
+            "rps": 426.39155800217384,
+            "requests": 8549,
+            "elapsed_s": 20.04964648,
+            "errors": 0,
+            "status_counts": {
+              "200": 8549
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 39.727979,
+              "p90": 59.212098,
+              "p99": 99.98296099999999
+            },
+            "raw_sha256": "bc9b19ca5775c3eb2a077dea970e3b1a16c637b7e4c67e9fc34d36438908a5fe"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              121452,
+              121457,
+              121462,
+              121471
+            ],
+            "attempts": 6,
+            "workers": [
+              {
+                "pid": 121452,
+                "gc": {
+                  "heap_live_slots": 522904,
+                  "old_objects": 366784,
+                  "malloc_increase_bytes": 418449,
+                  "count": 44,
+                  "minor_gc_count": 36,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 4774862,
+                  "time": 814
+                },
+                "rss": {
+                  "VmHWM": 201364,
+                  "VmRSS": 201364
+                }
+              },
+              {
+                "pid": 121457,
+                "gc": {
+                  "heap_live_slots": 445634,
+                  "old_objects": 368628,
+                  "malloc_increase_bytes": 464198,
+                  "count": 47,
+                  "minor_gc_count": 41,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5328485,
+                  "time": 685
+                },
+                "rss": {
+                  "VmHWM": 203340,
+                  "VmRSS": 203340
+                }
+              },
+              {
+                "pid": 121462,
+                "gc": {
+                  "heap_live_slots": 462010,
+                  "old_objects": 369888,
+                  "malloc_increase_bytes": 432263,
+                  "count": 46,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5106065,
+                  "time": 665
+                },
+                "rss": {
+                  "VmHWM": 201776,
+                  "VmRSS": 201776
+                }
+              },
+              {
+                "pid": 121471,
+                "gc": {
+                  "heap_live_slots": 454483,
+                  "old_objects": 371359,
+                  "malloc_increase_bytes": 822417,
+                  "count": 50,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5764789,
+                  "time": 723
+                },
+                "rss": {
+                  "VmHWM": 207072,
+                  "VmRSS": 207072
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              121452,
+              121457,
+              121462,
+              121471
+            ],
+            "attempts": 9,
+            "workers": [
+              {
+                "pid": 121452,
+                "gc": {
+                  "heap_live_slots": 454221,
+                  "old_objects": 366863,
+                  "malloc_increase_bytes": 657804,
+                  "count": 164,
+                  "minor_gc_count": 150,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 24461812,
+                  "time": 2439
+                },
+                "rss": {
+                  "VmHWM": 202320,
+                  "VmRSS": 202320
+                }
+              },
+              {
+                "pid": 121457,
+                "gc": {
+                  "heap_live_slots": 481921,
+                  "old_objects": 368075,
+                  "malloc_increase_bytes": 1847114,
+                  "count": 175,
+                  "minor_gc_count": 164,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 25892422,
+                  "time": 2263
+                },
+                "rss": {
+                  "VmHWM": 204500,
+                  "VmRSS": 204500
+                }
+              },
+              {
+                "pid": 121462,
+                "gc": {
+                  "heap_live_slots": 519369,
+                  "old_objects": 366931,
+                  "malloc_increase_bytes": 3193523,
+                  "count": 163,
+                  "minor_gc_count": 150,
+                  "major_gc_count": 13,
+                  "total_allocated_objects": 23965390,
+                  "time": 2396
+                },
+                "rss": {
+                  "VmHWM": 203540,
+                  "VmRSS": 203540
+                }
+              },
+              {
+                "pid": 121471,
+                "gc": {
+                  "heap_live_slots": 456842,
+                  "old_objects": 370505,
+                  "malloc_increase_bytes": 482068,
+                  "count": 166,
+                  "minor_gc_count": 152,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 24219476,
+                  "time": 2532
+                },
+                "rss": {
+                  "VmHWM": 209112,
+                  "VmRSS": 209112
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 8,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 281.9554652330104,
+            "requests": 1422,
+            "elapsed_s": 5.043349661,
+            "errors": 0,
+            "status_counts": {
+              "200": 1422
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 43.292322,
+              "p90": 93.419533,
+              "p99": 276.05832200000003
+            },
+            "raw_sha256": "6bc133c0e49346f7a3116ee5652bad349dcb72f9f9d216e743c489f57fd98b38"
+          },
+          "timed": {
+            "rps": 413.39126937731754,
+            "requests": 8291,
+            "elapsed_s": 20.056059753,
+            "errors": 0,
+            "status_counts": {
+              "200": 8291
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 38.40768,
+              "p90": 57.083163,
+              "p99": 106.51920199999999
+            },
+            "raw_sha256": "b71e803481d2ccee2a48316ba07a74ac85d659e7b9dbcb7003c634d55392aa37"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              122118,
+              122123,
+              122127,
+              122136
+            ],
+            "attempts": 32,
+            "workers": [
+              {
+                "pid": 122118,
+                "gc": {
+                  "heap_live_slots": 481579,
+                  "old_objects": 369449,
+                  "malloc_increase_bytes": 2473661,
+                  "count": 46,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5207801,
+                  "time": 908
+                },
+                "rss": {
+                  "VmHWM": 206252,
+                  "VmRSS": 206252
+                }
+              },
+              {
+                "pid": 122123,
+                "gc": {
+                  "heap_live_slots": 502168,
+                  "old_objects": 367972,
+                  "malloc_increase_bytes": 2205700,
+                  "count": 42,
+                  "minor_gc_count": 35,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 4572978,
+                  "time": 984
+                },
+                "rss": {
+                  "VmHWM": 201192,
+                  "VmRSS": 201192
+                }
+              },
+              {
+                "pid": 122127,
+                "gc": {
+                  "heap_live_slots": 476003,
+                  "old_objects": 368942,
+                  "malloc_increase_bytes": 3801751,
+                  "count": 42,
+                  "minor_gc_count": 35,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 4545306,
+                  "time": 940
+                },
+                "rss": {
+                  "VmHWM": 202868,
+                  "VmRSS": 202868
+                }
+              },
+              {
+                "pid": 122136,
+                "gc": {
+                  "heap_live_slots": 460466,
+                  "old_objects": 370894,
+                  "malloc_increase_bytes": 1135417,
+                  "count": 45,
+                  "minor_gc_count": 39,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4971557,
+                  "time": 892
+                },
+                "rss": {
+                  "VmHWM": 203036,
+                  "VmRSS": 203036
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              122118,
+              122123,
+              122127,
+              122136
+            ],
+            "attempts": 21,
+            "workers": [
+              {
+                "pid": 122118,
+                "gc": {
+                  "heap_live_slots": 467810,
+                  "old_objects": 368194,
+                  "malloc_increase_bytes": 478286,
+                  "count": 164,
+                  "minor_gc_count": 150,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 24093421,
+                  "time": 2738
+                },
+                "rss": {
+                  "VmHWM": 208340,
+                  "VmRSS": 208340
+                }
+              },
+              {
+                "pid": 122123,
+                "gc": {
+                  "heap_live_slots": 467988,
+                  "old_objects": 368012,
+                  "malloc_increase_bytes": 1703422,
+                  "count": 157,
+                  "minor_gc_count": 143,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 22970347,
+                  "time": 2721
+                },
+                "rss": {
+                  "VmHWM": 202456,
+                  "VmRSS": 202456
+                }
+              },
+              {
+                "pid": 122127,
+                "gc": {
+                  "heap_live_slots": 520821,
+                  "old_objects": 366906,
+                  "malloc_increase_bytes": 442634,
+                  "count": 160,
+                  "minor_gc_count": 146,
+                  "major_gc_count": 14,
+                  "total_allocated_objects": 23388892,
+                  "time": 2701
+                },
+                "rss": {
+                  "VmHWM": 204788,
+                  "VmRSS": 204788
+                }
+              },
+              {
+                "pid": 122136,
+                "gc": {
+                  "heap_live_slots": 492328,
+                  "old_objects": 372535,
+                  "malloc_increase_bytes": 2815646,
+                  "count": 164,
+                  "minor_gc_count": 153,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 24001729,
+                  "time": 2453
+                },
+                "rss": {
+                  "VmHWM": 204260,
+                  "VmRSS": 204260
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 8,
+          "arm": "on",
+          "warmup": {
+            "rps": 281.8302156479033,
+            "requests": 1423,
+            "elapsed_s": 5.049139237,
+            "errors": 0,
+            "status_counts": {
+              "200": 1423
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 42.281011,
+              "p90": 96.809866,
+              "p99": 324.865861
+            },
+            "raw_sha256": "ecc1fd03e559a968670a98eb4d7be79691e4dd661aacb8f932ba71f98f907c76"
+          },
+          "timed": {
+            "rps": 434.17439260157266,
+            "requests": 8733,
+            "elapsed_s": 20.114037467,
+            "errors": 0,
+            "status_counts": {
+              "200": 8733
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 33.454541,
+              "p90": 49.970613,
+              "p99": 129.76406100000003
+            },
+            "raw_sha256": "66329d47503368878b516cb26b52103a0827ab32fcc6b1ce658d8b65e82d4a07"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              122240,
+              122245,
+              122249,
+              122254
+            ],
+            "attempts": 11,
+            "workers": [
+              {
+                "pid": 122240,
+                "gc": {
+                  "heap_live_slots": 473293,
+                  "old_objects": 367981,
+                  "malloc_increase_bytes": 150804,
+                  "count": 39,
+                  "minor_gc_count": 28,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5098438,
+                  "time": 1223
+                },
+                "rss": {
+                  "VmHWM": 206104,
+                  "VmRSS": 206104
+                }
+              },
+              {
+                "pid": 122245,
+                "gc": {
+                  "heap_live_slots": 535423,
+                  "old_objects": 367995,
+                  "malloc_increase_bytes": 5130866,
+                  "count": 38,
+                  "minor_gc_count": 27,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 4809344,
+                  "time": 1214
+                },
+                "rss": {
+                  "VmHWM": 199812,
+                  "VmRSS": 199812
+                }
+              },
+              {
+                "pid": 122249,
+                "gc": {
+                  "heap_live_slots": 570815,
+                  "old_objects": 367031,
+                  "malloc_increase_bytes": 7089048,
+                  "count": 39,
+                  "minor_gc_count": 28,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5143926,
+                  "time": 1191
+                },
+                "rss": {
+                  "VmHWM": 199224,
+                  "VmRSS": 199224
+                }
+              },
+              {
+                "pid": 122254,
+                "gc": {
+                  "heap_live_slots": 505448,
+                  "old_objects": 367616,
+                  "malloc_increase_bytes": 3706375,
+                  "count": 38,
+                  "minor_gc_count": 27,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 4864139,
+                  "time": 1218
+                },
+                "rss": {
+                  "VmHWM": 201872,
+                  "VmRSS": 201872
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              122240,
+              122245,
+              122249,
+              122254
+            ],
+            "attempts": 6,
+            "workers": [
+              {
+                "pid": 122240,
+                "gc": {
+                  "heap_live_slots": 488900,
+                  "old_objects": 368025,
+                  "malloc_increase_bytes": 3051935,
+                  "count": 115,
+                  "minor_gc_count": 91,
+                  "major_gc_count": 24,
+                  "total_allocated_objects": 24839744,
+                  "time": 3220
+                },
+                "rss": {
+                  "VmHWM": 207556,
+                  "VmRSS": 207556
+                }
+              },
+              {
+                "pid": 122245,
+                "gc": {
+                  "heap_live_slots": 607281,
+                  "old_objects": 233293,
+                  "malloc_increase_bytes": 1217864,
+                  "count": 120,
+                  "minor_gc_count": 92,
+                  "major_gc_count": 28,
+                  "total_allocated_objects": 25340729,
+                  "time": 3422
+                },
+                "rss": {
+                  "VmHWM": 203536,
+                  "VmRSS": 203536
+                }
+              },
+              {
+                "pid": 122249,
+                "gc": {
+                  "heap_live_slots": 556839,
+                  "old_objects": 367152,
+                  "malloc_increase_bytes": 384647,
+                  "count": 119,
+                  "minor_gc_count": 89,
+                  "major_gc_count": 30,
+                  "total_allocated_objects": 25194312,
+                  "time": 3631
+                },
+                "rss": {
+                  "VmHWM": 202808,
+                  "VmRSS": 202808
+                }
+              },
+              {
+                "pid": 122254,
+                "gc": {
+                  "heap_live_slots": 573649,
+                  "old_objects": 367674,
+                  "malloc_increase_bytes": 6296600,
+                  "count": 112,
+                  "minor_gc_count": 86,
+                  "major_gc_count": 26,
+                  "total_allocated_objects": 23755844,
+                  "time": 3415
+                },
+                "rss": {
+                  "VmHWM": 204112,
+                  "VmRSS": 204112
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 9,
+          "arm": "off_a",
+          "warmup": {
+            "rps": 298.71542327338295,
+            "requests": 1503,
+            "elapsed_s": 5.031544684,
+            "errors": 0,
+            "status_counts": {
+              "200": 1503
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 42.867722,
+              "p90": 97.46499899999999,
+              "p99": 290.535483
+            },
+            "raw_sha256": "7abea39f760ec8c2f914d1da4b2731e55e2afdf9f57f51675e462bfd5f2b80bf"
+          },
+          "timed": {
+            "rps": 461.6826838335157,
+            "requests": 9251,
+            "elapsed_s": 20.03757196,
+            "errors": 0,
+            "status_counts": {
+              "200": 9251
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 33.688347,
+              "p90": 44.896305999999996,
+              "p99": 62.273944
+            },
+            "raw_sha256": "66d3a6ecce5c62a1cf6e616489a13640f09930c0a801f43e90e9952e31645e36"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              122954,
+              122959,
+              122964,
+              122973
+            ],
+            "attempts": 131,
+            "workers": [
+              {
+                "pid": 122954,
+                "gc": {
+                  "heap_live_slots": 479549,
+                  "old_objects": 368107,
+                  "malloc_increase_bytes": 5087419,
+                  "count": 48,
+                  "minor_gc_count": 42,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4809943,
+                  "time": 741
+                },
+                "rss": {
+                  "VmHWM": 199684,
+                  "VmRSS": 199684
+                }
+              },
+              {
+                "pid": 122959,
+                "gc": {
+                  "heap_live_slots": 460785,
+                  "old_objects": 369274,
+                  "malloc_increase_bytes": 6191434,
+                  "count": 52,
+                  "minor_gc_count": 46,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5321615,
+                  "time": 767
+                },
+                "rss": {
+                  "VmHWM": 208488,
+                  "VmRSS": 208488
+                }
+              },
+              {
+                "pid": 122964,
+                "gc": {
+                  "heap_live_slots": 494443,
+                  "old_objects": 371185,
+                  "malloc_increase_bytes": 11371285,
+                  "count": 50,
+                  "minor_gc_count": 44,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5026333,
+                  "time": 758
+                },
+                "rss": {
+                  "VmHWM": 208120,
+                  "VmRSS": 208120
+                }
+              },
+              {
+                "pid": 122973,
+                "gc": {
+                  "heap_live_slots": 476143,
+                  "old_objects": 369574,
+                  "malloc_increase_bytes": 476681,
+                  "count": 49,
+                  "minor_gc_count": 43,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4826053,
+                  "time": 762
+                },
+                "rss": {
+                  "VmHWM": 199804,
+                  "VmRSS": 199804
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              122954,
+              122959,
+              122964,
+              122973
+            ],
+            "attempts": 17,
+            "workers": [
+              {
+                "pid": 122954,
+                "gc": {
+                  "heap_live_slots": 471161,
+                  "old_objects": 366872,
+                  "malloc_increase_bytes": 2674046,
+                  "count": 198,
+                  "minor_gc_count": 191,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 25448496,
+                  "time": 2037
+                },
+                "rss": {
+                  "VmHWM": 201012,
+                  "VmRSS": 201012
+                }
+              },
+              {
+                "pid": 122959,
+                "gc": {
+                  "heap_live_slots": 471094,
+                  "old_objects": 368174,
+                  "malloc_increase_bytes": 1510870,
+                  "count": 204,
+                  "minor_gc_count": 195,
+                  "major_gc_count": 9,
+                  "total_allocated_objects": 26081120,
+                  "time": 2213
+                },
+                "rss": {
+                  "VmHWM": 210188,
+                  "VmRSS": 210188
+                }
+              },
+              {
+                "pid": 122964,
+                "gc": {
+                  "heap_live_slots": 439925,
+                  "old_objects": 368017,
+                  "malloc_increase_bytes": 975268,
+                  "count": 205,
+                  "minor_gc_count": 197,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 26123287,
+                  "time": 2208
+                },
+                "rss": {
+                  "VmHWM": 209508,
+                  "VmRSS": 203832
+                }
+              },
+              {
+                "pid": 122973,
+                "gc": {
+                  "heap_live_slots": 497326,
+                  "old_objects": 370153,
+                  "malloc_increase_bytes": 2474275,
+                  "count": 204,
+                  "minor_gc_count": 198,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 25678423,
+                  "time": 1962
+                },
+                "rss": {
+                  "VmHWM": 200828,
+                  "VmRSS": 200828
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 9,
+          "arm": "on",
+          "warmup": {
+            "rps": 331.09906446568993,
+            "requests": 1667,
+            "elapsed_s": 5.034746935,
+            "errors": 0,
+            "status_counts": {
+              "200": 1667
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 37.383728,
+              "p90": 87.42286200000001,
+              "p99": 227.92315699999997
+            },
+            "raw_sha256": "58ce680d357bcaaf82a5a958c96e85e888c4f9b9f9d074aa7199f05985c8676c"
+          },
+          "timed": {
+            "rps": 436.622555263664,
+            "requests": 8759,
+            "elapsed_s": 20.060805138,
+            "errors": 0,
+            "status_counts": {
+              "200": 8759
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 31.876683000000003,
+              "p90": 57.688049,
+              "p99": 117.585126
+            },
+            "raw_sha256": "7848a72148a5fa929ad805e0d1b363f431ebc7eb1fcd4fd7e20110a467ac28e9"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              123077,
+              123082,
+              123087,
+              123096
+            ],
+            "attempts": 5,
+            "workers": [
+              {
+                "pid": 123077,
+                "gc": {
+                  "heap_live_slots": 535484,
+                  "old_objects": 370497,
+                  "malloc_increase_bytes": 4415909,
+                  "count": 41,
+                  "minor_gc_count": 31,
+                  "major_gc_count": 10,
+                  "total_allocated_objects": 5818110,
+                  "time": 1005
+                },
+                "rss": {
+                  "VmHWM": 207424,
+                  "VmRSS": 207424
+                }
+              },
+              {
+                "pid": 123082,
+                "gc": {
+                  "heap_live_slots": 602210,
+                  "old_objects": 366742,
+                  "malloc_increase_bytes": 451187,
+                  "count": 41,
+                  "minor_gc_count": 30,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5448590,
+                  "time": 1072
+                },
+                "rss": {
+                  "VmHWM": 201284,
+                  "VmRSS": 201284
+                }
+              },
+              {
+                "pid": 123087,
+                "gc": {
+                  "heap_live_slots": 585283,
+                  "old_objects": 14868,
+                  "malloc_increase_bytes": 168442,
+                  "count": 42,
+                  "minor_gc_count": 30,
+                  "major_gc_count": 12,
+                  "total_allocated_objects": 5694760,
+                  "time": 1064
+                },
+                "rss": {
+                  "VmHWM": 200124,
+                  "VmRSS": 200124
+                }
+              },
+              {
+                "pid": 123096,
+                "gc": {
+                  "heap_live_slots": 435105,
+                  "old_objects": 366720,
+                  "malloc_increase_bytes": 141764,
+                  "count": 41,
+                  "minor_gc_count": 30,
+                  "major_gc_count": 11,
+                  "total_allocated_objects": 5470714,
+                  "time": 1069
+                },
+                "rss": {
+                  "VmHWM": 200212,
+                  "VmRSS": 200212
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              123077,
+              123082,
+              123087,
+              123096
+            ],
+            "attempts": 14,
+            "workers": [
+              {
+                "pid": 123077,
+                "gc": {
+                  "heap_live_slots": 628169,
+                  "old_objects": 368272,
+                  "malloc_increase_bytes": 8305543,
+                  "count": 118,
+                  "minor_gc_count": 101,
+                  "major_gc_count": 17,
+                  "total_allocated_objects": 26214116,
+                  "time": 2466
+                },
+                "rss": {
+                  "VmHWM": 209004,
+                  "VmRSS": 209004
+                }
+              },
+              {
+                "pid": 123082,
+                "gc": {
+                  "heap_live_slots": 554695,
+                  "old_objects": 366984,
+                  "malloc_increase_bytes": 344764,
+                  "count": 118,
+                  "minor_gc_count": 90,
+                  "major_gc_count": 28,
+                  "total_allocated_objects": 25110002,
+                  "time": 3336
+                },
+                "rss": {
+                  "VmHWM": 204872,
+                  "VmRSS": 204872
+                }
+              },
+              {
+                "pid": 123087,
+                "gc": {
+                  "heap_live_slots": 611788,
+                  "old_objects": 368037,
+                  "malloc_increase_bytes": 8385221,
+                  "count": 119,
+                  "minor_gc_count": 94,
+                  "major_gc_count": 25,
+                  "total_allocated_objects": 25773134,
+                  "time": 3059
+                },
+                "rss": {
+                  "VmHWM": 203976,
+                  "VmRSS": 203976
+                }
+              },
+              {
+                "pid": 123096,
+                "gc": {
+                  "heap_live_slots": 496068,
+                  "old_objects": 366770,
+                  "malloc_increase_bytes": 3309684,
+                  "count": 117,
+                  "minor_gc_count": 87,
+                  "major_gc_count": 30,
+                  "total_allocated_objects": 24688618,
+                  "time": 3538
+                },
+                "rss": {
+                  "VmHWM": 203256,
+                  "VmRSS": 203256
+                }
+              }
+            ]
+          }
+        },
+        {
+          "round": 9,
+          "arm": "off_b",
+          "warmup": {
+            "rps": 296.79461035706385,
+            "requests": 1497,
+            "elapsed_s": 5.043892132,
+            "errors": 0,
+            "status_counts": {
+              "200": 1497
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 41.793513999999995,
+              "p90": 91.304412,
+              "p99": 253.39575800000003
+            },
+            "raw_sha256": "533fba62d2f7b0789087da36d0ad08267651b31019524c250a25b8fedb5c15d8"
+          },
+          "timed": {
+            "rps": 441.75067030735653,
+            "requests": 8860,
+            "elapsed_s": 20.056562662,
+            "errors": 0,
+            "status_counts": {
+              "200": 8860
+            },
+            "transport_errors": {},
+            "latency_ms": {
+              "p50": 34.735774,
+              "p90": 56.650022,
+              "p99": 78.582925
+            },
+            "raw_sha256": "7d3bff6e601568880b2d204814ebcc2d88206d3e2aa762d1f8d4c3a73c507cb1"
+          },
+          "post_warmup_process_metrics": {
+            "expected_pids": [
+              123741,
+              123746,
+              123755,
+              123761
+            ],
+            "attempts": 119,
+            "workers": [
+              {
+                "pid": 123741,
+                "gc": {
+                  "heap_live_slots": 496694,
+                  "old_objects": 367815,
+                  "malloc_increase_bytes": 7259623,
+                  "count": 47,
+                  "minor_gc_count": 41,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 5283786,
+                  "time": 690
+                },
+                "rss": {
+                  "VmHWM": 208364,
+                  "VmRSS": 208364
+                }
+              },
+              {
+                "pid": 123746,
+                "gc": {
+                  "heap_live_slots": 518306,
+                  "old_objects": 370051,
+                  "malloc_increase_bytes": 1248212,
+                  "count": 44,
+                  "minor_gc_count": 38,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4757121,
+                  "time": 699
+                },
+                "rss": {
+                  "VmHWM": 203736,
+                  "VmRSS": 203736
+                }
+              },
+              {
+                "pid": 123755,
+                "gc": {
+                  "heap_live_slots": 496334,
+                  "old_objects": 368391,
+                  "malloc_increase_bytes": 8617779,
+                  "count": 47,
+                  "minor_gc_count": 40,
+                  "major_gc_count": 7,
+                  "total_allocated_objects": 5369267,
+                  "time": 811
+                },
+                "rss": {
+                  "VmHWM": 207192,
+                  "VmRSS": 207192
+                }
+              },
+              {
+                "pid": 123761,
+                "gc": {
+                  "heap_live_slots": 492622,
+                  "old_objects": 371489,
+                  "malloc_increase_bytes": 1942456,
+                  "count": 43,
+                  "minor_gc_count": 37,
+                  "major_gc_count": 6,
+                  "total_allocated_objects": 4696469,
+                  "time": 705
+                },
+                "rss": {
+                  "VmHWM": 206408,
+                  "VmRSS": 206408
+                }
+              }
+            ]
+          },
+          "post_load_process_metrics": {
+            "expected_pids": [
+              123741,
+              123746,
+              123755,
+              123761
+            ],
+            "attempts": 17,
+            "workers": [
+              {
+                "pid": 123741,
+                "gc": {
+                  "heap_live_slots": 466071,
+                  "old_objects": 367071,
+                  "malloc_increase_bytes": 595817,
+                  "count": 177,
+                  "minor_gc_count": 169,
+                  "major_gc_count": 8,
+                  "total_allocated_objects": 26344323,
+                  "time": 2041
+                },
+                "rss": {
+                  "VmHWM": 209164,
+                  "VmRSS": 203812
+                }
+              },
+              {
+                "pid": 123746,
+                "gc": {
+                  "heap_live_slots": 520988,
+                  "old_objects": 366756,
+                  "malloc_increase_bytes": 3788576,
+                  "count": 173,
+                  "minor_gc_count": 164,
+                  "major_gc_count": 9,
+                  "total_allocated_objects": 25749465,
+                  "time": 2106
+                },
+                "rss": {
+                  "VmHWM": 204116,
+                  "VmRSS": 204116
+                }
+              },
+              {
+                "pid": 123755,
+                "gc": {
+                  "heap_live_slots": 454656,
+                  "old_objects": 372682,
+                  "malloc_increase_bytes": 452173,
+                  "count": 163,
+                  "minor_gc_count": 148,
+                  "major_gc_count": 15,
+                  "total_allocated_objects": 23904729,
+                  "time": 2655
+                },
+                "rss": {
+                  "VmHWM": 209500,
+                  "VmRSS": 205992
+                }
+              },
+              {
+                "pid": 123761,
+                "gc": {
+                  "heap_live_slots": 477802,
+                  "old_objects": 368227,
+                  "malloc_increase_bytes": 1801658,
+                  "count": 171,
+                  "minor_gc_count": 161,
+                  "major_gc_count": 10,
+                  "total_allocated_objects": 25140303,
+                  "time": 2178
+                },
+                "rss": {
+                  "VmHWM": 207880,
+                  "VmRSS": 207880
+                }
+              }
+            ]
+          }
+        }
+      ]
     }
   },
-  "pending": [
-    "lobsters"
-  ],
+  "pending": [],
   "blocked": {}
 }
