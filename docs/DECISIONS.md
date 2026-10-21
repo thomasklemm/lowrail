@@ -13,6 +13,35 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Prism 2 adoption and target grammar (2026-10-21)
+
+Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust
+`ruby-prism`/sys 2.0.0 with exact Rubydex
+`c69a742c9097a2a5c13f97726abda55b0507121b`. Its `^2.0.0-rc.2` already accepts
+stable, so upstream #1078 is not a prerequisite. The old Rubydex pin's native
+`links=prism` conflict and 36 mechanical API errors are recorded, not bypassed.
+No Rubydex API integration or witness/type-recovery adoption follows.
+
+Exactness requires explicit grammar: Ruby `version: "current"`; one shared
+Rust parser uses captured boot/build runtime, 4.0 → `CRuby3_5`, 4.1 →
+`CRuby4_1`. Missing/unknown targets refuse; standalone `parse` requires
+`--ruby-version`. Both old Rust 1.9 and 2.0 plain `parse()` selected latest;
+that pre-existing boundary is now closed. The 4.1-only `&nil` regression
+fails on plain parse. Thermos correctness/security and maintainability
+follow-ups found no blocker. A naming-only consistency hint, not a behavior
+bug, is [ruby/prism#4297](https://github.com/ruby/prism/issues/4297).
+
+Nine-app census payload, delivered blog ISeq/source bytes and paired Rust
+facts/types/MCP/build trees match. Ruby manifests change only the two edited
+build-source pins; a later independently published render-unit fix is named
+separately. Wall/RSS samples are untimed-cohort diagnostics, no speed claim.
+Both Ruby 4.0.7 and pinned 4.1 preview gates run, retaining explicit 4.0-only
+fixture skips. The regenerated supplied blog fails the production source pin
+on baseline too; the owner-retained fixture passes strict form gates. No pin
+relaxation. `Prism.find` has 17 source-backed agreements but generated ERB
+and isolated Proc probes return nil: no witness adoption. Full inventory,
+limitations and machine evidence: [prism-2.md](prism-2.md).
+
 ## First accepted whole-request price (2026-10-21)
 
 **Interpreter Ir on one blog endpoint and fixture**, not a Rails-wide speed

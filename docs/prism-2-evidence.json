@@ -1,0 +1,651 @@
+{
+  "baseline": "060f85e21e35f192ac6312f6bb2499b130b32dac",
+  "ruby_upgrade": "6f13674862cd7e786daea46dd7c895b94311a014",
+  "archives": {
+    "blog-census.tar": "5469bef570e25be29f8bf6b80e856faf2fc6f8dd9e258327c6b60a5ba3dd3454",
+    "real-blog-r4.tgz": "96f89628b82e1a8e8e4c019618f405de64172a505f5685d23c6698bc6d83334e",
+    "retained-blog-source-86ebd4a8.tar.gz": "56d74970a6531ff667e62a8a32c396c8cddb6e78991f5b2a7825c1dfcd7a180c"
+  },
+  "census": {
+    "before_sha256": "6f0a2283dd686c27f215b747477597299d54d9dfd0df948ac38a423ac09fd408",
+    "after_sha256": "857b8dd0ecb3cb082db99ba22e6522c5137dd7c74ba3573920820b19f49ecf19",
+    "compact_apps_sha256": "ba8f7595b8f7e7253511a9876682352dacadaabcfaa7e77bf3758014b1d1fd7b",
+    "canonical_apps_sha256": "e5e0c41306a9ff64c5c249763c45b3a5fed39e68ea4a1e3964058ea6081ba64c",
+    "differences": [
+      {
+        "path": [
+          "prism"
+        ],
+        "before": "1.9.0",
+        "after": "2.0.0"
+      },
+      {
+        "path": [
+          "analyzer_sha256"
+        ],
+        "before": "e731c7165903a45d50524cdc9fa19eb1eb77a3741233e8b26c8b414fa60e3751",
+        "after": "f07d88bdc679417589ba08030482008ba29a6f6b26ea9a9764117a2698d031cd"
+      }
+    ],
+    "files": 1693,
+    "helpers": {
+      "button_to": 57,
+      "link_to": 537,
+      "form_with": 141,
+      "form_for": 7
+    }
+  },
+  "build": {
+    "before_files_sha256": {
+      "denylist.json": "1f15930c7a7f0845f3f3bcc69001dbce76670e310dffadb30b8283c24c6b9217",
+      "facts.json": "2c19caa1b9d38842cb1fe5246ef9d9e3e93a109b2e948be73f8b9af5f60db9e4",
+      "iseq/bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0.bin": "bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0",
+      "iseq/d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c.bin": "d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c",
+      "ledger.json": "fc79d73f8d3f16229c9d4a469718b74dca22502d656549511a021f7c965cd487",
+      "manifest.json": "58a5e2ec1fb502fc475e5745faff804ec5966355f8efe8a6247efb6597f62c9a",
+      "src/runtime__0.rb": "4b06cf2a81dcb286482d23f3bbe9b2bbf518cfb3cc1b1b8c48e5663e68802d0b",
+      "src/runtime__0.rb.orig": "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
+      "src/runtime__1.rb": "cc2492777a4f5e0776701571d288463052bc6f5fb19e9bfc591d644d9fa7983e",
+      "src/runtime__1.rb.orig": "c8559e0a0c9e40ac9a29a4ae01de7c9aab7c438e1af751368e10e3802024cb36",
+      "typed_facts.json": "dfcc127f140410c9ad09b9b552d5716f2d87e4881819a08abcbb91b3116e3671",
+      "units.json": "1fa20daab6cc8904e82a1e90fbf422e0d1faa0001c561326c17cae6acfe7960f"
+    },
+    "after_files_sha256": {
+      "denylist.json": "1f15930c7a7f0845f3f3bcc69001dbce76670e310dffadb30b8283c24c6b9217",
+      "facts.json": "2c19caa1b9d38842cb1fe5246ef9d9e3e93a109b2e948be73f8b9af5f60db9e4",
+      "iseq/bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0.bin": "bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0",
+      "iseq/d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c.bin": "d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c",
+      "ledger.json": "fc79d73f8d3f16229c9d4a469718b74dca22502d656549511a021f7c965cd487",
+      "manifest.json": "17f2d7b81b7b586b7b3075d359a4342d6e2b93167c66c3ee191f15fa92f6bd86",
+      "src/runtime__0.rb": "4b06cf2a81dcb286482d23f3bbe9b2bbf518cfb3cc1b1b8c48e5663e68802d0b",
+      "src/runtime__0.rb.orig": "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
+      "src/runtime__1.rb": "cc2492777a4f5e0776701571d288463052bc6f5fb19e9bfc591d644d9fa7983e",
+      "src/runtime__1.rb.orig": "c8559e0a0c9e40ac9a29a4ae01de7c9aab7c438e1af751368e10e3802024cb36",
+      "typed_facts.json": "dfcc127f140410c9ad09b9b552d5716f2d87e4881819a08abcbb91b3116e3671",
+      "units.json": "babfd893f9cbc47ca97731fef6da8b4c0227118dbcdd6b0d76eada7d5198d657"
+    },
+    "unchanged_generated_files": 1959,
+    "unchanged_generated_index_sha256": "46e0fb53ebbc57b9f8d93c13ea2c3bd0357472bfe51caf60310220fef8d86f68",
+    "changed_files": [
+      {
+        "path": [
+          "manifest.json"
+        ],
+        "before": "58a5e2ec1fb502fc475e5745faff804ec5966355f8efe8a6247efb6597f62c9a",
+        "after": "17f2d7b81b7b586b7b3075d359a4342d6e2b93167c66c3ee191f15fa92f6bd86"
+      },
+      {
+        "path": [
+          "units.json"
+        ],
+        "before": "1fa20daab6cc8904e82a1e90fbf422e0d1faa0001c561326c17cae6acfe7960f",
+        "after": "babfd893f9cbc47ca97731fef6da8b4c0227118dbcdd6b0d76eada7d5198d657"
+      }
+    ],
+    "manifest_differences": [
+      {
+        "path": [
+          "units",
+          0,
+          "sealed",
+          "sources",
+          "/home/user/workspace/repo/gem/lib/lowrail/sealed_build.rb"
+        ],
+        "before": "30e0915cc1e1300abcb9da2592c45e00bd8fc1fc2bdbee665ca5c331abd686cf",
+        "after": "00421e6fc5790770dda7dd2aca4952e6b23a9a3128b0a7f01f779b2c07edba40"
+      },
+      {
+        "path": [
+          "units",
+          1,
+          "data",
+          "sources",
+          "/home/user/workspace/repo/gem/lib/lowrail/form_scaffold_build.rb"
+        ],
+        "before": "79941426d0498780b7ba195d24e97d841e0512955a6777f67e30a64787bb723b",
+        "after": "c36319fd2254c029cfa30a9bc590fa67316835583e4d062f204ae27f3fb1ce42"
+      }
+    ],
+    "units_differences": [
+      {
+        "path": [
+          "units",
+          0,
+          "sealed",
+          "sources",
+          "/home/user/workspace/repo/gem/lib/lowrail/sealed_build.rb"
+        ],
+        "before": "30e0915cc1e1300abcb9da2592c45e00bd8fc1fc2bdbee665ca5c331abd686cf",
+        "after": "00421e6fc5790770dda7dd2aca4952e6b23a9a3128b0a7f01f779b2c07edba40"
+      },
+      {
+        "path": [
+          "units",
+          1,
+          "data",
+          "sources",
+          "/home/user/workspace/repo/gem/lib/lowrail/form_scaffold_build.rb"
+        ],
+        "before": "79941426d0498780b7ba195d24e97d841e0512955a6777f67e30a64787bb723b",
+        "after": "c36319fd2254c029cfa30a9bc590fa67316835583e4d062f204ae27f3fb1ce42"
+      }
+    ],
+    "comparison_harness": "External production-only Gemfile overlay: identical original gem versions, Minitest 5.27.0 in both arms, development-only RuboCop excluded; Prism 1.9.0 vs 2.0.0. Original app bundle untouched.",
+    "original_lock_sha256": "a0b681d52555b3493ff62ef3f9b6ef386ed09ca314f89d807d2f3a7129fec8a2",
+    "overlay_gemfile_sha256": "9f2f5b316c526fea6d246b0b2cdf0e5dd20b0db237af6149099bdb2e770370d7",
+    "denylist_sha256": "1f15930c7a7f0845f3f3bcc69001dbce76670e310dffadb30b8283c24c6b9217"
+  },
+  "timings": {
+    "baseline-build": {
+      "samples_seconds_rss_kib": [
+        [
+          5.88,
+          167444.0
+        ],
+        [
+          6.14,
+          168824.0
+        ],
+        [
+          6.44,
+          168124.0
+        ]
+      ],
+      "median_seconds": 6.14,
+      "median_peak_rss_kib": 168124.0
+    },
+    "upgraded-build": {
+      "samples_seconds_rss_kib": [
+        [
+          6.51,
+          168504.0
+        ],
+        [
+          6.24,
+          168616.0
+        ],
+        [
+          6.0,
+          168344.0
+        ]
+      ],
+      "median_seconds": 6.24,
+      "median_peak_rss_kib": 168504.0
+    },
+    "baseline-census": {
+      "samples_seconds_rss_kib": [
+        [
+          0.9,
+          39136.0
+        ],
+        [
+          0.79,
+          38636.0
+        ],
+        [
+          0.83,
+          39120.0
+        ],
+        [
+          0.72,
+          39112.0
+        ],
+        [
+          0.74,
+          38612.0
+        ]
+      ],
+      "median_seconds": 0.79,
+      "median_peak_rss_kib": 39112.0
+    },
+    "upgraded-census": {
+      "samples_seconds_rss_kib": [
+        [
+          0.83,
+          39488.0
+        ],
+        [
+          0.75,
+          39020.0
+        ],
+        [
+          0.75,
+          39176.0
+        ],
+        [
+          0.79,
+          39108.0
+        ],
+        [
+          0.8,
+          39120.0
+        ]
+      ],
+      "median_seconds": 0.79,
+      "median_peak_rss_kib": 39120.0
+    },
+    "before-rust-parse": {
+      "samples_seconds_rss_kib": [
+        [
+          0.06,
+          5252.0
+        ],
+        [
+          0.05,
+          5204.0
+        ],
+        [
+          0.05,
+          5244.0
+        ],
+        [
+          0.05,
+          5268.0
+        ],
+        [
+          0.05,
+          5260.0
+        ]
+      ],
+      "median_seconds": 0.05,
+      "median_peak_rss_kib": 5252.0
+    },
+    "upgraded-rust-parse": {
+      "samples_seconds_rss_kib": [
+        [
+          0.05,
+          5360.0
+        ],
+        [
+          0.05,
+          5264.0
+        ],
+        [
+          0.05,
+          5268.0
+        ],
+        [
+          0.05,
+          5384.0
+        ],
+        [
+          0.06,
+          5128.0
+        ]
+      ],
+      "median_seconds": 0.05,
+      "median_peak_rss_kib": 5268.0
+    }
+  },
+  "find": {
+    "find40.json": {
+      "sha256": "a05ab5b932446e5f36c98f501f8d799b63e7394478b4fae3c9764692161cbd89",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "prism": "2.0.0",
+      "methods": {
+        "agree": 17
+      },
+      "method_count": 17,
+      "method_agreements": 17,
+      "templates": 263,
+      "template_nil": 263,
+      "template_sites": 657,
+      "procs": 438,
+      "proc_nil": 438,
+      "ambiguous_proc_lines": 0
+    },
+    "find41-census.json": {
+      "sha256": "1fbd392ea90ab8c89698e3dddae3feaaec23bb32f8bb4e0ec8d1e9ee1d816d7b",
+      "ruby": "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f) +PRISM [x86_64-linux]",
+      "prism": "2.0.0",
+      "methods": {},
+      "method_count": 0,
+      "method_agreements": 0,
+      "templates": 263,
+      "template_nil": 263,
+      "template_sites": 657,
+      "procs": 438,
+      "proc_nil": 438,
+      "ambiguous_proc_lines": 0
+    }
+  },
+  "rust": {
+    "control_commit": "6f13674862cd7e786daea46dd7c895b94311a014",
+    "control_cli_sha256": "8e6c849b05ef8cc9eee9c34c3cb85956ed472b3cb0ff459862c0f1f96f5cda50",
+    "final_cli_sha256": "e0094f1b9734f55d020d396100da08a8c3f79c53d3cfeab018451de74ae74d29",
+    "mechanical_commit": "ffb43fd1d58a7e0167a70326c8e0334d73f7f841",
+    "grammar_commit": "8a87712f99b282debac55cbd87d667ff14af8047",
+    "ruby_prism": "2.0.0",
+    "ruby_prism_sys": "2.0.0",
+    "rubydex_rev": "c69a742c9097a2a5c13f97726abda55b0507121b",
+    "files_sha256": {
+      "denylist.json": "1f15930c7a7f0845f3f3bcc69001dbce76670e310dffadb30b8283c24c6b9217",
+      "facts.json": "2c19caa1b9d38842cb1fe5246ef9d9e3e93a109b2e948be73f8b9af5f60db9e4",
+      "iseq/bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0.bin": "bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0",
+      "iseq/d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c.bin": "d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c",
+      "ledger.json": "fc79d73f8d3f16229c9d4a469718b74dca22502d656549511a021f7c965cd487",
+      "manifest.json": "22f5831c942b5d4b84263404b25797d01619a80bdcefff0a9704cbb31fca9151",
+      "src/runtime__0.rb": "4b06cf2a81dcb286482d23f3bbe9b2bbf518cfb3cc1b1b8c48e5663e68802d0b",
+      "src/runtime__0.rb.orig": "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
+      "src/runtime__1.rb": "cc2492777a4f5e0776701571d288463052bc6f5fb19e9bfc591d644d9fa7983e",
+      "src/runtime__1.rb.orig": "c8559e0a0c9e40ac9a29a4ae01de7c9aab7c438e1af751368e10e3802024cb36",
+      "typed_facts.json": "dfcc127f140410c9ad09b9b552d5716f2d87e4881819a08abcbb91b3116e3671",
+      "units.json": "6f1987e6fab0853f0965ccccc005685ffb51b64a00efac92c126dddecf8e8b3d"
+    },
+    "unchanged_generated_files": 1959,
+    "generated_index_sha256": "46e0fb53ebbc57b9f8d93c13ea2c3bd0357472bfe51caf60310220fef8d86f68",
+    "outputs": {
+      "facts.txt": {
+        "before_sha256": "53e485af4ed2ea29b36a308febe4beed35aca5247d3d2e7d0c5a20efd9b5ee98",
+        "after_sha256": "53e485af4ed2ea29b36a308febe4beed35aca5247d3d2e7d0c5a20efd9b5ee98"
+      },
+      "types.json": {
+        "before_sha256": "601e1a8caf4dbc2e905c72831ec9a3d522432fba870128c6eb2afc70e6daf3eb",
+        "after_sha256": "601e1a8caf4dbc2e905c72831ec9a3d522432fba870128c6eb2afc70e6daf3eb"
+      },
+      "mcp.jsonl": {
+        "before_sha256": "0f83271a4ae1c6edee0bc2d9ddfac6e86b7d280faaf348d139d7585002023a56",
+        "after_sha256": "0f83271a4ae1c6edee0bc2d9ddfac6e86b7d280faaf348d139d7585002023a56"
+      }
+    },
+    "malformed_source_diagnostics": {
+      "stdout": {
+        "before_sha256": "906b659a46064f627c5361fa6934c8315f435141701bbf9afc06f1bea679d72a",
+        "after_sha256": "906b659a46064f627c5361fa6934c8315f435141701bbf9afc06f1bea679d72a"
+      },
+      "stderr": {
+        "before_sha256": "db7fb6e9c69b84327eb516a395c2c6a853ea989870d6c52a89a9858b210cf57e",
+        "after_sha256": "db7fb6e9c69b84327eb516a395c2c6a853ea989870d6c52a89a9858b210cf57e"
+      }
+    },
+    "corpus_parse": {
+      "stdout": {
+        "before_sha256": "a9ca03a4c22dcf155b1415b9361729788c0bb97836a63f5ff957db81e864b595",
+        "after_sha256": "a9ca03a4c22dcf155b1415b9361729788c0bb97836a63f5ff957db81e864b595"
+      },
+      "stderr": {
+        "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "intervening_render_fix": {
+      "commit": "ea44cf3",
+      "differences": [
+        {
+          "path": [
+            "units",
+            1,
+            "data",
+            "sources",
+            "/home/user/workspace/repo/gem/lib/lowrail/render_units.rb"
+          ],
+          "before": "bdcb1b43b7ec30b1bb49af130d66783747ce9e3776edec5c2e1b4c0fe1c11dbf",
+          "after": "648c0ed2d2bd75f3370e9efd7fef2423253c0be875fccdface531ab78f2a2a11"
+        },
+        {
+          "path": [
+            "units",
+            2,
+            "data",
+            "sources",
+            "/home/user/workspace/repo/gem/lib/lowrail/render_units.rb"
+          ],
+          "before": "bdcb1b43b7ec30b1bb49af130d66783747ce9e3776edec5c2e1b4c0fe1c11dbf",
+          "after": "648c0ed2d2bd75f3370e9efd7fef2423253c0be875fccdface531ab78f2a2a11"
+        },
+        {
+          "path": [
+            "units",
+            3,
+            "data",
+            "observer",
+            "iseq"
+          ],
+          "before": "f8ac2e338fbe37e138dd064ea9b9f8278b4c09dd46a879a31af4a11d3fdfaf70",
+          "after": "e903c9b66b0410dbce590c4216407f850912ea3c1ce54282ac9c35f8489b1987"
+        },
+        {
+          "path": [
+            "units",
+            3,
+            "data",
+            "observer",
+            "source_location",
+            1
+          ],
+          "before": 209,
+          "after": 211
+        },
+        {
+          "path": [
+            "units",
+            3,
+            "data",
+            "sources",
+            "/home/user/workspace/repo/gem/lib/lowrail/render_units.rb"
+          ],
+          "before": "bdcb1b43b7ec30b1bb49af130d66783747ce9e3776edec5c2e1b4c0fe1c11dbf",
+          "after": "648c0ed2d2bd75f3370e9efd7fef2423253c0be875fccdface531ab78f2a2a11"
+        }
+      ]
+    },
+    "timings": {
+      "rust-before-build": {
+        "samples_seconds_rss_kib": [
+          [
+            6.0,
+            168364.0
+          ],
+          [
+            6.0,
+            167848.0
+          ],
+          [
+            6.0,
+            168056.0
+          ]
+        ],
+        "median_seconds": 6.0,
+        "median_peak_rss_kib": 168056.0
+      },
+      "rust-final-build": {
+        "samples_seconds_rss_kib": [
+          [
+            6.23,
+            168276.0
+          ],
+          [
+            6.17,
+            168232.0
+          ],
+          [
+            6.14,
+            167956.0
+          ]
+        ],
+        "median_seconds": 6.17,
+        "median_peak_rss_kib": 168232.0
+      },
+      "rust-final-census": {
+        "samples_seconds_rss_kib": [
+          [
+            0.8,
+            39688.0
+          ],
+          [
+            0.77,
+            39356.0
+          ],
+          [
+            0.73,
+            39168.0
+          ],
+          [
+            0.73,
+            39064.0
+          ],
+          [
+            0.78,
+            39128.0
+          ]
+        ],
+        "median_seconds": 0.77,
+        "median_peak_rss_kib": 39168.0
+      },
+      "rust-before-parse": {
+        "samples_seconds_rss_kib": [
+          [
+            0.05,
+            5172.0
+          ],
+          [
+            0.06,
+            5296.0
+          ],
+          [
+            0.05,
+            5028.0
+          ],
+          [
+            0.05,
+            5336.0
+          ],
+          [
+            0.04,
+            5260.0
+          ]
+        ],
+        "median_seconds": 0.05,
+        "median_peak_rss_kib": 5260.0
+      },
+      "rust-final-parse": {
+        "samples_seconds_rss_kib": [
+          [
+            0.04,
+            5784.0
+          ],
+          [
+            0.05,
+            5728.0
+          ],
+          [
+            0.04,
+            5864.0
+          ],
+          [
+            0.04,
+            5784.0
+          ],
+          [
+            0.04,
+            5660.0
+          ]
+        ],
+        "median_seconds": 0.04,
+        "median_peak_rss_kib": 5784.0
+      }
+    },
+    "earlier_pre_simplification_timings": {
+      "rust-after-build": {
+        "samples_seconds_rss_kib": [
+          [
+            6.15,
+            168172.0
+          ],
+          [
+            6.26,
+            168696.0
+          ],
+          [
+            6.43,
+            168188.0
+          ]
+        ],
+        "median_seconds": 6.26,
+        "median_peak_rss_kib": 168188.0
+      },
+      "rust-after-census": {
+        "samples_seconds_rss_kib": [
+          [
+            0.74,
+            39272.0
+          ],
+          [
+            0.81,
+            39160.0
+          ],
+          [
+            0.81,
+            39040.0
+          ],
+          [
+            0.73,
+            39092.0
+          ],
+          [
+            0.86,
+            40952.0
+          ]
+        ],
+        "median_seconds": 0.81,
+        "median_peak_rss_kib": 39160.0
+      },
+      "rust-after-parse": {
+        "samples_seconds_rss_kib": [
+          [
+            0.04,
+            5736.0
+          ],
+          [
+            0.04,
+            5556.0
+          ],
+          [
+            0.04,
+            5532.0
+          ],
+          [
+            0.04,
+            5684.0
+          ],
+          [
+            0.04,
+            5628.0
+          ]
+        ],
+        "median_seconds": 0.04,
+        "median_peak_rss_kib": 5628.0
+      }
+    },
+    "grammar_contract": "Recorded boot/build Ruby 4.0.x -> CRuby3_5, 4.1.x -> CRuby4_1. CLI parse explicitly requires --ruby-version. Unknown/missing target refuses; no Latest fallback.",
+    "grammar_mutation_test": "Replacing Parser::parse with ruby_prism::parse fails target_ruby_grammar_is_explicit_in_parse_types_and_mcp under 4.0 &nil.",
+    "thermos": "Independent correctness/security and maintainability reviews before publication; reviewed source/Cargo/test files byte-identical after rebase; no medium/high correctness/security or maintainability blocker.",
+    "issue": "https://github.com/ruby/prism/issues/4297"
+  },
+  "verification": {
+    "rubies": [
+      "ruby 4.0.7 (2026-09-15 revision 229531a6cf)",
+      "ruby 4.1.0preview1 (2026-10-11 master 2d08b5f42f)"
+    ],
+    "cargo": "cargo test --locked: 39 unit + 2 types/MCP + 8 integration tests pass on both Ruby axes",
+    "fixture_refusal": "Supplied96f89628 app refuses app source pin mismatch on baseline060f85e and migration; no pin relaxed.",
+    "gems": {
+      "ruby_4_0": {
+        "tests": 37,
+        "assertions": 2869,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      "ruby_4_1_preview": {
+        "tests": 37,
+        "assertions": 2737,
+        "failures": 0,
+        "errors": 0,
+        "skips": 1
+      }
+    },
+    "retained_fixture": "Published86ebd4a8 retained source, original570c9c31 lock; initial strict form suite2/114, final2/123 after published ea44cf3 continuation regression, no skips or overlay. Original locked Minitest6.0.6 installed in isolated gem dir for final rerun; missing-gem and zero-test attempts do not count as gates. Preview keeps2 named4.0-only skips.",
+    "comparison_harness": "External production Gemfile, Minitest5.27 in both arms; no mutation of certified app bundle/lock. No plugins disabled."
+  }
+}
