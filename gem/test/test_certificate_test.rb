@@ -312,6 +312,7 @@ class TestCertificateTest < Minitest::Test
         foreign_output = foreign.send(:token_tag, false, form_options: options)
         render_collection.call(true)
         result = {tokens: tokens, rendered: rendered, layouts: layouts, reentrant: reentrant, errors: errors, foreign: foreign_output,
+          private_generation: view.class.private_method_defined?(:form_authenticity_token),
           production_epoch: Lowrail::Sealed::EPOCH[0],
           admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
       RUBY
@@ -330,9 +331,103 @@ class TestCertificateTest < Minitest::Test
       assert_equal [["left/0/2", "right/1/2"]] * 2, result.fetch("reentrant")
       assert_equal [["live template failure", ["size", "iterator", "left"]]] * 2, result.fetch("errors")
       assert_equal "", result.fetch("foreign")
+      assert_equal true, result.fetch("private_generation"), "private before the first original-operation witness"
       assert_equal 97, result.fetch("production_epoch")
       assert_equal [true, true], result.fetch("admitted")
       assert_empty result.dig("stats", "unit_deopts")
+    end
+  end
+
+  def test_render_name_and_tag_dispatch_bypass_existing_view_reflection
+    with_render_certificate do |dir, boot|
+      # Isolate the reflective-dispatch regression from the private-generator
+      # case. All setup precedes the first original-operation witness.
+      boot = boot.dup
+      changed = boot.sub!("foreign_view.class.send(:private, :form_authenticity_token)", <<~'RUBY')
+        names = %i[protect_against_forgery? form_authenticity_token request_forgery_protection_token]
+        mode = ENV.fetch("RENDER_HELPER_MODE")
+        if mode == "method_missing"
+          # A missing protection method is an existing named admission
+          # refusal; generation and name lookup remain live and may be missing.
+          missing = names.drop(1)
+          originals = missing.to_h { [_1, foreign_view.class.instance_method(_1)] }
+          foreign_view.class.define_method(:respond_to_missing?) do |name, include_private = false|
+            originals.key?(name) || super(name, include_private)
+          end
+          foreign_view.class.define_method(:method_missing) do |name, *args, **keywords, &block|
+            if (original = originals[name])
+              Thread.current[:render_probe]&.fetch(:missing_calls)&.push(name.to_s)
+              original.bind_call(self, *args, **keywords, &block)
+            else
+              super(name, *args, **keywords, &block)
+            end
+          end
+          missing.each { foreign_view.class.send(:undef_method, _1) }
+        else
+          foreign_view.class.send(mode, *names)
+        end
+        module ExistingViewReflection
+          %i[send __send__ public_send method].each do |reflection|
+            define_method(reflection) do |name, *args, **keywords, &block|
+              probe = Thread.current[:render_probe]
+              if probe && %i[protect_against_forgery? form_authenticity_token request_forgery_protection_token tag tag_builder].include?(name)
+                probe[:reflective_calls] << reflection.to_s
+                "wrong-#{name}-from-#{reflection}"
+              else
+                super(name, *args, **keywords, &block)
+              end
+            end
+          end
+
+          def instance_exec(*)
+            raise "unexpected view instance_exec dispatch" if Thread.current[:render_probe]
+            super
+          end
+        end
+        foreign_view.class.prepend(ExistingViewReflection)
+      RUBY
+      raise "view setup not found" unless changed
+      %w[public protected method_missing].each do |mode|
+        result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir).merge("RENDER_HELPER_MODE" => mode))
+          original = view.method(:token_tag).super_method
+          builder = view.instance_variable_get(:@tag_builder)
+          foreign = Class.new(ActionView::Helpers::TagHelper::TagBuilder) do
+            def tag_options(*) = ' data-probe="late-builder"'
+          end.new(view)
+          token_id = ids.fetch("sealed/token_tag")
+          records = [builder, foreign].map do |chosen|
+            before = Lowrail::Stats.snapshot
+            pair = [false, true].map do |fast|
+              view.instance_variable_set(:@tag_builder, builder)
+              probe = {view: view, builder: chosen, generated: 0, converted: 0, reflective_calls: [], missing_calls: []}
+              Thread.current[:render_probe] = probe
+              output = fast ? view.send(:token_tag, nil, form_options: options) : original.call(nil, form_options: options)
+              Thread.current[:render_probe] = nil
+              [output, probe[:generated], probe[:converted], probe[:reflective_calls], probe[:missing_calls]]
+            end
+            after = Lowrail::Stats.snapshot
+            {pair: pair, hits: after.fetch("unit_hits").fetch(token_id, 0) - before.fetch("unit_hits").fetch(token_id, 0),
+              fallbacks: after.fetch("unit_fallbacks").fetch(token_id, 0) - before.fetch("unit_fallbacks").fetch(token_id, 0)}
+          end
+          result = {public_generator: view.class.public_method_defined?(:form_authenticity_token),
+            protected_generator: view.class.protected_method_defined?(:form_authenticity_token), records: records,
+            admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
+        RUBY
+        assert_equal mode == "public", result.fetch("public_generator")
+        assert_equal mode == "protected", result.fetch("protected_generator")
+        stock, continuation = result.fetch("records")
+        result.fetch("records").each do |record|
+          assert_equal record.fetch("pair").first, record.fetch("pair").last, mode
+          assert_equal [1, 1, []], record.fetch("pair").last.values_at(1, 2, 3), "implicit calls never dispatch through view reflection"
+          expected_missing = mode == "method_missing" ? %w[form_authenticity_token request_forgery_protection_token] : []
+          assert_equal expected_missing, record.fetch("pair").last.last
+        end
+        assert_equal '<input data-probe="late-builder" />', continuation.fetch("pair").last.first
+        assert_equal [1, 0], stock.values_at("hits", "fallbacks")
+        assert_equal [0, 1], continuation.values_at("hits", "fallbacks")
+        assert_equal [true, true], result.fetch("admitted")
+        assert_empty result.dig("stats", "unit_deopts")
+      end
     end
   end
 
@@ -561,7 +656,12 @@ class TestCertificateTest < Minitest::Test
         empty = Object.new
         empty.define_singleton_method(:size) { 0 }
         empty.define_singleton_method(:each_with_info) { [] }
-        foreign_renderer.send(:collection_with_template, ArticlesController.new.view_context, Object.new, nil, empty)
+        foreign_view = ArticlesController.new.view_context
+        # Stock token_tag dispatches implicitly, including to a private
+        # generator. Set visibility before either unit's first witness, not
+        # as a post-admission mutation that would already retire authority.
+        foreign_view.class.send(:private, :form_authenticity_token)
+        foreign_renderer.send(:collection_with_template, foreign_view, Object.new, nil, empty)
         raise "foreign renderer authorized canonical context" if Lowrail::CollectionRender.admitted?
         require "rack/mock"
         view = nil
