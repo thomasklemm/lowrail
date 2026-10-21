@@ -819,3 +819,75 @@ Artifact manifest SHA256
 unchanged original denylist. No pooling with the ten-round baseline,
 new own-suite/complete DB-state gate, Thermos promotion, Callgrind, main
 integration or README update. The coordinator retains the publication decision.
+
+### Bounded GC diagnosis: original p99 cause remains unproven
+
+Two short, instrumented off-A/on/off-B probes on the same frozen runtime,
+not a new price: one 10-second load per arm with post-GC snapshots; then
+one 20-second lower-overhead check deferring `objspace` loading and all heap
+inspection until afterward, without retaining per-GC snapshots. Both use
+the same production Puma 4×1, c16, CPU split and five-second warmup. All cold
+and warm two-seed exact samples pass; every load completion is HTTP 200.
+All observations and receipts are retained in `rps_gc_diagnostic` in the
+JSON appendix; no failed probe is replaced or pooled into the RPS result.
+
+| Observed GC trigger | off-A | on | off-B |
+|---|---:|---:|---:|
+| 10 s: `newobj` / minor profiler records | 453 | 529 | 398 |
+| 20 s: `newobj` / minor profiler records | 965 | 1,005 | 943 |
+| Either probe: `malloc` entries / major records | 0 / 0 | 0 / 0 | 0 / 0 |
+| 10 s: collections / 1,000 completions | 28.957 | 30.024 | 24.345 |
+| 20 s: collections / 1,000 completions | 28.983 | **27.282** | 28.894 |
+| 20 s: allocated objects / completion | 2,711.96 | 2,366.15 | 2,713.13 |
+| 20 s: freed objects / collection | 93,574 | 86,698 | 93,863 |
+
+The lower-overhead on counter window has **1,004** cycles but its profiler
+readout has **1,005** records. Retain this one-record capture-boundary
+difference: reading/serializing the observer itself allocates. Do not call
+these deterministic request allocations or a new performance comparison.
+The first probe has lower reclaimed slots/GC on, but the second **reverses
+the collection-rate ordering**; neither reproduces the original excess
+major GCs. They cannot establish the historical cohort's cause.
+
+Post-warmup gauges below are four-process sums from the lower-overhead
+probe, **not per-process GC limits**; the JSON retains each worker/size pool:
+
+| GC.stat field | off-A | on | off-B |
+|---|---:|---:|---:|
+| heap_live_slots | 1,536,801 | 1,563,546 | 1,515,438 |
+| old_objects / old_objects_limit | 1,264,560 / 2,519,342 | 1,281,889 / 2,550,466 | 1,264,566 / 2,519,336 |
+| heap_allocatable_slots | 0 | 0 | 0 |
+| malloc_increase_bytes | 3,193,639 | 3,086,476 | 1,162,799 |
+| oldmalloc_increase_bytes | 8,177,225 | 4,515,764 | 4,320,876 |
+| malloc limit / oldmalloc limit, bytes | 67,108,864 / 94,741,920 | 67,108,864 / 113,690,304 | 67,108,864 / 94,741,920 |
+| minor / major counts since boot | 273 / 28 | 309 / 32 | 268 / 28 |
+
+`GC.latest_gc_info` has `major_by:nil`, `need_major_by:nil`, `gc_by:newobj`
+at every before/after snapshot and detailed event. Old objects stay below
+each worker's limit; every pool's load-phase forced-major/incremental-finish
+counter delta is zero. There are **no observed oldgen, oldmalloc, nofree or
+malloc-triggered majors**. Ruby's
+[source](https://github.com/ruby/ruby/blob/229531a6cfbf07e3caef30dbac24a2a3f3fed482/gc/default/default.c#L2080-L2116)
+enters `newobj` GC when an allocation pool cannot obtain a page; free slots
+in another size pool do not satisfy it. This explains why total allocation
+counts alone do not determine GC cadence, not which pool caused an
+unrecorded historical collection. Profiler enablement does not disable major
+GC; observer allocations/heap history still perturb these short probes.
+
+After diagnosed load only, forced full-GC heap snapshots find no retained
+source-ISeq inventory (`FormScaffoldInventory` has no initialized cache).
+The three retained certificate graphs occupy **356,123 bytes (347.8 KiB)**
+as a non-deduplicated per-unit upper bound, not additive with `@data` aliases.
+First-probe whole-worker ISeq payload is **42,226,876 bytes on versus
+42,275,180 off**; on retains 43,211 versus 43,237 ISeqs. These are whole-worker
+counts, include diagnostic roots, and do not attribute every heap difference
+to Lowrail. Full heap dumps are reduced to type/memory counts, hashed and
+removed; fixture strings are not exported.
+
+GC-overlapping Rack calls are slower (roughly 3–4 ms versus 1–3 ms), but the
+lower-overhead probe has **no Rack call ≥10 ms**. That is **not** a causal
+explanation for the earlier ~30 ms HTTP p99: Rack intervals omit Puma,
+transport and queue delay, and the short probes missed the major-GC pattern.
+**Cause sentence:** observed diagnostic GCs are allocation-slot exhaustion,
+but the confirmatory excess-major/p99 cause remains unproven. No justified
+boot-freeze/compact fix, GC tuning or runtime change is proposed or landed.
