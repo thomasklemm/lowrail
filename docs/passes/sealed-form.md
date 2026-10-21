@@ -8,6 +8,73 @@ below belong to their pinned historical runtimes; they are **not rescored or
 deleted**, and are not a claim that today's artifact can activate. See the
 [cold witness and coverage losses](../sealed-verification.md#current-runtime-passive-admission-or-explicit-refusal).
 
+## Separate collection, token and filter prices (2026-10-21)
+
+Three **separate finite interpreter micro cohorts** ran sequentially on
+[`2c6899c`](https://github.com/thomasklemm/lowrail/commit/2c6899cd444583c96006430da03cb32776e23bb7),
+after fresh disposable production/interpreter builds and native admission.
+These are **not whole-request numbers and are not additive**, either with
+one another or with the historical form price. Each candidate includes its
+own eligibility checks and live residue. Standalone checks/residue arms are
+diagnostic, not an arithmetic decomposition of the candidate.
+
+| Isolated real operation | Saved total Ir, paired median [95% CI] | Paired candidate Δ% [95% CI] | Decision |
+|---|---:|---:|---|
+| One stock two-comment collection invocation | 200,979.80 [200,498.47, 201,333.63] | −9.88386 [−9.90693, −9.87628] | Accepted isolated collection-fusion price |
+| Four live token tags from one show request | 89,927.06 [89,170.80, 90,472.40] | −11.12246 [−11.21563, −11.00622] | Accepted isolated token price |
+| One real controller filter chain | 4,124.64 [−2,807.96, +6,516.19] | −0.046934 [−0.074127, +0.031951] | Controls accepted; **no resolved saving, stop at price** |
+
+GC-excluded saved Ir are respectively **200,884.46**
+[200,569.19, 201,311.37], **89,807.18** [89,689.44, 90,048.67],
+and **3,296.42** [−1,380.45, +7,359.27]. Filter's interval spans zero in
+both modes. Its flattened-chain specimen remains evidence only: it is
+excluded from passive-form implementation and every production plan.
+
+Ruby 4.0.7 / Rails 8.1.4; six whole randomized rounds, seed 41231,
+N=0/200 subtraction for collection/token and N=0/50 for filter, at most
+**three** simultaneous Callgrind workers.
+Collection/token each use 30 workers and 120 GC-free windows; filter uses
+18 workers and 72 GC-free windows. All unchanged total/no-GC A/A, five-heap,
+brk-preflight and actual-interpreter gates pass. No retry, extra cohort,
+selected-arm salvage, YJIT measurement or gate change occurred. The A/A
+total intervals are [−0.053963, +0.024373]%,
+[−0.027465, +0.050796]% and [−0.048705, +0.057596]% respectively.
+
+Before counters, each specimen passed both **192-pair** observable controls
+(ordinary and header-writing render subscriber), with 105/285/108 active
+hits respectively and no fallbacks. Fifty native requests recorded
+50/200/50 active hits and zero fallbacks; separate negative controls retained
+the original behavior for epoch/input/chain changes. Fresh association SQL,
+records, live CSRF masking, halting/around/security bodies, and fresh request
+objects stay live in their respective specimens.
+
+Common runtime SHA is
+`36cb0a49b31ce2b30ba6213d29ae18048f0de81b4083667230987be8a0ae4d8b`;
+harness SHA is
+`b45c39d6b772e5acf604ca9a6b8bd4385a8d76c8f48d373aa36437243997f5aa`.
+Fresh artifact manifest SHAs (not production activation claims):
+
+- Collection: `9cee23cfa8f0d390393112a9d048402d0df84853ce04c498be80fd016c3c2423`.
+- Token: `829a2a84c291a30ac7c9520e14bb5ddaa22db31ad0aa74ae75c18ffbe9991523`.
+- Filter: `01e4aa76b2ef8030a5fcd17e80874650e0d6d54897571349677ed5af94326bf5`.
+
+The [numeric export](sealed-micros.json) includes exact source/tool/fixture/
+artifact/runtime/harness pins, paired intervals, rounds, window endpoints,
+heap capacities and controls. Raw app responses, tokens and logs remain
+private. Run the corresponding `bench/experiments/sealed_collection.rb`,
+`sealed_tokens.rb` or `sealed_filters.rb` against a new disposable app/output,
+with `RAILS_ENV=production LOWRAIL=0 BENCH_JIT=0 BENCH_ROUNDS=6
+BENCH_SEED=41231 BENCH_JOBS=3` and the pinned Valgrind on PATH/CPATH.
+These measurement-only specimens are not production installers.
+
+Current production form activation remains refused. The next priced target,
+**only after passive-admission review gates pass and a new allocation**, is
+one whole-request interpreter show cohort with form, token and collection
+active together. Only that run can establish their actual combined price;
+neither a sum nor an inferred request percentage is credited here.
+
+## Historical form prices
+
 **Latest accepted interpreter request saving: −14.457% [−14.474, −14.410].**
 The new budget-plus-request run uses **8.750826 → 7.485376 M Ir/request**,
 with **`measurement_complete:true`** and no unmodeled units. The earlier

@@ -47,6 +47,29 @@ This does **not** recover form activation or change its measured result, add
 measurements, or certify the unported suite scenarios
 ([prototype and scope](sealed-verification.md#optional-native-holder-prototype-link-coverage-recovered)).
 
+## Collection/token isolated prices; filter stops (2026-10-21)
+
+Three separate finite interpreter cohorts on
+[`2c6899c`](https://github.com/thomasklemm/lowrail/commit/2c6899cd444583c96006430da03cb32776e23bb7)
+pass the unchanged A/A/heap/brk/JIT-state controls. Collection fusion saves
+**200,979.80 Ir [200,498.47, 201,333.63] per two-comment invocation**,
+**−9.88386% [−9.90693, −9.87628]**. Token saves
+**89,927.06 Ir [89,170.80, 90,472.40] per four-token operation**,
+**−11.12246% [−11.21563, −11.00622]**. Accept those isolated prices only.
+
+Filter saves **4,124.64 Ir [−2,807.96, +6,516.19]**,
+**−0.046934% [−0.074127, +0.031951]**: no resolved saving. Stop it at price;
+keep the flattened-filter specimen only as evidence, not in passive form or
+any production plan. Six rounds each, no retry; all 312 windows GC-free.
+
+**These are not additive and are not whole-request percentages.** No
+production promotion follows; passive form still needs its approved
+symmetry/concurrency/bounded-admission/cold/exactness gates. After review and
+a new measurement allocation, price form + token + collection together in
+one whole-request interpreter show cohort. Do not infer a sum. The
+[method, admission, pins and intervals](passes/sealed-form.md#separate-collection-token-and-filter-prices-2026-10-21)
+and [numeric export](passes/sealed-micros.json) retain all three results.
+
 ## RBS exports preserve slot evidence, not signature certification (2026-10-21)
 
 Reuse the existing TypeModel and renderer for `types --rbs APP`, legacy split
