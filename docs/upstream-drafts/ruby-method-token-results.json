@@ -1,6 +1,34 @@
 {
   "base": "cfa50b00939fd07ae87ffceb730bd2cfbccd8553",
   "token_head": "30c96264ab0fb6e7c6e14336679ff0ca4079ca56",
+  "ticket": "https://bugs.ruby-lang.org/issues/22459",
+  "current_token_head": "a30db2f20843940c089bd8247135a7c7cd475ca5",
+  "historical_sections": ["costs", "native_interpreter", "writes", "census", "tests"],
+  "review_fix": {
+    "url": "https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5",
+    "ruby_sha256": "60e66e78e0e887084232bbc3eebd3f19ddc331a8c126cf0a4b50572df7027a30",
+    "tests": {"interpreter": {"tests": 13, "assertions": 97, "failures": 0, "errors": 0, "skips": 0}, "yjit": {"tests": 13, "assertions": 97, "failures": 0, "errors": 0, "skips": 0}},
+    "c99_standalone_header": "PASS",
+    "native_c_probe": {"checks": 10, "before_redefinition": 10, "after_redefinition": 0},
+    "reproduced": ["Cannot malloc during GC from st_insert in dfree", "fork resets single-Ractor predicate and can reenable tokens without a persistent latch"],
+    "fixes": ["existing-only st_update during unlink and existing-list registration", "valid published only after successful registration", "permanent disable latch set before multi-Ractor transition, retained across fork", "self-contained bool dependency in ruby/vm.h", "experimental lookup-only RDoc"],
+    "source_reviewed_not_fault_injected": "allocation failure registration publication",
+    "checked_not_established": ["compaction address hazard: rb_gc_mark pins live CME/class", "parallel-sweep dfree race: non-thread-safe destruction is deferred", "included-module token invalidation allegation: focused regression and direct probe both revoked token"],
+    "oracle": "No final-source blocker within documented single-Ractor lookup-only, non-refinement/non-Box scope",
+    "full_test_all": "NOT RERUN on fix; historical non-green results retained"
+  },
+  "post_fix_remeasurement": {
+    "status": "PENDING",
+    "invalid_attempt": {
+      "status": "INVALID",
+      "reason": "protocol drift: Lowrail pull mixed observer harness revisions during interpreter workers",
+      "ruby_head": "a30db2f20843940c089bd8247135a7c7cd475ca5",
+      "harness_heads": ["315d56f7dd8982c3eb974536c252b4aeb3709a81", "2ae8c72553b30493b71bdec22316099bf43b4475"],
+      "first_20_interpreter_workers": {"without_placement": 18, "with_placement": 2},
+      "prices_claimed": false,
+      "raw_directories": ["/tmp/epoch-research/token-pushed-interpreter", "/tmp/epoch-research/token-pushed-yjit"]
+    }
+  },
   "date": "2026-10-21",
   "costs": {
     "interpreter": {

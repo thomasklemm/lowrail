@@ -3,6 +3,10 @@
 2026-10-21. Experimental MRI API, not a production correctness or speed claim.
 This document is self-contained and may be attached to a Ruby Feature ticket.
 
+Posted by the owner as [Feature #22459](https://bugs.ruby-lang.org/issues/22459).
+The posted description is historical; the review correction below has not
+been posted by this thread. **Final-source read-cost remeasurement is pending.**
+
 **Recommendation:** discuss scoped method-validity tokens, not a global
 mutation counter. A production-mode request invalidated the global snapshot
 20 times on every request, but invalidated none of the 12 held method tokens.
@@ -16,9 +20,12 @@ on ruby/ruby master
 (re-fetched on 2026-10-21). It contains an
 [epoch experiment](https://github.com/thomasklemm/ruby/commit/535cf1796028189e1ab5346101568b454ca58c35)
 followed by the
-[token prototype](https://github.com/thomasklemm/ruby/commit/30c96264ab0fb6e7c6e14336679ff0ca4079ca56).
+[original token prototype](https://github.com/thomasklemm/ruby/commit/30c96264ab0fb6e7c6e14336679ff0ca4079ca56)
+and the reviewed
+[lifecycle fix](https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5).
 [Combined patch](https://github.com/thomasklemm/ruby/compare/cfa50b00939fd07ae87ffceb730bd2cfbccd8553...mutation-epoch-prototype.patch).
-Neither commit changes Ruby's cache policy. No upstream PR has been opened.
+The original linked commits are preserved; the global epoch remains a rejected
+alternative. None changes Ruby's cache policy. No upstream PR has been opened.
 
 Ruby surface:
 
@@ -35,7 +42,8 @@ int rb_vm_method_token_valid_p(VALUE token);
 ```
 
 - `klass` must be a Class, including an already-existing singleton Class;
-  an ordinary Module raises `TypeError`. Ruby `name` uses `rb_to_id` conversion.
+  an ordinary Module raises `TypeError` while tokens are enabled. Ruby `name`
+  uses `rb_to_id` conversion, which may execute Ruby coercion code.
   Acquisition returns `nil` for a missing or refined callable method entry
   (CME). It does not call the target or `method_missing`.
 - Acquisition resolves/registers the lookup even without a Ruby callsite,
@@ -43,26 +51,90 @@ int rb_vm_method_token_valid_p(VALUE token);
   Tokens sharing a CME share its invalidations; this is not exact event
   reporting or a promise never to invalidate conservatively.
 - Four existing method-cache/CME invalidation paths that notify YJIT and ZJIT
-  also permanently clear held tokens for that CME. Checks allocate nothing
-  and execute no Ruby callback. An invalid token never becomes valid again;
+  also permanently clear held tokens for that CME while enabled. Checks with
+  a valid token argument allocate nothing and execute no Ruby callback.
+  An invalid token never becomes valid again;
   consumers must revalidate their assumptions and acquire a fresh token.
 - A native non-owning registry is keyed by CME; token GC unlinks live entries.
   Revocation walks the held tokens for the affected CME. Memory retention and
   revocation fan-out have not been benchmarked at large subscription counts.
-- **Prototype restriction:** C callers require the GVL in the main Ractor.
-  Acquisition returns `nil` and checking returns false outside the main
-  Ractor; revocation currently ignores other Ractors. Main-Ractor threads
-  use the GVL, but no cross-Ractor mutation safety is claimed. This must not
-  be used as a concurrent, cross-Ractor assumption API. These restrictions
-  are not a proposed final concurrency design.
+- **Prototype restriction:** C callers require the GVL. The first transition
+  to multi-Ractor mode permanently disables acquisition (`nil`) and checks
+  (`false`) in every Ractor, even after termination or fork. A persistent
+  latch is set before other Ractors can run; the resettable single-Ractor
+  predicate alone is insufficient. Revocation is skipped after disabling;
+  registered nodes still unlink at GC. No concurrent-Ractor API is claimed.
+  These restrictions are not a proposed final concurrency design.
 - The token concerns lookup on the specified class, not the identity of a
   later receiver. Adding a singleton to one instance leaves its ordinary
   class token valid. Consumers need an independent actual-receiver-class
-  guard. Refinements, lexical/Box selection and mutable values are not
-  certified. Ordinary Ruby wrappers are overridable; the C entry is distinct.
+  guard. Callees (including `super`), refinements, lexical/Box selection and
+  mutable values are not certified. Ordinary Ruby wrappers are overridable;
+  the C entry is distinct.
 - A successful check is not a lock across subsequent Ruby calls or thread
   switches. Recheck after reentry before using an assumption, and do not
   replay already-executed application effects during fallback.
+
+## Final-source review and regression evidence
+
+Thermos correctness and maintainability reviews plus an independent oracle
+review informed the fix. The final oracle found no blocker within the
+documented single-Ractor, lookup-only, non-refinement/non-Box boundary. This
+is source review, not exhaustive VM invalidation coverage or API acceptance.
+
+- **Reproduced lifecycle crash:** collecting list heads with live sibling
+  tokens across four CMEs aborted with `[BUG] Cannot malloc during GC`.
+  `st_insert` can grow even when replacing an existing key. Both destruction
+  and existing-list registration now use an existing-only `st_update`;
+  its callback returns `ST_STOP` for an absent key. No allocation follows
+  borrowing an unrooted list head. The retained regression failed before
+  the fix and passes afterward.
+- **Registration exception safety:** zero-initialized `valid` is published
+  only after successful registration. A raised allocation failure cannot
+  make an unpublished node unlink itself. Allocation failure injection was
+  not performed; this ordering was source-reviewed and GC-stress tested.
+- **Ractor/fork revalidation:** the resettable single-Ractor predicate could
+  make a disabled token valid again in a forked child. The persistent latch
+  fixes this. Regression tests cover termination and fork, with/without a
+  subsequent definition change, and no intervening token API call.
+- **Header/docs:** `<ruby/vm.h>` directly includes its boolean dependency;
+  standalone C99 `-Werror` compilation passes. MRI-style RDoc documents the
+  experimental API and lookup-only scope. NEWS is deferred pending core's
+  acceptance rather than advertising a released facility.
+- **Not established:** live class/CME references are pinned by `rb_gc_mark`,
+  so the alleged compaction address hazard was not confirmed. Current master
+  defers non-thread-safe `dfree` in parallel local sweeps; the alleged
+  parallel-free registry race was not confirmed. Keep the registry: leaf
+  invalidators notify JITs without setting `METHOD_ENTRY_INVALIDATED`.
+- A final reviewer alleged included-module redefinition missed a child-class
+  token. Both the focused test and an independent executed probe revoked
+  the held token and observed the new result. The source complements the CME
+  on the defining ICLASS; the allegation was not confirmed, so no speculative
+  VM-cache change was made.
+
+On the exact pushed fix, interpreter and YJIT each pass **13 tests, 97
+assertions, zero failures/errors/skips**, including GC stress, lazy sweep,
+compaction, suppressed callbacks, visibility/alias/remove/undef,
+include/prepend, singleton replacement and fork refusal. A direct-C probe
+returned ten successful checks before redefinition and zero afterward.
+Installed Ruby SHA-256:
+`60e66e78e0e887084232bbc3eebd3f19ddc331a8c126cf0a4b50572df7027a30`.
+The final full `test-all` was not rerun; the historical non-green results
+below remain limitations, not final-source certification.
+
+## Final-source read-cost status: pending
+
+The first post-fix interpreter/YJIT attempt is **INVALID: protocol drift**.
+Ruby stayed pinned to the pushed fix, but a Lowrail pull during the cohort
+mixed observer harnesses from `315d56f7dd8982c3eb974536c252b4aeb3709a81`
+and `2ae8c72553b30493b71bdec22316099bf43b4475`. Among the first 20 completed
+interpreter workers, 18 lacked placement observations and two had them.
+No price from this attempt is claimed, irrespective of its numerical gates.
+Raw evidence is retained under `/tmp/epoch-research/token-pushed-interpreter`
+and `token-pushed-yjit`; results JSON records the rejected attempt separately.
+A new, explicitly authorized finite cohort will use an immutable detached
+harness worktree and record its exact SHA per worker. It is not yet evidence
+for a revised price. All read-cost figures below are **historical**.
 
 ## Steady-state production-mode churn
 
@@ -121,7 +193,7 @@ each request and would be renewed on invalidation. Neither the per-instance
 extend nor the superclass cache clearing invalidated these held tokens.
 This is not a claim that every possible application token would survive.
 
-## Read/check costs
+## Historical read/check costs (original token revision)
 
 Native CPU-time diagnostics preceded Callgrind. The direct C token-check loop
 cost about **3.59 ns/iteration**, including an empty native-call loop of about
@@ -130,7 +202,8 @@ same loop. These are machine-specific diagnostics, not stable latency claims.
 The native Ruby-loop probe did not establish steady YJIT compilation, so its
 Ruby/YJIT latencies are not used as evidence.
 
-Current-master token build, x86-64 Linux, GCC 12.2, `-O3 -g`, Valgrind 3.19
+Original master token build (the linked token prototype, not the lifecycle
+fix), x86-64 Linux, GCC 12.2, `-O3 -g`, Valgrind 3.19
 (512 MiB brk reservation). One finite six-round cohort per interpreter/YJIT
 mode, seed 41231, at most two workers. N=0/100,000 slopes subtract paired
 same-round empty Ruby-loop or native-call-loop slopes. Fixed per-pool floors
@@ -208,7 +281,7 @@ missed this ordering; the published epoch commit fixes it. A future constant
 token cannot simply subscribe to the late cache invalidation seam and assume
 this case is safe. A per-constant-name token is **not implemented** here.
 
-Targeted interpreter and YJIT runs each passed **10 tests, 59 assertions,
+Historical targeted interpreter and YJIT runs each passed **10 tests, 59 assertions,
 0 failures/errors**. `make test-all` on the master token build ran **38,696
 tests, 8,083,623 assertions, 1 failure, 2 errors, 221 skips**, using the
 repository-default excludes (including `memory_leak`) and four test workers.

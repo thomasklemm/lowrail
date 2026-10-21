@@ -4,6 +4,20 @@ Experiment only, 2026-10-20. **No runtime-gem, default, quarantine or upstream
 publication changes.** The [local Ruby patch](../upstream-drafts/ruby-4.0.7-mutation-epoch.patch)
 is not a supported Ruby API or a production Lowrail implementation.
 
+**Upstream follow-up (2026-10-21):** the owner posted
+[Feature #22459](https://bugs.ruby-lang.org/issues/22459), proposing scoped
+method tokens instead. Production Fizzy `/bubbles` bumped the global epoch
+20 times/request via `CollectionProxy#extend(*extending)`, while none of 12
+selected held tokens invalidated. The registry lifecycle/Ractor
+[review fix](https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5)
+passes 13 tests/97 assertions in interpreter and YJIT. Final-source cost
+remeasurement is pending; its first cohort is INVALID for harness drift.
+See the [current evidence](../upstream-drafts/ruby-method-token-evidence.md)
+and [unposted correction draft](../upstream-drafts/ruby-method-token-feature.md).
+The numbers and prototype below describe the historical 4.0.7 experiment,
+not the reviewed token implementation. The global epoch is a rejected
+alternative, not the proposed API.
+
 **Answer:** an allocation-free C getter can read a broad VM generation for
 **195 interpreter / 36 YJIT Ir**; read + integer comparison + successful branch
 costs **267 / 52 Ir**. It detects the tested method/visibility/constant

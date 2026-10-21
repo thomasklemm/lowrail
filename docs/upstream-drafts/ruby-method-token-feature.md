@@ -1,5 +1,35 @@
 # Feature: scoped method-assumption validity tokens
 
+Posted by the owner as [Feature #22459](https://bugs.ruby-lang.org/issues/22459).
+The original description below is preserved, not rewritten. Its costs and
+main-Ractor wording describe the original prototype, not the reviewed fix.
+
+## Correction comment draft — not posted
+
+The prototype has a [review fix](https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5),
+preserving the original commits and registry design. A new regression
+reproduced `Cannot malloc during GC`: `st_insert` can allocate even when
+replacing a registry head. Destruction and existing-list registration now
+use non-inserting `st_update`, and `valid` is published only after registration
+succeeds. Tokens now fail closed permanently at the first multi-Ractor
+transition, including after Ractor termination and fork. The public header is
+self-contained, and experimental lookup-only RDoc was added.
+
+Interpreter and YJIT each pass **13 tests, 97 assertions**. Independent review
+found no remaining blocker within that scope. Compaction and parallel-sweep
+concerns were checked and not established: `rb_gc_mark` pins the retained
+CMEs/classes, and non-thread-safe `dfree` is deferred. An alleged
+included-module invalidation gap did not reproduce in the test or direct probe.
+
+The previous Ir figures are **historical**, not measurements of this fix.
+Remeasurement is pending: the first replacement cohort is **INVALID** because
+it mixed observer-harness revisions, and no prices from it are claimed.
+The non-green full-suite result, noisy write timing, limited endpoint census
+and lookup-only/refinement/Box/constant exclusions remain unchanged; no final
+full-suite equivalence or concurrent-Ractor guarantee is claimed.
+
+## Original posted description — historical
+
 Would MRI consider an API for subscribing to a method-lookup assumption and
 cheaply checking whether it remains valid? The intended shape is scoped to
 `(class, method name)`, using existing callable-method-entry (CME) invalidation,
