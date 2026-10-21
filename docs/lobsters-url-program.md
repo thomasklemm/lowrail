@@ -48,6 +48,55 @@ the shared-validator rerun and finite-check log. The original frozen screen's
 now-removed local adapter/policy are archived there, not silently substituted
 with the shared validator. The program source stayed unchanged across both.
 
+## Guard-cost follow-up
+
+[`lobsters_url_guard.rb`](../bench/experiments/lobsters_url_guard.rb) is a
+conservative Ruby certificate experiment, **not a production Lowrail unit**.
+Set `url_guarded: true` in the private config and pin this additional source
+in `exploration_sources`. The off arms build the same certificate but remove
+the singleton override; timed on calls pay every check, with counters disabled.
+
+It checks effective bodies **and visibility** on actual receivers, following
+Endpoint's intrinsic reflection pattern rather than trusting hooks/epochs.
+Admission and post-`url_options` checks cover the generated helper, URL options
+and defaults, RouteSet URL generation, helper class continuations, route-table
+identity/membership, reload/redraw, route defaults/requirements/format state,
+Journey's generator/formatter, supporting primitives and actual scalar/container
+dispatch. Unknown targets/shapes refuse. Script-name completion, host/protocol
+and the final URL strategy remain live. Entry failure removes the override and
+resumes genuine Rails dispatch, including newly private/redefined methods.
+Post-boundary refusal resumes the correct optimized/generic continuation using
+already read options, not a replay of the original helper entry.
+
+[`lobsters_url_mutations.rb`](../bench/experiments/lobsters_url_mutations.rb)
+passes **80 off/on pairs**: 21 mutation families, path/URL variants where
+applicable, at entry and at the return from the live `url_options` call. Every
+one of the 40 boundary probes records a boundary fallback. Checks compare the
+active call and a later call, values/classes/encoding/frozen state, public error
+class/name and URL-options read counts. All mutation effects are confined to
+forked test children; app/config files and the database stay unchanged. Live
+mount prefixes and two hosts × two protocols also pass without cached output.
+This is finite evidence, not an arbitrary-Ruby-mutation or production admission
+claim. No own-suite/Thermos/main integration is claimed.
+
+One attempted guarded screen is **rejected and retained**: while it ran, an
+expanded probe showed that replacing `ActionDispatch::Http::URL.url_for` could
+observe missing `:params/:user/:password` keys in the root shortcut. RouteSet's
+`url_for` check was insufficient. The corrected candidate checks HTTP URL
+method bodies/visibility too and preserves the generic continuation's complete
+option shape. The new probe fails before that fix and all 80 pairs pass after
+it. Editing the pinned source deliberately invalidated the old run; the shared
+harness stopped at its source-drift gate. No old worker is pooled into the
+corrected screen, and no result from that candidate is certification evidence.
+
+The corrected candidate's screen keeps the **same 500/600, three rounds,
+`/newest` and `/hottest`** protocol and shared bfc682b validator. The owner's
+decision rule is allocation savings on **both** routes with exact output;
+losing that lead stops the prototype and forbids Callgrind. This implementation
+checks common generic facts even for optimized paths and snapshots mutable
+state conservatively: a loss does not prove that every possible native/VM-epoch
+certificate would lose. It measures this concrete Ruby implementation only.
+
 ## Question and specimen
 
 Can a complete fixed-route URL program remove enough framework interpretation

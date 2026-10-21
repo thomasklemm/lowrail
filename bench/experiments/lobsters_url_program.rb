@@ -8,18 +8,24 @@ module LobstersUrlProgram
 
     def discover
       @helpers = []
+      @observations = Hash.new { |hash, helper| hash[helper] = [] }
       base = ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper
       trace = TracePoint.new(:call) do |event|
         next unless event.method_id == :call && event.self.is_a?(base)
         @helpers << event.self unless @helpers.any? { _1.equal?(event.self) }
+        target = event.binding.local_variable_get(:t)
+        name = event.binding.local_variable_get(:method_name)
+        rows = @observations[event.self]
+        rows << [target, name] unless rows.any? { _1[0].class == target.class && _1[1] == name }
       end
       trace.enable { yield }
     ensure
       trace&.disable
     end
 
-    def compile(coverage: false)
+    def compile(coverage: false, guarded: false)
       @programs, @counts = [], Hash.new(0)
+      require_relative "lobsters_url_guard" if guarded
       generic = ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper.instance_method(:call)
       helpers.each do |helper|
         route = helper.instance_variable_get(:@route)
@@ -30,7 +36,16 @@ module LobstersUrlProgram
         original = helper.method(:call)
         helper.instance_variable_set(:@lowrail_url_original, original)
         helper.instance_variable_set(:@lowrail_url_generic, generic)
-        code = <<~RUBY
+        if guarded
+          certificate = LobstersUrlGuard::Certificate.new(helper, @observations.fetch(helper), path, coverage)
+          helper.instance_variable_set(:@lowrail_url_certificate, certificate)
+          code = <<~RUBY
+            def call(target, method_name, args, inner_options, strategy)
+              @lowrail_url_certificate.call(target, method_name, args, inner_options, strategy)
+            end
+          RUBY
+        else
+          code = <<~RUBY
           def call(target, method_name, args, inner_options, strategy)
             unless args.empty? && (inner_options.nil? ||
                 (#{helper.route_name.to_s == "root"} && inner_options.instance_of?(Hash) &&
@@ -66,6 +81,7 @@ module LobstersUrlProgram
             strategy.call(options)
           end
         RUBY
+        end
         helper.singleton_class.class_eval(code, __FILE__, __LINE__)
         @programs << {helper: helper, original: original, compiled: helper.method(:call),
           route: helper.route_name, path: path}

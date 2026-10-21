@@ -13,7 +13,7 @@ module NativeBench::Exploration
       LobstersUrlProgram.discover do
         workload.each_value { raise "discovery HTTP failure" unless _1.call.status == 200 }
       end
-      LobstersUrlProgram.compile(coverage: !ENV["LOWRAIL_STATS"].nil?)
+      LobstersUrlProgram.compile(coverage: !ENV["LOWRAIL_STATS"].nil?, guarded: config.fetch("url_guarded", false))
       raise "no naturally observed fixed URL programs" if LobstersUrlProgram.programs.empty?
       LobstersUrlProgram.select(arm == "on")
     end
