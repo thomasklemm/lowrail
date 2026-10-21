@@ -194,9 +194,65 @@ module OperationCapture
       @request_completions.clear
       @contexts.clear
       @recording = true
+      # Runtime forms have no rewritten source expression. Capture the real
+      # ERB block without a TracePoint, then remove this method before replay.
+      form = @manifest.units.find { _1["pass"] == "sealed/form_scaffold" }
+      if form
+        calls, contexts = [], @contexts
+        id = form.fetch("id")
+        site = form.fetch("data").fetch("site").fetch("source_location")
+        wrapper = Module.new do
+          define_method(:form_with) do |model: false, scope: nil, url: nil, format: nil, **options, &block|
+            if block && block.source_location == site
+              ambient = ActiveSupport::CurrentAttributes.descendants.to_h { [_1, _1.attributes.dup] }
+              raise "ambient request context changes within captured unit #{id}" if contexts.key?(id) && contexts.fetch(id) != ambient
+              contexts[id] = ambient
+              call = [self, model, scope, url, format, options, block]
+              calls << call
+            end
+            value = super(model: model, scope: scope, url: url, format: format, **options, &block)
+            call << value if call
+            value
+          end
+        end
+        ArticlesController.view_context_class.prepend(wrapper)
+      end
       yield
+      wrapper.send(:remove_method, :form_with) if wrapper
+      calls&.each do |view, models, scope, url, format, options, block, actual|
+        on = view.method(:form_with)
+        off = on.super_method
+        raise "form variant inactive" unless on.owner == Lowrail::FormScaffold::Variant && off
+        raise "unknown form constructor" unless models.instance_of?(Array) && models.size == 2 && models.last.instance_of?(Comment)
+        article = models.first
+        # Both arms pay the same Method#call, array and fresh constructor. The
+        # production variant, not the earlier handwritten micro, is priced.
+        pair = { original: -> { off.call(model: [article, Comment.new], scope: scope, url: url, format: format, **options, &block) },
+          expression: -> { on.call(model: [article, Comment.new], scope: scope, url: url, format: format, **options, &block) }, actual: actual }
+        pair[:counted] = pair.fetch(:expression)
+        pair[:equivalent] = ->(left, right) { form_equivalent?(view, left, right) }
+        (@records[id] ||= []) << pair
+      end
     ensure
+      wrapper.send(:remove_method, :form_with) if wrapper&.instance_methods(false)&.include?(:form_with)
       @recording = false
+    end
+
+    def form_equivalent?(view, left, right)
+      # Real entropy remains enabled. Validate each token independently before
+      # normalizing only its mask for the operation's output comparison.
+      [left, right].each do |html|
+        token = html[/name="authenticity_token" value="([^"]+)"/, 1] or raise "form token missing"
+        controller = view.controller
+        decoded = controller.send(:unmask_token, controller.send(:decode_csrf_token, token))
+        action = html[/action="([^"]+)"/, 1]
+        verb = html[/name="_method" value="([^"]+)"/, 1] || "post"
+        expected = controller.send(:per_form_csrf_token, view.session, URI.parse(action).path, verb)
+        raise "invalid replay token" unless ActiveSupport::SecurityUtils.fixed_length_secure_compare(decoded, expected)
+      end
+      normalize = ->(html) { html.gsub(/(name="authenticity_token" value=")[^"]+/, '\\1MASK') }
+      left.class == right.class && left.encoding == right.encoding && left.html_safe? == right.html_safe? &&
+        normalize.call(left) == normalize.call(right)
     end
   end
 end

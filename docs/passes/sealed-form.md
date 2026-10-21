@@ -243,8 +243,34 @@ The [numeric export](sealed-form-request.json) retains artifact, fixture,
 runtime/harness/source pins, per-round values, all controls and window/heap/GC
 endpoints, native probes and per-arm trace-self annotations. Raw responses,
 cookies and logs stay private. The historical `measurement_complete` flag
-remains **false**: single-pass Callgrind does not have an exact runtime-form
-operation capture/per-hit budget adapter, and the report must not relabel the
+remains **false**: at the measured revision, single-pass Callgrind had no exact
+runtime-form operation capture/per-hit budget adapter. The report must not relabel the
 older handwritten micro or divide this request saving by its hit count to
 invent one. **The request saving is accepted; the pass remains sealed-only,
 with no default change or promotion.**
+
+## Per-hit adapter follow-up (not a new measurement)
+
+The shared operation worker now captures this certified site's actual ERB
+block, view and request context without tracing, removes its capture method,
+then replays the **installed production variant and its real `super_method`**.
+Every arm constructs a fresh Comment/model array. Both pay `Method#call`;
+the variant includes its full predicate. Untimed replay validates live CSRF
+tokens independently and compares normalized bytes, safety and encoding
+against both the original and the captured request result.
+
+The public regression passes **1 test / 30 assertions**, including the
+192+192 observable pairs, constructor/value refusals and native operation
+capture. The adapter observes exactly **one invocation and completed hit per
+iteration and per request**, not inferred from the request saving. The
+matching-mode YJIT artifact also passes that untimed adapter check. Shared
+single-pass budget/report arithmetic passes alongside the existing stacked
+controls; `--pass sealed/form_scaffold --measure-budgets` can now generate and
+compare a genuine instruction budget without editing an artifact to remove
+unselected AR units or importing a different-metric micro.
+
+No new operation or request instruction windows have run. The old numeric
+export therefore remains unchanged and incomplete. An accepted, source-pinned
+budget plus request run with all existing controls is still needed before
+any **new** report can say `measurement_complete:true`; worker authorization
+and the separate YJIT cohort release remain outstanding.

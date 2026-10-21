@@ -98,11 +98,14 @@ module StackBudget
           completed_hits_per_request: entry["completed_hits_per_request_samples"],
           expected_saved_per_request: RequestPairs.estimate(contributions.fetch(entry.fetch("id")), seed: seed) }
       end }
-    output[:comparisons] = { "no_setup" => "off_a", "default" => "default" }.to_h do |label, reference|
+    stacked = cohorts.first.first.key?("stacked")
+    measured = stacked ? "stacked" : "default"
+    references = stacked ? { "no_setup" => "off_a", "default" => "default" } : { "no_setup" => "off_a" }
+    output[:comparisons] = references.to_h do |label, reference|
       relevant = units.reject { label == "default" && default_passes.include?(_1.fetch("pass")) }
       [label, metrics.to_h do |metric|
-        saved = cohorts.map { |rows| RequestPairs.median(rows.map { _1.fetch(reference).fetch(metric) - _1.fetch("stacked").fetch(metric) }) }
-        pct = cohorts.map { |rows| RequestPairs.median(rows.map { 100 * (_1.fetch("stacked").fetch(metric).fdiv(_1.fetch(reference).fetch(metric)) - 1) }) }
+        saved = cohorts.map { |rows| RequestPairs.median(rows.map { _1.fetch(reference).fetch(metric) - _1.fetch(measured).fetch(metric) }) }
+        pct = cohorts.map { |rows| RequestPairs.median(rows.map { 100 * (_1.fetch(measured).fetch(metric).fdiv(_1.fetch(reference).fetch(metric)) - 1) }) }
         comparison = { measured_saved_per_request: RequestPairs.estimate(saved, seed: seed), delta_pct: RequestPairs.estimate(pct, seed: seed) }
         if budget && budget.fetch("metric") == metric && (!relevant.empty? || output.fetch(:unmodeled_unit_ids).empty?)
           series = relevant.map { contributions.fetch(_1.fetch("id")) }

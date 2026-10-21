@@ -237,21 +237,23 @@ module PassBench
     begin
       stacked = !!options[:passes]
       raise "choose --pass or --passes" if !!options[:pass] == stacked
+      raise "choose --budgets or --measure-budgets" if options[:budgets] && options[:measure_budgets]
+      raise "instruction budgets cannot combine with --micro-case/--model" if
+        (options[:budgets] || options[:measure_budgets]) && (options[:micro_case] || options[:model])
       if stacked
         raise "stacked mode needs --default-build DIR" unless options[:default_build]
         raise "stacked mode uses --budgets, not --micro-case/--model" if options[:micro_case] || options[:model]
-        raise "choose --budgets or --measure-budgets" if options[:budgets] && options[:measure_budgets]
         raise "stacked mode cannot combine other comparison layers" if
           %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].any? { ENV[_1] }
-      elsif options[:default_build] || options[:budgets] || options[:measure_budgets]
-        raise "--default-build, --budgets and --measure-budgets require --passes"
+      elsif options[:default_build]
+        raise "--default-build requires --passes"
       end
       counter = result.fetch(:counter)
       raise "counter must be callgrind or native" unless %w[callgrind native].include?(counter)
       if options[:speculate]
         raise "only --speculate unguarded is supported" unless options[:speculate] == "unguarded"
         raise "unsafe comparison requires fixed-heap Callgrind, --pass and no other comparison layers" if
-          stacked || counter != "callgrind" || options[:micro_case] || options[:diagnostics] ||
+          stacked || counter != "callgrind" || options[:micro_case] || options[:diagnostics] || options[:budgets] || options[:measure_budgets] ||
           %w[BENCH_BASELINE_LIB BENCH_INSTANTIATE_DIR BENCH_VARIANT_APP].any? { ENV[_1] }
         warn "[lowrail] *** UNSAFE GUARD-TAX EXPERIMENT: ONLY THE UNGUARDED LAYER BYPASSES FACTS. NEVER DEPLOY. ***"
       end
@@ -323,13 +325,13 @@ module PassBench
         default_ids = reference_data.fetch("units").map { _1.fetch("id") }.join(",")
         result[:default_coverage] = probe(app, out, env.merge("LOWRAIL_DIR" => reference, "LOWRAIL_UNITS" => default_ids.empty? ? nil : default_ids,
           "BENCH_UNITS" => default_ids), route, "default-coverage")
-        if options[:measure_budgets]
-          result[:budget_input] = InstructionBudget.run(app, File.join(out, "budgets"), env, route, result, selected)
-          StackBudget.validate!(result.fetch(:budget_input), result, selected)
-        elsif options[:budgets]
-          result[:budget_input] = JSON.parse(File.read(options.fetch(:budgets)))
-          StackBudget.validate!(result.fetch(:budget_input), result, selected)
-        end
+      end
+      if options[:measure_budgets]
+        result[:budget_input] = InstructionBudget.run(app, File.join(out, "budgets"), env, route, result, selected)
+        StackBudget.validate!(result.fetch(:budget_input), result, selected)
+      elsif options[:budgets]
+        result[:budget_input] = JSON.parse(File.read(options.fetch(:budgets)))
+        StackBudget.validate!(result.fetch(:budget_input), result, selected)
       end
       if baseline
         preflight(File.join(app, ".lowrail"), baseline, root: app)
@@ -361,8 +363,8 @@ module PassBench
         raise "unexpected JIT mode in request workers" unless workers.all? { JitStability.actual(_1) == JitStability.mode(env.fetch("BENCH_JIT")) }
       end
       raise "request A/A, heap, activation or JIT checks failed; inspect requests.log" unless ok
-      if stacked
-        result[:stack] = StackBudget.report(raw, result, result[:budget_input], default_passes,
+      if stacked || result[:budget_input]
+        result[:stack] = StackBudget.report(raw, result, result[:budget_input], default_passes || [],
           seed: Integer(ENV.fetch("BENCH_SEED", "41231")))
       end
       # Keep time and instruction budgets separate: a YJIT micro cannot

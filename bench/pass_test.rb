@@ -46,6 +46,7 @@ class PassBenchTest < Minitest::Test
 
   def test_zero_units_cannot_masquerade_as_active_pass_measurement
     run_rejection(manifest) { assert_includes _1.fetch("error"), "no units" }
+    run_rejection(manifest, measure_budgets: true) { assert_includes _1.fetch("error"), "no units" }
   end
 
   def test_unsafe_snapshot_declines_normally_and_cannot_skip_existing_preflight
@@ -189,6 +190,13 @@ class PassBenchTest < Minitest::Test
       assert_equal [11, 12, 3], report.fetch(:units).map { _1.fetch(:id) }
       assert_empty report.fetch(:unmodeled_unit_ids)
       assert_in_delta(-7.0, no_setup.fetch(:delta_pct).fetch(:median), 1e-9)
+      single_raw = {"samples" => raw.fetch("samples").map { _1.reject { |key, _| key == "stacked" } }}
+      single = StackBudget.report(single_raw, result, accepted, [], seed: 1)
+      assert_equal ["no_setup"], single.fetch(:comparisons).keys
+      single_cost = single.fetch(:comparisons).fetch("no_setup").fetch("instructions_total")
+      assert_equal 40, single_cost.fetch(:measured_saved_per_request).fetch(:median)
+      assert_equal 12.0, single_cost.fetch(:sum_individual_expected_saved_per_request).fetch(:median)
+      assert_equal 28.0, single_cost.fetch(:measured_minus_expected).fetch(:median)
       defaults_only = accepted.merge("units" => [entries.last])
       partial = StackBudget.report(raw, result, defaults_only, ["view/link_to"], seed: 1)
       refute partial[:comparisons]["default"]["instructions_total"].key?(:sum_individual_expected_saved_per_request), "missing opt-in prices are not zero"

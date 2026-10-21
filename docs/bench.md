@@ -502,8 +502,10 @@ controls and repeat evidence before promotion, not just a narrow interval.
 #### Capturing genuine instruction budgets
 
 Add `--measure-budgets` instead of `--budgets FILE` to generate the input with
-the same fixed-heap Callgrind runner. This currently requires interpreter
-Callgrind and stacked mode, including for a default-only set:
+the same fixed-heap Callgrind runner. Automatic generation requires interpreter
+Callgrind. Both single-pass and stacked reports accept budgets; a single pass
+compares its enabled `default` arm against no setup, without a separate
+default-build reference. Stacked mode still requires that reference:
 
 ```sh
 BENCH_MICRO_ROUNDS=12 mise exec -- target/debug/lowrail bench "$app" \
@@ -539,6 +541,26 @@ they pay the same dispatch adapter. The operation includes the
 variant's full guard; no runtime registry hook or private activation is added.
 Original/on values are compared before timing. Separate counted calls establish
 completed hits, and stats are restored before measurement.
+
+`sealed/form_scaffold` captures the actual ERB block/view at its certified
+source site using a temporary worker-local helper method, removed before
+replay. No TracePoint or capture callback runs in the measured operations.
+Both original and installed-variant arms use `Method#call`, the real captured
+block and a fresh `Comment.new`/model array on every invocation. The full
+production predicate remains in the variant. Real masked tokens are decoded
+and validated independently against their emitted action/method before
+normalizing their mask for the untimed bytes/safety/encoding comparison.
+Request and replay completion counts come from the runtime's actual stats.
+
+`BENCH_OPERATION_CHECK=1` runs the operation worker's native equivalence and
+count checks, then exits with `untimed:true`, without a Callgrind extension or
+measurement windows. This validates capture, **not** a numeric budget. After
+worker authorization, an interpreter-certified sealed artifact can be priced
+with `LOWRAIL_SEALED=1 lowrail bench APP --pass sealed/form_scaffold
+--measure-budgets --path /articles/1 --out NEW_DIR`. All existing request,
+per-operation A/A, heap, mode, provenance and completion-mix gates still apply.
+Only a fully modeled accepted new run can set `measurement_complete:true`;
+adding the adapter never retroactively completes a historical request cohort.
 
 Runtime facts must be built for the measured JIT state too. On Ruby 4.0,
 enabling YJIT replaces native `Array#each` with an internal Ruby method;

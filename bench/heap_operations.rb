@@ -14,7 +14,6 @@ require File.expand_path("config/environment", Dir.pwd)
 require "rack/mock"
 require_relative "heap_windows"
 require_relative "pass_probe"
-require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
 Rails.application.eager_load!
 Rails.logger.level = :error
 ActiveRecord::Base.logger = nil if defined?(ActiveRecord::Base)
@@ -59,8 +58,9 @@ metadata = records.to_h do |id, pairs|
   OperationCapture.restore_context(id)
   pairs.each do |pair|
     original, optimized = pair.fetch(:original).call, pair.fetch(:expression).call
-    raise "operation replay differs: unit #{id}" unless equivalent.call(original, optimized) &&
-      (!pair.key?(:actual) || equivalent.call(pair.fetch(:actual), optimized))
+    compare = pair.fetch(:equivalent, equivalent)
+    raise "operation replay differs: unit #{id}" unless compare.call(original, optimized) &&
+      (!pair.key?(:actual) || compare.call(pair.fetch(:actual), optimized))
   end
   [id, { invocations_per_iteration: pairs.size }]
 end
@@ -80,14 +80,19 @@ records.each do |id, pairs|
 end
 metadata.each do |id, entry|
   pass = Lowrail.manifest.units.find { _1.fetch("id") == id }.fetch("pass")
-  runtime = %w[memo/uri_join memo/sha256 digest/file_memo inertia/config_bind].include?(pass)
-  entry[:invocations_per_request] = pass == "inertia/config_bind" ?
+  runtime = %w[memo/uri_join memo/sha256 digest/file_memo inertia/config_bind sealed/form_scaffold].include?(pass)
+  entry[:invocations_per_request] = %w[inertia/config_bind sealed/form_scaffold].include?(pass) ?
     request_hits.fetch(id.to_s, 0) + request_fallbacks.fetch(id.to_s, 0) : entry.fetch(:invocations_per_iteration)
   entry[:completed_hits_per_iteration] = runtime ? Lowrail::Stats.unit_hits.fetch(id.to_s, 0) : OperationCapture.completions[id]
   entry[:completed_hits_per_request] = runtime ? request_hits.fetch(id.to_s, 0) : OperationCapture.request_completions[id]
 end
 Lowrail::Stats.instance_variable_set(:@enabled, false)
 Lowrail.send(:remove_const, :Stats) unless stats_was_loaded
+if ENV["BENCH_OPERATION_CHECK"] == "1"
+  puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, operations: metadata, untimed: true)}"
+  exit
+end
+require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
 arm = ENV.fetch("BENCH_OPERATION_ARM") == "on" ? :expression : :original
 operations = records.transform_values { |pairs| pairs.map { _1.fetch(arm) } }
 operations.each do |id, calls|
