@@ -14,21 +14,17 @@ if ARGV.first != "worker"
   abort "usage: blog_endpoint_check.rb APP NEW_OUTPUT_DIR [MUTATION [BUILD_DIR]]" unless app && output
   abort "output directory must be new" if File.exist?(output)
   FileUtils.mkdir_p(output, mode: 0o700)
-  if build
-    FileUtils.mkdir_p(File.join(output, "root"))
-    FileUtils.ln_s(build, File.join(output, "root/.lowrail"))
-  end
   lib = File.expand_path("../../gem/lib", __dir__)
   %w[off on].each do |arm|
     env = {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1",
       "LOWRAIL" => arm == "on" ? "1" : "0", "LOWRAIL_STATS" => "",
+      "LOWRAIL_ROOT" => app, "LOWRAIL_DIR" => build,
       "LOWRAIL_SHADOW" => "strict", "ENDPOINT_MUTATION" => mutation,
       "RUBYOPT" => "-I#{lib} -rlowrail/setup"}
     if ENV["SEALED_RENDERER_STAGE"]
       env.merge!("LOWRAIL" => "0", "RUBYOPT" => nil,
         "SEALED_RENDERER_ARM" => arm, "SEALED_RENDERER_STAGE" => ENV.fetch("SEALED_RENDERER_STAGE"))
     end
-    env["LOWRAIL_ROOT"] = File.join(output, "root") if build
     ok = system(env, RbConfig.ruby, File.expand_path(__FILE__), "worker", File.join(output, "#{arm}.json"),
       chdir: app, out: File.join(output, "#{arm}.log"), err: [:child, :out])
     abort "#{arm} worker failed; inspect private log" unless ok

@@ -29,7 +29,7 @@ preflight = -> {
     raise "historical preflight failed: #{error}" unless status.success?
     JSON.parse(text.lines.last)
   else
-    PassBench.preflight(File.join(app, ".lowrail"), lib)
+    PassBench.preflight(File.join(app, ".lowrail"), lib, root: app)
   end
 }
 manifest = preflight.call

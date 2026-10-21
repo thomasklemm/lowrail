@@ -27,7 +27,7 @@ class PassBenchTest < Minitest::Test
     run_rejection(manifest.merge("ruby_description" => "obsolete Ruby")) do |result|
       assert_includes result.fetch("error"), "incompatible Ruby/format"
     end
-    run_rejection(manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "facts" => [] }],
+    run_rejection(manifest.merge("units" => [{ "id" => 0, "pass" => "inertia/props", "facts" => [] }],
       "templates" => { "/missing/template.erb" => { "source_sha256" => "stale" } })) do |result|
       assert_includes result.fetch("error"), "stale build"
     end
@@ -55,16 +55,16 @@ class PassBenchTest < Minitest::Test
       file = File.join(dir, "manifest.json")
       File.write(file, JSON.generate(data))
       lib = File.expand_path("../gem/lib", __dir__)
-      assert_equal data, PassBench.preflight(dir, lib, unsafe: true)
+      assert_equal data, PassBench.preflight(dir, lib, root: dir, unsafe: true)
       File.write(file, JSON.generate(data.merge("ruby_description" => "[LOWRAIL UNSAFE] obsolete Ruby")))
-      assert_raises(RuntimeError) { PassBench.preflight(dir, lib, unsafe: true) }
+      assert_raises(RuntimeError) { PassBench.preflight(dir, lib, root: dir, unsafe: true) }
       File.write(file, JSON.generate(data.merge("templates" => { "/missing.erb" => { "source_sha256" => "stale" } })))
-      assert_raises(RuntimeError) { PassBench.preflight(dir, lib, unsafe: true) }
+      assert_raises(RuntimeError) { PassBench.preflight(dir, lib, root: dir, unsafe: true) }
     end
     run_rejection(manifest, speculate: "unguarded", counter: "native") { assert_includes _1.fetch("error"), "fixed-heap Callgrind" }
-    mixed = manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "facts" => [] },
-      { "id" => 1, "pass" => "memo/sha256", "facts" => [] }])
-    run_rejection(mixed, pass: "memo/uri_join", speculate: "unguarded") { assert_includes _1.fetch("error"), "separate single-pass build" }
+    mixed = manifest.merge("units" => [{ "id" => 0, "pass" => "inertia/props", "facts" => [] },
+      { "id" => 1, "pass" => "endpoint/action", "facts" => [] }])
+    run_rejection(mixed, pass: "inertia/props", speculate: "unguarded") { assert_includes _1.fetch("error"), "separate single-pass build" }
   end
 
   def test_speculative_source_elision_preserves_literals_live_predicates_and_unselected_guards
@@ -113,13 +113,13 @@ class PassBenchTest < Minitest::Test
   end
 
   def test_stack_requires_an_actual_default_reference_not_an_optional_build
-    options = { pass: nil, passes: "memo/uri_join,active_record/instantiate", default_passes: "memo/uri_join" }
+    options = { pass: nil, passes: "inertia/props,endpoint/action", default_passes: "inertia/props" }
     run_rejection(manifest, **options) { assert_includes _1.fetch("error"), "needs --default-build" }
-    data = manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "facts" => [] }])
+    data = manifest.merge("units" => [{ "id" => 0, "pass" => "inertia/props", "facts" => [] }])
     Dir.mktmpdir("lowrail-default-reference-test") do |dir|
-      File.write(File.join(dir, "manifest.json"), JSON.generate(manifest.merge("units" => [{ "id" => 1, "pass" => "active_record/instantiate", "facts" => [] }])))
+      File.write(File.join(dir, "manifest.json"), JSON.generate(manifest.merge("units" => [{ "id" => 1, "pass" => "endpoint/action", "facts" => [] }])))
       run_rejection(data, **options, default_build: dir) { assert_includes _1.fetch("error"), "reference contains opt-in" }
-      File.write(File.join(dir, "manifest.json"), JSON.generate(manifest.merge("units" => [{ "id" => 0, "pass" => "memo/uri_join", "file" => "/another/app.rb", "facts" => [] }])))
+      File.write(File.join(dir, "manifest.json"), JSON.generate(manifest.merge("units" => [{ "id" => 0, "pass" => "inertia/props", "file" => "/another/app.rb", "facts" => [] }])))
       run_rejection(data, **options, default_build: dir) { assert_includes _1.fetch("error"), "another app" }
     end
   end
@@ -128,25 +128,25 @@ class PassBenchTest < Minitest::Test
     Dir.mktmpdir("lowrail-pass-certificate") do |dir|
       lib = File.join(dir, "lib")
       FileUtils.mkdir_p(File.join(lib, "lowrail"))
-      original = File.expand_path("../gem/lib/lowrail/memo.rb", __dir__)
-      target = File.join(lib, "lowrail/memo.rb")
+      original = File.expand_path("../gem/lib/lowrail/inertia_props.rb", __dir__)
+      target = File.join(lib, "lowrail/inertia_props.rb")
       FileUtils.cp(original, target)
-      data = manifest.merge("units" => [{ "id" => 0, "pass" => "memo/sha256", "facts" => [],
-        "memo" => { "sources" => { original => { "sha256" => Digest::SHA256.file(original).hexdigest,
+      data = manifest.merge("units" => [{ "id" => 0, "pass" => "inertia/props", "facts" => [],
+        "props" => { "sources" => { original => { "sha256" => Digest::SHA256.file(original).hexdigest,
           "size" => File.size(original), "mtime" => File.mtime(original).to_r.to_s } } } }])
       File.write(File.join(dir, "manifest.json"), JSON.generate(data))
-      assert_equal data, PassBench.preflight(dir, lib)
+      assert_equal data, PassBench.preflight(dir, lib, root: dir)
       File.write(target, "changed")
-      error = assert_raises(RuntimeError) { PassBench.preflight(dir, lib) }
+      error = assert_raises(RuntimeError) { PassBench.preflight(dir, lib, root: dir) }
       assert_includes error.message, "stale build"
       binary = File.join(dir, "endpoint.bin")
       File.binwrite(binary, RubyVM::InstructionSequence.compile("Module.new").to_binary)
       data = manifest.merge("units" => [{ "id" => 0, "pass" => "endpoint/action", "facts" => [],
         "endpoint" => { "templates" => {}, "iseq" => "endpoint.bin", "iseq_sha256" => Digest::SHA256.file(binary).hexdigest } }])
       File.write(File.join(dir, "manifest.json"), JSON.generate(data))
-      assert_equal data, PassBench.preflight(dir, lib)
+      assert_equal data, PassBench.preflight(dir, lib, root: dir)
       File.binwrite(binary, "corrupt")
-      error = assert_raises(RuntimeError) { PassBench.preflight(dir, lib) }
+      error = assert_raises(RuntimeError) { PassBench.preflight(dir, lib, root: dir) }
       assert_includes error.message, "stale build"
     end
   end

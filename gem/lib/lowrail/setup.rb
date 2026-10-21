@@ -18,4 +18,6 @@ elsif ENV["LOWRAIL_SPECULATE"]
   require experiment
 end
 
-Lowrail.boot(root: ENV.fetch("LOWRAIL_ROOT") { File.expand_path(Dir.pwd) })
+# Artifact storage may be snapshotted independently; root remains the actual
+# app directory against which relocation and source certificates are checked.
+Lowrail.boot(root: ENV.fetch("LOWRAIL_ROOT") { File.expand_path(Dir.pwd) }, dir: ENV["LOWRAIL_DIR"])

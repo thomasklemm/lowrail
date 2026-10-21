@@ -9,7 +9,7 @@ require_relative "../gem/lib/lowrail/manifest"
 
 # One report contract over the existing request/GC harness and method micros.
 module PassBench
-  def self.preflight(dir, lib, unsafe: false)
+  def self.preflight(dir, lib, root:, unsafe: false)
     path = File.join(dir, "manifest.json")
     data = JSON.parse(File.read(path))
     checked = data
@@ -17,7 +17,7 @@ module PassBench
       raise "unsafe snapshot marker missing" unless data.fetch("ruby_description").start_with?("[LOWRAIL UNSAFE] ")
       checked = data.merge("ruby_description" => data.fetch("ruby_description").delete_prefix("[LOWRAIL UNSAFE] "))
     end
-    manifest = Lowrail::Manifest.new(checked, dir)
+    manifest = Lowrail::Manifest.new(checked, dir, root: root)
     raise manifest.refusal_reason if manifest.refusal_reason
     raise "stale build: incompatible Ruby/format" unless manifest.compatible?
     raise "production build required" unless manifest.rails_env == "production"
@@ -259,7 +259,7 @@ module PassBench
       baseline = File.expand_path(ENV["BENCH_BASELINE_LIB"]) if ENV["BENCH_BASELINE_LIB"]
       raise "runtime comparison requires --pass default" if baseline && options[:pass] != "default"
       lib = File.expand_path(ENV.fetch("BENCH_LOWRAIL_LIB", File.join(__dir__, "../gem/lib")))
-      data = preflight(File.join(app, ".lowrail"), lib)
+      data = preflight(File.join(app, ".lowrail"), lib, root: app)
       result[:manifest_sha256] = Digest::SHA256.file(File.join(app, ".lowrail/manifest.json")).hexdigest
       result[:runtime_files_sha256] = runtime_fingerprint(lib)
       result[:runtime_fingerprint_sha256] = Digest::SHA256.hexdigest(JSON.generate(canonical(result.fetch(:runtime_files_sha256))))
@@ -279,7 +279,7 @@ module PassBench
       if stacked
         raise "stack build contains unselected passes; rebuild with exactly --passes SET" unless selected == data.fetch("units")
         reference = File.expand_path(options.fetch(:default_build))
-        reference_data = preflight(reference, lib)
+        reference_data = preflight(reference, lib, root: app)
         default_passes = options.fetch(:default_passes).split(",")
         raise "default reference contains opt-in passes" unless reference_data.fetch("units").all? { default_passes.include?(_1.fetch("pass")) }
         raise "default reference belongs to another app" unless reference_data.fetch("units").all? do |unit|
@@ -297,7 +297,7 @@ module PassBench
         route: route, headers: JSON.parse(ENV.fetch("BENCH_HEADERS", "{}")), cache_mb: ENV["CAMPFIRE_RESPONSE_CACHE_MB"])))
       ids = selected.map { _1.fetch("id") }.join(",")
       env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
-        "LOWRAIL" => "1", "LOWRAIL_ROOT" => app, "LOWRAIL_UNITS" => ids, "BENCH_UNITS" => ids,
+        "LOWRAIL" => "1", "LOWRAIL_ROOT" => app, "LOWRAIL_DIR" => nil, "LOWRAIL_UNITS" => ids, "BENCH_UNITS" => ids,
         "LOWRAIL_STATS" => "", "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil, "LOWRAIL_SHADOW" => nil,
         "LOWRAIL_JIT_DIAGNOSTICS" => nil,
         "LOWRAIL_SPECULATE" => nil, "LOWRAIL_SPECULATE_KEEP" => nil,
@@ -310,21 +310,15 @@ module PassBench
         speculative = File.join(out, "unsafe-build")
         result[:speculation] = SpeculativeBuild.build(app, speculative, selected.map { _1.fetch("id") }, env,
           File.join(out, "unsafe-build.log"))
-        speculative_data = preflight(speculative, lib, unsafe: true)
+        speculative_data = preflight(speculative, lib, root: app, unsafe: true)
         result[:speculation][:manifest_sha256] = Digest::SHA256.file(File.join(speculative, "manifest.json")).hexdigest
-        Dir.mktmpdir("lowrail-bench-unsafe") do |tmp|
-          FileUtils.ln_s(speculative, File.join(tmp, ".lowrail"))
-          result[:speculation][:coverage] = probe(app, out, env.merge("LOWRAIL_ROOT" => tmp,
-            "LOWRAIL_SPECULATE" => "unguarded"), route, "unsafe-coverage")
-        end
+        result[:speculation][:coverage] = probe(app, out, env.merge("LOWRAIL_DIR" => speculative,
+          "LOWRAIL_SPECULATE" => "unguarded"), route, "unsafe-coverage")
       end
       if stacked
-        Dir.mktmpdir("lowrail-bench-default") do |tmp|
-          FileUtils.ln_s(reference, File.join(tmp, ".lowrail"))
-          default_ids = reference_data.fetch("units").map { _1.fetch("id") }.join(",")
-          result[:default_coverage] = probe(app, out, env.merge("LOWRAIL_ROOT" => tmp, "LOWRAIL_UNITS" => default_ids.empty? ? nil : default_ids,
-            "BENCH_UNITS" => default_ids), route, "default-coverage")
-        end
+        default_ids = reference_data.fetch("units").map { _1.fetch("id") }.join(",")
+        result[:default_coverage] = probe(app, out, env.merge("LOWRAIL_DIR" => reference, "LOWRAIL_UNITS" => default_ids.empty? ? nil : default_ids,
+          "BENCH_UNITS" => default_ids), route, "default-coverage")
         if options[:measure_budgets]
           result[:budget_input] = InstructionBudget.run(app, File.join(out, "budgets"), env, route, result, selected)
           StackBudget.validate!(result.fetch(:budget_input), result, selected)
@@ -334,20 +328,17 @@ module PassBench
         end
       end
       if baseline
-        preflight(File.join(app, ".lowrail"), baseline)
+        preflight(File.join(app, ".lowrail"), baseline, root: app)
         result[:baseline_runtime_files_sha256] = runtime_fingerprint(baseline)
         result[:baseline_coverage] = probe(app, out, env.merge("RUBYOPT" => "-I#{baseline} -rlowrail/setup"), route, "baseline-coverage")
       end
       extra = ENV["BENCH_INSTANTIATE_DIR"]
       if extra
         raise "extra build is only supported with --pass default" unless options[:pass] == "default"
-        extra_data = preflight(File.expand_path(extra), lib)
-        Dir.mktmpdir("lowrail-bench-extra") do |tmp|
-          FileUtils.ln_s(File.expand_path(extra), File.join(tmp, ".lowrail"))
-          extra_ids = extra_data.fetch("units").map { _1.fetch("id") }.join(",")
-          result[:extra_coverage] = probe(app, out, env.merge("LOWRAIL_ROOT" => tmp, "LOWRAIL_UNITS" => extra_ids,
-            "BENCH_UNITS" => extra_ids), route, "extra-coverage")
-        end
+        extra_data = preflight(File.expand_path(extra), lib, root: app)
+        extra_ids = extra_data.fetch("units").map { _1.fetch("id") }.join(",")
+        result[:extra_coverage] = probe(app, out, env.merge("LOWRAIL_DIR" => File.expand_path(extra), "LOWRAIL_UNITS" => extra_ids,
+          "BENCH_UNITS" => extra_ids), route, "extra-coverage")
       end
       # The request driver, not this parent, assigns each worker's setup layer.
       run_env = env.merge("RUBYOPT" => nil, "LOWRAIL_STATS" => nil, "BENCH_COUNTER" => counter == "callgrind" ? "callgrind" : nil,
@@ -389,14 +380,14 @@ module PassBench
         raise "GC diagnostic failed" unless ok
       end
       # Detect a concurrent rebuild/edit rather than publish mixed provenance.
-      raise "build changed during measurement" unless data == preflight(File.join(app, ".lowrail"), lib)
-      raise "unsafe build changed during measurement" if speculative && speculative_data != preflight(speculative, lib, unsafe: true)
-      raise "default build changed during measurement" if stacked && reference_data != preflight(reference, lib)
-      raise "extra build changed during measurement" if extra && extra_data != preflight(File.expand_path(extra), lib)
+      raise "build changed during measurement" unless data == preflight(File.join(app, ".lowrail"), lib, root: app)
+      raise "unsafe build changed during measurement" if speculative && speculative_data != preflight(speculative, lib, root: app, unsafe: true)
+      raise "default build changed during measurement" if stacked && reference_data != preflight(reference, lib, root: app)
+      raise "extra build changed during measurement" if extra && extra_data != preflight(File.expand_path(extra), lib, root: app)
       raise "runtime changed during measurement" unless result.fetch(:runtime_files_sha256) == runtime_fingerprint(lib)
       raise "benchmark harness changed during measurement" unless result.fetch(:harness_files_sha256) == harness_fingerprint
       if baseline
-        preflight(File.join(app, ".lowrail"), baseline)
+        preflight(File.join(app, ".lowrail"), baseline, root: app)
         raise "baseline runtime changed during measurement" unless result.fetch(:baseline_runtime_files_sha256) == runtime_fingerprint(baseline)
       end
       result[:status] = "accepted"

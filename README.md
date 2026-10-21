@@ -109,6 +109,11 @@ is a silent no-op, and an artifact containing quarantined passes is refused
 with `Lowrail.refusal_reason`. In development it is off unless `LOWRAIL=1`.
 `LOWRAIL_DEBUG=1` prints refusals.
 
+`LOWRAIL_ROOT` names the real app root (default: the working directory).
+`LOWRAIL_DIR` optionally selects a separate artifact directory containing
+`manifest.json` (default: `LOWRAIL_ROOT/.lowrail`). Benchmark snapshots use
+this separation; relocation/source certificates still check the real app root.
+
 `--passes` must start with `default` or `all-opt-in`, then applies
 `+name`/`-name` in order. Names are the stable
 `area/name` identifiers in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

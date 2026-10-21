@@ -104,8 +104,8 @@ module RequestPairs
     environments = {}
     samples = []
     Dir.mktmpdir("lowrail-request-pairs") do |tmp|
-      # Snapshot complete builds: lowered paths are absolute, ISeq paths are
-      # relative to the manifest directory. Never hide/rename the app's build.
+      # Snapshot complete artifacts, not the app root: format-2 certificates
+      # still resolve against the real app. Never hide/rename the app's build.
       normal = File.join(tmp, "normal")
       FileUtils.mkdir_p(normal)
       FileUtils.cp_r(File.join(app, ".lowrail"), normal)
@@ -114,7 +114,9 @@ module RequestPairs
       raise "production build required" unless data.fetch("rails_env") == "production"
       empty = File.join(tmp, "empty")
       FileUtils.mkdir_p(File.join(empty, ".lowrail"))
-      File.write(File.join(empty, ".lowrail/manifest.json"), JSON.generate(data.merge("files" => {}, "templates" => {}, "units" => [])))
+      # Removed units/files also remove their relocation-pointer targets.
+      File.write(File.join(empty, ".lowrail/manifest.json"), JSON.generate(data.merge(
+        "files" => {}, "templates" => {}, "units" => [], "app_paths" => {"values" => [], "keys" => []})))
       missing = File.join(tmp, "missing")
       FileUtils.mkdir_p(missing)
       layers = { "off_a" => nil, "off_b" => nil, "missing" => missing, "empty" => empty,
@@ -158,6 +160,7 @@ module RequestPairs
           unit.fetch("ar_instantiate").fetch("sources").all? do |path, sha|
             # A library override must match the certificate too, not merely
             # the checkout whose absolute paths the builder recorded.
+            path = File.expand_path(path, app)
             actual = path.start_with?("#{root}/gem/lib/") ? File.join(lib, path.delete_prefix("#{root}/gem/lib/")) : path
             [path, actual].uniq.all? { File.file?(_1) && Digest::SHA256.file(_1).hexdigest == sha }
           end
@@ -185,7 +188,8 @@ module RequestPairs
       layers.each do |layer, build_root|
         runtime_lib = layer == "before" ? baseline : lib
         env = { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "error",
-          "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => build_root,
+          "LOWRAIL" => build_root ? "1" : "0", "LOWRAIL_ROOT" => app,
+          "LOWRAIL_DIR" => build_root && File.join(build_root, ".lowrail"),
           "LOWRAIL_UNITS" => layer == "disabled" ? "" :
             ((%w[stacked unguarded].include?(layer) || (layer == "default" && !reference)) ? ENV["BENCH_UNITS"] : nil),
           "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_DEBUG" => nil,

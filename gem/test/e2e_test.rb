@@ -146,6 +146,31 @@ class E2ETest < Minitest::Test
     end
   end
 
+  def test_external_artifact_directory_keeps_the_real_app_root_certificate
+    realpath_tmpdir do |parent|
+      app = File.join(parent, "app")
+      Dir.mkdir(app)
+      build_app(app)
+      snapshot = File.join(parent, "snapshot")
+      FileUtils.mv(File.join(app, ".lowrail"), snapshot)
+      env = {"LOWRAIL_ROOT" => app, "LOWRAIL_DIR" => snapshot, "LOWRAIL_STATS" => ""}
+      probe = SCRIPT + "\nputs JSON.generate(r.merge(root: Lowrail.root, reason: Lowrail.refusal_reason))"
+      result = ruby_json(probe, chdir: app, env: env)
+      assert_equal ["fast", 2], result.fetch("compute")
+      assert_equal ["fast", "CALC"], result.fetch("label")
+      assert_equal({"0" => 1, "1" => 1}, result.fetch("hits"))
+      assert_equal app, result.fetch("root")
+      assert_nil result.fetch("reason")
+
+      # Selecting the artifact must not authorize its embedded app root.
+      result = ruby_json(probe, chdir: app, env: env.merge("LOWRAIL_ROOT" => parent))
+      assert_equal ["orig", 2], result.fetch("compute")
+      assert_equal ["orig", "CALC"], result.fetch("label")
+      assert_empty result.fetch("hits")
+      assert_includes result.fetch("reason"), "--target-root #{parent}"
+    end
+  end
+
   def test_ruby_description_mismatch_is_noop
     realpath_tmpdir do |dir|
       build_app(dir)

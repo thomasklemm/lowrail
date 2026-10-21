@@ -84,7 +84,7 @@ module Lowrail
     # Entry point used by lowrail/setup: stats and the outcome reporters are
     # independent of whether lowering is active (verify needs outcomes for
     # LOWRAIL=0 runs too).
-    def boot(root: Dir.pwd)
+    def boot(root: Dir.pwd, dir: nil)
       require_relative "lowrail/jit_diagnostics" if ENV["LOWRAIL_JIT_DIAGNOSTICS"] == "1"
       if ENV["LOWRAIL_STATS"] || ENV["LOWRAIL_OUTCOMES"]
         require_relative "lowrail/stats"
@@ -101,7 +101,7 @@ module Lowrail
         require_relative "lowrail/rspec"
         Lowrail::RSpec.install(ENV["LOWRAIL_OUTCOMES"])
       end
-      setup(root: root)
+      setup(root: root, dir: dir)
     rescue StandardError, ScriptError => e
       # Never break an app: any failure here leaves plain Ruby running.
       refuse("setup failed (#{e.class}: #{e.message}); running without Lowrail")
