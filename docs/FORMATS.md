@@ -565,3 +565,44 @@ process-lifetime snapshots**, not additive per-test or per-ISeq counters.
 Unavailable values are null. Verify retains this array under
 `last.json` → `report.off/on.jit_diagnostics` without including it in any gate.
 See the [counter scope and limitations](jit-shapes.md#diagnostic-counters-never-gates).
+
+### Pinned load controls
+
+`lowrail verify APP --load-controls FILE -- TEST COMMAND...` explicitly loads
+reviewed evidence for rare app load races. There is no implicit global list.
+Each format-1 file is keyed to **git HEAD and SHA256 of Gemfile.lock**:
+
+```json
+{
+  "format": 1,
+  "source_revision": "<full app commit>",
+  "lock_sha256": "<full lockfile SHA256>",
+  "entries": [{
+    "identity": "after_suite\tload_events\t349\tload\tSomeJob\t/abs/app/job.rb",
+    "evidence": "off-off-evidence.json#pair-6",
+    "origin": "Observed background worker stack versus main-thread stack"
+  }]
+}
+```
+
+The evidence file must exist, resolved relative to the control file; a
+fragment identifies its relevant comparison. Approval requires actual
+off/off flips without Lowrail installation and observed thread/stack origins,
+not a guessed race. Only first-test/after-suite **indexed load events** are
+accepted: no constants, paths census, SQL, error markers, wildcard matching
+or path/event normalization. Literal absolute paths make a relocated identity
+fail to match. Duplicate or malformed entries and missing evidence are errors.
+
+Pin mismatches make the list inert with an explicit diagnostic. Changed
+tracked app source also disables it; the corpus's dependency-only Gemfile,
+lockfile and Ruby-version overlays are allowed. Pins are checked before and
+after the suite. Raw `report.off/on.loads` are never filtered; approved entries
+remain in `report.known_app_loads` with their evidence/origin. The separate
+**known app nondeterminism** text section reports differing, observed and
+pinned counts, plus each observed identity and its off/on presence. Unlisted
+changes keep the existing gate/repeat controls. A listed event is not evidence
+that Lowrail delivered a fast path; coverage still requires nonzero hits.
+
+The first [Fizzy list](../fixtures/corpus/fizzy-load-controls.json) has 18
+identities supported by a 20-run off/off sample and separate plain thread
+traces; [results and provenance](compat.md#fizzy-pinned-app-load-nondeterminism--2026-10-21).

@@ -10,11 +10,14 @@ use std::time::Instant;
 
 use serde_json::Value;
 
+mod load_controls;
+
 pub fn cli(args: &[String]) -> Result<(), String> {
     let mut app = None;
     let mut bisect = false;
     let mut observe_types = false;
     let mut observe_overhead = false;
+    let mut load_controls = None;
     let mut cmd: Vec<String> = vec!["bin/rails".into(), "test".into()];
     let mut it = args.iter();
     while let Some(a) = it.next() {
@@ -22,6 +25,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             "--bisect" => bisect = true,
             "--observe-types" => observe_types = true,
             "--observe-overhead" => { observe_types = true; observe_overhead = true; }
+            "--load-controls" => load_controls = Some(PathBuf::from(it.next().ok_or("--load-controls needs a JSON file")?)),
             "--" => {
                 cmd = it.by_ref().cloned().collect();
                 break;
@@ -30,7 +34,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    let app = app.ok_or("usage: lowrail verify APP [--bisect] [--observe-types|--observe-overhead] [-- TEST COMMAND...]")?;
+    let app = app.ok_or("usage: lowrail verify APP [--bisect] [--observe-types|--observe-overhead] [--load-controls FILE] [-- TEST COMMAND...]")?;
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
     if cmd.is_empty() {
         return Err("test command must not be empty".into());
@@ -41,8 +45,16 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let manifest: Value = if manifest_path.exists() {
         serde_json::from_slice(&std::fs::read(manifest_path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?
     } else { Value::Null };
+    let known_app_loads = match &load_controls {
+        Some(path) => load_controls::load(&app, path)?,
+        None => BTreeMap::new(),
+    };
     let seed = seed_env();
-    let mut report = verify(&app, &cmd, &seed, observe_types)?;
+    let mut report = verify(&app, &cmd, &seed, observe_types, known_app_loads)?;
+    // Do not retain an exemption if the suite changed either pin.
+    if let Some(path) = &load_controls {
+        report.known_app_loads = load_controls::load(&app, path)?;
+    }
     if !report.load_differences().is_empty() {
         report.load_culprit_passes = bisect_load_passes(&app, &cmd, &manifest, &report, &seed)?;
     }
@@ -56,7 +68,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             sql_other: report.on.sql_other.clone(), processes: report.on.processes,
             loads: report.on.loads.clone(),
             exit_ok: report.on.exit_ok, ..Default::default()
-        }, ..Default::default() };
+        }, known_app_loads: report.known_app_loads.clone(), ..Default::default() };
         overhead = Some(serde_json::json!({"recorded_seconds":report.on.seconds,
             "plain_seconds":control.off.seconds,
             "percent":(report.on.seconds / control.off.seconds - 1.0) * 100.0,
@@ -72,7 +84,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         return Ok(());
     }
     if bisect {
-        let culprits = bisect_units(&app, &cmd, &report.off, &report.unstable_sql, &seed)?;
+        let culprits = bisect_units(&app, &cmd, &report.off, &report.unstable_sql, &report.known_app_loads, &seed)?;
         println!("culprit units: {culprits:?}");
         write_denylist(&app, &culprits, &report.differences())?;
     }
@@ -113,6 +125,10 @@ pub struct Report {
     /// (inlined sequence ids, time, randomness). Their traces cannot gate.
     pub unstable_sql: BTreeSet<String>,
     pub unstable_loads: BTreeSet<String>,
+    /// Exact event identities with reviewed off/off evidence for this app pin.
+    /// Kept separate from noise observed in the current pair and never erased
+    /// from either run's raw census.
+    pub known_app_loads: BTreeMap<String, load_controls::Entry>,
     pub load_culprit_passes: Vec<String>,
 }
 
@@ -165,7 +181,7 @@ impl Report {
 
     pub fn load_differences(&self) -> Vec<String> {
         self.off.loads.symmetric_difference(&self.on.loads)
-            .filter(|entry| !self.unstable_loads.contains(*entry))
+            .filter(|entry| !self.unstable_loads.contains(*entry) && !self.known_app_loads.contains_key(*entry))
             .map(|entry| format!("{}: {entry}", if self.on.loads.contains(entry) { "on only" } else { "off only" }))
             .chain(self.off.loads.union(&self.on.loads).filter(|entry| entry.contains("\terrors\t")).cloned())
             .collect()
@@ -257,13 +273,25 @@ impl Report {
         }
         if !self.off.loads.is_empty() || !self.on.loads.is_empty() {
             let differences = self.load_differences();
+            let other_unstable = self.unstable_loads.iter().filter(|entry| !self.known_app_loads.contains_key(*entry)).count();
             s.push_str(&format!("\nload census: {} differences; {} unstable entries advisory; snapshots off/on {:.4}/{:.4}s",
-                differences.len(), self.unstable_loads.len(), self.off.load_snapshot_seconds, self.on.load_snapshot_seconds));
+                differences.len(), other_unstable, self.off.load_snapshot_seconds, self.on.load_snapshot_seconds));
             for finding in differences.iter().take(50) {
                 s.push_str(&format!("\n  {finding}"));
             }
             if !self.load_culprit_passes.is_empty() {
                 s.push_str(&format!("\nload census culprit passes: {}", self.load_culprit_passes.join(", ")));
+            }
+        }
+        if !self.known_app_loads.is_empty() {
+            let observed: Vec<_> = self.known_app_loads.iter()
+                .filter(|(identity, _)| self.off.loads.contains(*identity) || self.on.loads.contains(*identity)).collect();
+            let differing = observed.iter().filter(|(identity, _)| self.off.loads.contains(*identity) != self.on.loads.contains(*identity)).count();
+            s.push_str(&format!("\nknown app nondeterminism: {differing} differing load identities; {} observed; {} pinned controls",
+                observed.len(), self.known_app_loads.len()));
+            for (identity, entry) in observed {
+                s.push_str(&format!("\n  {identity} [off={}, on={}; evidence: {}; origin: {}]",
+                    self.off.loads.contains(identity), self.on.loads.contains(identity), entry.evidence, entry.origin));
             }
         }
         let diagnostics = self.off.jit_diagnostics.len() + self.on.jit_diagnostics.len();
@@ -291,7 +319,8 @@ fn env_refs(env: &[(String, String)]) -> Vec<(&str, &str)> {
     env.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect()
 }
 
-fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: bool) -> Result<Report, String> {
+fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: bool,
+    known_app_loads: BTreeMap<String, load_controls::Entry>) -> Result<Report, String> {
     let dir = app.join(".lowrail/verify");
     std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
     let env = env_refs(seed);
@@ -316,7 +345,7 @@ fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: 
         std::fs::rename(tmp, out).map_err(|e| e.to_string())?;
         on
     } else { run_with(app, cmd, &dir, "1", &env)? };
-    let mut report = Report { off, on, ..Default::default() };
+    let mut report = Report { off, on, known_app_loads, ..Default::default() };
     // Only when SQL would fail the gate: a second LOWRAIL=0 run tells
     // run-to-run noise apart from differences Lowrail causes.
     if (report.sql_gates() && !report.sql_differences().is_empty()) || !report.load_differences().is_empty() {
@@ -325,9 +354,9 @@ fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: 
         report.unstable_sql = unstable(&report.off, &control);
         report.unstable_loads = report.off.loads.symmetric_difference(&control.loads).cloned().collect();
         // A test that varies only now and then can agree in two off runs by
-        // chance. If differences remain, repeat the on run as well: only a
-        // difference both on runs agree on, against two agreeing off runs,
-        // counts as caused by Lowrail.
+        // chance. If differences remain, repeat the on run as well. Agreement
+        // across these finite controls is not proof of causality: rare app
+        // races need reviewed, pinned off/off evidence (--load-controls).
         if !report.sql_differences().is_empty() || !report.load_differences().is_empty() {
             eprintln!("lowrail verify: SQL/load traces still differ; control run with LOWRAIL=1");
             let on_control = run_labeled(app, cmd, &dir, "1-control", "1", &env)?;
@@ -366,7 +395,7 @@ fn unstable(a: &Run, b: &Run) -> BTreeSet<String> {
 /// respects LOWRAIL_UNITS, so disabled passes cannot run eager setup code.
 fn bisect_load_passes(app: &Path, cmd: &[String], manifest: &Value, report: &Report, seed: &[(String, String)]) -> Result<Vec<String>, String> {
     let mut findings: Vec<_> = report.off.loads.symmetric_difference(&report.on.loads)
-        .filter(|entry| !report.unstable_loads.contains(*entry)).collect();
+        .filter(|entry| !report.unstable_loads.contains(*entry) && !report.known_app_loads.contains_key(*entry)).collect();
     // An empty string disables setup entirely. A nonexistent (negative) ID
     // keeps delivery installed but every source arm falls back: distinguish
     // a loader/setup effect from a particular pass's activation.
@@ -404,7 +433,8 @@ fn bisect_load_passes(app: &Path, cmd: &[String], manifest: &Value, report: &Rep
 /// reruns the suite with only one half enabled (LOWRAIL_UNITS), recursing
 /// into halves that still differ. A set whose halves are each clean is
 /// reported whole (the units only fail together).
-fn bisect_units(app: &Path, cmd: &[String], off: &Run, unstable: &BTreeSet<String>, seed: &[(String, String)]) -> Result<Vec<Vec<u64>>, String> {
+fn bisect_units(app: &Path, cmd: &[String], off: &Run, unstable: &BTreeSet<String>,
+    known_app_loads: &BTreeMap<String, load_controls::Entry>, seed: &[(String, String)]) -> Result<Vec<Vec<u64>>, String> {
     let manifest: Value = serde_json::from_str(
         &std::fs::read_to_string(app.join(".lowrail/manifest.json")).map_err(|e| e.to_string())?,
     )
@@ -423,6 +453,7 @@ fn bisect_units(app: &Path, cmd: &[String], off: &Run, unstable: &BTreeSet<Strin
             off: Run { tests: off.tests.clone(), sql: off.sql.clone(), sql_other: off.sql_other.clone(), loads: off.loads.clone(), exit_ok: off.exit_ok, ..Default::default() },
             on,
             unstable_sql: unstable.clone(),
+            known_app_loads: known_app_loads.clone(),
             ..Default::default()
         };
         eprintln!("bisect: units [{list}] → {}", if r.identical() { "identical" } else { "differs" });

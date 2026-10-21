@@ -1,0 +1,97 @@
+{
+  "format": 1,
+  "source_revision": "6f1d200316ec3bae91d32c557d88647300807ee9",
+  "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+  "entries": [
+    {
+      "identity": "after_suite\tload_events\t349\thook\tactive_job_arguments\t/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/railtie.rb:23",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t349\tload\tQrCodeLink\t/home/user/workspace/repo/.corpus/fizzy/app/models/qr_code_link.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t350\tload\tSessionsController\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/sessions_controller.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t350\tload\tTurbo::Streams::BroadcastStreamJob\t/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/turbo-rails-2.0.11/app/jobs/turbo/streams/broadcast_stream_job.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t351\tload\tBubbleScoped\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/concerns/bubble_scoped.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t351\tload\tQrCodeLink\t/home/user/workspace/repo/.corpus/fizzy/app/models/qr_code_link.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t352\tload\tBucketScoped\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/concerns/bucket_scoped.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t352\tload\tSessionsController\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/sessions_controller.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t353\tload\tBubbleScoped\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/concerns/bubble_scoped.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t353\tload\tCommentsController\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/comments_controller.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t354\tload\tApplicationJob\t/home/user/workspace/repo/.corpus/fizzy/app/jobs/application_job.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t354\tload\tBucketScoped\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/concerns/bucket_scoped.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t355\tload\tCommentsController\t/home/user/workspace/repo/.corpus/fizzy/app/controllers/comments_controller.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t355\tload\tGenerateNotificationsJob\t/home/user/workspace/repo/.corpus/fizzy/app/jobs/generate_notifications_job.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t356\thook\tactive_job_arguments\t/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/railtie.rb:23",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t356\tload\tApplicationJob\t/home/user/workspace/repo/.corpus/fizzy/app/jobs/application_job.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t357\tload\tGenerateNotificationsJob\t/home/user/workspace/repo/.corpus/fizzy/app/jobs/generate_notifications_job.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    },
+    {
+      "identity": "after_suite\tload_events\t357\tload\tTurbo::Streams::BroadcastStreamJob\t/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/turbo-rails-2.0.11/app/jobs/turbo/streams/broadcast_stream_job.rb",
+      "evidence": "fizzy-load-evidence.json#off_off/6",
+      "origin": "Turbo::Streams::Broadcasts#broadcast_refresh_later_to -> ThreadDebouncer -> Concurrent::ScheduledTask worker races main-thread Event#generate_notifications_later; plain trace-plain-1/3 confirms both with no Lowrail files loaded."
+    }
+  ]
+}

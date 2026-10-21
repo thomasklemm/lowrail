@@ -120,3 +120,59 @@ fn verify_gates_reproducible_load_changes_and_isolates_the_pass() {
     }
     std::fs::remove_dir_all(app).unwrap();
 }
+
+#[test]
+fn verify_reports_exact_pinned_app_load_controls_without_hiding_other_changes() {
+    let app = std::env::temp_dir().join(format!("lowrail-verify-load-controls-{}", std::process::id()));
+    std::fs::create_dir_all(app.join(".lowrail")).unwrap();
+    std::fs::write(app.join("Gemfile.lock"), "hello").unwrap();
+    std::fs::write(app.join("app.rb"), "original").unwrap();
+    for args in [vec!["init", "-q"], vec!["add", "Gemfile.lock", "app.rb"], vec!["commit", "-qm", "fixture"]] {
+        assert!(Command::new("git").args(args).current_dir(&app)
+            .env("GIT_AUTHOR_NAME", "Thomas Klemm").env("GIT_AUTHOR_EMAIL", "github@tklemm.eu")
+            .env("GIT_COMMITTER_NAME", "Thomas Klemm").env("GIT_COMMITTER_EMAIL", "github@tklemm.eu")
+            .status().unwrap().success());
+    }
+    let head = Command::new("git").args(["rev-parse", "HEAD"]).current_dir(&app).output().unwrap();
+    let revision = String::from_utf8(head.stdout).unwrap().trim().to_string();
+    let identity = "after_suite\tload_events\t349\tload\tFixture\tfixture.rb";
+    let controls = app.join(".lowrail/load-controls.json");
+    std::fs::write(app.join(".lowrail/evidence.json"), "{\"off_off\":true}").unwrap();
+    let script = r#"
+      events=''; if [ "$LOWRAIL" = 1 ]; then events='"349\tload\tFixture\tfixture.rb"'; fi
+      if [ "$LOWRAIL" = 1 ] && [ "$1" = unlisted ]; then events="$events,\"350\\tload\\tUnlisted\\tother.rb\""; fi
+      if [ "$LOWRAIL" = 1 ] && [ "$1" = shifted ]; then events='"350\tload\tFixture\tfixture.rb"'; fi
+      printf '{"tests":{"a":{"result":"pass"}},"verify_loads":{"stages":{"first_test":{},"after_suite":{"load_events":[%s]}}}}' "$events" > "$LOWRAIL_OUTCOMES"
+    "#;
+    for case in ["listed", "unlisted", "shifted", "lock", "revision", "dirty"] {
+        std::fs::write(app.join("Gemfile.lock"), if case == "lock" { "changed" } else { "hello" }).unwrap();
+        std::fs::write(app.join("app.rb"), if case == "dirty" { "changed" } else { "original" }).unwrap();
+        std::fs::write(&controls, serde_json::json!({"format":1,
+            "source_revision": if case == "revision" { "0000000000000000000000000000000000000000" } else { &revision },
+            "lock_sha256":"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+            "entries":[{"identity":identity,"evidence":"evidence.json#off_off",
+                "origin":"background worker versus main thread; fixture control"}]}).to_string()).unwrap();
+        let result = Command::new(env!("CARGO_BIN_EXE_lowrail"))
+            .args(["verify", app.to_str().unwrap(), "--load-controls", controls.to_str().unwrap(),
+                "--", "sh", "-c", script, "sh", case]).output().unwrap();
+        let stdout = String::from_utf8_lossy(&result.stdout);
+        assert_eq!(result.status.success(), case == "listed", "{case}: {stdout}\n{}", String::from_utf8_lossy(&result.stderr));
+        let last: serde_json::Value = serde_json::from_slice(&std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
+        if matches!(case, "listed" | "unlisted" | "shifted") {
+            let count = if case == "shifted" { 0 } else { 1 };
+            assert!(stdout.contains(&format!("known app nondeterminism: {count} differing load identities")), "{stdout}");
+            assert_eq!(last["report"]["known_app_loads"][identity]["origin"], "background worker versus main thread; fixture control");
+            if case == "shifted" {
+                assert!(stdout.contains("on only: after_suite\tload_events\t350\tload\tFixture"), "{stdout}");
+                continue;
+            }
+            assert!(stdout.contains(identity) && stdout.contains("evidence.json#off_off"), "{stdout}");
+            assert!(last["report"]["on"]["loads"].as_array().unwrap().iter().any(|v| v == identity));
+            if case == "unlisted" { assert!(stdout.contains("on only: after_suite\tload_events\t350\tload\tUnlisted"), "{stdout}"); }
+        } else {
+            assert!(last["report"]["known_app_loads"].as_object().unwrap().is_empty());
+            assert!(stdout.contains("on only: after_suite\tload_events\t349\tload\tFixture"), "{stdout}");
+        }
+    }
+    std::fs::remove_dir_all(app).unwrap();
+}

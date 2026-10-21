@@ -165,15 +165,21 @@ is not represented as a strict single-process SQL gate. The earlier rejected
 CASA default cohort remains rejected; this later scheduled integration run
 does not erase it. Fizzy's seven baseline errors remain a negative control.
 
-For Fizzy, the archived levers sweep on
+For Fizzy, the archived **all-opt-in** levers sweep on
 [4eb7b58](https://github.com/thomasklemm/lowrail/commit/4eb7b58) reported **18
-stable load differences**, already with all seven sealed-only flags and a
-format-1 manifest containing `files: {}`, `units: []`, `passes: {}`. Our frozen
-integration based on `ed7cbbe` and the cb83265-based run above both have **0
-stable / 8 unstable** differences, format-2 manifests with empty files/units
-and zero hits. The quarantine does **not** explain 18→0: setup/runtime changes
-include format 2, the TracePoint fix and hook-free delivery. This remains
-**unattributed**, not a claim that the delivery seam alone fixed it.
+stable / 8 unstable** load differences (default: **0 / 8**), already with all
+seven sealed-only flags and an empty format-1 artifact. Our frozen integration
+based on [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe) and the
+cb83265-based run above were both **all-opt-in**, not default: **0 / 8**, empty
+format-2 artifacts and zero hits. On
+[b091cb7](https://github.com/thomasklemm/lowrail/commit/b091cb7206a0bc877a9eef9a0201ec95f85c7a2a),
+default is **18 / 8** and all-opt-in **0 / 26**; those 26 unstable entries
+include the same 18 event identities. The format-2 manifests are identical
+across these selections. A fresh default run on
+[4a33992](https://github.com/thomasklemm/lowrail/commit/4a33992bd78c343e04764619781ce4008d608d94)
+is again **0 / 8**, with gem/Rust contents unchanged from b091cb7. These are
+not evidence of a selection, quarantine or delivery-seam fix: the bounded
+off/off investigation below reproduces all 18 as app nondeterminism.
 
 The integrated full gem suite passes **138 tests / 6,199 assertions**, with
 no failures/errors/skips, including cold sealed delivery, `exit_trace_leave`,
@@ -372,6 +378,70 @@ An old mixed/quarantined CodeTriage artifact was exercised separately:
 `Lowrail.refusal_reason` records the quarantined source pass/rebuild reason,
 no manifest is installed, Rails 8.1.4 boots and the original model query
 returns its result. The valid artifact was restored afterwards.
+
+## Fizzy: pinned app load nondeterminism — 2026-10-21
+
+On 4a33992, **10 sequential off/off pairs** use the verifier's actual
+preload/reporters/census, seed 41231 and one worker. Arm A sees the early
+Active Job/Turbo variant **1/10** times (run `6-a`); arm B **0/10**. Every run
+has the same **124 outcomes (117 pass, seven baseline errors), 5,322 own-thread
+queries, zero hits and zero fallbacks**. Pair `6-a`/`6-b` differs in exactly
+the 18 formerly "stable" load-event identities; it reorders nine identical
+events at positions 349–357, without a set difference. This is an observed
+rare branch, not a bound on its probability. Two repeats can miss it.
+
+Separate targeted traces capture both paths with identical test order and
+actual `$LOADED_FEATURES` sets, but different feature order:
+
+- **Early, background thread:** Turbo's `broadcast_refresh_later_to` →
+  `ThreadDebouncer` → `Concurrent::ScheduledTask` worker loads
+  `Turbo::Streams::BroadcastStreamJob`, which loads `ActiveJob::Arguments`
+  and fires `active_job_arguments` before `QrCodeLink`.
+- **Late, main thread:** `Event#generate_notifications_later` loads
+  `ActiveJob::Arguments` after `QrCodeLink`/`ApplicationJob`; the Turbo worker
+  loads its job afterwards. Turbo's normal debounce delay is 0.5 seconds.
+
+The plain trace pair `trace-plain-1`/`trace-plain-3` has **no Lowrail files
+loaded at all**. The verifier off/off controls do preload the gem symmetrically,
+but install no Guard, Loader or initialize observer. An empty on artifact also
+returns before those installers. No app/gem source, delay or load order is
+patched. These facts establish an app scheduling race, not a new Lowrail
+autoload regression. The seven existing app errors still prevent a support
+claim independently of the census.
+
+The reviewed [18 exact identities](../fixtures/corpus/fizzy-load-controls.json)
+each point to [off/off and thread/stack evidence](../fixtures/corpus/fizzy-load-evidence.json).
+Use `verify --load-controls fixtures/corpus/fizzy-load-controls.json` explicitly.
+Entries apply only to the Fizzy revision pinned above and lock SHA256 `73c7a5a9…`
+(full pins in the files); changed pins or changed tracked app source make
+them inert. The ordinary dependency-only corpus overlays remain allowed.
+Event positions and absolute paths are literal, **not normalized or wildcarded**;
+a new checkout/Ruby path needs new matching evidence, not path substitution.
+Raw censuses retain every identity. Text separately reports **known app
+nondeterminism**, with observed/differing/pinned counts, evidence and origins;
+JSON retains the controls in `report.known_app_loads`, alongside raw loads.
+Everything outside the list keeps the existing gate and repeat
+controls; constants, SQL and census errors cannot be listed. There is no
+global repeat relaxation. Fresh default **and** all-opt-in verifies with the
+list each report
+**0 stable differences / 8 other unstable entries / 9 known identities
+observed (0 differing), 18 pinned**, with identical outcomes/SQL and no hits.
+Both fresh artifacts have zero units. The rebased JIT-admission boundary also
+records built-YJIT/startup-interpreter refusal (the app enables YJIT later);
+these remain original-only comparisons, not active delivery support.
+Regression coverage checks a reported listed event, an unlisted event,
+a changed event position, a lock mismatch, a revision mismatch and dirty
+tracked app code. The listed-event test fails before this feature exists.
+
+Rebased policy checks: Cargo **40 tests** (35 unit, one MCP, four verifier
+integration), release build and both Fizzy CLI verifies pass. The full gem
+suite is **not green**: 144 tests / 6,320 assertions, two failures already on
+main. `DigestMemoTest` still expects production hits from a built-YJIT artifact
+started in interpreter (assigned to the TracePoint/JIT-mode owner);
+`FormScaffoldTest` copies this orb's `RealBlog::Application` corpus while the
+closed inventory requires `RealBlogR4::Application` (assigned to the sealed-form
+owner). Neither admission/inventory boundary is relaxed and neither unrelated
+test is edited by the policy change.
 
 ## Reproduction
 

@@ -13,3 +13,4 @@ ruby-prism = "1.9.0"
 rubydex = { git = "https://github.com/Shopify/rubydex", rev = "d8ff47595223571588ae40cb748f43cef6a9dfaf" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+sha2 = "0.10"
