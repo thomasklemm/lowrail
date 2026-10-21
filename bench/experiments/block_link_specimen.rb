@@ -20,7 +20,7 @@ module BlockLinkSpecimen
   class << self
     attr_reader :contexts, :counts, :discovered
 
-    def install(app:, artifact:, contexts:, arm:, discover: false)
+    def install(app:, artifact:, contexts:, arm:, discover: false, control_sites: [])
       @app, @artifact, @arm, @discover = app, artifact, arm, discover
       @manifest = contexts.to_h { |entry| [entry.fetch("key"), entry] }.freeze
       @contexts = @manifest.to_h { |key, _| [key, {state: "pending", lock: Mutex.new, attempts: 0}] }
@@ -31,6 +31,7 @@ module BlockLinkSpecimen
           site.dig("options", "keys") == ["class"] && site.dig("options", "values") == "literal"
       end.to_h { |site| [[File.join(app, site.fetch("file")), site.fetch("line")], site] }
       raise "23 finite sites required" unless @catalog.size == 23
+      control_sites.each { |site| @catalog[[site.fetch("file"), site.fetch("line")]] = site }
       ENV["LOWRAIL"] = "1" # Same source-only bench delivery in ALL arms.
       raise "cold bench delivery setup refused: #{Lowrail.refusal_reason}" unless Lowrail.setup(root: app, dir: artifact)
     end
@@ -97,7 +98,7 @@ module BlockLinkSpecimen
       css = FETCH.bind_call(options, :class)
       return refuse(call, "nonliteral class value") unless exact(css, String) && css.encoding == Encoding::UTF_8 && css.valid_encoding?
       descriptor = entry[:descriptor].merge("site" => call[:site], "block" => signature(sequence, entry[:method_name]),
-        "block_location" => sequence.to_a.fetch(4).fetch(:code_location), "class" => css)
+        "block_location" => sequence.to_a.fetch(4).fetch(:code_location), "class" => css.dup.freeze)
       key = Digest::SHA256.hexdigest(JSON.generate(descriptor))
       call.merge!(key: key, descriptor: descriptor, entry: entry, css: css.dup.freeze)
       @discovered[key] = descriptor.merge("key" => key) if @discover

@@ -34,7 +34,7 @@ module BlockLinkDelivery
   end
 
   def sources
-    root = Gem::Specification.find_by_name("actionview", "8.1.4").full_gem_path + "/lib/action_view/"
+    root = (Gem::Specification.find_by_name("actionview", "8.1.4").full_gem_path + "/lib/action_view/").encode(Encoding::UTF_8)
     STOCK.to_h do |relative, pin|
       path = root + relative
       source = File.read(path)
@@ -93,7 +93,7 @@ module BlockLinkDelivery
     end
     audit_sources = AUDIT.to_h do |key, pin|
       gem_name, relative = key.split(":", 2)
-      path = File.join(Gem.loaded_specs.fetch(gem_name).full_gem_path, relative)
+      path = File.join(Gem.loaded_specs.fetch(gem_name).full_gem_path, relative).encode(Encoding::UTF_8)
       raise "audit source pin mismatch #{relative}" unless Digest::SHA256.file(path).hexdigest == pin
       sequences[path] = RubyVM::InstructionSequence.compile(File.read(path), path, path, 1)
       [path, pin]
