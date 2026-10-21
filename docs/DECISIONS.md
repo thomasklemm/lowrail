@@ -102,6 +102,12 @@ its original request-only proposal as historical evidence.
 [Protocol, failures and reproduction](block-link-specimen.md#untimed-heap-preconditioning-prefer-n10-on-the-existing-tool),
 [all untimed window evidence](fizzy-link-heap.json).
 
+**One improvement KILLED before screening:** branch-only request-cached dependency scan backed by existing Guard resets.
+Ruby 4.0.7 / Rails 8.1.4 control: one scan; after `private :content_tag_string`, cached eligibility stays true while the full post-block scan is false.
+Stock saved-builder dispatch enters `method_missing` and raises `ArgumentError`; cached eligibility would bypass that live error.
+Visibility changes fire no Guard hook; bet D also leaves saved-ancestry, suppressed-callback and refinement holes open. No authoritative epoch.
+Correctness prerequisite failed: no HTTP/allocation/YJIT screen or new cohort. Keep the stock fallback; production widening is PARKED and block-link work stops.
+
 ## First accepted whole-request price (2026-10-21)
 
 **Historical at ae025b0; the corrected-source re-price below supersedes it.**

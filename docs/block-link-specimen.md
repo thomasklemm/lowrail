@@ -850,3 +850,18 @@ cost exclusion, compressed cross-object IDs, recursion merging and refusal
 of corrupt totals; that validation fixture was not added to the runtime or
 kept test suite. A separate Prism read of the actual dependency array finds 40 entries;
 no runtime witness, app or frozen harness is modified by this analysis.
+
+**Follow-up: the one request-cache improvement is KILLED before screening.**
+The branch-only negative control uses the real Guard hooks and one actual
+member of the dependency vector. After one successful scan, changing the
+saved builder class's `content_tag_string` from public to private leaves
+cached eligibility true, while the full post-block scan returns false.
+Stock dispatch reaches TagBuilder's `method_missing` and raises
+`ArgumentError: wrong number of arguments (given 6, expected 2..3)`; bypassing
+that dispatch is observably wrong. This is a fresh-process counterexample,
+not a template witness, admitted unit, HTTP coverage or per-site price.
+The prototype remains only on local branch `thomasklemm/block-link-request-scan`;
+neither it nor bet D's unfinished detector is imported into main. Per the
+correctness-first stop rule, no allocation/native-YJIT screen or new cohort
+runs. Keep the stock fallback and stop block-link work; the five-line kill
+note is in [DECISIONS](DECISIONS.md#fizzy-block-links-n50-invalid-n10-scoped-warm-bench-price-2026-10-21).
