@@ -3,30 +3,4457 @@
   "token_head": "30c96264ab0fb6e7c6e14336679ff0ca4079ca56",
   "ticket": "https://bugs.ruby-lang.org/issues/22459",
   "current_token_head": "a30db2f20843940c089bd8247135a7c7cd475ca5",
-  "historical_sections": ["costs", "native_interpreter", "writes", "census", "tests"],
+  "historical_sections": [
+    "costs",
+    "native_interpreter",
+    "writes",
+    "census",
+    "tests"
+  ],
   "review_fix": {
     "url": "https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5",
     "ruby_sha256": "60e66e78e0e887084232bbc3eebd3f19ddc331a8c126cf0a4b50572df7027a30",
-    "tests": {"interpreter": {"tests": 13, "assertions": 97, "failures": 0, "errors": 0, "skips": 0}, "yjit": {"tests": 13, "assertions": 97, "failures": 0, "errors": 0, "skips": 0}},
+    "tests": {
+      "interpreter": {
+        "tests": 13,
+        "assertions": 97,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      "yjit": {
+        "tests": 13,
+        "assertions": 97,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      }
+    },
     "c99_standalone_header": "PASS",
-    "native_c_probe": {"checks": 10, "before_redefinition": 10, "after_redefinition": 0},
-    "reproduced": ["Cannot malloc during GC from st_insert in dfree", "fork resets single-Ractor predicate and can reenable tokens without a persistent latch"],
-    "fixes": ["existing-only st_update during unlink and existing-list registration", "valid published only after successful registration", "permanent disable latch set before multi-Ractor transition, retained across fork", "self-contained bool dependency in ruby/vm.h", "experimental lookup-only RDoc"],
+    "native_c_probe": {
+      "checks": 10,
+      "before_redefinition": 10,
+      "after_redefinition": 0
+    },
+    "reproduced": [
+      "Cannot malloc during GC from st_insert in dfree",
+      "fork resets single-Ractor predicate and can reenable tokens without a persistent latch"
+    ],
+    "fixes": [
+      "existing-only st_update during unlink and existing-list registration",
+      "valid published only after successful registration",
+      "permanent disable latch set before multi-Ractor transition, retained across fork",
+      "self-contained bool dependency in ruby/vm.h",
+      "experimental lookup-only RDoc"
+    ],
     "source_reviewed_not_fault_injected": "allocation failure registration publication",
-    "checked_not_established": ["compaction address hazard: rb_gc_mark pins live CME/class", "parallel-sweep dfree race: non-thread-safe destruction is deferred", "included-module token invalidation allegation: focused regression and direct probe both revoked token"],
+    "checked_not_established": [
+      "compaction address hazard: rb_gc_mark pins live CME/class",
+      "parallel-sweep dfree race: non-thread-safe destruction is deferred",
+      "included-module token invalidation allegation: focused regression and direct probe both revoked token"
+    ],
     "oracle": "No final-source blocker within documented single-Ractor lookup-only, non-refinement/non-Box scope",
     "full_test_all": "NOT RERUN on fix; historical non-green results retained"
   },
   "post_fix_remeasurement": {
-    "status": "PENDING",
+    "status": "ACCEPTED",
     "invalid_attempt": {
       "status": "INVALID",
       "reason": "protocol drift: Lowrail pull mixed observer harness revisions during interpreter workers",
       "ruby_head": "a30db2f20843940c089bd8247135a7c7cd475ca5",
-      "harness_heads": ["315d56f7dd8982c3eb974536c252b4aeb3709a81", "2ae8c72553b30493b71bdec22316099bf43b4475"],
-      "first_20_interpreter_workers": {"without_placement": 18, "with_placement": 2},
+      "harness_heads": [
+        "315d56f7dd8982c3eb974536c252b4aeb3709a81",
+        "2ae8c72553b30493b71bdec22316099bf43b4475"
+      ],
+      "first_20_interpreter_workers": {
+        "without_placement": 18,
+        "with_placement": 2
+      },
       "prices_claimed": false,
-      "raw_directories": ["/tmp/epoch-research/token-pushed-interpreter", "/tmp/epoch-research/token-pushed-yjit"]
+      "raw_directories": [
+        "/tmp/epoch-research/token-pushed-interpreter",
+        "/tmp/epoch-research/token-pushed-yjit"
+      ],
+      "completed": true,
+      "slots_3_4_released": true,
+      "raw_sha256": {
+        "interpreter": {
+          "samples": "8314911803e516893c2a1ff8777e535b66fc709eb3a2d847b5eeb2077da76cb4",
+          "summary": "a0f83170cbffae15d4cbd4ec4ecbfe492786617692922ad65a38b248ccca3d90",
+          "prices": "3fe805e22cf7ec5d989cdddc0b4fb1a30ac8543e1a9a79e0f4109b38bfaebc57"
+        },
+        "yjit": {
+          "samples": "17e009fdbcfa47a69056933b531b72b729a686116dd33b269101fe7a86076375",
+          "summary": "039e7157f0090a7a409008818e77e5663a9259a671b380e2425db97f8245dd0f",
+          "prices": "968b8553c0fda58f95a191dba76f983b4aeec1bce4f7830dfa9118a66dd51a6c"
+        }
+      }
+    },
+    "final_cohort": {
+      "ruby_head": "a30db2f20843940c089bd8247135a7c7cd475ca5",
+      "ruby_sha256": "60e66e78e0e887084232bbc3eebd3f19ddc331a8c126cf0a4b50572df7027a30",
+      "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+      "slots": [
+        1,
+        2
+      ],
+      "slots_released": true,
+      "workers_max": 2,
+      "retries": 0,
+      "costs": {
+        "interpreter": {
+          "status": "ACCEPTED",
+          "prices_claimed": true,
+          "metadata": {
+            "seed": 41231,
+            "rounds": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T14:27:48Z mutation-epoch-prototype a30db2f208) +PRISM [x86_64-linux]",
+            "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+            "sources": {
+              "bench/experiments/vm_token_cost.rb": "54fb45234557da3cc39a51b1afa4cfea928c259859d14c4cc5c1541dd49c8331",
+              "/tmp/epoch-research/token-pinned-harness/bench/experiments/vm_token_native.c": "02bc907d0417abfeed244659f5ccd75275ae8ed73c6ca792206e0630cb59a2a7"
+            },
+            "valgrind": {
+              "pass": true,
+              "version": "valgrind-3.19.0",
+              "rails_boot": false,
+              "driver_sha256": "3d240b9d3e7e0b28b2d129395d51f716fdb57ed19372066b9a0a37d51eb5d151",
+              "build": {
+                "version": "3.19.0",
+                "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+                "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+                "brk_reservation_mib": 512,
+                "tool": "libexec/valgrind/callgrind-amd64-linux",
+                "tool_sha256": "40edc54db6ab8043265994003768c5a9fafe7d9531c888532c6d5eba6443352f",
+                "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+                "libc": "glibc 2.36"
+              },
+              "log_sha256": "88eb63dcba402e3249788c155152cf9ec8e0bf5bf674e86a0cd0034a83c8d30b"
+            },
+            "counter": "callgrind",
+            "heap_mode": "fixed",
+            "heap_slots": [
+              1000000,
+              1000000,
+              250000,
+              250000,
+              100000,
+              100000,
+              100000,
+              20000,
+              10000,
+              10000,
+              10000,
+              10000
+            ],
+            "region": "after warmup and three full GCs",
+            "requests": 100000,
+            "requested_yjit": false,
+            "requested_jit": "interpreter",
+            "actual_yjit": [
+              false
+            ],
+            "actual_jit": [
+              "interpreter"
+            ]
+          },
+          "worker_pins": {
+            "0-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "8335f14b21ff9e95d0cc74de3eb704970f1cfc19ccd7bf3c5afc75f485407f00"
+            },
+            "0-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "d01f56694d2293d9f0590b013f6604322c1252bcf740bcf1b5e5a687fe0bac82"
+            },
+            "0-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "d6746c89fd212efb67e047524cfa0ad28ca6b0ccc747a2c5feffa3986f5d4e2a"
+            },
+            "0-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "3222402353a7d12f539468f4d6285c9a605e585c8644c583b377e53efeea67fc"
+            },
+            "0-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "956f6b6e289c7634bab212373862ad743488e22ab6c82d06ff68ae91ead0a3bd"
+            },
+            "0-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "89dd5a6f968c97155672aeff89276e9cb578a03b1419278a0c5a9e744dfd17e4"
+            },
+            "0-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "64752af617b5a701a861d08eebac71e96d693278676e1678ff4b971da914c154"
+            },
+            "0-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "aa8392b1a2a35489a0d1012cbec73aab60a973d42f6ab06ae9a2797e056fc8e0"
+            },
+            "0-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "81c003d8a15b0b9a992872334b48f74b390bf87588052aa9784b302fbe789960"
+            },
+            "0-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "3e472658c4b0c152dc3dbbd0ea2381873a70e9af8f213e40671a7f31fb85b879"
+            },
+            "1-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "5d42448f8d0ba95096dee07887ad27cc98dbdc4b3689d38f31efc0b195e5be85"
+            },
+            "1-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "746ba40dabb619ea6fd2d5e7ae0be0b12181f0ea2bc94fd79ef28afe66f7df7c"
+            },
+            "1-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "3bf66570aea5e574413bd7c09fc1871e1d3dffc34f416d8b956b62dbe74e0a5a"
+            },
+            "1-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "ad1fadf7ab637149b8eb42555d3774fa437b51bc6ece11d37669c0ee873cdd96"
+            },
+            "1-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "fe6591ec3aa6013150347af959fe405b6eabb3a6cb017d704cceffd6699cbeb7"
+            },
+            "1-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "f229a8c054e4113508d826df5bd180017ce4c5d64abdf4e49b080954bdb49fca"
+            },
+            "1-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "3a0f3b58cbaccdb79bea3155c8ebb10daef1a26abcb97eabc3e9fe505547435a"
+            },
+            "1-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "21e0f5ecd5f5b9aaebcc93edd5dc3ae9e0e8c8d101548a884e199d1c6285ab30"
+            },
+            "1-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "ef504fd7c102a6892fb8c2ded85b4d66ec8f2e30875dfbc8026c86575c5b6fc8"
+            },
+            "1-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "10100917d227af592ef0e293bb4a52f1b4c0e22825b258785866eb6a0d024380"
+            },
+            "2-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "6738c1dc5247e47f45b6a1d7338a1270e22c86d6ac76342865a78d532ef657e0"
+            },
+            "2-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "95b9c48b94d9416e530bcd8c743a78dfc9d6fe66699e972ef59276c5d549a66a"
+            },
+            "2-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "1f4db198f9f37a10e3c1d228a2d7b935d29734a92539ca11407109a24ae662f3"
+            },
+            "2-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "824006843bdaa55b4e2f57f904117e675375426e459104d07bb6142c65c454f7"
+            },
+            "2-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "c7e53ce52b4aa73d37ffbff91709366a093747317f9e02d3324e65788d4419ad"
+            },
+            "2-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "ed30ccd221aa841a756514368ed7f8ea4174ed8550de576cb606673bf52fb3b3"
+            },
+            "2-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "d92b47a70fde4ebcd5e6a0f8c0e14fba211fc35a945ad95ab85c34e7c6d15f3f"
+            },
+            "2-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "ca633264f444abbdf658456fdbfea0ef6d1edc650256e5b8d0289fe173035f9b"
+            },
+            "2-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "cd78502947564ec53026a3b38f8aa63bc7c6f5ba32c513b984387ca884720ec3"
+            },
+            "2-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "5d118288b45cabbb01eb90e261fd1851ee063efbee23cc249ed993e2cc45ab69"
+            },
+            "3-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "2da6a46e2d01a664625d5f3c1e725036dd70007fe033fac0a5b2a50cce8e38ca"
+            },
+            "3-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "347e60b5140646ea40a17327a56c6f976642babe47f6bdc483e3ff78936e1319"
+            },
+            "3-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "1780bd4a9680fad0b616f08c3eb782991664a811c4741e92bdd42b6fd7f598f5"
+            },
+            "3-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "f4d5a8f0d3ad200bb8073bad68965cdb28566aa953bb499ef01fc6d7cb8eb142"
+            },
+            "3-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "110597c62fe9b3d44ce8be53328d99d261b28b57194ec2d75d67a2089fdaaa1e"
+            },
+            "3-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "64adf493c81225a89b762df0ae81286f7e5a4343b8b4e2e6e92e75f7aa0bbef0"
+            },
+            "3-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "64c1186712668ca3d7ce1f97450a5a517946ac2cb24860cab6140a4a3298ae21"
+            },
+            "3-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "c9a5b4ff67caed37b9d176aa71d4a219d7d8f94421de885ecc1b1d30707e905a"
+            },
+            "3-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "bdfbdde7bbce499d8dec2c3e5686a6bd84010427c9a28d34c36f0fd1b7c35d8a"
+            },
+            "3-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "cfbb7c4019a409fa6f9f8479cb3705a78623a57f477b0b17e8ec007e390c7785"
+            },
+            "4-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "a9f5601922b19be68c4aa00a8470e3df88d4c30ec7d606b9117cc09c8fca2abb"
+            },
+            "4-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "adcd6ddcf008a0e7f802a9c8238f5b70c57e2d832723ec086cd93af3766437fe"
+            },
+            "4-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "43fa9d327d0edaf2f37bd4c5de1dcff9fa99c08c6fc0fbcdbf98b7a4d859acab"
+            },
+            "4-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "74503a534e8978583ed8fe0c5bf054700facaed1501a2ec3a7eb4d4695fb1d90"
+            },
+            "4-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "79c7f18ee7123a4d7cbcd4c4eb49f25ed9e8cdd0d4e65106a031fb5df53a0688"
+            },
+            "4-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "e6cd92c1721b4b25236dc50585e472819141f5ded648ddf5011bc4dd8ec6c5ac"
+            },
+            "4-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "c3499290c9c870344be3b98bd83df67d725ac6b1b1d23ddf71fded70f9ea2a21"
+            },
+            "4-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "eb6a6fd5fc7e680f56834b96223776870b6fa71c034d49365e47ac629c9f84ce"
+            },
+            "4-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "dae0fa51bd55c06bb602b4736b2e3b9da498b6858472707704b99d8f8895687a"
+            },
+            "4-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "5d537560186eb8fde10979756518bc87806a8a90c4a0c4dcb7817ed048e81747"
+            },
+            "5-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "91637992aeb582bd46d1fa9f51414798ff87d4f2e374d611156bd8ead0abbc28"
+            },
+            "5-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "ee0bc9c0d113f1f9aa1786280099065f51e35d0718927be0599b1db5f31c8b56"
+            },
+            "5-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "0277fa0b331fe67291a5df4d4a0c2618fceffca2284dea3fd2fe47441b84c3d9"
+            },
+            "5-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "931281848adaf14e63dbec272c1ea66cdbf1ab50cd05d8627dd57f254fe1b91e"
+            },
+            "5-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "e232b677a8c20c168279b3cbafb47e04ac84a94232bb23aa85d21b3ce0e9c477"
+            },
+            "5-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "d3f108de2a4cf2303e919f6b581312362ee20b2f332731b1e205a73aaab876c1"
+            },
+            "5-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "7a865fca51e6e5e6efd01ec2c1e1c3757b8707f45fd1f9a81399aec00559e7a9"
+            },
+            "5-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "8183b0a1d7879762c4c87f3d2fda8741bd914694ea394736d2efb0efae2ffbcd"
+            },
+            "5-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "952f49daceb367f8ae8e95ab6617ff6ffb27a3f2239b7863efb4c6dd7ef78efe"
+            },
+            "5-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "0b29d45f742bd973e3bda01c39e2f83104ef7a28b0f08b44d60c798b6a2d6d52"
+            }
+          },
+          "controls": {
+            "layers": {
+              "c_off_a": {
+                "instructions_total": {
+                  "value": {
+                    "median": 6.988435000000001,
+                    "ci95": [
+                      6.97681,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -98.26584708046002,
+                    "ci95": [
+                      -98.26868175397216,
+                      -98.2630124069479
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 6.988435000000001,
+                    "ci95": [
+                      6.97681,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -98.26584708046002,
+                    "ci95": [
+                      -98.26868175397216,
+                      -98.2630124069479
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "c_off_b": {
+                "instructions_total": {
+                  "value": {
+                    "median": 6.988435000000001,
+                    "ci95": [
+                      6.97681,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -98.26584708046002,
+                    "ci95": [
+                      -98.26868175397216,
+                      -98.2630124069479
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 6.988435000000001,
+                    "ci95": [
+                      6.97681,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -98.26584708046002,
+                    "ci95": [
+                      -98.26868175397216,
+                      -98.2630124069479
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "c_token": {
+                "instructions_total": {
+                  "value": {
+                    "median": 32.988434999999996,
+                    "ci95": [
+                      32.97681,
+                      33.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -91.81404806227846,
+                    "ci95": [
+                      -91.81669662083482,
+                      -91.81139950372209
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 32.988434999999996,
+                    "ci95": [
+                      32.97681,
+                      33.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -91.81404806227846,
+                    "ci95": [
+                      -91.81669662083482,
+                      -91.81139950372209
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "epoch_branch": {
+                "instructions_total": {
+                  "value": {
+                    "median": 667.988375,
+                    "ci95": [
+                      667.97675,
+                      668.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 65.75872076223524,
+                    "ci95": [
+                      65.75682382133996,
+                      65.76061770313054
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 667.988375,
+                    "ci95": [
+                      667.97675,
+                      668.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 65.75872076223524,
+                    "ci95": [
+                      65.75682382133996,
+                      65.76061770313054
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "off_a": {
+                "instructions_total": {
+                  "value": {
+                    "median": 402.988375,
+                    "ci95": [
+                      402.97675,
+                      403.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 402.988375,
+                    "ci95": [
+                      402.97675,
+                      403.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "token_read": {
+                "instructions_total": {
+                  "value": {
+                    "median": 586.988375,
+                    "ci95": [
+                      586.97675,
+                      587.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 45.65888535943881,
+                    "ci95": [
+                      45.65756823821341,
+                      45.660202480664225
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 586.988375,
+                    "ci95": [
+                      586.97675,
+                      587.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 45.65888535943881,
+                    "ci95": [
+                      45.65756823821341,
+                      45.660202480664225
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "off_b": {
+                "instructions_total": {
+                  "value": {
+                    "median": 402.988375,
+                    "ci95": [
+                      402.97675,
+                      403.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 402.988375,
+                    "ci95": [
+                      402.97675,
+                      403.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "epoch_read": {
+                "instructions_total": {
+                  "value": {
+                    "median": 596.988375,
+                    "ci95": [
+                      596.97675,
+                      597.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 48.14034652027787,
+                    "ci95": [
+                      48.13895781637718,
+                      48.141735224178575
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 596.988375,
+                    "ci95": [
+                      596.97675,
+                      597.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 48.14034652027787,
+                    "ci95": [
+                      48.13895781637718,
+                      48.141735224178575
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "cas": {
+                "instructions_total": {
+                  "value": {
+                    "median": 13.988434999999999,
+                    "ci95": [
+                      13.97681,
+                      14.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -96.52882426787268,
+                    "ci95": [
+                      -96.53160883351211,
+                      -96.52603970223325
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 13.988434999999999,
+                    "ci95": [
+                      13.97681,
+                      14.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -96.52882426787268,
+                    "ci95": [
+                      -96.53160883351211,
+                      -96.52603970223325
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "token_branch": {
+                "instructions_total": {
+                  "value": {
+                    "median": 604.988375,
+                    "ci95": [
+                      604.97675,
+                      605.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 50.12551544894913,
+                    "ci95": [
+                      50.1240694789082,
+                      50.12696141899007
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 604.988375,
+                    "ci95": [
+                      604.97675,
+                      605.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 50.12551544894913,
+                    "ci95": [
+                      50.1240694789082,
+                      50.12696141899007
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              }
+            },
+            "aa": {
+              "pass": true,
+              "metrics": {
+                "instructions_total": true,
+                "instructions_no_gc": true
+              },
+              "tolerance_pct": 0.5
+            },
+            "gc": {
+              "off_a": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              }
+            },
+            "heap_capacity": {
+              "0": {
+                "min": 1000983,
+                "max": 1000983,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "1": {
+                "min": 1000454,
+                "max": 1000454,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "2": {
+                "min": 250635,
+                "max": 250635,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "3": {
+                "min": 250369,
+                "max": 250369,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "4": {
+                "min": 100204,
+                "max": 100204,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "5": {
+                "min": 100156,
+                "max": 100156,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "6": {
+                "min": 100514,
+                "max": 100514,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "7": {
+                "min": 20145,
+                "max": 20145,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "8": {
+                "min": 10033,
+                "max": 10033,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "9": {
+                "min": 10141,
+                "max": 10141,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "10": {
+                "min": 10116,
+                "max": 10116,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "11": {
+                "min": 10017,
+                "max": 10017,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              }
+            },
+            "heap_matched": true,
+            "jit": {
+              "requested_jit": "interpreter",
+              "diagnostic_only": false,
+              "requested_yjit": false,
+              "actual_yjit": [
+                false
+              ],
+              "actual_jit": [
+                "interpreter"
+              ],
+              "pass": true,
+              "workers": {
+                "0-c_off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-c_off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-c_token": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-epoch_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-token_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-epoch_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-cas": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-token_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-c_token": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-cas": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-c_off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-token_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-token_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-epoch_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-epoch_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-c_off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-token_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-c_off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-c_token": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-c_off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-cas": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-epoch_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-token_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-epoch_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-c_off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-cas": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-c_token": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-epoch_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-c_off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-token_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-token_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-epoch_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-c_token": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-c_off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-epoch_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-c_off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-token_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-cas": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-token_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-epoch_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-token_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-c_token": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-c_off_b": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-c_off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-epoch_read": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-cas": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-epoch_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-token_branch": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-off_a": {
+                  "actual_jit": "interpreter",
+                  "actual_yjit": false,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                }
+              }
+            },
+            "all_measured_windows_zero_collections": true,
+            "all_positive_windows_zero_allocations": true,
+            "native_aa": {
+              "instructions_total": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "pass": true
+              },
+              "instructions_no_gc": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "pass": true
+              }
+            }
+          },
+          "samples": [
+            {
+              "c_off_a": {
+                "instructions_total": 6.97681,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 6.97681,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 32.97681,
+                "instructions_no_gc": 33.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 667.97675,
+                "instructions_no_gc": 668.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 402.97675,
+                "instructions_no_gc": 403.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 586.97675,
+                "instructions_no_gc": 587.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 402.97675,
+                "instructions_no_gc": 403.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 596.97675,
+                "instructions_no_gc": 597.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 13.97681,
+                "instructions_no_gc": 14.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 604.97675,
+                "instructions_no_gc": 605.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "c_token": {
+                "instructions_total": 33.00006,
+                "instructions_no_gc": 32.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 14.00006,
+                "instructions_no_gc": 13.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 403.0,
+                "instructions_no_gc": 402.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 605.0,
+                "instructions_no_gc": 604.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 587.0,
+                "instructions_no_gc": 586.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 597.0,
+                "instructions_no_gc": 596.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 668.0,
+                "instructions_no_gc": 667.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 403.0,
+                "instructions_no_gc": 402.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "token_read": {
+                "instructions_total": 586.97675,
+                "instructions_no_gc": 587.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 402.97675,
+                "instructions_no_gc": 403.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "instructions_total": 6.97681,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 402.97675,
+                "instructions_no_gc": 403.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 32.97681,
+                "instructions_no_gc": 33.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 6.97681,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 13.97681,
+                "instructions_no_gc": 14.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 596.97675,
+                "instructions_no_gc": 597.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 604.97675,
+                "instructions_no_gc": 605.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 667.97675,
+                "instructions_no_gc": 668.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "c_off_a": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 14.00006,
+                "instructions_no_gc": 13.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 403.0,
+                "instructions_no_gc": 402.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 403.0,
+                "instructions_no_gc": 402.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 33.00006,
+                "instructions_no_gc": 32.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 597.0,
+                "instructions_no_gc": 596.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 605.0,
+                "instructions_no_gc": 604.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 587.0,
+                "instructions_no_gc": 586.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 668.0,
+                "instructions_no_gc": 667.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "c_token": {
+                "instructions_total": 32.97681,
+                "instructions_no_gc": 33.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "instructions_total": 6.97681,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 402.97675,
+                "instructions_no_gc": 403.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 596.97675,
+                "instructions_no_gc": 597.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 6.97681,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 604.97675,
+                "instructions_no_gc": 605.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 13.97681,
+                "instructions_no_gc": 14.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 586.97675,
+                "instructions_no_gc": 587.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 402.97675,
+                "instructions_no_gc": 403.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 667.97675,
+                "instructions_no_gc": 668.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "off_b": {
+                "instructions_total": 403.0,
+                "instructions_no_gc": 402.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 587.0,
+                "instructions_no_gc": 586.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 33.00006,
+                "instructions_no_gc": 32.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 597.0,
+                "instructions_no_gc": 596.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 14.00006,
+                "instructions_no_gc": 13.97681,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 668.0,
+                "instructions_no_gc": 667.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 605.0,
+                "instructions_no_gc": 604.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 403.0,
+                "instructions_no_gc": 402.97675,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            }
+          ],
+          "prices": {
+            "epoch_read": {
+              "median": 194.00000000000003,
+              "ci95": [
+                194.0,
+                194.00000000000006
+              ]
+            },
+            "epoch_branch": {
+              "median": 265.0,
+              "ci95": [
+                265.0,
+                265.00000000000006
+              ]
+            },
+            "token_read": {
+              "median": 184.00000000000003,
+              "ci95": [
+                184.0,
+                184.00000000000006
+              ]
+            },
+            "token_branch": {
+              "median": 202.00000000000003,
+              "ci95": [
+                202.0,
+                202.00000000000006
+              ]
+            },
+            "c_token": {
+              "median": 26.0,
+              "ci95": [
+                25.999999999999996,
+                26.0
+              ]
+            },
+            "cas": {
+              "median": 7.0,
+              "ci95": [
+                6.999999999999999,
+                7.0
+              ]
+            }
+          },
+          "prices_no_gc": {
+            "epoch_read": {
+              "median": 194.00000000000003,
+              "ci95": [
+                194.0,
+                194.00000000000006
+              ]
+            },
+            "epoch_branch": {
+              "median": 265.0,
+              "ci95": [
+                265.0,
+                265.00000000000006
+              ]
+            },
+            "token_read": {
+              "median": 184.00000000000003,
+              "ci95": [
+                184.0,
+                184.00000000000006
+              ]
+            },
+            "token_branch": {
+              "median": 202.00000000000003,
+              "ci95": [
+                202.0,
+                202.00000000000006
+              ]
+            },
+            "c_token": {
+              "median": 26.0,
+              "ci95": [
+                25.999999999999996,
+                26.0
+              ]
+            },
+            "cas": {
+              "median": 7.0,
+              "ci95": [
+                6.999999999999999,
+                7.0
+              ]
+            }
+          },
+          "raw_sha256": {
+            "samples": "9c961e1069078ddb2121ad9d37d4b12e7d7337d768bbd7ae1ba78a49fd1263f6",
+            "summary": "c1c3a2376656d7ac18c1e79827428e03cd2aa5fd59aa03d3362bd9fb489d7d8d",
+            "prices": "3b0122e2c75672615a9508ced563ce4ba3e77a13a67c91778ef0cd4526fbdd0d"
+          }
+        },
+        "yjit": {
+          "status": "ACCEPTED",
+          "prices_claimed": true,
+          "metadata": {
+            "seed": 41231,
+            "rounds": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T14:27:48Z mutation-epoch-prototype a30db2f208) +PRISM [x86_64-linux]",
+            "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+            "sources": {
+              "bench/experiments/vm_token_cost.rb": "54fb45234557da3cc39a51b1afa4cfea928c259859d14c4cc5c1541dd49c8331",
+              "/tmp/epoch-research/token-pinned-harness/bench/experiments/vm_token_native.c": "02bc907d0417abfeed244659f5ccd75275ae8ed73c6ca792206e0630cb59a2a7"
+            },
+            "valgrind": {
+              "pass": true,
+              "version": "valgrind-3.19.0",
+              "rails_boot": false,
+              "driver_sha256": "3d240b9d3e7e0b28b2d129395d51f716fdb57ed19372066b9a0a37d51eb5d151",
+              "build": {
+                "version": "3.19.0",
+                "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+                "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+                "brk_reservation_mib": 512,
+                "tool": "libexec/valgrind/callgrind-amd64-linux",
+                "tool_sha256": "40edc54db6ab8043265994003768c5a9fafe7d9531c888532c6d5eba6443352f",
+                "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+                "libc": "glibc 2.36"
+              },
+              "log_sha256": "f6478815476aa5857728077085592fd44815e9af9027a1fcaba7b35171235954"
+            },
+            "counter": "callgrind",
+            "heap_mode": "fixed",
+            "heap_slots": [
+              1000000,
+              1000000,
+              250000,
+              250000,
+              100000,
+              100000,
+              100000,
+              20000,
+              10000,
+              10000,
+              10000,
+              10000
+            ],
+            "region": "after warmup and three full GCs",
+            "requests": 100000,
+            "requested_yjit": true,
+            "requested_jit": "yjit",
+            "actual_yjit": [
+              true
+            ],
+            "actual_jit": [
+              "yjit"
+            ]
+          },
+          "worker_pins": {
+            "0-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "259d2658d29955328be8e5298fb08f7ce1c6f6fc65cac393ee6cc3aa9c18f8a3"
+            },
+            "0-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "a6387850b6b2ee791e53ea39a8aa26dbe4fccff3012eceb7df7fc93c681765d5"
+            },
+            "0-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "1d44e759615ce88ae328bf000418c32b036616e4fd31aa4eca15830104d0ad1c"
+            },
+            "0-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "215fa3db63ac640a263fa03fd85dbc9adcedce58eb308ae722ba47e81c52b1c8"
+            },
+            "0-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "5eb76b7561f4a3c81bf9f1493371bd1aa909e2f1fdeb6908e0a864901f401c51"
+            },
+            "0-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "39acabbb5a0802812c01252c629307eb3664e84ab8b4ea1d8773b64bc0ebb156"
+            },
+            "0-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "a3e8ece568fd9f936b112d80796e5d030f29241442edbae0560008a68591e61d"
+            },
+            "0-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "d51ab212d6ef0b8ace30686bd667fde2bcad7726cf5c890592f6e236d6a31eaf"
+            },
+            "0-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "efac0575273c74bbf80978b5e9c26c9ff1e10f4c01a40bdbf28998f07a217e4b"
+            },
+            "0-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "da95d9412b4edbf9b841999ba1f35fd06a88e0ea3d9e2391328ebb0adcf6d911"
+            },
+            "1-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "8d81f56a81fba02f413daf443b8dca226c8d4d53330e1709d0df1fba787ed6f2"
+            },
+            "1-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "654bcb2a420d54d9231329f74beb234d25a6c570649830328490123aa2fa21aa"
+            },
+            "1-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "317b55b8032f97192b00ae4ba60d77e73621832aedaab19e6b912c08be937223"
+            },
+            "1-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "05cb649743d937cb93ae55c352a3a53e1e576491962fdd63e2696a37cf74aa89"
+            },
+            "1-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "74cbc5a9f1b759bdca0d93c4dc5d263705bfd6d1e427ddf8ff094cdb781a4167"
+            },
+            "1-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "fefb5d834ae05a8c82ea3ce1737b2711d53c6dfd895a8102aa9919a3850eae2c"
+            },
+            "1-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "4cf4d5125578968fab6241ed90d45ec0ecd70fae368d7909fb72686180d754a2"
+            },
+            "1-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "e430f80c8f4e917801b864791fd0b9adf2b57e896d7a61553253a61a47ecadb0"
+            },
+            "1-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "369a642c6bbcb1c8ac855823e2ddbeb3bad08942ef4a382e4d65a1a0f52aa56a"
+            },
+            "1-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "4059e50bff19d7a444ff2aa047d3af5c5347cc99f31f07fae5d78111468c361c"
+            },
+            "2-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "9865dc68aee711412fdd5725fe6283f1a6d37567fd92edce296393c0203d227a"
+            },
+            "2-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "c3fd339539c2b92e1b095f935c13007e68b5a06174adb5986a88814193b49b48"
+            },
+            "2-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "ac6696b2d26b8afc4a1b5df1f537e00b1b69197c1776d277633d08aeda2f6a31"
+            },
+            "2-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "4c7bcf978e1a9d300f1e8d71e4caacf253707d07021e0ba82a4a2eb9d3bc9100"
+            },
+            "2-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "d42515ae9ca80ddc185526d2882181e0ce3773a9dca835f0f9d1a52b03f444f4"
+            },
+            "2-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "987b474555d113dfdd524f788a6ac47730ade10f29beb7732c8cf73c6829b819"
+            },
+            "2-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "1fddd97304a6d02fd91e889704b66c805ee1fe56e0d24cde6d8bb369cc1de243"
+            },
+            "2-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "bce127023ef2607c027e7ad6ab383b308b4d5cfd966458c103c545c72b1f2bc6"
+            },
+            "2-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "6f67055bcce344a43afc0e2a363060d973bb60182c866b0107799cc9aff94797"
+            },
+            "2-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "581fdb233654cfd80aa8285312408b6872de709371cd4339c7c6312fe2da56c5"
+            },
+            "3-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "021da6774b469193563acf2e5d4f16c12ee9635aa63185be5e2f73a1906645ce"
+            },
+            "3-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "67069ae5689c68a67df208ba5302edda7f9d021d89622ee5d397167ff294c30b"
+            },
+            "3-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "3d2784f3e9aa62adcda2f5fe436a4afe3e7205005de9e46e32df6b9ea00d6662"
+            },
+            "3-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "9618d67b04cecdf81992cdb7212f342149b6d033d693217079a2db63117a1f64"
+            },
+            "3-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "9ef8140197a9cb1a23dd26efc722bc9f1e90f01f03bc5d3f5b83ba6c796e04df"
+            },
+            "3-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "536c6b871fd128192a10e33369dc3e9760af6c49ee7b4146cf1bd4bd3fce8854"
+            },
+            "3-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "4dfd72793e5d2f0b94265b4181e00e324485a2c3df86356f2b0d4bff69ef8ea9"
+            },
+            "3-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "7d9ea492a0579e6fa9b830c772215e307df2f929f269d685f7b8c53310154320"
+            },
+            "3-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "7aa0673612ef1a6586a5e4f453042293cf33f0126df893f5235ab8f5670abf81"
+            },
+            "3-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "930d381bff620e262299e78ef0606417e4fd16fe934b69e18443380234a90336"
+            },
+            "4-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "0f99442a33ce36b87378a11bfa7bd5b46be91299b30cd73e6b67532346533780"
+            },
+            "4-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "67b7aed57e07f4ea635fc8952b3ce2ff1dab70eb3b7735ead9b596ec968967f4"
+            },
+            "4-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "3a04ec39124d1af67b01389561cef895a0be018f82c9558bb8e877046d36bfcc"
+            },
+            "4-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "c0d94be28551dbf3000050669beb744d7463ee94b3a08a56c54e6a32bf29d589"
+            },
+            "4-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "042860f70b6f9046c2d3c7fae785addac2aab50ba96b4dd31c643acd8ccee136"
+            },
+            "4-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "eceea66cd857b7b4ea0abff808457dbf62b7c4aef4a220440b456cdd4a627d6d"
+            },
+            "4-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "b8082d79804bb2c9c81d6c4af4b96fc170a182d32b5a320c18d047dcdcfedbe8"
+            },
+            "4-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "ca8956c39f78ee27619f429ee19f62e14eca2923aa304bc4ee5848a0a24b812b"
+            },
+            "4-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "c9b41091b426048efbe79608606472149d083a9fcdd75a9b6a9d8200fa600e6c"
+            },
+            "4-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "e0e290399a940992936e349c6d238f562babf1b2299678146595956fedb87146"
+            },
+            "5-token_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "eb1e5580b59aa1aa007552772209a6a8675d5e389bb3e06cb871f7c806850cf3"
+            },
+            "5-off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "97c9e4d4c040d273e31443383471b2efda7ec989ad33f0d78f4463e51ff007f7"
+            },
+            "5-c_token": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "1f4ee43b8fa7c9e096df0767fe5a96953a5b2df8a11234ffb599d52a5d259918"
+            },
+            "5-c_off_b": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "0ba3b195755ca47d7c2c3cdc321a56eb33958d7a759039ae74231bd04de0f07f"
+            },
+            "5-c_off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "472e7f8c9387323963817669f57a6142f1b26c8d0f47b302099eecc28a510574"
+            },
+            "5-epoch_read": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "994b43025e5e0832a403baae22982989af387c0eb3f485759d78121b889b2bf6"
+            },
+            "5-cas": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "98e6d0714f3a8c9f58e59a6a2181887b1c36aaa36565dc94106308e433b6727e"
+            },
+            "5-epoch_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "f7066b7bdba69d27c4edff76ee4573790ffb0ae1edf173f0450a5b10fb190bf4"
+            },
+            "5-token_branch": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "f59e679c781fe2c23f2bb8945aa4118bf634452738a1264b7709d0e2009c5d67"
+            },
+            "5-off_a": {
+              "harness_head": "0f83cd0eddab1997c9dda6e54c6e990edab7dbfd",
+              "log_sha256": "0191e883f21ba7235b55336442cfa2ed6deca8200cc6d554b51b308f46c50660"
+            }
+          },
+          "controls": {
+            "layers": {
+              "c_off_a": {
+                "instructions_total": {
+                  "value": {
+                    "median": 6.987175000000001,
+                    "ci95": [
+                      6.97429,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -80.0293016374873,
+                    "ci95": [
+                      -80.058774703546,
+                      -79.99982857142857
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 6.987175000000001,
+                    "ci95": [
+                      6.97429,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -80.0293016374873,
+                    "ci95": [
+                      -80.058774703546,
+                      -79.99982857142857
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "c_off_b": {
+                "instructions_total": {
+                  "value": {
+                    "median": 6.987175000000001,
+                    "ci95": [
+                      6.97429,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -80.0293016374873,
+                    "ci95": [
+                      -80.058774703546,
+                      -79.99982857142857
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 6.987175000000001,
+                    "ci95": [
+                      6.97429,
+                      7.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -80.0293016374873,
+                    "ci95": [
+                      -80.058774703546,
+                      -79.99982857142857
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "c_token": {
+                "instructions_total": {
+                  "value": {
+                    "median": 32.987175,
+                    "ci95": [
+                      32.97429,
+                      33.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -5.716219446072962,
+                    "ci95": [
+                      -5.718324606431635,
+                      -5.714114285714289
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 32.987175,
+                    "ci95": [
+                      32.97429,
+                      33.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -5.716219446072962,
+                    "ci95": [
+                      -5.718324606431635,
+                      -5.714114285714289
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "epoch_branch": {
+                "instructions_total": {
+                  "value": {
+                    "median": 125.987115,
+                    "ci95": [
+                      125.97423,
+                      126.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 260.09578766995014,
+                    "ci95": [
+                      260.0,
+                      260.19157533990034
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 125.987115,
+                    "ci95": [
+                      125.97423,
+                      126.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 260.09578766995014,
+                    "ci95": [
+                      260.0,
+                      260.19157533990034
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "token_read": {
+                "instructions_total": {
+                  "value": {
+                    "median": 137.98711500000002,
+                    "ci95": [
+                      137.97423,
+                      138.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 294.39413329675676,
+                    "ci95": [
+                      294.28571428571433,
+                      294.50255230779925
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 137.98711500000002,
+                    "ci95": [
+                      137.97423,
+                      138.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 294.39413329675676,
+                    "ci95": [
+                      294.28571428571433,
+                      294.50255230779925
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "off_a": {
+                "instructions_total": {
+                  "value": {
+                    "median": 34.987115,
+                    "ci95": [
+                      34.97423,
+                      35.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 34.987115,
+                    "ci95": [
+                      34.97423,
+                      35.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "epoch_read": {
+                "instructions_total": {
+                  "value": {
+                    "median": 109.987115,
+                    "ci95": [
+                      109.97423,
+                      110.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 214.36466016754133,
+                    "ci95": [
+                      214.28571428571428,
+                      214.44360604936836
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 109.987115,
+                    "ci95": [
+                      109.97423,
+                      110.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 214.36466016754133,
+                    "ci95": [
+                      214.28571428571428,
+                      214.44360604936836
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "off_b": {
+                "instructions_total": {
+                  "value": {
+                    "median": 34.987115,
+                    "ci95": [
+                      34.97423,
+                      35.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 34.987115,
+                    "ci95": [
+                      34.97423,
+                      35.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "cas": {
+                "instructions_total": {
+                  "value": {
+                    "median": 13.987175,
+                    "ci95": [
+                      13.97429,
+                      14.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -60.021933355183435,
+                    "ci95": [
+                      -60.044038138938305,
+                      -59.99982857142857
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 13.987175,
+                    "ci95": [
+                      13.97429,
+                      14.00006
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": -60.021933355183435,
+                    "ci95": [
+                      -60.044038138938305,
+                      -59.99982857142857
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              },
+              "token_branch": {
+                "instructions_total": {
+                  "value": {
+                    "median": 140.98711500000002,
+                    "ci95": [
+                      140.97423,
+                      141.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 302.9687197034584,
+                    "ci95": [
+                      302.85714285714283,
+                      303.080296549774
+                    ]
+                  }
+                },
+                "instructions_no_gc": {
+                  "value": {
+                    "median": 140.98711500000002,
+                    "ci95": [
+                      140.97423,
+                      141.0
+                    ]
+                  },
+                  "delta_pct": {
+                    "median": 302.9687197034584,
+                    "ci95": [
+                      302.85714285714283,
+                      303.080296549774
+                    ]
+                  }
+                },
+                "allocations": {
+                  "value": {
+                    "median": 0.0,
+                    "ci95": [
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "delta_pct": null
+                }
+              }
+            },
+            "aa": {
+              "pass": true,
+              "metrics": {
+                "instructions_total": true,
+                "instructions_no_gc": true
+              },
+              "tolerance_pct": 0.5
+            },
+            "gc": {
+              "off_a": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "minor_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "major_gc_per_request": {
+                  "median": 0.0,
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ]
+                },
+                "gc_per_1k_allocations": null
+              }
+            },
+            "heap_capacity": {
+              "0": {
+                "min": 1000983,
+                "max": 1000983,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "1": {
+                "min": 1000452,
+                "max": 1000452,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "2": {
+                "min": 250635,
+                "max": 250635,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "3": {
+                "min": 250369,
+                "max": 250369,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "4": {
+                "min": 100204,
+                "max": 100204,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "5": {
+                "min": 100156,
+                "max": 100156,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "6": {
+                "min": 100515,
+                "max": 100515,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "7": {
+                "min": 20145,
+                "max": 20145,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "8": {
+                "min": 10033,
+                "max": 10033,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "9": {
+                "min": 10141,
+                "max": 10141,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "10": {
+                "min": 10120,
+                "max": 10120,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              },
+              "11": {
+                "min": 10017,
+                "max": 10017,
+                "page_target": null,
+                "pages_matched": null,
+                "matched": true
+              }
+            },
+            "heap_matched": true,
+            "jit": {
+              "requested_jit": "yjit",
+              "diagnostic_only": false,
+              "requested_yjit": true,
+              "actual_yjit": [
+                true
+              ],
+              "actual_jit": [
+                "yjit"
+              ],
+              "pass": true,
+              "workers": {
+                "0-c_off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-c_off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-c_token": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-epoch_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-token_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-epoch_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-cas": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "0-token_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-c_token": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-cas": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-c_off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-token_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-token_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-epoch_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-epoch_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "1-c_off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-token_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-c_off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-c_off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-c_token": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-epoch_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-cas": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-token_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "2-epoch_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-c_off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-cas": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-epoch_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-c_token": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-token_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-c_off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-token_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "3-epoch_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-c_off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-c_token": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-epoch_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-c_off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-token_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-cas": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-token_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "4-epoch_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-token_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-c_token": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-c_off_b": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-c_off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-epoch_read": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-cas": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-epoch_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-token_branch": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                },
+                "5-off_a": {
+                  "actual_jit": "yjit",
+                  "actual_yjit": true,
+                  "missing_counters": [],
+                  "mode_matched": true,
+                  "warmup_stable": true,
+                  "windows_stable": true,
+                  "pass": true
+                }
+              }
+            },
+            "all_measured_windows_zero_collections": true,
+            "all_positive_windows_zero_allocations": true,
+            "native_aa": {
+              "instructions_total": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "pass": true
+              },
+              "instructions_no_gc": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "pass": true
+              }
+            }
+          },
+          "samples": [
+            {
+              "c_off_a": {
+                "instructions_total": 6.97429,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 6.97429,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 32.97429,
+                "instructions_no_gc": 33.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 125.97423,
+                "instructions_no_gc": 126.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 137.97423,
+                "instructions_no_gc": 138.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 34.97423,
+                "instructions_no_gc": 35.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 109.97423,
+                "instructions_no_gc": 110.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 34.97423,
+                "instructions_no_gc": 35.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 13.97429,
+                "instructions_no_gc": 14.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 140.97423,
+                "instructions_no_gc": 141.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "c_token": {
+                "instructions_total": 33.00006,
+                "instructions_no_gc": 32.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 14.00006,
+                "instructions_no_gc": 13.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 35.0,
+                "instructions_no_gc": 34.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 141.0,
+                "instructions_no_gc": 140.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 138.0,
+                "instructions_no_gc": 137.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 110.0,
+                "instructions_no_gc": 109.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 126.0,
+                "instructions_no_gc": 125.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 35.0,
+                "instructions_no_gc": 34.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "token_read": {
+                "instructions_total": 137.97423,
+                "instructions_no_gc": 138.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 34.97423,
+                "instructions_no_gc": 35.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "instructions_total": 6.97429,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 34.97423,
+                "instructions_no_gc": 35.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 6.97429,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 32.97429,
+                "instructions_no_gc": 33.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 109.97423,
+                "instructions_no_gc": 110.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 13.97429,
+                "instructions_no_gc": 14.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 140.97423,
+                "instructions_no_gc": 141.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 125.97423,
+                "instructions_no_gc": 126.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "c_off_a": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 14.00006,
+                "instructions_no_gc": 13.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 35.0,
+                "instructions_no_gc": 34.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 35.0,
+                "instructions_no_gc": 34.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 110.0,
+                "instructions_no_gc": 109.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 33.00006,
+                "instructions_no_gc": 32.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 141.0,
+                "instructions_no_gc": 140.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 138.0,
+                "instructions_no_gc": 137.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 126.0,
+                "instructions_no_gc": 125.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "c_off_a": {
+                "instructions_total": 6.97429,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 32.97429,
+                "instructions_no_gc": 33.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 109.97423,
+                "instructions_no_gc": 110.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 34.97423,
+                "instructions_no_gc": 35.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 6.97429,
+                "instructions_no_gc": 7.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 140.97423,
+                "instructions_no_gc": 141.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 13.97429,
+                "instructions_no_gc": 14.00006,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_read": {
+                "instructions_total": 137.97423,
+                "instructions_no_gc": 138.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 34.97423,
+                "instructions_no_gc": 35.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 125.97423,
+                "instructions_no_gc": 126.0,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            },
+            {
+              "token_read": {
+                "instructions_total": 138.0,
+                "instructions_no_gc": 137.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_b": {
+                "instructions_total": 35.0,
+                "instructions_no_gc": 34.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_token": {
+                "instructions_total": 33.00006,
+                "instructions_no_gc": 32.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_b": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "c_off_a": {
+                "instructions_total": 7.00006,
+                "instructions_no_gc": 6.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_read": {
+                "instructions_total": 110.0,
+                "instructions_no_gc": 109.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "cas": {
+                "instructions_total": 14.00006,
+                "instructions_no_gc": 13.97429,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "epoch_branch": {
+                "instructions_total": 126.0,
+                "instructions_no_gc": 125.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "token_branch": {
+                "instructions_total": 141.0,
+                "instructions_no_gc": 140.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              },
+              "off_a": {
+                "instructions_total": 35.0,
+                "instructions_no_gc": 34.97423,
+                "allocations": 0.0,
+                "minor_gc_per_request": 0.0,
+                "major_gc_per_request": 0.0,
+                "gc_per_1k_allocations": null
+              }
+            }
+          ],
+          "prices": {
+            "epoch_read": {
+              "median": 75.0,
+              "ci95": [
+                75.0,
+                75.0
+              ]
+            },
+            "epoch_branch": {
+              "median": 91.0,
+              "ci95": [
+                91.0,
+                91.0
+              ]
+            },
+            "token_read": {
+              "median": 103.0,
+              "ci95": [
+                103.0,
+                103.0
+              ]
+            },
+            "token_branch": {
+              "median": 106.0,
+              "ci95": [
+                106.0,
+                106.0
+              ]
+            },
+            "c_token": {
+              "median": 26.0,
+              "ci95": [
+                25.999999999999996,
+                26.000000000000004
+              ]
+            },
+            "cas": {
+              "median": 7.0,
+              "ci95": [
+                6.999999999999999,
+                7.0
+              ]
+            }
+          },
+          "prices_no_gc": {
+            "epoch_read": {
+              "median": 75.0,
+              "ci95": [
+                75.0,
+                75.0
+              ]
+            },
+            "epoch_branch": {
+              "median": 91.0,
+              "ci95": [
+                91.0,
+                91.0
+              ]
+            },
+            "token_read": {
+              "median": 103.0,
+              "ci95": [
+                103.0,
+                103.0
+              ]
+            },
+            "token_branch": {
+              "median": 106.0,
+              "ci95": [
+                106.0,
+                106.0
+              ]
+            },
+            "c_token": {
+              "median": 26.0,
+              "ci95": [
+                25.999999999999996,
+                26.000000000000004
+              ]
+            },
+            "cas": {
+              "median": 7.0,
+              "ci95": [
+                6.999999999999999,
+                7.0
+              ]
+            }
+          },
+          "raw_sha256": {
+            "samples": "aa30b047415daa5fde8abbc4de15d31a96fbde415dc97f96c6aed1cac8bd831e",
+            "summary": "d3e6168a597aa7fbedcdab7e836e07b8f84d8b05774ecc043fc4b32b4872fc62",
+            "prices": "0cf427ad7391752a1b46af7e79863f22b7bd1012fdfe88759d19ba770d8c070a"
+          }
+        }
+      },
+      "clean_detached_harness_before_and_after": true,
+      "ruby_binary_unchanged": true,
+      "harness_files": {
+        "bench/experiments/vm_token_cost.rb": "54fb45234557da3cc39a51b1afa4cfea928c259859d14c4cc5c1541dd49c8331",
+        "bench/experiments/vm_token_native.c": "02bc907d0417abfeed244659f5ccd75275ae8ed73c6ca792206e0630cb59a2a7",
+        "bench/request_pairs.rb": "d390a08c3d2f05046bd41e3985aece1a1b4d7f638c84598cb792b6d55ebf20d9",
+        "bench/heap_windows.rb": "b4f3bfa341ba37d09f3d84b7c77dd629aa7b87c36d80805b3bca37836f2b32d6",
+        "bench/jit_stability.rb": "743649435ea5af8e3902d35516e592e522afa7ed8b74135b491b6559496ca1a9",
+        "bench/worker_placement.rb": "d6d63ec89aa6e6652f70048f05dd682a25e6ebd77a41839c62a7eb6ab9867aa8"
+      }
     }
   },
   "date": "2026-10-21",

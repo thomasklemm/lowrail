@@ -10,8 +10,10 @@ method tokens instead. Production Fizzy `/bubbles` bumped the global epoch
 20 times/request via `CollectionProxy#extend(*extending)`, while none of 12
 selected held tokens invalidated. The registry lifecycle/Ractor
 [review fix](https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5)
-passes 13 tests/97 assertions in interpreter and YJIT. Final-source cost
-remeasurement is pending; its first cohort is INVALID for harness drift.
+passes 13 tests/97 assertions in interpreter and YJIT. Its detached pinned
+cohort passed A/A, heap and JIT gates: token read/guard **184/202 interpreter,
+103/106 YJIT Ir**, direct C **26 Ir**. The first attempt remains INVALID for
+harness drift; its prices are not claimed.
 See the [current evidence](../upstream-drafts/ruby-method-token-evidence.md)
 and [unposted correction draft](../upstream-drafts/ruby-method-token-feature.md).
 The numbers and prototype below describe the historical 4.0.7 experiment,

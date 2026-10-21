@@ -4,7 +4,10 @@ Posted by the owner as [Feature #22459](https://bugs.ruby-lang.org/issues/22459)
 The original description below is preserved, not rewritten. Its costs and
 main-Ractor wording describe the original prototype, not the reviewed fix.
 
-## Correction comment draft — not posted
+## Correction comment draft — prepared before remeasurement
+
+Prepared and delivered while pricing was pending. The cost follow-up below
+updates that status; this thread has posted neither comment.
 
 The prototype has a [review fix](https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5),
 preserving the original commits and registry design. A new regression
@@ -27,6 +30,21 @@ it mixed observer-harness revisions, and no prices from it are claimed.
 The non-green full-suite result, noisy write timing, limited endpoint census
 and lookup-only/refinement/Box/constant exclusions remain unchanged; no final
 full-suite equivalence or concurrent-Ractor guarantee is claimed.
+
+## Cost follow-up comment draft — not posted
+
+Remeasurement of the [reviewed fix](https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5)
+is complete, using a clean detached Lowrail harness at
+[`0f83cd0`](https://github.com/thomasklemm/lowrail/commit/0f83cd0eddab1997c9dda6e54c6e990edab7dbfd),
+recorded in every worker. Net token read/successful-guard costs are **184/202
+Ir in the interpreter, 103/106 Ir with YJIT**; direct C validity is **26 Ir**
+in both. One finite six-round pair passed Ruby/native A/A (95% intervals
+[0, 0]%), fixed-heap and actual-JIT/JIT-flat gates, with zero collections or
+positive-window allocations. These supersede the historical token figures.
+The mixed-harness attempt remains INVALID; it supplied no claimed price.
+Costs exclude acquisition/revalidation and are instructions, not application
+speedups. Non-green full-suite, noisy write timing and scope caveats remain;
+[evidence and controls](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream-drafts/ruby-method-token-evidence.md).
 
 ## Original posted description — historical
 

@@ -5,7 +5,7 @@ This document is self-contained and may be attached to a Ruby Feature ticket.
 
 Posted by the owner as [Feature #22459](https://bugs.ruby-lang.org/issues/22459).
 The posted description is historical; the review correction below has not
-been posted by this thread. **Final-source read-cost remeasurement is pending.**
+been posted by this thread. **The pinned final-source read-cost cohort passed.**
 
 **Recommendation:** discuss scoped method-validity tokens, not a global
 mutation counter. A production-mode request invalidated the global snapshot
@@ -122,7 +122,46 @@ Installed Ruby SHA-256:
 The final full `test-all` was not rerun; the historical non-green results
 below remain limitations, not final-source certification.
 
-## Final-source read-cost status: pending
+## Final-source read costs (reviewed fix)
+
+Ruby remains at the linked lifecycle fix. The explicitly authorized fresh
+cohort used Lowrail harness
+[`0f83cd0`](https://github.com/thomasklemm/lowrail/commit/0f83cd0eddab1997c9dda6e54c6e990edab7dbfd)
+in `/tmp/epoch-research/token-pinned-harness`, a separate detached worktree.
+It was clean before and after; no pulls or edits occurred there, benchmark
+sources were read-only, and the Ruby binary hash above was unchanged.
+Every one of the 120 worker payloads records that same `harness_head` and
+the pushed Ruby revision. Driver/observer hashes, worker log hashes, paired
+slopes, controls and raw-dump hashes are retained in the results JSON.
+
+Native C correctness/disassembly and CPU-time diagnostics preceded Callgrind.
+One finite six-round interpreter/YJIT pair, seed 41231, N=0/100,000, at most
+two workers; same-round empty Ruby/native loops are subtracted. GCC 12.2
+`-O3 -g`, patched Valgrind 3.19 (512 MiB brk reservation), and the same
+12-pool heap floors listed in the historical protocol below. Both modes
+passed **Ruby A/A, native A/A, fixed-heap and actual-JIT gates**; every YJIT
+measured window was compilation/invalidation-flat. Ruby/native A/A 95%
+intervals were [0, 0]%, within ±0.5%. No measured window collected; every
+positive window allocated zero objects. Total and GC-excluded net results
+agree to floating-point precision; nominal bootstrap intervals round to
+[value, value] for these deterministic synthetic paths.
+
+| Net executed instructions (Ir) per operation, reviewed fix | Interpreter | YJIT |
+|---|---:|---:|
+| Ruby `token.valid?` read | **184** | **103** |
+| Successful `raise unless token.valid?` | **202** | **106** |
+| Direct C `rb_vm_method_token_valid_p` | **26** | **26** |
+| Rejected-alternative epoch read / successful guard | 194 / 265 | 75 / 91 |
+| Isolated uncontended CAS | 7 | 7 |
+
+These replace, rather than retroactively relabel, the historical token
+183/201 and 102/105 figures. Acquisition/revalidation, failure paths,
+subscription-heavy writes and whole-request savings remain unpriced. The
+token's advantage remains scope, not a lower YJIT read cost than the epoch.
+The fresh cohort used slots 1+2; both were released when it finished, with no
+retry. Slots 3+4 had already been released after the invalid attempt below.
+
+### Invalid predecessor — no price claim
 
 The first post-fix interpreter/YJIT attempt is **INVALID: protocol drift**.
 Ruby stayed pinned to the pushed fix, but a Lowrail pull during the cohort
@@ -132,9 +171,9 @@ interpreter workers, 18 lacked placement observations and two had them.
 No price from this attempt is claimed, irrespective of its numerical gates.
 Raw evidence is retained under `/tmp/epoch-research/token-pushed-interpreter`
 and `token-pushed-yjit`; results JSON records the rejected attempt separately.
-A new, explicitly authorized finite cohort will use an immutable detached
-harness worktree and record its exact SHA per worker. It is not yet evidence
-for a revised price. All read-cost figures below are **historical**.
+It completed before the separately authorized pinned cohort above; it was
+not rerun to rescue a failed numerical gate. All figures in the explicitly
+historical cost section below remain **historical**.
 
 ## Steady-state production-mode churn
 
