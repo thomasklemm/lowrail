@@ -374,3 +374,166 @@ about the existing upstream proposal and a fresh semantic investigation;
 it is not PR-ready. No fork branch, issue, comment, review or workflow was
 created, and fork main was not touched. Only this Lowrail findings record
 was changed.
+
+## Action View partial/collection pipeline: no PR (2026-10-21)
+
+**No-go: two fewer allocations on fallback collection rendering, but no
+reliable throughput benefit established.** The common shared-ERB-buffer
+path and fully warm collection cache do not benefit. Retain upstream's
+`map`; the experiment is not a claim that every possible reduction in this
+pipeline has been exhausted. The descriptive Lowrail form/token/collection
+request result does not transfer to stock Rails or this experiment.
+
+### Overlap and residual candidate
+
+Canonical `rails/rails:main` was freshly fetched at
+[a5545972e7](https://github.com/rails/rails/commit/a5545972e7fc2a17062b46b31e1fba99eea85a49).
+Searches included open and closed issues/PRs for `CollectionRenderer`,
+`PartialRenderer`, `ObjectRenderer`, partial performance, resolver cache,
+`implicit_locals`, `each_with_info`, `collection_with_template`, collection
+allocation, and render-collection payloads. Relevant descriptions and diffs
+were read, together with recent main commits and the rendering/lookup file
+histories. These are search results, not proof of absence of all overlap.
+
+| Reduction | Disposition |
+|---|---|
+| Fuse per-item output buffers/wrappers | Already merged in [#59118](https://github.com/rails/rails/pull/59118). [#59155](https://github.com/rails/rails/pull/59155) retains subclass hooks; [#59158](https://github.com/rails/rails/pull/59158) restricts sharing to ERB/known templates. No duplicate or widening of those boundaries. |
+| Reuse already-resolved partials across render calls | Direct overlap with open [#45958](https://github.com/rails/rails/pull/45958); related normalization cache [#57147](https://github.com/rails/rails/pull/57147). No new cache. First-match lookup/allocation reductions already include [#57783](https://github.com/rails/rails/pull/57783) and [#58786](https://github.com/rails/rails/pull/58786). Details refactor [#58168](https://github.com/rails/rails/pull/58168) is closed/unmerged, not credited as merged. |
+| Elide template instrumentation payloads | Already [#59112](https://github.com/rails/rails/pull/59112); related open [#58271](https://github.com/rails/rails/pull/58271) and [#58957](https://github.com/rails/rails/pull/58957). No event/payload change, subscriber-absence memo or instrumentation shortcut. |
+| Remove per-item locals/iteration or derive one path per model class | Not equivalent: mixed objects of the same class can select different paths, and cached misses use filtered-collection counters/iteration sizes. Strict locals also remove implicit keys during rendering. Retain live assignments and every object conversion. |
+| Avoid the fallback loop's temporary Enumerator | Separate residual experiment, not output fusion or a cache. No matching iterator-removal proposal found. It retains `collection_with_template`'s signature, dispatch, per-item wrappers and template/layout order. Measured below; not published. |
+
+The Rails checkout used local branch
+`thomasklemm/collection-direct-iteration`. The existing `thomasklemm/rails`
+fork was verified as a fork of `rails/rails`; **no branch was pushed and
+fork main was not touched**. No Rails commit, PR, issue, comment, review or
+workflow was published. The two-open-PR admission check was not needed
+because the performance admission failed first.
+
+### Exact experimental change and reproduction
+
+In `actionview/lib/action_view/renderer/collection_renderer.rb`, only
+`collection_with_template` changed as follows; all elided loop statements
+remain in their original order:
+
+```diff
+ partial_iteration = PartialIteration.new(collection.size)
++collection_body = []
+
+-collection.each_with_info.map do |object, (path, as, counter, iteration)|
++collection.each_with_info do |object, (path, as, counter, iteration)|
+   # unchanged locals, template lookup, rendering, layout and iterate! calls
+-  build_rendered_template(content, _template)
++  collection_body << build_rendered_template(content, _template)
++  # Enumerable#map returned nil to the collection's each block.
++  nil
+ end
++collection_body
+```
+
+The `nil` is necessary, not cosmetic: the old Enumerable mapping callback
+returns nil to the underlying iterator. Without it, the direct loop returns
+its accumulator to a user collection's `each`. A mutant with only that nil
+removed fails the retained controls with **`changed yield results`**.
+
+[Standalone benchmark](../bench/upstream/actionview_collections.rb) and
+[differential controls](../bench/upstream/actionview_collection_controls.rb)
+run stock Rails, without Lowrail. Install the Rails Gemfile/lock test tools
+and benchmark-ips 2.15.1 under Ruby 4.0.7. Make two checkouts of the pinned
+canonical commit and apply only the loop edit to the experiment. Run from
+Lowrail with **fresh output prefixes** (the after run intentionally shares
+its before run's prefix):
+
+```sh
+mise exec -- ruby bench/upstream/actionview_collection_controls.rb /path/to/rails-before > /tmp/av-before.json
+mise exec -- ruby bench/upstream/actionview_collection_controls.rb /path/to/rails-experiment > /tmp/av-after.json
+diff -u /tmp/av-before.json /tmp/av-after.json
+# Repeat the controls with ruby --yjit.
+mise exec -- ruby bench/upstream/actionview_collections.rb /path/to/rails-before before /tmp/fresh-av-interpreter
+mise exec -- ruby bench/upstream/actionview_collections.rb /path/to/rails-experiment after /tmp/fresh-av-interpreter
+mise exec -- ruby --yjit bench/upstream/actionview_collections.rb /path/to/rails-before before /tmp/fresh-av-yjit
+mise exec -- ruby --yjit bench/upstream/actionview_collections.rb /path/to/rails-experiment after /tmp/fresh-av-yjit
+```
+
+### Measurements and limits
+
+Ruby **4.0.7**, x86_64 Linux, benchmark-ips **2.15.1**. One serial
+before/after process pair per execution mode, interpreter pair first, then
+YJIT; each scenario uses 2 s warmup and 5 s measurement. Allocations cover
+2,000 warmed operations with GC enabled. Tests and dependency installation
+had finished before timing; no selected-case rerun was used. The cold-cache
+operation includes clearing its MemoryStore; the warm-cache control uses a
+separate, already-populated store. The scripts check escaped output, safety
+and encoding before measurement.
+
+All numbers are per render, not per item. Objects are identical between
+modes unless both interpreter / YJIT counts are shown.
+
+| Operation | Objects/op before → after | Interpreter i/s before → after | YJIT i/s before → after |
+|---|---:|---:|---:|
+| Plain partial control | 35 → 35 | 52,340 ±2.1% → 46,670 ±8.4% | 127,603 ±3.5% → 133,794 ±5.4% |
+| Derived object control | 38 → 38 | 44,404 ±2.2% → 44,513 ±8.8% | 127,878 ±8.3% → 125,613 ±8.5% |
+| Shared ERB collection, 20 items, control | 103 → 103 | 15,727 ±10.9% → 15,524 ±10.9% | 43,079 ±14.1% → 40,346 ±10.4% |
+| Returning HTML handler, 20 items | 249 → 247 | 13,037 ±9.6% → 13,645 ±4.7% | 26,194 ±13.5% → 31,426 ±5.0% |
+| Per-item layout, 20 items | 334 → 332 | 7,026 ±8.5% → 7,811 ±13.3% | 15,601 ±13.2% → 13,161 ±16.6% |
+| Heterogeneous collection, 20 items | 287 → 285 | 8,937 ±9.3% → 8,604 ±10.1% | 15,975 ±19.0% → 17,576 ±13.4% |
+| Cold collection cache, 20 items | 1,543 → 1,541 / 1,563 → 1,561 | 1,991 ±8.1% → 1,920 ±1.3% | 3,297 ±4.5% → 3,732 ±7.0% |
+| Warm collection cache, 20 items, control | 1,020 → 1,020 / 1,030 → 1,030 | 2,778 ±13.1% → 2,949 ±10.8% | 4,176 ±13.1% → 4,089 ±9.9% |
+
+The partial allocation census includes one measurement-floor object per
+2,000 operations in both arms (35.0005/op). The saving is **two constant
+objects per fallback invocation**, approximately 0.13–0.80% of these render
+allocations, not two objects per item. Timings are exploratory: the ± values
+are within-run standard deviations, not confidence intervals for treatment
+effects. In particular, benchmark-ips calling a result "same-ish" does not
+prove equality. Untouched partial timing moves −10.8% in the interpreter,
+and layout timing changes direction between modes. Favorable HTML/cold-cache
+YJIT point estimates do not override the controls or establish causality.
+No request-speed, instruction-count or JIT-flat claim is made; the mixed
+results were retained rather than rerun until favorable.
+
+### Behavior, reviews and verdict
+
+The controls produce identical **23-entry** normalized snapshots before
+and after in interpreter and YJIT modes. They cover ordinary/object renders,
+String/Symbol `as:`, spacer and per-item layouts, mixed paths from one record
+class, strict locals, non-ERB output, cold/warm/partial cache hits, duplicate
+keys, callable keys, cached mixed-collection refusal, empty collections,
+invalid names, missing templates, rendering exceptions, blocks, observable
+yield returns and a renderer subclass retaining individual bodies. They
+compare output/safety/encoding, observed local values/counter/iteration
+facts, selected notification payload fields and conversion call order.
+Resolver controls check warm identity reuse, separate local-name signatures,
+deliberate staleness before clear, and invalidation after `clear_cache`.
+Four independent views each render 20 collections concurrently. This is
+bounded evidence, **not** every possible override/thread interleaving, full
+payload-object identity coverage or concurrent shared-view certification.
+
+The complete Action View suite passes on the candidate, including a rerun
+after the comment-only review clarification: **2,901 tests / 6,865 assertions**,
+**249 / 338**, **173 / 334**; zero failures, errors or skips in every group.
+Command from `actionview/`: `BUNDLE_ONLY=default:test:rubocop
+PARALLEL_WORKERS=1 SEED=41231 bundle exec rake test` under Ruby 4.0.7.
+RuboCop on the renderer and both scripts: **3 files, no offenses**. This is
+local component verification, not hosted CI or the Jbuilder gem's suite.
+
+Two independent **Thermos** reviewers and an independent **oracle** reviewed
+the exact loop change and scripts. No supported-contract correctness or
+security blocker was established. Maintainability review requires explaining
+the load-bearing nil if the experiment is retained; the comment was added.
+The oracle recommends **no PR**: the measured constant allocation cut has
+not earned the explicit accumulator and subtle yield-return obligation.
+Two incorrect preliminary correctness-review statements were checked rather
+than accepted: the direct block form does avoid the Enumerator, and the
+yield observer does detect removal of nil (confirmed by the failing mutant).
+Fresh prefixes and the executed before-first order avoid the reviewer's
+hypothetical stale/reversed benchmark baseline. No speculative compatibility
+layer or extra cache was added to appease a review.
+
+Rails `CONTRIBUTING.md`, the checked-in PR template, and the guide's benchmark,
+commit-message and CHANGELOG sections were checked. An implementation-only
+refactor requires no CHANGELOG entry; a submission would need compelling
+measurements and a Rails behavior test for the non-obvious yield obligation.
+No Rails commit message or PR description was prepared after this no-go.
+The scripts and this findings record are the only delivered Lowrail changes;
+there is no new Rails optimization to merge or monitor.
