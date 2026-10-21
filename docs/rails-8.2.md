@@ -40,16 +40,17 @@ changes/platforms are frozen in the patches, not deferred to future resolution.
 All pre-existing corpus entries and 8.1.4 overlays remain unchanged, including
 the original `campfire` and separate `campfire-r81`.
 
-The tested Lowrail code is [6a8e5c9](https://github.com/thomasklemm/lowrail/commit/6a8e5c9b280d6e3b791166f7ba0c3faefe9ffcfc).
+The initial app receipts test Lowrail [6a8e5c9](https://github.com/thomasklemm/lowrail/commit/6a8e5c9b280d6e3b791166f7ba0c3faefe9ffcfc).
 The required pre-publication pull/rebase incorporated the separately owned
 Prism build fix [6dc269a](https://github.com/thomasklemm/lowrail/commit/6dc269a197718cb26d68f70eedc4bd214e707951).
-These app receipts predate that fix; they are not fresh verification of the
-post-rebase runtime. The source scanner/test was checked again after rebase.
+Those initial receipts predate that fix; they are not fresh verification of
+the post-rebase runtime. The follow-up below pins its newer tested code
+separately. The source scanner/test was checked again after rebase.
 Writebook's executions use `.corpus/writebook-r82-candidate`; the standard
 `writebook-r82` entry was separately replayed source-only and its patched
 dependency bytes checked, not misreported as a second tested checkout.
 
-## Own-suite and default no-op gates
+## Initial own-suite and default no-op gates
 
 Seed **41231**, `PARALLEL_WORKERS=1`, `MT_CPU=1`, `LOWRAIL_VERIFY_LOADS=1`,
 Ruby 4.0.7. Plain baselines have `LOWRAIL=0` and **no Lowrail preload**.
@@ -80,12 +81,13 @@ Raw logs and complete receipts remain private in `.lowrail/private/rails-8.2/`.
   `own.size + other.size`, not an own-thread count: the strict verifier also
   compares that count. Six fixed isolated **off-only** executions (three
   off/off pairs, no retry-to-green) all pass with 40 and the same digest.
-  They **do not reproduce count variation on this new pin**. The prior
+  Those initial isolated controls **do not reproduce count variation on this
+  new pin**. The prior
   [Campfire investigation](campfire-bench.md#9-original-rails-82-alpha-compatibility-evidence)
   reproduced 40/41 off/off on its original Rails pin, but is not relabeled
-  as evidence for this one. Current disposition: concurrency-sensitive
-  other-thread count difference, **unresolved strict gate**, not proved
-  Lowrail causation and not silently exempted. No reporter/runtime fix here.
+  as evidence for this one. The fixed-count full-suite follow-up below now
+  reproduces 40/41 **off/off on this exact pin**. The original strict gate
+  remains rejected; no reporter/runtime exemption or fix was introduced.
 * **Campfire plain browser:** the Trix-mention editing test fails its
   unchanged helper's expectation of three connected Cable stream sources
   (one found). This occurred with no Lowrail loaded; both instrumented arms,
@@ -103,10 +105,11 @@ Raw logs and complete receipts remain private in `.lowrail/private/rails-8.2/`.
   and hook sets match; this is not evidence of extra loaded constants.
   The verifier automatically runs one `LOWRAIL_UNITS=-1` setup-only arm
   (zero manifest units, no pass-group runs), flags `setup/source delivery
-  (no active units)` and still exits 1. This is a **suspected setup/load-order
-  compatibility issue**, not a proved runtime bug or reason to change
-  runtime/admission in this task. Repro: the documented default Campfire
-  build followed by `lowrail verify ... -- bundle exec rails test:system
+  (no active units)` and still exits 1. This was a **suspected setup/load-order
+  compatibility issue**, not a proved runtime bug. The reduced follow-up
+  below reproduces the exact sequence swap **off/off** and records which
+  setup components are actually present. Original repro: the documented
+  default Campfire build followed by `lowrail verify ... -- bundle exec rails test:system
   --seed 41231` with the recorded load-census/browser environment. All raw
   identities and controls are retained; no retry, exemption or fix follows.
 * **Fizzy plain baseline:** five Vips loader-policy failures; four webhook
@@ -148,7 +151,7 @@ Raw logs and complete receipts remain private in `.lowrail/private/rails-8.2/`.
   against the owned, empty disposable SQLite files loads it successfully.
   No schema/config/test patch or SQL/load exemption was introduced.
 
-## Public sealed build attempts
+## Initial public sealed build attempts
 
 The command is `lowrail build APP --sealed --env production --jit interpreter`,
 with a disposable production database and `SECRET_KEY_BASE_DUMMY=1`, never
@@ -178,6 +181,169 @@ Fizzy's other opt-in builders also decline: 74 instantiate `NameError`,
 unsupported build boundaries, not default-run crashes or admitted 8.2 units.
 Writebook's plain, no-preload production runner fails the same Redis
 requirement, independently of the Lowrail oracle.
+
+## Fixed-count follow-up (2026-10-21)
+
+The follow-up uses Lowrail
+[`7122f22`](https://github.com/thomasklemm/lowrail/commit/7122f22d2d9586e945d51fcbdab0c84dee8a0998),
+the same app/Rails pins, Ruby 4.0.7 and seed 41231. Both Campfire cohorts use
+an **EMPTY compatible manifest**, with no selected passes or files. All three
+on arms in each cohort admit it with no refusal and zero units. Each cohort
+is exactly **three off/off pairs followed by three off/on pairs**, twelve
+fresh, serialized processes, with no early stop or retry-to-green. No
+measurement, runtime fix, new exemption or admission change is made.
+The [follow-up JSON appendix](rails-8.2-followup.json) supplements, rather
+than overwrites, the original receipts above. Private raw traces are under
+`.lowrail/private/rails-8.2-followup/`.
+
+### 1. Campfire load sequence: exact swap reproduced off/off
+
+The reduced reproducer runs only the existing
+`PushSubscriptionResyncTest#test_a_browser_posts_its_subscription_again_once_per_session,_so_it_survives_a_password_change`.
+It is the first test in the original full-browser order and exercises
+concurrent HTTP/Cable lazy loads. **All twelve runs pass.** In off/off pair 2,
+all first-test snapshots and the final constant, Zeitwerk-path and hook sets
+match exactly; only three final sequence entries differ:
+
+| Event | Off A | Off B |
+|---|---|---|
+| 346 | `ActionCable::Server::Socket` | same |
+| 347 | `ActionCable::Server::TaggedLoggerProxy` | `RoomScoped` |
+| 348 | `RoomScoped` | `Rooms::InvolvementsController` |
+| 349 | `Rooms::InvolvementsController` | `ActionCable::Server::TaggedLoggerProxy` |
+
+Off/off pair 3 also reverses the proxy-versus-controller ordering; pair 1
+has different indices with the proxy still first. Off/on pairs 1 and 3 have
+identical target sequences; pair 2 differs. The original two off-only entries
+are therefore **not evidence of a Lowrail-on-only setup bug**.
+
+The post-suite witnesses check actual loaded files and Module/ISeq ancestors,
+not merely whether a dependency could exist:
+
+| Candidate setup step | Present in these empty-manifest processes? |
+|---|---|
+| Loader / lowered delivery | No `loader.rb` or ISeq delivery hook |
+| `ModuleHooks` prepend on `Module` | Absent; no `guard.rb` loaded |
+| Bootsnap / require-hooks adapter | Neither adapter loaded; neither dependency is in this Campfire lock |
+| `VerifyLoads` instrumentation | Enabled symmetrically in every arm; its observer hooks are present |
+
+The off/off stop condition is met at the full empty-manifest step, so no
+further component-removal cohorts are run and no absent component is forced
+into the app. This does **not** prove that census instrumentation is
+non-perturbative or that plain, uninstrumented runs have the same scheduling;
+it does show the exact disputed sequence without Lowrail activation. No
+smallest faulty setup step or runtime fix is claimed. The separate plain
+Trix failure and other unproven browser entries remain unresolved.
+
+### 2. Campfire SQL: exact 40/41 traces reproduced off/off
+
+The load-event result does not itself explain a query count, so a separate
+fixed cohort runs the **full non-system suite**, preserving the failing
+case's suite context rather than repeating the earlier isolated controls.
+All twelve identity/outcome maps match: **632 pass, 2 skip** each.
+
+| Pair | First total queries | Second total queries |
+|---|---|---|
+| Off/off 1 | 40 | 41 |
+| Off/off 2 | 41 | 40 |
+| Off/off 3 | 40 | 40 |
+| Off/on 1 | 40 | 40 |
+| Off/on 2 | 40 | 40 |
+| Off/on 3 | 40 | 41 |
+
+For the named concurrent `ensure!` test, every run has **28 own-thread
+queries**, digest `468d325c...`; other threads have 12 or 13. Their two
+digests, `40ff187a...` and `d2bef362...`, match the original 40/41 receipts
+exactly. Comparing full traces in off/off pair 1 finds only one multiset
+change: the insert-trigger existence probe returning no rows occurs three
+times instead of twice, on other threads. The test explicitly starts two
+workers calling `Room::MessagesCount.ensure!`, which probes before and inside
+the SQLite write transaction. This is concrete off/off evidence of the
+app's concurrent repair variation, not an inferred Lowrail setup effect.
+It does not retroactively turn the original strict verifier rejection green.
+
+### 3. Writebook dependency overlay corrected, once-only checks
+
+Rails' Redis cache store requires redis-client **>= 0.28.0** at runtime,
+but this app's upstream lock held **0.22.2**. In the dependency-only checkout,
+`BUNDLE_FROZEN=false mise exec ruby@4.0.7 -- bundle update redis-client --conservative`
+resolves **0.30.1**. Relative to the initial overlay, **only that lockfile
+version changes**; no additional direct dependency, app initializer or
+configuration patch is needed. The updated overlay's SHA-256 is
+`44b9c14fa70eb672c1d0af3ae922e43c856ae45261cff75d1c4684844a21297c`.
+Replaying it onto clean pinned dependency files yields all three files
+byte-identical to the tested checkout. The original JSON appendix retains
+its original lock/overlay receipt; the follow-up JSON carries the new hash.
+
+Facts and the default empty artifact are rebuilt with the corrected frozen
+bundle. Each plain suite and each `lowrail verify` is run **once**, serially:
+
+| Check | Result with corrected lock |
+|---|---|
+| Plain production boot, no Lowrail preload | Exit 0; Rails 8.2 alpha / Ruby 4.0.7 / redis-client 0.30.1 / `RedisCacheStore` |
+| Plain non-system | 310 tests: 303 pass, 4 Vips failures, 1 URI error, 2 skip; exit 1 |
+| Default non-system verify | Same 310 identities/outcomes off/on; identical SQL for all 310 / 16,640 queries; zero load differences or unstable entries; exit 0 |
+| Plain browser | 3 pass; exit 0 |
+| Default browser verify | Same 3 identities/outcomes; identical SQL / 377 queries; zero load differences or unstable entries; exit 0 |
+
+The new off/on tests and SQL also match their original counterparts.
+There are **zero units/hits**, and the existing default artifact's YJIT versus
+interpreter-at-admission refusal is retained, not mistaken for active
+optimization. Plain production still warns about the app's missing
+`AccountsController` route target; no Lowrail preload is present there.
+
+One new public sealed attempt with the documented production/interpreter
+command passes the old Redis boundary but still exits 1 **before builders**:
+
+```text
+certification JIT mode mismatch: expected interpreter, observed yjit; certification refused
+```
+
+The app's unchanged `config/initializers/enable_yjit.rb:9` calls
+`RubyVM::YJIT.enable` in `after_initialize` without consulting `config.yjit`.
+An interpreter build cannot certify that final VM state. This is a
+fail-closed mode boundary, not an observed Rails-source sealed refusal or
+evidence that 8.2 optimization was admitted. The prior default manifest is
+byte-identical after the failed build. No initializer/runtime patch, second
+mode attempt or retry follows; Writebook has **no observed sealed builder
+refusal** in either attempt, for different explicitly recorded reasons.
+
+### 4. Fizzy residuals stay named and unresolved
+
+Campfire's off/off sequence evidence does not establish a shared cause in
+another app. There are **no new Fizzy runs or reclassifications**. These
+on/on-only entries remain unresolved:
+
+* SQL: `MermaidDiagramTest#test_a_diagram_drawn_for_a_block_whose_language_a_refresh_has_since_changed_is_discarded`.
+* Load events: `Boards::ColumnsController` (597), `PwaController` (598),
+  `Boards::Columns::ClosedsController` (599), `Cards::WatchesController` (644).
+
+Their full identities and holders remain in both JSON appendices. No
+Lowrail compatibility bug requiring a runtime fix is established by this
+follow-up. Independent baseline failures, the other unproven Campfire
+browser differences and all source-drift certification work remain open.
+**Rails 8.2 support is still blocked; stage 2 still waits for beta/RC.**
+
+### Reproducing the bounded Campfire checks
+
+With the documented default empty build and dedicated disposable Redis,
+from the Lowrail repository:
+
+```sh
+# Fresh output directories are mandatory; the script refuses overwriting.
+SE_BROWSER_PATH=/path/to/chrome \
+  mise exec ruby@4.0.7 -- ruby script/rails82-setup-check.rb \
+  .corpus/campfire-r82 .lowrail/private/new-load-cohort loads
+mise exec ruby@4.0.7 -- ruby script/rails82-setup-check.rb \
+  .corpus/campfire-r82 .lowrail/private/new-sql-cohort sql
+```
+
+The script retains full private SQL/load traces, per-process witnesses and
+JSON summaries. Event indices are sorted **numerically**, not by the string
+ordering used for serialized census entries. An initial harness attempt
+failed before app boot because Ruby `-r` could not require an extensionless
+preloader; its log is retained as invalid. Giving the preloader `.rb` fixes
+the harness; it is not a thirteenth app execution or a runtime workaround.
 
 ## Early-warning source inventory
 

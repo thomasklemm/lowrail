@@ -18,7 +18,7 @@ live in the linked docs; numbers come from executed runs, dated.
 | Historical upper bounds | endpoint render path, −26 %/−37 % handwritten specimens, not supported passes or current prices; caller-side certification loses (0fbb909) |
 | Types/MCP | source-backed Sorbet + Rails signatures; blog slots 2/99/7/188, Wikino 0/1,715/1/1,129 (proven/static/observed/unknown); 517 original wrapped returns → static, forwarding placeholders removed; blog Steep 51 → 6 → 2, still non-gating ([details](types.md#sorbet-and-framework-signatures-follow-up--2026-10-21)) |
 | Prism 2 | Ruby dev + Rust 2.0.0; explicit target grammar, unknown versions refuse. Census/delivered bytes and Rust facts/types/MCP match; both Ruby axes tested, named production-fixture skips preserved. No Prism.find witness adoption or speed claim ([evidence](prism-2.md)) |
-| Rails 8.2 alpha | [Separate pinned compatibility corpus and re-runnable source drift](rails-8.2.md); default no-op only, baseline failures and strict SQL rejection retained; sealed re-certification waits for beta/RC |
+| Rails 8.2 alpha | [Pinned corpus, source drift and fixed-count follow-up](rails-8.2.md); Campfire load/SQL variation reproduced off/off; Writebook lock corrected, baseline failures/Fizzy residuals retained; support blocked, sealed re-certification waits for beta/RC |
 | Limits / next work | default/quarantine unchanged; broader sealed admission and active own-suite coverage remain incomplete; frozen-props integration deferred; Ruby 4.1/ZJIT remains a separate matrix |
 
 ## Fizzy block-link heap protocol (2026-10-21)
