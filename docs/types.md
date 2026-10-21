@@ -138,7 +138,21 @@ Contradictions stay in `conflicts` and withdraw body proof. Parameters use
 `arg:NAME` slots, including untyped rest/block parameters; RBS block input and
 return types stay untyped. There is **no whole-signature status**.
 
-MCP `export_rbs` takes no arguments and returns `format: 1`, `files` (the two
+### Per-app slot coverage
+
+`types APP` JSON (format 1), MCP `export_rbs`, and the `# lowrail coverage:`
+comment in `app.rbs`/standalone stdout contain the same `coverage` object:
+`{"proven":2,"static":55,"observed":11,"unknown":176}` for the blog snapshot
+below. Count each modeled return and argument slot once, not its sample
+multiplicity; exclude ivar facts, roles, support stubs and unmodeled methods.
+Counts include modeled receivers that cannot be declared in RBS; those still
+have explicit export diagnostics. All four keys are present even at zero.
+This is coverage of the existing type model, including its framework entries,
+not a fraction of all app behavior or a lowering certificate. Static plus
+samples still counts as static. The table below reports these disjoint slot
+counts, unlike the older overlapping source counts in the quality ledger.
+
+MCP `export_rbs` takes no arguments and returns `format: 1`, `coverage`, `files` (the two
 RBS filenames mapped to content), `signatures` (method IDs mapped to `rbs`
 and `slots`), `diagnostics`, and `conflicts`. It reads the server's existing
 facts/samples, refreshes on content changes and never writes files. For example:
@@ -165,8 +179,9 @@ Ruby 4.0.7 / RBS 4.2.0: both split files and concatenated stdout parse with
 `RBS::Parser.parse_signature`; split exports pass `rbs -I DIR validate`.
 The real MCP text/structured output round-trips, its files equal the legacy
 file export, and their concatenation equals `types --rbs APP` byte for byte.
-Steep is not installed; this is signature validation, not a complete Rails
-type-checking result. All exports and logs are outside the source apps.
+The coverage follow-up rechecks these equalities, the JSON/RBS/MCP counts,
+parsing and validation on both apps. All exports and logs are outside the
+source apps. This is signature validation, not a complete Rails type check.
 
 | App | Exported signatures | Proven / static / observed / unknown **slots** | Diagnostics / conflicts |
 |---|---:|---:|---:|
@@ -184,6 +199,38 @@ Wikino's 38 existing raw-ERB inference diagnostics remain visible; no ERB
 type is fabricated to silence them. Regressions cover a schema reader,
 observed return/argument counts, body-local proof, unknown helper slots,
 contradictions, invalid receiver diagnostics and read-only MCP refresh.
+
+### One disposable Steep check — non-gating
+
+Steep **2.1.0** and RBS **4.2.0** installed cheaply in a separate temporary
+bundle on Ruby 4.0.7 (24 gems). Ran **once**, with the generated blog RBS and
+unchanged copies of `app/models`, `app/controllers` and `app/helpers`:
+
+```ruby
+# Disposable Steepfile, not an app or repository configuration change
+target :blog do
+  signature "sig" # generated app.rbs and lowrail_support.rbs
+  check "app/models"
+  check "app/controllers"
+  check "app/helpers"
+end
+```
+
+`bundle exec steep check -j 1 --no-daemon` exits **1: 51 problems in 9 files**:
+42 `Ruby::NoMethod`, 8 `Ruby::UnknownConstant` warnings and 1
+`Ruby::UnexpectedPositionalArgument`. Missing declarations include Rails base
+classes, macros, `params`, `render`, relation methods and inherited AR
+construction; the positional-argument error is `Article.new(article_params)`
+without its Rails constructor signature. Empty helper modules have no modeled
+members/declaration. Generated member information and name-only support stubs
+are not a Rails RBS distribution. No signatures were invented, warnings
+suppressed or Rails collection installed to make this check pass.
+
+This is an integration limitation, **not a passed source type check**, and
+does not change the successful RBS parse/validate results. Steep is not a gate
+or repository dependency. The original install/check logs and exit status
+remain in `.lowrail/private/type-export/followups/steep-{install,check}.log`
+and `steep-exit.txt`; disposable bundle/source copies are removed afterward.
 
 ## Type quality ledger — 2026-10-20
 

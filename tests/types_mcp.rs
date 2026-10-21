@@ -54,6 +54,8 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
     );
     let app_rbs = std::fs::read_to_string(out.join("app.rbs")).unwrap();
     let support_rbs = std::fs::read_to_string(out.join("lowrail_support.rbs")).unwrap();
+    let coverage = app_rbs.lines().find_map(|line| line.strip_prefix("# lowrail coverage: ")).unwrap();
+    assert_eq!(serde_json::from_str::<Value>(coverage).unwrap(), types["coverage"]);
     let stdout_rbs = Command::new(bin).args(["types", "--rbs"]).arg(&app).output().unwrap();
     assert!(stdout_rbs.status.success());
     assert_eq!(String::from_utf8(stdout_rbs.stdout).unwrap(), format!("{support_rbs}{app_rbs}"));
@@ -127,6 +129,7 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
             let export = &response["result"]["structuredContent"];
             assert_eq!(export["files"]["app.rbs"], app_rbs);
             assert_eq!(export["files"]["lowrail_support.rbs"], support_rbs);
+            assert_eq!(export["coverage"], types["coverage"]);
             assert_eq!(export["signatures"]["Article#title"]["slots"]["return"]["status"], "static");
             assert_eq!(serde_json::from_str::<Value>(response["result"]["content"][0]["text"].as_str().unwrap()).unwrap(), *export);
         } else {

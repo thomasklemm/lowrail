@@ -356,7 +356,7 @@ impl TypeModel {
 
     pub fn typed_facts(&self) -> serde_json::Value {
         serde_json::json!({"format":1, "methods":self.methods,
-            "conflicts":self.conflicts, "diagnostics":self.diagnostics})
+            "coverage":rbs::coverage(self), "conflicts":self.conflicts, "diagnostics":self.diagnostics})
     }
 
     pub fn export_rbs(&self, facts: &Facts) -> rbs::Export<'_> {
@@ -412,7 +412,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     }
     println!(
         "{}",
-        serde_json::to_string_pretty(&model).map_err(|e| e.to_string())?
+        serde_json::to_string_pretty(&model.typed_facts()).map_err(|e| e.to_string())?
     );
     Ok(())
 }

@@ -2,6 +2,34 @@ use super::*;
 use serde_json::json;
 
 #[test]
+fn coverage_counts_return_and_argument_slots_not_samples_or_ivars() {
+    let dir = std::env::temp_dir().join(format!("lowrail-type-coverage-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("example.rb");
+    std::fs::write(&file, "class Example\n def proven = 7\n def inferred = proven\n def sampled(value); external(value); end\n def unknown; external; end\nend\n").unwrap();
+    let methods: Vec<_> = [("proven",2),("inferred",3),("sampled",4),("unknown",5)].into_iter()
+        .map(|(name,line)| json!({"name":name,"source_location":format!("{}:{line}",file.display()),
+            "parameters":if name == "sampled" { json!([["req","value"]]) } else { json!([]) }})).collect();
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,
+        "modules":[{"name":"Example","kind":"class","methods":methods}]})).unwrap();
+    let mut model = TypeModel::from_facts(&facts);
+    model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":[
+        {"module":"Example","name":"sampled","calls":3,"returns":{"String":3},
+            "args":{"value":{"Symbol":3}},"ivars":{"@extra":{"Integer":3}}}
+    ]}).to_string().as_bytes()).unwrap();
+    let expected = json!({"proven":1,"static":1,"observed":2,"unknown":1});
+    assert_eq!(model.typed_facts()["coverage"], expected);
+    let export = serde_json::to_value(model.export_rbs(&facts)).unwrap();
+    assert_eq!(export["coverage"], expected);
+    let comment = export["files"]["app.rbs"].as_str().unwrap().lines()
+        .find_map(|line| line.strip_prefix("# lowrail coverage: ")).unwrap();
+    assert_eq!(serde_json::from_str::<serde_json::Value>(comment).unwrap(), expected);
+    assert_eq!(TypeModel::default().typed_facts()["coverage"],
+        json!({"proven":0,"static":0,"observed":0,"unknown":0}));
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn schema_nullability_associations_routes_and_roles() {
     let facts: Facts = serde_json::from_value(json!({
         "models": [{"name":"Article", "table":"articles", "columns":[
