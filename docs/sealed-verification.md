@@ -123,6 +123,84 @@ On base `88506d9` plus this change, with no test exclusions:
   prepared only in disposable corpus copies, preserving gem versions and the
   original corpus locks; the private Rails fixture bundle was prepared likewise.
 
+### Optional native holder prototype: link coverage recovered
+
+The follow-up on `fb07512` replaces link's objspace dependency with
+`Lowrail::Native.exact_class?(object, expected)`. Its complete operation is
+`CLASS_OF(object) == expected`, using Ruby's public C API. Returning a boolean
+avoids exposing internal Class/ICLASS objects (which objspace sometimes wraps).
+No singleton-class flag branch is needed: an eigenclass pointer cannot equal
+the certified ordinary view/Hash/Regexp class. This is **not** `object.class`,
+`instance_of?`, method enumeration, heap walking or eigenclass construction.
+There is no Ruby dispatch, allocation or GC operation in the primitive.
+
+This is an explicitly built, optional prototype: run **`rake compile` from
+`gem/` under each chosen Ruby**. It needs the Ruby headers and a C compiler.
+Engine/version/revision/platform-specific directories keep the two builds
+separate. The gem ships the source and Rake task, not a mandatory installation
+extension: no compiler is needed to install/require the Ruby gem. It never
+compiles during application boot. A failed rebuild removes the prior output;
+an absent or unloadable binary leaves link visibly refused with **"Lowrail
+native actual-holder primitive unavailable; run rake compile; keep original"**.
+There is **no objspace fallback**, including when the app loads objspace itself.
+
+Requiring Lowrail attempts the native require unconditionally, including
+`LOWRAIL=0`; the off/on loaded features match in the public regression. The
+extension defines only `Lowrail::Native.exact_class?`. The link certificate
+pins the actual native binary's SHA256 and the method's metadata, as well as
+every existing source/body/visibility/delivery/literal-state guard. The shared
+literal-table audit accepts a predicate so the separate form build-time
+objspace audit remains unchanged. No form file or runtime form policy changed.
+Admission still only reads the cached view class: the missing-cache regression
+refuses without creating it or loading features, then admits at request entry
+after the app supplies it naturally.
+
+On **both Ruby 4.0.7 and 4.1-preview1**, the native admission decision matches
+`ObjectSpace.internal_class_of(object).equal?(expected)` for stock instances,
+private singleton overrides, singleton prepends, undef, `respond_to_missing?`,
+empty eigenclasses, subclasses, Hash/Regexp and immediate values. App reflection
+overrides are not invoked. In separate diagnostic processes, 10,000 warmed
+calls allocate **0 objects**, keep pending GC **marking → marking** with the
+collection count unchanged, and leave eigenclass counts **76 → 76** (4.0.7) /
+**71 → 71** (preview). Heap walking is isolated from the GC-state experiment;
+objspace is loaded only for diagnostic oracle/counting processes, not admission.
+Disassembly of both compiled predicates contains no calls; the C operation
+only reads the dispatch class and compares pointers.
+
+Fresh blog production/YJIT artifact, same two GETs, restored four-DB snapshot
+and minimum raw/seed-0/seed-1 off/off/on sequences:
+
+| Observation | Before native primitive | After |
+|---|---|---|
+| Link 18 index / show hits, fallbacks | 0/0, 0/0 | **5/0, 2/0** in raw and both companions; no link refusal |
+| Form 19 index / show hits, fallbacks | 0/0, 0/0 | **unchanged 0/0, 0/0**, explicit passive-activation refusal |
+| Boot SQL, primary/cache/queue/cable | 0/0/0/0 | **0/0/0/0 in all nine workers** |
+| Request SQL | index 14; show 2 | **index 14/14/14; show 2/2/2**, primary only; exact text/binds/order |
+| Hooks / app features | passive witness | **146 identical cold hook executions**; early/late callbacks once each; API absent, objspace unloaded before/after requests |
+| Declared entropy companions | exact for two GETs, link unexercised | **both exact for two GETs**, now with link hits; no exclusions |
+| Raw gate | rejected_off_control | **rejected_off_control retained**, not normalized or reclassified |
+
+Private evidence: `.lowrail/private/blog-native-holder-final/` and
+`.lowrail/private/native-holder-{gc,eigen}-r{4,41}.json`. These are correctness
+diagnostics, **not measurements**, whole-app support or new certification.
+The same 19 ordinary and two system test IDs remain uncovered. Preview tests
+the primitive, not unsupported preview sealed admission. Form's historical
+measured result and coverage rejection remain unchanged.
+
+Final strict full suites (`LOWRAIL_STRICT_GATES=1 rake test`, seed 1729):
+Ruby 4.0.7 **158 tests / 6,831 assertions, zero failures/errors/skips**;
+4.1-preview1 **158 / 5,910, zero failures/errors**, with three named
+4.0.7-only skips (BlogProduction, SealedLink and FormScaffold). The first
+preview attempt failed a missing Herb native dependency; installing the
+same-version source dependency in the disposable corpus bundle fixed setup,
+and the complete strict rerun above passed. No production guard was changed
+to make preview admission pass. Cargo's **37 unit + 1 types/MCP + 8 verify**
+tests pass. A locally packaged/installed gem requires without a native build,
+then its shipped source compiles and loads without objspace. Private full
+logs are `native-full-r4-final.log`, `native-full-r41.log`, the retained
+`native-full-r41-missing-herb.log` and `native-package.log` under
+`.lowrail/private/`.
+
 ## The evidence gap and the claim we can actually make
 
 [`Manifest`](../gem/lib/lowrail/manifest.rb) admits sealed-v1 only with the

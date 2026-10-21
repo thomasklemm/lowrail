@@ -75,9 +75,9 @@ class SealedLinkTest < Minitest::Test
       assert_equal "sealed-v1", manifest["tier"]
       link_unit = manifest.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("id").to_s
       scenario = <<~'RUBY'
+        Lowrail.send(:remove_const, :Native) if ENV["MISSING_NATIVE"] && defined?(Lowrail::Native)
         require "./config/environment"
         require "rack/mock"
-        require "objspace"
         events = []
         ActiveSupport::Notifications.subscribe("render_template.action_view") do |*args|
           events << ActiveSupport::ExecutionContext.to_h.fetch(:controller).instance_variable_get(:@assigned)
@@ -100,6 +100,7 @@ class SealedLinkTest < Minitest::Test
         puts JSON.generate(status: response.status, body: response.body, conversions: $conversions,
           events: events, metadata: metadata, hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks,
           trace_exits: trace_exits,
+          objspace: $LOADED_FEATURES.grep(/objspace/),
           refusal: defined?(Lowrail::Sealed) && Lowrail::Sealed.refusal)
       RUBY
       %w[stock view builder].each do |receiver|
@@ -116,6 +117,7 @@ class SealedLinkTest < Minitest::Test
           assert_equal off[key], sealed[key], "#{receiver}: #{key}"
         end
         assert_empty refused["hits"]
+        assert_empty sealed.fetch("objspace"), "neither app nor link admission loads objspace"
         assert_equal receiver == "stock" ? 1 : 0, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
         assert_equal receiver == "stock" ? 0 : 1, sealed.fetch("fallbacks").fetch(link_unit, 0)
         assert_equal '<a class="one&quot;two" href="/target?x=&lt;&amp;q=&quot;">A&lt;&amp;</a>', sealed["body"] if receiver == "stock"
@@ -137,9 +139,24 @@ class SealedLinkTest < Minitest::Test
       %w[status body conversions events metadata].each { assert_equal off[_1], sealed[_1], "renamed: #{_1}" }
       assert_equal 1, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
       assert_equal 0, sealed.fetch("fallbacks").fetch(link_unit, 0)
+      missing = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
+        "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "MISSING_NATIVE" => "1"})
+      %w[status body conversions events metadata].each { assert_equal off[_1], missing[_1], "missing native: #{_1}" }
+      assert_match(/native actual-holder primitive unavailable/, missing.fetch("refusal"))
+      assert_equal 0, missing.fetch("hits").fetch(link_unit, 0)
+      assert_empty missing.fetch("objspace"), "objspace is never a fallback"
+      unpinned = JSON.parse(certified)
+      sources = unpinned.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("sealed").fetch("sources")
+      sources.delete_if { |path, _| path.start_with?("#{Lowrail::NATIVE_PATH}.") }
+      File.write(manifest_path, JSON.generate(unpinned))
+      refused = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
+        "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
+      %w[status body conversions events metadata].each { assert_equal off[_1], refused[_1], "uncertified native: #{_1}" }
+      assert_equal 0, refused.fetch("hits").fetch(link_unit, 0)
+      assert_match(/loaded native actual-holder binary not certified/, refused.fetch("refusal"))
+      File.write(manifest_path, certified)
       deferred = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
         require "./config/environment"
-        require "objspace" # App-owned dependency, not Lowrail activation.
         ArticlesController.instance_variable_set(:@view_context_class, nil)
         features = $LOADED_FEATURES.dup
         Lowrail::Sealed.activate

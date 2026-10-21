@@ -34,15 +34,18 @@ class BlogProductionTest < Minitest::Test
           end
         end
         on = records.last
-        %w[Lowrail::Sealed Lowrail::FormScaffold].each { |name| refute_nil on.fetch("refusals").fetch(name) }
+        assert_nil on.fetch("refusals").fetch("Lowrail::Sealed")
+        refute_nil on.fetch("refusals").fetch("Lowrail::FormScaffold")
         form = report.fetch("units").find { _1.fetch("pass") == "sealed/form_scaffold" }
         link = report.fetch("units").find { _1.fetch("pass") == "sealed/link_to" }
-        [form, link].each do |unit|
-          refute_nil unit, "build-time certification remains intact"
-          id = unit.fetch("id").to_s
-          assert on.fetch("scenarios").all? { _1.fetch("hits").fetch(id, 0).zero? && _1.fetch("fallbacks").fetch(id, 0).zero? }
-          refute_empty on.fetch("unit_refusals").fetch(id)
-        end
+        refute_nil form, "build-time form certification remains intact"
+        refute_nil link
+        form_id, link_id = [form, link].map { _1.fetch("id").to_s }
+        assert on.fetch("scenarios").all? { _1.fetch("hits").fetch(form_id, 0).zero? && _1.fetch("fallbacks").fetch(form_id, 0).zero? }
+        refute_empty on.fetch("unit_refusals").fetch(form_id)
+        assert_equal [5, 2], on.fetch("scenarios").map { _1.fetch("hits").fetch(link_id, 0) }
+        assert on.fetch("scenarios").all? { _1.fetch("fallbacks").fetch(link_id, 0).zero? }
+        refute on.fetch("unit_refusals").key?(link_id)
       end
       assert_equal 2, report.fetch("entropy_companions").size, "both declared seeds must run"
     end

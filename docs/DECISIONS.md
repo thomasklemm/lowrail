@@ -37,6 +37,16 @@ not a support claim. Raw entropy still rejects off/off; the two declared
 companions now agree exactly for their two GETs, with no cold SQL/load
 exclusions. [Evidence, coverage losses and regressions](sealed-verification.md#current-runtime-passive-admission-or-explicit-refusal).
 
+The bounded follow-up recovers **link index/show 5/2 hits, zero fallbacks**
+with the optional Lowrail-owned public-C-API `exact_class?` primitive, loaded
+symmetrically at gem require even off. No Ruby reflection/heap-walk substitute,
+objspace fallback, runtime compile or readiness warming. Missing native build
+still refuses visibly. Both-Ruby oracle/passivity witnesses and cold blog
+companions retain all guards and exact SQL/hooks/loads; raw entropy stays red.
+This does **not** recover form activation or change its measured result, add
+measurements, or certify the unported suite scenarios
+([prototype and scope](sealed-verification.md#optional-native-holder-prototype-link-coverage-recovered)).
+
 ## RBS exports preserve slot evidence, not signature certification (2026-10-21)
 
 Reuse the existing TypeModel and renderer for `types --rbs APP`, legacy split

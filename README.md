@@ -113,6 +113,12 @@ is a silent no-op, and an artifact containing quarantined passes is refused
 with `Lowrail.refusal_reason`. In development it is off unless `LOWRAIL=1`.
 `LOWRAIL_DEBUG=1` prints refusals.
 
+Sealed link's optional native holder prototype is built explicitly with
+`rake compile` from `gem/`, under each chosen Ruby (headers and C compiler
+required). It is loaded equally on/off, never compiled during app boot, and
+never loads objspace. A missing/unloadable build keeps the original path with
+a visible refusal. [Contract and bounded validation](docs/sealed-verification.md#optional-native-holder-prototype-link-coverage-recovered).
+
 `LOWRAIL_ROOT` names the real app root (default: the working directory).
 `LOWRAIL_DIR` optionally selects a separate artifact directory containing
 `manifest.json` (default: `LOWRAIL_ROOT/.lowrail`). Benchmark snapshots use

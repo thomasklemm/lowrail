@@ -4,3 +4,5 @@
 *.test
 /target/
 /.corpus/
+/gem/tmp/
+/gem/lib/lowrail/native/

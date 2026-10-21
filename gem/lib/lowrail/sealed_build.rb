@@ -52,6 +52,13 @@ module Lowrail
       return refuse.call("sealed pilot requires production Ruby 4.0.7 / Rails 8.1.4 blog") unless
         ENV["RAILS_ENV"] == "production" && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
       return refuse.call("denylisted by verify --bisect") if denied.any? { _1["pass"] == PASS }
+      native = Lowrail.loaded_constant("Lowrail::Native")
+      return refuse.call("Lowrail native actual-holder primitive unavailable; run rake compile; keep original") unless native
+      exact_class = native.method(:exact_class?)
+      return refuse.call("custom actual-holder primitive") unless exact_class.source_location.nil? &&
+        exact_class.owner.equal?(native.singleton_class) && exact_class.original_name == :exact_class?
+      native_file = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
+      return refuse.call("native actual-holder binary unavailable") unless native_file
       controller = Lowrail.loaded_constant("ArticlesController")
       return refuse.call("eager-loaded ArticlesController required; keep lazy applications original") unless
         controller.is_a?(Class) && controller < ActionController::Base
@@ -89,11 +96,12 @@ module Lowrail
         String.instance_method(:html_safe?),
         ERB::Util.method(:xml_name_escape), ERB::Util.method(:unwrapped_html_escape)]
       return refuse.call("custom literal escaping/blankness") unless ruby_primitives.all? { stock?(_1) }
-      require "objspace"
-      return refuse.call("custom literal tables") unless Sealed.literal_state?
+      return refuse.call("custom literal tables") unless Sealed.literal_state?(exact_class: exact_class)
       primitive_methods = primitives.flat_map do |holder, names|
         names.map { {"holder" => holder.name, "method" => _1.to_s, "signature" => Sealed.signature(holder.instance_method(_1))} }
       end
+      primitive_methods << {"holder" => "Lowrail::Native", "singleton" => true,
+        "method" => "exact_class?", "signature" => Sealed.signature(exact_class)}
       ruby_primitives.each do |method|
         singleton = Method === method
         primitive_methods << {"holder" => singleton ? "ERB::Util" : "String", "singleton" => singleton,
@@ -157,7 +165,7 @@ module Lowrail
       }
       files = [{path: factory_file, original: factory_source, parts: [factory_code]},
         {path: dispatch_file, original: dispatch_source, parts: [dispatch_code]}]
-      sources = [__FILE__, File.join(__dir__, "sealed.rb"), File.join(__dir__, "templates.rb"),
+      sources = [__FILE__, File.join(__dir__, "sealed.rb"), File.join(__dir__, "templates.rb"), native_file,
         *VIEW.map { view_class.instance_method(_1).source_location&.first },
         *BUILDER.map { builder.instance_method(_1).source_location&.first },
         *ruby_primitives.map { _1.source_location.first }, dispatch_file,

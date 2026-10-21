@@ -1,6 +1,25 @@
 # frozen_string_literal: true
 
 require "rake/testtask"
+require_relative "lib/lowrail"
+
+# Explicit and optional: shipping/using the Ruby gem does not require a C
+# compiler. An unavailable build leaves link admission visibly refused.
+native_dir = File.join(__dir__, "lib/lowrail/native", Lowrail::NATIVE_VARIANT)
+native = File.join(native_dir, "lowrail_native.#{RbConfig::CONFIG.fetch('DLEXT')}")
+file native => [__FILE__, *FileList[File.join(__dir__, "ext/lowrail_native/*.{c,rb}")]] do
+  rm_f native # A failed rebuild must not leave an old binary available.
+  build = File.join(__dir__, "tmp/native", Lowrail::NATIVE_VARIANT)
+  mkdir_p build
+  Dir.chdir(build) do
+    ruby File.join(__dir__, "ext/lowrail_native/extconf.rb")
+    sh RbConfig::CONFIG.fetch("MAKE", "make")
+    mkdir_p native_dir
+    cp File.basename(native), native
+  end
+end
+desc "Compile the optional passive class primitive for this exact Ruby build"
+task compile: native
 
 Rake::TestTask.new(:test) do |t|
   t.libs << "lib" << "test"
@@ -8,4 +27,5 @@ Rake::TestTask.new(:test) do |t|
   t.warning = true
 end
 
+task test: :compile
 task default: :test

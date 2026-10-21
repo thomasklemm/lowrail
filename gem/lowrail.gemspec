@@ -9,6 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Thomas Klemm"]
   spec.license = "MIT"
   spec.required_ruby_version = ">= 4.0"
-  spec.files = Dir["lib/**/*.rb"]
+  # The native prototype is opt-in via rake compile, not an installation-time
+  # dependency: a missing compiler must not prevent the Ruby gem from loading.
+  spec.files = Dir["lib/**/*.rb", "ext/**/*.{c,rb}", "Rakefile"]
   spec.add_development_dependency "minitest-mock", "~> 5.27"
 end

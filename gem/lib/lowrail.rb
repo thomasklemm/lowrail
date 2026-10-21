@@ -25,6 +25,17 @@ module Lowrail
   VERSION = "0.0.1"
   FORMAT = 2
 
+  # Optional, explicitly compiled prototype. Never compile during app boot,
+  # and never substitute objspace. Attempt the identical require even when
+  # LOWRAIL=0. Revision-specific paths keep different Ruby builds separate.
+  NATIVE_VARIANT = [RUBY_ENGINE, RUBY_VERSION, RUBY_REVISION, RUBY_PLATFORM].join("-")
+  NATIVE_PATH = File.expand_path("lowrail/native/#{NATIVE_VARIANT}/lowrail_native", __dir__)
+  begin
+    require NATIVE_PATH
+  rescue LoadError
+    # Runtime admission records an explicit refusal if the primitive is absent.
+  end
+
   # Guard states, indexed by unit id. nil = not yet validated, true = facts
   # hold, false = facts failed. Lowered code reads this array directly:
   #

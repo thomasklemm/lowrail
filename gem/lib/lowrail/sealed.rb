@@ -45,15 +45,17 @@ module Lowrail
         Lowrail.debug("sealed refused: #{reason}")
       end
 
-      def literal_state?
+      # The default preserves the separate build-time form audit. Link always
+      # supplies its native predicate; it never falls back to objspace.
+      def literal_state?(exact_class: ->(object, expected) { ObjectSpace.internal_class_of(object).equal?(expected) })
         types = ActionView::Helpers::TagHelper::TAG_TYPES
         blank = String::BLANK_RE
         names = ERB::Util::SAFE_XML_TAG_NAME_REGEXP
         native_escape = ERB::Util.method(:html_escape).super_method
-        ObjectSpace.internal_class_of(types).equal?(Hash) && types.frozen? &&
+        exact_class.call(types, Hash) && types.frozen? &&
           types.default.nil? && types.default_proc.nil? && types["class"].nil? && types["href"].nil? &&
-          ObjectSpace.internal_class_of(blank).equal?(Regexp) && blank.frozen? && blank == /\A[[:space:]]*\z/ &&
-          ObjectSpace.internal_class_of(names).equal?(Regexp) && names.frozen? &&
+          exact_class.call(blank, Regexp) && blank.frozen? && blank == /\A[[:space:]]*\z/ &&
+          exact_class.call(names, Regexp) && names.frozen? &&
           names.match?("class") && names.match?("href") && native_escape &&
           native_escape.owner.equal?(ERB::Util.singleton_class) && native_escape.source_location.nil?
       end
@@ -63,9 +65,13 @@ module Lowrail
         return decline("unsupported Ruby/Rails") unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
         return decline("application class differs from certificate") unless Rails.application.class.name == @data.fetch("application_class")
         # Certification may prepare a disposable build process. Admission may
-        # only observe the real app: even requiring objspace or repeating an
-        # eager-load hook changes the app's cold execution.
-        return decline("actual-holder primitive not already loaded; keep original") unless ObjectSpace.respond_to?(:internal_class_of)
+        # only observe the real app. The optional primitive was loaded equally
+        # in both arms at gem require, never compiled or replaced here.
+        native = Lowrail.loaded_constant("Lowrail::Native")
+        return decline("Lowrail native actual-holder primitive unavailable; run rake compile; keep original") unless native
+        @holder = native.method(:exact_class?)
+        native_file = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
+        return decline("loaded native actual-holder binary not certified; rebuild required") unless @data.fetch("sources").key?(native_file)
         dependencies = ["ActionView::Helpers::TagHelper::TagBuilder", "ActionView::Helpers::TagHelper::TAG_TYPES",
           "String::BLANK_RE", "ERB::Util::SAFE_XML_TAG_NAME_REGEXP", *@data.fetch("primitive_methods").map { _1.fetch("holder") }]
         return decline("helper dependencies not already loaded; keep original") unless dependencies.all? { Lowrail.loaded_constant(_1) }
@@ -97,11 +103,10 @@ module Lowrail
         end
         builder = ActionView::Helpers::TagHelper::TagBuilder
         return decline("custom constructor") unless signature(builder.method(:new)) == @data.fetch("constructor")
-        return decline("custom literal tables") unless literal_state?
+        return decline("custom literal tables") unless literal_state?(exact_class: @holder)
         # This native read does not CREATE a singleton class (unlike
         # #singleton_class). It also rejects preexisting private overrides and
         # singleton prepends. It is main-Ractor-only; callers gate first.
-        @holder = ObjectSpace.method(:internal_class_of)
         @epoch = defined?(Lowrail::Seal) ? Lowrail::Seal::EPOCH : EPOCH
         require_relative "templates"
         Templates.install(Lowrail.manifest.templates.merge(@data.fetch("templates")))
@@ -130,7 +135,7 @@ module Lowrail
 
       def view?(view)
         Ractor.current.equal?(Ractor.main) && ACTIVE[0] && Thread.current[REQUEST] &&
-          @epoch[0].zero? && @holder.call(view).equal?(@view_class)
+          @epoch[0].zero? && @holder.call(view, @view_class)
       end
 
       def link?(view, url, html, css)
