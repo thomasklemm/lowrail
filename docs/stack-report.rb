@@ -31,7 +31,7 @@ reports = directories.map do |directory|
       "sha256_values" => hashes.uniq} : {"covered" => false}]
   end
   {"name" => File.basename(directory), "scope" => result.fetch("scope"),
-    "protocol" => config.slice("workload", "paths", "rounds", "warmup", "samples", "seed_number", "cpu"),
+    "protocol" => config.slice("workload", "paths", "rounds", "warmup", "samples", "seed_number", "cpu", "stack_direct_sites"),
     "pins" => pins.slice("revision", "source_sha256", "script_sha256", "manifest_sha256", "lock_sha256", "ruby_sha256"),
     "artifact_units" => result.fetch("artifact_units"), "screen" => screen,
     "db_checks" => db_checks, "workers" => workers,
@@ -48,5 +48,30 @@ effects = blog.transform_values do |report|
 end
 output = {"format" => 1, "scope" => "Exploratory stack screens; provisional, no production admission or published price",
   "reports" => reports, "blog_allocation_effects" => effects}
+
+joint_names = %w[F-only AR-only F-AR]
+joint = joint_names.to_h { |name| [name, reports.find { _1.fetch("name") == "screen-fizzy-joint-#{name}" }] }
+if joint.values.all?
+  output["fizzy_joint_allocation_effects"] = joint.fetch("F-AR").fetch("screen").fetch("routes").keys.to_h do |route|
+    selections = joint.transform_values do |report|
+      allocations = report.fetch("screen").fetch("routes").fetch(route).fetch("allocation_samples")
+        .transform_values { _1.fetch("median") }
+      {"allocations" => allocations, "objects_saved_vs_controls" => %w[off_a off_b].to_h {
+        [_1, allocations.fetch(_1) - allocations.fetch("on")] }}
+    end
+    full = selections.fetch("F-AR")
+    without = {"F" => selections.fetch("AR-only"), "AR" => selections.fetch("F-only")}
+    [route, {"selections" => selections,
+      "loo_saved_on_medians" => without.transform_values { _1.fetch("allocations").fetch("on") - full.fetch("allocations").fetch("on") },
+      "loo_saved_control_adjusted" => without.transform_values { |selection| %w[off_a off_b].to_h {
+        [_1, full.fetch("objects_saved_vs_controls").fetch(_1) - selection.fetch("objects_saved_vs_controls").fetch(_1)] } },
+      # Positive means more saving than the standalone sum, not proven GC synergy.
+      "interaction_extra_saved_vs_controls" => %w[off_a off_b].to_h { |arm|
+        [arm, full.fetch("objects_saved_vs_controls").fetch(arm) -
+          selections.fetch("F-only").fetch("objects_saved_vs_controls").fetch(arm) -
+          selections.fetch("AR-only").fetch("objects_saved_vs_controls").fetch(arm)] }}]
+  end
+end
+
 File.write(destination, JSON.pretty_generate(output) + "\n")
 puts "#{reports.size} screens exported; no configs/secrets/bodies/logs included"

@@ -45,12 +45,12 @@ sign: objects saved by retaining that component in the full stack.
 | Existing sealed form scaffold | Blog show, retained fixture only | −378 objects/request | −378; 1 hit/request | +378 | Favorable screen, provisional: active own-suite gap retained |
 | Existing sealed token tag | Blog show, retained fixture only | +32 objects/request | +32; 4 hits/request | −32 | Excluded on Blog by deterministic cost; live-token continuations retained |
 | Existing sealed collection render | Blog show, retained fixture only | 0 objects/request | 0; 1 hit/request | 0 | Allocation tie, no win credit; active own-suite gap retained |
-| Existing sealed AR instantiation | Blog / Campfire / Fizzy active; Lobsters warmed vector has zero hits | Blog 0; Campfire near tie; Fizzy median tie after `c10ccb8` | Blog 0; 3 hits/request; Fizzy combination pending | Blog 0 | Fizzy pre-fix exclusion superseded; provisionally neutral candidate, no saving/admission credit; DB/active own-suite gaps retained |
+| Existing sealed AR instantiation | Blog / Campfire / Fizzy active; Lobsters warmed vector has zero hits | Blog 0; Campfire near tie; Fizzy near tie after `c10ccb8` | Blog 0; Fizzy +1 raw median object (0 to +2 control-adjusted), unresolved | Blog 0; Fizzy −1 raw (0 to −2 adjusted) | Pre-fix exclusion superseded; no resolved incremental saving or final admission; DB/active own-suite gaps retained |
 | Props `frozen_split` (`dd844dd`) | None of these four apps use Inertia | Isolated interpreter micro −0.460571% Ir, not request credit | — | — | Excluded: frozen-holder tier not implemented; do not freeze app holders to admit it |
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
 | E subset callbacks | None admitted | Blog show/index: zero objects saved in E's corrected exact screen | — | — | Coordinator killed: no deterministic saving, wall unresolved; census retained |
-| F AR callsite compile | Fizzy buckets only; no admitted app | Local 9,072 / 9,072 → 8,500 (−572, −6.31%) | −572; sole applicable candidate, not a multi-component test | +572 against the measured off controls | Favorable guarded response screen, provisional; DB/SQL cold-state and active own-suite gates remain open |
+| F AR callsite compile | Fizzy buckets only; no admitted app | Matched standalone −573 / −574 objects against off-A / off-B | −572; 2 hits/request beside AR | +572, also +572 against either adjusted control | Favorable guarded response screen, provisional; no resolved allocation synergy; DB/SQL cold-state and active own-suite gates remain open |
 | G framework fold | None admitted | — | — | — | Closed: notification/CSP elisions fail exactness in all four boots; no remaining qualifying slice |
 | H boot image | None admitted | — | — | — | Await successful boot screen and correctness gates |
 | Fizzy bench block-link | None | +0.403071% interpreter Ir (`8385e0c`) | — | — | Excluded: deterministic loss and no production admission |
@@ -346,12 +346,13 @@ GC counts/time, RSS and coverage are retained. Show GC counts on [29,18,31]
 versus off-A [20,17,27] and off-B [18,17,20] are not a fewer-GC result.
 
 This supersedes, rather than deletes, the old cost exclusion. AR may now be
-tested beside F's DirectSite as a neutral candidate. A combined/F-only
-comparison on the same updated sources is still needed before assigning
-any Fizzy within-stack or leave-one-out effect.
+tested beside F's DirectSite as a neutral candidate. The matched comparison
+below measures that composition without treating neutrality as a saving.
 
 ### Guarded F DirectSite: a second app-specific candidate, not synergy
 
+This initial standalone checkpoint precedes the matched matrix below; retain
+it, but do not mix its controls with the later selections for attribution.
 Imported F's three experiment/check sources unchanged from `addf55e`;
 `ar_request_sites.rb` SHA256 is
 `e313ae13363783705471e8a3b57a44d84eea97ab31dc146d338317504b1f37e1`
@@ -408,6 +409,86 @@ entropy traces, cookies and response bodies. These are finite request and
 fallback controls, not a general method/purity/mid-request certificate,
 whole-DB gate or active own-suite proof. No main admission or stack price.
 
+### Matched Fizzy F-only / AR-only / F+AR attribution
+
+All three selections use the same runtime/bench files at `cb3a6a0`, original
+source/lock/seed, CPU 2 and three-round 200/300 native YJIT protocol. F remains
+the unchanged guarded `addf55e` implementation. The external
+`bench/experiments/stack_request_sites.rb` adapter selects the component
+before login/warmup and adds public-unit counters outside measured requests.
+It does not strip guards, replace fallbacks or patch app/config files.
+F-only uses a normally rebuilt zero-unit artifact; AR-only and F+AR use the
+same normally rebuilt 45-unit artifact. `stack_direct_sites` is false only
+for AR-only, so component removal is real, not counter suppression.
+
+Before measurement, real fresh-worker smoke checks showed bucket hits per
+ten requests: F-only 20 DirectSite / 0 AR; AR-only 0 / 110; F+AR 20 / 110.
+Off/on non-counted workers also completed, exercising the counters-disabled
+path. The full screens confirm those same active counts, zero bucket
+fallbacks and 200 SQL events in every bucket coverage arm. Other routes
+retain AR hits 45/6/7/4/43 and **zero DirectSite hits**.
+
+Each triple below is **off-A / off-B / on** integer allocation median.
+LOO saving is the omitted-selection on median minus F+AR's on median;
+negative means retaining the component costs objects, not saves them.
+
+| Route | F-only | AR-only (= minus F) | F+AR | LOO F saved | LOO AR saved | Both-seed exact, every selection |
+|---|---|---|---|---:|---:|---|
+| buckets | 9,072 / 9,073 / 8,499 | 9,073 / 9,072 / 9,072 | 9,073 / 9,072 / 8,500 | +572 | −1 | PASS |
+| filtered bubbles | 22,543 / 22,543 / 22,543 | 22,543 / 22,543 / 22,544 | 22,543 / 22,543 / 22,543 | +1 | 0 | FAIL |
+| account users | 5,596 / 5,596 / 5,593 | 5,596 / 5,596 / 5,596 | 5,596 / 5,596 / 5,593 | +3 | 0 | PASS |
+| workflows | 3,826 / 3,826 / 3,826 | 3,826 / 3,826 / 3,825 | 3,826 / 3,826 / 3,826 | −1 | 0 | PASS |
+| notifications | 3,807 / 3,807 / 3,807 | 3,807 / 3,807 / 3,807 | 3,807 / 3,807 / 3,807 | 0 | 0 | FAIL |
+| bubble show | 18,362 / 18,362 / 18,358 | 18,362 / 18,361 / 18,361 | 18,362 / 18,361 / 18,359 | +2 | −1 | FAIL |
+
+**F supplies the bucket saving; adding AR does not improve it.** F-only
+saves 573/574 objects against its two controls; F+AR saves 573/572, about
+6.3%. Its F marginal is 572 objects with either control adjustment. AR's
+raw marginal is −1 object saved, but adjusting each selection against its
+own control gives 0/−2. This is unresolved small cost, not an AR gain or a
+stable new exclusion. Bucket mean allocations are F-only
+9,073.094 / 9,073.549 / 8,500.078 and F+AR
+9,073.534 / 9,073.156 / 8,500.516: retain the baseline shifts, not just
+the on-on subtraction. AR-only's allocation effect also spans zero.
+
+The median arithmetic is 1–2 objects less saving than the standalone sum
+when using the same named control across selections. Allowing either off
+control independently gives an extra-saving range of **−3 to 0 objects**
+(a control-choice range, not a confidence interval). These data are
+compatible with additive signed allocation effects, with **no resolved
+overlap or superadditivity**. Small non-bucket differences are retained,
+including users/show shifts with zero DirectSite hits; they are not evidence
+of an EventSummary optimization or a traced per-hit saving on those routes.
+
+Bucket native wall and memory/GC observations, again off-A / off-B / on:
+
+| Selection | Paired wall Δ / A/A spread | GC counts in the three workers per arm | GC ms/request | RSS KiB |
+|---|---|---|---|---|
+| F-only | −2.69% / 1.95% | [9,11,9] / [12,9,11] / [9,9,9] | 0.408 / 0.422 / 0.425 | 233,868 / 231,825 / 236,095 |
+| AR-only | −0.86% / 2.83% | [9,10,16] / [9,11,11] / [11,17,18] | 0.532 / 0.429 / 0.566 | 229,857 / 233,717 / 219,827 |
+| F+AR | −2.87% / 1.62% | [11,10,11] / [11,10,10] / [15,16,9] | 0.424 / 0.411 / 0.455 | 232,327 / 233,263 / 221,340 |
+
+All bucket wall effects remain unresolved under 3× A/A. F+AR's on workers
+collect 40 times versus F-only's 27, not GC synergy; smaller RSS does not
+prove a smaller retained heap or explain the trigger. Post-warmup
+`heap_live_slots`, `old_objects` and `malloc_increase_bytes` remain unmeasured
+by this screen harness. All other routes' metrics remain in the export.
+
+Each full screen exits **2**. Buckets/users/workflows pass actual status,
+body and all headers for both seeds in all rounds; filtered/notifications/show
+still fail off/off too. DB/completion and active own-suite gates stay open.
+Neither component is finally admitted and no whole-stack price is requested.
+The shared export now derives raw/control-adjusted LOO and interaction
+arithmetic reproducibly, preserving both off controls; asymmetric synthetic
+checks distinguish baseline shifts, sign mistakes and partial matrices.
+
+**Forked RPS boundary:** F's owner reported a fallback-only Puma coverage
+worker (four bucket fallbacks, zero hits); the suspected pre-fork binding is
+not diagnosed here. These fresh in-process workers have actual F hits, but
+that does not certify a forked server. Any future stack RPS result must first
+show nonzero DirectSite hits in its own coverage workers. No RPS run is made
+here, and the later RPS heap snapshot fields do not repair old screen data.
+
 ### Lobsters AR: warm-cache zero credit
 
 Same 200/300 protocol, 24 normally built AR units. `/newest`, `/active`,
@@ -429,14 +510,15 @@ mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
 ```
 
 Corrected Blog attribution, initial four-app screens and post-shadow-fix
-Campfire/Fizzy retests plus guarded F are complete: **17 retained screens**.
+Campfire/Fizzy retests plus guarded F are complete: **20 retained screens**.
 Blog's signed allocation effects are additive, not all beneficial. There is no admitted
 multi-component stack across apps. Token is excluded on Blog; existing AR is
 provisionally neutral on Fizzy after `c10ccb8`; Campfire offers no clear
 reduction and retains exactness gaps; Lobsters' cached vector provides no active credit. Form's favorable
 Blog request reduction stays provisional until active own suites exist.
 Bet F's guarded `addf55e` now has a favorable local buckets allocation screen,
-with existing AR excluded in that screen. Sealed form applies only to the
+plus matched F-only / AR-only / F+AR attribution: AR adds no resolved saving.
+Sealed form applies only to the
 certified Blog fixture, not Fizzy; do not force a cross-app form/DirectSite combination.
 No cross-app win, native latency gain, GC synergy or supported component is
 claimed. Shared screen tests pass 2 tests / 39 assertions; imported dispatch

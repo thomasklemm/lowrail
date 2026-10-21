@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Stack Fizzy composition: F supplies the saving, no resolved AR gain (2026-10-21)
+
+Matched F-only / AR-only / F+AR screens retain identical runtime, fixtures and protocol, with both off controls and active component counters.
+Buckets: 9,072/9,073 → 8,499 for F alone; 9,073/9,072 → 8,500 combined; LOO attributes 572 saved objects to F, AR −1 raw (0/−2 control-adjusted), unresolved small cost.
+Allocation effects are compatible with additive signed effects, not demonstrated overlap/superadditivity; combined on GC counts total 40 versus F-only 27, with wall effects below 3× A/A.
+All selections pass buckets/users/workflows response equality; filtered/notifications/show fail off/off too, each screen exits 2; DB/completion and active own-suite gates remain open.
+No final admission, price or RPS run; future forked RPS must show actual DirectSite hits, not fallback-only coverage. [Twenty retained screens and matched attribution](stack.md#matched-fizzy-f-only--ar-only--far-attribution).
+
 ## Stack AR guard retest: Fizzy exclusion superseded (2026-10-21)
 
 Imported the independently gated `c10ccb8` lazy no-match guard fix unchanged and rebuilt all 45 public AR units; same seed/source/lock, six GETs, both off controls.
