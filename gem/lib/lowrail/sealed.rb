@@ -83,6 +83,7 @@ module Lowrail
         @holder = native.method(:exact_class?)
         native_file = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
         return decline("loaded native actual-holder binary not certified; rebuild required") unless @data.fetch("sources").key?(native_file)
+        return decline("view context dispatch changed; rebuild") unless view_context_fact == @data.fetch("view_context")
         dependencies = ["ActionView::Helpers::TagHelper::TagBuilder", "ActionView::Helpers::TagHelper::TAG_TYPES",
           "String::BLANK_RE", "ERB::Util::SAFE_XML_TAG_NAME_REGEXP", *@data.fetch("primitive_methods").map { _1.fetch("holder") }]
         return decline("helper dependencies not already loaded; keep original") unless dependencies.all? { Lowrail.loaded_constant(_1) }
@@ -155,7 +156,7 @@ module Lowrail
         return count(false) unless @epoch[0].zero? && String === url &&
           ENCODING.bind_call(url) == Encoding::UTF_8 && VALID.bind_call(url) &&
           html.size == 2 && html["class"] == css && html["href"].equal?(url)
-        count(BUILDERS.key?(view.send(:tag_builder)))
+        count(BUILDERS.key?(VIEW_CONTEXT.bind_call(view) { tag_builder }))
       end
 
       def count(ok)

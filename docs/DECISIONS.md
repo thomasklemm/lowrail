@@ -21,7 +21,10 @@ live ordering and saved-value continuation. Apply the same mechanism to the
 form's builder/buffer/URL/token boundaries. Keep the named route's original
 explicit `public_send` with a newly constructed String name and its live app
 override effects; polymorphic routing does not call that helper implicitly.
-Collection's existing implicit renderer calls need no change. Test admission
+Collection's existing implicit renderer calls need no change. A separate
+follow-up fixes `Sealed.link?`'s private `tag_builder` call with the same
+primitive and certificate fact; its pre-boot hostile-view regression fails
+on unchanged main. Test admission
 remains a separate, unpublished review and will consume this one primitive.
 
 **The accepted −15.225536% was measured at

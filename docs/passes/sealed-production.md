@@ -36,9 +36,11 @@ also bypasses a view's own `instance_exec` override. Unit/epoch/holder/table
 state is retained in local variables, not read from the view after switching
 `self`. No view/request/block is retained by admission. Build independently
 requires native owner `BasicObject`, original name `instance_exec`, no Ruby
-source location and no ISeq; both form and render certificates pin its
+source location and no ISeq; form, render and link certificates pin its
 signature, and runtime admission checks the same captured method. A changed capture
-refuses as `view context dispatch changed; rebuild`.
+with a present certificate key refuses as `view context dispatch changed;
+rebuild`. Older certificates missing that key fail closed through the existing
+`KeyError` refusal boundary instead.
 
 ### Reviewed token/form/collection call list
 
@@ -56,15 +58,15 @@ refuses as `view context dispatch changed; rebuild`.
 | Collection renderer | No reflective view dispatch; existing implicit `build_rendered_template` already runs on the actual renderer. Stock explicit `current.render(view, ...)` remains explicit |
 | Admission `view_class.instance_method(:_routes).bind_call(view)` | Retain: read-only stock-getter witness, body independently certified before the call; it is not a live-helper substitution |
 | `view.method`, `view.__send__` | None in these production runtime/admission paths; the route's original `public_send` is deliberately retained |
-| Separate `Sealed.link?`: `view.send(:tag_builder)` | Existing reflective-dispatch debt, retained outside this token/form/collection fix; **not** certified safe by this review |
+| Separate `Sealed.link?`: `view.send(:tag_builder)` | Same implicit-call fix in a separate follow-up commit, using `VIEW_CONTEXT`; link build/admission pin the same shared fact |
 
 The three `view.send` calls in `FormScaffoldInventory.check` (builder default,
 UTF-8 policy, content-exfiltration policy), and compiler/template reflection
 in `FormScaffoldBuild`/inventory, remain **build-only** synthetic probes. They
 do not authorize reflective dispatch during requests. Type/Module `.method`
 reads in admission check certificate bodies, never invoke a helper on a view.
-The separate sealed link pass, default/quarantine and guarded passes are not
-changed by this sweep.
+The sealed link follow-up is separate from the token/form/collection fix.
+Default/quarantine and guarded passes are unchanged by either fix.
 
 The kept production regression uses four fresh boot modes: private, protected,
 ordinary public (`reflective`), and missing-method generator, each with the hostile reflective
@@ -117,6 +119,32 @@ cause. Clean main at the same seed passes **7 / 118**; both the diagnostic
 source-frozen run and the final uninstrumented run pass **7 / 118**. Final
 runtime/test hashes are checked unchanged across the production/certificate
 run. No failed result is suppressed or used as price evidence.
+
+### Separate sealed-link dispatch fix
+
+The link sibling was not unreachable debt: its existing cold production
+fixture admits a link unit. Adding a view `send` override before boot, which
+raises only for `:tag_builder`, makes that fixture fail on unchanged main
+(`6a8e5c9`): the sealed request returns **500**, not the stock **200**. The
+override is not a post-seal mutation. The follow-up runs this private helper
+as an actual fcall via the same `VIEW_CONTEXT`, with the same shared native
+fact pinned in the link certificate and checked at admission.
+
+The regression compares off, unopted-in and sealed response bodies, status,
+conversion counts, render events/assigns and method metadata. It requires a
+link hit, not silent refusal, for a view with hostile `send`, `__send__`,
+`public_send`, `method` and `instance_exec` overrides. The latter four prevent
+replacing the fcall with another reflective substitute. Foreign view and
+builder holders must still fall back. This follow-up changes only
+`sealed.rb` and `sealed_build.rb` source pins and adds the `view_context`
+certificate key. It does not edit link template/factory/entry lowering or
+claim a new price. The full existing link suite includes its native YJIT
+trace smoke check; that is not the paused seam experiment or a priced cohort.
+
+`ruby -Igem/lib -Igem/test gem/test/sealed_link_test.rb` passes **2 / 162,
+zero failures/errors/skips** with the five-override regression. Independent
+Thermos correctness and maintainability reviews, including follow-ups on the
+regression and refusal wording, report no remaining material finding.
 
 ## What is certified
 
