@@ -243,6 +243,24 @@ outcomes/counters remain in the results JSON. After reconciliation, the full
 matrices above ran sequentially after gem checks, without changing app code,
 test code, driver configuration or timeouts; no failure was normalized away.
 
+The coordinator then prescribed a **fixed six-run diagnosis**, not retries to
+green: three alternating off/on pairs of exactly that CI=1 system command,
+seed 41231, retained prepared app and original off/on Bootsnap directories,
+serially with no concurrent gem checks. All six exit zero with both exact
+identities passing and actual eager loading true. Each on arm has Article
+18/1/0, Comment 8/1/0, link 0/43/0 and form 0/6/0 with unchanged refusals;
+all off counters are zero. The earlier timeout remains **unestablished under
+concurrent load**, not disproved or assigned a proven cause.
+
+The same historical artifact was used, not a rebuilt artifact that could
+silently refuse. Its only runtime-pin difference was the later production
+token continuation fix. A private mount namespace exposed the artifact's exact
+historical `render_units.rb` read-only at its original path; every runtime/app
+source pin matched before the six runs. The working checkout retained the
+published production fix throughout. No app/test/timeout or cache-directory
+edit was made. All six records and the exact artifact digest are retained in
+the results JSON's `bounded_timeout_diagnosis` section.
+
 The previous review slice had one hit then one sticky deopt per AR unit,
 from natural attribute generation. Delaying authorization alone preserved
 parity but exposed further overly broad retirements: `append_features` on

@@ -9750,5 +9750,1374 @@
         }
       ]
     }
+  },
+  "bounded_timeout_diagnosis": {
+    "seed": 41231,
+    "order": "off/on pairs, fixed three repetitions",
+    "artifact_sha256": "bb798f161ed0d79073eba32397ef6031aaa5f7185d30b37d7fc086a4442e46a9",
+    "runtime_pins_match": true,
+    "app_pins_match": true,
+    "conditions": "serial, no concurrent gem checks; retained prepared app and original off/on Bootsnap directories; historical render_units.rb privately bind-mounted, checkout unchanged",
+    "runs": [
+      {
+        "repetition": 1,
+        "arm": "off",
+        "exit": 0,
+        "outcomes": {
+          "ArticlesSystemTest#test_article_with_comments": {
+            "result": "pass"
+          },
+          "ArticlesSystemTest#test_full_article_lifecycle": {
+            "result": "pass"
+          }
+        },
+        "natural_state": {
+          "eager_load": true,
+          "rake_eager_load": false,
+          "models": [
+            {
+              "name": "ActionMailbox::InboundEmail",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionMailbox::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::EncryptedRichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::RichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Attachment",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Blob",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::VariantRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ApplicationRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "Article",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "Comment",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "SolidCable::Message",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCable::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Entry",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Batch",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BatchExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BlockedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ClaimedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Execution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::FailedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Job",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Pause",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Process",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ReadyExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringTask",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ScheduledExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Semaphore",
+              "schema_loaded": false,
+              "attributes_generated": false
+            }
+          ]
+        },
+        "verification_test": [
+          {
+            "state": "active",
+            "pid": 129135,
+            "unit_deopts": {},
+            "unit_refusals": {},
+            "unit_pending": {}
+          }
+        ],
+        "units": [
+          {
+            "id": "0",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "1",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "2",
+            "pass": "sealed/link_to",
+            "target": "ArticlesController",
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "3",
+            "pass": "sealed/form_scaffold",
+            "target": "ArticlesController#form_with",
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          }
+        ]
+      },
+      {
+        "repetition": 1,
+        "arm": "on",
+        "exit": 0,
+        "outcomes": {
+          "ArticlesSystemTest#test_article_with_comments": {
+            "result": "pass"
+          },
+          "ArticlesSystemTest#test_full_article_lifecycle": {
+            "result": "pass"
+          }
+        },
+        "natural_state": {
+          "eager_load": true,
+          "rake_eager_load": false,
+          "models": [
+            {
+              "name": "ActionMailbox::InboundEmail",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionMailbox::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::EncryptedRichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::RichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Attachment",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Blob",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::VariantRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ApplicationRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "Article",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "Comment",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "SolidCable::Message",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCable::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Entry",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Batch",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BatchExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BlockedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ClaimedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Execution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::FailedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Job",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Pause",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Process",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ReadyExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringTask",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ScheduledExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Semaphore",
+              "schema_loaded": false,
+              "attributes_generated": false
+            }
+          ]
+        },
+        "verification_test": [
+          {
+            "state": "active",
+            "pid": 129384,
+            "unit_deopts": {},
+            "unit_refusals": {
+              "2": [
+                "verification_literal_table_observer_unavailable"
+              ],
+              "3": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            },
+            "unit_pending": {}
+          }
+        ],
+        "units": [
+          {
+            "id": "0",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 18,
+            "fallbacks": 1,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "1",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 8,
+            "fallbacks": 1,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "2",
+            "pass": "sealed/link_to",
+            "target": "ArticlesController",
+            "hits": 0,
+            "fallbacks": 43,
+            "deopts": 0,
+            "refusals": [
+              "verification_literal_table_observer_unavailable"
+            ]
+          },
+          {
+            "id": "3",
+            "pass": "sealed/form_scaffold",
+            "target": "ArticlesController#form_with",
+            "hits": 0,
+            "fallbacks": 6,
+            "deopts": 0,
+            "refusals": [
+              "verification_form_config_schema_translation_observer_unavailable"
+            ]
+          }
+        ]
+      },
+      {
+        "repetition": 2,
+        "arm": "off",
+        "exit": 0,
+        "outcomes": {
+          "ArticlesSystemTest#test_article_with_comments": {
+            "result": "pass"
+          },
+          "ArticlesSystemTest#test_full_article_lifecycle": {
+            "result": "pass"
+          }
+        },
+        "natural_state": {
+          "eager_load": true,
+          "rake_eager_load": false,
+          "models": [
+            {
+              "name": "ActionMailbox::InboundEmail",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionMailbox::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::EncryptedRichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::RichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Attachment",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Blob",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::VariantRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ApplicationRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "Article",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "Comment",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "SolidCable::Message",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCable::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Entry",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Batch",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BatchExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BlockedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ClaimedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Execution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::FailedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Job",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Pause",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Process",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ReadyExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringTask",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ScheduledExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Semaphore",
+              "schema_loaded": false,
+              "attributes_generated": false
+            }
+          ]
+        },
+        "verification_test": [
+          {
+            "state": "active",
+            "pid": 129635,
+            "unit_deopts": {},
+            "unit_refusals": {},
+            "unit_pending": {}
+          }
+        ],
+        "units": [
+          {
+            "id": "0",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "1",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "2",
+            "pass": "sealed/link_to",
+            "target": "ArticlesController",
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "3",
+            "pass": "sealed/form_scaffold",
+            "target": "ArticlesController#form_with",
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          }
+        ]
+      },
+      {
+        "repetition": 2,
+        "arm": "on",
+        "exit": 0,
+        "outcomes": {
+          "ArticlesSystemTest#test_article_with_comments": {
+            "result": "pass"
+          },
+          "ArticlesSystemTest#test_full_article_lifecycle": {
+            "result": "pass"
+          }
+        },
+        "natural_state": {
+          "eager_load": true,
+          "rake_eager_load": false,
+          "models": [
+            {
+              "name": "ActionMailbox::InboundEmail",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionMailbox::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::EncryptedRichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::RichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Attachment",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Blob",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::VariantRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ApplicationRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "Article",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "Comment",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "SolidCable::Message",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCable::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Entry",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Batch",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BatchExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BlockedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ClaimedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Execution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::FailedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Job",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Pause",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Process",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ReadyExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringTask",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ScheduledExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Semaphore",
+              "schema_loaded": false,
+              "attributes_generated": false
+            }
+          ]
+        },
+        "verification_test": [
+          {
+            "state": "active",
+            "pid": 129875,
+            "unit_deopts": {},
+            "unit_refusals": {
+              "2": [
+                "verification_literal_table_observer_unavailable"
+              ],
+              "3": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            },
+            "unit_pending": {}
+          }
+        ],
+        "units": [
+          {
+            "id": "0",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 18,
+            "fallbacks": 1,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "1",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 8,
+            "fallbacks": 1,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "2",
+            "pass": "sealed/link_to",
+            "target": "ArticlesController",
+            "hits": 0,
+            "fallbacks": 43,
+            "deopts": 0,
+            "refusals": [
+              "verification_literal_table_observer_unavailable"
+            ]
+          },
+          {
+            "id": "3",
+            "pass": "sealed/form_scaffold",
+            "target": "ArticlesController#form_with",
+            "hits": 0,
+            "fallbacks": 6,
+            "deopts": 0,
+            "refusals": [
+              "verification_form_config_schema_translation_observer_unavailable"
+            ]
+          }
+        ]
+      },
+      {
+        "repetition": 3,
+        "arm": "off",
+        "exit": 0,
+        "outcomes": {
+          "ArticlesSystemTest#test_article_with_comments": {
+            "result": "pass"
+          },
+          "ArticlesSystemTest#test_full_article_lifecycle": {
+            "result": "pass"
+          }
+        },
+        "natural_state": {
+          "eager_load": true,
+          "rake_eager_load": false,
+          "models": [
+            {
+              "name": "ActionMailbox::InboundEmail",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionMailbox::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::EncryptedRichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::RichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Attachment",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Blob",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::VariantRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ApplicationRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "Article",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "Comment",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "SolidCable::Message",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCable::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Entry",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Batch",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BatchExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BlockedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ClaimedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Execution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::FailedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Job",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Pause",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Process",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ReadyExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringTask",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ScheduledExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Semaphore",
+              "schema_loaded": false,
+              "attributes_generated": false
+            }
+          ]
+        },
+        "verification_test": [
+          {
+            "state": "active",
+            "pid": 130129,
+            "unit_deopts": {},
+            "unit_refusals": {},
+            "unit_pending": {}
+          }
+        ],
+        "units": [
+          {
+            "id": "0",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "1",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "2",
+            "pass": "sealed/link_to",
+            "target": "ArticlesController",
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "3",
+            "pass": "sealed/form_scaffold",
+            "target": "ArticlesController#form_with",
+            "hits": 0,
+            "fallbacks": 0,
+            "deopts": 0,
+            "refusals": []
+          }
+        ]
+      },
+      {
+        "repetition": 3,
+        "arm": "on",
+        "exit": 0,
+        "outcomes": {
+          "ArticlesSystemTest#test_article_with_comments": {
+            "result": "pass"
+          },
+          "ArticlesSystemTest#test_full_article_lifecycle": {
+            "result": "pass"
+          }
+        },
+        "natural_state": {
+          "eager_load": true,
+          "rake_eager_load": false,
+          "models": [
+            {
+              "name": "ActionMailbox::InboundEmail",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionMailbox::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::EncryptedRichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActionText::RichText",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Attachment",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Blob",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ActiveStorage::VariantRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "ApplicationRecord",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "Article",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "Comment",
+              "schema_loaded": true,
+              "attributes_generated": true
+            },
+            {
+              "name": "SolidCable::Message",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCable::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Entry",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidCache::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Batch",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BatchExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::BlockedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ClaimedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Execution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::FailedExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Job",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Pause",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Process",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ReadyExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Record",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::RecurringTask",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::ScheduledExecution",
+              "schema_loaded": false,
+              "attributes_generated": false
+            },
+            {
+              "name": "SolidQueue::Semaphore",
+              "schema_loaded": false,
+              "attributes_generated": false
+            }
+          ]
+        },
+        "verification_test": [
+          {
+            "state": "active",
+            "pid": 130375,
+            "unit_deopts": {},
+            "unit_refusals": {
+              "2": [
+                "verification_literal_table_observer_unavailable"
+              ],
+              "3": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            },
+            "unit_pending": {}
+          }
+        ],
+        "units": [
+          {
+            "id": "0",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 18,
+            "fallbacks": 1,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "1",
+            "pass": "active_record/instantiate",
+            "target": null,
+            "hits": 8,
+            "fallbacks": 1,
+            "deopts": 0,
+            "refusals": []
+          },
+          {
+            "id": "2",
+            "pass": "sealed/link_to",
+            "target": "ArticlesController",
+            "hits": 0,
+            "fallbacks": 43,
+            "deopts": 0,
+            "refusals": [
+              "verification_literal_table_observer_unavailable"
+            ]
+          },
+          {
+            "id": "3",
+            "pass": "sealed/form_scaffold",
+            "target": "ArticlesController#form_with",
+            "hits": 0,
+            "fallbacks": 6,
+            "deopts": 0,
+            "refusals": [
+              "verification_form_config_schema_translation_observer_unavailable"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
