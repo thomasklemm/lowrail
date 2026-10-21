@@ -70,6 +70,49 @@ total-Ir A/A excluded zero and JIT flatness failed. Its raw +16.499% binder and
 +29.517% restored-original deltas remain in the export, not accepted effects
 or a replacement for the originating accepted +16.339% cohort. No retries.
 
+## Post-fix whole-request checks: one finite cohort per mode
+
+Measured boundary:
+[ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e),
+Ruby 4.0.7, same Starter JSON route/headers, pinned brk512 Valgrind, six
+rounds and at most four workers. A public format-2 production `--sealed`
+build excludes unrelated passes through the existing denylist: exactly one
+config-bind unit, no delivered files/templates. The custom request probe
+uses the **actual app root**, not generic request-pair snapshot wrappers.
+At that boundary the latter needed a separate real-root/artifact-directory
+seam for format-2 file delivery; relocation admission was not bypassed here.
+The subsequent
+[artifact-directory seam](https://github.com/thomasklemm/lowrail/commit/cb832658d52e0a9f440d51ccac7dd985ceb09f2a)
+provides `LOWRAIL_DIR` while keeping the certified app root unchanged.
+
+| Mode | Total Ir vs off, 95% interval | Gates / interpretation |
+|---|---|---|
+| Interpreter | **−10.156% [−10.219, −10.084]** | **accepted**, both A/A, heap, brk and actual mode |
+| YJIT | −0.153% [−0.563, −0.071] | **rejected**, both A/A controls and JIT-flat measured windows; diagnostic only |
+
+Interpreter no-GC is −10.161% [−10.254, −10.105]. Activated but original
+binder restored is −0.161% [−0.190, −0.094] total, not the former flat tax.
+Separate untimed interpreter coverage is **11 hits / 0 fallbacks** per
+request. YJIT heap/brk gates pass, but 10/24 workers compile during measured
+windows despite stable warmups. No rerun and no clean-worker salvage.
+
+**Additional YJIT limitation: installed ownership is not fast-path proof.**
+Untimed statistics show **0 hits / 9,911 fallbacks**. Inspecting every actual
+fact finds exactly one mismatch: the artifact was built with
+`LOWRAIL_BUILD_JIT=0`, certifying C `Array#each` (`source_location: nil`),
+but runtime `--yjit` uses Ruby `Array#each` at `<internal:array>:219`.
+The existing guard correctly declines it; do not relax this fact. The
+rejected raw delta therefore does not price a demonstrated config fast
+path. A future experiment needs a mode-matched artifact and untimed hits
+before pricing. **Config remains sealed-only, no promotion.**
+
+Native post-fix 50-request counters still have **`exit_trace_leave = 0`**,
+400 side exits and zero window compilation/invalidation. This establishes
+clean production activation/ordinary fallback, not YJIT fast-path coverage.
+The independent targeted/global micros remain causal evidence for the
+sticky-trace fix. Numeric hashes, gates and attribution are retained in
+the export; the original accepted regression is not overwritten.
+
 ## Minimal causal proof: enable, boot, disable, then call unrelated code
 
 `bench/experiments/trace_stickiness.rb` uses a boot method and an unrelated
@@ -307,17 +350,37 @@ not JIT-flat performance evidence. Protocol unit checks with pinned headers
 pass 13 / 151 (`request_pairs_test.rb`) and 16 / 157 (`pass_test.rb`); an
 earlier invocation without the pinned Valgrind include path failed as such.
 
-## Doctor design: detect sticky tracing from any gem
+## Doctor: detect sticky tracing from any gem
 
 Third-party boot debuggers, coverage/APM/profilers can cause the same VM-wide
 condition without Lowrail. Do not identify a guilty gem from a counter alone.
-Proposed **opt-in diagnostic**, not implemented: on a stats-capable YJIT boot,
-warm a representative request, snapshot counters, execute one request, and
-report positive `exit_trace_leave` delta separately from current live
-TracePoint presence. Also run an unrelated hot leaf-method control to
-distinguish a local targeted hook from global contamination. A clean live
-hook census does not clear the warning. No counter/key must mean
-“unavailable,” never zero; do not turn stats on in benchmark windows.
+**Opt-in diagnostic:** `lowrail doctor APP --trace-check`, optionally with
+`--path /safe-get`. It runs in doctor's independent `LOWRAIL=0` boot process,
+before any seal-check observers. It never enables YJIT, stats or a TracePoint
+itself. Supply stats-capable YJIT flags in a disposable diagnostic run:
+
+```sh
+RUBYOPT="--yjit --yjit-stats=quiet" lowrail doctor APP --trace-check --path /up -- bin/rails test
+```
+
+The unrelated ordinary-def leaf warms 1,000 calls, proves compilation with
+`insns_compiled`, then counts 1,000 returns. With a request path it also
+executes ten warmup GETs and samples one GET, without following redirects.
+Use a safe endpoint. Reports retain status and counter deltas, not response
+bodies or headers, under `doctor.json.return_tracing` and `doctor-trace.json`.
+The ordinary baseline suite still runs. Warning is advisory, not a failed
+correctness gate. Normal setup/benchmarks never call this probe.
+
+Positive leaf exits suggest VM-wide contamination even with zero enabled
+Ruby TracePoints; positive request-only exits do not establish global
+stickiness. Counters are process-wide, so concurrent traced work can also
+contribute. `not_observed` is not a clean-VM certificate: other event classes
+and unexercised paths remain outside scope. Disabled YJIT, absent counters
+or unproven leaf compilation yield `unavailable`, never an inferred zero.
+Regression tests run a third-party global boot hook then disable it: **1,000
+exits**, versus **0** for off and targeted-only boot hooks, on both Ruby
+targets. They also distinguish request-only targeted tracing and missing
+stats/interpreter mode. Do not turn stats on in benchmark windows.
 
 Without YJIT, no supported public Ruby API directly exposes the sticky global
 event mask. Disasm/to_a normalize it away. An interpreter return-heavy micro

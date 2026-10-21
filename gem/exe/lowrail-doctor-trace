@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# One explicit, untimed diagnostic process. Boot exactly as doctor normally
+# does; never enable YJIT, statistics or a TracePoint on the app's behalf.
+output, path = ARGV
+abort "usage: lowrail-doctor-trace OUTPUT [REQUEST_PATH]" unless output
+require File.expand_path("config/environment", Dir.pwd)
+require "json"
+require_relative "../lib/lowrail/jit_diagnostics"
+
+begin
+  request = if path
+    require "rack/mock"
+    session = Rack::MockRequest.new(Rails.application)
+    -> { session.get(path) }
+  end
+  report = Lowrail::JitDiagnostics.sticky_tracing(request: request)
+rescue StandardError => error
+  report = {"status" => "unavailable", "reason" => "#{error.class}: #{error.message.lines.first&.strip}"}
+end
+File.write(output, JSON.pretty_generate(report))

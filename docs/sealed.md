@@ -114,7 +114,19 @@ lowrail seal-check APP --static
 # Ordered onboarding: boot, baseline suite, hints, optional dynamic census,
 # existing guarded refusals grouped by reason. JSON: .lowrail/doctor.json.
 lowrail doctor APP --seal-check -- bin/rails test --seed 41231
+# Separate opt-in return-tracing check, with no tracing installed by doctor:
+RUBYOPT="--yjit --yjit-stats=quiet" lowrail doctor APP --trace-check --path /up -- bin/rails test
 ```
+
+Doctor's `--trace-check` samples an unrelated warmed, JIT-compiled leaf and,
+with `--path`, ten warmup GETs plus one GET in its independent boot process.
+Use a safe endpoint in a disposable diagnostic run, never a timed benchmark.
+It neither enables YJIT/stats itself nor installs a TracePoint. Disabled
+global tracing can leave executable VM instrumentation behind even with
+zero live observers; request-only targeted tracing is reported separately.
+Missing counters or disabled YJIT mean `unavailable`, not a clean result.
+The advisory `return_tracing` JSON neither promotes a pass nor fails the
+baseline. [Mechanism, scope and regression](passes/yjit-regression.md#doctor-detect-sticky-tracing-from-any-gem).
 
 The command runs the app's own suite with lowering off, materializes the
 boot surface after `initialize!` has returned (all `after_initialize` hooks

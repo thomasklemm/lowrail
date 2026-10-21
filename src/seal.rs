@@ -93,22 +93,39 @@ pub fn static_check(app: &Path) -> Result<Value, String> {
 }
 
 pub fn doctor(args: &[String]) -> Result<(), String> {
-    let usage = "usage: lowrail doctor APP [--seal-check] [-- TEST COMMAND...]";
+    let usage = "usage: lowrail doctor APP [--seal-check] [--trace-check [--path PATH]] [-- TEST COMMAND...]";
     let mut args = args.iter();
     let app = PathBuf::from(args.next().ok_or(usage)?).canonicalize().map_err(|e| e.to_string())?;
     let mut dynamic = false;
+    let mut trace_check = false;
+    let mut request_path = None;
     let mut cmd = vec!["bin/rails".to_string(), "test".to_string()];
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--seal-check" => dynamic = true,
+            "--trace-check" => trace_check = true,
+            "--path" => request_path = Some(args.next().ok_or(usage)?),
             "--" => { cmd = args.cloned().collect(); break; }
             _ => return Err(usage.into()),
         }
     }
+    if request_path.is_some_and(|path| !trace_check || !path.starts_with('/')) { return Err(usage.into()); }
     if cmd.is_empty() { return Err("test command must not be empty".into()); }
     println!("doctor: 1. boot (LOWRAIL=0)");
-    let boot = Command::new("bundle").args(["exec", "ruby", "-e", "require File.expand_path('config/environment', Dir.pwd)"])
-        .current_dir(&app).env("LOWRAIL", "0").status().map_err(|e| e.to_string())?.success();
+    let mut boot_command = Command::new("bundle");
+    boot_command.args(["exec", "ruby"]);
+    if trace_check {
+        std::fs::create_dir_all(app.join(".lowrail")).map_err(|e| e.to_string())?;
+        boot_command.arg(crate::facts::gem_dir().join("exe/lowrail-doctor-trace"))
+            .arg(app.join(".lowrail/doctor-trace.json"))
+            .env_remove("LOWRAIL_OUTCOMES").env_remove("LOWRAIL_SEAL_CHECK")
+            .env_remove("LOWRAIL_STATS").env_remove("LOWRAIL_VERIFY_LOADS");
+        if let Some(path) = request_path { boot_command.arg(path); }
+    } else {
+        boot_command.args(["-e", "require File.expand_path('config/environment', Dir.pwd)"]);
+    }
+    let boot = boot_command.current_dir(&app).env("LOWRAIL", "0")
+        .status().map_err(|e| e.to_string())?.success();
     println!("doctor: 2. baseline suite (LOWRAIL=0)");
     let baseline = if boot { Some(Command::new(&cmd[0]).args(&cmd[1..]).current_dir(&app)
         .env("LOWRAIL", "0").env("PARALLEL_WORKERS", "1").status().map_err(|e| e.to_string())?.success()) } else { None };
@@ -138,9 +155,15 @@ pub fn doctor(args: &[String]) -> Result<(), String> {
         refusals.entry(reason.into()).or_default().push(row.clone());
     }
     for (reason, rows) in &refusals { println!("  {} {reason}", rows.len()); }
+    let return_tracing = if trace_check && boot { read("doctor-trace.json")? } else { Value::Null };
+    if trace_check {
+        println!("doctor: return tracing {} ({})", return_tracing["status"].as_str().unwrap_or("not run"),
+            return_tracing["reason"].as_str().unwrap_or("boot failed"));
+    }
     let report = json!({"format":1,"boot_ok":boot,"baseline_ok":baseline,"command":cmd,
         "static":static_report.ok(),"static_error":static_error,"seal_requested":dynamic,
         "seal_error":dynamic_error,"seal":if seal_ran { read("seal.json")? } else { Value::Null },
+        "trace_requested":trace_check,"return_tracing":return_tracing,
         "guarded_ledger_available":!ledger.is_null(),
         "guarded_refusals":refusals});
     let path = app.join(".lowrail/doctor.json");

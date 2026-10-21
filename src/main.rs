@@ -24,7 +24,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   mcp APP              serve read-only type/fact tools over stdio
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes
   seal-check APP       run APP's tests and report post-seal contract observations
-  doctor APP           boot, baseline tests, static hints and optional --seal-check
+  doctor APP           boot, baseline tests, hints; optional --seal-check / --trace-check
   observe APP          run APP's tests with the recorder, write .lowrail/observed.json";
 
 fn main() -> ExitCode {

@@ -1,5 +1,79 @@
 {
   "diagnosis_only": true,
+  "post_fix_request_checks": {
+    "boundary": "ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e",
+    "app": "react-starter-kit",
+    "route": "/dashboard JSON",
+    "rounds": 6,
+    "requests": 50,
+    "max_callgrind_workers": 4,
+    "seed": 41231,
+    "manifest_sha256": "69e00b7ed1be59279010638fa865c1ac08169e05f757957b85057b0de3248810",
+    "manifest": {"format": 2, "tier": "sealed-v1", "units": 1, "files": 0, "templates": 0, "build_jit": "interpreter"},
+    "valgrind": {
+      "version": "3.19.0",
+      "brk_reservation_mib": 512,
+      "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+      "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+      "tool_sha256": "5fe02646537c5669b032c5146665728f9dab384918fea30118b7c7df3dc30ad7"
+    },
+    "interpreter": {
+      "accepted": true,
+      "aa_total": true,
+      "aa_no_gc": true,
+      "heap_matched": true,
+      "brk_pass": true,
+      "actual_jit_matched": true,
+      "total_delta_pct": [-10.155902769440043, -10.218573151977223, -10.083658420744213],
+      "no_gc_delta_pct": [-10.16058375718773, -10.253668676819155, -10.10507276246062],
+      "restored_original_total_delta_pct": [-0.16062247595219348, -0.18987376438582837, -0.09411813520536216],
+      "paired_total_ir": {
+        "off_a": [5126024.9, 5132408.22, 5125040.4, 5124661.38, 5125923.3, 5122714.18],
+        "off_b": [5125500.7, 5125836.24, 5130392.46, 5124879.52, 5129092.48, 5124830.66],
+        "guarded": [4604413.92, 4607023.78, 4605562.96, 4608246.38, 4603051.46, 4605818.96],
+        "active_original": [5117261.08, 5121692.76, 5117143.46, 5116095.02, 5120214.74, 5118776.36]
+      },
+      "samples_sha256": "d1ecd8a8a72fb840a93fb52d69ed4b69de20da7fc6ecf2f74aab46c5e414591c",
+      "summary_sha256": "658cfc301c2d907d2d559df38e52337cdce9780af9f7f59e5f14f57d2d301e68",
+      "verdict_sha256": "2138a11fc6c3a0d27bce80ff497665670427e603fbb57dc8c186f09541bb59e9"
+    },
+    "yjit": {
+      "accepted": false,
+      "diagnostic_only": true,
+      "aa_total": false,
+      "aa_no_gc": false,
+      "heap_matched": true,
+      "brk_pass": true,
+      "actual_jit_matched": true,
+      "jit_flat": false,
+      "nonflat_workers": ["0-off_b", "0-guarded", "0-off_a", "0-active_original", "1-off_a", "3-off_b", "3-active_original", "4-off_b", "4-off_a", "4-active_original"],
+      "total_delta_pct": [-0.15266964660589633, -0.563343725325377, -0.07149355353797682],
+      "no_gc_delta_pct": [-0.18900497562794882, -1.2396346929872903, -0.00012918730809552414],
+      "paired_total_ir": {
+        "off_a": [3272929.98, 3302989.24, 3274453.16, 3275770.88, 3273100.5, 3272948.8],
+        "off_b": [3270858.3, 3270614.88, 3272423.26, 3334285.06, 3273385.42, 3267114.8],
+        "guarded": [3269830.88, 3273176.4, 3267115.58, 3274188.74, 3269189.46, 3266866.06],
+        "active_original": [3256049.04, 3253728.42, 3250793.74, 3316716.24, 3247461.52, 3257049.14]
+      },
+      "samples_sha256": "1cba3ff8d20a75941c2121cd2ee938f72ef0b51e29eaa22e66a6fa7c6cdb6220",
+      "summary_sha256": "c93ff733c8c04e633a2d763fd8f9598da6f316f61cc3bd4397107d2a5cf95029",
+      "verdict_sha256": "3d61fe2aa2f6206c1a68b6a0d694ca29ab4fdec9df6a645629f1a5ede11477bb"
+    },
+    "untimed_attribution": {
+      "interpreter_request": {"status": 200, "hits": 11, "fallbacks": 0, "raw_sha256": "e3bb96ed58e60ca879c73e4b684420c84c637d2e9daceec502f43c7c6a24a956"},
+      "yjit": {"hits": 0, "fallbacks": 9911, "raw_sha256": "3ce4265ff680249447d8afd6008380a2d835f89952dac50461937fc22bf88a8c"},
+      "failed_facts": [{"receiver": "Array", "method": "each", "expected_source_location": null, "actual_source_location": ["<internal:array>", 219]}],
+      "failed_facts_sha256": "a10960464b4175ed653b96e22dde8f161f99c54bfcbb0f5ea666c686704afd9f",
+      "native_yjit_50_requests": {
+        "exit_trace_leave_delta": 0,
+        "side_exits": 400,
+        "compiled_iseq_delta": 0,
+        "invalidation_delta": 0,
+        "fast_path_proven": false,
+        "raw_sha256": "c187244b89e8a9072cf85d200dbbee65780801e3ee247efb17dbaac358f4de10"
+      }
+    }
+  },
   "cohorts": {
     "config-yjit": {
       "verdict": {

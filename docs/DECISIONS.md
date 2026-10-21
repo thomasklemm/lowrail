@@ -13,6 +13,27 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Sticky tracing fixed; config promotion still blocked (2026-10-21)
+
+Production activation/delivery no longer enables global return tracing
+([published boundary](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e)).
+Target only `initialize!`; observe lazy readiness without tracing; record
+delivery in Loader itself. Native post-boot Starter counters show **zero
+`exit_trace_leave`**. Global-return versus targeted-only micros isolate the
+tax on both interpreter and YJIT; no pass body or certificate was weakened.
+
+One finite post-fix config-only Starter JSON cohort per mode, no retries:
+**interpreter −10.156% Ir [−10.219, −10.084], accepted**; YJIT **rejected**
+both A/A controls and measured-window JIT flatness (10/24 workers). Its raw
+−0.153% is diagnostic only. Untimed YJIT attribution finds **0 hits / 9,911
+fallbacks**: a JIT-disabled build certified C `Array#each`, whereas `--yjit`
+uses `<internal:array>:219`. Correct refusal of that fact is not a reason to
+relax it. The native zero-trace proof covers activation/fallback, not a
+verified fast path. Interpreter coverage separately has 11 hits / 0 fallbacks
+per request. Keep **sealed-only, no promotion**: no accepted post-fix YJIT
+cohort demonstrates non-regression. Old accepted/rejected results remain
+separate. [Diagnosis, proposal and all evidence](passes/yjit-regression.md).
+
 ## Relocatable delivery (2026-10-20)
 
 Use typed app-root-relative metadata and explicit AOT `build --target-root`
@@ -128,7 +149,7 @@ retry or clean-arm salvage. [Experiment, ablations and controls](passes/sealed-r
 | `active_record/instantiate` | **sealed-only**; performance still parked | Suppressed model singleton hook plus replaced `instantiate_instance_of` changes original row titles but not fast rows. AR epochs remain 52/55; cached guard remains true. SEAL001 required. Historical −38% alpha load-only gain disappeared upstream, blog stacked +0.59% remains a loss ([audit](passes/suppressed-hooks.md)) |
 | `active_record/preload_plans` | **sealed-only**, guarded/opt-in refused | Suppressed model singleton hook plus replaced `scope_for_association` filters original rows but not fast rows. AR epochs remain 52/55, so the epoch is not complete coverage of suppressed dependency mutation. SEAL001 required; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `active_record/ar_plans` | **sealed-only**, guarded/opt-in refused | Suppress the visitor owner's `method_added`, replace `visit_Arel_Nodes_SelectStatement` with an SQL-comment-producing body: original SQL changes, cached plan SQL does not. Same visitor identity and unchanged AR epochs 52/55 do not rescue the certificate. SEAL001 required; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
-| `inertia/config_bind` | **sealed-only**, promotion blocked | Generic registry quarantine is published; independent public production activation/refusal regression added. Warmed suppressed `Hash.method_added` defeats the certificate. Fresh Starter JSON interpreter −6.947% vs off (−6.928% vs default), HTML −0.275%; accepted YJIT **+16.339% / +16.459%** vs off. Second sealed candidate, not a default gain. #437 open/unmerged; 3.23.0 lacks it; version/body allowlist refuses future fixed bodies ([prices](passes/next-levers.md), [audit](passes/suppressed-hooks.md)) |
+| `inertia/config_bind` | **sealed-only**, promotion blocked | Warmed suppressed `Hash.method_added` defeats the guarded certificate. Pre-fix JSON interpreter −6.947%, HTML −0.275%; accepted YJIT **+16.339% / +16.459%** included sticky global tracing. Post-fix JSON interpreter **−10.156% accepted**; YJIT rejected A/A/flatness and a separate untimed probe has zero hits (JIT-mode fact mismatch). No accepted post-fix YJIT non-regression proof, no promotion. #437 open/unmerged; 3.23.0 lacks it; future fixed bodies refuse ([diagnosis](passes/yjit-regression.md), [old prices](passes/next-levers.md), [audit](passes/suppressed-hooks.md)) |
 | `inertia/props` | opt-in experiment; no promotion | Ordinary-Hash tuple iteration only; original prop body/lexical scope and fallback retained, actual iterator/visibility checked at every traversal after app code. Five-app 779 outcomes and own-thread SQL identical, nonzero hits in all three Inertia apps. Historical draft +0.873% interpreter / +0.976% YJIT cohorts stay rejected after safety fixes changed fingerprints ([retained evidence](passes/props.md)). One new final-runtime brk512 cohort/mode: interpreter +4.364% [+4.292, +4.462] accepted; YJIT diagnostic +31.043% rejected (5/36 non-flat workers). No credited gain or retry ([recheck](bench.md#decision-critical-512-mib-remeasurement-2026-10-20)) |
 | Whole compiled ERB specialization | surveyed; no pass | I18n epoch not closed; Campfire URLs have 7 valid guards but 0 completed lowerings/request. No credited saving; [profile and refusals](passes/erb.md) |
 | Literal-run ERB | rejected | 2 sites across five apps; two append calls saved per rendered layout do not justify a pass/guard ([survey](passes/erb.md)) |

@@ -1,0 +1,75 @@
+# frozen_string_literal: true
+
+require_relative "test_helper"
+
+class JitDiagnosticsTest < Minitest::Test
+  include LowrailTest
+
+  def test_doctor_detects_disabled_global_boot_tracing_but_not_targeted_boot_tracing
+    realpath_tmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "config"))
+      File.write(File.join(dir, "config/environment.rb"), <<~'RUBY')
+        module ThirdParty
+          def self.boot = 29
+        end
+        case ENV["TRACE_MODE"]
+        when "global", "targeted"
+          trace = TracePoint.new(:return) {}
+          ENV["TRACE_MODE"] == "global" ? trace.enable : trace.enable(target: ThirdParty.method(:boot))
+          ThirdParty.boot
+          trace.disable
+        end
+      RUBY
+      %w[off targeted global no_stats interpreter].each do |mode|
+        flags = mode == "interpreter" ? "--disable-yjit" : "--yjit"
+        flags += " --yjit-stats=quiet" unless %w[no_stats interpreter].include?(mode)
+        output = File.join(dir, "trace.json")
+        out, err, status = ruby(File.join(GEM_ROOT, "exe/lowrail-doctor-trace"), output,
+          setup: false, chdir: dir, env: {"RUBYOPT" => flags, "TRACE_MODE" => mode})
+        assert status.success?, "#{mode}: #{err}#{out}"
+        data = JSON.parse(File.read(output))
+        if %w[no_stats interpreter].include?(mode)
+          assert_equal "unavailable", data.fetch("status"), mode
+          assert_nil data.fetch("leaf")
+          next
+        end
+        assert_equal 0, data.fetch("enabled_tracepoints"), mode
+        assert_equal true, data.dig("leaf", "yjit_compiled"), mode
+        assert_equal(mode == "global" ? "warning" : "not_observed", data.fetch("status"), mode)
+        assert_equal(mode == "global", data.fetch("global_return_tracing_suspected"), mode)
+        assert_equal(mode == "global" ? 1000 : 0, data.dig("leaf", "exit_trace_leave_delta"), mode)
+      end
+    end
+  end
+
+  def test_request_only_targeted_tracing_is_not_mislabeled_as_global
+    skip "Rack is not installed" if Gem::Specification.find_all_by_name("rack").empty?
+    realpath_tmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "config"))
+      File.write(File.join(dir, "config/environment.rb"), <<~'RUBY')
+        module Rails
+          class Application
+            def leaf = 29
+            def call(_env)
+              100.times { leaf }
+              [200, {"content-type" => "text/plain"}, ["ok"]]
+            end
+          end
+          def self.application = @app ||= Application.new
+        end
+        $request_trace = TracePoint.new(:return) {}
+        $request_trace.enable(target: Rails.application.method(:leaf))
+      RUBY
+      output = File.join(dir, "trace.json")
+      out, err, status = ruby(File.join(GEM_ROOT, "exe/lowrail-doctor-trace"), output, "/probe",
+        setup: false, chdir: dir, env: {"RUBYOPT" => "--yjit --yjit-stats=quiet"})
+      assert status.success?, "#{err}#{out}"
+      data = JSON.parse(File.read(output))
+      assert_equal "warning", data.fetch("status")
+      assert_equal false, data.fetch("global_return_tracing_suspected")
+      assert_equal 0, data.dig("leaf", "exit_trace_leave_delta")
+      assert_equal 200, data.dig("request", "status")
+      assert_operator data.dig("request", "exit_trace_leave_delta"), :>, 0
+    end
+  end
+end

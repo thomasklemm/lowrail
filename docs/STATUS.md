@@ -5,19 +5,33 @@ Decisions on what to pursue, park or reject: [DECISIONS.md](DECISIONS.md).
 Living summary of what works, what was learned, and what is next. Details
 live in the linked docs; numbers come from executed runs, dated.
 
-## At a glance (2026-10-20)
+## At a glance (2026-10-21)
 
 | Area | State |
 |---|---|
 | Default build | lowers nothing: `view/link_to` and `route/path` quarantined (45fd07a); five-app manifests have 0 units |
 | Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; hook-free delivery preserves loader selection; Redprints' strict load census passes with targeted Bundlebun refusal, **0 hits** ([compatibility report](compat.md)) |
 | Opt-in passes | guarded selection: only props + endpoint; seven cached-fact passes sealed-only after suppressed-hook audit; see [DECISIONS](DECISIONS.md#passes) |
-| Measurement | interpreter fixed-heap/A/A protocol (c9d2397) accepted; YJIT whole-request cohorts rejected by the JIT-flat gate (07205de); guard micro K 822→425 interpreter / 371→140 YJIT Ir |
+| Measurement | post-TracePoint-fix config-only Starter JSON interpreter **−10.156% Ir accepted**; post-fix YJIT rejected A/A/JIT flatness, untimed mode-mismatched artifact has zero fast hits; no config promotion ([diagnosis](passes/yjit-regression.md)). Guard micro K 822→425 interpreter / 371→140 YJIT Ir |
 | Biggest measured lever | endpoint render path, −26 %/−37 % handwritten upper bounds; caller-side certification loses (0fbb909) |
 | Types/MCP | typed facts (f704751), MCP + quality ledger (8df58ed) |
 | In progress | body-installed endpoint pricing (guarded tier); sealed tier + `seal-check`; props pass; Ruby 4.1/ZJIT matrix |
 
 ## Works (2026-10-20)
+
+- **Production tracing fixed; promotion unchanged (2026-10-21):**
+  [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e)
+  removes global return observers from activation and cold delivery, using
+  targeted initialization and a Loader witness. Native warmed Starter
+  requests have **zero `exit_trace_leave`**. One finite six-round check per
+  mode: interpreter **−10.156% [−10.219, −10.084]** accepted, 11 hits/request
+  and no fallbacks in separate coverage; YJIT **rejected** both A/A and
+  measured-window JIT flatness (10/24 workers). Raw −0.153% is not a speed
+  claim. Untimed YJIT has 0 hits / 9,911 fallbacks because a JIT-disabled
+  artifact certified a different `Array#each` implementation. That correct
+  fact refusal must not be weakened. Config remains sealed-only, not
+  promoted. Old cohorts, the CASA pre-flags SQL RED and the Redprints load
+  boundary remain recorded separately. [Evidence and emit proposal](passes/yjit-regression.md).
 
 Ruby 4.0+ (gemspec), developed on 4.0.7; the second target is Ruby 4.1
 ([separate compatibility matrix](ruby-4.1.md)). Ruby 3.4 was dropped by owner
