@@ -44,9 +44,24 @@ rows = [
     "|---|---|---|---|---|---|",
 ]
 for entry in json.loads((root / "docs/results.json").read_text()):
-    data = json.loads((root / entry["source"]).read_text(), parse_float=Decimal)
+    source_url = entry["source"]
+    if "source_commit" in entry:
+        source_commit = entry["source_commit"]
+        if len(source_commit) != 40 or source_commit != entry["publication"]:
+            sys.exit("Branch source must be pinned to its full publication commit")
+        commit(source_commit)
+        source = subprocess.check_output(
+            ["git", "show", f"{source_commit}:{entry['source']}"], cwd=root, text=True
+        )
+        source_url = f"https://github.com/thomasklemm/lowrail/blob/{source_commit}/{entry['source']}"
+    else:
+        source = (root / entry["source"]).read_text()
+    data = json.loads(source, parse_float=Decimal)
     if lookup(data, entry["accepted"]) != entry.get("accepted_value", True):
         sys.exit(f"Not accepted: {entry['source']}")
+    for gate in entry.get("required_gates", []):
+        if lookup(data, gate) is not True:
+            sys.exit(f"Failed gate {gate}: {entry['source']}")
     if lookup(data, entry["revision_field"]) != entry["revision"]:
         sys.exit(f"Revision mismatch: {entry['source']}")
     total = interval(lookup(data, entry["total"]))
@@ -59,11 +74,12 @@ for entry in json.loads((root / "docs/results.json").read_text()):
             f"{historical['reason']} {commit(entry['revision'])}; "
             f"{historical['follow_up']} ({commit(historical['publication'])})"
         )
+    runtime = f"; runtime {commit(entry['runtime_revision'])}" if "runtime_revision" in entry else ""
     rows.append(
         f"| {entry['date']} | [{entry['app_endpoint']}]({entry['report']}) | "
         f"{entry['ruby_rails']} | {entry['mode']}; {entry['tier']} | "
         f"{price} | "
-        f"{commit(entry['revision'])} / {commit(entry['publication'])}; [JSON]({entry['source']}) |"
+        f"{commit(entry['revision'])} / {commit(entry['publication'])}{runtime}; [JSON]({source_url}) |"
     )
 readme = root / "README.md"
 before, rest = readme.read_text().split("<!-- current-results:start -->\n")
