@@ -626,16 +626,69 @@ with two counter-dependent skips because this test shell does not put
 Valgrind on PATH. The actual heap probes above explicitly select the pinned
 Valgrind tool=none. No extra instruction workers were started by the tests.
 
-**Exactly one replacement now approved:** six rounds, seed 41231,
+**Exactly one replacement authorized and completed below:** six rounds, seed 41231,
 N=0/10, off_a/off_b/on, jobs=1, reusing the released original slot, the frozen
 floors above and the same tool. The original untimed JSON retains its
 request-only proposal as historical evidence; approval does not alter those
-probe bytes. The replacement is not pooled with N=50 and has no result yet.
+probe bytes. The replacement is not pooled with N=50.
 The exact on-window gate scales to 240, not 1200; its 23-site map and four zeros
 are unchanged. Both total/no-GC A/A 95% intervals must contain zero wholly
 within ±0.5%, with all pin/mode/brk/heap/mix gates; no retry, exclusions,
 YJIT or another N after a failed A/A. A failed A/A is reported REJECTED.
-Even an accepted result would only be a scoped warm bench comparison of
+The accepted result below is only a scoped warm bench comparison of
 these six GETs, not production admission or cold-start cost. Cold remains
 RED with the named timestamp/interleaving rejections above; payload/assigns,
 lazy cached-bind values and SolidCache completion remain uncovered.
+
+## Replacement result: scoped warm bench price, not a win
+
+**Decision rule before the numbers:** INVALID on any exact mix, pin, mode,
+brk or exact-page deviation. Both total/no-GC A/A 95% intervals must contain
+zero wholly within ±0.5%; otherwise REJECTED, not a reason to try another N.
+
+**Accepted only as a scoped warm bench price for these six Fizzy GETs at
+N=0/10 and init slots `[3350000,300000,460000,30000,20000]`.** This specimen
+increases instructions; acceptance is of the controlled measurement, not a
+win, runtime admission or product promotion. Cold off/off/on remains **RED**.
+Accepted named off/off rejections remain nine SolidCache `created_at` values
+and historical order-sensitive estimation-SQL interleaving. **Uncovered:**
+payload/assigns, lazy cached-bind values and SolidCache completion. No
+production admission, cold-start, latency, YJIT or whole-app claim.
+
+| Metric / six-GET vector | Off-A median | On median | On/A Δ% [95% interval] | Off-B/A Δ% [95% interval] |
+|---|---:|---:|---:|---:|
+| Total interpreter Ir | 681,459,115.15 | 684,282,312.00 | **+0.403071 [+0.386235, +0.429585]** | −0.022014 [−0.046920, +0.026381] |
+| GC-excluded Ir | 674,432,187.70 | 677,171,714.05 | **+0.402000 [+0.380081, +0.421142]** | −0.029792 [−0.042940, +0.026493] |
+| Allocated objects, diagnostic | 208,158.60 | 209,276.80 | +0.536278 [+0.533744, +0.539356] | +0.002402 [−0.001057, +0.006077] |
+
+Percentages are medians of six paired round ratios, not ratios of the
+absolute medians. Bootstrap resamples whole rounds. Total/no-GC are separate
+executions, not a GC-saving decomposition. Some windows record one
+collection; fixed pages do not mean GC is disabled.
+
+The original INVALID service/slot was released at **20:06:40 UTC**; this one
+replacement started at **20:08:23**, never concurrently. It completes all 18
+sequential workers, six rounds / seed 41231 / off_a/off_b/on / jobs=1, on the
+same clean detached
+[`da5fe91`](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577)
+harness, Fizzy
+[`6f1d200`](https://github.com/basecamp/fizzy/commit/6f1d200316ec3bae91d32c557d88647300807ee9),
+Ruby 4.0.7 / Rails 8.1.4 overlay and unchanged brk512 binary above. All
+per-worker source/native/lock/artifact/context pins pass. No retry,
+exclusions, app/config/GC-policy change, higher-segment tool or pooling with
+N=50. The replacement service and slot are released too.
+
+Both A/A controls pass. Every one of the **72 measured windows** retains
+exact pages `[2047,367,1128,148,199]`, with **zero additions** to any pool's
+`total_allocated_pages`. Each full on window has exactly **240 hits over 19
+identities**, all four explicit zero sites remain zero, and off/N0 adds zero.
+Independent validation sums every dump's self costs (not inclusive call
+costs), matching all **72 totals** and window values; all **36 N0
+subtractions** and the separate bootstrap estimates reproduce exactly.
+Input/fixture hashes remain unchanged afterward; the detached tree is clean.
+
+The [complete numeric export](fizzy-link-ir-n10.json) retains the preregistered
+rule, all inputs/tool/native pins, actual caller source, every worker/window/
+site map, all raw dump/log digests and the independent reconciliation. The
+earlier [N=50 export](fizzy-link-ir-invalid.json) remains **INVALID diagnostic
+data only**, not a price/direction claim or a sample pooled into this result.

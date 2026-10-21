@@ -42,7 +42,7 @@ relaxation. `Prism.find` has 17 source-backed agreements but generated ERB
 and isolated Proc probes return nil: no witness adoption. Full inventory,
 limitations and machine evidence: [prism-2.md](prism-2.md).
 
-## Fizzy block links: N=50 INVALID; N=10 replacement approved (2026-10-21)
+## Fizzy block links: N=50 INVALID; N=10 scoped warm bench price (2026-10-21)
 
 **Rule before numbers:** any pin/mode/brk/exact-page/mix violation invalidates
 the whole cohort; both total/no-GC A/A 95% intervals must contain zero wholly
@@ -55,21 +55,29 @@ the heap failure still invalidates everything. All 18 workers, 72 dumps and
 36 N0 subtractions independently reconcile. No retry/exclusions. The old
 service/slot is released. [Complete INVALID export](fizzy-link-ir-invalid.json).
 
+**N=0/10 accepted as a scoped warm bench price, not a win:** total interpreter
+Ir **+0.403071% [+0.386235, +0.429585]**, no-GC **+0.402000%
+[+0.380081, +0.421142]** for these six Fizzy GETs at the stated floors only.
+Cold off/off/on remains **RED**. Accepted named off/off rejections: nine
+SolidCache `created_at` values and historical estimation-SQL interleaving.
+**Uncovered:** payload/assigns, lazy cached-bind values, SolidCache completion.
+No production admission, cold-start or whole-app claim.
+
 Init slots are floors, not caps. Untimed off-only whole-window allocation
 budgeting with N=0/10 yields fixed init slots
 `3350000,300000,460000,30000,20000` (254 MB of slots). Fresh off/on workers in
 both phase orders retain exact pages and add none inside all 16 windows;
 full on windows have exactly 240 hits/19 identities with four explicit zeros.
-Same brk512 tool and detached worker harness; no app/config/GC-policy change
-or higher-segment tool. **Exactly one N=0/10 replacement is now approved**,
-six rounds / seed 41231 / off_a/off_b/on / jobs=1, after the old slot release.
-No result yet; no pooling with invalid N=50 data. The untimed report retains
-the original request-only proposal as historical evidence.
-
-Cold off/off/on remains **RED**. Accepted named off/off rejections: nine
-SolidCache `created_at` values and historical order-sensitive estimation SQL
-interleaving. Payload/assigns, lazy cached-bind values and SolidCache
-completion remain uncovered. No production admission or cold-start claim.
+The one authorized replacement completes six rounds / seed 41231 /
+off_a/off_b/on / jobs=1 after the old slot release. Both A/A 95% intervals
+contain zero within ±0.5%: total [−0.046920, +0.026381], no-GC
+[−0.042940, +0.026493]. All 18 workers retain exact pages, zero page additions
+and the exact 240-hit/19-identity mix with four zeros; 72 dumps and 36
+subtractions independently reconcile. Same detached harness/brk512 tool;
+no app/config/GC-policy change, higher-segment tool, retry, exclusions, YJIT
+or pooling with invalid N=50 data. Slot released. The untimed report retains
+its original request-only proposal as historical evidence.
+[Complete scoped N=10 export](fizzy-link-ir-n10.json).
 [Protocol, failures and reproduction](block-link-specimen.md#untimed-heap-preconditioning-prefer-n10-on-the-existing-tool),
 [all untimed window evidence](fizzy-link-heap.json).
 
