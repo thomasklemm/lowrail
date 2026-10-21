@@ -1,12 +1,16 @@
 # Sealed new-comment form scaffold
 
-**Positive interpreter price; sealed-only pilot, request result pending.**
-The complete checked measurement specimen saves
+**Accepted interpreter request saving: −14.405% [−14.451, −14.374].**
+The real-artifact blog-show cohort uses **8.747394 → 7.486001 M Ir/request**.
+This remains a `sealed_only` pilot: **no default change or promotion**, and no
+accepted YJIT non-regression cohort. See the pinned request result below.
+
+Before implementation, the complete checked measurement specimen saved
 **1,282,228 Ir/form** [1,280,077, 1,284,287], **−79.712%** of the original
-form's work, and **392 objects/form**. One invocation on blog show implies a
+form's work, and **392 objects/form**. One invocation on blog show implied a
 conditional **about 14.7%** request budget against the separately measured
-8.744 M interpreter baseline. It is not an achieved request saving, an
-additive stacking claim, native throughput or promotion.
+8.744 M interpreter baseline. That micro remains a separate source-pinned
+experiment, not an additive stacking claim, native throughput or promotion.
 
 The owner selected this slice after the [link pilot](sealed-links.md) stayed
 in the stacking backlog. It is the largest stage in the earlier
@@ -122,10 +126,9 @@ RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 BENCH_JOBS=4 BENCH_JIT=0 \
 ```
 
 The guarded tier and seven-pass quarantine remain unchanged. **YJIT is
-held**, not rejected or credited: warmup-method work is separate. An untimed
-hit check and one finite **real-artifact** interpreter show cohort, after
-worker release, decide the request result. This micro does not pre-authorize
-a speed claim.
+held**, not rejected or credited: warmup-method work is separate. The finite
+**real-artifact** interpreter show cohort below supplies the request result;
+the earlier micro alone did not pre-authorize a speed claim.
 
 ## Production generator and variant
 
@@ -169,5 +172,79 @@ mise exec -- ruby -Igem/lib -Igem/test gem/test/form_scaffold_test.rb
 ```
 
 The regression skips explicitly when the optional blog corpus or Ruby 4.0.7
-is absent; that skip is not form coverage. Production request pricing still
-must use the exact published revision and a freshly source-pinned artifact.
+is absent; that skip is not form coverage. Fresh orbs also need the disposable
+blog production SQLite fixture populated with Articles 1/2/3 and 2/1/0
+Comments, not just a test/development schema. A missing production database
+correctly refuses inventory; do not relax eligibility to make the test pass.
+The test copies that fixture before changing anything. Production request
+pricing must use the exact published revision and a freshly pinned artifact.
+
+## Accepted real-artifact interpreter request cohort
+
+Measured published head:
+[`f39bcd7`](https://github.com/thomasklemm/lowrail/commit/f39bcd71a8e8ac77b8be0d4fc3e945c932870cb6),
+with the implementation from
+[`6cfc6e3`](https://github.com/thomasklemm/lowrail/commit/6cfc6e3e8e8e155d731229e69cdbb56aa7a5007a).
+The artifact SHA is
+`1ba58a84c38bf295d0c4f74b5832ebb451a29e7386d8d148668c5cedec02a83f`.
+The existing build denylist excludes `sealed/link_to`; only form unit 18 is
+enabled. Other runtime units stay disabled, with **no delivered files or
+templates**. This is form-only against unchanged Rails, not a stacked gain.
+
+Ruby 4.0.7 / Rails 8.1.4; `/articles/1` with two comments; one finite cohort,
+six fresh randomized rounds, N=0/50 subtraction, seed 41231, at most four
+workers, and the same five fixed heaps and pinned 512-MiB Valgrind tool as
+the micro. **No retries, extra cohorts or clean-arm salvage.** All 144 windows
+are GC-free; heap matching and actual interpreter-mode gates pass. This is
+not a production GC schedule or native-throughput claim.
+
+| Arm | Total Ir/request | Paired Δ% vs off-A [95% CI] | Native `vm_trace` self Ir/request |
+|---|---:|---:|---:|
+| Off A | 8,747,393.93 | reference | 0 |
+| Off B | 8,745,130.10 | −0.027 [−0.053, +0.052] | 0 |
+| Missing artifact | 8,747,583.14 | +0.018 [−0.012, +0.044] | 0 |
+| Empty artifact | 8,744,793.49 | −0.019 [−0.057, +0.004] | 0 |
+| Disabled units | 8,746,355.86 | −0.003 [−0.031, +0.029] | 0 |
+| Form enabled | **7,486,000.93** | **−14.405 [−14.451, −14.374]** | **0** |
+
+No-GC delta is **−14.401% [−14.451, −14.370]**. Both independent A/A
+controls pass: total [−0.053, +0.052]%, no-GC [−0.037, +0.032]% contain
+zero and are inside ±0.5%. Objects/request are **2,244.37 → 1,864.24**;
+these whole-request medians are not the older micro's allocation count.
+The exact-artifact native/public probe records **one form hit/request,
+zero form fallbacks**. The public regression passes 192+192 byte/header/SQL/
+event/assign/state pairs, live token/fallback replay and custom-builder
+refusal. Full implementation-head gem: 142 tests / 4,999 assertions, six
+skips, no failures/errors; Cargo 35+1+3. Five-app default outcomes and
+own-thread SQL remain identical (blog 21, Campfire 634 with two skips,
+PingCRM 26, Redprints 50+12 browser, Starter 36). Other-thread SQL differences
+in Campfire/PingCRM remain advisory. Zero default units/hits are not optimized
+coverage, and this orb does not claim Ruby 4.1 coverage.
+
+The in-mode tracing check sums **native `vm_trace` function self Ir**, not
+its callees, across all native source locations using `callgrind_annotate
+--auto=no --inclusive=no --show=Ir --threshold=100`. N=50 minus N=0 divided
+by 50 is **exactly zero in every arm and round, in both modes**: 72 deltas
+from the cohort's own windows. The same extractor reproduces the historical
+positive control **283,074 Ir/request** (14,153,799 − 99, divided by 50).
+No tracing tax is subtracted to manufacture this saving.
+
+The separate untimed YJIT diagnostic on the interpreter-certified artifact
+has zero lifetime/delta `exit_trace_leave`, but **zero form hits** because
+boot inventory differs in JIT mode; the variant is never installed. That is
+not fast-path evidence or a statement about interpreter windows. After the
+published mode-admission boundary, a fresh `build --jit yjit` artifact on
+[`827f935`](https://github.com/thomasklemm/lowrail/commit/827f93530ec33573265bc4c4f1bd83fd384d7b64)
+passes an untimed 50-request check: **50 hits, zero fallbacks, zero lifetime/
+delta trace exits**. No YJIT instruction cohort has started; it waits for
+the separately owned accepted warmup-method A/A validation and worker release.
+
+The [numeric export](sealed-form-request.json) retains artifact, fixture,
+runtime/harness/source pins, per-round values, all controls and window/heap/GC
+endpoints, native probes and per-arm trace-self annotations. Raw responses,
+cookies and logs stay private. The historical `measurement_complete` flag
+remains **false**: single-pass Callgrind does not have an exact runtime-form
+operation capture/per-hit budget adapter, and the report must not relabel the
+older handwritten micro or divide this request saving by its hit count to
+invent one. **The request saving is accepted; the pass remains sealed-only,
+with no default change or promotion.**
