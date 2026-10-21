@@ -41,8 +41,9 @@ not the corrected source. [Protocol and historical records](docs/bench.md#curren
 ([retained method and reaper-driven late-entry diagnosis](docs/passes/production-yjit-method.md));
 frozen props is an accepted isolated micro only, with integration deferred
 ([scope](docs/passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred)).
-There is **no accepted Fizzy price yet**; its scoped warm bench cohort is
-in progress/pending publication ([specimen](docs/block-link-specimen.md)).
+There is **no accepted Fizzy price yet**;
+[first cohort INVALID (heap growth)](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51).
+A replacement N=10 cohort is running ([specimen](docs/block-link-specimen.md)).
 
 To update: publish the accepted export first, edit only the metadata/source
 paths in [docs/results.json](docs/results.json), then run
