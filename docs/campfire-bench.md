@@ -1,8 +1,9 @@
 # Campfire: benchmark routes, certified reachability, and a pricing request
 
-2026-10-21. **Untimed discovery, not a speed or sealed-support claim.** No
-Callgrind worker, counter window or timing cohort has executed. Slot 2 was
-assigned, but the new screen-first policy arrived before measurement.
+2026-10-21. **Discovery and rejected native exploration, not a speed or
+sealed-support claim.** No counted Callgrind worker or window has executed.
+Slot 2 is released after a cheap screen and one allocation-only variant fail
+to justify pricing under the new screen-first policy.
 The authorized follow-up changes only Ruby parser compatibility in Lowrail;
 no default, quarantine, admission inventory or upstream app code was changed.
 The machine-readable [appendix](campfire-bench.json) retains the counts,
@@ -17,12 +18,12 @@ outcomes pass; the fixed browser diagnostic classifies the query-count
 rejection as test/other-thread nondeterminism. Raw cold HTTP identity rejects
 entropy. The first complete companions also reject Redis expiry, internal
 features and unavailable cached binds. The one authorized rule rerun passes
-both seeds with those named items retained. **No price: screen first under
-the new owner policy.** Sections 1–9 retain the initial discovery/failed prerequisites;
+both seeds with those named items retained. **KILLED after a screen and one
+allocation-only variant; no price.** Sections 1–9 retain the initial discovery/failed prerequisites;
 [§10](#10-authorized-prerequisite-follow-up) supersedes their zero-hit/build/heap
 status without discarding the original failures; §11 records the bounded
 diagnostic and first negative companion results; §12 records the accepted
-rule rerun and the pre-measurement stop.
+rule rerun and the pre-measurement stop; §13 records both rejected native screens.
 
 ## 1. Which requests do public benchmarks exercise?
 
@@ -659,6 +660,73 @@ An Ir price requires a clear screen win (roughly >3× A/A noise), not the earlie
 pre-approval alone. No speed, latency, active own-suite or Oct-8-app claim follows
 from these prerequisites. Runtime/default/quarantine and Campfire source/config
 remain unchanged.
+
+## 13. Screen, one allocation-only variant, then kill
+
+**Decision: kill `campfire-r81-room-instantiate-v1`; release slot 2.** This is
+only the r81 fixture at 02023b0, not the October 8 performance app. The accepted
+companions above retain the browser other-thread nondeterminism, raw CSRF/
+cookie/ETag/runtime/session-clock rejections, accepted off/off Redis expiry,
+path/hash-pinned blog Lowrail-feature exemption and ten unevaluated cached-bind
+gaps. None becomes a raw exactness pass or an active sealed own-suite claim.
+
+Bet A's independent [twelve-round native results](https://github.com/thomasklemm/lowrail/blob/bfc682b97dbebdb1082d4f54e8ed426e7ff27c27/docs/native-bench.md#campfire-no-resolved-native-latency-win-allocations-increase)
+on harness [54d92f1](https://github.com/thomasklemm/lowrail/commit/54d92f1e1068eb4e0b1ba60d68f2fc776e08cd52)
+already find allocations increasing on all five routes: room +0.332%,
+pagination +0.677%, sidebar +0.085%, search +0.238%, POST +0.819%.
+Every wall estimate stays within its A/A floor (4.32–9.63%); boot is
+2784.18 → 2919.08 ms, also unresolved against A/A. Those are separate
+exploration results, not pooled with our screen or a request price.
+
+Our screen uses the shared [`script/screen` at ff46f99](https://github.com/thomasklemm/lowrail/blob/ff46f99517f6a1fcb9dfc3ab3e132616be100457/script/screen),
+in an isolated worktree, with a separately built public `--sealed --env
+production --jit yjit` artifact: 19 instantiation units, no delivered files.
+Each of two finite screens has three serial off-A/on/off-B rounds, 20 warmups,
+30 samples per worker, CPU 2 and seed 41231, plus three separate coverage
+workers. No exclusions, repeated variant or Callgrind worker. The first screen
+and the single variant each finish in about 71 seconds.
+
+| Screen | A/A floor | Paired wall Δ [95% interval] | Integer allocations/request median [min, max], off-A / off-B / on |
+|---|---:|---:|---|
+| Original | 5.571% | −0.741% [−9.988, +5.508] | 15526 [15516,15575] / 15526 [15517,15577] / 15578.5 [15564,15628] |
+| One allocation-free shadow predicate | 4.293% | −4.168% [−6.107, −1.864] | 15525.5 [15515,15580] / 15525 [15513,15577] / 15524.5 [15515,15574] |
+
+Each of the 52 successful row hits calls `ARShadow.enabled?`, whose
+`%w[1 strict]` literal allocates an Array even when shadowing is disabled,
+explaining approximately 52 extra objects per room request. Allocation tracing
+locates ten arrays at `ar_shadow.rb:24` for ten calls; 10,000 disabled checks
+allocate 10,002 objects versus two for the allocation-free predicate (one in
+the empty-loop control). The one-line prototype reads ENV once and compares
+against the same two strings; seven ENV-value cases agree. It is confined to
+the exploration branch, not delivered to main. A fresh normal public build,
+not an edited manifest, is used after the change; runtime-file hashes distinguish
+the two runs even though the instantiation manifest is identical.
+
+The variant removes the approximately one-object-per-hit overhead, but its
+one-object median advantage over off-A is within the overlapping observed
+allocation ranges, and its wall interval does not clear 3× the 4.293% A/A floor.
+**Both screens also reject exact body/all-header digest equality off/off and
+off/on in every round and both seeds; status remains 200.** The source-pinned
+entropy validator reports no errors, but replaying the accepted fresh
+login+room companion after native warmup does not establish warm byte identity.
+That new validation boundary is unclassified, retained, and not dismissed as
+one of the accepted cold rejections. No digest is normalized and timed entropy
+is not pinned. No further attempt is made to repair a bet with no screened win.
+
+Separate coverage workers still observe exactly 52 warm hits and two Room STI
+fallbacks/request, with zero hits in both off arms. Cold login+room's 103 hits
+remain outside warm windows. Native hardware counters are unavailable
+(`perf_event_open` ENOENT, paranoid 2). These screens are not an own-suite,
+DB-state or completion certificate for the prototype. No runtime/default/
+quarantine or app-source change reaches main.
+
+All 24 workers and the complete samples, source/runtime pins, actual response
+digests, traces and failed checks are retained privately; the appendix records
+receipt hashes. The supervised services restart after their finite commands,
+but the new-output guard refuses before another worker; both services are
+stopped. Logs are appended, not overwritten; later restart failures overwrite
+the exit-marker files, so those files are not used as original exit evidence.
+No additional screen or counted window results from a service restart.
 
 ## Reproduction boundaries
 

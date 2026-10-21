@@ -44,6 +44,14 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Campfire r81 room instantiation: KILLED after screen + one variant (2026-10-21)
+
+Original room screen: allocations 15526 → 15578.5/request; wall −0.741%, A/A floor 5.571%; no win.
+Each of 52 hits allocates an Array in disabled `ARShadow.enabled?` (`%w[1 strict]`); 10000 calls allocate 10002 objects versus two with an allocation-free predicate.
+One branch-only variant removes that overhead, not the underlying tie: allocations 15525.5/15525/15524.5 (off-A/off-B/on); wall −4.168% [−6.107, −1.864] fails 3× the 4.293% A/A floor.
+Both screens reject exact body/all-header identity even off/off; the warm validation boundary is unclassified, not normalized or dismissed as cold entropy.
+Kill the Ir cohort; slot 2 released, no runtime promotion. Keep browser/CSRF/cookie/ETag/runtime/session-clock/Redis-expiry rejections, blog feature exemption and ten cached-bind gaps named. [Both screens, allocation proof and independent five-route result](campfire-bench.md#13-screen-one-allocation-only-variant-then-kill).
+
 ## Campfire r81 instantiation: companions accepted, screen before price (2026-10-21)
 
 The single authorized companion rerun exits 0 for both seeds, off/off/on:
@@ -60,9 +68,9 @@ two Room STI fallbacks, **only campfire-r81 02023b0, not the Oct-8 fixture**.
 Both phase orders retain the frozen pages in 16 exact-worker tool=none windows.
 Slot 2 was assigned; its launcher fails before any counted Callgrind worker or
 window. Its initial log was overwritten; the cause remains unconfirmed.
-The new **screen first, price rarely** policy arrives before
-measurement: no cohort retry or price; use the shared native YJIT wall/alloc/
-exact-output screen once published. No runtime/default/quarantine or app patch.
+The new **screen first, price rarely** policy arrives before Ir measurement:
+no cohort retry or price. The subsequently published shared screen and one
+variant kill the bet (above). No runtime/default/quarantine or app patch reaches main.
 [Evidence, exclusions and private-receipt hashes](campfire-bench.md#12-one-authorized-companion-rerun-accepted-with-named-items).
 
 ## Prism 2 adoption and target grammar (2026-10-21)
