@@ -243,6 +243,26 @@ Defer the real-app slice until these failures and the asynchronous boundary
 have explicit solutions; no support/promotion or measurement claim
 ([bounded result](sealed-verification.md#blog-write-and-model-scenarios)).
 
+The next C follow-up introduces a symmetric, **terminal two-second completion
+boundary**, not output normalization. At workflow end, join the existing Solid
+Cable writer and accepted trim tasks through its real shutdown, including
+in-flight batches; never use a queue-empty sleep or the dropping server-restart
+path. Keep every raw provisional/exit capture. A separate completed effect
+snapshot is allowed only on success. Deadline, reported async errors,
+unsupported listeners/adapters or unfinished Solid Queue jobs visibly refuse;
+even identical refusals cannot pass. There is no queue supervisor in this
+Rack slice, so enqueued Turbo jobs stay unfinished, not artificially executed
+or discarded. The frozen 216-worker run joins all 63 started Cable writers;
+162 snapshots complete and match worker-exit state, while 54 refuse unfinished
+jobs. All 225 scenario assertions pass, but raw and both seeds still reject
+off/off: real writer timestamps and SQL interleavings remain compared, with
+three trim DELETEs retained. No silently broadened entropy control. The single
+full-article form fallback is the **correct refusal** of
+`articles/_form.html.erb:1`, single Article, `{class: "contents"}`, nil
+scope/url/format on `GET /articles/3/edit`; the comment-form certificate does
+not cover it. Keep runtime/inventory guards and the red gate unchanged
+([boundary and witness](sealed-verification.md#terminal-asynchronous-completion-boundary)).
+
 ## One read-only explanation surface (2026-10-21)
 
 `lowrail explain`, MCP `explain_unit`/`explain_site` and doctor's build section

@@ -571,6 +571,142 @@ These supplement, not relabel, the pinned full runs above. The shared worker's
 signature and actual-production/YJIT assertion are unchanged; an explicit
 interpreter caller is a separate follow-up.
 
+### Terminal asynchronous completion boundary
+
+The worker now has an explicit **two-second terminal boundary**, applied
+identically in raw and both seeded off/off/on groups, after the final scenario
+action and its synchronous after-commit callbacks return. It is not a sleep,
+queue-empty heuristic, Rails test adapter, callback suppression or a prepared
+Lowrail-only control. No more requests run in that worker afterwards.
+
+The [bounded implementation](../fixtures/corpus/blog_completion.rb) checks
+the audited source hashes for Rails 8.1.4, Solid Cable 4.1.0 and Solid Queue
+1.7.0 before inspecting their existing objects. It never calls the lazy
+`ActionCable.server`/`pubsub` constructors to create unused components.
+For an existing Solid Cable broadcaster, its real public `shutdown` closes
+the input queue, joins the writer **including the current in-flight batch**,
+then shuts down and joins accepted trim work. It does not use
+`ActionCable.server.restart`, whose worker-pool halt can drop queued work.
+The entire operation is joined under a deadline; timeout refuses without
+interrupting a transaction, killing a thread, discarding work or claiming a
+completed snapshot. Reported `Rails.error` failures also refuse: Solid Cable
+rescues writer/trim exceptions, so thread termination alone is insufficient.
+
+The blog's ActiveJob adapter is **Solid Queue**, not Rails' AsyncAdapter.
+There is no supervisor in these Rack workers, and its adapter has no public
+drain/execution API. A separate read-only SQLite connection reports unfinished
+job IDs/classes, ready/claimed/scheduled/blocked/failed/batch counts and queue
+processes. Unfinished work **refuses immediately**, rather than waiting out a
+deadline for a worker that does not exist or artificially executing/deleting
+jobs. External queue processes, Cable listeners/connection workers/event
+loops and other ActiveJob adapters (including AsyncAdapter's uncertified
+delayed/recursive work) are unsupported completion boundaries and refuse.
+This is a closed blog-workflow boundary, not a general async scheduler proof.
+
+Every earlier step/scenario snapshot and parent-read `exit_effects` remains
+raw and **provisional**; they still participate in exact comparisons. Only
+after successful completion does the worker take `completed_effects`.
+Otherwise it is null, with a visible `completion` refusal. These new fields
+are compared too; identical refusals produce `rejected_async_completion`,
+never equivalence. An off/off mismatch still has priority as
+`rejected_off_control`. Missing completion evidence cannot pass. SQL through
+the drain remains in `late_sql` and the ordered `sql_stream`; no timestamp,
+bind, row, event or ordering normalization was added. The older pre-boundary
+captures above are retained rather than replaced or rescored.
+
+Even a successful writer join cannot make the outputs deterministic: Cable's
+`Message.broadcast_batch` timestamps are real background-thread time, its
+batching and SQL interleavings are schedule-dependent, and autotrim uses real
+randomness/retention time. None of those inputs was silently added to the
+scenario-thread entropy companion. Queued Turbo `ActionBroadcastJob` work is
+a separate unfinished effect class, not a completed broadcast. The gate stays
+red; real queue-worker execution and any additional declared schedule/entropy
+control require their own explicit follow-up, with raw rejection retained.
+
+**Frozen, rebased result:** fresh artifact on
+[`6d24559`](https://github.com/thomasklemm/lowrail/commit/6d245593d2a6701845c52d9491410028c9898d7a)
+plus this harness change, private `blog-completion-final/`; all **216 workers**
+have one identical driver-source hash map, also checked against the files at
+the end. Manifest SHA-256
+`a0e51e7f31fccbb2380627a20bb7a906ef4cd8a2bd80996169bcaa9135bbf708`.
+
+* **225/225 scenario assertions pass**, zero boot SQL, SQL/value capture errors
+  or reported Rails errors. Raw and **both seeds stay `rejected_off_control`**.
+* **63 existing Cable writers joined** successfully, including their accepted
+  trim work. The capture retains **three Cable trim DELETEs**, not an autotrim
+  exclusion. There were no unforced deadline failures.
+* **162 workers complete** and their completed snapshots all equal the
+  parent's worker-exit snapshots. **54 refuse** (six cases × three arms ×
+  three groups), solely for unfinished `Turbo::Streams::ActionBroadcastJob`
+  jobs, with zero queue processes. Their completed snapshots are null, not
+  partially successful. Twenty-seven of the completed workers joined Cable;
+  another 36 joined Cable but still refused unfinished jobs.
+* The six refused source IDs are article controller **create/update**, comment
+  controller **create**, `CommentTest#test_belongs_to_article_association`,
+  and **both system workflows**. Their exact pending IDs/classes and queue
+  states remain in each report. These are not accepted completion coverage.
+* Counts are unchanged in every on group: **link 104 hits / 4 fallbacks**
+  (legacy index/show **5/2 hits**), **form 12 hits / 1 fallback**. No widening
+  of a certificate, inventory, clock control or support claim.
+
+The in-flight regression holds a **real** Cable writer after dequeue and
+before `broadcast_batch` writes, calls the boundary with a 0.01-second
+deadline, then releases it. Both Rubies refuse at the deadline, leave the
+writer alive, and persist the real message after release. This distinguishes
+the implementation from a queue-empty shortcut or cancellation. Real write,
+bad-CSRF, completed-snapshot and identical-refusal controls also pass; changed
+body/bind/events/effects still reject, and missing completion evidence cannot
+pass. The new terminal witness runs on preview with **raw entropy**, not a
+pretended 4.0 companion or a new skip. The 4.0-only entropy policy is unchanged.
+
+Strict full gem suite before the integration rebase: **4.0.7, 172 tests /
+7,151 assertions, one existing all-sealed cold Template/Preloader ancestry
+failure, zero errors/skips**. After rebasing and preserving the worker's
+`expected_jit` keyword and actual-mode checks, the affected primary file is
+**10 / 272, the same single ancestry failure**, no errors/skips. Full preview
+on the rebased tree is **172 / 6,259, zero failures/errors**, with only the
+three existing 4.0-only cold/form/link fixture skips. Its real terminal
+witness is executed, not skipped. `cargo test --locked` is **39 + 1 + 8**, all
+passing. Neither the known primary failure nor the all-sealed on-only
+Template/Preloader ancestry was hidden or changed. No measurement slots.
+
+The earlier `blog-completion-v1/` development run is retained, including
+driver-source drift during iteration; it is not the frozen publication
+evidence. Preview's first full invocation used the wrong working directory
+and failed to find `lowrail/compiler`; the corrected run uses `gem/`, the
+private source-platform corpus/bundle and a temporarily substituted Rails
+profiling bundle, restored afterwards. Shared entropy/app pins are untouched.
+Reviewable aggregate: `.amp/in/artifacts/blog-completion-summary.json`.
+
+### Exact full-article form refusal
+
+A targeted call/return observer on the real `FormScaffold.valid?` entry in a
+fresh production artifact identifies the single fallback in
+`ArticlesSystemTest#test_full_article_lifecycle`:
+
+| Input | Observed value |
+|---|---|
+| Request | `GET /articles/3/edit` |
+| Block source | `app/views/articles/_form.html.erb:1` |
+| Model | A single `Article`, not an Array |
+| Options | `{class: "contents"}` |
+| `scope`, `url`, `format` | All nil |
+| Result | false, `unknown form site/options`; original Rails form runs |
+
+The certificate instead covers `app/views/articles/show.html.erb:42`,
+`[article, blank_comment]`, `{class: "space-y-4"}`. The article-edit partial
+has different fields, conditional error markup/classes, persisted-model
+update routing and a different submit button. This is a **correct refusal**,
+not an omitted entry in the comment-form inventory. Keep it unchanged; merely
+adding its site/options would not prove its output. Later show requests still
+hit the certified comment form. The input-refusal field retains its last
+failure, so a later successful form does not erase that finding.
+
+Private diagnostic evidence: `blog-form-site-base/form-inputs.json` and
+`system.json`, plus the source-hashed certificate/build logs. The workflow
+observed **2 form hits / 1 fallback**, with no artifact/admission refusal.
+No runtime/form/inventory guard was changed, and no measurement was started.
+
 ### Remaining source IDs and non-ID gaps
 
 The uncovered list shrinks from **19 ordinary + 2 system IDs to 0 ordinary +

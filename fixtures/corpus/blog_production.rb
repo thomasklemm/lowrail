@@ -9,10 +9,12 @@ require "rbconfig"
 require "yaml"
 require_relative "blog_entropy"
 require_relative "blog_scenarios"
+require_relative "blog_completion"
 
 # A bounded, untimed production Rack-boundary experiment, not a replacement
 # for lowrail verify or a whole-suite/SEAL001–009 certificate. No test runtime.
-# Raw workers are untouched; explicit entropy companions are separate workers.
+# Raw entropy is untouched; terminal completion applies in every worker.
+# Explicit entropy companions are separate workers, never output normalization.
 module BlogProduction
   ROOT = File.expand_path("../..", __dir__)
   SCRIPT = File.join(ROOT, "script/blog-production-verify")
@@ -24,7 +26,7 @@ module BlogProduction
 
   def self.driver_sources
     %w[script/blog-production-verify fixtures/corpus/blog_production.rb fixtures/corpus/blog_scenarios.rb
-       fixtures/corpus/blog_entropy.rb fixtures/corpus/blog-entropy-controls.json].to_h do |path|
+       fixtures/corpus/blog_completion.rb fixtures/corpus/blog_entropy.rb fixtures/corpus/blog-entropy-controls.json].to_h do |path|
       [path, Digest::SHA256.file(File.join(ROOT, path)).hexdigest]
     end
   end
@@ -184,6 +186,8 @@ module BlogProduction
     Lowrail::VerifyLoads.install
     require File.expand_path("config/application")
     Rails.application.config.yjit = false if expected_jit == "interpreter"
+    completion = Completion.new
+    Rails.error.subscribe(completion)
     seam_trace = TracePoint.new(:call) { capture_form_seam(_1.self) }
     seam_trace.enable(target: Lowrail::FormScaffold::Variant.instance_method(:form_with))
     events, boot_events, late_events, sql_stream, errors = [], [], [], [], []
@@ -280,12 +284,19 @@ module BlogProduction
         "hits" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.unit_hits : {},
         "fallbacks" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.unit_fallbacks : {}}
     end
+    # All scenario actions/commits have returned. This is terminal: never run
+    # another request after closing Cable's input queue. Keep every provisional
+    # capture above, but only claim a completed snapshot after a successful join.
+    completed = completion.finish
+    completed_effects = effects if completed.fetch("status") == "completed"
+    Lowrail::VerifyLoads.capture("async_completion")
     refusals = %w[Lowrail::Sealed Lowrail::FormScaffold].to_h do |name|
       mod = Lowrail.loaded_constant(name)
       [name, mod&.refusal]
     end
     form = Lowrail.loaded_constant("Lowrail::FormScaffold")
     File.write(destination, JSON.pretty_generate({"driver_sources" => driver_sources, "initial_effects" => initial, "scenarios" => responses,
+      "completion" => completed, "completed_effects" => completed_effects,
       "boot_sql" => boot_events, "late_sql" => late_events, "sql_stream" => sql_stream,
       "cold_witness" => cold_witness.merge("after_requests" => cold_features,
         "natural_form_seams" => natural_form_seams),
@@ -301,11 +312,17 @@ module BlogProduction
   def self.compare(runs, scenarios: SCENARIOS)
     raise "three workers required" unless runs.size == 3
     raise "missing/reordered scenarios" unless runs.all? { |run| run.fetch("scenarios").map { _1.fetch("id") } == scenarios.map { _1.fetch("id") } }
+    boundaries = runs.flat_map { |run| [run, *run.fetch("cold_cases", [])] }
+    boundaries.each do |run|
+      if run.fetch("completion").fetch("status") == "completed" && run.fetch("completed_effects").nil?
+        raise "completion requires an effect snapshot"
+      end
+    end
     differences = %w[off_control off_on].zip([runs[1], runs[2]]).to_h do |label, other|
       baseline = runs.fetch(0)
       mismatches = []
       %w[initial_effects loads features boot_sql cold_witness].each { mismatches << _1 unless baseline.fetch(_1) == other.fetch(_1) }
-      %w[late_sql sql_stream exit_effects].each { mismatches << _1 unless baseline[_1] == other[_1] }
+      %w[late_sql sql_stream exit_effects completion completed_effects].each { mismatches << _1 unless baseline[_1] == other[_1] }
       mismatches << "cold_cases" unless baseline["cold_cases"] == other["cold_cases"]
       mismatches << "driver_sources" unless baseline["driver_sources"] == other["driver_sources"]
       baseline.fetch("scenarios").zip(other.fetch("scenarios")).each do |left, right|
@@ -316,9 +333,12 @@ module BlogProduction
       [label, mismatches]
     end
     errors = runs.flat_map { _1.fetch("errors") + _1.fetch("loads").values.flat_map { |stage| stage.fetch("errors", []) } }
+    incomplete = boundaries.map { _1.fetch("completion") }.reject { _1.fetch("status") == "completed" }
     hit_units = runs.fetch(2).fetch("scenarios").flat_map { _1.fetch("hits").select { |_, count| count.positive? }.keys }.uniq.sort
     status = if differences.fetch("off_control").any?
       "rejected_off_control"
+    elsif incomplete.any?
+      "rejected_async_completion"
     elsif errors.any? || differences.fetch("off_on").any?
       "rejected"
     elsif hit_units.empty?
@@ -326,7 +346,8 @@ module BlogProduction
     else
       "equivalent_for_executed_scenarios"
     end
-    {"status" => status, "differences" => differences, "capture_errors" => errors, "hit_units" => hit_units}
+    {"status" => status, "differences" => differences, "capture_errors" => errors,
+      "async_refusals" => incomplete, "hit_units" => hit_units}
   end
 
   def self.oracles(run, title)
@@ -408,7 +429,7 @@ module BlogProduction
             record.fetch("errors").concat(other.fetch("errors") + other.fetch("loads").values.flat_map { _1.fetch("errors", []) })
             record.fetch("case_diagnostics") << {"id" => scenario.fetch("id"), "worker" => "#{case_label}.json",
               **other.slice("refusals", "unit_refusals", "jit")}
-            {"id" => scenario.fetch("id"), **other.slice("driver_sources", "initial_effects", "loads", "features", "boot_sql", "late_sql", "sql_stream", "exit_effects", "cold_witness")}
+            {"id" => scenario.fetch("id"), **other.slice("driver_sources", "initial_effects", "loads", "features", "boot_sql", "late_sql", "sql_stream", "exit_effects", "cold_witness", "completion", "completed_effects")}
           end
           File.write(File.join(output, "#{label}.json"), JSON.pretty_generate(record))
         end
@@ -475,6 +496,7 @@ module BlogProduction
       "controls" => {"comparison" => "raw_unpinned", "secret_key_base" => "Rails DUMMY: independently generated per process, not pinned",
         "session_csrf" => "legacy GETs fresh; breadth workflows retain actual encrypted session cookie and submit natural form tokens; normal raw SecureRandom", "clock_x_runtime" => "real clock, header compared exactly",
         "request_id" => "caller-supplied scenario ID", "database" => "four restored SQLite files, no live worker during restore",
+        "async_completion" => "All arms: terminal Cable writer/accepted-trim shutdown, two-second deadline; no supervisor or artificial execution for pending Solid Queue work; refusal is not completion",
         "entropy_companion" => entropy_companions ? "separate declared workers below; raw rejection retained" : "not requested; raw gate unchanged"},
       "entropy_companions" => companions,
       "event_projection" => {"names" => "start/finish action_controller and action_view notifications in observed order",
@@ -490,9 +512,9 @@ module BlogProduction
       "supplemental" => scenarios.select { _1.fetch("id").start_with?("BlogProductionControl#") },
       "partial" => scenarios.select { _1["boundary"] == "server_workflow_only" },
       "uncovered" => inventory.reject { |test| complete.any? { _1.fetch("id") == test.fetch("id") } },
-      "effects_boundary" => "Exact provisional step snapshots plus parent-read persisted DB/storage state after worker exit; no asynchronous drain or quiescence claim",
+      "effects_boundary" => "Raw provisional step/scenario and exit snapshots retained. Separate completed_effects only after a symmetric terminal two-second Cable writer/accepted-trim join and empty Solid Queue state; unfinished/unsupported work refuses, never discarded or executed artificially",
       "sql_boundary" => "Ordered whole-worker capture through report serialization, including other threads; boot, scenario and post-scenario phases retained separately",
-      "limitations" => [breadth ? "Writes and enqueued job/cable rows captured, but no job execution, async completion guarantee, browser/JS, HTTP server, streaming or external service equivalence" : "No writes/jobs/JS/HTTP server/streaming; no external service equivalence", "Shared observers/setup: no true no-gem observer-transparency control", "No extra warm/control repeats beyond one off/off/on sequence", "Source-declared test inventory only, no dynamic test discovery", "No SEAL001–009 or unsampled-input certification"])
+      "limitations" => [breadth ? "No Solid Queue supervisor/job execution; unfinished jobs explicitly refuse completion. Cable subscriber/connection workers and non-SolidQueue ActiveJob adapters unsupported; no browser/JS, HTTP server, streaming or external service equivalence" : "No writes/jobs/JS/HTTP server/streaming; no external service equivalence", "Shared observers/setup: no true no-gem observer-transparency control", "No extra warm/control repeats beyond one off/off/on sequence", "Source-declared test inventory only, no dynamic test discovery", "No SEAL001–009 or unsampled-input certification"])
     if report.fetch("status") == "equivalent_for_executed_scenarios" && companions.any? { _1.fetch("status") != "equivalent_for_executed_scenarios" }
       report["status"] = "rejected_companion"
     end
