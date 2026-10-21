@@ -552,6 +552,13 @@ an aggregate `path` after its forked workers finish. Verify reads the aggregate
 when present, otherwise the per-process files, so hits are not counted twice.
 Use `lowrail verify APP -- bundle exec rspec --seed 12345` for RSpec; custom
 test commands are also accepted by `lowrail observe`.
+Verify honors a test command's `--seed N` or `--seed=N` in every arm and
+isolation/control run, and prints `command seed N`. It mirrors that seed into
+`SEED` and appends it to `SPEC_OPTS`, preserving caller filters: RSpec parses
+`SPEC_OPTS` after command arguments, so generating a different seed there
+would silently override the requested order. Without a command seed, explicit
+`SEED`/`TESTOPTS`/`SPEC_OPTS` remain unchanged; otherwise verify chooses and
+prints one common seed for the pair.
 
 Outcome writers include `ruby: RUBY_DESCRIPTION` (merged Minitest files use
 `ruby_descriptions`). Verify preserves the distinct descriptions for each

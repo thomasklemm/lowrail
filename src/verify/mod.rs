@@ -49,7 +49,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         Some(path) => load_controls::load(&app, path)?,
         None => BTreeMap::new(),
     };
-    let seed = seed_env();
+    let seed = seed_env(&cmd);
     let mut report = verify(&app, &cmd, &seed, observe_types, known_app_loads)?;
     // Do not retain an exemption if the suite changed either pin.
     if let Some(path) = &load_controls {
@@ -304,9 +304,20 @@ impl Report {
 
 /// Both runs (and bisect reruns) use the same test order, so
 /// order-dependent work (the first test in a process loads schemas, creates
-/// triggers, warms caches) lands in the same test. An explicit SEED,
-/// TESTOPTS or SPEC_OPTS wins.
-fn seed_env() -> Vec<(String, String)> {
+/// triggers, warms caches) lands in the same test. A command --seed wins;
+/// otherwise preserve explicit SEED, TESTOPTS or SPEC_OPTS.
+fn seed_env(cmd: &[String]) -> Vec<(String, String)> {
+    let command_seed = cmd.iter().enumerate().filter_map(|(i, arg)| {
+        if arg == "--seed" { cmd.get(i + 1).map(String::as_str) }
+        else { arg.strip_prefix("--seed=") }
+    }).last();
+    if let Some(seed) = command_seed {
+        eprintln!("lowrail verify: command seed {seed} for every run");
+        // RSpec parses SPEC_OPTS after ARGV. Retain filters and other caller
+        // options, but never let a later environment seed replace this one.
+        let options = format!("{} --seed {seed}", std::env::var("SPEC_OPTS").unwrap_or_default());
+        return vec![("SEED".into(), seed.into()), ("SPEC_OPTS".into(), options.trim().into())];
+    }
     if ["SEED", "TESTOPTS", "SPEC_OPTS"].iter().any(|k| std::env::var_os(k).is_some()) {
         return Vec::new();
     }

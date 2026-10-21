@@ -2,6 +2,42 @@
 use std::process::Command;
 
 #[test]
+fn verify_honors_command_seed_instead_of_overriding_it_through_rspec_options() {
+    let app = std::env::temp_dir().join(format!("lowrail-verify-seed-{}", std::process::id()));
+    std::fs::create_dir_all(&app).unwrap();
+    // RSpec parses SPEC_OPTS after the command arguments, so a generated
+    // --seed there overrides an explicit command seed. Model that public
+    // runner boundary without requiring a Rails/RSpec installation.
+    let script = r#"
+      seed=$2
+      case "$1" in --seed=*) seed=${1#--seed=} ;; esac
+      case "${SPEC_OPTS-}" in *"--seed "*) seed=${SPEC_OPTS##*--seed } ;; esac
+      printf '{"tests":{"seed-%s":{"result":"pass"}}}' "$seed" > "$LOWRAIL_OUTCOMES"
+      if [ "$EXPECTED_TAG" = 1 ]; then
+        case "$SPEC_OPTS" in *"--tag selected"*) ;; *) exit 42 ;; esac
+      fi
+    "#;
+    for args in [vec!["--seed", "41231"], vec!["--seed=41231"]] {
+        for tagged in [false, true] {
+            let mut command = Command::new(env!("CARGO_BIN_EXE_lowrail"));
+            command.args(["verify", app.to_str().unwrap(), "--", "sh", "-c", script, "sh"])
+                .args(&args).env_remove("SEED").env_remove("TESTOPTS").env_remove("SPEC_OPTS")
+                .env("EXPECTED_TAG", if tagged { "1" } else { "0" });
+            if tagged { command.env("SPEC_OPTS", "--tag selected --seed 773"); }
+            let result = command.output().unwrap();
+            assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+            let last: serde_json::Value = serde_json::from_slice(
+                &std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
+            for arm in ["off", "on"] {
+                assert_eq!(last["report"][arm]["tests"], serde_json::json!({"seed-41231":["pass", ""]}));
+            }
+            assert!(String::from_utf8_lossy(&result.stderr).contains("command seed 41231"));
+        }
+    }
+    std::fs::remove_dir_all(app).unwrap();
+}
+
+#[test]
 fn verify_counts_merged_minitest_or_independent_rspec_processes_once() {
     let app = std::env::temp_dir().join(format!("lowrail-verify-{}", std::process::id()));
     std::fs::create_dir_all(&app).unwrap();
