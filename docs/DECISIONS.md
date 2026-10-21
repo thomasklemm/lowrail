@@ -28,8 +28,13 @@ rejected off control. The artifact has one form unit and zero files/templates,
 with neither known asymmetric Template/Preloader chain. Both 192-pair controls
 record form104/token281/collection104, and 50 warm requests record 50/200/50,
 all with zero fallbacks. This admits **pricing only**, not production token or
-collection support. Publish and pin before one finite six-round interpreter
-cohort, at most two workers; no retry-to-green, filter stage or additive claim.
+collection support. The published, pinned six-round interpreter cohort is now
+**REJECTED**: total A/A is +0.025019% [+0.006339%, +0.051123%], excluding zero.
+Combined −17.862649% total / −17.863529% GC-excluded Ir is **descriptive only**,
+not a speed claim. GC-excluded A/A, all five heaps and all 18 interpreter-mode
+checks pass but cannot salvage a failed total control. No rerun, filter stage,
+additive claim or promotion. Diagnose the retained off/off difference untimed;
+another cohort requires a concrete harness fix and separate approval.
 [Protocol, pins and retained failures](passes/sealed-combined.md).
 
 ## Passive form admission, not runtime recertification (2026-10-21)

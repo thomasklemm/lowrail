@@ -1,0 +1,768 @@
+{
+  "status": "rejected_off_control",
+  "accepted": false,
+  "retried": false,
+  "reason": "Total-instruction A/A interval excludes zero; GC-excluded/heap/JIT passes cannot salvage the cohort.",
+  "scope": "Whole GET /articles/1 with symmetric observation seams; form production unit plus token/collection pricing specimens. Descriptive only, not native latency or production token/collection admission.",
+  "provenance": {
+    "revision": "32f91d9e3d7fecd16a03241e663b5b22e9fb5931",
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+    "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+    "app_source_sha256": "86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf"
+  },
+  "pins": {
+    "manifest_sha256": "de41a71450a5cf9dd38b36e0ecbef043be6d875f95c765b42598c286c43ebca1",
+    "gate_report_sha256": "77852c500191c67aa65e247b5cacb078d32260078abd8315eef3434c18e7b07a",
+    "samples_sha256": "5ed66bbceea3d572ebf14571792af958859094015f6ddf7acdcfbe39700c4d90",
+    "summary_sha256": "b1e117c7d0831258b4220b181d3a1d8ca825cbe582a6ae3be95c63f7659bc8cb",
+    "runtime_map_sha256": "e40a2940b6df73f3255fedd26c002d4bfdf39a146d9219424d09fc9c95ea6584",
+    "harness_map_sha256": "4c993a4d6262f2c4b45b2f230c4859081a339529e2b0a3ae580ac283454c5ceb",
+    "framework_map_sha256": "701df051d47573a0b728d242c9ac54eae6d780ab5748752ac0d65410249235fe",
+    "native_binary_sha256": "f3056ad41f398339366ec61274cedb366767e9531940822fc377e9723397aa62",
+    "valgrind": {
+      "pass": true,
+      "version": "valgrind-3.19.0",
+      "rails_boot": true,
+      "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+      "build": {
+        "version": "3.19.0",
+        "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+        "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+        "brk_reservation_mib": 512,
+        "tool": "libexec/valgrind/callgrind-amd64-linux",
+        "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+        "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+        "libc": "glibc 2.36"
+      },
+      "log_sha256": "ae62c1e208fdcf7bb28c4be35f6855a942ea8fda0eb481cf6fe5c252271b6e65"
+    }
+  },
+  "protocol": {
+    "seed": 41231,
+    "rounds": 6,
+    "requests": 50,
+    "heap_slots": [
+      1000000,
+      250000,
+      100000,
+      20000,
+      10000
+    ],
+    "region": "after warmup and three full GCs",
+    "counter": "callgrind",
+    "heap_mode": "fixed",
+    "requested_jit": "interpreter",
+    "actual_jit": [
+      "interpreter"
+    ],
+    "actual_yjit": [
+      false
+    ],
+    "route": "GET:/articles/1",
+    "arms": [
+      "off_a",
+      "off_b",
+      "combined"
+    ],
+    "max_workers": 2,
+    "measured_processes": 18,
+    "phase_subtraction": [
+      0,
+      50
+    ],
+    "warmup_requests": 50,
+    "aa_tolerance_pct": 0.5
+  },
+  "correctness": {
+    "raw_status": "rejected_off_control",
+    "seeded": [
+      {
+        "seed": 0,
+        "status": "equivalent_for_executed_scenarios",
+        "differences": {
+          "off_control": [],
+          "off_on": []
+        },
+        "capture_errors": [],
+        "cold_equal": true,
+        "forbidden_chains_absent": true,
+        "form_counts": [
+          0,
+          0,
+          1
+        ],
+        "combined_counts": {
+          "token": 4,
+          "collection": 1
+        }
+      },
+      {
+        "seed": 1,
+        "status": "equivalent_for_executed_scenarios",
+        "differences": {
+          "off_control": [],
+          "off_on": []
+        },
+        "capture_errors": [],
+        "cold_equal": true,
+        "forbidden_chains_absent": true,
+        "form_counts": [
+          0,
+          0,
+          1
+        ],
+        "combined_counts": {
+          "token": 4,
+          "collection": 1
+        }
+      }
+    ],
+    "pairs": {
+      "none": {
+        "pairs": 192,
+        "form_hits": 104,
+        "combined_counts": {
+          "token": 281,
+          "collection": 104
+        }
+      },
+      "render_subscriber": {
+        "pairs": 192,
+        "form_hits": 104,
+        "combined_counts": {
+          "token": 281,
+          "collection": 104
+        }
+      }
+    },
+    "native": {
+      "hits": {
+        "form": 50,
+        "token": 200,
+        "collection": 50
+      },
+      "fallbacks": {
+        "form": 0,
+        "token": 0,
+        "collection": 0
+      },
+      "untimed_witness_seconds": {
+        "form": 0.028102529999159742,
+        "token_collection": 0.020413845995790325
+      }
+    }
+  },
+  "summary": {
+    "layers": {
+      "combined": {
+        "instructions_total": {
+          "value": {
+            "median": 7235293.199999999,
+            "ci95": [
+              7234241.109999999,
+              7239767.09
+            ]
+          },
+          "delta_pct": {
+            "median": -17.862649281323172,
+            "ci95": [
+              -17.890224436718285,
+              -17.7877735210785
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 7235790.07,
+            "ci95": [
+              7234294.65,
+              7236994.8
+            ]
+          },
+          "delta_pct": {
+            "median": -17.863528693542712,
+            "ci95": [
+              -17.885967503375266,
+              -17.845666166908522
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 1813.3200000000002,
+            "ci95": [
+              1812.75,
+              1814.3600000000001
+            ]
+          },
+          "delta_pct": {
+            "median": -20.528024229407826,
+            "ci95": [
+              -20.583287177852895,
+              -20.48139861807529
+            ]
+          }
+        }
+      },
+      "off_a": {
+        "instructions_total": {
+          "value": {
+            "median": 8808329.52,
+            "ci95": [
+              8806192.7,
+              8810894.64
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 8809919.7,
+            "ci95": [
+              8807831.91,
+              8810804.16
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2281.84,
+            "ci95": [
+              2281.55,
+              2282.58
+            ]
+          },
+          "delta_pct": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "off_b": {
+        "instructions_total": {
+          "value": {
+            "median": 8811033.370000001,
+            "ci95": [
+              8809516.95,
+              8812130.96
+            ]
+          },
+          "delta_pct": {
+            "median": 0.02501851559444379,
+            "ci95": [
+              0.006338518036563823,
+              0.051123309219824886
+            ]
+          }
+        },
+        "instructions_no_gc": {
+          "value": {
+            "median": 8811400.870000001,
+            "ci95": [
+              8809338.14,
+              8811716.03
+            ]
+          },
+          "delta_pct": {
+            "median": 0.008619804198906067,
+            "ci95": [
+              -0.008449129432580582,
+              0.04409929021965686
+            ]
+          }
+        },
+        "allocations": {
+          "value": {
+            "median": 2282.1499999999996,
+            "ci95": [
+              2281.9700000000003,
+              2282.52
+            ]
+          },
+          "delta_pct": {
+            "median": 0.015778693131418553,
+            "ci95": [
+              -0.022781192716919696,
+              0.036376620485412126
+            ]
+          }
+        }
+      }
+    },
+    "aa": {
+      "pass": false,
+      "metrics": {
+        "instructions_total": false,
+        "instructions_no_gc": true
+      },
+      "tolerance_pct": 0.5
+    },
+    "gc": {
+      "off_a": {
+        "minor_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "off_b": {
+        "minor_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "combined": {
+        "minor_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "major_gc_per_request": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "gc_per_1k_allocations": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "heap_capacity": {
+      "0": {
+        "min": 1000437,
+        "max": 1000450,
+        "page_target": 611,
+        "pages_matched": true,
+        "matched": true
+      },
+      "1": {
+        "min": 250421,
+        "max": 250440,
+        "page_target": 306,
+        "pages_matched": true,
+        "matched": true
+      },
+      "2": {
+        "min": 100555,
+        "max": 100570,
+        "page_target": 246,
+        "pages_matched": true,
+        "matched": true
+      },
+      "3": {
+        "min": 20172,
+        "max": 20180,
+        "page_target": 99,
+        "pages_matched": true,
+        "matched": true
+      },
+      "4": {
+        "min": 10176,
+        "max": 10185,
+        "page_target": 100,
+        "pages_matched": true,
+        "matched": true
+      }
+    },
+    "heap_matched": true,
+    "jit": {
+      "requested_jit": "interpreter",
+      "diagnostic_only": false,
+      "requested_yjit": false,
+      "actual_yjit": [
+        false
+      ],
+      "actual_jit": [
+        "interpreter"
+      ],
+      "pass": true,
+      "workers": {
+        "0-combined": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-off_a": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "0-off_b": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-combined": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_a": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "1-off_b": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-combined": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_a": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "2-off_b": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-combined": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_b": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "3-off_a": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-combined": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_b": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "4-off_a": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_b": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-off_a": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        },
+        "5-combined": {
+          "actual_jit": "interpreter",
+          "actual_yjit": false,
+          "missing_counters": [],
+          "mode_matched": true,
+          "warmup_stable": true,
+          "windows_stable": true,
+          "pass": true
+        }
+      }
+    }
+  },
+  "rounds": [
+    {
+      "combined": {
+        "instructions_total": 7240463.46,
+        "instructions_no_gc": 7236386.56,
+        "allocations": 1814.64,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 8806236.8,
+        "instructions_no_gc": 8808662.1,
+        "allocations": 2281.54,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 8811251.28,
+        "instructions_no_gc": 8811789.54,
+        "allocations": 2282.22,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "combined": {
+        "instructions_total": 7235553.34,
+        "instructions_no_gc": 7236209.92,
+        "allocations": 1812.58,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 8810776.38,
+        "instructions_no_gc": 8810779.48,
+        "allocations": 2282.62,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 8812090.76,
+        "instructions_no_gc": 8810860.08,
+        "allocations": 2282.04,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "combined": {
+        "instructions_total": 7233658.26,
+        "instructions_no_gc": 7234175.7,
+        "allocations": 1812.92,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 8811012.9,
+        "instructions_no_gc": 8810453.98,
+        "allocations": 2282.54,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 8810815.46,
+        "instructions_no_gc": 8811215.22,
+        "allocations": 2282.08,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "combined": {
+        "instructions_total": 7239070.72,
+        "instructions_no_gc": 7237603.04,
+        "allocations": 1813.48,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 8808269.34,
+        "instructions_no_gc": 8807816.2,
+        "allocations": 2282.42,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 8806148.6,
+        "instructions_no_gc": 8809385.42,
+        "allocations": 2281.56,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "combined": {
+        "instructions_total": 7235033.06,
+        "instructions_no_gc": 7234413.6,
+        "allocations": 1813.16,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_b": {
+        "instructions_total": 8810764.56,
+        "instructions_no_gc": 8811642.52,
+        "allocations": 2281.9,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 8808478.36,
+        "instructions_no_gc": 8807001.72,
+        "allocations": 2281.86,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    },
+    {
+      "off_b": {
+        "instructions_total": 8812171.16,
+        "instructions_no_gc": 8811586.52,
+        "allocations": 2282.62,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "off_a": {
+        "instructions_total": 8808180.68,
+        "instructions_no_gc": 8810828.84,
+        "allocations": 2281.82,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      },
+      "combined": {
+        "instructions_total": 7234823.96,
+        "instructions_no_gc": 7235370.22,
+        "allocations": 1814.08,
+        "minor_gc_per_request": 0.0,
+        "major_gc_per_request": 0.0,
+        "gc_per_1k_allocations": 0.0
+      }
+    }
+  ],
+  "limitations": [
+    "Raw independent entropy/clock off control remains rejected.",
+    "All-sealed Template/Preloader cold ancestry remains an independent named failure.",
+    "Preview Rails component uncovered; no preview sealed activation or timing claim.",
+    "No inference about arbitrary subscribers/inputs, request jobs or real HTTP.",
+    "Original-first-render witness work is outside warm counter windows.",
+    "First invocation lacked the parent sealed opt-in and refused before creating a cohort directory or counter process; corrected only that command environment."
+  ]
+}

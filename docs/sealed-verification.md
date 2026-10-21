@@ -36,7 +36,12 @@ that scope is not certified or normalized by the isolated passing gate.
 50 separate native warm requests record 50/200/50, all zero fallbacks.
 The artifact contains only one form unit, no delivered files/templates.
 Token and collection remain pricing specimens, not production certificates.
-No combined speed claim precedes the single finite pinned cohort.
+The single published-head finite cohort is **REJECTED**: total A/A +0.025019%
+[+0.006339%, +0.051123%] excludes zero. The observed −17.862649% total /
+−17.863529% GC-excluded instruction deltas are **descriptive only**, not an
+accepted speed claim. GC-excluded A/A, all five heaps and all 18 actual
+interpreter workers pass; none overrides the failed total control. No retry.
+[Numeric export and protocol](passes/sealed-combined.md#rejected-whole-request-result).
 
 ## Passive form v1 review gates
 

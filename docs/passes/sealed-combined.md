@@ -1,6 +1,7 @@
 # Combined passive form, token and collection study
 
-**Untimed gates pass; no combined price yet.** This is one whole-request
+**Cohort REJECTED: total A/A excludes zero. No accepted speed claim.** Untimed
+gates pass. This is one whole-request
 interpreter `GET /articles/1` experiment, not a sum of the isolated prices.
 Only form has a production certificate. Token and collection are explicitly
 pricing specimens; no pass promotion, default change, filter flattening or
@@ -81,16 +82,16 @@ component bundle rejects the actual `x86_64-linux` platform, so that component
 is **uncovered**. No preview timing or sealed-activation claim is made. This
 does not substitute for the primary interpreter checks above.
 
-The separate untimed native probe records witness work outside warm windows:
-**29.56 ms form + 21.70 ms token/collection** in one observation. These are
+The published-head untimed native probe records witness work outside warm windows:
+**28.10 ms form + 20.41 ms token/collection** in one observation. These are
 not controlled cold latency estimates and are not amortized into the warm
 instruction result.
 
-## Pins and planned finite protocol
+## Pins and executed finite protocol
 
-Development gate on
-[`32e7474`](https://github.com/thomasklemm/lowrail/commit/32e7474a67df871b19d6193d9a6e824d70cfedd9)
-plus these changes:
+Published, remote-main-verified specimen and fresh gate on
+[`32f91d9`](https://github.com/thomasklemm/lowrail/commit/32f91d9e3d7fecd16a03241e663b5b22e9fb5931).
+These exact pins and the passing combined-artifact gate were sent before counters:
 
 - Ruby **4.0.7**, Rails **8.1.4**, actual **interpreter**.
 - Artifact SHA-256:
@@ -103,15 +104,48 @@ plus these changes:
 - Valgrind 3.19.0, 512-MiB reservation, tool
   `5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588`.
 
-Publish first, rerun the gates on that exact head, and send the final pins
-before any counters. One finite cohort: six randomized rounds, seed41231,
+One finite cohort: six randomized rounds, seed41231,
 three arms (off-A/off-B/combined), N=0/50 subtraction, at most two workers,
 the existing five fixed heap floors and total/GC-excluded A/A gates. No
 retry-to-green or selective-arm salvage. The original-first-render witness
 cost is outside warm per-hit windows and remains separately reported.
 
-The driver requires the passing gate report and checks exact manifest,
+The driver required the passing gate report and checked exact manifest,
 runtime, harness, framework and native binary hashes before and after the
 cohort. Historical runtimes/cohorts are untouched. Isolated collection
 −9.88%/invocation and token −11.12%/four-token operation are **not additive and
-not whole-request numbers**. Only the combined cohort can price this request.
+not whole-request numbers**.
+
+The first command omitted the parent `LOWRAIL_SEALED=1` opt-in and correctly
+refused at manifest preflight, before creating the cohort directory or any
+counter worker. Only that command environment was corrected; no candidate,
+control, fixture, tolerance or measured window was retried.
+
+## Rejected whole-request result
+
+All **18** measured workers completed on actual interpreter mode; Valgrind's
+brk preflight and all five slot-range/exact-page heap gates pass. Every total
+window has **zero minor and major collections**. Nevertheless, the total
+instruction A/A interval excludes zero. The whole cohort is **REJECTED**;
+the GC-excluded A/A pass does not salvage it. No retry or production promotion.
+
+Values below are medians [nominal 95% bootstrap intervals], descriptive only.
+The [numeric export](sealed-combined-results.json) retains all six round rows,
+full summaries, control verdicts, correctness counts, witness costs and pins.
+
+| Metric | Off-A / request | Combined / request | Combined Δ% | Off-B/A Δ% | A/A |
+|---|---:|---:|---:|---:|---|
+| Total Ir | 8,808,329.52 | 7,235,293.20 | −17.862649 [−17.890224, −17.787774] | +0.025019 [+0.006339, +0.051123] | **FAIL: excludes zero** |
+| GC-excluded Ir | 8,809,919.70 | 7,235,790.07 | −17.863529 [−17.885968, −17.845666] | +0.008620 [−0.008449, +0.044099] | pass |
+| Allocations | 2,281.84 | 1,813.32 | −20.528024 [−20.583287, −20.481399] | +0.015779 [−0.022781, +0.036377] | diagnostic |
+
+Total and GC-excluded windows are separate executions with N=0 subtraction;
+their small difference is not evidence of GC savings, particularly with zero
+collections. The A/A difference is small but the declared gate is unchanged.
+Untimed diagnosis, not another cohort, is the next step. A further measurement
+requires a concrete fixable harness cause, a pinned fix and separate approval.
+
+Raw private samples SHA-256:
+`5ed66bbceea3d572ebf14571792af958859094015f6ddf7acdcfbe39700c4d90`;
+summary `b1e117c7d0831258b4220b181d3a1d8ca825cbe582a6ae3be95c63f7659bc8cb`;
+gate report `77852c500191c67aa65e247b5cacb078d32260078abd8315eef3434c18e7b07a`.
