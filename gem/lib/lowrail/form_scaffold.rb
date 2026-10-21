@@ -58,6 +58,7 @@ module Lowrail
         @view_class.prepend(Variant) unless @view_class < Variant
         @active = true
         @refusal = nil
+        FormScaffoldInventory.release
         true
       rescue StandardError, ScriptError => error
         decline("#{error.class}: #{error.message.lines.first&.strip}")

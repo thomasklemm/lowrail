@@ -20,6 +20,7 @@ module Lowrail
     module_function
 
     def check
+      return "source inventory released; restart to recertify" if @released
       return "requires production Ruby 4.0.7 / Rails 8.1.4 blog" unless ENV["RAILS_ENV"] == "production" &&
         RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
       return "eager-loaded targets required; keep lazy applications original" unless Rails.application.config.eager_load &&
@@ -179,7 +180,16 @@ module Lowrail
       "inventory: #{error.class}: #{error.message.lines.first&.strip}"
     end
 
+    # Only the completed activation may close this compiler. Requests use
+    # the certified facts, never these temporary source trees. A later setup
+    # must refuse rather than recertify by lazily compiling source again.
+    def release
+      @compiled = nil
+      @released = true
+    end
+
     def template(path)
+      raise ArgumentError, "source inventory released; restart to recertify" if @released
       resolver = ArticlesController.view_paths.paths.find { _1.instance_of?(ActionView::FileSystemResolver) && path.start_with?("#{_1.path}/") }
       raise ArgumentError, "custom template resolver" unless resolver
       template = resolver.send(:build_unbound_template, path).bind_locals([])
@@ -190,6 +200,7 @@ module Lowrail
     end
 
     def stock_fact(method)
+      return nil if @released
       path, line = method.source_location
       sequence = RubyVM::InstructionSequence.of(method)
       if !path || path.start_with?("<internal:")

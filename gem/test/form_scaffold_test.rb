@@ -64,6 +64,54 @@ class FormScaffoldTest < Minitest::Test
       coverage = JSON.parse(out.lines.find { _1.start_with?("LOWRAIL_BENCH ") }.delete_prefix("LOWRAIL_BENCH "))
       assert_equal [{"id" => form.fetch("id"), "pass" => "sealed/form_scaffold", "hits_per_request" => 1.0,
         "fallbacks_per_request" => 0.0}], coverage.fetch("units")
+      retention = ruby_json(<<~'RUBY', chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
+        require "weakref"
+        require "lowrail/form_scaffold_inventory"
+        roots = []
+        # Test-only lifetime observer: nested tracing is suppressed while
+        # activation runs inside the initialize! completion TracePoint.
+        observer = Module.new do
+          define_method(:template) do |path|
+            source = super(path)
+            roots.replace(instance_variable_get(:@compiled).values.map { WeakRef.new(_1) })
+            source
+          end
+        end
+        Lowrail::FormScaffoldInventory.singleton_class.prepend(observer)
+        require "./config/application"
+        Rails.application.config.yjit = false
+        require "./config/environment"
+        raise "no source roots witnessed: #{Lowrail::FormScaffold.refusal}" if roots.empty?
+        3.times { GC.start(full_mark: true, immediate_sweep: true) }
+        raise "certification roots retained" if roots.any?(&:weakref_alive?)
+        require "rack/mock"
+        session = Rack::MockRequest.new(Rails.application)
+        request = -> {
+          response = session.get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
+          raise "HTTP #{response.status}" unless response.status == 200
+        }
+        id = Lowrail.manifest.units.find { _1["pass"] == "sealed/form_scaffold" }.fetch("id").to_s
+        counts = -> { [Lowrail::Stats.unit_hits.fetch(id, 0), Lowrail::Stats.unit_fallbacks.fetch(id, 0)] }
+        Lowrail::Stats.reset_counts!
+        50.times { request.call }
+        result = {requests: counts.call}
+        Lowrail::Sealed::EPOCH[0] = 1
+        request.call
+        result[:epoch] = counts.call
+        Lowrail::Sealed::EPOCH[0] = 0
+        Lowrail::Stats.reset_counts!
+        # A later public setup must refuse recertification, not silently
+        # reopen the source compiler after its boot-only roots were released.
+        Lowrail.setup(root: Dir.pwd)
+        request.call
+        result[:later_setup] = counts.call
+        result[:refusal] = Lowrail::FormScaffold.refusal
+        puts JSON.generate(result)
+      RUBY
+      assert_equal [50, 0], retention.fetch("requests")
+      assert_equal [50, 1], retention.fetch("epoch")
+      assert_equal [0, 1], retention.fetch("later_setup")
+      assert_includes retention.fetch("refusal"), "source inventory released"
       out, err, status = ruby("--disable-yjit", "--disable-zjit", File.expand_path("../../bench/heap_operations.rb", __dir__),
         "GET:/articles/1", chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1",
           "LOWRAIL_SEALED" => "1", "BENCH_JIT" => "0", "BENCH_UNITS" => form.fetch("id").to_s, "BENCH_OPERATION_CHECK" => "1"})

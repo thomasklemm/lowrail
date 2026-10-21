@@ -413,6 +413,30 @@ repopulate the cache. The export retains the exact diagnostic source/result.
 This supports releasing the boot-only cache after complete certification
 without weakening per-hit checks. It does **not** establish that the cache
 explains the entire separately reported ~9k extra pool-0 objects under YJIT.
-No production cache cleanup was implemented, and no accepted or rejected
-cohort was repriced: the retained cache remains a known memory cost of the
-published pass pending a separately gated cleanup.
+At diagnostic publication no production cleanup had been implemented. No
+accepted or rejected cohort was repriced.
+
+### Post-measurement production release
+
+The owner subsequently selected the safe release. Successful activation now
+drops `@compiled` **after** source, inventory and template certification,
+holder/epoch setup and variant installation have all completed. The source
+compiler then stays closed for that process: later inventory/template/fact
+requests refuse instead of recompiling lazily. A later public `setup` keeps
+serving the original form and reports **"source inventory released; restart
+to recertify"**. No per-hit check, `valid?` or `render` body changed.
+
+The public build regression observes weak references to the real source
+roots at the final template-certification boundary, then requires all of
+them to be collectible after activation. It fails before this change with
+"certification roots retained". On the changed runtime, the next **50 real
+requests produce 50 hits and zero fallbacks**, a forced epoch change falls
+back, and a later public setup also falls back with the release diagnostic.
+The existing **192+192** raw observable comparisons, live-token replay,
+renamed-app certification and custom-builder refusal remain in that test.
+
+This is a **post-measurement memory-lifetime change**, not a repricing or
+new speed claim. Both accepted interpreter exports and the rejected YJIT
+export retain their original artifacts, numbers and fingerprints. The
+remaining YJIT object-gap/v3 diagnosis is separate. No additional instruction
+cohort ran for this cleanup; sealed-only status and no promotion remain.
