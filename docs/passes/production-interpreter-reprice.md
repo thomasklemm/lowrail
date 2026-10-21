@@ -10,7 +10,9 @@ The historical −15.49% remains a result for `ae025b0`, not this source.
 private-helper / reflective-send dispatch defect. **−15.225536% remains a
 price for that exact source and specimen only**, not the subsequently fixed
 runtime. The [dispatch fix and correctness gates](sealed-production.md#helper-dispatch-safety)
-do not remeasure it. No new cohort is authorized here.
+do not remeasure it. The separately authorized
+[dispatch-corrected cohort](production-dispatch-reprice.md) is **rejected A/A**;
+there is no accepted replacement price. The original record below is retained.
 
 ## Frozen source and finite protocol
 
