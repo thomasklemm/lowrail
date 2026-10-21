@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Stack screen: exclude Blog token, not the form win (2026-10-21)
+
+Corrected public builds include sealed dispatch fixes and allocation-free shadow checks; nine Blog selections pass two-seed response and DB comparisons.
+Form-only saves 378 objects/request; the full form/token/collection/AR set saves 346, so named optimizations do not simply add up as savings.
+Token alone adds 32; LOO independently attributes a −32 saving to retaining token, excluding it from the Blog candidate stack.
+Collection and AR have active hits but zero standalone/LOO allocation deltas; signed costs compose additively, with no measured GC synergy.
+All favorable screens remain provisional pending active own suites; wall remains unresolved, no whole-stack price. [Living ledger and evidence](stack.md).
+
 ## Production sealed helper dispatch safety (2026-10-21)
 
 Production token admission did not refuse an existing view `send` override

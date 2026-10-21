@@ -32,6 +32,9 @@ alone, and full stack minus each component. Define saved objects as off minus
 on; a leave-one-out saving is (stack minus component) minus full stack.
 Compare that marginal with the standalone saving to classify overlap or
 synergy. Do not sum isolated micro results or mix fixtures/modes.
+In the inventory below, Δ alone is on minus off; Δ inside is full minus
+leave-one-out (negative saves objects). The LOO column uses the opposite
+sign: objects saved by retaining that component in the full stack.
 
 ## Candidate inventory
 
@@ -39,10 +42,10 @@ synergy. Do not sum isolated micro results or mix fixtures/modes.
 
 | Component | Apps active / eligible | Deterministic delta alone | Delta inside stack | Leave-one-out delta | Status |
 |---|---|---|---|---|---|
-| Existing sealed form scaffold | Blog show, retained fixture only | — | — | — | Pending local screen; active own-suite gap retained |
-| Existing sealed token tag | Blog show, retained fixture only | — | — | — | Pending local screen; live-token continuations retained |
-| Existing sealed collection render | Blog show, retained fixture only | — | — | — | Pending local screen; live lookup/events retained |
-| Existing sealed AR instantiation | Blog / Campfire r81 / Fizzy / Lobsters: determine natural hits | Campfire room/pagination/sidebar/search +51/+46/+8/+19 objects/request before shadow fix | — | — | Campfire exclusion provisional: coordinator identified per-hit disabled-shadow allocation; retest published fix before deciding |
+| Existing sealed form scaffold | Blog show, retained fixture only | −378 objects/request | −378; 1 hit/request | +378 | Favorable screen, provisional: active own-suite gap retained |
+| Existing sealed token tag | Blog show, retained fixture only | +32 objects/request | +32; 4 hits/request | −32 | Excluded on Blog by deterministic cost; live-token continuations retained |
+| Existing sealed collection render | Blog show, retained fixture only | 0 objects/request | 0; 1 hit/request | 0 | Allocation tie, no win credit; active own-suite gap retained |
+| Existing sealed AR instantiation | Blog active; Lobsters warmed vector has zero hits; Campfire/Fizzy retesting | Blog 0; Campfire/Fizzy pre-fix excesses superseded pending corrected screens | Blog 0; 3 hits/request | Blog 0 | Blog tie, no win credit; Campfire/Fizzy final exclusion undecided |
 | Props `frozen_split` (`dd844dd`) | None of these four apps use Inertia | Isolated interpreter micro −0.460571% Ir, not request credit | — | — | Excluded: frozen-holder tier not implemented; do not freeze app holders to admit it |
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
@@ -64,8 +67,8 @@ duplicate their implementation work.
   lock `570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596`.
   Fresh `BlogShowGetOnly` data, not an old job-bearing seed. Initial numbers
   are pre-dispatch-fix. The published corrections through `62f8a6b` are now
-  integrated on the exploration branch; nine fresh public builds are ready
-  for corrected full/alone/leave-one-out screens.
+  integrated on the exploration branch, together with shadow fix `acc130d`;
+  nine fresh public builds have completed corrected full/alone/LOO screens.
 - **Campfire r81:** `02023b0f0cafc4d66e06e43be072cf4d6ca328fa`, dependency-only
   Rails 8.1.4 overlay, original `CampfireScenario` fixtures and authentication,
   dedicated disposable Redis. Room STI rows remain original. Queued POST
@@ -102,12 +105,55 @@ Native paired wall is −14.90%, but A/A max absolute round spread is **13.76%**
 the effect is **unresolved**, not a wall win. Per-request counted hits:
 Article 1, Comment 2, form 1, token 4, collection 1; zero fallbacks.
 
-The known P1 `view.send` dispatch defect is not exercised by this fixture.
-The coordinator requires a published fix and a fresh sealed-component screen
-before admission. Existing results remain explicitly **pre-dispatch-fix**.
-The active own-suite gap independently prevents admission/pricing.
+The known P1 `view.send` dispatch defect was not exercised by this fixture.
+These results are **superseded, pre-dispatch-fix**, not deleted. The corrected
+screens below replace them for current-source reasoning. The active
+own-suite gap independently prevents admission/pricing.
 
-### Campfire AR: provisional exclusion before the shadow allocation fix
+### Corrected Blog: form-only beats the full stack
+
+Sources include dispatch fixes `1c99962`/`62f8a6b` and the allocation-free
+shadow predicate `acc130d`, merged on exploration at `db13e01`. Rebuilt all
+nine artifacts with public `build --sealed --env production --jit yjit`
+and normal denylists. Same fixture, three rounds, 200 warmups / 300 samples,
+CPU 2. All nine selections pass actual two-seed status/body/all-header
+comparisons; all DB/storage snapshots remain unchanged and identical across
+arms/seeds/rounds. No test-tier or guard relaxation.
+
+| Selection | Off-A / off-B objects | On objects | Objects saved vs off | LOO saving when omitted component is retained |
+|---|---|---:|---:|---:|
+| full: form + token + collection + AR | 2,412 / 2,412 | 2,066 | 346 | — |
+| form alone | 2,412 / 2,412 | 2,034 | 378 | — |
+| token alone | 2,412 / 2,412 | 2,444 | −32 | — |
+| collection alone | 2,412 / 2,412 | 2,412 | 0 | — |
+| AR alone | 2,412 / 2,412 | 2,412 | 0 | — |
+| full minus form | 2,412 / 2,412 | 2,444 | −32 | +378 |
+| full minus token | 2,412 / 2,412 | 2,034 | 378 | −32 |
+| full minus collection | 2,412 / 2,412 | 2,066 | 346 | 0 |
+| full minus AR | 2,412 / 2,412 | 2,066 | 346 | 0 |
+
+**Form-only (−378 objects, −15.67%) beats full (−346, −14.34%).** These
+components do not simply add up **as savings**. The LOO rows, not an assumed
+per-hit budget, attribute the entire 32-object gap to token on this route;
+collection and AR contribute zero at the measured medians. Signed allocation
+deltas are additive here (−378 +32 +0 +0 = −346), with no measured overlap or
+superadditivity. Exclude token from the Blog candidate stack. The stack
+without token ties form-only; zero-cost active components receive no win
+credit. This is one favorable component, not evidence for many tiny wins.
+
+Full native wall is +0.62% against a 3.92% A/A spread, unresolved. Form-only
+is −9.61% against 12.36% A/A, also unresolved. Do not turn either into a speed
+claim. Full GC counts are on [8,8,9], off-A [6,6,6], off-B [6,6,7]: there is
+no evidence of fewer collections. Full GC ms/request is 0.275 on versus
+0.582/0.521 off; RSS is 181,777 KiB versus 179,945/179,904 KiB. The screen
+does not fix heap layout across artifacts, so neither these measurements nor
+cross-artifact differences establish GC synergy. Every case's GC counts/time,
+native wall, RSS and coverage remain in the export.
+
+All favorable results remain **provisional** until active own-suite coverage
+and the unchanged admission gates exist. No whole-stack price is requested.
+
+### Campfire AR: superseded pre-shadow-fix exclusion screen
 
 Same three-round 200/300 protocol, four GETs (POST omitted: queued work has
 no completion certificate). Nineteen normally built AR units. Median object
@@ -126,13 +172,13 @@ header differences in **off/off as well as on/off**; no candidate-specific
 correctness diagnosis follows. All wall effects are unresolved against A/A.
 
 The coordinator identified `ARShadow.enabled?`'s per-call `%w[1 strict]`
-Array as an existing main allocation bug and is publishing its allocation-free
-fix in the Campfire thread. The caller exists on the measured per-row path;
+Array as an existing main allocation bug; its allocation-free correction is
+published at `acc130d`. The caller exists on the measured per-row path;
 these excesses approximately track hits. **Exclusion is provisional**, not a
-final AR negative: rerun on the published correction, without a local duplicate
-implementation. Retain this entire original screen, including exactness RED.
+final AR negative: the corrected retest is running, without a local duplicate
+implementation. Retain this entire superseded screen, including exactness RED.
 
-### Fizzy AR: provisional exclusion before the shadow allocation fix
+### Fizzy AR: superseded pre-shadow-fix exclusion screen
 
 Same 200/300 protocol, six original GETs, 45 normally built AR units.
 The two off controls sometimes differ by one object, so show both rather
@@ -150,8 +196,8 @@ than selecting the baseline that makes the effect larger.
 The whole screen exits 2: retained exactness failures include off/off
 differences, not a diagnosed candidate-specific failure. DB effects remain
 uncovered. Some allocation excesses exceed the counted AR hits; the known
-shadow-predicate allocation cannot explain all of them. Rerun all six after
-the published fix before deciding final exclusion. No latency claim.
+shadow-predicate allocation cannot explain all of them. All six will be
+retested on `acc130d` before final exclusion. No latency claim.
 
 ### Lobsters AR: warm-cache zero credit
 
@@ -173,10 +219,10 @@ mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
   .lowrail/stack/screen-*
 ```
 
-Corrected Blog standalone/leave-one-out attribution and post-shadow-fix
-Campfire/Fizzy retests are pending; initial four-app screens are complete.
-No additive interaction, cross-app win, native latency gain or supported
-component is claimed yet.
+Corrected Blog attribution and initial four-app screens are complete;
+post-shadow-fix Campfire/Fizzy retests are pending. Blog's signed allocation
+effects are additive, not all beneficial. No cross-app win, native latency
+gain, GC synergy or supported component is claimed.
 Propose at most **one** whole-stack Callgrind/README price to the coordinator
 only after a clear screen (>3× A/A wall noise or solid deterministic reduction)
 and the correctness/admission boundaries are resolved. No Callgrind is launched
