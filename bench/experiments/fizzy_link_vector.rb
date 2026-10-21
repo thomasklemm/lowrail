@@ -60,7 +60,7 @@ module FizzyLinkVector
 
     def request(method, path, params = nil)
       headers = @headers.merge("HTTP_COOKIE" => @cookies.map { |name, value| "#{name}=#{value}" }.join("; "))
-      headers["params"] = params if params
+      headers[:params] = params if params
       response = @session.request(method, path, headers)
       Array(response.headers["set-cookie"]).each do |cookie|
         name, value = cookie.split(";", 2).first.split("=", 2)
