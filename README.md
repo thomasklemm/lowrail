@@ -21,8 +21,10 @@ for the other projects we learned from.
 
 ## Current results (2026-10-21)
 
+### Warm-request instruction counts
+
 **Warm-request instruction results, including increases and historical records—not latency or throughput claims.**
-**Ir instructions, not latency · no YJIT claim yet · opt-in research, not default**.
+**Ir instructions, not latency · no YJIT instruction claim yet · opt-in research, not default**.
 Blog and Starter each cover one endpoint/fixture in the sealed tier. Fizzy has
 a fixed six-GET block-link vector and a separate one-route branch prototype;
 both are bench-only, not production admission.
@@ -75,12 +77,38 @@ admission or cold-start performance; **cold still RED**.
 The [first N=50 cohort remains INVALID (heap growth)](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51),
 without a credited price or direction claim ([scope and evidence](docs/block-link-specimen.md)).
 
+### Full-request throughput (real Puma)
+
+<!-- throughput-results:start -->
+**2026-10-21 · [Blog (bet A), `GET /articles/1`](https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.md#confirmatory-result-throughput-gate-passes-p99-is-higher) · Ruby / Rails 4.0.7 / 8.1.4 · Stock Ruby YJIT.**
+
+**Sealed opt-in: production form/token/collection; one route, one orb, exploration harness on a branch; not whole-app, capacity or production-admission evidence.** Measured on [487bec5](https://github.com/thomasklemm/lowrail/commit/487bec5065e7d9bec5d1b2df48831eb926e457cb); does **not** include [b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c).
+Puma 4 workers × 1 thread, c16, 5 s warmup / 20 s load, 20 rotated off-A/on/off-B rounds.
+Protocol [44a33c4](https://github.com/thomasklemm/lowrail/commit/44a33c4967d27db5c91e8954c7736fd97d3e9da9); published [51801ed](https://github.com/thomasklemm/lowrail/commit/51801edc3aab276da3538763257d7d12921aa37f); [exact JSON](https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.json).
+
+**RPS A/A +0.37% [−1.24, +2.18].** The preregistered rule passes: A/A contains zero and the on/off RPS lower bound exceeds the A/A upper bound.
+This does not establish ±2% resolution or a latency gate.
+
+| Metric | Paired on/off Δ [95% interval] | off-A | on | off-B |
+|---|---|---:|---:|---:|
+| **RPS** | **+10.46% [+8.11, +12.81]** | 1613.8 | 1782.7 | 1611.2 |
+| **p50, ms** | **−8.67% [−11.04, −6.17]** | 9.2 | 8.4 | 9.1 |
+| **p90, ms** | **−12.90% [−16.62, −9.10]** | 15.8 | 14.0 | 15.8 |
+| **p99, ms** | **+12.73% [+1.13, +24.78]** | 26.0 | 29.9 | 26.0 |
+| **GC collections / 1,000 requests** | — | 18.7 | 24.0 | 18.9 |
+| **Allocations / request** | — | 2679 | 2333 | 2679 |
+
+**Not uniformly faster: p99 increases despite lower p50/p90 and higher RPS. GC collections increase despite fewer allocations; the cause is not established.**
+Arm values are medians of windows; paired deltas are means of within-round ratios, not ratios of those medians. GC/allocations are load-bracketing four-process diagnostics including metrics/background work, not exclusive request counters.
+<!-- throughput-results:end -->
+
 To update: publish the accepted export first, edit only the metadata/source
 paths in [docs/results.json](docs/results.json), then run
 `python3 docs/render-results.py` (`--check` detects drift). Numbers are read
 from the original exports, never copied into the index. Pinned exports use
 an explicit `source_commit` matching the full publication SHA; fetch bet F's
-branch with `git fetch origin thomasklemm/ar-callsite-compile` before rendering.
+branch with `git fetch origin thomasklemm/ar-callsite-compile` and bet A's with
+`git fetch origin thomasklemm/native-yjit-bench` before rendering.
 They are read from that commit, never substituted from the main worktree.
 Refresh the short
 [status](docs/STATUS.md#at-a-glance-2026-10-21) and [benchmark summary](docs/bench.md#current-accepted-request-results)

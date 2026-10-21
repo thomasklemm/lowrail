@@ -75,5 +75,27 @@
     "revision_field": "request_pivot.ir.protocol.harness_sha",
     "total": "request_pivot.ir.decision.effects.instructions_total.effect",
     "no_gc": "request_pivot.ir.decision.effects.instructions_no_gc.effect"
+  },
+  {
+    "kind": "throughput",
+    "date": "2026-10-21",
+    "app_endpoint": "Blog (bet A), `GET /articles/1`",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Stock Ruby YJIT",
+    "tier": "Sealed opt-in: production form/token/collection; one route, one orb, exploration harness on a branch; not whole-app, capacity or production-admission evidence",
+    "revision": "487bec5065e7d9bec5d1b2df48831eb926e457cb",
+    "excluded_revision": "b059fc9fbcdbc4cff6a7bc523defb01e7783385c",
+    "publication": "51801edc3aab276da3538763257d7d12921aa37f",
+    "report": "https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.md#confirmatory-result-throughput-gate-passes-p99-is-higher",
+    "source": "docs/native-bench.json",
+    "source_commit": "51801edc3aab276da3538763257d7d12921aa37f",
+    "accepted": "rps_confirmatory_blog.predeclared_decision.accepted_scoped_throughput",
+    "required_gates": [
+      "rps_confirmatory_blog.passed",
+      "rps_confirmatory_blog.predeclared_decision.aa_contains_zero",
+      "rps_confirmatory_blog.predeclared_decision.on_off_lower_exceeds_aa_upper"
+    ],
+    "revision_field": "rps_confirmatory_blog.base_main_revision",
+    "result": "rps_confirmatory_blog"
   }
 ]
