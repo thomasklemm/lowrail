@@ -6,7 +6,8 @@ three have green upgraded baselines; Fizzy is a useful negative control. The
 exercise found genuine Lowrail load-order bugs. Hook-free delivery now fixes
 require-hooks adapter selection; Bundlebun's integration order still needs a
 targeted delivery/activation refusal. Redprints passes strict verify only as
-a no-op, losing its former 277 fast-path hits.
+a no-op. Its historical 277-hit target is obsolete after quarantine; the
+current eligible ceiling is **14 `inertia/props` hits**, still refused.
 
 All new app copies use **Ruby 4.0.7 and Rails 8.1.4**. Ruby 3.4 was dropped by
 owner decision; the loader regression matrix also exercises 4.1-preview,
@@ -293,9 +294,10 @@ Both Ruby 4.0.7 and 4.1-preview pass the presence/absence/all-order matrix,
 including cold/warm/on/off cache checks and the load census. No gem mode is
 forced and no introspection is spoofed.
 
-With that fix alone Redprints retains its 277 hits, but **12 stable load
-differences** remain. Bundlebun enumerates integration constants unsorted;
-additional Lowrail runtime identifier interning changes the autoload order.
+With that fix alone the historical pre-quarantine build retains its 277 hits,
+but **12 stable load differences** remain. Bundlebun enumerates integration
+constants unsorted; additional Lowrail runtime identifier interning changes
+the autoload order.
 Six off and six setup-only fresh boots agree, while six active boots use
 another order with the same correct adapter. This is not random suite noise
 or a source-pass outcome divergence.
@@ -305,10 +307,23 @@ Bundlebun bundle now refuses delivery and runtime activation before runtime
 installers load, with `bundlebun_load_order` in ledger/manifest and the stats
 refusal reason. Existing artifacts are caught too. Final strict Redprints
 verify: **50 pass, 692 identical queries, 0 stable load differences**, 32
-unstable advisory entries, **0 hits / 0 fallbacks**. The retained-hit gate is
-**not met**: this is safe refusal, not active Redprints support. No upstream
-repository or integration order was patched. [Detection, seams, matrix and
-limits](loaders.md#refused-bundlebun-integration-enumeration).
+unstable advisory entries, **0 hits / 0 fallbacks**. The current gate is
+**14 eligible props hits**, identical outcomes/SQL and unchanged detection/load
+behavior; the old seven-unit 277-hit aggregate is obsolete, not permission to
+reactivate sealed-only passes. The current gate is **not met**: this is safe
+refusal, not active Redprints support.
+
+The bounded follow-up confirms a real Bundlebun boundary, not a synthetic
+census mismatch. Compiling one symbol without evaluating it yields eight
+stable load-event differences; `$LOADED_FEATURES` independently confirms the
+ExecJS/JS order swap. Four processes without Lowrail, census or TracePoint
+reproduce it too. Early props delivery has a coincidental census pass
+(14 hits, 50 outcomes / 692 queries, zero stable differences), but changes
+actual order in direct controls: **non-certifying**. Waiting until Bundlebun
+naturally finishes preserves its order but misses the already loaded props
+file and yields zero hits. Refusal stays unchanged. No upstream repository or
+integration order was patched; the [upstream draft](upstream/bundlebun-integration-order.md)
+is local only. [Detection, seams, matrix and bounded controls](loaders.md#refused-bundlebun-integration-enumeration).
 
 ## Existing corpus and framework regression gates
 

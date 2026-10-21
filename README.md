@@ -22,8 +22,9 @@ why and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how a pass plugs in.
   identical outcomes/SQL. The expanded [gem-breadth corpus](docs/compat.md)
   found and fixed early-autoload bugs. Hook-free delivery preserves
   require-hooks' adapter; Redprints passes the strict load census only by
-  refusing Bundlebun delivery/activation, losing its 277 hits. No universal
-  support claim follows from the green outcome comparisons.
+  refusing Bundlebun delivery/activation. Its current eligible target is
+  14 props hits, still unmet; the pre-quarantine 277-hit target is obsolete.
+  No universal support claim follows from the green outcome comparisons.
 - **The default build lowers nothing.** The two former default passes,
   `view/link_to` and `route/path`, are quarantined. Warmed apps could
   observe stale helpers when code changed mid-request

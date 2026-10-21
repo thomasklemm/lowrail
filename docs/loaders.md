@@ -165,9 +165,10 @@ tested native/cold/warm/eval cases without either compromise.
 
 ### Refused: Bundlebun integration enumeration
 
-Hook-free delivery removes require-hooks' adapter difference in Redprints,
-but leaves **12 stable load-event differences** (formerly 26), with the same
-50 outcomes, 692 queries and 277 hits. Bundlebun 0.5.0.1.3.14 enumerates
+In the historical pre-quarantine build, hook-free delivery removes
+require-hooks' adapter difference in Redprints, but leaves **12 stable
+load-event differences** (formerly 26), with the same 50 outcomes, 692 queries
+and 277 hits across seven units. Bundlebun 0.5.0.1.3.14 enumerates
 `Integrations.constants` unsorted and autoloads each entry. Additional
 runtime identifier interning changes MRI's constant enumeration order.
 An 18-process control separates this from adapter selection: all six off
@@ -190,10 +191,85 @@ dependencies introduced dynamically or through an unexamined alternate lock.
 
 Redprints now passes strict verify: **50 pass, 692 identical queries, zero
 stable load differences**, 32 unstable advisory entries, **0 hits / 0
-fallbacks**. The former 277 hits are intentionally lost, so the requested
-nonzero-hit Redprints gate is **not satisfied**. This is a targeted no-op,
-not full active support. See [compatibility results](compat.md) and
-[DECISIONS](DECISIONS.md).
+fallbacks**. The **277-hit target is obsolete**: it is a pre-quarantine
+aggregate, not today's eligible guarded build. The current gate is to retain
+the eligible **14 `inertia/props` hits**, identical outcomes/SQL, unchanged
+hook detection and zero stable load differences. That gate is **not
+satisfied**. No sealed-only pass is re-enabled to recover the old total.
+This is a targeted no-op, not full active support. See
+[compatibility results](compat.md) and [DECISIONS](DECISIONS.md).
+
+#### Bounded follow-up: delivery timing cannot certify this bundle
+
+The pinned gem's Ruby source is
+[Bundlebun 0.5.0, commit b18ac047](https://github.com/yaroslav/bundlebun/blob/b18ac047ca4f958e09de9003ef9daea1be2bf458/lib/bundlebun.rb#L90-L130).
+It installs **no `load_iseq` hook**. At the bottom of `bundlebun.rb` it sets up
+its Zeitwerk loader, prepends Bun's directory to PATH, loads tasks if Rake is
+already defined, and calls `load_integrations` synchronously. That calls
+[`Integrations.bun!`](https://github.com/yaroslav/bundlebun/blob/b18ac047ca4f958e09de9003ef9daea1be2bf458/lib/bundlebun/integrations.rb#L22-L28):
+
+```ruby
+integration_modules = constants.map { |const| const_get(const) }
+  .select { |const| const.is_a?(Module) }
+integration_modules.select { |mod| mod.respond_to?(:bun!) && mod.bun! }
+```
+
+`const_get` resolves the registered autoloads in this unspecified enumeration
+order. CSS/JS integrations prepend task commands when their host is loaded;
+ExecJS replaces its Bun runtime and assigns `ExecJS.runtime`; Vite prepends
+runner extensions. None is a Lowrail delivery registry or a post-integrations
+callback. Manual `load_integrations` repeats the walk, not a readiness signal.
+
+Fresh Ruby 4.0.7 probes on Lowrail `01cfc45` observed natural entry/return of
+`load_integrations`, without requiring Bundlebun early. A disposable artifact
+contained only the eligible props unit; both refusal layers were bypassed
+**only in the probe**, never in production. Before Bundlebun even enters the
+walk, `inertia_rails/props_resolver.rb` is already in `$LOADED_FEATURES`.
+
+| Probe | Actual integration file order | Props hits | Result |
+|---|---|---:|---|
+| Direct off, twice | ExecJS / Vite / CSS / JS | 0 | 50 passing examples |
+| Direct early setup, twice | CSS / ExecJS / JS / Vite | 14 | 50 passing examples, **different actual load order** |
+| Setup at natural integration return, twice | same as direct off | 0 | 50 passing examples, delivery already missed |
+| Early setup with strict census | CSS / ExecJS / JS / Vite on both sides | 14 | 50 outcomes / 692 queries identical, 0 stable differences; **coincidental, non-certifying** |
+| Setup at integration return with strict census | same as its off control | 0 | 50 outcomes / 692 queries identical, 0 stable differences |
+
+The direct and census runs use the same activation probe; only the latter
+boots the verification reporters. Observer/startup identifier allocation can
+mask the divergence. A green census cohort is not proof that an unobserved
+startup has the same order.
+
+**The eight-difference compile-only control is an actual load-order change,
+not a synthetic census difference.** It compiles one new symbol literal,
+never evaluates it and never activates Lowrail. Two off and two on controls
+agree within their sides. `$LOADED_FEATURES`, independently of the census,
+records CSS / ExecJS / JS / Vite versus CSS / JS / ExecJS / Vite. Two swapped
+entries, on/off, at first-test/after-suite account for all eight stable
+entries. Owners, source locations, parameters and order of the complete
+`load_iseq` chain remain equal; require-hooks still selects Bootsnap.
+
+A separate **four-process census-free control** reproduces that same swap
+with the single compilation: no Lowrail preload, reporters, TracePoint,
+compiler override or census. It only reads `$LOADED_FEATURES` at exit, after
+the loads. Thus the verifier can perturb which order appears, but it is
+correctly reporting real Bundlebun integration loads here. A bare
+`require "bundlebun"` without the Redprints startup prefix did not reproduce
+the swap; the reproduction needs the app's identifier history.
+
+Waiting until integration completion (or Rails initialization) cannot deliver
+the already evaluated props file. Re-loading it would repeat app code, not
+exact delivery. Early setup still allocates identifiers that influence
+Bundlebun's unordered walk. Padding IDs, sorting its constants, forcing its
+autoloads, or making the off arm allocate the active runtime is not an exact
+fix. No public Ruby API reserves/restores this process-wide identifier state.
+This is a bounded unsupported boundary for the locked version and present
+delivery contract, **not a proof that every possible integration is
+impossible**. Refusal remains unchanged. A deterministic upstream integration
+policy needs a new app baseline and certification; a completion hook alone
+does not recover files loaded before it. The
+[local-only upstream draft](upstream/bundlebun-integration-order.md) records
+both options and the census-free reproduction. Nothing was posted upstream,
+no foreign repository was changed, and no measured cohort was run.
 
 ## Executed regression matrix
 
