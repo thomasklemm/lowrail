@@ -148,6 +148,16 @@ source and generated-code checks. Unknown input is a ledger refusal with a
 remedy, not permission to learn a customized body as stock. Lazy apps and
 Ruby 4.1 remain original for this pilot; this is not a generic form compiler.
 
+The application namespace is a build fact, not the literal
+`RealBlogR4::Application`: `script/corpus` invokes `rails new` with the chosen
+destination, whose basename determines the module, and copies can retain
+their original name. The inventory records the actual application class and
+rechecks it at activation, alongside the unchanged closed stock/model/config
+inventory and app-source pins. The public regression also builds a renamed
+application, requires a live form hit without fallback, then still refuses
+its custom builder. This corrects a false refusal; it does not broaden the
+certified form, model, helper or locale semantics.
+
 The variant keeps the measured live residue and per-hit checks, including
 the model constructor in the unchanged ERB, URL generation, real CSRF
 masking, mutable pre-content-table reads and fresh safe output. Foreign
@@ -236,8 +246,8 @@ not fast-path evidence or a statement about interpreter windows. After the
 published mode-admission boundary, a fresh `build --jit yjit` artifact on
 [`827f935`](https://github.com/thomasklemm/lowrail/commit/827f93530ec33573265bc4c4f1bd83fd384d7b64)
 passes an untimed 50-request check: **50 hits, zero fallbacks, zero lifetime/
-delta trace exits**. No YJIT instruction cohort has started; it waits for
-the separately owned accepted warmup-method A/A validation and worker release.
+delta trace exits**. At that publication no YJIT instruction cohort had
+started; the later finite warmup-v2 result below is rejected.
 
 The [numeric export](sealed-form-request.json) retains artifact, fixture,
 runtime/harness/source pins, per-round values, all controls and window/heap/GC
@@ -269,8 +279,56 @@ controls; `--pass sealed/form_scaffold --measure-budgets` can now generate and
 compare a genuine instruction budget without editing an artifact to remove
 unselected AR units or importing a different-metric micro.
 
-No new operation or request instruction windows have run. The old numeric
-export therefore remains unchanged and incomplete. An accepted, source-pinned
-budget plus request run with all existing controls is still needed before
-any **new** report can say `measurement_complete:true`; worker authorization
-and the separate YJIT cohort release remain outstanding.
+At adapter publication no new operation or request instruction windows had
+run. The old numeric export remains unchanged and incomplete. Only a new,
+accepted, source-pinned budget plus request run with all existing controls
+can produce a new report with `measurement_complete:true`.
+
+## Finite YJIT follow-up: rejected, no retry
+
+One form-only show cohort ran after the separate warmup-v2 A/A validation,
+on exact head
+[`ab8e4df`](https://github.com/thomasklemm/lowrail/commit/ab8e4dfced319e95527ba480bea845ff330d33bb).
+Its unchanged artifact was built on
+[`827f935`](https://github.com/thomasklemm/lowrail/commit/827f93530ec33573265bc4c4f1bd83fd384d7b64)
+with `--sealed --env production --jit yjit`, manifest SHA
+`2bd964cf1d666756287822a9f351d7007bf428d54b9f71ab143b8cd1756b3096`.
+The denylist excludes links; only form unit 18 is enabled, with no delivered
+files/templates. The pinned app actually declares `RealBlogR4::Application`;
+the later app-name fix is not part of this cohort.
+
+Ruby 4.0.7 / Rails 8.1.4, six randomized rounds, N=0/50, seed 41231, at most
+four workers, fixed heaps and the same pinned Valgrind tool. Warmup uses
+`quiet-2000-v2`; measured workers do **not** use `--yjit-stats`. A repeated
+untimed native check on that exact head/artifact records **50 hits/50
+requests, zero fallbacks, zero lifetime/delta `exit_trace_leave`, and zero
+enabled TracePoints**. Coverage separately records one form hit/request.
+
+The cohort is **rejected**, including all arms and both modes:
+
+- Four of 144 windows compiled additional YJIT blocks:
+  `0-disabled` no-GC N=50 **+50**, `2-missing` no-GC N=50 **+8**,
+  `5-default` no-GC N=0 **+7**, `5-missing` total N=50 **+14**.
+- `3-off_a` and `4-off_a` hit the **20,000-request warmup ceiling**, without
+  the required quiet interval.
+- Actual heap capacities mismatch: pool 0 **1,000,445–1,002,093** slots and
+  pool 2 **100,148–100,570**, beyond the existing one-page tolerance.
+- A/A and idle-boundary controls pass; all 144 windows are GC-free. Those
+  passes cannot override the failed JIT and heap gates.
+
+Raw total Ir/request is **5,416,639.41 → 4,661,292.39**,
+**−13.938% [−14.020, −13.875]**. No-GC is
+**−13.925% [−14.067, −13.888]**. These numbers are **diagnostic only**, not an
+accepted YJIT saving or non-regression claim. No retry, extra cohort,
+selected-arm salvage or promotion occurred. Native `vm_trace` function self
+Ir/request is exactly **0 in every arm/round and both modes** (72 deltas),
+from this YJIT cohort's own N=50 minus N=0 dumps, not the interpreter windows.
+
+The [numeric export](sealed-form-yjit-v2.json) retains the full result,
+source/build/runtime/harness pins, original samples, every rejection and
+per-arm trace-self annotations. Runtime and harness file hashes were checked
+against the pinned Git revision. Raw files and the byte-identical artifact
+archive stay private for the separately owned warmup diagnosis. The
+historical accepted interpreter result is unchanged; `sealed_only` status,
+the guarded default tier and quarantine are unchanged. There is still **no
+accepted YJIT non-regression cohort and no promotion**.
