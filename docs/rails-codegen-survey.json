@@ -1,0 +1,5879 @@
+{
+  "kind": "rejected_rails_performance_screens_not_request_timings_or_support_claims",
+  "rails_revision": "5e732a78bf708e7f1d649de4b6ebf00d86daaabc",
+  "final_canonical_revision": "d272e2c0e3c1a53a3eb0fa2b161bfe5beb239b90",
+  "ruby_revision": "5771bd7a39100a1ceb003d78937b367ec2531f02",
+  "notes": [
+    "Final interpolation-hoist gate uses delegated-exact-*.json, three process pairs per mode pinned to CPU 0.",
+    "delegated-hoist-* is an earlier frozen-name approximation; delegated-pinned-* screens codegen/symbol/main.",
+    "Earlier shared_iseq booleans compare wrapper identity and must not be interpreted as evidence about underlying ISeq sharing.",
+    "class_attribute/store screens have five samples per case, not three independent pinned processes.",
+    "Native clocks/allocation readings are separate from all TracePoint request workers.",
+    "Route evidence contains only four successful suite runs, not the six claimed in the worker final message."
+  ],
+  "benchmark_sources": {
+    "bench/experiments/rails_class_attribute_ips.rb": "21dd5fee9006c2949cd6ebca8ab54b7fdf0cb69a9100944959ef61570f7971da",
+    "bench/experiments/rails_delegated_type_ips.rb": "417d76a11ac273b116a093388b96cb8340184b132ab8fc3003449b09d3aefb80",
+    "bench/experiments/rails_store_ips.rb": "1073da1b2960e84a09429635588a21aff8370c287062c3aec186a69e0e56fe38"
+  },
+  "samples": {
+    "constant-interpreter.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "zjit": false,
+      "variant": "constant",
+      "warmup": 2000000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 22905539.565933906,
+            "allocations": 7,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23487736.0101662,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24606723.77546771,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24269851.94041215,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 22212508.840182487,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 15791522.143848298,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15806150.837150566,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 16227694.757694159,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15574970.760335026,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15573004.851396488,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 16030287.959498307,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15985826.786925329,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 16039665.502530077,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15635888.295134906,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 16379759.240606466,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 24652795.45246891,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23027296.312959153,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23971015.85846586,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24176754.316665716,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24019817.194680456,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 24671059.894923665,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23377351.2805398,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23991829.49610065,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24293575.735403415,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23027962.016058594,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 24383195.493734557,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23169294.634622667,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24496112.755968466,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24532698.822238367,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 22985256.4244678,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 16172552.858654538,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15557789.425937463,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15992191.307241417,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 16212947.808639599,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 14998666.738511046,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 41556153.2715865,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 41180384.66268716,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 41632181.6897399,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 41637899.042188644,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 39339602.9383207,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ]
+      },
+      "owner_iseq": "method"
+    },
+    "constant-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "yjit": true,
+      "zjit": false,
+      "variant": "constant",
+      "warmup": 2000000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 34954858.45688454,
+            "allocations": 7,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37419172.435941555,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35951997.4969752,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37264133.49952095,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35260496.2246219,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 30726955.96140487,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 30595602.13919597,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 29174533.02028833,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32299238.126223255,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 30358446.980101388,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 33789384.14587204,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 33629265.48890525,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34356663.269002736,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34333022.36542179,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32830487.14679265,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 36803151.91616248,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 36610051.564929664,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37163139.55273538,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35044169.601265125,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35450079.06039265,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 35807929.588704765,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 36890473.64461714,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 36021936.98496967,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35598637.69142149,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35471807.28072287,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 35566483.855668336,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 36009004.49803826,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34918077.23245882,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34178838.736632355,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34791580.93006299,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 31840480.719941948,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 33844769.77207995,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31955401.91623618,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32175166.962907095,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31894451.309546124,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 44402968.91390984,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 46210494.959785275,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 44913571.28772899,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 45890191.47177476,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 43977435.35388427,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ]
+      },
+      "owner_iseq": "method"
+    },
+    "constant-zjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "yjit": false,
+      "zjit": true,
+      "variant": "constant",
+      "warmup": 2000000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 32366686.699059587,
+            "allocations": 7,
+            "iterations": 5000000
+          },
+          {
+            "ips": 33605724.53355211,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34374708.480980605,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 33819281.46134845,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34325925.597237505,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 29826221.991486143,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 30648778.805236556,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32563721.047565762,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 30804568.253405903,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31451499.733652513,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 38002016.03738133,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 41059743.77485896,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 41903665.76868133,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 40808803.38611185,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 42972623.31049108,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 32686558.73007568,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34223305.83857576,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32783110.136419337,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34490298.67569352,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34226860.67069714,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 32512937.206548873,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34435357.994205326,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 33018464.41397884,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34269646.79538919,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 33654081.8618975,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 21111062.377400883,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21741419.522687662,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21281004.62549446,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21068504.36836412,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21871423.73515277,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 31134489.487277877,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31301616.953261726,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31053628.498514537,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31237176.74850588,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32767601.13664227,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 43802280.04712502,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 44350685.91172801,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 45859451.8963487,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 44743325.48373824,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 44858964.80529504,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ]
+      },
+      "owner_iseq": "method"
+    },
+    "delegated-codegen-interpreter.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "codegen",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1748587.8317242002,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1775584.3487149202,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1813876.5064415324,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1822624.5018566342,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1846252.6666859551,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1410047.6109484043,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1536498.8184167482,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1628052.7675438924,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1588353.2309332604,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1629135.3112394146,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "shared_iseq": false,
+      "iseq_type": "method"
+    },
+    "delegated-codegen-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "codegen",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2587529.237755468,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2532418.4958021925,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2692886.150145813,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2709684.541806152,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2727477.456688589,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2552850.9911825545,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2684648.975274261,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2725922.136934722,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2779332.1154020494,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2762749.708645893,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "shared_iseq": false,
+      "iseq_type": "method"
+    },
+    "delegated-codegen-zjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "codegen",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2594428.721685611,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2749819.2804989954,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2755700.3618544615,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2592405.3421962103,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2752134.4970352175,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2593413.3012843244,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2696781.761640264,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2739855.524978969,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2606947.1149361776,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2779416.1779900356,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "shared_iseq": false,
+      "iseq_type": "method"
+    },
+    "delegated-exact-interpreter-1-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1605531.7478942687,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1601969.009586038,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1531570.9020094445,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1613052.9171174068,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1634884.4877038829,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1471619.5213668447,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1462452.1312637383,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1447094.3122574,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1472942.9501263285,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1557621.5548447608,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-interpreter-1-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1349956.3648201295,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1351598.2006709576,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1365183.6690124604,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1458687.952226809,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1455675.8445359864,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1174337.5456944993,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1260615.0039131222,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1298931.3208820696,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1286671.4660758346,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1254912.079607979,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-interpreter-2-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1685472.6167266364,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1618306.8096683768,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1632648.0419984108,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1646014.5663267472,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1642016.7387519355,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1494263.1092658672,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1490591.9085617529,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1500184.1967414345,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1495096.162705268,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1500736.9233589487,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-interpreter-2-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1415960.0449028483,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1385042.4240909275,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1374752.7890330565,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1364435.07043459,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1384517.4040227702,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1289787.3713097852,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1296956.6267515935,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1186441.1162450926,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1267979.561064543,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1291811.214716999,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-interpreter-3-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1608701.6008044688,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1581448.6108488806,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1600831.8562659975,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1609114.5008306482,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1596114.6457932997,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1453347.466042108,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1444743.0317343115,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1501938.1449143016,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1440949.168548472,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1447067.6875425093,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-interpreter-3-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1381217.8390511551,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1363618.3979649462,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1368168.7615906866,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1348383.8391311548,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1352651.0314719314,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1268501.89453117,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1268924.2919739054,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1264749.5247667455,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1267833.6226982835,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1249351.5880876721,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-yjit-1-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2374123.3338888264,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2356709.4328573896,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2354423.6102089393,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2352771.0406749924,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2347675.1202144367,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2383984.772689388,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2380920.7713960335,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2370999.2225892576,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2376730.4870694224,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2367034.292578517,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-yjit-1-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1995333.0317710768,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2023367.8510329216,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2030052.4127664368,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1950769.088177572,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1944800.1235382613,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1987184.2355306442,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1996877.2573857994,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2027985.8477732781,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2001648.4635978881,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1959828.4247044546,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-yjit-2-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2300989.3681313507,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2262545.2585704927,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2275896.318693382,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2312921.089257161,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2316223.8831771803,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2313065.922805551,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2328677.0763738155,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2305729.238196257,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2328584.65491476,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2308089.1498885145,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-yjit-2-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2045419.819341468,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1943738.6556625345,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1957707.319875325,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1948195.09611412,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1955027.3141296576,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1988850.877872574,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1973096.087050781,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1964825.3275992854,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1965656.9556997744,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2011444.0606964242,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-yjit-3-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2312042.098329871,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2380116.3424185803,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2363933.8023820287,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2356690.0826063934,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2339383.3217125502,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2432396.5486663347,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2407925.4921974395,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2385880.2604133496,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2386510.1539860177,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2372063.7835426535,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-yjit-3-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1928804.8763719318,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1947668.8112407152,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1925632.1406466,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1559332.4548917105,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1893255.1077185946,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1923654.6428074448,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1937946.709920275,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1916114.89647178,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1907722.8177571837,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1919633.0404901174,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-zjit-1-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2454580.13620428,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2416507.7307405993,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2418985.7775619854,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2422141.3091350044,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2449959.6777095897,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2458409.7697487622,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2449536.3484523026,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2453430.9968971387,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2442173.954775272,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2338086.3839404956,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-zjit-1-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2010983.7519359067,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2079852.5095069122,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1995787.34396593,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2033668.1241855568,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2033128.1313395407,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2025814.9538794453,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2061397.9335046674,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2043586.2450332863,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2020269.9114742351,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2043564.9276147736,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-zjit-2-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2333202.8512983616,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2395463.201580584,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2380981.1851574676,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2396419.856093247,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2416628.4627918852,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2426209.8657612647,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2379831.4151938274,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2411384.059263236,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2408227.576580228,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2456772.691410618,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-zjit-2-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2026129.8580950703,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2067230.294114998,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2054613.7412745021,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2037194.3197571826,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2057088.8819533698,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2030091.6485793297,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2061419.3165131973,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2041950.5696456034,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2045590.9173310346,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2068536.4885074235,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-zjit-3-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2520130.106250712,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2415279.331427591,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2424615.5858083894,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2427740.383210253,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2503669.5094756708,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2470195.8611017023,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2478191.300109394,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2484235.9824653952,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2492055.138198771,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2491231.4848665446,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-exact-zjit-3-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2074085.28950147,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1841328.6144891926,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1994527.5230878422,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1949473.453457251,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2011733.625475198,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2073432.6470879924,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2043948.1786405127,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2020423.2320566394,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1961265.3525094485,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1991793.2342544878,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-interpreter-1-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1619717.096097129,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1665912.0584810826,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1627613.4120618463,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1708007.799857516,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1714382.6856474185,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1606342.380735292,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1637158.1368542016,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1590201.7341208633,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1583499.5207504036,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1518642.3539031774,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-interpreter-1-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1432481.3659953463,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1264900.4498240752,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1408848.4519080827,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1446265.141685858,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1450410.8637590501,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1264106.3388197415,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1283625.3935168574,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1322772.3585059696,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1311587.7694748654,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1340807.2449885688,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-interpreter-2-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1679852.023985228,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1705343.4380321808,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1754015.8983304352,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1752526.0274879811,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1723153.653783251,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1550371.0247548558,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1608683.5981325817,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1605627.34620516,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1583734.4441718287,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1548014.3133552112,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-interpreter-2-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1343514.6756370629,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1429906.7265403927,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1306464.4854350407,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1424708.6201604595,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1397495.1512124515,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1279946.549432254,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1331076.252179273,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1330143.2171588892,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1262837.8198510313,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1332526.6767609613,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-interpreter-3-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1634212.590966493,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1675044.7323206672,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1689397.107743558,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1658782.8120110545,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1693596.1724594978,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1526976.4508637723,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1532349.746175475,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1571371.6117892677,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1538573.4838846687,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1517319.4186059786,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-interpreter-3-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1424829.2671616469,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1426090.6603391164,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1423006.2118734727,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1446604.1678886842,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1453133.5266023376,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1321248.6156684381,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1278950.8322269053,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1311417.0952025077,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1310833.568989476,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1256387.604144227,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-yjit-1-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2467929.904886566,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2405435.319724729,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2405033.280586992,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2393220.439189568,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2537789.513057983,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2434460.41230572,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2472534.8541300874,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2448961.4815174774,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2477328.529772987,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2575547.0304451524,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-yjit-1-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1953368.94602238,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1949129.4331304836,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1965079.80092766,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1966996.9501721526,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1970981.713213806,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1945366.5098029138,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1955034.4978498002,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2010014.606323509,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2000170.0244530758,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1980292.3464209319,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-yjit-2-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2420209.7914816034,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2384327.5441939062,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2340112.6240062662,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2460421.947796168,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2468415.0191880846,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2381905.1259891093,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2402123.406950583,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2422533.2580227954,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2570067.4336092095,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2404688.3178927856,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-yjit-2-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2093120.161437254,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1943651.7061199918,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1969052.9655662419,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1972261.4328066676,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2038843.973835905,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2054189.7811458374,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1975997.6845651479,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2010631.5561608535,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2049579.147411373,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2012627.3143380384,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-yjit-3-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2459386.9928233093,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2615023.953292721,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2582799.3158943728,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2597693.7820071224,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2586940.5127412085,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2511917.7340314495,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2597481.0042213034,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2613983.4611329804,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2641319.211634881,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2583893.375320996,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-yjit-3-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1922927.8628851776,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1949688.7801482182,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1898988.8123842226,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2084955.280859875,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2048971.446145264,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1966953.8225185967,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1967204.8228246921,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1856767.3752775323,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2061537.8829745755,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1890034.2788535482,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-zjit-1-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2607584.082162827,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2621135.8867467716,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2649242.162950826,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2653977.997856654,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2660554.8967206483,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2667473.961656941,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2676905.910294695,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2584601.1117323013,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2615244.3616402675,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2551299.899161341,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-zjit-1-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2034795.4871133007,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2123237.043372661,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2123137.7968998435,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2184389.589641341,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2178117.1078018867,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2043963.2895802842,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2108312.5857100664,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2008895.4634417596,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2181142.961031248,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2211161.508358977,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-zjit-2-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2564741.2701691086,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2646556.289972124,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2514623.6682118746,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2423656.9627246712,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2438890.6676507276,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2687696.7361279023,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2328305.274273352,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2591713.433001466,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2437259.493367833,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2488521.737037415,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-zjit-2-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1949156.7604793368,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2152091.532431312,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2150340.3533956897,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2159023.185193777,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2163433.779421589,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1968480.129248726,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2148171.0359569876,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2136508.729973938,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2177975.5526221497,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2168802.705450397,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-zjit-3-hoist.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "hoist",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2544206.018446359,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2574697.2783558657,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2564495.175161909,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2584796.477843875,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2574186.139645916,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2619870.6523506497,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2634300.9289256753,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2419843.837434518,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2637335.595108972,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2638767.066909032,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-hoist-zjit-3-main.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2169670.4651360754,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2203339.0241273665,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2190378.7442815793,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2175798.60000367,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2170553.164019706,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2195445.9005064047,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2191370.640562346,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2190400.075325157,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2174463.002987008,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2187733.2923575738,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-main-interpreter.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1469259.672359925,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1443553.5241100476,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1439304.0515854952,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1456560.991739392,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1432468.262025406,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1318403.1141821728,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1295666.6597647138,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1269557.8642224849,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1307958.723943527,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1305170.1329238508,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "shared_iseq": false,
+      "iseq_type": "block"
+    },
+    "delegated-main-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1970405.6732682288,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2008350.145516978,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2032935.70933673,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1936412.93190887,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2010162.8769445946,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2009648.511410157,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2025816.5728802436,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1978277.5784416376,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1967190.641697759,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2062448.2199811186,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "shared_iseq": false,
+      "iseq_type": "block"
+    },
+    "delegated-main-zjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2044247.959688462,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2062272.4447325568,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2066942.5478281612,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2066973.90235621,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2133856.3295684922,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1992401.4272538896,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2140490.418655043,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2084902.8308097792,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2015522.5773624112,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2009145.7843052002,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "shared_iseq": false,
+      "iseq_type": "block"
+    },
+    "delegated-pinned-1-codegen-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "codegen",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2530148.023046271,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2559792.385682902,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2459384.071361163,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2599454.4244238217,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2627522.2052024957,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2480524.1799051133,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2401430.312065879,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2552915.8113902053,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2718418.2126830406,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2646570.9919949486,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "method"
+    },
+    "delegated-pinned-1-main-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1984132.8735380073,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1973202.4038295054,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1917302.377028454,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1972773.800078375,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1989079.428819823,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1983359.5872793973,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2012026.9798008688,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1931787.0760947608,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1937231.6713776435,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2025471.6406663693,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-pinned-1-symbol-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "symbol",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2516266.112918255,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2430086.7800034443,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2438452.7812257158,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2497211.7631782293,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2488047.017819266,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2516747.2668394414,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2491923.517022313,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2522403.8141090106,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2506136.6734937783,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2440584.0752604315,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-pinned-2-codegen-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "codegen",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2615536.3144788626,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2674630.961640855,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2620195.9130447526,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2620725.104003938,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2648438.1379020396,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2669215.721413423,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2670861.1151628853,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2606588.8461403036,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2613718.15252057,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2676872.0951932827,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "method"
+    },
+    "delegated-pinned-2-main-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1936883.2841363295,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1946104.5002343284,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2007069.6459222026,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2000465.3762623123,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1955770.1829933976,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1945319.7464684416,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1954493.9092109487,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2054715.7911562785,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2027224.8430792785,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1944959.2027502335,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-pinned-2-symbol-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "symbol",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2521503.495275488,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2490312.032489202,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2597021.3209451134,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2630385.022528449,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2633463.835250199,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2508687.862022379,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2565201.6740912506,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2589465.9984581675,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2667137.772100552,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2602680.7901041834,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-pinned-3-codegen-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "codegen",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2332674.320180109,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2668342.4853655696,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2672315.585506733,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2531066.954898814,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2516551.972589975,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2571914.980072406,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2473760.2621194427,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2610454.394747369,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2613562.9358823635,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2500359.661109246,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "method"
+    },
+    "delegated-pinned-3-main-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "main",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 1975666.9899170103,
+            "allocations": 2000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2030642.2865109092,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 1936836.8677301956,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2058136.6045276592,
+            "allocations": 2000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2081923.8708729183,
+            "allocations": 2000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 1979457.0874551446,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1999516.724805476,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1911870.8816318181,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 1991275.356458295,
+            "allocations": 4000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2096232.0825746078,
+            "allocations": 4000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "delegated-pinned-3-symbol-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "variant": "symbol",
+      "results": {
+        "monomorphic": [
+          {
+            "ips": 2564129.2704945696,
+            "allocations": 1000005,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2424064.9298025053,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2436559.9702906613,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2590433.127906238,
+            "allocations": 1000000,
+            "iterations": 1000000
+          },
+          {
+            "ips": 2451284.72396241,
+            "allocations": 1000000,
+            "iterations": 1000000
+          }
+        ],
+        "polymorphic": [
+          {
+            "ips": 2599923.824570768,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2564213.92002296,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2456633.8140494036,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2588179.532247029,
+            "allocations": 2000000,
+            "iterations": 2000000
+          },
+          {
+            "ips": 2556568.059764587,
+            "allocations": 2000000,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "iseq_type": "block"
+    },
+    "main-interpreter.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "zjit": false,
+      "variant": "main",
+      "warmup": 2000000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 21648390.92186025,
+            "allocations": 7,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21211247.141608454,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21617182.457241546,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 22902758.870927908,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21639081.295675643,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 14671965.300214453,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15494993.325943522,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15330393.71602532,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15416096.524179043,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 14487332.001637777,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 14842500.718308842,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 16033799.197398286,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 14946814.898016524,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 16149500.08237794,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15080967.527919255,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 21502035.436427265,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21955536.80612771,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21575424.55580575,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 22582596.90958374,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21575003.56678163,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 21289593.721087437,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 19641387.314712647,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21478825.559470415,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 22726929.03411433,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 23105775.792364664,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 22765690.347145002,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 19737919.432068925,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21483212.69105878,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 22589424.460943814,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 22798052.805559035,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 15334878.240523497,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 13526670.650149133,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 14585269.679814603,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 15321991.67027314,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 14860930.373302078,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 42640159.99673343,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 38392499.886962295,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 39528685.56787924,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 41563388.573306106,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 40796603.28784754,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ]
+      },
+      "owner_iseq": "block"
+    },
+    "main-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "yjit": true,
+      "zjit": false,
+      "variant": "main",
+      "warmup": 2000000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 36282364.65842156,
+            "allocations": 7,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37097813.698176734,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 36090633.94706836,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37121861.866303734,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37163559.68779911,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 32216084.87903676,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 30959779.35187024,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32109183.760216564,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31908593.163484506,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32013690.795732833,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 34704254.57644975,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 33746040.66143372,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34987724.871650144,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34487047.620223746,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34544835.451754086,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 37257715.59036986,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37098296.76746148,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37247397.092326015,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37255597.41322677,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37021788.44797917,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 35386234.09248366,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35654574.23482281,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35987729.99785513,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35960437.73602005,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35842609.42454119,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 35392956.85115193,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 36140104.4296105,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 36378776.28433564,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35197650.080984585,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 35780615.563812256,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 30136602.650000904,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31834590.9291086,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32332299.266640026,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31176042.04972043,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31303899.249392208,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 43886342.41311239,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 47083917.37401701,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 43472258.29578748,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 45630894.75867654,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 44981772.71102201,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ]
+      },
+      "owner_iseq": "block"
+    },
+    "main-zjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "yjit": false,
+      "zjit": true,
+      "variant": "main",
+      "warmup": 2000000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 30910290.30704052,
+            "allocations": 7,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31899854.87160375,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 30846462.528599963,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 24996105.98162813,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32044662.5689041,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 30351058.922344632,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 28325953.75200804,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 29129126.5048737,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 29798912.35040052,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31401917.17625108,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 34666751.56784573,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 37258838.07206181,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 40899273.26163656,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 40159620.67726766,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 42268422.829430714,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 26228813.62333775,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31264936.628084995,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32164568.34135775,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 30800506.266680375,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32360919.209091455,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 29666406.832444344,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31119507.15410177,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31814513.749378793,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31144444.27621914,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 32104467.62946715,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 18610537.286223363,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 19545705.19426149,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 20794123.06844867,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 19701140.398531415,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 21284683.743358966,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 29335345.44077781,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 26980541.741191562,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 29997225.856575612,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 29143080.41878751,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 31170475.933624152,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 42326301.2613254,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 41422268.03630208,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 43683134.39002203,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 34187001.448364414,
+            "allocations": 0,
+            "iterations": 5000000
+          },
+          {
+            "ips": 44060170.825228356,
+            "allocations": 0,
+            "iterations": 5000000
+          }
+        ]
+      },
+      "owner_iseq": "block"
+    },
+    "screen-constant-yjit.json": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "yjit": true,
+      "zjit": null,
+      "variant": "constant",
+      "warmup": 500000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 34919159.61376041,
+            "allocations": 8,
+            "iterations": 2000000
+          },
+          {
+            "ips": 34473306.39679041,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 34276681.89032742,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 31286585.26176663,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 29786171.183225013,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 30356021.33769126,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 31359965.18789413,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 30683727.023376703,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 31564603.415837657,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 33779511.70257937,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 32030682.83162585,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 35159721.47309388,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 33234228.310488414,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 34087048.53904772,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 34622667.62667657,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 31545273.61893923,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 33301969.53848376,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 34025812.49171229,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 28403598.201897543,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 28425061.836943153,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 28331129.195107494,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 43344785.314402446,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 41381549.514751315,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 43272172.44489281,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "owner_iseq": "method"
+    },
+    "screen-main-yjit.json": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "yjit": true,
+      "zjit": null,
+      "variant": "main",
+      "warmup": 500000,
+      "results": {
+        "class_read": [
+          {
+            "ips": 35971234.66687957,
+            "allocations": 8,
+            "iterations": 2000000
+          },
+          {
+            "ips": 21533980.88023026,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 36727410.682009496,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "instance_read": [
+          {
+            "ips": 31397475.413764685,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 30796840.847787205,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 31954081.21843165,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "predicate": [
+          {
+            "ips": 33745246.93975933,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 34789728.18666133,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 31356743.25357843,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "inherited_read": [
+          {
+            "ips": 36052312.193542615,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 35828170.03135461,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 36748927.487055466,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "subclass_override": [
+          {
+            "ips": 36314656.475516155,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 36638466.832572885,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 37369336.945686206,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "grandchild_read": [
+          {
+            "ips": 36551906.59488897,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 37261932.11834327,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 37514539.463136695,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "overridden_class_instance": [
+          {
+            "ips": 30347120.530913908,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 30944182.51226676,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 31035437.954488415,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ],
+        "instance_override": [
+          {
+            "ips": 41836248.15529053,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 40737862.08264855,
+            "allocations": 1,
+            "iterations": 2000000
+          },
+          {
+            "ips": 43260851.57904567,
+            "allocations": 1,
+            "iterations": 2000000
+          }
+        ]
+      },
+      "owner_iseq": "block"
+    },
+    "store-main-interpreter.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "store_source": [
+        "/home/user/workspace/repos/rails/activerecord/lib/active_record/store.rb",
+        155
+      ],
+      "variant": "main",
+      "warmup": 1000000,
+      "results": {
+        "serialized_reader": [
+          {
+            "ips": 631723.0975356472,
+            "allocations": 5,
+            "iterations": 3000000
+          },
+          {
+            "ips": 623083.7175795822,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 629796.4677056486,
+            "allocations": 48,
+            "iterations": 3000000
+          },
+          {
+            "ips": 628209.5025862929,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 577792.1896012676,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "json_reader": [
+          {
+            "ips": 868852.2105721349,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 832363.2643529263,
+            "allocations": 77,
+            "iterations": 3000000
+          },
+          {
+            "ips": 873579.679122175,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 861100.0688342329,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 832476.2888192785,
+            "allocations": 48,
+            "iterations": 3000000
+          }
+        ],
+        "overridden_reader_with_super": [
+          {
+            "ips": 597087.0065483225,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 610164.0378585871,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 613081.639663467,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 596146.5184431323,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 606173.30898616,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ]
+      },
+      "reader_iseq": "block"
+    },
+    "store-main-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "store_source": [
+        "/home/user/workspace/repos/rails/activerecord/lib/active_record/store.rb",
+        155
+      ],
+      "variant": "main",
+      "warmup": 1000000,
+      "results": {
+        "serialized_reader": [
+          {
+            "ips": 1421653.6564632764,
+            "allocations": 5,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1390172.824835185,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1365078.1455228499,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1424215.2918046508,
+            "allocations": 76,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1369683.0711161727,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "json_reader": [
+          {
+            "ips": 1956096.4722758895,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1866832.5527436237,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1898231.1291462432,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1893830.9027754588,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1958715.5350200273,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "overridden_reader_with_super": [
+          {
+            "ips": 1342105.3073766988,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1340817.4875281039,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1325093.2784726862,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1320144.6546394029,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1374784.5099748985,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ]
+      },
+      "reader_iseq": "block"
+    },
+    "store-main-zjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "store_source": [
+        "/home/user/workspace/repos/rails/activerecord/lib/active_record/store.rb",
+        155
+      ],
+      "variant": "main",
+      "warmup": 1000000,
+      "results": {
+        "serialized_reader": [
+          {
+            "ips": 1513863.6147956697,
+            "allocations": 5,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1537199.39921646,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1513127.7480556874,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1482505.712099661,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1529053.508248294,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "json_reader": [
+          {
+            "ips": 2396690.6418924183,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2378592.9281468415,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2302436.942238757,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2296778.4423221773,
+            "allocations": 76,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2286322.2227126397,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "overridden_reader_with_super": [
+          {
+            "ips": 1491756.7157362925,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1413580.0120297635,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1475711.3836556554,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1424645.800109219,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1436652.3751586964,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ]
+      },
+      "reader_iseq": "block"
+    },
+    "store-plain-interpreter.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "store_source": [
+        "/home/user/workspace/rails-research/store_ips.rb",
+        22
+      ],
+      "variant": "plain",
+      "warmup": 1000000,
+      "results": {
+        "serialized_reader": [
+          {
+            "ips": 644472.7256835249,
+            "allocations": 5,
+            "iterations": 3000000
+          },
+          {
+            "ips": 623488.6844716035,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 638622.0182617335,
+            "allocations": 48,
+            "iterations": 3000000
+          },
+          {
+            "ips": 639547.9824940321,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 638027.3385675737,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "json_reader": [
+          {
+            "ips": 851119.1472198413,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 854820.1668954209,
+            "allocations": 77,
+            "iterations": 3000000
+          },
+          {
+            "ips": 848865.9254232182,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 849995.6348473994,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 855047.164149294,
+            "allocations": 48,
+            "iterations": 3000000
+          }
+        ],
+        "overridden_reader_with_super": [
+          {
+            "ips": 606974.8127625366,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 617516.5119098542,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 589516.8522005024,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 590982.8503324895,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 602469.9975795294,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ]
+      },
+      "reader_iseq": "method"
+    },
+    "store-plain-yjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "store_source": [
+        "/home/user/workspace/rails-research/store_ips.rb",
+        22
+      ],
+      "variant": "plain",
+      "warmup": 1000000,
+      "results": {
+        "serialized_reader": [
+          {
+            "ips": 1355627.1538873482,
+            "allocations": 5,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1390524.133682227,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1398214.298572671,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1363211.8668967227,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1455403.6939311991,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "json_reader": [
+          {
+            "ips": 1775734.6296142866,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1937873.4752524367,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1831084.6113832057,
+            "allocations": 76,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1852149.2441388897,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1982608.5800058476,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "overridden_reader_with_super": [
+          {
+            "ips": 1360981.3148901553,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1372852.1145776177,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1296571.4992795847,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1368013.8107122001,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1414760.7643935336,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ]
+      },
+      "reader_iseq": "method"
+    },
+    "store-plain-zjit.json": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +ZJIT +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "store_source": [
+        "/home/user/workspace/rails-research/store_ips.rb",
+        22
+      ],
+      "variant": "plain",
+      "warmup": 1000000,
+      "results": {
+        "serialized_reader": [
+          {
+            "ips": 1568385.8096760588,
+            "allocations": 5,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1584019.4570812555,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1573044.7036243419,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1496121.6017275928,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1528789.5011555303,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "json_reader": [
+          {
+            "ips": 2481755.328137994,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2497102.1192333964,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2441681.8810708127,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2454055.2010225914,
+            "allocations": 76,
+            "iterations": 3000000
+          },
+          {
+            "ips": 2399670.162456243,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ],
+        "overridden_reader_with_super": [
+          {
+            "ips": 1573174.3435237668,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1575116.1421339267,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1561064.9885701037,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1543038.6556084943,
+            "allocations": 0,
+            "iterations": 3000000
+          },
+          {
+            "ips": 1474363.181051314,
+            "allocations": 0,
+            "iterations": 3000000
+          }
+        ]
+      },
+      "reader_iseq": "method"
+    }
+  },
+  "request_recount": {
+    "blog": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "lock_sha256": "7867715ad047f3699258888df27df2c5a9973ec8e49840cb16ee63afd93966da",
+      "delegated_name_helpers": [],
+      "requests": [
+        {
+          "route": "/articles",
+          "status": 200,
+          "families": {
+            "route_set": 70,
+            "class_attribute": 287,
+            "other": 7,
+            "view_base": 7,
+            "turbo_layout_proc": 2
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/articles/1",
+          "status": 200,
+          "families": {
+            "route_set": 29,
+            "class_attribute": 119,
+            "view_base": 6,
+            "turbo_layout_proc": 2
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/articles",
+          "status": 200,
+          "families": {
+            "route_set": 70,
+            "class_attribute": 112,
+            "view_base": 7,
+            "turbo_layout_proc": 2
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/articles/1",
+          "status": 200,
+          "families": {
+            "route_set": 29,
+            "class_attribute": 88,
+            "view_base": 6,
+            "turbo_layout_proc": 2
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/articles",
+          "status": 200,
+          "families": {
+            "route_set": 70,
+            "class_attribute": 112,
+            "view_base": 7,
+            "turbo_layout_proc": 2
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/articles/1",
+          "status": 200,
+          "families": {
+            "route_set": 29,
+            "class_attribute": 88,
+            "view_base": 6,
+            "turbo_layout_proc": 2
+          },
+          "delegated_name_calls": 0
+        }
+      ]
+    },
+    "fizzy": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "lock_sha256": "293a187d109c53173600a57d5f31ae3c8bd1d323fed82264f4c8516e455a7d93",
+      "delegated_name_helpers": [
+        {
+          "holder": "Message",
+          "name": "messageable_name",
+          "current": {
+            "owner": "Message",
+            "source_location": [
+              "/home/user/workspace/repos/rails/activerecord/lib/active_record/delegated_type.rb",
+              290
+            ],
+            "parameters": [],
+            "arity": 0,
+            "iseq_type": "block",
+            "iseq_label": "block in define_delegated_type_methods"
+          },
+          "replaced_on_holder": false
+        },
+        {
+          "holder": "Subscription",
+          "name": "subscribable_name",
+          "current": {
+            "owner": "Subscription",
+            "source_location": [
+              "/home/user/workspace/repos/rails/activerecord/lib/active_record/delegated_type.rb",
+              290
+            ],
+            "parameters": [],
+            "arity": 0,
+            "iseq_type": "block",
+            "iseq_label": "block in define_delegated_type_methods"
+          },
+          "replaced_on_holder": false
+        }
+      ],
+      "requests": [
+        {
+          "route": "/buckets",
+          "status": 200,
+          "families": {
+            "class_attribute": 1971,
+            "route_set": 62,
+            "view_base": 9,
+            "store": 12,
+            "named_scopes": 12,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/bubbles?bucket_ids%5B%5D=693169840&bucket_ids%5B%5D=664343589&creator_ids%5B%5D=127326141&stage_ids%5B%5D=66287381",
+          "status": 200,
+          "families": {
+            "class_attribute": 3041,
+            "route_set": 139,
+            "store": 66,
+            "view_base": 27,
+            "named_scopes": 22,
+            "turbo_layout_proc": 2,
+            "other": 3
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/account/users",
+          "status": 200,
+          "families": {
+            "route_set": 76,
+            "class_attribute": 256,
+            "view_base": 9,
+            "turbo_layout_proc": 2,
+            "named_scopes": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/workflows",
+          "status": 200,
+          "families": {
+            "route_set": 28,
+            "class_attribute": 206,
+            "view_base": 9,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/notifications",
+          "status": 200,
+          "families": {
+            "class_attribute": 1361,
+            "route_set": 42,
+            "view_base": 7,
+            "turbo_layout_proc": 2,
+            "named_scopes": 4,
+            "store": 1,
+            "other": 2
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/buckets/693169840/bubbles/613325334",
+          "status": 200,
+          "families": {
+            "class_attribute": 2909,
+            "route_set": 153,
+            "view_base": 29,
+            "named_scopes": 24,
+            "store": 4,
+            "turbo_layout_proc": 2,
+            "other": 2
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/buckets",
+          "status": 200,
+          "families": {
+            "class_attribute": 851,
+            "route_set": 62,
+            "view_base": 9,
+            "store": 12,
+            "named_scopes": 12,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/bubbles?bucket_ids%5B%5D=693169840&bucket_ids%5B%5D=664343589&creator_ids%5B%5D=127326141&stage_ids%5B%5D=66287381",
+          "status": 200,
+          "families": {
+            "class_attribute": 1703,
+            "route_set": 87,
+            "store": 60,
+            "view_base": 17,
+            "named_scopes": 14,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/account/users",
+          "status": 200,
+          "families": {
+            "route_set": 76,
+            "class_attribute": 241,
+            "view_base": 9,
+            "turbo_layout_proc": 2,
+            "named_scopes": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/workflows",
+          "status": 200,
+          "families": {
+            "route_set": 28,
+            "class_attribute": 167,
+            "view_base": 9,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/notifications",
+          "status": 200,
+          "families": {
+            "class_attribute": 202,
+            "route_set": 16,
+            "view_base": 7,
+            "turbo_layout_proc": 2,
+            "named_scopes": 4,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/buckets/693169840/bubbles/613325334",
+          "status": 200,
+          "families": {
+            "class_attribute": 1767,
+            "route_set": 99,
+            "view_base": 25,
+            "named_scopes": 22,
+            "store": 4,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/buckets",
+          "status": 200,
+          "families": {
+            "class_attribute": 851,
+            "route_set": 62,
+            "view_base": 9,
+            "store": 12,
+            "named_scopes": 12,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/bubbles?bucket_ids%5B%5D=693169840&bucket_ids%5B%5D=664343589&creator_ids%5B%5D=127326141&stage_ids%5B%5D=66287381",
+          "status": 200,
+          "families": {
+            "class_attribute": 1703,
+            "route_set": 87,
+            "store": 60,
+            "view_base": 17,
+            "named_scopes": 14,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/account/users",
+          "status": 200,
+          "families": {
+            "route_set": 76,
+            "class_attribute": 241,
+            "view_base": 9,
+            "turbo_layout_proc": 2,
+            "named_scopes": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/workflows",
+          "status": 200,
+          "families": {
+            "route_set": 28,
+            "class_attribute": 167,
+            "view_base": 9,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/notifications",
+          "status": 200,
+          "families": {
+            "class_attribute": 202,
+            "route_set": 16,
+            "view_base": 7,
+            "turbo_layout_proc": 2,
+            "named_scopes": 4,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        },
+        {
+          "route": "/buckets/693169840/bubbles/613325334",
+          "status": 200,
+          "families": {
+            "class_attribute": 1767,
+            "route_set": 99,
+            "view_base": 25,
+            "named_scopes": 22,
+            "store": 4,
+            "turbo_layout_proc": 2,
+            "other": 1
+          },
+          "delegated_name_calls": 0
+        }
+      ]
+    }
+  },
+  "campfire_delegated_counter": {
+    "pins": {
+      "app_sha": "02023b0f0cafc4d66e06e43be072cf4d6ca328fa",
+      "harness_sha": "673b1cc3cbbb341a6956e027e54bc2a18049bde0",
+      "ruby": "ruby 4.1.0dev (2026-10-21T20:49:20Z master 5771bd7a39) +PRISM [x86_64-linux]",
+      "rails": "8.2.0.alpha",
+      "lock_sha256": "7d57678757776e409e45b3d16dec689af49d44ac188364d431644b13250e93e7",
+      "harness_sha256": "e9c92f275c3e8d390dfaf0892668696a4912808d0db8b228331d816e08b8561f",
+      "interpreter": true
+    },
+    "helpers": [],
+    "requests": [
+      {
+        "phase": "cold",
+        "id": "room",
+        "status": 200,
+        "all_ruby_calls": 692717,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "cold",
+        "id": "pagination",
+        "status": 200,
+        "all_ruby_calls": 687226,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "cold",
+        "id": "sidebar",
+        "status": 200,
+        "all_ruby_calls": 42655,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "cold",
+        "id": "search",
+        "status": 200,
+        "all_ruby_calls": 120951,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "cold",
+        "id": "post",
+        "status": 200,
+        "all_ruby_calls": 38389,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "warm",
+        "id": "room",
+        "status": 200,
+        "all_ruby_calls": 75395,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "warm",
+        "id": "pagination",
+        "status": 200,
+        "all_ruby_calls": 63922,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "warm",
+        "id": "sidebar",
+        "status": 200,
+        "all_ruby_calls": 30227,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "warm",
+        "id": "search",
+        "status": 200,
+        "all_ruby_calls": 31653,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "warm",
+        "id": "post",
+        "status": 200,
+        "all_ruby_calls": 36799,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "repeat",
+        "id": "room",
+        "status": 200,
+        "all_ruby_calls": 75395,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "repeat",
+        "id": "pagination",
+        "status": 200,
+        "all_ruby_calls": 63922,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "repeat",
+        "id": "sidebar",
+        "status": 200,
+        "all_ruby_calls": 30227,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "repeat",
+        "id": "search",
+        "status": 200,
+        "all_ruby_calls": 31653,
+        "delegated_name_calls": {}
+      },
+      {
+        "phase": "repeat",
+        "id": "post",
+        "status": 200,
+        "all_ruby_calls": 36799,
+        "delegated_name_calls": {}
+      }
+    ]
+  }
+}
