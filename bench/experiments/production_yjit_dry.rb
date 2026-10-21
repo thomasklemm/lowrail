@@ -121,7 +121,7 @@ workers = {}
   compile_log = File.join(output, "#{label}.yjit.log")
   ok = system(env.merge("LOWRAIL" => arm == "production" ? "1" : "0", "BENCH_PHASE_ORDER" => order.to_s,
     "BENCH_YJIT_LOG_FILE" => compile_log), RbConfig.ruby, *JitStability.flags("yjit"), "--yjit-log=#{compile_log}",
-    __FILE__, "worker", "GET:/articles/1", chdir: app, out: log_path, err: [:child, :out])
+    File.expand_path(__FILE__), "worker", "GET:/articles/1", chdir: app, out: log_path, err: [:child, :out])
   records = File.readlines(log_path).filter_map do |line|
     prefix = line.split(" ", 2).first
     [prefix, JSON.parse(line.delete_prefix(prefix + " "))] if %w[YJIT_DRY_PIN LOWRAIL_BENCH YJIT_DRY_FINAL].include?(prefix)
