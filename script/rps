@@ -7,6 +7,7 @@ require "optparse"
 require "net/http"
 require "shellwords"
 require "securerandom"
+require "etc"
 load File.expand_path("screen", __dir__)
 
 module NativeRps
@@ -18,6 +19,18 @@ module NativeRps
     File.write(path, JSON.pretty_generate(value), perm: 0o600)
   end
 
+  module RequestTags
+    def call(env)
+      return super if env["HTTP_X_LOWRAIL_METRICS"] || env["HTTP_X_LOWRAIL_VALIDATION"]
+      index = RpsGcTags.begin_request(env.fetch("puma.socket"))
+      begin
+        super
+      ensure
+        RpsGcTags.end_request(index)
+      end
+    end
+  end
+
   # Only designated untimed samples enter the existing declared-entropy
   # validator. Ordinary HTTP load always calls the unchanged Rack app directly.
   class Samples
@@ -27,10 +40,18 @@ module NativeRps
 
     def call(env)
       if env["HTTP_X_LOWRAIL_METRICS"] == @config.fetch("validation_key")
+        capture = if @config["gc_tags_library"]
+          case env["HTTP_X_LOWRAIL_GC_TAGS"]
+          when "start" then RpsGcTags.start
+          when "stop"
+            @gc_tags_dump ||= RpsGcTags.dump(File.join(@directory, "gc-tags-#{Process.pid}.csv"))
+          end
+        end
         stats = GC.stat
         snapshot = {"pid" => Process.pid, "gc" => stats.slice(:heap_live_slots, :old_objects,
           :malloc_increase_bytes, :count, :minor_gc_count, :major_gc_count, :total_allocated_objects,
           :time), "rss" => NativeBench.rss}
+        snapshot["gc_tags"] = capture if capture
         return [200, {"content-type" => "application/json"}, [JSON.generate(snapshot)]]
       end
       return @app.call(env) unless env["HTTP_X_LOWRAIL_VALIDATION"] == @config.fetch("validation_key")
@@ -87,6 +108,10 @@ module NativeRps
     if config["exploration_setup"]
       require config.fetch("exploration_setup")
       NativeBench::Exploration.install(config: config, state: state, arm: arm)
+    end
+    if config["gc_tags_library"]
+      require config.fetch("gc_tags_library")
+      Samples.prepend(RequestTags)
     end
     require "rack/builder"
     application = Rack::Builder.parse_file(File.join(config.fetch("app"), "config.ru"))
@@ -177,16 +202,54 @@ module NativeRps
       File.write(destination + ".urls", urls.join("\n") + "\n")
       command.concat(["--urls-from-file", destination + ".urls"])
     end
-    ok = system({"NO_COLOR" => "true"}, *command, out: destination, err: destination + ".stderr")
+    service = "rps-wire-#{Process.pid}" if config["packet_capture_cpu"] && File.basename(destination) == "timed.json"
+    begin
+      if service
+        capture = destination + ".pcap"
+        pidfile = destination + ".capture-pid"
+        recorder = ["taskset", "-c", config.fetch("packet_capture_cpu").to_s, "tcpdump", "-Z", "root",
+          "--immediate-mode", "-U", "-i", "lo", "-Q", "in", "-n", "-s", "128", "-B", "4096", "--time-stamp-precision", "nano",
+          "-w", capture, "tcp port #{Integer(config.fetch('port'))}"].shelljoin
+        script = "echo $$ > #{pidfile.shellescape}; exec #{recorder} 2>#{(destination + '.capture-stderr').shellescape}"
+        launch = ["sudo", "-n", "sh", "-c", script].shelljoin
+        raise "packet observer failed" unless system("amp", "orb", "service", "start", service, "--command", launch,
+          out: destination + ".capture-service", err: [:child, :out])
+        deadline = NativeBench.clock + 10
+        until File.exist?(pidfile) && File.exist?(destination + ".capture-stderr") &&
+            File.read(destination + ".capture-stderr").include?("listening on lo")
+          raise "packet observer readiness failed" if NativeBench.clock > deadline
+          sleep 0.05
+        end
+      end
+      ok = system({"NO_COLOR" => "true"}, *command, out: destination, err: destination + ".stderr")
+      if service
+        # Drain capture after oha has joined its outstanding requests. This is
+        # outside the oha window; a zero-drop counter alone does not prove that
+        # a buffered pcap tail reached disk before the recorder was stopped.
+        sleep 0.1
+        pid = Integer(File.read(pidfile))
+        stat = File.read("/proc/#{pid}/stat").split(") ", 2).last.split
+        capture_cpu_s = (Integer(stat[11]) + Integer(stat[12])).fdiv(Etc.sysconf(Etc::SC_CLK_TCK))
+      end
+    ensure
+      system("amp", "orb", "service", "stop", service, out: destination + ".capture-stop", err: [:child, :out]) if service
+    end
     raise "oha failed: #{destination}" unless ok
     report = JSON.parse(File.read(destination))
     statuses, errors = report.fetch("statusCodeDistribution"), report.fetch("errorDistribution")
-    {"rps" => report.fetch("summary").fetch("requestsPerSec"),
+    result = {"rps" => report.fetch("summary").fetch("requestsPerSec"),
       "requests" => statuses.values.sum, "elapsed_s" => report.fetch("summary").fetch("total"),
       "errors" => errors.values.sum + statuses.reject { |status, _| status == "200" }.values.sum,
       "status_counts" => statuses, "transport_errors" => errors,
       "latency_ms" => report.fetch("latencyPercentiles").slice("p50", "p90", "p99").transform_values { _1 * 1000 },
       "raw_sha256" => Digest::SHA256.file(destination).hexdigest}
+    if service
+      stderr = File.read(destination + ".capture-stderr")
+      result["packet_capture"] = {"sha256" => Digest::SHA256.file(capture).hexdigest,
+        "cpu_s_before_stop" => capture_cpu_s, "cpu_affinity" => config.fetch("packet_capture_cpu"),
+        "kernel_drops" => stderr[/^(\d+) packets dropped by kernel$/, 1]&.to_i}
+    end
+    result
   end
 
   def summary(rows)
@@ -236,7 +299,7 @@ module NativeRps
     end
   end
 
-  def process_metrics(config, directory, boot)
+  def process_metrics(config, directory, boot, gc_tags: nil)
     master = boot.fetch("pid")
     children = File.read("/proc/#{master}/task/#{master}/children").split.map(&:to_i)
     expected = children.empty? ? [master] : children
@@ -246,7 +309,7 @@ module NativeRps
     until (expected - records.keys).empty?
       raise "incomplete Puma worker metrics: #{records.keys}/#{expected}" if NativeBench.clock > deadline
       response = client.request("GET", config.fetch("paths").first, "metrics", extra_headers: {
-        "X-Lowrail-Metrics" => config.fetch("validation_key")})
+        "X-Lowrail-Metrics" => config.fetch("validation_key"), "X-Lowrail-Gc-Tags" => gc_tags.to_s})
       raise "metrics HTTP #{response.code}" unless response.code == "200"
       row = JSON.parse(response.body)
       records[row.fetch("pid")] = row
@@ -278,7 +341,7 @@ module NativeRps
     end
     raise "nonempty absolute GET paths required" unless config.fetch("paths").is_a?(Array) &&
       !config.fetch("paths").empty? && config.fetch("paths").all? { _1.is_a?(String) && _1.start_with?("/") }
-    %w[exploration_setup puma_setup contexts].each { config[_1] = File.realpath(config[_1]) if config[_1] }
+    %w[exploration_setup puma_setup contexts gc_tags_library].each { config[_1] = File.realpath(config[_1]) if config[_1] }
     raise "dedicated disposable corpus app required" unless config.fetch("app").start_with?(File.join(NativeBench::ROOT, ".corpus/"))
     raise "output outside app/seed required" if %w[app seed].any? { output.start_with?(config.fetch(_1) + "/") }
     raise "pinned oha 1.14.0 Linux amd64 required" unless Digest::SHA256.file(config.fetch("oha")).hexdigest == OHA_SHA256
@@ -293,7 +356,7 @@ module NativeRps
        config.fetch("gemfile", config.fetch("app") + "/Gemfile") + ".lock", config.fetch("validation_policy")] +
       Dir[File.join(config.fetch("artifact"), "**/*")].select { File.file?(_1) } +
       Dir[File.join(config.fetch("seed"), "**/*")].select { File.file?(_1) } +
-      config.fetch("exploration_sources", []) + config.values_at("exploration_setup", "puma_setup", "contexts").compact
+      config.fetch("exploration_sources", []) + config.values_at("exploration_setup", "puma_setup", "contexts", "gc_tags_library").compact
     files << File.join(NativeBench::ROOT, "docs/helper-census.json") if config.fetch("workload") == "fizzy" &&
       !config.fetch("exploration_only", false)
     pins = files.uniq.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
@@ -366,9 +429,11 @@ module NativeRps
         warm_rows = report.fetch("rows").map { {"samples" => _1.fetch("warm_samples")} } + [{"samples" => row.fetch("warm_samples")}]
         raise "warm exact-output sample failed; no timed load" unless config["diagnostic_load_on_exact_failure"] ||
           exact_checks(warm_rows).values.all? { _1.fetch("passed") }
-        row["post_warmup_process_metrics"] = process_metrics(config, directory, row.fetch("boot"))
+        row["post_warmup_process_metrics"] = process_metrics(config, directory, row.fetch("boot"),
+          gc_tags: config["gc_tags_library"] ? "start" : nil)
         timed = load(config, client, config.fetch("duration"), File.join(directory, "timed.json"))
-        row["post_load_process_metrics"] = process_metrics(config, directory, row.fetch("boot"))
+        row["post_load_process_metrics"] = process_metrics(config, directory, row.fetch("boot"),
+          gc_tags: config["gc_tags_library"] ? "stop" : nil)
         report.fetch("rows") << row.merge("warmup" => warmup, "timed" => timed)
         write(File.join(output, "progress.json"), report)
         raise "source/runtime/fixture drift" unless BlogProduction::Entropy.source_pin(config.fetch("app")) == source_pin &&

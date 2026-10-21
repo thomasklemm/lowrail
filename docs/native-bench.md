@@ -891,3 +891,76 @@ transport and queue delay, and the short probes missed the major-GC pattern.
 **Cause sentence:** observed diagnostic GCs are allocation-slot exhaustion,
 but the confirmatory excess-major/p99 cause remains unproven. No justified
 boot-freeze/compact fix, GC tuning or runtime change is proposed or landed.
+
+### Final current-main cohort: preregistered GC/wire attribution
+
+**One attempt, not started at declaration.** Runtime is main
+[`5ac665c`](https://github.com/thomasklemm/lowrail/commit/5ac665c5c2c61e329ef9ccb34f62df086bda5d74),
+including the `b059fc9` token and `c10ccb8` guard allocation fixes. Rebuilt
+the same three-unit form/token/collection sealed YJIT artifact, retaining
+the original denylist and previous artifact. Same fixture and protocol as
+`44a33c4`: 20 fresh-server rounds, rotated off-A/on/off-B, Puma 4×1, c16,
+server CPUs 0–3 / client CPUs 4–7, 5 s warmup / 20 s load, stock Ruby 4.0.7,
+Rails 8.1.4, pinned oha 1.14.0. Same two-seed literal cold/warm exact samples,
+separate coverage preflight, worker snapshots and error/pin/mode checks.
+Same fixed-seed 5,000-bootstrap paired-round **mean percentage** decision:
+A/A 95% CI contains zero **and** on/off RPS lower bound exceeds A/A upper.
+No retries, exclusions, tuning, pooling, forced GC or runtime/app changes.
+Report p50/p90/p99 even if worse; throughput acceptance is not latency
+acceptance or own-suite/DB certification. Coordinator decides README use.
+
+Both observers below run **identically in all arms from the first timed
+window**, enabled after warmup and disabled after oha joins outstanding
+requests. No body/header/entropy changes in native timed requests:
+
+* `bench/rps_gc_tags.c`: compile an external Ruby extension and set
+  `gc_tags_library` in the JSON config. Native bounded per-worker buffers
+  record socket peer port, realtime/monotonic Rack start/end and GC count;
+  internal GC ENTER/EXIT callbacks record actual pause intervals, not whole
+  incremental/lazy cycles. No per-request Ruby record allocations. Capacity
+  32,768 requests / 131,072 pauses per worker; report drops/open intervals.
+  This measures an outer Rack call, not socket read/write or body streaming.
+* Set `packet_capture_cpu:"7"` to record passive direct IPv4 HTTP/1.1
+  loopback packets with tcpdump 4.99.3/libpcap 1.10.3, nanosecond timestamps,
+  immediate delivery, snaplen 128 and 4 MiB kernel buffer. A post-load 100 ms
+  drain is outside oha timing. Capture starts before oha and stops afterward.
+  The orb has only CPUs 0–7: **no spare CPU**, so recorder CPU 7 shares the
+  existing client CPU set, not a server CPU. Report recorder user+system CPU
+  seconds, native observer CPU and kernel/record drops by arm. CPU accounting
+  excludes Ruby wrapper overhead, clock-query remainder and kernel packet
+  capture cost; it is not a measured no-observer overhead ablation.
+
+Reproduction after compiling `bench/rps_gc_tags.c` with the target Ruby
+include directories and `gcc -O2 -shared -fPIC -Wall`:
+
+```sh
+mise exec ruby@4.0.7 -- ruby script/rps --config PRIVATE_CONFIG.json --output NEW_DIRECTORY
+python3 bench/rps_attribution.py NEW_DIRECTORY > attribution.json
+```
+
+The offline parser joins peer-port/keepalive ordinals only when counts and
+clock ordering agree; it audits retransmissions, sequence gaps/wrap, record
+capacity, capture counts and drift against the monotonic interval. Failed
+joins stay counted as unknown, never shifted or replaced. The wire span is
+first observed GET payload to last response payload; it omits client-side
+scheduling and is **not** oha latency or an exact end-to-end join to oha's
+unkeyed histogram. oha remains the primary RPS/p50/p90/p99 source. For each
+window's wire p99 tail report GC overlap before/inside/after its assigned
+worker's Rack call, and Rack versus wire-minus-Rack remainder. The remainder
+includes transport, scheduling, body/write and queue work: **not pure Puma
+queueing**. Overlap is correlation, not a causal intervention; a pause can
+overlap several queued requests. Do not select a new pricing statistic from
+this diagnosis or claim a cause if the p99 pattern does not reproduce.
+
+Setup validation (not a pricing cohort): two rounds of one-second warmup/load
+with all observers on join **8,712 / 8,712** oha completions, native records
+and wire spans across six servers; four observer records per server, zero
+kernel/native drops, count/order mismatches or open pauses, and passing
+two-seed cold/warm exact checks. The preceding buffered-capture smoke had
+missing tail records despite zero kernel drops; it is retained, not used as
+evidence of complete attribution. Immediate delivery plus the post-load drain
+fix that setup failure. Ruby harness checks: 4 runs / 64 assertions pass;
+the offline parser regression checks asymmetric Rack/remainder intervals,
+before/inside/after GC, keepalive ordinals, retransmission/sequence wrap and
+missing-record refusal. New artifact manifest SHA256
+`d8ee4ee316a056b7a3e47779dcdc6cae8294f96f164ced6d1c2f680ba0739a19`.
