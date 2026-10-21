@@ -1,0 +1,3780 @@
+{
+  "base": "cfa50b00939fd07ae87ffceb730bd2cfbccd8553",
+  "token_head": "30c96264ab0fb6e7c6e14336679ff0ca4079ca56",
+  "date": "2026-10-21",
+  "costs": {
+    "interpreter": {
+      "metadata": {
+        "seed": 41231,
+        "rounds": 6,
+        "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]",
+        "sources": {
+          "bench/experiments/vm_token_cost.rb": "bd2d40668839327fc3b7a22efeb293cc9642da0cb509d3fd4fca201871559aa0",
+          "/home/user/workspace/repo/bench/experiments/vm_token_native.c": "02bc907d0417abfeed244659f5ccd75275ae8ed73c6ca792206e0630cb59a2a7"
+        },
+        "valgrind": {
+          "pass": true,
+          "version": "valgrind-3.19.0",
+          "rails_boot": false,
+          "driver_sha256": "3d240b9d3e7e0b28b2d129395d51f716fdb57ed19372066b9a0a37d51eb5d151",
+          "build": {
+            "version": "3.19.0",
+            "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+            "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+            "brk_reservation_mib": 512,
+            "tool": "libexec/valgrind/callgrind-amd64-linux",
+            "tool_sha256": "40edc54db6ab8043265994003768c5a9fafe7d9531c888532c6d5eba6443352f",
+            "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+            "libc": "glibc 2.36"
+          },
+          "log_sha256": "af7970dec03674881d996ce84ce67ed2e38b0a36c79c7c78e9ba634c48393f32"
+        },
+        "counter": "callgrind",
+        "heap_mode": "fixed",
+        "heap_slots": [
+          1000000,
+          1000000,
+          250000,
+          250000,
+          100000,
+          100000,
+          100000,
+          20000,
+          10000,
+          10000,
+          10000,
+          10000
+        ],
+        "region": "after warmup and three full GCs",
+        "requests": 100000,
+        "requested_yjit": false,
+        "requested_jit": "interpreter",
+        "actual_yjit": [
+          false
+        ],
+        "actual_jit": [
+          "interpreter"
+        ]
+      },
+      "prices": {
+        "accepted": true,
+        "prices": {
+          "epoch_read": {
+            "median": 193.99999999999997,
+            "ci95": [
+              193.99999999999994,
+              194.0
+            ]
+          },
+          "epoch_branch": {
+            "median": 265.0,
+            "ci95": [
+              264.99999999999994,
+              265.0
+            ]
+          },
+          "token_read": {
+            "median": 182.99999999999997,
+            "ci95": [
+              182.99999999999994,
+              183.0
+            ]
+          },
+          "token_branch": {
+            "median": 200.99999999999997,
+            "ci95": [
+              200.99999999999994,
+              201.0
+            ]
+          },
+          "c_token": {
+            "median": 26.0,
+            "ci95": [
+              25.999999999999996,
+              26.000000000000004
+            ]
+          },
+          "cas": {
+            "median": 7.0,
+            "ci95": [
+              6.999999999999999,
+              7.0
+            ]
+          }
+        }
+      },
+      "controls": {
+        "layers": {
+          "c_off_a": {
+            "instructions_total": {
+              "value": {
+                "median": 6.988675000000001,
+                "ci95": [
+                  6.97729,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -98.26578855486139,
+                "ci95": [
+                  -98.2685647027749,
+                  -98.2630124069479
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 6.988675000000001,
+                "ci95": [
+                  6.97729,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -98.26578855486139,
+                "ci95": [
+                  -98.2685647027749,
+                  -98.2630124069479
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "c_off_b": {
+            "instructions_total": {
+              "value": {
+                "median": 6.988675000000001,
+                "ci95": [
+                  6.97729,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -98.26578855486139,
+                "ci95": [
+                  -98.2685647027749,
+                  -98.2630124069479
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 6.988675000000001,
+                "ci95": [
+                  6.97729,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -98.26578855486139,
+                "ci95": [
+                  -98.2685647027749,
+                  -98.2630124069479
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "c_token": {
+            "instructions_total": {
+              "value": {
+                "median": 32.988675,
+                "ci95": [
+                  32.97729,
+                  33.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -91.81399337927022,
+                "ci95": [
+                  -91.81658725481834,
+                  -91.81139950372209
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 32.988675,
+                "ci95": [
+                  32.97729,
+                  33.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -91.81399337927022,
+                "ci95": [
+                  -91.81658725481834,
+                  -91.81139950372209
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "epoch_branch": {
+            "instructions_total": {
+              "value": {
+                "median": 667.988615,
+                "ci95": [
+                  667.97723,
+                  668.0
+                ]
+              },
+              "delta_pct": {
+                "median": 65.75868159737163,
+                "ci95": [
+                  65.75682382133996,
+                  65.76053937340329
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 667.988615,
+                "ci95": [
+                  667.97723,
+                  668.0
+                ]
+              },
+              "delta_pct": {
+                "median": 65.75868159737163,
+                "ci95": [
+                  65.75682382133996,
+                  65.76053937340329
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "off_a": {
+            "instructions_total": {
+              "value": {
+                "median": 402.988615,
+                "ci95": [
+                  402.97723,
+                  403.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 402.988615,
+                "ci95": [
+                  402.97723,
+                  403.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "token_read": {
+            "instructions_total": {
+              "value": {
+                "median": 585.988615,
+                "ci95": [
+                  585.97723,
+                  586.0
+                ]
+              },
+              "delta_pct": {
+                "median": 45.4107121974302,
+                "ci95": [
+                  45.40942928039702,
+                  45.41199511446339
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 585.988615,
+                "ci95": [
+                  585.97723,
+                  586.0
+                ]
+              },
+              "delta_pct": {
+                "median": 45.4107121974302,
+                "ci95": [
+                  45.40942928039702,
+                  45.41199511446339
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "off_b": {
+            "instructions_total": {
+              "value": {
+                "median": 402.988615,
+                "ci95": [
+                  402.97723,
+                  403.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 402.988615,
+                "ci95": [
+                  402.97723,
+                  403.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "epoch_read": {
+            "instructions_total": {
+              "value": {
+                "median": 596.988615,
+                "ci95": [
+                  596.97723,
+                  597.0
+                ]
+              },
+              "delta_pct": {
+                "median": 48.14031784864187,
+                "ci95": [
+                  48.13895781637718,
+                  48.141677880906556
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 596.988615,
+                "ci95": [
+                  596.97723,
+                  597.0
+                ]
+              },
+              "delta_pct": {
+                "median": 48.14031784864187,
+                "ci95": [
+                  48.13895781637718,
+                  48.141677880906556
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "cas": {
+            "instructions_total": {
+              "value": {
+                "median": 13.988675,
+                "ci95": [
+                  13.97729,
+                  14.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -96.5287667768176,
+                "ci95": [
+                  -96.53149385140198,
+                  -96.52603970223325
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 13.988675,
+                "ci95": [
+                  13.97729,
+                  14.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -96.5287667768176,
+                "ci95": [
+                  -96.53149385140198,
+                  -96.52603970223325
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "token_branch": {
+            "instructions_total": {
+              "value": {
+                "median": 603.988615,
+                "ci95": [
+                  603.97723,
+                  604.0
+                ]
+              },
+              "delta_pct": {
+                "median": 49.87733962668563,
+                "ci95": [
+                  49.8759305210918,
+                  49.87874873227946
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 603.988615,
+                "ci95": [
+                  603.97723,
+                  604.0
+                ]
+              },
+              "delta_pct": {
+                "median": 49.87733962668563,
+                "ci95": [
+                  49.8759305210918,
+                  49.87874873227946
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          }
+        },
+        "aa": {
+          "pass": true,
+          "metrics": {
+            "instructions_total": true,
+            "instructions_no_gc": true
+          },
+          "tolerance_pct": 0.5
+        },
+        "gc": {
+          "off_a": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          }
+        },
+        "heap_capacity": {
+          "0": {
+            "min": 1000983,
+            "max": 1000983,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "1": {
+            "min": 1000454,
+            "max": 1000454,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "2": {
+            "min": 250635,
+            "max": 250635,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "3": {
+            "min": 250369,
+            "max": 250369,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "4": {
+            "min": 100209,
+            "max": 100209,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "5": {
+            "min": 100156,
+            "max": 100156,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "6": {
+            "min": 100516,
+            "max": 100516,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "7": {
+            "min": 20145,
+            "max": 20145,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "8": {
+            "min": 10033,
+            "max": 10033,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "9": {
+            "min": 10140,
+            "max": 10140,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "10": {
+            "min": 10120,
+            "max": 10120,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "11": {
+            "min": 10017,
+            "max": 10017,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          }
+        },
+        "heap_matched": true,
+        "jit": {
+          "requested_jit": "interpreter",
+          "diagnostic_only": false,
+          "requested_yjit": false,
+          "actual_yjit": [
+            false
+          ],
+          "actual_jit": [
+            "interpreter"
+          ],
+          "pass": true
+        },
+        "native_aa": {
+          "instructions_total": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "instructions_no_gc": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "all_measured_windows_zero_collections": true,
+        "all_positive_windows_zero_allocations": true
+      },
+      "samples": [
+        {
+          "c_off_a": {
+            "instructions_total": 6.97729,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 6.97729,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 32.97729,
+            "instructions_no_gc": 33.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 667.97723,
+            "instructions_no_gc": 668.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 402.97723,
+            "instructions_no_gc": 403.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 585.97723,
+            "instructions_no_gc": 586.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 402.97723,
+            "instructions_no_gc": 403.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 596.97723,
+            "instructions_no_gc": 597.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 13.97729,
+            "instructions_no_gc": 14.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 603.97723,
+            "instructions_no_gc": 604.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "c_token": {
+            "instructions_total": 33.00006,
+            "instructions_no_gc": 32.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 14.00006,
+            "instructions_no_gc": 13.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 403.0,
+            "instructions_no_gc": 402.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 604.0,
+            "instructions_no_gc": 603.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 586.0,
+            "instructions_no_gc": 585.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 668.0,
+            "instructions_no_gc": 667.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 597.0,
+            "instructions_no_gc": 596.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 403.0,
+            "instructions_no_gc": 402.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "off_b": {
+            "instructions_total": 402.97723,
+            "instructions_no_gc": 403.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 585.97723,
+            "instructions_no_gc": 586.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 6.97729,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 402.97723,
+            "instructions_no_gc": 403.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 32.97729,
+            "instructions_no_gc": 33.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 6.97729,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 13.97729,
+            "instructions_no_gc": 14.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 596.97723,
+            "instructions_no_gc": 597.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 603.97723,
+            "instructions_no_gc": 604.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 667.97723,
+            "instructions_no_gc": 668.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "c_off_a": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 14.00006,
+            "instructions_no_gc": 13.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 403.0,
+            "instructions_no_gc": 402.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 403.0,
+            "instructions_no_gc": 402.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 33.00006,
+            "instructions_no_gc": 32.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 597.0,
+            "instructions_no_gc": 596.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 604.0,
+            "instructions_no_gc": 603.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 586.0,
+            "instructions_no_gc": 585.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 668.0,
+            "instructions_no_gc": 667.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "c_token": {
+            "instructions_total": 32.97729,
+            "instructions_no_gc": 33.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 6.97729,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 402.97723,
+            "instructions_no_gc": 403.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 596.97723,
+            "instructions_no_gc": 597.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 6.97729,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 603.97723,
+            "instructions_no_gc": 604.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 13.97729,
+            "instructions_no_gc": 14.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 585.97723,
+            "instructions_no_gc": 586.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 402.97723,
+            "instructions_no_gc": 403.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 667.97723,
+            "instructions_no_gc": 668.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "off_b": {
+            "instructions_total": 403.0,
+            "instructions_no_gc": 402.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 586.0,
+            "instructions_no_gc": 585.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 33.00006,
+            "instructions_no_gc": 32.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 597.0,
+            "instructions_no_gc": 596.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 668.0,
+            "instructions_no_gc": 667.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 14.00006,
+            "instructions_no_gc": 13.97729,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 403.0,
+            "instructions_no_gc": 402.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 604.0,
+            "instructions_no_gc": 603.97723,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        }
+      ]
+    },
+    "yjit": {
+      "metadata": {
+        "seed": 41231,
+        "rounds": 6,
+        "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]",
+        "sources": {
+          "bench/experiments/vm_token_cost.rb": "bd2d40668839327fc3b7a22efeb293cc9642da0cb509d3fd4fca201871559aa0",
+          "/home/user/workspace/repo/bench/experiments/vm_token_native.c": "02bc907d0417abfeed244659f5ccd75275ae8ed73c6ca792206e0630cb59a2a7"
+        },
+        "valgrind": {
+          "pass": true,
+          "version": "valgrind-3.19.0",
+          "rails_boot": false,
+          "driver_sha256": "3d240b9d3e7e0b28b2d129395d51f716fdb57ed19372066b9a0a37d51eb5d151",
+          "build": {
+            "version": "3.19.0",
+            "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+            "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+            "brk_reservation_mib": 512,
+            "tool": "libexec/valgrind/callgrind-amd64-linux",
+            "tool_sha256": "40edc54db6ab8043265994003768c5a9fafe7d9531c888532c6d5eba6443352f",
+            "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+            "libc": "glibc 2.36"
+          },
+          "log_sha256": "83bca0b8676da041ab72b7b57709787846929278e0b90f434e786e768e62198e"
+        },
+        "counter": "callgrind",
+        "heap_mode": "fixed",
+        "heap_slots": [
+          1000000,
+          1000000,
+          250000,
+          250000,
+          100000,
+          100000,
+          100000,
+          20000,
+          10000,
+          10000,
+          10000,
+          10000
+        ],
+        "region": "after warmup and three full GCs",
+        "requests": 100000,
+        "requested_yjit": true,
+        "requested_jit": "yjit",
+        "actual_yjit": [
+          true
+        ],
+        "actual_jit": [
+          "yjit"
+        ]
+      },
+      "prices": {
+        "accepted": true,
+        "prices": {
+          "epoch_read": {
+            "median": 75.0,
+            "ci95": [
+              75.0,
+              75.0
+            ]
+          },
+          "epoch_branch": {
+            "median": 91.0,
+            "ci95": [
+              91.0,
+              91.0
+            ]
+          },
+          "token_read": {
+            "median": 102.0,
+            "ci95": [
+              101.99999999999999,
+              102.0
+            ]
+          },
+          "token_branch": {
+            "median": 105.0,
+            "ci95": [
+              104.99999999999999,
+              105.0
+            ]
+          },
+          "c_token": {
+            "median": 26.0,
+            "ci95": [
+              25.999999999999996,
+              26.0
+            ]
+          },
+          "cas": {
+            "median": 6.999999999999999,
+            "ci95": [
+              6.999999999999999,
+              6.999999999999999
+            ]
+          }
+        }
+      },
+      "controls": {
+        "layers": {
+          "c_off_a": {
+            "instructions_total": {
+              "value": {
+                "median": 6.987415,
+                "ci95": [
+                  6.97477,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -80.02875226607209,
+                "ci95": [
+                  -80.05767596071561,
+                  -79.99982857142857
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 6.987415,
+                "ci95": [
+                  6.97477,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -80.02875226607209,
+                "ci95": [
+                  -80.05767596071561,
+                  -79.99982857142857
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "c_off_b": {
+            "instructions_total": {
+              "value": {
+                "median": 6.987415,
+                "ci95": [
+                  6.97477,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -80.02875226607209,
+                "ci95": [
+                  -80.05767596071561,
+                  -79.99982857142857
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 6.987415,
+                "ci95": [
+                  6.97477,
+                  7.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -80.02875226607209,
+                "ci95": [
+                  -80.05767596071561,
+                  -79.99982857142857
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "c_token": {
+            "instructions_total": {
+              "value": {
+                "median": 32.987415,
+                "ci95": [
+                  32.97477,
+                  33.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -5.7161802063507405,
+                "ci95": [
+                  -5.718246126987192,
+                  -5.714114285714289
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 32.987415,
+                "ci95": [
+                  32.97477,
+                  33.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -5.7161802063507405,
+                "ci95": [
+                  -5.718246126987192,
+                  -5.714114285714289
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "epoch_branch": {
+            "instructions_total": {
+              "value": {
+                "median": 125.98735500000001,
+                "ci95": [
+                  125.97471,
+                  126.0
+                ]
+              },
+              "delta_pct": {
+                "median": 260.0940022090248,
+                "ci95": [
+                  260.0,
+                  260.1880044180495
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 125.98735500000001,
+                "ci95": [
+                  125.97471,
+                  126.0
+                ]
+              },
+              "delta_pct": {
+                "median": 260.0940022090248,
+                "ci95": [
+                  260.0,
+                  260.1880044180495
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "off_a": {
+            "instructions_total": {
+              "value": {
+                "median": 34.987355,
+                "ci95": [
+                  34.97471,
+                  35.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 34.987355,
+                "ci95": [
+                  34.97471,
+                  35.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "token_read": {
+            "instructions_total": {
+              "value": {
+                "median": 136.98735499999998,
+                "ci95": [
+                  136.97471,
+                  137.0
+                ]
+              },
+              "delta_pct": {
+                "median": 291.53393654198373,
+                "ci95": [
+                  291.4285714285714,
+                  291.6393016553961
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 136.98735499999998,
+                "ci95": [
+                  136.97471,
+                  137.0
+                ]
+              },
+              "delta_pct": {
+                "median": 291.53393654198373,
+                "ci95": [
+                  291.4285714285714,
+                  291.6393016553961
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "off_b": {
+            "instructions_total": {
+              "value": {
+                "median": 34.987355,
+                "ci95": [
+                  34.97471,
+                  35.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 34.987355,
+                "ci95": [
+                  34.97471,
+                  35.0
+                ]
+              },
+              "delta_pct": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "epoch_read": {
+            "instructions_total": {
+              "value": {
+                "median": 109.98735500000001,
+                "ci95": [
+                  109.97471,
+                  110.0
+                ]
+              },
+              "delta_pct": {
+                "median": 214.3631886338116,
+                "ci95": [
+                  214.28571428571428,
+                  214.44066298190893
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 109.98735500000001,
+                "ci95": [
+                  109.97471,
+                  110.0
+                ]
+              },
+              "delta_pct": {
+                "median": 214.3631886338116,
+                "ci95": [
+                  214.28571428571428,
+                  214.44066298190893
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "cas": {
+            "instructions_total": {
+              "value": {
+                "median": 13.987414999999999,
+                "ci95": [
+                  13.97477,
+                  14.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -60.02152132691634,
+                "ci95": [
+                  -60.04321408240412,
+                  -59.99982857142857
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 13.987414999999999,
+                "ci95": [
+                  13.97477,
+                  14.00006
+                ]
+              },
+              "delta_pct": {
+                "median": -60.02152132691634,
+                "ci95": [
+                  -60.04321408240412,
+                  -59.99982857142857
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          },
+          "token_branch": {
+            "instructions_total": {
+              "value": {
+                "median": 139.98735499999998,
+                "ci95": [
+                  139.97471,
+                  140.0
+                ]
+              },
+              "delta_pct": {
+                "median": 300.1084640873362,
+                "ci95": [
+                  300.0,
+                  300.2169281746724
+                ]
+              }
+            },
+            "instructions_no_gc": {
+              "value": {
+                "median": 139.98735499999998,
+                "ci95": [
+                  139.97471,
+                  140.0
+                ]
+              },
+              "delta_pct": {
+                "median": 300.1084640873362,
+                "ci95": [
+                  300.0,
+                  300.2169281746724
+                ]
+              }
+            },
+            "allocations": {
+              "value": {
+                "median": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "delta_pct": null
+            }
+          }
+        },
+        "aa": {
+          "pass": true,
+          "metrics": {
+            "instructions_total": true,
+            "instructions_no_gc": true
+          },
+          "tolerance_pct": 0.5
+        },
+        "gc": {
+          "off_a": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "minor_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "major_gc_per_request": {
+              "median": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "gc_per_1k_allocations": null
+          }
+        },
+        "heap_capacity": {
+          "0": {
+            "min": 1000983,
+            "max": 1000983,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "1": {
+            "min": 1000453,
+            "max": 1000453,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "2": {
+            "min": 250635,
+            "max": 250635,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "3": {
+            "min": 250369,
+            "max": 250369,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "4": {
+            "min": 100205,
+            "max": 100205,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "5": {
+            "min": 100156,
+            "max": 100156,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "6": {
+            "min": 100515,
+            "max": 100515,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "7": {
+            "min": 20145,
+            "max": 20145,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "8": {
+            "min": 10033,
+            "max": 10033,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "9": {
+            "min": 10140,
+            "max": 10140,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "10": {
+            "min": 10118,
+            "max": 10118,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          },
+          "11": {
+            "min": 10017,
+            "max": 10017,
+            "page_target": null,
+            "pages_matched": null,
+            "matched": true
+          }
+        },
+        "heap_matched": true,
+        "jit": {
+          "requested_jit": "yjit",
+          "diagnostic_only": false,
+          "requested_yjit": true,
+          "actual_yjit": [
+            true
+          ],
+          "actual_jit": [
+            "yjit"
+          ],
+          "pass": true
+        },
+        "native_aa": {
+          "instructions_total": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "instructions_no_gc": {
+            "median": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "all_measured_windows_zero_collections": true,
+        "all_positive_windows_zero_allocations": true
+      },
+      "samples": [
+        {
+          "c_off_a": {
+            "instructions_total": 6.97477,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 6.97477,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 32.97477,
+            "instructions_no_gc": 33.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 125.97471,
+            "instructions_no_gc": 126.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 34.97471,
+            "instructions_no_gc": 35.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 136.97471,
+            "instructions_no_gc": 137.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 34.97471,
+            "instructions_no_gc": 35.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 109.97471,
+            "instructions_no_gc": 110.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 13.97477,
+            "instructions_no_gc": 14.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 139.97471,
+            "instructions_no_gc": 140.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "c_token": {
+            "instructions_total": 33.00006,
+            "instructions_no_gc": 32.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 14.00006,
+            "instructions_no_gc": 13.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 35.0,
+            "instructions_no_gc": 34.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 140.0,
+            "instructions_no_gc": 139.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 137.0,
+            "instructions_no_gc": 136.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 126.0,
+            "instructions_no_gc": 125.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 110.0,
+            "instructions_no_gc": 109.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 35.0,
+            "instructions_no_gc": 34.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "off_b": {
+            "instructions_total": 34.97471,
+            "instructions_no_gc": 35.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 136.97471,
+            "instructions_no_gc": 137.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 34.97471,
+            "instructions_no_gc": 35.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 6.97477,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 32.97477,
+            "instructions_no_gc": 33.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 6.97477,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 109.97471,
+            "instructions_no_gc": 110.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 13.97477,
+            "instructions_no_gc": 14.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 139.97471,
+            "instructions_no_gc": 140.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 125.97471,
+            "instructions_no_gc": 126.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "c_off_a": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 14.00006,
+            "instructions_no_gc": 13.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 35.0,
+            "instructions_no_gc": 34.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 35.0,
+            "instructions_no_gc": 34.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 33.00006,
+            "instructions_no_gc": 32.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 110.0,
+            "instructions_no_gc": 109.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 140.0,
+            "instructions_no_gc": 139.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 137.0,
+            "instructions_no_gc": 136.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 126.0,
+            "instructions_no_gc": 125.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "c_token": {
+            "instructions_total": 32.97477,
+            "instructions_no_gc": 33.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 6.97477,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 34.97471,
+            "instructions_no_gc": 35.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 109.97471,
+            "instructions_no_gc": 110.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 6.97477,
+            "instructions_no_gc": 7.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 139.97471,
+            "instructions_no_gc": 140.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 13.97477,
+            "instructions_no_gc": 14.00006,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 136.97471,
+            "instructions_no_gc": 137.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_b": {
+            "instructions_total": 34.97471,
+            "instructions_no_gc": 35.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 125.97471,
+            "instructions_no_gc": 126.0,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        },
+        {
+          "off_b": {
+            "instructions_total": 35.0,
+            "instructions_no_gc": 34.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_read": {
+            "instructions_total": 137.0,
+            "instructions_no_gc": 136.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_token": {
+            "instructions_total": 33.00006,
+            "instructions_no_gc": 32.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_b": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_read": {
+            "instructions_total": 110.0,
+            "instructions_no_gc": 109.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "c_off_a": {
+            "instructions_total": 7.00006,
+            "instructions_no_gc": 6.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "epoch_branch": {
+            "instructions_total": 126.0,
+            "instructions_no_gc": 125.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "cas": {
+            "instructions_total": 14.00006,
+            "instructions_no_gc": 13.97477,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "token_branch": {
+            "instructions_total": 140.0,
+            "instructions_no_gc": 139.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          },
+          "off_a": {
+            "instructions_total": 35.0,
+            "instructions_no_gc": 34.97471,
+            "allocations": 0.0,
+            "minor_gc_per_request": 0.0,
+            "major_gc_per_request": 0.0,
+            "gc_per_1k_allocations": null
+          }
+        }
+      ]
+    }
+  },
+  "native_interpreter": {
+    "metadata": {
+      "seed": 41231,
+      "rounds": 6,
+      "workers": {},
+      "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]",
+      "sources": {
+        "bench/experiments/vm_token_cost.rb": "bd2d40668839327fc3b7a22efeb293cc9642da0cb509d3fd4fca201871559aa0",
+        "/home/user/workspace/repo/bench/experiments/vm_token_native.c": "02bc907d0417abfeed244659f5ccd75275ae8ed73c6ca792206e0630cb59a2a7"
+      }
+    },
+    "nanoseconds_per_check_including_loop": [
+      {
+        "c_off_b": 1.3520166,
+        "c_off_a": 1.4231726,
+        "c_token": 3.5762625999999993,
+        "epoch_branch": 41.55522340000001,
+        "off_a": 25.772587799999997,
+        "token_read": 35.493868400000004,
+        "off_b": 26.330872799999998,
+        "epoch_read": 35.3244356,
+        "cas": 11.858424999999999,
+        "token_branch": 37.626752999999994
+      },
+      {
+        "c_token": 3.569543,
+        "cas": 11.8391854,
+        "off_a": 28.6604554,
+        "c_off_b": 1.406349400000001,
+        "token_branch": 37.742274800000004,
+        "token_read": 35.168109199999996,
+        "epoch_branch": 40.794421799999995,
+        "epoch_read": 35.7225644,
+        "off_b": 26.118483599999998,
+        "c_off_a": 1.3741266000000003
+      },
+      {
+        "token_read": 35.082839,
+        "off_b": 25.9465142,
+        "c_off_a": 1.5139099999999988,
+        "off_a": 27.067707399999996,
+        "c_token": 3.5701732000000015,
+        "c_off_b": 1.3843869999999994,
+        "epoch_read": 36.583096,
+        "cas": 11.83468,
+        "token_branch": 37.388942,
+        "epoch_branch": 42.0378982
+      },
+      {
+        "cas": 11.815110999999998,
+        "c_off_a": 1.2690988,
+        "off_a": 25.866728800000004,
+        "off_b": 25.6862504,
+        "epoch_read": 36.074749800000006,
+        "c_token": 3.743632999999999,
+        "token_branch": 37.4775892,
+        "c_off_b": 1.3781858000000007,
+        "token_read": 34.8806454,
+        "epoch_branch": 40.49059760000001
+      },
+      {
+        "c_off_a": 1.3149725999999986,
+        "c_token": 3.611912599999999,
+        "epoch_read": 36.0861534,
+        "off_a": 35.9611372,
+        "c_off_b": 1.4587074000000007,
+        "token_branch": 37.232392000000004,
+        "cas": 11.8302036,
+        "token_read": 35.52773800000001,
+        "off_b": 25.867088,
+        "epoch_branch": 40.6819202
+      },
+      {
+        "token_read": 35.167455999999994,
+        "off_b": 26.077862000000003,
+        "c_token": 3.6512826,
+        "c_off_b": 1.2900029999999993,
+        "epoch_read": 36.0605836,
+        "c_off_a": 1.4801778,
+        "epoch_branch": 41.9636718,
+        "cas": 11.825906000000002,
+        "token_branch": 37.777124,
+        "off_a": 25.920862
+      }
+    ]
+  },
+  "writes": {
+    "boot-cost.json": {
+      "mode": "boot",
+      "seed": 41231,
+      "binaries": {
+        "off_a": "/tmp/epoch-research/baseline-source/ruby",
+        "off_b": "/tmp/epoch-research/baseline-source/ruby",
+        "epoch": "/tmp/epoch-research/epoch-source/ruby"
+      },
+      "hashes": {
+        "off_a": "c5997c775c655efe8c250e08874ed63a4fbb0cb60b89e2e92af3aab48cd1fcbb",
+        "off_b": "c5997c775c655efe8c250e08874ed63a4fbb0cb60b89e2e92af3aab48cd1fcbb",
+        "epoch": "58e27ff0d0fa47c5814fcfe66c4a2a652de2cfbfe01b19105c746aa8d0e32e54"
+      },
+      "samples": [
+        {
+          "off_a": {
+            "cpu_seconds": 1.121116448,
+            "mode": "boot",
+            "allocations": 1189755,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 1.1425224129999998,
+            "mode": "boot",
+            "allocations": 1189624,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 1.1255952200000001,
+            "mode": "boot",
+            "allocations": 1189752,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 1.157416722,
+            "mode": "boot",
+            "allocations": 1189748,
+            "collections": 22,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 1.170202085,
+            "mode": "boot",
+            "allocations": 1189623,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 1.1280614869999999,
+            "mode": "boot",
+            "allocations": 1189626,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 1.143843358,
+            "mode": "boot",
+            "allocations": 1189755,
+            "collections": 22,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 1.153097339,
+            "mode": "boot",
+            "allocations": 1189753,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 1.189062594,
+            "mode": "boot",
+            "allocations": 1189624,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 1.081211251,
+            "mode": "boot",
+            "allocations": 1189752,
+            "collections": 17,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 1.117086529,
+            "mode": "boot",
+            "allocations": 1189626,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 1.127906549,
+            "mode": "boot",
+            "allocations": 1189753,
+            "collections": 17,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 1.1287243599999999,
+            "mode": "boot",
+            "allocations": 1189622,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 1.105555347,
+            "mode": "boot",
+            "allocations": 1189623,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 1.108611483,
+            "mode": "boot",
+            "allocations": 1189751,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "off_a": {
+            "cpu_seconds": 1.104519454,
+            "mode": "boot",
+            "allocations": 1189752,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 1.09270069,
+            "mode": "boot",
+            "allocations": 1189754,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 1.123014303,
+            "mode": "boot",
+            "allocations": 1189624,
+            "collections": 21,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        }
+      ],
+      "percent": {
+        "off_b": {
+          "median": -0.6174867583635224,
+          "ci95": [
+            -2.335587629976821,
+            1.7592525266975412
+          ]
+        },
+        "epoch": {
+          "median": 0.4359688407562179,
+          "ci95": [
+            -2.616287209405604,
+            1.8617919751759193
+          ]
+        }
+      }
+    },
+    "definitions-cost.json": {
+      "mode": "definitions",
+      "seed": 41231,
+      "binaries": {
+        "off_a": "/tmp/epoch-research/baseline-source/ruby",
+        "off_b": "/tmp/epoch-research/baseline-source/ruby",
+        "epoch": "/tmp/epoch-research/epoch-source/ruby"
+      },
+      "hashes": {
+        "off_a": "c5997c775c655efe8c250e08874ed63a4fbb0cb60b89e2e92af3aab48cd1fcbb",
+        "off_b": "c5997c775c655efe8c250e08874ed63a4fbb0cb60b89e2e92af3aab48cd1fcbb",
+        "epoch": "58e27ff0d0fa47c5814fcfe66c4a2a652de2cfbfe01b19105c746aa8d0e32e54"
+      },
+      "samples": [
+        {
+          "off_a": {
+            "cpu_seconds": 0.05178478600000001,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 0.051798208999999984,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.050707229000000006,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 0.052982277999999994,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.051796394999999995,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.04986417599999998,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 0.051887206000000005,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.049821065,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.05077095899999999,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 0.05245939999999999,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.051520014,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.05114461600000002,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 0.052252652999999996,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.050609722999999995,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.050694142,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "off_a": {
+            "cpu_seconds": 0.05094379399999999,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.050161785,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 0.05249641899999999,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 29,
+            "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]"
+          }
+        }
+      ],
+      "percent": {
+        "off_b": {
+          "median": -0.850784431023599,
+          "ci95": [
+            -2.9056245751950094,
+            1.320302191206435
+          ]
+        },
+        "epoch": {
+          "median": 2.809219933744267,
+          "ci95": [
+            1.1577147493939788,
+            3.6107323601442087
+          ]
+        }
+      }
+    },
+    "master-definitions-cost.json": {
+      "mode": "definitions",
+      "seed": 41231,
+      "binaries": {
+        "off_a": "/tmp/epoch-research/master-control/ruby",
+        "off_b": "/tmp/epoch-research/master-control/ruby",
+        "epoch": "/tmp/epoch-research/master-epoch-control/ruby",
+        "token": "/tmp/epoch-research/master-install/bin/ruby"
+      },
+      "source_sha256": "422941d642fa72a1526240235ac2105e06654cd37a4d6cfaca5be6440529e7c2",
+      "hashes": {
+        "off_a": "5b9fbf526cc5ea56f97dc247d416062b163e746e190ae13a00ef4ae168e60984",
+        "off_b": "5b9fbf526cc5ea56f97dc247d416062b163e746e190ae13a00ef4ae168e60984",
+        "epoch": "85eeb881c36ce04446a756a98a98f9fbdaa1de93a3e1a61d3f0f5648100aaa73",
+        "token": "9228cdf766c98f0adda221c767c096805056d31d6dcd8df3acbff931661644ea"
+      },
+      "samples": [
+        {
+          "off_a": {
+            "cpu_seconds": 0.050671101999999996,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 0.061093004,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "token": {
+            "cpu_seconds": 0.051077554000000004,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.050953415,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "token": {
+            "cpu_seconds": 0.050449716000000006,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.050286909,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.050869016,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 0.053648564999999995,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "epoch": {
+            "cpu_seconds": 0.050169216,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.053670699999999995,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "token": {
+            "cpu_seconds": 0.051087228000000005,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.050243591,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "token": {
+            "cpu_seconds": 0.05093126900000001,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.053302473999999996,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.051316578,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 0.050691538999999994,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "off_b": {
+            "cpu_seconds": 0.052863499,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 0.053967891999999996,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.053523548,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "token": {
+            "cpu_seconds": 0.073668752,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          }
+        },
+        {
+          "token": {
+            "cpu_seconds": 0.053628712999999995,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_b": {
+            "cpu_seconds": 0.050677825,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "epoch": {
+            "cpu_seconds": 0.05138323,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          },
+          "off_a": {
+            "cpu_seconds": 0.05022477699999999,
+            "mode": "definitions",
+            "allocations": 400008,
+            "collections": 6,
+            "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +PRISM [x86_64-linux]"
+          }
+        }
+      ],
+      "percent": {
+        "off_b": {
+          "median": 0.7295943887071332,
+          "ci95": [
+            -2.4794522008962705,
+            3.9892795114053303
+          ]
+        },
+        "epoch": {
+          "median": 1.5683604993941946,
+          "ci95": [
+            -2.5231830972063443,
+            13.626347735350532
+          ]
+        },
+        "token": {
+          "median": 1.2406157167387355,
+          "ci95": [
+            -2.062413576233324,
+            22.207712234177457
+          ]
+        }
+      }
+    }
+  },
+  "census": {
+    "blog-census.log": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "yjit": true,
+      "app": "/home/user/workspace/repo/.corpus/real-blog",
+      "rows": [
+        {
+          "path": "/articles",
+          "warmup": 200,
+          "requests": 1000,
+          "statuses": {
+            "200": 1000
+          },
+          "changed_requests": 0,
+          "bumps": 0,
+          "histogram": {
+            "0": 1000
+          },
+          "non_singleton_changed_requests": 0,
+          "non_singleton_bumps": 0,
+          "non_singleton_histogram": {
+            "0": 1000
+          },
+          "seams": []
+        },
+        {
+          "path": "/articles/1",
+          "warmup": 200,
+          "requests": 1000,
+          "statuses": {
+            "200": 1000
+          },
+          "changed_requests": 0,
+          "bumps": 0,
+          "histogram": {
+            "0": 1000
+          },
+          "non_singleton_changed_requests": 0,
+          "non_singleton_bumps": 0,
+          "non_singleton_histogram": {
+            "0": 1000
+          },
+          "seams": []
+        }
+      ]
+    },
+    "fizzy-census.log": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "yjit": true,
+      "app": "/home/user/workspace/repo/.corpus/fizzy",
+      "rows": [
+        {
+          "path": "/first_run",
+          "warmup": 200,
+          "requests": 1000,
+          "statuses": {
+            "200": 1000
+          },
+          "changed_requests": 0,
+          "bumps": 0,
+          "histogram": {
+            "0": 1000
+          },
+          "non_singleton_changed_requests": 0,
+          "non_singleton_bumps": 0,
+          "non_singleton_histogram": {
+            "0": 1000
+          },
+          "seams": []
+        }
+      ]
+    },
+    "fizzy-auth-census.log": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "yjit": true,
+      "app": "/home/user/workspace/repo/.corpus/fizzy",
+      "rows": [
+        {
+          "path": "/buckets",
+          "warmup": 200,
+          "requests": 1000,
+          "statuses": {
+            "200": 1000
+          },
+          "changed_requests": 0,
+          "bumps": 0,
+          "histogram": {
+            "0": 1000
+          },
+          "non_singleton_changed_requests": 0,
+          "non_singleton_bumps": 0,
+          "non_singleton_histogram": {
+            "0": 1000
+          },
+          "seams": []
+        },
+        {
+          "path": "/bubbles",
+          "warmup": 200,
+          "requests": 1000,
+          "statuses": {
+            "200": 1000
+          },
+          "changed_requests": 1000,
+          "bumps": 20000,
+          "histogram": {
+            "20": 1000
+          },
+          "non_singleton_changed_requests": 1000,
+          "non_singleton_bumps": 5000,
+          "non_singleton_histogram": {
+            "5": 1000
+          },
+          "seams": [
+            [
+              "make_singleton_class",
+              true,
+              5000,
+              [
+                [
+                  "<cfunc>",
+                  0,
+                  "Module#extend_object"
+                ],
+                [
+                  "<cfunc>",
+                  0,
+                  "Kernel#extend"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_proxy.rb",
+                  37,
+                  "ActiveRecord::Associations::CollectionProxy#initialize"
+                ],
+                [
+                  "<cfunc>",
+                  0,
+                  "Class#new"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/relation/delegation.rb",
+                  139,
+                  "ActiveRecord::Delegation::ClassMethods#create"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb",
+                  41,
+                  "ActiveRecord::Associations::CollectionAssociation#reader"
+                ],
+                [
+                  null,
+                  107,
+                  "Account::GeneratedAssociationMethods#users"
+                ],
+                [
+                  null,
+                  37,
+                  "#<Class:0x00007fca7b0d4240>#_app_views_filters__assignees_html_erb___610899852750238797_40400"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb",
+                  50,
+                  "ActionView::Helpers::CaptureHelper#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/buffers.rb",
+                  75,
+                  "ActionView::OutputBuffer#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb",
+                  50,
+                  "ActionView::Helpers::CaptureHelper#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/form_helper.rb",
+                  775,
+                  "ActionView::Helpers::FormHelper#form_with"
+                ]
+              ]
+            ],
+            [
+              "rb_include_module",
+              true,
+              10000,
+              [
+                [
+                  "<cfunc>",
+                  0,
+                  "Module#extend_object"
+                ],
+                [
+                  "<cfunc>",
+                  0,
+                  "Kernel#extend"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_proxy.rb",
+                  37,
+                  "ActiveRecord::Associations::CollectionProxy#initialize"
+                ],
+                [
+                  "<cfunc>",
+                  0,
+                  "Class#new"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/relation/delegation.rb",
+                  139,
+                  "ActiveRecord::Delegation::ClassMethods#create"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb",
+                  41,
+                  "ActiveRecord::Associations::CollectionAssociation#reader"
+                ],
+                [
+                  null,
+                  107,
+                  "Account::GeneratedAssociationMethods#users"
+                ],
+                [
+                  null,
+                  37,
+                  "#<Class:0x00007fca7b0d4240>#_app_views_filters__assignees_html_erb___610899852750238797_40400"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb",
+                  50,
+                  "ActionView::Helpers::CaptureHelper#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/buffers.rb",
+                  75,
+                  "ActionView::OutputBuffer#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb",
+                  50,
+                  "ActionView::Helpers::CaptureHelper#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/form_helper.rb",
+                  775,
+                  "ActionView::Helpers::FormHelper#form_with"
+                ]
+              ]
+            ],
+            [
+              "rb_clear_method_cache",
+              false,
+              5000,
+              [
+                [
+                  "<cfunc>",
+                  0,
+                  "Module#extend_object"
+                ],
+                [
+                  "<cfunc>",
+                  0,
+                  "Kernel#extend"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_proxy.rb",
+                  37,
+                  "ActiveRecord::Associations::CollectionProxy#initialize"
+                ],
+                [
+                  "<cfunc>",
+                  0,
+                  "Class#new"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/relation/delegation.rb",
+                  139,
+                  "ActiveRecord::Delegation::ClassMethods#create"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb",
+                  41,
+                  "ActiveRecord::Associations::CollectionAssociation#reader"
+                ],
+                [
+                  null,
+                  107,
+                  "Account::GeneratedAssociationMethods#users"
+                ],
+                [
+                  null,
+                  37,
+                  "#<Class:0x00007fca7b0d4240>#_app_views_filters__assignees_html_erb___610899852750238797_40400"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb",
+                  50,
+                  "ActionView::Helpers::CaptureHelper#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/buffers.rb",
+                  75,
+                  "ActionView::OutputBuffer#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb",
+                  50,
+                  "ActionView::Helpers::CaptureHelper#capture"
+                ],
+                [
+                  "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/form_helper.rb",
+                  775,
+                  "ActionView::Helpers::FormHelper#form_with"
+                ]
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    "master-token-census3.log": {
+      "ruby": "ruby 4.1.0dev (2026-10-21T11:03:13Z mutation-epoch-prototype 535cf17960) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "yjit": true,
+      "app": "/home/user/workspace/repo/.corpus/fizzy",
+      "rows": [
+        {
+          "path": "/buckets",
+          "warmup": 200,
+          "requests": 1000,
+          "statuses": {
+            "200": 1000
+          },
+          "changed_requests": 0,
+          "bumps": 0,
+          "histogram": {
+            "0": 1000
+          },
+          "non_singleton_changed_requests": null,
+          "non_singleton_bumps": null,
+          "non_singleton_histogram": null,
+          "seams": null,
+          "held_tokens": [
+            "Hash#each",
+            "Hash#each_with_object",
+            "#<Class:0x00007ff8a8b4fa20>#convert_options_to_data_attributes",
+            "#<Class:0x00007ff8a8b4fa20>#link_to_remote_options?",
+            "#<Class:0x00007ff8a8b4fa20>#url_target",
+            "#<Class:0x00007ff8a8b4fa20>#url_for",
+            "#<Class:0x00007ff8a8b4fa20>#content_tag",
+            "#<Class:0x00007ff8a8b4fa20>#ensure_valid_html5_tag_name",
+            "#<Class:0x00007ff8a8b4fa20>#tag_builder",
+            "ActionView::Helpers::TagHelper::TagBuilder#content_tag_string",
+            "ActionView::Helpers::TagHelper::TagBuilder#tag_options",
+            "ActionView::Helpers::TagHelper::TagBuilder#tag_option"
+          ],
+          "token_changed_requests": 0,
+          "token_invalidations": {},
+          "token_invalidation_histogram": {
+            "0": 1000
+          }
+        },
+        {
+          "path": "/bubbles",
+          "warmup": 200,
+          "requests": 1000,
+          "statuses": {
+            "200": 1000
+          },
+          "changed_requests": 1000,
+          "bumps": 20000,
+          "histogram": {
+            "20": 1000
+          },
+          "non_singleton_changed_requests": null,
+          "non_singleton_bumps": null,
+          "non_singleton_histogram": null,
+          "seams": null,
+          "held_tokens": [
+            "Hash#each",
+            "Hash#each_with_object",
+            "#<Class:0x00007ff8a8b4fa20>#convert_options_to_data_attributes",
+            "#<Class:0x00007ff8a8b4fa20>#link_to_remote_options?",
+            "#<Class:0x00007ff8a8b4fa20>#url_target",
+            "#<Class:0x00007ff8a8b4fa20>#url_for",
+            "#<Class:0x00007ff8a8b4fa20>#content_tag",
+            "#<Class:0x00007ff8a8b4fa20>#ensure_valid_html5_tag_name",
+            "#<Class:0x00007ff8a8b4fa20>#tag_builder",
+            "ActionView::Helpers::TagHelper::TagBuilder#content_tag_string",
+            "ActionView::Helpers::TagHelper::TagBuilder#tag_options",
+            "ActionView::Helpers::TagHelper::TagBuilder#tag_option"
+          ],
+          "token_changed_requests": 0,
+          "token_invalidations": {},
+          "token_invalidation_histogram": {
+            "0": 1000
+          }
+        }
+      ]
+    }
+  },
+  "tests": {
+    "master-token-test.log": {
+      "log_sha256": "9c821fd92f7bf2d2ca39abb012c3470366d3c2646871520a76c3940677cc65b3",
+      "summary": "10 tests, 59 assertions, 0 failures, 0 errors, 0 skips",
+      "failure_error_identities": []
+    },
+    "master-token-yjit-test.log": {
+      "log_sha256": "6790875ac29ef5b4ea81b834193f495f30972cd3e65d57efe4ad72a3aebbaa6d",
+      "summary": "10 tests, 59 assertions, 0 failures, 0 errors, 0 skips",
+      "failure_error_identities": []
+    },
+    "master-token-test-all.log": {
+      "log_sha256": "65ddabbf9d4a56cd8b5c46c1b979100b2bc5fa2efd348c4846a2c03b16ae51d3",
+      "summary": "38696 tests, 8083623 assertions, 1 failures, 2 errors, 221 skips",
+      "failure_error_identities": [
+        "TestIO#test_seek",
+        "TestIO#test_seek_symwhence",
+        "TestThread#test_handle_interrupt_masks_sigint"
+      ]
+    },
+    "master-control-test2.log": {
+      "log_sha256": "f8bc5cdecd4aeab3aeda151f893a017e41dc8f54451fe4687360e7eccab884db",
+      "summary": "3 tests, 22 assertions, 1 failures, 2 errors, 0 skips",
+      "failure_error_identities": [
+        "TestIO#test_seek",
+        "TestIO#test_seek_symwhence",
+        "TestThread#test_handle_interrupt_masks_sigint"
+      ]
+    },
+    "epoch-test-all.log": {
+      "log_sha256": "f8302e50a4097cb17fb7435c729b92a704b171ec23541794773e5558b1570454",
+      "summary": "32800 tests, 7257888 assertions, 1 failures, 2 errors, 318 skips",
+      "failure_error_identities": [
+        "TestIO#test_seek",
+        "TestIO#test_seek_symwhence",
+        "TestThread#test_handle_interrupt_masks_sigint"
+      ]
+    },
+    "baseline-test-all.log": {
+      "log_sha256": "a4f011b03f14938b7b7c2fd1ad1240d2e12fcb6e573e0af713687f9e3b2140d2",
+      "summary": "33786 tests, 7289086 assertions, 1 failures, 2 errors, 318 skips",
+      "failure_error_identities": [
+        "TestIO#test_seek",
+        "TestIO#test_seek_symwhence",
+        "TestThread#test_handle_interrupt_masks_sigint"
+      ]
+    }
+  }
+}

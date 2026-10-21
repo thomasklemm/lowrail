@@ -1,0 +1,313 @@
+diff -ruN a/class.c b/class.c
+--- a/class.c	2026-10-21 11:20:29.501044292 +0000
++++ b/class.c	2026-10-21 11:20:29.505044353 +0000
+@@ -1291,7 +1291,7 @@
+     // Full class ancestry may not have been filled until we reach here.
+     rb_class_update_superclasses(METACLASS_OF(metaclass));
+ 
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, metaclass);
+     return metaclass;
+ }
+ 
+@@ -1314,7 +1314,7 @@
+     rb_zjit_invalidate_no_singleton_class(orig_class);
+ 
+     SET_METACLASS_OF(klass, METACLASS_OF(rb_class_real(orig_class)));
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+     return klass;
+ }
+ 
+@@ -1697,7 +1697,7 @@
+     int changed = 0;
+ 
+     ensure_includable(klass, module);
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+ 
+     changed = include_modules_at(klass, RCLASS_ORIGIN(klass), module, TRUE);
+     if (changed < 0)
+@@ -1729,7 +1729,7 @@
+             iclass = iclass->next;
+         }
+     }
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+ }
+ 
+ static enum rb_id_table_iterator_result
+@@ -1953,7 +1953,7 @@
+     if (module_in_super_chain(klass, module))
+         rb_raise(rb_eArgError, "cyclic prepend detected");
+ 
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+     klass_had_no_origin = ensure_origin(klass);
+     changed = do_include_modules_at(klass, klass, module, FALSE, false);
+     RUBY_ASSERT(changed >= 0); // already checked for cyclic prepend above
+@@ -1997,7 +1997,7 @@
+         }
+         RB_GC_GUARD(new_origins);
+     }
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+ }
+ 
+ /*
+diff -ruN a/epoch_census.inc b/epoch_census.inc
+--- a/epoch_census.inc	1970-01-01 00:00:00.000000000 +0000
++++ b/epoch_census.inc	2026-10-21 11:20:29.521044600 +0000
+@@ -0,0 +1,80 @@
++/* Diagnostic build only: one pinned stack per VM seam and holder kind.
++ * Capture frames without allocation or invoking application callbacks.
++ * Single-main-Ractor census, not a public API or performance build. */
++#include "ruby/debug.h"
++static bool epoch_census_active;
++static unsigned long epoch_non_singleton;
++static struct {
++    const char *source;
++    bool singleton;
++    unsigned long count;
++    int depth;
++    VALUE frames[12];
++    int lines[12];
++} epoch_samples[64];
++
++void
++rb_vm_mutation_epoch_bump_at(const char *source, VALUE holder)
++{
++    rb_vm_mutation_epoch_bump();
++    bool singleton = !NIL_P(holder) && RCLASS_SINGLETON_P(holder);
++    if (!singleton) epoch_non_singleton++;
++    if (!epoch_census_active) return;
++    for (int i = 0; i < 64; i++) {
++        if (!epoch_samples[i].source) {
++            epoch_samples[i].source = source;
++            epoch_samples[i].singleton = singleton;
++        }
++        if (epoch_samples[i].source == source && epoch_samples[i].singleton == singleton) {
++            if (!epoch_samples[i].count++) {
++                epoch_samples[i].depth = rb_profile_frames(0, 12, epoch_samples[i].frames, epoch_samples[i].lines);
++            }
++            return;
++        }
++    }
++    rb_bug("epoch census table full");
++}
++
++static VALUE
++vm_epoch_census_start(VALUE self)
++{
++    epoch_census_active = false;
++    memset(epoch_samples, 0, sizeof(epoch_samples));
++    epoch_census_active = true;
++    return Qnil;
++}
++
++static VALUE
++vm_epoch_census_stop(VALUE self)
++{
++    epoch_census_active = false;
++    VALUE result = rb_ary_new();
++    for (int i = 0; i < 64 && epoch_samples[i].source; i++) {
++        VALUE stack = rb_ary_new();
++        for (int j = 0; j < epoch_samples[i].depth; j++) {
++            VALUE frame = epoch_samples[i].frames[j];
++            rb_ary_push(stack, rb_ary_new_from_args(3, rb_profile_frame_absolute_path(frame),
++                INT2NUM(epoch_samples[i].lines[j]), rb_profile_frame_full_label(frame)));
++        }
++        rb_ary_push(result, rb_ary_new_from_args(4, rb_str_new_cstr(epoch_samples[i].source),
++            RBOOL(epoch_samples[i].singleton), ULONG2NUM(epoch_samples[i].count), stack));
++    }
++    return result;
++}
++
++static VALUE
++vm_epoch_non_singleton(VALUE self)
++{
++    return ULONG2NUM(epoch_non_singleton);
++}
++
++static void
++Init_epoch_census(void)
++{
++    for (int i = 0; i < 64; i++) {
++        for (int j = 0; j < 12; j++) rb_global_variable(&epoch_samples[i].frames[j]);
++    }
++    rb_define_singleton_method(rb_cRubyVM, "epoch_census_start", vm_epoch_census_start, 0);
++    rb_define_singleton_method(rb_cRubyVM, "epoch_census_stop", vm_epoch_census_stop, 0);
++    rb_define_singleton_method(rb_cRubyVM, "non_singleton_epoch", vm_epoch_non_singleton, 0);
++}
+diff -ruN a/internal/vm.h b/internal/vm.h
+--- a/internal/vm.h	2026-10-21 11:20:29.517044538 +0000
++++ b/internal/vm.h	2026-10-21 11:20:45.205285843 +0000
+@@ -45,6 +45,7 @@
+ /* vm.c */
+ /* Experimental conservative code-mutation generation; not a public API. */
+ void rb_vm_mutation_epoch_bump(void);
++void rb_vm_mutation_epoch_bump_at(const char *source, VALUE holder);
+ VALUE rb_obj_is_thread(VALUE obj);
+ void rb_vm_mark(void *ptr);
+ void rb_vm_register_global_object(VALUE obj);
+diff -ruN a/variable.c b/variable.c
+--- a/variable.c	2026-10-21 11:20:29.505044353 +0000
++++ b/variable.c	2026-10-21 11:20:29.509044415 +0000
+@@ -3007,7 +3007,7 @@
+     VALUE result = rb_mutex_synchronize(autoload_mutex, autoload_synchronized, (VALUE)&arguments);
+ 
+     if (result == Qtrue) {
+-        rb_vm_mutation_epoch_bump();
++        rb_vm_mutation_epoch_bump_at(__func__, module);
+         const_added(module, name);
+     }
+ }
+@@ -3642,7 +3642,7 @@
+     if (rb_id_table_lookup(RCLASS_WRITABLE_CONST_TBL(mod), id, &writable_ce)) {
+         rb_id_table_delete(RCLASS_WRITABLE_CONST_TBL(mod), id);
+         /* Warning.warn below may reenter Ruby after the constant is gone. */
+-        rb_vm_mutation_epoch_bump();
++        rb_vm_mutation_epoch_bump_at(__func__, mod);
+         if ((rb_const_entry_t *)writable_ce != ce) {
+             xfree((rb_const_entry_t *)writable_ce);
+         }
+@@ -3932,7 +3932,7 @@
+     check_before_mod_set(klass, id, val, "constant");
+ 
+     RB_VM_LOCKING() {
+-        rb_vm_mutation_epoch_bump();
++        rb_vm_mutation_epoch_bump_at(__func__, klass);
+         struct rb_id_table *tbl = RCLASS_WRITABLE_CONST_TBL(klass);
+         if (!tbl) {
+             tbl = rb_id_table_create(0);
+@@ -4010,7 +4010,7 @@
+ static void
+ const_tbl_update(struct autoload_const *ac, int autoload_force)
+ {
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, ac->module);
+     VALUE value;
+     VALUE klass = ac->module;
+     VALUE val = ac->value;
+@@ -4042,7 +4042,7 @@
+                 ce->line = line;
+             }
+             RUBY_ASSERT_CRITICAL_SECTION_LEAVE();
+-            rb_vm_mutation_epoch_bump();
++            rb_vm_mutation_epoch_bump_at(__func__, klass);
+             return;
+         }
+         else {
+@@ -4078,7 +4078,7 @@
+     ce->flag = visibility;
+     RB_OBJ_WRITE(klass, &ce->value, val);
+     RB_OBJ_WRITE(klass, &ce->file, rb_source_location(&ce->line));
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+ }
+ 
+ void
+diff -ruN a/vm.c b/vm.c
+--- a/vm.c	2026-10-21 11:20:29.509044415 +0000
++++ b/vm.c	2026-10-21 11:20:45.221286089 +0000
+@@ -749,6 +749,8 @@
+     return epoch < (unsigned long)FIXNUM_MAX ? LONG2FIX(epoch) : Qnil;
+ }
+ 
++#include "epoch_census.inc"
++
+ static const struct rb_callcache vm_empty_cc = {
+     .flags = T_IMEMO | (imemo_callcache << FL_USHIFT) | VM_CALLCACHE_UNMARKABLE,
+     .klass = Qundef,
+@@ -4267,6 +4269,7 @@
+     rb_undef_method(CLASS_OF(rb_cRubyVM), "new");
+     rb_define_singleton_method(rb_cRubyVM, "stat", vm_stat, -1);
+     rb_define_singleton_method(rb_cRubyVM, "mutation_epoch", vm_mutation_epoch, 0);
++    Init_epoch_census();
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines", vm_keep_script_lines, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines=", vm_keep_script_lines_set, 1);
+ 
+diff -ruN a/vm_method.c b/vm_method.c
+--- a/vm_method.c	2026-10-21 11:20:29.513044476 +0000
++++ b/vm_method.c	2026-10-21 11:20:45.213285966 +0000
+@@ -317,7 +317,7 @@
+ static inline void
+ vm_cme_invalidate(rb_callable_method_entry_t *cme)
+ {
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, cme->owner);
+     VM_ASSERT(IMEMO_TYPE_P(cme, imemo_ment), "cme: %d", imemo_type((VALUE)cme));
+     VM_ASSERT(callable_method_entry_p(cme));
+     METHOD_ENTRY_INVALIDATED_SET(cme);
+@@ -340,7 +340,7 @@
+ void
+ rb_clear_constant_cache_for_id(ID id)
+ {
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, Qnil);
+     VALUE lookup_result;
+     rb_vm_t *vm = GET_VM();
+ 
+@@ -377,7 +377,7 @@
+     VALUE ccs_data;
+     if (tbl && rb_managed_id_table_lookup(tbl, mid, &ccs_data)) {
+         struct rb_class_cc_entries *ccs = (struct rb_class_cc_entries *)ccs_data;
+-        rb_vm_mutation_epoch_bump();
++        rb_vm_mutation_epoch_bump_at(__func__, ccs->cme->owner);
+         rb_yjit_cme_invalidate((rb_callable_method_entry_t *)ccs->cme);
+         rb_zjit_cme_invalidate((rb_callable_method_entry_t *)ccs->cme);
+         if (NIL_P(ccs->cme->owner)) invalidate_negative_cache(mid);
+@@ -392,7 +392,7 @@
+ {
+     VALUE cme;
+     if (tbl && rb_id_table_lookup(tbl, mid, &cme)) {
+-        rb_vm_mutation_epoch_bump();
++        rb_vm_mutation_epoch_bump_at(__func__, ((rb_callable_method_entry_t *)cme)->owner);
+         rb_yjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_zjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_id_table_delete(tbl, mid);
+@@ -462,7 +462,7 @@
+ {
+     VALUE cme;
+     if (tbl && rb_id_table_lookup(tbl, mid, &cme)) {
+-        rb_vm_mutation_epoch_bump();
++        rb_vm_mutation_epoch_bump_at(__func__, ((rb_callable_method_entry_t *)cme)->owner);
+         rb_yjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_zjit_cme_invalidate((rb_callable_method_entry_t *)cme);
+         rb_id_table_delete(tbl, mid);
+@@ -611,7 +611,7 @@
+ void
+ rb_clear_method_cache(VALUE klass_or_module, ID mid)
+ {
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass_or_module);
+     if (RB_TYPE_P(klass_or_module, T_MODULE)) {
+         VALUE module = klass_or_module; // alias
+ 
+@@ -817,7 +817,7 @@
+ void
+ rb_clear_all_refinement_method_cache(void)
+ {
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, Qnil);
+     rb_vm_t *vm = GET_VM();
+ 
+     RB_VM_LOCK_ENTER();
+@@ -849,7 +849,7 @@
+     VM_ASSERT_TYPE3(table_owner, T_CLASS, T_ICLASS, T_MODULE);
+     rb_id_table_insert(table, method_id, (VALUE)me);
+     RB_OBJ_WRITTEN(table_owner, Qundef, (VALUE)me);
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+ }
+ 
+ // rb_f_notimplement has an extra trailing argument to distinguish it from other methods
+@@ -2183,7 +2183,7 @@
+     }
+     rb_clear_method_cache(klass, mid);
+     rb_id_table_delete(RCLASS_WRITABLE_M_TBL(klass), mid);
+-    rb_vm_mutation_epoch_bump();
++    rb_vm_mutation_epoch_bump_at(__func__, klass);
+ 
+     rb_vm_check_redefinition_opt_method(me, klass);
+ 
