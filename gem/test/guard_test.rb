@@ -81,6 +81,84 @@ class GuardTest < Minitest::Test
     assert_operator results.size, :>=, 25
   end
 
+  def test_unrelated_module_invalidation_does_not_allocate
+    out = ruby_json(<<~'RUBY', setup: false, env: { "RUBYLIB" => GEM_LIB })
+      require "json"
+      require "lowrail"
+      require "lowrail/manifest"
+      require "lowrail/guard"
+      units = %w[foo bar baz].each_with_index.map do |name, id|
+        { "id" => id, "facts" => [{ "method" => name }] }
+      end
+      manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
+        "compile_option" => "", "files" => {}, "units" => units }, "/tmp")
+      Lowrail::Guard.install(manifest)
+      unrelated = Module.new
+      object = Object.new
+      def allocations(mod, object)
+        before = GC.stat(:total_allocated_objects)
+        1_000.times do
+          Lowrail::Guard.reset_module(mod)
+          Lowrail::Guard.note_extend(mod, object)
+        end
+        GC.stat(:total_allocated_objects) - before
+      end
+      allocations(unrelated, object) # Warm the scan, loop and GC.stat call sites.
+      puts JSON.generate(allocations: allocations(unrelated, object))
+    RUBY
+    assert_equal 0, out.fetch("allocations")
+  end
+
+  def test_module_scans_preserve_visibility_and_inherited_matches
+    out = ruby_json(<<~'RUBY', setup: false, env: { "RUBYLIB" => GEM_LIB })
+      require "json"
+      require "lowrail"
+      require "lowrail/manifest"
+      require "lowrail/guard"
+      ancestor = Module.new do
+        def inherited_public; end
+        protected def inherited_protected; end
+        private def inherited_private; end
+      end
+      mod = Module.new do
+        include ancestor
+        def own_public; end
+        protected def own_protected; end
+        private def own_private; end
+      end
+      matches = %i[own_private inherited_public own_protected inherited_private own_public inherited_protected]
+      results = [16, 17].map do |size|
+        names = matches + (1..size - matches.size).map { |n| :"absent_#{n}" }
+        units = names.each_with_index.map { |name, id| { "id" => id, "facts" => [{ "method" => name.to_s }] } }
+        manifest = Lowrail::Manifest.new({ "format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
+          "compile_option" => "", "files" => {}, "units" => units }, "/tmp")
+        Lowrail::Guard.install(manifest)
+        index = manifest.units_by_method
+        reference = if size <= 16
+          index.each_key.select { |n| mod.method_defined?(n) || mod.private_method_defined?(n) }
+        else
+          (mod.instance_methods + mod.private_instance_methods).select { |n| index.key?(n) }
+        end
+        selection = Lowrail::Guard.names_of(mod)
+        Lowrail::G.replace(Array.new(size, true))
+        Lowrail::Guard.reset_module(mod)
+        reset = Lowrail::G.dup
+        Lowrail::G.fill(true)
+        Lowrail::Guard.note_extend(mod, Object.new)
+        { selection: selection, reference: reference, reset: reset, extend: Lowrail::G.dup }
+      end
+      puts JSON.generate(results)
+    RUBY
+    out.each_with_index do |result, i|
+      assert_equal result.fetch("reference"), result.fetch("selection")
+      assert_equal %w[inherited_private inherited_protected inherited_public own_private own_protected own_public],
+        result.fetch("selection").sort
+      expected = [nil] * 6 + [true] * (10 + i)
+      assert_equal expected, result.fetch("reset")
+      assert_equal expected, result.fetch("extend")
+    end
+  end
+
   def test_late_yjit_enable_can_replace_a_tracked_array_iterator
     out = ruby_json(<<~'RUBY')
       require "json"

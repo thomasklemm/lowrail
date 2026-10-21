@@ -98,9 +98,14 @@ module Lowrail
       # its ancestors) defines may now resolve differently. Asking the module
       # for its methods costs ~1.5us for a typical 10-method concern; probing
       # each tracked name costs ~70ns per name, so probe only small manifests.
+      # Collect before invalidating; unrelated modules need no result array.
       def names_of(mod)
         if @names.size <= 16
-          @names.each_key.select { |n| mod.method_defined?(n) || mod.private_method_defined?(n) }
+          names = nil
+          @names.each_key do |n|
+            (names ||= []) << n if mod.method_defined?(n) || mod.private_method_defined?(n)
+          end
+          names
         else
           (mod.instance_methods + mod.private_instance_methods).select { |n| @names.key?(n) }
         end
@@ -108,7 +113,7 @@ module Lowrail
 
       def reset_module(mod)
         return if @names.empty?
-        names_of(mod).each { |n| reset_method(n) }
+        names_of(mod)&.each { |n| reset_method(n) }
       end
 
       # obj got a singleton method (or module) for a tracked name.
@@ -119,7 +124,7 @@ module Lowrail
 
       def note_extend(mod, obj)
         return if @names.empty?
-        names_of(mod).each { |n| note_override(obj, n) }
+        names_of(mod)&.each { |n| note_override(obj, n) }
       end
 
       private
