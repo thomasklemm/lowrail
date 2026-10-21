@@ -22,25 +22,54 @@ module HeapWindows
     end
   end
 
-  def self.prepare_heap
+  def self.collect
     3.times { GC.start }
+  end
+
+  def self.page_targets
+    GC.stat_heap.to_h do |pool, stats|
+      # Allow one slot for the page header/alignment, conservatively. Equal
+      # page counts can still differ slightly in slots; the old gate remains.
+      slots = GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE) / stats.fetch(:slot_size) - 1
+      floor = Integer(ENV.fetch("RUBY_GC_HEAP_#{pool}_INIT_SLOTS"))
+      [pool, (floor + slots - 1) / slots]
+    end
+  end
+
+  def self.prepare_heap
+    collect
     raise "app disabled GC" if GC.disable
     # Preserve 4.0's published fillers; 4.1 has 12 differently sized pools.
     lengths = [0, 4, 9, 19, 39] if GC.stat_heap.size == 5
     anchors = []
-    GC.stat_heap.each do |pool, stats|
-      target = Integer(ENV.fetch("RUBY_GC_HEAP_#{pool}_INIT_SLOTS"))
-      count = [target - GC.stat_heap(pool, :heap_live_slots), 0].max
+    targets = page_targets
+    # Prepare pool 0 last: bookkeeping for the other pools uses small slots.
+    GC.stat_heap.to_a.reverse_each do |pool, stats|
+      target = targets.fetch(pool)
+      raise "heap pool #{pool} already exceeds page target #{target}" if stats.fetch(:heap_eden_pages) > target
       size = stats.fetch(:slot_size)
       length = lengths ? lengths.fetch(pool) : (size - GC::INTERNAL_CONSTANTS.fetch(:RBASIC_SIZE)) / [0].pack("J").bytesize
-      fillers = Array.new(count) { size < 40 ? Object.new : Array.new(length) }
       stride = GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE) / stats.fetch(:slot_size) / 2
-      fillers.each_with_index { |object, index| anchors << object if (index % stride).zero? }
-      anchors << fillers.last unless fillers.empty?
-      fillers.clear
+      index, object = 0, nil
+      until GC.stat_heap(pool, :heap_eden_pages) == target
+        # With GC disabled the unanchored fillers remain occupied too.
+        object = size < 40 ? Object.new : Array.new(length)
+        anchors << object if (index % stride).zero?
+        index += 1
+        raise "filler does not grow heap pool #{pool}" if index > target * GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE) / size
+      end
+      anchors << object if object
     end
     GC.enable
+    # Discard fillers BEFORE observers. Otherwise their nearly full heap can
+    # grow by an arm-dependent page before automatic collection catches up.
+    collect
+    targets.each do |pool, target|
+      raise "heap pool #{pool} did not retain page target #{target}" unless GC.stat_heap(pool, :heap_eden_pages) == target
+    end
     anchors
+  ensure
+    GC.enable
   end
 
   def self.run(windows, prepare: nil, observe: nil, settle: nil, warmup: nil, idle_connections: nil)
@@ -63,7 +92,7 @@ module HeapWindows
     warmup&.call
     windows.each do |window|
       prepare&.call(window[:unit])
-      3.times { GC.start }
+      collect
       window[:last_request_start_ns] = clock.call if clock
       settle&.call
       if clock

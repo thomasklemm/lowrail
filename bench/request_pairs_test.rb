@@ -10,12 +10,14 @@ class RequestPairsTest < Minitest::Test
       require "json"
       $requests = 0
       def JitStability.snapshot
-        blocks = $always ? $requests : ($requests >= 700 ? 2 : 1)
+        # 10,000 preparatory requests do not count toward certification. The
+        # rare path first fires 700 requests into the certification phase.
+        blocks = $always ? $requests : ($requests >= 10700 ? 2 : 1)
         {compiled_iseq_count: 1, compiled_block_count: blocks, invalidation_count: 0}
       end
-      rare = JitStability.warm { $requests += _1 }
+      rare = JitStability.warm { |count| $requests += count }
       $requests, $always = 0, true
-      capped = JitStability.warm { $requests += _1 }
+      capped = JitStability.warm { |count| $requests += count }
       puts JSON.generate(rare: rare, capped: capped)
     RUBY
     text, status = Open3.capture2({ "BENCH_JIT_WINDOW" => "200", "BENCH_JIT_MAX_WARMUP" => "20000" },
@@ -23,11 +25,47 @@ class RequestPairsTest < Minitest::Test
     assert status.success?, text
     data = JSON.parse(text)
     assert data.dig("rare", "stable")
+    assert_equal 10000, data.dig("rare", "rehearsal", "requests")
     assert_equal 2800, data.dig("rare", "history").last.fetch("requests")
     assert_equal 10, data.dig("rare", "consecutive_flat_windows")
     refute data.dig("capped", "stable")
     assert_equal "warmup_cap", data.dig("capped", "stop_reason")
     assert_equal 20000, data.dig("capped", "history").last.fetch("requests")
+  end
+
+  def test_native_no_app_harness_is_flat_and_keeps_its_explicit_pages
+    program = <<~'RUBY'
+      require "json"
+      # Native-only endpoints: no Valgrind process or instruction windows.
+      module LowrailCallgrindBench
+        def self.start(_exclude); end
+        def self.finish = 0
+      end
+      HeapWindows.floors.each_with_index do |floor, pool|
+        ENV["RUBY_GC_HEAP_#{pool}_INIT_SLOTS"] = [floor / 10, 10_000].max.to_s
+      end
+      sum = 1
+      operation = ->(count, _unit = nil) { count.times { sum = (sum * 1664525 + 1013904223) & 0xffff_ffff } }
+      windows = HeapWindows.windows(50)
+      warm = nil
+      HeapWindows.run(windows, observe: JitStability.method(:snapshot),
+        warmup: -> { warm = JitStability.warm(&operation) }, &operation)
+      puts JSON.generate(warmup: warm, windows: windows, pages: HeapWindows.page_targets)
+    RUBY
+    text, status = Open3.capture2e({ "RUBYOPT" => nil, "BENCH_JIT" => "yjit", "BENCH_JIT_WINDOW" => "200",
+      "BENCH_JIT_MAX_WARMUP" => "20000", "BENCH_HEAP_SLOTS" => nil }, RbConfig.ruby,
+      "--yjit", "--disable-zjit", "-r", File.expand_path("jit_stability", __dir__), "-e", program)
+    assert status.success?, text
+    result = JSON.parse(text)
+    assert result.dig("warmup", "stable"), result.fetch("warmup").inspect
+    certified = result.fetch("warmup").fetch("history").last.fetch("counters")
+    result.fetch("windows").each do |window|
+      assert_equal certified, window.fetch("jit_before"), "no harness compilation after certification"
+      assert_equal window.fetch("jit_before"), window.fetch("jit_after"), window.slice("mode", "requests").inspect
+      %w[pools_before pools_after].each do |endpoint|
+        assert_equal result.fetch("pages"), window.fetch(endpoint).transform_values { _1.fetch("heap_eden_pages") }
+      end
+    end
   end
 
   def test_idle_clock_bound_and_companion_symmetry_are_independent
@@ -275,7 +313,8 @@ class RequestPairsTest < Minitest::Test
   def test_operation_windows_sum_allocations_and_keep_zero_allocation_reports_finite
     skip "Valgrind not installed" unless system("sh", "-c", "command -v valgrind >/dev/null")
     saved = ENV.to_h.slice("BENCH_HEAP_SLOTS", "BENCH_JIT")
-    ENV.update("BENCH_HEAP_SLOTS" => Array.new(GC.stat_heap.size, 10_000).join(","), "BENCH_JIT" => "0")
+    floors = HeapWindows.floors.map { [(_1 / 10), 10_000].max }
+    ENV.update("BENCH_HEAP_SLOTS" => floors.join(","), "BENCH_JIT" => "0")
     Dir.mktmpdir("lowrail-operation-window-test") do |dir|
       script = File.join(dir, "operation.rb")
       File.write(script, <<~RUBY)

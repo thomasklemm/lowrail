@@ -166,8 +166,11 @@ accepted maps. In each, trace A aborts in Callgrind `threads.c:247`,
 `vgCallgrind_post_signal`, on `sigNum == vgCallgrind_current_state.sig`;
 no full round was aggregated. The surviving trace B was cancelled after each
 failure, with its logs kept. No brk overflow appears. The failure stack includes
-MRI `fiber_setcontext` and Enumerator `zip`, but a focused Fiber/zip probe did
-not reproduce it: **the cause is unassigned**, not an established Fiber bug.
+MRI `fiber_setcontext` and Enumerator `zip`. The original focused Fiber/zip
+probe did not reproduce it; that negative control is retained. Subsequent
+authorized single-run controls reproduce the assertion with **both the exact
+sampler engine and stock Callgrind 3.19.0**, establishing an upstream
+signal/Fiber-switch tool boundary, not a sampler-patch-only defect (below).
 The ordinary off-A room worker completed all four windows without the assertion.
 This differs from the reproduced shared-worker brk exposure and does not
 establish that ordinary non-sampling `lowrail bench` workers have this failure.
@@ -188,6 +191,65 @@ These prefix-only captures do not establish which URI callers dominate; do
 not import Starter's cookie diagnosis into Campfire or infer an importmap
 saving from a JSON route. Association/query shape and URI callers are app
 investigation leads, not accepted optimization budgets or an HTML profile.
+
+### Campfire sampler boundary: untimed diagnosis
+
+**No replacement cohort, sample reassignment, app patch or runtime/default
+change.** A native census with a thread-directed POSIX SIGPROF timer records
+the current Ruby execution context without Fiber hooks: 10,000 iterations,
+20,000 ns CLOCK_MONOTONIC / SIGEV_THREAD_ID one-shot, rearmed in the handler.
+On the pinned Ruby 4.0.7 binary, Array zip has **0/5,409 empty samples**;
+Enumerable zip has **22/18,588**, and explicit Fiber resume/yield has
+**130/15,216**. Every empty is on a **child EC**, none on the root EC or a
+foreign native thread. Under `--tool=none`, 1,000 iterations of the same timer
+give Array **0/70**, Enumerable **0/1,044**, Fiber **1/1,136**, also child EC.
+That run's `none-amd64-linux` engine SHA-256 is
+`bf64a244e6e91cbe2f3730a6e03c5026bf96a2dcd2350696fbc8d8b8bc425c1d`;
+the native run has no Valgrind engine. Both use Ruby binary SHA-256
+`fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895`.
+These are untimed synthetic observations, not instruction budgets. The
+historical JSON empties did not record EC identity: this mechanism is present,
+but their individual attribution remains unknown; all 12 remain rejected.
+
+Two separately authorized, single untimed Callgrind invocations use the same
+10,000-iteration explicit-Fiber body (64 yield/resume pairs and checked
+results), with instrumentation START/STOP, interpreter, no Rails/server:
+
+| Tool / SHA-256 | Signal delivery | Result |
+|---|---|---|
+| Exact retained sampler engine `bab749e091c31c770a292f7261a322c6ef7e156ae4881d74ec71ffeadc7d04ac`; patch `6bed296abf1c40e0deb17c066d72d50bc118af5b5121c7741aba1aff4984fc92` | Existing instruction-triggered sampler; seed 41231, no wall timer | Exit 1, `threads.c:247`, valid rt_sigreturn at `fiber_setcontext` 0x523bba; BB#280033 |
+| **Stock**, unpatched Callgrind 3.19.0 engine `6d59099f65e4ec17a39f54b406d7424a1e7feb89d8dae5b335969619b1ee770d`; verified source archive `dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02` | POSIX one-shot timer above; **not the instruction sampler** | Exit 1, same assertion/address after valid rt_sigreturn; BB#114112337 |
+
+The schedules differ; counts or failure positions are not comparable. Stock's
+positive result establishes the upstream boundary. Source inspection finds
+both the core's rt_sigreturn callback and Callgrind's shadow-stack-bottom
+post-signal heuristic; premature heuristic unwinding across a stack switch
+is a **hypothesis**, not a traced internal-state cause. No assertion is
+suppressed or speculative sampler fix shipped. A detailed upstream report
+draft and reproducer are retained **locally only**; nothing is submitted.
+The brk-only benchmark tool is unchanged and not implicated by these
+signal-instrumentation reproductions.
+
+This is not just an unused synthetic path. A separate native TracePoint
+census of five warmed requests per route, using a private fixture database,
+unchanged Campfire `af4dd9f` and its **Rails 8.2.0.alpha `e3d5c56` lock**,
+returns HTTP 200 for all JSON/room/sidebar requests. It observes
+`ActiveRecord::Key::Single` (includes Enumerable) calling `zip` over another
+Key, with `Enumerator#next` at `active_record/key.rb:27`. The real callers are
+`AssociationScope#last_chain_scope` / `#next_chain_scope`
+(`association_scope.rb:66/92`), and room rendering also takes
+`ForeignAssociation#set_owner_attributes` (`foreign_association.rb:30`),
+through Action Text's rich-text body construction. The census sees
+**3/8/5 Enumerable zip calls and 3/8/5 Enumerator next calls per
+JSON/room/sidebar request**; sidebar additionally has six Array zip calls.
+These are companion native observations, not counts recovered from the old
+windows. The retained HTML native stacks already contain
+`get_next_values → enumerator_next → call_next → zip_i → enum_zip` alongside
+`fiber_setcontext`, linking the failed requests to this boundary. No Puma,
+ActionCable or app timer is required to reproduce it, and none is assigned
+as its cause. Future coverage needs a certified sampler/tool solution for
+these Fiber transitions; dropping empties or changing app associations is
+not a measurement fix. Existing Campfire cohorts remain unavailable/rejected.
 
 Publishing the method addendum required the authorized pull/rebase. Main had
 meanwhile changed `heap_windows.rb` and `request_pairs.rb` for multi-pool/JIT

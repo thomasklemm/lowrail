@@ -101,22 +101,24 @@ operations.each do |id, calls|
 end
 n = Integer(ENV.fetch("BENCH_REQUESTS", "50"))
 windows = HeapWindows.windows(n, operations.keys)
+operation = ->(count, id) {
+  calls = operations.fetch(id)
+  count.times { calls.each(&:call) }
+}
 jit_warmup = nil
 if JitStability.enabled?
   warmup = -> {
-    jit_warmup = JitStability.warm do |count|
-      operations.each do |id, calls|
+    jit_warmup = JitStability.warm(rehearsal_requests: n) do |count|
+      operations.each_key do |id|
         OperationCapture.restore_context(id)
-        count.times { calls.each(&:call) }
+        operation.call(count, id)
       end
     end
-    jit_warmup[:stage] = "post_heap_observer_captured_context"
+    jit_warmup[:stage] = "post_heap_observer_rehearsal_captured_context"
   }
   observe = JitStability.method(:snapshot)
 end
-anchors = HeapWindows.run(windows, prepare: OperationCapture.method(:restore_context), observe: observe, warmup: warmup) do |count, id|
-  calls = operations.fetch(id)
-  count.times { calls.each(&:call) }
-end
+anchors = HeapWindows.run(windows, prepare: OperationCapture.method(:restore_context), observe: observe, warmup: warmup, &operation)
 puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, windows: windows,
-  operations: metadata, heap_anchors: anchors, ar_installed: 0, jit_warmup: jit_warmup)}"
+  operations: metadata, heap_anchors: anchors, heap_page_targets: HeapWindows.page_targets,
+  ar_installed: 0, jit_warmup: jit_warmup)}"

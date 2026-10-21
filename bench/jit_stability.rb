@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "heap_windows"
+
 # Compilation is work, not steady-state request cost. Keep these observations
 # outside Callgrind/GC endpoints; retain failed warmups and windows as evidence.
 module JitStability
@@ -47,31 +49,38 @@ module JitStability
     counters(jit).to_h { |key| [key, stats[key]] }
   end
 
-  def self.warm
+  def self.warm(rehearsal_requests: 50, &workload)
     size = Integer(ENV.fetch("BENCH_JIT_WINDOW", "200"))
     limit = Integer(ENV.fetch("BENCH_JIT_MAX_WARMUP", "20000"))
     raise "JIT warmup needs positive windows" unless size.positive?
     required = [3, (2000 + size - 1) / size].max
     raise "JIT warmup cap must allow 2000 quiet requests and at least three windows" unless limit >= size * required
+    # Exercise the SAME loop, GC block, callback arity and quiescent exit.
+    # Separate preparation/certification histories cannot share a quiet budget.
+    rehearsal = observe_batches(rehearsal_requests, 200, 200, 1, &workload)
+    result = observe_batches(size, limit / size, 0, required, &workload)
+    missing = result.fetch(:history).last.fetch(:counters).select { |_, value| !value.is_a?(Integer) }.keys
+    flat = result.fetch(:consecutive_flat_windows)
+    result.merge(method: "rehearsed-pages-quiet-2000-v3", stable: flat >= required && missing.empty?, observed_counters_flat: flat >= required,
+      stop_reason: !missing.empty? ? "missing_counters" : flat >= required ? "quiescent" : "warmup_cap",
+      rehearsal: rehearsal, required_flat_windows: required, minimum_quiet_requests: 2000,
+      missing_counters: missing, window_requests: size, max_requests: limit)
+  end
+
+  def self.observe_batches(size, maximum, minimum, required)
     history = [{ requests: 0, counters: snapshot }]
     flat = 0
-    (limit / size).times do |index|
-      yield size
-      # The N=0 subtraction endpoint has its own lazy Integer#times exit.
-      # Certify it too; it must not first compile inside the empty window.
-      yield 0
-      3.times { GC.start }
+    maximum.times do |index|
+      yield size, nil
+      yield 0, nil
+      HeapWindows.collect
       current = snapshot
       flat = current == history.last.fetch(:counters) ? flat + 1 : 0
       history << { requests: (index + 1) * size, counters: current }
-      break if flat >= required
+      break if index + 1 >= minimum && flat >= required
     end
-    missing = history.last.fetch(:counters).select { |_, value| !value.is_a?(Integer) }.keys
-    { method: "quiet-2000-v2", stable: flat >= required && missing.empty?, observed_counters_flat: flat >= required,
-      stop_reason: !missing.empty? ? "missing_counters" : flat >= required ? "quiescent" : "warmup_cap",
-      required_flat_windows: required, minimum_quiet_requests: 2000,
-      missing_counters: missing, consecutive_flat_windows: flat, window_requests: size,
-      max_requests: limit, history: history }
+    { cycles: history.size - 1, requests: history.last.fetch(:requests),
+      consecutive_flat_windows: flat, history: history }
   end
 
   # JSON worker observations, not the flag passed to Ruby, decide the gate.

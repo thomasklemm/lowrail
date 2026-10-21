@@ -492,8 +492,19 @@ module RequestPairs
         .select { _1.fetch("requests").positive? }.map { _1.fetch("pools_before").fetch(pool.to_s) }
       capacities = stats.map { _1.fetch("heap_eden_slots") }
       page_slots = GC::INTERNAL_CONSTANTS.fetch(:HEAP_PAGE_SIZE).fdiv(stats.first.fetch("slot_size")).ceil
+      targets = metadata.fetch(:workers).values.map { _1.dig("heap_page_targets", pool.to_s) }.uniq
+      # v3 standard workers declare exact pages as well as the unchanged
+      # slot-range gate. Legacy experiment workers do not claim this method.
+      pages_matched = if targets != [nil]
+        targets.size == 1 && !targets.first.nil? && metadata.fetch(:workers).values.all? do |worker|
+          worker.fetch("windows").all? do |window|
+            %w[pools_before pools_after].all? { window.fetch(_1).fetch(pool.to_s).fetch("heap_eden_pages") == targets.first }
+          end
+        end
+      end
       [pool, { min: capacities.min, max: capacities.max,
-        matched: capacities.min >= slots.fetch(pool) && capacities.max - capacities.min <= page_slots }]
+        page_target: targets.first, pages_matched: pages_matched,
+        matched: capacities.min >= slots.fetch(pool) && capacities.max - capacities.min <= page_slots && pages_matched != false }]
     end
     summary[:heap_matched] = summary[:heap_capacity].values.all? { _1.fetch(:matched) }
     summary[:jit] = JitStability.control(metadata.fetch(:workers), requested: jit)

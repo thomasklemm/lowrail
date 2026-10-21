@@ -54,6 +54,15 @@ if census && defined?(ActiveRecord::Base)
   trace = TracePoint.new(:line) { |event| verify_paths += 1 if event.path == source && event.lineno == target_line }
   census.merge!(source_sha256: Digest::SHA256.file(source).hexdigest, target_line: target_line)
 end
+workload = ->(count, _unit = nil) {
+  if trace
+    verify_paths = 0
+    trace.enable(target: body) { counted_requests(count, session, verb, path, headers) }
+  else
+    counted_requests(count, session, verb, path, headers)
+  end
+  census[:counts] << (trace ? verify_paths : 0) if census
+}
 jit_warmup = nil
 if JitStability.enabled?
   observe = JitStability.method(:snapshot)
@@ -76,8 +85,8 @@ if JitStability.enabled?
     else
       counted_requests(1, session, verb, path, headers)
     end
-    jit_warmup = JitStability.warm { |count| counted_requests(count, session, verb, path, headers) }
-    jit_warmup[:stage] = "post_heap_observer_idle"
+    jit_warmup = JitStability.warm(rehearsal_requests: n, &workload)
+    jit_warmup[:stage] = "post_heap_observer_idle_rehearsal"
     jit_warmup[:idle_boundary] = { sleep_seconds: idle, verify_timeouts: timeouts }
   }
 end
@@ -92,15 +101,10 @@ end
 # symmetrically before N=0/N=50 endpoints; operation workers own captured context.
 settle = -> { counted_requests(1, session, verb, path, headers) }
 anchors = HeapWindows.run(windows, observe: observe, settle: settle, warmup: warmup,
-  idle_connections: idle_connections) do |count|
-  if trace
-    verify_paths = 0
-    trace.enable(target: body) { counted_requests(count, session, verb, path, headers) }
-  else
-    counted_requests(count, session, verb, path, headers)
-  end
-  census[:counts] << (trace ? verify_paths : 0) if census
-end
+  idle_connections: idle_connections, &workload)
+# The shared callback also runs during untimed preparation/certification.
+# Only the final four executions correspond to the companion's windows.
+census[:counts] = census[:counts].last(windows.size) if census
 ar_installed = 0
 if defined?(Lowrail::ARInstantiate)
   ar_installed = Lowrail.manifest.units.count do |unit|
@@ -110,6 +114,7 @@ if defined?(Lowrail::ARInstantiate)
 end
 puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, windows: windows,
   lowrail_jit: defined?(Lowrail) && Lowrail.respond_to?(:jit_status) ? Lowrail.jit_status : nil,
-  heap_anchors: anchors, ar_installed: ar_installed, jit_warmup: jit_warmup, request_settle: true,
+  heap_anchors: anchors, heap_page_targets: HeapWindows.page_targets,
+  ar_installed: ar_installed, jit_warmup: jit_warmup, request_settle: true,
   idle_census: census,
   compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"

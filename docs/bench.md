@@ -1091,6 +1091,102 @@ Benchmark tests: 4.0.7 **15/166**, 4.1-preview1 **15/180**, no failures/errors/
 skips; final upstream rebase also passed the five focused gate tests, **89
 assertions** on each VM. No app/runtime/default or timeout policy changed.
 
+#### v3 declaration: rehearse harness helpers and target eden pages
+
+**Declared before measurement; one multi-arm validation is authorized after
+publication, with at most four workers and no retry.** The accepted v2 off/off
+result above remains accepted, but does not generalize to the first real
+six-arm form cohort. That cohort on
+[`ab8e4df`](https://github.com/thomasklemm/lowrail/commit/ab8e4dfced319e95527ba480bea845ff330d33bb)
+is **rejected**, without retry or re-scoring. Its A/A and idle controls pass;
+heap matching and JIT stability do not. There are 36 workers / 144 windows:
+
+| Rejected observation | Diagnosis from retained data and untimed native probes |
+|---|---|
+| `3-off_a`, `4-off_a` hit 20,000 requests; last reset at 19,200, only four flat batches | Both histories acquire four ISeqs with +3/+4/+9/+6 blocks. An unchanged-worker native probe with 50-request observation batches instead of 200 names `GC.start` (`<internal:gc>:44`), the GC block in `JitStability.warm`, `counted_requests`, and its warm callback, at requests 1,950/2,000/2,950/3,000: the same block deltas at one quarter the request positions. The harness's batch-call thresholds, not just app request thresholds, need preparation. Not every later block-only reset has an archived site identity. |
+| `0-disabled no_gc N50 +50`, `2-missing no_gc N50 +8`, `5-missing total N50 +14` | **Unattributed.** Original-harness native disabled/missing probes have flat windows. Their activation paths differ from off, but the retained counters do not establish refusal/fallback sites; no such cause is claimed. |
+| `5-default no_gc N0 +7` | An original-harness native default probe reproduces a +7-block empty window in `Integer#times`, indexes 0/11/12/31/31/34/38. It proves another harness-context mechanism, not the unlogged historical window's identity. |
+| Default has 611/245 pages in pools 0/2, other arms 612/246 | Slot ranges exceed the unchanged one-page gates by 9/12 slots; no window grows capacity. Staged native probes reach the same 611/245 immediately after preparation, then show observers consuming the nearly full, uncollected filler heap: disabled grows before collection, while default collects earlier. This is a preparation/GC-phase mechanism, not in-window growth. |
+
+Cap exhaustion already **fails closed at acceptance**:
+`stable=false`, `stop_reason=warmup_cap` rejects both workers and the cohort.
+Execution is not fail-fast: their four windows and histories are retained,
+not dropped or counted as accepted workers. v3 preserves that accounting.
+
+Default's different setup is real. `Passes.install` skips the runtime-only
+form installer when its units are disabled. Default instead runs
+`FormScaffold.activate` / `FormScaffoldInventory.check`, hashes the stock
+source inventory, materializes/certifies methods, and retains **42 compiled
+source-file roots** in `@compiled`. A separate full-GC census before preparation
+finds pool-0 live slots **229,688 default vs 220,730 disabled**, and pool-2
+**27,362 vs 25,114**. These are instrumented native setup observations, not
+measured allocations or noise to subtract. Canonical `.lowrail` is not used:
+the retained runtime-only YJIT artifact has manifest SHA-256
+`2bd964cf1d666756287822a9f351d7007bf428d54b9f71ab143b8cd1756b3096`,
+unit 18, no delivered files/templates, and independently pinned runtime sources.
+
+**v3 changes the harness only:**
+
+1. Grow to an explicit **eden-page count**, not `floor − live_slots` objects.
+   For each pool use the ceiling of its slot floor divided by
+   `HEAP_PAGE_SIZE / slot_size − 1` (integer division, a conservative
+   header/alignment allowance). Ruby 4.0.7's unchanged five slot floors give
+   **611 / 306 / 246 / 99 / 100 pages**. Prepare small-slot pool 0 last, retain
+   sparse anchors, then collect discarded fillers **before observers**.
+   Pre-existing excess pages, failed growth or lost anchors refuse preparation.
+   Workers export `heap_page_targets`; every N=0/N=50 before/after endpoint
+   must retain those identical targets across arms. The original slot-floor
+   and **one-page slot-range gate remain**, additionally to this page check.
+2. Preserve the exact observer/clock prewarm, unchanged effective-timeout idle
+   exercise and request-only settling. After the idle exercise, run **200
+   preparatory cycles** of N=50 and N=0 through the **same workload Proc and
+   two-argument callback signature** used by windows. Use the same GC helper,
+   counter observations and batch-loop exit as certification. That is 10,000
+   untimed requests for N=50, separately reported, not quiet-budget credit.
+   A pure-harness probe caught +3 callback-entry blocks when warmup passed one
+   argument but windows passed two; another probe caught a lazy warm-loop exit.
+   Neither is fixed by merely issuing more requests through a different body.
+   Client START/ZERO/DUMP requests are **not** rehearsed: these C methods have
+   no Ruby ISeq/call threshold, and extra dumps would corrupt window indexing.
+3. Only then begin a fresh certification history: **≥2,000 quiet requests**,
+   default ten 200-request batches, cap **20,000 certification requests**.
+   Any changed/missing counter still rejects; no quiet-budget borrowing from
+   preparation. The fixed preparatory budget is additional and explicit, not
+   a silent increase to the certification cap. `jit_warmup.method` is
+   `rehearsed-pages-quiet-2000-v3`; `rehearsal` retains its own history/counts.
+   Captured operations reuse their exact replay Proc and restore captured
+   context; they never substitute an unrelated app request.
+
+The pure no-app native YJIT check uses the real C client extension without a
+Valgrind process: all four windows and the interval from final certification
+to them have **zero new ISeqs, blocks or invalidations**. A kept native regression
+also checks this invariant and exact page retention. Compilation-log probes
+are untimed diagnostics, **not accepted instruction/latency cohorts**. Neither
+flat native results nor a proposed v3 cure attribute the three unlogged
+disabled/missing windows. Those remain a reason to require multi-arm validation.
+
+**Predeclared validation:** one finite Ruby 4.0.7 / Rails 8.1.4 blog-show
+cohort, six rounds, seed 41231, N=50, alternating phase order, with **off-A,
+off-B, empty artifact, missing artifact, disabled units, active form-only
+default**. Preserve the retained `2bd964cf…` artifact for diagnosis. The later
+app-namespace certificate change makes it stale against current main: build
+a **fresh `--jit yjit` artifact in a disposable identical app copy**, leaving
+canonical interpreter `.lowrail` untouched. Pin both artifact digests, the
+published method/runtime SHA, tool, identical fixture and source hashes
+before/after. Before measurement require an untimed native YJIT check on
+that fresh artifact: nonzero form hits, zero fallbacks, `exit_trace_leave=0`,
+and `certification_jit=yjit`. If the separately published boot-root-release
+change lands before launch, pull and build on that head; otherwise record
+its later arrival without waiting or retrying. This reproduces the
+six-arm setup structure rather than validating off/off alone. At most four
+Callgrind workers, only after explicit slot authorization; no retry. Keep the
+pinned 512 MiB brk-only Valgrind, ±0.5% off/off A/A gate, every-window JIT gate,
+strict heap gates, brk checks, outside-window timestamps and separate companion
+symmetry checks. Long windows still have only supplementary companion counts,
+never exact measured aged-path counts. No app, timeout or YJIT setting changes;
+no pass promotion or renewed YJIT measurement authorization follows from native
+checks. Old rejected config/link/form cohorts stay rejected.
+
 Warm the observer too: after heap preparation, an enabled observer gets 200
 untimed rounds of the **exact** `GC.stat_heap(pool, existing_hash)`,
 `GC.stat(existing_hash)` and JIT snapshot signatures used at the endpoints.
@@ -1116,7 +1212,8 @@ there is no filtering, automatic retry or widened tolerance. The untimed
 observer may compile during heap preparation, but not inside a measured window.
 
 `BENCH_JIT_WINDOW` and `BENCH_JIT_MAX_WARMUP` change the warmup window and bound;
-v2 requires at least 2,000 quiet workload iterations and three windows.
+v2/v3 require at least 2,000 quiet workload iterations and three windows.
+v3 separately rehearses 200 N=0/N=50 cycles before that certification budget.
 `BENCH_JIT_CALL_THRESHOLD` optionally
 passes a positive `--yjit-call-threshold` to instruction workers. Default leaves
 Ruby's production threshold unchanged. Do not compare different thresholds as
