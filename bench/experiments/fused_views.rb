@@ -12,7 +12,15 @@ module FusedViews
   PLANS = {}
   LEDGER = []
   COUNTS = Hash.new(0)
+  ATTEMPTED = {}
+  TARGETS = {"ArticlesController" => {"show" => ["comments/comment"], "index" => ["articles/article"]},
+    "RoomsController" => {"show" => []}}.freeze
+  METHOD = Kernel.instance_method(:public_method)
   class Refused < StandardError; end
+
+  # Campfire retains Prism 1.4 in its unchanged bundle. Ruby 4.0 was named
+  # 3.5 in that parser's grammar API; never use its unspecified latest mode.
+  GRAMMAR = Gem::Version.new(Prism::VERSION) >= Gem::Version.new("2.0") ? "current" : "3.5"
 
   # These seams are installed symmetrically by the experiment driver. They do
   # not run in ordinary Lowrail builds and must not be used as production API.
@@ -20,7 +28,14 @@ module FusedViews
     private
 
     def render_template(view, template, layout_name, locals)
-      plan = PLANS[[view.controller.class.name, view.controller.action_name]]
+      controller, action = view.controller.class, view.controller.action_name
+      key = [controller.name, action]
+      # Own-suite witness only: never force controller autoloads at initialize!
+      # when the app's own test boot leaves them lazy.
+      if FusedViews.enabled? && !PLANS.key?(key) && !ATTEMPTED[key] && TARGETS.dig(*key)
+        FusedViews.install(controller, action, partials: TARGETS.dig(*key))
+      end
+      plan = PLANS[key]
       return super unless FusedViews.enabled? && plan && locals.empty?
       layout = layout_name && find_layout(layout_name, locals.keys, [formats.first])
       return super(view, template, layout, locals) unless plan.valid?(view, template, layout)
@@ -45,6 +60,7 @@ module FusedViews
     def enabled? = @enabled
 
     def install(controller, action, partials: [])
+      ATTEMPTED[[controller.name, action]] = true
       raise Refused, "Ruby/Rails version" unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
       plan = Plan.new(controller, action, partials)
       PLANS[[controller.name, action]] = plan
@@ -57,6 +73,23 @@ module FusedViews
     def observe
       ActionView::TemplateRenderer.prepend(Renderer)
       ActionView::Template.prepend(Partial)
+    end
+
+    def chain(method)
+      result = []
+      while method
+        result << method
+        method = method.super_method
+      end
+      result
+    end
+
+    def original(view, template, locals)
+      saved = Thread.current.thread_variable_get(CURRENT)
+      Thread.current.thread_variable_set(CURRENT, nil)
+      template.render(view, locals) { |*name| view._layout_for(*name) }
+    ensure
+      Thread.current.thread_variable_set(CURRENT, saved)
     end
   end
 
@@ -90,18 +123,21 @@ module FusedViews
         [@view_class, :_run], [@view_class, :render], [ActionView::Template, :render],
         [ActionView::Template, :compiled_source], [ActionView::TemplateRenderer, :render_template],
         [ActionView::CollectionRenderer, :collection_with_template]
-      ].map { |holder, name| [holder, name, holder.instance_method(name)] }
+      ].map { |holder, name| [holder, name, FusedViews.chain(holder.instance_method(name))] }
+      @render = FusedViews.chain(ActionView::Template.instance_method(:render))
+      @run = @view_class.instance_method(:_run)
       @view_paths = controller.view_paths
+      branches = @partials.map.with_index do |template, n|
+        "#{n.zero? ? 'if' : 'elsif'} __fv_partial.equal?(__fv_plan.templates[#{@templates.index(template)}])\n#{bodies.fetch(template)}"
+      end
+      callback = branches.empty? ? "::FusedViews::MISS" : "#{branches.join("\n")}\nelse\n::FusedViews::MISS\nend"
       @code = <<~RUBY
         # frozen_string_literal: #{!!ActionView::Template.frozen_string_literal}
         def #{@method_name}(__fv_renderer, __fv_template, __fv_layout, __fv_locals)
           __fv_previous = Thread.current.thread_variable_get(::FusedViews::CURRENT)
           __fv_plan = ::FusedViews::PLANS[#{[controller.name, action].inspect}]
           __fv_callback = lambda do |__fv_partial, __fv_partial_locals|
-            #{@partials.map.with_index { |template, n| "#{n.zero? ? 'if' : 'elsif'} __fv_partial.equal?(__fv_plan.templates[#{@templates.index(template)}])\n#{bodies.fetch(template)}" }.join("\n")}
-            else
-              ::FusedViews::MISS
-            end
+            #{callback}
           end
           Thread.current.thread_variable_set(::FusedViews::CURRENT, [self, __fv_callback])
           ActiveSupport::Notifications.instrument("render_layout.action_view", identifier: __fv_layout.identifier) do
@@ -127,15 +163,29 @@ module FusedViews
       # Direct method identity catches suppressed mutation hooks between
       # requests. This is NOT a certificate for mutations during live helpers;
       # those are excluded by the explicitly accepted sealed contract.
-      @dependencies.all? { |holder, name, body| holder.instance_method(name) == body } &&
+      @dependencies.all? { |holder, name, body| FusedViews.chain(holder.instance_method(name)) == body } &&
         @templates.all? { |t| t.source == @sources.fetch(t) && @view_class.instance_method(t.method_name) == @methods.fetch(t) }
+    rescue NameError
+      false
+    end
+
+    def render_current?(template)
+      FusedViews.chain(METHOD.bind_call(template, :render).unbind) == @render
+    rescue NameError
+      false
+    end
+
+    def body_current?(view, template)
+      template.source == @sources.fetch(template) &&
+        METHOD.bind_call(view, :_run).unbind == @run &&
+        METHOD.bind_call(view, template.method_name).unbind == @methods.fetch(template)
     rescue NameError
       false
     end
 
     def region(template, index)
       compiled = template.send(:compiled_source)
-      parsed = Prism.parse(compiled, version: "current")
+      parsed = Prism.parse(compiled, version: GRAMMAR)
       raise Refused, "unparseable handler" unless parsed.success?
       definition = parsed.value.statements.body.fetch(0)
       raise Refused, "custom handler shape" unless Prism::DefNode === definition
@@ -161,24 +211,34 @@ module FusedViews
       input = index < 2 ? "__fv_locals" : "__fv_partial_locals"
       object = index == 0 ? "__fv_template" : index == 1 ? "__fv_layout" : "__fv_partial"
       <<~RUBY
-        begin
-          #{prefix}template = #{object}
-          #{prefix}template.send(:instrument_render_template) do
-            #{prefix}saved = [@output_buffer, @virtual_path, @current_template]
-            begin
-              @current_template = #{prefix}template
-              @output_buffer = ActionView::OutputBuffer.new
-              #{prefix}local_assigns, #{prefix}output_buffer = #{input}, @output_buffer
-              #{prefix}result = begin
-                #{body}
+        #{prefix}template = #{object}
+        if !__fv_plan.render_current?(#{prefix}template)
+          ::FusedViews.original(self, #{prefix}template, #{input})
+        else
+          begin
+            #{prefix}template.send(:instrument_render_template) do
+              if __fv_plan.body_current?(self, #{prefix}template)
+                ::FusedViews::COUNTS[#{"#{key}/#{template.virtual_path}".inspect}] += 1
+                #{prefix}saved = [@output_buffer, @virtual_path, @current_template]
+                begin
+                  @current_template = #{prefix}template
+                  @output_buffer = ActionView::OutputBuffer.new
+                  #{prefix}local_assigns, #{prefix}output_buffer = #{input}, @output_buffer
+                  #{prefix}result = begin
+                    #{body}
+                  end
+                ensure
+                  @output_buffer, @virtual_path, @current_template = #{prefix}saved
+                end
+              else
+                #{prefix}template.send(:compile!, self)
+                #{prefix}result = _run(#{prefix}template.method_name, #{prefix}template, #{input}, ActionView::OutputBuffer.new) { |*name| _layout_for(*name) }
               end
               #{prefix}result.is_a?(ActionView::OutputBuffer) ? #{prefix}result.to_s : #{prefix}result
-            ensure
-              @output_buffer, @virtual_path, @current_template = #{prefix}saved
             end
+          rescue => #{prefix}error
+            #{prefix}template.send(:handle_render_error, self, #{prefix}error)
           end
-        rescue => #{prefix}error
-          #{prefix}template.send(:handle_render_error, self, #{prefix}error)
         end
       RUBY
     end
