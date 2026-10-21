@@ -91,6 +91,7 @@ lowrail build path/to/app --passes default,+props,+endpoint
 lowrail verify path/to/app     # prints its test seed to stderr; SEED=… to fix it
 
 # 4. Types and tooling
+lowrail explain path/to/app    # current selection, guards, refusals and recorded stats
 lowrail observe path/to/app    # record observed types from a test run
 lowrail types path/to/app --rbs sig/lowrail
 lowrail mcp path/to/app        # read-only MCP server over stdio

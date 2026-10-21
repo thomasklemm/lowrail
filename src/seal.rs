@@ -136,8 +136,7 @@ pub fn doctor(args: &[String]) -> Result<(), String> {
     } else { None };
     let read = |name: &str| -> Result<Value, String> {
         let path = app.join(".lowrail").join(name);
-        if !path.exists() { return Ok(Value::Null); }
-        serde_json::from_slice(&std::fs::read(path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+        Ok(crate::facts::read_json(&path)?.unwrap_or(Value::Null))
     };
     // Rerender comparison after a newly requested dynamic run, without rerunning tests.
     let seal_ran = dynamic && baseline == Some(true);
@@ -160,17 +159,25 @@ pub fn doctor(args: &[String]) -> Result<(), String> {
         println!("doctor: return tracing {} ({})", return_tracing["status"].as_str().unwrap_or("not run"),
             return_tracing["reason"].as_str().unwrap_or("boot failed"));
     }
+    println!("doctor: 6. current build explanation (read-only)");
+    let explanation = crate::explain::read(&app, None, None, None, None, None);
+    let explanation_error = explanation.as_ref().err().cloned();
+    match &explanation {
+        Ok(report) => print!("{}", report.render()),
+        Err(error) => eprintln!("explanation unavailable: {error}"),
+    }
     let report = json!({"format":1,"boot_ok":boot,"baseline_ok":baseline,"command":cmd,
         "static":static_report.ok(),"static_error":static_error,"seal_requested":dynamic,
         "seal_error":dynamic_error,"seal":if seal_ran { read("seal.json")? } else { Value::Null },
         "trace_requested":trace_check,"return_tracing":return_tracing,
         "jit_mode":boot_report["jit_mode"],
+        "explanation":explanation.ok(),"explanation_error":explanation_error,
         "guarded_ledger_available":!ledger.is_null(),
         "guarded_refusals":refusals});
     let path = app.join(".lowrail/doctor.json");
     std::fs::write(&path, serde_json::to_vec_pretty(&report).unwrap()).map_err(|e| e.to_string())?;
     println!("doctor JSON: {}", path.display());
-    if !boot || baseline != Some(true) || static_error.is_some() || dynamic_error.is_some() {
+    if !boot || baseline != Some(true) || static_error.is_some() || dynamic_error.is_some() || explanation_error.is_some() {
         return Err("doctor incomplete or baseline failed; report retained".into());
     }
     Ok(())

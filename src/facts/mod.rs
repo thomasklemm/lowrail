@@ -24,31 +24,12 @@ const USAGE: &str = "usage: lowrail facts APP [--out PATH] [--no-boot] [--origin
 
 pub fn load(path: impl AsRef<Path>) -> Result<Facts, String> {
     let path = path.as_ref();
-    let bytes = std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?;
-    let mut data: serde_json::Value =
-        serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", path.display()))?;
+    let mut data = read_json(path)?.ok_or_else(|| format!("{}: not found", path.display()))?;
     if data["format"] == 2 {
         let anchor = data["app_root"].as_str().ok_or("facts missing app_root")?;
         let root = path.parent().unwrap_or(Path::new(".")).join(anchor)
             .canonicalize().map_err(|e| format!("facts app_root: {e}"))?;
-        let paths = data["app_paths"].clone();
-        let expand = |s: &str| {
-            let (prefix, relative) = s.strip_prefix("(eval at ").map_or(("", s), |p| ("(eval at ", p));
-            let absolute = if relative == "." { root.clone() } else { root.join(relative) };
-            format!("{prefix}{}", absolute.display())
-        };
-        for pointer in paths["values"].as_array().ok_or("facts missing app_paths.values")? {
-            let pointer = pointer.as_str().ok_or("invalid facts path pointer")?;
-            let value = data.pointer_mut(pointer).ok_or_else(|| format!("missing facts path {pointer}"))?;
-            *value = serde_json::Value::String(expand(value.as_str().ok_or("invalid facts path value")?));
-        }
-        for pointer in paths["keys"].as_array().ok_or("facts missing app_paths.keys")?.iter().rev() {
-            let pointer = pointer.as_str().ok_or("invalid facts key pointer")?;
-            let entries = data.pointer_mut(pointer).and_then(|v| v.as_object_mut())
-                .ok_or_else(|| format!("missing facts path map {pointer}"))?;
-            *entries = std::mem::take(entries).into_iter().map(|(key, value)| (expand(&key), value)).collect();
-        }
-        data["app_root"] = serde_json::json!(root);
+        resolve_paths(&mut data, &root)?;
     }
     let facts: Facts =
         serde_json::from_value(data).map_err(|e| format!("{}: {e}", path.display()))?;
@@ -60,6 +41,40 @@ pub fn load(path: impl AsRef<Path>) -> Result<Facts, String> {
         ));
     }
     Ok(facts)
+}
+
+/// Shared artifact reader: absent is distinct from malformed. Readers must
+/// not turn a corrupt replacement into a stale successful answer.
+pub fn read_json(path: &Path) -> Result<Option<serde_json::Value>, String> {
+    match std::fs::read(path) {
+        Ok(bytes) => serde_json::from_slice(&bytes).map(Some).map_err(|e| format!("{}: {e}", path.display())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(format!("{}: {e}", path.display())),
+    }
+}
+
+/// Facts and manifests use the same typed path-pointer table. Never expand
+/// opaque code, configuration or literals by guessing which strings are paths.
+pub fn resolve_paths(data: &mut serde_json::Value, root: &Path) -> Result<(), String> {
+    let paths = data["app_paths"].clone();
+    let expand = |s: &str| {
+        let (prefix, relative) = s.strip_prefix("(eval at ").map_or(("", s), |p| ("(eval at ", p));
+        let absolute = if relative == "." { root.to_path_buf() } else { root.join(relative) };
+        format!("{prefix}{}", absolute.display())
+    };
+    for pointer in paths["values"].as_array().ok_or("missing app_paths.values")? {
+        let pointer = pointer.as_str().ok_or("invalid path pointer")?;
+        let value = data.pointer_mut(pointer).ok_or_else(|| format!("missing path {pointer}"))?;
+        *value = serde_json::Value::String(expand(value.as_str().ok_or("invalid path value")?));
+    }
+    for pointer in paths["keys"].as_array().ok_or("missing app_paths.keys")?.iter().rev() {
+        let pointer = pointer.as_str().ok_or("invalid key pointer")?;
+        let entries = data.pointer_mut(pointer).and_then(|v| v.as_object_mut())
+            .ok_or_else(|| format!("missing path map {pointer}"))?;
+        *entries = std::mem::take(entries).into_iter().map(|(key, value)| (expand(&key), value)).collect();
+    }
+    data["app_root"] = serde_json::json!(root);
+    Ok(())
 }
 
 /// Lowrail's Ruby gem. For now the crate's own `gem/` directory.

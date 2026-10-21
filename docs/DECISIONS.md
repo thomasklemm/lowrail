@@ -13,6 +13,19 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## One read-only explanation surface (2026-10-21)
+
+`lowrail explain`, MCP `explain_unit`/`explain_site` and doctor's build section
+share one typed report over the existing ledger/manifest and `facts::load`.
+Show actual certificates, guard/contract descriptions, reason codes and
+recorded counters; do not boot Ruby or evaluate guards to manufacture an
+answer. Eligibility is not activation, advisory dump mode is not certification
+mode, and an unrecorded site is not a refusal. New builds retain exact pass
+selection; older selections remain unknown. Stale/unbound stats stay visible
+without being attributed to current unit IDs. Compiler-dropped units stay
+original despite eligible ledger rows. This is tooling, not a promotion,
+weakened refusal or support/speed claim. [API and checks](types.md#explain-a-build-not-an-inferred-promise).
+
 ## Sticky tracing fixed; config promotion still blocked (2026-10-21)
 
 Production activation/delivery no longer enables global return tracing

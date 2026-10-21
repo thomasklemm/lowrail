@@ -93,6 +93,7 @@ class CompilerTest < Minitest::Test
       out = File.join(dir, ".lowrail")
       input = {
         "out" => out,
+        "selected_passes" => ["inertia/props"],
         "files" => [{ "path" => good, "lowered" => File.join(dir, "good.lowered.rb") },
                     { "path" => bad, "lowered" => File.join(dir, "bad.lowered.rb") },
                     { "path" => changed, "lowered" => File.join(dir, "changed.lowered.rb"), "source_sha256" => "0" * 64 },
@@ -105,6 +106,7 @@ class CompilerTest < Minitest::Test
       }
       err = StringIO.new
       manifest = Lowrail::Compiler.compile(input, err: err)
+      assert_equal ["inertia/props"], manifest.fetch("selected_passes")
       assert_equal ["good.rb"], manifest["files"].keys
       assert_equal [0, 3, 4], manifest["units"].map { _1["id"] }
       assert_match(/skipping #{Regexp.escape(bad)}: SyntaxError/, err.string)

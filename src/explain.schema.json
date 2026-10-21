@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lowrail explanation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "app", "artifact_dir", "manifest_available", "ledger_available", "selected_passes", "certification_jit", "rails_env", "tier", "facts", "delivery_refusals", "stats", "units", "sites", "notes"],
+  "properties": {
+    "format": {"const": 1},
+    "app": {"type": "string"},
+    "artifact_dir": {"type": "string"},
+    "manifest_available": {"type": "boolean"},
+    "ledger_available": {"type": "boolean"},
+    "selected_passes": {"type": ["array", "null"], "items": {"type": "string"}},
+    "certification_jit": {"$ref": "#/$defs/nullable_string"},
+    "rails_env": {"$ref": "#/$defs/nullable_string"},
+    "tier": {"$ref": "#/$defs/nullable_string"},
+    "facts": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/facts"}]},
+    "delivery_refusals": {"type": "array", "items": {"$ref": "#/$defs/reason"}},
+    "stats": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/stats"}]},
+    "units": {"type": "array", "items": {"$ref": "#/$defs/unit"}},
+    "sites": {"type": "array", "items": {"$ref": "#/$defs/site"}},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "nullable_string": {"type": ["string", "null"]},
+    "count": {"type": "integer", "minimum": 0},
+    "count_map": {"type": "object", "additionalProperties": {"$ref": "#/$defs/count"}},
+    "reason": {
+      "type": "object", "additionalProperties": false, "required": ["code", "detail"],
+      "properties": {"code": {"type": "string"}, "detail": {"type": "string"}}
+    },
+    "facts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "ruby_description", "rails_version", "yjit"],
+      "properties": {
+        "path": {"type": "string"}, "ruby_description": {"type": "string"},
+        "rails_version": {"$ref": "#/$defs/nullable_string"}, "yjit": {"type": "boolean"}
+      }
+    },
+    "stats": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "binding", "unit_hits", "unit_fallbacks", "jit_modes", "refusals"],
+      "properties": {
+        "source": {"type": "string"},
+        "binding": {"enum": ["current_manifest", "stale_manifest", "unbound_snapshot"]},
+        "unit_hits": {"$ref": "#/$defs/count_map"}, "unit_fallbacks": {"$ref": "#/$defs/count_map"},
+        "jit_modes": {"type": "array", "items": {"type": "object"}},
+        "refusals": {"type": "array", "items": {"$ref": "#/$defs/reason"}}
+      }
+    },
+    "counts": {
+      "type": "object", "additionalProperties": false, "required": ["hits", "fallbacks"],
+      "properties": {"hits": {"$ref": "#/$defs/count"}, "fallbacks": {"$ref": "#/$defs/count"}}
+    },
+    "guard": {
+      "type": "object", "additionalProperties": false, "required": ["phase", "requirement"],
+      "properties": {"phase": {"enum": ["admission", "contract", "activation", "call"]}, "requirement": {"type": "string"}}
+    },
+    "unit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "pass", "target", "kind", "certification_jit", "certified_facts", "certificates", "guards", "counts"],
+      "properties": {
+        "id": {"$ref": "#/$defs/count"}, "pass": {"type": "string"}, "target": {"type": "string"},
+        "kind": {"type": "string"}, "certification_jit": {"$ref": "#/$defs/nullable_string"},
+        "certified_facts": {"type": "array", "items": {"type": "object"}},
+        "certificates": {"type": "object", "description": "Unchanged pass-specific certificate payloads, not inferred type hints"},
+        "guards": {"type": "array", "items": {"$ref": "#/$defs/guard"}},
+        "counts": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/counts"}]}
+      }
+    },
+    "location": {
+      "type": "object", "additionalProperties": false, "required": ["path", "line", "origin"],
+      "properties": {
+        "path": {"type": "string"}, "line": {"type": "integer", "minimum": 1},
+        "origin": {"enum": ["ledger", "boot_constant", "boot_method", "query"]}
+      }
+    },
+    "site": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "line", "location", "site", "pass", "status", "reason", "unit_ids", "ledger"],
+      "properties": {
+        "target": {"type": "string"}, "line": {"$ref": "#/$defs/count"}, "site": {"type": "string"},
+        "location": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/location"}]},
+        "pass": {"$ref": "#/$defs/nullable_string"},
+        "status": {"enum": ["lowered", "refused", "ledgered", "left_original"]},
+        "reason": {"$ref": "#/$defs/reason"}, "unit_ids": {"type": "array", "items": {"$ref": "#/$defs/count"}},
+        "ledger": {"type": ["object", "null"], "description": "Original ledger row including copies, outcomes and survey metadata"}
+      }
+    }
+  }
+}

@@ -196,6 +196,8 @@ Tools:
 | `routes` | optional `name`, `path`, `controller` substrings (combined with AND) | Matching routes, in route-set order |
 | `lowering_ledger` | none | Current `.lowrail/ledger.json`, or an explicit missing-ledger result |
 | `lowering_status` | `target`: `Class#method` or `Class.method` | Matched ledger sites and original reasons; `lowered`, `refused`, `mixed`, or `not_recorded` |
+| `explain_unit` | integer `id`; optional `dir`, `stats` | Build unit, complete certified facts/payloads, guards, associated ledger sites and recorded counters; typed `outputSchema` |
+| `explain_site` | `location`: `path:line`; optional `dir`, `stats` | Exact ledger site(s), associated units, or explicit `left_original/not_recorded`; same typed `outputSchema` |
 | `verify_stats` | none | Last completed verify's pass/unit hits and fallbacks, command, equivalence result, recorder overhead and `matches_current_manifest` |
 | `diagnostics` | none | Source-read/parse diagnostics and static/observed type conflicts |
 
@@ -235,3 +237,86 @@ also launches the real executable over stdin/stdout and validates blog RBS.
 The current fact dumper does not record validations or enum mappings. Missing
 validations are reported as unavailable, not as an empty validated set.
 Diagnostics are not a substitute for the lowering ledger or `lowrail verify`.
+
+## Explain a build, not an inferred promise
+
+```sh
+lowrail explain APP                         # current persisted selection, all units/sites
+lowrail explain APP --unit 18               # IDs belong to this artifact only
+lowrail explain APP --site app/views/articles/show.html.erb:42 --json
+lowrail explain APP --pass active_record/instantiate
+lowrail explain APP --dir .lowrail-other --stats /absolute/stats.json.PID
+```
+
+All explanation entry points use one read-only report, with no Ruby process,
+autoloads, live guard evaluation, build or test run. `doctor` prints it as
+step 6 and saves it in `doctor.json["explanation"]`; the doctor command itself
+still boots and runs its normal baseline. MCP returns the same report in
+`structuredContent` and text, advertising the
+[versioned JSON Schema](../src/explain.schema.json) in `tools/list`.
+Example: `{"name":"explain_unit","arguments":{"id":18}}` or
+`{"name":"explain_site","arguments":{"location":"app/views/articles/show.html.erb:42"}}`.
+Relative `dir`, `stats` and site paths are relative to APP in both CLI and MCP.
+
+`location.origin` distinguishes a ledger's source site (`ledger`) from an
+exact target's recorded constant or method definition (`boot_constant` or
+`boot_method`). The latter are definition context, **not claimed call sites**:
+CRM's class-level instantiate refusal can be queried at `Contact`'s definition
+line, but is not attributed to neighboring definitions or every line in its
+file. An unrecorded lookup has origin `query`; unavailable locations are null.
+
+The report joins existing manifest/ledger artifacts and uses **`facts::load`**
+for both fact formats and their shared typed path resolution. It does not
+duplicate Ruby's compatibility/admission validator or turn advisory types
+into certificates. `certified_facts` and `certificates` are the unit's actual
+recorded payloads; the dump's `yjit` flag is shown separately from the
+manifest's authoritative **`certification_jit`**. Guards distinguish admission,
+the sealed contract, activation and call-time checks; they are descriptions,
+not a new certification engine.
+
+Site states describe the **build**, not whether the running app activated it:
+
+- `lowered`: a lowered ledger site maps to an emitted manifest unit.
+- `refused`: preserves the ledger's pass, reason code and full detail (CRM's
+  unaudited Rails 8.0 instantiate is `rails_implementation`). Refusals have
+  sites, not invented unit IDs.
+- `ledgered`: warning/survey metadata remains visible, not relabeled refusal.
+- `left_original`: `not_recorded` at an unrecorded queried location, or
+  `not_emitted` when ledger eligibility did not produce a manifest unit.
+  The original ledger row/copies remain available; neighboring refused sites
+  do not inherit a lowered unit's counters.
+
+New builds record the exact `selected_passes`, including an empty selection.
+Older artifacts report selection **unknown**, never guessed from units or
+whole-pass quarantine rows. Unit IDs (including the pilot's form unit 18)
+can change when a build emits different earlier units. Source/guard freshness
+is not implied by any explanation.
+
+By default counters/JIT observations come from `.lowrail/verify/last.json`.
+They attach to units only if its captured manifest equals the current raw
+manifest. A mismatch is `stale_manifest`, with raw counts retained separately;
+an explicit runtime Stats snapshot is `unbound_snapshot`, likewise not silently
+attributed to current IDs. A matching report is `current_manifest`, still a
+historical snapshot rather than a live guard check. Missing stats yield null
+counts, **not fabricated zeroes**. Per-site counts do not exist; site records
+link to their unit's aggregate counters.
+
+Whole-artifact `delivery_refusal` and observed runtime refusals remain distinct
+from successful build eligibility. `jit_mode_mismatch` is emitted only for an
+**observed refusal**, preserving its certification/admission/current modes and
+message; a later diagnostic drift is not invented into a refusal. Bundlebun
+keeps `bundlebun_load_order`; other runtime messages preserve their detail
+under `runtime_refusal`. No compatibility or guard check is weakened.
+
+Regressions cover form unit 18 with its exact-site certificate/guards, CRM's
+Rails implementation refusal, mode-mismatch admission, stale/missing counters,
+compiler-dropped units, neighboring sites and a typed MCP transport round trip.
+An untimed fresh blog build/doctor/MCP check also validates both tool outputs
+against JSON Schema and compares CLI/MCP JSON exactly. The current copied
+`RealBlog` fixture emits form unit **3**; the older `sealed/link_to` pilot
+separately refuses because it requires `RealBlogR4`. The form's two-example
+production check has identical outcomes/4 queries but form **0 hits/0 fallbacks**
+(no activation claim), with 4 AR hits. The unit-18 schema regression does not
+relabel those observations.
+Actual interpreter-artifact/YJIT-startup refusal is separately recorded. No
+measured cohort or speed/support claim follows.

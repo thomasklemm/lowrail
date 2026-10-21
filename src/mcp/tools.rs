@@ -13,6 +13,8 @@ pub(super) fn list() -> Vec<Value> {
         ("lowering_ledger", "Current lowering ledger, including reasons not lowered", json!({}), vec![]),
         ("seal_ledger", "Last seal-check observations, affected tests and remedies; not proof of contract enforcement", json!({}), vec![]),
         ("doctor", "Last onboarding report: boot, baseline suite, static hints, optional seal-check and grouped guarded refusals", json!({}), vec![]),
+        ("explain_unit", "Read-only build certification, guards, ledger sites and recorded unit counters; never evaluates guards", json!({"id":{"type":"integer","minimum":0},"dir":string,"stats":string}), vec!["id"]),
+        ("explain_site", "Explain an exact path:line (or explicitly not recorded), preserving refusals and unit provenance", json!({"location":string,"dir":string,"stats":string}), vec!["location"]),
         ("lowering_status", "Per-method ledger sites: lowered/refused and original reasons; not_recorded is not refused", json!({"target":string}), vec!["target"]),
         ("verify_stats", "Pass and unit hits/fallbacks from the last verify, with build freshness", json!({}), vec![]),
         ("diagnostics", "Source diagnostics and static/observed type conflicts", json!({}), vec![]),
@@ -20,7 +22,12 @@ pub(super) fn list() -> Vec<Value> {
         "name":name, "description":description,
         "inputSchema":{"type":"object", "properties":properties, "required":required, "additionalProperties":false},
         "annotations":{"readOnlyHint":true,"destructiveHint":false,"openWorldHint":false}
-    })).collect()
+    })).map(|mut tool| {
+        if matches!(tool["name"].as_str(), Some("explain_unit" | "explain_site")) {
+            tool["outputSchema"] = crate::explain::schema();
+        }
+        tool
+    }).collect()
 }
 
 struct Snapshot {
@@ -77,8 +84,14 @@ impl Data {
             .ok_or("unknown tool")?;
         let args = args.as_object().ok_or("arguments must be an object")?;
         for (key, value) in args {
-            if schema["inputSchema"]["properties"].get(key).is_none() || !value.is_string() {
-                return Err(format!("unexpected argument or non-string value: {key}"));
+            let expected = &schema["inputSchema"]["properties"][key];
+            let valid = match expected["type"].as_str() {
+                Some("string") => value.is_string(),
+                Some("integer") => value.as_u64().is_some(),
+                _ => false,
+            };
+            if !valid {
+                return Err(format!("unexpected argument or invalid value: {key}"));
             }
         }
         let required = |key: &str| {
@@ -86,6 +99,13 @@ impl Data {
                 .and_then(Value::as_str)
                 .ok_or_else(|| format!("{key} is required"))
         };
+        if name == "explain_unit" || name == "explain_site" {
+            let dir = args.get("dir").and_then(Value::as_str).map(std::path::Path::new);
+            let stats = args.get("stats").and_then(Value::as_str).map(std::path::Path::new);
+            let id = if name == "explain_unit" { Some(args.get("id").and_then(Value::as_u64).ok_or("id is required")?) } else { None };
+            let location = if name == "explain_site" { Some(required("location")?) } else { None };
+            return serde_json::to_value(crate::explain::read(&self.app, dir, stats, id, location, None)?).map_err(|e| e.to_string());
+        }
         if name == "seal_ledger" || name == "doctor" {
             let file = if name == "doctor" { "doctor.json" } else { "seal.json" };
             return match read_optional(&self.app.join(".lowrail").join(file))? {
@@ -95,14 +115,9 @@ impl Data {
         }
         if name == "lowering_ledger" {
             let path = self.app.join(".lowrail/ledger.json");
-            return match std::fs::read(&path) {
-                Ok(bytes) => Ok(
-                    json!({"available":true,"ledger":serde_json::from_slice::<Value>(&bytes).map_err(|e| e.to_string())?}),
-                ),
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(
-                    json!({"available":false,"reason":"ledger.json does not exist; run lowrail build"}),
-                ),
-                Err(e) => Err(format!("{}: {e}", path.display())),
+            return match crate::facts::read_json(&path)? {
+                Some(ledger) => Ok(json!({"available":true,"ledger":ledger})),
+                None => Ok(json!({"available":false,"reason":"ledger.json does not exist; run lowrail build"})),
             };
         }
         if name == "verify_stats" {
@@ -114,8 +129,7 @@ impl Data {
                 || !last["report"]["on"]["unit_hits"].is_object()
                 || !last["report"]["on"]["unit_fallbacks"].is_object()
             { return Err("invalid or unsupported last verify report".into()); }
-            let current: Option<Value> = read_optional(&self.app.join(".lowrail/manifest.json"))?
-                .map(|bytes| serde_json::from_slice(&bytes)).transpose().map_err(|e| e.to_string())?;
+            let current = crate::facts::read_json(&self.app.join(".lowrail/manifest.json"))?;
             return Ok(json!({"available":true,"matches_current_manifest":current.as_ref() == Some(&last["manifest"]),
                 "identical":last["identical"],"command":last["command"],"passes":last["passes"],
                 "unit_hits":last["report"]["on"]["unit_hits"],
@@ -123,8 +137,8 @@ impl Data {
                 "recorder_overhead":last["recorder_overhead"]}));
         }
         let ledger = if name == "lowering_status" {
-            read_optional(&self.app.join(".lowrail/ledger.json"))?
-                .map(|bytes| serde_json::from_slice::<Vec<Value>>(&bytes)).transpose().map_err(|e| e.to_string())?
+            crate::facts::read_json(&self.app.join(".lowrail/ledger.json"))?
+                .map(serde_json::from_value::<Vec<Value>>).transpose().map_err(|e| e.to_string())?
         } else { None };
         let snapshot = self.refresh()?;
         match name {

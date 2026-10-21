@@ -22,7 +22,7 @@ fn protocol_errors_notifications_and_tool_discovery() {
     assert_eq!(responses[2]["error"]["code"], -32000);
     assert_eq!(responses[3]["result"]["protocolVersion"], "2025-06-18");
     let tools = responses[4]["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 10);
+    assert_eq!(tools.len(), 12);
     assert!(tools.iter().any(|t| t["name"] == "type_of"));
     assert_eq!(responses[5]["error"]["code"], -32602);
     assert_eq!(responses[6]["result"], json!({}));
@@ -150,5 +150,112 @@ fn method_status_does_not_attribute_neighboring_sites_to_a_method() {
     assert_eq!(second["status"], "refused");
     assert_eq!(second["sites"][0]["reason"], "argument_shape");
     assert_eq!(data.call("lowering_status", &json!({"target":"Article#missing"})).unwrap()["status"], "not_recorded");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn explanation_round_trip_preserves_certificates_refusals_and_counter_provenance() {
+    let dir = std::env::temp_dir().join(format!("lowrail-explain-{}", std::process::id()));
+    let artifact = dir.join(".lowrail");
+    std::fs::create_dir_all(artifact.join("verify")).unwrap();
+    std::fs::write(artifact.join("facts.json"), json!({"format":2,"app_root":"..","yjit":false,
+        "rails_version":"8.1.4","app_paths":{"values":[],"keys":[]}}).to_string()).unwrap();
+    let mut manifest = json!({"format":2,"app_root":"..","app_paths":{"keys":[],"values":["/units/0/data/site/source_location/0"]},
+        "certification_jit":"yjit","rails_env":"production","tier":"sealed-v1","selected_passes":["sealed/form_scaffold"],
+        "units":[{"id":18,"pass":"sealed/form_scaffold","kind":"method","target":"ArticlesController#form_with","facts":[],
+          "data":{"inventory":{"audited":"retained"},"site":{"source_location":["app/views/articles/show.html.erb",23],"handler_sha256":"exact"}}}]});
+    std::fs::write(artifact.join("manifest.json"), manifest.to_string()).unwrap();
+    let mut ledger = json!([
+        {"pass":"sealed/form_scaffold","target":"app/views/articles/show.html.erb","line":23,"site":"form_with","outcome":"lowered","reason":"lowered","detail":"lowered","copies":1},
+        {"pass":"sealed/form_scaffold","target":"app/views/articles/show.html.erb","line":24,"site":"form_with","outcome":"refused","reason":"dynamic_options","detail":"original retained"},
+        {"pass":"jit/shape","target":"app/views/articles/show.html.erb","line":23,"outcome":"warning","reason":"uninspected","detail":"not a refusal"}
+    ]);
+    std::fs::write(artifact.join("ledger.json"), ledger.to_string()).unwrap();
+    std::fs::write(artifact.join("verify/last.json"), json!({"format":1,"manifest":manifest,
+        "report":{"on":{"unit_hits":{"18":17},"unit_fallbacks":{"18":3},"jit_modes":[{
+            "certification":"yjit","admission":"yjit","current":"yjit","refusal":null}]}}}).to_string()).unwrap();
+    let requests = [json!({"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}),
+        json!({"jsonrpc":"2.0","id":2,"method":"tools/list"}),
+        json!({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"explain_unit","arguments":{"id":18}}}),
+        json!({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"explain_site","arguments":{"location":"app/views/articles/show.html.erb:24"}}})];
+    let input = requests.iter().map(|r| format!("{r}\n")).collect::<String>();
+    let mut output = Vec::new();
+    serve(dir.clone(), input.as_bytes(), &mut output).unwrap();
+    let responses = String::from_utf8(output).unwrap().lines().map(|s| serde_json::from_str::<Value>(s).unwrap()).collect::<Vec<_>>();
+    let tool = responses[1]["result"]["tools"].as_array().unwrap().iter().find(|t| t["name"] == "explain_unit").unwrap();
+    assert_eq!(tool["inputSchema"]["properties"]["id"]["type"], "integer");
+    assert_eq!(tool["outputSchema"]["properties"]["units"]["items"]["$ref"], "#/$defs/unit");
+    let value = &responses[2]["result"]["structuredContent"];
+    let typed: crate::explain::Report = serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(serde_json::to_value(&typed).unwrap(), *value, "typed MCP schema round trip");
+    assert_eq!(serde_json::from_str::<Value>(responses[2]["result"]["content"][0]["text"].as_str().unwrap()).unwrap(), *value);
+    assert_eq!(value["selected_passes"], json!(["sealed/form_scaffold"]));
+    assert_eq!(value["certification_jit"], "yjit");
+    assert_eq!(value["facts"]["yjit"], false, "facts mode is not build certification");
+    assert_eq!(value["units"][0]["counts"], json!({"hits":17,"fallbacks":3}));
+    assert_eq!(value["units"][0]["certificates"]["data"]["inventory"]["audited"], "retained");
+    assert_eq!(value["sites"].as_array().unwrap().len(), 1, "neighboring refusal/warning must not inherit counters");
+    assert_eq!(value["sites"][0]["status"], "lowered");
+    assert!(typed.render().contains("FormScaffold.valid?"));
+    assert!(typed.render().contains("seal epoch zero"));
+    assert_eq!(responses[3]["result"]["structuredContent"]["sites"][0]["status"], "refused");
+    assert_eq!(responses[3]["result"]["structuredContent"]["units"], json!([]));
+    let mut data = tools::Data::new(dir.clone());
+    assert!(data.call("explain_unit", &json!({"id":"18"})).is_err());
+    assert!(data.call("explain_site", &json!({"location":"x:0"})).is_err());
+    let unknown = data.call("explain_site", &json!({"location":"app/views/articles/show.html.erb:25"})).unwrap();
+    assert_eq!(unknown["sites"][0]["status"], "left_original");
+    assert_eq!(unknown["sites"][0]["reason"]["code"], "not_recorded");
+    manifest["certification_jit"] = json!("interpreter");
+    std::fs::write(artifact.join("manifest.json"), manifest.to_string()).unwrap();
+    let stale = data.call("explain_unit", &json!({"id":18})).unwrap();
+    assert_eq!(stale["stats"]["binding"], "stale_manifest");
+    assert_eq!(stale["units"][0]["counts"], Value::Null);
+    std::fs::write(artifact.join("verify/last.json"), json!({"format":1,"manifest":manifest,
+        "report":{"on":{"unit_hits":{},"unit_fallbacks":{},"jit_modes":[{"certification":"interpreter","admission":"yjit","current":"yjit",
+            "refusal":"certification JIT mode mismatch: built interpreter, running yjit; rebuild with --jit yjit"}]}}}).to_string()).unwrap();
+    let mismatch = data.call("explain_unit", &json!({"id":18})).unwrap();
+    assert_eq!(mismatch["stats"]["refusals"][0]["code"], "jit_mode_mismatch");
+    assert_eq!(mismatch["units"][0]["counts"], json!({"hits":0,"fallbacks":0}));
+    assert!(serde_json::from_value::<crate::explain::Report>(mismatch).unwrap().render().contains("runtime refused [jit_mode_mismatch]"));
+    std::fs::remove_file(artifact.join("verify/last.json")).unwrap();
+    let missing = data.call("explain_unit", &json!({"id":18})).unwrap();
+    assert_eq!(missing["stats"], Value::Null);
+    assert_eq!(missing["units"][0]["counts"], Value::Null, "missing stats are not zero coverage");
+    std::fs::write(artifact.join("stats.json.123"), json!({"unit_hits":{"18":29},"unit_fallbacks":{"18":2}}).to_string()).unwrap();
+    let unbound = data.call("explain_unit", &json!({"id":18,"stats":".lowrail/stats.json.123"})).unwrap();
+    assert_eq!(unbound["stats"]["binding"], "unbound_snapshot");
+    assert_eq!(unbound["stats"]["unit_hits"]["18"], 29);
+    assert_eq!(unbound["units"][0]["counts"], Value::Null, "unbound raw counts stay visible, not attributed to this artifact");
+    // A compiler-dropped unit leaves its successful ledger row intact, but
+    // cannot be reported as delivered or assigned old unit counters.
+    manifest["units"] = json!([]);
+    manifest["app_paths"]["values"] = json!([]);
+    std::fs::write(artifact.join("manifest.json"), manifest.to_string()).unwrap();
+    let dropped = data.call("explain_site", &json!({"location":"app/views/articles/show.html.erb:23"})).unwrap();
+    assert_eq!(dropped["sites"][0]["reason"]["code"], "not_emitted");
+    assert_eq!(dropped["sites"][1]["status"], "ledgered");
+    ledger = json!([{"pass":"active_record/instantiate","target":"Contact","line":0,"site":"Contact._load_from_sql",
+        "outcome":"refused","reason":"rails_implementation","detail":"unaudited Rails implementation","copies":1},
+        {"pass":"active_record/instantiate","target":"Other","line":0,"site":"Other._load_from_sql",
+        "outcome":"refused","reason":"different_reason","detail":"neighboring class"}]);
+    std::fs::write(artifact.join("ledger.json"), ledger.to_string()).unwrap();
+    std::fs::write(artifact.join("facts.json"), json!({"format":2,"app_root":"..","rails_version":"8.0.5",
+        "app_paths":{"values":["/modules/0/const_source_location","/modules/1/const_source_location"],"keys":[]},
+        "modules":[{"name":"Contact","const_source_location":"app/models/entities/contact.rb:40"},
+            {"name":"Other","const_source_location":"app/models/entities/contact.rb:41"}]}).to_string()).unwrap();
+    let crm = crate::explain::read(&dir, None, None, None, None, Some("active_record/instantiate")).unwrap();
+    assert_eq!(crm.sites[0].status, crate::explain::Status::Refused);
+    assert_eq!(crm.sites[0].reason.code, "rails_implementation");
+    assert_eq!(crm.sites[0].reason.detail, "unaudited Rails implementation");
+    assert_eq!(crm.facts.as_ref().unwrap().rails_version.as_deref(), Some("8.0.5"));
+    let crm_site = data.call("explain_site", &json!({"location":"app/models/entities/contact.rb:40"})).unwrap();
+    assert_eq!(crm_site["sites"].as_array().unwrap().len(), 1);
+    assert_eq!(crm_site["sites"][0]["target"], "Contact");
+    assert_eq!(crm_site["sites"][0]["location"]["origin"], "boot_constant");
+    assert_eq!(crm_site["sites"][0]["reason"]["code"], "rails_implementation");
+    assert_eq!(crm_site["units"], json!([]));
+    std::fs::write(artifact.join("ledger.json"), "{").unwrap();
+    assert!(data.call("explain_site", &json!({"location":"x:1"})).is_err(), "no stale successful answer");
     std::fs::remove_dir_all(dir).unwrap();
 }

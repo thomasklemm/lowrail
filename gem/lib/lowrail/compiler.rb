@@ -102,6 +102,7 @@ module Lowrail
         }
         manifest["rails_env"] = input["rails_env"] if input["rails_env"]
         manifest["tier"] = input["tier"] if input["tier"]
+        manifest["selected_passes"] = input["selected_passes"] if input["selected_passes"]
         manifest["templates"] = templates unless templates.empty?
         manifest["delivery_refusal"] = input["delivery_refusal"] if input["delivery_refusal"]
         warnings = []

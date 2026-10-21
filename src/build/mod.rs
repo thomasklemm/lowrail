@@ -200,6 +200,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection, target_root: Option<&Pat
         "templates": templates,
         "units": units,
         "typed_facts": typed_facts,
+        "selected_passes": passes.iter().map(|p| p.name).collect::<Vec<_>>(),
         "tier": if passes.is_sealed() { Some("sealed-v1") } else { None },
     });
     let input_path = dir.join("units.json");
@@ -216,7 +217,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection, target_root: Option<&Pat
     if !status.success() {
         return Err("lowrail-compile failed".into());
     }
-    let manifest: Value = serde_json::from_slice(&std::fs::read(dir.join("manifest.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    let manifest = facts::read_json(&dir.join("manifest.json"))?.ok_or("compiler did not write manifest.json")?;
     Ok(summary(&ledger, manifest["units"].as_array().unwrap(), templates.len(), manifest["files"].as_object().map_or(0, |f| f.len()), &dir))
 }
 

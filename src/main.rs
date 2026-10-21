@@ -3,6 +3,7 @@
 
 mod bench;
 mod build;
+mod explain;
 mod facts;
 mod lower;
 mod mcp;
@@ -18,6 +19,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   parse FILE...        check that files parse with Prism
   facts APP            boot APP, write APP/.lowrail/facts.json, print a summary
   build APP            lower APP using its facts, write ISeqs + manifest
+  explain APP          explain current build units/sites, guards, refusals and recorded counters
   bench APP (--pass NAME | --passes SET --default-build DIR) [--path PATH]
                        controlled pass/request measurements; --budgets JSON for additivity
   types APP [--rbs DIR] derive types from boot facts, optionally write RBS
@@ -34,6 +36,7 @@ fn main() -> ExitCode {
             "parse" => parse(rest),
             "facts" => facts::cli(rest),
             "build" => build::cli(rest),
+            "explain" => explain::cli(rest),
             "bench" => bench::cli(rest),
             "types" => types::cli(rest),
             "mcp" => mcp::cli(rest),

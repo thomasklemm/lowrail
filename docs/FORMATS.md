@@ -278,6 +278,7 @@ See [the separate contract](sealed.md#artifact-acceptance-and-the-first-delivere
   "format": 2,
   "ruby_description": "...",
   "certification_jit": "interpreter",
+  "selected_passes": ["inertia/props"],
   "app_root": "..", "build_root": "/build/app", "iseq_root": "/deploy/app",
   "app_paths": {"values": ["/units/0/file"], "keys": ["/files", "/templates"]},
   "relocation_refusals": [],
@@ -317,6 +318,14 @@ refusals. No runtime JIT configuration is changed. A later mode change at
 `initialize!` completion is a diagnostic, not an uninstall: `jit_mode` in
 Stats and `jit_modes` in outcomes retain certification/admission/current/
 after_initialize modes, drift and refusal. Rebuild older artifacts.
+
+`selected_passes` records the exact expanded registry selection, including
+`[]` when nothing was selected. It is provenance only, not new runtime
+authority. Older manifests lack this field; `lowrail explain` reports their
+selection as unknown rather than guessing from emitted units or quarantine
+rows. Its [typed CLI/MCP/doctor report](types.md#explain-a-build-not-an-inferred-promise)
+joins the manifest and ledger and keeps certification, runtime observations
+and advisory boot facts separate.
 
 File delivery requires all three per-file checks: unchanged source bytes,
 the same compiler recipe, and the same original ISeq from the **live loader
