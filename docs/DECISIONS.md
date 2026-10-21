@@ -13,6 +13,15 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Bet D: always-on method TracePoint rejected (2026-10-21)
+
+Reject the live `:call/:c_call/:raise` method tripwire as a production detector.
+Six-round native YJIT blog show: off-A/off-B/on/tripwire 2.961/2.977/2.446/13.560 ms;
+tripwire adds **454.306%** [429.296, 478.032], versus A/A +0.598% [-2.803, 4.284].
+It adds 71.326 objects/request too; any guard saving is dwarfed. No Callgrind or README claim.
+Singleton-seal improvement has concrete visibility/saved-ancestry holes; not an authoritative epoch.
+See [contract proposal and evidence](freeze-mode-proposal.md); main and production admission unchanged.
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

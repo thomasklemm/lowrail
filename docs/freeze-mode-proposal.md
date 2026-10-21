@@ -40,8 +40,9 @@ or terminate the failed request and restart with the contract disabled.
    writes too. Known `query_constraints_list ||= nil` and
    `connection_class ||= false` writes cannot be warmed away. Not the proposed
    method-only production contract.
-2. **Selective module freeze**: freeze only currently stateless UrlHelper and
-   TagHelper modules/eigenclasses. Leave classes and mutable ancestors alone.
+2. **Selective module freeze**: freeze only currently stateless helper
+   modules/eigenclasses (in these boots **TagHelper only**, not UrlHelper).
+   Leave classes and mutable ancestors alone.
    A useful narrow compatibility probe, **not complete dispatch certification**.
    Inherited/core/receiver facts remain uncovered; no pass may infer otherwise.
 3. **Method-only tripwire**, `bench/experiments/method_seal.rb`: a stock Ruby
@@ -59,6 +60,58 @@ conservatively withdraw authorization. The first violation ends observation;
 reports are first-break witnesses, not exhaustive lists of subsequent writes.
 There is no claim of race-safe multi-Ractor publication or arbitrary in-flight
 deoptimization. No production guard may be removed based on this alone.
+
+## Rejected observer cost; singleton-seal improvement
+
+At exploration source [2c420ad](https://github.com/thomasklemm/lowrail/commit/2c420ad05ea1c6d5619ba1ccf6d2ec1b8f7dca6c),
+six finite alternating rounds, 500 warmup/300 timed requests/arm, CPU 2,
+Ruby 4.0.7 / Rails 8.1.4 / native YJIT with stats enabled identically:
+
+| Blog GET /articles/1 | off-A | off-B | Lowrail on | on + TracePoint |
+|---|---:|---:|---:|---:|
+| Mean of round request medians, ms | 2.961157 | 2.976779 | 2.446227 | 13.560401 |
+| Objects/request | — | — | 1878.029 | 1949.354 |
+
+A/A +0.598% [-2.803, +4.284]; tripwire/on **+454.306%**
+[+429.296, +478.032], about **5.54×**. **NO-GO** as a production detector.
+The existing sealed artifact's on/off difference is not new freeze-tier
+performance credit. This experiment does not elide any existing unit guard.
+YJIT remains enabled; activation invalidation delta is zero in every blog
+worker. We have not established a deoptimization mechanism from that counter.
+Raw compiled/side-exit/trace-leave counters are retained privately; missing
+`ratio_in_yjit` is not interpreted as zero. Campfire finite comparison pending.
+
+`singleton_seal.rb` is the one cheaper improvement: after callback-owner
+preflight, freeze holder/ancestor eigenclasses and hook carriers. Class-ivar
+writes remain legal; existing ModuleHooks/ObjectHooks clear a flag. This is
+**a deliberately incomplete research detector, not an admission authority**.
+It refuses the whole set before freezing if any effective mutation callback
+has an unexpected owner. It cannot turn an open hole into a safe fallback.
+
+Finite fresh-process probes (`singleton_seal_probe.rb`, Ruby 4.0.7):
+
+| Mutation | Outcome |
+|---|---|
+| nil/false class-ivar memo writes | legal; flag stays enabled |
+| ordinary def, remove_method, undef_method, saved pre-hook define_method | detected; flag withdrawn and warning emitted |
+| custom holder method_added present at barrier | refused before freeze |
+| install custom holder method_added after freeze | FrozenError, loud irreversible compatibility failure, not safe fallback |
+| private/public/protected on existing method | **open hole**; mutation succeeds, flag remains enabled |
+| module_function on existing method | FrozenError on eigenclass copy; visibility may already have changed; not safe fallback |
+| normal include/prepend | detected before ancestry change |
+| normal extend on holder | detected, then FrozenError |
+| incoming prepend_features calls saved pre-hook primitive | **open hole**, ancestry changes with flag enabled |
+| ordinary instance singleton override | detected |
+| pre-existing suppressing instance singleton callback | **open hole** |
+| new subclass suppresses singleton_method_added and method_added | **open hole** |
+| new refinement method definition | detected conservatively by matching name |
+| activate pre-existing refinement via using | **open hole**; lexical scopes require separate admission |
+| C rb_attr via Fiddle with GVL | detected; does not prove arbitrary native VM internals covered |
+
+Do not use Guard resets as an authoritative epoch after arbitrary live block
+execution. Request-entry scans alone also miss mutations inside a block before
+later skipped calls. Retain exact post-boundary dependency scans or refuse.
+Freezing every live instance/eigenclass is not an acceptable substitute.
 
 ## Reproduction / work in progress
 
