@@ -64,6 +64,18 @@ class MaterializeTest < Minitest::Test
     # Speculative relation delegation for the one app class method.
     assert_equal "speculative: 1 model class methods", step("relation_delegation")["note"]
     assert(@f["modules"].any? { |m| m["name"].start_with?("Widget::GeneratedRelationMethods") && m["methods"].any? { |x| x["name"] == "cheapest" } })
+    out, err, status = Open3.capture3(CLEAN_ENV, lowrail_cli, "types", @dir)
+    assert status.success?, err
+    types = JSON.parse(out).fetch("methods")
+    {"Widget.new" => "Widget", "Widget#draft?" => "bool", "Widget#id" => "Integer?"}.each do |target, expected|
+      ty = types.fetch(target).fetch("return_type")
+      assert_equal expected, ty.fetch("name"), target
+      assert_equal "static", ty.fetch("evidence"), target
+      refute_empty ty.fetch("provenance"), target
+    end
+    # Multiple IDs return an array; do not claim scalar find from the name.
+    assert_equal "(Widget | Array[Widget])", types.fetch("Widget.find").fetch("return_type").fetch("name")
+    assert_equal "untyped", types.fetch("Widget#name=").fetch("return_type").fetch("name")
   end
 
   def test_templates_are_compiled_and_linked_to_their_script

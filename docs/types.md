@@ -14,7 +14,7 @@ rbs -I .corpus/real-blog/sig/lowrail validate
 app. Stdout is a JSON object with a `methods` map keyed by `Class#method` or
 `Class.method`, and source-read/parse diagnostics. Every return/parameter type
 has a `name` (RBS notation) and `provenance` entries with `source` and `detail`.
-Sources are `boot_fact`, `schema`, `inference`, and `observed`. Existing
+Sources are `boot_fact`, `schema`, `rails_api`, `inference`, and `observed`. Existing
 `.lowrail/observed.json` samples are merged **after** static inference, never
 fed back into it. Types remain advisory unless explicitly proven within an
 analyzed body; a lowering consumer must still certify its execution context.
@@ -75,9 +75,11 @@ type union and proof separate from precision.
 
 ## What is modeled
 
-- Columns seed reader types, including schema `null` (`String?`, `Integer`,
-  `bool`, `BigDecimal`, `Date`). Time columns allow both `Time` and
-  `ActiveSupport::TimeWithZone`, because the dump does not pin time-zone-aware
+- Columns seed nullable reader types (`String?`, `Integer?`, `bool?`,
+  `BigDecimal?`, `Date?`), including primary keys: even a `NOT NULL` column
+  can be unset on an unsaved record. The storage `null` fact is retained in
+  provenance, not mistaken for a Ruby-object invariant. Time columns allow both
+  `Time` and `ActiveSupport::TimeWithZone`, because the dump does not pin time-zone-aware
   attribute configuration. Unknown/custom/JSON types stay `untyped`. Schema
   nullability describes storage, not the state of every unsaved Ruby object.
 - Attribute API readers are nullable, because the facts do not capture their
@@ -90,7 +92,9 @@ type union and proof separate from precision.
 - Common AR query class methods and booted named scopes return
   `ActiveRecord::Relation[Model]`. Prism recognizes literal `scope :name` and
   `enum :name` declarations in the model's source file. Enum readers are
-  `String?`; enum value-specific predicates/scopes are not yet enumerated.
+  `String?`. The boot census's generated enum module also supplies predicates
+  (`bool`), with actual prefix/suffix names, including non-identifier labels.
+  Bang methods and enum-generated scopes/mappings are not newly inferred.
   `where` and `unscoped` are not seeded: no-argument `where` returns a
   WhereChain, and block-form `unscoped` returns the block's result.
 - Controller actions and method-based `before_action` callbacks have roles
@@ -100,12 +104,15 @@ type union and proof separate from precision.
   Parameters are permissive because route facts do not describe the full
   polymorphic/positional/keyword calling convention.
 
-Boot method parameters replace guessed parameter lists where available.
+Boot method parameters replace guessed parameter lists where available;
+owner/source-matched Rails API signatures replace generic delegation shapes.
 Prism matches boot source locations and original method names, then propagates
-simple literals, attribute/association reads, no-argument calls and local/ivar
+simple literals, attribute/association reads, ordinary calls and local/ivar
 assignments through up to eight synchronous return-inference rounds. Custom
 reader bodies take precedence over schema seeds. Unsupported control flow,
-blocks, dynamic calls, arguments and recursive unknowns remain `untyped`.
+blocks, safe navigation, splats, forwarding and recursive unknowns remain
+`untyped`. Argument values are not inferred; a bounded argument grammar rejects
+nested control flow, and argument-bearing calls discard local/ivar knowledge.
 This is not whole-program parameter inference, controller-to-view ivar flow,
 or validation of source freshness. Regenerate facts after changing the app.
 
@@ -158,12 +165,14 @@ and `slots`), `diagnostics`, and `conflicts`. It reads the server's existing
 facts/samples, refreshes on content changes and never writes files. For example:
 `{"name":"export_rbs","arguments":{}}`.
 
-The support file supplies minimal Rails relation,
-TimeWithZone, Date, BigDecimal and Tempfile declarations and name-only stubs for
+The support file supplies a bounded, boot-owner/source-matched real-Rails API
+catalog for relation chains, controller parameters and common macro/call shapes,
+plus minimal TimeWithZone, Date, BigDecimal and Tempfile declarations and name-only stubs for
 namespaced external classes introduced by observations (e.g. strong parameters
 and safe strings). Array, Hash, Set and Queue samples do not infer element
 types. Namespace class/module kinds come from boot facts even when the namespace
-has no modeled methods. Omit the support file when loading full Rails/stdlib
+has no modeled methods. Empty app helpers/classes and actual superclass chains
+are declared from boot facts. Omit the support file when loading full Rails/stdlib
 signatures. This is generated member information,
 not a complete Rails signature distribution. Existing files with these two
 names in the chosen output directory are overwritten; other files are left
@@ -231,6 +240,88 @@ does not change the successful RBS parse/validate results. Steep is not a gate
 or repository dependency. The original install/check logs and exit status
 remain in `.lowrail/private/type-export/followups/steep-{install,check}.log`
 and `steep-exit.txt`; disposable bundle/source copies are removed afterward.
+
+### Rails API follow-up — 2026-10-21
+
+Reused the **same facts and observations**, not a fresh recording. The runtime
+gem and lowering are unchanged; no benchmark, Callgrind or measurement
+cohort was run. Ruby 4.0.7, RBS 4.2.0, Steep 2.1.0.
+
+The complete original blog unknown ledger is:
+
+| Cause | Unknown slots |
+|---|---:|
+| Framework/engine controller and callback returns | 78 |
+| Framework arguments (`send_stream`, live-stream configuration) | 8 |
+| Casting writer inputs/results | 26 |
+| Primary-key readers (previously rejected stock AR owner) | 2 |
+| Query delegation arguments | 32 |
+| Permissive route arguments | 30 |
+| **Total** | **176** |
+
+Empty app helpers were **unmodeled**, not hidden unknown slots. App action
+returns already had body/observation evidence; no controller-to-view dominance
+or helper types are invented. The full Wikino ledger (not just a sample) finds
+**2,079 argument + 693 return slots behind Sorbet runtime wrappers**, 336
+casting writer slots, 334 query/scope arguments, 178 other framework returns,
+36 route arguments, 18 primary-key readers, 19 other framework arguments,
+7 other singleton returns, and 3 app arguments/4 app returns. In particular,
+`ControllerConcerns::Authenticatable#current_user_record` and its inherited
+controller copies resolve to `sorbet-runtime/.../_methods.rb`, not their app
+body locations. Declaring those returns from names would be guessing.
+
+Roundhouse references: `src/ingest/model.rs` (`ty_of_column_slot`,
+`expand_enum_decl`), `src/lower/model_to_library/schema.rs` (readers and
+constructors), [`src/catalog/mod.rs`](https://github.com/rubys/roundhouse/blob/main/src/catalog/mod.rs)
+(class/relation receiver contexts), and
+`src/lower/controller/actions.rs` (callback/view flow). Reuse its bottom-up
+schema → framework API → caller propagation, **not** its replacement-runtime
+RBS: real Rails returns CollectionProxy/Relation, casts writer inputs, allows
+nil on unsaved records, and overloads `find` for arrays and blocks.
+
+Added the bounded catalog in `src/types/rails.rs`: advisory `rails_api` facts
+name the gem/version, source file and resolved boot owner. Stock AR `new`
+accepts optional attributes and a block; block-free `find` returns
+`Model | Array[Model]`, and `find_by` is nullable. Constructor, query and
+generated enum-predicate types propagate into simple callers; calls never
+promote callee facts to body proof. Custom owners/bodies win. Versions outside
+Rails 8.0/8.1 or replaced source locations do not receive these API facts.
+Anonymous model ancestors retain their boot order; ambiguous erased holder
+identities leave enum predicates untyped rather than skipping a possible override.
+`render`, parameter extraction, macro results and wrapped `redirect_to` retain
+`untyped`; known call shape is useful without pretending to know its result.
+No upstream RBS distribution is imported or installed in the app. Full
+collection import, enum mappings/bang methods, callback block-self typing,
+controller-to-view flow and Sorbet-wrapper recovery remain follow-ups.
+
+| App | Signatures before → after | Proven/static/observed/unknown before → after |
+|---|---:|---|
+| Blog | 161 → 167 | 2/55/11/176 → **2/69/7/158** |
+| Wikino | 1,436 → 1,504 | 0/367/1/3,707 → **0/471/1/3,545** |
+
+Denominators change: blog has **4 existing unknown slots → static**, 4
+observed returns → static with samples retained, and 6 newly modeled typed
+returns. Wikino has **36 existing unknown slots → static** and 68 new typed
+returns. The rest of the unknown reduction is accurate query-delegation shape
+(including zero-argument `none`), **not recovered argument value types**.
+Support-file members are excluded from these counts as before. Proven counts
+are unchanged; both apps retain zero conflicts and pass `rbs -I OUT validate`.
+Wikino's 38 raw-template diagnostics remain visible.
+
+On unchanged copies of the same blog models/controllers/helpers and the same
+Steepfile above, the old export reproduces **51 problems** (42 `Ruby::NoMethod`,
+8 `Ruby::UnknownConstant`, 1 `Ruby::UnexpectedPositionalArgument`). The new
+export has **6 `Ruby::NoMethod` problems in 4 files**, exit **1**, no unknown
+constants or constructor argument error. Remaining: Turbo `broadcasts_to`
+(2), callback block-self `article` (2), Importmap
+`stale_when_importmap_changes` (1), controller route mixin `articles_path` (1).
+These are still limitations, not a green Steep gate; no warnings are suppressed.
+Exports, exact input snapshots, complete unknown ledgers and before/after
+Steep logs are retained privately in `.lowrail/private/type-sources/`.
+`cargo test --locked`: **47 passed**. Affected gem tests (`facts`, `materialize`,
+`observe`, strict mode, seed 1729): **21 runs, 246 assertions, 0 failures/errors**,
+one named optional skip (`MaterializeCorpusTest#test_campfire`, app absent).
+Both apps' real MCP exports equal the split CLI files and standalone stdout.
 
 ## Type quality ledger — 2026-10-20
 

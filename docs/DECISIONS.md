@@ -82,6 +82,23 @@ remain diagnostics rather than invented RBS constants. Blog and Wikino parse
 and validate with RBS; this is tooling, not lowering support or speed evidence.
 [Contract and bounded checks](types.md#rbs-output).
 
+### Seed real Rails APIs, not replacement-runtime types (2026-10-21)
+
+Reuse Roundhouse's bottom-up schema/API/caller design, but not its runtime RBS.
+The bounded Rails 8.0/8.1 catalog checks boot owner and gem source, retains
+`rails_api` provenance, and never produces proof. Unsaved column readers,
+including IDs, are nullable; constructors, block-free finder unions, relation
+chains and boot-generated enum predicates feed advisory inference. Preserve
+untyped casting inputs and unsupported framework results. Export booted
+inheritance and empty helpers so known APIs can actually be used by Steep.
+
+Same-snapshot unknown slots: blog **176 → 158**, Wikino **3,707 → 3,545**;
+most of the net reduction is correcting delegation parameter shape, not
+recovering argument value types. Blog Steep **51 → 6**, still failing and
+non-gating. Full RBS-collection import and recovery through Sorbet wrappers
+remain follow-ups, not claims. Runtime/lowering and measurement work are
+untouched. [Classification, exact slot counts and limitations](types.md#rails-api-follow-up--2026-10-21).
+
 ## Sealed verification: external production scenarios, first slice rejected (2026-10-21)
 
 The two-example production probes are not whole-suite active coverage. Compare

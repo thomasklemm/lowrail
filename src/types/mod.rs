@@ -1,6 +1,7 @@
 //! Boot-first advisory types. These are not guards and never authorize lowering.
 mod infer;
 mod observed;
+mod rails;
 mod rbs;
 #[cfg(test)]
 mod tests;
@@ -16,6 +17,7 @@ use std::path::Path;
 pub enum Source {
     BootFact,
     Schema,
+    RailsApi,
     Inference,
     Observed,
 }
@@ -151,7 +153,7 @@ pub fn resolve<'a>(
     } else {
         ancestors.iter().map(String::as_str).collect()
     };
-    for ancestor in names {
+    for (index, &ancestor) in names.iter().enumerate() {
         let (ancestor, single) = if singleton {
             match ancestor
                 .strip_prefix("#<Class:")
@@ -164,7 +166,28 @@ pub fn resolve<'a>(
         } else {
             (ancestor, false)
         };
-        if let Some(m) = facts.modules.iter().find(|m| m.name == ancestor)
+        let module = if let Some(m) = facts.modules.iter().find(|m| m.name == ancestor) {
+            Some(m)
+        } else if !singleton && ancestor.starts_with('#')
+            && facts.models.iter().any(|m| m.name == receiver)
+        {
+            // Anonymous owner labels have their object IDs erased. An indexed
+            // model ancestor is exact; a holder is usable only at a unique
+            // position. Never skip an ambiguous module to a later definition.
+            let indexed = format!("{receiver}.ancestors[{index}]");
+            let prefix = format!("{receiver}.");
+            let mut candidates = facts.modules.iter().filter(|m| m.synthetic && (
+                m.name == indexed || (m.name.starts_with(&prefix)
+                    && !m.name.contains(".ancestors[")
+                    && names.iter().filter(|&&n| n == ancestor).count() == 1
+                    && m.methods.iter().any(|method| method.owner == ancestor))));
+            let first = candidates.next()?;
+            if candidates.next().is_some() { return None; }
+            Some(first)
+        } else {
+            None
+        };
+        if let Some(m) = module
             && let Some(method) = m
                 .methods
                 .iter()
@@ -191,7 +214,8 @@ impl TypeModel {
             for column in &model.columns {
                 let ty = scalar(column.type_.as_deref());
                 let ty = Type::new(
-                    nullable(ty, column.null),
+                    // NOT NULL constrains stored rows, not unsaved objects.
+                    nullable(ty, true),
                     Source::Schema,
                     format!(
                         "{}.{}: type={:?}, null={}",
@@ -280,6 +304,7 @@ impl TypeModel {
                 );
             }
         }
+        rails::seed(facts, &mut out);
         infer::analyze(facts, &mut out);
         out
     }

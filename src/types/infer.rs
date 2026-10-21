@@ -10,7 +10,7 @@ enum Expr {
     Literal(&'static str),
     Self_,
     Constant(String),
-    Call(Option<Box<Expr>>, String),
+    Call(Option<Box<Expr>>, String, bool),
     Sequence(Vec<Expr>),
     Read(String),
     Write(String, Box<Expr>),
@@ -54,10 +54,13 @@ fn expression(node: Node<'_>) -> Expr {
             Box::new(expression(n.value())),
         )
     } else if let Some(n) = node.as_call_node() {
-        if n.block().is_none() && n.arguments().is_none() && !n.is_safe_navigation() {
+        if n.block().is_none() && !n.is_safe_navigation()
+            && n.arguments().is_none_or(|a| a.arguments().iter().all(argument))
+        {
             Expr::Call(
                 n.receiver().map(|r| Box::new(expression(r))),
                 String::from_utf8_lossy(n.name().as_slice()).into(),
+                n.arguments().is_some(),
             )
         } else {
             Expr::Unknown
@@ -66,6 +69,33 @@ fn expression(node: Node<'_>) -> Expr {
         // Never infer just the tail of a body with unsupported control flow.
         Expr::Unknown
     }
+}
+
+// Only accept arguments without unsupported control flow (including a return
+// nested inside a hash or another call). Values are NOT inferred from argument
+// positions. Calls with blocks, splats, forwarding and safe navigation refuse.
+fn argument(node: Node<'_>) -> bool {
+    if node.as_string_node().is_some() || node.as_symbol_node().is_some()
+        || node.as_integer_node().is_some() || node.as_float_node().is_some()
+        || node.as_true_node().is_some() || node.as_false_node().is_some()
+        || node.as_nil_node().is_some() || node.as_self_node().is_some()
+        || node.as_constant_read_node().is_some()
+        || (node.as_constant_path_node().is_some()
+            && observed::constant(String::from_utf8_lossy(node.location().as_slice()).trim_start_matches("::")))
+        || node.as_local_variable_read_node().is_some() || node.as_instance_variable_read_node().is_some()
+    { return true; }
+    if let Some(array) = node.as_array_node() {
+        return array.elements().iter().all(argument);
+    }
+    if let Some(call) = node.as_call_node() {
+        return call.block().is_none() && !call.is_safe_navigation()
+            && call.receiver().is_none_or(argument)
+            && call.arguments().is_none_or(|a| a.arguments().iter().all(argument));
+    }
+    let elements = if let Some(hash) = node.as_hash_node() { hash.elements() }
+        else if let Some(hash) = node.as_keyword_hash_node() { hash.elements() }
+        else { return false; };
+    elements.iter().all(|n| n.as_assoc_node().is_some_and(|a| argument(a.key()) && argument(a.value())))
 }
 
 #[derive(Default)]
@@ -278,6 +308,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             let own_key = key(&owner.name, &method.name, method.singleton);
             let body = bodies.get(&own_key).cloned();
             let sig = model.methods.get_mut(&id).unwrap();
+            let catalog = rails::lookup(facts, &sig.receiver, &sig.method, sig.singleton);
             sig.parameters = method
                 .parameters
                 .iter()
@@ -290,6 +321,9 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
                     })
                 })
                 .collect();
+            if let Some(catalog) = &catalog {
+                sig.parameters = catalog.parameters.clone();
+            }
             if let Some(body) = body {
                 sig.return_type =
                     Type::new("untyped", Source::BootFact, format!("custom body of {id}"));
@@ -303,7 +337,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
                     && sig.return_type.provenance.iter().any(|p| {
                         p.detail == format!("booted scope {}.{}", sig.receiver, sig.method)
                     });
-                if !generated && !query && !scope {
+                if !generated && !query && !scope && catalog.is_none() {
                     sig.return_type = Type::new(
                         "untyped",
                         Source::BootFact,
@@ -326,6 +360,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             let mut locals = BTreeMap::new();
             let ty = evaluate(
                 expr,
+                facts,
                 model,
                 &sig.receiver,
                 sig.singleton,
@@ -355,6 +390,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
 
 fn evaluate(
     expr: &Expr,
+    facts: &Facts,
     model: &TypeModel,
     receiver: &str,
     singleton: bool,
@@ -378,31 +414,41 @@ fn evaluate(
         )),
         Expr::Read(name) => locals.get(name).cloned(),
         Expr::Write(name, value) => {
-            let ty = evaluate(value, model, receiver, singleton, locals)?;
+            let ty = evaluate(value, facts, model, receiver, singleton, locals)?;
             locals.insert(name.clone(), ty.clone());
             Some(ty)
         }
         Expr::Sequence(expressions) => {
             let mut last = Type::new("nil", Source::Inference, "empty body");
             for expr in expressions {
-                last = evaluate(expr, model, receiver, singleton, locals)?;
+                last = evaluate(expr, facts, model, receiver, singleton, locals)?;
             }
             Some(last)
         }
         Expr::Constant(_) => None,
-        Expr::Call(target, name) => {
+        Expr::Call(target, name, arguments) => {
             let (class, single) = match target.as_deref() {
                 None | Some(Expr::Self_) => (receiver.to_owned(), singleton),
                 Some(Expr::Constant(class)) => (class.clone(), true),
                 Some(target) => (
-                    evaluate(target, model, receiver, singleton, locals)?.name,
+                    evaluate(target, facts, model, receiver, singleton, locals)?.name,
                     false,
                 ),
             };
             // A call may mutate the receiver's ivars, even when its return
             // type is known. Never carry an exit-ivar proof across it.
-            locals.retain(|name, _| !name.starts_with('@'));
-            let mut ty = model.get(&class, name, single)?.return_type.clone();
+            if *arguments {
+                // Argument calls can mutate locals through a captured binding.
+                // We do not analyze their effects or retain stale local facts.
+                locals.clear();
+            } else {
+                locals.retain(|name, _| !name.starts_with('@'));
+            }
+            let inherited = resolve(facts, &class, name, single)
+                .and_then(|(owner, method)| model.get(&owner.name, &method.name, method.singleton));
+            let mut ty = model.get(&class, name, single).or(inherited)
+                .map(|s| s.return_type.clone())
+                .or_else(|| rails::lookup(facts, &class, name, single).map(|s| s.return_type))?;
             // Even a literal-returning callee can be replaced at runtime.
             // No call/lookup proof is supplied by this advisory walker.
             ty.evidence = Evidence::Static;

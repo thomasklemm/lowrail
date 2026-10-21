@@ -48,7 +48,7 @@ fn schema_nullability_associations_routes_and_roles() {
     let model = TypeModel::from_facts(&facts);
     for (query, ty) in [
         ("Article#title", "String?"),
-        ("Article#count", "Integer"),
+        ("Article#count", "Integer?"),
         (
             "Article#created_at",
             "(Time | ActiveSupport::TimeWithZone)?",
@@ -179,6 +179,74 @@ fn prism_fixpoint_overrides_and_unsupported_control_flow() {
             String::from_utf8_lossy(&result.stderr)
         );
     }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides() {
+    let dir = std::env::temp_dir().join(format!("lowrail-rails-types-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("article.rb");
+    let source = "class Article\n def self.make = new(title: 'hello')\n def self.list = includes(:comments).order(created_at: :desc)\n def self.early = new(title: (external ? (return 7) : 'ok'))\n def self.nested = new(title: helper(external ? (return 7) : 'ok'))\n def self.blocked = new { break 7 }\n def self.custom = Other.new\n def live? = 'override'\nend\nclass Other\n def self.new = 'not an instance'\nend\n";
+    std::fs::write(&file, source).unwrap();
+    assert!(ruby_prism::parse(source.as_bytes()).errors().next().is_none());
+    let mut methods: Vec<_> = [("make",2),("list",3),("early",4),("nested",5),("blocked",6),("custom",7)]
+        .into_iter().map(|(name,line)| json!({"name":name,"singleton":true,
+            "source_location":format!("{}:{line}",file.display())})).collect();
+    methods.push(json!({"name":"live?","owner":"Article","source_location":format!("{}:8",file.display())}));
+    let mut facts: Facts = serde_json::from_value(json!({"app_root":dir,
+        "gems":[{"name":"activerecord","version":"8.1.4","path":"/rails"}],
+        "models":[{"name":"Article","primary_key":"id","columns":[{"name":"id","type":"uuid","null":false}]}],
+        "modules":[
+            {"name":"Article","kind":"class","ancestors":["Article","#<Enum:0x>","Trailing"],"singleton_ancestors":["#<Class:Article>","ActiveRecord::Inheritance::ClassMethods","ActiveRecord::Querying"],"methods":methods},
+            {"name":"Other","kind":"class","methods":[{"name":"new","singleton":true,"source_location":format!("{}:11",file.display())}]},
+            {"name":"ActiveRecord::Inheritance::ClassMethods","methods":[{"name":"new","owner":"ActiveRecord::Inheritance::ClassMethods","source_location":"/rails/lib/active_record/inheritance.rb:56"}]},
+            {"name":"ActiveRecord::Querying","methods":[{"name":"includes","owner":"ActiveRecord::Querying","source_location":"/rails/lib/active_record/querying.rb:24","parameters":[["rest","args"],["keyrest","kwargs"],["block","block"]]}]},
+            {"name":"ActiveRecord::Relation","kind":"class","ancestors":["ActiveRecord::QueryMethods"]},
+            {"name":"ActiveRecord::QueryMethods","methods":[{"name":"order","owner":"ActiveRecord::QueryMethods","source_location":"/rails/lib/active_record/relation/query_methods.rb:1"}]},
+            {"name":"Trailing","methods":[{"name":"draft?","owner":"Trailing"}]},
+            {"name":"Article._enum_methods_module","synthetic":true,"methods":[
+                {"name":"draft?","owner":"#<Enum:0x>","source_location":"/rails/lib/active_record/enum.rb:307"},
+                {"name":"in-progress?","owner":"#<Enum:0x>","source_location":"/rails/lib/active_record/enum.rb:307"},
+                {"name":"live?","owner":"#<Enum:0x>","source_location":"/rails/lib/active_record/enum.rb:307"}]}
+        ]})).unwrap();
+    let model = TypeModel::from_facts(&facts);
+    for (target, expected) in [("Article.new","Article"),("Article.make","Article"),
+        ("Article.list","ActiveRecord::Relation[Article]"),("Article.custom","String"),
+        ("Article#draft?","bool"),("Article#live?","String"),("Article#id","String?")] {
+        let ty = model.fact(target,"return").unwrap_or_else(|| panic!("missing {target}"));
+        assert_eq!(ty.name, expected, "{target}");
+        if !matches!(target, "Article#live?") { assert_eq!(ty.proven_type(), None, "{target}"); }
+    }
+    for target in ["Article.early","Article.nested","Article.blocked"] {
+        assert_eq!(model.fact(target,"return").unwrap().name, "untyped", "{target}");
+    }
+    assert!(model.fact("Article.make","return").unwrap().provenance.iter().any(|p| p.source == Source::RailsApi && p.detail.contains("8.1.4")));
+    let export = model.export_rbs(&facts);
+    assert_eq!(model.fact("Article#in-progress?","return").unwrap().name, "bool");
+    assert!(export.files["app.rbs"].contains("def `in-progress?`: () -> bool"));
+    model.write_rbs(&facts, &dir.join("sig")).unwrap();
+    if std::process::Command::new("rbs").arg("--version").output().is_ok() {
+        let check = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
+        assert!(check.status.success(), "{}{}", String::from_utf8_lossy(&check.stdout), String::from_utf8_lossy(&check.stderr));
+    }
+    // Same owner/name, but the source is replaced or a Rails version is outside
+    // the catalog: neither is evidence for the stock constructor contract.
+    facts.modules.iter_mut().find(|m| m.name == "ActiveRecord::Inheritance::ClassMethods").unwrap()
+        .methods[0].source_location = Some("/custom/inheritance.rb:56".into());
+    assert!(TypeModel::from_facts(&facts).lookup("Article.new").is_none());
+    facts.gems[0].version = "9.0.0".into();
+    assert!(TypeModel::from_facts(&facts).lookup("Article#draft?").is_none());
+    facts.gems[0].version = "8.1.4".into();
+    // Erased anonymous owner IDs must not turn a shadowed enum into bool.
+    facts.modules[0].ancestors.insert(0, "#<Module:0x>".into());
+    facts.modules.push(serde_json::from_value(json!({"name":"Article.ancestors[0]","synthetic":true,
+        "methods":[{"name":"draft?","owner":"#<Module:0x>"}]})).unwrap());
+    assert_eq!(TypeModel::from_facts(&facts).fact("Article#draft?","return").unwrap().name, "untyped");
+    facts.modules[0].ancestors.remove(0);
+    facts.modules.pop();
+    facts.modules[0].ancestors.push("#<Enum:0x>".into());
+    assert_eq!(TypeModel::from_facts(&facts).fact("Article#draft?","return").unwrap().name, "untyped");
     std::fs::remove_dir_all(dir).unwrap();
 }
 
