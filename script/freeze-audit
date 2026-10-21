@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Run in the app bundle: ruby /path/to/script/freeze-audit PROFILE REPORT
+#   --holder Article --warmup /path/to/warmup.rb -- /path/to/requests.rb
+# This is intentionally a separate command, never installed by lowrail/setup.
+require File.expand_path("config/boot", Dir.pwd)
+require "optparse"
+require_relative "../gem/lib/lowrail/freeze_audit"
+
+profile, destination = ARGV.shift(2)
+abort "usage: freeze-audit holders|app|core REPORT [--holder NAME] [--warmup FILE] -- RUBY_SCRIPT [ARGS]" unless profile && destination
+destination = File.expand_path(destination)
+raise "report already exists" if File.exist?(destination)
+names, excluded_names, warmup = [], [], nil
+OptionParser.new do |options|
+  options.on("--holder NAME") { names << _1 }
+  options.on("--exclude-holder NAME") { excluded_names << _1 }
+  options.on("--warmup FILE") { warmup = File.expand_path(_1) }
+end.order!(ARGV)
+workload = ARGV.shift or abort "a Ruby workload script is required"
+ENV["LOWRAIL_FREEZE"] = "1" # Explicit command accepts the contract in BOTH arms.
+session = nil
+# Register before the app/test framework: their at_exit workloads must run
+# before the observer is stopped and the final report is written.
+at_exit do
+  report = session ? session.finish! : {"status" => "pre_freeze_failure", "errors" => []}
+  report["workload"] = workload
+  report["warmup"] = warmup
+  report["exception"] = $! && {"class" => $!.class.name, "backtrace" => $!.backtrace}
+  report["workload_exit_ok"] = $!.nil? || (SystemExit === $! && $!.success?)
+  report["status"] = "workload_failed" unless report["workload_exit_ok"]
+  File.write(destination, JSON.pretty_generate(report))
+  exit 1 if report["workload_exit_ok"] && !report["errors"].empty?
+end
+require File.expand_path("config/environment", Dir.pwd)
+Rails.application.eager_load!
+load warmup if warmup
+holders = names.map { Lowrail.loaded_constant(_1) || raise("holder not already loaded: #{_1}") }
+exclusions = excluded_names.map { Lowrail.loaded_constant(_1) || raise("exclusion not already loaded: #{_1}") }
+roots = [Dir.pwd, *Gem.loaded_specs.values.map(&:full_gem_path)]
+session = Lowrail::FreezeAudit::Session.new(profile: profile, holders: holders, roots: roots, exclusions: exclusions)
+session.start!
+load File.expand_path(workload)
