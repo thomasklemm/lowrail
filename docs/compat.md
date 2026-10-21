@@ -631,6 +631,14 @@ RubyToolbox retains real dry-struct coercions/errors and class-body Sidekiq
 retry/lock options; CRM retains PaperTrail registration and the app's Ransack
 scope. None forces model loading just to manufacture activation or hits.
 
+The later [real-app C GET eligibility check](sealed-verification.md#real-app-get-eligibility-after-passive-form-activation)
+tests only the current link/form builders after passive form activation.
+Five of the seven requested apps boot production/YJIT but return zero units;
+Writebook and CASA fail production boot before inventory. **No eligible GET
+workers run, and no new on-only difference or runtime hit count is claimed.**
+The exact per-app reasons and pins are in that table. The older preload and
+instantiate hits below are separate probes, not link/form GET coverage.
+
 | App / selection / mode | Outcomes | Own-thread SQL | Hits / fallbacks | Stable / unstable loads |
 |---|---|---|---|---|
 | Wikino sealed production / YJIT | 2 pass, identical | 3, identical | **1 preload / 0** | **0 / 0** |

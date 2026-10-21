@@ -263,6 +263,20 @@ scope/url/format on `GET /articles/3/edit`; the comment-form certificate does
 not cover it. Keep runtime/inventory guards and the red gate unchanged
 ([boundary and witness](sealed-verification.md#terminal-asynchronous-completion-boundary)).
 
+The deferred real-app GET slice stops at **build eligibility**, as scoped:
+fresh frozen production/YJIT link/form-only inventories on Starter,
+CodeTriage and PingCRM return zero units for the closed blog controller/model
+domain; Redprints (Rails 8.1.3) and Wikino (8.0.5.1) return zero at the 8.1.4
+version gate. Writebook fails production boot on its removed
+`sqlite3_production_warning=` API, and CASA requires an unsupplied master key;
+their inventories are not reached. Passive admission did not generalize
+build-time certification. **Zero GET workers, no measured runtime hit/fallback
+or on-only-difference result**, not an empty equivalence pass. Preserve each
+row and stop rather than adding app/config shims, upgrading pins, borrowing
+another pass's hits or widening inventory. Real-app C coverage remains a
+product gap, with no support expansion or measurements
+([per-app evidence](sealed-verification.md#real-app-get-eligibility-after-passive-form-activation)).
+
 ## One read-only explanation surface (2026-10-21)
 
 `lowrail explain`, MCP `explain_unit`/`explain_site` and doctor's build section

@@ -8,6 +8,86 @@ Use captured replay where it is faithful, adapters where the suite depends
 on process-local test machinery, and an explicit uncovered ledger everywhere
 else. Do not admit a production artifact into `RAILS_ENV=test` to get hits.
 
+## Real-app GET eligibility after passive form activation
+
+**No eligible link/form GET slice: five zero-unit inventories, two production
+boot failures, zero GET workers.** This is a coverage rejection, not an empty
+off/off/on pass. The passive-form runtime change did not generalize the
+builders' closed blog inventory. Do not substitute the other sealed passes'
+historical hits or change an app to manufacture eligibility.
+
+Fresh probes freeze the complete Lowrail gem from
+[`be21eaf`](https://github.com/thomasklemm/lowrail/commit/be21eaf0a9d894f859973645d5fec979b409f275),
+including its separately built native binary, and run the unchanged
+`gem/exe/lowrail-runtime-build` protocol with **only `SealedBuild` and
+`FormScaffoldBuild`**, an empty denylist and explicit YJIT certification.
+Ruby is **4.0.7 revision 229531a6cf**. Each app uses an isolated source copy,
+its existing frozen corpus lock/overlay and local disposable database copy.
+No implementation, configuration or dependency is edited to get past a
+refusal. The five successful processes verify actual production/YJIT before
+and after both builders. A failed boot does not establish zero units.
+
+| Corpus app / source pin | Locked Rails | Link / form units | Result and stopping reason |
+|---|---|---|---|
+| [Writebook](https://github.com/basecamp/writebook/commit/be1f8fcf1b0fc8064011c2d29d75133885b182e2) | 8.1.4 | not reached | Production boot fails: `NoMethodError`, `ActiveRecord::Base.sqlite3_production_warning=` from `config/environments/production.rb:66`. No API shim or app patch. |
+| [CASA](https://github.com/rubyforgood/casa/commit/b584d2e6e6ebffe382f34c2ec202d20384d035ca) | 8.1.4 | not reached | Production requires `config.require_master_key = true`; no master key supplied. No credential/configuration bypass. |
+| [Redprints CFP](https://github.com/evilmartians/redprints-cfp/commit/6080fc24fbf0015f7e5a5ae932e903731502c65a) | 8.1.3 | 0 / 0 | Both builders refuse the required production Ruby 4.0.7 / **Rails 8.1.4 blog** domain. No upgrade. |
+| [React Starter Kit](https://github.com/inertia-rails/react-starter-kit/commit/f8081935e9bda68f8ef1ec53dc7eed19c819ee68) | 8.1.4 | 0 / 0 | Link: `eager-loaded ArticlesController required; keep lazy applications original`. Form: `eager-loaded targets required; keep lazy applications original`. |
+| [CodeTriage](https://github.com/codetriage/codetriage/commit/d1868f8634e97a111a7fca49d58cc776d206007e) | 8.1.4 | 0 / 0 | Same missing blog controller/model inventory, with both exact refusal strings above. |
+| [PingCRM](https://github.com/ledermann/pingcrm/commit/22464f822dcf59c4425993dd623780ad44497fda) | 8.1.4 | 0 / 0 | Same missing blog controller/model inventory, with both exact refusal strings above. |
+| [Wikino](https://github.com/wikinoapp/wikino/commit/25255d2d6c808df6672e293661ea797a76c6d2a9), `rails/` | 8.0.5.1 | 0 / 0 | Both builders refuse the required production Ruby 4.0.7 / **Rails 8.1.4 blog** domain. Existing dependency-only wrapper/lock; no upgrade. |
+
+The "eager-loaded" reasons are the builders' literal text, **not a diagnosis
+that these production apps disable eager loading**. Their source trees do
+not define `ArticlesController`; the runtime-build entrypoint already calls
+the existing build-time `eager_load!`. Link certification still requires that
+particular controller and stock helper chain. Form certification additionally
+requires `Article`, `Comment`, the audited source inventory and the exact
+literal blank-comment form in `articles/show.html.erb`. Natural passive
+runtime admission cannot create a build-time certificate for another app.
+
+Consequently **per-unit runtime hits, fallbacks, activation refusals and
+on-only response/SQL/load/effect differences are not measured**; their export
+values are null, not clean zeros. There is no emitted unit to isolate and no
+off/off/on comparison to call equivalent. The requested stop rule applies
+to every row. Wider real-app GET coverage remains unestablished, and the
+blog's raw/seeded red gates remain unchanged. No measurements or support
+expansion follow.
+
+To reproduce the inventory request, use the corpus pins/overlays in
+`script/corpus` and the existing Wikino dependency wrapper from
+`docs/compat.md`. Freeze the gem and its revision-specific native extension,
+copy each app without an old `.lowrail`, supply isolated DB URLs, preserve
+empty `log/` and `tmp/` directories, and run from the app copy:
+
+```sh
+RAILS_ENV=production RACK_ENV=production LOWRAIL=0 LOWRAIL_SEALED=1 \
+SECRET_KEY_BASE_DUMMY=1 BUNDLE_FROZEN=true \
+bundle exec ruby --yjit "$FROZEN_GEM/exe/lowrail-runtime-build" <<'JSON'
+{"builders":[{"file":"sealed_build","module":"SealedBuild"},{"file":"form_scaffold_build","module":"FormScaffoldBuild"}],"denied":[],"certification_jit":"yjit"}
+JSON
+```
+
+No production master keys or real external-service credentials were supplied.
+The entrypoint's SHA-256 is
+`3f1c0bbb1d228651c1359d55d3cddc4f0798c258d4bc7f3b802f6858c957b712`;
+the 4.0.7 native binary is
+`38f0f5b540a44e7e1c2597b04d0664b2e5ca194b65e736c50a1e506517a34f6a`.
+All frozen gem hashes, copied app/lock source fingerprints, equality to the
+original corpus sources and raw stdout/stderr hashes were checked after the
+run. Wikino's relocated wrapper retains the exact checked-in lock bytes.
+The first Redprints copy omitted `log/`; its Avo `ENOENT avo.log` attempt is
+retained as **invalid setup**, not an app failure. Creating the directory,
+without changing source or the frozen driver, yields the zero-unit result
+above. No other failed app is repaired or rerun.
+
+Raw inventories, logs and input fingerprints remain in
+`.lowrail/private/real-app-get-eligibility/`; reviewable export is
+`.amp/in/artifacts/real-app-get-eligibility.json`. This documentation-only
+follow-up changes no runtime, builder, oracle, app or guard. Validation is the
+seven real production builder processes and the retained hash audit, not a
+new full-suite or GET-equivalence claim.
+
 ## Combined interpreter artifact: independent cold gate
 
 The [combined pricing study](passes/sealed-combined.md) reuses the complete
