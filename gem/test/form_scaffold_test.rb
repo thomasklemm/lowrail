@@ -5,6 +5,109 @@ require_relative "test_helper"
 class FormScaffoldTest < Minitest::Test
   include LowrailTest
 
+  def test_passive_production_token_and_collection_public_artifact
+    skip "sealed rendering fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
+    corpus = File.join(CORPUS_ROOT, "real-blog-r4")
+    missing_prerequisite "no #{corpus} (see script/corpus)" unless File.file?(File.join(corpus, "config/environment.rb"))
+    fixture = File.expand_path("../../fixtures/corpus/blog_show_get_only.rb", __dir__)
+    checker = File.expand_path("../../bench/experiments/sealed_production_check.rb", __dir__)
+    realpath_tmpdir do |dir|
+      app = File.join(dir, "blog")
+      FileUtils.mkdir_p(app)
+      (Dir.children(corpus) - %w[.git .lowrail tmp log node_modules storage]).each { FileUtils.cp_r(File.join(corpus, _1), app) }
+      FileUtils.mkdir_p(File.join(app, "storage"))
+      env = CLEAN_ENV.merge("RAILS_ENV" => "production", "RACK_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1",
+        "LOWRAIL_BUILD_JIT" => "0", "LOWRAIL_SEALED" => nil)
+      out, err, status = ruby("-e", <<~'RUBY', fixture, chdir: app, setup: false, env: env)
+        require "./config/application"
+        Rails.application.config.yjit = false
+        require "./config/environment"
+        require ARGV.fetch(0)
+        BlogShowGetOnly.prepare
+        puts JSON.generate(ActiveRecord::Base.descendants.filter_map(&:name).sort)
+      RUBY
+      assert status.success?, "#{out}\n#{err}"
+      models = JSON.parse(out.lines.last)
+      FileUtils.cp_r(File.join(app, "storage"), File.join(dir, "seed"))
+      FileUtils.mkdir_p(File.join(app, ".lowrail"))
+      denied = %w[memo/sha256 memo/uri_join digest/file_memo active_record/preload_plans active_record/ar_plans
+        inertia/config_bind sealed/link_to].map { {"pass" => _1} }
+      denied.concat(models.map { {"pass" => "active_record/instantiate", "file" => _1} })
+      File.write(File.join(app, ".lowrail/denylist.json"), JSON.generate(denied))
+      out, err, status = Open3.capture3(env, lowrail_cli, "build", app, "--env", "production", "--sealed")
+      assert status.success?, "#{out}\n#{err}"
+      manifest_path = File.join(app, ".lowrail/manifest.json")
+      manifest = JSON.parse(File.read(manifest_path))
+      assert_equal %w[sealed/form_scaffold sealed/token_tag sealed/collection_render], manifest.fetch("units").map { _1.fetch("pass") }
+      output = File.join(dir, "gates")
+      out, err, status = ruby(checker, app, File.join(dir, "seed"), output, setup: false, env: env)
+      assert status.success?, "#{out}\n#{err}"
+      report = JSON.parse(File.read(File.join(output, "gates.json")))
+      assert_equal "pass", report.fetch("status")
+      assert_equal "BlogShowGetOnly", report.fetch("fixture").fetch("name")
+      assert_equal [192, 192], report.fetch("pairs").values.map { _1.fetch("pairs") }
+      assert report.fetch("cold").fetch("companions").all? { _1.fetch("cold_equal") && _1.fetch("forbidden_chains_absent") }
+
+      # Generation and name conversion remain live and once-only, including a
+      # post-generation continuation for values outside the literal residue.
+      boot_env = env.merge("RUBYOPT" => SETUP_OPT, "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "")
+      boundary = ruby_json(<<~'RUBY', chdir: app, env: boot_env)
+        require "./config/application"
+        Rails.application.config.yjit = false
+        require "./config/environment"
+        require "rack/mock"
+        view = nil
+        trace = TracePoint.new(:call) { |event| view = event.self }
+        trace.enable(target: Lowrail::TokenTag::Variant.instance_method(:token_tag))
+        Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
+        trace.disable
+        raise "not admitted" unless Lowrail::TokenTag.admitted?
+        original = view.method(:token_tag).super_method
+        generated = converted = 0
+        live_value = nil
+        view.controller.define_singleton_method(:form_authenticity_token) { |**| generated += 1; live_value }
+        name = Object.new
+        name.define_singleton_method(:to_s) { converted += 1; 'csrf<&" Ω' }
+        view.controller.class.request_forgery_protection_token = name
+        options = {action: "/articles/1/comments", method: "post"}
+        values = ['plain<&" Ω', 'safe<&" Ω'.html_safe, ["left<&", "right\""], /regexp<&"/, nil]
+        records = values.map do |value|
+          live_value = value
+          generated = converted = 0
+          left = original.call(nil, form_options: options)
+          right = view.send(:token_tag, nil, form_options: options)
+          {left: left, right: right, classes: [left.class.name, right.class.name],
+            encodings: [left.encoding.name, right.encoding.name], generated: generated, converted: converted}
+        end
+        puts JSON.generate(records: records, stats: Lowrail::Stats.snapshot)
+      RUBY
+      boundary.fetch("records").each do |record|
+        assert_equal record.fetch("left"), record.fetch("right")
+        assert_equal 1, record.fetch("classes").uniq.size
+        assert_equal 1, record.fetch("encodings").uniq.size
+        assert_equal 2, record.fetch("generated"), "one generation in each arm, no replay after fallback"
+        assert_equal 2, record.fetch("converted"), "one live name conversion in each arm"
+      end
+      bad = Marshal.load(Marshal.dump(manifest))
+      bad.fetch("units").reject { _1["pass"] == "sealed/form_scaffold" }.each { _1.fetch("data").fetch("observer")["iseq"] = "changed" }
+      File.write(manifest_path, JSON.generate(bad))
+      declined = ruby_json(<<~'RUBY', chdir: app, env: boot_env)
+        require "./config/application"
+        Rails.application.config.yjit = false
+        require "./config/environment"
+        require "rack/mock"
+        statuses = 3.times.map { Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on").status }
+        puts JSON.generate(statuses: statuses, stats: Lowrail::Stats.snapshot)
+      RUBY
+      assert_equal [200, 200, 200], declined.fetch("statuses")
+      bad.fetch("units").reject { _1["pass"] == "sealed/form_scaffold" }.each do |unit|
+        id = unit.fetch("id").to_s
+        assert_equal 0, declined.fetch("stats").fetch("unit_hits").fetch(id, 0)
+        assert_equal ["observer body changed; rebuild; terminal admission"], declined.fetch("stats").fetch("unit_refusals").fetch(id)
+      end
+    end
+  end
+
   def test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder
     skip "sealed form fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
     corpus = File.join(CORPUS_ROOT, "real-blog-r4")

@@ -28,6 +28,8 @@ if ENV["LOWRAIL_SEALED"] == "1"
   require_relative "routes"
   require_relative "form_scaffold"
   Lowrail::FormScaffold.observe_forms
+  require_relative "render_units"
+  Lowrail::RenderUnits.observe
 end
 
 # Artifact storage may be snapshotted independently; root remains the actual

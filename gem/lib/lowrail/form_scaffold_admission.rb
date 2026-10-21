@@ -100,6 +100,13 @@ module Lowrail
         facts.each do |method_name, fact|
           method = singleton || constructor ? type.method(method_name) : type.instance_method(method_name)
           method = method.super_method if target == "view" && method_name == "form_with" && method.owner.equal?(FormScaffold::Variant)
+          if target == "view" && method_name == "token_tag" && defined?(TokenTag::Variant) && method.owner.equal?(TokenTag::Variant)
+            # Only this explicitly certified symmetric observer may precede
+            # the stock helper. Never unwrap an arbitrary helper override.
+            return "token observer changed; rebuild" unless passive["token_observer"] &&
+              Sealed.signature(method) == passive.fetch("token_observer")
+            method = method.super_method
+          end
           expected_body = fact.reject { |key, _| key == "visibility" }
           actual_body = FormScaffoldInventory.runtime_fact(method)
           if method_name == "tag_builder" && Sealed::ACTIVE[0]

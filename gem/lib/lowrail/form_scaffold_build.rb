@@ -4,6 +4,7 @@ require "prism"
 require_relative "form_scaffold"
 require_relative "form_scaffold_inventory"
 require_relative "form_scaffold_admission"
+require_relative "render_units"
 
 module Lowrail
   module FormScaffoldBuild
@@ -50,6 +51,7 @@ module Lowrail
       passive = passive_certificate(path, line)
       sources = [__FILE__, File.join(__dir__, "form_scaffold.rb"), File.join(__dir__, "form_scaffold_inventory.rb"),
         File.join(__dir__, "form_scaffold_admission.rb"), File.join(__dir__, "setup.rb"),
+        File.join(__dir__, "render_units.rb"),
         File.join(__dir__, "sealed.rb"), File.join(__dir__, "templates.rb"), passive.delete("native_file"), path, Rails.root.join("Gemfile.lock").to_s,
         *Dir[Rails.root.join("{app,config,lib}/**/*.{rb,yml}")]].uniq
       unit = {"pass" => pass, "kind" => "method", "target" => "ArticlesController#form_with", "facts" => [], "sites" => 1,
@@ -91,6 +93,7 @@ module Lowrail
       polymorphic = ActionDispatch::Routing::PolymorphicRoutes::HelperMethodBuilder
       key = polymorphic.get(nil, :path).instance_variable_get(:@key_strategy)
       {"version" => 1, "native_file" => binary, "native_method" => Sealed.signature(exact), "readers" => readers,
+        "token_observer" => Sealed.signature(TokenTag::Variant.instance_method(:token_tag)),
         "translations" => FormScaffoldAdmission.translations(I18n.backend, exact),
         "polymorphic_key" => Sealed.signature(key.method(:call), sequence: RubyVM::InstructionSequence.of(key).to_a),
         "block_iseq" => FormScaffoldAdmission.block_signature(block, template.method_name)}

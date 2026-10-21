@@ -103,7 +103,8 @@ module Lowrail
         # A refused installer may never put a guard in the app's call path.
         # Its intentional 0/0 is not evidence of successful activation.
         data["unit_refusals"] = {}
-        {"sealed/link_to" => "Lowrail::Sealed", "sealed/form_scaffold" => "Lowrail::FormScaffold"}.each do |pass, name|
+        {"sealed/link_to" => "Lowrail::Sealed", "sealed/form_scaffold" => "Lowrail::FormScaffold",
+          "sealed/token_tag" => "Lowrail::TokenTag", "sealed/collection_render" => "Lowrail::CollectionRender"}.each do |pass, name|
           runtime = Lowrail.loaded_constant(name)
           next unless runtime&.refusal
           Lowrail.manifest.units.select { _1["pass"] == pass }.each do |unit|

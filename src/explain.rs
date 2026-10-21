@@ -264,6 +264,13 @@ fn guards(unit: &Value, manifest: &Value) -> Vec<Guard> {
             ("activation", "Passive v1 certificate: first natural certified form runs original. One atomic read-only witness per process; concurrent prepublication calls run original, failed admission is terminal. No runtime Materialize, requires, schema probes, compiler or hook replay. LOWRAIL=0 has the identical observation seam; recorded unit_refusals are historical pending/refused reasons, not a live admission check"),
             ("call", "FormScaffold.valid?: main Ractor, published admission, seal epoch zero; original model/options/block site, native exact view/model/builder/buffer holders, stock default form builder, English locale, persisted article and blank unpersisted error-free child; otherwise super"),
         ] { result.push(Guard { phase: phase.into(), requirement: requirement.into() }); }
+    } else if unit["pass"] == "sealed/token_tag" || unit["pass"] == "sealed/collection_render" {
+        result.push(Guard { phase: "activation".into(), requirement: "First natural operation runs original; one atomic read-only witness, terminal failure, identical off/on observers. Native/source/stock method/observer-body certificates; no runtime materialization, forced loading, lookup or compiler. Published only after seal epoch recheck".into() });
+        result.push(Guard { phase: "call".into(), requirement: if unit["pass"] == "sealed/token_tag" {
+            "Main Ractor, epoch zero, exact cached view/tag-builder context and plain action/method Hash, nil token; otherwise original. Live protection, token generation/masking, token name/config and quoted attribute escaping".into()
+        } else {
+            "Main Ractor, epoch zero, exact renderer/view, nonnil template and no layout; otherwise original. Live derivation, loading, lookup, iterator/preloading, cache-key effects, locals, Template#render, notifications and RenderedTemplate objects remain".into()
+        } });
     } else if unit["pass"] == "sealed/link_to" {
         result.push(Guard { phase: "activation".into(), requirement: "Sealed.activate: certified Native.exact_class? primitive, helper dependencies and cached controller view class must already exist; no runtime Materialize, require or view-class construction. Retry at natural request entry; exact source/body/visibility/delivery/literal-table guards remain".into() });
     } else if unit.as_object().is_some_and(|o| o.keys().any(|k| !["id", "kind", "pass", "target", "file", "sites", "facts"].contains(&k.as_str()))) {

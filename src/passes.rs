@@ -39,6 +39,8 @@ pub const REGISTRY: &[Pass] = &[
     Pass { name: "endpoint/action", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "endpoint_build", module: "EndpointBuild" }, alias: "endpoint" },
     Pass { name: "sealed/link_to", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "sealed_build", module: "SealedBuild" }, alias: "sealed_link_to" },
     Pass { name: "sealed/form_scaffold", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "form_scaffold_build", module: "FormScaffoldBuild" }, alias: "form_scaffold" },
+    Pass { name: "sealed/token_tag", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "render_units_build", module: "TokenTagBuild" }, alias: "token_tag" },
+    Pass { name: "sealed/collection_render", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "render_units_build", module: "CollectionRenderBuild" }, alias: "collection_render" },
 ];
 
 pub fn quarantine_reason(name: &str) -> Option<&'static str> {
@@ -141,6 +143,7 @@ mod tests {
         assert!(Selection::parse("default,+memo").is_err());
         assert_eq!(Selection::sealed().iter().map(|p| p.name).collect::<Vec<_>>(),
             ["memo/uri_join", "memo/sha256", "digest/file_memo", "active_record/preload_plans",
-             "active_record/instantiate", "active_record/ar_plans", "inertia/config_bind", "sealed/link_to", "sealed/form_scaffold"]);
+             "active_record/instantiate", "active_record/ar_plans", "inertia/config_bind", "sealed/link_to", "sealed/form_scaffold",
+             "sealed/token_tag", "sealed/collection_render"]);
     }
 }
