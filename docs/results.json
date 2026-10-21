@@ -30,5 +30,22 @@
     "total": "post_fix_request_checks.interpreter.total_delta_pct",
     "no_gc": "post_fix_request_checks.interpreter.no_gc_delta_pct",
     "decimals": 3
+  },
+  {
+    "date": "2026-10-21",
+    "app_endpoint": "Fizzy, fixed six-GET vector",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Interpreter",
+    "tier": "Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED",
+    "revision": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+    "publication": "8385e0cf5d951e378a690e55707e431eef049b69",
+    "report": "docs/block-link-specimen.md",
+    "source": "docs/fizzy-link-ir-n10.json",
+    "accepted": "status",
+    "accepted_value": "ACCEPTED_SCOPED_WARM_BENCH_PRICE",
+    "revision_field": "preregistered.harness_sha",
+    "total": "summary.layers.on.instructions_total.delta_pct",
+    "no_gc": "summary.layers.on.instructions_no_gc.delta_pct",
+    "decimals": 6
   }
 ]

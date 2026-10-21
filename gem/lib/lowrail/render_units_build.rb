@@ -14,6 +14,8 @@ module Lowrail
       # production domain deliberately inherits its narrow blog restrictions.
       inventory = FormScaffoldInventory.check
       return refusal.call(inventory) if String === inventory
+      context = Sealed.view_context_fact
+      return refusal.call("custom view context dispatch; keep original") unless context
       native = Lowrail.loaded_constant("Lowrail::Native")
       return refusal.call("missing actual-holder primitive; run rake compile") unless native
       exact = native.method(:exact_class?)
@@ -50,7 +52,7 @@ module Lowrail
       observer = pass == TokenTag::PASS ? TokenTag::Variant.instance_method(:token_tag) :
         CollectionRender::Variant.instance_method(:collection_with_template)
       data = {"version" => 1, "application_class" => inventory.fetch("application_class"),
-        "native_method" => Sealed.signature(exact), "observer" => Sealed.signature(observer),
+        "native_method" => Sealed.signature(exact), "observer" => Sealed.signature(observer), "view_context" => context,
         "sources" => sources.to_h { [_1, Manifest.sha256_file(_1)] }, "methods" => facts}
       {units: [{"pass" => pass, "kind" => "method", "target" => pass == TokenTag::PASS ? "ArticlesController#token_tag" :
         "ActionView::CollectionRenderer#collection_with_template", "facts" => [], "data" => data}], files: [],

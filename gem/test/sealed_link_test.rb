@@ -77,6 +77,15 @@ class SealedLinkTest < Minitest::Test
         RUBY
         "app/helpers/application_helper.rb" => <<~'RUBY',
           module ApplicationHelper
+            if ENV["SEND_OVERRIDE"]
+              %i[send __send__ public_send method instance_exec].each do |dispatch|
+                define_method(dispatch) do |*args, **kwargs, &block|
+                  raise "view #{dispatch} intercepted tag_builder" if dispatch == :instance_exec || args.first == :tag_builder
+                  super(*args, **kwargs, &block)
+                end
+              end
+            end
+
             def link_target
               $conversions = ($conversions || 0) + 1
               "/target?x=<&q=\""
@@ -121,11 +130,12 @@ class SealedLinkTest < Minitest::Test
           objspace: $LOADED_FEATURES.grep(/objspace/),
           refusal: defined?(Lowrail::Sealed) && Lowrail::Sealed.refusal)
       RUBY
-      %w[stock view builder].each do |receiver|
-        foreign = receiver == "stock" ? nil : receiver
+      %w[stock send view builder].each do |receiver|
+        foreign = %w[view builder].include?(receiver) ? receiver : nil
         off, refused, sealed = [["0", nil], ["1", nil], ["1", "1"]].map do |mode, opt_in|
           ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => mode,
-            "LOWRAIL_SEALED" => opt_in, "LOWRAIL_STATS" => "", "FOREIGN" => foreign})
+            "LOWRAIL_SEALED" => opt_in, "LOWRAIL_STATS" => "", "FOREIGN" => foreign,
+            "SEND_OVERRIDE" => receiver == "send" ? "1" : nil})
         end
         assert_equal 200, sealed["status"]
         assert_equal 1, sealed["conversions"]
@@ -136,9 +146,10 @@ class SealedLinkTest < Minitest::Test
         end
         assert_empty refused["hits"]
         assert_empty sealed.fetch("objspace"), "neither app nor link admission loads objspace"
-        assert_equal receiver == "stock" ? 1 : 0, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
-        assert_equal receiver == "stock" ? 0 : 1, sealed.fetch("fallbacks").fetch(link_unit, 0)
-        assert_equal '<a class="one&quot;two" href="/target?x=&lt;&amp;q=&quot;">A&lt;&amp;</a>', sealed["body"] if receiver == "stock"
+        admitted = %w[stock send].include?(receiver)
+        assert_equal admitted ? 1 : 0, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
+        assert_equal admitted ? 0 : 1, sealed.fetch("fallbacks").fetch(link_unit, 0)
+        assert_equal '<a class="one&quot;two" href="/target?x=&lt;&amp;q=&quot;">A&lt;&amp;</a>', sealed["body"] if admitted
       end
       application = File.join(dir, "config/application.rb")
       File.write(application, File.read(application).sub(/module \w+\n/, "module RenamedLinkFixture\n"))

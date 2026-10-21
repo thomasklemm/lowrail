@@ -1,7 +1,8 @@
 # Campfire: benchmark routes, certified reachability, and a pricing request
 
 2026-10-21. **Untimed discovery, not a speed or sealed-support claim.** No
-Callgrind run, counter window, timing cohort or measurement slot was used.
+Callgrind worker, counter window or timing cohort has executed. Slot 2 was
+assigned, but the new screen-first policy arrived before measurement.
 The authorized follow-up changes only Ruby parser compatibility in Lowrail;
 no default, quarantine, admission inventory or upstream app code was changed.
 The machine-readable [appendix](campfire-bench.json) retains the counts,
@@ -15,11 +16,13 @@ suite is green off/on with the production artifact refusing in test. Browser
 outcomes pass; the fixed browser diagnostic classifies the query-count
 rejection as test/other-thread nondeterminism. Raw cold HTTP identity rejects
 entropy. The first complete companions also reject Redis expiry, internal
-features and unavailable cached binds. **Pricing is conditionally pre-approved
-but remains blocked and unrun.** Sections 1–9 retain the initial discovery/failed prerequisites;
+features and unavailable cached binds. The one authorized rule rerun passes
+both seeds with those named items retained. **No price: screen first under
+the new owner policy.** Sections 1–9 retain the initial discovery/failed prerequisites;
 [§10](#10-authorized-prerequisite-follow-up) supersedes their zero-hit/build/heap
 status without discarding the original failures; §11 records the bounded
-diagnostic and first negative companion results.
+diagnostic and first negative companion results; §12 records the accepted
+rule rerun and the pre-measurement stop.
 
 ## 1. Which requests do public benchmarks exercise?
 
@@ -483,10 +486,12 @@ placement, brk512, exact-page, A/A ±0.5% interval and all rejected-round gates
 from the accepted blog protocol. Price only live sealed AR instantiation,
 including its guards; no preload/helper/endpoint unit or cache-policy change.
 
-**Not ready to execute.** The coordinator subsequently pre-approved exactly
+**Historical conditional request.** The coordinator subsequently pre-approved exactly
 this cohort, conditional on the browser classification, cold companions, and
 **Fizzy's approved N=10 cohort releasing the slot**. The first cold companions
-fail (§11), so no cohort starts. No speed estimate is inferred from
+fail (§11), so no cohort starts at that point. The coordinator later corrects
+the cross-orb slot assumption and assigns this orb slot 2; the new screen-first
+policy arrives before any counter window (§12). No speed estimate is inferred from
 52 hits or the blog's −15.23%. No further runtime change is authorized here.
 
 ## 11. Fixed browser diagnostic and negative cold companions
@@ -577,6 +582,83 @@ CAMPFIRE_DISPOSABLE_REDIS=1 BUNDLE_GEMFILE=/absolute/APP/Gemfile \
   bench/experiments/campfire_room_companion.rb run APP SEED NEW_PRIVATE_OUTPUT
 # Exit 2 is an honest rejected gate, not an install or performance result.
 ```
+
+## 12. One authorized companion rerun: accepted with named items
+
+The negative command and harness were published first at
+[ba512b0](https://github.com/thomasklemm/lowrail/commit/ba512b0777ea4b825de3e9ae746a7d056fdd37eb).
+Exactly one new command then runs raw and seed-0/seed-1 off-A/off-B/on, with
+only the three authorized rule changes. **Exit 0; both companion seeds pass**,
+with no other differences or errors. Raw identity stays **rejected**.
+
+1. **Redis expiry remains compared and reported.** All 42 key names and DUMP
+   values agree, as do the other 41 expiries. Only `rate-limit:sessions`
+   absolute expiry is a named accepted off/off rejection. Its actual values
+   below are retained at both completed and post-process-exit boundaries;
+   neither the clock nor the snapshots are rewritten.
+
+   | Seed | off-A expiry (ms) | off-B expiry (ms) | on expiry (ms) |
+   |---|---:|---:|---:|
+   | 0 | 1792615366517 | 1792615369748 | 1792615372955 |
+   | 1 | 1792615376369 | 1792615379624 | 1792615382840 |
+
+2. **The blog feature rule is reused as-is:**
+   [blog_production.rb:304](../fixtures/corpus/blog_production.rb#L304),
+   `$LOADED_FEATURES.reject { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) }`.
+   `ROOT` here is the same Lowrail checkout root, not the Campfire app root.
+   The loaded `Lowrail.boot` source path must agree; every excluded file must
+   also match its pre-worker path/content SHA256 pin. Raw ordered features
+   remain in every receipt. Off excludes 18 Lowrail files; on excludes those
+   same 18 plus `ar_shadow.rb`, `ar_instantiate.rb`, `ar_guard.rb`, in that
+   order. The [appendix](campfire-bench.json) lists all 21 paths and hashes.
+   Every non-Lowrail feature and its order, plus all load snapshots, agrees.
+3. **Cached binds remain uncovered, not fabricated.** Each worker retains all
+   153 SQL records and cache flags. Ten cached events carry
+   `binds_unavailable` / `cached_lazy_proc_not_evaluated`; no Proc is called or
+   bind recast. Their zero-based positions are 11, 15–18 and 148–152, identical
+   off/off/on. Noncached unsupported bind capture still fails.
+
+For both seeds, full HTTP status/header/body bytes (200/302/200), SQLite
+schema/all rows, observed events, ancestry and entropy traces agree off/off/on.
+All nine workers finish with no pending Resque/WebPush/Cable work or reported
+errors, and completed effects equal post-exit effects within every worker.
+The on login-plus-cold-room arm has **103 hits**, outside the proposed warm
+windows; the warm claim remains **52 hits + 2 Room STI fallbacks**.
+
+Raw off/off and off/on still reject CSRF values (two on sign-in, 323 on room),
+ETag, Set-Cookie, X-Runtime and session clock/token state. All body byte chunks
+outside those named CSRF values agree. Raw SQL differs only at the two session
+write events; raw fragment DUMPs retain clock differences. None of these raw
+rejections is filtered or replaced by a companion success. Arbitrary subscriber
+payloads/controller assigns are not newly certified by the existing projection.
+
+Comparator validation accepts the known receipts under the three rules and
+rejects **12 adversarial mutations**, including another Redis expiry/value/key,
+DB rows, non-Lowrail feature order, loads, SQL/cache/gap identity, HTTP body,
+completion, and missing-versus-nil keys. This validation launches no app workers.
+
+### Slot 2 and screen-first policy
+
+The coordinator accepts the rerun and assigns slot 2, correcting the previous
+cross-orb wait: Fizzy's orb is independent. Four untimed exact-worker checks
+(`--tool=none`, off/on × both phase orders) pass all 16 windows with the frozen
+pages, no added pages and the closed warm hit map. No new floors are derived.
+The Ir launcher then fails **before any counted Callgrind worker or window**.
+The first log was overwritten by automatic service restarts, so its cause is
+unconfirmed. A separate read-only artifact-preflight reproduction with the
+same parent environment refuses because `LOWRAIL_SEALED=1` is absent; that is
+not proof of the lost launch's cause. Automatic restarts encounter the
+new-output guard; the service is stopped.
+There is no protocol, worker log or Callgrind dump in that attempted output.
+The source and untimed logs remain private; no failed data is dropped.
+
+The owner's new **screen first, price rarely** policy arrives at that point.
+No Ir cohort is retried or started. Next is a cheap three-round native YJIT
+wall/allocation/exact-output screen using Bet A's `script/screen` once published.
+An Ir price requires a clear screen win (roughly >3× A/A noise), not the earlier
+pre-approval alone. No speed, latency, active own-suite or Oct-8-app claim follows
+from these prerequisites. Runtime/default/quarantine and Campfire source/config
+remain unchanged.
 
 ## Reproduction boundaries
 

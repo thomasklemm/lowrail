@@ -67,6 +67,8 @@ module Lowrail
     # These synthetic operations remain strictly build-time. Runtime admission
     # compares the already-running block, never reconstructs this template.
     def passive_certificate(path, line)
+      context = Sealed.view_context_fact
+      raise ArgumentError, "custom view context dispatch; keep original" unless context
       native = Lowrail.loaded_constant("Lowrail::Native")
       raise ArgumentError, "missing actual-holder primitive; run rake compile" unless native
       exact = native.method(:exact_class?)
@@ -93,6 +95,7 @@ module Lowrail
       polymorphic = ActionDispatch::Routing::PolymorphicRoutes::HelperMethodBuilder
       key = polymorphic.get(nil, :path).instance_variable_get(:@key_strategy)
       {"version" => 1, "native_file" => binary, "native_method" => Sealed.signature(exact), "readers" => readers,
+        "view_context" => context,
         "token_observer" => Sealed.signature(TokenTag::Variant.instance_method(:token_tag)),
         "translations" => FormScaffoldAdmission.translations(I18n.backend, exact),
         "polymorphic_key" => Sealed.signature(key.method(:call), sequence: RubyVM::InstructionSequence.of(key).to_a),

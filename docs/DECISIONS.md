@@ -4,6 +4,37 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Production sealed helper dispatch safety (2026-10-21)
+
+Production token admission did not refuse an existing view `send` override
+or a private live generator. Stock Rails calls those helpers implicitly;
+the specialization used `view.send` and a public generator call. Reproduced
+before a fix: wrong CSRF name with generation/conversion/send counts 1/0/1
+versus stock 1/1/0, and a private generator raising `NoMethodError` instead
+of generating once. Both were admitted, not post-seal mutations.
+
+Use a captured, independently stock-certified `BasicObject#instance_exec`
+to run actual implicit calls on the actual view. It bypasses view-defined
+`send`, `__send__`, `public_send`, `method` and `instance_exec`, while retaining
+private/protected and `method_missing` dispatch, stock `defined?` semantics,
+live ordering and saved-value continuation. Apply the same mechanism to the
+form's builder/buffer/URL/token boundaries. Keep the named route's original
+explicit `public_send` with a newly constructed String name and its live app
+override effects; polymorphic routing does not call that helper implicitly.
+Collection's existing implicit renderer calls need no change. A separate
+follow-up fixes `Sealed.link?`'s private `tag_builder` call with the same
+primitive and certificate fact; its pre-boot hostile-view regression fails
+on unchanged main. Test admission
+remains a separate, unpublished review and will consume this one primitive.
+
+**The accepted −15.225536% was measured at
+[`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
+which had this dispatch defect. It remains a price for that exact source and
+specimen only, not the fixed runtime.** No re-price, YJIT cohort or slot is
+authorized by this fix. Default/quarantine/guarded passes are unchanged;
+YJIT seam work stays paused and `835cf16` parked.
+[Dispatch sweep and correctness gates](passes/sealed-production.md#helper-dispatch-safety).
+
 Working assumption: many small exact passes (each < 2 %) should **stack**.
 `lowrail bench --passes SET --default-build DIR` (8db84d8) measures a pass set as one layer against no-setup and a separate default
 reference, and report the stacked effect next to the sum of individual
@@ -12,6 +43,27 @@ still missing for most passes (`measurement_complete: false`); adapters are
 the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
+
+## Campfire r81 instantiation: companions accepted, screen before price (2026-10-21)
+
+The single authorized companion rerun exits 0 for both seeds, off/off/on:
+HTTP bytes, SQLite, loads/non-Lowrail feature order, events and completed/exit
+state agree under the declared controls. **Named items stay next to this result:**
+browser other-thread nondeterminism; raw CSRF/cookie/ETag/runtime/session-clock
+rejections; Redis `rate-limit:sessions` expiry accepted off/off rejection;
+the blog's path/hash-pinned Lowrail feature exemption; ten cached lazy-Proc
+binds/worker unavailable, never evaluated. All 42 Redis key names/values and
+41 other expiries remain exact. Cold login+room has 103 hits, outside warm work.
+
+The warm target remains 52 hits (Account5/User5/Message40/Boost1/Session1) plus
+two Room STI fallbacks, **only campfire-r81 02023b0, not the Oct-8 fixture**.
+Both phase orders retain the frozen pages in 16 exact-worker tool=none windows.
+Slot 2 was assigned; its launcher fails before any counted Callgrind worker or
+window. Its initial log was overwritten; the cause remains unconfirmed.
+The new **screen first, price rarely** policy arrives before
+measurement: no cohort retry or price; use the shared native YJIT wall/alloc/
+exact-output screen once published. No runtime/default/quarantine or app patch.
+[Evidence, exclusions and private-receipt hashes](campfire-bench.md#12-one-authorized-companion-rerun-accepted-with-named-items).
 
 ## Prism 2 adoption and target grammar (2026-10-21)
 
@@ -80,6 +132,12 @@ its original request-only proposal as historical evidence.
 [Complete scoped N=10 export](fizzy-link-ir-n10.json).
 [Protocol, failures and reproduction](block-link-specimen.md#untimed-heap-preconditioning-prefer-n10-on-the-existing-tool),
 [all untimed window evidence](fizzy-link-heap.json).
+
+**One improvement KILLED before screening:** branch-only request-cached dependency scan backed by existing Guard resets.
+Ruby 4.0.7 / Rails 8.1.4 control: one scan; after `private :content_tag_string`, cached eligibility stays true while the full post-block scan is false.
+Stock saved-builder dispatch enters `method_missing` and raises `ArgumentError`; cached eligibility would bypass that live error.
+Visibility changes fire no Guard hook; bet D also leaves saved-ancestry, suppressed-callback and refinement holes open. No authoritative epoch.
+Correctness prerequisite failed: no HTTP/allocation/YJIT screen or new cohort. Keep the stock fallback; production widening is PARKED and block-link work stops.
 
 ## First accepted whole-request price (2026-10-21)
 

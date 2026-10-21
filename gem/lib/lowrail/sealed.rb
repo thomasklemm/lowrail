@@ -13,6 +13,10 @@ module Lowrail
     REQUEST = :__lowrail_sealed_request
     ENCODING = String.instance_method(:encoding)
     VALID = String.instance_method(:valid_encoding?)
+    # Run live helper calls as fcalls on the view, without invoking any of
+    # its overridable send/__send__/instance_exec methods. Build certificates
+    # independently require this captured core body to be stock.
+    VIEW_CONTEXT = BasicObject.instance_method(:instance_exec)
 
     class << self
       attr_reader :refusal
@@ -32,6 +36,12 @@ module Lowrail
           "parameters" => method.parameters.map { _1.map(&:to_s) },
           "original_name" => method.original_name.to_s,
           "iseq" => sequence && Manifest.digest.hexdigest(Marshal.dump(clean.call(sequence)))}
+      end
+
+      def view_context_fact
+        return unless VIEW_CONTEXT.owner.equal?(BasicObject) && VIEW_CONTEXT.original_name == :instance_exec &&
+          VIEW_CONTEXT.source_location.nil? && RubyVM::InstructionSequence.of(VIEW_CONTEXT).nil?
+        signature(VIEW_CONTEXT)
       end
 
       def install(units)
@@ -73,6 +83,7 @@ module Lowrail
         @holder = native.method(:exact_class?)
         native_file = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
         return decline("loaded native actual-holder binary not certified; rebuild required") unless @data.fetch("sources").key?(native_file)
+        return decline("view context dispatch changed; rebuild") unless view_context_fact == @data.fetch("view_context")
         dependencies = ["ActionView::Helpers::TagHelper::TagBuilder", "ActionView::Helpers::TagHelper::TAG_TYPES",
           "String::BLANK_RE", "ERB::Util::SAFE_XML_TAG_NAME_REGEXP", *@data.fetch("primitive_methods").map { _1.fetch("holder") }]
         return decline("helper dependencies not already loaded; keep original") unless dependencies.all? { Lowrail.loaded_constant(_1) }
@@ -145,7 +156,7 @@ module Lowrail
         return count(false) unless @epoch[0].zero? && String === url &&
           ENCODING.bind_call(url) == Encoding::UTF_8 && VALID.bind_call(url) &&
           html.size == 2 && html["class"] == css && html["href"].equal?(url)
-        count(BUILDERS.key?(view.send(:tag_builder)))
+        count(BUILDERS.key?(VIEW_CONTEXT.bind_call(view) { tag_builder }))
       end
 
       def count(ok)
