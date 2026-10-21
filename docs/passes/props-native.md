@@ -1,7 +1,8 @@
-# Props native dispatch predicate: untimed preparation
+# Props native dispatch predicate: stop at price
 
-2026-10-21. **Pricing only; no production props integration, promotion or
-speed claim.** The ordinary-def Ruby-reflection shape still stops at its
+2026-10-21. **Accepted interpreter micro, still a loss: +1.384% Ir.
+Stop at price; no retry, YJIT run, production integration or promotion.**
+The ordinary-def Ruby-reflection shape separately still stops at its
 [accepted interpreter loss](yjit-regression.md#corrected-interpreter-pricing-stop-at-price):
 30,482.987 Ir of checks versus 4,445.573 Ir of unchecked iteration saving,
 6.857×. Its YJIT micro remains cancelled. This is a separately requested
@@ -107,10 +108,12 @@ not twelve more independent operations. The two main-Ractor equalities,
 active-unit hash lookups, Guard state access and cached fact checks remain.
 No body/visibility requirement or recursive entry is elided.
 
-The 30,482.987 Ir figure includes all checks and reflection side effects;
-an operation census cannot determine its removable Ir fraction. In
-particular the new C predicate still pays native method lookup, and all
-outer checks remain. **How much of the 6.857× deficit closes is unpriced.**
+The historical 30,482.987 Ir figure includes all checks and reflection side
+effects; the operation census alone cannot determine its removable Ir
+fraction. The separate native cohort below prices the replacement against
+its own contemporaneous complete-check control, not by subtracting results
+from different cohorts. The native predicate still pays method lookup, and
+all outer checks remain.
 
 ## Reproduce without a measured window
 
@@ -135,15 +138,66 @@ source proofs now include the native C/build recipe and compiled binaries.
 The harness regression forces the native predicate false and requires the
 liveness gate to refuse, preserving fallback-priced-cohort protection.
 
-The prepared `props_native` group has original paired A/A controls,
+The `props_native` group has original paired A/A controls,
 Ruby-reflection `split` and `checks_original`, native `native_split` and
 `native_checks_original`, plus unchecked `each`. All build fresh nested
-inputs identically. The coordinator has authorized one finite interpreter
-cohort with **at most two workers**, after the untimed gates. It must price
-`native_checks_original − original`, compare it against `original − each`,
-and require the complete `native_split` candidate itself to win under
-unchanged gates. No Callgrind window has run for this shape; no YJIT cohort
-or production integration is authorized by this preparation.
+inputs identically. Its one authorized interpreter cohort is complete; both
+worker slots are released. No further cohort or integration follows.
+
+## One finite interpreter price
+
+Measured clean
+[83bf0ba](https://github.com/thomasklemm/lowrail/commit/83bf0baa9c21d86955e31f626bbc466b60c41f9d),
+Ruby 4.0.7 revision `229531a6cf`, Inertia 3.22.0, pinned Valgrind 3.19/brk512:
+six rounds, seed 41231, N=1,000, **two workers maximum**, 42 independent
+worker boots and 168 windows, one cohort and no retry. Both A/A controls,
+all five heap pools, brk, actual interpreter mode and unchanged-source gates
+pass. Before any window, every checked arm has `guard_valid=true`, **20
+authorizations / 0 fallbacks** per ten resolves; original/unchecked controls
+have zero counts. No Stats instrumentation runs in a priced process.
+
+| Paired result | Total Ir, median [95% CI] | GC-excluded Ir, median [95% CI] |
+|---|---:|---:|
+| Complete native candidate versus original | **+1.383906% [1.360285, 1.409477]** | **+1.383817% [1.360197, 1.409653]** |
+| Complete Ruby checks (`checks_original − original`) | 30,982.589 [30,705.145, 31,262.448] | 30,982.376 [30,675.444, 31,289.648] |
+| Remaining native checks (`native_checks_original − original`) | 5,849.248 [5,821.248, 5,897.248] | 5,849.248 [5,821.248, 5,897.248] |
+| Available iteration saving (`original − each`) | 4,445.369 [4,393.471, 4,471.573] | 4,445.471 [4,393.471, 4,471.471] |
+| Complete-check cost removed | 81.188% [80.810, 81.296] | 81.058% [80.938, 81.297] |
+| Remaining checks / available saving | **1.321176× [1.301877, 1.336813]** | **1.321176× [1.301877, 1.336813]** |
+
+Original/native-checks-original allocate **55 / 55 objects per resolve**;
+native-split/unchecked allocate **46 / 46**. Removing nine objects does not
+make the complete candidate win. The paired remaining check-minus-saving
+gap is **1,427.777 Ir [1,349.777, 1,479.777]**, about **24.309%
+[23.188, 25.194]** of the remaining checks. These are medians of paired-round
+differences/ratios, not differences/ratios of independently rounded medians.
+
+**Stop this shape at price.** The primitive removes most reflection cost but
+does not close the deficit enough. No retry, YJIT run or production props
+integration is authorized. The older 30,482.987 Ir / 6.857× result and earlier
+invalid fallback-priced cohort remain unchanged; this is not a rescore.
+Production reflection/delivery remains uncertified, and no request saving
+is claimed. Outer-check attribution is an untimed follow-up using retained
+dumps/censuses, not another measured cohort.
+
+[Sanitized numeric export](props-native-interpreter.json) retains both CIs,
+all paired rounds, liveness, gate verdicts and Ruby/native/source/counter/tool
+fingerprints. It contains no raw private app files, process environments or
+Callgrind dumps. The native binary SHA is
+`38f0f5b540a44e7e1c2597b04d0664b2e5ca194b65e736c50a1e506517a34f6a`;
+the Valgrind tool SHA is
+`5fe02646537c5669b032c5146665728f9dab384918fea30118b7c7df3dc30ad7`.
+
+The single completed command, **not an instruction to retry**:
+
+```sh
+PATH=/tmp/vg/bin:$PATH CPATH=/tmp/vg/include \
+BENCH_JIT=0 BENCH_JOBS=2 BENCH_REQUESTS=1000 BENCH_AA_TOLERANCE=0.5 \
+BENCH_HEAP_SLOTS=1000000,250000,100000,20000,10000 \
+env -u RUBYOPT -u RUBY_YJIT_ENABLE -u RUBY_ZJIT_ENABLE \
+  -u BENCH_YJIT_LOG -u BENCH_JIT_CALL_THRESHOLD \
+  mise exec -- ruby bench/experiments/yjit_regression.rb props_native NEW_OUTDIR
+```
 
 ## Strict-gate provenance
 

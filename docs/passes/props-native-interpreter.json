@@ -1,0 +1,979 @@
+{
+  "accepted": true,
+  "decision": "stop_at_price_no_retry_yjit_or_integration",
+  "measured_commit": "83bf0baa9c21d86955e31f626bbc466b60c41f9d",
+  "kind": "one_finite_interpreter_micro_not_a_request_or_production_certificate",
+  "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+  "ruby_executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+  "configuration": {
+    "seed": 41231,
+    "rounds": 6,
+    "requests": 1000,
+    "maximum_concurrent_workers": 2,
+    "worker_boots": 42,
+    "windows": 168,
+    "heap_slots": [
+      1000000,
+      250000,
+      100000,
+      20000,
+      10000
+    ],
+    "actual_jit": [
+      "interpreter"
+    ]
+  },
+  "valgrind": {
+    "pass": true,
+    "version": "valgrind-3.19.0",
+    "rails_boot": false,
+    "driver_sha256": "7b49fcf94679c3a16430d6940df3b63e88705bc5ad8b6154a54e19dab4e05b6a",
+    "build": {
+      "version": "3.19.0",
+      "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+      "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+      "brk_reservation_mib": 512,
+      "tool": "libexec/valgrind/callgrind-amd64-linux",
+      "tool_sha256": "5fe02646537c5669b032c5146665728f9dab384918fea30118b7c7df3dc30ad7",
+      "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+      "libc": "glibc 2.36"
+    },
+    "log_sha256": "45d6b3bfe12466835fef43bb25d63a53e6b652d213c7ef65d5ecc122a24d2035"
+  },
+  "gates": {
+    "aa": {
+      "pass": true,
+      "metrics": {
+        "instructions_total": true,
+        "instructions_no_gc": true
+      },
+      "tolerance_pct": 0.5
+    },
+    "heap_matched": true,
+    "heap_capacity": {
+      "0": {
+        "min": 1000453,
+        "max": 1000456,
+        "page_target": null,
+        "pages_matched": null,
+        "matched": true
+      },
+      "1": {
+        "min": 250430,
+        "max": 250432,
+        "page_target": null,
+        "pages_matched": null,
+        "matched": true
+      },
+      "2": {
+        "min": 100565,
+        "max": 100566,
+        "page_target": null,
+        "pages_matched": null,
+        "matched": true
+      },
+      "3": {
+        "min": 20175,
+        "max": 20177,
+        "page_target": null,
+        "pages_matched": null,
+        "matched": true
+      },
+      "4": {
+        "min": 10179,
+        "max": 10182,
+        "page_target": null,
+        "pages_matched": null,
+        "matched": true
+      }
+    },
+    "jit_mode_pass": true,
+    "all_worker_modes_matched": true,
+    "source_proof_pass": true,
+    "brk_pass": true
+  },
+  "liveness": {
+    "original": {
+      "guard_valid": true,
+      "operations": 10,
+      "fast_authorization_expected": false,
+      "hits": {},
+      "fallbacks": {},
+      "pass": true,
+      "actual_jit": "interpreter"
+    },
+    "split": {
+      "guard_valid": true,
+      "operations": 10,
+      "fast_authorization_expected": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true,
+      "actual_jit": "interpreter"
+    },
+    "native_split": {
+      "guard_valid": true,
+      "operations": 10,
+      "fast_authorization_expected": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true,
+      "actual_jit": "interpreter"
+    },
+    "checks_original": {
+      "guard_valid": true,
+      "operations": 10,
+      "fast_authorization_expected": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true,
+      "actual_jit": "interpreter"
+    },
+    "native_checks_original": {
+      "guard_valid": true,
+      "operations": 10,
+      "fast_authorization_expected": true,
+      "hits": {
+        "0": 20
+      },
+      "fallbacks": {},
+      "pass": true,
+      "actual_jit": "interpreter"
+    },
+    "each": {
+      "guard_valid": true,
+      "operations": 10,
+      "fast_authorization_expected": false,
+      "hits": {},
+      "fallbacks": {},
+      "pass": true,
+      "actual_jit": "interpreter"
+    }
+  },
+  "summary": {
+    "native_split": {
+      "instructions_total": {
+        "value": {
+          "median": 104900.402,
+          "ci95": [
+            104897.5305,
+            104949.659
+          ]
+        },
+        "delta_pct": {
+          "median": 1.3839055942761247,
+          "ci95": [
+            1.3602854605427872,
+            1.4094767644754036
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "value": {
+          "median": 104899.5305,
+          "ci95": [
+            104896.659,
+            104951.402
+          ]
+        },
+        "delta_pct": {
+          "median": 1.3838173027180378,
+          "ci95": [
+            1.3601968634856076,
+            1.4096529202633268
+          ]
+        }
+      },
+      "allocations": {
+        "value": {
+          "median": 46.0,
+          "ci95": [
+            46.0,
+            46.0
+          ]
+        },
+        "delta_pct": {
+          "median": -16.36363636363637,
+          "ci95": [
+            -16.36363636363637,
+            -16.36363636363637
+          ]
+        }
+      }
+    },
+    "checks_original": {
+      "instructions_total": {
+        "value": {
+          "median": 134448.3425,
+          "ci95": [
+            134197.668,
+            134753.432
+          ]
+        },
+        "delta_pct": {
+          "median": 29.939529387424958,
+          "ci95": [
+            29.66895827808882,
+            30.213152113375862
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "value": {
+          "median": 134474.47,
+          "ci95": [
+            134167.626,
+            134754.632
+          ]
+        },
+        "delta_pct": {
+          "median": 29.936989238410305,
+          "ci95": [
+            29.64025319046054,
+            30.241775323717256
+          ]
+        }
+      },
+      "allocations": {
+        "value": {
+          "median": 75.0,
+          "ci95": [
+            75.0,
+            75.0
+          ]
+        },
+        "delta_pct": {
+          "median": 36.36363636363635,
+          "ci95": [
+            36.36363636363635,
+            36.36363636363635
+          ]
+        }
+      }
+    },
+    "off_a": {
+      "instructions_total": {
+        "value": {
+          "median": 103466.523,
+          "ci95": [
+            103464.984,
+            103517.75349999999
+          ]
+        },
+        "delta_pct": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "value": {
+          "median": 103466.523,
+          "ci95": [
+            103464.984,
+            103517.75349999999
+          ]
+        },
+        "delta_pct": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "allocations": {
+        "value": {
+          "median": 55.0,
+          "ci95": [
+            55.0,
+            55.0
+          ]
+        },
+        "delta_pct": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "off_b": {
+      "instructions_total": {
+        "value": {
+          "median": 103491.75349999999,
+          "ci95": [
+            103466.523,
+            103516.984
+          ]
+        },
+        "delta_pct": {
+          "median": 0.0,
+          "ci95": [
+            -0.025116277982445423,
+            0.05025854930784668
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "value": {
+          "median": 103491.75349999999,
+          "ci95": [
+            103464.984,
+            103518.523
+          ]
+        },
+        "delta_pct": {
+          "median": 0.0,
+          "ci95": [
+            -0.02511665138930086,
+            0.05025780174328087
+          ]
+        }
+      },
+      "allocations": {
+        "value": {
+          "median": 55.0,
+          "ci95": [
+            55.0,
+            55.0
+          ]
+        },
+        "delta_pct": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "each": {
+      "instructions_total": {
+        "value": {
+          "median": 99046.2825,
+          "ci95": [
+            99019.411,
+            99073.154
+          ]
+        },
+        "delta_pct": {
+          "median": -4.295353086103631,
+          "ci95": [
+            -4.320730731731054,
+            -4.246304552357621
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "value": {
+          "median": 99046.2825,
+          "ci95": [
+            99020.2825,
+            99072.2825
+          ]
+        },
+        "delta_pct": {
+          "median": -4.295483542414347,
+          "ci95": [
+            -4.320599902013478,
+            -4.246304552357621
+          ]
+        }
+      },
+      "allocations": {
+        "value": {
+          "median": 46.0,
+          "ci95": [
+            46.0,
+            46.0
+          ]
+        },
+        "delta_pct": {
+          "median": -16.36363636363637,
+          "ci95": [
+            -16.36363636363637,
+            -16.36363636363637
+          ]
+        }
+      }
+    },
+    "split": {
+      "instructions_total": {
+        "value": {
+          "median": 127327.5585,
+          "ci95": [
+            127172.4855,
+            127471.383
+          ]
+        },
+        "delta_pct": {
+          "median": 23.008138697731127,
+          "ci95": [
+            22.90428161839906,
+            23.20243822779695
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "value": {
+          "median": 127328.66450000001,
+          "ci95": [
+            127170.024,
+            127465.26000000001
+          ]
+        },
+        "delta_pct": {
+          "median": 23.061756688918045,
+          "ci95": [
+            22.87847374812928,
+            23.167398837079034
+          ]
+        }
+      },
+      "allocations": {
+        "value": {
+          "median": 64.0,
+          "ci95": [
+            64.0,
+            64.0
+          ]
+        },
+        "delta_pct": {
+          "median": 16.36363636363636,
+          "ci95": [
+            16.36363636363636,
+            16.36363636363636
+          ]
+        }
+      }
+    },
+    "native_checks_original": {
+      "instructions_total": {
+        "value": {
+          "median": 109339.0015,
+          "ci95": [
+            109314.232,
+            109363.771
+          ]
+        },
+        "delta_pct": {
+          "median": 5.6533599811893875,
+          "ci95": [
+            5.623429780791989,
+            5.699667707979317
+          ]
+        }
+      },
+      "instructions_no_gc": {
+        "value": {
+          "median": 109339.0015,
+          "ci95": [
+            109315.0015,
+            109363.0015
+          ]
+        },
+        "delta_pct": {
+          "median": 5.653275890985521,
+          "ci95": [
+            5.62342943610874,
+            5.699752488242793
+          ]
+        }
+      },
+      "allocations": {
+        "value": {
+          "median": 55.0,
+          "ci95": [
+            55.0,
+            55.0
+          ]
+        },
+        "delta_pct": {
+          "median": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "paired_prices": {
+    "instructions_total": {
+      "ruby_check_cost": {
+        "median": 30982.589,
+        "ci95": [
+          30705.145000000004,
+          31262.448000000004
+        ]
+      },
+      "native_check_cost": {
+        "median": 5849.248000000007,
+        "ci95": [
+          5821.248,
+          5897.247999999992
+        ]
+      },
+      "unchecked_iteration_saving": {
+        "median": 4445.369000000006,
+        "ci95": [
+          4393.471000000005,
+          4471.573000000004
+        ]
+      },
+      "native_check_to_saving": {
+        "median": 1.3211757660245287,
+        "ci95": [
+          1.301877227228633,
+          1.336812866263616
+        ]
+      },
+      "ruby_cost_removed_pct": {
+        "median": 81.18822864099728,
+        "ci95": [
+          80.8101910944093,
+          81.29625095540811
+        ]
+      },
+      "remaining_break_even_gap": {
+        "median": 1427.7769999999946,
+        "ci95": [
+          1349.7769999999946,
+          1479.7769999999946
+        ]
+      },
+      "remaining_checks_to_remove_pct": {
+        "median": 24.308565741532405,
+        "ci95": [
+          23.187615608046002,
+          25.19395093747839
+        ]
+      }
+    },
+    "instructions_no_gc": {
+      "ruby_check_cost": {
+        "median": 30982.375500000002,
+        "ci95": [
+          30675.44399999999,
+          31289.648000000016
+        ]
+      },
+      "native_check_cost": {
+        "median": 5849.247999999992,
+        "ci95": [
+          5821.248,
+          5897.248000000007
+        ]
+      },
+      "unchecked_iteration_saving": {
+        "median": 4445.471000000005,
+        "ci95": [
+          4393.471000000005,
+          4471.471000000005
+        ]
+      },
+      "native_check_to_saving": {
+        "median": 1.3211755182789877,
+        "ci95": [
+          1.30187678136542,
+          1.3368126126188642
+        ]
+      },
+      "ruby_cost_removed_pct": {
+        "median": 81.05829963699225,
+        "ci95": [
+          80.93834265950534,
+          81.29709475296494
+        ]
+      },
+      "remaining_break_even_gap": {
+        "median": 1427.7769999999946,
+        "ci95": [
+          1349.7769999999946,
+          1479.7769999999946
+        ]
+      },
+      "remaining_checks_to_remove_pct": {
+        "median": 24.308579935113457,
+        "ci95": [
+          23.18760115975142,
+          25.193965131059443
+        ]
+      }
+    }
+  },
+  "source_sha256": {
+    "bench/experiments/yjit_regression.rb": "dfa1a3ee0d9bcdb4a4730dbf14b6d0e2092faba4dad0fe64ee51832e486d2422",
+    "bench/experiments/props_variant.rb": "e6be6f9060798195719536e3dab348ed6359f8bfaf88630a97530ba350ddcbeb",
+    "gem/lib/lowrail/ar_guard.rb": "056647c46829f7013031e392342239513ca73ba4f599e634c83b8f82c73b133f",
+    "gem/lib/lowrail/ar_instantiate.rb": "5d59e8983fa6781977ac1743f0d2e4f79acf1083f0748756d322125c3f44314f",
+    "gem/lib/lowrail/ar_instantiate_build.rb": "0bb41782f7c2bf7ad975177c1f03986b1d7c38c560e0bc11fa8ae008efbde1f8",
+    "gem/lib/lowrail/ar_plan_build.rb": "20606044a887d968156d498a61216961fe8f49cac349a416ebbb798c22fe45fc",
+    "gem/lib/lowrail/ar_plan_facts.rb": "dfd04d08ab7e74a7ed7b30fcf53ff2bc6001d3ade6b85644ca12c372ead47d9a",
+    "gem/lib/lowrail/ar_plan_sites.rb": "0bf7051d9af853c832c69426623ccb920490c3c05b136738c84457601c7d2dcb",
+    "gem/lib/lowrail/ar_plans.rb": "899a94ad12d1f2c45b5dda3f0cb74ae88dee61756404b0c7b6d45cffc827e8a6",
+    "gem/lib/lowrail/ar_shadow.rb": "6d95adb126d88f62c74bc9c5858bdffe2d41a017ae19e030f9b375b277afb422",
+    "gem/lib/lowrail/build_jit.rb": "f559c807f2c2ad4fe752be18fb41226003439ef4c2e25cb49c20832faa74e858",
+    "gem/lib/lowrail/compilation.rb": "57897144c65f2f912d2b493b63c061b86d71c368ca144fe371b6b3324fbf37f1",
+    "gem/lib/lowrail/compiler.rb": "26a4158e886f553e570e6fddba4839418caf7617243a7a470bde23f467eccd3c",
+    "gem/lib/lowrail/digest_memo.rb": "affea7b66a0cb357b2e81b49453dd5d5a856e983b25ecf58637b5a590ce34475",
+    "gem/lib/lowrail/digest_memo_build.rb": "473cb2383546b0f674d9e3bae970603230dbc8289768fe0d11ec85eec9ede2fa",
+    "gem/lib/lowrail/endpoint.rb": "0e76c7dc06f71af7498759041655b33b0eef07b4cd8c147152be86669445f90a",
+    "gem/lib/lowrail/endpoint_build.rb": "f879fc7ea70028062daea277b2235703a8b91e71151b8f68edc90e85e3fc2063",
+    "gem/lib/lowrail/facts.rb": "2a11392a9506b7ff1cb8f423154f2d4c5217820a1cf85088c85dd79a18eb1756",
+    "gem/lib/lowrail/form_scaffold.rb": "a8106fe4a6b2a21d8025994f9383834b6cb61ef8ae306752e6ae7a46d2a21cd4",
+    "gem/lib/lowrail/form_scaffold_build.rb": "4b5b6dfbf3d10b0265d91c93e880c92ca2438910754402944efd5758671c656d",
+    "gem/lib/lowrail/form_scaffold_inventory.rb": "69e21b0ca6d38fb0b19003e959325f081197f8099fbd7e29cbbe9ec93ba7f8aa",
+    "gem/lib/lowrail/freeze_audit.rb": "8446079e2924aea41b806bb2485136e4ae6376d04655feacf8ec2e7ac9fcf87e",
+    "gem/lib/lowrail/guard.rb": "189ad92f5963f57bdd4d0528fbc9a4fcb2ae15db2e1aa2666210f4b86a74f3fc",
+    "gem/lib/lowrail/inertia_config.rb": "270bbcc9621cb5512f8b0777fdd5f2772d2f1e9ef7a54e3cd5446480b668e7ff",
+    "gem/lib/lowrail/inertia_config_build.rb": "d4ac21ee498700ec426c96b7d7efceacf5cea9b627ee484278a6a9827d9af3bd",
+    "gem/lib/lowrail/inertia_props.rb": "2063023df8f23ef89c46abdfa448693166efdb1c5c0eb1d0546f64ffae4d8259",
+    "gem/lib/lowrail/inertia_props_build.rb": "15eae72432076a3b8f567737ac9e26d074ac152b5f10b174ad42a2833ce422e5",
+    "gem/lib/lowrail/jit_diagnostics.rb": "b9fdf0f399e6ef35f4451589a2e30758a91b6fe14b4f1746fa3b888d98fb5a9c",
+    "gem/lib/lowrail/jit_shapes.rb": "046d58ec87e394fbad13974bd4d8abae2361e8b3aaacdc664072c5f7f0e57ffb",
+    "gem/lib/lowrail/load_hooks.rb": "7b9a49ae7349b8faa421ff582470cb7960a4ea35ce99f23224536a5f93ad3091",
+    "gem/lib/lowrail/loader.rb": "65f63010722cf36554499071ef70f6e0e247abdd8b3ce7147ec7696bb329b1f8",
+    "gem/lib/lowrail/manifest.rb": "47da0de0660452d77d278b813bba25b5ed77c8ab4786db3814955c479faac31f",
+    "gem/lib/lowrail/materialize.rb": "1c5e0f460103b3e5b3c3b5455f7cc67135fd18068505bb4041a522e47f75a2ed",
+    "gem/lib/lowrail/memo.rb": "2cb8bd2fc14cb0dd91419d8e493dd94c60337fd0844730c03ef6d693ae6ed381",
+    "gem/lib/lowrail/memo_facts.rb": "75a40a2bad4fb0a118d970db55e2728587a101fdbec28e0515ecb7c02cbe2018",
+    "gem/lib/lowrail/minitest.rb": "602b187259464b2330dfdc1c9864b0fea218af5484c0ec23cada573328ed1341",
+    "gem/lib/lowrail/observe.rb": "aa25c1e137426e82a72e30a292233de3435061fb38bcc30faea297ded575374f",
+    "gem/lib/lowrail/oracle_routes.rb": "3e5543c327ea86c306f288df386e98efc14d7741541ed6e7d2caea252b354802",
+    "gem/lib/lowrail/passes.rb": "36bf9751f9c7d450e9fade7ce3d76a0a15dbf6de105234952ea46ade974b7dae",
+    "gem/lib/lowrail/paths.rb": "7b593eb4bf81399ab33603f8fea705ef58f54d81d3ea2ca3e407a305879baecb",
+    "gem/lib/lowrail/preload_build.rb": "5d562d1c33884481c73ca3f0fd89f33d776dfa01fbdc3267880a24e6e2021b28",
+    "gem/lib/lowrail/preload_facts.rb": "89f08a90fc97e4a1e502bae7803fcc369bb2d57bf58d29b79eaa643c1cd5c099",
+    "gem/lib/lowrail/preload_plans.rb": "427b19500eb8e346aab995798c309fd37c0a06a5a8e49600e9a1676a6f16c501",
+    "gem/lib/lowrail/routes.rb": "4c5b749e77209c7a306d6c716e4d37dfe14d53e80847b7a0f9ad714eb54c0f85",
+    "gem/lib/lowrail/rspec.rb": "a816c99eec56eda9788d80bfe040b1f96111aba18196446c73cceffdebc0eade",
+    "gem/lib/lowrail/script_capture.rb": "027a119d9b2bbf342fa44fa276f22c86b9643d8cffd632d78187eae25a53153c",
+    "gem/lib/lowrail/seal.rb": "1f6a7c32805a1f1c1e3232a6890610a7f5308b644087256aa32fa6cc62db1da4",
+    "gem/lib/lowrail/seal_rules.rb": "96d7ed8f0681e70600d1a12c9269aa201af7902886c3b23949cea892d11c48b6",
+    "gem/lib/lowrail/seal_snapshot.rb": "85e14c98ac1ddcfe0405c6ae7c742b0c101dbcf52a668fccdc55ee82ede304e4",
+    "gem/lib/lowrail/seal_static.rb": "981e5f9cfa1d68ebb5809f46fed1cd97bbb2fc8232d353eb69a0b1c463a82c7a",
+    "gem/lib/lowrail/sealed.rb": "c6c2079721650b5ccca61f722d3776e4dbbe9acfb8e3c46bde0ffa57fa064b73",
+    "gem/lib/lowrail/sealed_build.rb": "028acaadf158bad2c4ea9d5a3e3ce4519359d7c8fed9eb6d6b1eb66fe9e8c626",
+    "gem/lib/lowrail/setup.rb": "af25949b57a7189f00f968020ed74d78aefb7a2c5577f0a7f3c67a4a098d0f9e",
+    "gem/lib/lowrail/sql_trace.rb": "b3a0dc848066e77735dc53911a29a9bb2d44863a8cb49b08240b862d258d327c",
+    "gem/lib/lowrail/stats.rb": "d1a7924403ddc296abab4fdd85ef8b18428d8a0632bab9a32d3e2683b6f0a311",
+    "gem/lib/lowrail/templates.rb": "713367d0c9f2fcfc1c0841bde7f5ae3b40b5e35dcd6c1aeacbb92d3588356ed3",
+    "gem/lib/lowrail/verify_loads.rb": "7bacbc8177efaa2065c24054830d85f5f85895fca28eab5ac7e2de85699a0ffc",
+    "gem/lib/lowrail.rb": "5cfefdfcaedb1b08b908d0a05aaa7f42cb62c4b1e66966618ffe9e3f6390232f",
+    "gem/lib/minitest/lowrail_plugin.rb": "9f05c90d5c1fd15acceeb54f75b16e57e2cde4fe796fe97f6f3f70f3e7119911",
+    "gem/ext/lowrail_native/lowrail_native.c": "c6d69bf723c3f5c942d3ea1ebfbebe8ce17978b57fca86b2bd3338a7f70c2b10",
+    "gem/ext/lowrail_native/extconf.rb": "6835f5e878f1710e3c0e0e31bee97bd9b45fdf18710c36896a305d763ca01e20",
+    "gem/lib/lowrail/native/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/lowrail_native.so": "38f0f5b540a44e7e1c2597b04d0664b2e5ca194b65e736c50a1e506517a34f6a",
+    "gem/lib/lowrail/native/ruby-4.1.0-2d08b5f42f2cbed4a4e6ecf8d62987a4f21f98c1-x86_64-linux/lowrail_native.so": "956dd758c2970ebba428365d87bd9832ee45affa423f6149656520e030972169",
+    "bench/request_pairs.rb": "c582902248a5465c22bbd56b15238e4262211fd83c033e72fd7d621f6fcb13cc",
+    "bench/heap_windows.rb": "dc8d7e8e2e47db8c398f823f82fd1fa07147ce6e62d38feee336c5204e0365c2",
+    "bench/jit_stability.rb": "743649435ea5af8e3902d35516e592e522afa7ed8b74135b491b6559496ca1a9",
+    "bench/callgrind.c": "b6d7ddf7667884c32b6c363f4e3a718e5ac5a8b75ce550e4d236fe6b4baec2a1"
+  },
+  "inertia_rails": {
+    "version": "3.22.0",
+    "source_sha256": {
+      "lib/generators/inertia/controller/controller_generator.rb": "01fc3d52c0ca4202d065269e0e003ac90263eb25c95d554518995fb490b0c906",
+      "lib/generators/inertia/install/helpers.rb": "ca5b57d52ba71699c1a928f160968f8cd7ddc5a6ba3ba17896c565c5d0b5535a",
+      "lib/generators/inertia/install/install_generator.rb": "1e973968ad28a8ee1c8a66a4004e3d11db3494100f7a85a6cfaa634a88a9207f",
+      "lib/generators/inertia/install/js_package_manager.rb": "6fd75a34d4289cd27a61221c2ab04e4fa90eaba7e263daa4a4612c4b8d06bc96",
+      "lib/generators/inertia/install/templates/controller.rb": "c19657c00c7ff1e691d91cc81f33751a81b32e9ee18cbcc3f2d9c42bd806d008",
+      "lib/generators/inertia/install/templates/inertia_controller.rb": "b70cab4b2984fadd1414cc750d10c0434769fbe531db55ad7a50c4b0af349bff",
+      "lib/generators/inertia/install/templates/initializer.rb": "f616df999bbcd2c929d3dab4d57b86a20fc37e6337e78ed2b4a0db20232d0173",
+      "lib/generators/inertia/scaffold/scaffold_generator.rb": "8f113ccfcd87c155f491984ceb55edc00346bfd8130f05de3fec0c819c8ec5c0",
+      "lib/generators/inertia/scaffold_controller/scaffold_controller_generator.rb": "dc61b842d1e3368cfbf3d5a483ec7fd8a43cd74b611430bfade582e7b04e3179",
+      "lib/generators/inertia_templates/controller/controller_generator.rb": "000e5b69e928367a36367dcd4548b559c87506b0dd4a38ad4297fb5fd00c633b",
+      "lib/generators/inertia_templates/scaffold/scaffold_generator.rb": "0ec755c222e7fa1d3244e71506df65bfcd02a6793c90c77ca41956b48cd55072",
+      "lib/generators/inertia_tw_templates/controller/controller_generator.rb": "baa53445c3c166ceb8703f1a4434b3ba3935b8bd0a07543049a09d4cfbfc8c85",
+      "lib/generators/inertia_tw_templates/scaffold/scaffold_generator.rb": "640d19fb9ffdfdcddeb3877058fe2ddd5131f4aa343c79d4d630c275959b0336",
+      "lib/inertia_rails/always_prop.rb": "6face47e38b381bf62d7d1e43a3d2bb26101c4206fe19dc0f0e284b588c662a3",
+      "lib/inertia_rails/base_prop.rb": "c1ecbd6e29b50a75f65ed0b17e0ba30977f1f1e57623fa7c7c7c7908c5e6aef0",
+      "lib/inertia_rails/cached_prop.rb": "ec4e39bac5924f7bc97cf71f7e599ef959baf55e77f731b3e1d186162f3769ef",
+      "lib/inertia_rails/configuration.rb": "79c6f11db937d9d1ac8197395bdee83cb194ccff10c7844600895dbf2821de99",
+      "lib/inertia_rails/controller.rb": "a389a86603505fe2746bb6d0d4fc80d6cec5b2de39d08979f8a77b7e525da56e",
+      "lib/inertia_rails/current.rb": "1c1508e1e72bf31d9b23c5e1bf14c141a2ad4331f0cf351cb8f18de7943a114f",
+      "lib/inertia_rails/defer_prop.rb": "28a73a7a074f228e21a4311075f8f1633717240a4d612639d9e2e7c68c102026",
+      "lib/inertia_rails/engine.rb": "8afd9132f8591edc9b1c55d0a0e157a35959bceedbafd0207325e97bc41169eb",
+      "lib/inertia_rails/errors.rb": "ee05cda8445ebaaebe241cf5d32a3d4096dcdec4fbfce5b83e6949fb58957c6a",
+      "lib/inertia_rails/extensions/better_errors.rb": "2c1d5eba23eca58d913a9d4a43c4f6ac3fc74ad39f435156c181c2a9a538d8f4",
+      "lib/inertia_rails/extensions/debug_exceptions.rb": "218e3920373327381d20d26184c1d12607289a804b3cdbbf77e2ec39a179fc86",
+      "lib/inertia_rails/extensions/mapper.rb": "905edf323c4b6f83ec768e4d53094c6de3ef53fe7f1f8cfa7450a63a922d1e82",
+      "lib/inertia_rails/extensions/request.rb": "a86c0373cdd608eea6f0580d6c1c7fdfd2d4a76de68cbde0f484ab871b893f6b",
+      "lib/inertia_rails/flash_extension.rb": "036a68781e80079fa84755fd5bca51c7a03c7b1338fe670ca805269b68879663",
+      "lib/inertia_rails/generators/controller_template_base.rb": "9f19432ae9882b100998a7e60e55fb9e565fb36277fd308dfdff25fc28657a5f",
+      "lib/inertia_rails/generators/helper.rb": "8fdc2faa207f77ba58906419e425210d09614e67b6c71c5ef725b317df30539c",
+      "lib/inertia_rails/generators/scaffold_template_base.rb": "d100a08860302ecd81bbdcb17029c85c14776a48416f796772fd181d2bbfff8a",
+      "lib/inertia_rails/helper.rb": "847b9b19cd6de5ec1e1b2687642fe63b84411c9e690d87fec7a87e1a3ccb9a64",
+      "lib/inertia_rails/ignore_on_first_load_prop.rb": "7fe47e81c6343daee70435085bde2635546e268bbaa111e2bcff896cf3490c98",
+      "lib/inertia_rails/lazy_prop.rb": "61c357eac9033b29e0fe68af78da1bae3134100366d5c053ce68876563873138",
+      "lib/inertia_rails/merge_prop.rb": "b5026ca8867a0d977619893f2bffff54af61d64b61ecaa920ae50bce2dc1b123",
+      "lib/inertia_rails/meta_tag.rb": "ae2936d3299aca82b99bd0759984c20dd9d190d0c930097adac99f4093f0b441",
+      "lib/inertia_rails/meta_tag_builder.rb": "6fd9a824baeaf7caa947bf6dc7bd75b4ffc80a955e83e9887e823d135557839a",
+      "lib/inertia_rails/middleware.rb": "bc25370e9e265a133c701e7b9e15f4389dde029e34da2ad12eaca427982c264b",
+      "lib/inertia_rails/minitest.rb": "c362715eaa398d08c8e05361138c5df0d31a6e6b5e25b5ffc212a44f1034b333",
+      "lib/inertia_rails/once_prop.rb": "d080545ededbd1cfbcc89d240b7ae80533b48c009bb3fe60946ef24eead92db3",
+      "lib/inertia_rails/optional_prop.rb": "ec0caecb1288aea01bf271968d3736532a342aecc2dc3b0af2e9bcc59ebf107c",
+      "lib/inertia_rails/precognition.rb": "087e4dfbfbbe5a376f8830d57924289c92f9da2ef6b6345726e381fb620dcb0e",
+      "lib/inertia_rails/prop_cacheable.rb": "4633fa717f05895d8af978b7143281bc048e73c15c25ca1fa04411bc14b29721",
+      "lib/inertia_rails/prop_evaluator.rb": "f79be50033ccc0e30a5645cfb31be3a1154008f77bae8ada47738b39af669c64",
+      "lib/inertia_rails/prop_mergeable.rb": "55ed2b04a07b05925da8f71d8e9fbb46f1c130a6a59254a47fac164c799209a3",
+      "lib/inertia_rails/prop_onceable.rb": "327936e43683a7eeb58701966aaa68086e8e2a21fe466adf77e44da6e57cace2",
+      "lib/inertia_rails/props_resolver.rb": "48957d68dc3b619ca5a9de807c74ab12d425304592b410a95684d0bd89be32af",
+      "lib/inertia_rails/raw_json.rb": "1e0c2a9c7cfb6ccdfa94468045f3063506fa59daa35bee23d030db61923818a0",
+      "lib/inertia_rails/renderer.rb": "c53d593f549770c5020ef49ff50f0973a3d774d89a7154d5dcb6d1dc173ffd9f",
+      "lib/inertia_rails/rspec/deprecated.rb": "406347436167c82a9ed5ab583b2a011303a015bb294324f8de060b994ebf7e67",
+      "lib/inertia_rails/rspec.rb": "5cc58e03a6b0f7f2ef27a9e81f5c491500fdf44182c6788bc4fc3f1b5cbdde6d",
+      "lib/inertia_rails/scroll_metadata.rb": "7d7d358c5f5a516e8b1a22a19e006ffcca6b553297ecb3771c7e4bf832515909",
+      "lib/inertia_rails/scroll_prop.rb": "00051ef45a68c6c3d38dca1df55efc69c0265ee78780becb405c05312ac0be63",
+      "lib/inertia_rails/ssr.rb": "a82162f5595c65e784abffec560011afebf840b7baea86975728de12110bb01e",
+      "lib/inertia_rails/ssr_renderer.rb": "3efd42476a73dbaa879cccfa1e6977cdf0ecd9f142d0bf461a75cec5df6ecafe",
+      "lib/inertia_rails/testing.rb": "b644555bfdd1bb5d0f83a4546dbe5c1a1038ec2bcf84126776b252ecf6d6de8e",
+      "lib/inertia_rails/version.rb": "b5a0c2c24be8ea336951c19a166c0f6c754ddd569a3281c410d36e346c13704e",
+      "lib/inertia_rails/xsrf_cookie_refresh_policy.rb": "33d8161384ce342fbae29723f0ac77228769de4c0e9b929679a71cf81544c590",
+      "lib/inertia_rails.rb": "1633d85bf2644698e4e44e0dcca2b6454274634d1ee47c8feb0acad2679cd97a",
+      "lib/puma/plugin/inertia_ssr.rb": "5f8a2047e691f89fc2ef00ae516f96cb8afde68bb4eda7f3e134cfe60b0cf41f"
+    }
+  },
+  "counter_extension_sha256": "6cf59ad0d495ad9ac48572769478f4e6401cc887e714e74a8159bb485d6604b5",
+  "rounds": [
+    {
+      "native_split": {
+        "instructions_total": 104896.659,
+        "instructions_no_gc": 104898.402,
+        "allocations": 46.0
+      },
+      "checks_original": {
+        "instructions_total": 134751.017,
+        "instructions_no_gc": 134193.626,
+        "allocations": 75.0
+      },
+      "off_a": {
+        "instructions_total": 103464.984,
+        "instructions_no_gc": 103466.523,
+        "allocations": 55.0
+      },
+      "off_b": {
+        "instructions_total": 103516.984,
+        "instructions_no_gc": 103518.523,
+        "allocations": 55.0
+      },
+      "each": {
+        "instructions_total": 99071.411,
+        "instructions_no_gc": 99073.154,
+        "allocations": 46.0
+      },
+      "split": {
+        "instructions_total": 127497.383,
+        "instructions_no_gc": 127224.729,
+        "allocations": 64.0
+      },
+      "native_checks_original": {
+        "instructions_total": 109314.232,
+        "instructions_no_gc": 109315.771,
+        "allocations": 55.0
+      }
+    },
+    {
+      "native_split": {
+        "instructions_total": 104898.402,
+        "instructions_no_gc": 104896.659,
+        "allocations": 46.0
+      },
+      "checks_original": {
+        "instructions_total": 134197.668,
+        "instructions_no_gc": 134754.632,
+        "allocations": 75.0
+      },
+      "each": {
+        "instructions_total": 99021.154,
+        "instructions_no_gc": 99019.411,
+        "allocations": 46.0
+      },
+      "split": {
+        "instructions_total": 127172.435,
+        "instructions_no_gc": 127437.659,
+        "allocations": 64.0
+      },
+      "native_checks_original": {
+        "instructions_total": 109363.771,
+        "instructions_no_gc": 109362.232,
+        "allocations": 55.0
+      },
+      "off_b": {
+        "instructions_total": 103466.523,
+        "instructions_no_gc": 103464.984,
+        "allocations": 55.0
+      },
+      "off_a": {
+        "instructions_total": 103466.523,
+        "instructions_no_gc": 103464.984,
+        "allocations": 55.0
+      }
+    },
+    {
+      "each": {
+        "instructions_total": 99019.411,
+        "instructions_no_gc": 99021.154,
+        "allocations": 46.0
+      },
+      "off_b": {
+        "instructions_total": 103516.984,
+        "instructions_no_gc": 103518.523,
+        "allocations": 55.0
+      },
+      "off_a": {
+        "instructions_total": 103516.984,
+        "instructions_no_gc": 103518.523,
+        "allocations": 55.0
+      },
+      "native_checks_original": {
+        "instructions_total": 109362.232,
+        "instructions_no_gc": 109363.771,
+        "allocations": 55.0
+      },
+      "native_split": {
+        "instructions_total": 104950.659,
+        "instructions_no_gc": 104952.402,
+        "allocations": 46.0
+      },
+      "split": {
+        "instructions_total": 127434.072,
+        "instructions_no_gc": 127167.319,
+        "allocations": 64.0
+      },
+      "checks_original": {
+        "instructions_total": 134755.847,
+        "instructions_no_gc": 134194.308,
+        "allocations": 75.0
+      }
+    },
+    {
+      "off_a": {
+        "instructions_total": 103466.523,
+        "instructions_no_gc": 103464.984,
+        "allocations": 55.0
+      },
+      "off_b": {
+        "instructions_total": 103466.523,
+        "instructions_no_gc": 103464.984,
+        "allocations": 55.0
+      },
+      "checks_original": {
+        "instructions_total": 134197.668,
+        "instructions_no_gc": 134754.632,
+        "allocations": 75.0
+      },
+      "split": {
+        "instructions_total": 127172.536,
+        "instructions_no_gc": 127432.6,
+        "allocations": 64.0
+      },
+      "each": {
+        "instructions_total": 99073.154,
+        "instructions_no_gc": 99071.411,
+        "allocations": 46.0
+      },
+      "native_checks_original": {
+        "instructions_total": 109363.771,
+        "instructions_no_gc": 109362.232,
+        "allocations": 55.0
+      },
+      "native_split": {
+        "instructions_total": 104898.402,
+        "instructions_no_gc": 104896.659,
+        "allocations": 46.0
+      }
+    },
+    {
+      "split": {
+        "instructions_total": 127445.383,
+        "instructions_no_gc": 127172.729,
+        "allocations": 64.0
+      },
+      "checks_original": {
+        "instructions_total": 134699.017,
+        "instructions_no_gc": 134141.626,
+        "allocations": 75.0
+      },
+      "each": {
+        "instructions_total": 99019.411,
+        "instructions_no_gc": 99021.154,
+        "allocations": 46.0
+      },
+      "off_b": {
+        "instructions_total": 103516.984,
+        "instructions_no_gc": 103518.523,
+        "allocations": 55.0
+      },
+      "native_split": {
+        "instructions_total": 104948.659,
+        "instructions_no_gc": 104950.402,
+        "allocations": 46.0
+      },
+      "native_checks_original": {
+        "instructions_total": 109314.232,
+        "instructions_no_gc": 109315.771,
+        "allocations": 55.0
+      },
+      "off_a": {
+        "instructions_total": 103464.984,
+        "instructions_no_gc": 103466.523,
+        "allocations": 55.0
+      }
+    },
+    {
+      "native_split": {
+        "instructions_total": 104902.402,
+        "instructions_no_gc": 104900.659,
+        "allocations": 46.0
+      },
+      "checks_original": {
+        "instructions_total": 134197.668,
+        "instructions_no_gc": 134754.632,
+        "allocations": 75.0
+      },
+      "off_a": {
+        "instructions_total": 103518.523,
+        "instructions_no_gc": 103516.984,
+        "allocations": 55.0
+      },
+      "off_b": {
+        "instructions_total": 103466.523,
+        "instructions_no_gc": 103464.984,
+        "allocations": 55.0
+      },
+      "split": {
+        "instructions_total": 127221.045,
+        "instructions_no_gc": 127492.861,
+        "allocations": 64.0
+      },
+      "native_checks_original": {
+        "instructions_total": 109315.771,
+        "instructions_no_gc": 109314.232,
+        "allocations": 55.0
+      },
+      "each": {
+        "instructions_total": 99073.154,
+        "instructions_no_gc": 99071.411,
+        "allocations": 46.0
+      }
+    }
+  ],
+  "raw_files_sha256": {
+    "samples.json": "4d4012dcd028d1632be92bdc6fd1f1654fe2830ebb0dad062ccad27b649a58d5",
+    "summary.json": "4aaca942d9cab166dad250dc87e8e88ffb0c74e6588ba476b4cb9b9052bf4a87",
+    "verdict.json": "2138a11fc6c3a0d27bce80ff497665670427e603fbb57dc8c186f09541bb59e9",
+    "liveness.json": "94a2d30eca5b49edf2781c5fbd10eba0759d09818917698777652e74414b76a8"
+  }
+}

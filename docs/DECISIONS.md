@@ -187,7 +187,7 @@ requested native preparation below does not revise this price. Config-bind
 YJIT stays on hold until its measurement
 method is accepted. [Pins, paired estimates, controls and backlog boundary](passes/yjit-regression.md#corrected-interpreter-pricing-stop-at-price).
 
-## Props native dispatch: witness and census before price (2026-10-21)
+## Props native dispatch: stop at price too (2026-10-21)
 
 Add `Lowrail::Native.plain_hash_iteration?` beside the optional actual-class
 primitive, **without production props integration**. It checks the actual
@@ -204,10 +204,26 @@ bind_call entries, four method comparisons and two class comparisons with
 two native predicate calls; outer admission remains. This is **not** a
 measured fraction of the old 30,483 Ir check cost. The undocumented MRI
 visibility API is feature-detected and version-witnessed, not a generic VM
-portability claim. No speed claim or new Callgrind cohort yet: request a
-separate finite interpreter price after the untimed gates and worker release.
-The old ordinary-def stop and invalid fallback cohort remain unchanged.
-[Boundary, refusals, census and reproduction](passes/props-native.md).
+portability claim.
+
+One finite interpreter cohort on
+[83bf0ba](https://github.com/thomasklemm/lowrail/commit/83bf0baa9c21d86955e31f626bbc466b60c41f9d)
+passes both A/A, all five heaps, brk, mode, source and positive liveness gates
+(20 authorizations/zero fallbacks in each checked arm). Ruby 4.0.7/Inertia
+3.22.0/pinned Valgrind 3.19 brk512; six rounds, seed 41231, N=1,000, at most
+two workers, no retries. Native split **still loses +1.383906% total Ir
+[1.360285, 1.409477]**, **+1.383817% GC-excluded [1.360197, 1.409653]**,
+despite 55→46 objects/resolve. Same-cohort checks fall from 30,982.589 to
+5,849.248 Ir [5,821.248, 5,897.248], **81.188% removed [80.810, 81.296]**,
+but available iteration saving is only 4,445.369 [4,393.471, 4,471.573]:
+**1.321176× [1.301877, 1.336813]** remaining check/saving ratio.
+
+**Stop the native shape at price as well. No retry, YJIT run, production
+integration or promotion.** Both worker slots are released. The old
+ordinary-def stop and invalid fallback cohort remain unchanged; no cross-
+cohort rescore or request saving. Attribute the remaining checks from the
+retained dumps/untimed census before proposing another candidate or asking
+for slots. [Boundary, both CIs, pins and sanitized export](passes/props-native.md).
 
 ## Relocatable delivery (2026-10-20)
 
