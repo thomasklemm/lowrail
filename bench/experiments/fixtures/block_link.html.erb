@@ -1,0 +1,29 @@
+<% observations[:before] = output_buffer; output_buffer.raw_buffer.replace("old") if mode == "buffer"; @tag_builder = ActionView::Helpers::TagHelper::TagBuilder.new(self) if mode == "foreign"; self.output_buffer = ActionView::StreamingBuffer.new { |chunk| log << ["stream", chunk] } if mode == "streaming" %>
+<%= link_to target, class: "literal" do %><%
+  log << "block"
+  case mode
+  when "raise" then raise "block failure"
+  when "throw" then throw :bench_exit, "thrown"
+  when "break" then break "broken"
+  when "return" then return "returned"
+  when "next" then next "next<&"
+  when "nil" then next nil
+  when "whitespace" then next " \t"
+  when "unsafe" then next "unsafe<&"
+  when "safe" then next "safe<&".html_safe
+  when "nested" then next capture { log << "nested"; safe_concat("nested<&") }
+  when "builder"
+    observations[:saved] = @tag_builder
+    @tag_builder = ActionView::Helpers::TagHelper::TagBuilder.new(self)
+  when "singleton"
+    observations[:saved] = @tag_builder
+    @tag_builder.define_singleton_method(:content_tag_string) { |*| log << "new saved method"; "new saved receiver".html_safe }
+  when "buffer"
+    replacement = ActionView::OutputBuffer.new("new")
+    self.output_buffer = replacement
+    replacement.safe_concat("+block")
+    observations[:replacement] = replacement
+    next replacement
+  end
+  safe_concat("héllo<&")
+%><% end %>

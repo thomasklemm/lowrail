@@ -51,6 +51,9 @@ module BlockLinkSpecimen
     end
 
     def template_enter(view, method_name, template, locals, buffer, strict)
+      # An external negative-control harness may retain an already-natural
+      # view. The admission registry never owns that reference or callback.
+      ::BlockLinkControls.observe(view) if defined?(::BlockLinkControls)
       previous = Thread.current[THREAD_TEMPLATE]
       entry = {previous: previous, view: view, reason: "not a selected template"}
       Thread.current[THREAD_TEMPLATE] = entry
