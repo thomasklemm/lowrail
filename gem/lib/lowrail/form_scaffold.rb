@@ -37,29 +37,10 @@ module Lowrail
       def activate
         return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production"
         require_relative "form_scaffold_inventory"
-        @data = @unit.fetch("data")
-        return decline("stale source inventory; rebuild") unless @data.fetch("sources").all? { |path, sha| Manifest.sha256_file(path) == sha }
-        problem = FormScaffoldInventory.check
-        return decline(problem) if String === problem
-        return decline("boot inventory changed; rebuild") unless problem == @data.fetch("inventory")
-        @site = @data.fetch("site")
-        code = FormScaffoldInventory.template(@site.fetch("source_location").first)
-        return decline("ERB compiler/config changed; rebuild") unless Digest::SHA256.hexdigest(code) == @site.fetch("handler_sha256")
-        require "objspace"
-        @holder = ObjectSpace.method(:internal_class_of)
-        @ivars = Object.instance_method(:instance_variable_get)
-        @view_class = ArticlesController.view_context_class
-        @article_class, @model_class = Article, Comment
-        @form_class = ActionView::Helpers::FormBuilder
-        @builder_class = ActionView::Helpers::TagHelper::TagBuilder
-        @buffer_class = ActionView::OutputBuffer
-        @table = ActionView::Helpers::TagHelper::PRE_CONTENT_STRINGS
-        @epoch = defined?(Lowrail::Seal) ? Lowrail::Seal::EPOCH : Sealed::EPOCH
-        @view_class.prepend(Variant) unless @view_class < Variant
-        @active = true
-        @refusal = nil
-        FormScaffoldInventory.release
-        true
+        # Keep the build audit and candidate guards, but never reproduce its
+        # controller/view/I18n/ERB effects in a real application. No variant is
+        # installed, so an uninstrumented original form is intentionally 0/0.
+        decline(FormScaffoldInventory.check(runtime: true))
       rescue StandardError, ScriptError => error
         decline("#{error.class}: #{error.message.lines.first&.strip}")
       end

@@ -39,11 +39,12 @@
     },
     "stats": {
       "type": "object", "additionalProperties": false,
-      "required": ["source", "binding", "unit_hits", "unit_fallbacks", "jit_modes", "refusals"],
+      "required": ["source", "binding", "unit_hits", "unit_fallbacks", "unit_refusals", "jit_modes", "refusals"],
       "properties": {
         "source": {"type": "string"},
         "binding": {"enum": ["current_manifest", "stale_manifest", "unbound_snapshot"]},
         "unit_hits": {"$ref": "#/$defs/count_map"}, "unit_fallbacks": {"$ref": "#/$defs/count_map"},
+        "unit_refusals": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
         "jit_modes": {"type": "array", "items": {"type": "object"}},
         "refusals": {"type": "array", "items": {"$ref": "#/$defs/reason"}}
       }
@@ -58,13 +59,14 @@
     },
     "unit": {
       "type": "object", "additionalProperties": false,
-      "required": ["id", "pass", "target", "kind", "certification_jit", "certified_facts", "certificates", "guards", "counts"],
+      "required": ["id", "pass", "target", "kind", "certification_jit", "certified_facts", "certificates", "guards", "activation_refusal", "counts"],
       "properties": {
         "id": {"$ref": "#/$defs/count"}, "pass": {"type": "string"}, "target": {"type": "string"},
         "kind": {"type": "string"}, "certification_jit": {"$ref": "#/$defs/nullable_string"},
         "certified_facts": {"type": "array", "items": {"type": "object"}},
         "certificates": {"type": "object", "description": "Unchanged pass-specific certificate payloads, not inferred type hints"},
         "guards": {"type": "array", "items": {"$ref": "#/$defs/guard"}},
+        "activation_refusal": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/reason"}], "description": "Current runtime policy, separate from build eligibility and historical stats"},
         "counts": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/counts"}]}
       }
     },

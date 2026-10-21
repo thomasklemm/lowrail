@@ -2,6 +2,21 @@
 use std::process::Command;
 
 #[test]
+fn verify_reports_activation_refusals_even_without_calls_or_hits() {
+    let app = std::env::temp_dir().join(format!("lowrail-verify-refusal-{}", std::process::id()));
+    std::fs::create_dir_all(&app).unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_lowrail"))
+        .args(["verify", app.to_str().unwrap(), "--", "sh", "-c", r#"
+          printf '%s' '{"tests":{"example":{"result":"pass"}},"unit_refusals":{"19":["passive activation unavailable"]}}' > "$LOWRAIL_OUTCOMES"
+        "#]).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    assert!(String::from_utf8_lossy(&result.stdout).contains("unit 19 activation refused: passive activation unavailable"));
+    let last: serde_json::Value = serde_json::from_slice(&std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
+    assert_eq!(last["report"]["on"]["unit_refusals"]["19"], serde_json::json!(["passive activation unavailable"]));
+    std::fs::remove_dir_all(app).unwrap();
+}
+
+#[test]
 fn verify_honors_command_seed_instead_of_overriding_it_through_rspec_options() {
     let app = std::env::temp_dir().join(format!("lowrail-verify-seed-{}", std::process::id()));
     std::fs::create_dir_all(&app).unwrap();

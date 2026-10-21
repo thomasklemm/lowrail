@@ -45,6 +45,7 @@ pub struct Statistics {
     pub binding: String,
     pub unit_hits: BTreeMap<String, u64>,
     pub unit_fallbacks: BTreeMap<String, u64>,
+    pub unit_refusals: BTreeMap<String, Vec<String>>,
     pub jit_modes: Vec<Value>,
     pub refusals: Vec<Reason>,
 }
@@ -65,6 +66,9 @@ pub struct Unit {
     pub certified_facts: Vec<Value>,
     pub certificates: BTreeMap<String, Value>,
     pub guards: Vec<Guard>,
+    /// Current runtime policy, not a rewriting of the build decision or
+    /// historical counters. Applies even when no stats were collected.
+    pub activation_refusal: Option<Reason>,
     pub counts: Option<Counts>,
 }
 
@@ -122,7 +126,10 @@ pub fn read(app: &Path, dir: Option<&Path>, stats: Option<&Path>, id: Option<u64
             certificates: u.as_object().ok_or("unit must be an object")?.iter()
                 .filter(|(k, _)| !["id", "pass", "target", "file", "kind", "sites", "facts"].contains(&k.as_str()))
                 .map(|(k, v)| (k.clone(), v.clone())).collect(),
-            guards: guards(u, &manifest), counts });
+            guards: guards(u, &manifest), activation_refusal: (name == "sealed/form_scaffold").then(|| Reason {
+                code: "effectful_form_certification".into(),
+                detail: "form certification requires runtime controller/view/I18n/ERB effects; passive activation unavailable; keep original".into(),
+            }), counts });
     }
     let mut sites = Vec::new();
     for row in rows.into_iter().flatten() {
@@ -233,6 +240,7 @@ fn read_stats(path: &Path, manifest: Option<&Value>) -> Result<Option<Statistics
     Ok(Some(Statistics { source: path.display().to_string(), binding: binding.into(),
         unit_hits: serde_json::from_value(run["unit_hits"].clone()).map_err(|e| format!("invalid unit_hits: {e}"))?,
         unit_fallbacks: serde_json::from_value(run["unit_fallbacks"].clone()).map_err(|e| format!("invalid unit_fallbacks: {e}"))?,
+        unit_refusals: serde_json::from_value(run.get("unit_refusals").cloned().unwrap_or_else(|| serde_json::json!({}))).map_err(|e| format!("invalid unit_refusals: {e}"))?,
         jit_modes: modes, refusals }))
 }
 
@@ -247,9 +255,11 @@ fn guards(unit: &Value, manifest: &Value) -> Vec<Guard> {
     }
     if unit["pass"] == "sealed/form_scaffold" {
         for (phase, requirement) in [
-            ("activation", "FormScaffold.activate: source SHA256 inventory, exact boot inventory and compiled ERB handler SHA256 must match data"),
-            ("call", "FormScaffold.valid?: main Ractor, active variant, seal epoch zero; original model/options/block site, exact view/model/builder/buffer holders, stock default form builder, English locale, persisted article and blank unpersisted error-free child; otherwise super"),
+            ("activation", "FormScaffold.activate: currently refuses; build-time inventory is retained, never replayed in the application"),
+            ("call", "Dormant candidate FormScaffold.valid?: main Ractor, active variant, seal epoch zero; original model/options/block site, exact view/model/builder/buffer holders, stock default form builder, English locale, persisted article and blank unpersisted error-free child; otherwise super. No variant is installed by the current runtime"),
         ] { result.push(Guard { phase: phase.into(), requirement: requirement.into() }); }
+    } else if unit["pass"] == "sealed/link_to" {
+        result.push(Guard { phase: "activation".into(), requirement: "Sealed.activate: objspace primitive, helper dependencies and cached controller view class must already exist; no runtime Materialize, require or view-class construction. Retry at natural request entry; exact source/body/visibility/delivery/literal-table guards remain".into() });
     } else if unit.as_object().is_some_and(|o| o.keys().any(|k| !["id", "kind", "pass", "target", "file", "sites", "facts"].contains(&k.as_str()))) {
         result.push(Guard { phase: "activation".into(), requirement: "Pass-specific runtime certificate and input checks apply; complete recorded payloads are in certificates, not advisory inferred types".into() });
     }
@@ -267,9 +277,13 @@ impl Report {
             out.push_str(&format!("recorded stats: {} [{}; not a live guard check]\n", s.source, s.binding));
             for mode in &s.jit_modes { out.push_str(&format!("  observed JIT: {mode}\n")); }
             for r in &s.refusals { out.push_str(&format!("  runtime refused [{}]: {}\n", r.code, r.detail)); }
+            for (id, reasons) in &s.unit_refusals {
+                for reason in reasons { out.push_str(&format!("  recorded unit {id} activation refused: {reason}\n")); }
+            }
         } else { out.push_str("stats: not recorded (unknown, not zero hits)\n"); }
         for u in &self.units {
             out.push_str(&format!("unit {}: lowered (build) {} {}\n", u.id, u.pass, u.target));
+            if let Some(r) = &u.activation_refusal { out.push_str(&format!("  current runtime policy refuses [{}]: {}\n", r.code, r.detail)); }
             for guard in &u.guards { out.push_str(&format!("  guard [{}]: {}\n", guard.phase, guard.requirement)); }
             for fact in &u.certified_facts { out.push_str(&format!("  certified fact: {fact}\n")); }
             for (name, payload) in &u.certificates { out.push_str(&format!("  certificate {name}: {} (complete payload in --json)\n", payload.as_object().map(|o| o.keys().cloned().collect::<Vec<_>>().join(", ")).unwrap_or_else(|| "recorded value".into()))); }

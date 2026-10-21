@@ -5,8 +5,9 @@ require_relative "manifest"
 require_relative "sealed"
 
 module Lowrail
-  # Build and activation use the same closed inventory. These are independent
-  # audited gem-source fingerprints, not hashes learned from an app's boot.
+  # Build-only closed inventory. Its synthetic schema, translation, view and
+  # compiler probes are not a passive observation of a running application.
+  # These are audited gem-source pins, not hashes learned from an app's boot.
   module FormScaffoldInventory
     STOCK = {
       "actionview" => "b7135e378dc024f779abcf81b6f002e4ffc840fd691a77ea8278803ceddd35fd",
@@ -19,7 +20,11 @@ module Lowrail
 
     module_function
 
-    def check
+    def check(runtime: false)
+      # The current certificate has no read-only witness for these synthetic
+      # probes. Do not try to produce one by executing them in the app. Until
+      # such a certificate exists, exact-or-refuse means the original form.
+      return "form certification requires runtime controller/view/I18n/ERB effects; passive activation unavailable; keep original" if runtime
       return "source inventory released; restart to recertify" if @released
       return "requires production Ruby 4.0.7 / Rails 8.1.4 blog" unless ENV["RAILS_ENV"] == "production" &&
         RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"

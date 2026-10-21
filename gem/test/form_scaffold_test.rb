@@ -64,140 +64,49 @@ class FormScaffoldTest < Minitest::Test
         out, err, status = Open3.capture3(build_env.merge("LOWRAIL_SEALED" => "1", "LOWRAIL_FORM_CHECK" => "1",
           "LOWRAIL_OUTCOMES" => File.join(dir, "form-outcomes")),
           RUBY, checker, app, output, observer, File.join(app, ".lowrail"))
-        assert status.success?, "#{out}\n#{err}"
-        assert_includes out, "192 isolated pairs identical"
+        # The observable comparisons still run, but the existing coverage gate
+        # must reject: passive form activation has not been certified.
+        refute status.success?, "must not claim form coverage: #{out}"
+        assert_includes err, "production form coverage missing"
+        off = JSON.parse(File.read(File.join(output, "off.json")))
         on = JSON.parse(File.read(File.join(output, "on.json")))
-        assert_operator on.fetch("form_hits"), :>, 0
+        assert_equal 192, on.fetch("responses").size
+        assert_equal off.fetch("responses"), on.fetch("responses")
+        assert_equal 0, on.fetch("form_hits")
         assert_equal 0, on.fetch("fallbacks").fetch(form.fetch("id").to_s, 0)
+        assert_includes on.fetch("refusals").fetch("Lowrail::FormScaffold"), "controller/view/I18n/ERB effects"
         if observer == "render_subscriber"
           assert on.fetch("responses").any? { _1.fetch("headers")["x-render-observer"] == "live" }
         end
       end
-      out, err, status = ruby("--disable-yjit", "--disable-zjit", File.expand_path("../../bench/pass_probe.rb", __dir__),
-        "GET:/articles/1", chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1",
-          "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "BENCH_JIT" => "0", "BENCH_UNITS" => form.fetch("id").to_s})
-      assert status.success?, "#{out}\n#{err}"
-      coverage = JSON.parse(out.lines.find { _1.start_with?("LOWRAIL_BENCH ") }.delete_prefix("LOWRAIL_BENCH "))
-      assert_equal [{"id" => form.fetch("id"), "pass" => "sealed/form_scaffold", "hits_per_request" => 1.0,
-        "fallbacks_per_request" => 0.0}], coverage.fetch("units")
-      retention = ruby_json(<<~'RUBY', chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
-        require "weakref"
-        require "lowrail/form_scaffold_inventory"
-        roots = []
-        # Test-only lifetime observer: nested tracing is suppressed while
-        # activation runs inside the initialize! completion TracePoint.
-        observer = Module.new do
-          define_method(:template) do |path|
-            source = super(path)
-            roots.replace(instance_variable_get(:@compiled).values.map { WeakRef.new(_1) })
-            source
-          end
-        end
-        Lowrail::FormScaffoldInventory.singleton_class.prepend(observer)
+      out, err, status = ruby("-e", <<~'RUBY', chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "LOWRAIL_DEBUG" => "1"})
         require "./config/application"
         Rails.application.config.yjit = false
         require "./config/environment"
-        raise "no source roots witnessed: #{Lowrail::FormScaffold.refusal}" if roots.empty?
-        3.times { GC.start(full_mark: true, immediate_sweep: true) }
-        raise "certification roots retained" if roots.any?(&:weakref_alive?)
         require "rack/mock"
         session = Rack::MockRequest.new(Rails.application)
-        request = -> {
-          response = session.get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
-          raise "HTTP #{response.status}" unless response.status == 200
-        }
-        id = Lowrail.manifest.units.find { _1["pass"] == "sealed/form_scaffold" }.fetch("id").to_s
-        counts = -> { [Lowrail::Stats.unit_hits.fetch(id, 0), Lowrail::Stats.unit_fallbacks.fetch(id, 0)] }
-        Lowrail::Stats.reset_counts!
-        50.times { request.call }
-        result = {requests: counts.call}
-        Lowrail::Sealed::EPOCH[0] = 1
-        request.call
-        result[:epoch] = counts.call
-        Lowrail::Sealed::EPOCH[0] = 0
-        Lowrail::Stats.reset_counts!
-        # A later public setup must refuse recertification, not silently
-        # reopen the source compiler after its boot-only roots were released.
+        2.times do
+          raise "request failed" unless session.get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on").status == 200
+        end
+        # Neither a natural render nor a later setup permits the effectful
+        # certificate to be replayed in the app's process.
         Lowrail.setup(root: Dir.pwd)
-        request.call
-        result[:later_setup] = counts.call
-        result[:refusal] = Lowrail::FormScaffold.refusal
-        puts JSON.generate(result)
+        puts JSON.generate(refusal: Lowrail::FormScaffold.refusal, stats: Lowrail::Stats.snapshot,
+          source_roots: Lowrail::FormScaffoldInventory.instance_variable_get(:@compiled),
+          variant: ArticlesController.view_context_class < Lowrail::FormScaffold::Variant)
       RUBY
-      assert_equal [50, 0], retention.fetch("requests")
-      assert_equal [50, 1], retention.fetch("epoch")
-      assert_equal [0, 1], retention.fetch("later_setup")
-      assert_includes retention.fetch("refusal"), "source inventory released"
-      out, err, status = ruby("--disable-yjit", "--disable-zjit", File.expand_path("../../bench/heap_operations.rb", __dir__),
-        "GET:/articles/1", chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1",
-          "LOWRAIL_SEALED" => "1", "BENCH_JIT" => "0", "BENCH_UNITS" => form.fetch("id").to_s, "BENCH_OPERATION_CHECK" => "1"})
       assert status.success?, "#{out}\n#{err}"
-      operations = JSON.parse(out.lines.find { _1.start_with?("LOWRAIL_BENCH ") }.delete_prefix("LOWRAIL_BENCH "))
-      assert operations.fetch("untimed")
-      assert_equal({form.fetch("id").to_s => {"invocations_per_iteration" => 1, "invocations_per_request" => 1,
-        "completed_hits_per_iteration" => 1, "completed_hits_per_request" => 1}}, operations.fetch("operations"))
-      replay = ruby_json(<<~'RUBY', chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
-        require "./config/application"
-        Rails.application.config.yjit = false
-        require "./config/environment"
-        require "rack/mock"
-        raise Lowrail::FormScaffold.refusal if Lowrail::FormScaffold.refusal
-        captured = nil
-        # Observe only this one ISeq, not a global tracing event. Capture the
-        # real ERB block; every replay below calls the public form_with API.
-        trace = TracePoint.new(:call) do |event|
-          captured = [event.self, event.binding.local_variable_get(:model), event.binding.local_variable_get(:block)]
-          trace.disable
-        end
-        trace.enable(target: Lowrail::FormScaffold::Variant.instance_method(:form_with)) do
-          Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
-        end
-        view, models, block = captured
-        original = view.method(:form_with).super_method
-        id = Lowrail.manifest.units.find { _1["pass"] == "sealed/form_scaffold" }.fetch("id").to_s
-        counts = -> { [Lowrail::Stats.unit_hits.fetch(id, 0), Lowrail::Stats.unit_fallbacks.fetch(id, 0)] }
-        normalize = ->(html) { html.gsub(/(name="authenticity_token" value=")[^"]+/, '\\1MASK') }
-        check = ->(model) do
-          before = counts.call
-          left = original.call(model: [models.first, model], class: "space-y-4", &block)
-          right = view.form_with(model: [models.first, model], class: "space-y-4", &block)
-          raise "form output/safety differs" unless normalize.call(left) == normalize.call(right) && left.html_safe? == right.html_safe? && left.encoding == right.encoding
-          [left, right].each do |html|
-            token = html[/name="authenticity_token" value="([^"]+)"/, 1] or raise "token missing"
-            decoded = view.controller.send(:unmask_token, view.controller.send(:decode_csrf_token, token))
-            action = html[/action="([^"]+)"/, 1]
-            verb = html[/name="_method" value="([^"]+)"/, 1] || "post"
-            expected = view.controller.send(:per_form_csrf_token, view.session, URI.parse(action).path, verb)
-            raise "token not valid for emitted form" unless ActiveSupport::SecurityUtils.fixed_length_secure_compare(decoded, expected)
-          end
-          counts.call.zip(before).map { _1 - _2 }
-        end
-        result = {blank: check.call(Comment.new)}
-        result[:nonblank] = check.call(Comment.new(commenter: "<& Ω", body: "not blank"))
-        errors = Comment.new
-        errors.errors.add(:body, "not accepted")
-        result[:errors] = check.call(errors)
-        singleton = Comment.new
-        singleton.define_singleton_method(:body) { "singleton" }
-        result[:singleton] = check.call(singleton)
-        result[:persisted] = check.call(Comment.first!)
-        view.instance_variable_set(:@_default_form_builder, Class.new(ActionView::Helpers::FormBuilder))
-        result[:builder] = check.call(Comment.new)
-        view.instance_variable_set(:@_default_form_builder, nil)
-        I18n.available_locales |= [:fr]
-        I18n.with_locale(:fr) { result[:locale] = check.call(Comment.new) }
-        Lowrail::Sealed::EPOCH[0] = 1
-        result[:deopt] = check.call(Comment.new)
-        Lowrail::Sealed::EPOCH[0] = 0
-        table = ActionView::Helpers::TagHelper::PRE_CONTENT_STRINGS
-        saved = table.dup
-        table[:label], table["label"], table["textarea"] = "SYMBOL", "WRONG", "TEXTAREA"
-        result[:live_table] = check.call(Comment.new)
-        table.replace(saved)
-        puts JSON.generate(result)
-      RUBY
-      assert_equal({"blank" => [1, 0], "nonblank" => [0, 1], "errors" => [0, 1], "singleton" => [0, 1],
-        "persisted" => [0, 1], "builder" => [0, 1], "locale" => [0, 1], "deopt" => [0, 1], "live_table" => [1, 0]}, replay)
+      assert_includes err, "sealed form refused: form certification requires runtime controller/view/I18n/ERB effects"
+      refusal = JSON.parse(out.lines.last)
+      assert_includes refusal.fetch("refusal"), "controller/view/I18n/ERB effects"
+      assert_equal [refusal.fetch("refusal")], refusal.fetch("stats").fetch("unit_refusals").fetch(form.fetch("id").to_s)
+      assert_nil refusal.fetch("source_roots")
+      refute refusal.fetch("variant")
+      out, err, status = Open3.capture3(bin, "explain", app, "--unit", form.fetch("id").to_s, "--json")
+      assert status.success?, "#{out}\n#{err}"
+      policy = JSON.parse(out).fetch("units").first.fetch("activation_refusal")
+      assert_equal "effectful_form_certification", policy.fetch("code")
+      assert_equal refusal.fetch("refusal"), policy.fetch("detail"), "CLI/doctor/MCP policy must agree with actual activation"
       # rails new derives the namespace from the destination basename; a
       # copied corpus need not have the namespace of its current directory.
       application = File.join(app, "config/application.rb")
@@ -218,14 +127,16 @@ class FormScaffoldTest < Minitest::Test
         puts JSON.generate(application: Rails.application.class.name, status: response.status,
           hits: Lowrail::Stats.unit_hits.fetch(id, 0), fallbacks: Lowrail::Stats.unit_fallbacks.fetch(id, 0))
       RUBY
-      assert_equal({"application" => "RenamedFormFixture::Application", "status" => 200, "hits" => 1, "fallbacks" => 0}, renamed_result)
+      assert_equal({"application" => "RenamedFormFixture::Application", "status" => 200, "hits" => 0, "fallbacks" => 0}, renamed_result)
       output = File.join(dir, "renamed")
       out, err, status = Open3.capture3(build_env.merge("LOWRAIL_SEALED" => "1", "LOWRAIL_FORM_CHECK" => "1"),
         RUBY, checker, app, output, "none", File.join(app, ".lowrail"))
-      assert status.success?, "#{out}\n#{err}\n#{Dir[File.join(output, '*.log')].map { File.read(_1) }.join("\n")}"
-      assert_includes out, "192 isolated pairs identical"
+      refute status.success?, "must not claim renamed form coverage: #{out}"
+      assert_includes err, "production form coverage missing"
       renamed_on = JSON.parse(File.read(File.join(output, "on.json")))
-      assert_operator renamed_on.fetch("form_hits"), :>, 0
+      assert_equal JSON.parse(File.read(File.join(output, "off.json"))).fetch("responses"), renamed_on.fetch("responses")
+      assert_equal 192, renamed_on.fetch("responses").size
+      assert_equal 0, renamed_on.fetch("form_hits")
       assert_equal 0, renamed_on.fetch("fallbacks").fetch(renamed_form.fetch("id").to_s, 0)
       # Off-only reproduction must still check the certified identity, even
       # though Lowrail itself is not loaded in this worker.

@@ -21,6 +21,27 @@ module BlogProduction
   ].freeze
   DATABASES = %w[production production_cache production_queue production_cable].freeze
 
+  # Untimed cold-activation witness, shared by all workers. Observe actual
+  # executions, including callbacks registered after boot; do not replay hooks.
+  module ColdHooks
+    def with_execution_control(name, block, once)
+      super do
+        path, line = block.source_location
+        unless path&.start_with?(File.join(ROOT, "gem/lib/lowrail"))
+          BlogProduction.cold_hooks << [name.to_s, path, line]
+        end
+        yield
+      end
+    end
+  end
+
+  def self.cold_hooks = @cold_hooks ||= []
+
+  def self.cold_features
+    {"api_loaded" => !!Lowrail.loaded_constant("ActionController::API"),
+      "objspace" => $LOADED_FEATURES.grep(%r{/(?:objspace\.rb|objspace\.(?:so|bundle))\z})}
+  end
+
   # Event names/order and these scalar payload fields only, not full arbitrary
   # subscriber payload equivalence (request objects, durations, allocations).
   class AppEvents
@@ -102,7 +123,11 @@ module BlogProduction
     require "lowrail/verify_loads"
     Lowrail::VerifyLoads.install
     require File.expand_path("config/application")
-    events, errors = [], []
+    events, boot_events, errors = [], [], []
+    callbacks = []
+    ActiveSupport::LazyLoadHooks.prepend(ColdHooks)
+    ActiveSupport.on_load(:before_eager_load, yield: true) { |app| callbacks << ["early_eager", app.class.name] }
+    ActiveSupport.on_load(:action_controller) { callbacks << ["early_controller", name] }
     app_events = AppEvents.new
     ActiveSupport::Notifications.subscribe(/\.(?:action_controller|action_view)\z/, app_events)
     request_thread = nil
@@ -110,12 +135,12 @@ module BlogProduction
     # Rails has already computed this exact array for the adapter. Do not call
     # value_for_database again, or evaluate the lazy Proc used by cached SQL.
     ActiveSupport::Notifications.subscribe("sql.active_record") do |*args|
-      next unless request_thread
       payload = args.last
       begin
         binds = payload[:type_casted_binds]
         raise "unavailable adapter bind values (#{binds.class})" unless Array === binds
-        events << {"sql" => value(payload.fetch(:sql)), "binds" => value(binds),
+        (request_thread ? events : boot_events) << {"sql" => value(payload.fetch(:sql)), "binds" => value(binds),
+          "database" => payload[:connection]&.pool&.db_config&.name,
           "name" => value(payload[:name]), "cached" => !!payload[:cached],
           "row_count" => payload[:row_count], "affected_rows" => payload[:affected_rows],
           "thread" => Thread.current.equal?(request_thread) ? "request" : "other"}
@@ -147,6 +172,9 @@ module BlogProduction
       return
     end
     require "rack/mock"
+    ActiveSupport.on_load(:before_eager_load, yield: true) { |app| callbacks << ["late_eager", app.class.name] }
+    ActiveSupport.on_load(:action_controller) { callbacks << ["late_controller", name] }
+    cold_witness = {"hooks" => cold_hooks.dup, "callbacks" => callbacks.dup, "features" => cold_features}
     Lowrail::VerifyLoads.capture("cold_boot")
     initial = effects
     responses = SCENARIOS.map do |scenario|
@@ -175,6 +203,8 @@ module BlogProduction
     end
     form = Lowrail.loaded_constant("Lowrail::FormScaffold")
     File.write(destination, JSON.pretty_generate({"initial_effects" => initial, "scenarios" => responses,
+      "boot_sql" => boot_events, "cold_witness" => cold_witness.merge("after_requests" => cold_features),
+      "unit_refusals" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.snapshot.fetch("unit_refusals") : {},
       "loads" => Lowrail::VerifyLoads.snapshot.fetch("stages"), "features" => $LOADED_FEATURES.reject { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) },
       "entropy_seed" => entropy_seed && Integer(entropy_seed), "entropy_control" => control,
       "jit" => Lowrail.jit_status, "refusals" => refusals.merge("artifact" => Lowrail.refusal_reason,
@@ -189,7 +219,7 @@ module BlogProduction
     differences = %w[off_control off_on].zip([runs[1], runs[2]]).to_h do |label, other|
       baseline = runs.fetch(0)
       mismatches = []
-      %w[initial_effects loads features].each { mismatches << _1 unless baseline.fetch(_1) == other.fetch(_1) }
+      %w[initial_effects loads features boot_sql cold_witness].each { mismatches << _1 unless baseline.fetch(_1) == other.fetch(_1) }
       baseline.fetch("scenarios").zip(other.fetch("scenarios")).each do |left, right|
         %w[response sql effects events entropy_trace].each do |field|
           mismatches << "#{left.fetch('id')}:#{field}" unless left.fetch(field) == right.fetch(field)
@@ -225,7 +255,7 @@ module BlogProduction
     end
   end
 
-  def self.run(source, output, entropy_companions: false)
+  def self.run(source, output, entropy_companions: false, cli: File.join(ROOT, "target/release/lowrail"))
     source = File.realpath(source)
     output = File.expand_path(output)
     raise "output must be new and outside the source app" if File.exist?(output) || output.start_with?(source + "/")
@@ -252,8 +282,8 @@ module BlogProduction
     worker.call("prepare", "prepare", "0")
     seed = File.join(output, "seed")
     FileUtils.cp_r(File.join(app, "storage"), seed)
-    execute.call("build", [File.join(ROOT, "target/release/lowrail"), "build", app, "--env", "production", "--sealed", "--jit", "yjit"], "LOWRAIL" => "0", "RUBYOPT" => nil)
-    execute.call("explain", [File.join(ROOT, "target/release/lowrail"), "explain", app, "--json"], "LOWRAIL" => "0", "RUBYOPT" => nil)
+    execute.call("build", [cli, "build", app, "--env", "production", "--sealed", "--jit", "yjit"], "LOWRAIL" => "0", "RUBYOPT" => nil)
+    execute.call("explain", [cli, "explain", app, "--json"], "LOWRAIL" => "0", "RUBYOPT" => nil)
     sequence = ->(prefix, companion_seed = nil) do
       %w[off1 off2 on].map do |arm|
         label = "#{prefix}#{arm}"

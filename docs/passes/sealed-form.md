@@ -1,5 +1,13 @@
 # Sealed new-comment form scaffold
 
+**Current runtime status: refused, pending passive activation.** The build-time
+certificate/audit remains, but reproducing its controller/view/I18n/ERB probes
+inside the app changes cold behavior. Current production runtime refuses with
+that explicit reason and installs no form variant. The accepted measurements
+below belong to their pinned historical runtimes; they are **not rescored or
+deleted**, and are not a claim that today's artifact can activate. See the
+[cold witness and coverage losses](../sealed-verification.md#current-runtime-passive-admission-or-explicit-refusal).
+
 **Latest accepted interpreter request saving: −14.457% [−14.474, −14.410].**
 The new budget-plus-request run uses **8.750826 → 7.485376 M Ir/request**,
 with **`measurement_complete:true`** and no unmodeled units. The earlier

@@ -62,17 +62,19 @@ module Lowrail
         return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production"
         return decline("unsupported Ruby/Rails") unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
         return decline("application class differs from certificate") unless Rails.application.class.name == @data.fetch("application_class")
-        require "objspace"
-        return decline("actual-holder primitive unavailable") unless ObjectSpace.respond_to?(:internal_class_of)
-        require_relative "materialize"
-        errors = []
-        Materialize.run(app_root: Rails.root.to_s, measure: false, record: ->(where, error) { errors << where })
-        return decline("incomplete materialization") unless errors.empty?
+        # Certification may prepare a disposable build process. Admission may
+        # only observe the real app: even requiring objspace or repeating an
+        # eager-load hook changes the app's cold execution.
+        return decline("actual-holder primitive not already loaded; keep original") unless ObjectSpace.respond_to?(:internal_class_of)
+        dependencies = ["ActionView::Helpers::TagHelper::TagBuilder", "ActionView::Helpers::TagHelper::TAG_TYPES",
+          "String::BLANK_RE", "ERB::Util::SAFE_XML_TAG_NAME_REGEXP", *@data.fetch("primitive_methods").map { _1.fetch("holder") }]
+        return decline("helper dependencies not already loaded; keep original") unless dependencies.all? { Lowrail.loaded_constant(_1) }
         return decline("stale sources") unless @data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha }
         return decline("cold factory/entry delivery missing") unless @data.fetch("delivery").keys.all? { Loader.served?(_1) }
         controller = Lowrail.loaded_constant(@data.fetch("controller"))
         return decline("controller missing") unless controller
-        @view_class = controller.view_context_class
+        @view_class = controller.instance_variable_get(:@view_context_class)
+        return decline("view context class not already materialized; keep original") unless @view_class
         @data.fetch("view_methods").each do |name, expected|
           actual = @view_class.instance_method(name)
           return decline("view method #{name}") unless signature(actual) == expected.fetch("signature") &&
@@ -118,7 +120,12 @@ module Lowrail
       # Authorization stays behind this seam so a future trusted VM provider
       # can replace test certification without regenerating template bodies.
       def request_allowed?
-        Ractor.current.equal?(Ractor.main) && ACTIVE[0] && @epoch[0].zero?
+        return false unless Ractor.current.equal?(Ractor.main) && @data
+        # A dependency may become available through the app's own requires
+        # after initialize!. Retry at the existing request entry, without
+        # forcing any loading or warming an application cache.
+        activate unless ACTIVE[0]
+        ACTIVE[0] && @epoch[0].zero?
       end
 
       def view?(view)

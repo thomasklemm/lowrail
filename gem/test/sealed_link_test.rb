@@ -137,6 +137,24 @@ class SealedLinkTest < Minitest::Test
       %w[status body conversions events metadata].each { assert_equal off[_1], sealed[_1], "renamed: #{_1}" }
       assert_equal 1, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
       assert_equal 0, sealed.fetch("fallbacks").fetch(link_unit, 0)
+      deferred = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
+        require "./config/environment"
+        require "objspace" # App-owned dependency, not Lowrail activation.
+        ArticlesController.instance_variable_set(:@view_context_class, nil)
+        features = $LOADED_FEATURES.dup
+        Lowrail::Sealed.activate
+        refused = {reason: Lowrail::Sealed.refusal, active: Lowrail::Sealed::ACTIVE[0],
+          view_class: ArticlesController.instance_variable_get(:@view_context_class), features: $LOADED_FEATURES == features}
+        # The app's own normal entry point supplies the missing cache. Only
+        # then may passive admission authorize the unchanged certificate.
+        ArticlesController.view_context_class
+        allowed = Lowrail::Sealed.request_allowed?
+        puts JSON.generate(refused: refused, allowed: allowed, reason: Lowrail::Sealed.refusal)
+      RUBY
+      assert_equal({"reason" => "view context class not already materialized; keep original", "active" => false,
+        "view_class" => nil, "features" => true}, deferred.fetch("refused"))
+      assert_equal true, deferred.fetch("allowed")
+      assert_nil deferred.fetch("reason")
       ["WrongCertificate::Application", nil].each do |name|
         changed = JSON.parse(certified)
         data = changed.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("sealed")

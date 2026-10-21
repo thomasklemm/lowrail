@@ -71,6 +71,7 @@ module Lowrail
         stats = defined?(Stats) && Stats.enabled? ? Stats.snapshot : { "unit_hits" => {}, "unit_fallbacks" => {} }
         data = { "pid" => Process.pid, "ppid" => Process.ppid, "tests" => tests, "ruby" => RUBY_DESCRIPTION,
           "unit_hits" => stats["unit_hits"], "unit_fallbacks" => stats["unit_fallbacks"],
+          "unit_refusals" => stats.fetch("unit_refusals", {}),
           "jit_modes" => [Lowrail.jit_status.merge("pid" => Process.pid)],
           "sql" => SqlTrace.snapshot }
         data["jit_diagnostics"] = [JitDiagnostics.snapshot] if defined?(JitDiagnostics)
@@ -141,7 +142,7 @@ module Lowrail
     def self.write_report(path, tests)
       own = file_data(tests)
       Lowrail.write_json("#{path}.#{Process.pid}", own)
-      merged = { "tests" => {}, "unit_hits" => Hash.new(0), "unit_fallbacks" => Hash.new(0), "sql" => {}, "processes" => [] }
+      merged = { "tests" => {}, "unit_hits" => Hash.new(0), "unit_fallbacks" => Hash.new(0), "unit_refusals" => {}, "sql" => {}, "processes" => [] }
       children = Dir.glob("#{path}.*").filter_map do |f|
         next unless f.match?(/\.\d+\z/) && f != "#{path}.#{Process.pid}"
         data = read_json(f)
@@ -152,6 +153,7 @@ module Lowrail
         merged["sql"].merge!(data["sql"] || {})
         data["unit_hits"]&.each { |id, n| merged["unit_hits"][id] += n }
         data["unit_fallbacks"]&.each { |id, n| merged["unit_fallbacks"][id] += n }
+        data["unit_refusals"]&.each { |id, reasons| merged["unit_refusals"][id] = (merged["unit_refusals"].fetch(id, []) | reasons) }
         merged["processes"] << data["pid"]
         (merged["ruby_descriptions"] ||= []) << data["ruby"] if data["ruby"]
         (merged["jit_modes"] ||= []).concat(data["jit_modes"]) if data["jit_modes"]

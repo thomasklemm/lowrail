@@ -100,6 +100,16 @@ module Lowrail
         data = { "pid" => Process.pid, "ppid" => Process.ppid, "unit_hits" => unit_hits,
           "unit_fallbacks" => unit_fallbacks, "loaded_files" => loaded_files,
           "jit_mode" => Lowrail.jit_status }
+        # A refused installer may never put a guard in the app's call path.
+        # Its intentional 0/0 is not evidence of successful activation.
+        data["unit_refusals"] = {}
+        {"sealed/link_to" => "Lowrail::Sealed", "sealed/form_scaffold" => "Lowrail::FormScaffold"}.each do |pass, name|
+          runtime = Lowrail.loaded_constant(name)
+          next unless runtime&.refusal
+          Lowrail.manifest.units.select { _1["pass"] == pass }.each do |unit|
+            data["unit_refusals"][unit.fetch("id").to_s] = [runtime.refusal]
+          end
+        end if Lowrail.manifest
         data["refusal_reason"] = Lowrail.refusal_reason if Lowrail.refusal_reason
         data
       end

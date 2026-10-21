@@ -284,5 +284,6 @@ File.write(destination, JSON.generate({responses: responses, endpoint_hits: endp
   form_hits: defined?(Lowrail::Stats) && Lowrail.manifest ? Lowrail.manifest.units.select { _1["pass"] == "sealed/form_scaffold" }.sum { Lowrail::Stats.unit_hits.fetch(_1.fetch("id").to_s, 0) } : 0,
   specimen_hits: specimen ? specimen.hits : 0,
   specimen_fallbacks: specimen.respond_to?(:fallbacks) ? specimen.fallbacks : 0,
+  refusals: %w[Lowrail::Sealed Lowrail::FormScaffold].to_h { |name| [name, defined?(Lowrail) && Lowrail.loaded_constant(name)&.refusal] },
   hits: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {},
   fallbacks: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_fallbacks : {}}))

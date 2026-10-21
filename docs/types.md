@@ -384,6 +384,16 @@ manifest's authoritative **`certification_jit`**. Guards distinguish admission,
 the sealed contract, activation and call-time checks; they are descriptions,
 not a new certification engine.
 
+`activation_refusal` is the **current runtime policy**, separate from that
+historical build decision and its counters. The form certificate remains
+build-eligible but currently refuses production activation because its
+controller/view/I18n/ERB recertification would change app behavior. This reason
+is shown even without stats, in CLI, doctor and MCP. Recorded stats also retain
+`unit_refusals` by unit ID (including intentional 0/0 with no installed variant);
+stale/unbound stats are still labeled, not attributed as current activation.
+Link admission requires app-owned objspace loading and an already-cached view
+class; it never materializes either. See [the readiness fix](sealed-verification.md#current-runtime-passive-admission-or-explicit-refusal).
+
 Site states describe the **build**, not whether the running app activated it:
 
 - `lowered`: a lowered ledger site maps to an emitted manifest unit.

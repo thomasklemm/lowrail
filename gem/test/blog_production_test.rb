@@ -4,8 +4,53 @@ require_relative "test_helper"
 require_relative "../../fixtures/corpus/blog_production"
 
 class BlogProductionTest < Minitest::Test
+  include LowrailTest
+
+  def test_cold_sealed_admission_does_not_prepare_the_app
+    skip "sealed blog cold witness requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
+    source = File.join(CORPUS_ROOT, "real-blog-r4")
+    missing_prerequisite "no #{source} (see script/corpus)" unless File.file?(File.join(source, "config/environment.rb"))
+    realpath_tmpdir do |dir|
+      output = File.join(dir, "cold")
+      capture_io { BlogProduction.run(source, output, entropy_companions: true, cli: lowrail_cli) }
+      report = JSON.parse(File.read(File.join(output, "report.json")))
+      assert_equal "rejected_off_control", report.fetch("raw_status"), "raw entropy rejection is retained"
+      report.fetch("entropy_companions").each do |companion|
+        records = companion.fetch("workers").map { JSON.parse(File.read(File.join(output, _1))) }
+        baseline = records.first
+        records.each do |record|
+          assert_empty record.fetch("errors")
+          assert_empty record.fetch("boot_sql"), "no primary/cache/queue/cable probes before the app's requests"
+          assert_equal baseline.fetch("cold_witness"), record.fetch("cold_witness")
+          assert_equal({"api_loaded" => false, "objspace" => []}, record.fetch("cold_witness").fetch("features"))
+          assert_equal record.fetch("cold_witness").fetch("features"), record.fetch("cold_witness").fetch("after_requests")
+          assert_equal %w[early_controller early_eager late_eager late_controller].sort,
+            record.fetch("cold_witness").fetch("callbacks").map(&:first).sort
+          assert_equal [14, 2], record.fetch("scenarios").map { _1.fetch("sql").size }
+          assert_equal [200, 200], record.fetch("scenarios").map { _1.fetch("response").fetch("status") }
+          assert record.fetch("scenarios").flat_map { _1.fetch("sql") }.all? { _1.fetch("database") == "primary" }
+          baseline.fetch("scenarios").zip(record.fetch("scenarios")).each do |off, other|
+            %w[response sql effects events].each { |field| assert_equal off.fetch(field), other.fetch(field), field }
+          end
+        end
+        on = records.last
+        %w[Lowrail::Sealed Lowrail::FormScaffold].each { |name| refute_nil on.fetch("refusals").fetch(name) }
+        form = report.fetch("units").find { _1.fetch("pass") == "sealed/form_scaffold" }
+        link = report.fetch("units").find { _1.fetch("pass") == "sealed/link_to" }
+        [form, link].each do |unit|
+          refute_nil unit, "build-time certification remains intact"
+          id = unit.fetch("id").to_s
+          assert on.fetch("scenarios").all? { _1.fetch("hits").fetch(id, 0).zero? && _1.fetch("fallbacks").fetch(id, 0).zero? }
+          refute_empty on.fetch("unit_refusals").fetch(id)
+        end
+      end
+      assert_equal 2, report.fetch("entropy_companions").size, "both declared seeds must run"
+    end
+  end
+
   def runs
     baseline = {"initial_effects" => {"articles" => [1, 2], "jobs" => []},
+      "boot_sql" => [], "cold_witness" => {"hooks" => ["before_eager_load"], "features" => {"api_loaded" => false, "objspace" => []}},
       "loads" => {"cold_boot" => {"load_events" => ["0 load Article", "1 hook active_record"]}},
       "features" => ["article.rb", "comment.rb"], "errors" => [],
       "scenarios" => BlogProduction::SCENARIOS.map { |scenario| {
@@ -28,6 +73,9 @@ class BlogProductionTest < Minitest::Test
       "effects" => ->(run) { run.fetch("scenarios").first.fetch("effects")["jobs"] = ["duplicate broadcast"] },
       "sql_order" => ->(run) { run.fetch("scenarios").first.fetch("sql").reverse! },
       "events" => ->(run) { run.fetch("scenarios").first.fetch("events").reverse! },
+      "boot_sql" => ->(run) { run.fetch("boot_sql") << {"database" => "queue", "sql" => "SELECT sqlite_version(*)"} },
+      "cold_hook" => ->(run) { run.fetch("cold_witness").fetch("hooks") << "before_eager_load" },
+      "cold_feature" => ->(run) { run.fetch("cold_witness").fetch("features")["api_loaded"] = true },
       "loads" => ->(run) { run.fetch("loads").fetch("cold_boot")["load_events"] = ["0 hook active_record", "1 load Article"] }
     }
     changes.each do |field, change|

@@ -125,6 +125,7 @@ pub struct Run {
     /// Guard false: the original code ran. Not a failure, but a unit that only
     /// falls back is a pass that does nothing (often a guard bug).
     pub unit_fallbacks: BTreeMap<String, u64>,
+    pub unit_refusals: BTreeMap<String, BTreeSet<String>>,
     /// Per-test SQL trace digest and event count (gem/lib/lowrail/sql_trace.rb).
     pub sql: BTreeMap<String, (String, u64)>,
     /// Digest of queries from other threads (advisory: interleaving varies).
@@ -302,6 +303,9 @@ impl Report {
         for (u, n) in &self.on.unit_fallbacks {
             let only = if self.on.unit_hits.contains_key(u) { "" } else { " (never took the fast path)" };
             s.push_str(&format!("\n  unit {u}: {n}{only}"));
+        }
+        for (unit, reasons) in &self.on.unit_refusals {
+            for reason in reasons { s.push_str(&format!("\nunit {unit} activation refused: {reason}")); }
         }
         for ruby in self.off.ruby_descriptions.union(&self.on.ruby_descriptions) {
             s.push_str(&format!("\nRuby: {ruby}"));
@@ -667,6 +671,13 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         if let Some(falls) = data["unit_fallbacks"].as_object() {
             for (k, v) in falls {
                 *run.unit_fallbacks.entry(k.clone()).or_default() += v.as_u64().unwrap_or(0);
+            }
+        }
+        if let Some(refusals) = data["unit_refusals"].as_object() {
+            for (id, reasons) in refusals {
+                for reason in reasons.as_array().into_iter().flatten().filter_map(Value::as_str) {
+                    run.unit_refusals.entry(id.clone()).or_default().insert(reason.into());
+                }
             }
         }
     }

@@ -8,6 +8,121 @@ Use captured replay where it is faithful, adapters where the suite depends
 on process-local test machinery, and an explicit uncovered ledger everywhere
 else. Do not admit a production artifact into `RAILS_ENV=test` to get hits.
 
+## Current runtime: passive admission or explicit refusal
+
+The cold findings below exposed a correctness bug, not a fair-comparison
+artifact. Runtime `Sealed.activate` used `Materialize.run`: on performed **81
+boot SQL reads** (primary 15, cache 6, queue 54, cable 6), repeated eager-load
+hooks, forced `ActionController::API`, and required objspace. The separate form
+audit also generated attributes, constructed a controller/view, looked up I18n
+translations and compiled ERB. None of that belongs in runtime admission.
+Build-time materialization and the stock form audit remain unchanged.
+
+Runtime link admission now only reads already-loaded dependencies and the
+controller's cached view class. It never requires objspace, invokes eager-load
+hooks or constructs that cache. The existing request entry can retry after
+the **app itself** supplies prerequisites; all source/body/visibility/delivery/
+literal-state guards still apply. A missing prerequisite is a visible refusal.
+
+The current form certificate has no passive equivalent for its synthetic
+probes. It is therefore **not activatable in production**, even after a
+natural form render. `FormScaffold.activate` and runtime inventory checks
+refuse with: **"form certification requires runtime controller/view/I18n/ERB
+effects; passive activation unavailable; keep original"**. No helper variant
+is installed. A form's intentional 0 hits / 0 fallbacks is a **coverage
+rejection**, not an activation or support claim. Build eligibility and its
+renamed-app/custom-builder tests remain intact; this is not a weakened audit.
+
+`LOWRAIL_DEBUG=1` shows activation refusals in the diagnostic log. Stats and
+Minitest/RSpec outcome reports also retain `unit_refusals`, including a refused
+installer that never put a counting guard into the app. `lowrail explain`,
+doctor and both MCP explain tools show the form's current `activation_refusal`
+even without stats. Historical build decisions/counters stay historical.
+
+### Bounded readiness recheck
+
+Fresh production/YJIT build on base
+[`88506d9`](https://github.com/thomasklemm/lowrail/commit/88506d9b10a5177fee768b64fa6f02440e7f0d47)
+plus this fix; private evidence `.lowrail/private/blog-production-readiness/`.
+Run the same raw off/off/on sequence and both declared entropy companions
+(seeds 0 and 1), sequentially restoring the same four databases. No measurements,
+exclusions, prepared-Materialize companion or new support/certification claim.
+
+| Observation | Before | After, off1 / off2 / on |
+|---|---|---|
+| Boot SQL, primary/cache/queue/cable | off 0; on 15/6/54/6 | **0/0/0/0 in every worker** |
+| Cold index / show SQL | index 14/14/3; show 2/2/2 | **index 14/14/14; show 2/2/2**, primary only; exact text/binds/order |
+| Hooks / features | 12 extra cold hooks, API and objspace on only | **identical hook execution sequence**; API absent and objspace unloaded before/after both GETs |
+| Early and post-boot app-style callbacks | before_eager_load repeated; controller Base + API on | each registration executes **once**, controller Base only, including late registrations |
+| Raw unpinned gate | rejected_off_control | **rejected_off_control**, unchanged: both response comparisons contain natural entropy |
+| Declared seed 0 and 1 comparisons | rejected cold SQL/loads | **exact agreement for these two GETs** in responses/all headers, SQL/binds, effects, captured events, entropy trace, loads/features and cold witness; no capture errors |
+
+All 18 scenario assertions pass, but this is **not sealed form/link coverage**:
+
+| Unit | Before index hits/fallbacks; show hits/fallbacks | After |
+|---|---|---|
+| 18 sealed/link_to | 5/0; 2/0 | **0/0; 0/0**, objspace not already loaded |
+| 19 sealed/form_scaffold | 0/0; 1/0 | **0/0; 0/0**, explicit effectful-certificate refusal |
+| 0 preload plan | 1/1; 0/0 | unchanged |
+| 1 Article instantiate | 2/0; 1/0 | unchanged |
+| 2 Comment instantiate | 2/0; 1/0 | unchanged |
+
+The comparator still rejects altered bodies/headers, SQL/binds/order, effects,
+events and loads; it now additionally compares boot SQL by database and the
+cold hook/feature witness. The minimum off/off control is retained. The same
+19 ordinary and two system test IDs listed below remain uncovered.
+
+### Coverage rejection, including the larger controls
+
+The interpreter form checker still compares all **192 pairs** for both `none`
+and `render_subscriber`. Both remain exactly equal in their recorded response,
+SQL, event, assignment and model-state fields, but the unchanged coverage gate
+now exits 1: **`production form coverage missing`**. Historical form hits were
+**105 per control → 0**, with zero form fallbacks. Link is also 0/0 because
+objspace was not app-loaded; a historical aggregate link count for these
+controls was not retained, so no before-count is inferred. Other current
+hits are preload 45, Article 261, Comment 171; preload falls back 47 times.
+Private evidence: `.lowrail/private/blog-form-readiness/`. These are coverage
+rejections, not successful sealed-form verification.
+
+The public link regression retains **1 hit / 0 fallbacks** in both its
+original and renamed application when the app explicitly loads objspace and
+its cached view class exists. Removing that cache gives an explicit refusal,
+does not recreate it or load features; after the app naturally creates it,
+request-entry admission succeeds. Foreign view/builder overrides still take
+the original path. This is not a substitute for the blog C coverage lost above.
+
+The four required real-blog gem gates (three facts checks and the 21-test
+empty-artifact off/on suite) remain green. They never exercised form/link,
+so their form/link hit counts stay **0 → 0**. A separate YJIT-matched verify
+using the production C artifact in test mode also gives **21/21 outcomes and
+125 queries identical**, zero hits/fallbacks, with the existing explicit
+production-only artifact refusal. No test-env admission was added.
+
+### Correctness checks for this fix
+
+On base `88506d9` plus this change, with no test exclusions:
+
+- `cargo build --locked && cargo test --locked`: **37 unit + 1 types/MCP +
+  8 verify integration tests pass**.
+- From `gem/`, `LOWRAIL_STRICT_GATES=1 mise exec -- rake test
+  TESTOPTS='--verbose --seed=1729'`: Ruby **4.0.7, 156 tests / 6,775 assertions,
+  zero failures/errors/skips**. The final additional form log/CLI assertions
+  also pass separately: **1 test / 63 assertions**.
+- The same full strict command with `mise exec ruby@4.1.0-preview1` and
+  `LOWRAIL_TEST_CORPUS_ROOT` pointing to disposable prepared corpus copies:
+  **156 tests / 5,885 assertions, zero failures/errors, three named skips**:
+  `BlogProductionTest#test_cold_sealed_admission_does_not_prepare_the_app`,
+  `SealedLinkTest#test_cold_opt_in_delivery_preserves_response_effects_and_refuses_foreign_receivers`,
+  and `FormScaffoldTest#test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder`.
+  Each explicitly requires Ruby 4.0.7; no preview sealed-activation claim.
+- The first preview attempt recorded three failures: missing RSpec matchers
+  (two reporter tests), and missing native dependencies in the Rails profiling
+  bundle. After installing those prerequisites, targeted checks and the entire
+  strict suite above pass. Native Nokogiri/SQLite/FFI source variants were
+  prepared only in disposable corpus copies, preserving gem versions and the
+  original corpus locks; the private Rails fixture bundle was prepared likewise.
+
 ## The evidence gap and the claim we can actually make
 
 [`Manifest`](../gem/lib/lowrail/manifest.rb) admits sealed-v1 only with the
@@ -22,8 +137,9 @@ examples/app. Wikino and RubyToolbox hit specific sealed paths; CRM does not.
 The [reported results](compat.md#sealed-production-probes-bounded-non-vacuous-coverage)
 are smoke/contract evidence, not whole-suite active coverage. Default/opt-in
 zero-hit suites test noninterference and refusal, not sealed semantics.
-The copied-blog form probe also shows that preloading Minitest/reporters can
-change the inventory and correctly prevent activation ([follow-up](types.md#explain-a-build-not-an-inferred-promise)).
+The historical copied-blog form probe's reporter/inventory refusal and the
+later tracing recheck remain recorded below. Neither supersedes the current
+explicit passive-activation refusal ([explain](types.md#explain-a-build-not-an-inferred-promise)).
 
 No finite suite proves an app's **whole behavior on all inputs**. The attainable
 claim is equivalence over the suite's mapped production scenarios, with an

@@ -13,6 +13,30 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Sealed admission must not materialize the app (2026-10-21)
+
+The blog cold witness establishes an app-observable correctness violation:
+runtime Materialize repeats hooks, autoloads API, requires objspace and probes
+four databases. Remove it from runtime link admission. Check only already-loaded
+dependencies/cached view class; the app may supply them naturally before a
+later request, otherwise refuse. Do not prepare the off arm to hide the change.
+
+**The accepted interpreter form saving (−14.457%, earlier −14.405%) remains
+measured, unchanged and not rescored, but is currently NOT ACTIVATABLE IN
+PRODUCTION pending passive activation.** The existing form certificate needs
+controller/view/I18n/ERB effects to recertify, so refuse it conservatively.
+Build-time certification and its tests remain; no guard weakening or effectful
+recertification. The historical table/cohorts below describe their pinned
+runtimes, not current activation. The sealed owner's YJIT cohort remains
+separate on its pinned 88506d9 artifact; this fix uses no measurement slots.
+
+Refusals are explicit in activation diagnostics, unit stats/outcomes and the
+shared explain/doctor/MCP surface. Cold blog form show hits fall **1 → 0**;
+link index/show hits fall **5/2 → 0/0**. Record that as coverage rejection,
+not a support claim. Raw entropy still rejects off/off; the two declared
+companions now agree exactly for their two GETs, with no cold SQL/load
+exclusions. [Evidence, coverage losses and regressions](sealed-verification.md#current-runtime-passive-admission-or-explicit-refusal).
+
 ## RBS exports preserve slot evidence, not signature certification (2026-10-21)
 
 Reuse the existing TypeModel and renderer for `types --rbs APP`, legacy split
