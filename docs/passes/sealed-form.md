@@ -1,9 +1,11 @@
 # Sealed new-comment form scaffold
 
-**Accepted interpreter request saving: −14.405% [−14.451, −14.374].**
-The real-artifact blog-show cohort uses **8.747394 → 7.486001 M Ir/request**.
+**Latest accepted interpreter request saving: −14.457% [−14.474, −14.410].**
+The new budget-plus-request run uses **8.750826 → 7.485376 M Ir/request**,
+with **`measurement_complete:true`** and no unmodeled units. The earlier
+−14.405% request result remains unchanged, not rescored.
 This remains a `sealed_only` pilot: **no default change or promotion**, and no
-accepted YJIT non-regression cohort. See the pinned request result below.
+accepted YJIT non-regression cohort. See both pinned interpreter results below.
 
 Before implementation, the complete checked measurement specimen saved
 **1,282,228 Ir/form** [1,280,077, 1,284,287], **−79.712%** of the original
@@ -125,9 +127,9 @@ RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 BENCH_JOBS=4 BENCH_JIT=0 \
     .corpus/real-blog-r4 /tmp/NEW-form-price
 ```
 
-The guarded tier and seven-pass quarantine remain unchanged. **YJIT is
-held**, not rejected or credited: warmup-method work is separate. The finite
-**real-artifact** interpreter show cohort below supplies the request result;
+The guarded tier and seven-pass quarantine remain unchanged. YJIT was held
+at micro publication; its later finite request follow-up is rejected below.
+The finite **real-artifact** interpreter show cohort below supplies the request result;
 the earlier micro alone did not pre-authorize a speed claim.
 
 ## Production generator and variant
@@ -182,12 +184,12 @@ mise exec -- ruby -Igem/lib -Igem/test gem/test/form_scaffold_test.rb
 ```
 
 The regression skips explicitly when the optional blog corpus or Ruby 4.0.7
-is absent; that skip is not form coverage. Fresh orbs also need the disposable
-blog production SQLite fixture populated with Articles 1/2/3 and 2/1/0
-Comments, not just a test/development schema. A missing production database
-correctly refuses inventory; do not relax eligibility to make the test pass.
-The test copies that fixture before changing anything. Production request
-pricing must use the exact published revision and a freshly pinned artifact.
+is absent; that skip is not form coverage. It creates the production schema
+and Articles 1/2/3 with three Comments inside its disposable app copy, rather
+than depending on the orb's corpus production database. Missing production
+data still correctly refuses real build inventory; eligibility is unchanged.
+Production request pricing must use the exact published revision and a
+freshly pinned artifact.
 
 ## Accepted real-artifact interpreter request cohort
 
@@ -332,3 +334,85 @@ archive stay private for the separately owned warmup diagnosis. The
 historical accepted interpreter result is unchanged; `sealed_only` status,
 the guarded default tier and quarantine are unchanged. There is still **no
 accepted YJIT non-regression cohort and no promotion**.
+
+## New interpreter budget-plus-request run: accepted and complete
+
+One new finite run used exact published build/measurement head
+[`c51b20e`](https://github.com/thomasklemm/lowrail/commit/c51b20eea4431dbf32e56c9b3693a74934c1e89f),
+`build --sealed --env production --jit interpreter`, and manifest SHA
+`df827fe2e92cede4dff9eb8dcefe05a54ab1bc673dd2f85e6832ac22ad527482`.
+Only form unit 18 is enabled; links are denylisted, and there are no delivered
+files/templates. Artifact source pins and every runtime/harness fingerprint
+are in the [new numeric export](sealed-form-request-budget.json), checked
+against that exact Git head. This is not a rescore of `f39bcd7`, whose
+historical `measurement_complete:false` export is unchanged.
+
+Ruby 4.0.7 / Rails 8.1.4, `/articles/1`, seed 41231, real entropy: six
+operation rounds at N=0/200, then six request rounds at N=0/50, at most four
+workers. Both phases pass total/no-GC A/A, all five fixed-heap and actual
+interpreter gates. All **72 operation and 144 request windows are GC-free**.
+No retry, extra cohort or selected-arm salvage occurred. The exact-artifact
+untimed native check recorded **50 requests, 50 hits, zero fallbacks, no
+activation refusal and zero enabled TracePoints** before measurement.
+
+| Request arm | Total Ir/request | Paired Δ% vs off-A [95% CI] | Native `vm_trace` self Ir/request |
+|---|---:|---:|---:|
+| Off A | 8,750,826.47 | reference | 0 |
+| Off B | 8,747,404.35 | −0.021 [−0.046, +0.012] | 0 |
+| Missing artifact | 8,745,177.60 | −0.053 [−0.087, −0.011] | 0 |
+| Empty artifact | 8,750,084.65 | −0.009 [−0.044, +0.062] | 0 |
+| Disabled units | 8,746,562.61 | −0.048 [−0.071, +0.005] | 0 |
+| Form enabled | **7,485,376.17** | **−14.457 [−14.474, −14.410]** | **0** |
+
+No-GC request saving is **−14.421% [−14.461, −14.412]**;
+objects/request are **2,244.54 → 1,864.25**. The native `vm_trace` **function
+self** extractor yields exactly zero in all 72 request deltas and all 36
+operation deltas, including every arm, round and total/no-GC mode. These are
+this interpreter run's own windows, not the separate YJIT diagnostic.
+
+The operation adapter replays the real captured site against the installed
+variant and its original `super_method`. Constructor, full per-hit checks,
+fresh output, live URLs and real CSRF masking remain inside the price:
+
+| Operation arm | Total Ir/form | Objects/form |
+|---|---:|---:|
+| Original A | 1,613,770.12 | 471 |
+| Original B | 1,613,404.61 | 471 |
+| Installed variant, including predicate | 342,480.05 | 85 |
+
+Independently counted completed hits are **one per iteration and request**.
+The guard-included paired budget is **1,271,062.10 Ir/hit**
+[1,269,801.76, 1,272,502.72]. The paired request saving is
+**1,265,147.20 Ir/request** [1,260,354.23, 1,266,696.28]; measured minus
+predicted is **−5,914.90** [−11,648.99, −3,407.26]. This residual includes
+setup/context work, not just interaction. Paired medians are not obtained by
+subtracting the displayed arm medians. No unmodeled hit or fallback units
+remain, so the new result has **`measurement_complete:true`** for total Ir.
+No-GC budget remains unmodeled separately, as the export reports.
+
+The run is an **accepted interpreter instruction saving**, not native
+throughput or a production GC schedule. **Sealed-only, default/quarantine
+unchanged; no promotion and no accepted YJIT non-regression cohort.** All
+workers were released immediately after the run.
+
+## Retained certification cache: untimed follow-up only
+
+The active production pass currently retains **42 compiled source-inventory
+files**. `FormScaffoldInventory.check` and `.template` need them during
+activation; `FormScaffold.valid?` and `.render` do not read that cache. It
+must not be discarded between inventory and template certification.
+
+After the new cohort, a separate native **interpreter** process warmed 50
+successful requests, then manually cleared only `@compiled` after activation
+and forced full GCs. ISeq wrappers decreased **1,448 → 412**, and pool-0 live
+slots **229,325 → 227,056** (the diagnostic itself retains its snapshot).
+The next **50 requests still had 50 hits and zero fallbacks**; forcing the
+epoch nonzero then produced an original-path fallback. Requests did not
+repopulate the cache. The export retains the exact diagnostic source/result.
+
+This supports releasing the boot-only cache after complete certification
+without weakening per-hit checks. It does **not** establish that the cache
+explains the entire separately reported ~9k extra pool-0 objects under YJIT.
+No production cache cleanup was implemented, and no accepted or rejected
+cohort was repriced: the retained cache remains a known memory cost of the
+published pass pending a separately gated cleanup.
