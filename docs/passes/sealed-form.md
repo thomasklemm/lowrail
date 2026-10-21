@@ -1,7 +1,7 @@
-# Sealed new-comment form: price before implementation
+# Sealed new-comment form scaffold
 
-**Positive interpreter price; implementation authorized, not yet a production
-pass or a request-level speed claim.** The complete checked scaffold saves
+**Positive interpreter price; sealed-only pilot, request result pending.**
+The complete checked measurement specimen saves
 **1,282,228 Ir/form** [1,280,077, 1,284,287], **−79.712%** of the original
 form's work, and **392 objects/form**. One invocation on blog show implies a
 conditional **about 14.7%** request budget against the separately measured
@@ -121,11 +121,53 @@ RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 BENCH_JOBS=4 BENCH_JIT=0 \
     .corpus/real-blog-r4 /tmp/NEW-form-price
 ```
 
-The guarded tier, seven-pass quarantine and all production installers are
-unchanged by this price. **YJIT is held**, not rejected or credited: the
-coordinator assigned warmup-method work separately. The authorized next step
-is a `sealed_only` pass with a separate variant method, explicit boot
-inventory/refusals, and public regression gates. Pass/runtime publication
-waits for the loader boundary; an untimed hit check and one finite **real
-artifact** interpreter show cohort, after worker release, decide the request
-result. This micro does not pre-authorize a speed claim.
+The guarded tier and seven-pass quarantine remain unchanged. **YJIT is
+held**, not rejected or credited: warmup-method work is separate. An untimed
+hit check and one finite **real-artifact** interpreter show cohort, after
+worker release, decide the request result. This micro does not pre-authorize
+a speed claim.
+
+## Production generator and variant
+
+`sealed/form_scaffold` is a separate `form_with` method variant, selected only
+by `build --sealed --env production` and production `LOWRAIL_SEALED=1`.
+The original ERB and original Rails helper remain intact. No inline template
+if/else, loader change, guard bypass or default-tier opt-in is introduced.
+
+The first generator domain is intentionally narrow: Ruby 4.0.7, Rails 8.1.4,
+the eagerly loaded blog classes, and the exact literal blank-comment block
+with no locals. Boot inventory certifies effective folded methods and their
+public dispatch, independently pinned gem sources, generated accessors and
+delegation bodies, schema defaults/types and initialization callbacks,
+English literal translations, form configuration, polymorphic naming/cache,
+and the ERB handler/compiler context. Activation repeats the inventory,
+source and generated-code checks. Unknown input is a ledger refusal with a
+remedy, not permission to learn a customized body as stock. Lazy apps and
+Ruby 4.1 remain original for this pilot; this is not a generic form compiler.
+
+The variant keeps the measured live residue and per-hit checks, including
+the model constructor in the unchanged ERB, URL generation, real CSRF
+masking, mutable pre-content-table reads and fresh safe output. Foreign
+holders/builders/buffers, non-English requests, nonblank/error/persisted
+children and epoch deopt call `super` with the already evaluated model and
+block. There is no cached record, token, generated HTML or query result.
+The production no-mutation promise remains essential: this is not a new
+Ruby mutation-enforcement mechanism.
+
+The permanent public CLI regression builds an isolated copy of the actual
+blog fixture, compares **192+192** raw observable pairs (ordinary and
+header-writing render subscriber), and requires form hits with zero form
+fallbacks. A separate replay through the public helper checks value-based
+fallbacks, asymmetric mutable table keys, output safety/encoding and real
+per-form tokens against their emitted action/method. A custom builder that
+adds output is refused at build time, and retains that output with Lowrail
+off and on. Run with:
+
+```sh
+mise exec -- cargo build
+mise exec -- ruby -Igem/lib -Igem/test gem/test/form_scaffold_test.rb
+```
+
+The regression skips explicitly when the optional blog corpus or Ruby 4.0.7
+is absent; that skip is not form coverage. Production request pricing still
+must use the exact published revision and a freshly source-pinned artifact.

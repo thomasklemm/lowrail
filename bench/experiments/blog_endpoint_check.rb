@@ -30,14 +30,16 @@ if ARGV.first != "worker"
     abort "#{arm} worker failed; inspect private log" unless ok
   end
   off, on = %w[off on].map { JSON.parse(File.read(File.join(output, "#{_1}.json"))) }
-  count = ENV["SEALED_RENDERER_STAGE"] ? 192 : 144
+  count = ENV["SEALED_RENDERER_STAGE"] || ENV["LOWRAIL_FORM_CHECK"] ? 192 : 144
   raise "specimen count" unless off.fetch("responses").size == count && on.fetch("responses").size == count
   off.fetch("responses").zip(on.fetch("responses")).each_with_index do |(left, right), index|
     next if left == right
     fields = (left.keys | right.keys).reject { left[_1] == right[_1] }
     abort "specimen #{index} differs: #{fields.join(', ')}; private raw responses retained"
   end
-  if ENV["SEALED_RENDERER_STAGE"]
+  if ENV["LOWRAIL_FORM_CHECK"]
+    raise "production form coverage missing" unless on.fetch("form_hits").positive? && off.fetch("form_hits").zero?
+  elsif ENV["SEALED_RENDERER_STAGE"]
     raise "specimen coverage missing" unless on.fetch("specimen_hits").positive? && off.fetch("specimen_hits").zero?
   elsif build && on.fetch("endpoint_hits").empty?
     raise "default source coverage missing" if on.fetch("hits").empty?
@@ -109,7 +111,7 @@ class EndpointEvents
     state = controller && {"action" => controller.action_name,
       "articles_assigned" => controller.instance_variable_defined?(:@articles),
       "article_assigned" => controller.instance_variable_defined?(:@article)}
-    if state && ENV["SEALED_RENDERER_STAGE"]
+    if state && (ENV["SEALED_RENDERER_STAGE"] || ENV["LOWRAIL_FORM_CHECK"])
       article = controller.instance_variable_get(:@article)
       state["assign_keys"] = controller.view_assigns.keys.sort
       state["article"] = article && [article.class.name, article.attributes,
@@ -221,7 +223,7 @@ end
 armed = true
 responses = []
 fixtures = %w[stock escaped empty]
-fixtures << "empty_comments" if ENV["SEALED_RENDERER_STAGE"]
+fixtures << "empty_comments" if ENV["SEALED_RENDERER_STAGE"] || ENV["LOWRAIL_FORM_CHECK"]
 fixtures.each do |fixture|
   Article.transaction(requires_new: true) do
     if fixture == "escaped"
@@ -250,6 +252,7 @@ endpoint_fallbacks = units.to_h do |unit|
   [unit.fetch("target"), Lowrail::Stats.unit_fallbacks.fetch(unit.fetch("id").to_s, 0)]
 end
 File.write(destination, JSON.generate({responses: responses, endpoint_hits: endpoint_hits, endpoint_fallbacks: endpoint_fallbacks,
+  form_hits: defined?(Lowrail::Stats) && Lowrail.manifest ? Lowrail.manifest.units.select { _1["pass"] == "sealed/form_scaffold" }.sum { Lowrail::Stats.unit_hits.fetch(_1.fetch("id").to_s, 0) } : 0,
   specimen_hits: defined?(SealedFormCost) ? SealedFormCost.hits : defined?(SealedRenderer) ? SealedRenderer.hits : 0,
   hits: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {},
   fallbacks: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_fallbacks : {}}))

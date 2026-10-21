@@ -17,7 +17,8 @@ module Lowrail
       InertiaConfig: {file: "inertia_config", passes: %w[inertia/config_bind], sealed_only: true},
       InertiaProps: {file: "inertia_props", passes: %w[inertia/props], source: true},
       Endpoint: {file: "endpoint", passes: %w[endpoint/action]},
-      Sealed: {file: "sealed", passes: %w[sealed/link_to], sealed_only: true}
+      Sealed: {file: "sealed", passes: %w[sealed/link_to], sealed_only: true},
+      FormScaffold: {file: "form_scaffold", passes: %w[sealed/form_scaffold], sealed_only: true}
     }.freeze
 
     def self.sealed_only?(pass)

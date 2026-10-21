@@ -38,6 +38,7 @@ pub const REGISTRY: &[Pass] = &[
     Pass { name: "inertia/props", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "inertia_props_build", module: "InertiaPropsBuild" }, alias: "props" },
     Pass { name: "endpoint/action", kind: Kind::Runtime, default: false, sealed_only: false, builder: Builder::Runtime { file: "endpoint_build", module: "EndpointBuild" }, alias: "endpoint" },
     Pass { name: "sealed/link_to", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "sealed_build", module: "SealedBuild" }, alias: "sealed_link_to" },
+    Pass { name: "sealed/form_scaffold", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "form_scaffold_build", module: "FormScaffoldBuild" }, alias: "form_scaffold" },
 ];
 
 pub fn quarantine_reason(name: &str) -> Option<&'static str> {
@@ -140,6 +141,6 @@ mod tests {
         assert!(Selection::parse("default,+memo").is_err());
         assert_eq!(Selection::sealed().iter().map(|p| p.name).collect::<Vec<_>>(),
             ["memo/uri_join", "memo/sha256", "digest/file_memo", "active_record/preload_plans",
-             "active_record/instantiate", "active_record/ar_plans", "inertia/config_bind", "sealed/link_to"]);
+             "active_record/instantiate", "active_record/ar_plans", "inertia/config_bind", "sealed/link_to", "sealed/form_scaffold"]);
     }
 }
