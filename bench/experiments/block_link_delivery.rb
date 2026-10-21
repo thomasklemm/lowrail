@@ -68,8 +68,9 @@ module BlockLinkDelivery
     end
   end
 
-  def build(app, destination)
+  def build(app, destination, jit: "interpreter")
     raise "new bench artifact required" if File.exist?(destination)
+    raise "build process JIT mismatch" unless %w[interpreter yjit].include?(jit) && Lowrail.jit_mode == jit
     FileUtils.mkdir_p(destination, mode: 0o700)
     files = sources.map.with_index do |(path, data), index|
       lowered = File.join(destination, "#{index}.rb")
@@ -77,14 +78,14 @@ module BlockLinkDelivery
       {"path" => path, "lowered" => lowered, "source_sha256" => data.fetch("sha256")}
     end
     input = {"app_root" => app, "out" => destination, "rails_env" => "production",
-      "certification_jit" => "interpreter", "files" => files,
+      "certification_jit" => jit, "files" => files,
       "units" => files.map.with_index { |file, id| {"id" => id, "kind" => "file", "pass" => "bench/block_link", "file" => file.fetch("path"), "facts" => []} }}
     # Disposable BUILD process: observe the app's real per-file compiler
     # recipes during original production boot. No template renders/handlers.
     Dir.chdir(app) do
       Lowrail::Compilation.boot(input) do
         require File.join(app, "config/application")
-        Rails.application.config.yjit = false
+        Rails.application.config.yjit = false if jit == "interpreter"
       end
     end
     manifest = Lowrail::Compiler.compile(input)
