@@ -32,6 +32,26 @@ rounds and accept or reject the whole cohort; **no retry or exclusions**.
 Only this driver's summary policy changes, not other shared-harness gates.
 YJIT seam work stays paused; no README/results edit by this worker.
 
+## Blog new-rule interpreter re-price: ACCEPTED (2026-10-21)
+
+The one prospective cohort on clean detached `b059fc9` completes: **−15.022961%
+total Ir [−15.051352,−14.996655]**, no-GC **−15.021453%
+[−15.044109,−14.967704]**. Both A/A intervals are wholly within the
+preregistered ±0.1%: total **[−0.068389,+0.004169]%**, no-GC
+**[−0.077337,+0.033586]%**. All other gates pass: heap/exact pages/brk,
+actual interpreter, fresh pre/post cold seeds, 192+192 observable pairs,
+native/deopt. Independently reconciled 72 dumps/self-cost sums, 36 subtractions,
+18 source certificates and 681 pins. Exactly six rounds / 18 serial workers;
+no measurement retry/exclusions. Launcher refusals before counter work and
+after completion are retained; service stopped and slot 1 released.
+
+This replaces the defective-source headline **only for this three-unit blog
+endpoint/fixture**. The old `62f8a6b` rejection is not rescored; `553e7aa` stays
+historical/defective-source only. Token-only is allocation-neutral, not a win;
+do not attribute the entire cross-source difference to it. No latency/YJIT,
+whole-app, test-tier or default promotion claim. README/results remain with
+the docs owner. [Protocol and complete accepted export](passes/production-aa01-reprice.md).
+
 ## Production sealed helper dispatch safety (2026-10-21)
 
 Production token admission did not refuse an existing view `send` override
@@ -59,7 +79,8 @@ remains a separate, unpublished review and will consume this one primitive.
 [`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
 which had this dispatch defect. It remains a price for that exact source and
 specimen only, not the fixed runtime.** The separately authorized replacement
-cohort at `62f8a6b` is rejected below; there is no accepted current-source price.
+cohort at `62f8a6b` is rejected below. The later prospective `b059fc9` cohort
+above is the accepted replacement, not a reclassification of that rejection.
 Default/quarantine/guarded passes are unchanged;
 YJIT seam work stays paused and `835cf16` parked.
 [Dispatch sweep and correctness gates](passes/sealed-production.md#helper-dispatch-safety).

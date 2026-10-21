@@ -1,11 +1,14 @@
 # Dispatch-corrected interpreter re-price: rejected A/A
 
-**No accepted replacement price.** The one authorized interpreter cohort at
+**This cohort provides no accepted replacement price.** The one authorized interpreter cohort at
 [`62f8a6b`](https://github.com/thomasklemm/lowrail/commit/62f8a6bbbecabb21df218a01b121299fee726eff)
 fails the preregistered GC-excluded A/A zero-containment gate. Retain all data;
 do not retry, relax the rule or credit its apparent saving. The former
 **−15.225536%** remains [defective-source evidence at 553e7aa](production-interpreter-reprice.md),
 not the dispatch-corrected runtime. YJIT seam work stays paused.
+
+The later [prospective new-rule cohort at b059fc9](production-aa01-reprice.md)
+is accepted separately. This rejection and its original rule/data are unchanged.
 
 ## Screen before the cohort
 

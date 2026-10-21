@@ -1,6 +1,6 @@
 # Passive production token and collection units
 
-**No accepted dispatch-corrected whole-request price.**
+**Current-source three-unit price: [−15.022961% interpreter Ir](production-aa01-reprice.md).**
 `sealed/token_tag` and `sealed/collection_render` have public
 build/runtime certificates. The measured production form/token/collection
 units are separate from the rejected [combined pricing specimen](sealed-combined.md).
@@ -12,7 +12,9 @@ The separately authorized [corrected-source re-price](production-interpreter-rep
 at `553e7aa` is **−15.23% total interpreter Ir [−15.25, −15.21]**, with both
 A/A controls and pre/post correctness gates passing, but is defective-source
 only. The [dispatch-corrected attempt](production-dispatch-reprice.md) is
-**rejected no-GC A/A**, not a replacement price. No YJIT price is claimed.
+**rejected no-GC A/A**, not a replacement price. The later prospective
+`b059fc9` cohort is accepted under its separately preregistered rule; the
+earlier rejection is unchanged. No YJIT price is claimed.
 
 ## Helper dispatch safety
 
