@@ -100,13 +100,15 @@ module MethodTokenExperiment
       before = RubyVM::YJIT.runtime_stats&.slice(*JitStability::COUNTERS)
       allocations = GC.stat(:total_allocated_objects)
       collections = GC.stat(:count)
+      cpu_start = Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID)
       start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       yield n
       elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+      cpu_elapsed = Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID) - cpu_start
       allocated = GC.stat(:total_allocated_objects) - allocations
       collected = GC.stat(:count) - collections
       after = RubyVM::YJIT.runtime_stats&.slice(*JitStability::COUNTERS)
-      {seconds: elapsed, allocated: allocated, collections: collected, jit_before: before, jit_after: after,
+      {seconds: elapsed, cpu_seconds: cpu_elapsed, allocated: allocated, collections: collected, jit_before: before, jit_after: after,
         jit_flat: !RubyVM::YJIT.enabled? || (before.values.all? { Integer === _1 } && before == after)}
     end
   end
@@ -138,6 +140,7 @@ if ENV["METHOD_TOKEN_WORKER"]
     owner = unbound.owner
     tokens = [Lowrail::Native.method_token(klass, :target)].freeze
     snapshots = [MethodTokenExperiment.public_snapshot(klass, :target)]
+    hash = {}
     operation = case arm
     when "off_a", "off_b" then ->(n) { n.times { true } }
     when "tokens" then ->(n) { n.times { Lowrail::Native.method_tokens_valid?(tokens) } }
@@ -147,7 +150,7 @@ if ENV["METHOD_TOKEN_WORKER"]
     when "public" then ->(n) { n.times { MethodTokenExperiment.public_valid?(snapshots) } }
     when "public_c" then ->(n) { n.times { Lowrail::Native.same_method?(receiver, :target, saved) } }
     when "stat" then ->(n) { n.times { RubyVM.stat(:global_cvar_state) } }
-    when "basic_c" then ->(n) { n.times { Lowrail::Native.plain_hash_iteration?({}) } }
+    when "basic_c" then ->(n) { n.times { Lowrail::Native.plain_hash_iteration?(hash) } }
     end
     n = 500_000
   when "request"
@@ -207,7 +210,7 @@ FileUtils.mkdir_p(out)
 rng = Random.new(41231)
 samples = []
 %w[interpreter yjit].each do |jit|
-  flags = jit == "yjit" ? %w[--yjit --yjit-stats=quiet --disable-zjit] : %w[--disable-yjit --disable-zjit]
+  flags = jit == "yjit" ? %w[--yjit --disable-zjit] : %w[--disable-yjit --disable-zjit]
   {"micro" => %w[off_a off_b tokens method unbound owner_only public public_c stat basic_c],
    "request" => %w[off_a off_b hooks public tokens], "probe" => %w[hooks public tokens]}.each do |kind, arms|
     (kind == "probe" ? 1 : 8).times do |round|
@@ -226,22 +229,17 @@ samples = []
 end
 summaries = samples.reject { _1["kind"].nil? }.group_by { [_1.fetch("mode"), _1.fetch("kind")] }.to_h do |key, group|
   pairs = group.group_by { _1.fetch("round") }
-  arms = group.map { _1.fetch("arm") }.uniq
   flat = group.all? { _1.fetch("window").fetch("jit_flat") && (!_1["warmup"] || _1.fetch("warmup").fetch("stable")) }
-  prices = arms.to_h do |arm|
-    values = pairs.values.map { |rows| rows.find { _1.fetch("arm") == arm } }
-    ns = values.map { _1.fetch("window").fetch("seconds") * 1e9 / _1.fetch("n") }
-    allocations = values.map { _1.fetch("window").fetch("allocated").fdiv(_1.fetch("n")) }
-    deltas = pairs.values.map do |rows|
-      baseline = rows.find { _1.fetch("arm") == "off_a" }.fetch("window").fetch("seconds")
-      value = rows.find { _1.fetch("arm") == arm }.fetch("window").fetch("seconds")
-      (value / baseline - 1) * 100
+  rounds = pairs.values.map do |rows|
+    rows.to_h do |row|
+      window, n = row.fetch("window"), row.fetch("n")
+      [row.fetch("arm"), {"wall_us" => window.fetch("seconds") * 1e6 / n,
+        "cpu_us" => window.fetch("cpu_seconds") * 1e6 / n,
+        "allocations" => window.fetch("allocated").fdiv(n)}]
     end
-    [arm, {ns_including_loop: RequestPairs.estimate(ns, seed: 41231),
-      allocations: RequestPairs.estimate(allocations, seed: 41231), percent_vs_off_a: RequestPairs.estimate(deltas, seed: 41231)}]
   end
-  aa = prices.fetch("off_b").fetch(:percent_vs_off_a).fetch(:ci95)
-  [key.join("/"), {jit_flat: flat, aa_contains_zero: aa.first <= 0 && aa.last >= 0, arms: prices}]
+  summary = RequestPairs.summarize(rounds, seed: 41231, tolerance: 2)
+  [key.join("/"), summary.merge(jit_flat: flat, accepted_native: flat && summary.fetch(:aa).fetch(:pass))]
 end
 File.write(File.join(out, "summary.json"), JSON.pretty_generate(summaries))
 puts JSON.pretty_generate(summaries)
