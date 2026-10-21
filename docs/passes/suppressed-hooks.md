@@ -178,3 +178,35 @@ Redprints' earlier strict-load refusal also remains red.
 
 No compatibility result is pending now. These historical controls do not
 validate the later production TracePoint changes or any sealed acceleration.
+
+### Fizzy on the published hook-free-loader head
+
+One new correctness comparison **per selection**, not a retry of the frozen
+controls above, ran on
+[`b091cb7`](https://github.com/thomasklemm/lowrail/commit/b091cb7206a0bc877a9eef9a0201ec95f85c7a2a)
+(loader boundary `2d1ad72`, doctor and test-only timeout observer). Ruby 4.0.7,
+seed 41231, `RAILS_ENV=test`, `PARALLEL_WORKERS=1`,
+`LOWRAIL_VERIFY_LOADS=1`; release binary rebuilt before both artifacts.
+
+| Selection | Outcomes / own-thread SQL | Stable load differences | Unstable load entries | Verify |
+|---|---|---:|---:|---|
+| Default | 124 identical: 117 pass + the same 7 baseline errors; 5,322 identical queries | **18** | 8 | **refused**, exit 1 |
+| All-opt-in | same outcomes and queries | **0** | **26**, including the 18 reordered-event identities | exit 0, advisory instability remains |
+
+Both format-2 artifacts have files `{}`, units `[]`, passes `{}` and empty
+hit/fallback maps. There is **no accelerated coverage**. The first default
+mismatch is `after_suite/load_events/349`: off records the
+`active_job_arguments` hook (`activejob-8.1.4/lib/active_job/railtie.rb:23`),
+on records `QrCodeLink`. Events 349–357 contain the same nine hook/load
+identities in different order; no loaded-set or outcome/SQL difference is
+claimed. In the all-opt-in same-mode controls those event positions vary,
+so the verifier removes their identities symmetrically as unstable. Its zero
+stable count is **not proof that the cause was fixed**.
+
+No pass is selected, and `Lowrail.setup` returns for an empty manifest before
+Guard, Loader or Passes installation. The setup/manifest-versus-inherent-order
+cause is not isolated; the exact commands, manifests and reports were handed
+to the loader owner. No loader changes, extra Fizzy comparisons, baseline
+error fixes or gate suppression were made here. The older 18 remain a
+post-quarantine/pre-format-2/pre-loader result, not retrospectively attributed
+to one later change.
