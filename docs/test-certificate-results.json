@@ -77,9 +77,10 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 84741,
+              "pid": 95037,
               "unit_deopts": {},
-              "unit_refusals": {}
+              "unit_refusals": {},
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -191,25 +192,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 84769,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 95070,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -217,23 +210,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 30,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 30,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 8,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 9,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",
@@ -329,25 +318,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 84797,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 95126,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -355,23 +336,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 30,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 30,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 8,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 9,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",
@@ -423,9 +400,10 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 84825,
+              "pid": 95155,
               "unit_deopts": {},
-              "unit_refusals": {}
+              "unit_refusals": {},
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -480,25 +458,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 85125,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 95508,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -506,23 +476,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 15,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 18,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 12,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 8,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",
@@ -561,25 +527,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 85386,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 95783,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -587,23 +545,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 15,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 18,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 12,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 8,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",
@@ -712,9 +666,10 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 85717,
+              "pid": 96140,
               "unit_deopts": {},
-              "unit_refusals": {}
+              "unit_refusals": {},
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -826,25 +781,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 85753,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 96172,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -852,23 +799,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 30,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 30,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 8,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 9,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",
@@ -964,25 +907,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 85780,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 96220,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -990,23 +925,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 30,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 30,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 8,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 9,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",
@@ -1058,9 +989,10 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 85806,
+              "pid": 96276,
               "unit_deopts": {},
-              "unit_refusals": {}
+              "unit_refusals": {},
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -1115,25 +1047,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 86068,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 96582,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -1141,23 +1065,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 15,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 18,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 12,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 8,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",
@@ -1196,25 +1116,17 @@
           "verification_test": [
             {
               "state": "active",
-              "pid": 86343,
-              "unit_deopts": {
-                "0": 1,
-                "1": 1
-              },
+              "pid": 96860,
+              "unit_deopts": {},
               "unit_refusals": {
                 "2": [
                   "verification_literal_table_observer_unavailable"
                 ],
                 "3": [
                   "verification_form_config_schema_translation_observer_unavailable"
-                ],
-                "0": [
-                  "dependent_state_mutation:define_method_attribute="
-                ],
-                "1": [
-                  "dependent_state_mutation:define_method_attribute="
                 ]
-              }
+              },
+              "unit_pending": {}
             }
           ],
           "units": [
@@ -1222,23 +1134,19 @@
               "id": "0",
               "pass": "active_record/instantiate",
               "target": "Article",
-              "hits": 1,
-              "fallbacks": 15,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 18,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "1",
               "pass": "active_record/instantiate",
               "target": "Comment",
-              "hits": 1,
-              "fallbacks": 12,
-              "deopts": 1,
-              "refusals": [
-                "dependent_state_mutation:define_method_attribute="
-              ]
+              "hits": 8,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": []
             },
             {
               "id": "2",

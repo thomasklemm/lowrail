@@ -98,6 +98,7 @@ module Lowrail
 
       def certificate(root)
         runtime = Dir[File.join(__dir__, "*.rb"), File.join(Gem.loaded_specs.fetch("bootsnap").full_gem_path, "lib/**/*.rb")].sort
+        runtime << File.join(Gem.loaded_specs.fetch("activerecord").full_gem_path, "lib/active_record/attribute_methods.rb")
         {"version" => 1, "mode" => "verification-only", "policy" => policy, "source_set" => sources(root),
           "runtime_sources" => runtime.to_h { [_1, Manifest.sha256_file(_1)] }}
       end
@@ -106,12 +107,17 @@ module Lowrail
         observe_boot
         @manifest, @root = manifest, root
         @certificate = manifest.verification_test
+        @models = manifest.units.filter_map { |unit| [unit.dig("ar_instantiate", "model"), unit.fetch("id")] if unit["ar_instantiate"] }.to_h
+        @pending = @models.values.to_h { [_1, "verification_attribute_generation_pending"] }
+        @generated = ObjectSpace::WeakMap.new
+        @generation_source = @certificate.fetch("runtime_sources", {}).keys.find { _1.end_with?("/active_record/attribute_methods.rb") }
         require_relative "stats"
         Stats.enable!
         require_relative "seal_snapshot"
         Process.singleton_class.prepend(ForkHook) unless Process.singleton_class < ForkHook
-        @observer = TracePoint.new(:call, :c_call) do |event|
+        @observer = TracePoint.new(:call, :c_call, :return, :c_return) do |event|
           forked! if @pid != Process.pid
+          generation_completed(event) if event.event == :return && @status != "refused"
           next unless @status == "active"
           if Module === event.self && NAME.bind_call(event.self)&.match?(/\ABootsnap(?:::|\z)/) &&
               (MUTATIONS.include?(event.method_id) || /\A\w+[=!]\z/.match?(event.method_id) || %i[setup update_options].include?(event.method_id))
@@ -124,11 +130,51 @@ module Lowrail
             next
           end
           @snapshots.each do |id, snapshot|
-            retire(id, "dependent_state_mutation:#{event.method_id}") if snapshot[:holders].any? { _1.equal?(event.self) } ||
-              snapshot[:objects].any? { _1.equal?(event.self) }
+            watched = snapshot[:holders].any? { _1.equal?(event.self) }
+            next unless watched || %i[append_features prepend_features extend_object].include?(event.method_id)
+            # A source module's append_features may target an unrelated class;
+            # similarly a method named reject! may mutate its argument, not
+            # its receiver. Observe destination facts, not mutator spellings.
+            # Method callbacks run after definition, before app callback code.
+            if %i[return c_return].include?(event.event) ||
+                %i[method_added method_removed method_undefined singleton_method_added
+                  singleton_method_removed singleton_method_undefined].include?(event.method_id)
+              unchanged?(id, snapshot)
+            elsif watched &&
+                %i[instance_variable_set remove_instance_variable const_set remove_const autoload
+                  reset_column_information reload_schema_from_cache initialize_load_schema_monitor
+                  default_scope attribute enum serialize store_accessor].include?(event.method_id)
+              # Opaque writes can restore a hoisted cache without a method
+              # callback. Retire before them; never silently reauthorize.
+              retire(id, "dependent_state_mutation:#{event.method_id}")
+            end
           end
+        rescue StandardError, ScriptError
+          refuse_all("verification_observation_unknown")
         end
         @observer.enable
+      end
+
+      # Only successful completion of the real, source-certified Rails method
+      # can release a never-authorized unit. Inspecting a true flag inside its
+      # body (or calling the generator ourselves) is not a completion witness.
+      def generation_completed(event)
+        return unless event.method_id == :define_attribute_methods && event.path == @generation_source &&
+          event.defined_class.equal?(Lowrail.loaded_constant("ActiveRecord::AttributeMethods::ClassMethods")) &&
+          event.return_value == true && Class === event.self
+        name = NAME.bind_call(event.self)
+        id = @models[name]
+        return unless id && @pending.key?(id) && !@refusals.key?(id) && !@snapshots.key?(id) &&
+          Lowrail.loaded_constant(name).equal?(event.self) &&
+          IVAR.bind_call(event.self, :@schema_loaded) == true &&
+          IVAR.bind_call(event.self, :@attribute_methods_generated) == true
+        @generated[event.self] = true
+        @pending.delete(id)
+        # A counting guard may already have cached the pending false result.
+        # This is first authorization, not revival of a retired decision; no
+        # hit/deopt counter or process-wide Seal epoch/ledger is reset.
+        G[id] = nil; K[id] = Lowrail.const_get(:NO_RECEIVER, false); V[id] = nil
+        Stats::STATE[id] = nil
       end
 
       # Called by the real reporter only after normal helper loading and the
@@ -160,13 +206,15 @@ module Lowrail
         unit = @manifest.units.find { _1.fetch("id") == id }
         reason = unit && UNOBSERVED[unit.fetch("pass")]
         return retire(id, reason) if reason
+        if (model = unit&.dig("ar_instantiate", "model"))
+          return false if @pending.key?(id)
+          klass = Lowrail.loaded_constant(model)
+          return retire(id, "verification_attribute_generation_invalidated") unless klass && @generated[klass] &&
+            IVAR.bind_call(klass, :@schema_loaded) == true && IVAR.bind_call(klass, :@attribute_methods_generated) == true
+        end
         snapshot = @snapshots[id]
         return true unless snapshot
-        snapshot[:states].each do |holder, before|
-          after = method_state(holder)
-          return retire(id, "dependent_method_or_ancestor_drift") unless SealSnapshot.diff(before, after).empty?
-        end
-        true
+        unchanged?(id, snapshot)
       rescue StandardError, ScriptError
         retire(id, "verification_observation_unknown")
       end
@@ -175,29 +223,37 @@ module Lowrail
         return if @snapshots.key?(id)
         holders = holders.compact.uniq
         chains = holders.flat_map { SealSnapshot::ANCESTORS.bind_call(_1) }.uniq
-        app = IVAR.bind_call(Lowrail.loaded_constant("Rails"), :@application)
-        objects = [IVAR.bind_call(app, :@config)]
-        notifier = Lowrail.loaded_constant("ActiveSupport::Notifications")
-        objects << notifier if notifier
-        objects << IVAR.bind_call(notifier, :@notifier) if notifier
-        @snapshots[id] = {holders: holders + chains,
-          objects: objects.compact,
-          states: chains.to_h { [_1, method_state(_1)] }}
+        unit = @manifest.units.find { _1.fetch("id") == id }
+        names = unit.fetch("facts").map { _1.fetch("method").to_sym }.uniq
+        @snapshots[id] = {holders: holders + chains, names: names,
+          states: chains.to_h { [_1, method_state(_1, names)] }}
+      end
+
+      def unchanged?(id, snapshot)
+        snapshot[:states].each do |holder, before|
+          after = method_state(holder, snapshot.fetch(:names))
+          return retire(id, "dependent_method_or_ancestor_drift") unless SealSnapshot.diff(before, after).empty?
+        end
+        true
       end
 
       # Do not enumerate/read unrelated constants (deprecated bindings can
       # themselves emit warnings). Named dependencies are resolved without
-      # autoloading by each existing pass's admission check.
-      def method_state(holder)
+      # autoloading by each existing pass's admission check. Only named method
+      # assumptions are folded; unrelated methods and notification subscribers
+      # remain live. Snapshot every holder in the lookup chain, not just its
+      # first owner, so a changed super body/visibility/ancestry also retires.
+      def method_state(holder, names)
         methods = {}
         {"public" => SealSnapshot::PUBLIC, "protected" => SealSnapshot::PROTECTED,
           "private" => SealSnapshot::PRIVATE}.each do |visibility, getter|
-          getter.bind_call(holder, false).each { methods[_1] = [visibility, SealSnapshot::METHOD.bind_call(holder, _1)] }
+          (getter.bind_call(holder, false) & names).each { methods[_1] = [visibility, SealSnapshot::METHOD.bind_call(holder, _1)] }
         end
         {ancestors: SealSnapshot::ANCESTORS.bind_call(holder), methods: methods, constants: {}}
       end
 
       def retire(id, reason)
+        @pending&.delete(id)
         unless @refusals.key?(id)
           @deopts[id] = @deopts.fetch(id, 0) + 1 if @snapshots.key?(id)
           @refusals[id] = [reason]
@@ -217,6 +273,8 @@ module Lowrail
       def revoke_runtime
         G.clear; K.fill(Lowrail.const_get(:NO_RECEIVER, false)); V.clear
         Stats::STATE.clear if defined?(Stats)
+        @generated = ObjectSpace::WeakMap.new
+        @pending&.clear
         if defined?(Sealed)
           Sealed::ACTIVE[0] = false
           Sealed::BUILDERS.clear
@@ -255,7 +313,7 @@ module Lowrail
       def evidence
         active? if @pid
         {"state" => @status, "pid" => Process.pid, "unit_deopts" => @deopts.transform_keys(&:to_s),
-          "unit_refusals" => @refusals.transform_keys(&:to_s)}
+          "unit_refusals" => @refusals.transform_keys(&:to_s), "unit_pending" => (@pending || {}).transform_keys(&:to_s)}
       end
     end
 
