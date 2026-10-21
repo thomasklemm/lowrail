@@ -257,9 +257,18 @@ The existing Fizzy workflow's five init-slot floors are
 both phase orders must first retain exact pages and add none.
 
 **Reject the entire finite cohort** on any source/tool/mode/brk/hit/heap
-failure. Both A/A 95% intervals must contain zero wholly within ±0.5%.
+failure. Before any counter window, the coordinator changed the project-wide
+A/A gate: **both total and no-GC A/A 95% intervals must lie wholly within
+±0.1%; neither must contain zero**. This replaces this experiment's earlier
+contains-zero/±0.5% rule before counting. The shared helper's legacy
+contains-zero summary remains unchanged and is retained as a diagnostic;
+the adapter's `decision.json` applies the project rule and additionally
+checks zero new pages in every measured window, not just equal capacity.
 Call a win only if **both** on/off upper 95% bounds are below
 −max(0.5%, 3 × largest absolute A/A bound). No filtering or retry-to-green.
+An initial tool=none launch failed before app boot because a relative worker
+path was resolved from the app directory. The absolute-path fix and this
+rule change precede every counted window; the failed launch is retained.
 There is no counted result at this checkpoint. One real-Puma RPS check will
 use bet A's shared Fizzy adapter after it is published; native Rack wall
 screens are not RPS measurements.

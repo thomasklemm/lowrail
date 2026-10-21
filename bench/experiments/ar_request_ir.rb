@@ -16,7 +16,7 @@ module ARRequestIR
   RULE = {
     "scope" => "one Fizzy buckets fixture, interpreter Ir, not latency or production admission",
     "rounds" => 6, "seed" => 41231, "requests" => 10, "jobs" => 1,
-    "aa" => "both total/no-GC 95% intervals contain zero and lie wholly within ±0.5%",
+    "aa" => "both total/no-GC 95% intervals lie wholly within ±0.1%; containing zero is not required",
     "win" => "both on/off upper 95% bounds below -max(0.5%, 3 × largest absolute A/A bound)",
     "gates" => "all source/tool/interpreter/exact-page/no-new-page/brk/hit gates pass; any violation rejects the whole cohort",
     "accepted_rejection" => "separate cold correctness companion: SolidCache created_at differs off/off; no whole-DB certificate",
@@ -33,7 +33,7 @@ module ARRequestIR
     FizzyLinkFixture.environment(config.fetch("app"), seed).merge(
       "BUNDLE_GEMFILE" => config.fetch("gemfile", File.join(config.fetch("app"), "Gemfile")),
       "BUNDLE_FROZEN" => "true", "LOWRAIL" => "0", "LOWRAIL_STATS" => nil,
-      "RUBYOPT" => nil, "BENCH_JIT" => "0", "BENCH_JOBS" => "1", "BENCH_AA_TOLERANCE" => "0.5",
+      "RUBYOPT" => nil, "BENCH_JIT" => "0", "BENCH_JOBS" => "1", "BENCH_AA_TOLERANCE" => "0.1",
       "BENCH_HEAP_SLOTS" => FLOORS.join(","), "BENCH_HARNESS_SHA" => sha,
       "BENCH_AR_IR_CONFIG" => File.realpath(config_path), "BENCH_AR_IR_APPROVED" => sha,
       "BENCH_AR_IR_ARM" => arm, "BENCH_STATE_ROOT" => state_root)
@@ -94,7 +94,7 @@ module ARRequestIR
     # Check clean detached ownership before creating even an untimed worker.
     FizzyLinkVector.pin!(app: settings.fetch("app"), artifact: settings.fetch("artifact"), contexts: RULE)
     ENV["BENCH_JOBS"] = "1"
-    ENV["BENCH_JIT"], ENV["BENCH_HEAP_SLOTS"], ENV["BENCH_AA_TOLERANCE"] = "0", FLOORS.join(","), "0.5"
+    ENV["BENCH_JIT"], ENV["BENCH_HEAP_SLOTS"], ENV["BENCH_AA_TOLERANCE"] = "0", FLOORS.join(","), "0.1"
     envs = %w[off_a off_b on].to_h { [_1, environment(settings, output, _1, sha, config_path)] }
     File.write(File.join(output, "protocol.json"), JSON.pretty_generate(RULE.merge("harness_sha" => sha,
       "config_sha256" => Digest::SHA256.file(config_path).hexdigest, "mode" => mode)))
@@ -108,7 +108,7 @@ module ARRequestIR
         log = File.join(output, "#{label}.log")
         vg = File.join(output, "#{label}.valgrind.log")
         ok = system(env, "valgrind", "--tool=none", "--log-file=#{vg}", RbConfig.ruby,
-          *JitStability.flags("0"), __FILE__, "GET:/buckets", chdir: settings.fetch("app"), out: log, err: [:child, :out])
+          *JitStability.flags("0"), File.expand_path(__FILE__), "GET:/buckets", chdir: settings.fetch("app"), out: log, err: [:child, :out])
         raise "untimed worker failed #{label}" unless ok
         RequestPairs.check_valgrind_log!(output, label)
         row = JSON.parse(File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }.delete_prefix("LOWRAIL_BENCH "))
@@ -126,17 +126,38 @@ module ARRequestIR
       puts "untimed: interpreter, hits, exact pages and no page growth PASS (4 workers / 16 windows)"
     else
       metadata = {seed: 41231, rounds: 6, workers: {}, protocol: RULE, harness_sha: sha}
-      pass = RequestPairs.heap_instructions(envs, settings.fetch("app"), output, "GET:/buckets", metadata,
-        worker: __FILE__, requests: 10)
+      legacy_pass = RequestPairs.heap_instructions(envs, settings.fetch("app"), output, "GET:/buckets", metadata,
+        worker: File.expand_path(__FILE__), requests: 10)
       summary = JSON.parse(File.read(File.join(output, "summary.json")))
+      # Keep the shared helper's unchanged contains-zero result in summary.json.
+      # The project rule was changed before this cohort, not after seeing it.
+      aa = %w[instructions_total instructions_no_gc].to_h do |metric|
+        interval = summary.fetch("layers").fetch("off_b").fetch(metric).fetch("delta_pct").fetch("ci95")
+        [metric, {"ci95" => interval, "pass" => interval.first >= -0.1 && interval.last <= 0.1}]
+      end
+      no_new_pages = metadata.fetch(:workers).transform_values do |worker|
+        worker.fetch("windows").all? do |window|
+          window.fetch("pools_before").all? do |pool, before|
+            before.fetch("total_allocated_pages") == window.fetch("pools_after").fetch(pool).fetch("total_allocated_pages")
+          end
+        end
+      end
+      gates = {"project_aa" => aa.values.all? { _1.fetch("pass") }, "no_new_pages" => no_new_pages.values.all?,
+        "heap_matched" => summary.fetch("heap_matched"), "jit" => summary.fetch("jit").fetch("pass"),
+        "valgrind" => metadata.fetch(:valgrind).fetch(:pass),
+        "idle_boundary" => !summary.key?("idle_boundary") || summary.fetch("idle_boundary").fetch("pass")}
+      pass = gates.values.all?
       effects = %w[instructions_total instructions_no_gc].to_h do |metric|
         aa = summary.fetch("layers").fetch("off_b").fetch(metric).fetch("delta_pct").fetch("ci95")
         bound = [0.5, 3 * aa.map(&:abs).max].max
         effect = summary.fetch("layers").fetch("on").fetch(metric).fetch("delta_pct")
         [metric, {"effect" => effect, "required_upper_bound_pct" => -bound, "clear_win" => effect.fetch("ci95").last < -bound}]
       end
-      File.write(File.join(output, "decision.json"), JSON.pretty_generate("gates_pass" => pass, "effects" => effects,
-        "accepted_ir_win" => pass && effects.values.all? { _1.fetch("clear_win") }))
+      decision = {"gates_pass" => pass, "gates" => gates, "project_aa" => aa, "no_new_pages" => no_new_pages,
+        "legacy_helper_gates_pass" => legacy_pass, "legacy_helper_rule" => "also requires containing zero; retained diagnostic, not project admission",
+        "effects" => effects, "accepted_ir_win" => pass && effects.values.all? { _1.fetch("clear_win") }}
+      File.write(File.join(output, "decision.json"), JSON.pretty_generate(decision))
+      puts JSON.pretty_generate(decision)
     end
   end
 end
