@@ -8,7 +8,7 @@ require_relative "fizzy_link_vector"
 module BlockLinkControls
   TEMPLATE = File.expand_path("fixtures/block_link.html.erb", __dir__).freeze
   SITE = {"file" => TEMPLATE, "line" => 2}.freeze
-  MODES = %w[normal nil whitespace unsafe safe nested next raise throw break return builder singleton buffer foreign streaming url_error].freeze
+  MODES = %w[normal nil whitespace unsafe safe nested next raise throw break return builder singleton buffer foreign streaming url_error native].freeze
 
   class << self
     def observe(view)
@@ -20,6 +20,15 @@ module BlockLinkControls
     def invoke(template, view, mode)
       log, observations = [], {}
       target = "/target?x=1&y=2"
+      if mode == "native"
+        # The original template/block stays unchanged. This opaque local's
+        # normal << dispatch replaces the holder primitive during the block.
+        log.define_singleton_method(:<<) do |value|
+          result = super(value)
+          Lowrail::Native.define_singleton_method(:exact_class?) { |*| true } if value == "block"
+          result
+        end
+      end
       if mode == "url_error"
         target = Object.new
         target.define_singleton_method(:to_model) { log << "url"; raise "URL failure" }
@@ -47,7 +56,7 @@ module BlockLinkControls
       counts = ledgers.map { _1.fetch("specimen").fetch("counts").fetch(site, {}) }
       outcome = ledgers.last.fetch("outcome")
       unwind = %w[raise throw break return url_error].include?(mode)
-      fallback = %w[foreign singleton streaming].include?(mode)
+      fallback = %w[foreign singleton streaming native].include?(mode)
       checks = {
         "completed_first_original" => counts.first["original_completed"] == 1 && counts.first.fetch("hits", 0).zero?,
         "exercised_fast_prelude" => arm == "off" || counts[1]["hits"] == 1,
@@ -69,6 +78,7 @@ module BlockLinkControls
       checks["old_buffer_restored"] = outcome["old_after_link"] == "old" && outcome["replacement_after_link"] == "new+block" if mode == "buffer"
       checks["actual_streaming_fallback"] = outcome.dig("result", "streaming") == true && outcome["log"].include?(["stream", expected]) if mode == "streaming"
       checks["URL_before_block"] = outcome.values_at("message", "log") == ["URL failure", ["url"]] if mode == "url_error"
+      checks["native_dependency_fallback"] = arm == "off" || counts.last.fetch("fallback: seal/holder/dependency changed", 0) == 1 if mode == "native"
       checks
     end
 

@@ -23,6 +23,8 @@ module BlockLinkSpecimen
 
     def install(app:, artifact:, contexts:, arm:, discover: false, control_sites: [])
       @app, @artifact, @arm, @discover = app, artifact, arm, discover
+      @holder = Lowrail::Native.method(:exact_class?)
+      raise "native holder unavailable" unless @holder.source_location.nil?
       @manifest = contexts.to_h { |entry| [entry.fetch("key"), entry] }.freeze
       @contexts = @manifest.to_h { |key, _| [key, {state: "pending", lock: Mutex.new, attempts: 0}] }
       @counts, @discovered = {}, {}
@@ -39,7 +41,7 @@ module BlockLinkSpecimen
 
     def ivar(value, key) = IVAR.bind_call(value, key)
     def klass(value) = CLASS.bind_call(value)
-    def exact(value, type) = Lowrail::Native.exact_class?(value, type)
+    def exact(value, type) = @holder.call(value, type)
     def signature(sequence, method_name) = Lowrail::FormScaffoldAdmission.block_signature(sequence, method_name.to_s)
 
     def template_source(template, source)
@@ -204,7 +206,7 @@ module BlockLinkSpecimen
         raise "nonstock visibility #{name}" unless visibility == expected_visibility
         audit_method!(method)
       end
-      raise "native holder unavailable" unless defined?(Lowrail::Native) && Lowrail::Native.method(:exact_class?).source_location.nil?
+      raise "native holder changed" unless Lowrail::Native.method(:exact_class?) == @holder
       raise "cold seams not delivered" unless delivered.all? { Lowrail::Loader.served?(_1) }
       @escaping = %i[unwrapped_html_escape xml_name_escape].map { |name| [name, ERB::Util.method(name)] }
       @escaping.each { |_, method| audit_method!(method) }
@@ -229,10 +231,11 @@ module BlockLinkSpecimen
     end
 
     def dependencies?
-      @dependencies && @dependencies.all? { |holder, name, method, visibility|
+      @dependencies && Lowrail::Native.method(:exact_class?) == @holder &&
+        @dependencies.all? { |holder, name, method, visibility|
         holder.instance_method(name) == method && Lowrail::Sealed.visibility(holder, name) == visibility
       } && @escaping.all? { |name, method| ERB::Util.method(name) == method } &&
-        Lowrail::Sealed.literal_state?(exact_class: Lowrail::Native.method(:exact_class?))
+        Lowrail::Sealed.literal_state?(exact_class: @holder)
     end
 
     def predicate(call, builder, content, options, escape)
