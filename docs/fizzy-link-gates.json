@@ -1,0 +1,1256 @@
+{
+  "format": 1,
+  "scope": "untimed bench-only block-link prototype; no production admission or cohort approval",
+  "app": {
+    "repository": "basecamp/fizzy",
+    "source_revision": "6f1d200316ec3bae91d32c557d88647300807ee9",
+    "overlay": "frozen Rails 8.1.4 corpus dependency overlay"
+  },
+  "pins": {
+    "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+    "harness_root": "/home/user/workspace/lowrail-block-link-harness",
+    "app_source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+    "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+    "contexts_sha256": "7a874ed1294aec928a8302c716250e8b41558f08bb7f504e177cd0145cc88928",
+    "artifact": {
+      "0.rb": "f4b29282e15dc0c1749d4e983a0a10e6683d2a7ad02cc34e2dc28a6ab4387611",
+      "1.rb": "5166836669a97b51e94bc8f36478c30097866c27072f7e2b4f6c84d5b19f4aab",
+      "2.rb": "4f3bc4d019ec3baca925f2bcff381ec581e1e0b281a3554d510b8f879c7912c4",
+      "3.rb": "3a6f994f65650e10216492d80ddb39e8d32678b688f65f50cbd47a05df138aea",
+      "4.rb": "26cc20eedca714797ca2a6b3623fe915b5d4de09230ea7da08b0aa77e110850f",
+      "5.rb": "5696efed8a494fa1625938a36ca9ec507e4d131594bbb115f7fb712bd6022aea",
+      "audit-sources.json": "30d6d3c484dd942f24c89b783a5da6976901280703e9f2e386baad2d797c6af9",
+      "expected-methods.json": "cbd18116c5f3da45af9d71c4f5a496ebde59c255efefa3efe7cd93aa8796b758",
+      "iseq/071d0dfce20cdfe74ae5777982e9975a88a97db87bd6cf0c88997cae0e24fb02.bin": "071d0dfce20cdfe74ae5777982e9975a88a97db87bd6cf0c88997cae0e24fb02",
+      "iseq/1402d24464182ceb619d02a086af737f498050ff6be456c5dd6ced29c35c451b.bin": "1402d24464182ceb619d02a086af737f498050ff6be456c5dd6ced29c35c451b",
+      "iseq/3aa97bb8190b56508f23f815839f4ca7e78c0c1d25d3b6381cb489f9f74ca25e.bin": "3aa97bb8190b56508f23f815839f4ca7e78c0c1d25d3b6381cb489f9f74ca25e",
+      "iseq/a5aeaa496299b9471e1eac098dbf19dc35ce2c7967088712c9d8d0fc405d8aa2.bin": "a5aeaa496299b9471e1eac098dbf19dc35ce2c7967088712c9d8d0fc405d8aa2",
+      "iseq/ac72c8f8fdb888f1e21675f66f52be5793430b845c3df4af5e201bd68950c1be.bin": "ac72c8f8fdb888f1e21675f66f52be5793430b845c3df4af5e201bd68950c1be",
+      "iseq/f9218f76c017c0df270b43f77d96897d957d082bbdf531ad30111b402e4097f0.bin": "f9218f76c017c0df270b43f77d96897d957d082bbdf531ad30111b402e4097f0",
+      "ledger.json": "eebc13cb36eb4a9a08bbd792fd76b220fa59e19425f19835767e1110371caeed",
+      "manifest.json": "53cbdc4e438b1b0761e9dba863c2bd973aa64be6c39eaf0716347a0346382b4a"
+    },
+    "native": {
+      "gem/lib/lowrail/native/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/lowrail_native.so": "a3669eda9f150f05bec4d7663859693266bd1e0fcd58b02769caa95bf58e9c8a"
+    },
+    "sources": {
+      "bench/experiments/block_link_controls.rb": "1236319d59a5a9812a943caea8d27da2dd712efa9e26425ec94cbe2eb99b4f2e",
+      "bench/experiments/block_link_delivery.rb": "c999db1017da1a3f1d23a625d0c61e0f081cc5358ac17fd3622a6fd38aefe39c",
+      "bench/experiments/block_link_specimen.rb": "d6322023a6a331921aa0805656ee91f129921781b6c0d00821ed4f972288006f",
+      "bench/experiments/fizzy_link_check.rb": "44164d2f2d4d5dab72c16f16c5018605d9999eabcb351a218e46aadc1c3139ec",
+      "bench/experiments/fizzy_link_completion.rb": "03cc59120d9f82f479746639b1e6a4922695a800cce89d02a59164adea07f985",
+      "bench/experiments/fizzy_link_fixture.rb": "2a396ed02e2c93509bb5b1ffe990ab2c5d26d16850732ea9bb79e22ce62b34ed",
+      "bench/experiments/fizzy_link_http.rb": "aee546bdaa1e601e2c65455bb86b2c942a034f4f48204a4eb062a5c0079fbd6e",
+      "bench/experiments/fizzy_link_vector.rb": "54f834b57f0749e72ab33cf1b1cc6595ea564f794d6514b83bea068dc32b8e2d",
+      "bench/heap_windows.rb": "b4f3bfa341ba37d09f3d84b7c77dd629aa7b87c36d80805b3bca37836f2b32d6",
+      "bench/jit_stability.rb": "743649435ea5af8e3902d35516e592e522afa7ed8b74135b491b6559496ca1a9",
+      "bench/request_pairs.rb": "d390a08c3d2f05046bd41e3985aece1a1b4d7f638c84598cb792b6d55ebf20d9",
+      "bench/worker_placement.rb": "d6d63ec89aa6e6652f70048f05dd682a25e6ebd77a41839c62a7eb6ab9867aa8"
+    },
+    "entropy_policy_sha256": "190ec133a693e833e0c70a16a011bc0408677446debcf38941a2dd4d71400c6e"
+  },
+  "entropy_policy": {
+    "format": 1,
+    "app_source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+    "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+    "ruby_version": "4.0.7",
+    "seeds": [
+      0,
+      1
+    ],
+    "evidence": "docs/sealed-verification.md#declared-blog-entropy-companions",
+    "scope": "Disposable isolated Fizzy six-request companion only, NOT production inputs or blog authority",
+    "controls": {
+      "secret_key_base": "lowrail-disposable-blog-companion-only- repeated four times; DUMMY disabled",
+      "random": "Per-workflow, per-declared-site Random seeded with SHA256(seed/scenario ID/site); streams continue over session round trips; integer bytes, not OpenSSL RNG reseeding",
+      "runtime": "Only Rack::Runtime#call's two Rack::Utils.clock_time reads per request return successive 0.001-second inputs; real reads retained separately; x-runtime remains a literal compared header, not a performance measurement",
+      "request_id": "Caller-supplied original test ID",
+      "session": "Legacy GETs fresh; breadth workflows retain actual encrypted cookies and submit the natural form's CSRF/_method inputs. No security certification",
+      "state": "Same closed four-SQLite-file snapshot and cleared tmp before each sequential worker; each additional breadth case is a new worker, not a rollback hiding after_commit effects",
+      "wall_clock": "Breadth companions only: every Time.now read on the active scenario thread returns the declared fixed epoch; real reads and call sites retained separately. Includes AR timestamps, job enqueued_at and cookie expiry; raw and legacy GET wall clocks remain real"
+    },
+    "wall_clock": {
+      "epoch": 1767312000,
+      "scope": "breadth scenario thread only",
+      "evidence": "docs/sealed-verification.md#blog-write-and-model-scenarios"
+    },
+    "runtime_sources": {
+      "ruby:random/formatter.rb": "9a787be99c281f98c8abc34ab67521be733a7297f156a7df496df2ccb417437e",
+      "ruby:openssl/cipher.rb": "087436098382bbe93b90cacad6b33b7ed63acf7c7014bdfe89b0d515c1e0259b",
+      "securerandom:lib/securerandom.rb": "2a99f878e3cf2d92b88dad1512c9c86272ca8679af9a8a1d5790f7c37a9d40a4",
+      "rack:lib/rack/runtime.rb": "c07bc0de1850728c77b2e5436c930abdfc3b0decb036a27dc7d77a58c28122bf",
+      "rack:lib/rack/utils.rb": "82ab7360295a67ebfe3a9dd0502eba3377dc453bf2b9bf778f5dd2a6bd4db18e",
+      "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb": "a9fe0df38a05ce2ee4486c801ce78719afe239abf66b01a388c61c27ed1f6b4d",
+      "actionpack:lib/action_controller/metal/request_forgery_protection.rb": "01af4e9a30bc81f78ead041c27f8571c9f01a68f94d6c9450abd2e594209d051",
+      "actionpack:lib/action_dispatch/middleware/cookies.rb": "9db3611f9911521c8f3959b38d0e2025697f9449e7bb8555c0e7b9d70e5333ea",
+      "activesupport:lib/active_support/message_encryptor.rb": "f23ae37f44fa36b9cbc8f189a4d5e0d753b1b0a99e3bf76b835b804739935d61",
+      "activejob:lib/active_job/core.rb": "b740be56b9be48c76b1e8d65bdc44cef4341d0d596246fac0691da71f6fe35e1",
+      "actionpack:lib/action_dispatch/middleware/flash.rb": "310b093336210f80a0cd369f9070281408c9ab9cdf14dc54ec33f36b58860553"
+    },
+    "random_sites": [
+      {
+        "name": "csrf_token",
+        "provider": "SecureRandom",
+        "source": "actionpack:lib/action_controller/metal/request_forgery_protection.rb",
+        "method": "generate_csrf_token",
+        "bytes": 32
+      },
+      {
+        "name": "csrf_mask",
+        "provider": "SecureRandom",
+        "source": "actionpack:lib/action_controller/metal/request_forgery_protection.rb",
+        "method": "mask_token",
+        "bytes": 32
+      },
+      {
+        "name": "session_id",
+        "provider": "SecureRandom",
+        "source": "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb",
+        "method": "generate_sid",
+        "bytes": 16
+      },
+      {
+        "name": "cookie_iv",
+        "provider": "OpenSSL::Random",
+        "source": "ruby:openssl/cipher.rb",
+        "method": "random_iv",
+        "bytes": 12
+      },
+      {
+        "name": "active_job_id",
+        "provider": "SecureRandom",
+        "source": "activejob:lib/active_job/core.rb",
+        "method": "initialize",
+        "bytes": 16
+      }
+    ]
+  },
+  "context_count": 24,
+  "source_site_count": 23,
+  "cold_entries": 29,
+  "warm_entries": 24,
+  "warm_site_identities": 19,
+  "cold": [
+    {
+      "status": "rejected_off_control",
+      "fields": {
+        "initial_effects": {
+          "off_off": true,
+          "off_on": true
+        },
+        "steps": {
+          "off_off": true,
+          "off_on": true
+        },
+        "sql": {
+          "off_off": false,
+          "off_on": false
+        },
+        "events": {
+          "off_off": true,
+          "off_on": true
+        },
+        "completed_effects": {
+          "off_off": false,
+          "off_on": false
+        },
+        "completion": {
+          "off_off": true,
+          "off_on": true
+        },
+        "loads": {
+          "off_off": true,
+          "off_on": true
+        },
+        "features": {
+          "off_off": true,
+          "off_on": true
+        },
+        "ancestry": {
+          "off_off": true,
+          "off_on": true
+        }
+      },
+      "controls": {
+        "same_clean_harness": true,
+        "completed_cable_queue": true,
+        "no_capture_errors": true,
+        "no_undeclared_entropy": true,
+        "same_entropy_trace": true
+      },
+      "sql_events": [
+        647,
+        647,
+        642
+      ],
+      "cached_unavailable_binds": [
+        168,
+        168,
+        168
+      ],
+      "compared_payload_fields": [
+        [
+          "controller",
+          "action",
+          "method",
+          "path",
+          "format",
+          "status",
+          "identifier",
+          "layout",
+          "count",
+          "cache_hits"
+        ]
+      ],
+      "uncovered": [
+        "arbitrary render subscriber payloads/controller assigns are not fully captured",
+        "cached lazy SQL-bind Proc values are explicitly unavailable; only SQL text/cache hit compared",
+        "source-only prototype has no production passive admission authority",
+        "SolidCache background completion is outside the Cable/queue-only adapter; cache SQL/state remain compared, never discarded"
+      ],
+      "seed": 0
+    },
+    {
+      "status": "rejected_off_control",
+      "fields": {
+        "initial_effects": {
+          "off_off": true,
+          "off_on": true
+        },
+        "steps": {
+          "off_off": true,
+          "off_on": true
+        },
+        "sql": {
+          "off_off": true,
+          "off_on": true
+        },
+        "events": {
+          "off_off": true,
+          "off_on": true
+        },
+        "completed_effects": {
+          "off_off": false,
+          "off_on": false
+        },
+        "completion": {
+          "off_off": true,
+          "off_on": true
+        },
+        "loads": {
+          "off_off": true,
+          "off_on": true
+        },
+        "features": {
+          "off_off": true,
+          "off_on": true
+        },
+        "ancestry": {
+          "off_off": true,
+          "off_on": true
+        }
+      },
+      "controls": {
+        "same_clean_harness": true,
+        "completed_cable_queue": true,
+        "no_capture_errors": true,
+        "no_undeclared_entropy": true,
+        "same_entropy_trace": true
+      },
+      "sql_events": [
+        642,
+        642,
+        642
+      ],
+      "cached_unavailable_binds": [
+        168,
+        168,
+        168
+      ],
+      "compared_payload_fields": [
+        [
+          "controller",
+          "action",
+          "method",
+          "path",
+          "format",
+          "status",
+          "identifier",
+          "layout",
+          "count",
+          "cache_hits"
+        ]
+      ],
+      "uncovered": [
+        "arbitrary render subscriber payloads/controller assigns are not fully captured",
+        "cached lazy SQL-bind Proc values are explicitly unavailable; only SQL text/cache hit compared",
+        "source-only prototype has no production passive admission authority",
+        "SolidCache background completion is outside the Cable/queue-only adapter; cache SQL/state remain compared, never discarded"
+      ],
+      "seed": 1
+    }
+  ],
+  "accepted_rejection_decision": "coordinator review pending; no differences filtered or treated as equal",
+  "named_off_off_rejections": [
+    "SolidCache 1.0.6 background size-estimation SQL interleaving differs; asynchronous cache completion is not certified by the Cable/queue adapter",
+    "SolidCache writes SQLite STRFTIME(%Y-%m-%d %H:%M:%f, NOW) timestamps; fixed Ruby Time.now does not fix the database clock"
+  ],
+  "warm_completed_hits_per_site": {
+    "app/views/buckets/index.html.erb:5": 1,
+    "app/views/buckets/_bucket.html.erb:2": 2,
+    "app/views/buckets/_bucket.html.erb:16": 2,
+    "app/views/buckets/_bucket.html.erb:20": 2,
+    "app/views/filters/_filter.html.erb:3": 1,
+    "app/views/filters/_filter.html.erb:17": 1,
+    "app/views/notifications/_tray.html.erb:6": 3,
+    "app/views/bubbles/index.html.erb:9": 1,
+    "app/views/filters/_buckets.html.erb:21": 1,
+    "app/views/filters/_tags.html.erb:20": 1,
+    "app/views/filters/_assignees.html.erb:22": 1,
+    "app/views/filters/_creators.html.erb:23": 1,
+    "app/views/filters/_stages.html.erb:21": 1,
+    "app/views/filters/_settings.html.erb:20": 1,
+    "app/views/bubbles/_bubble.html.erb:33": 0,
+    "app/views/bubbles/list/_bubble.html.erb:3": 0,
+    "app/views/bubbles/list/_bubble.html.erb:12": 0,
+    "app/views/accounts/users/index.html.erb:5": 1,
+    "app/views/accounts/users/index.html.erb:18": 1,
+    "app/views/workflows/index.html.erb:13": 1,
+    "app/views/workflows/_workflow.html.erb:17": 1,
+    "app/views/notifications/index.html.erb:14": 1,
+    "app/views/comments/_body.html.erb:6": 0
+  },
+  "phase_completed_hits": [
+    {
+      "phase": "cold",
+      "total": 5
+    },
+    {
+      "phase": "warm",
+      "total": 24
+    },
+    {
+      "phase": "warm_repeat",
+      "total": 24
+    }
+  ],
+  "negative_controls": {
+    "pass": true,
+    "separate_from_Fizzy_coverage": true,
+    "fresh_processes": 34,
+    "rows": [
+      {
+        "mode": "break",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "YnJva2VuCg=="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "broken\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "YnJva2Vu"
+          },
+          "link_class": "String",
+          "link_safe": false,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "buffer",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "old_buffer_restored": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "old_buffer_restored": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "bmV3K2Jsb2NrPGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPjwvYT4K"
+          },
+          "log": [
+            "block"
+          ],
+          "before": "old",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPjwvYT4="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "old",
+          "replacement_after_link": "new+block",
+          "replacement": "new+block<a class=\"literal\" href=\"/target?x=1&amp;y=2\"></a>\n",
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "builder",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPgo="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">héllo<&</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPg=="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": true
+        }
+      },
+      {
+        "mode": "foreign",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPgo="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">héllo<&</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPg=="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "nested",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPm5lc3RlZDwmPC9hPgo="
+          },
+          "log": [
+            "block",
+            "nested"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">nested<&</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPm5lc3RlZDwmPC9hPg=="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "next",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPm5leHQmbHQ7JmFtcDs8L2E+Cg=="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">next&lt;&amp;</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPm5leHQmbHQ7JmFtcDs8L2E+"
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "nil",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPjwvYT4K"
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\"></a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPjwvYT4="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "normal",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPgo="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">héllo<&</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPg=="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "raise",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true
+          }
+        },
+        "outcome": {
+          "error": "RuntimeError",
+          "message": "block failure",
+          "log": [
+            "block"
+          ],
+          "before": ""
+        }
+      },
+      {
+        "mode": "return",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "cmV0dXJuZWQ="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "",
+          "link_result": {
+            "type": "NilClass",
+            "value": null
+          },
+          "link_class": "NilClass",
+          "link_safe": false,
+          "old_after_link": null,
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "safe",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPnNhZmU8JjwvYT4K"
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">safe<&</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPnNhZmU8JjwvYT4="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "singleton",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "new_saved_method_once": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "new_saved_method_once": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "bmV3IHNhdmVkIHJlY2VpdmVyCg=="
+          },
+          "log": [
+            "block",
+            "new saved method"
+          ],
+          "before": "new saved receiver\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "bmV3IHNhdmVkIHJlY2VpdmVy"
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": false
+        }
+      },
+      {
+        "mode": "streaming",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "actual_streaming_fallback": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "actual_streaming_fallback": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "streaming": true
+          },
+          "log": [
+            "block",
+            [
+              "stream",
+              "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">héllo<&</a>"
+            ],
+            [
+              "stream",
+              "\n"
+            ]
+          ],
+          "before": "",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPg=="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "throw",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true
+          }
+        },
+        "outcome": {
+          "throw": "thrown",
+          "log": [
+            "block"
+          ],
+          "before": "",
+          "link_result": {
+            "type": "NilClass",
+            "value": null
+          },
+          "link_class": "NilClass",
+          "link_safe": false,
+          "old_after_link": null,
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "unsafe",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPnVuc2FmZSZsdDsmYW1wOzwvYT4K"
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">unsafe&lt;&amp;</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPnVuc2FmZSZsdDsmYW1wOzwvYT4="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "url_error",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "URL_before_block": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "URL_before_block": true
+          }
+        },
+        "outcome": {
+          "error": "RuntimeError",
+          "message": "URL failure",
+          "log": [
+            "url"
+          ],
+          "before": ""
+        }
+      },
+      {
+        "mode": "whitespace",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPiAJPC9hPgo="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\"> \t</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPiAJPC9hPg=="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      }
+    ]
+  },
+  "workers": {
+    "fizzy-link-final-controls/break-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "e573172e408149a11078afb3a91e2bbd6f48b42f7218b2ade1f842b800d50eee"
+    },
+    "fizzy-link-final-controls/break-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "7012ca6216d0a759ce7a652bea1e4fd678b177ab44bf99d8ddd8b56d197e4ac1"
+    },
+    "fizzy-link-final-controls/buffer-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "8a01426e4165acfacc7885b62e51d75454805bff03a93cc9ea21eea9f5827538"
+    },
+    "fizzy-link-final-controls/buffer-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "9d465c20bb554e7ddbcf2ab1c4b6f1394cf096d7173163066e4763744fd3370f"
+    },
+    "fizzy-link-final-controls/builder-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "97a99967be850158057b822a242412003b6dba5a9cee9900387266909a9289d7"
+    },
+    "fizzy-link-final-controls/builder-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "1f71d690b052efb8125c1ea0d975e951dc211644fa4b1862ec8e8dde04d64b10"
+    },
+    "fizzy-link-final-controls/foreign-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "1f30146ba795a2f67818182723fdcd361d19caee82474c10adbb621b81e5f1a7"
+    },
+    "fizzy-link-final-controls/foreign-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "40adf730654df93c9180400462a0346415b37547d3e9a34dd21cfe4916f41788"
+    },
+    "fizzy-link-final-controls/nested-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "8ce199a038adb1b8beefca97faf121a7e84dda3ed28f999c9dc60d197413ec6e"
+    },
+    "fizzy-link-final-controls/nested-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "23e419bdecd96354ac8f46462ff4652ced2152090c47f411120315860bed4511"
+    },
+    "fizzy-link-final-controls/next-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "19036ba4ba781b1c9153db2fdc203ebd46f8651b5a6bb08f0e36516fd8d94e8b"
+    },
+    "fizzy-link-final-controls/next-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "08c0e28409acb46dfe49f3b2a78c573fa52f0d713a7a043be24f32ff615f7679"
+    },
+    "fizzy-link-final-controls/nil-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "f234d81558766544ae2d67f62630916e32abbaa19f1305a1b1cf2ae866fe8409"
+    },
+    "fizzy-link-final-controls/nil-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "af7e30a311d421cb36a73c28ac43976f8ac160aa5d681238974782e5aea114c1"
+    },
+    "fizzy-link-final-controls/normal-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "e52535dafabe3ce5cc344d13969fb19291c14108adbf39934f1fbda7a8b38d01"
+    },
+    "fizzy-link-final-controls/normal-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "5306bad6b0e7642a08698e91c57041787bb89692121e133c6e3fc54bfc3ab585"
+    },
+    "fizzy-link-final-controls/raise-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "57ca4153b015a648f218fa34436cc6c1ac886d4892c908f328048a86d01a3dfa"
+    },
+    "fizzy-link-final-controls/raise-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "55d27d7f11db546d021d0adfdf70f6ba3692021082cc48101a342892288884f4"
+    },
+    "fizzy-link-final-controls/return-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "09b3c3b03aaba9a384ae1a2fffe5ac517152247a8e99afd0e7681ca9c3aad577"
+    },
+    "fizzy-link-final-controls/return-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "d23545bc7d9bdf376bf0a19f7ffc5559bdbce096f6391501e9328869d89fa5cc"
+    },
+    "fizzy-link-final-controls/safe-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "314ed45ed4af465eec2f04a651b417b0721f03b0524aa0d718b014df43d78990"
+    },
+    "fizzy-link-final-controls/safe-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "8cd86ce3fae726b3dae75db1cab56905b72ef37dbe8bc8b0a01bcf976ed2fea4"
+    },
+    "fizzy-link-final-controls/singleton-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "acd9f19cc889a19d92a7b329bfd42ce8350c9ace089a3e681ea558c9ef7dc525"
+    },
+    "fizzy-link-final-controls/singleton-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "6484906979f4150097579b03b46f2b6775231d30e197f8a751b5ff78396654bb"
+    },
+    "fizzy-link-final-controls/streaming-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "65ccd8ecd32b5d79e530c645265840b205483c711fd2fecd09c5707baf081db0"
+    },
+    "fizzy-link-final-controls/streaming-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "23e572cf84b2375f6fb959b3e17447756c3b5d04d9340ac2bac3cceb58c742d6"
+    },
+    "fizzy-link-final-controls/throw-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "4898d7f9f9665116070da4d16e151e06007740587e650f0b2112b5c06a430319"
+    },
+    "fizzy-link-final-controls/throw-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "b44781b36094e33a8d257b696bfe7b937d76175f2408632b24b914542e1a1086"
+    },
+    "fizzy-link-final-controls/unsafe-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "a07450fd423f5e168b36855bb3059d38e144cfad9e074de8a1026d0c9f75b8af"
+    },
+    "fizzy-link-final-controls/unsafe-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "ecc56eb3a52797b61e16ec5105a7cb1c6f1e69267313338c41643e7aa93a924e"
+    },
+    "fizzy-link-final-controls/url_error-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "928f96b7af7baf1dbe403bda06bbf51415b49f47eab643ceb132c380189a2195"
+    },
+    "fizzy-link-final-controls/url_error-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "994400f6f3c90b5e538399d0c488288bc3dfa111d5ded242e9cd81824cf81fd7"
+    },
+    "fizzy-link-final-controls/whitespace-off.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "ab801b947ad47d51b842247985b6fd0a94a464e37f1a925a2201a749478b8f92"
+    },
+    "fizzy-link-final-controls/whitespace-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "13b907119c1391b2abf7e5b11a66aeb32c44d686ba220bbdaf4cca02d699e5f7"
+    },
+    "fizzy-link-final-gates/0-off_a.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "18ddab6b9244f855a3f59a91b232468fc323b216bb88c2fae0b9bc565fb072ac"
+    },
+    "fizzy-link-final-gates/0-off_b.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "b3eaff39482c7f1f8a07fb1f85d5c51904bc49e1f804b4853e7d9fb415e47775"
+    },
+    "fizzy-link-final-gates/0-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "d31dbd4f47484113b1ad01d0d538b79953320e8f3ff8bbf97e1c29cda7f8f018"
+    },
+    "fizzy-link-final-gates/1-off_a.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "7643d6502107cf356ffe9ac1e4049b8063f1245b83d66cc3b8060902761303c7"
+    },
+    "fizzy-link-final-gates/1-off_b.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "02b6c1bdef95d1759524b1430e13f020c81ca770a304542e054aa3e602f18105"
+    },
+    "fizzy-link-final-gates/1-on.json": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "raw_sha256": "5d4d90f8b16ea6651346d1644def31c6074bf4ebdf50b26b7d48c4f83070a5fa"
+    }
+  },
+  "production_changes": false,
+  "app_patches": false,
+  "measurements_run": false,
+  "cohort_authorized": false
+}

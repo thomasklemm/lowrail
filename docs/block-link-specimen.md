@@ -283,3 +283,127 @@ The existing native `exact_class?` is only holder evidence: no Proc/binding
 or constructor authority follows. The bench specimen must charge all seams,
 manifest selection, witness, post-live guards and fallback costs. This review
 accepts a direction, not a production certificate or measured cohort.
+
+## Executed bench-only gates
+
+The [pinned machine report](fizzy-link-gates.json) records **40 untimed
+workers**, all run from the clean detached harness
+[`6c3342f`](https://github.com/thomasklemm/lowrail/commit/6c3342fd77b90557b8da0133bbc296013aad42d4).
+This is not the eventual documentation commit or a floating local main.
+Each worker records its harness SHA, source/native/artifact/context hashes,
+Fizzy source/lock fingerprints, and (for companions) the entropy-policy hash.
+App and dependency pins remain the unchanged corpus fixture above.
+
+Discovery, in a separate original process, froze **24 contexts across23
+sites** before gate workers. A successful original call is still required
+in each process/context; no contexts or cached builders are manufactured.
+Rails stores file-backed source in a `Sources::File` wrapper and registers
+an ERB handler **instance**. The bench therefore observes the actual encoded
+source at normal compilation through a sixth symmetric, source-pinned seam;
+it never calls Template#source/compiled_source, a handler, or a compiler to
+create witness evidence. Missing natural compilation/constructor evidence
+refuses. Eval block ISeqs use their actual `path`, with child-tree and full
+location association, not a source-line-only authorization.
+
+### Cold off/off/on: still rejected, not normalized
+
+Two independent seeded sequences use the existing thread-scoped
+`BlogProduction::Entropy` controls with a separately pinned Fizzy policy.
+Both seeds have identical full HTTP status/body/headers, selected render and
+controller events, load/feature order, ancestry, initial DB state and entropy
+trace in all arms. There are zero capture or undeclared-entropy errors.
+
+The separately named `fizzy-solid-cable-3.0.5-synchronous-v1` completion
+adapter passes for all six workers. Its own version/source pins cover
+3.0.5's synchronous broadcast/TrimJob.perform_now path and1.1.2 queue
+adapter. It reads existing Cable ivars and the isolated queue DB; it does
+not call shutdown (which would create a listener), create a server/adapter,
+load a model, run a job, or reuse the blog4.1.0 writer-drain certificate.
+Existing listener/worker/event-loop/heartbeat, unfinished queue work,
+unknown adapters or source/version mismatches refuse. **This is Cable/queue
+completion only, not SolidCache completion.**
+
+Exactly168 cached lazy-bind events per worker are retained with the named
+`binds_unavailable/cached_lazy_proc_not_invoked` value. Their SQL text,
+cache-hit flag, order and other captured fields are compared. The Proc is
+never invoked, query attributes are not recast, and unavailable bind values
+are explicitly uncovered rather than invented.
+
+Both complete comparisons remain **`rejected_off_control`**:
+
+- Other-thread SolidCache1.0.6 size-estimation SQL can interleave with
+  request-thread SQL. Seed0 rejects SQL order; seed1 happens to agree, which
+  does not establish a completed/ordered cache boundary.
+- Cache writes contain `STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')`; fixing Ruby's
+  Time.now does not fix SQLite's clock. Cache row timestamps/state differ
+  even off/off. No timestamps, queries or database rows are discarded.
+
+Compared event fields are controller/action/method/path/format/status,
+identifier/layout/count/cache_hits plus captured flash. Arbitrary subscriber
+payloads, controller assigns and cached Proc bind values remain uncovered.
+Asynchronous SolidCache completion is outside the completion adapter and
+remains a separate explicit gap. No general equivalence claim follows.
+
+### Separate boundary controls:17 paired cases pass
+
+Each of34 fresh processes naturally signs in and visits /buckets, then
+renders the pinned labelled bench template on that already-used view. Only
+the external control harness temporarily holds the view; the admission
+registry retains no view/request/model/Proc graph. The control has its own
+frozen context, first-original witness, and an exercised normal fast call
+before the mutation. It supplies no Fizzy authorization or coverage.
+
+All17 off/on outcome comparisons and independently specified checks pass:
+normal, nil, whitespace, unsafe/safe Strings, nested capture, next,
+raise/throw/break/return, saved-builder replacement, a new singleton method
+on the saved builder, output-buffer replacement, foreign builder, streaming,
+and a URL error before the block. Captured bytes/encoding and tag safety,
+once-only effects and completed-hit deltas are checked. Saved-builder and
+buffer replacement remain correct fast cases; singleton/foreign/streaming
+cases exercise the saved receiver's live fallback. The streaming constructor
+setup error from the earlier draft is retained as rejected setup, not a pass.
+Its corrected case actually runs the block once and takes the buffer-
+provenance refusal after the positive fast prelude.
+
+Warm vectors complete **24 suffix hits across19 identities**, identically
+in both seeds and both warm repetitions. Cold has5 hits after24 successful
+first originals. The report includes the complete per-site warm map,
+including four explicit cache-elided zeros; counts are not source coverage
+or production admission.
+
+### Reproduction and the held shared-driver adapter
+
+Run the tracked `block_link_delivery.rb` build against the frozen corpus
+bundle and an isolated fixture prepared by `fizzy_link_fixture.rb`. The
+builder observes actual original production boot recipes; it does not render
+templates. Use a clean detached worktree with its matching native extension,
+then freeze original `discover` output before any `cold`/control workers:
+
+```sh
+# Ruby invocation throughout: mise exec ruby@4.0.7 -- bundle exec ruby
+# BUNDLE_GEMFILE points at the frozen corpus Gemfile; BUNDLE_FROZEN=true.
+# Every STATE is a new copy of the same external four-DB fixture seed.
+BENCH_HARNESS_SHA="$PIN" ruby "$HARNESS/bench/experiments/fizzy_link_vector.rb" \
+  discover "$APP" "$DISCOVERY_STATE" "$ARTIFACT" "$EMPTY_CONTEXTS" off "$DISCOVERY_JSON"
+BENCH_HARNESS_SHA="$PIN" BENCH_ENTROPY_SEED=0 BENCH_ENTROPY_POLICY="$POLICY" \
+  ruby "$HARNESS/bench/experiments/fizzy_link_vector.rb" \
+  cold "$APP" "$NEW_STATE" "$ARTIFACT" "$FROZEN_CONTEXTS" off "$OUTPUT"
+# Repeat off/off/on, seed0 and seed1, with distinct NEW_STATE paths.
+ruby "$HARNESS/bench/experiments/fizzy_link_check.rb" cold \
+  "$REPORT" "$OFF_A_JSON" "$OFF_B_JSON" "$ON_JSON"
+```
+
+For controls, use `block_link_controls.rb discover|gate` with its separately
+frozen manifest; compare with `fizzy_link_check.rb controls`. Raw logs,
+discarded setup attempts and complete private responses remain under
+`.lowrail/private/fizzy-link-*`; public reports contain no session cookies.
+
+`RequestPairs.heap_instructions` can consume the same vector driver via the
+single route argument `VECTOR:fizzy-links`. The tracked adapter creates a
+new per-worker state copy, records all pins, charges guard/witness/count
+work, records each window's completed site mix, and refuses any change from
+the predeclared warm map. One iteration means **six GETs**, not one request.
+There is no cohort launcher in this slice. An unapproved invocation refuses
+before starting a counter or creating worker state; that refusal was checked.
+The measured path has not run. **No cohort approval, measurement, production
+registration, form change or app patch is included.**
