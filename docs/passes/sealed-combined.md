@@ -142,10 +142,78 @@ full summaries, control verdicts, correctness counts, witness costs and pins.
 Total and GC-excluded windows are separate executions with N=0 subtraction;
 their small difference is not evidence of GC savings, particularly with zero
 collections. The A/A difference is small but the declared gate is unchanged.
-Untimed diagnosis, not another cohort, is the next step. A further measurement
-requires a concrete fixable harness cause, a pinned fix and separate approval.
+The untimed diagnosis below establishes no fixable harness cause. A further
+measurement would require a concrete harness cause, a pinned fix and separate
+approval; none is proposed.
 
 Raw private samples SHA-256:
 `5ed66bbceea3d572ebf14571792af958859094015f6ddf7acdcfbe39700c4d90`;
 summary `b1e117c7d0831258b4220b181d3a1d8ca825cbe582a6ae3be95c63f7659bc8cb`;
 gate report `77852c500191c67aa65e247b5cacb078d32260078abd8315eef3434c18e7b07a`.
+
+## Untimed total A/A diagnosis
+
+**No concrete, fixable harness cause established; the rejection stands. No
+new cohort proposed or counters run.** This analysis reads the retained
+samples and all 48 off-worker window profiles, not a new execution of the app.
+It does not change the candidate, controls, bootstrap, tolerances or pins.
+
+The table uses zero-based rounds. Ir differences are **off-B minus off-A per
+request**, after each arm's own N=0 subtraction. Allocation differences are
+objects across the full **50-request** window, not per request. The queue
+order is reproduced from the pinned seed 41231; it is not an observed CPU
+placement or precise OS process-start order. At most two workers overlap.
+
+| Round | Queued arms | Total Δ Ir/request | GC-excluded Δ Ir/request | Total Δ objects/50 | GC-excluded Δ objects/50 |
+|---|---|---:|---:|---:|---:|
+| 0 | A, combined, B | +5,014.48 | +3,127.44 | +34 | −6 |
+| 1 | combined, A, B | +1,314.38 | +80.60 | −29 | −55 |
+| 2 | combined, A, B | −197.44 | +761.24 | −23 | +6 |
+| 3 | combined, B, A | +2,120.74 | −1,569.22 | +43 | −27 |
+| 4 | combined, B, A | +2,286.20 | +4,640.80 | +2 | +59 |
+| 5 | A, B, combined | +3,990.48 | +757.68 | +40 | −6 |
+
+Findings and limits:
+
+- **Not collections inside the windows.** All 12 off workers / 48 windows,
+  including N=0 and both modes, have zero GC segments, minor/major count
+  increments and GC-time increments. `gc.c` self costs include allocation and
+  write-barrier work; they are not evidence of a collection. Total and
+  GC-excluded are different executions, not one trace with GC subtracted.
+  Total runs first in even rounds and GC-excluded first in odd rounds, equally
+  for A and B. Their separate paired ratios produce the reported distinct
+  bootstrap intervals; a pass in one is not a replacement for the other.
+- **Outside-window collection counts match, object graphs need not.** Every
+  off worker has pre-window GC counts 12/15/18/21 by window rank, minor count 2
+  throughout, major counts 10/13/16/19: three full collections at each boundary.
+  All retain 2,168 heap anchors, pass the page/capacity gates, and start each
+  N=50 window with `malloc_increase_bytes` 41,584. Before the total N=50 window,
+  B−A old-object counts are −38/+4/−2/−1/−1/−1. Fixed capacity does not make
+  live graphs, retained caches or allocator state identical. These differences
+  are observed, not normalized, and do not establish a defective preparation
+  step or an attribution of the failed interval.
+- **The subtraction seam is too small to explain it.** A/B N=0 differences
+  are at most 4 Ir within a paired mode, hence at most 0.08 Ir/request after
+  division by 50. They cannot explain the table's full-window differences.
+  `callgrind_annotate` self-cost sums reconcile with each retained window's
+  trailing totals; paired subtraction also reproduces the exported numbers.
+- **Allocation drift is present, not a proven cause.** Its sign does not
+  follow the instruction delta: rounds 1/2 allocate fewer objects in total B,
+  while only round 2 has a negative total instruction delta. Comparing all 48
+  annotated profiles localizes full-window differences to native hash/table/set
+  lookup, allocator, dispatch and string work. For example, round 0 `hash.c` is
+  +3,481.12/+3,440.00 Ir/request (total/GC-excluded); round 5
+  `concurrent_set.c:rb_concurrent_set_find` is +1,620 in both modes, while `malloc.c` changes
+  +201.02/−912.36. Persistent lookup differences coexist with mode-specific
+  allocation/string/allocator differences. This localizes executed work; it
+  does not prove a hash-seed, address-layout or harness bug.
+- **Ordering/placement is not an established explanation.** B's total delta
+  is positive both when queued before A (rounds 3/4) and after A (0/1/5); the
+  same queued order in rounds 1/2 even gives opposite total signs. Worker CPU
+  affinity, migrations and precise overlap were not recorded and cannot be
+  recovered from these samples. Placement remains an evidence gap, not a
+  diagnosed cause or permission to measure again.
+
+There is consequently no pinned harness fix or replacement-cohort request.
+The −17.862649% remains descriptive only. No native latency, production
+token/collection admission or accepted combined speed claim follows.

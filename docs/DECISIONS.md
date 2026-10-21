@@ -33,8 +33,13 @@ collection support. The published, pinned six-round interpreter cohort is now
 Combined −17.862649% total / −17.863529% GC-excluded Ir is **descriptive only**,
 not a speed claim. GC-excluded A/A, all five heaps and all 18 interpreter-mode
 checks pass but cannot salvage a failed total control. No rerun, filter stage,
-additive claim or promotion. Diagnose the retained off/off difference untimed;
-another cohort requires a concrete harness fix and separate approval.
+additive claim or promotion. Untimed diagnosis of all 48 off-worker profiles
+establishes **no concrete fixable harness cause**: no in-window GC, matching
+outside-window collection counts, negligible A/B subtraction seams, but live
+object/allocation and native lookup/allocator differences. Queue order does not
+explain the signs; actual CPU placement was not recorded. No replacement
+cohort is proposed. Another would require a pinned harness fix and separate
+approval, not a hypothesis or a candidate change.
 [Protocol, pins and retained failures](passes/sealed-combined.md).
 
 ## Passive form admission, not runtime recertification (2026-10-21)
