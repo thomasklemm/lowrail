@@ -26,7 +26,7 @@ No runtime/main promotion; CASA sign-in stays HTTP 500, full outputs/DB/own suit
 Keep branch-only candidate: 36 fresh Puma trees, warmup lower PSS than both off controls in all three rounds on Blog/Campfire/Fizzy/Lobsters; zero 5xx/1,035 responses.
 Median total PSS MiB off→warmup: 250.5→240.3 / 288.7→267.2 / 260.6→245.0 / 440.0→395.8; extra first response 0.15–0.36 s; opt-in helper never runs automatically.
 Blog/Campfire real-Puma RPS +6.09% [+3.00,+9.05] / +1.11% [−0.92,+3.29], A/A floors 4.94% / 4.64%; no detected loss beyond A/A, no resolved gain or non-inferiority proof.
-Both exact cold/warm two-seed status/body/all-header gates pass, zero load errors; Campfire's biased off/off interval is retained; Fizzy/Lobsters RPS await published HTTP adapters.
+Three completed apps pass cold/warm two-seed status/body/all-header gates with zero load errors; Fizzy RPS −0.44% [−2.38,+1.52] inside A/A floor 4.99%, higher GC-time proxy retained; Lobsters running on published adapters.
 No main/runtime promotion: full outputs/DB state, constants/method/features, own suites and Thermos remain unmet. [Tables and sanitized records](boot-image.md#bounded-follow-up-explicit-puma-warmup).
 
 ## Prism 2 adoption and target grammar (2026-10-21)

@@ -276,9 +276,12 @@ No steady-state worker lifetime or additional workers-per-box is inferred.
 
 ### Real-server RPS and exact-output gate
 
-One cohort per supported app uses published `script/rps`
+Blog/Campfire use published `script/rps`
 [`96b447f`](https://github.com/thomasklemm/lowrail/commit/96b447f730fcba7e698ad76ae55c740de2fca82f)
-in an isolated detached worktree, not a merge of bet-A changes. The external
+and Fizzy/Lobsters use the subsequently published adapters at
+[`b1e239f`](https://github.com/thomasklemm/lowrail/commit/b1e239f5bfcd2354166aeabddf1e6cc7a605fcaf).
+The isolated detached worktree advances only after the earlier cohorts finish;
+this is not a merge of bet-A changes or a rerun of Blog/Campfire. The external
 [Puma adapter](../bench/experiments/prefork_puma.rb) enables preloading and the
 same observer in every arm, calling the helper only for `on`. It records each
 actual master hook's completion/time outside app state. No app Puma/config.ru
@@ -313,22 +316,49 @@ exact status/body/all Rack headers, including natural HTTP login's GET/POST
 companions. All eleven on-arm hooks completed. **132,912 timed + 22,395 warmup
 HTTP200**, zero load/transport errors.
 
+**Fizzy complete:** fresh public fixture/secret/four-DB seed, six GETs including
+`/buckets`, natural CSRF/password login, `exploration_only:true` and independently
+compiled empty artifact. A/A −1.65% [−4.99%, +1.06%], floor **4.99%**;
+warmup/off **−0.44% [−2.38%, +1.52%]**, unresolved, no aggregate loss beyond
+A/A. Median off-A / on / off-B **312.7 / 309.4 / 310.0 RPS**. Cold/warm
+two-seed exact route/login workflows all pass; eleven completed on hooks;
+**186,333 timed + 28,998 warmup HTTP200**, zero errors. The −14.52% off/off
+round and −6.22% on/off round remain in the export, not excluded or rerun.
+Timing is an aggregate uniform-random six-URL pool, **not** the interpreter
+study's fixed-vector price or per-route throughput.
+
+Lobsters uses the unchanged shipped DB (SHA256 `d9817ef6…`), `/` plus
+`/s/enr7ye`, and absolute `fixtures/corpus/lobsters-rps.Gemfile` from the pinned
+harness. This dependency-only overlay adds Puma **8.0.2** to the prior overlay;
+only the corresponding overlay/lock hashes change in its validator policy,
+not entropy rules. Its cohort is running; no result yet.
+
 | App | A/A paired RPS Δ [95% interval] | A/A floor | Warmup/off RPS Δ [95% interval] | Decision |
 |---|---:|---:|---:|---|
 | Blog | −0.10% [−4.32%, +4.94%] | 4.94% | +6.09% [+3.00%, +9.05%] | No detected loss; gain unresolved against A/A |
 | Campfire | −2.54% [−4.64%, −0.51%] | 4.64% | +1.11% [−0.92%, +3.29%] | No detected loss; unresolved; off/off bias retained |
-| Fizzy | — | — | — | Blocked: HTTP/validation adapter absent in published harness |
-| Lobsters | — | — | — | Blocked: HTTP/validation adapter absent in published harness |
+| Fizzy | −1.65% [−4.99%, +1.06%] | 4.99% | −0.44% [−2.38%, +1.52%] | No aggregate loss beyond A/A; unresolved |
+| Lobsters | — | — | — | Running, published adapter unblocked |
 
-Neither completed cohort triggers the owner's kill rule. Keep the repeatable
+None of the completed cohorts triggers the owner's kill rule. Keep the repeatable
 PSS saving as a **candidate**, charging **0.15–0.36 seconds** extra first-response
 time in the memory screen. The coarse/biased A/A controls do not establish a
 published speed win or formal throughput non-inferiority. `passed:true` in the
 RPS export means exact samples and zero load errors, not a speed/control pass.
-The two remaining RPS checks await bet A's adapters, not substituted login/
+The last RPS check uses bet A's actual HTTP adapter, not substituted login/
 empty pages or in-process Rack timings. Full outputs/DB state, app own suites,
 constant/method/feature-table equality after warmup and Thermos have **not**
 been established. Nothing is promoted to main or enabled automatically.
+
+The newer harness also captures all four workers' GC/RSS after warmup and
+after load; all 30 Fizzy servers supply complete snapshots. Median mean-worker
+RSS after load off-A / on / off-B is **244.3 / 237.3 / 243.4 MiB**. The sum of
+workers' GC-time deltas divided by timed responses is **0.620 / 0.929 / 0.629
+ms/response**: the warmup arm's proxy is higher, not hidden as a memory win.
+These snapshots include background and untimed metrics-request work, are not
+exclusive request counters, do not measure PSS, and do not prove causality or
+long-lived capacity. All captured GC fields remain in the JSON; the older
+Blog/Campfire cohorts have no such snapshots and are not backfilled.
 
 ## Reproduction and retained boundaries
 
