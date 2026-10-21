@@ -13,6 +13,14 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Bet B: fused view bodies — killed (2026-10-21)
+
+- **What:** one generated layout/template/collection-partial method per blog action, with live helpers and separate buffers; [evidence](passes/fused-views.md).
+- **A/A first:** three-round native YJIT wall 95% bands show −1.20%…+2.55%, index +0.15%…+10.45%; allocation bands −0.012%…+0.016% / +0.010%…+0.044%.
+- **Result:** fused wall **+24.5% show / +18.9% index**, allocations **+113 / +136 per request**; not the handwritten −26%/−37% ceilings or a README price.
+- **Boundaries:** Campfire has **zero fusion hits** (explicit-local/cached render refusal); moving the form block loses sealed form completion, while token/collection still hit.
+- **Stop:** no widening, form-provenance work or repricing. **Unverified hypothesis:** reflected method-chain checks and per-region scope/buffer plumbing add objects while most Rails rendering/helper work remains live.
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

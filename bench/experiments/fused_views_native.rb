@@ -34,6 +34,20 @@ module NativeBench
         "form_input_refusal" => Lowrail::FormScaffold.input_refusal}
     end
 
+    # Shared screen's untimed exactness companion only. No normalization and
+    # no deterministic input replacement in a measured request.
+    def self.validation_request(route:, seed:, request:)
+      require_relative "../../fixtures/corpus/blog_entropy"
+      unless @entropy_validation
+        @entropy_validation = BlogProduction::Entropy.validate(Dir.pwd)
+        raise "entropy pin refused: #{@entropy_validation}" unless @entropy_validation.fetch("active")
+        BlogProduction::Entropy.install(@entropy_validation.fetch("policy"))
+      end
+      response, evidence = BlogProduction::Entropy.with(seed, "fused/#{route}", &request)
+      [response, {"passed" => evidence.fetch("errors").empty?, "entropy" => evidence,
+        "source_pin_active" => @entropy_validation.fetch("active")}]
+    end
+
     # Workload extension only: the shared driver initially supplies show only.
     # No clocks, windows, statistics or activation rules are replaced here.
     module Routes
