@@ -13,6 +13,19 @@ module NativeBench::Exploration
         NativeBench.arms(config).include?(arm)
       raise "unsafe opt-in/arm mismatch" unless (ENV["LOWRAIL_EXPLORE_UNGUARDED"] == "1") == (arm == "unguarded")
       @config, @state, @arm = config, state, arm
+      if config.fetch("workload") == "lobsters"
+        require_relative "lobsters_native_validation"
+        require_relative "lobsters_url_program"
+        LobstersNativeValidation.install(config.fetch("app"))
+        workload = NativeBench.routes(config, state, arm)
+        LobstersUrlProgram.discover do
+          workload.each_value { raise "discovery HTTP failure" unless _1.call.status == 200 }
+        end
+        LobstersUrlProgram.compile(coverage: !ENV["LOWRAIL_STATS"].nil?, guarded: true)
+        raise "no naturally observed fixed URL programs" if LobstersUrlProgram.programs.empty?
+        LobstersUrlProgram.select(%w[on unguarded].include?(arm))
+        return
+      end
       policy = case config.fetch("workload")
       when "blog" then JSON.parse(File.read(BlogProduction::Entropy::POLICY))
       when "campfire" then JSON.parse(File.read(CampfireRoomCompanion::POLICY))
@@ -34,6 +47,7 @@ module NativeBench::Exploration
     end
 
     def validation_request(route:, seed:, request:)
+      return LobstersNativeValidation.validation_request(route: route, seed: seed, request: request) if @config.fetch("workload") == "lobsters"
       response, trace = BlogProduction::Entropy.with(seed, "guard-ceiling/#{route}", wall_clock: true) { request.call }
       [response, {"passed" => trace.fetch("errors").empty?, "control" => @control, "entropy" => trace}]
     end
@@ -54,6 +68,16 @@ module NativeBench::Exploration
       when "fizzy"
         raise "no naturally admitted link contexts" unless BlockLinkSpecimen.contexts.values.any? { _1[:state] == "active" }
         BlockLinkSpecimen.singleton_class.prepend(@config["guard_scope"] == "suffix" ? SuffixChecks : LinkChecks)
+      when "lobsters"
+        LobstersUrlGuard::Certificate.prepend(UrlChecks)
+      end
+    end
+
+    def counts
+      return LobstersUrlProgram.counts if @config.fetch("workload") == "lobsters"
+      return BlockLinkSpecimen.counts if @config.fetch("workload") == "fizzy"
+      if Lowrail::Stats.enabled?
+        {"hits" => Lowrail::Stats.unit_hits.dup, "fallbacks" => Lowrail::Stats.unit_fallbacks.dup}
       end
     end
   end
@@ -69,6 +93,10 @@ module NativeBench::Exploration
   module RowChecks
     def valid? = true
     def current? = true
+  end
+
+  module UrlChecks
+    def valid?(_target, _name) = true
   end
 
   module FormChecks
