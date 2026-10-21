@@ -120,6 +120,35 @@ class SealedLinkTest < Minitest::Test
         assert_equal receiver == "stock" ? 0 : 1, sealed.fetch("fallbacks").fetch(link_unit, 0)
         assert_equal '<a class="one&quot;two" href="/target?x=&lt;&amp;q=&quot;">A&lt;&amp;</a>', sealed["body"] if receiver == "stock"
       end
+      application = File.join(dir, "config/application.rb")
+      File.write(application, File.read(application).sub(/module \w+\n/, "module RenamedLinkFixture\n"))
+      out, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "production", "LOWRAIL_BUILD_JIT" => "0"), bin, "build", dir, "--env", "production", "--sealed")
+      assert status.success?, "#{out}\n#{err}"
+      manifest_path = File.join(dir, ".lowrail/manifest.json")
+      certified = File.read(manifest_path)
+      renamed_unit = JSON.parse(certified).fetch("units").find { _1["pass"] == "sealed/link_to" }
+      refute_nil renamed_unit, "renaming the application must not refuse the stock link inventory"
+      assert_equal "RenamedLinkFixture::Application", renamed_unit.fetch("sealed").fetch("application_class")
+      link_unit = renamed_unit.fetch("id").to_s
+      off, sealed = %w[0 1].map do |mode|
+        ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => mode,
+          "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
+      end
+      %w[status body conversions events metadata].each { assert_equal off[_1], sealed[_1], "renamed: #{_1}" }
+      assert_equal 1, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
+      assert_equal 0, sealed.fetch("fallbacks").fetch(link_unit, 0)
+      ["WrongCertificate::Application", nil].each do |name|
+        changed = JSON.parse(certified)
+        data = changed.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("sealed")
+        name ? data["application_class"] = name : data.delete("application_class")
+        File.write(manifest_path, JSON.generate(changed))
+        refused = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
+          "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
+        %w[status body conversions events metadata].each { assert_equal off[_1], refused[_1], "uncertified name: #{_1}" }
+        assert_equal 0, refused.fetch("hits").fetch(link_unit, 0)
+        assert_match(/application/, refused.fetch("refusal"))
+      end
+      File.write(manifest_path, certified)
       # disasm normalizes trace_leave to leave, so a text search is vacuous.
       # Exercise the executable VM state after real cold delivery/activation.
       out, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "production"), bin,

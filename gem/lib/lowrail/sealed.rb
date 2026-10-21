@@ -61,7 +61,7 @@ module Lowrail
       def activate
         return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production"
         return decline("unsupported Ruby/Rails") unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
-        return decline("unsupported application") unless Rails.application.class.name == "RealBlogR4::Application"
+        return decline("application class differs from certificate") unless Rails.application.class.name == @data.fetch("application_class")
         require "objspace"
         return decline("actual-holder primitive unavailable") unless ObjectSpace.respond_to?(:internal_class_of)
         require_relative "materialize"

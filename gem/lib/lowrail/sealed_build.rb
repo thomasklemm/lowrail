@@ -50,10 +50,11 @@ module Lowrail
       ledger = []
       refuse = ->(reason) { {units: [], files: [], ledger: [{"pass" => PASS, "method" => "ArticlesController", "outcome" => reason}]} }
       return refuse.call("sealed pilot requires production Ruby 4.0.7 / Rails 8.1.4 blog") unless
-        ENV["RAILS_ENV"] == "production" && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4" &&
-        Rails.application.class.name == "RealBlogR4::Application"
+        ENV["RAILS_ENV"] == "production" && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
       return refuse.call("denylisted by verify --bisect") if denied.any? { _1["pass"] == PASS }
-      controller = ArticlesController
+      controller = Lowrail.loaded_constant("ArticlesController")
+      return refuse.call("eager-loaded ArticlesController required; keep lazy applications original") unless
+        controller.is_a?(Class) && controller < ActionController::Base
       view_class = controller.view_context_class
       tag = ActionView::Helpers::TagHelper
       builder = tag::TagBuilder
@@ -163,7 +164,8 @@ module Lowrail
         *Dir[Rails.root.join("{app,config,lib}/**/*.rb")], Rails.root.join("Gemfile.lock").to_s].compact.uniq
       unit = {"pass" => PASS, "kind" => "runtime", "target" => "ArticlesController", "facts" => [],
         "sites" => ledger.count { _1["outcome"] == "lowered" }, "sealed" => {
-          "controller" => "ArticlesController", "view_methods" => view_methods, "builder_methods" => builder_methods,
+          "application_class" => Rails.application.class.name, "controller" => "ArticlesController",
+          "view_methods" => view_methods, "builder_methods" => builder_methods,
           "primitive_methods" => primitive_methods,
           "constructor" => Sealed.signature(builder.method(:new)), "delivery" => delivery,
           "sources" => sources.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }, "templates" => templates}}
