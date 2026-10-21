@@ -29,6 +29,14 @@ Fix the real bind-name encoding gap (`creator_id`: stock UTF-8 vs Symbol-derived
 Wall +8.19% is unresolved against 14.19% A/A; SolidCache created_at off/off remains an accepted rejection, not a whole-DB certificate.
 Authorize only the single guarded buckets interpreter cohort under the predeclared rule and one shared RPS check; branch only, no main admission ([evidence](ar-callsite.md)).
 
+## Bet F: guarded bucket interpreter price accepted, branch only (2026-10-21)
+
+Fizzy GET `/buckets`, guarded DirectSite runtime addf55e, measured 87c3c19: total Ir −5.486472% [−5.578917, −5.415108], no-GC −5.499293% [−5.545698, −5.448101].
+Both A/A 95% intervals are wholly within the project ±0.1% rule fixed before counting; every mode/source/tool/brk/exact-page/no-new-page gate passes.
+Six rounds, 18 workers, 72 dumps and 36 N=0 subtractions independently reconcile; 240 guarded hits, zero fallback; no retry or exclusion.
+Accept only a branch prototype, bench-only, one route, not on main, not admission; login-cache expires_at and SolidCache created_at off/off remain named rejections.
+One unchanged-harness real-Puma check follows; no YJIT throughput, full DB-state, DirectSite own-suite or Thermos/main-integration claim ([evidence and JSON](ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry)).
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

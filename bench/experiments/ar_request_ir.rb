@@ -148,8 +148,8 @@ module ARRequestIR
         "idle_boundary" => !summary.key?("idle_boundary") || summary.fetch("idle_boundary").fetch("pass")}
       pass = gates.values.all?
       effects = %w[instructions_total instructions_no_gc].to_h do |metric|
-        aa = summary.fetch("layers").fetch("off_b").fetch(metric).fetch("delta_pct").fetch("ci95")
-        bound = [0.5, 3 * aa.map(&:abs).max].max
+        interval = summary.fetch("layers").fetch("off_b").fetch(metric).fetch("delta_pct").fetch("ci95")
+        bound = [0.5, 3 * interval.map(&:abs).max].max
         effect = summary.fetch("layers").fetch("on").fetch(metric).fetch("delta_pct")
         [metric, {"effect" => effect, "required_upper_bound_pct" => -bound, "clear_win" => effect.fetch("ci95").last < -bound}]
       end

@@ -1,8 +1,9 @@
 # Bet F: Active Record query programs, not an AR replacement
 
-2026-10-21. **Exploration branch only; no support, latency, or README price
-claim.** Ruby 4.0.7, Rails 8.1.4, startup YJIT. No application source/config
-patches beyond the existing corpus dependency overlays; no Callgrind. The
+2026-10-21. **Branch prototype, bench-only, one priced route, not on main,
+not admission.** Ruby 4.0.7, Rails 8.1.4. Native screens use startup YJIT;
+the single instruction cohort uses the interpreter. No application source/config
+patches beyond the existing corpus dependency overlays. The
 machine-readable evidence is [ar-callsite.json](ar-callsite.json).
 
 The implementation checkpoint is
@@ -11,8 +12,8 @@ based on
 [`2f749c1`](https://github.com/thomasklemm/lowrail/commit/2f749c13256ef8876f6065a1173d62969328e76c).
 The subsequent request-level pivot is described below. Nothing requires
 these files from `lowrail/setup`, changes production admission, or removes
-a production guard. The single authorized interpreter cohort has its rule
-fixed below before any counting; it is not yet a result.
+a production guard. The single authorized interpreter cohort and its
+pre-count rule are recorded below; no native latency claim follows.
 
 ## The seams are different
 
@@ -269,9 +270,65 @@ Call a win only if **both** on/off upper 95% bounds are below
 An initial tool=none launch failed before app boot because a relative worker
 path was resolved from the app directory. The absolute-path fix and this
 rule change precede every counted window; the failed launch is retained.
-There is no counted result at this checkpoint. One real-Puma RPS check will
-use bet A's shared Fizzy adapter after it is published; native Rack wall
-screens are not RPS measurements.
+
+### Slot 3 result: accepted scoped interpreter price, no retry
+
+Measured clean detached
+[`87c3c19`](https://github.com/thomasklemm/lowrail/commit/87c3c1974c424eabef5178f518641d013dd601b3),
+with the guarded query runtime unchanged from
+[`addf55e`](https://github.com/thomasklemm/lowrail/commit/addf55e00b080d2627503b7f10a74bbe68e17ed1).
+Only Fizzy **GET `/buckets`**, one closed fixture, interpreter; no other
+request or app is priced. A/A first:
+
+| Metric | A/A paired median | A/A 95% interval | Project gate |
+|---|---:|---:|---|
+| Total Ir | −0.003299% | [−0.056066%, +0.030632%] | Pass, wholly within ±0.1% |
+| GC-excluded Ir | −0.008940% | [−0.048641%, +0.019714%] | Pass, wholly within ±0.1% |
+
+| Metric | off-A / request | on / request | Paired change [95% interval] |
+|---|---:|---:|---:|
+| Total Ir | 40,169,918.95 | 37,963,881.65 | **−5.486472% [−5.578917%, −5.415108%]** |
+| GC-excluded Ir | 40,170,145.70 | 37,961,128.65 | **−5.499293% [−5.545698%, −5.448101%]** |
+| Objects, diagnostic | 8,984.45 | 8,420.60 | −6.260055% [−6.313500%, −6.245269%] |
+
+Displayed arm values are medians; paired percentages are not ratios of those
+medians. Both Ir upper bounds beat the predeclared −0.5% threshold. All
+18 workers / 72 windows pass mode, source/tool/brk, exact-page and zero-new-page
+gates. Page targets are 2047/367/1128/148/199. Each full on window completes
+20 guarded hits, zero fallbacks: 240 hits total. SQL shadowing stays outside
+the counters. The tool=none preflight passes all four workers / 16 windows.
+An independent audit reconciles **72 raw dumps and 36 N=0 subtractions**,
+every page/hit ledger and both disabled JITs. No workers were excluded.
+
+The original `decision.json` is retained verbatim. A report-only local-variable
+reuse made its `project_aa` field contain just the last interval; both
+per-metric intervals remain in the unchanged summary, and both were checked
+before that reuse. The source fix changes only that post-count serialization,
+not any window, gate, effect or measured runtime. The JSON appendix supplies
+the labelled intervals separately and does not replace the original receipt.
+
+Named **login-cache `expires_at`** and **SolidCache `created_at`** off/off
+rejections remain. Exact post-login response/SQL controls do not become a
+whole-DB certificate. This is the coordinator-accepted **branch prototype,
+bench-only, one route, not on main, not admission** price; not production
+support, generally certified compilation, or a native YJIT speed claim.
+
+### One real-Puma follow-up: declared before HTTP load
+
+Use the unchanged shared `script/rps` at
+[`b1e239f`](https://github.com/thomasklemm/lowrail/commit/b1e239f5bfcd2354166aeabddf1e6cc7a605fcaf),
+an isolated identical corpus copy, the same four-DB seed, and the independent
+zero-unit YJIT artifact. Only `/buckets`; natural CSRF/password login;
+`exploration_only: true` skips only BlockLinkSpecimen. No app/Puma config edits.
+Ten fresh-server rounds, off-A/on/off-B rotation, four workers × one thread,
+c16, 5-second warmup / 20-second load; server CPUs 0–3, client 4–7;
+oha 1.14.0, fixed upstream binary digest. Post-warmup/load GC/RSS snapshots,
+both seeds' exact status/body/all-header workflows and all errors are retained.
+Do not overlap with Ir or pool with native Rack screens. No forced GC or
+JIT-flat claim. Report A/A and p99 first; require zero errors, passing cold/warm
+exactness and the entire on/off RPS interval above **3 × the largest absolute
+A/A bound** for a clear throughput win. Otherwise unresolved, never retry.
+The RPS check has not run at this export checkpoint.
 
 ## Exactness evidence and its boundary
 
