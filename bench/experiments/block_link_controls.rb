@@ -30,6 +30,8 @@ module BlockLinkControls
       end
       outcome = {"throw" => outcome} unless Hash === outcome
       outcome.merge("log" => log, "before" => observations[:before]&.raw_buffer,
+        "link_result" => BlogProduction.value(observations[:link_result]),
+        "old_after_link" => observations[:old_after_link], "replacement_after_link" => observations[:replacement_after_link],
         "replacement" => observations[:replacement]&.raw_buffer,
         "builder_replaced" => observations[:saved] && !observations[:saved].equal?(BlockLinkSpecimen.ivar(view, :@tag_builder)))
     rescue StandardError => error
