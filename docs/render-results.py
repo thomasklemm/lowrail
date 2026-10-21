@@ -34,7 +34,7 @@ rows = [
 ]
 for entry in json.loads((root / "docs/results.json").read_text()):
     data = json.loads((root / entry["source"]).read_text())
-    if lookup(data, entry["accepted"]) is not True:
+    if lookup(data, entry["accepted"]) != entry.get("accepted_value", True):
         sys.exit(f"Not accepted: {entry['source']}")
     if lookup(data, entry["revision_field"]) != entry["revision"]:
         sys.exit(f"Revision mismatch: {entry['source']}")
