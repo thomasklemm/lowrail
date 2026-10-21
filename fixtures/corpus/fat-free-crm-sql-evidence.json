@@ -1,0 +1,737 @@
+{
+  "format": 1,
+  "source_revision": "91595c40a6baaa70512296157aab4bd56009e9b5",
+  "lock_sha256": "4973b3a7b0c44ae90b08da790eb71c29ae41c70ee8e0270720b601443e850d92",
+  "analysis_revision": "f67b04416e9b0c7646b104ead478430f169fe33b",
+  "effective_gemfile": "external wrapper eval_gemfile of unchanged app; unicode-emoji 4.3.0, ffi 1.17.4; lock Bundler 4.0.21",
+  "app_lock_sha256": "38f3de9bc3af153d6c48cb17dcb8cff08c6ab34337588352e941e7a6aaa2ea79",
+  "mechanism": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app.",
+  "configuration": {
+    "ruby": "4.0.7",
+    "RAILS_ENV": "test",
+    "RUBY_YJIT_ENABLE": "1",
+    "SEED": "41231",
+    "SPEC_OPTS": "--seed 41231",
+    "LOWRAIL_VERIFY_LOADS": "1",
+    "LOWRAIL_SHADOW": "strict",
+    "LOWRAIL_STATS": "",
+    "DATABASE_URL": "unset",
+    "command": "bundle exec rspec --seed 41231 --format progress spec/models spec/lib"
+  },
+  "original_rejected": {
+    "report_sha256": "a686fcd2c1683d223bafafaf85fcf527c2b3c7f2b6dd1de2c148e95f286ba30b",
+    "off": {
+      "campaign": [
+        "40ffc2cf1ceeaa5b5810c8cea1ebf89d23bff2f43ef6ff4445c83497654ab0ef",
+        59
+      ],
+      "permission12": [
+        "43d1b97431de5be7b0166d8af6983e56095232eec0d0ab89f9caa948fdc91fd1",
+        65
+      ],
+      "permission9": [
+        "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+        49
+      ]
+    },
+    "on": {
+      "campaign": [
+        "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+        58
+      ],
+      "permission12": [
+        "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+        64
+      ],
+      "permission9": [
+        "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+        48
+      ]
+    },
+    "outcomes": 497,
+    "hits": 0
+  },
+  "natural_exact_off": {
+    "runs": {
+      "1": {
+        "raw_sha256": "4c9f01432a53c92fb99b3f6fe143ca6b80219eb6a4681bfeffbe9cb4148091f5",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+            58
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+            48
+          ]
+        }
+      },
+      "2": {
+        "raw_sha256": "59975b421d912a13a00dcf70294c3693c2e780f90f1713061b22c4d97c06d3fa",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+            58
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+            48
+          ]
+        }
+      },
+      "3": {
+        "raw_sha256": "1669bef6343d31df15e2471f7cc0c91ab18dc25cd5222e7a68c6f1b935d315b1",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+            58
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+            48
+          ]
+        }
+      },
+      "4": {
+        "raw_sha256": "9ec7ad70c824f92e179ec7caf36ebc4c4aba65e5fff21ade3decffdbad161ae3",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+            58
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+            48
+          ]
+        }
+      },
+      "5": {
+        "raw_sha256": "d83a5a3ce13a344e1f07d53d3a9378a43c6a11bde96664b3e9e6e8e8b1fa9dc4",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+            58
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+            48
+          ]
+        }
+      },
+      "6": {
+        "raw_sha256": "d290ae371c78fa702c0bb3408625513cbddeb0e91b132df734b5461e3641adbf",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+            58
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+            49
+          ]
+        }
+      },
+      "7": {
+        "raw_sha256": "8b9eac04b20851f2af6c67d8bc928806f70a6271a7c9a891873fd3e6ce316324",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+            58
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+            48
+          ]
+        }
+      },
+      "8": {
+        "raw_sha256": "8ab707689e9f451de23e14689a29b1e43e124966607aaab5e16379df45ca9209",
+        "outcomes": 497,
+        "all_pass": true,
+        "sql": {
+          "campaign": [
+            "40ffc2cf1ceeaa5b5810c8cea1ebf89d23bff2f43ef6ff4445c83497654ab0ef",
+            59
+          ],
+          "permission12": [
+            "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+            64
+          ],
+          "permission9": [
+            "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+            48
+          ]
+        }
+      }
+    },
+    "flip_rate": {
+      "campaign": "1/8 extra UPDATE",
+      "permission9": "1/8 extra UPDATE",
+      "permission12": "0/8 extra UPDATE; not claimed naturally observed in this sample"
+    }
+  },
+  "variants": {
+    "campaign": {
+      "59": {
+        "test": "./spec/models/entities/campaign_spec.rb[1:2:1]",
+        "digest": "40ffc2cf1ceeaa5b5810c8cea1ebf89d23bff2f43ef6ff4445c83497654ab0ef",
+        "count": 59,
+        "arm": "LOWRAIL=0",
+        "source": "original_lowrail0",
+        "mechanism": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app."
+      },
+      "58": {
+        "test": "./spec/models/entities/campaign_spec.rb[1:2:1]",
+        "digest": "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+        "count": 58,
+        "arm": "LOWRAIL=0",
+        "source": "natural_exact_off1",
+        "mechanism": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app."
+      }
+    },
+    "permission12": {
+      "65": {
+        "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]",
+        "digest": "43d1b97431de5be7b0166d8af6983e56095232eec0d0ab89f9caa948fdc91fd1",
+        "count": 65,
+        "arm": "LOWRAIL=0",
+        "source": "original_lowrail0",
+        "mechanism": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app."
+      },
+      "64": {
+        "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]",
+        "digest": "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+        "count": 64,
+        "arm": "LOWRAIL=0",
+        "source": "natural_exact_off1",
+        "mechanism": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app."
+      }
+    },
+    "permission9": {
+      "49": {
+        "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]",
+        "digest": "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+        "count": 49,
+        "arm": "LOWRAIL=0",
+        "source": "original_lowrail0",
+        "mechanism": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app."
+      },
+      "48": {
+        "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]",
+        "digest": "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+        "count": 48,
+        "arm": "LOWRAIL=0",
+        "source": "natural_exact_off1",
+        "mechanism": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app."
+      }
+    }
+  },
+  "diagnostic_seeded": {
+    "0-a": {
+      "raw_sha256": "c94d22045ad07b6a69bb0efd05d2e8fa91f875d91d591c6b73e330571b6ed2b8",
+      "intervention": "before each example: srand(0); FFaker::Random.seed = 0; not used by gate",
+      "sql": {
+        "campaign": [
+          "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+          58
+        ],
+        "permission12": [
+          "43d1b97431de5be7b0166d8af6983e56095232eec0d0ab89f9caa948fdc91fd1",
+          65
+        ],
+        "permission9": [
+          "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+          49
+        ]
+      },
+      "outcomes": 497,
+      "all_pass": true
+    },
+    "0-b": {
+      "raw_sha256": "0a0cab81a86f3d3f33bb076511612f26d70f206466c852f0a932c65b87baa6d1",
+      "intervention": "before each example: srand(0); FFaker::Random.seed = 0; not used by gate",
+      "sql": {
+        "campaign": [
+          "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+          58
+        ],
+        "permission12": [
+          "43d1b97431de5be7b0166d8af6983e56095232eec0d0ab89f9caa948fdc91fd1",
+          65
+        ],
+        "permission9": [
+          "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+          49
+        ]
+      },
+      "outcomes": 497,
+      "all_pass": true
+    },
+    "1-a": {
+      "raw_sha256": "8ca148cf6c1a49de05e58b853ed29cd55c1db32c1eb25c682cdba0a316fb8415",
+      "intervention": "before each example: srand(0); FFaker::Random.seed = 0; not used by gate",
+      "sql": {
+        "campaign": [
+          "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+          58
+        ],
+        "permission12": [
+          "43d1b97431de5be7b0166d8af6983e56095232eec0d0ab89f9caa948fdc91fd1",
+          65
+        ],
+        "permission9": [
+          "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+          49
+        ]
+      },
+      "outcomes": 497,
+      "all_pass": true
+    },
+    "1-b": {
+      "raw_sha256": "396758e3096dbeac48d4d3d021808e206d62e694816623af1f5ba50562fa375d",
+      "intervention": "before each example: srand(0); FFaker::Random.seed = 0; not used by gate",
+      "sql": {
+        "campaign": [
+          "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+          58
+        ],
+        "permission12": [
+          "43d1b97431de5be7b0166d8af6983e56095232eec0d0ab89f9caa948fdc91fd1",
+          65
+        ],
+        "permission9": [
+          "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+          49
+        ]
+      },
+      "outcomes": 497,
+      "all_pass": true
+    }
+  },
+  "plain_targeted_samples": [
+    {
+      "name": "crm-plain-probe-1",
+      "raw_sha256": "cf940cfc73173a932ebe90de58fa6b119f522e6214bf181e745fe70ec0f69d7e",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "proposal",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "analysis",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "analysis"
+      }
+    },
+    {
+      "name": "crm-plain-probe-10",
+      "raw_sha256": "5170d3d3da6b2895879473d07ebbac326e312ad18b40f5fa0d0f45ee71a14e84",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "prospecting",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "analysis",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "lost"
+      }
+    },
+    {
+      "name": "crm-plain-probe-2",
+      "raw_sha256": "06f760386862564d6da777936ee67dd10f89af8a90d53e59b4432935447722a8",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "proposal",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "prospecting",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "prospecting"
+      }
+    },
+    {
+      "name": "crm-plain-probe-3",
+      "raw_sha256": "0ab72d352f1d71c28383ba646efda1b454400f91fc9eba47602346450d07e0ad",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "proposal",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "negotiation",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "prospecting"
+      }
+    },
+    {
+      "name": "crm-plain-probe-4",
+      "raw_sha256": "1681591b4fc8ec10e5e1d1d746b98664aac76805d55c238e5febb2cf0e50a293",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "final_review",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "prospecting",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "presentation"
+      }
+    },
+    {
+      "name": "crm-plain-probe-5",
+      "raw_sha256": "1f2428ebb8a96227646d4ab16c37cfb93e4f34223b85e023c44209f978b28617",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "won",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "analysis",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "prospecting"
+      }
+    },
+    {
+      "name": "crm-plain-probe-6",
+      "raw_sha256": "927e33a775c80d68839ccc9682df85600c66a3fb07c5bd9dc373363e9c551af2",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "negotiation",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "presentation",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "proposal"
+      }
+    },
+    {
+      "name": "crm-plain-probe-7",
+      "raw_sha256": "051641596f12e8695af026f350a20e85e305528cdda076bab03572ad049d883e",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "negotiation",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "final_review",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "lost"
+      }
+    },
+    {
+      "name": "crm-plain-probe-8",
+      "raw_sha256": "123c2d8a0d7329724c8726b4a20e6f8c6e3c66075044b61c3967ad2b2426c05a",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "won",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "proposal",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "lost"
+      }
+    },
+    {
+      "name": "crm-plain-probe-9",
+      "raw_sha256": "f3da4d0212d172eb767c28ab339b66d0dc1a42ebca1dfa317c4c70095210088a",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]": "prospecting",
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "negotiation",
+        "./spec/models/entities/campaign_spec.rb[1:2:1]": "presentation"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-1",
+      "raw_sha256": "eee16a64dbecc2f1974e3e5fd053ebb07bf5f60023a6e8bee72280edb9fc4d3b",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "lost"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-10",
+      "raw_sha256": "ce98b90a09daf66604fc96200efed719d11876ebeac807ab0baa499be3641504",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "negotiation"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-2",
+      "raw_sha256": "97ad3a93c7646a79345a141981013c51dd1b2b61860d33dab0be1021fee4a17a",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "final_review"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-3",
+      "raw_sha256": "32e608f9469ff7a250cee7ecf50d0bee5f122e1ed3b0c3a0c6f53e3167047c32",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "negotiation"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-4",
+      "raw_sha256": "fdf86d5390c84af9be0a7cce74d8b876e7ff5cdffb49a135ce4af91f4fe66cd6",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "final_review"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-5",
+      "raw_sha256": "afe278ed5b4403422d374e7280ff80b96a486aea14db7fb93cb2f8ab55fbae9c",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "prospecting"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-6",
+      "raw_sha256": "6921ff42d41859a9f9a80f5ec1f726e07bad80b5a304892d9946ca426f209a02",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "analysis"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-7",
+      "raw_sha256": "bed0d414a6127474625200a6dab342dc52d5e708f0023d5f69a716f2aba921ef",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "presentation"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-8",
+      "raw_sha256": "74b2a6da56c51152910078054230d0a4f345bdebd40fda5dc45e6999f6879dcd",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "presentation"
+      }
+    },
+    {
+      "name": "crm-remaining-probe-9",
+      "raw_sha256": "6e18431d1288d59fce0194d82faa39fbb449264f55258c072e50da311f77db18",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "presentation"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-0",
+      "raw_sha256": "024539bde9109497514a3e00be84b193476bbbc019882aee41a5eddf1fa77057",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "won"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-1",
+      "raw_sha256": "536eb94aac8bb6feac278d94aef968563198926772b7f881465a3576e899be5e",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "won"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-2",
+      "raw_sha256": "33e0234793e4f23d9af024d2c72f60dd9b2752ff550adb059b8607c8b1b39162",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "negotiation"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-3",
+      "raw_sha256": "96557772e5b35405c5cdac9e822516b82f4e7f654bf4128066655099983f38ef",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "negotiation"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-4",
+      "raw_sha256": "515d7c6c0e3c389f5f4caa96980b527cac096670dab04469160fca86c19bf7b5",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "proposal"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-5",
+      "raw_sha256": "608de8df6ecf9e8b87b1be2d73567af664569842f7e71b431f218d313047f0e3",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "lost"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-6",
+      "raw_sha256": "e8c38df12bebdbe34aeac346066170be1b2ff02f556d2fc96ae549310a19cdc1",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "presentation"
+      }
+    },
+    {
+      "name": "crm-rng-intervention-7",
+      "raw_sha256": "0d4d89f0641c28f5a166a838998e1448d13d7f90f9ddb0b79115171a44b85e32",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "stages": {
+        "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]": "negotiation"
+      }
+    }
+  ],
+  "branch_examples": [
+    {
+      "name": "crm-plain-probe-5",
+      "raw_sha256": "1f2428ebb8a96227646d4ab16c37cfb93e4f34223b85e023c44209f978b28617",
+      "runtime_loaded": [],
+      "intervention": "none",
+      "events": [
+        {
+          "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]",
+          "name": "Opportunity Create",
+          "sql": "INSERT INTO \"opportunities\" (\"user_id\", \"campaign_id\", \"assigned_to\", \"name\", \"access\", \"source\", \"stage\", \"probability\", \"amount\", \"discount\", \"closes_on\", \"deleted_at\", \"created_at\", \"updated_at\", \"background_info\", \"subscribed_users\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"id\"",
+          "binds": {
+            "stage": "won",
+            "amount": "417.0",
+            "discount": "47.0"
+          },
+          "stack": []
+        },
+        {
+          "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]",
+          "name": "Campaign Update",
+          "sql": "UPDATE \"campaigns\" SET \"revenue\" = ?, \"updated_at\" = ? WHERE \"campaigns\".\"id\" = ?",
+          "binds": {
+            "revenue": "1312.0",
+            "id": 1
+          },
+          "stack": [
+            "/home/user/workspace/repo/.corpus/fat-free-crm/app/models/observers/opportunity_observer.rb:43:in 'OpportunityObserver#update_campaign_revenue'",
+            "/home/user/workspace/repo/.corpus/fat-free-crm/app/models/observers/opportunity_observer.rb:14:in 'OpportunityObserver#after_create'"
+          ]
+        },
+        {
+          "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]",
+          "name": "Opportunity Create",
+          "sql": "INSERT INTO \"opportunities\" (\"user_id\", \"campaign_id\", \"assigned_to\", \"name\", \"access\", \"source\", \"stage\", \"probability\", \"amount\", \"discount\", \"closes_on\", \"deleted_at\", \"created_at\", \"updated_at\", \"background_info\", \"subscribed_users\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"id\"",
+          "binds": {
+            "stage": "analysis",
+            "amount": "353.0",
+            "discount": "52.0"
+          },
+          "stack": []
+        },
+        {
+          "test": "./spec/models/entities/campaign_spec.rb[1:2:1]",
+          "name": "Opportunity Create",
+          "sql": "INSERT INTO \"opportunities\" (\"user_id\", \"campaign_id\", \"assigned_to\", \"name\", \"access\", \"source\", \"stage\", \"probability\", \"amount\", \"discount\", \"closes_on\", \"deleted_at\", \"created_at\", \"updated_at\", \"background_info\", \"subscribed_users\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"id\"",
+          "binds": {
+            "stage": "prospecting",
+            "amount": "702.0",
+            "discount": "51.0"
+          },
+          "stack": [
+            "/home/user/workspace/repo/.corpus/fat-free-crm/spec/models/entities/campaign_spec.rb:49:in 'block (3 levels) in <main>'"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "crm-rng-intervention-0",
+      "raw_sha256": "024539bde9109497514a3e00be84b193476bbbc019882aee41a5eddf1fa77057",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "events": [
+        {
+          "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]",
+          "name": "Opportunity Create",
+          "sql": "INSERT INTO \"opportunities\" (\"user_id\", \"campaign_id\", \"assigned_to\", \"name\", \"access\", \"source\", \"stage\", \"probability\", \"amount\", \"discount\", \"closes_on\", \"deleted_at\", \"created_at\", \"updated_at\", \"background_info\", \"subscribed_users\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"id\"",
+          "binds": {
+            "stage": "won",
+            "amount": "87.0",
+            "discount": "46.0"
+          },
+          "stack": []
+        },
+        {
+          "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]",
+          "name": "Campaign Update",
+          "sql": "UPDATE \"campaigns\" SET \"revenue\" = ?, \"updated_at\" = ? WHERE \"campaigns\".\"id\" = ?",
+          "binds": {
+            "revenue": "513.0",
+            "id": 1
+          },
+          "stack": [
+            "/home/user/workspace/repo/.corpus/fat-free-crm/app/models/observers/opportunity_observer.rb:43:in 'OpportunityObserver#update_campaign_revenue'",
+            "/home/user/workspace/repo/.corpus/fat-free-crm/app/models/observers/opportunity_observer.rb:14:in 'OpportunityObserver#after_create'"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "crm-rng-intervention-2",
+      "raw_sha256": "33e0234793e4f23d9af024d2c72f60dd9b2752ff550adb059b8607c8b1b39162",
+      "runtime_loaded": [],
+      "intervention": "srand(seed before each example); FFaker untouched",
+      "events": [
+        {
+          "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]",
+          "name": "Opportunity Create",
+          "sql": "INSERT INTO \"opportunities\" (\"user_id\", \"campaign_id\", \"assigned_to\", \"name\", \"access\", \"source\", \"stage\", \"probability\", \"amount\", \"discount\", \"closes_on\", \"deleted_at\", \"created_at\", \"updated_at\", \"background_info\", \"subscribed_users\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING \"id\"",
+          "binds": {
+            "stage": "negotiation",
+            "amount": "679.0",
+            "discount": "67.0"
+          },
+          "stack": []
+        }
+      ]
+    }
+  ],
+  "raw_evidence_directory": ".lowrail/private/breadth-evidence/ (ignored, in this Amp thread); initial and rejected reports retained, SHA256 values above"
+}

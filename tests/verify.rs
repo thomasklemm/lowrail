@@ -212,3 +212,66 @@ fn verify_reports_exact_pinned_app_load_controls_without_hiding_other_changes() 
     }
     std::fs::remove_dir_all(app).unwrap();
 }
+
+#[test]
+fn verify_limits_pinned_sql_controls_to_observed_whole_trace_variants() {
+    let app = std::env::temp_dir().join(format!("lowrail-verify-sql-controls-{}", std::process::id()));
+    std::fs::create_dir_all(app.join(".lowrail")).unwrap();
+    std::fs::write(app.join("Gemfile.lock"), "hello").unwrap();
+    for args in [vec!["init", "-q"], vec!["add", "Gemfile.lock"], vec!["commit", "-qm", "fixture"]] {
+        assert!(Command::new("git").args(args).current_dir(&app)
+            .env("GIT_AUTHOR_NAME", "Thomas Klemm").env("GIT_AUTHOR_EMAIL", "github@tklemm.eu")
+            .env("GIT_COMMITTER_NAME", "Thomas Klemm").env("GIT_COMMITTER_EMAIL", "github@tklemm.eu")
+            .status().unwrap().success());
+    }
+    let head = Command::new("git").args(["rev-parse", "HEAD"]).current_dir(&app).output().unwrap();
+    let revision = String::from_utf8(head.stdout).unwrap().trim().to_string();
+    let controls = app.join(".lowrail/controls.json");
+    std::fs::write(app.join(".lowrail/evidence.json"), "{\"off_off\":true}").unwrap();
+    // SHA256 of the independently defined complete query sequences: SELECT 1,
+    // SELECT 2, SELECT 3, and SELECT 2 followed by an unrelated SELECT 4.
+    let hashes: Vec<_> = ["SELECT 1", "SELECT 2", "SELECT 3", "SELECT 2\nSELECT 4"].iter().map(|sql| {
+        use sha2::{Digest, Sha256};
+        format!("{:x}", Sha256::digest(sql.as_bytes()))
+    }).collect();
+    let script = r#"
+      digest="$2"; n=1
+      if [ "$LOWRAIL" = 1 ]; then
+        digest="$3"
+        case "$1" in digest) digest="$4";; unlisted) digest="$5"; n=2;; count) n=2;; esac
+      fi
+      # A subsequent same-mode control differs too: it must not broaden the
+      # closed list into an exemption for the whole example.
+      if [ "$1" != lock ] && [ "$1" != overlay ]; then
+        case "$LOWRAIL_OUTCOMES" in */outcomes-*-control.json) digest="$4";; esac
+      fi
+      printf '{"tests":{"a":{"result":"pass"}},"sql":{"a":{"digest":"%s","n":%s}}}' "$digest" "$n" > "$LOWRAIL_OUTCOMES"
+    "#;
+    for case in ["allowed", "digest", "unlisted", "count", "lock", "overlay"] {
+        std::fs::write(app.join("Gemfile.lock"), if case == "lock" { "changed" } else { "hello" }).unwrap();
+        std::fs::write(app.join("OverlayGemfile.lock"), "changed").unwrap();
+        std::fs::write(&controls, serde_json::json!({"format":1,
+            "source_revision":revision,
+            "lock_sha256":"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+            "entries":[], "sql_entries":[{"test":"a", "identity":"SELECT 1 or SELECT 2",
+                "origin":"diagnostic-only RNG control", "variants":[
+                    {"digest":hashes[0],"count":1,"evidence":"evidence.json#off_a"},
+                    {"digest":hashes[1],"count":1,"evidence":"evidence.json#off_b"}]}]}).to_string()).unwrap();
+        let result = Command::new(env!("CARGO_BIN_EXE_lowrail"))
+            .args(["verify", app.to_str().unwrap(), "--load-controls", controls.to_str().unwrap(),
+                "--", "sh", "-c", script, "sh", case, &hashes[0], &hashes[1], &hashes[2], &hashes[3]])
+            .env("BUNDLE_GEMFILE", if case == "overlay" { "OverlayGemfile" } else { "Gemfile" })
+            .output().unwrap();
+        let stdout = String::from_utf8_lossy(&result.stdout);
+        assert_eq!(result.status.success(), case == "allowed", "{case}: {stdout}\n{}", String::from_utf8_lossy(&result.stderr));
+        let last: serde_json::Value = serde_json::from_slice(&std::fs::read(app.join(".lowrail/verify/last.json")).unwrap()).unwrap();
+        if matches!(case, "lock" | "overlay") {
+            assert!(last["report"]["known_app_sql"].as_object().unwrap().is_empty());
+        } else {
+            assert!(stdout.contains("known app nondeterminism: SQL") && stdout.contains("evidence.json#off_a"), "{stdout}");
+            assert_eq!(last["report"]["known_app_sql"]["a"]["identity"], "SELECT 1 or SELECT 2");
+        }
+        assert_eq!(last["report"]["off"]["sql"]["a"][0], hashes[0]);
+    }
+    std::fs::remove_dir_all(app).unwrap();
+}

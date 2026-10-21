@@ -45,15 +45,17 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let manifest: Value = if manifest_path.exists() {
         serde_json::from_slice(&std::fs::read(manifest_path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?
     } else { Value::Null };
-    let known_app_loads = match &load_controls {
+    let pinned = match &load_controls {
         Some(path) => load_controls::load(&app, path)?,
-        None => BTreeMap::new(),
+        None => load_controls::Pinned::default(),
     };
     let seed = seed_env(&cmd);
-    let mut report = verify(&app, &cmd, &seed, observe_types, known_app_loads)?;
+    let mut report = verify(&app, &cmd, &seed, observe_types, pinned)?;
     // Do not retain an exemption if the suite changed either pin.
     if let Some(path) = &load_controls {
-        report.known_app_loads = load_controls::load(&app, path)?;
+        let pinned = load_controls::load(&app, path)?;
+        report.known_app_loads = pinned.loads;
+        report.known_app_sql = pinned.sql;
     }
     if !report.load_differences().is_empty() {
         report.load_culprit_passes = bisect_load_passes(&app, &cmd, &manifest, &report, &seed)?;
@@ -68,7 +70,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             sql_other: report.on.sql_other.clone(), processes: report.on.processes,
             loads: report.on.loads.clone(),
             exit_ok: report.on.exit_ok, ..Default::default()
-        }, known_app_loads: report.known_app_loads.clone(), ..Default::default() };
+        }, known_app_loads: report.known_app_loads.clone(), known_app_sql: report.known_app_sql.clone(), ..Default::default() };
         overhead = Some(serde_json::json!({"recorded_seconds":report.on.seconds,
             "plain_seconds":control.off.seconds,
             "percent":(report.on.seconds / control.off.seconds - 1.0) * 100.0,
@@ -84,7 +86,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         return Ok(());
     }
     if bisect {
-        let culprits = bisect_units(&app, &cmd, &report.off, &report.unstable_sql, &report.known_app_loads, &seed)?;
+        let culprits = bisect_units(&app, &cmd, &report, &seed)?;
         println!("culprit units: {culprits:?}");
         write_denylist(&app, &culprits, &report.differences())?;
     }
@@ -129,6 +131,8 @@ pub struct Report {
     /// Kept separate from noise observed in the current pair and never erased
     /// from either run's raw census.
     pub known_app_loads: BTreeMap<String, load_controls::Entry>,
+    /// Closed, proved whole-trace variants, not blanket per-test exclusions.
+    pub known_app_sql: BTreeMap<String, load_controls::SqlEntry>,
     pub load_culprit_passes: Vec<String>,
 }
 
@@ -154,9 +158,12 @@ impl Report {
         self.off
             .sql
             .iter()
-            .filter(|(name, _)| !self.unstable_sql.contains(*name))
+            // A reviewed SQL control may not be broadened by this run's
+            // ordinary per-test noise classifier: unknown variants still fail.
+            .filter(|(name, _)| self.known_app_sql.contains_key(*name) || !self.unstable_sql.contains(*name))
             .filter_map(|(name, off)| match self.on.sql.get(name) {
-                Some(on) if on.0 != off.0 => Some(format!("{name}: {} → {} queries", off.1, on.1)),
+                Some(on) if on != off && !self.known_app_sql.get(name).is_some_and(|entry| entry.allows(off) && entry.allows(on)) =>
+                    Some(format!("{name}: {} → {} queries", off.1, on.1)),
                 _ => None,
             })
             .collect()
@@ -220,10 +227,11 @@ impl Report {
         }
         let traced = self.off.sql.keys().filter(|k| self.on.sql.contains_key(*k)).count();
         let sql_diffs = self.sql_differences();
-        if !self.unstable_sql.is_empty() {
+        let other_unstable_sql = self.unstable_sql.iter().filter(|test| !self.known_app_sql.contains_key(*test)).count();
+        if other_unstable_sql > 0 {
             s.push_str(&format!(
                 "sql traces: {} tests excluded, their queries differ between two runs of the same mode\n",
-                self.unstable_sql.len()
+                other_unstable_sql
             ));
         }
         if sql_diffs.is_empty() {
@@ -294,6 +302,17 @@ impl Report {
                     self.off.loads.contains(identity), self.on.loads.contains(identity), entry.evidence, entry.origin));
             }
         }
+        if !self.known_app_sql.is_empty() {
+            let differing = self.known_app_sql.keys().filter(|test| self.off.sql.get(*test) != self.on.sql.get(*test)).count();
+            s.push_str(&format!("\nknown app nondeterminism: SQL; {differing} differing tests; {} pinned controls", self.known_app_sql.len()));
+            for (test, entry) in &self.known_app_sql {
+                s.push_str(&format!("\n  {test}: {} [off={:?}, on={:?}; origin: {}]",
+                    entry.identity, self.off.sql.get(test), self.on.sql.get(test), entry.origin));
+                for variant in &entry.variants {
+                    s.push_str(&format!("\n    allowed {} / {} queries; evidence: {}", variant.digest, variant.count, variant.evidence));
+                }
+            }
+        }
         let diagnostics = self.off.jit_diagnostics.len() + self.on.jit_diagnostics.len();
         if diagnostics > 0 {
             s.push_str(&format!("\nJIT diagnostics: {diagnostics} process snapshots in last.json (not per-ISeq counters; not a gate)"));
@@ -331,7 +350,7 @@ fn env_refs(env: &[(String, String)]) -> Vec<(&str, &str)> {
 }
 
 fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: bool,
-    known_app_loads: BTreeMap<String, load_controls::Entry>) -> Result<Report, String> {
+    pinned: load_controls::Pinned) -> Result<Report, String> {
     let dir = app.join(".lowrail/verify");
     std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
     let env = env_refs(seed);
@@ -356,7 +375,7 @@ fn verify(app: &Path, cmd: &[String], seed: &[(String, String)], observe_types: 
         std::fs::rename(tmp, out).map_err(|e| e.to_string())?;
         on
     } else { run_with(app, cmd, &dir, "1", &env)? };
-    let mut report = Report { off, on, known_app_loads, ..Default::default() };
+    let mut report = Report { off, on, known_app_loads: pinned.loads, known_app_sql: pinned.sql, ..Default::default() };
     // Only when SQL would fail the gate: a second LOWRAIL=0 run tells
     // run-to-run noise apart from differences Lowrail causes.
     if (report.sql_gates() && !report.sql_differences().is_empty()) || !report.load_differences().is_empty() {
@@ -444,8 +463,7 @@ fn bisect_load_passes(app: &Path, cmd: &[String], manifest: &Value, report: &Rep
 /// reruns the suite with only one half enabled (LOWRAIL_UNITS), recursing
 /// into halves that still differ. A set whose halves are each clean is
 /// reported whole (the units only fail together).
-fn bisect_units(app: &Path, cmd: &[String], off: &Run, unstable: &BTreeSet<String>,
-    known_app_loads: &BTreeMap<String, load_controls::Entry>, seed: &[(String, String)]) -> Result<Vec<Vec<u64>>, String> {
+fn bisect_units(app: &Path, cmd: &[String], report: &Report, seed: &[(String, String)]) -> Result<Vec<Vec<u64>>, String> {
     let manifest: Value = serde_json::from_str(
         &std::fs::read_to_string(app.join(".lowrail/manifest.json")).map_err(|e| e.to_string())?,
     )
@@ -460,11 +478,13 @@ fn bisect_units(app: &Path, cmd: &[String], off: &Run, unstable: &BTreeSet<Strin
         let mut env = env_refs(seed);
         env.push(("LOWRAIL_UNITS", &list));
         let on = run_with(app, cmd, &dir, "1", &env)?;
+        let off = &report.off;
         let r = Report {
             off: Run { tests: off.tests.clone(), sql: off.sql.clone(), sql_other: off.sql_other.clone(), loads: off.loads.clone(), exit_ok: off.exit_ok, ..Default::default() },
             on,
-            unstable_sql: unstable.clone(),
-            known_app_loads: known_app_loads.clone(),
+            unstable_sql: report.unstable_sql.clone(),
+            known_app_loads: report.known_app_loads.clone(),
+            known_app_sql: report.known_app_sql.clone(),
             ..Default::default()
         };
         eprintln!("bisect: units [{list}] → {}", if r.identical() { "identical" } else { "differs" });

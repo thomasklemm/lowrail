@@ -443,6 +443,79 @@ closed inventory requires `RealBlogR4::Application` (assigned to the sealed-form
 owner). Neither admission/inventory boundary is relaxed and neither unrelated
 test is edited by the policy change.
 
+## Fat Free CRM: pinned SQL randomness — 2026-10-21
+
+Round-2 uses the unchanged real Rails 8.0.5 app at
+[`91595c4`](https://github.com/fatfreecrm/fat_free_crm/commit/91595c40a6baaa70512296157aab4bd56009e9b5)
+with PaperTrail 16 and Ransack 4.4.1, Ruby 4.0.7 **YJIT at build and startup**.
+The external dependency-only Gemfile evaluates the original app Gemfile and
+pins unicode-emoji 4.3.0 / ffi 1.17.4; its Bundler 4.0.21 lock hash is
+`4973b3a7b0c44ae90b08da790eb71c29ae41c70ee8e0270720b601443e850d92`.
+No tracked app implementation or test changes. The bounded **model/lib
+subset**, not the entire suite, passes **497 examples**. SQLite test DB,
+`DATABASE_URL` unset, `RAILS_ENV=test`, explicit RSpec seed 41231, matching
+`SEED`/`SPEC_OPTS`, strict shadow SQL and load census in both arms.
+
+The original default artifact has **zero units** and is not JIT-refused.
+Its verifier exits 1 on these three SQL differences, despite identical
+outcomes and zero hits/fallbacks:
+
+| Exact example id suffix | Original off → on queries | Exact-environment off-only controls (8) |
+|---|---|---|
+| `campaign_spec.rb[1:2:1]` | 59 → 58 | Seven 58, one 59 |
+| `opportunity_spec.rb[1:10:1:12:1]` | 65 → 64 | Eight 64; no natural flip in this sample |
+| `opportunity_spec.rb[1:10:1:9:1]` | 49 → 48 | Seven 48, one 49 |
+
+All three differ by the **same one statement**, between campaign counter
+update and tagging lookup, without reordering the other queries:
+
+```sql
+UPDATE "campaigns" SET "revenue" = ?, "updated_at" = ? WHERE "campaigns"."id" = ?
+```
+
+The bind signature is `revenue:Float,updated_at:Time,id:Integer`, uncached.
+The observer's create callback takes this branch only when stage is `won`.
+`spec/factories/opportunity_factories.rb:10` uses **bare `Array#sample`**,
+with the unseeded Kernel RNG. RSpec's seed fixes test order but deliberately
+does not call `srand`; FFaker's separate RNG is also unseeded by this app.
+The earlier four off controls all agreeing was finite-sample agreement, not
+proof of off-side determinism. Eight fresh full controls pass all 497 tests
+and reproduce two identities' exact digests. The original rejected **off**
+arm already contains all three higher-count variants.
+
+No-Lowrail target traces capture `OpportunityObserver#after_create:14` →
+`update_campaign_revenue:43`, along with actual stage/amount/discount/revenue
+binds. Ten natural three-example traces give two `won` branches for
+`[1:10:1:9:1]`, none for the other two; ten further traces of the remaining
+identity still have no `won`. These are recorded, not repeated until green.
+**Diagnostic only:** a fixed eight-seed experiment, with no Lowrail runtime
+loaded, exercises the remaining identity's branch at `srand(0)` and `srand(1)`
+but not seeds 2–7. Finally two off and two on **full subset** runs with
+`srand(0); FFaker::Random.seed = 0` before each example have identical
+original-three digests/counts **58/65/49** and 497 passing outcomes each.
+This confirms app RNG behavior, not a Lowrail SQL change. None of these RNG
+interventions is installed in the ordinary gate or the foreign app.
+
+The approved [three SQL controls](../fixtures/corpus/fat-free-crm-load-controls.json)
+contain exactly two whole-trace digest/count variants per test, all observed
+with `LOWRAIL=0`, with [mechanism, stacks, rates and hashes](../fixtures/corpus/fat-free-crm-sql-evidence.json).
+Use `--load-controls` explicitly. Both pins and tracked-source cleanliness
+are checked before/after; `BUNDLE_GEMFILE` controls use the **effective** lock,
+not the unchanged app's unused lock. Every entry/variant stays visible in
+known-app-nondeterminism text and raw JSON. Unknown digests, counts or extra
+queries in the same example still fail, even if repeat controls call that
+example noisy. No global repeats, SQL normalization or blanket exclusions.
+
+The first ordinary default verify with this list still **rejects two other,
+unlisted identities** (`dropbox_spec.rb[1:3:1]`, 37 → 42;
+`opportunity_spec.rb[1:10:1:6:1]`, 45 → 46). All 497 outcomes agree,
+0 hits/0 fallbacks, **0 stable / 8 unstable loads**, 23 other SQL identities
+advisory; all three approved identities happen to agree in this pair and
+are still reported. This is not a green full-subset support claim and does
+not erase either rejected cohort. Cargo: **42 pass**; the new CLI regression
+fails before SQL controls exist and checks allowed variants, unknown digest,
+an added unlisted query in the same example, wrong count and lock mismatch.
+
 ## Reproduction
 
 Use isolated copies/databases; never point these commands at a live app DB.

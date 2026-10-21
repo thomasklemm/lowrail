@@ -576,8 +576,10 @@ See the [counter scope and limitations](jit-shapes.md#diagnostic-counters-never-
 ### Pinned load controls
 
 `lowrail verify APP --load-controls FILE -- TEST COMMAND...` explicitly loads
-reviewed evidence for rare app load races. There is no implicit global list.
-Each format-1 file is keyed to **git HEAD and SHA256 of Gemfile.lock**:
+reviewed evidence for rare app load races and closed SQL variants. There is
+no implicit global list. Each format-1 file is keyed to **git HEAD and SHA256
+of the effective Bundler lockfile** (normally `APP/Gemfile.lock`;
+`BUNDLE_GEMFILE` selects its adjacent `.lock`, or `gems.locked` for `gems.rb`):
 
 ```json
 {
@@ -595,8 +597,8 @@ Each format-1 file is keyed to **git HEAD and SHA256 of Gemfile.lock**:
 The evidence file must exist, resolved relative to the control file; a
 fragment identifies its relevant comparison. Approval requires actual
 off/off flips without Lowrail installation and observed thread/stack origins,
-not a guessed race. Only first-test/after-suite **indexed load events** are
-accepted: no constants, paths census, SQL, error markers, wildcard matching
+not a guessed race. `entries` accepts only first-test/after-suite **indexed
+load events**: no constants, paths census, SQL, error markers, wildcard matching
 or path/event normalization. Literal absolute paths make a relocated identity
 fail to match. Duplicate or malformed entries and missing evidence are errors.
 
@@ -613,3 +615,34 @@ that Lowrail delivered a fast path; coverage still requires nonzero hits.
 The first [Fizzy list](../fixtures/corpus/fizzy-load-controls.json) has 18
 identities supported by a 20-run off/off sample and separate plain thread
 traces; [results and provenance](compat.md#fizzy-pinned-app-load-nondeterminism--2026-10-21).
+
+The optional `sql_entries` array shares those pins and source-cleanliness
+checks. It is **not a blanket test exclusion**. Each entry names the exact
+test and SQL event explaining the branch, its observed mechanism, and a
+closed set of at least two **complete ordered own-thread trace** SHA256/count
+pairs. Every variant needs evidence observed with Lowrail off, naturally or
+in an explicitly diagnostic-only RNG experiment. For example:
+
+```json
+{
+  "test": "./spec/models/example_spec.rb[1:2:1]",
+  "identity": "Campaign Update\tUPDATE ...\trevenue:Float\t\t0",
+  "origin": "Unseeded Array#sample selects the observer's won branch",
+  "variants": [
+    {"digest": "<64 lowercase hex digits>", "count": 58, "evidence": "evidence.json#off_a"},
+    {"digest": "<64 lowercase hex digits>", "count": 59, "evidence": "evidence.json#off_b"}
+  ]
+}
+```
+
+Only when **both arms** match allowed complete traces does this entry excuse
+a difference. New queries, reordered queries, unknown digests or wrong counts
+in the same example still fail; ordinary repeat-control noise cannot broaden
+the closed list. The explanatory `identity` is never used as a substring or
+wildcard matcher. Other-thread SQL stays advisory as before. All approved SQL
+controls appear in the **known app nondeterminism: SQL** section, including
+unobserved ones, with off/on digest/counts, differing/pinned counts, mechanism
+and each variant's evidence. JSON retains raw traces and `report.known_app_sql`.
+No SQL normalization, global repeat relaxation or automatic RNG seeding is
+introduced. [CRM's first three controls](../fixtures/corpus/fat-free-crm-load-controls.json)
+retain the rejected original cohort and [off-only/diagnostic evidence](../fixtures/corpus/fat-free-crm-sql-evidence.json).

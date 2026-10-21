@@ -1,0 +1,59 @@
+{
+  "format": 1,
+  "source_revision": "91595c40a6baaa70512296157aab4bd56009e9b5",
+  "lock_sha256": "4973b3a7b0c44ae90b08da790eb71c29ae41c70ee8e0270720b601443e850d92",
+  "entries": [],
+  "sql_entries": [
+    {
+      "test": "./spec/models/entities/campaign_spec.rb[1:2:1]",
+      "identity": "Campaign Update\tUPDATE \"campaigns\" SET \"revenue\" = ?, \"updated_at\" = ? WHERE \"campaigns\".\"id\" = ?\trevenue:Float,updated_at:Time,id:Integer\t\t0",
+      "origin": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app.",
+      "variants": [
+        {
+          "digest": "d425ebeb807f2037ac1ba83f24cb007ab7c3f7da7c4b41070195ce60d1c16d22",
+          "count": 58,
+          "evidence": "fat-free-crm-sql-evidence.json#variants/campaign/58"
+        },
+        {
+          "digest": "40ffc2cf1ceeaa5b5810c8cea1ebf89d23bff2f43ef6ff4445c83497654ab0ef",
+          "count": 59,
+          "evidence": "fat-free-crm-sql-evidence.json#variants/campaign/59"
+        }
+      ]
+    },
+    {
+      "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:12:1]",
+      "identity": "Campaign Update\tUPDATE \"campaigns\" SET \"revenue\" = ?, \"updated_at\" = ? WHERE \"campaigns\".\"id\" = ?\trevenue:Float,updated_at:Time,id:Integer\t\t0",
+      "origin": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app.",
+      "variants": [
+        {
+          "digest": "6886ddd3fd5db638256a5e386336e689b3c637f074ba6f93d73290c610b57ec5",
+          "count": 64,
+          "evidence": "fat-free-crm-sql-evidence.json#variants/permission12/64"
+        },
+        {
+          "digest": "43d1b97431de5be7b0166d8af6983e56095232eec0d0ab89f9caa948fdc91fd1",
+          "count": 65,
+          "evidence": "fat-free-crm-sql-evidence.json#variants/permission12/65"
+        }
+      ]
+    },
+    {
+      "test": "./spec/models/entities/opportunity_spec.rb[1:10:1:9:1]",
+      "identity": "Campaign Update\tUPDATE \"campaigns\" SET \"revenue\" = ?, \"updated_at\" = ? WHERE \"campaigns\".\"id\" = ?\trevenue:Float,updated_at:Time,id:Integer\t\t0",
+      "origin": "Bare Array#sample in spec/factories/opportunity_factories.rb:10 uses the Kernel RNG, unseeded by RSpec --seed (which only orders examples). OpportunityObserver#after_create at app/models/observers/opportunity_observer.rb:14 adds a campaign-revenue UPDATE only for stage == won. FFaker has a separate RNG; neither source is seeded by this app.",
+      "variants": [
+        {
+          "digest": "b44a71bb9697c2f385908fb1f733364ccf0f44b7a0d7e4977d3644b8b3347b15",
+          "count": 48,
+          "evidence": "fat-free-crm-sql-evidence.json#variants/permission9/48"
+        },
+        {
+          "digest": "1bf80b4f13e7d4f7770b9569bf863dcb90173779201c394e747f868c670833cd",
+          "count": 49,
+          "evidence": "fat-free-crm-sql-evidence.json#variants/permission9/49"
+        }
+      ]
+    }
+  ]
+}
