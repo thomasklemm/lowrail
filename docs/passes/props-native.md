@@ -199,6 +199,129 @@ env -u RUBYOPT -u RUBY_YJIT_ENABLE -u RUBY_ZJIT_ENABLE \
   mise exec -- ruby bench/experiments/yjit_regression.rb props_native NEW_OUTDIR
 ```
 
+## Untimed attribution of the remaining checks
+
+This is a read of the **retained 83bf0ba cohort**, not another cohort or a
+rescore. Across six rounds × two native arms × both N=1,000 windows, all
+**24** incoming `lowrail_plain_hash_iteration` edges report 2,000 calls and
+1,132,000 Ir. Each edge reconciles to its native self cost plus four child
+edges. The two calls cost **1,132 Ir/resolve, not approximately 50**:
+
+| Native work per resolve | Ir |
+|---|---:|
+| BASIC lookup for `each` / `each_with_object` | 214 / 240 |
+| Public visibility lookup for `each` / `each_with_object` | 288 / 314 |
+| Native self: class check, argument handling, branches and return | 76 |
+| **Native total** | **1,132** |
+
+There are four BASIC and four visibility queries per resolve, not four
+combined queries. The figures above include their lookup descendants. The
+undocumented visibility query is not a cheap flag read. Therefore
+**4,717.248 Ir** of the measured 5,849.248 remains outside the predicate.
+
+The retained dumps also permit this disjoint machine-function accounting.
+For each arm, subtract its N=0 self-cost table from its N=1,000 table, then
+subtract `off_a`; collapse recursive function-name suffixes. Self-cost totals
+reconcile to each dump's `summary`, and the paired result reconciles to the
+published check cost. Inclusive native/`vm_defined` edges below replace,
+rather than add to, their descendant self rows. Both modes give the same
+rows; these are medians across six rounds, **not new component CIs**.
+
+| Component | Ir/resolve |
+|---|---:|
+| Native predicate, inclusive as above | 1,132.000 |
+| Disabled-Stats `vm_defined` calls and descendants | 630.000 |
+| Ractor current/main builtin bodies and `equal?` body | 30.000 |
+| `vm_exec_core`, incremental self cost | 2,284.105 |
+| `rb_vm_opt_getconstant_path`, self | 504.000 |
+| C-function frame dispatch helpers, self | 420.000 |
+| Ruby ISeq setup helpers, self | 302.000 |
+| `vm_call_ivar`, self | 128.000 |
+| `rb_hash_aref`, self | 174.000 |
+| Other machine-function self cost, after the inclusive exclusions | 245.143 |
+| **Remaining complete-check cost** | **5,849.248** |
+
+The Hash row varies 170–174 Ir and the residual 197.143–293.143 across
+rounds. The other listed rows are constant. Do not sum inclusive annotate
+rows: inlined source-file rows can duplicate the native function, and
+recursive VM frames overlap. The incoming edges are authoritative.
+
+### Ruby-component census and the disabled instrumentation tax
+
+The VM table is **not** a per-Ruby-method Ir profile. Guard, activation and
+body bytecodes all run in shared `vm_exec_core`; the retained dumps cannot
+assign its 2,284.105 Ir honestly among them. A disposable targeted-ISeq
+observer and the existing scoped C-call census establish the warm operation
+counts instead:
+
+| Operation per fresh whole resolve | Count |
+|---|---:|
+| Guard entry / positive authorization | 2 / 2 |
+| `Ractor.current` / `Ractor.main` expressions / identity tests | 2 / 2 / 2 |
+| `InertiaProps.active?` / active-table Hash reads | 2 / 2 |
+| `Guard.state` getter / cached-state Array reads | 2 / 2 |
+| `Guard.validate` / state writes | **0 / 0** |
+| Native predicate | 2 |
+| Disabled Stats conditional / nested-constant `defined` instructions | 2 / 4 |
+| `Stats.enabled?` / counting / extra recursive checks outside those entries | **0 / 0 / 0** |
+
+Stats is **absent**, not enabled, in these measured processes. Disassembly
+shows two `defined` instructions per guard: first `::Lowrail`, then `Stats`.
+Their four calls cost 630 Ir/resolve inside `vm_defined` and descendants,
+before charging their interpreter opcodes. Merely removing counting work
+would save nothing: no counter executes. The avoidable tax is testing for
+disabled instrumentation at every traversal.
+
+There is also no full unit-metadata lookup to cache on this warm path.
+Hoisting its activation/state **booleans** per request would weaken the
+callback boundary: a later traversal must still see invalidation. Caching
+the backing table/array across `install` is not equivalent either; install
+can replace them. Keep fresh reads unless a separate lifetime proof covers
+replacement. Likewise, do not remove the main-Ractor guard from directly
+callable helper entries. No supported direct main-Ractor predicate was
+found in the installed public/exported C API; this report does not propose
+copying VM structs or making the existing unsafe extension Ractor-safe.
+
+### Concrete next candidate, not implemented or priced
+
+First remove **only disabled instrumentation dispatch**: provide ordinary
+non-counting/counting guard definitions, selected when installed and when
+`Stats.enable!` runs later, following the existing `Lowrail.check` pattern.
+The non-counting definition omits `defined?/enabled?`; the counting definition
+retains exactly the current authorization/fallback counts, early Ractor
+refusal and exception behavior. Both still perform Ractor, active-table,
+current-state and actual-iterator checks at **every recursive entry**. A late
+enable witness must prove no hit escapes counting. Optionally inline the
+same guard expression in the ordinary-def entry to avoid its Ruby helper
+dispatch, without hoisting any predicate. That dispatch saving is unpriced;
+the machine-function table is not a fabricated estimate of it.
+
+Removing the disabled conditional targets at least the identified 630 Ir
+plus its VM opcodes, but **does not alone prove closure** of the paired
+1,427.777-Ir gap. This is a candidate for correctness preparation, not an
+authorization for integration or a new cohort.
+
+For the independently prepared **frozen-holder** companion, native lookup
+work is still real: freezing can remove the 1,056 Ir of BASIC/visibility
+queries while retaining `exact_class?` on every receiver. Nevertheless even
+a free predicate saves at most 1,132 Ir, below the paired gap; freezing alone
+cannot close it. Combining that separately witnessed, symmetrically frozen
+contract with non-counting/counting guard selection targets over 1,686 Ir of
+identified work before replacement/interaction costs. That is the concrete
+combined budget to investigate, **not an additive speed claim**. Freezing
+is not a substitute for a certificate in the mutable guarded tier. The
+freeze owner has this breakdown and remains prepared/unpriced.
+
+After pulling the guard-dependency prerequisite
+[7f9f97c](https://github.com/thomasklemm/lowrail/commit/7f9f97c19e13be2ab047d83e5fda8768cc112147),
+untimed native-split admission still gives `guard_valid=true`, **20
+authorizations / 0 fallbacks** per ten resolves on both Rubies. The current
+`guard.rb` proof is
+`9f0f1d99ee6593ac4594e5e0b092f2543195482e1523ceb15d7593624ce64437`.
+This refresh does not change the historical cohort's source certificate.
+No new Callgrind worker, slot, YJIT run or production change was used for
+this attribution.
+
 ## Strict-gate provenance
 
 Both complete strict suites pass with the native candidate over

@@ -248,6 +248,21 @@ cohort rescore or request saving. Attribute the remaining checks from the
 retained dumps/untimed census before proposing another candidate or asking
 for slots. [Boundary, both CIs, pins and sanitized export](passes/props-native.md).
 
+The untimed retained-dump attribution finds **1,132 Ir/resolve in the native
+predicate itself** (454 BASIC, 602 visibility, 76 scaffolding), identically
+across 24 positive windows, not approximately 50 Ir. Another **630 Ir** is
+inside disabled-Stats constant checks, before their interpreter opcodes.
+The warm path performs no full unit validation, only two activation and
+cached-state reads. Do not hoist mutable admission across callbacks.
+Freezing alone cannot close the paired 1,428-Ir gap, even with a free
+predicate. The next **unpriced** candidate combines the separately witnessed
+frozen-holder contract with counting/non-counting guard definitions selected
+at installation and late Stats activation. Keep Ractor/admission and actual
+receiver checks at every recursive entry; prove late counts and frozen
+lifetime behavior before requesting a cohort. No runtime integration or
+speed claim follows from the 1,686-Ir combined target budget.
+[Machine-function accounting, census and candidate](passes/props-native.md#untimed-attribution-of-the-remaining-checks).
+
 ## Relocatable delivery (2026-10-20)
 
 Use typed app-root-relative metadata and explicit AOT `build --target-root`
