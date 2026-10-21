@@ -144,6 +144,9 @@ module Lowrail
             refuse_all("verification_policy_mutation:#{event.method_id}")
             next
           end
+          # Every watched method/constant holder is a Module. Ordinary live
+          # array/hash/string writes cannot mutate those lookup destinations.
+          next unless Module === event.self
           @snapshots.each do |id, snapshot|
             watched = snapshot[:holders].any? { _1.equal?(event.self) }
             next unless watched || %i[append_features prepend_features extend_object].include?(event.method_id)
