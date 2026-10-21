@@ -45,7 +45,7 @@ sign: objects saved by retaining that component in the full stack.
 | Existing sealed form scaffold | Blog show, retained fixture only | −378 objects/request | −378; 1 hit/request | +378 | Favorable screen, provisional: active own-suite gap retained |
 | Existing sealed token tag | Blog show, retained fixture only | +32 objects/request | +32; 4 hits/request | −32 | Excluded on Blog by deterministic cost; live-token continuations retained |
 | Existing sealed collection render | Blog show, retained fixture only | 0 objects/request | 0; 1 hit/request | 0 | Allocation tie, no win credit; active own-suite gap retained |
-| Existing sealed AR instantiation | Blog / Campfire / Fizzy active; Lobsters warmed vector has zero hits | Blog 0; Campfire near tie; Fizzy filtered/users/show +18/+10/+37 | Blog 0; 3 hits/request | Blog 0 | Fizzy excluded by deterministic cost; Campfire unadmitted (near tie, exactness RED); Blog/Lobsters no win credit |
+| Existing sealed AR instantiation | Blog / Campfire / Fizzy active; Lobsters warmed vector has zero hits | Blog 0; Campfire near tie; Fizzy median tie after `c10ccb8` | Blog 0; 3 hits/request; Fizzy combination pending | Blog 0 | Fizzy pre-fix exclusion superseded; provisionally neutral candidate, no saving/admission credit; DB/active own-suite gaps retained |
 | Props `frozen_split` (`dd844dd`) | None of these four apps use Inertia | Isolated interpreter micro −0.460571% Ir, not request credit | — | — | Excluded: frozen-holder tier not implemented; do not freeze app holders to admit it |
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
@@ -240,7 +240,7 @@ uncovered. Some allocation excesses exceed the counted AR hits; the known
 shadow-predicate allocation cannot explain all of them. The corrected retest
 below supersedes these cost observations. No latency claim.
 
-### Corrected Fizzy AR: residual cost excludes it on this app
+### Fizzy AR: superseded pre-names_of-fix residual-cost exclusion
 
 Rebuilt the 45-unit public artifact using the original disposable fixture's
 environment and DB, then screened all six GETs on `acc130d`, same three-round
@@ -268,6 +268,8 @@ differences off/off too. DB effects remain uncovered. These refusals are not
 normalized away or diagnosed as candidate-specific errors. No native latency
 win is claimed; show records +6.06% paired wall against 1.79% A/A, but fails
 exactness and is not an accepted price. Pre-fix data remain intact above.
+The `c10ccb8` retest below supersedes this cost exclusion; these are retained
+pre-names_of-fix results, not current-source evidence of a penalty.
 
 ### Bounded Fizzy AR allocation diagnosis: avoidable guard scratch
 
@@ -298,7 +300,7 @@ Native URI encoding contributes +8/−1 String differences; ObjectSpace leaves
 an explicit +2/+12 VM-internal residual unassigned. Users remains response
 exact for both seeds; show's existing exactness rejection stays red.
 
-**Proposed, not landed:** in the small-index branch collect matching names
+**Diagnosis-time proposal, subsequently landed upstream:** collect matching names
 with a direct `@names.each_key` block and allocate the result Array lazily
 only on the first match; let the two internal callers skip a nil no-match
 result. Preserve collect-before-reset ordering, both visibility predicates,
@@ -308,8 +310,45 @@ A standalone selector sketch with the real three-name index allocates
 and inherited match-selection controls agree. This corroborates three
 avoidable objects per empty scan (9/36 per observed route), not a precise
 request-level saving promise. The coordinator owns assignment and the usual
-correctness/Thermos gates. No runtime fix or follow-up screen is landed here;
-existing AR remains excluded on Fizzy pending that independently gated work.
+correctness/Thermos gates. The Campfire thread landed this independently at
+`c10ccb8`; the exploration branch imports that unchanged published fix at
+`a2c82f6`, not a duplicate implementation. The follow-up screen is below.
+
+### Post-names_of-fix Fizzy AR: allocation-neutral candidate
+
+Rebuilt all 45 public AR units normally after integrating `c10ccb8`; no other
+units. Same original seed/source/lock hashes, six GETs, three rounds,
+200 warmups / 300 samples, CPU 2, actual Ruby 4.0.7 native YJIT / Rails 8.1.4.
+
+| Route | Off-A / off-B / on allocation medians | AR hits / request | Two-seed exact response |
+|---|---|---:|---|
+| buckets | 9,065 / 9,065 / 9,065 | 11 | PASS |
+| filtered bubbles | 22,518 / 22,519 / 22,518 | 45 | FAIL |
+| account users | 5,588 / 5,588 / 5,588 | 6 | PASS |
+| workflows | 3,825 / 3,825 / 3,825 | 7 | PASS |
+| notifications | 3,805 / 3,805 / 3,805 | 4 | FAIL |
+| bubble show | 18,339 / 18,339 / 18,339 | 43 | FAIL |
+
+The former +18/+10/+37 excesses are gone at the measured medians. Every
+route is no greater than either control at its median; all mean-allocation
+effects are unresolved at the allocation A/A floor. For example users means
+are 5,588.281 / 5,588.074 / 5,588.494 with a paired interval spanning zero;
+do not present these data as proof of a strictly non-increasing expectation,
+an AR saving or a price. They support a **provisionally neutral exploration
+candidate**, not final admission. There are no counted AR fallbacks.
+
+The whole screen exits **2**. Buckets/users/workflows pass actual both-seed
+status/body/all-header equality in every round; every off/off-exact route
+is also on/off exact. Filtered/notifications/show retain off/off body/header
+differences. DB/completion and active own-suite gates remain open. Native
+wall is unresolved under the 3× A/A rule; raw effects and both controls,
+GC counts/time, RSS and coverage are retained. Show GC counts on [29,18,31]
+versus off-A [20,17,27] and off-B [18,17,20] are not a fewer-GC result.
+
+This supersedes, rather than deletes, the old cost exclusion. AR may now be
+tested beside F's DirectSite as a neutral candidate. A combined/F-only
+comparison on the same updated sources is still needed before assigning
+any Fizzy within-stack or leave-one-out effect.
 
 ### Guarded F DirectSite: a second app-specific candidate, not synergy
 
@@ -390,18 +429,20 @@ mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
 ```
 
 Corrected Blog attribution, initial four-app screens and post-shadow-fix
-Campfire/Fizzy retests plus guarded F are complete: **16 retained screens**. Blog's signed
-allocation effects are additive, not all beneficial. There is no admitted
+Campfire/Fizzy retests plus guarded F are complete: **17 retained screens**.
+Blog's signed allocation effects are additive, not all beneficial. There is no admitted
 multi-component stack across apps. Token is excluded on Blog; existing AR is
-excluded on Fizzy; Campfire offers no clear reduction and retains exactness
-gaps; Lobsters' cached vector provides no active credit. Form's favorable
+provisionally neutral on Fizzy after `c10ccb8`; Campfire offers no clear
+reduction and retains exactness gaps; Lobsters' cached vector provides no active credit. Form's favorable
 Blog request reduction stays provisional until active own suites exist.
 Bet F's guarded `addf55e` now has a favorable local buckets allocation screen,
-with existing AR excluded on Fizzy. Sealed form applies only to the certified Blog fixture,
-not Fizzy; do not force a cross-app form/DirectSite combination.
+with existing AR excluded in that screen. Sealed form applies only to the
+certified Blog fixture, not Fizzy; do not force a cross-app form/DirectSite combination.
 No cross-app win, native latency gain, GC synergy or supported component is
 claimed. Shared screen tests pass 2 tests / 39 assertions; imported dispatch
 regressions pass form 2/202 and link 2/162; shadow-predicate regression 1/4.
+Updated guard/AR guard/AR instantiation tests pass 13 tests / 107 assertions,
+zero skips. These are runtime unit checks, not an active Fizzy own suite.
 Propose at most **one** whole-stack Callgrind/README price to the coordinator
 only after a clear screen (>3× A/A wall noise or solid deterministic reduction)
 and the correctness/admission boundaries are resolved. No Callgrind is launched

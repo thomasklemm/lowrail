@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Stack AR guard retest: Fizzy exclusion superseded (2026-10-21)
+
+Imported the independently gated `c10ccb8` lazy no-match guard fix unchanged and rebuilt all 45 public AR units; same seed/source/lock, six GETs, both off controls.
+Users 5,588 / 5,588 / 5,588 and show 18,339 / 18,339 / 18,339 off-A/off-B/on; all six on medians tie or beat both controls, mean effects unresolved at allocation A/A noise.
+All off/off-exact routes remain on/off exact; filtered/notifications/show retain off/off exactness RED, DB/completion and active own-suite gaps remain open.
+Supersede rather than delete the prior +18/+10/+37 cost exclusion: AR is a provisionally neutral Fizzy candidate, not an allocation win or final admission.
+No combined F+AR interaction has been measured yet and no stack price is requested. [Post-fix measurements and qualifications](stack.md#post-names_of-fix-fizzy-ar-allocation-neutral-candidate).
+
 ## Stack F screen: guarded buckets reduction, still provisional (2026-10-21)
 
 Imported F's guarded `addf55e` unchanged; existing AR excluded, normal zero-unit artifact, six Fizzy GETs, no app/config edits.
@@ -12,7 +20,7 @@ Other routes have no DirectSite hits; filtered/notifications/show retain off/off
 All 13 directed cases × two seeds match responses; cold SQL and primary/cache DB differences keep the full control gate red and active own suites remain open.
 This is the only applicable Fizzy candidate, not a form combination or multi-component synergy; no main admission or stack price. [Evidence and refusals](stack.md#guarded-f-directsite-a-second-app-specific-candidate-not-synergy).
 
-## Stack AR retest: Fizzy excluded, Campfire near tie (2026-10-21)
+## Stack AR retest: superseded Fizzy exclusion, Campfire near tie (2026-10-21)
 
 Rerun existing public AR artifacts after main's allocation-free shadow fix; retain pre-fix screens as superseded evidence, not deleted results.
 Campfire room now ties at 15,527 objects/request, other medians within one object of controls; no clear reduction, three routes retain off/off exactness failures.
