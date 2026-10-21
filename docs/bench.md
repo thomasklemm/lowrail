@@ -17,14 +17,21 @@ directly from accepted JSON exports via [results.json](results.json) and
 export, update that metadata once, then render. Do not replace original
 records or copy new numbers into every summary.
 
-- **Blog: no current-source price.** The historical form/token/collection record at
+- **Blog:** the accepted current-source production form/token/collection price at
+  [`b059fc9`](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c),
+  published in
+  [`602e20c`](https://github.com/thomasklemm/lowrail/commit/602e20c5b22c912bb3ef050949271a68395a1bba),
+  uses the **2026-10-21 prospective A/A rule**: both total/no-GC nominal 95%
+  intervals wholly within ±0.1%, zero containment not required
+  ([preregistration and accepted export](passes/production-aa01-reprice.md)).
+  The earlier record at
   [`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
   published in
   [`47f8e7b`](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16),
-  includes the token-continuation safety fix but predates the dispatch fixes
+  remains defective-source evidence only, before the dispatch fixes
   ([historical report and export](passes/production-interpreter-reprice.md)).
-  The post-fix re-price cohort was **rejected on its preregistered no-GC A/A
-  gate**, not accepted as a replacement price
+  The `62f8a6b` post-fix cohort remains **rejected under its old
+  zero-containment/±0.5% no-GC A/A gate**, never rescored or pooled
   ([publication](https://github.com/thomasklemm/lowrail/commit/673b1cc3cbbb341a6956e027e54bc2a18049bde0),
   [report and export](passes/production-dispatch-reprice.md)).
 - **Starter:** the post-TracePoint-fix JSON config-binding record remains

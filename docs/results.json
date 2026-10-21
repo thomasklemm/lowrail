@@ -4,17 +4,18 @@
     "app_endpoint": "BlogShowGetOnly (blog), `GET /articles/1`",
     "ruby_rails": "4.0.7 / 8.1.4",
     "mode": "Interpreter",
-    "tier": "Sealed opt-in: production form/token/collection; historical pre-fix record, no current price",
-    "historical": {
-      "reason": "measured on pre-fix source",
-      "follow_up": "the post-fix re-price cohort was rejected on its preregistered no-GC A/A gate",
-      "publication": "673b1cc3cbbb341a6956e027e54bc2a18049bde0"
-    },
-    "revision": "553e7aafa88754fd32359e5e11ba0cc5bfcd6f65",
-    "publication": "47f8e7bc2f6084181369d82846645a19c3a31f16",
-    "report": "docs/passes/production-interpreter-reprice.md",
-    "source": "docs/passes/production-interpreter-reprice-results.json",
+    "tier": "Sealed opt-in: production form/token/collection",
+    "revision": "b059fc9fbcdbc4cff6a7bc523defb01e7783385c",
+    "publication": "602e20c5b22c912bb3ef050949271a68395a1bba",
+    "report": "docs/passes/production-aa01-reprice.md",
+    "source": "docs/passes/production-aa01-reprice-results.json",
+    "source_commit": "602e20c5b22c912bb3ef050949271a68395a1bba",
     "accepted": "result.accepted",
+    "required_gates": [
+      "summary.aa.pass",
+      "summary.aa.metrics.instructions_total",
+      "summary.aa.metrics.instructions_no_gc"
+    ],
     "revision_field": "measurement_revision",
     "total": "summary.layers.production.instructions_total.delta_pct",
     "no_gc": "summary.layers.production.instructions_no_gc.delta_pct",

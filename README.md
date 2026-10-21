@@ -27,12 +27,12 @@ Blog and Starter each cover one endpoint/fixture in the sealed tier. Fizzy has
 a fixed six-GET block-link vector and a separate one-route branch prototype;
 both are bench-only, not production admission.
 Current prices pass total and GC-excluded A/A, fixed-heap, brk and actual-mode
-gates. Blog has no current-source price after its post-fix A/A rejection.
+gates. Each price applies only to its named endpoint/fixture and tier.
 
 <!-- current-results:start -->
 | Date | App / endpoint | Ruby / Rails | Mode / tier | Ir Δ vs no Lowrail [95% interval] | Measured / published |
 |---|---|---|---|---|---|
-| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection; historical pre-fix record, no current price | **No current price:** −15.23% was measured on pre-fix source [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65); the post-fix re-price cohort was rejected on its preregistered no-GC A/A gate ([673b1cc](https://github.com/thomasklemm/lowrail/commit/673b1cc3cbbb341a6956e027e54bc2a18049bde0)) | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
+| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-aa01-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection | **Total −15.02% [−15.05, −15.00]**; GC-excluded −15.02% [−15.04, −14.97] | [b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c) / [602e20c](https://github.com/thomasklemm/lowrail/commit/602e20c5b22c912bb3ef050949271a68395a1bba); [JSON](https://github.com/thomasklemm/lowrail/blob/602e20c5b22c912bb3ef050949271a68395a1bba/docs/passes/production-aa01-reprice-results.json) |
 | 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.16% [−10.22, −10.08]**; GC-excluded −10.16% [−10.25, −10.11] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
 | 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.40% [+0.39, +0.43]**; GC-excluded +0.40% [+0.38, +0.42] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
 | 2026-10-21 | [Fizzy (bet F), `GET /buckets`](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry) | 4.0.7 / 8.1.4 | Interpreter; Guarded DirectSite call-site query programs; branch prototype, bench-only, one route, not on main, not admission | **Total −5.49% [−5.58, −5.42]**; GC-excluded −5.50% [−5.55, −5.45] | [87c3c19](https://github.com/thomasklemm/lowrail/commit/87c3c1974c424eabef5178f518641d013dd601b3) / [f2e2e35](https://github.com/thomasklemm/lowrail/commit/f2e2e35b4d6372e8d67d285f329f0c93823ba259); runtime [addf55e](https://github.com/thomasklemm/lowrail/commit/addf55e00b080d2627503b7f10a74bbe68e17ed1); [JSON](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.json) |
@@ -40,16 +40,27 @@ gates. Blog has no current-source price after its post-fix A/A rejection.
 
 Displayed values are rounded; exact values are in the linked JSON exports.
 
+**Blog A/A rule change, 2026-10-21:** set prospectively before counting, both
+total and GC-excluded nominal 95% intervals must lie wholly within **±0.1%**;
+zero containment is no longer required
+([preregistration](https://github.com/thomasklemm/lowrail/blob/b059fc9fbcdbc4cff6a7bc523defb01e7783385c/docs/DECISIONS.md#token-allocation-fix-and-one-new-rule-blog-cohort-preregistered-2026-10-21)).
+
 Bet F's per-metric A/A gates both pass within ±0.1%. The linked branch JSON
 documents a cosmetic `project_aa` field overwrite; the table uses the per-metric
 records, not that field. Accepted off/off rejections remain: **login rate-limit
 cache `expires_at`** and **SolidCache `created_at`**. This is not a whole-DB
 certificate or admission.
 
-The historical blog record includes the token-continuation safety fix but
-predates the dispatch fixes; its post-fix attempt is not an accepted price.
-The earlier
-**−15.49%** is historical, valid only at
+**Blog history:** **−15.23%** at
+[`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
+published in
+[`47f8e7b`](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16),
+was measured on defective source only, before the dispatch fixes. The
+[`62f8a6b` cohort](docs/passes/production-dispatch-reprice.md) remains rejected
+under its old zero-containment/±0.5% A/A rule
+([`673b1cc`](https://github.com/thomasklemm/lowrail/commit/673b1cc3cbbb341a6956e027e54bc2a18049bde0));
+it was not rescored or pooled into the new cohort. The earlier **−15.49%**
+is historical, valid only at
 [`ae025b0`](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
 not the corrected source. [Protocol and historical records](docs/bench.md#current-accepted-request-results).
 
@@ -67,7 +78,7 @@ without a credited price or direction claim ([scope and evidence](docs/block-lin
 To update: publish the accepted export first, edit only the metadata/source
 paths in [docs/results.json](docs/results.json), then run
 `python3 docs/render-results.py` (`--check` detects drift). Numbers are read
-from the original exports, never copied into the index. Branch exports require
+from the original exports, never copied into the index. Pinned exports use
 an explicit `source_commit` matching the full publication SHA; fetch bet F's
 branch with `git fetch origin thomasklemm/ar-callsite-compile` before rendering.
 They are read from that commit, never substituted from the main worktree.
