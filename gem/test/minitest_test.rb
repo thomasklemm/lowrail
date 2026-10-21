@@ -48,6 +48,11 @@ class MinitestPluginTest < Minitest::Test
       assert_equal({ "0" => 5 }, data["unit_hits"])
       assert_equal 1, per_process.size
       refute data.key?("jit_diagnostics"), "diagnostics are opt-in"
+      # Diagnostics must exercise a mode-matched artifact, not an early refusal.
+      input = File.join(dir, "units.json")
+      File.write(input, JSON.generate(JSON.parse(File.read(input)).merge("certification_jit" => "yjit")))
+      _, err, status = ruby(COMPILE, input, setup: false)
+      assert status.success?, err
       diagnosed, = run_suite(dir, "LOWRAIL_JIT_DIAGNOSTICS" => "1", "RUBYOPT" => "#{SETUP_OPT} --yjit")
       assert_equal data["tests"], diagnosed["tests"]
       assert_equal data["unit_hits"], diagnosed["unit_hits"]

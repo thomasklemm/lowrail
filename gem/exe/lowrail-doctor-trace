@@ -5,18 +5,33 @@
 # does; never enable YJIT, statistics or a TracePoint on the app's behalf.
 output, path = ARGV
 abort "usage: lowrail-doctor-trace OUTPUT [REQUEST_PATH]" unless output
+require_relative "../lib/lowrail"
+startup = Lowrail.jit_mode
 require File.expand_path("config/environment", Dir.pwd)
 require "json"
 require_relative "../lib/lowrail/jit_diagnostics"
 
 begin
-  request = if path
+  request = if path && path != "--mode-only"
     require "rack/mock"
     session = Rack::MockRequest.new(Rails.application)
     -> { session.get(path) }
   end
-  report = Lowrail::JitDiagnostics.sticky_tracing(request: request)
+  report = path == "--mode-only" ? {"status" => "not_requested"} : Lowrail::JitDiagnostics.sticky_tracing(request: request)
 rescue StandardError => error
   report = {"status" => "unavailable", "reason" => "#{error.class}: #{error.message.lines.first&.strip}"}
 end
+dir = ENV["LOWRAIL_DIR"] || File.join(Dir.pwd, ".lowrail")
+manifest = File.join(dir, "manifest.json")
+begin
+  certified = JSON.parse(File.read(manifest))["certification_jit"] if File.file?(manifest)
+rescue StandardError => error
+  metadata_error = "#{error.class}: #{error.message.lines.first&.strip}"
+end
+current = Lowrail.jit_mode
+report["jit_mode"] = {"startup" => startup, "after_initialize" => current, "certification" => certified,
+  "drift" => startup != current ? "JIT mode drift during boot: #{startup} -> #{current}" : nil,
+  "mismatch" => File.file?(manifest) ? certified != current : nil,
+  "metadata_error" => metadata_error,
+  "scope" => "LOWRAIL=0 boot; metadata comparison only, not artifact admission"}
 File.write(output, JSON.pretty_generate(report))

@@ -96,6 +96,8 @@ pub struct Run {
     /// Process-wide JIT snapshots; never part of equivalence or coverage gates.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub jit_diagnostics: Vec<Value>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub jit_modes: Vec<Value>,
     #[serde(skip_serializing_if = "BTreeSet::is_empty")]
     pub loads: BTreeSet<String>,
     pub load_snapshot_seconds: f64,
@@ -245,6 +247,13 @@ impl Report {
         }
         for ruby in self.off.ruby_descriptions.union(&self.on.ruby_descriptions) {
             s.push_str(&format!("\nRuby: {ruby}"));
+        }
+        for mode in &self.on.jit_modes {
+            for field in ["drift", "refusal"] {
+                if let Some(reason) = mode[field].as_str() {
+                    s.push_str(&format!("\nLowrail JIT/admission: {reason}"));
+                }
+            }
         }
         if !self.off.loads.is_empty() || !self.on.loads.is_empty() {
             let differences = self.load_differences();
@@ -506,6 +515,9 @@ fn run_labeled(app: &Path, cmd: &[String], dir: &Path, label: &str, mode: &str, 
         }
         if let Some(snapshots) = data["jit_diagnostics"].as_array() {
             run.jit_diagnostics.extend(snapshots.iter().cloned());
+        }
+        if let Some(modes) = data["jit_modes"].as_array() {
+            run.jit_modes.extend(modes.iter().cloned());
         }
         if let Some(stages) = data["verify_loads"]["stages"].as_object() {
             run.load_snapshot_seconds += data["verify_loads"]["snapshot_seconds"].as_f64().unwrap_or(0.0);

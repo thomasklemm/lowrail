@@ -14,9 +14,12 @@
 # pass) is loaded.
 
 ENV["RAILS_ENV"] ||= "test"
+require_relative "../lib/lowrail/build_jit"
+mode = Lowrail::BuildJit.prepare(ARGV.first)
 require File.expand_path("config/environment", Dir.pwd)
 require "json"
 Rails.application.eager_load!
+Lowrail::BuildJit.check(mode)
 
 require_relative "../lib/lowrail/oracle_routes"
 
@@ -29,7 +32,8 @@ LOWRAIL_VIEWS = views = Hash.new do |h, name|
   h[name] = controller.view_context
 end
 
-$stdout.puts JSON.generate({ ready: true, rails_env: Rails.env, rails: Rails.version, ruby: RUBY_DESCRIPTION })
+$stdout.puts JSON.generate({ ready: true, rails_env: Rails.env, rails: Rails.version, ruby: RUBY_DESCRIPTION,
+  certification_jit: Lowrail.jit_mode })
 $stdin.each_line do |line|
   req = JSON.parse(line)
   begin

@@ -61,6 +61,28 @@ module Lowrail
   class << self
     attr_reader :manifest, :root, :refusal_reason
 
+    def jit_mode
+      yjit = RubyVM::YJIT.enabled?
+      zjit = defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+      yjit ? (zjit ? "both" : "yjit") : (zjit ? "zjit" : "interpreter")
+    end
+
+    def jit_status
+      {"certification" => @certification_jit, "admission" => @admission_jit,
+        "current" => jit_mode, "after_initialize" => @initialized_jit,
+        "drift" => @jit_drift, "refusal" => @refusal_reason}
+    end
+
+    # Observe actual VM state, never predict or force Rails' JIT config.
+    def initialized_jit!
+      return unless @admission_jit
+      @initialized_jit = jit_mode
+      if @initialized_jit != @admission_jit && !@jit_drift
+        @jit_drift = "JIT mode drift after initialize!: admitted #{@admission_jit}, now #{@initialized_jit}; guards remain fail-closed; deploy with matching startup JIT flags and rebuild"
+        debug @jit_drift
+      end
+    end
+
     # Runtime facts observe constants; they never resolve an autoload or
     # invoke const_missing. A missing dependency means wait or fall back.
     def loaded_constant(name)
@@ -150,6 +172,12 @@ module Lowrail
       end
       unless manifest.compatible?
         refuse("manifest built for #{manifest.ruby_description} (format #{manifest.format}); running #{RUBY_DESCRIPTION}. Falling back to plain Ruby.")
+        return false
+      end
+      @certification_jit = manifest.certification_jit
+      @admission_jit = jit_mode
+      unless @certification_jit == @admission_jit
+        refuse("certification JIT mode mismatch: built #{@certification_jit || 'unknown'}, running #{@admission_jit}; rebuild with --jit #{@admission_jit} and matching deployment startup flags")
         return false
       end
       @root = root

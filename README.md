@@ -116,6 +116,23 @@ with `Lowrail.refusal_reason`. In development it is off unless `LOWRAIL=1`.
 `manifest.json` (default: `LOWRAIL_ROOT/.lowrail`). Benchmark snapshots use
 this separation; relocation/source certificates still check the real app root.
 
+Build for the deployment's **startup JIT mode**:
+
+```sh
+lowrail build path/to/app --env production --jit yjit
+RUBY_YJIT_ENABLE=1 RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails server
+```
+
+`--jit interpreter|yjit|zjit` configures certification, not the deployed app.
+Without it, the build observes the app's mode (legacy `LOWRAIL_BUILD_JIT=0/1`
+still works). Each artifact records `certification_jit`; a different actual
+mode at admission, or missing mode metadata, refuses the whole artifact before
+installers run. Rebuild old artifacts. For YJIT, start the process with
+`RUBY_YJIT_ENABLE=1` or `--yjit`, not only Rails' late `config.yjit` switch.
+Late changes at `initialize!` completion are reported as mode drift in
+`LOWRAIL_DEBUG`, stats, verify and bench; guards remain fail-closed, with no
+uninstall or mode forcing. Doctor compares startup/after-boot modes separately.
+
 `--passes` must start with `default` or `all-opt-in`, then applies
 `+name`/`-name` in order. Names are the stable
 `area/name` identifiers in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

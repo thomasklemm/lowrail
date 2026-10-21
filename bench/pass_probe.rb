@@ -12,7 +12,8 @@ module PassProbe
   end
 
   def self.active!(ids)
-    raise "build inactive: manifest declined" unless defined?(Lowrail) && Lowrail.manifest&.compatible?
+    raise "build inactive: #{defined?(Lowrail) && Lowrail.refusal_reason || 'manifest declined'}" unless defined?(Lowrail) && Lowrail.manifest&.compatible?
+    raise "build inactive: #{Lowrail.jit_status.fetch('drift')}" if Lowrail.respond_to?(:jit_status) && Lowrail.jit_status["drift"]
     units = Lowrail.manifest.units.select { ids.include?(_1.fetch("id")) }
     raise "build inactive: selected units absent" unless units.size == ids.size
     units.each do |unit|
@@ -70,6 +71,7 @@ if $PROGRAM_NAME == __FILE__
   Rails.application.eager_load!
   Rails.logger.level = :error
   ActiveRecord::Base.logger = nil if defined?(ActiveRecord::Base)
+  puts "LOWRAIL_MODE #{JSON.generate(Lowrail.jit_status)}" if defined?(Lowrail) && Lowrail.respond_to?(:jit_status)
   JitStability.assert_mode!
   ids = ENV.fetch("BENCH_UNITS").split(",").map { Integer(_1) }
   units = PassProbe.active!(ids) if ENV["LOWRAIL"] == "1"
@@ -116,6 +118,7 @@ if $PROGRAM_NAME == __FILE__
       route_completions_per_request: defined?(Lowrail::Routes) ? Lowrail::Routes.instance_variable_get(:@bench_completions).fdiv(n) : 0 }
   end
   JitStability.assert_mode!
+  result[:lowrail_jit] = Lowrail.jit_status if defined?(Lowrail) && Lowrail.respond_to?(:jit_status)
   if ENV["LOWRAIL_JIT_DIAGNOSTICS"] == "1"
     require_relative "../gem/lib/lowrail/jit_diagnostics"
     result[:jit_diagnostics] = Lowrail::JitDiagnostics.snapshot

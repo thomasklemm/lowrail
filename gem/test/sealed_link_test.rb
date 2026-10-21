@@ -121,6 +121,9 @@ class SealedLinkTest < Minitest::Test
       end
       # disasm normalizes trace_leave to leave, so a text search is vacuous.
       # Exercise the executable VM state after real cold delivery/activation.
+      out, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "production"), bin,
+        "build", dir, "--env", "production", "--sealed", "--jit", "yjit")
+      assert status.success?, "#{out}\n#{err}"
       traced = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
         "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "CHECK_YJIT_TRACE" => "1",
         "RUBYOPT" => "#{SETUP_OPT} --yjit --yjit-stats=quiet"})

@@ -277,6 +277,7 @@ See [the separate contract](sealed.md#artifact-acceptance-and-the-first-delivere
 {
   "format": 2,
   "ruby_description": "...",
+  "certification_jit": "interpreter",
   "app_root": "..", "build_root": "/build/app", "iseq_root": "/deploy/app",
   "app_paths": {"values": ["/units/0/file"], "keys": ["/files", "/templates"]},
   "relocation_refusals": [],
@@ -305,6 +306,17 @@ See [the separate contract](sealed.md#artifact-acceptance-and-the-first-delivere
   }]
 }
 ```
+
+`certification_jit` is the actual VM mode used by build certification
+(`interpreter`, `yjit`, or `zjit`). `build --jit MODE` explicitly selects it;
+otherwise the oracle observes the app's mode. Runtime builders and the ISeq
+compiler must agree. Binary compatibility still normalizes JIT markers in
+`ruby_description`; setup separately refuses a missing/different
+`certification_jit` before any installer, after existing delivery/quarantine
+refusals. No runtime JIT configuration is changed. A later mode change at
+`initialize!` completion is a diagnostic, not an uninstall: `jit_mode` in
+Stats and `jit_modes` in outcomes retain certification/admission/current/
+after_initialize modes, drift and refusal. Rebuild older artifacts.
 
 File delivery requires all three per-file checks: unchanged source bytes,
 the same compiler recipe, and the same original ISeq from the **live loader
@@ -379,6 +391,7 @@ the named route to still have that path spec, required parts and
 
 ```json
 {"out": "/abs/app/.lowrail", "app_root": "/abs/app", "target_root": "/deploy/app", "rails_env": "test",
+ "certification_jit": "interpreter",
  "files": [{"path": "/abs/app/models/article.rb",
             "lowered": "/abs/app/.lowrail/src/app__models__article.rb",
             "original": "/abs/app/.lowrail/src/app__models__article.rb.orig"}],
@@ -394,6 +407,8 @@ removed afterwards; the app's existing cache is untouched. It then compiles
 each lowered source with the original path, parser, line, process defaults
 and explicit options, writes binaries, and atomically writes `manifest.json`.
 Defaults are restored after every compilation, including syntax errors.
+Mode preparation that loads `config/application` happens inside that same
+observation/cache window, so cold framework delivery retains its certificates.
 Optional `target_root` comes from `lowrail build --target-root PATH`; it must
 be absolute but need not exist during build. Only app-owned file compilation
 filenames change; gem file paths and compiler policy do not. The runtime does
@@ -528,6 +543,10 @@ test commands are also accepted by `lowrail observe`.
 Outcome writers include `ruby: RUBY_DESCRIPTION` (merged Minitest files use
 `ruby_descriptions`). Verify preserves the distinct descriptions for each
 off/on run, making the [explicit mise Ruby axis](ruby-4.1.md) auditable.
+`jit_modes` retains separate per-process mode/admission records, including
+initialization drift and refusals; verify prints on-run reasons and keeps
+them under `last.json` → `report.off/on.jit_modes`. These records do not change
+test equivalence or manufacture fast-path coverage.
 `LOWRAIL_JIT_DIAGNOSTICS=1` adds a `jit_diagnostics` array of **separate
 process-lifetime snapshots**, not additive per-test or per-ISeq counters.
 Unavailable values are null. Verify retains this array under

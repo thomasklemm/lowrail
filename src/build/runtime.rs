@@ -33,7 +33,7 @@ pub struct LoweredSource {
     pub code: String,
 }
 
-pub fn run(app: &Path, env: &str, passes: &Selection, denied: &[Value]) -> Result<Vec<Output>, String> {
+pub fn run(app: &Path, env: &str, passes: &Selection, denied: &[Value], certification_jit: &str) -> Result<Vec<Output>, String> {
     let builders: Vec<_> = passes.iter().filter(|p| p.kind == Kind::Runtime).map(|p| {
         let Builder::Runtime { file, module } = p.builder else { unreachable!() };
         json!({"file": file, "module": module})
@@ -48,7 +48,7 @@ pub fn run(app: &Path, env: &str, passes: &Selection, denied: &[Value]) -> Resul
         .env("LOWRAIL", "0")
         .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::inherit())
         .spawn().map_err(|e| format!("runtime builders: {e}"))?;
-    let request = json!({"builders": builders, "denied": denied});
+    let request = json!({"builders": builders, "denied": denied, "certification_jit": certification_jit});
     child.stdin.take().unwrap().write_all(request.to_string().as_bytes()).map_err(|e| e.to_string())?;
     let output = child.wait_with_output().map_err(|e| e.to_string())?;
     if !output.status.success() { return Err(format!("runtime builders failed ({})", output.status)); }

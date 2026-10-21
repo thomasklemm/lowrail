@@ -300,20 +300,20 @@ class PassBenchTest < Minitest::Test
         RubyVM::YJIT.enable if Rails.application.config.yjit
         File.write("observed.json", JSON.generate(yjit: !!RubyVM::YJIT.enabled?))
       RUBY
-      [nil, "0"].each do |mode|
+      [[nil, nil, true], ["0", nil, false], [nil, "interpreter", false], ["0", "yjit", true]].each do |mode, certificate, expected|
         output, error, status = Open3.capture3({ "RUBYOPT" => nil, "LOWRAIL_BUILD_JIT" => mode },
           RbConfig.ruby, "--disable-yjit", File.expand_path("../gem/exe/lowrail-runtime-build", __dir__),
-          chdir: app, stdin_data: JSON.generate(builders: [], denied: []))
+          chdir: app, stdin_data: JSON.generate(builders: [], denied: [], certification_jit: certificate))
         assert status.success?, error
         assert_equal [], JSON.parse(output)
-        assert_equal(mode.nil?, JSON.parse(File.read(File.join(app, "observed.json"))).fetch("yjit"))
+        assert_equal expected, JSON.parse(File.read(File.join(app, "observed.json"))).fetch("yjit")
       end
       File.write(File.join(app, "config/environment.rb"), "require_relative 'application'; RubyVM::YJIT.enable\n")
       _, error, status = Open3.capture3({ "RUBYOPT" => nil, "LOWRAIL_BUILD_JIT" => "0" },
         RbConfig.ruby, "--disable-yjit", File.expand_path("../gem/exe/lowrail-runtime-build", __dir__),
         chdir: app, stdin_data: JSON.generate(builders: [], denied: []))
       refute status.success?
-      assert_includes error, "runtime build unexpectedly enabled YJIT"
+      assert_includes error, "certification JIT mode mismatch: expected interpreter, observed yjit"
     end
   end
 

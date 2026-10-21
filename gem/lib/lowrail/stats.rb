@@ -98,7 +98,8 @@ module Lowrail
 
       def snapshot
         data = { "pid" => Process.pid, "ppid" => Process.ppid, "unit_hits" => unit_hits,
-          "unit_fallbacks" => unit_fallbacks, "loaded_files" => loaded_files }
+          "unit_fallbacks" => unit_fallbacks, "loaded_files" => loaded_files,
+          "jit_mode" => Lowrail.jit_status }
         data["refusal_reason"] = Lowrail.refusal_reason if Lowrail.refusal_reason
         data
       end

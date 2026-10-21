@@ -60,5 +60,6 @@ if defined?(Lowrail::ARInstantiate)
   end
 end
 puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, windows: windows,
+  lowrail_jit: defined?(Lowrail) && Lowrail.respond_to?(:jit_status) ? Lowrail.jit_status : nil,
   heap_anchors: anchors, ar_installed: ar_installed, jit_warmup: jit_warmup, request_settle: true,
   compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"

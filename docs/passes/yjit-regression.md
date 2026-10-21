@@ -113,6 +113,34 @@ The independent targeted/global micros remain causal evidence for the
 sticky-trace fix. Numeric hashes, gates and attribution are retained in
 the export; the original accepted regression is not overwritten.
 
+### Operational follow-up: explicit mode admission, not weaker facts
+
+Build now accepts `--jit interpreter|yjit|zjit`. The oracle observes its actual
+mode and passes it through runtime certification and `units.json` to the ISeq
+compiler; `manifest.json` records `certification_jit`. Setup compares the actual
+mode before Guard, Loader or pass installers, retaining earlier
+delivery/quarantine refusal precedence. Mismatched or missing mode metadata
+declines the whole artifact with a `LOWRAIL_DEBUG` reason, not a guard charge
+on every original-only call. Rebuild old artifacts.
+
+Admission does not predict or change app configuration. The existing targeted
+initialize! completion observer re-reads the mode: an off-certified artifact
+can enter before Rails enables YJIT, then reports **mode drift** through
+debug, Stats, verify's per-process `jit_modes`, and bench coverage/worker
+metadata. Bench activation refuses drift; correctness remains guarded without
+uninstall machinery. Doctor also records startup/after-initialize modes in
+its **Lowrail-off metadata comparison**, explicitly not an admission probe.
+
+Deploy with `RUBY_YJIT_ENABLE=1` or `--yjit` and build `--jit yjit`, rather than
+relying only on late `config.yjit`. Public regressions cover early mismatch
+in both directions (no Guard/Loader, zero fallbacks), matched hits, and a real
+Rails late enable after a warmed C Array#each fact (original result, fallback
+and drift in stats/outcomes). The sealed cold-delivery regression additionally
+rebuilds in YJIT mode and retains positive hits plus zero `trace_leave` exits.
+Mode preparation that requires config/application is inside the compiler's
+observation/cold-cache window, preserving native delivery certificates.
+**No new measured cohort, no revised YJIT verdict, no promotion.**
+
 ## Minimal causal proof: enable, boot, disable, then call unrelated code
 
 `bench/experiments/trace_stickiness.rb` uses a boot method and an unrelated

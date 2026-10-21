@@ -88,7 +88,7 @@ module Lowrail
   # Each file names its ISeq binary and the original source's SHA-256.
   # Units are the guarded specializations, each with the facts it assumes.
   class Manifest
-    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method, :refusal_reason
+    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method, :refusal_reason, :certification_jit
 
     QUARANTINED_PASSES = %w[view/link_to route/path].freeze
 
@@ -110,6 +110,7 @@ module Lowrail
       end
       Paths.resolve!(data, root: root)
       @ruby_description = data.fetch("ruby_description")
+      @certification_jit = data["certification_jit"]
       @compile_option = data.fetch("compile_option")
       @files = data.fetch("files")
       # Lowered template code by template identifier (see lowrail/templates.rb).
@@ -180,8 +181,8 @@ module Lowrail
       File.join(@dir, entry.fetch("iseq"))
     end
 
-    # YJIT and the parser are runtime choices that do not change the ISeq
-    # format; strip them so a build made without YJIT serves a YJIT process.
+    # Binary compatibility is separate from certification-mode admission:
+    # JITs can replace core methods even when the ISeq format is unchanged.
     def self.normalize(desc)
       desc.sub(/ \+YJIT( dev)?/, "").sub(/ \+ZJIT( dev)?/, "").sub(/ \+PRISM/, "").sub(/ \+MN/, "")
     end

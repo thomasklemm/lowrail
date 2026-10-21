@@ -31,6 +31,98 @@ class E2ETest < Minitest::Test
     puts JSON.generate(r)
   RUBY
 
+  def test_certification_jit_mismatch_refuses_whole_artifact_before_installers
+    realpath_tmpdir do |dir|
+      ["interpreter", "yjit", nil].each do |certification|
+        build_app(dir, compile: false)
+        input = File.join(dir, "units.json")
+        File.write(input, JSON.generate(JSON.parse(File.read(input)).merge("certification_jit" => certification)))
+        _, err, status = ruby(COMPILE, input, setup: false, env: {"RUBYOPT" => "--disable-yjit"})
+        assert status.success?, err
+        path = File.join(dir, ".lowrail/manifest.json")
+        manifest = JSON.parse(File.read(path))
+        assert_equal certification || "interpreter", manifest.fetch("certification_jit")
+        unless certification
+          manifest.delete("certification_jit") # An old artifact has no mode certificate.
+          File.write(path, JSON.generate(manifest))
+        end
+        %w[interpreter yjit].each do |runtime|
+          flags = runtime == "yjit" ? "--yjit" : "--disable-yjit"
+          out, err, status = ruby("-e", <<~'RUBY', chdir: dir, env: {"RUBYOPT" => "#{flags} #{SETUP_OPT}", "LOWRAIL_DEBUG" => "1", "LOWRAIL_STATS" => ""})
+            require "json"
+            require_relative "app"
+            puts JSON.generate(value: Calc.new.compute(7), manifest: !Lowrail.manifest.nil?,
+              guard: !!defined?(Lowrail::Guard), loader: !!defined?(Lowrail::Loader),
+              reason: Lowrail.refusal_reason, stats: Lowrail::Stats.snapshot)
+          RUBY
+          assert status.success?, err
+          data = JSON.parse(out.lines.last)
+          matched = certification == runtime
+          assert_equal [matched ? "fast" : "orig", 8], data.fetch("value")
+          %w[manifest guard loader].each { assert_equal matched, data.fetch(_1), "#{certification}/#{runtime}: #{data}" }
+          if matched
+            assert_nil data.fetch("reason")
+            assert_equal({"0" => 1}, data.dig("stats", "unit_hits"))
+          else
+            assert_includes data.fetch("reason"), "certification JIT mode mismatch"
+            assert_includes err, "built #{certification || 'unknown'}, running #{runtime}"
+            assert_empty data.dig("stats", "unit_fallbacks"), "no per-call fallback after refusal"
+          end
+        end
+      end
+    end
+  end
+
+  def test_late_rails_yjit_enable_reports_drift_and_keeps_fact_checks
+    skip "Rails is not installed" if Gem::Specification.find_all_by_name("railties").empty?
+    realpath_tmpdir do |dir|
+      units = default_units(dir)
+      units[0]["facts"] << {"receiver" => "Array", "method" => "each", "singleton" => false,
+        "owner" => "Array", "source_location" => nil, "visibility" => "public"}
+      build_app(dir, units: units)
+      FileUtils.mkdir_p(File.join(dir, "config"))
+      File.write(File.join(dir, "config/environment.rb"), <<~'RUBY')
+        require "rails"
+        require_relative "../app"
+        raise "not admitted before late enable" unless Calc.new.compute(7) == [:fast, 8]
+        class LateJitApp < Rails::Application
+          config.root = File.expand_path("..", __dir__)
+          config.eager_load = false
+          config.secret_key_base = "x" * 64
+          config.yjit = true
+          config.logger = Logger.new(nil)
+        end
+        Rails.application.initialize!
+      RUBY
+      out, err, status = ruby("-e", <<~'RUBY', chdir: dir, env: {"RUBYOPT" => "--disable-yjit #{SETUP_OPT}", "RAILS_ENV" => "test", "LOWRAIL_STATS" => "", "LOWRAIL_DEBUG" => "1", "LOWRAIL_OUTCOMES" => File.join(dir, "outcomes")})
+        require_relative "config/environment"
+        require_relative "app"
+        require "json"
+        Lowrail::Stats.reset_counts!
+        puts JSON.generate(value: Calc.new.compute(7), stats: Lowrail::Stats.snapshot,
+          admitted: !Lowrail.manifest.nil?, each_source: Array.instance_method(:each).source_location)
+        require "minitest/autorun"
+        class DriftTest < Minitest::Test
+          def test_original = assert_equal [:orig, 8], Calc.new.compute(7)
+        end
+      RUBY
+      assert status.success?, "#{err}\n#{out}"
+      data = JSON.parse(out.lines.find { _1.start_with?('{"value":') })
+      assert data.fetch("admitted")
+      assert_equal ["orig", 8], data.fetch("value")
+      assert_equal({"0" => 1}, data.dig("stats", "unit_fallbacks"))
+      mode = data.dig("stats", "jit_mode")
+      assert_equal "interpreter", mode.fetch("certification")
+      assert_equal "interpreter", mode.fetch("admission")
+      assert_equal "yjit", mode.fetch("after_initialize")
+      assert_includes mode.fetch("drift"), "JIT mode drift after initialize!"
+      assert_includes err, "admitted interpreter, now yjit"
+      outcomes = JSON.parse(File.read(File.join(dir, "outcomes")))
+      assert_equal "pass", outcomes.dig("tests", "DriftTest#test_original", "result")
+      assert_equal mode.fetch("drift"), outcomes.fetch("jit_modes").first.fetch("drift")
+    end
+  end
+
   def test_fast_path_stub_and_restore
     realpath_tmpdir do |dir|
       build_app(dir)

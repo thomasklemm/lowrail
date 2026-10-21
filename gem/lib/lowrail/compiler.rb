@@ -8,6 +8,7 @@ require_relative "../lowrail"
 require_relative "manifest"
 require_relative "compilation"
 require_relative "jit_shapes"
+require_relative "build_jit"
 
 module Lowrail
   # Build step behind `gem/exe/lowrail-compile UNITS_JSON` (see
@@ -34,13 +35,20 @@ module Lowrail
         input = argv.first or (err.puts("usage: lowrail-compile UNITS_JSON"); return 2)
         input = JSON.parse(File.read(input))
         input["delivery_refusal"] = Lowrail.delivery_refusal(Dir.pwd)
-        Compilation.boot(input) if input["rails_env"] && File.file?("config/environment.rb")
+        mode = nil
+        if input["rails_env"] && File.file?("config/environment.rb")
+          Compilation.boot(input) { mode = BuildJit.prepare(input["certification_jit"]) }
+        else
+          mode = BuildJit.prepare(input["certification_jit"])
+        end
+        BuildJit.check(mode)
         manifest = compile(input, err: err)
         err.puts "[lowrail] compiled #{manifest["files"].size} file(s), #{manifest["units"].size} unit(s)"
         0
       end
 
       def compile(input, err: $stderr)
+        BuildJit.check(input["certification_jit"])
         out = File.expand_path(input.fetch("out"))
         root = File.expand_path(input.fetch("app_root") { File.dirname(out) })
         target_root = input["target_root"] || root
@@ -87,6 +95,7 @@ module Lowrail
         manifest = {
           "format" => FORMAT,
           "ruby_description" => RUBY_DESCRIPTION,
+          "certification_jit" => Lowrail.jit_mode,
           "compile_option" => Manifest.compile_option_fingerprint,
           "files" => files,
           "units" => units

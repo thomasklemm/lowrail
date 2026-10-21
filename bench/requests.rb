@@ -89,6 +89,7 @@ if ENV["BENCH_PIPE"]
   end
   reply.call(ready: true, pid: Process.pid, ruby: RUBY_DESCRIPTION,
     yjit: RubyVM::YJIT.enabled?, units: defined?(Lowrail) && Lowrail.manifest&.units&.size,
+    lowrail_jit: defined?(Lowrail) && Lowrail.respond_to?(:jit_status) ? Lowrail.jit_status : nil,
     ar_installed: ar_installed)
   STDIN.each_line do |line|
     command = JSON.parse(line)

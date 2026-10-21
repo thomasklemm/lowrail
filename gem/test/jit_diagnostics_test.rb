@@ -19,15 +19,25 @@ class JitDiagnosticsTest < Minitest::Test
           ThirdParty.boot
           trace.disable
         end
+        RubyVM::YJIT.enable if ENV["TRACE_MODE"] == "late"
       RUBY
-      %w[off targeted global no_stats interpreter].each do |mode|
-        flags = mode == "interpreter" ? "--disable-yjit" : "--yjit"
-        flags += " --yjit-stats=quiet" unless %w[no_stats interpreter].include?(mode)
+      %w[off targeted global no_stats interpreter late].each do |mode|
+        flags = %w[interpreter late].include?(mode) ? "--disable-yjit" : "--yjit"
+        flags += " --yjit-stats=quiet" unless %w[no_stats interpreter late].include?(mode)
         output = File.join(dir, "trace.json")
-        out, err, status = ruby(File.join(GEM_ROOT, "exe/lowrail-doctor-trace"), output,
+        args = [File.join(GEM_ROOT, "exe/lowrail-doctor-trace"), output]
+        args << "--mode-only" if mode == "late"
+        out, err, status = ruby(*args,
           setup: false, chdir: dir, env: {"RUBYOPT" => flags, "TRACE_MODE" => mode})
         assert status.success?, "#{mode}: #{err}#{out}"
         data = JSON.parse(File.read(output))
+        if mode == "late"
+          assert_equal "not_requested", data.fetch("status")
+          assert_equal "interpreter", data.dig("jit_mode", "startup")
+          assert_equal "yjit", data.dig("jit_mode", "after_initialize")
+          assert_includes data.dig("jit_mode", "drift"), "interpreter -> yjit"
+          next
+        end
         if %w[no_stats interpreter].include?(mode)
           assert_equal "unavailable", data.fetch("status"), mode
           assert_nil data.fetch("leaf")

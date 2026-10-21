@@ -11,7 +11,7 @@ module Lowrail
 
       def boot(input)
         @paths = Array(input["files"]).to_h { [_1.fetch("path"), true] }
-        return if @paths.empty?
+        return yield if @paths.empty?
         require "tmpdir"
         @booted = true
         ENV["RAILS_ENV"] = input.fetch("rails_env")
@@ -20,6 +20,9 @@ module Lowrail
         previous = ENV["BOOTSNAP_CACHE_DIR"]
         Dir.mktmpdir("lowrail-compile") do |cache|
           ENV["BOOTSNAP_CACHE_DIR"] = cache
+          # Configuring the build's JIT may load config/application and its
+          # framework files. Observe those under the same native/cold recipe.
+          yield
           require File.expand_path("config/environment")
           Rails.application.eager_load! if defined?(Rails)
         end

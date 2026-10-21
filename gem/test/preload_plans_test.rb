@@ -99,6 +99,7 @@ class PreloadPlansTest < Minitest::Test
     PolyPost.create!(owner: a)
     dir = Dir.pwd
     File.write("manifest.json", JSON.generate({format: Lowrail::FORMAT, ruby_description: RUBY_DESCRIPTION,
+      certification_jit: Lowrail.jit_mode,
       compile_option: Lowrail::Manifest.compile_option_fingerprint, files: {}, units: [],
       tier: "sealed-v1", rails_env: "production"}))
     File.write("ledger.json", "[]")

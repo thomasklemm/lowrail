@@ -34,6 +34,14 @@ per request. Keep **sealed-only, no promotion**: no accepted post-fix YJIT
 cohort demonstrates non-regression. Old accepted/rejected results remain
 separate. [Diagnosis, proposal and all evidence](passes/yjit-regression.md).
 
+**Operational closure, not promotion:** `build --jit MODE` records the actual
+certification mode across builders/compiler. Setup refuses unknown/mismatched
+modes before installers; initialize! completion reports later drift rather
+than forcing the app or uninstalling. Doctor, stats, verify and bench expose
+the distinction. Deploy YJIT at startup (`RUBY_YJIT_ENABLE=1` or `--yjit`) and
+rebuild `--jit yjit`. Both early mismatch directions and real Rails late
+enablement have regression coverage; no new measured cohort was started.
+
 ## Relocatable delivery (2026-10-20)
 
 Use typed app-root-relative metadata and explicit AOT `build --target-root`

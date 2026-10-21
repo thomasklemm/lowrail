@@ -11,10 +11,10 @@ fn verify_counts_merged_minitest_or_independent_rspec_processes_once() {
     for merged in [false, true] {
         let script = r#"
           [ "$LOWRAIL_SHADOW" = strict ] || exit 42
-          printf '%s' '{"tests":{"example[1:1]":{"result":"pass"}},"unit_hits":{"7":3},"unit_fallbacks":{"9":4},"ruby":"ruby fixture","jit_diagnostics":[{"pid":1,"counter":11}]}' > "$LOWRAIL_OUTCOMES.1"
-          printf '%s' '{"tests":{"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":2},"unit_fallbacks":{"9":2},"ruby":"ruby fixture","jit_diagnostics":[{"pid":2,"counter":22}]}' > "$LOWRAIL_OUTCOMES.2"
+          printf '%s' '{"tests":{"example[1:1]":{"result":"pass"}},"unit_hits":{"7":3},"unit_fallbacks":{"9":4},"ruby":"ruby fixture","jit_diagnostics":[{"pid":1,"counter":11}],"jit_modes":[{"pid":1,"drift":"fixture mode drift"}]}' > "$LOWRAIL_OUTCOMES.1"
+          printf '%s' '{"tests":{"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":2},"unit_fallbacks":{"9":2},"ruby":"ruby fixture","jit_diagnostics":[{"pid":2,"counter":22}],"jit_modes":[{"pid":2,"drift":null}]}' > "$LOWRAIL_OUTCOMES.2"
           if [ "$1" = true ]; then
-            printf '%s' '{"tests":{"example[1:1]":{"result":"pass"},"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":5},"unit_fallbacks":{"9":6},"ruby_descriptions":["ruby fixture"],"jit_diagnostics":[{"pid":1,"counter":11},{"pid":2,"counter":22}]}' > "$LOWRAIL_OUTCOMES"
+            printf '%s' '{"tests":{"example[1:1]":{"result":"pass"},"example[1:2]":{"result":"skip","failure":"later"}},"unit_hits":{"7":5},"unit_fallbacks":{"9":6},"ruby_descriptions":["ruby fixture"],"jit_diagnostics":[{"pid":1,"counter":11},{"pid":2,"counter":22}],"jit_modes":[{"pid":1,"drift":"fixture mode drift"},{"pid":2,"drift":null}]}' > "$LOWRAIL_OUTCOMES"
             # A newer build during execution must not relabel these counters.
             printf '%s' '{"units":[{"id":7,"pass":"different/pass"}]}' > .lowrail/manifest.json
           fi
@@ -55,6 +55,10 @@ fn verify_counts_merged_minitest_or_independent_rspec_processes_once() {
         let mut snapshots = last["report"]["on"]["jit_diagnostics"].as_array().unwrap().clone();
         snapshots.sort_by_key(|value| value["pid"].as_u64());
         assert_eq!(snapshots, serde_json::json!([{"pid":1,"counter":11},{"pid":2,"counter":22}]).as_array().unwrap().clone());
+        assert!(stdout.contains("fixture mode drift"), "{stdout}");
+        let mut modes = last["report"]["on"]["jit_modes"].as_array().unwrap().clone();
+        modes.sort_by_key(|value| value["pid"].as_u64());
+        assert_eq!(modes, serde_json::json!([{"pid":1,"drift":"fixture mode drift"},{"pid":2,"drift":null}]).as_array().unwrap().clone());
     }
     std::fs::remove_dir_all(app).unwrap();
 }

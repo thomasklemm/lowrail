@@ -35,15 +35,18 @@ pub struct RubyOracle {
     stdout: BufReader<ChildStdout>,
     next_id: u64,
     pub rails_env: String,
+    pub certification_jit: String,
 }
 
 impl RubyOracle {
-    pub fn start(app: &Path, rails_env: &str) -> Result<Self, String> {
+    pub fn start(app: &Path, rails_env: &str, jit: Option<&str>) -> Result<Self, String> {
         let script = crate::facts::gem_dir().join("exe/lowrail-oracle");
-        let mut child = Command::new("bundle")
-            .args(["exec", "ruby"])
-            .arg(&script)
+        let mut command = Command::new("bundle");
+        command.args(["exec", "ruby"]).arg(&script);
+        if let Some(jit) = jit { command.arg(jit); }
+        let mut child = command
             .current_dir(app)
+            .env_remove("RUBYOPT")
             .env("RAILS_ENV", rails_env)
             .env("LOWRAIL", "0")
             .stdin(Stdio::piped())
@@ -56,7 +59,8 @@ impl RubyOracle {
         let mut line = String::new();
         stdout.read_line(&mut line).map_err(|e| e.to_string())?;
         let ready: Value = serde_json::from_str(&line).map_err(|e| format!("oracle did not start: {e}: {line}"))?;
-        Ok(Self { child, stdin, stdout, next_id: 0, rails_env: ready["rails_env"].as_str().unwrap_or("").to_string() })
+        let certification_jit = ready["certification_jit"].as_str().ok_or("oracle missing certification JIT mode")?.to_string();
+        Ok(Self { child, stdin, stdout, next_id: 0, rails_env: ready["rails_env"].as_str().unwrap_or("").to_string(), certification_jit })
     }
 }
 

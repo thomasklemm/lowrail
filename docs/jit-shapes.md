@@ -160,6 +160,20 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
     YJIT warns that Ruby calls/layers themselves cost; do not split methods
     just to cross ZJIT's threshold. Measure the whole guarded operation.
 
+11. **Certify in the startup JIT mode, then observe initialization drift.**
+    YJIT enablement can replace core methods, not merely change execution:
+    the untimed config-only request attribution found 0 hits / 9,911
+    fallbacks when an interpreter certificate expected C `Array#each` but
+    YJIT used `<internal:array>:219`. Keep that guard exact. Build with
+    `--jit interpreter|yjit|zjit`; manifests record `certification_jit` and
+    setup refuses a different/unknown mode before installers. Deploy YJIT
+    with `RUBY_YJIT_ENABLE=1` or `--yjit`. Enabling it only through Rails'
+    `config.yjit` can drift after admission; targeted initialize! completion
+    reports that in debug/stats/verify/bench, without uninstalling or forcing
+    the app's mode. Regressions cover both early mismatch directions and a
+    warmed Array#each certificate invalidated by real Rails late enablement.
+    This closes admission/attribution, not the rejected cohort or promotion.
+
 ## Concrete Lowrail audit and exact alternatives (not implemented)
 
 | Current place / cost | Alternative and required boundary |

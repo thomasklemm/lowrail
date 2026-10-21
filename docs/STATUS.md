@@ -32,6 +32,14 @@ live in the linked docs; numbers come from executed runs, dated.
   fact refusal must not be weakened. Config remains sealed-only, not
   promoted. Old cohorts, the CASA pre-flags SQL RED and the Redprints load
   boundary remain recorded separately. [Evidence and emit proposal](passes/yjit-regression.md).
+- **JIT admission and drift (2026-10-21):** `build --jit MODE` certifies in
+  the explicit mode; the manifest's actual `certification_jit` must match
+  before installers. Missing/different metadata refuses the whole artifact.
+  Actual mode changes by initialize! completion are debug/stats/verify/bench
+  diagnostics, not uninstalls or forced app config. Doctor separately compares
+  Lowrail-off startup/after-boot modes. Regressions cover both early mismatch
+  directions and Rails late enablement; deploy YJIT at startup and rebuild
+  `--jit yjit`. No new measurements or pass promotion.
 
 Ruby 4.0+ (gemspec), developed on 4.0.7; the second target is Ruby 4.1
 ([separate compatibility matrix](ruby-4.1.md)). Ruby 3.4 was dropped by owner

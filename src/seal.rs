@@ -114,16 +114,13 @@ pub fn doctor(args: &[String]) -> Result<(), String> {
     println!("doctor: 1. boot (LOWRAIL=0)");
     let mut boot_command = Command::new("bundle");
     boot_command.args(["exec", "ruby"]);
-    if trace_check {
-        std::fs::create_dir_all(app.join(".lowrail")).map_err(|e| e.to_string())?;
-        boot_command.arg(crate::facts::gem_dir().join("exe/lowrail-doctor-trace"))
-            .arg(app.join(".lowrail/doctor-trace.json"))
-            .env_remove("LOWRAIL_OUTCOMES").env_remove("LOWRAIL_SEAL_CHECK")
-            .env_remove("LOWRAIL_STATS").env_remove("LOWRAIL_VERIFY_LOADS");
-        if let Some(path) = request_path { boot_command.arg(path); }
-    } else {
-        boot_command.args(["-e", "require File.expand_path('config/environment', Dir.pwd)"]);
-    }
+    std::fs::create_dir_all(app.join(".lowrail")).map_err(|e| e.to_string())?;
+    boot_command.arg(crate::facts::gem_dir().join("exe/lowrail-doctor-trace"))
+        .arg(app.join(".lowrail/doctor-trace.json"))
+        .env_remove("LOWRAIL_OUTCOMES").env_remove("LOWRAIL_SEAL_CHECK")
+        .env_remove("LOWRAIL_STATS").env_remove("LOWRAIL_VERIFY_LOADS");
+    if let Some(path) = request_path { boot_command.arg(path); }
+    if !trace_check { boot_command.arg("--mode-only"); }
     let boot = boot_command.current_dir(&app).env("LOWRAIL", "0")
         .status().map_err(|e| e.to_string())?.success();
     println!("doctor: 2. baseline suite (LOWRAIL=0)");
@@ -155,7 +152,10 @@ pub fn doctor(args: &[String]) -> Result<(), String> {
         refusals.entry(reason.into()).or_default().push(row.clone());
     }
     for (reason, rows) in &refusals { println!("  {} {reason}", rows.len()); }
-    let return_tracing = if trace_check && boot { read("doctor-trace.json")? } else { Value::Null };
+    let boot_report = if boot { read("doctor-trace.json")? } else { Value::Null };
+    let return_tracing = if trace_check { boot_report.clone() } else { Value::Null };
+    if let Some(drift) = boot_report["jit_mode"]["drift"].as_str() { println!("doctor: {drift}"); }
+    if boot_report["jit_mode"]["mismatch"] == true { println!("doctor: certification JIT mode differs after boot; rebuild with matching --jit and startup flags"); }
     if trace_check {
         println!("doctor: return tracing {} ({})", return_tracing["status"].as_str().unwrap_or("not run"),
             return_tracing["reason"].as_str().unwrap_or("boot failed"));
@@ -164,6 +164,7 @@ pub fn doctor(args: &[String]) -> Result<(), String> {
         "static":static_report.ok(),"static_error":static_error,"seal_requested":dynamic,
         "seal_error":dynamic_error,"seal":if seal_ran { read("seal.json")? } else { Value::Null },
         "trace_requested":trace_check,"return_tracing":return_tracing,
+        "jit_mode":boot_report["jit_mode"],
         "guarded_ledger_available":!ledger.is_null(),
         "guarded_refusals":refusals});
     let path = app.join(".lowrail/doctor.json");

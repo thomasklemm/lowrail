@@ -36,6 +36,9 @@ module Lowrail
         Templates.install(manifest.templates)
       end
       units = manifest.units
+      # Source-only artifacts need the same late-mode observation as runtime
+      # variants. Reuse the targeted initialization boundary, never a global hook.
+      after_initialize
       selected_ids = ENV["LOWRAIL_UNITS"]&.split(",")&.map { Integer(_1) }
       REGISTRY.each do |name, entry|
         selected = units.select { entry.fetch(:passes).include?(_1["pass"]) }
@@ -64,8 +67,11 @@ module Lowrail
     # on_load also runs immediately when the application already initialized.
     # A global :return TracePoint leaves trace_leave instructions VM-wide even
     # after disable. Target only initialize!: removal restores that local ISeq.
-    def self.after_initialize(runtime, receivers = [])
-      activate = -> { when_loaded(receivers) { runtime.activate } }
+    def self.after_initialize(runtime = nil, receivers = [])
+      activate = -> {
+        Lowrail.initialized_jit!
+        when_loaded(receivers) { runtime.activate } if runtime
+      }
       LoadHooks.active_support do
         ::ActiveSupport.on_load(:after_initialize, yield: true) do |app|
           if !app.respond_to?(:initialized?) || app.initialized?

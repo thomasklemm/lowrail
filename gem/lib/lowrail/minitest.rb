@@ -71,6 +71,7 @@ module Lowrail
         stats = defined?(Stats) && Stats.enabled? ? Stats.snapshot : { "unit_hits" => {}, "unit_fallbacks" => {} }
         data = { "pid" => Process.pid, "ppid" => Process.ppid, "tests" => tests, "ruby" => RUBY_DESCRIPTION,
           "unit_hits" => stats["unit_hits"], "unit_fallbacks" => stats["unit_fallbacks"],
+          "jit_modes" => [Lowrail.jit_status.merge("pid" => Process.pid)],
           "sql" => SqlTrace.snapshot }
         data["jit_diagnostics"] = [JitDiagnostics.snapshot] if defined?(JitDiagnostics)
         data["verify_loads"] = VerifyLoads.snapshot if defined?(VerifyLoads)
@@ -152,6 +153,7 @@ module Lowrail
         data["unit_fallbacks"]&.each { |id, n| merged["unit_fallbacks"][id] += n }
         merged["processes"] << data["pid"]
         (merged["ruby_descriptions"] ||= []) << data["ruby"] if data["ruby"]
+        (merged["jit_modes"] ||= []).concat(data["jit_modes"]) if data["jit_modes"]
         (merged["jit_diagnostics"] ||= []).concat(data["jit_diagnostics"]) if data["jit_diagnostics"]
         if (loads = data["verify_loads"])
           target = (merged["verify_loads"] ||= { "stages" => {}, "snapshot_seconds" => 0.0 })

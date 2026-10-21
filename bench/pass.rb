@@ -69,7 +69,11 @@ module PassBench
     log = File.join(out, "#{label}.log")
     ok = system(env, RbConfig.ruby, *JitStability.flags(env.fetch("BENCH_JIT")),
       File.join(__dir__, "pass_probe.rb"), route, chdir: app, out: log, err: [:child, :out])
-    raise "activation/JIT probe failed; inspect #{log}" unless ok
+    unless ok
+      mode = File.readlines(log).find { _1.start_with?("LOWRAIL_MODE ") }
+      mode = mode && JSON.parse(mode.delete_prefix("LOWRAIL_MODE "))
+      raise "activation/JIT probe failed: #{mode && (mode['drift'] || mode['refusal'])}; inspect #{log}"
+    end
     line = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
     JSON.parse(line.to_s.delete_prefix("LOWRAIL_BENCH "))
   end
@@ -353,6 +357,7 @@ module PassBench
         workers = raw["cohorts"] ? raw.fetch("cohorts").flat_map { _1.fetch("workers").values } : raw.fetch("workers").values
         result[:actual_yjit] = workers.map { _1.fetch("yjit") }.uniq
         result[:actual_jit] = workers.map { JitStability.actual(_1) }.uniq
+        result[:jit_modes] = workers.filter_map { _1["lowrail_jit"] }.uniq
         raise "unexpected JIT mode in request workers" unless workers.all? { JitStability.actual(_1) == JitStability.mode(env.fetch("BENCH_JIT")) }
       end
       raise "request A/A, heap, activation or JIT checks failed; inspect requests.log" unless ok
