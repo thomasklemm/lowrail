@@ -5,6 +5,7 @@
 # CONFIG: app, path, env; optional before_boot (external credentials fixture).
 require "json"
 require "digest"
+require "digest/sha2"
 require "fileutils"
 require "rbconfig"
 
@@ -43,13 +44,14 @@ module BootImage
   end
 
   def save(path)
-    File.binwrite(path, Marshal.dump({"ruby" => RUBY_DESCRIPTION,
+    File.binwrite(path, Marshal.dump({"ruby" => @entry_ruby,
       "load_path" => @entry_load_path, "gems" => @entry_gems,
       "files" => @files, "misses" => @misses}), perm: 0o600)
   end
 
-  def install(path)
+  def install(path, release: false)
     @hits, @files, @refusal = 0, {}, nil
+    @release = release
     # Trusted, local build output ONLY. This is not an untrusted artifact reader.
     image = Marshal.load(File.binread(path))
     @refusal = "ruby" unless image.fetch("ruby") == RUBY_DESCRIPTION
@@ -79,6 +81,7 @@ module BootImage
     return unless Digest::SHA256.file(path).hexdigest == entry.fetch("sha256")
     sequence = API.load_from_binary(entry.fetch("binary"))
     @hits += 1
+    @files.delete(path) if @release
     sequence
   rescue StandardError
     nil
@@ -102,48 +105,74 @@ module BootImage
   def census(app)
     # Observe already-loaded modules only; never resolve autoloads.
     constants, methods = [], {}
-    ObjectSpace.each_object(Module) do |mod|
+    modules = ObjectSpace.each_object(Module).filter_map do |mod|
       name = Module.instance_method(:name).bind_call(mod)
-      next unless name && !name.start_with?("#<", "BootImage")
-      mod.constants(false).each do |key|
-        constants << "#{name}::#{key}" unless mod.autoload?(key, false)
+      [name, mod] if name && !name.start_with?("#<", "BootImage")
+    end.to_h
+    app_names = modules.filter_map do |name, mod|
+      parent, _, key = name.rpartition("::")
+      scope = parent.empty? ? Object : modules[parent]
+      next unless scope
+      source = Module.instance_method(:const_source_location).bind_call(scope, key, false)
+      name if source && source[0].start_with?(app + "/")
+    end
+    modules.each do |name, mod|
+      Module.instance_method(:constants).bind_call(mod, false).each do |key|
+        constants << "#{name}::#{key}" unless Module.instance_method(:autoload?).bind_call(mod, key, false)
       end
+      app_owned = app_names.any? { name == _1 || name.start_with?(_1 + "::") }
       [mod, mod.singleton_class].each_with_index do |holder, side|
         entries = %i[public protected private].flat_map do |visibility|
-          holder.public_send("#{visibility}_instance_methods", false).filter_map do |key|
-            method = holder.instance_method(key)
+          Module.instance_method("#{visibility}_instance_methods").bind_call(holder, false).filter_map do |key|
+            method = Module.instance_method(:instance_method).bind_call(holder, key)
             location = method.source_location
-            next unless location && location[0].start_with?(app + "/")
+            next unless app_owned || (location && location[0].start_with?(app + "/"))
             [key.to_s, visibility.to_s, location, method.parameters, method.arity]
           end
         end
         methods["#{name}#{side.zero? ? '#' : '.'}"] = entries.sort_by(&:first) unless entries.empty?
       end
     end
-    {"loaded_features" => $LOADED_FEATURES.dup, "constants" => constants.sort, "app_methods" => methods.sort.to_h}
+    chain = %i[load_iseq translate].to_h do |key|
+      method = API.method(key) if API.respond_to?(key, true)
+      entries = []
+      while method
+        entries << [method.owner.to_s, method.source_location, method.parameters]
+        method = method.super_method
+      end
+      [key, entries]
+    end
+    {"loaded_features" => $LOADED_FEATURES.dup, "constants" => constants.sort,
+      "app_methods" => methods.sort.to_h, "compiler_chain" => chain}
   end
 
   def fork_memory(path, treatment)
-    ActiveRecord::Base.connection_handler.clear_all_connections! if defined?(ActiveRecord::Base)
     GC.start
     before = memory
     GC.compact if treatment != "none"
     Process.warmup if treatment == "warmup"
     reader, writer = IO.pipe
+    release_reader, release_writer = IO.pipe
     pid = fork do
       reader.close
+      release_writer.close
       initial = memory
       10.times { request(path) }
       GC.start
       writer.write(JSON.generate({"initial" => initial, "warm" => memory}))
       writer.close
+      release_reader.read(1)
       exit! 0
     end
     writer.close
+    release_reader.close
     child = JSON.parse(reader.read)
     reader.close
+    parent_after = memory
+    release_writer.write("x")
+    release_writer.close
     Process.wait(pid)
-    {"treatment" => treatment, "parent_before" => before, "parent_after" => memory, "child" => child,
+    {"treatment" => treatment, "parent_before" => before, "parent_after" => parent_after, "child" => child,
       "child_exit" => $?.exitstatus}
   end
 
@@ -151,13 +180,18 @@ module BootImage
     app = config.fetch("app")
     Dir.chdir(app)
     require "bundler/setup"
-    # External Bootsnap injection also covers ruby-bench, which has no cache.
-    # Paths are supplied by the launcher, not added to an application's bundle.
-    $LOAD_PATH.unshift(*config.fetch("bootsnap_paths"))
-    require "bootsnap/setup"
+    # Apps without Bootsnap use an external dependency-only Gemfile wrapper.
+    # Plain/capture/image do not load a cache the app itself would not load.
+    require "bootsnap/setup" unless ENV["DISABLE_BOOTSNAP"] == "1"
+    if mode.start_with?("image_paths")
+      require "bootsnap"
+      Bootsnap.setup(cache_dir: ENV.fetch("BOOTSNAP_CACHE_DIR"), load_path_cache: true,
+        compile_cache_iseq: false, compile_cache_yaml: true, compile_cache_json: true)
+    end
+    @entry_ruby = RUBY_DESCRIPTION
     @entry_load_path, @entry_gems = $LOAD_PATH.dup, gem_versions
     capture if mode == "capture"
-    install(image) if mode == "image"
+    install(image, release: mode.end_with?("release")) if mode.start_with?("image")
     require File.join(ROOT, "gem/lib/lowrail/setup") if mode == "lowrail"
     load config["before_boot"] if config["before_boot"]
     require File.join(app, "config/environment")
@@ -179,8 +213,9 @@ module BootImage
     result = {"mode" => mode, "ruby" => RUBY_DESCRIPTION, "rails" => Rails.version,
       "yjit" => RubyVM::YJIT.enabled?, "boot_finished" => boot_finished, "first_finished" => first_finished,
       "first" => first, "warm_memory_kib" => warm_memory, "image_hits" => @hits || 0, "refusal" => @refusal}
-    result["census"] = census(app) if config["census"]
+    result["lowrail"] = Lowrail.jit_status.merge("units" => Lowrail.manifest&.units&.size) if mode == "lowrail"
     result["fork"] = fork_memory(config.fetch("path"), config.fetch("fork")) if config["fork"]
+    result["census"] = census(app) if config["census"]
     if mode == "capture"
       save(image)
       result["image_files"] = @files.size
@@ -191,10 +226,10 @@ module BootImage
   end
 
   def run(config, output)
+    output = File.expand_path(output)
     raise "new output directory required" if File.exist?(output)
     FileUtils.mkdir_p(output)
     config = JSON.parse(File.read(config))
-    config["bootsnap_paths"] = %w[bootsnap msgpack].flat_map { Gem::Specification.find_by_name(_1).full_require_paths }
     config_path = File.join(output, "config.json")
     File.write(config_path, JSON.generate(config), perm: 0o600)
     image = File.join(output, "image.marshal")
@@ -208,7 +243,7 @@ module BootImage
           "DISABLE_BOOTSNAP" => %w[bootsnap lowrail].include?(mode) ? nil : "1",
           "BOOTSNAP_CACHE_DIR" => File.join(output, "bootsnap"))
         started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-        success = system(env, RbConfig.ruby, __FILE__, "worker", config_path, mode, path, image,
+        success = system(env, RbConfig.ruby, "-rbundler/setup", File.expand_path(__FILE__), "worker", config_path, mode, path, image,
           out: File.join(output, "#{mode}-#{index}.log"), err: [:child, :out])
         result = success ? JSON.parse(File.read(path)) : {"mode" => mode, "error" => "worker_exit", "exit" => $?.exitstatus}
         if success
