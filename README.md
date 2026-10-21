@@ -21,15 +21,18 @@ for the other projects we learned from.
 
 ## Current results (2026-10-21)
 
-**Accepted warm-request work reductions, not latency or throughput claims.**
-Each row: **one endpoint and fixture · Ir instructions, not latency · no YJIT claim yet · opt-in sealed tier, not default**.
+**Accepted warm-request instruction results, including increases—not latency or throughput claims.**
+**Ir instructions, not latency · no YJIT claim yet · opt-in research, not default**.
+Blog and Starter each cover one endpoint/fixture in the sealed tier; Fizzy
+covers a fixed six-GET vector in a bench-only specimen, not production admission.
 Both total and GC-excluded A/A, fixed-heap, brk and actual-mode gates pass.
 
 <!-- current-results:start -->
 | Date | App / endpoint | Ruby / Rails | Mode / tier | Ir Δ vs no Lowrail [95% interval] | Measured / published |
 |---|---|---|---|---|---|
-| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection | **Total −15.225536% [−15.253476, −15.205974]**; GC-excluded −15.254650% [−15.278100, −15.199984] | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
+| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection; measured on pre-fix source; re-price pending | **Total −15.225536% [−15.253476, −15.205974]**; GC-excluded −15.254650% [−15.278100, −15.199984] | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
 | 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.156% [−10.219, −10.084]**; GC-excluded −10.161% [−10.254, −10.105] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
+| 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.403071% [+0.386235, +0.429585]**; GC-excluded +0.402000% [+0.380081, +0.421142] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
 <!-- current-results:end -->
 
 The blog row includes the token-continuation safety fix; the earlier
@@ -41,9 +44,12 @@ not the corrected source. [Protocol and historical records](docs/bench.md#curren
 ([retained method and reaper-driven late-entry diagnosis](docs/passes/production-yjit-method.md));
 frozen props is an accepted isolated micro only, with integration deferred
 ([scope](docs/passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred)).
-There is **no accepted Fizzy price yet**;
-[first cohort INVALID (heap growth)](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51).
-A replacement N=10 cohort is running ([specimen](docs/block-link-specimen.md)).
+
+Fizzy's accepted N=10 warm bench price above is an **instruction INCREASE
+(Lowrail slower here)** under fixed init-slot floors, not production
+admission or cold-start performance; **cold still RED**.
+The [first N=50 cohort remains INVALID (heap growth)](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51),
+without a credited price or direction claim ([scope and evidence](docs/block-link-specimen.md)).
 
 To update: publish the accepted export first, edit only the metadata/source
 paths in [docs/results.json](docs/results.json), then run
@@ -58,7 +64,7 @@ when scope or acceptance changes; retain superseded records as historical.
   [corpus compatibility report](docs/compat.md) distinguishes identical
   outcomes/SQL, baseline errors, bounded subsets, safe refusals and actual hits.
 - **Opt-in:** sealed production units require the [separate contract](docs/sealed.md)
-  and exact passive admission. The two measured rows do not imply arbitrary
+  and exact passive admission. The two sealed production rows do not imply arbitrary
   endpoint coverage or config promotion. A separate
   [verification-only AR test certificate](docs/test-certificate.md) exercises
   naturally ready Article/Comment units, including true eager-load coverage;

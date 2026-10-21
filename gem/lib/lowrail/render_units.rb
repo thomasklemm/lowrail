@@ -38,6 +38,7 @@ module Lowrail
       return "missing actual-holder primitive; keep original" unless native
       exact = native.method(:exact_class?)
       return "actual-holder primitive changed; rebuild" unless Sealed.signature(exact) == data.fetch("native_method")
+      return "view context dispatch changed; rebuild" unless Sealed.view_context_fact == data.fetch("view_context")
       binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
       return "actual-holder binary not certified; rebuild" unless data.fetch("sources").key?(binary)
       return "stale sources; rebuild" unless data.fetch("sources").all? { |file, sha| File.file?(file) && Manifest.sha256_file(file) == sha }
@@ -173,30 +174,33 @@ module Lowrail
       end
 
       def render(view, options)
-        unless view.send(:protect_against_forgery?)
-          count(true)
-          return ""
+        unit, epoch, holder, builder_class = self, @epoch, @holder, @builder_class
+        Sealed::VIEW_CONTEXT.bind_call(view) do
+          unless defined?(protect_against_forgery?) && protect_against_forgery?
+            unit.count(true)
+            next ""
+          end
+          value = form_authenticity_token(form_options: options.merge(authenticity_token: nil))
+          name = request_forgery_protection_token.to_s
+          remove_autocomplete = ActionView::Base.remove_hidden_field_autocomplete
+          builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
+          unless epoch[0].zero? && holder.call(name, String) && holder.call(value, String) &&
+              holder.call(builder, builder_class) && RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
+            # Continue AFTER live generation/conversion. Re-entering token_tag
+            # would generate/mask a token twice and replay app-defined effects.
+            unit.count(false, "live token/name/builder holder or seal epoch changed")
+            attributes = {type: "hidden", name: name, value: value}
+            attributes[:autocomplete] = "off" unless remove_autocomplete
+            next tag(:input, **attributes)
+          end
+          unit.count(true)
+          autocomplete = remove_autocomplete ? "" : ' autocomplete="off"'
+          name = ERB::Util.unwrapped_html_escape(name)
+          name = name.gsub('"', "&quot;") if name.include?('"')
+          value = ERB::Util.unwrapped_html_escape(value)
+          value = value.gsub('"', "&quot;") if value.include?('"')
+          %(<input type="hidden" name="#{name}" value="#{value}"#{autocomplete} />).html_safe
         end
-        value = view.form_authenticity_token(form_options: options.merge(authenticity_token: nil))
-        name = view.send(:request_forgery_protection_token).to_s
-        remove_autocomplete = ActionView::Base.remove_hidden_field_autocomplete
-        builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
-        unless @epoch[0].zero? && @holder.call(name, String) && @holder.call(value, String) &&
-            @holder.call(builder, @builder_class) && RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
-          # Continue AFTER live generation/conversion. Re-entering token_tag
-          # would generate/mask a token twice and replay app-defined effects.
-          count(false, "live token/name/builder holder or seal epoch changed")
-          attributes = {type: "hidden", name: name, value: value}
-          attributes[:autocomplete] = "off" unless remove_autocomplete
-          return view.send(:tag, :input, **attributes)
-        end
-        count(true)
-        autocomplete = remove_autocomplete ? "" : ' autocomplete="off"'
-        name = ERB::Util.unwrapped_html_escape(name)
-        name = name.gsub('"', "&quot;") if name.include?('"')
-        value = ERB::Util.unwrapped_html_escape(value)
-        value = value.gsub('"', "&quot;") if value.include?('"')
-        %(<input type="hidden" name="#{name}" value="#{value}"#{autocomplete} />).html_safe
       end
     end
   end

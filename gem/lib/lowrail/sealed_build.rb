@@ -56,6 +56,8 @@ module Lowrail
           %w[ArticlesController ActionView::Helpers::TagHelper::TagBuilder ActionView::Helpers::UrlHelper ERB::Util].all? { Lowrail.loaded_constant(_1) }
       end
       return refuse.call("denylisted by verify --bisect") if denied.any? { _1["pass"] == PASS }
+      context = Sealed.view_context_fact
+      return refuse.call("custom view context dispatch; keep original") unless context
       native = Lowrail.loaded_constant("Lowrail::Native")
       return refuse.call("Lowrail native actual-holder primitive unavailable; run rake compile; keep original") unless native
       exact_class = native.method(:exact_class?)
@@ -177,6 +179,7 @@ module Lowrail
       unit = {"pass" => PASS, "kind" => "runtime", "target" => "ArticlesController", "facts" => [],
         "sites" => ledger.count { _1["outcome"] == "lowered" }, "sealed" => {
           "application_class" => Rails.application.class.name, "controller" => "ArticlesController",
+          "view_context" => context,
           "view_methods" => view_methods, "builder_methods" => builder_methods,
           "primitive_methods" => primitive_methods,
           "constructor" => Sealed.signature(builder.method(:new)), "delivery" => delivery,

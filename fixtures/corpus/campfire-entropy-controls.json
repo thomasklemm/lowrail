@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "app_source_sha256": "643476403352b6f5c5c2a431ef5aeb2b1228a6b0c2878d629ea0e277baf4746d",
+  "lock_sha256": "0429e4e3e73f5c49efad7c88014bea13e1461b3ca69af3b9900caaff749971f5",
+  "ruby_version": "4.0.7",
+  "seeds": [0, 1],
+  "evidence": "docs/campfire-bench.md",
+  "scope": "Disposable campfire-r81 natural login and room GET only; not production security inputs or a timing control",
+  "controls": {
+    "secret_key_base": "original disposable fixture secret, restored unchanged in every worker",
+    "random": "Blog per-workflow/per-site streams, plus the audited base58 session-token gen_random boundary; unknown calls refuse",
+    "runtime": "Only Rack::Runtime#call clock inputs are pinned; real observations retained, literal x-runtime compared",
+    "wall_clock": "Time.now on the scenario thread only, including session timestamps and cookie expiry; every real read retained",
+    "state": "Restored primary.sqlite3 and cleared dedicated Redis before each serial worker; Redis values and absolute expiries compared exactly"
+  },
+  "wall_clock": {"epoch": 1767312000, "scope": "active scenario thread only"},
+  "runtime_sources": {
+    "ruby:random/formatter.rb": "9a787be99c281f98c8abc34ab67521be733a7297f156a7df496df2ccb417437e",
+    "openssl:lib/openssl/cipher.rb": "087436098382bbe93b90cacad6b33b7ed63acf7c7014bdfe89b0d515c1e0259b",
+    "securerandom:lib/securerandom.rb": "2a99f878e3cf2d92b88dad1512c9c86272ca8679af9a8a1d5790f7c37a9d40a4",
+    "rack:lib/rack/runtime.rb": "c07bc0de1850728c77b2e5436c930abdfc3b0decb036a27dc7d77a58c28122bf",
+    "rack:lib/rack/utils.rb": "457bfbe2a359fe86f8eb95f23fd18118c89103e268eb87ecf49c1dd5cbc1807f",
+    "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb": "a9fe0df38a05ce2ee4486c801ce78719afe239abf66b01a388c61c27ed1f6b4d",
+    "actionpack:lib/action_controller/metal/request_forgery_protection.rb": "01af4e9a30bc81f78ead041c27f8571c9f01a68f94d6c9450abd2e594209d051",
+    "actionpack:lib/action_dispatch/middleware/cookies.rb": "9db3611f9911521c8f3959b38d0e2025697f9449e7bb8555c0e7b9d70e5333ea",
+    "activesupport:lib/active_support/message_encryptor.rb": "f23ae37f44fa36b9cbc8f189a4d5e0d753b1b0a99e3bf76b835b804739935d61",
+    "actionpack:lib/action_dispatch/middleware/flash.rb": "310b093336210f80a0cd369f9070281408c9ab9cdf14dc54ec33f36b58860553",
+    "activerecord:lib/active_record/secure_token.rb": "685172867e7df53f8fab58809a61c8089b7c58a7f05d1d793f01edd07ca131a1",
+    "activesupport:lib/active_support/core_ext/securerandom.rb": "c2fa8555ec74d1aa723e286cd7afea6d988c9e696f20ed9399a727f79115784c"
+  },
+  "random_sites": [
+    {"name": "csrf_token", "provider": "SecureRandom", "source": "actionpack:lib/action_controller/metal/request_forgery_protection.rb", "method": "generate_csrf_token", "bytes": 32},
+    {"name": "csrf_mask", "provider": "SecureRandom", "source": "actionpack:lib/action_controller/metal/request_forgery_protection.rb", "method": "mask_token", "bytes": 32},
+    {"name": "session_id", "provider": "SecureRandom", "source": "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb", "method": "generate_sid", "bytes": 16},
+    {"name": "cookie_iv", "provider": "OpenSSL::Random", "source": "openssl:lib/openssl/cipher.rb", "method": "random_iv", "bytes": 12},
+    {"name": "session_token_base58", "provider": "SecureRandom::gen_random", "source": "activerecord:lib/active_record/secure_token.rb", "method": "generate_unique_secure_token", "bytes": 4}
+  ]
+}

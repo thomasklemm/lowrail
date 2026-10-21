@@ -4,6 +4,37 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Production sealed helper dispatch safety (2026-10-21)
+
+Production token admission did not refuse an existing view `send` override
+or a private live generator. Stock Rails calls those helpers implicitly;
+the specialization used `view.send` and a public generator call. Reproduced
+before a fix: wrong CSRF name with generation/conversion/send counts 1/0/1
+versus stock 1/1/0, and a private generator raising `NoMethodError` instead
+of generating once. Both were admitted, not post-seal mutations.
+
+Use a captured, independently stock-certified `BasicObject#instance_exec`
+to run actual implicit calls on the actual view. It bypasses view-defined
+`send`, `__send__`, `public_send`, `method` and `instance_exec`, while retaining
+private/protected and `method_missing` dispatch, stock `defined?` semantics,
+live ordering and saved-value continuation. Apply the same mechanism to the
+form's builder/buffer/URL/token boundaries. Keep the named route's original
+explicit `public_send` with a newly constructed String name and its live app
+override effects; polymorphic routing does not call that helper implicitly.
+Collection's existing implicit renderer calls need no change. A separate
+follow-up fixes `Sealed.link?`'s private `tag_builder` call with the same
+primitive and certificate fact; its pre-boot hostile-view regression fails
+on unchanged main. Test admission
+remains a separate, unpublished review and will consume this one primitive.
+
+**The accepted −15.225536% was measured at
+[`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
+which had this dispatch defect. It remains a price for that exact source and
+specimen only, not the fixed runtime.** No re-price, YJIT cohort or slot is
+authorized by this fix. Default/quarantine/guarded passes are unchanged;
+YJIT seam work stays paused and `835cf16` parked.
+[Dispatch sweep and correctness gates](passes/sealed-production.md#helper-dispatch-safety).
+
 Working assumption: many small exact passes (each < 2 %) should **stack**.
 `lowrail bench --passes SET --default-build DIR` (8db84d8) measures a pass set as one layer against no-setup and a separate default
 reference, and report the stacked effect next to the sum of individual
@@ -12,6 +43,35 @@ still missing for most passes (`measurement_complete: false`); adapters are
 the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
+
+## Campfire r81 room instantiation: KILLED after screen + one variant (2026-10-21)
+
+Original room screen: allocations 15526 → 15578.5/request; wall −0.741%, A/A floor 5.571%; no win.
+Each of 52 hits allocates an Array in disabled `ARShadow.enabled?` (`%w[1 strict]`); 10000 calls allocate 10002 objects versus two with an allocation-free predicate.
+One branch-only variant removes that overhead, not the underlying tie: allocations 15525.5/15525/15524.5 (off-A/off-B/on); wall −4.168% [−6.107, −1.864] fails 3× the 4.293% A/A floor.
+Both screens reject exact body/all-header identity even off/off; the warm validation boundary is unclassified, not normalized or dismissed as cold entropy.
+Kill the Ir cohort; slot 2 released, no runtime promotion. Keep browser/CSRF/cookie/ETag/runtime/session-clock/Redis-expiry rejections, blog feature exemption and ten cached-bind gaps named. [Both screens, allocation proof and independent five-route result](campfire-bench.md#13-screen-one-allocation-only-variant-then-kill).
+
+## Campfire r81 instantiation: companions accepted, screen before price (2026-10-21)
+
+The single authorized companion rerun exits 0 for both seeds, off/off/on:
+HTTP bytes, SQLite, loads/non-Lowrail feature order, events and completed/exit
+state agree under the declared controls. **Named items stay next to this result:**
+browser other-thread nondeterminism; raw CSRF/cookie/ETag/runtime/session-clock
+rejections; Redis `rate-limit:sessions` expiry accepted off/off rejection;
+the blog's path/hash-pinned Lowrail feature exemption; ten cached lazy-Proc
+binds/worker unavailable, never evaluated. All 42 Redis key names/values and
+41 other expiries remain exact. Cold login+room has 103 hits, outside warm work.
+
+The warm target remains 52 hits (Account5/User5/Message40/Boost1/Session1) plus
+two Room STI fallbacks, **only campfire-r81 02023b0, not the Oct-8 fixture**.
+Both phase orders retain the frozen pages in 16 exact-worker tool=none windows.
+Slot 2 was assigned; its launcher fails before any counted Callgrind worker or
+window. Its initial log was overwritten; the cause remains unconfirmed.
+The new **screen first, price rarely** policy arrives before Ir measurement:
+no cohort retry or price. The subsequently published shared screen and one
+variant kill the bet (above). No runtime/default/quarantine or app patch reaches main.
+[Evidence, exclusions and private-receipt hashes](campfire-bench.md#12-one-authorized-companion-rerun-accepted-with-named-items).
 
 ## Prism 2 adoption and target grammar (2026-10-21)
 
@@ -42,7 +102,7 @@ relaxation. `Prism.find` has 17 source-backed agreements but generated ERB
 and isolated Proc probes return nil: no witness adoption. Full inventory,
 limitations and machine evidence: [prism-2.md](prism-2.md).
 
-## Fizzy block links: N=50 INVALID; N=10 replacement approved (2026-10-21)
+## Fizzy block links: N=50 INVALID; N=10 scoped warm bench price (2026-10-21)
 
 **Rule before numbers:** any pin/mode/brk/exact-page/mix violation invalidates
 the whole cohort; both total/no-GC A/A 95% intervals must contain zero wholly
@@ -55,23 +115,37 @@ the heap failure still invalidates everything. All 18 workers, 72 dumps and
 36 N0 subtractions independently reconcile. No retry/exclusions. The old
 service/slot is released. [Complete INVALID export](fizzy-link-ir-invalid.json).
 
+**N=0/10 accepted as a scoped warm bench price, not a win:** total interpreter
+Ir **+0.403071% [+0.386235, +0.429585]**, no-GC **+0.402000%
+[+0.380081, +0.421142]** for these six Fizzy GETs at the stated floors only.
+Cold off/off/on remains **RED**. Accepted named off/off rejections: nine
+SolidCache `created_at` values and historical estimation-SQL interleaving.
+**Uncovered:** payload/assigns, lazy cached-bind values, SolidCache completion.
+No production admission, cold-start or whole-app claim.
+
 Init slots are floors, not caps. Untimed off-only whole-window allocation
 budgeting with N=0/10 yields fixed init slots
 `3350000,300000,460000,30000,20000` (254 MB of slots). Fresh off/on workers in
 both phase orders retain exact pages and add none inside all 16 windows;
 full on windows have exactly 240 hits/19 identities with four explicit zeros.
-Same brk512 tool and detached worker harness; no app/config/GC-policy change
-or higher-segment tool. **Exactly one N=0/10 replacement is now approved**,
-six rounds / seed 41231 / off_a/off_b/on / jobs=1, after the old slot release.
-No result yet; no pooling with invalid N=50 data. The untimed report retains
-the original request-only proposal as historical evidence.
-
-Cold off/off/on remains **RED**. Accepted named off/off rejections: nine
-SolidCache `created_at` values and historical order-sensitive estimation SQL
-interleaving. Payload/assigns, lazy cached-bind values and SolidCache
-completion remain uncovered. No production admission or cold-start claim.
+The one authorized replacement completes six rounds / seed 41231 /
+off_a/off_b/on / jobs=1 after the old slot release. Both A/A 95% intervals
+contain zero within ±0.5%: total [−0.046920, +0.026381], no-GC
+[−0.042940, +0.026493]. All 18 workers retain exact pages, zero page additions
+and the exact 240-hit/19-identity mix with four zeros; 72 dumps and 36
+subtractions independently reconcile. Same detached harness/brk512 tool;
+no app/config/GC-policy change, higher-segment tool, retry, exclusions, YJIT
+or pooling with invalid N=50 data. Slot released. The untimed report retains
+its original request-only proposal as historical evidence.
+[Complete scoped N=10 export](fizzy-link-ir-n10.json).
 [Protocol, failures and reproduction](block-link-specimen.md#untimed-heap-preconditioning-prefer-n10-on-the-existing-tool),
 [all untimed window evidence](fizzy-link-heap.json).
+
+**One improvement KILLED before screening:** branch-only request-cached dependency scan backed by existing Guard resets.
+Ruby 4.0.7 / Rails 8.1.4 control: one scan; after `private :content_tag_string`, cached eligibility stays true while the full post-block scan is false.
+Stock saved-builder dispatch enters `method_missing` and raises `ArgumentError`; cached eligibility would bypass that live error.
+Visibility changes fire no Guard hook; bet D also leaves saved-ancestry, suppressed-callback and refinement holes open. No authoritative epoch.
+Correctness prerequisite failed: no HTTP/allocation/YJIT screen or new cohort. Keep the stock fallback; production widening is PARKED and block-link work stops.
 
 ## First accepted whole-request price (2026-10-21)
 

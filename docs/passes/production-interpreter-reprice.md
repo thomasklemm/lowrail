@@ -6,6 +6,12 @@ Ruby 4.0.7 / Rails 8.1.4, including the `ea44cf3` token-continuation safety
 fix. It is not native latency, YJIT, whole-app performance or test admission.
 The historical −15.49% remains a result for `ae025b0`, not this source.
 
+**Later correctness finding:** measured `553e7aa` still had the production
+private-helper / reflective-send dispatch defect. **−15.225536% remains a
+price for that exact source and specimen only**, not the subsequently fixed
+runtime. The [dispatch fix and correctness gates](sealed-production.md#helper-dispatch-safety)
+do not remeasure it. No new cohort is authorized here.
+
 ## Frozen source and finite protocol
 
 The clean detached measured harness/runtime is published
