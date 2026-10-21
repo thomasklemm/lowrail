@@ -1,4 +1,4 @@
-<% observations[:before] = output_buffer; output_buffer.raw_buffer.replace("old") if mode == "buffer"; @tag_builder = ActionView::Helpers::TagHelper::TagBuilder.new(self) if mode == "foreign"; self.output_buffer = ActionView::StreamingBuffer.new { |chunk| log << ["stream", chunk] } if mode == "streaming" %>
+<% observations[:before] = output_buffer; output_buffer.raw_buffer.replace("old") if mode == "buffer"; @tag_builder = ActionView::Helpers::TagHelper::TagBuilder.new(self) if mode == "foreign"; self.output_buffer = ActionView::StreamingBuffer.new(->(chunk) { log << ["stream", chunk] }) if mode == "streaming" %>
 <% result = link_to target, class: "literal" do %><%
   log << "block"
   case mode

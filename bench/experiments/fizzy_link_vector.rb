@@ -4,7 +4,7 @@
 # Importing this file NEVER starts Callgrind or a measured cohort.
 require_relative "fizzy_link_fixture"
 require_relative "block_link_specimen"
-require_relative "../../fixtures/corpus/blog_production"
+require_relative "fizzy_link_completion"
 
 module FizzyLinkVector
   module_function
@@ -16,7 +16,9 @@ module FizzyLinkVector
     branch = IO.popen(["git", "-C", root, "branch", "--show-current"], &:read).strip
     raise "clean detached harness required" unless dirty.empty? && branch.empty? && sha == ENV.fetch("BENCH_HARNESS_SHA")
     {"harness_sha" => sha, "harness_root" => root,
-      "sources" => Dir[File.join(__dir__, "{block_link_*,fizzy_link_*}.rb")].sort.to_h { [_1.delete_prefix(root + "/"), Digest::SHA256.file(_1).hexdigest] }}
+      "native" => Dir[File.join(root, "gem/lib/lowrail/native/**/*.so")].sort.to_h { [_1.delete_prefix(root + "/"), Digest::SHA256.file(_1).hexdigest] },
+      "sources" => (Dir[File.join(__dir__, "{block_link_*,fizzy_link_*}.rb")] +
+        %w[request_pairs heap_windows jit_stability worker_placement].map { File.expand_path("../#{_1}.rb", __dir__) }).sort.to_h { [_1.delete_prefix(root + "/"), Digest::SHA256.file(_1).hexdigest] }}
   end
 
   def effects(state)
@@ -50,7 +52,7 @@ module FizzyLinkVector
     def initialize(state, record: true)
       require "rack/mock"
       require "cgi"
-      @state, @cookies, @steps, @record = state, {}, [], record
+      @state, @cookies, @steps, @record, @requests = state, {}, [], record, 0
       @session = Rack::MockRequest.new(Rails.application)
       @headers = {"HTTP_HOST" => "fizzy.example.invalid", "HTTPS" => "on", "HTTP_ORIGIN" => "https://fizzy.example.invalid",
         "HTTP_USER_AGENT" => "Mozilla/5.0 Firefox/140.0"}
@@ -59,7 +61,8 @@ module FizzyLinkVector
     end
 
     def request(method, path, params = nil)
-      headers = @headers.merge("HTTP_COOKIE" => @cookies.map { |name, value| "#{name}=#{value}" }.join("; "))
+      headers = @headers.merge("HTTP_COOKIE" => @cookies.map { |name, value| "#{name}=#{value}" }.join("; "),
+        "HTTP_X_REQUEST_ID" => "lowrail-fizzy-link-#{@requests += 1}")
       headers[:params] = params if params
       response = @session.request(method, path, headers)
       Array(response.headers["set-cookie"]).each do |cookie|
@@ -97,6 +100,14 @@ module FizzyLinkVector
     pin = pin!
     FizzyLinkFixture.environment(app, state).each { |key, value| value ? ENV[key] = value : ENV.delete(key) }
     require File.join(app, "config/boot")
+    entropy_seed = ENV["BENCH_ENTROPY_SEED"]
+    if entropy_seed
+      policy_path = ENV.fetch("BENCH_ENTROPY_POLICY")
+      control = BlogProduction::Entropy.validate(app, policy: JSON.parse(File.read(policy_path)))
+      raise control.fetch("reason") unless control.fetch("active")
+      pin["entropy_policy_sha256"] = Digest::SHA256.file(policy_path).hexdigest
+      BlogProduction::Entropy.install(control.fetch("policy"))
+    end
     BlockLinkSpecimen.install(app: app, artifact: artifact, contexts: manifest, arm: arm, discover: discover)
     require_relative "../../gem/lib/lowrail/verify_loads"
     Lowrail::VerifyLoads.install
@@ -105,18 +116,28 @@ module FizzyLinkVector
     ActiveSupport::Notifications.subscribe(/\.(?:action_controller|action_view)\z/, app_events)
     sql, errors = [], []
     phase = "boot"
+    request_thread = Thread.current
     ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
       begin
-        raise "adapter-produced binds unavailable" unless Array === payload[:type_casted_binds]
+        binds = payload[:type_casted_binds]
+        captured_binds = if Array === binds
+          BlogProduction.value(binds)
+        elsif payload[:cached] && Proc === binds
+          # Never call the lazy Proc or recast query attributes. Compare the
+          # real SQL/cache event, explicitly leaving these binds uncovered.
+          {"status" => "binds_unavailable", "reason" => "cached_lazy_proc_not_invoked"}
+        else
+          raise "adapter-produced binds unavailable outside known cached lazy Proc"
+        end
         sql << {"phase" => phase, "sql" => BlogProduction.value(payload[:sql]),
-          "binds" => BlogProduction.value(payload[:type_casted_binds]), "database" => payload[:connection]&.pool&.db_config&.name,
+          "binds" => captured_binds, "database" => payload[:connection]&.pool&.db_config&.name,
           "name" => BlogProduction.value(payload[:name]), "cached" => !!payload[:cached], "row_count" => payload[:row_count],
-          "affected_rows" => payload[:affected_rows], "thread" => Thread.current.name}
+          "affected_rows" => payload[:affected_rows], "thread" => Thread.current.equal?(request_thread) ? "request" : "other"}
       rescue StandardError => error
         errors << error.message
       end
     end
-    completion = BlogProduction::Completion.new
+    completion = FizzyLinkCompletion305.new(state)
     Rails.error.subscribe(completion)
     Rails.application.config.yjit = false
     require File.join(app, "config/environment")
@@ -126,23 +147,28 @@ module FizzyLinkVector
     initial = effects(state)
     driver = Driver.new(state)
     app_events.thread = Thread.current
-    phase = "login"
-    driver.login
     ledgers = []
-    %w[cold warm warm_repeat].each do |stage|
-      phase = stage
-      start = driver.steps.size
-      driver.vector
-      Lowrail::VerifyLoads.capture(stage)
-      ledgers << {"phase" => stage, "steps" => driver.steps[start..], "specimen" => JSON.parse(JSON.generate(BlockLinkSpecimen.report)),
-        "effects" => effects(state)}
+    scenario = lambda do
+      phase = "login"
+      driver.login
+      %w[cold warm warm_repeat].each do |stage|
+        phase = stage
+        start = driver.steps.size
+        driver.vector
+        Lowrail::VerifyLoads.capture(stage)
+        ledgers << {"phase" => stage, "steps" => driver.steps[start..], "specimen" => JSON.parse(JSON.generate(BlockLinkSpecimen.report)),
+          "effects" => effects(state)}
+      end
     end
+    _, entropy = entropy_seed ? BlogProduction::Entropy.with(Integer(entropy_seed), "fizzy-link-six-request-vector",
+      requests: 20, wall_clock: true, &scenario) : [scenario.call, nil]
     phase = "post_scenario"
     app_events.thread = nil
     completed = completion.finish
     Lowrail::VerifyLoads.capture("async_completion")
     data = {"pins" => pin, "arm" => arm, "initial_effects" => initial, "steps" => driver.steps,
       "ledgers" => ledgers, "sql" => sql, "events" => app_events.events, "errors" => errors,
+      "entropy_seed" => entropy_seed, "entropy" => entropy,
       "completion" => completed, "completed_effects" => completed["status"] == "completed" ? effects(state) : nil,
       "loads" => Lowrail::VerifyLoads.snapshot.fetch("stages"), "features" => $LOADED_FEATURES.dup,
       "ancestry" => %w[Object Kernel BasicObject ActionView::Base ActionView::Template ActionView::OutputBuffer
@@ -151,7 +177,9 @@ module FizzyLinkVector
           [name, holder&.ancestors&.map(&:name)]
         end,
       "specimen" => BlockLinkSpecimen.report, "jit" => Lowrail.jit_status,
+      "compared_payload_fields" => BlogProduction::AppEvents::FIELDS,
       "coverage_refusals" => ["arbitrary render subscriber payloads/controller assigns are not fully captured",
+        "cached lazy SQL-bind Proc values are explicitly unavailable; only SQL text/cache hit compared",
         "source-only prototype has no production passive admission authority"]}
     File.write(destination, JSON.pretty_generate(data), perm: 0o600)
   end
