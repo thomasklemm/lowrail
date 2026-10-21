@@ -54,13 +54,17 @@ end
 
 destination = ARGV.fetch(1)
 require File.expand_path("config/application", Dir.pwd)
-Rails.application.config.yjit = false
+Rails.application.config.yjit = false unless ENV["BENCH_JIT"] == "yjit"
 require File.expand_path("config/environment", Dir.pwd)
 require "rack/mock"
 Rails.application.eager_load!
 Rails.logger.level = :error
 ActiveRecord::Base.logger = nil
 raise "wrong app" unless Rails.version == "8.1.4" && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
+if ENV["LOWRAIL_FORM_CHECK"]
+  expected_jit = ENV.fetch("BENCH_JIT", "interpreter")
+  raise "form checker JIT mode mismatch" unless Lowrail.jit_mode == expected_jit
+end
 # A copied Rails app need not share the namespace of the corpus directory.
 # Read the certificate directly so the off worker checks the same identity.
 manifest_path = File.join(ENV["LOWRAIL_DIR"] || Rails.root.join(".lowrail"), "manifest.json")

@@ -31,7 +31,7 @@ if ARGV.first == "worker"
       end, "lowrail_features" => $LOADED_FEATURES.select { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) })
     end
   end)
-  BlogProduction.worker(phase, destination, seed, expected_jit: "interpreter")
+  BlogProduction.worker(phase, destination, seed, expected_jit: JitStability.mode)
   result = JSON.parse(File.read(destination))
   result["admissions"] = RUNTIMES.to_h { |name| [name, Lowrail.loaded_constant(name).admission] }
   result["production_refusals"] = RUNTIMES.to_h { |name| [name, Lowrail.loaded_constant(name).refusal] }
@@ -45,15 +45,16 @@ raise "new output outside app required" if File.exist?(output) || output.start_w
 BlogShowGetOnly.validate(seed_dir)
 manifest_file = File.join(app, ".lowrail/manifest.json")
 manifest = JSON.parse(File.read(manifest_file))
-raise "isolated three-unit interpreter artifact required" unless manifest.fetch("units").map { _1.fetch("pass") } == PASSES &&
-  manifest.fetch("files").empty? && manifest.fetch("templates", {}).empty? && manifest.fetch("certification_jit") == "interpreter"
+jit = manifest.fetch("certification_jit")
+raise "isolated three-unit interpreter/YJIT artifact required" unless manifest.fetch("units").map { _1.fetch("pass") } == PASSES &&
+  manifest.fetch("files").empty? && manifest.fetch("templates", {}).empty? && %w[interpreter yjit].include?(jit)
 ids = manifest.fetch("units").to_h { [_1.fetch("pass"), _1.fetch("id").to_s] }
 FileUtils.mkdir_p(output, mode: 0o700)
 lib = File.join(ROOT, "gem/lib")
 env = ENV.keys.grep(/\A(?:LOWRAIL_|RUBY_|BUNDLE_|DATABASE_URL\z|RAILS_|RACK_ENV\z)/).to_h { [_1, nil] }.merge(
   "RAILS_ENV" => "production", "RACK_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "SECRET_KEY_BASE" => nil,
   "LOWRAIL_ROOT" => app, "LOWRAIL_DIR" => File.join(app, ".lowrail"), "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "",
-  "RUBYOPT" => "-I#{lib} -rlowrail/setup", "RAILS_LOG_LEVEL" => "fatal")
+  "RUBYOPT" => "-I#{lib} -rlowrail/setup", "RAILS_LOG_LEVEL" => "fatal", "BENCH_JIT" => jit)
 restore = -> {
   FileUtils.rm_rf(File.join(app, "storage"))
   FileUtils.cp_r(seed_dir, File.join(app, "storage"))
@@ -62,7 +63,7 @@ restore = -> {
 execute = ->(label, program, extra = {}) {
   File.open(File.join(output, "#{label}.log"), "w") do |log|
     raise "#{label} failed; inspect #{log.path}" unless system(env.merge(extra), RbConfig.ruby,
-      "--disable-yjit", "--disable-zjit", *program, chdir: app, out: log, err: log)
+      *JitStability.flags(jit), *program, chdir: app, out: log, err: log)
   end
 }
 sequence = ->(prefix, seed = nil) {
@@ -122,9 +123,10 @@ end
 restore.call
 native = <<~'RUBY'
   require "./config/application"
-  Rails.application.config.yjit = false
+  Rails.application.config.yjit = false if ENV.fetch("BENCH_JIT") == "interpreter"
   require "./config/environment"
   require "rack/mock"
+  raise "native JIT mode mismatch" unless Lowrail.jit_mode == ENV.fetch("BENCH_JIT")
   request = -> { Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on") }
   runtimes = [Lowrail::FormScaffold, Lowrail::TokenTag, Lowrail::CollectionRender]
   raise "natural witness failed" unless request.call.status == 200 && runtimes.all?(&:admitted?)
@@ -142,11 +144,12 @@ native = <<~'RUBY'
   raise "deopt missing" unless units.values.all? { Lowrail::Stats.unit_fallbacks.fetch(_1, 0).positive? }
   binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") } or raise "native binary missing"
   puts "PRODUCTION_NATIVE #{JSON.generate(hits: hits, fallbacks: fallbacks, deopt_fallbacks: Lowrail::Stats.unit_fallbacks,
-    admissions: runtimes.to_h { [_1.name, _1.admission] }, native_binary: {binary => Digest::SHA256.file(binary).hexdigest})}"
+    admissions: runtimes.to_h { [_1.name, _1.admission] }, jit: Lowrail.jit_status,
+    native_binary: {binary => Digest::SHA256.file(binary).hexdigest})}"
 RUBY
 execute.call("native", ["-e", native], "LOWRAIL" => "1")
 native_report = JSON.parse(File.readlines(File.join(output, "native.log")).find { _1.start_with?("PRODUCTION_NATIVE ") }.delete_prefix("PRODUCTION_NATIVE "))
-report = {status: "pass", cold: {raw: raw, companions: companions}, pairs: pairs, native: native_report,
+report = {status: "pass", certification_jit: jit, cold: {raw: raw, companions: companions}, pairs: pairs, native: native_report,
   fixture: {name: "BlogShowGetOnly", sha256: Digest::SHA256.file(File.join(ROOT, "fixtures/corpus/blog_show_get_only.rb")).hexdigest},
   manifest_sha256: Digest::SHA256.file(manifest_file).hexdigest, runtime_files_sha256: PassBench.runtime_fingerprint(lib),
   harness_files_sha256: PassBench.harness_fingerprint, gate_source_sha256: Digest::SHA256.file(__FILE__).hexdigest,
