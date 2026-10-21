@@ -707,3 +707,38 @@ resolves that startup failure without a source/config or entropy-rule edit.
 Private smoke result SHA256: Fizzy
 `f657bed732304f3cd95266d8456c692de6385da0bcf5049e549cf632ebec316a`;
 Lobsters `d7fd8e03163b38d1045f2f1930108d08e9a20d5d806b3c4826e72775543ac4e0`.
+
+### Predeclared confirmatory blog RPS cohort (one attempt)
+
+Coordinator authorization follows the first exploratory blog RPS signal.
+**Protocol and decision rule written before any confirmatory load.** One
+cohort only: **20 rotated off-A/on/off-B rounds**, otherwise the same blog
+show fixture, Ruby 4.0.7 / Rails 8.1.4 / startup YJIT, pinned oha 1.14.0,
+production app Puma config, four workers × one thread, c16, server CPUs
+0–3 / client CPUs 4–7, 5-second warmup and 20-second load window per fresh
+server. Separate three-arm coverage preflight; complete two-seed cold and
+post-warmup status/body/all-Rack-header sampling. New per-worker post-warmup
+and post-load GC/heap/RSS snapshots are outside the timed load. No forced
+GC, heap changes, app/config patches, process overlap in this orb, retries,
+outlier exclusions, alternate statistic selection, or pooling with the
+earlier ten-round baseline or adapter smokes.
+
+Runtime is refreshed from published main **487bec5 or later** before launch;
+if the sealed token prefix/suffix fix is published first, include it and
+rebuild the three-unit sealed form/token/collection YJIT artifact. Record
+the actual main, protocol/harness and artifact pins in the result, retaining
+the earlier artifact separately. Do not change pins mid-cohort. This is stock
+`mise` Ruby 4.0.7, not the separate token-enabled Ruby fork.
+
+**Fixed decision rule:** provided all exact-output, HTTP error, activation,
+mode, input-pin and worker-snapshot checks pass, accept as a **scoped blog
+throughput result only if** (1) the paired-round A/A bootstrap 95% interval
+contains zero, **and** (2) the paired on/off RPS 95% lower bound strictly
+exceeds the A/A 95% upper bound. Use the existing fixed-seed 5,000 paired-
+round bootstrap and mean within-round percentage differences; do not use
+the ratio of pooled requests or arm medians. Otherwise report the rejection
+or unresolved result, without another attempt. Report p50/p90/p99 alongside
+RPS, including the actual paired p99 change even if worse. This gate does
+not assert a latency win, complete DB/own-suite equivalence, production
+admission, or permission to publish a README price; the coordinator decides
+that separately. **Status at declaration: not started.**
