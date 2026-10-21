@@ -6,6 +6,11 @@ different, explicit promise by an application's operator**, not a claim that
 Ruby became statically immutable. Passing `seal-check` is evidence about the
 tests exercised, not acceptance of that promise and not a support/speed claim.
 
+The [production behavioral verification proposal](sealed-verification.md)
+compares suite-derived replay, a certified test seam and an external scenario
+driver. It recommends the external driver; no new runner or admission change
+is implemented. Current two-example breadth probes remain smoke evidence.
+
 ## Contract and the work it can remove
 
 Certification is a closed inventory of classes, singleton classes, ancestor
