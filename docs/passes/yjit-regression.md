@@ -378,6 +378,80 @@ not JIT-flat performance evidence. Protocol unit checks with pinned headers
 pass 13 / 151 (`request_pairs_test.rb`) and 16 / 157 (`pass_test.rb`); an
 earlier invocation without the pinned Valgrind include path failed as such.
 
+## Guarded props ordinary-def pricing specimen
+
+`bench/experiments/props_variant.rb` is a **pre-implementation specimen**,
+not a runtime pass or a promotion. It retains the actual
+`InertiaProps.valid?(id, props)` check at **every recursive traversal entry**.
+There is no cached-G replacement or load-only authorization. An iterator
+already executing is not restarted if app code mutates a later receiver.
+
+The `split` arm puts the original `each_with_object` body in a separate
+private ordinary `def`. The fast method retains its explicit positional and
+keyword signature, executes the existing guard, and either runs the `each`
+body or calls that original fallback with explicit local arguments (no
+`*args`, `**kwargs` or block-backed dispatcher). Recursive calls still enter
+the guarded method. This adds a method and changes fallback frames/source
+layout: passing the specimen's value/lifetime gate is **not** certification
+of production reflection, backtraces or delivery.
+
+The `props_variant` pricing group in `yjit_regression.rb` prepares five arms:
+
+| Arm | Purpose |
+|---|---|
+| `original` (paired off/off controls) | Whole original resolver work |
+| `guarded` | Current emitted inline branch and exact receiver checks |
+| `checks_original` | Original work **plus** every exact recursive guard, including its singleton-class side effects; paired excess prices checks |
+| `split` | Proposed ordinary-def shape, with the same complete checks |
+| `each` | Unchecked iteration upper bound only; never a safe candidate |
+
+`checks_original`'s Stats hits mean successful **authorization**, not a
+completed fast iterator: that arm deliberately always performs original
+work. Comparing a single root guard against an entire resolution would
+underprice recursive checks and fresh receiver shapes.
+
+Unlike the historical `props` group, every `props_variant` operation builds
+fresh nested input hashes/arrays and a new resolver, identically in all arms.
+Reusing a resolver only makes the expanded root fresh; its nested inputs
+remain shared and could underprice singleton-class churn. Compare
+`checks_original − original` against `original − each`, so common
+construction cost is not counted as saving or as available check budget.
+Then require the complete guarded candidate itself to win. This is the
+pricing plan, not measured evidence that it does win.
+
+The untimed `--check` gate reuses the public resolver fixture on all three
+audited gem versions, discovering first/last calls at every exercised body
+callsite. It compares values, metadata, ordered effects and once-only lazy
+evaluations against the original through suppressed mutations, changed
+`each`, private iteration, Hash subclasses, stale/malformed facts and a
+non-main Ractor. The observer recognizes the moved fallback body too; the
+plain control still determines the mutation boundaries. Normal calls must
+authorize without fallback, mutated receivers must fall back, and stale or
+malformed certificates must have zero authorizations. Each child asserts
+and records its actual JIT mode, not the driver's mode. A separate hot case
+warms the resolver, proves its ISeq compiled under YJIT, then mutates the
+later receiver from a real lazy-prop callback without enabling the fixture's
+TracePoint.
+That case must preserve the original ordered effects and observe the changed
+iterator through fallback. Signature/private visibility are checked too;
+source hashes are retained and must stay unchanged for the entire gate.
+
+Ruby 4.0.7 passes **478 comparisons in each of interpreter and YJIT mode**
+across Inertia 3.21.2/3.22.0/3.23.0. Ruby 4.1 preview separately passes the
+**six hot-callback comparisons** under YJIT, not a full preview matrix.
+
+```sh
+BENCH_JIT=0 mise exec -- ruby bench/experiments/props_variant.rb --check /tmp/NEW-props-check-interpreter
+BENCH_JIT=1 mise exec -- ruby bench/experiments/props_variant.rb --check /tmp/NEW-props-check-yjit
+```
+
+No `props_variant` Callgrind cohort has run; worker authorization remains
+held. When released, the prepared group uses the pinned Valgrind and the
+same finite A/A/heap/brk/JIT-flat protocol, with at most four workers. If
+checks alone exceed the potential saving, stop at design; an ordinary `def`
+does not make expensive reflection cheap. No speed claim or pass change
+follows from an untimed correctness check.
+
 ## Doctor: detect sticky tracing from any gem
 
 Third-party boot debuggers, coverage/APM/profilers can cause the same VM-wide

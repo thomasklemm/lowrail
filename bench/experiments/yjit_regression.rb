@@ -11,7 +11,8 @@ module YjitRegression
     "config" => %w[original guarded residue checks direct_checks direct_ivars selected],
     "global" => %w[original installed activated warmed singleton_hash],
     "shapes" => %w[original inline separate bmethod direct splat kw_literal kwargs g k v writes check mono poly lines],
-    "props" => %w[original guarded each checks cached_guard]
+    "props" => %w[original guarded each checks cached_guard],
+    "props_variant" => %w[original guarded split checks_original each]
   }.freeze
 
   def self.install(build, runtime)
@@ -146,7 +147,7 @@ module YjitRegression
         "@index = (@index + 1) & 7; @receivers[@index].target(@value)"
       when "lines" then "\n\n#{residue}\n\n"
       end
-    when "props"
+    when "props", "props_variant"
       # Load the real resolver and dependencies without booting an application.
       %w[prop_cacheable prop_onceable prop_mergeable base_prop ignore_on_first_load_prop always_prop
         lazy_prop optional_prop cached_prop defer_prop merge_prop once_prop scroll_metadata scroll_prop
@@ -159,6 +160,10 @@ module YjitRegression
       lowered = file.fetch(:parts).map(&:to_s).join
       resolver_body = original[/    def deep_transform_props.*?^    def transform_array/m].sub(/    def transform_array\z/, "")
       if arm == "guarded"
+        eval(lowered, TOPLEVEL_BINDING, file.fetch(:path))
+      elsif %w[split checks_original].include?(arm)
+        require_relative "props_variant"
+        lowered = PropsVariant.source(original, shape: arm)
         eval(lowered, TOPLEVEL_BINDING, file.fetch(:path))
       elsif arm == "cached_guard"
         eval(lowered.sub("::Lowrail::Passes::InertiaProps.valid?(0, props)", "::Lowrail::G[0]"), TOPLEVEL_BINDING, file.fetch(:path))
@@ -175,6 +180,9 @@ module YjitRegression
       runner.instance_variable_set(:@resolver, InertiaRails::PropsResolver.new(props, evaluator: ->(x) { x }))
       if arm == "checks"
         "::Lowrail::Passes::InertiaProps.valid?(0, @props)"
+      elsif group == "props_variant"
+        runner.instance_variable_set(:@evaluator, ->(x) { x })
+        "::InertiaRails::PropsResolver.new(#{props.inspect}, evaluator: @evaluator).resolve"
       else
         "@resolver.resolve"
       end
@@ -190,7 +198,7 @@ module YjitRegression
     if group == "config" && !%w[checks direct_checks].include?(arm)
       raise "wrong options" unless value.instance_variable_get(:@options) == runner.options &&
         !value.instance_variable_get(:@options).equal?(runner.options) && value.instance_variable_get(:@controller).equal?(controller)
-    elsif group == "props" && arm != "checks"
+    elsif %w[props props_variant].include?(group) && arm != "checks"
       raise "wrong props" unless value.first == runner.instance_variable_get(:@props)
     elsif group == "shapes"
       raise "wrong arithmetic" unless value == 26
@@ -244,7 +252,8 @@ end
 # request_pairs passes a route argument; a tiny launcher avoids changing its API.
 launcher = File.join(out, "worker.rb")
 File.write(launcher, "ARGV.replace(['--worker', ENV.fetch('YJIT_DIAG_GROUP'), ENV.fetch('YJIT_DIAG_ARM')]); load #{File.expand_path(__FILE__).dump}\n")
-sources = [__FILE__, *Dir[File.expand_path("../../gem/lib/lowrail/{inertia*,guard,manifest}.rb", __dir__)],
+sources = [__FILE__, File.expand_path("props_variant.rb", __dir__),
+  *Dir[File.expand_path("../../gem/lib/lowrail/{inertia*,guard,manifest}.rb", __dir__)],
   *%w[request_pairs heap_windows jit_stability].map { File.expand_path("../#{_1}.rb", __dir__) }].to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
 metadata = {seed: 41231, rounds: 6, workers: {}, sources: sources, group: group, diagnosis_only: true}
 accepted = RequestPairs.heap_instructions(environments, Dir.pwd, out, "unused", metadata,
