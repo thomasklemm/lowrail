@@ -77,25 +77,36 @@ module NativeBench
     when "blog"
       require "rack/mock"
       rack = Rack::MockRequest.new(Rails.application)
-      {"GET /articles/1" => -> { rack.get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on") }}
+      headers = {"HTTP_HOST" => "localhost", "HTTPS" => "on"}.merge(config.fetch("headers", {}))
+      config.fetch("paths", ["/articles/1"]).to_h do |path|
+        ["GET #{path}", -> { rack.get(path, headers) }]
+      end
     when "campfire"
       require_relative "../bench/experiments/campfire_scenario"
       driver = CampfireScenario::Driver.new(state, record: false, validate: false)
       driver.login
       driver.prepare_post
-      %w[room pagination sidebar search post].to_h { |id| [id, -> { driver.run(id) }] }
+      vector = JSON.parse(File.read(File.join(state, "scenario.json"))).fetch("vector")
+      config.fetch("paths", %w[room pagination sidebar search post]).to_h do |path|
+        route = vector.find { _1.fetch("id") == path || _1.fetch("path") == path } or raise "unknown Campfire route #{path}"
+        id = route.fetch("id")
+        [id, -> { driver.run(id) }]
+      end
     when "fizzy"
       require_relative "../bench/experiments/fizzy_link_vector"
       driver = FizzyLinkVector::Driver.new(state, record: false)
       driver.login
-      JSON.parse(File.read(File.join(state, "vector.json"))).to_h { |path| ["GET #{path}", -> { driver.request("GET", path) }] }
+      config.fetch("paths") { JSON.parse(File.read(File.join(state, "vector.json"))) }.to_h do |path|
+        ["GET #{path}", -> { driver.request("GET", path) }]
+      end
     when "lobsters"
       require "rack/mock"
       rack = Rack::MockRequest.new(Rails.application)
+      headers = {"HTTP_HOST" => "localhost", "HTTPS" => "on"}.merge(config.fetch("headers", {}))
       # Same shipped DB/dependency overlay as the hotspot study. Anonymous
       # public story lists, not a claim to reproduce the login-heavy vector.
-      %w[/newest /active /recent /hottest].to_h do |path|
-        ["GET #{path}", -> { rack.get(path, "HTTP_HOST" => "localhost", "HTTPS" => "on") }]
+      config.fetch("paths", %w[/newest /active /recent /hottest]).to_h do |path|
+        ["GET #{path}", -> { rack.get(path, headers) }]
       end
     end
   end
@@ -110,16 +121,22 @@ module NativeBench
     end
   end
 
+  def response_digest(response)
+    {"status" => response.status, "body_sha256" => Digest::SHA256.hexdigest(response.body),
+      "headers_sha256" => Digest::SHA256.hexdigest(JSON.generate(response.headers.to_h.sort.to_h))}
+  end
+
   def worker(config, state, arm, destination, coverage)
     started = Float(ENV.fetch("NATIVE_BENCH_STARTED"))
-    if config.fetch("workload") == "fizzy"
+    block_link = config.fetch("workload") == "fizzy" && !config.fetch("exploration_only", false)
+    if block_link
       require_relative "../bench/experiments/fizzy_link_vector"
       BlockLinkSpecimen.install(app: config.fetch("app"), artifact: config.fetch("artifact"),
         contexts: JSON.parse(File.read(config.fetch("contexts"))), arm: arm == "on" ? "on" : "off")
     end
     require File.join(config.fetch("app"), "config/environment")
     boot_ms = (clock - started) * 1000
-    BlockLinkSpecimen.dependencies! if config.fetch("workload") == "fizzy"
+    BlockLinkSpecimen.dependencies! if block_link
     raise "production Ruby 4.0.7 / Rails 8.1.4 / YJIT required" unless RUBY_VERSION == "4.0.7" &&
       Rails.version == "8.1.4" && Rails.env.production? && RubyVM::YJIT.enabled? && !jit.fetch("zjit")
     setup_started = clock
@@ -129,18 +146,37 @@ module NativeBench
     end
     setup_ms = (clock - setup_started) * 1000
     workload = routes(config, state, arm)
-    invoke = ->(call) { response = call.call; raise "HTTP #{response.status}" if response && response.status != 200 }
+    invoke = ->(call) do
+      response = call.call
+      raise "HTTP #{response.status}" if response && response.status != 200
+      response
+    end
     config.fetch("warmup").times { workload.each_value { invoke.call(_1) } }
+    if config["screen"]
+      exact = workload.to_h do |route, call|
+        [route, [0, 1].to_h do |seed|
+          response, evidence = if defined?(Exploration) && Exploration.respond_to?(:validation_request)
+            Exploration.validation_request(route: route, seed: seed, request: -> { invoke.call(call) })
+          else
+            [invoke.call(call), {"passed" => true, "control" => "raw; no entropy companion"}]
+          end
+          [seed.to_s, response_digest(response).merge("evidence" => evidence)]
+        end]
+      end
+    end
     rows = workload.to_h do |name, call|
       n = coverage ? 10 : config.fetch("samples")
       samples = Array.new(n)
+      allocation_samples = Array.new(n) if config["screen"]
       before_counts = counts
       before_rss, before_jit = rss, jit
       before_gc, before_alloc, before_gc_count = GC.total_time, GC.stat(:total_allocated_objects), GC.count
       n.times do |i|
+        allocated = GC.stat(:total_allocated_objects) if allocation_samples
         t = clock
         invoke.call(call)
         samples[i] = (clock - t) * 1_000_000
+        allocation_samples[i] = GC.stat(:total_allocated_objects) - allocated if allocation_samples
       end
       allocations, gc_ns, collections = GC.stat(:total_allocated_objects) - before_alloc, GC.total_time - before_gc, GC.count - before_gc_count
       [name, {"samples_us" => coverage ? [] : samples, "requests" => n,
@@ -149,8 +185,10 @@ module NativeBench
         "gc_ms_per_request" => gc_ns.fdiv(n * 1_000_000), "gc_count" => collections,
         "rss_before_kib" => before_rss, "rss_after_kib" => rss,
         "jit_before" => before_jit, "jit_after" => jit, "counts_before" => before_counts, "counts_after" => counts}]
+        .tap { |_, row| row["allocation_samples"] = allocation_samples if allocation_samples }
     end
     File.write(destination, JSON.pretty_generate({"arm" => arm, "coverage" => coverage,
+      "exact" => exact,
       "boot_ms" => boot_ms, "exploration_setup_ms" => setup_ms, "ruby" => RUBY_DESCRIPTION, "rails" => Rails.version,
       "affinity" => File.read("/proc/self/status")[/^Cpus_allowed_list:.*$/], "routes" => rows,
       "refusal" => Lowrail.refusal_reason, "jit" => jit}), perm: 0o600)
@@ -228,8 +266,8 @@ module NativeBench
     # each position equally over a multiple of six rounds.
     offset = rng.rand(3)
     schedule = config.fetch("rounds").times.flat_map do |round|
-      order = ARMS.rotate((round + offset) % 3)
-      order = order.reverse if round.odd?
+      order = config["screen"] ? %w[off_a on off_b] : ARMS.rotate((round + offset) % 3)
+      order = order.reverse if round.odd? && !config["screen"]
       order.map { [round, _1, false] }
     end
     schedule = ARMS.map { ["coverage", _1, true] } + schedule
@@ -268,7 +306,7 @@ module NativeBench
     end
     report["summary"] = summarize(report.fetch("workers"))
     File.write(File.join(output, "result.json"), JSON.pretty_generate(report), perm: 0o600)
-    puts JSON.pretty_generate(report.fetch("summary"))
+    puts JSON.pretty_generate(report.fetch("summary")) unless config["screen"]
   end
 end
 

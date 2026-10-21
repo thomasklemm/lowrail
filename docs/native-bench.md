@@ -150,6 +150,86 @@ none is needed for these native measurements. These timings are not a fresh
 own-suite or exact output/DB-state certification; main integration and any
 README performance number still require all owner gates and Thermos review.
 
+## Cheap screen first (owner policy, 2026-10-21)
+
+New ideas use [`script/screen`](../script/screen), not a twelve-round price
+cohort. The already-running Campfire cohort is retained; queued Fizzy and
+Lobsters cohorts are paused while this shared tool is delivered. A screen
+is for killing/promoting an idea, never a README price or support claim.
+
+```sh
+CAMPFIRE_DISPOSABLE_REDIS=1 mise exec ruby@4.0.7 -- script/screen \
+  "$PWD/.corpus/campfire-r81" /rooms/486777696 \
+  --config PRIVATE_CONFIG.json --output NEW_PRIVATE_DIRECTORY \
+  --exploration-setup /absolute/exploration.rb
+```
+
+The native config supplies `workload`, `seed`, `artifact`, and optional
+`gemfile`, `contexts`, `exploration_sources` and `headers`. All fixture/artifact
+paths are absolute. An explicit app and one or more routes are required.
+Blog/Lobsters/Fizzy routes are GET paths. Campfire routes are existing scenario
+IDs or exact fixture paths (its POST keeps its scenario method/parameters).
+No app source/config edit is authorized. Prepare dependencies/data first:
+the screen is not a ten-minute corpus installer. The artifact must certify
+YJIT, including for zero-unit controls; do not reuse interpreter ISeqs.
+
+- Three short fresh-process **off-A/on/off-B** rounds, preceded by one
+  coverage worker per arm. Defaults: 20 vector warmups, 30 requests/route;
+  `--warmup N`, `--samples N`, `--cpu N` override these explicitly. Nine timing
+  workers, not a long cohort. No reruns/exclusions to obtain a win.
+- State is restored by the native harness. Per-request allocation deltas
+  use integer `GC.stat(:total_allocated_objects)` counts, not statistical
+  allocation sampling. Report median **and full min/max**: background work,
+  cache changes and framework activity can prevent deterministic counts.
+  GC is not disabled/forced. The added clocks/count reads are symmetric.
+- Print the maximum absolute paired A/A round difference and the bootstrap
+  A/A envelope **before** on/off. The larger is the screen noise floor.
+  `clear_wall_win` requires exact checks plus the complete on/off interval
+  below minus three times that floor. Three rounds are screening evidence,
+  not precision inference or permission to publish a price.
+- Print status/body/all-header digest equality, allocation counts, native
+  YJIT median, GC time, RSS and separate coverage-worker deltas (including
+  per-unit hits/fallbacks when supplied). `screen.json` also retains p90,
+  throughput, GC counts, boot and all paired summaries. `result.json` and
+  raw worker JSON retain individual samples, pins and JIT state.
+- Exact checks compare **actual unnormalized** status/body/header digests
+  across off-A/off-B/on within every round, separately for seeds 0 and 1.
+  They execute outside timed windows. A mismatch is retained and exits 2;
+  failed output equivalence must not be interpreted as a speed win.
+  This is not a DB/own-suite certificate. Main still needs those gates.
+
+The existing `NativeBench::Exploration.install(config:, state:, arm:)` and
+optional `.counts` hooks are unchanged. An optional
+`.validation_request(route:, seed:, request:)` wraps **only untimed exact
+requests** and returns `[actual_response, evidence_hash]`, with string-keyed
+`evidence_hash["passed"] == true`. Use the existing source-pinned fixture
+entropy validator/install/with in all arms; include trace/errors and the
+validated pins in evidence, and list extra source files in
+`exploration_sources`. Never normalize digests, widen an entropy policy, or
+pin native timed entropy. Without the hook checks are explicitly raw and
+can fail A/A on entropy. For the blog's request-ID input, set
+`"headers": {"HTTP_X_REQUEST_ID": "native-screen-validation"}` in config;
+the blog/Lobsters Rack driver merges these ordinary headers in all arms.
+An adapter may also preserve its existing `NativeBench.routes` wrapper.
+
+Fizzy AR-only exploration sets `"exploration_only": true` (or
+`--exploration-only`) to skip **only** BlockLinkSpecimen installation and its
+dependencies. Contexts are then unnecessary. Supply an independently built
+appropriate public/empty artifact: a block-link artifact still contains its
+delivery source and cannot work without its specimen. Public Lowrail preload,
+production mode, native guards, fixture login, and source pins are unchanged.
+Optional config `paths` also works in `native-bench`; absent keys preserve
+its original route vector and block-link behavior.
+
+One Linux hardware instruction probe in this orb (`perf_event_open`,
+hardware instructions, user-space calling process) returned **ENOENT (2)**;
+`perf_event_paranoid=2`, and `perf` is not installed. No native instruction
+counts are claimed. The screen records the probe once per invocation; it
+does not substitute elapsed time or a process-startup count for request Ir.
+If a different host exposes counters, the current tool reports availability
+but does not yet collect them. Callgrind remains separately authorized and
+reserved for a promoted result to publish, not these screens.
+
 ## Results / JSON appendix
 
 Pending the finite native cohorts. No speed direction is inferred from the

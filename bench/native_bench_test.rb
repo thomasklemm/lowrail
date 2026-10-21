@@ -1,9 +1,32 @@
 # frozen_string_literal: true
 
 require "minitest/autorun"
-load File.expand_path("../script/native-bench", __dir__)
+load File.expand_path("../script/screen", __dir__)
 
 class NativeBenchTest < Minitest::Test
+  def test_screen_checks_actual_responses_both_seeds_every_round_and_control_evidence
+    response = Struct.new(:status, :body, :headers)
+    workers = 3.times.flat_map do |round|
+      NativeBench::ARMS.map do |arm|
+        {"round" => round, "arm" => arm, "coverage" => false, "exact" => {"GET /x" =>
+          [0, 1].to_h { |seed| [seed.to_s, NativeBench.response_digest(response.new(200, "seed#{seed}", {"a" => "b"})).merge("evidence" => {"passed" => true})] }}}
+      end
+    end
+    checks = -> { NativeScreen.exact_checks(workers).fetch("GET /x").values.map { _1.fetch("passed") } }
+    assert_equal [true, true], checks.call
+    last = workers.last.fetch("exact").fetch("GET /x").fetch("1")
+    %w[status body_sha256 headers_sha256].each do |field|
+      original = last.fetch(field)
+      last[field] = "changed"
+      assert_equal [true, false], checks.call, field
+      last[field] = original
+    end
+    last.fetch("evidence")["passed"] = false
+    assert_equal [true, false], checks.call
+    assert_equal({"hits" => {"a" => 3, "b" => 0}},
+      NativeScreen.counter_delta({"hits" => {"a" => 4}}, {"hits" => {"a" => 7, "b" => 0}}))
+  end
+
   def test_report_uses_paired_rounds_and_retains_noise_and_zero_gc
     # Different baseline scales distinguish mean paired ratios from a ratio
     # of pooled means. Integer RSS also catches accidental integer division.
