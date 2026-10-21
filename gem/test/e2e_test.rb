@@ -361,6 +361,38 @@ class E2ETest < Minitest::Test
     end
   end
 
+  def test_selected_hook_dependencies_are_symmetric_without_enabling_off_delivery
+    realpath_tmpdir do |dir|
+      units = default_units(dir)
+      units.first["facts"] = []
+      build_app(dir, units: units)
+      code = <<~'RUBY'
+        require "json"
+        require_relative "app"
+        puts JSON.generate(chains: [Object, Kernel, BasicObject, Module, Calc].map { _1.ancestors.map(&:name) },
+          compute: Calc.new.compute(1), label: Calc.new.label,
+          loaded: !!(defined?(Lowrail::Loader) && Lowrail::Loader.installed?))
+      RUBY
+      [[nil, true, true], ["0", true, false], ["", false, false]].each do |selection, module_hook, object_hook|
+        off, on = %w[0 1].map { |flag| ruby_json(code, chdir: dir, env: {"LOWRAIL" => flag, "LOWRAIL_UNITS" => selection}) }
+        assert_equal off.fetch("chains"), on.fetch("chains"), "selection #{selection.inspect}"
+        assert_equal module_hook, on.fetch("chains").flatten.include?("Lowrail::Guard::ModuleHooks")
+        assert_equal object_hook, on.fetch("chains").flatten.include?("Lowrail::Guard::ObjectHooks")
+        assert_equal ["orig", 2], off.fetch("compute")
+        assert_equal ["orig", "CALC"], off.fetch("label")
+        refute off.fetch("loaded"), "hooks alone must not deliver optimized code"
+      end
+      # A runtime-only, facts-free artifact has neither dependency. This is
+      # the hook shape of the sealed form pilot (its own certificate remains).
+      edit_manifest(dir) { _1.merge!("units" => [units.first], "files" => {}, "templates" => {}) }
+      %w[0 1].each do |flag|
+        result = ruby_json(code, chdir: dir, env: {"LOWRAIL" => flag})
+        refute result.fetch("chains").flatten.any? { _1&.start_with?("Lowrail::Guard::") }
+        assert_equal ["orig", 2], result.fetch("compute")
+      end
+    end
+  end
+
   def test_no_enabled_units_serves_originals_but_keeps_reporting
     realpath_tmpdir do |dir|
       build_app(dir)

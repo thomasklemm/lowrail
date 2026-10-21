@@ -22,8 +22,17 @@ class BlogProductionTest < Minitest::Test
           assert_empty record.fetch("errors")
           assert_empty record.fetch("boot_sql"), "no primary/cache/queue/cable probes before the app's requests"
           assert_equal baseline.fetch("cold_witness"), record.fetch("cold_witness")
-          assert_equal({"api_loaded" => false, "objspace" => []}, record.fetch("cold_witness").fetch("features"))
-          assert_equal record.fetch("cold_witness").fetch("features"), record.fetch("cold_witness").fetch("after_requests")
+          features = record.fetch("cold_witness").fetch("features")
+          assert_equal({"api_loaded" => false, "objspace" => []}, features.slice("api_loaded", "objspace"))
+          %w[Object Kernel BasicObject].each do |holder|
+            assert_includes features.fetch("holder_ancestry").keys, holder
+            assert_includes features.fetch("holder_ancestry").fetch(holder), holder
+          end
+          after = record.fetch("cold_witness").fetch("after_requests")
+          # Natural rendering may create the cached view and tag classes. It
+          # must not add an off/on chain difference; compare like stages.
+          assert_equal baseline.fetch("cold_witness").fetch("after_requests"), after
+          assert_equal features.slice("api_loaded", "objspace"), after.slice("api_loaded", "objspace")
           assert_equal %w[early_controller early_eager late_eager late_controller].sort,
             record.fetch("cold_witness").fetch("callbacks").map(&:first).sort
           assert_equal [14, 2], record.fetch("scenarios").map { _1.fetch("sql").size }
@@ -79,6 +88,7 @@ class BlogProductionTest < Minitest::Test
       "boot_sql" => ->(run) { run.fetch("boot_sql") << {"database" => "queue", "sql" => "SELECT sqlite_version(*)"} },
       "cold_hook" => ->(run) { run.fetch("cold_witness").fetch("hooks") << "before_eager_load" },
       "cold_feature" => ->(run) { run.fetch("cold_witness").fetch("features")["api_loaded"] = true },
+      "cold_ancestry" => ->(run) { run.fetch("cold_witness").fetch("features")["holder_ancestry"] = {"Object" => %w[Object Kernel Lowrail::Guard::ObjectHooks BasicObject]} },
       "loads" => ->(run) { run.fetch("loads").fetch("cold_boot")["load_events"] = ["0 hook active_record", "1 load Article"] }
     }
     changes.each do |field, change|

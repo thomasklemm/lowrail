@@ -153,7 +153,8 @@ module Lowrail
     end
 
     def setup(root: Dir.pwd, dir: nil)
-      return false unless enabled?
+      enabled = enabled?
+      return false unless enabled || ENV["LOWRAIL"] == "0"
       # With no selected units, serve original source rather than installing
       # lowered code whose guards can only fall back. Reporters boot above.
       return false if ENV["LOWRAIL_UNITS"] == ""
@@ -189,6 +190,13 @@ module Lowrail
       @admission_jit = jit_mode
       unless @certification_jit == @admission_jit
         refuse("certification JIT mode mismatch: built #{@certification_jit || 'unknown'}, running #{@admission_jit}; rebuild with --jit #{@admission_jit} and matching deployment startup flags")
+        return false
+      end
+      unless enabled
+        unless manifest.units.empty?
+          require_relative "lowrail/guard"
+          Guard.install_hooks(manifest)
+        end
         return false
       end
       @root = root

@@ -8,6 +8,62 @@ Use captured replay where it is faithful, adapters where the suite depends
 on process-local test machinery, and an explicit uncovered ledger everywhere
 else. Do not admit a production artifact into `RAILS_ENV=test` to get hits.
 
+## Full ancestry census
+
+The cold observer now records **complete inherited ancestry**, without
+filtering Lowrail modules, for Object, Kernel, BasicObject, the named holders
+in every certificate/fact, ActionView::Template when templates are delivered,
+and the controller's already-cached view class. It reads names and caches;
+it never constructs a view, resolves an autoload or scans the heap. Missing
+holders stay null. The before/after-request stages are compared between arms,
+not equated to one another: natural rendering may populate a previously
+missing view/tag class. Anonymous ancestors retain their positions as null;
+this is a named-chain census, not a cross-process object-identity proof.
+
+The earlier narrower API/objspace/hook witness missed an on-only inherited
+`Lowrail::Guard::ObjectHooks`. Form/link units have no method-fact dependency
+on that hook. Hook admission now depends on selected facts; file delivery has
+an independent ModuleHooks/Bootsnap dependency. Required hooks are symmetric
+with explicit LOWRAIL=0, while that arm still delivers and activates nothing.
+Missing, incompatible, quarantined and empty builds remain no-ops.
+
+**Open exactness failures, not normalized:** the all-sealed artifact still
+adds `Lowrail::Templates::CompiledSource` to `ActionView::Template` and
+`Lowrail::PreloadPlans::Hook` to `ActiveRecord::Associations::Preloader` on
+only. The expanded cold test is intentionally red for this artifact. Existing
+scalar-event/body/SQL equality and old narrow cold passes cannot override that
+failure. The follow-up must select these seams only where needed and make
+needed seams symmetric without activating optimization in the off arm.
+Historical measured runtimes/results are retained, not rescored.
+
+Fresh isolated production/YJIT artifacts on base
+[`315d56f`](https://github.com/thomasklemm/lowrail/commit/315d56f7dd8982c3eb974536c252b4aeb3709a81)
+plus the hook fix, each with its own off/off/on seed-0 companion:
+
+| Artifact | Files / templates | Full named-chain differences, cold / after GETs | Coverage |
+|---|---:|---:|---|
+| Form only | 0 / 0 | **0 / 0** | Still explicitly refused by this prerequisite runtime; zero hits, unexercised |
+| Link only | 2 / 0 | **0 / 0** | Index/show **5/2 hits**, no fallbacks; recorded fields exactly equal |
+| Default | 0 / 0 | **0 / 0** | Empty quarantined default, zero hits; unexercised, not support coverage |
+
+The form/default comparisons have zero off/off and off/on differences and
+zero capture errors, but are not renamed to coverage passes. Neither requires
+ObjectHooks; only link's file delivery requires ModuleHooks, identical in both
+arms. The all-sealed raw result remains `rejected_off_control`; its seed-0 and
+seed-1 companions both reject **only `cold_witness`** after the expanded
+census. The corresponding real cold test remains red, not normalized or
+marked skipped. Targeted guard/loader/admission checks pass on 4.0.7
+(43 tests / 1,319 assertions, no skips), guard/manifest checks on 4.1-preview1
+(12 / 121, no skips), and `cargo test --locked` passes. This is an untimed
+prerequisite study, not a pricing run or passive-form admission result.
+
+Manifest SHA-256, form/link/default respectively:
+`24210f4b799f203ad6bb9667546d640dac7b4501035ac4d8f971180d44e05a62`,
+`cff8c2f6b3fd2be6af3d46f36485e7983b778c89bce0008a2cc432dade78c9f1`,
+`8d8609c1e5b4fe31429a82f295a63c4bb1ae2cca91ca89ff3328103dec2d8fd6`.
+Private retained workers/artifacts: `.lowrail/private/hook-census-1/`;
+`isolated-summary.json` records both ancestry stages and the exact verdicts.
+
 ## Current runtime: passive admission or explicit refusal
 
 The cold findings below exposed a correctness bug, not a fair-comparison

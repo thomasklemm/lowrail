@@ -206,6 +206,7 @@ fn explanation_round_trip_preserves_certificates_refusals_and_counter_provenance
     assert_eq!(value["units"][0]["activation_refusal"]["code"], "effectful_form_certification");
     assert!(value["units"][0]["activation_refusal"]["detail"].as_str().unwrap().contains("controller/view/I18n/ERB effects"));
     assert!(typed.render().contains("current runtime policy refuses [effectful_form_certification]"));
+    assert!(typed.render().contains("Hook dependency: none for this unit"));
     assert_eq!(value["sites"].as_array().unwrap().len(), 1, "neighboring refusal/warning must not inherit counters");
     assert_eq!(value["sites"][0]["status"], "lowered");
     assert!(typed.render().contains("FormScaffold.valid?"));
@@ -218,6 +219,13 @@ fn explanation_round_trip_preserves_certificates_refusals_and_counter_provenance
     let unknown = data.call("explain_site", &json!({"location":"app/views/articles/show.html.erb:25"})).unwrap();
     assert_eq!(unknown["sites"][0]["status"], "left_original");
     assert_eq!(unknown["sites"][0]["reason"]["code"], "not_recorded");
+    let mut guarded = manifest.clone();
+    guarded["units"][0]["facts"] = json!([{"receiver":"Article","method":"title"}]);
+    guarded["files"] = json!({"app/models/article.rb": {}});
+    std::fs::write(artifact.join("manifest.json"), guarded.to_string()).unwrap();
+    let hooks = crate::explain::read(&dir, None, None, None, None, None).unwrap().render();
+    assert!(hooks.contains("requires ModuleHooks and ObjectHooks"));
+    assert!(hooks.contains("Source delivery requires ModuleHooks"));
     manifest["certification_jit"] = json!("interpreter");
     std::fs::write(artifact.join("manifest.json"), manifest.to_string()).unwrap();
     let stale = data.call("explain_unit", &json!({"id":18})).unwrap();

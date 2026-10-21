@@ -13,6 +13,29 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Full ancestry is observable (2026-10-21)
+
+Do not normalize Lowrail modules out of `Object.ancestors`, view ancestry or
+any certified holder. The passive-form cold witness exposed an older on-only
+`Guard::ObjectHooks` inherited through BasicObject. Facts-free form/link units
+do not depend on it. Select invalidation hooks from the selected units' actual
+method facts, not from the tier name; retain both hooks for every factful unit.
+File delivery separately needs `ModuleHooks` for late Bootsnap rehook. Necessary
+hooks must be installed identically with explicit `LOWRAIL=0`, without enabling
+guards, source delivery or pass activation in that arm. Explain/doctor/MCP
+describe both dependencies; `LOWRAIL_UNITS=""` still installs neither.
+
+The expanded cold census compares complete Object/Kernel/BasicObject and
+certificate-named holder chains before and after natural requests, including
+the naturally cached view. **All-sealed currently fails exactness:**
+`Templates::CompiledSource` is prepended to `ActionView::Template` on-only,
+and `PreloadPlans::Hook` to `ActiveRecord::Associations::Preloader` on-only.
+These are open correctness failures of those seams, not entropy or harmless
+instrumentation, and historical narrower cold comparisons do not cover them.
+Keep the mismatches and the rejected all-sealed evidence. Fix those passes
+separately; do not weaken the full-chain gate or credit their hits as exact
+coverage. [Census scope and limitations](sealed-verification.md#full-ancestry-census).
+
 ## Sealed admission must not materialize the app (2026-10-21)
 
 The blog cold witness establishes an app-observable correctness violation:

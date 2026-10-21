@@ -37,9 +37,37 @@ module BlogProduction
 
   def self.cold_hooks = @cold_hooks ||= []
 
+  # Read certificate names without activating the artifact or resolving any
+  # autoload. Include complete inherited chains, even Lowrail's own modules:
+  # an on-only prepend is observable, not something to normalize away.
+  def self.holder_ancestry
+    manifest = File.join(ENV.fetch("LOWRAIL_DIR", ".lowrail"), "manifest.json")
+    artifact = File.file?(manifest) ? JSON.parse(File.read(manifest)) : {}
+    names = %w[Object Kernel BasicObject]
+    names << "ActionView::Template" unless artifact.fetch("templates", {}).empty?
+    collect = ->(value) do
+      case value
+      when Hash then value.each { |key, entry| collect.call(key); collect.call(entry) }
+      when Array then value.each { collect.call(_1) }
+      when String
+        names << value if value.match?(/\A[A-Z]\w*(?:::[A-Z]\w*)*\z/)
+      end
+    end
+    collect.call(artifact.fetch("units", []))
+    holders = names.uniq.sort.to_h do |name|
+      holder = Lowrail.loaded_constant(name)
+      [name, Module === holder ? holder.ancestors.map(&:name) : nil]
+    end
+    controller = Lowrail.loaded_constant("ArticlesController")
+    view = controller&.instance_variable_get(:@view_context_class)
+    holders["@cached_view"] = view&.ancestors&.map(&:name)
+    holders
+  end
+
   def self.cold_features
     {"api_loaded" => !!Lowrail.loaded_constant("ActionController::API"),
-      "objspace" => $LOADED_FEATURES.grep(%r{/(?:objspace\.rb|objspace\.(?:so|bundle))\z})}
+      "objspace" => $LOADED_FEATURES.grep(%r{/(?:objspace\.rb|objspace\.(?:so|bundle))\z}),
+      "holder_ancestry" => holder_ancestry}
   end
 
   # Event names/order and these scalar payload fields only, not full arbitrary

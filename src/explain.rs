@@ -170,6 +170,9 @@ pub fn read(app: &Path, dir: Option<&Path>, stats: Option<&Path>, id: Option<u64
         sites.retain(|s| s.pass.as_deref() == Some(pass));
     }
     let mut notes = vec!["Build eligibility is not runtime activation. Guards are described, never evaluated. Counters are recorded per unit, not per site.".into()];
+    if manifest["files"].as_object().is_some_and(|files| !files.is_empty()) {
+        notes.push("Source delivery requires ModuleHooks for late Bootsnap rehook, independently of unit facts; installed identically with LOWRAIL=0. LOWRAIL_UNITS=\"\" installs no hooks or delivery.".into());
+    }
     if manifest["selected_passes"].is_null() { notes.push("Exact pass selection was not recorded by this build; it cannot be inferred from successful units or quarantine rows. Rebuild to record it.".into()); }
     if boot.is_none() { notes.push("No facts dump; unit certificates and ledger are still shown, without boot-fact context.".into()); }
     let delivery_refusals = manifest["delivery_refusal"].as_str().map(refusal).into_iter().collect();
@@ -251,7 +254,10 @@ fn guards(unit: &Value, manifest: &Value) -> Vec<Guard> {
         result.push(Guard { phase: "contract".into(), requirement: "LOWRAIL_SEALED=1, production, sealed-only units and SEAL001–009 no-mutation contract; cached hooks are not completeness proof".into() });
     }
     if unit["facts"].as_array().is_some_and(|f| !f.is_empty()) {
+        result.push(Guard { phase: "admission".into(), requirement: "Hook dependency: selecting this unit requires ModuleHooks and ObjectHooks for method-fact invalidation; installed identically with LOWRAIL=0, without activating guards or delivery in that arm".into() });
         result.push(Guard { phase: "call".into(), requirement: "Guard.validate: recorded receiver/method owner, source location, visibility, receiver/subclass/override and optional route facts; original body on false".into() });
+    } else {
+        result.push(Guard { phase: "admission".into(), requirement: "Hook dependency: none for this unit (no method facts). Other selected units or source delivery may require hooks; sealed status alone does not remove a dependency".into() });
     }
     if unit["pass"] == "sealed/form_scaffold" {
         for (phase, requirement) in [

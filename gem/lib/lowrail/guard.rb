@@ -52,8 +52,26 @@ module Lowrail
           V.clear
           return
         end
-        Module.prepend(ModuleHooks) unless Module < ModuleHooks
-        BasicObject.prepend(ObjectHooks) unless BasicObject < ObjectHooks
+        install_hooks(manifest)
+      end
+
+      # Only selected method facts need invalidation. Facts-free sealed units
+      # use their own certificates, not these hooks. Source delivery also needs
+      # ModuleHooks to rehook a later Bootsnap prepend. Install the same chain
+      # in the explicit off arm; its empty indexes leave app methods untouched.
+      def install_hooks(manifest)
+        return if manifest.refusal_reason
+        selected = ENV["LOWRAIL_UNITS"]&.split(",")&.map { Integer(_1) }
+        invalidation = manifest.units.any? do |unit|
+          (!selected || selected.include?(unit.fetch("id"))) && !unit.fetch("facts").empty?
+        end
+        @names ||= {}
+        if invalidation || !manifest.files.empty?
+          Module.prepend(ModuleHooks) unless Module < ModuleHooks
+        end
+        if invalidation
+          BasicObject.prepend(ObjectHooks) unless BasicObject < ObjectHooks
+        end
       end
 
       def installed? = !@manifest.nil?
