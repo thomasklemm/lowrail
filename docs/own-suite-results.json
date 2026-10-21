@@ -1,5 +1,69 @@
 {
   "format": 1,
+  "admission_and_baseline_follow_up": {
+    "checked_revision": "bda793a5eb2b962ae385929f295adb110667b9f7",
+    "rechecked_after_pull_revision": "497d69647f7c0f4839890bd2ef27153c3cfcb29a",
+    "ruby": "4.0.7",
+    "blog": {
+      "sealed_test_build": {
+        "command": ["lowrail", "build", "APP", "--sealed", "--env", "test", "--jit", "yjit"],
+        "exit_status": 1,
+        "error": "--sealed requires --env production and cannot be combined with --passes; see docs/sealed.md"
+      },
+      "explicit_passes_test_build": {
+        "command": ["lowrail", "build", "APP", "--env", "test", "--passes", "default,+sealed_link_to,+form_scaffold", "--jit", "yjit"],
+        "exit_status": 1,
+        "error": "sealed passes require build --sealed and the separate production contract"
+      },
+      "production_manifest_unchanged_sha256": "7a2cbed37db4027d16dfa431f0249221c1f74dcca63c97f4e7a0f2a95f924362",
+      "runtime_probe_environment": {"LOWRAIL": "1", "LOWRAIL_SEALED": "1", "RAILS_ENV": "test", "RUBY_YJIT_ENABLE": "1"},
+      "runtime_probe": {
+        "certification": null,
+        "admission": null,
+        "current": "yjit",
+        "after_initialize": null,
+        "drift": null,
+        "refusal": "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+      },
+      "legacy_form_runtime_inventory_check": "form certification requires runtime controller/view/I18n/ERB effects; passive activation unavailable; keep original",
+      "post_pull_form_test_activation": {
+        "state": "refused",
+        "attempts": 0,
+        "reason": "production_only; this test runs unoptimized; terminal admission, attempts=0/1"
+      },
+      "post_pull_recheck": "CLI rebuilt; sealed --env test still exits 1 with the same error; runtime_probe repeats identically. Owner commit 91d76da adds passive production form admission but does not admit test. Legacy inventory refusal is no longer the new activation path; old effectful certificates require rebuilding.",
+      "optimized_own_suite_status": "blocked; no new suite run or active per-unit coverage claimed",
+      "proposal_not_implemented": "Owner-scoped verification-only test-environment certificate, built and admitted in matching test environment with all other certificates/contract checks retained. Reuse the owner's passive natural-render form witness with a fresh test certificate. Do not restore effectful activation, delete production predicates or relabel production certificates."
+    },
+    "fizzy": {
+      "classification": "dependency-overlay API incompatibility: Rails 8.1.4 removed the internal reset_all API used by this historical app",
+      "app_helper": "https://github.com/basecamp/fizzy/blob/6f1d200316ec3bae91d32c557d88647300807ee9/test/test_helpers/session_test_helper.rb#L22",
+      "original_current_attributes_source": "https://raw.githubusercontent.com/rails/rails/5520bd835e3724ffafe3f719f9aafe951567f2f3/activesupport/lib/active_support/current_attributes.rb",
+      "original_source_sha256": "72be134546beee49f786a6cd55e06090a1a9cb27ab1334aae41caf0c277dad2c",
+      "api_removed_in": "https://github.com/rails/rails/commit/475877fc5e2fffbb80c654c5248b5eb6a5cf587d",
+      "probe_scope": "Fresh Ruby processes without Lowrail, loading the unchanged app/models/current.rb. Only the CurrentAttributes source file changes; Ruby 4.0.7 and 8.1.4 support dependencies are held constant. This is not a full original-stack suite run.",
+      "installed_api_probe": {
+        "ruby": "4.0.7",
+        "support_dependencies": "8.1.4",
+        "current_attributes_variant": "8.1.4 installed source",
+        "reset_all_on_base": false,
+        "reset_all_on_app_current": false,
+        "call": "NoMethodError: undefined method 'reset_all' for an instance of Current",
+        "receiver": "Current",
+        "method": "reset_all"
+      },
+      "original_api_probe": {
+        "ruby": "4.0.7",
+        "support_dependencies": "8.1.4",
+        "current_attributes_variant": "5520bd835e3724ffafe3f719f9aafe951567f2f3 source file",
+        "reset_all_on_base": true,
+        "reset_all_on_app_current": true,
+        "call": "ok",
+        "session_after": null
+      },
+      "baseline_status": "Current overlay remains red; original-stack full-suite greenness is not established. Requires an approved compatible app/dependency pin or upstream helper change followed by a full rerun; no app/framework patch applied."
+    }
+  },
   "recorded_utc": "2026-10-21T12:58:45.800649+00:00",
   "tested_revision": "74abb60fa1f24dff3618ccef70b21b91ac61fc08",
   "environment": {

@@ -864,3 +864,86 @@ totals. Cargo tests and the Minitest reporter's 4 tests / 83 assertions also
 pass. The complete strict E2E file passes 18 tests / 345 assertions with no
 skips, including its existing 21-test blog hook gate. Runtime, lowering,
 admission and reporter code are unchanged.
+
+### Follow-up: optimized admission blocked; Fizzy errors classified
+
+Checked on [bda793a](https://github.com/thomasklemm/lowrail/commit/bda793a5eb2b962ae385929f295adb110667b9f7),
+with Ruby 4.0.7. The existing CLI cannot produce the requested test-environment
+20-unit artifact. Both commands exit **1**, leaving the production manifest
+byte-identical:
+
+```text
+lowrail build APP --sealed --env test --jit yjit
+--sealed requires --env production and cannot be combined with --passes; see docs/sealed.md
+
+lowrail build APP --env test --passes default,+sealed_link_to,+form_scaffold --jit yjit
+sealed passes require build --sealed and the separate production contract
+```
+
+| Check | Observed result | Optimized own-suite coverage |
+|---|---|---|
+| Build sealed artifact for test through CLI | Rejected before build, exit 1 | Blocked |
+| Load existing 20-unit production artifact in test | Whole artifact refused | None |
+| Current form activator under test | `production_only; this test runs unoptimized; terminal admission, attempts=0/1` | None |
+| Fizzy unchanged `Current`, Rails 8.1.4 API, Lowrail off | Exact `reset_all` error reproduced | Baseline diagnosis only |
+| Same model/Ruby/dependencies, original pinned CurrentAttributes source | `reset_all` succeeds; session becomes nil | Bounded API control, not an original-stack full-suite run |
+
+The publication rebase picked up the owner's
+[91d76da passive-form admission](https://github.com/thomasklemm/lowrail/commit/91d76da)
+through [497d696](https://github.com/thomasklemm/lowrail/commit/497d696).
+After rebuilding the CLI on that head, the sealed test build still exits 1
+with the same error above. A fresh runtime probe with
+`LOWRAIL=1 LOWRAIL_SEALED=1 RAILS_ENV=test` still reports exactly:
+`sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized`.
+There are independent production checks in `src/build/mod.rs`,
+`gem/lib/lowrail/manifest.rb`, `sealed_build.rb`, `sealed.rb`,
+`form_scaffold_inventory.rb` and `form_scaffold.rb` (the last four under
+`gem/lib/lowrail/`). Environment equality in `guard.rb` must also remain intact.
+
+At the initial head, the form activator always declined its runtime inventory:
+`form certification requires runtime controller/view/I18n/ERB effects; passive activation unavailable; keep original`.
+The newly published owner change replaces that activation path with a passive
+witness after the first natural original form render, still **production-only**.
+The current activator's direct test-mode probe returns the exact refusal in
+the table, before any admission attempt. Old effectful form certificates also
+require rebuilding. The historical inventory-method refusal is retained in
+the evidence, but is **not** a claim that new production passive admission is
+unavailable. A manifest containing a form unit is not execution coverage.
+
+**Smallest owner-scoped proposal, not implemented:** add an explicit
+verification-only sealed **test-environment certificate**, built against and
+admitted only to the same test environment. Coordinate the CLI, manifest,
+link builder/activator and form inventory/activator; retain opt-in, environment
+equality, source/native certificates, original fallback and the sealed
+contract/deopt checks. Reuse the owner's passive natural-render witness for
+fresh test certificates, rather than restoring the old effectful activator.
+Do not admit a production certificate into test or simply delete production
+predicates. Test config must itself be certified (for example, blog's eager
+loading is controlled by `CI`, and CSRF differs). This belongs to the
+sealed/admission owner. This task made no admission/runtime changes, relabeled
+no artifact, and presents no zero-hit suite rerun as new coverage. Per-unit
+active hits/fallbacks and on-only bisection remain blocked until that seam exists.
+
+**Fizzy is an overlay/API incompatibility, not intrinsically permanently red.**
+The app at
+[6f1d200](https://github.com/basecamp/fizzy/commit/6f1d200316ec3bae91d32c557d88647300807ee9/test/test_helpers/session_test_helper.rb#L22)
+uses the internal `Current.reset_all` API in its helper's `ensure`.
+Its original [Rails pin](https://github.com/rails/rails/blob/5520bd835e3724ffafe3f719f9aafe951567f2f3/activesupport/lib/active_support/current_attributes.rb#L156-L163)
+defines that inherited class method. Rails removed it in
+[475877f](https://github.com/rails/rails/commit/475877fc5e2fffbb80c654c5248b5eb6a5cf587d),
+before 8.1.4, switching framework cleanup to `clear_all`. The overlay therefore
+removes an API this historical app calls. `Current.reset_all` now falls through
+the class's `method_missing` to `instance.public_send`, explaining why the
+error names **an instance of Current**. `clear_all` drops the registry;
+`Current.reset` only resets that class's instance, so neither should be
+silently installed as a compatibility alias.
+
+The control loads only the original CurrentAttributes source file alongside
+8.1.4 support dependencies, then loads the unchanged app model, in a fresh
+Ruby 4.0.7 process without Lowrail. The original API succeeds and the installed
+8.1.4 API gives the exact seven-test error. This isolates the API break from
+Ruby/Lowrail; it does **not** prove the full original dependency stack green.
+The [evidence](own-suite-results.json) retains both probe outputs and source
+pins. Keep the current overlay as a red negative control until an approved
+compatible app/dependency pin or explicit upstream helper change is chosen
+and the complete suite rerun. No app or framework patch was applied.
