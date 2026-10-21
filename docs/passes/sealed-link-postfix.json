@@ -1,0 +1,5148 @@
+{
+  "format": 1,
+  "scope": "Finite post-TracePoint-fix link pilot; retained rejections, no retries or default promotion",
+  "pins": {
+    "head": "cb832658d52e0a9f440d51ccac7dd985ceb09f2a",
+    "build_jit_flag": "0",
+    "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+    "lockfile_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+    "corpus_source": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+    "runtime_files_sha256": {
+      "lowrail.rb": "2f4248dccf3619f6768cdc5d1a0cb12bea1bfce40876b54bc0ee0a22e1b7a31b",
+      "lowrail/ar_guard.rb": "056647c46829f7013031e392342239513ca73ba4f599e634c83b8f82c73b133f",
+      "lowrail/ar_instantiate.rb": "5d59e8983fa6781977ac1743f0d2e4f79acf1083f0748756d322125c3f44314f",
+      "lowrail/ar_instantiate_build.rb": "0bb41782f7c2bf7ad975177c1f03986b1d7c38c560e0bc11fa8ae008efbde1f8",
+      "lowrail/ar_plan_build.rb": "20606044a887d968156d498a61216961fe8f49cac349a416ebbb798c22fe45fc",
+      "lowrail/ar_plan_facts.rb": "dfd04d08ab7e74a7ed7b30fcf53ff2bc6001d3ade6b85644ca12c372ead47d9a",
+      "lowrail/ar_plan_sites.rb": "0bf7051d9af853c832c69426623ccb920490c3c05b136738c84457601c7d2dcb",
+      "lowrail/ar_plans.rb": "899a94ad12d1f2c45b5dda3f0cb74ae88dee61756404b0c7b6d45cffc827e8a6",
+      "lowrail/ar_shadow.rb": "6d95adb126d88f62c74bc9c5858bdffe2d41a017ae19e030f9b375b277afb422",
+      "lowrail/compilation.rb": "6263ed051b2de96d6d6a3ab93d63f6a47ff4d83d885a524ab87528c77a08c145",
+      "lowrail/compiler.rb": "a82eba9b251f717ea51ebd050a082a703cce178ab9ed376ded02e166e05e72ab",
+      "lowrail/digest_memo.rb": "affea7b66a0cb357b2e81b49453dd5d5a856e983b25ecf58637b5a590ce34475",
+      "lowrail/digest_memo_build.rb": "473cb2383546b0f674d9e3bae970603230dbc8289768fe0d11ec85eec9ede2fa",
+      "lowrail/endpoint.rb": "0e76c7dc06f71af7498759041655b33b0eef07b4cd8c147152be86669445f90a",
+      "lowrail/endpoint_build.rb": "f879fc7ea70028062daea277b2235703a8b91e71151b8f68edc90e85e3fc2063",
+      "lowrail/facts.rb": "2a11392a9506b7ff1cb8f423154f2d4c5217820a1cf85088c85dd79a18eb1756",
+      "lowrail/guard.rb": "189ad92f5963f57bdd4d0528fbc9a4fcb2ae15db2e1aa2666210f4b86a74f3fc",
+      "lowrail/inertia_config.rb": "270bbcc9621cb5512f8b0777fdd5f2772d2f1e9ef7a54e3cd5446480b668e7ff",
+      "lowrail/inertia_config_build.rb": "d4ac21ee498700ec426c96b7d7efceacf5cea9b627ee484278a6a9827d9af3bd",
+      "lowrail/inertia_props.rb": "2063023df8f23ef89c46abdfa448693166efdb1c5c0eb1d0546f64ffae4d8259",
+      "lowrail/inertia_props_build.rb": "15eae72432076a3b8f567737ac9e26d074ac152b5f10b174ad42a2833ce422e5",
+      "lowrail/jit_diagnostics.rb": "d7c6d8dfd9494e1f496b48f0650c342a91410da7ba899c38a0937f18dafebb18",
+      "lowrail/jit_shapes.rb": "046d58ec87e394fbad13974bd4d8abae2361e8b3aaacdc664072c5f7f0e57ffb",
+      "lowrail/load_hooks.rb": "7b9a49ae7349b8faa421ff582470cb7960a4ea35ce99f23224536a5f93ad3091",
+      "lowrail/loader.rb": "63d668be59cc322abbb0dbc68fc0889efcd864b500f616ee1e7684caa0ac78f3",
+      "lowrail/manifest.rb": "afdfb3928895cf1fff17805abdb700cfdce90d876d3b8383bcd3a1aa62b2d8e6",
+      "lowrail/materialize.rb": "1c5e0f460103b3e5b3c3b5455f7cc67135fd18068505bb4041a522e47f75a2ed",
+      "lowrail/memo.rb": "645a9f88bb9c114345a50f090860f9365e0d8b94c4bbc6aa3130afbb22771a9f",
+      "lowrail/memo_facts.rb": "75a40a2bad4fb0a118d970db55e2728587a101fdbec28e0515ecb7c02cbe2018",
+      "lowrail/minitest.rb": "257e67267cb2d3de020b3cb5c938fcecb73d83de8f447bdb65737a4637a9a17b",
+      "lowrail/observe.rb": "aa25c1e137426e82a72e30a292233de3435061fb38bcc30faea297ded575374f",
+      "lowrail/oracle_routes.rb": "3e5543c327ea86c306f288df386e98efc14d7741541ed6e7d2caea252b354802",
+      "lowrail/passes.rb": "f5fe5ce3c1cb42749a861acd1a97978795b805b3757af22cd3ae15f02ed0c53a",
+      "lowrail/paths.rb": "7b593eb4bf81399ab33603f8fea705ef58f54d81d3ea2ca3e407a305879baecb",
+      "lowrail/preload_build.rb": "5d562d1c33884481c73ca3f0fd89f33d776dfa01fbdc3267880a24e6e2021b28",
+      "lowrail/preload_facts.rb": "89f08a90fc97e4a1e502bae7803fcc369bb2d57bf58d29b79eaa643c1cd5c099",
+      "lowrail/preload_plans.rb": "427b19500eb8e346aab995798c309fd37c0a06a5a8e49600e9a1676a6f16c501",
+      "lowrail/routes.rb": "4c5b749e77209c7a306d6c716e4d37dfe14d53e80847b7a0f9ad714eb54c0f85",
+      "lowrail/rspec.rb": "790c1fcedb5df0834909632d69e8e48cbd0769d6576efc1c6b3287ae07a31422",
+      "lowrail/script_capture.rb": "027a119d9b2bbf342fa44fa276f22c86b9643d8cffd632d78187eae25a53153c",
+      "lowrail/seal.rb": "358d59c7b51f5255c2649a624d0ea3f6dc2869bd4a4aaa82823ef054c1462805",
+      "lowrail/seal_rules.rb": "96d7ed8f0681e70600d1a12c9269aa201af7902886c3b23949cea892d11c48b6",
+      "lowrail/seal_snapshot.rb": "85e14c98ac1ddcfe0405c6ae7c742b0c101dbcf52a668fccdc55ee82ede304e4",
+      "lowrail/seal_static.rb": "981e5f9cfa1d68ebb5809f46fed1cd97bbb2fc8232d353eb69a0b1c463a82c7a",
+      "lowrail/sealed.rb": "c3000718baa41b3d669311f1b1d080750895b80386016f04e43ac373bc5bab13",
+      "lowrail/sealed_build.rb": "da5312b0582ddd1f1f18b2f8938842066b4fa0fee3a41d84a4ba48ffa54bd78e",
+      "lowrail/setup.rb": "af25949b57a7189f00f968020ed74d78aefb7a2c5577f0a7f3c67a4a098d0f9e",
+      "lowrail/sql_trace.rb": "32ccf8ceec5d42882995801e915ff3f4b48bbfa1e5f8e4f6b50fe11e61114e43",
+      "lowrail/stats.rb": "cdc78ed35415d55e6a32ffaa5f2c5aba5809f8b4608fa00f3452db85df464e95",
+      "lowrail/templates.rb": "61d00351ca8a193f40f7ccdad57d0381f63f3dc7b45830780263d272c2423092",
+      "lowrail/verify_loads.rb": "cb30d406367c70d5fa3931935b3645e2b1e84f4aebc92712d95c82f8a721037e",
+      "minitest/lowrail_plugin.rb": "9f05c90d5c1fd15acceeb54f75b16e57e2cde4fe796fe97f6f3f70f3e7119911"
+    },
+    "harness_files_sha256": {
+      "ar_cached_reader.rb": "6e8c9b6083643c3405dfdff1e8a25e3cb660c57827163108141530a25e10f8f3",
+      "ar_chain_ceiling.rb": "394745f0125c081d4215f38711ad8f6a8c90cf97ec3e2671742b9d71648c5837",
+      "ar_equivalence.rb": "26a6dcaffc41e9ece189cb1dfb3c64ec512f21a731a0cc3ac05321eca31b21c3",
+      "ar_equivalence_models.rb": "6289c9a3188e409fcb121d7b6e8b2e2114cf43b2b31092f460f8b381e176b582",
+      "ar_equivalence_runtime.rb": "cc766d2128b3bb3d0a32b4401454373253a306ec4c71420d47d25d5f3d47e2af",
+      "ar_instantiate.rb": "f11054e3422991ccf2ecbe73c09d2289ffd3c86cee28967ddd2855a3b13ef38b",
+      "ar_instantiate_runs.rb": "be152c93857f34044ed39fb4b478d997dcb0f19c4d468b33e70770d32432c68f",
+      "ar_plans.rb": "bb233f137e1d24aef6eecf8971c899f7ad7643adb2b27f7d10287f954453ed45",
+      "ar_plans_runs.rb": "c15c5c874bb7e2930d278332abf0dc4d67736e0ac44e3394589f7cc3a2790cb3",
+      "ar_profile_summary.rb": "80d9c050004e7ab17adc175529d631f6943d87a34077a8f6c8c5e7ba5277a924",
+      "ar_rails_suite.rb": "d80a1c507fb8ba50d23bc9059db4d0ab4680fcf6ad9af8eb7d8c21b5d7d786d6",
+      "ar_request_hits.rb": "98eddd64861bb96e6d2af3bfcd3d240d71821a0c94b1f21cbc59bb2d7ec7ecdf",
+      "ar_shadow_cost.rb": "115134b1a8675592ac5a71d2eaa6a710b534d15ecd5a648ad4253b1b06da1910",
+      "ar_survey.rb": "14db5b6e70fa2bf7d636d5bbc1ef3bba3fe7a0713fe2c62eb295a7b8cdd5deb9",
+      "callback_survey.rb": "0f214ef1a9b75f681ec1ca0317176d50c6cb760b905b3e19aabb6264c7378bc6",
+      "callgrind.c": "b6d7ddf7667884c32b6c363f4e3a718e5ac5a8b75ce550e4d236fe6b4baec2a1",
+      "campfire_setup.rb": "2de60b8446780177daccceb761073b27deedacfcdc19276e3f2896fcc5aa2e34",
+      "experiments/allocations.rb": "757793e1ae8decd5f7a696010580e4281d715ad12b10d310e65f7ba9e445a93f",
+      "experiments/allocations_micro.rb": "6278da0b6778a0c8200c0f5d30dc8e900109ab0dc6a7adf6846ec8c2f27e130f",
+      "experiments/allocations_micro_study.rb": "ba0b22ad79aa2f909ff24145392831fe62954d4cfb691659df0ccfe63c29ba60",
+      "experiments/allocations_report.rb": "e0ce9021f82c6c499429d62de08d0b1299fea1d73fb8c7dc87059ba054ee0e43",
+      "experiments/allocations_study.rb": "f056add0e8463d283c475f0d29888ddaf56ac7190658f3bfbe684a61d82aec6c",
+      "experiments/blog_ablation.rb": "28ace24f1f206689b20c2360d4283d713f9d76abeec5870c6f6b703444cc1491",
+      "experiments/blog_check.rb": "81200ab7e575e4cd3275ffe11ac6f220e2c8fb4c01ce5788d66d6310b340396a",
+      "experiments/blog_decompose.rb": "12624e24a7aa6904245a829fe10023dc1eb5d5d63fc118f0d4a50f172448bb54",
+      "experiments/blog_endpoint_check.rb": "13be837425cbb34f6e509c1f8a35dc8327fa0bc0dc3ed2ef422e73d4870c6d01",
+      "experiments/blog_eventful.rb": "fdacc686e5e076e26255d5ff4a90e958d524725e9f1b062b3fa2b742c8269693",
+      "experiments/blog_events_check.rb": "b297d1e8ac6a7462e10c3e7265b5327b4a82b4f1aeb49304773fd5ab85b14c53",
+      "experiments/blog_layers.rb": "2fad724d077596d05e62619d79390b85bf0048a46f2a8b94734032ea7f28e49c",
+      "experiments/blog_profile.rb": "aab936b0c27a1364aa507e6f8a82750d18ef7611b67124345ff73c0c9e9c1f06",
+      "experiments/blog_study.rb": "f36aa5be8a6a76fc56f7bf7c610b48dc7917787999fbe550392e64cd4e50b1e2",
+      "experiments/blog_test_shapes.rb": "78293e0f4f478a6ea4f92a6debe5b23bad5ebd82a42cb38d77f0189247edede8",
+      "experiments/constant_epoch.rb": "e4c295b4eee8522326d4a2c70f6d362bc1705afb5f49f6c782e5cb9e89da36be",
+      "experiments/endpoint_bodies.rb": "d8eb742ab59343070bcfc63688c6abb18d88514bcf4cbcadabfe3048d6b0f11d",
+      "experiments/endpoint_sections.rb": "ffc007801cf4fe5cc5d4815c23af9c4092dc8b1957d7e69cbef682016e11c6ff",
+      "experiments/guard_inline_cache.rb": "52fb6c860944f4dcf1c3b08233180f926d867a0c5b178c21327495bbd213bc99",
+      "experiments/hotspots.c": "d67ddb204ce939bcb189387fb31c01ba9f86dd14976ce330b77c416eef90da9c",
+      "experiments/hotspots.rb": "92f05e5ab76dfc9740959cc734b869d73c14580c8fbc735ff20978d6314d528d",
+      "experiments/hotspots_detail.c": "9051968f268a831fbf1eb00d182a9b0cf8911459fd810e9f6f139ff25964025c",
+      "experiments/hotspots_detail.rb": "cf0c76ffbf3f843ec9e788db34871f58363a4d51f7af1acab68bd88123775777",
+      "experiments/hotspots_report.rb": "e55d647850ebe1ea76296fa1a2eae511035961b1069db23f33eb427141b468fd",
+      "experiments/hotspots_study.rb": "98358b204bc148a95a10d9d42fa987512c3a6e3a27e4c57a9e44cc947a9aa875",
+      "experiments/sealed_helpers.rb": "92bcf073df06fda701e8759a4b3e43248a1b3caa71ed9afa6861e02449a6c4b8",
+      "experiments/sealed_links.rb": "951ea314ef5026e10a17d1bcfb366a322b1d0aa0f7450c2a5e66225560dc4ad8",
+      "experiments/sealed_provenance.rb": "4548a32a7a1d2dcc0da61c86ed53454892c5d93dc0fcaca6ab6c4a89ce9c225d",
+      "experiments/sealed_renderer.rb": "9daf4968f4d2d7d1a8529f8458b26222b6121c2ac6ebfaa4617fdd194194ca5a",
+      "experiments/sealed_renderer_report.rb": "596b2e68fc548c4654d2c43dd3c13a5bd8c120de1e1ef606b05c382e2dcc4b52",
+      "experiments/sealed_renderer_study.rb": "b4496601feac67c8896ed27c71804b7c9f52c33e8aa7d2936e745978ad214b31",
+      "experiments/sealed_renderer_worker.rb": "25481a79f80d9ab0d043d30742097a05b92433616c6355e118c489118cae4059",
+      "experiments/sealed_residual.c": "fbacc18f67ce5ebad2fa082dff09434e51f6ced737ef094761cf8006e48b891b",
+      "experiments/sealed_residual.rb": "383b13320effdab80e3bd3ed8c359929ace2bcea161d62f29e35c7c4c9535fb9",
+      "experiments/speculation_context.rb": "8e4474bd364581ac8c24e5b25cf7cd9802940f5f53404990be7f37c372a99271",
+      "experiments/speculative_build.rb": "1765156b4c113084b5471ff0341cc199f382eab94c69ab63eb04c403f3ca5834",
+      "experiments/trace_stickiness.rb": "421d1971cfd4d3b7ae034d5ef928eb724a82242da6175299cb753436bc338a96",
+      "experiments/vm_epoch.rb": "67f79131db4f08d27dbe41ab143d4f335bfd9d01a192f5e27afa8e453c2e5570",
+      "experiments/yjit_regression.rb": "dfb4fe05a581b5ba62ae386a833681c3470f459e5d495de31b938611e0625e45",
+      "experiments/yjit_request_probe.rb": "1fb5f9cbd466acf098768c01b576be0a002a5df675a834e318441f0366d5052b",
+      "experiments/yjit_study.rb": "a5d44d311f9b4500faa639800553dae5d79faaf9432505cf89addd92bc0dab80",
+      "gc_requests.rb": "44da6cc09a6c74cedb882041afe9a742d6174a46bcc9a6e78f266784ebfa9203",
+      "guard_breakdown.rb": "c257e65f68bd9b68a3b5973daa6acabb79dce967545a88d99119880ccaa431bf",
+      "guard_cost.rb": "d7d47ba9c13db7ccf015ecd637d6b67a994ef11688345b000d2caa4dd09e135e",
+      "heap_operations.rb": "e6035573a092faaff53675abc48341f224d9856efaffd4a910bc9f88e411faea",
+      "heap_requests.rb": "5e07e8e6ae78890513e6fdfb2a20532c734d66c5fe011cbfc04ee695367b744f",
+      "heap_windows.rb": "9f6775411bc03df75fe0461af8e001a9b86d5ce4ca2bda6a7aba200c53f1ab95",
+      "importmap.rb": "f935e15582b0852e2c8f8d62a162518dcfbd9d6b5ecc1627ca0d08ff74c7a039",
+      "inertia_config.rb": "90cf5d636a027e0ee83acff43081f8d9440f11ee512ce7a380171940b864979a",
+      "inertia_setup.rb": "ed465ba324c31ca11c3704c5893ec94b9dde20aef9a3ee86cc02cde5b80d2e37",
+      "instruction_budget.rb": "7835780b63d22624f98fc6de5fdda2786e2f4a91162a87882f3acc33578eabb2",
+      "jit_stability.rb": "5ab9d3741b0599d279a76098fced9414c5126fb81add4d7b1e29ccc89ba6cace",
+      "memo_check.rb": "19a6ac35b9b9fb55424cca1702ba049e9605177d4dc3c62ce1b5460d824dcde5",
+      "operation_capture.rb": "4407542e1c9dc61a30201b4b3e5e6c19fa460db2ed0b8a9d18259b0118fa0894",
+      "pass.rb": "6f7ec9d3712c203d71597792311f60af36bf06f519d39a4057d03bac03736314",
+      "pass_probe.rb": "cae6c6b252e5e3475d45d3054c54ceb87d66b6f64601b209b708df80da536dcd",
+      "preload_paths.rb": "635c89211fab02b46e3fda04ce0a5714a0565e9be9577a54ecd4029b6c0421f1",
+      "profile_summary.rb": "37befeeca1315c6c3e8fa6c00b11e2bac8f87c7ed0648bb64bd8f29c618eb702",
+      "rails_suite_profiles.rb": "40a8c03f5bafc1ffee8aed8d9693827ad71bca7dddfbeebfddc82fad127d5f41",
+      "rails_suite_report.rb": "d772c6c9f3edc27df5c8864ddc3ea33ff88c176e9bf7c20cf9e5dc11c2b892bc",
+      "request_pairs.rb": "6d56b51681e62f5e1ecb8e1cc543ff1ffdc21806135437f73e84a39218d6698b",
+      "requests.rb": "b92ea40c2eee4a06f4cb993a103ca248d7937c739e5ad9f77951c44582d9237e",
+      "routes.rb": "57979254f6912136d73a23b50a5cb8fcfc78b902ffe5a44f13782d238fad1154",
+      "speculation.rb": "fccada3c2c0321515c561cd27293786e133a5be984015645007dc0a9e704efc6",
+      "speculation_holes.rb": "c2e5afaa123266e897c27e32060991bff38060a5afc7e92c9401b92cd6c0d19e",
+      "stack_budget.rb": "461eb868e42a04562486bf736cf13173a294e3a105eee506c5426d8d6fb6de3f",
+      "string_blank_backport_audit.rb": "1944e1694be1f31e433b9bc8a2a84094396d238f7dfb32e661aaa91e4dbf9d29"
+    },
+    "sealed_sources": {
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionpack-8.1.4/lib/action_controller/metal.rb": "c8559e0a0c9e40ac9a29a4ae01de7c9aab7c438e1af751368e10e3802024cb36",
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/tag_helper.rb": "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/url_helper.rb": "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/core_ext/erb/util.rb": "1e348e9c8840caa9942691a290e0424c1755256b03a90eb96a094bbf86ff368f",
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/core_ext/object/blank.rb": "203eefc5b094f4a0f5bf68b4c34198891127f52ed7825e146c2fa089a46f8ec7",
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/core_ext/string/output_safety.rb": "8d8c461dbcd14db6b894671a1ec53b03c39637a67c27222e7d22bbe3c2f411d6",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/Gemfile.lock": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/controllers/application_controller.rb": "2dbc62a952370be917a271f7814f9d45478d665e9157f12d57ab2b3644cfc2fc",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/controllers/articles_controller.rb": "f4925b0f6b558f2c5e0efce69e3550bef300f20b919f5203a627ad2ba4954806",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/controllers/comments_controller.rb": "c36ecb36a0f49a07d6e0637d29fb72701fdaeba58d575bbed3f89d117cc3f536",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/helpers/application_helper.rb": "f77fac5ea412dbed92c4524fe0ed180acb2b7239f84daf758da989032301f5c8",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/helpers/articles_helper.rb": "55fb4801454bba81425ed07d5c87ef3ca043ef01454ee2ad25bb1abe9b7e6566",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/helpers/comments_helper.rb": "cd879781aba453d17cddbe0938497e21da2338ba3bb97085951b465e9ac396c6",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/jobs/application_job.rb": "d51e125007521b0f59765422cf3cf949b59b2054cdac6567a95b4a7aeaf1d722",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/mailers/application_mailer.rb": "51b58ee6215d29f50f4f35b309e849766e40f584016e48ec9ea66558ab352fa7",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/models/application_record.rb": "12bf7d0eaefce4d50e0719991e19b48a36a7865aeb7ac745980584806155fdc1",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/models/article.rb": "90157f73bc572b264c09b591a3a02176f5deae3afec530d32c7d4b445f13fd76",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/models/comment.rb": "772299e4a7b3c50f7b8a576af71387b4b54d7d79cf367cb905bdd368a70381b3",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/application.rb": "2c8eee4972420e4e9c33e0e2e8b71b6c58ffdd61934fd903503f25a25cd108ca",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/boot.rb": "bb5a9499136e72c70c557bc3ff4d2661cc9b05dc5b848fb720540e3fe716e4ea",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/ci.rb": "ac7709eb3bcfb751062fb259c3e32eb0645249286d43d6886e3a99d5ba0d76d5",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/environment.rb": "73b2e731e02cedb9dc0335e1a35c3a2b7738032e3aa7e62ac32cbb8432b43c69",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/environments/development.rb": "0d8297c851e8127c69cd5c9269232f0c38dcc84e7fb3176d1fe46655e980872a",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/environments/production.rb": "4e1ebb6a51314f5d504a054fb2ab1bc4876fc651eee3adfb0386331d87a2fc2d",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/environments/test.rb": "b3208a3cb7383c4383dfa44d815fd0f942d03ca64ca2ca06a104aad9773403e2",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/importmap.rb": "148fdf21d156d2d1274627caa734d3e2d05ce23ae60e6a371fae054933ca30be",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/initializers/assets.rb": "f55d4ce66ec2b48256ff492c99c7105b7cc1726c78789dffdbee2611e193c1a6",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/initializers/content_security_policy.rb": "ce826e17b3fb793bff050c64f2d515da14b0a63b77f0144368646597075fbdd5",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/initializers/filter_parameter_logging.rb": "f864bd67e7bdaa63a5331b9fc15446613c410c3a314cd70d1b6a7c8b566b6120",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/initializers/inflections.rb": "e2c18b803625a073b25e4ee4460677da33a8bf19bbbcad629718a8e15c58acc2",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/puma.rb": "be1d845c72a6c48ee64662549d55a74d3c0142cb6c6e5574a8eb1ff122f71f20",
+      "/home/user/workspace/repo/.corpus/real-blog-r4/config/routes.rb": "4a7649f9f5e4dea06bda1a784fb32511dfcc51a98d035a1fa0e7a3a376ea515d",
+      "/home/user/workspace/repo/gem/lib/lowrail/sealed.rb": "c3000718baa41b3d669311f1b1d080750895b80386016f04e43ac373bc5bab13",
+      "/home/user/workspace/repo/gem/lib/lowrail/sealed_build.rb": "da5312b0582ddd1f1f18b2f8938842066b4fa0fee3a41d84a4ba48ffa54bd78e",
+      "/home/user/workspace/repo/gem/lib/lowrail/templates.rb": "61d00351ca8a193f40f7ccdad57d0381f63f3dc7b45830780263d272c2423092"
+    },
+    "sealed_templates": {
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/views/articles/_article.html.erb": {
+        "source_sha256": "e2f5347453d774749eafb81769efef719516e01b2571764e2bf1d401b584e0a2",
+        "lowered_code_sha256": "1ca64332288a5d1c70b86cfd871d1ae18f50a11db1d164a4b7548aa8a96c1d35"
+      },
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/views/articles/edit.html.erb": {
+        "source_sha256": "16c4524f1006dacfe139a16ed80e67675148ea46b3ee4434dab48db795524775",
+        "lowered_code_sha256": "4cc7e40ab97c0b933751f1305eb9882c360dad3dcd918d63ce9a4e541419a683"
+      },
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/views/articles/index.html.erb": {
+        "source_sha256": "274f31ad1942fadca30816a3d3d6eed2658aee6efa412c3b02a664fd6cc9ca85",
+        "lowered_code_sha256": "4066f84d2e4c6094e18ea992aedb155c0ed7d11f22beffd4408d972853fb2287"
+      },
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/views/articles/new.html.erb": {
+        "source_sha256": "ae105f43e9453aec37b9ebc1f52a2e03cc88310a0e069277b2b0934a8c11e4c0",
+        "lowered_code_sha256": "288088db9a3fa577e83555af5dc45d306dd6986bcc2e455de50e28aadee26924"
+      },
+      "/home/user/workspace/repo/.corpus/real-blog-r4/app/views/articles/show.html.erb": {
+        "source_sha256": "c741ec85c511a450527b75f1cc516cc259ee0a2c5e7a291ddc7c41676801e6de",
+        "lowered_code_sha256": "ed3ad523fb419f857578389b05f2fc9c5306b8327f61e1567b0596a97b2cddd2"
+      }
+    },
+    "delivered_files": {
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionview-8.1.4/lib/action_view/helpers/tag_helper.rb": {
+        "iseq": "iseq/d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c.bin",
+        "source_sha256": "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
+        "lowered": "src/runtime__0.rb",
+        "lowered_sha256": "4b06cf2a81dcb286482d23f3bbe9b2bbf518cfb3cc1b1b8c48e5663e68802d0b",
+        "iseq_sha256": "d95122f02b64e784fad19dafc584994af03c337fad436ee8ead437003c997e3c",
+        "original_iseq_sha256": "7248f507d9f6241f374272d0cf2c6eff0d1c24c7e8e5da8c32410efc1af5ffa8",
+        "portable_fingerprint": false,
+        "compile_option": "597d78d066183580433870c4742521b7ee5956736f06d9131814dfd387e4e278"
+      },
+      "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionpack-8.1.4/lib/action_controller/metal.rb": {
+        "iseq": "iseq/bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0.bin",
+        "source_sha256": "c8559e0a0c9e40ac9a29a4ae01de7c9aab7c438e1af751368e10e3802024cb36",
+        "lowered": "src/runtime__1.rb",
+        "lowered_sha256": "cc2492777a4f5e0776701571d288463052bc6f5fb19e9bfc591d644d9fa7983e",
+        "iseq_sha256": "bea055e8ea8afac34d1238fee4bfcac12c93db0877d639becd28eda70ac52dd0",
+        "original_iseq_sha256": "f9eb245bf8771b5e9958d73794033101189b5fabbccda3dc4ef180ad4df5dd68",
+        "portable_fingerprint": false,
+        "compile_option": "597d78d066183580433870c4742521b7ee5956736f06d9131814dfd387e4e278"
+      }
+    },
+    "unit_id": 18
+  },
+  "correctness": {
+    "pairs": 144,
+    "hits": {
+      "18": 350
+    },
+    "fallbacks": {}
+  },
+  "native_checks": {
+    "native-0": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "arm": "0",
+      "results": {
+        "index": {
+          "requests": 50,
+          "hits": {},
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        },
+        "show": {
+          "requests": 50,
+          "hits": {},
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        }
+      },
+      "tracepoints": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "native-1": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "arm": "1",
+      "results": {
+        "index": {
+          "requests": 50,
+          "hits": {
+            "18": 350
+          },
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        },
+        "show": {
+          "requests": 50,
+          "hits": {
+            "18": 100
+          },
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        }
+      },
+      "tracepoints": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "pre-yjit-index": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "arm": "1",
+      "results": {
+        "index": {
+          "requests": 50,
+          "hits": {
+            "18": 350
+          },
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        },
+        "show": {
+          "requests": 50,
+          "hits": {
+            "18": 100
+          },
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        }
+      },
+      "tracepoints": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "pre-yjit-show": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "arm": "1",
+      "results": {
+        "index": {
+          "requests": 50,
+          "hits": {
+            "18": 350
+          },
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        },
+        "show": {
+          "requests": 50,
+          "hits": {
+            "18": 100
+          },
+          "fallbacks": {},
+          "exit_trace_leave": 0,
+          "lifetime_exit_trace_leave": 0
+        }
+      },
+      "tracepoints": [
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  },
+  "preflight_refusal": "Initial interpreter-index driver invocation omitted RAILS_ENV=production; parent admission refused before any worker or measured window. Retained separately, not a measured cohort.",
+  "results": {
+    "interpreter": {
+      "index": {
+        "actual_jit": [
+          "interpreter"
+        ],
+        "actual_yjit": [
+          false
+        ],
+        "app": "real-blog-r4",
+        "corpus_source": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+        "counter": "callgrind",
+        "coverage": {
+          "requests": 10,
+          "route_completions_per_request": 0.0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "units": [
+            {
+              "fallbacks_per_request": 0.0,
+              "hits_per_request": 7.0,
+              "id": 18,
+              "pass": "sealed/link_to"
+            }
+          ],
+          "yjit": false,
+          "zjit": false
+        },
+        "error": "request A/A, heap, activation or JIT checks failed; inspect requests.log",
+        "harness_fingerprint_sha256": "fde0a454a7668a20d7c3354dbf17a8eeed0f75495cbebe254556558de7a7202e",
+        "lockfile_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+        "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+        "measurement_complete": false,
+        "pass": "sealed/link_to",
+        "provenance": {
+          "actual_jit": [
+            "interpreter"
+          ],
+          "actual_yjit": [
+            false
+          ],
+          "app": "real-blog-r4",
+          "cache_mb": null,
+          "counter": "callgrind",
+          "heap_mode": "fixed",
+          "heap_slots": [
+            1000000,
+            250000,
+            100000,
+            20000,
+            10000
+          ],
+          "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+          "region": "after warmup and three full GCs",
+          "requested_jit": "interpreter",
+          "requested_yjit": false,
+          "requests": 50,
+          "rounds": 6,
+          "route": "GET:/articles",
+          "runtime_sha256": "2f4248dccf3619f6768cdc5d1a0cb12bea1bfce40876b54bc0ee0a22e1b7a31b",
+          "seed": 41231,
+          "valgrind": {
+            "build": {
+              "brk_reservation_mib": 512,
+              "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+              "libc": "glibc 2.36",
+              "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+              "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+              "tool": "libexec/valgrind/callgrind-amd64-linux",
+              "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+              "version": "3.19.0"
+            },
+            "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+            "log_sha256": "1d0958d00e30e3c630e3d6965994d5d9d4ca4c6d54dbef5d39b9d7a80de6b7b3",
+            "pass": true,
+            "rails_boot": true,
+            "version": "valgrind-3.19.0"
+          },
+          "variant_app": null
+        },
+        "request": {
+          "aa": {
+            "metrics": {
+              "instructions_no_gc": true,
+              "instructions_total": false
+            },
+            "pass": false,
+            "tolerance_pct": 0.5
+          },
+          "gc": {
+            "default": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "disabled": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "empty": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "missing": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_a": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_b": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            }
+          },
+          "heap_capacity": {
+            "0": {
+              "matched": true,
+              "max": 1000456,
+              "min": 1000445
+            },
+            "1": {
+              "matched": true,
+              "max": 250434,
+              "min": 250422
+            },
+            "2": {
+              "matched": true,
+              "max": 100160,
+              "min": 100153
+            },
+            "3": {
+              "matched": true,
+              "max": 20177,
+              "min": 20175
+            },
+            "4": {
+              "matched": true,
+              "max": 10079,
+              "min": 10078
+            }
+          },
+          "heap_matched": true,
+          "jit": {
+            "actual_jit": [
+              "interpreter"
+            ],
+            "actual_yjit": [
+              false
+            ],
+            "diagnostic_only": false,
+            "pass": true,
+            "requested_jit": "interpreter",
+            "requested_yjit": false,
+            "workers": {
+              "0-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              }
+            }
+          },
+          "layers": {
+            "default": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.3577075900855542,
+                    -0.29091099284997424
+                  ],
+                  "median": -0.3086529897033452
+                },
+                "value": {
+                  "ci95": [
+                    2350.91,
+                    2351.5
+                  ],
+                  "median": 2351.21
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -1.351083661543967,
+                    -1.2738166320284516
+                  ],
+                  "median": -1.282601566003111
+                },
+                "value": {
+                  "ci95": [
+                    8979056.73,
+                    8983817.850000001
+                  ],
+                  "median": 8981447.34
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -1.3580766438300917,
+                    -1.2726939119380887
+                  ],
+                  "median": -1.2995007246717538
+                },
+                "value": {
+                  "ci95": [
+                    8979200.48,
+                    8984846.280000001
+                  ],
+                  "median": 8981144.21
+                }
+              }
+            },
+            "disabled": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.05255294699569868,
+                    0.024174215252281694
+                  ],
+                  "median": -0.009750418990889242
+                },
+                "value": {
+                  "ci95": [
+                    2358.08,
+                    2358.74
+                  ],
+                  "median": 2358.48
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.029486576536325027,
+                    0.023709437120211785
+                  ],
+                  "median": -0.01080217892426294
+                },
+                "value": {
+                  "ci95": [
+                    9096353.47,
+                    9102227.09
+                  ],
+                  "median": 9099815.530000001
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.05864048465115679,
+                    0.01795508624883313
+                  ],
+                  "median": -0.014511709793840755
+                },
+                "value": {
+                  "ci95": [
+                    9095609.07,
+                    9102155.06
+                  ],
+                  "median": 9100095.86
+                }
+              }
+            },
+            "empty": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.04280721345266136,
+                    0.018236044967279152
+                  ],
+                  "median": -0.016108703998080065
+                },
+                "value": {
+                  "ci95": [
+                    2358.1400000000003,
+                    2358.75
+                  ],
+                  "median": 2358.3500000000004
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.08769660734367912,
+                    0.03308130653836283
+                  ],
+                  "median": -0.006966296133859018
+                },
+                "value": {
+                  "ci95": [
+                    9095421.8,
+                    9100975.57
+                  ],
+                  "median": 9097899.81
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.07975576183960609,
+                    0.003946793392040071
+                  ],
+                  "median": -0.027804493006661213
+                },
+                "value": {
+                  "ci95": [
+                    9095287.49,
+                    9099571.71
+                  ],
+                  "median": 9098593.899999999
+                }
+              }
+            },
+            "missing": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.06569282194086035,
+                    0.02459797966101185
+                  ],
+                  "median": -0.034336421754627144
+                },
+                "value": {
+                  "ci95": [
+                    2357.63,
+                    2358.58
+                  ],
+                  "median": 2358.21
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.03386196949500819,
+                    0.052934692091011204
+                  ],
+                  "median": 0.015512179786558722
+                },
+                "value": {
+                  "ci95": [
+                    9098964.28,
+                    9103471.28
+                  ],
+                  "median": 9100614.739999998
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.04816981785116248,
+                    0.039468617492888214
+                  ],
+                  "median": -0.017598707504179467
+                },
+                "value": {
+                  "ci95": [
+                    9097032.36,
+                    9102595.280000001
+                  ],
+                  "median": 9100861.89
+                }
+              }
+            },
+            "off_a": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    2358.0,
+                    2359.4700000000003
+                  ],
+                  "median": 2358.73
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    9097844.67,
+                    9103406.15
+                  ],
+                  "median": 9098654.940000001
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    9098644.28,
+                    9102823.81
+                  ],
+                  "median": 9101416.64
+                }
+              }
+            },
+            "off_b": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.04873917619332979,
+                    0.008481620387323918
+                  ],
+                  "median": -0.020772685772585398
+                },
+                "value": {
+                  "ci95": [
+                    2357.95,
+                    2358.6000000000004
+                  ],
+                  "median": 2358.21
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.0375071073079325,
+                    0.01687713693568904
+                  ],
+                  "median": -0.004002031266492345
+                },
+                "value": {
+                  "ci95": [
+                    9097262.32,
+                    9100869.68
+                  ],
+                  "median": 9099530.219999999
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.03695191236396389,
+                    -0.0021407552587004997
+                  ],
+                  "median": -0.011576613057512342
+                },
+                "value": {
+                  "ci95": [
+                    9097582.93,
+                    9102037.33
+                  ],
+                  "median": 9098652.59
+                }
+              }
+            }
+          }
+        },
+        "request_context_sha256": "7abfd86e688ffe435d358a9a2499dce394bf1a203c56fe6160622a8e72c15ba4",
+        "route": "GET:/articles",
+        "runtime_fingerprint_sha256": "aeb6fc3596d79beeb64079f8f36a29febafda465d4f5518f2c8f59cc1fd50d03",
+        "schema_version": 1,
+        "status": "rejected",
+        "rounds": [
+          {
+            "off_b": {
+              "instructions_total": 9101754.42,
+              "instructions_no_gc": 9099607.4,
+              "allocations": 2357.96,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 9102658.22,
+              "instructions_no_gc": 9105731.96,
+              "allocations": 2357.8,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 9101495.48,
+              "instructions_no_gc": 9103071.62,
+              "allocations": 2358.78,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 9095885.58,
+              "instructions_no_gc": 9093942.44,
+              "allocations": 2358.3,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 9102192.14,
+              "instructions_no_gc": 9101092.78,
+              "allocations": 2358.62,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8979361.88,
+              "instructions_no_gc": 8980497.3,
+              "allocations": 2351.16,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "disabled": {
+              "instructions_total": 9095553.04,
+              "instructions_no_gc": 9095976.56,
+              "allocations": 2358.06,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 9098629.94,
+              "instructions_no_gc": 9098703.24,
+              "allocations": 2358.94,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 9100251.48,
+              "instructions_no_gc": 9101945.36,
+              "allocations": 2358.14,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8979039.08,
+              "instructions_no_gc": 8977960.12,
+              "allocations": 2351.26,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 9097503.58,
+              "instructions_no_gc": 9099453.04,
+              "allocations": 2357.98,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 9102989.4,
+              "instructions_no_gc": 9098684.06,
+              "allocations": 2359.66,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "missing": {
+              "instructions_total": 9101472.3,
+              "instructions_no_gc": 9098375.02,
+              "allocations": 2358.54,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 9098903.36,
+              "instructions_no_gc": 9098383.2,
+              "allocations": 2358.2,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 9097662.28,
+              "instructions_no_gc": 9097923.88,
+              "allocations": 2358.44,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8982632.14,
+              "instructions_no_gc": 8982643.3,
+              "allocations": 2351.02,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 9095665.1,
+              "instructions_no_gc": 9096730.38,
+              "allocations": 2358.1,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 9099448.92,
+              "instructions_no_gc": 9097096.38,
+              "allocations": 2358.56,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "off_a": {
+              "instructions_total": 9102436.36,
+              "instructions_no_gc": 9101080.34,
+              "allocations": 2359.06,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 9102320.24,
+              "instructions_no_gc": 9100811.34,
+              "allocations": 2358.44,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 9096764.7,
+              "instructions_no_gc": 9099553.54,
+              "allocations": 2357.56,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8987060.42,
+              "instructions_no_gc": 8984992.4,
+              "allocations": 2351.68,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 9094689.4,
+              "instructions_no_gc": 9096901.16,
+              "allocations": 2358.4,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 9101036.62,
+              "instructions_no_gc": 9100767.42,
+              "allocations": 2358.7,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "off_b": {
+              "instructions_total": 9098111.72,
+              "instructions_no_gc": 9100928.02,
+              "allocations": 2357.94,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 9102814.64,
+              "instructions_no_gc": 9101382.56,
+              "allocations": 2358.56,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 9098385.2,
+              "instructions_no_gc": 9098625.82,
+              "allocations": 2358.4,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 9102998.42,
+              "instructions_no_gc": 9104997.2,
+              "allocations": 2358.28,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 9098557.86,
+              "instructions_no_gc": 9099760.24,
+              "allocations": 2358.3,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8981935.68,
+              "instructions_no_gc": 8982397.38,
+              "allocations": 2351.32,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "off_b": {
+              "instructions_total": 9099193.46,
+              "instructions_no_gc": 9096600.76,
+              "allocations": 2358.76,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 9099155.1,
+              "instructions_no_gc": 9098863.64,
+              "allocations": 2358.4,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 9097300.02,
+              "instructions_no_gc": 9100136.7,
+              "allocations": 2357.7,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8980352.74,
+              "instructions_no_gc": 8980153.34,
+              "allocations": 2350.8,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 9099694.5,
+              "instructions_no_gc": 9102190.9,
+              "allocations": 2357.98,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 9100396.92,
+              "instructions_no_gc": 9097306.14,
+              "allocations": 2359.28,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          }
+        ]
+      },
+      "show": {
+        "actual_jit": [
+          "interpreter"
+        ],
+        "actual_yjit": [
+          false
+        ],
+        "app": "real-blog-r4",
+        "corpus_source": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+        "counter": "callgrind",
+        "coverage": {
+          "requests": 10,
+          "route_completions_per_request": 0.0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+          "units": [
+            {
+              "fallbacks_per_request": 0.0,
+              "hits_per_request": 2.0,
+              "id": 18,
+              "pass": "sealed/link_to"
+            }
+          ],
+          "yjit": false,
+          "zjit": false
+        },
+        "harness_fingerprint_sha256": "fde0a454a7668a20d7c3354dbf17a8eeed0f75495cbebe254556558de7a7202e",
+        "lockfile_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+        "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+        "measurement_complete": false,
+        "pass": "sealed/link_to",
+        "provenance": {
+          "actual_jit": [
+            "interpreter"
+          ],
+          "actual_yjit": [
+            false
+          ],
+          "app": "real-blog-r4",
+          "cache_mb": null,
+          "counter": "callgrind",
+          "heap_mode": "fixed",
+          "heap_slots": [
+            1000000,
+            250000,
+            100000,
+            20000,
+            10000
+          ],
+          "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+          "region": "after warmup and three full GCs",
+          "requested_jit": "interpreter",
+          "requested_yjit": false,
+          "requests": 50,
+          "rounds": 6,
+          "route": "GET:/articles/1",
+          "runtime_sha256": "2f4248dccf3619f6768cdc5d1a0cb12bea1bfce40876b54bc0ee0a22e1b7a31b",
+          "seed": 41231,
+          "valgrind": {
+            "build": {
+              "brk_reservation_mib": 512,
+              "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+              "libc": "glibc 2.36",
+              "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+              "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+              "tool": "libexec/valgrind/callgrind-amd64-linux",
+              "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+              "version": "3.19.0"
+            },
+            "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+            "log_sha256": "4ada436ca661607a120f74025e55a3e2c7263524a77f36383e9a875c357cfb57",
+            "pass": true,
+            "rails_boot": true,
+            "version": "valgrind-3.19.0"
+          },
+          "variant_app": null
+        },
+        "request": {
+          "aa": {
+            "metrics": {
+              "instructions_no_gc": true,
+              "instructions_total": true
+            },
+            "pass": true,
+            "tolerance_pct": 0.5
+          },
+          "gc": {
+            "default": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "disabled": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "empty": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "missing": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_a": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_b": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            }
+          },
+          "heap_capacity": {
+            "0": {
+              "matched": true,
+              "max": 1000457,
+              "min": 1000440
+            },
+            "1": {
+              "matched": true,
+              "max": 250430,
+              "min": 250421
+            },
+            "2": {
+              "matched": true,
+              "max": 100159,
+              "min": 100148
+            },
+            "3": {
+              "matched": true,
+              "max": 20177,
+              "min": 20175
+            },
+            "4": {
+              "matched": true,
+              "max": 10079,
+              "min": 10078
+            }
+          },
+          "heap_matched": true,
+          "jit": {
+            "actual_jit": [
+              "interpreter"
+            ],
+            "actual_yjit": [
+              false
+            ],
+            "diagnostic_only": false,
+            "pass": true,
+            "requested_jit": "interpreter",
+            "requested_yjit": false,
+            "workers": {
+              "0-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-default": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-disabled": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-empty": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-missing": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-off_a": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-off_b": {
+                "actual_jit": "interpreter",
+                "actual_yjit": false,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              }
+            }
+          },
+          "layers": {
+            "default": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.11318700160787287,
+                    -0.08422041807578107
+                  ],
+                  "median": -0.09801302488574026
+                },
+                "value": {
+                  "ci95": [
+                    2241.49,
+                    2242.55
+                  ],
+                  "median": 2242.09
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.2375186951243502,
+                    -0.1385992278872039
+                  ],
+                  "median": -0.1873885435557443
+                },
+                "value": {
+                  "ci95": [
+                    8727116.56,
+                    8732323.92
+                  ],
+                  "median": 8728369.690000001
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.22148809670833325,
+                    -0.15931728314918514
+                  ],
+                  "median": -0.18462056385110115
+                },
+                "value": {
+                  "ci95": [
+                    8726666.719999999,
+                    8729839.780000001
+                  ],
+                  "median": 8728979.9
+                }
+              }
+            },
+            "disabled": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.004900475775310165,
+                    0.028077960752803666
+                  ],
+                  "median": 0.021830936370903498
+                },
+                "value": {
+                  "ci95": [
+                    2244.23,
+                    2245.01
+                  ],
+                  "median": 2244.75
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.05778388649086974,
+                    0.07334113151756805
+                  ],
+                  "median": 0.02188927247070982
+                },
+                "value": {
+                  "ci95": [
+                    8744494.6,
+                    8749135.879999999
+                  ],
+                  "median": 8746735.48
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.0017663818490332162,
+                    0.06537541597322338
+                  ],
+                  "median": 0.038558419219059115
+                },
+                "value": {
+                  "ci95": [
+                    8746447.899999999,
+                    8749477.309999999
+                  ],
+                  "median": 8747941.780000001
+                }
+              }
+            },
+            "empty": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.02494867859682004,
+                    0.05437147150363364
+                  ],
+                  "median": -0.011138715324859882
+                },
+                "value": {
+                  "ci95": [
+                    2243.8900000000003,
+                    2245.11
+                  ],
+                  "median": 2244.17
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.07352167096684181,
+                    0.04466723862228683
+                  ],
+                  "median": 0.030415545307937997
+                },
+                "value": {
+                  "ci95": [
+                    8742735.219999999,
+                    8748038.15
+                  ],
+                  "median": 8746454.030000001
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.03557546505459919,
+                    0.05064898140187957
+                  ],
+                  "median": 0.03170366278237857
+                },
+                "value": {
+                  "ci95": [
+                    8743658.71,
+                    8749341.25
+                  ],
+                  "median": 8746022.45
+                }
+              }
+            },
+            "missing": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.028068286661209196,
+                    0.021834840528778265
+                  ],
+                  "median": 0.006683729561074436
+                },
+                "value": {
+                  "ci95": [
+                    2243.83,
+                    2244.8599999999997
+                  ],
+                  "median": 2244.08
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.022679176361362074,
+                    0.08360081747663672
+                  ],
+                  "median": 0.043029006600570074
+                },
+                "value": {
+                  "ci95": [
+                    8746185.0,
+                    8752050.1
+                  ],
+                  "median": 8747948.6
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.0014052647109574767,
+                    0.07127954768818556
+                  ],
+                  "median": 0.025084751225745716
+                },
+                "value": {
+                  "ci95": [
+                    8745712.870000001,
+                    8750020.54
+                  ],
+                  "median": 8747503.649999999
+                }
+              }
+            },
+            "off_a": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    2243.73,
+                    2244.6
+                  ],
+                  "median": 2244.4300000000003
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    8742218.57,
+                    8751377.89
+                  ],
+                  "median": 8743500.88
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    8742731.33,
+                    8748546.129999999
+                  ],
+                  "median": 8743657.32
+                }
+              }
+            },
+            "off_b": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.015594046928424365,
+                    0.06060749236966867
+                  ],
+                  "median": 0.003118742626628812
+                },
+                "value": {
+                  "ci95": [
+                    2243.89,
+                    2245.3599999999997
+                  ],
+                  "median": 2244.59
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.08049169816146118,
+                    0.07148040725387661
+                  ],
+                  "median": 0.04650097822738175
+                },
+                "value": {
+                  "ci95": [
+                    8744175.23,
+                    8749205.66
+                  ],
+                  "median": 8746987.399999999
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.04465779680116744,
+                    0.09564032303117642
+                  ],
+                  "median": 0.03215395030138346
+                },
+                "value": {
+                  "ci95": [
+                    8743363.719999999,
+                    8751438.8
+                  ],
+                  "median": 8747398.8
+                }
+              }
+            }
+          }
+        },
+        "request_context_sha256": "d4aa189124012f42d47f7bce124e88c68da30b99f36c9b1a76773de082a1d710",
+        "route": "GET:/articles/1",
+        "runtime_fingerprint_sha256": "aeb6fc3596d79beeb64079f8f36a29febafda465d4f5518f2c8f59cc1fd50d03",
+        "schema_version": 1,
+        "status": "accepted",
+        "rounds": [
+          {
+            "off_b": {
+              "instructions_total": 8749732.3,
+              "instructions_no_gc": 8748213.56,
+              "allocations": 2245.14,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 8742253.08,
+              "instructions_no_gc": 8743512.38,
+              "allocations": 2243.6,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 8745880.9,
+              "instructions_no_gc": 8746862.4,
+              "allocations": 2243.94,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 8746708.7,
+              "instructions_no_gc": 8746391.02,
+              "allocations": 2244.12,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 8749203.78,
+              "instructions_no_gc": 8752218.1,
+              "allocations": 2244.06,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8725100.94,
+              "instructions_no_gc": 8726333.38,
+              "allocations": 2241.32,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "empty": {
+              "instructions_total": 8741923.76,
+              "instructions_no_gc": 8740673.32,
+              "allocations": 2244.24,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 8750837.3,
+              "instructions_no_gc": 8751882.1,
+              "allocations": 2245.1,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 8748113.58,
+              "instructions_no_gc": 8744550.68,
+              "allocations": 2245.08,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8728537.24,
+              "instructions_no_gc": 8728160.74,
+              "allocations": 2242.34,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 8746874.4,
+              "instructions_no_gc": 8745787.26,
+              "allocations": 2244.62,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 8750130.64,
+              "instructions_no_gc": 8751612.46,
+              "allocations": 2244.58,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "missing": {
+              "instructions_total": 8746284.94,
+              "instructions_no_gc": 8745465.68,
+              "allocations": 2244.62,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 8743900.54,
+              "instructions_no_gc": 8743489.38,
+              "allocations": 2244.4,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 8753145.3,
+              "instructions_no_gc": 8750197.76,
+              "allocations": 2245.58,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8729827.56,
+              "instructions_no_gc": 8727899.74,
+              "allocations": 2242.64,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 8746187.1,
+              "instructions_no_gc": 8744438.52,
+              "allocations": 2244.34,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 8746490.16,
+              "instructions_no_gc": 8746407.6,
+              "allocations": 2244.1,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "missing": {
+              "instructions_total": 8746009.38,
+              "instructions_no_gc": 8746904.32,
+              "allocations": 2243.94,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 8746961.62,
+              "instructions_no_gc": 8751143.32,
+              "allocations": 2243.86,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 8742404.28,
+              "instructions_no_gc": 8742880.32,
+              "allocations": 2243.7,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8729852.0,
+              "instructions_no_gc": 8733022.58,
+              "allocations": 2241.84,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 8752192.34,
+              "instructions_no_gc": 8749213.9,
+              "allocations": 2245.96,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 8748668.94,
+              "instructions_no_gc": 8748091.22,
+              "allocations": 2244.6,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "missing": {
+              "instructions_total": 8745416.36,
+              "instructions_no_gc": 8747944.36,
+              "allocations": 2243.72,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 8747923.2,
+              "instructions_no_gc": 8748187.54,
+              "allocations": 2244.56,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 8743414.1,
+              "instructions_no_gc": 8742396.88,
+              "allocations": 2244.46,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 8750285.68,
+              "instructions_no_gc": 8750180.54,
+              "allocations": 2244.94,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 8745393.66,
+              "instructions_no_gc": 8744797.12,
+              "allocations": 2244.26,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8728232.5,
+              "instructions_no_gc": 8731625.26,
+              "allocations": 2241.66,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "disabled": {
+              "instructions_total": 8747769.98,
+              "instructions_no_gc": 8747079.94,
+              "allocations": 2244.9,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 8744323.16,
+              "instructions_no_gc": 8745470.14,
+              "allocations": 2244.08,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 8748722.36,
+              "instructions_no_gc": 8747952.84,
+              "allocations": 2244.1,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 8729422.56,
+              "instructions_no_gc": 8728578.64,
+              "allocations": 2242.46,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 8746164.0,
+              "instructions_no_gc": 8746500.46,
+              "allocations": 2243.84,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 8743209.58,
+              "instructions_no_gc": 8742040.26,
+              "allocations": 2244.62,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          }
+        ]
+      }
+    },
+    "yjit": {
+      "index": {
+        "actual_jit": [
+          "yjit"
+        ],
+        "actual_yjit": [
+          true
+        ],
+        "app": "real-blog-r4",
+        "corpus_source": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+        "counter": "callgrind",
+        "coverage": {
+          "requests": 10,
+          "route_completions_per_request": 0.0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+          "units": [
+            {
+              "fallbacks_per_request": 0.0,
+              "hits_per_request": 7.0,
+              "id": 18,
+              "pass": "sealed/link_to"
+            }
+          ],
+          "yjit": true,
+          "zjit": false
+        },
+        "error": "request A/A, heap, activation or JIT checks failed; inspect requests.log",
+        "harness_fingerprint_sha256": "fde0a454a7668a20d7c3354dbf17a8eeed0f75495cbebe254556558de7a7202e",
+        "lockfile_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+        "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+        "measurement_complete": false,
+        "pass": "sealed/link_to",
+        "provenance": {
+          "actual_jit": [
+            "yjit"
+          ],
+          "actual_yjit": [
+            true
+          ],
+          "app": "real-blog-r4",
+          "cache_mb": null,
+          "counter": "callgrind",
+          "heap_mode": "fixed",
+          "heap_slots": [
+            1000000,
+            250000,
+            100000,
+            20000,
+            10000
+          ],
+          "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+          "region": "after warmup and three full GCs",
+          "requested_jit": "yjit",
+          "requested_yjit": true,
+          "requests": 50,
+          "rounds": 6,
+          "route": "GET:/articles",
+          "runtime_sha256": "2f4248dccf3619f6768cdc5d1a0cb12bea1bfce40876b54bc0ee0a22e1b7a31b",
+          "seed": 41231,
+          "valgrind": {
+            "build": {
+              "brk_reservation_mib": 512,
+              "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+              "libc": "glibc 2.36",
+              "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+              "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+              "tool": "libexec/valgrind/callgrind-amd64-linux",
+              "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+              "version": "3.19.0"
+            },
+            "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+            "log_sha256": "f9409d348a5aceb875924b7124cc4b3828004fddb743e19c797248089566e65f",
+            "pass": true,
+            "rails_boot": true,
+            "version": "valgrind-3.19.0"
+          },
+          "variant_app": null
+        },
+        "request": {
+          "aa": {
+            "metrics": {
+              "instructions_no_gc": true,
+              "instructions_total": true
+            },
+            "pass": true,
+            "tolerance_pct": 0.5
+          },
+          "gc": {
+            "default": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "disabled": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "empty": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "missing": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_a": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_b": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            }
+          },
+          "heap_capacity": {
+            "0": {
+              "matched": true,
+              "max": 1000470,
+              "min": 1000438
+            },
+            "1": {
+              "matched": true,
+              "max": 250440,
+              "min": 250414
+            },
+            "2": {
+              "matched": true,
+              "max": 100172,
+              "min": 100139
+            },
+            "3": {
+              "matched": true,
+              "max": 20179,
+              "min": 20174
+            },
+            "4": {
+              "matched": true,
+              "max": 10081,
+              "min": 10076
+            }
+          },
+          "heap_matched": true,
+          "jit": {
+            "actual_jit": [
+              "yjit"
+            ],
+            "actual_yjit": [
+              true
+            ],
+            "diagnostic_only": false,
+            "pass": false,
+            "requested_jit": "yjit",
+            "requested_yjit": true,
+            "workers": {
+              "0-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": false,
+                "warmup_stable": true,
+                "windows_stable": false
+              },
+              "1-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": false,
+                "warmup_stable": true,
+                "windows_stable": false
+              },
+              "1-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": false,
+                "warmup_stable": true,
+                "windows_stable": false
+              },
+              "1-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": false,
+                "warmup_stable": true,
+                "windows_stable": false
+              },
+              "2-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": false,
+                "warmup_stable": true,
+                "windows_stable": false
+              },
+              "4-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": false,
+                "warmup_stable": true,
+                "windows_stable": false
+              },
+              "5-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              }
+            }
+          },
+          "layers": {
+            "default": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.3258066843418672,
+                    -0.29223275726078524
+                  ],
+                  "median": -0.3031459160592276
+                },
+                "value": {
+                  "ci95": [
+                    2370.96,
+                    2371.3999999999996
+                  ],
+                  "median": 2371.0699999999997
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -1.902230081955697,
+                    -1.6409051208608805
+                  ],
+                  "median": -1.7823088158263445
+                },
+                "value": {
+                  "ci95": [
+                    5577759.66,
+                    5589598.5600000005
+                  ],
+                  "median": 5581563.98
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -1.910933613902388,
+                    -1.764124587686161
+                  ],
+                  "median": -1.8408579074517484
+                },
+                "value": {
+                  "ci95": [
+                    5576434.6899999995,
+                    5581239.2
+                  ],
+                  "median": 5579236.27
+                }
+              }
+            },
+            "disabled": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.024384353083567456,
+                    0.028591826624546623
+                  ],
+                  "median": -0.00714815387160006
+                },
+                "value": {
+                  "ci95": [
+                    2377.78,
+                    2379.21
+                  ],
+                  "median": 2378.2799999999997
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.08912546330601678,
+                    0.08589356900403633
+                  ],
+                  "median": -0.03060010047446493
+                },
+                "value": {
+                  "ci95": [
+                    5681189.65,
+                    5684829.970000001
+                  ],
+                  "median": 5683667.5600000005
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.06955680211674364,
+                    0.04292587109887558
+                  ],
+                  "median": 0.010191831260797368
+                },
+                "value": {
+                  "ci95": [
+                    5681117.88,
+                    5685363.42
+                  ],
+                  "median": 5682990.96
+                }
+              }
+            },
+            "empty": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.022283167220571443,
+                    0.019342247141296287
+                  ],
+                  "median": -0.006726801468698307
+                },
+                "value": {
+                  "ci95": [
+                    2377.9300000000003,
+                    2378.8199999999997
+                  ],
+                  "median": 2378.3599999999997
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.1145128935185813,
+                    0.0276791091857298
+                  ],
+                  "median": -0.03882779729963426
+                },
+                "value": {
+                  "ci95": [
+                    5679333.65,
+                    5683055.4399999995
+                  ],
+                  "median": 5682080.57
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.06537679137701424,
+                    0.36479008618469644
+                  ],
+                  "median": 0.003571873979518747
+                },
+                "value": {
+                  "ci95": [
+                    5679959.46,
+                    5704609.16
+                  ],
+                  "median": 5683067.4399999995
+                }
+              }
+            },
+            "missing": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.020599412904537262,
+                    0.00925032619720767
+                  ],
+                  "median": 0.001681809967479797
+                },
+                "value": {
+                  "ci95": [
+                    2378.13,
+                    2378.67
+                  ],
+                  "median": 2378.3100000000004
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.11445167180597071,
+                    0.09782550884975816
+                  ],
+                  "median": 0.0030418494579076416
+                },
+                "value": {
+                  "ci95": [
+                    5679467.78,
+                    5687760.05
+                  ],
+                  "median": 5683610.3100000005
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.008664354466569879,
+                    0.8672285187909856
+                  ],
+                  "median": 0.09361248167689684
+                },
+                "value": {
+                  "ci95": [
+                    5682793.92,
+                    5736308.91
+                  ],
+                  "median": 5686431.779999999
+                }
+              }
+            },
+            "off_a": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    2378.11,
+                    2378.71
+                  ],
+                  "median": 2378.52
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    5679523.66,
+                    5687614.27
+                  ],
+                  "median": 5684480.24
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    5681078.26,
+                    5686994.640000001
+                  ],
+                  "median": 5682337.4399999995
+                }
+              }
+            },
+            "off_b": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.025643545490955377,
+                    0.03574066335141346
+                  ],
+                  "median": 0.008829988475084205
+                },
+                "value": {
+                  "ci95": [
+                    2378.0699999999997,
+                    2379.09
+                  ],
+                  "median": 2378.63
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.060078939767022055,
+                    0.49515998283560236
+                  ],
+                  "median": -0.009726504442109096
+                },
+                "value": {
+                  "ci95": [
+                    5681984.45,
+                    5710556.640000001
+                  ],
+                  "median": 5683245.17
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.01662292641883556,
+                    0.061313602589097016
+                  ],
+                  "median": 0.012462052514183863
+                },
+                "value": {
+                  "ci95": [
+                    5683009.86,
+                    5686866.12
+                  ],
+                  "median": 5683780.68
+                }
+              }
+            }
+          }
+        },
+        "request_context_sha256": "7abfd86e688ffe435d358a9a2499dce394bf1a203c56fe6160622a8e72c15ba4",
+        "route": "GET:/articles",
+        "runtime_fingerprint_sha256": "aeb6fc3596d79beeb64079f8f36a29febafda465d4f5518f2c8f59cc1fd50d03",
+        "schema_version": 1,
+        "status": "rejected",
+        "rounds": [
+          {
+            "empty": {
+              "instructions_total": 5680895.52,
+              "instructions_no_gc": 5683203.34,
+              "allocations": 2377.8,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5682691.14,
+              "instructions_no_gc": 5683062.96,
+              "allocations": 2378.28,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5682922.76,
+              "instructions_no_gc": 5681096.72,
+              "allocations": 2379.58,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5683670.4,
+              "instructions_no_gc": 5735784.78,
+              "allocations": 2378.74,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5681362.94,
+              "instructions_no_gc": 5683134.96,
+              "allocations": 2378.32,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5580947.9,
+              "instructions_no_gc": 5582225.06,
+              "allocations": 2371.24,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "disabled": {
+              "instructions_total": 5686680.8,
+              "instructions_no_gc": 5684384.96,
+              "allocations": 2378.84,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5757828.62,
+              "instructions_no_gc": 5678061.78,
+              "allocations": 2378.3,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5725530.26,
+              "instructions_no_gc": 5679232.24,
+              "allocations": 2379.08,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5579746.66,
+              "instructions_no_gc": 5580902.9,
+              "allocations": 2370.9,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5685753.58,
+              "instructions_no_gc": 5685897.52,
+              "allocations": 2378.78,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5683732.12,
+              "instructions_no_gc": 5683424.72,
+              "allocations": 2377.68,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "off_a": {
+              "instructions_total": 5681912.28,
+              "instructions_no_gc": 5685960.34,
+              "allocations": 2377.94,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5682349.32,
+              "instructions_no_gc": 5683065.62,
+              "allocations": 2378.78,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5575689.18,
+              "instructions_no_gc": 5596638.46,
+              "allocations": 2371.02,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5684224.9,
+              "instructions_no_gc": 5686234.22,
+              "allocations": 2378.12,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5683539.38,
+              "instructions_no_gc": 5681842.8,
+              "allocations": 2378.56,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5681112.84,
+              "instructions_no_gc": 5683806.04,
+              "allocations": 2377.78,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "off_a": {
+              "instructions_total": 5681983.74,
+              "instructions_no_gc": 5679314.66,
+              "allocations": 2378.5,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5685365.3,
+              "instructions_no_gc": 5682871.0,
+              "allocations": 2378.46,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5684416.6,
+              "instructions_no_gc": 5680873.78,
+              "allocations": 2378.54,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5578725.88,
+              "instructions_no_gc": 5577640.2,
+              "allocations": 2371.12,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5684046.04,
+              "instructions_no_gc": 5683529.08,
+              "allocations": 2378.32,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5683688.06,
+              "instructions_no_gc": 5682318.34,
+              "allocations": 2378.54,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "off_a": {
+              "instructions_total": 5680244.24,
+              "instructions_no_gc": 5679732.66,
+              "allocations": 2378.54,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5683059.16,
+              "instructions_no_gc": 5685274.98,
+              "allocations": 2377.78,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5683829.24,
+              "instructions_no_gc": 5681097.9,
+              "allocations": 2379.4,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5688446.96,
+              "instructions_no_gc": 5689285.88,
+              "allocations": 2378.8,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5679023.4,
+              "instructions_no_gc": 5679435.06,
+              "allocations": 2378.18,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5581530.5,
+              "instructions_no_gc": 5582558.66,
+              "allocations": 2371.56,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "disabled": {
+              "instructions_total": 5681122.92,
+              "instructions_no_gc": 5681282.58,
+              "allocations": 2378.24,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5688366.94,
+              "instructions_no_gc": 5685328.5,
+              "allocations": 2378.52,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5577180.2,
+              "instructions_no_gc": 5577879.12,
+              "allocations": 2371.02,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5714789.2,
+              "instructions_no_gc": 5684085.66,
+              "allocations": 2378.14,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5682595.5,
+              "instructions_no_gc": 5682907.54,
+              "allocations": 2378.06,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5688235.7,
+              "instructions_no_gc": 5689268.2,
+              "allocations": 2378.64,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          }
+        ],
+        "changed_jit_windows": {
+          "0-off_b": [
+            {
+              "mode": "no_gc",
+              "requests": 50,
+              "jit_before": {
+                "compiled_iseq_count": 2879,
+                "compiled_block_count": 41340,
+                "invalidation_count": 1147
+              },
+              "jit_after": {
+                "compiled_iseq_count": 2880,
+                "compiled_block_count": 41368,
+                "invalidation_count": 1147
+              }
+            }
+          ],
+          "1-missing": [
+            {
+              "mode": "total",
+              "requests": 50,
+              "jit_before": {
+                "compiled_iseq_count": 2883,
+                "compiled_block_count": 41440,
+                "invalidation_count": 1157
+              },
+              "jit_after": {
+                "compiled_iseq_count": 2883,
+                "compiled_block_count": 41472,
+                "invalidation_count": 1157
+              }
+            }
+          ],
+          "1-empty": [
+            {
+              "mode": "total",
+              "requests": 50,
+              "jit_before": {
+                "compiled_iseq_count": 2873,
+                "compiled_block_count": 41182,
+                "invalidation_count": 1118
+              },
+              "jit_after": {
+                "compiled_iseq_count": 2873,
+                "compiled_block_count": 41199,
+                "invalidation_count": 1118
+              }
+            }
+          ],
+          "2-default": [
+            {
+              "mode": "no_gc",
+              "requests": 50,
+              "jit_before": {
+                "compiled_iseq_count": 3067,
+                "compiled_block_count": 47656,
+                "invalidation_count": 1162
+              },
+              "jit_after": {
+                "compiled_iseq_count": 3067,
+                "compiled_block_count": 47665,
+                "invalidation_count": 1162
+              }
+            }
+          ],
+          "4-missing": [
+            {
+              "mode": "no_gc",
+              "requests": 50,
+              "jit_before": {
+                "compiled_iseq_count": 2883,
+                "compiled_block_count": 41516,
+                "invalidation_count": 1157
+              },
+              "jit_after": {
+                "compiled_iseq_count": 2883,
+                "compiled_block_count": 41517,
+                "invalidation_count": 1157
+              }
+            }
+          ],
+          "5-missing": [
+            {
+              "mode": "total",
+              "requests": 50,
+              "jit_before": {
+                "compiled_iseq_count": 2883,
+                "compiled_block_count": 41307,
+                "invalidation_count": 1157
+              },
+              "jit_after": {
+                "compiled_iseq_count": 2883,
+                "compiled_block_count": 41319,
+                "invalidation_count": 1157
+              }
+            }
+          ]
+        }
+      },
+      "show": {
+        "actual_jit": [
+          "yjit"
+        ],
+        "actual_yjit": [
+          true
+        ],
+        "app": "real-blog-r4",
+        "corpus_source": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+        "counter": "callgrind",
+        "coverage": {
+          "requests": 10,
+          "route_completions_per_request": 0.0,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+          "units": [
+            {
+              "fallbacks_per_request": 0.0,
+              "hits_per_request": 2.0,
+              "id": 18,
+              "pass": "sealed/link_to"
+            }
+          ],
+          "yjit": true,
+          "zjit": false
+        },
+        "error": "request A/A, heap, activation or JIT checks failed; inspect requests.log",
+        "harness_fingerprint_sha256": "fde0a454a7668a20d7c3354dbf17a8eeed0f75495cbebe254556558de7a7202e",
+        "lockfile_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+        "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+        "measurement_complete": false,
+        "pass": "sealed/link_to",
+        "provenance": {
+          "actual_jit": [
+            "yjit"
+          ],
+          "actual_yjit": [
+            true
+          ],
+          "app": "real-blog-r4",
+          "cache_mb": null,
+          "counter": "callgrind",
+          "heap_mode": "fixed",
+          "heap_slots": [
+            1000000,
+            250000,
+            100000,
+            20000,
+            10000
+          ],
+          "manifest_sha256": "fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a",
+          "region": "after warmup and three full GCs",
+          "requested_jit": "yjit",
+          "requested_yjit": true,
+          "requests": 50,
+          "rounds": 6,
+          "route": "GET:/articles/1",
+          "runtime_sha256": "2f4248dccf3619f6768cdc5d1a0cb12bea1bfce40876b54bc0ee0a22e1b7a31b",
+          "seed": 41231,
+          "valgrind": {
+            "build": {
+              "brk_reservation_mib": 512,
+              "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+              "libc": "glibc 2.36",
+              "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+              "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+              "tool": "libexec/valgrind/callgrind-amd64-linux",
+              "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+              "version": "3.19.0"
+            },
+            "driver_sha256": "b0e78b9d59751a503366085d143cec57fcfd3f8fc712f54d894898332419aeab",
+            "log_sha256": "0276eec9cdaf7771ee22c91851318ca8e268d6f0150448f68834e1bd3b13d1e6",
+            "pass": true,
+            "rails_boot": true,
+            "version": "valgrind-3.19.0"
+          },
+          "variant_app": null
+        },
+        "request": {
+          "aa": {
+            "metrics": {
+              "instructions_no_gc": true,
+              "instructions_total": true
+            },
+            "pass": true,
+            "tolerance_pct": 0.5
+          },
+          "gc": {
+            "default": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "disabled": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "empty": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "missing": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_a": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            },
+            "off_b": {
+              "gc_per_1k_allocations": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "major_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              },
+              "minor_gc_per_request": {
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "median": 0.0
+              }
+            }
+          },
+          "heap_capacity": {
+            "0": {
+              "matched": true,
+              "max": 1000470,
+              "min": 1000430
+            },
+            "1": {
+              "matched": true,
+              "max": 250448,
+              "min": 250415
+            },
+            "2": {
+              "matched": true,
+              "max": 100172,
+              "min": 100141
+            },
+            "3": {
+              "matched": true,
+              "max": 20179,
+              "min": 20174
+            },
+            "4": {
+              "matched": true,
+              "max": 10081,
+              "min": 10076
+            }
+          },
+          "heap_matched": true,
+          "jit": {
+            "actual_jit": [
+              "yjit"
+            ],
+            "actual_yjit": [
+              true
+            ],
+            "diagnostic_only": false,
+            "pass": false,
+            "requested_jit": "yjit",
+            "requested_yjit": true,
+            "workers": {
+              "0-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "0-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "1-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": false,
+                "warmup_stable": true,
+                "windows_stable": false
+              },
+              "2-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "2-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "3-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "4-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-default": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-disabled": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-empty": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-missing": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-off_a": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              },
+              "5-off_b": {
+                "actual_jit": "yjit",
+                "actual_yjit": true,
+                "missing_counters": [],
+                "mode_matched": true,
+                "pass": true,
+                "warmup_stable": true,
+                "windows_stable": true
+              }
+            }
+          },
+          "layers": {
+            "default": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.1033554339331666,
+                    -0.05058083636839683
+                  ],
+                  "median": -0.07230939986835883
+                },
+                "value": {
+                  "ci95": [
+                    2252.01,
+                    2252.99
+                  ],
+                  "median": 2252.33
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.8055078426401019,
+                    -0.69115215884204
+                  ],
+                  "median": -0.7595497332629431
+                },
+                "value": {
+                  "ci95": [
+                    5372980.41,
+                    5377590.02
+                  ],
+                  "median": 5374193.03
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.756200589739392,
+                    -0.6897571876496811
+                  ],
+                  "median": -0.7147828889127517
+                },
+                "value": {
+                  "ci95": [
+                    5374808.96,
+                    5378985.75
+                  ],
+                  "median": 5375833.1
+                }
+              }
+            },
+            "disabled": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.0257296701996923,
+                    0.008431329043712132
+                  ],
+                  "median": -0.009315742859145049
+                },
+                "value": {
+                  "ci95": [
+                    2253.63,
+                    2254.34
+                  ],
+                  "median": 2253.86
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.05459772092971105,
+                    0.7118235253926741
+                  ],
+                  "median": 0.008380077901531946
+                },
+                "value": {
+                  "ci95": [
+                    5414347.88,
+                    5453438.99
+                  ],
+                  "median": 5415210.199999999
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.1004311607304742,
+                    0.056590578953308324
+                  ],
+                  "median": 0.013112069510479163
+                },
+                "value": {
+                  "ci95": [
+                    5412452.0,
+                    5417236.54
+                  ],
+                  "median": 5415287.82
+                }
+              }
+            },
+            "empty": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.022622293558266504,
+                    0.028394171626067166
+                  ],
+                  "median": 0.005767052047089827
+                },
+                "value": {
+                  "ci95": [
+                    2253.8500000000004,
+                    2254.75
+                  ],
+                  "median": 2254.09
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.060062931334342595,
+                    0.04229579044482401
+                  ],
+                  "median": -0.0014987061198068474
+                },
+                "value": {
+                  "ci95": [
+                    5412092.09,
+                    5418496.210000001
+                  ],
+                  "median": 5415321.01
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.05948631739589039,
+                    0.06361797102699684
+                  ],
+                  "median": 0.030909808294099506
+                },
+                "value": {
+                  "ci95": [
+                    5412939.18,
+                    5419649.720000001
+                  ],
+                  "median": 5415951.49
+                }
+              }
+            },
+            "missing": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.0017747331697848256,
+                    0.009759591420144265
+                  ],
+                  "median": 0.004879528096013441
+                },
+                "value": {
+                  "ci95": [
+                    2253.8199999999997,
+                    2254.5299999999997
+                  ],
+                  "median": 2254.37
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.012363033205287088,
+                    0.06493601804787863
+                  ],
+                  "median": 0.04566537448658092
+                },
+                "value": {
+                  "ci95": [
+                    5415553.0600000005,
+                    5420849.6
+                  ],
+                  "median": 5417210.09
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.016472791410199195,
+                    0.05068308232187846
+                  ],
+                  "median": 0.03967556282570284
+                },
+                "value": {
+                  "ci95": [
+                    5415049.86,
+                    5420085.08
+                  ],
+                  "median": 5417294.720000001
+                }
+              }
+            },
+            "off_a": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    2253.84,
+                    2254.38
+                  ],
+                  "median": 2254.21
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    5413275.23,
+                    5417503.49
+                  ],
+                  "median": 5416174.99
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    0.0,
+                    0.0
+                  ],
+                  "median": 0.0
+                },
+                "value": {
+                  "ci95": [
+                    5412411.34,
+                    5418029.37
+                  ],
+                  "median": 5416204.23
+                }
+              }
+            },
+            "off_b": {
+              "allocations": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.00798500790180623,
+                    0.05413191291738784
+                  ],
+                  "median": 0.0026613203697456456
+                },
+                "value": {
+                  "ci95": [
+                    2254.04,
+                    2255.08
+                  ],
+                  "median": 2254.41
+                }
+              },
+              "instructions_no_gc": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.05150543157279586,
+                    0.0897288777075178
+                  ],
+                  "median": 0.0379805236208286
+                },
+                "value": {
+                  "ci95": [
+                    5413739.72,
+                    5420575.15
+                  ],
+                  "median": 5416763.6
+                }
+              },
+              "instructions_total": {
+                "delta_pct": {
+                  "ci95": [
+                    -0.055309305649137164,
+                    0.09265902110729973
+                  ],
+                  "median": 0.04660281993186244
+                },
+                "value": {
+                  "ci95": [
+                    5414896.66,
+                    5419522.970000001
+                  ],
+                  "median": 5416768.12
+                }
+              }
+            }
+          }
+        },
+        "request_context_sha256": "d4aa189124012f42d47f7bce124e88c68da30b99f36c9b1a76773de082a1d710",
+        "route": "GET:/articles/1",
+        "runtime_fingerprint_sha256": "aeb6fc3596d79beeb64079f8f36a29febafda465d4f5518f2c8f59cc1fd50d03",
+        "schema_version": 1,
+        "status": "rejected",
+        "rounds": [
+          {
+            "off_b": {
+              "instructions_total": 5416544.38,
+              "instructions_no_gc": 5419500.98,
+              "allocations": 2254.06,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5417071.94,
+              "instructions_no_gc": 5418512.52,
+              "allocations": 2254.2,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5414540.48,
+              "instructions_no_gc": 5416368.26,
+              "allocations": 2254.2,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5418600.96,
+              "instructions_no_gc": 5419105.44,
+              "allocations": 2253.86,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5416567.54,
+              "instructions_no_gc": 5416669.84,
+              "allocations": 2254.48,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5374936.1,
+              "instructions_no_gc": 5375252.2,
+              "allocations": 2251.82,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "missing": {
+              "instructions_total": 5420348.36,
+              "instructions_no_gc": 5419983.78,
+              "allocations": 2254.18,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5376730.1,
+              "instructions_no_gc": 5373983.7,
+              "allocations": 2252.42,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5413908.06,
+              "instructions_no_gc": 5415140.56,
+              "allocations": 2253.84,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5420698.48,
+              "instructions_no_gc": 5414929.78,
+              "allocations": 2255.08,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5415055.08,
+              "instructions_no_gc": 5412862.72,
+              "allocations": 2255.08,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5417867.98,
+              "instructions_no_gc": 5416805.46,
+              "allocations": 2254.22,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "off_b": {
+              "instructions_total": 5416991.86,
+              "instructions_no_gc": 5421649.32,
+              "allocations": 2254.18,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5412569.8,
+              "instructions_no_gc": 5415560.18,
+              "allocations": 2254.18,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5374783.52,
+              "instructions_no_gc": 5374402.36,
+              "allocations": 2252.72,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5415578.36,
+              "instructions_no_gc": 5416597.7,
+              "allocations": 2254.34,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5414727.5,
+              "instructions_no_gc": 5488365.46,
+              "allocations": 2253.54,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5415063.64,
+              "instructions_no_gc": 5415712.24,
+              "allocations": 2254.42,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "missing": {
+              "instructions_total": 5414521.36,
+              "instructions_no_gc": 5414508.42,
+              "allocations": 2253.46,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5417860.96,
+              "instructions_no_gc": 5414616.72,
+              "allocations": 2255.08,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5374834.4,
+              "instructions_no_gc": 5372214.58,
+              "allocations": 2252.2,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5412252.88,
+              "instructions_no_gc": 5410990.28,
+              "allocations": 2253.5,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5415848.14,
+              "instructions_no_gc": 5415279.84,
+              "allocations": 2253.88,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5413105.02,
+              "instructions_no_gc": 5412833.06,
+              "allocations": 2253.92,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "missing": {
+              "instructions_total": 5419821.8,
+              "instructions_no_gc": 5421715.42,
+              "allocations": 2254.4,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5417918.54,
+              "instructions_no_gc": 5418201.52,
+              "allocations": 2254.24,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "disabled": {
+              "instructions_total": 5410995.94,
+              "instructions_no_gc": 5413950.42,
+              "allocations": 2253.72,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5414738.24,
+              "instructions_no_gc": 5416563.94,
+              "allocations": 2254.02,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5416839.34,
+              "instructions_no_gc": 5417886.98,
+              "allocations": 2254.26,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5377116.14,
+              "instructions_no_gc": 5373746.24,
+              "allocations": 2253.26,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          },
+          {
+            "disabled": {
+              "instructions_total": 5417401.14,
+              "instructions_no_gc": 5414745.34,
+              "allocations": 2254.48,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_b": {
+              "instructions_total": 5421184.98,
+              "instructions_no_gc": 5416963.26,
+              "allocations": 2254.64,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "missing": {
+              "instructions_total": 5418021.9,
+              "instructions_no_gc": 5417750.34,
+              "allocations": 2254.58,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "default": {
+              "instructions_total": 5380855.36,
+              "instructions_no_gc": 5379927.84,
+              "allocations": 2252.24,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "empty": {
+              "instructions_total": 5412773.34,
+              "instructions_no_gc": 5411351.12,
+              "allocations": 2253.84,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            },
+            "off_a": {
+              "instructions_total": 5418140.2,
+              "instructions_no_gc": 5415981.72,
+              "allocations": 2254.52,
+              "minor_gc_per_request": 0.0,
+              "major_gc_per_request": 0.0
+            }
+          }
+        ],
+        "changed_jit_windows": {
+          "2-disabled": [
+            {
+              "mode": "no_gc",
+              "requests": 50,
+              "jit_before": {
+                "compiled_iseq_count": 2945,
+                "compiled_block_count": 42832,
+                "invalidation_count": 1159
+              },
+              "jit_after": {
+                "compiled_iseq_count": 2945,
+                "compiled_block_count": 42862,
+                "invalidation_count": 1159
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

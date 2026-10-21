@@ -1,8 +1,9 @@
-# Sealed links: prices and pre-fix delivery diagnostics
+# Sealed links: prices and finite delivery results
 
-Status: the opt-in delivery boundary is published; **no request win or
-promotion claim**. Request measurements below precede the central activation
-TracePoint fix and must not judge the pilot after that fix.
+Status: **stacking backlog, no promotion**. The post-TracePoint-fix series
+accepts only interpreter show: **−0.185%**. Interpreter index and both YJIT
+cohorts reject their controls; their deltas remain diagnostic. The earlier
+pre-fix measurements below are historical diagnostics, not the current result.
 The guarded tier and the source-arm quarantine are unchanged. The five-app
 [seal census](../sealed-corpus.md) precedes these experiments; the blog is
 seal-clean only in the documented, dynamic, test-observed sense.
@@ -202,3 +203,88 @@ at build, with a permanent public-build regression. After the central fix,
 rebuild the source-pinned artifact, repeat the correctness gates and run
 fresh, finite interpreter **and** YJIT index/show cohorts. Promotion remains
 pending; the micro price cannot replace the request gate.
+
+## Post-fix: four finite cohorts, one small accepted result
+
+Measured and published harness head:
+[`cb83265`](https://github.com/thomasklemm/lowrail/commit/cb832658d52e0a9f440d51ccac7dd985ceb09f2a),
+including the central production TracePoint fix. All four cohorts use that
+exact head and one freshly rebuilt, source-pinned format-2 `sealed-v1`
+artifact. No loader redesign landed during these measurements. The
+[numeric export](sealed-link-postfix.json) records the manifest SHA
+`fbd041bcf7eb64f8d789cec50038249d1701baab3b1caf08fb86c2580f0abf0a`,
+35 source certificates, five template pins, both delivered ISeq contracts,
+runtime/harness hashes, per-round numbers and changed JIT windows.
+Corpus source is Roundhouse's real-blog fixture at
+[`bb90df2`](https://github.com/rubys/roundhouse/commit/bb90df2514f80817f98d89848dd0a6baa8df20a9);
+the lockfile SHA is
+`570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596`.
+
+### Admission and correctness before measurement
+
+Format-2 path-bound ISeqs correctly refused the old harness's fake snapshot
+app root. `LOWRAIL_DIR` now forwards the existing separate artifact directory
+through normal boot; `LOWRAIL_ROOT` remains the **real app root**. Both
+`request_pairs.rb` and `pass.rb` keep snapshot isolation and check relocation
+against that real root. Empty controls remove pointers to removed units/files.
+No certificate or guard is bypassed. The public external-directory regression
+fails before this fix and passes afterwards, including wrong-root refusal.
+Untimed real-app boots admit the empty snapshot without units and activate
+only the full snapshot; missing/disabled/off arms remain original.
+
+On the pushed head, the isolated checker passes **144 identical pairs** of
+status, byte body, all headers, ordered SQL, controller/render events and
+assigns: **350 link hits, zero fallbacks**. Untimed native probes record
+**7 index / 2 show hits per request**, including a repeated YJIT probe before
+each YJIT cohort. No JIT-mode fact mismatch or zero-hit measurement is hidden.
+Native off/sealed YJIT both have **zero lifetime and delta
+`exit_trace_leave`**, with no live TracePoints. Full gem checks pass
+132 tests / 4,598 assertions (six skips), harness suites 16/157 and 13/151,
+and Cargo 35 + 1 + 3. The default tier/quarantine is unchanged.
+
+### Request results
+
+Ruby 4.0.7 / Rails 8.1.4, six fresh rounds per cohort, seed 41231,
+N=0/50, the five unchanged fixed heaps, at most four Callgrind workers.
+The 512-MiB pinned tool SHA is
+`5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588`.
+There is **one cohort per route/mode, no retries and no clean-arm salvage**.
+
+| Mode / route | Off Ir/request | Sealed Ir/request | Paired total Δ%, 95% CI | Disposition |
+|---|---:|---:|---|---|
+| Interpreter index | 9,101,417 | 8,981,144 | −1.300 [−1.358, −1.273] | **Rejected A/A; diagnostic only** |
+| Interpreter show | 8,743,657 | 8,728,980 | **−0.185 [−0.221, −0.159]** | **Accepted** |
+| YJIT index | 5,682,337 | 5,579,236 | −1.841 [−1.911, −1.764] | **Rejected JIT-flatness; diagnostic only** |
+| YJIT show | 5,416,204 | 5,375,833 | −0.715 [−0.756, −0.690] | **Rejected JIT-flatness; diagnostic only** |
+
+Interpreter index total A/A excludes zero: **[−0.037, −0.002]%**; its
+no-GC A/A passes. Interpreter show passes both, with accepted no-GC delta
+**−0.187% [−0.238, −0.139]**. All four cohorts pass heap matching, actual
+execution-mode and overflow gates; both YJIT A/A controls pass.
+
+All 36 warmups in each YJIT cohort reach three flat windows. Nevertheless,
+index has **6/36** workers compile inside a measured N=50 window:
+`0-off_b` (+1 ISeq/+28 blocks), `1-empty` (+17 blocks), `1-missing` (+32),
+`2-default` (+9), `4-missing` (+1), `5-missing` (+12). Show has **1/36**:
+`2-disabled` (+30 blocks). No invalidation delta occurs. These failures include
+off/empty/disabled controls; their compilation sites remain unattributed.
+Neither a clean sealed arm nor an attractive raw delta repairs the cohort.
+
+An initial driver invocation omitted parent `RAILS_ENV=production` and
+refused admission before launching any worker or measured window. That
+failure is retained separately, not counted as a measured cohort or replaced
+control. Reproduction requires explicit production/sealed acceptance:
+
+```sh
+RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 LOWRAIL_SEALED=1 \
+BENCH_JIT=0 BENCH_JOBS=4 BENCH_ROUNDS=6 BENCH_REQUESTS=50 \
+PATH=/tmp/VALGRIND-brk512/bin:$PATH CPATH=/tmp/VALGRIND-brk512/include \
+  mise exec -- ruby bench/pass.rb .corpus/real-blog-r4 \
+    --pass sealed/link_to --path /articles/1 --out /tmp/NEW-output
+```
+
+**Decision: stacking backlog, no default promotion and no accepted YJIT win.**
+The accepted show gain is small; do not subtract a hypothetical setup tax or
+credit the rejected index result. Next is interpreter-first pricing of the
+show form scaffold, using the behavior-matched sealed-renderer specimen.
+Further YJIT cohorts wait for the separately owned warmup-method investigation.

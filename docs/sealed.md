@@ -186,10 +186,11 @@ honor the contract; **do not deploy an unchecked artifact on an arbitrary app**.
 
 ## Pilot order and gates
 
-The first pilot is now sealed-only reactivation of `view/link_to` and
-`route/path`, **after pricing its residual checks**. The guarded tier and old
-artifacts remain quarantined; a sealed artifact must refuse without explicit
-sealed acceptance. The historical −5.995% index / −0.987% show numbers price
+The first delivered pilot is the separate `sealed/link_to` pass, **after
+pricing its residual checks**. The guarded `view/link_to` and `route/path`
+passes and old artifacts remain quarantined; routes stay live. A sealed
+artifact must refuse without explicit sealed acceptance. The historical
+−5.995% index / −0.987% show numbers price
 unsafe pre-quarantine code, not the new tier. Effective receiver selection,
 mutable tables, configuration and primitive inputs still need live predicates
 or refusal. The three quarantine repros must appear in the detector ledger;
@@ -204,8 +205,12 @@ fresh-builder provenance with real original-body ISeq delivery, weak-map
 registration/lookup and GC cleanup: 95,638 → 52,762 interpreter Ir for two
 literal-name links, 17 → 9 objects. This clears that measured builder-cost
 hurdle, not the complete deployment certificate or request gates. Route's
-initial incomplete −4,687-Ir price does not authorize its activation. No
-first-pilot request result is yet claimed.
+initial incomplete −4,687-Ir price does not authorize its activation. The
+[post-TracePoint-fix request series](passes/sealed-links.md#post-fix-four-finite-cohorts-one-small-accepted-result)
+accepts only interpreter show, **−0.185% [−0.221, −0.159]**; interpreter index
+and both YJIT cohorts reject their controls. Links are on the stacking backlog,
+not promoted. Next is interpreter-first form-scaffold pricing on show; new
+YJIT cohorts wait for the separately owned warmup-method investigation.
 
 ### Artifact acceptance and the first delivered slice
 
