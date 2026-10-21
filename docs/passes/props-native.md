@@ -1,7 +1,12 @@
-# Props native dispatch predicate: stop at price
+# Props native dispatch and frozen-holder micro
 
-2026-10-21. **Accepted interpreter micro, still a loss: +1.384% Ir.
-Stop at price; no retry, YJIT run, production integration or promotion.**
+2026-10-21. **Frozen split: accepted micro, integration deferred until the
+sealed freeze tier is implemented.** The combined frozen-holder/selected-
+counting specimen saves **−0.460571% Ir [−0.508479, −0.408556]**, including
+marker/replacement costs. No pass promotion, YJIT or whole-request cohort.
+The native-only shape still stops at price: its original accepted loss was
++1.384%; the new symmetric frozen/Stats-preloaded reference loses +2.098%
+and is rejected/dropped. These are separate cohorts, not a rescore.
 The ordinary-def Ruby-reflection shape separately still stops at its
 [accepted interpreter loss](yjit-regression.md#corrected-interpreter-pricing-stop-at-price):
 30,482.987 Ir of checks versus 4,445.573 Ir of unchecked iteration saving,
@@ -324,7 +329,8 @@ this attribution.
 
 ## Combined frozen-holder and selected-counting specimen
 
-**Untimed preparation only; no combined cohort, integration or speed claim.**
+**Preparation and lifetime proof, before the separately authorized price
+below.** These witnesses alone make no speed or integration claim.
 The independently published freeze-only base is
 [d5fbdf1](https://github.com/thomasklemm/lowrail/commit/d5fbdf13081a30b91b0430a353ab2fe412adbec2).
 The combined specimen extends that same `bench/experiments/props_freeze.rb`,
@@ -483,6 +489,79 @@ iteration saving **within the new paired rounds**, not by re-scoring the
 historical 83bf0ba cohort. The marker/replacement costs are inside the measured
 candidate. Unless net paired savings establish break-even after the agreed
 1,428-Ir gap and these costs, props stops permanently. No retry or salvage.
+
+## Accepted combined interpreter micro: integration deferred
+
+**Status: accepted micro, integration deferred until the sealed freeze tier
+is implemented.** One finite cohort on
+[d97df0a](https://github.com/thomasklemm/lowrail/commit/d97df0ab7fcc840c98de2885ce23e54ab5a5952b)
+passes every unchanged A/A, five-pool heap, brk, interpreter-mode, source and
+positive-admission gate. No retry or salvage. The zero-window launch above
+remains invalid; it was not a price. The tracked launcher and specimen have
+the SHA-256 pins listed above; the complete sanitized source/binary proof,
+all six paired rounds, contrasts and raw-evidence hashes are in
+[props-frozen-interpreter.json](props-frozen-interpreter.json).
+
+Ruby **4.0.7 revision 229531a6cf**, Inertia **3.22.0**, interpreter only;
+seed **41231**, **six rounds**, N=**1,000**, seven labels/six unique arms,
+**42 independent boots / 168 windows**, of which 84 contain operations.
+Fixed heap floors remain **1,000,000 / 250,000 / 100,000 / 20,000 / 10,000**.
+Pinned Valgrind **3.19.0, brk512**, tool SHA-256
+`5fe02646537c5669b032c5146665728f9dab384918fea30118b7c7df3dc30ad7`;
+counter binary SHA-256
+`6cf59ad0d495ad9ac48572769478f4e6401cc887e714e74a8159bb485d6604b5`.
+Every measured child is a unique direct controller child, with positive
+windows and no nesting. The enforced cap reports **peak 2, started 42,
+active 0, refused 0**. Counted pre-price companions report **20 hits / zero
+fallbacks** in each checked arm, **0/0** in original/unchecked controls.
+Both slots were released when the cohort finished.
+
+`frozen_split` versus original saves **−0.460571% total Ir
+[−0.508479, −0.408556]** and **−0.460571% GC-excluded Ir
+[−0.508479, −0.408556]**. Allocations fall **55 → 46 objects/resolve**.
+The completion marker, selected-definition dispatch and all remaining
+recursive Ractor/admission/actual-class checks are inside these windows;
+there is no disabled-Stats observer and no excluded replacement charge.
+
+Full paired contrasts follow, in **Ir/resolve, median [95% CI]**. Bootstrap
+whole rounds 5,000 times with `RequestPairs.estimate`, seed 41231; do not
+subtract independently bootstrapped medians or resample requests. Here
+`N`, `F`, `NC`, `FC`, `O`, `E` denote `native_split`, `frozen_split`,
+`native_checks_original`, `frozen_checks_original`, `off_a`, `each`.
+
+| Paired contrast | Total Ir | GC-excluded Ir |
+|---|---:|---:|
+| Native check cost: NC − O | 6,589.766 [6,539.766, 6,617.766] | 6,589.766 [6,539.766, 6,617.766] |
+| Combined check cost: FC − O | 3,959.224 [3,885.224, 3,987.224] | 3,959.224 [3,885.224, 3,987.224] |
+| Unchecked iteration saving: O − E | 4,445.369 [4,393.369, 4,470.369] | 4,445.369 [4,393.369, 4,470.369] |
+| Removed check cost: NC − FC | 2,630.542 [2,628.542, 2,656.542] | 2,630.542 [2,628.542, 2,656.542] |
+| Native split loss: N − O | 2,178.397 [2,150.397, 2,204.397] | 2,178.397 [2,150.397, 2,204.397] |
+| Actual native-to-combined saving: N − F | 2,652.542 [2,628.542, 2,682.542] | 2,652.542 [2,628.542, 2,682.542] |
+| Checks minus iteration saving: FC − 2O + E | −460.145 [−585.145, −432.145] | −460.145 [−585.145, −432.145] |
+| Actual net combined saving: O − F | **478.145 [424.145, 528.145]** | **478.145 [424.145, 528.145]** |
+
+The last row is the decisive measured break-even result: it remains positive
+after marker/replacement costs, so the conditional permanent-stop rule does
+**not** fire for `frozen_split`. Do not subtract the historical 1,428-Ir gap
+or marker costs again. This setup preloads Stats and freezes every arm;
+its native check/gap prices differ from 83bf0ba. The conservative
+checks-versus-iteration contrast also clears zero within this cohort, but
+the separate original-body/control shapes are not an exact additive
+identity for the transformed body. Keep their full contrasts, not a
+fabricated component reconciliation or cross-cohort rescore.
+
+**`native_split` is rejected and dropped:** **+2.098314% total Ir
+[2.070323, 2.123393]**, **+2.098331% GC-excluded
+[2.070323, 2.123376]**. The cohort is accepted; this arm's price is a loss.
+Its earlier +1.384% cohort is neither replaced nor rescored.
+
+The small saving depends on the explicit frozen-holder contract, not on
+unchanged mutable-app behavior. The opt-in sealed freeze tier is still only
+an [accepted design](../freeze-integration.md); Fizzy, for example, retains
+recurring falsy-memo writes. No production props integration, pass promotion,
+YJIT or whole-request cohort follows. Test-certificate and passive
+token/collection correctness take priority. If the freeze tier is built,
+a new workstream must establish its prerequisites before picking up props.
 
 ## Strict-gate provenance
 

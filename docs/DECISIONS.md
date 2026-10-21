@@ -361,7 +361,7 @@ lifetime behavior before requesting a cohort. No runtime integration or
 speed claim follows from the 1,686-Ir combined target budget.
 [Machine-function accounting, census and candidate](passes/props-native.md#untimed-attribution-of-the-remaining-checks).
 
-The **combined specimen is prepared, still unpriced**: frozen holders plus
+Before pricing, the **combined specimen was prepared**: frozen holders plus
 ordinary counting/non-counting definitions selected on installation/late
 Stats enable, retaining every recursive-entry Ractor/admission/receiver
 check. Both Rubies pass 478 lifetime comparisons in each counting mode
@@ -390,6 +390,41 @@ Keep the fc40772 specimen equivalent and every pricing gate unchanged.
 If paired savings do not cover the 1,428-Ir gap and all marker/replacement
 costs with uncertainty accounted for, props stops permanently at that price.
 [Dispatch correction, native check and reproduction](passes/props-native.md#tracked-pricing-launcher-and-zero-window-invalid-attempt).
+
+### Frozen props: accepted micro, integration deferred
+
+The one separately authorized finite interpreter cohort on
+[d97df0a](https://github.com/thomasklemm/lowrail/commit/d97df0ab7fcc840c98de2885ce23e54ab5a5952b)
+passes all unchanged A/A, five-pool heap, brk, mode, source and positive
+liveness gates. Ruby 4.0.7 `229531a6cf`, Inertia 3.22.0, pinned Valgrind 3.19
+brk512; six rounds, seed 41231, N=1,000, **42 boots / 168 windows**.
+The hard cap held: **peak 2, final active 0, refused 0**, all direct children,
+no nesting; both slots released. The earlier zero-window launch stays invalid.
+
+`frozen_split` saves **−0.460571% total Ir [−0.508479, −0.408556]** and
+**−0.460571% GC-excluded [−0.508479, −0.408556]**, **55 → 46 objects/resolve**.
+Actual paired net saving is **478.145 Ir [424.145, 528.145]**, including
+marker/replacement costs: the conditional permanent-stop rule clears.
+Within these new paired rounds, native checks cost **6,589.766 Ir**, combined
+checks **3,959.224 Ir**, and unchecked iteration saves **4,445.369 Ir**;
+checks removed are **2,630.542 Ir [2,628.542, 2,656.542]**.
+All full contrasts and both CIs are retained, not reconstructed from
+differences of medians. The reference setup preloads Stats and freezes every
+arm; **no cross-cohort rescoring** of the old 1,428-Ir gap or native price.
+
+**`native_split` is rejected and dropped**, losing **+2.098314% total Ir
+[2.070323, 2.123393]**, **+2.098331% GC-excluded [2.070323, 2.123376]**.
+The accepted cohort does not make every arm a win.
+
+**Status: accepted micro, integration deferred until the sealed freeze tier
+is implemented.** Frozen holders require the opt-in freeze contract, which
+is still only an [accepted design](freeze-integration.md); Fizzy still has
+recurring falsy-memo writes. The saving is real but small. Test-certificate
+and passive token/collection correctness take priority. **No integration,
+pass promotion, YJIT or whole-request cohort.** If the tier is built later,
+a new workstream picks up props on top of it.
+[Full contrasts and pins](passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred),
+[sanitized export](passes/props-frozen-interpreter.json).
 
 ## Relocatable delivery (2026-10-20)
 
