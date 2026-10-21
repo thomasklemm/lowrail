@@ -58,7 +58,8 @@ module NativeBench
     when "lobsters"
       {"DATABASE_URL" => "sqlite3:#{state}/primary.sqlite3"}
     when "blog"
-      {"SECRET_KEY_BASE_DUMMY" => "1", "SECRET_KEY_BASE" => nil, "RAILS_LOG_LEVEL" => "fatal"}
+      {"SECRET_KEY_BASE_DUMMY" => config["fixture_secret_key_base"] ? nil : "1",
+        "SECRET_KEY_BASE" => config["fixture_secret_key_base"], "RAILS_LOG_LEVEL" => "fatal"}
     else raise "unknown workload"
     end
     # Clean inherited benchmark/activation state. Both off arms preload the
@@ -211,7 +212,7 @@ module NativeBench
         end
         aa = comparison(values.fetch("off_a"), values.fetch("off_b"))
         effect = comparison(values.fetch("off_a"), values.fetch("on"))
-        next [metric, {"arm_means" => values.transform_values { _1.sum / _1.size }, "aa" => aa,
+        next [metric, {"arm_means" => values.transform_values { _1.sum.fdiv(_1.size) }, "aa" => aa,
           "on_off" => effect, "direction" => "unresolved_zero_baseline"}] unless aa["ci95_pct"] && effect["ci95_pct"]
         # The complete A/A envelope is an empirical noise floor, not a claim
         # that a CI crossing zero proves equality. No filtered/clean reruns.
@@ -222,7 +223,7 @@ module NativeBench
           "higher_than_noise_floor"
         else "unresolved_at_noise_floor"
         end
-        [metric, {"arm_means" => values.transform_values { _1.sum / _1.size }, "aa" => aa,
+        [metric, {"arm_means" => values.transform_values { _1.sum.fdiv(_1.size) }, "aa" => aa,
           "on_off" => effect, "aa_noise_floor_pct" => floor, "direction" => label}]
       end]
     end

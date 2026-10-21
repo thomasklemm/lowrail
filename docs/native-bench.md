@@ -153,8 +153,8 @@ README performance number still require all owner gates and Thermos review.
 ## Cheap screen first (owner policy, 2026-10-21)
 
 New ideas use [`script/screen`](../script/screen), not a twelve-round price
-cohort. The already-running Campfire cohort is retained; queued Fizzy and
-Lobsters cohorts are paused while this shared tool is delivered. A screen
+cohort. The already-running Campfire cohort is retained; the owner canceled
+the queued twelve-round Fizzy and Lobsters cohorts after seeing its noise. A screen
 is for killing/promoting an idea, never a README price or support claim.
 
 ```sh
@@ -212,6 +212,48 @@ can fail A/A on entropy. For the blog's request-ID input, set
 the blog/Lobsters Rack driver merges these ordinary headers in all arms.
 An adapter may also preserve its existing `NativeBench.routes` wrapper.
 
+Blog validation must also supply `fixture_secret_key_base` in config before
+boot (the disposable `BlogProduction::Entropy::SECRET` companion value).
+With that input DUMMY is unset and the identical fixture secret is supplied
+in every arm; without it the original DUMMY behavior stays unchanged.
+Never put a deployment secret in the config/export. Campfire/Fizzy already
+restore their disposable seed's `secret_key_base`. Their natural login is
+outside `validation_request`: a custom adapter can wrap the external driver's
+login with the existing pinned controls during `install`/route construction,
+then end that context before warmup/timing. No app/config edits are needed.
+
+### Lobsters exact-response companion
+
+There was no existing Lobsters policy. The blog validator correctly refuses
+its source/lock/Rack versions. Reuse the **mechanism**, not the blog policy:
+[`lobsters-native-entropy.json`](../fixtures/corpus/lobsters-native-entropy.json)
+has independent Lobsters source/lock, external overlay/lock and runtime pins.
+[`LobstersNativeValidation`](../bench/experiments/lobsters_native_validation.rb)
+validates them and delegates to the unchanged `BlogProduction::Entropy`
+validator/install/with. It declares no new random sites. A two-seed, three-arm
+fresh-process probe of `/` matches actual status/body/all headers with no
+entropy errors. Raw entropy still differs and remains explicitly rejected.
+
+The shortest exploration setup (also compose these calls with a prototype):
+
+```ruby
+require "/absolute/repo/bench/experiments/lobsters_native_validation"
+module NativeBench::Exploration
+  def self.install(config:, state:, arm:)
+    LobstersNativeValidation.install(config.fetch("app"))
+    # Install the same observer/guards in every arm; activate only on as needed.
+  end
+  def self.validation_request(**args) = LobstersNativeValidation.validation_request(**args)
+end
+```
+
+Set config `headers.HTTP_X_REQUEST_ID` to a fixed ordinary request ID and add
+the policy plus `fixtures/corpus/blog_entropy.rb` to `exploration_sources`.
+Do not edit upstream's benchmark secret/config. These fixed RNG/clock inputs
+are active only inside the two untimed validation requests per route; real
+reads/traces/errors are retained, and all timed entropy remains native.
+This is exact-response evidence for executed routes, not DB/own-suite admission.
+
 Fizzy AR-only exploration sets `"exploration_only": true` (or
 `--exploration-only`) to skip **only** BlockLinkSpecimen installation and its
 dependencies. Contexts are then unnecessary. Supply an independently built
@@ -232,5 +274,78 @@ reserved for a promoted result to publish, not these screens.
 
 ## Results / JSON appendix
 
-Pending the finite native cohorts. No speed direction is inferred from the
-harness smoke runs or the accepted interpreter instruction result.
+### Campfire: no resolved native latency win; allocations increase
+
+**Noise first.** Frozen harness
+[`54d92f1`](https://github.com/thomasklemm/lowrail/commit/54d92f1e1068eb4e0b1ba60d68f2fc776e08cd52),
+19 public sealed instantiation units, CPU 2, 200 vector warmups and 300
+requests/route/worker. All 36 timing and 3 coverage workers completed;
+54,000 individual request samples independently recalculated in Python.
+Observed Ruby/Rails/JIT/affinity and all captured source/artifact/runtime
+pins match. All 36 timing workers are nonflat: not a strict YJIT price.
+
+| Route | A/A median Δ, 95% interval | Noise floor | On/off median Δ, 95% interval | Decision |
+|---|---:|---:|---:|---|
+| room | +3.99% [−1.55, +8.88] | 8.88% | +1.44% [−2.02, +4.57] | unresolved |
+| pagination | +1.53% [−2.59, +5.69] | 5.69% | +0.89% [−2.34, +4.52] | unresolved |
+| sidebar | +2.31% [−4.31, +9.63] | 9.63% | −1.46% [−8.73, +6.65] | unresolved |
+| search | +1.73% [−3.78, +7.62] | 7.62% | −2.29% [−7.59, +2.93] | unresolved |
+| POST | +1.09% [−2.27, +4.32] | 4.32% | −2.84% [−5.61, −0.28] | unresolved |
+
+Even POST's nominal interval excluding zero does **not** clear the A/A floor.
+Do not rank these five wall-time point estimates as demonstrated speedups.
+
+| Route | Median ms off → on | p90 ms off → on | Serial req/s off → on | Allocations/request off → on | Paired allocation Δ |
+|---|---:|---:|---:|---:|---:|
+| room | 14.542 → 14.717 | 18.950 → 18.974 | 59.97 → 58.75 | 15,428.32 → 15,479.49 | +0.332% |
+| pagination | 6.974 → 7.016 | 8.701 → 8.507 | 130.25 → 133.18 | 6,771.02 → 6,816.84 | +0.677% |
+| sidebar | 7.410 → 7.224 | 9.289 → 8.980 | 128.25 → 132.71 | 8,982.01 → 8,989.63 | +0.085% |
+| search | 8.980 → 8.715 | 11.392 → 10.824 | 99.49 → 102.46 | 7,968.86 → 7,987.82 | +0.238% |
+| POST | 11.679 → 11.329 | 14.851 → 14.441 | 80.47 → 83.83 | 10,523.55 → 10,609.79 | +0.819% |
+
+Arm values are means of the twelve per-worker metrics, not pooled requests.
+Paired percentage changes need not equal ratios of these displayed means.
+Allocation increases clear their corresponding tiny A/A bands on all routes.
+Coverage workers retain 52/46/8/19/3 warm hits/request; two Room STI fallbacks
+on room. Counters were disabled in the public timed arm.
+
+| Route | GC ms/request off → on | Post-window RSS KiB off → on |
+|---|---:|---:|
+| room | 2.670 → 2.856 | 275,148.67 → 272,363.67 |
+| pagination | 0.904 → 0.715 | 272,529.33 → 269,563.67 |
+| sidebar | 0.710 → 0.520 | 269,064.67 → 266,651.33 |
+| search | 1.283 → 1.241 | 269,022.67 → 267,002.67 |
+| POST | 1.100 → 0.854 | 267,651.33 → 264,565.00 |
+
+GC/RSS differences are unresolved against their A/A floors. Boot is
+2,784.18 → 2,919.08 ms (+134.90 ms); paired +5.10% [1.54, 9.25], also
+unresolved by its A/A floor. This response-only POST does not establish
+async completion or a write steady state. No new own-suite/output/DB-state
+certificate follows from timing success.
+
+The [JSON appendix](native-bench.json) retains all 39 workers' metrics,
+coverage/JIT records, schedule, per-round deltas and pinned inputs; private
+sample/log/full-result hashes preserve provenance without public fixture
+secrets or response bodies. A display-only RSS mean bug used integer division
+in the frozen summary. The appendix explicitly preserves those original
+means and independently recomputes fractional means from unchanged worker
+records. Differences, intervals and decisions are unaffected. The harness
+now uses floating-point means; its regression test fails on the old code.
+
+### Ranked view and remaining scope
+
+1. **Demonstrated help:** none from this native cohort.
+2. **Demonstrated cost:** Campfire allocations increase on all five routes,
+   +0.085–0.819%; no resolved wall-time, GC or RSS direction.
+3. **No-op/control:** Lobsters' public artifact has zero units. Initial short
+   smoke has a 20.61–26.94% A/A spread and raw entropy rejection, not evidence
+   of equality or a lowering win. A fixed larger calibration is recorded
+   separately, not pooled or rerun until green.
+4. **Not measured:** Fizzy's long cohort canceled; blog waits for the published
+   production `view.send` fix SHA. No pre-fix native speed number is promoted.
+   Fizzy's accepted interpreter instruction increase is not a YJIT result.
+
+The completed full CLI smoke took 53.94 seconds for two Lobsters routes and
+correctly exited 2 for unnormalized raw entropy inequality. It verifies the
+tool's refusal path, not a prototype win. The larger calibration below is
+the single owner-requested settings experiment, not an optimization variant.

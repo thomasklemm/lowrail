@@ -56,5 +56,8 @@ class NativeBenchTest < Minitest::Test
     end
     assert_equal "unresolved_zero_baseline", result.fetch("gc_ms_per_request").fetch("direction")
     assert_equal [0, 0, 0, 0, 0, 0], result.fetch("gc_ms_per_request").fetch("on_off").fetch("absolute_round_deltas")
+    workers.first.fetch("routes").fetch("GET /example").fetch("rss_after_kib")["VmRSS"] += 1
+    rss = NativeBench.summarize(workers).fetch("GET /example").fetch("rss_kib")
+    assert_in_delta 250 + 1.0 / 6, rss.fetch("arm_means").fetch("off_a"), 1e-10
   end
 end
