@@ -38,12 +38,14 @@ sign: objects saved by retaining that component in the full stack.
 
 ## Candidate inventory
 
-`—` means not measured, never zero. “Pending” is not admission.
+`—` means not measured, never zero. “Pending” is not admission. Blog
+standalone/LOO values below are from the pre-token-allocation-fix matrix;
+the later current-main screen measures the full stack only, not new marginals.
 
 | Component | Apps active / eligible | Deterministic delta alone | Delta inside stack | Leave-one-out delta | Status |
 |---|---|---|---|---|---|
 | Existing sealed form scaffold | Blog show, retained fixture only | −378 objects/request | −378; 1 hit/request | +378 | Favorable screen, provisional: active own-suite gap retained |
-| Existing sealed token tag | Blog show, retained fixture only | +32 objects/request | +32; 4 hits/request | −32 | Excluded on Blog by deterministic cost; live-token continuations retained |
+| Existing sealed token tag | Blog show, retained fixture only | +32 pre-fix; published fix approximately neutral, no new standalone screen here | +32 pre-fix; current marginal unmeasured | −32 pre-fix; current LOO unmeasured | Old cost exclusion superseded by `b059fc9`; full stack now saves 378; not a standalone token win or admission |
 | Existing sealed collection render | Blog show, retained fixture only | 0 objects/request | 0; 1 hit/request | 0 | Allocation tie, no win credit; active own-suite gap retained |
 | Existing sealed AR instantiation | Blog / Campfire / Fizzy active; Lobsters warmed vector has zero hits | Blog 0; Campfire near tie; Fizzy near tie after `c10ccb8` | Blog 0; Fizzy +1 raw median object (0 to +2 control-adjusted), unresolved | Blog 0; Fizzy −1 raw (0 to −2 adjusted) | Pre-fix exclusion superseded; no resolved incremental saving or final admission; DB/active own-suite gaps retained |
 | Props `frozen_split` (`dd844dd`) | None of these four apps use Inertia | Isolated interpreter micro −0.460571% Ir, not request credit | — | — | Excluded: frozen-holder tier not implemented; do not freeze app holders to admit it |
@@ -69,6 +71,8 @@ duplicate their implementation work.
   are pre-dispatch-fix. The published corrections through `62f8a6b` are now
   integrated on the exploration branch, together with shadow fix `acc130d`;
   nine fresh public builds have completed corrected full/alone/LOO screens.
+  A subsequent full-stack rebuild matches fetched main `5ac665c`, including
+  the token allocation fix; its one new screen is recorded separately below.
 - **Campfire r81:** `02023b0f0cafc4d66e06e43be072cf4d6ca328fa`, dependency-only
   Rails 8.1.4 overlay, original `CampfireScenario` fixtures and authentication,
   dedicated disposable Redis. Room STI rows remain original. Queued POST
@@ -112,6 +116,9 @@ own-suite gap independently prevents admission/pricing.
 
 ### Corrected Blog: form-only beats the full stack
 
+**Historical pre-token-allocation-fix attribution.** Retain this complete
+matrix; the subsequent current-main full-stack screen supersedes the cost
+exclusion without pretending to rerun these standalone/LOO selections.
 Sources include dispatch fixes `1c99962`/`62f8a6b` and the allocation-free
 shadow predicate `acc130d`, merged on exploration at `db13e01`. Rebuilt all
 nine artifacts with public `build --sealed --env production --jit yjit`
@@ -164,6 +171,56 @@ for future runs; it cannot supply them retroactively for this screen batch.
 
 All favorable results remain **provisional** until active own-suite coverage
 and the unchanged admission gates exist. No whole-stack price is requested.
+
+### Current-main Blog: full stack recovers 378 saved objects
+
+One bounded re-screen, not another attribution matrix or RPS cohort. Fetched
+`origin/main` at `5ac665c5c2c61e329ef9ccb34f62df086bda5d74` and merged it on
+the exploration branch at `b68ce2d6be0c0567706244129853e73392554283`.
+Every runtime file matches that main snapshot, including the published
+`b059fc9` token allocation fix. Fresh public
+`build --sealed --env production --jit yjit` and the unchanged normal
+denylist produce 17 AR units plus form/token/collection, with no manifest
+pruning, guard changes or app/config patches. The prior build workspace is
+restored; only disposable build/data directories are used.
+
+The shared screen is unchanged: original BlogShowGetOnly seed/source/lock,
+disposable fixture secret, fixed request ID, CPU 2, three rounds of
+200 warmups / 300 samples and separate counted workers. Pinned entropy
+controls run only in untimed validation, never in the measured requests.
+All actual two-seed status/body/all-header comparisons pass, and all four
+DB/storage snapshots are unchanged locally and identical across all arms,
+seeds and rounds. **Exit 0**, no retry or excluded round.
+
+| Blog `GET /articles/1` | off-A | off-B | form + token + collection + AR |
+|---|---:|---:|---:|
+| Integer allocations/request, median [min,max] | 2,412 [2,404,2,423] | 2,412 [2,404,2,422] | 2,034 [2,025,2,044] |
+| Native wall, mean of worker medians (µs) | 1,759.24 | 1,815.48 | 1,514.26 |
+| GC count, each of three measured workers | [6,6,6] | [6,6,7] | [13,11,13] |
+| GC ms/request | 0.4992 | 0.5238 | 0.1306 |
+| RSS KiB | 179,755 | 179,831 | 176,136 |
+
+**378 objects/request saved (15.67%) against either off control**, versus
+346 in the retained pre-token-fix full-stack screen. This matches the old
+form-only allocation median; it is consistent with removal of the token
+penalty, not a new standalone/LOO proof or evidence that neutral components
+add savings. The old +32 token cost exclusion is superseded, not erased.
+The published token diagnosis is allocation-neutral, not a standalone win.
+
+Paired native wall is **−13.91% [−15.69,−12.26]**, with A/A interval
+[−0.58,+5.46]% and max absolute round spread **5.46%**. It does not pass the
+unchanged 3× A/A rule: `clear_wall_win` is false. Keep the favorable
+deterministic result and unresolved wall result separate; no screen retry.
+Coverage per request is Article 1 / Comment 2 / form 1 / token 4 / collection 1,
+zero fallbacks. On has 37 GC collections versus 18/19 off despite lower
+allocation volume and GC time: **no fewer-GC or retained-heap claim**.
+Post-warmup heap live/old/malloc fields remain unmeasured by this harness.
+
+Sanitized evidence is `screen-blog-full-main` in the export; all 20 prior
+reports remain unchanged. This remains provisional with the active own-suite
+and unchanged admission boundaries retained. No price request, main change,
+RPS cohort or further matrix is authorized here. Report this checkpoint,
+then idle.
 
 ### Campfire AR: superseded pre-shadow-fix exclusion screen
 
@@ -489,6 +546,15 @@ that does not certify a forked server. Any future stack RPS result must first
 show nonzero DirectSite hits in its own coverage workers. No RPS run is made
 here, and the later RPS heap snapshot fields do not repair old screen data.
 
+**Later owner/coordinator report:** F's `936cc46` export uses worker-local
+binding after fork and reports positive hits/zero fallbacks in all four
+coverage workers. Its RPS +5.65% [+0.64,+10.50] does not clear the preregistered
+whole-interval rule; the packet observer added after initial windows is a
+further timing limitation. F is parked on its branch, not imported here or
+admitted on main. The coordinator explicitly prohibits a Fizzy stack RPS
+cohort; satisfying coverage is not authorization to run one. The old-runtime
+interpreter price is separate, not a price for the fork fix.
+
 ### Lobsters AR: warm-cache zero credit
 
 Same 200/300 protocol, 24 normally built AR units. `/newest`, `/active`,
@@ -510,9 +576,12 @@ mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
 ```
 
 Corrected Blog attribution, initial four-app screens and post-shadow-fix
-Campfire/Fizzy retests plus guarded F are complete: **20 retained screens**.
+Campfire/Fizzy retests, guarded F and the current-main Blog full stack are
+complete: **21 retained screens**.
 Blog's signed allocation effects are additive, not all beneficial. There is no admitted
-multi-component stack across apps. Token is excluded on Blog; existing AR is
+multi-component stack across apps. Blog's old token cost exclusion is
+superseded; the current full stack saves 378 objects without a new individual
+attribution. Existing AR is
 provisionally neutral on Fizzy after `c10ccb8`; Campfire offers no clear
 reduction and retains exactness gaps; Lobsters' cached vector provides no active credit. Form's favorable
 Blog request reduction stays provisional until active own suites exist.
@@ -525,7 +594,7 @@ claimed. Shared screen tests pass 2 tests / 39 assertions; imported dispatch
 regressions pass form 2/202 and link 2/162; shadow-predicate regression 1/4.
 Updated guard/AR guard/AR instantiation tests pass 13 tests / 107 assertions,
 zero skips. These are runtime unit checks, not an active Fizzy own suite.
-Propose at most **one** whole-stack Callgrind/README price to the coordinator
-only after a clear screen (>3× A/A wall noise or solid deterministic reduction)
-and the correctness/admission boundaries are resolved. No Callgrind is launched
-by this exploration ledger.
+Current assignment ends after this one Blog re-screen and report: **idle**.
+No price request, further screen, Fizzy stack RPS or main change. Any future
+pricing would need new coordinator authorization and the unchanged
+correctness/admission gates; nothing is launched by this ledger.

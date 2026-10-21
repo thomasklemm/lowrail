@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Stack Blog current-main re-screen: recover 378 allocations, then idle (2026-10-21)
+
+One fresh full-stack build on exploration `b68ce2d`, runtime matching fetched main `5ac665c` including token fix `b059fc9`; unchanged three-round 200/300 screen and fixtures.
+Off-A/off-B/on allocation medians 2,412/2,412/2,034: 378 saved (15.67%); actual status/body/all headers and DB/storage comparisons pass both seeds/all rounds, exit 0, active hits 1/2/1/4/1 with zero fallbacks.
+Wall −13.91% [−15.69,−12.26] fails 3× the 5.46% A/A spread; on GC collections 37 versus off 18/19, lower GC time/RSS but no fewer-GC or retained-heap claim.
+Supersede—not erase—the old token cost exclusion; this full-only re-screen does not supply new standalone/LOO attribution or close active own-suite/admission gaps.
+No price request, main change or further cohort; F is parked after unresolved forked RPS and Fizzy stack RPS is explicitly prohibited. Report this checkpoint, then idle. [Twenty-one retained screens](stack.md#current-main-blog-full-stack-recovers-378-saved-objects).
+
 ## Stack Fizzy composition: F supplies the saving, no resolved AR gain (2026-10-21)
 
 Matched F-only / AR-only / F+AR screens retain identical runtime, fixtures and protocol, with both off controls and active component counters.
