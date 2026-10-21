@@ -13,6 +13,30 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Framework-fold exactness kills (2026-10-21)
+
+**Kill G1 — request-entry-only absent Notifications folding.**
+Entry listeners are empty; `Notifications.subscribed` adds a temporary listener before instrumentation.
+Stock delivers payload **37**; folded direct yield drops it, with the same once-only body result.
+The listener is gone at exit too: a request-boundary fingerprint cannot authorize this elision.
+Four production/YJIT boots reproduce it; stop before allocations/wall, no pass ([evidence](framework-fold.md)).
+
+**Kill G2 — elide CSP middleware because the boot policy is nil.**
+Downstream code sets the normal request-local policy, without changing any method or global config.
+Stock emits **`default-src 'none'`**; skipping the middleware loses the security header.
+Entry and exit middleware/downstream facts still match; a boot-state epoch cannot close this boundary.
+Four production/YJIT boots reproduce it; stop before allocations/wall, no pass ([evidence](framework-fold.md)).
+
+**Bounded close-out:** eight equal off-A/off-B controls and eight divergent
+on results across blog, Campfire r81, Fizzy and Lobsters; source/lock pins
+unchanged. These are isolated framework witnesses after real boots, not app
+request or own-suite verification. Generic callbacks stay parked at
+**0.38/0.78/0.39% CPU** in Fizzy/Campfire/Lobsters. The only remaining
+in-scope source-file slice above roughly 2% is ETag (**5.95/3.37%** in
+Campfire/Lobsters), dominated by hashing live response bytes, not boot-fixed
+work. No further eligible fold found: stop. URL generation remains with C,
+per-action selection with E. No win, benchmark, production pass or main change.
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

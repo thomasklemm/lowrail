@@ -1,0 +1,315 @@
+{
+  "format": 1,
+  "date": "2026-10-21",
+  "scope": "two isolated framework boundary counterexamples after four real production boots; NOT app-route tests, own-suite verification, or a performance screen",
+  "lowrail_probe_revision": "7286d63706130bed5dc08aaf56153f33224b2a2c",
+  "profile_revision": "07558fd64c64904ba97cd61a622ff9feddd56c63",
+  "summary": {
+    "app_boots": 4,
+    "witnesses": 8,
+    "equal_off_controls": 8,
+    "unequal_on_results": 8,
+    "allocation_or_wall_workers": 0,
+    "callgrind_workers": 0
+  },
+  "apps": {
+    "blog": {
+      "revision": "retained archive b1dd980b6689bf2b3912691e527d74e0b7699fb32cb53169791c24879f0c0a99",
+      "source_sha256": "86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf",
+      "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+      "source_and_lock_unchanged": true,
+      "witness": {
+        "scope": "exactness-first negative screen, not an app-route performance result",
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "rails": "8.1.4",
+        "rack": "3.2.7",
+        "environment": "production",
+        "yjit": true,
+        "probe_sha256": "2fd674af0b3355fcc37378f4785b9319a0ae14cc29243f8fee1381602814c825",
+        "notifications": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "off_b": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "on": {
+              "entry_matches": true,
+              "observed_events": [],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_request_entry_absence_fold"
+        },
+        "policy_middleware": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "off_b": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "on": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": null,
+              "middleware_facts_still_match": true
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_boot_nil_policy_elision"
+        }
+      }
+    },
+    "campfire-r81": {
+      "revision": "02023b0f0cafc4d66e06e43be072cf4d6ca328fa",
+      "source_sha256": "643476403352b6f5c5c2a431ef5aeb2b1228a6b0c2878d629ea0e277baf4746d",
+      "lock_sha256": "0429e4e3e73f5c49efad7c88014bea13e1461b3ca69af3b9900caaff749971f5",
+      "source_and_lock_unchanged": true,
+      "witness": {
+        "scope": "exactness-first negative screen, not an app-route performance result",
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "rails": "8.1.4",
+        "rack": "3.2.0",
+        "environment": "production",
+        "yjit": true,
+        "probe_sha256": "2fd674af0b3355fcc37378f4785b9319a0ae14cc29243f8fee1381602814c825",
+        "notifications": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "off_b": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "on": {
+              "entry_matches": true,
+              "observed_events": [],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_request_entry_absence_fold"
+        },
+        "policy_middleware": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "off_b": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "on": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": null,
+              "middleware_facts_still_match": true
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_boot_nil_policy_elision"
+        }
+      }
+    },
+    "fizzy": {
+      "revision": "6f1d200316ec3bae91d32c557d88647300807ee9",
+      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+      "source_and_lock_unchanged": true,
+      "witness": {
+        "scope": "exactness-first negative screen, not an app-route performance result",
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "rails": "8.1.4",
+        "rack": "3.2.7",
+        "environment": "production",
+        "yjit": true,
+        "probe_sha256": "2fd674af0b3355fcc37378f4785b9319a0ae14cc29243f8fee1381602814c825",
+        "notifications": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "off_b": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "on": {
+              "entry_matches": true,
+              "observed_events": [],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_request_entry_absence_fold"
+        },
+        "policy_middleware": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "off_b": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "on": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": null,
+              "middleware_facts_still_match": true
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_boot_nil_policy_elision"
+        }
+      }
+    },
+    "lobsters": {
+      "revision": "351a39b77e6c06f4f4fa03148639b10a6bb0c716",
+      "source_sha256": "2881d82b58431b16075cf149555f4d22ef4148bc74acff0a8871609f8a7ae6e2",
+      "lock_sha256": "105a3c0f736082a5714e1db0feb48dc96addb87dd9050051fc8b3d85e4f35fcf",
+      "source_and_lock_unchanged": true,
+      "witness": {
+        "scope": "exactness-first negative screen, not an app-route performance result",
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "rails": "8.1.4",
+        "rack": "2.2.24",
+        "environment": "production",
+        "yjit": true,
+        "probe_sha256": "2fd674af0b3355fcc37378f4785b9319a0ae14cc29243f8fee1381602814c825",
+        "notifications": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "off_b": {
+              "entry_matches": true,
+              "observed_events": [
+                37
+              ],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            },
+            "on": {
+              "entry_matches": true,
+              "observed_events": [],
+              "body_evaluations": 1,
+              "listeners_after_request": 0
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_request_entry_absence_fold"
+        },
+        "policy_middleware": {
+          "arms": {
+            "off_a": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "off_b": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": "default-src 'none'",
+              "middleware_facts_still_match": true
+            },
+            "on": {
+              "entry_matches": true,
+              "status": 200,
+              "body": "same body",
+              "policy_header": null,
+              "middleware_facts_still_match": true
+            }
+          },
+          "off_control_equal": true,
+          "exact": false,
+          "verdict": "kill_boot_nil_policy_elision"
+        }
+      }
+    }
+  },
+  "lobsters_shipped_db_sha256": "d9817ef63aed4989d504d26e341b33d163448cb123f10981082718876227a820",
+  "remaining_source_files_at_least_2pct_cpu": {
+    "fizzy": {},
+    "campfire-r81": {
+      "GEM/rack-3.2.0/lib/rack/etag.rb": 5.945347119645494
+    },
+    "lobsters": {
+      "GEM/rack-2.2.24/lib/rack/etag.rb": 3.372243839169909
+    }
+  }
+}
