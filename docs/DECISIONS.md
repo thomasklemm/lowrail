@@ -373,6 +373,24 @@ price. Disabled workers have no observer or Stats query. No Callgrind slots,
 YJIT run or production edits; request two slots for one finite interpreter
 cohort only after publication. [Contract, witnesses and pins](passes/props-native.md#combined-frozen-holder-and-selected-counting-specimen).
 
+The first authorized combined-price **launch was invalid and produced zero
+measured windows**, not a props price. The private launcher expected
+`--worker`, while `RequestPairs` passed its route argument `unused`. A worker
+re-entered the controller and launched two nested children: three concurrent
+Callgrind processes transiently exceeded the two-process cap. All four dumps
+contain `totals: 0`; no round completed. Admission/preflight passed, but that
+does not repair dispatch or cap failure. Preserve the launcher, four dumps,
+logs and nested outputs; no retry, salvage or break-even claim follows.
+
+The owner separately authorizes **one first measurement**, conditional on a
+published tracked launcher, exact-route native E2E check and hard process
+guards. Worker roles must be explicit and cannot invoke the controller or
+create children; supervision refuses a third launch **before** spawning it.
+Keep the fc40772 specimen equivalent and every pricing gate unchanged.
+If paired savings do not cover the 1,428-Ir gap and all marker/replacement
+costs with uncertainty accounted for, props stops permanently at that price.
+[Dispatch correction, native check and reproduction](passes/props-native.md#tracked-pricing-launcher-and-zero-window-invalid-attempt).
+
 ## Relocatable delivery (2026-10-20)
 
 Use typed app-root-relative metadata and explicit AOT `build --target-root`

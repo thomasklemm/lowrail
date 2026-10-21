@@ -381,9 +381,9 @@ callbacks, receiver overrides/visibility, stale/malformed facts and the
 explicitly bootstrapped non-main-Ractor witness. These are lifetime proofs,
 not a measured cohort; no Callgrind slots were used.
 
-The preparation retains these SHA-256 pins, including the unchanged factory
-and iteration emitter. Both native binaries are built separately, not copied
-between Rubies; private paths and raw per-case files stay local.
+The fc40772 preparation retained these SHA-256 pins, including the unchanged
+factory and iteration emitter. Both native binaries are built separately,
+not copied between Rubies; private paths and raw per-case files stay local.
 
 | Combined preparation input | SHA-256 |
 |---|---|
@@ -419,6 +419,70 @@ Guard, runtime, native C/build/binary fingerprints. Liveness additionally
 requires current manifest format and interpreter certification/actual mode.
 No measured-worker/cohort entrypoint is added here; request a separate
 two-worker allocation only after these proofs pass.
+
+## Tracked pricing launcher and zero-window invalid attempt
+
+The initial private launch on fc40772 is **invalid/unpriced**. Its worker
+branch expected `--worker`, but `RequestPairs.heap_instructions` passes the
+route argument `unused`. One worker exited on the output-directory check;
+the other re-entered the controller and spawned two nested children. Thus
+three Callgrind processes overlapped, exceeding the two-process cap. All
+four dumps report `totals: 0`: **zero measured windows and zero completed
+rounds**, not evidence for either a saving or a permanent price stop.
+All six admission companions and the pinned-tool preflight had passed.
+The failed launch was stopped without retry/salvage and both slots released.
+The original private launcher SHA-256 is
+`ccf9595de832045498a37b0c2cb462c17ed0d983cafe9cc279363e3d4493150e`;
+its source, logs, zero-Ir dumps and nested outputs remain local evidence.
+
+The separately authorized first measurement uses the tracked
+`bench/experiments/props_freeze_price.rb`. Explicit inherited worker roles
+accept **only** the exact `unused` route and reject controller arguments;
+an absent role never treats that route as a controller output directory.
+Each child verifies its parent PID, current source proof and positive
+admission. Worker-local Kernel/Process/IO guards reject system, spawn,
+fork, exec, daemon, backticks and popen before freezing, symmetrically in
+all arms. The controller supervises the actual `system` launch boundary:
+two mutex-held permits span each child's lifetime, and a third attempt
+raises **before spawn**. Peak/active/refusal counts are retained even on
+failure. These are benchmark process controls, not production changes.
+
+The exact-route **native E2E check passes** with no Callgrind process:
+all six unique arms, seven direct worker boots including off-A/off-B, N=3,
+**28 executed windows, 14 positive operation windows**, all with allocation
+work; original/checks arms allocate 165 objects in each positive window,
+split/unchecked arms 138. Every child reports the controller as parent;
+all PIDs are unique, no nested controller, peak **2**, final active/refused
+**0/0**. Counted companions authorize 20/0 in checked arms and 0/0 in
+controls. This validates plumbing, not Ir or A/A. The specimen, iteration
+factory, guard/runtime/native inputs still match the fc40772 lifetime proof.
+Both Rubies additionally pass **9 tests / 128 assertions**: the existing
+Stats/freeze witnesses plus wrong-role/route controller refusal, twelve
+child-process API refusals, and a concurrent third-launch negative control
+whose callback never runs. The tracked launcher SHA-256 is
+`fdaa43bccb075b6ab5f873a77480b7dd2ca8a2d7b1cd976e4f3340c43d6660ef`.
+
+```sh
+# Native-only exact-route check; NEW_CHECK_OUT must not exist.
+PATH=/tmp/vg/bin:$PATH CPATH=/tmp/vg/include BENCH_JIT=0 BENCH_JOBS=2 \
+  mise exec -- ruby bench/experiments/props_freeze_price.rb --check NEW_CHECK_OUT
+
+# Only with the separate two-slot authorization; PIN is the published head.
+PATH=/tmp/vg/bin:$PATH CPATH=/tmp/vg/include BENCH_JIT=0 BENCH_JOBS=2 \
+BENCH_REQUESTS=1000 BENCH_AA_TOLERANCE=0.5 \
+BENCH_HEAP_SLOTS=1000000,250000,100000,20000,10000 PROPS_FREEZE_PIN=PIN \
+  mise exec -- ruby bench/experiments/props_freeze_price.rb --cohort NEW_OUT
+```
+
+The one cohort keeps seed 41231, six rounds, seven labels, 42 independent
+boots, 168 windows and **every shared A/A/heap/brk/mode/source gate unchanged**.
+Stats stays preloaded but disabled in all measured arms, with no observer.
+Both native reference arms are also frozen; their predicate still performs
+the BASIC/visibility queries. Compare native/frozen check costs and unchecked
+iteration saving **within the new paired rounds**, not by re-scoring the
+historical 83bf0ba cohort. The marker/replacement costs are inside the measured
+candidate. Unless net paired savings establish break-even after the agreed
+1,428-Ir gap and these costs, props stops permanently. No retry or salvage.
 
 ## Strict-gate provenance
 

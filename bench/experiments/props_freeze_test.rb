@@ -218,4 +218,63 @@ class PropsFreezeTest < Minitest::Test
       assert_equal expected, results.last, condition
     end
   end
+
+  def test_price_worker_cannot_reenter_controller_or_accept_a_fake_route
+    launcher = File.expand_path("props_freeze_price.rb", __dir__)
+    %w[worker liveness].each do |role|
+      stdout, stderr, status = Open3.capture3({"PROPS_FREEZE_ROLE" => role, "BENCH_JIT" => "0", "RUBYOPT" => nil},
+        RbConfig.ruby, "--disable-yjit", "--disable-zjit", launcher, "--cohort", "/no-controller-permitted")
+      refute status.success?, stdout
+      assert_includes stderr, "worker cannot enter controller"
+    end
+    _, stderr, status = Open3.capture3({"PROPS_FREEZE_ROLE" => nil, "BENCH_JIT" => "0", "RUBYOPT" => nil},
+      RbConfig.ruby, "--disable-yjit", "--disable-zjit", launcher, "unused")
+    refute status.success?
+    assert_includes stderr, "usage: props_freeze_price.rb"
+  end
+
+  def test_price_worker_refuses_every_child_process_api
+    stdout, stderr, status = run_child(<<~RUBY)
+      require #{File.expand_path('props_freeze_price.rb', __dir__).dump}
+      PropsFreezePrice.block_children!
+      attempts = [-> { system('false') }, -> { spawn('false') }, -> { fork {} },
+        -> { exec('false') }, -> { `false` }, -> { Kernel.system('false') },
+        -> { Process.spawn('false') }, -> { Process.fork {} }, -> { Process._fork },
+        -> { Process.exec('false') }, -> { Process.daemon }, -> { IO.popen('false') }]
+      refusals = attempts.map do |attempt|
+        begin
+          attempt.call
+          false
+        rescue RuntimeError => error
+          error.message == 'props worker cannot create or replace processes'
+        end
+      end
+      puts JSON.generate(refusals)
+    RUBY
+    assert status.success?, stderr
+    assert_equal [true] * 12, JSON.parse(stdout)
+  end
+
+  def test_price_supervisor_refuses_a_third_launch_before_running_it
+    stdout, stderr, status = run_child(<<~RUBY)
+      require #{File.expand_path('props_freeze_price.rb', __dir__).dump}
+      limit = PropsFreezePrice::WorkerLimit.new
+      ready, release = Queue.new, Queue.new
+      holders = Array.new(2) { Thread.new { limit.around { ready << true; release.pop } } }
+      2.times { ready.pop }
+      ran = false
+      refusal = begin
+        limit.around { ran = true }
+        false
+      rescue RuntimeError => error
+        error.message == 'two-worker process cap exceeded before spawn'
+      end
+      2.times { release << true }
+      holders.each(&:value)
+      puts JSON.generate(refused: refusal, third_ran: ran, report: limit.report)
+    RUBY
+    assert status.success?, stderr
+    assert_equal({"refused" => true, "third_ran" => false,
+      "report" => {"active" => 0, "peak" => 2, "started" => 2, "refused" => 1}}, JSON.parse(stdout))
+  end
 end
