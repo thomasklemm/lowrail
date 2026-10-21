@@ -115,9 +115,28 @@ fn class_type(facts: &Facts, class: &str) -> String {
 }
 
 fn compatible(facts: &Facts, static_type: &str, class: &str) -> bool {
+    if static_type.ends_with('?') && class == "NilClass" { return true; }
+    let ty = static_type.trim_end_matches('?');
+    let ty = if ty.starts_with('(') && ty.ends_with(')') { &ty[1..ty.len()-1] } else { ty };
+    let mut depth = 0;
+    for (i, c) in ty.char_indices() {
+        match c {
+            '(' | '[' => depth += 1,
+            ')' | ']' => depth -= 1,
+            '|' if depth == 0 => return compatible(facts, ty[..i].trim(), class)
+                || compatible(facts, ty[i+1..].trim(), class),
+            _ => {}
+        }
+    }
+    let ty = ty.trim_start_matches("::");
+    let base = ty.split('[').next().unwrap_or(ty);
+    // Array/Hash samples do not describe their elements. Keep model-specific
+    // relation identities, whose observed class does carry the model name.
+    let container = matches!(base, "Array" | "Hash");
     let observed = class_type(facts, class);
-    let ty = static_type.trim_end_matches('?').trim_matches(['(', ')']);
-    (static_type.ends_with('?') && class == "NilClass")
-        || ty.split(" | ").any(|arm| arm == observed
-            || facts.modules.iter().any(|m| m.name == class && m.ancestors.iter().any(|a| a == arm)))
+    let expected = if container { base } else { ty };
+    let observed = if container { observed.split('[').next().unwrap_or(&observed) } else { &observed };
+    expected == observed
+        || (ty == "true" && class == "TrueClass") || (ty == "false" && class == "FalseClass")
+        || facts.modules.iter().any(|m| m.name == class && m.ancestors.iter().any(|a| a == expected))
 }

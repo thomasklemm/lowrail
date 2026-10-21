@@ -299,11 +299,17 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             }
         }
     }
+    sorbet::seed(facts, model);
     // Boot parameters and ownership override catalog guesses, including custom
     // readers. Resolve ancestor methods for model accessors as well.
     let ids: Vec<_> = model.methods.keys().cloned().collect();
     for id in ids {
         let sig = &model.methods[&id];
+        if sig.return_type.provenance.iter().any(|p| p.source == Source::SorbetSig) {
+            // A declaration is advisory even if its source body is a literal.
+            bodies.remove(&id);
+            continue;
+        }
         if let Some((owner, method)) = resolve(facts, &sig.receiver, &sig.method, sig.singleton) {
             let own_key = key(&owner.name, &method.name, method.singleton);
             let body = bodies.get(&own_key).cloned();

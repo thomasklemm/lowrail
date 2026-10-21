@@ -148,6 +148,19 @@ pub struct Method {
     /// method's body (ISeq identity), if any.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub script: Option<String>,
+    /// Read-only snapshot of an already-built Sorbet registry entry.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sorbet_sig: Option<SorbetSignature>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SorbetSignature {
+    pub version: String,
+    pub source_location: String,
+    pub parameters: Vec<Vec<String>>,
+    pub parameter_types: BTreeMap<String, String>,
+    pub return_type: String,
 }
 
 impl Method {

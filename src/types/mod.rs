@@ -3,6 +3,7 @@ mod infer;
 mod observed;
 mod rails;
 mod rbs;
+mod sorbet;
 #[cfg(test)]
 mod tests;
 
@@ -18,6 +19,8 @@ pub enum Source {
     BootFact,
     Schema,
     RailsApi,
+    #[serde(rename = "sorbet sig")]
+    SorbetSig,
     Inference,
     Observed,
 }
@@ -96,6 +99,8 @@ pub struct Signature {
     pub observation: Option<crate::observe::MethodTypes>,
     /// Action/callback roles do not imply a particular Ruby return value.
     pub roles: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub block_self: Option<String>,
 }
 
 impl Signature {
@@ -292,16 +297,14 @@ impl TypeModel {
         }
         for route in &facts.routes {
             if let Some(name) = &route.name {
-                out.insert(
-                    "Lowrail::RouteHelpers",
-                    &format!("{name}_path"),
-                    false,
-                    Type::new(
-                        "String",
-                        Source::BootFact,
-                        format!("route {name}: {}", route.path),
-                    ),
-                );
+                for suffix in ["path", "url"] {
+                    out.insert(
+                        "Lowrail::RouteHelpers",
+                        &format!("{name}_{suffix}"),
+                        false,
+                        Type::new("String", Source::BootFact, format!("route {name}: {}", route.path)),
+                    );
+                }
             }
         }
         rails::seed(facts, &mut out);
@@ -362,6 +365,7 @@ impl TypeModel {
                 ivars: BTreeMap::new(),
                 observation: None,
                 roles: vec![],
+                block_self: None,
             })
     }
 

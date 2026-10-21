@@ -14,7 +14,7 @@ live in the linked docs; numbers come from executed runs, dated.
 | Opt-in passes | guarded selection: only props + endpoint; seven cached-fact passes sealed-only after suppressed-hook audit; see [DECISIONS](DECISIONS.md#passes) |
 | Measurement | post-TracePoint-fix config-only Starter JSON interpreter **−10.156% Ir accepted**; post-fix YJIT rejected A/A/JIT flatness, untimed mode-mismatched artifact has zero fast hits; no config promotion ([diagnosis](passes/yjit-regression.md)). Guard micro K 822→425 interpreter / 371→140 YJIT Ir |
 | Biggest measured lever | endpoint render path, −26 %/−37 % handwritten upper bounds; caller-side certification loses (0fbb909) |
-| Types/MCP | source-backed Rails API catalog; blog slots 2/69/7/158, Wikino 0/471/1/3,545 (proven/static/observed/unknown); blog Steep 51 → 6, still non-gating ([details](types.md#rails-api-follow-up--2026-10-21)) |
+| Types/MCP | source-backed Sorbet + Rails signatures; blog slots 2/99/7/188, Wikino 0/1,715/1/1,129 (proven/static/observed/unknown); 517 original wrapped returns → static, forwarding placeholders removed; blog Steep 51 → 6 → 2, still non-gating ([details](types.md#sorbet-and-framework-signatures-follow-up--2026-10-21)) |
 | In progress | body-installed endpoint pricing (guarded tier); sealed tier + `seal-check`; props pass; Ruby 4.1/ZJIT matrix |
 
 ## Works (2026-10-20)

@@ -13,4 +13,5 @@ Gem::Specification.new do |spec|
   # dependency: a missing compiler must not prevent the Ruby gem from loading.
   spec.files = Dir["lib/**/*.rb", "ext/**/*.{c,rb}", "Rakefile"]
   spec.add_development_dependency "minitest-mock", "~> 5.27"
+  spec.add_development_dependency "sorbet-runtime", "0.5.12435"
 end

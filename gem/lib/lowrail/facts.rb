@@ -29,6 +29,9 @@ module Lowrail
     KERNEL_SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
     KERNEL_IS_A = Kernel.instance_method(:is_a?)
     KERNEL_CLASS = Kernel.instance_method(:class)
+    IVAR_GET = Kernel.instance_method(:instance_variable_get)
+    OBJECT_ID = BasicObject.instance_method(:__id__)
+    HASH_GET = Hash.instance_method(:[])
 
     CALLBACK_KINDS = %w[initialize find touch validation validate save create update destroy commit rollback].freeze
     BLOCK_LABEL = /\A(?:rescue in |ensure in )*block(?: \(\d+ levels\))? in /
@@ -64,6 +67,17 @@ module Lowrail
       # compiled inside one carry its digest ("script").
       def collect(app_root: nil, generated_dir: nil)
         @errors ||= []
+        @sorbet_registry = nil
+        spec = Gem.loaded_specs["sorbet-runtime"]
+        if spec && spec.version.to_s == "0.5.12435" &&
+            $LOADED_FEATURES.any? { |p| p.end_with?("/types/private/methods/_methods.rb") }
+          methods = ::T::Private::Methods
+          registry = IVAR_GET.bind_call(methods, :@signatures_by_method)
+          pending = IVAR_GET.bind_call(methods, :@sig_wrappers)
+          if KERNEL_IS_A.bind_call(registry, Hash) && KERNEL_IS_A.bind_call(pending, Hash)
+            @sorbet_registry = [spec, registry, pending]
+          end
+        end
         out = {}
         out["format"] = FORMAT
         out["ruby_description"] = RUBY_DESCRIPTION
@@ -255,7 +269,53 @@ module Lowrail
         if iseq && @script_index && (script = @script_index[iseq])
           entry["script"] = ScriptCapture.digest(script)
         end
+        if (sig = sorbet_signature(um))
+          entry["sorbet_sig"] = sig
+        end
         entry
+      end
+
+      # Never call signature_for_method: it executes pending sig blocks and
+      # installs validators. Read only already-built entries of the inspected
+      # 0.5 registry layout, and raw ivars (not type.name/coerce/build_type).
+      def sorbet_signature(um)
+        return unless @sorbet_registry
+        spec, registry, pending = @sorbet_registry
+        key = "#{OBJECT_ID.bind_call(um.owner)}##{um.name}"
+        return if HASH_GET.bind_call(pending, key)
+        sig = HASH_GET.bind_call(registry, key)
+        return unless sig && MOD_NAME.bind_call(KERNEL_CLASS.bind_call(sig)) == "T::Private::Methods::Signature"
+        original = IVAR_GET.bind_call(sig, :@method)
+        return unless KERNEL_IS_A.bind_call(original, UnboundMethod)
+        path = um.source_location&.first
+        wrapper = path && path.start_with?(File.join(spec.full_gem_path, "lib/types/private/methods/"))
+        return unless wrapper || um == original
+        loc = original.source_location
+        return unless loc
+        types = {}
+        Array(IVAR_GET.bind_call(sig, :@arg_types)).each { |name, type| types[str(name)] = sorbet_type(type) }
+        (IVAR_GET.bind_call(sig, :@kwarg_types) || {}).each { |name, type| types[str(name)] = sorbet_type(type) }
+        %i[rest keyrest block].each do |kind|
+          name = IVAR_GET.bind_call(sig, :"@#{kind}_name")
+          types[str(name)] = sorbet_type(IVAR_GET.bind_call(sig, :"@#{kind}_type")) if name
+        end
+        {
+          "version" => spec.version.to_s,
+          "source_location" => "#{str(loc[0])}:#{loc[1]}",
+          "parameters" => IVAR_GET.bind_call(sig, :@parameters).map { |p| p.map { |v| str(v) } },
+          "parameter_types" => types,
+          "return_type" => sorbet_type(IVAR_GET.bind_call(sig, :@return_type)),
+        }
+      end
+
+      def sorbet_type(type)
+        # Anything requiring lazy alias/type initialization remains unknown.
+        return "T.untyped" unless type
+        if MOD_NAME.bind_call(KERNEL_CLASS.bind_call(type)) == "T::Types::Simple"
+          raw = IVAR_GET.bind_call(type, :@raw_type)
+          return MOD_NAME.bind_call(raw) || "T.untyped" if KERNEL_IS_A.bind_call(raw, Module)
+        end
+        "T.untyped"
       end
 
       # method | block (define_method) | eval | cfunc | attr_reader | attr_writer | none

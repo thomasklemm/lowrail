@@ -128,6 +128,48 @@ class FactsTest < Minitest::Test
     assert_equal "ArgumentError: bad", Lowrail::Facts.collect["errors"].first["error"]
   end
 
+  def test_sorbet_registry_does_not_execute_pending_sigs_or_app_methods
+    available = system(RbConfig.ruby, "-e", 'gem "sorbet-runtime", "0.5.12435"', out: File::NULL, err: File::NULL)
+    missing_prerequisite "sorbet-runtime 0.5.12435 not installed" unless available
+    out, err, status = Open3.capture3(RbConfig.ruby, "-I#{File.expand_path('../lib', __dir__)}", "-e", <<~'RUBY')
+      gem "sorbet-runtime", "0.5.12435"
+      require "sorbet-runtime"
+      require "lowrail/facts"
+      require "stringio"
+      $sigs = $calls = 0
+      class Declared
+        extend T::Sig
+        sig { $sigs += 1; params(value: Integer).returns(String) }
+        def ready(value); $calls += 1; value.to_s; end
+        sig { $sigs += 1; returns(Integer) }
+        def pending; $calls += 1; 7; end
+      end
+      Declared.new.ready(3) # The app, not the dumper, builds this one entry.
+      before = Declared.instance_method(:pending)
+      collected = Lowrail::Facts.collect.fetch("modules").find { |m| m["name"] == "Declared" }.fetch("methods")
+      ready = collected.find { |m| m["name"] == "ready" }
+      pending = collected.find { |m| m["name"] == "pending" }
+      same = before == Declared.instance_method(:pending)
+      io = StringIO.new
+      Lowrail::Facts.dump(io, app_root: Dir.pwd)
+      persisted = JSON.parse(io.string).fetch("modules").find { |m| m["name"] == "Declared" }.fetch("methods").find { |m| m["name"] == "ready" }
+      Declared.class_eval { def ready(value); false; end }
+      stale = Lowrail::Facts.collect.fetch("modules").find { |m| m["name"] == "Declared" }.fetch("methods").find { |m| m["name"] == "ready" }
+      puts JSON.generate({ready: ready, persisted: persisted, pending: pending, stale: stale, sigs: $sigs, calls: $calls, same: same})
+    RUBY
+    assert status.success?, err
+    data = JSON.parse(out)
+    sig = data.fetch("ready").fetch("sorbet_sig")
+    assert_equal "String", sig.fetch("return_type")
+    assert_equal({"value" => "Integer"}, sig.fetch("parameter_types"))
+    assert_equal [["req", "value"]], sig.fetch("parameters")
+    assert_equal "0.5.12435", sig.fetch("version")
+    assert_equal sig, data.fetch("persisted").fetch("sorbet_sig")
+    refute data.fetch("pending").key?("sorbet_sig")
+    refute data.fetch("stale").key?("sorbet_sig")
+    assert_equal [1, 1, true], data.values_at("sigs", "calls", "same")
+  end
+
   def test_dump_to_io_and_path_is_deterministic
     io = StringIO.new
     Lowrail::Facts.dump(io, timings: {boot_seconds: 1.5})

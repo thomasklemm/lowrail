@@ -14,8 +14,8 @@ rbs -I .corpus/real-blog/sig/lowrail validate
 app. Stdout is a JSON object with a `methods` map keyed by `Class#method` or
 `Class.method`, and source-read/parse diagnostics. Every return/parameter type
 has a `name` (RBS notation) and `provenance` entries with `source` and `detail`.
-Sources are `boot_fact`, `schema`, `rails_api`, `inference`, and `observed`. Existing
-`.lowrail/observed.json` samples are merged **after** static inference, never
+Sources are `boot_fact`, `schema`, `rails_api`, `sorbet sig`, `inference`, and
+`observed`. Existing `.lowrail/observed.json` samples are merged **after** static inference, never
 fed back into it. Types remain advisory unless explicitly proven within an
 analyzed body; a lowering consumer must still certify its execution context.
 
@@ -59,7 +59,7 @@ Every type has `name`, `provenance`, `evidence`, and `samples`:
 | Evidence | Consumer contract |
 |---|---|
 | `proven_body` | Literal/local assignment proof **within the analyzed method body**. No value-class check needed there; still certify the unchanged effective method/source and execution context with the normal pass guard. `proven_type()` returns the name only for this case. |
-| `static` | Schema, boot catalog, or call-based inference. Needs method/schema/config certificates and, when applicable, live value checks. Storage nullability is not a Ruby-object invariant. |
+| `static` | Schema, boot catalog, declared Sorbet sig, or call-based inference. Needs method/schema/config certificates and, when applicable, live value checks. Storage nullability is not a Ruby-object invariant. |
 | `observed` | Sample-only type. Needs a live value/shape check and the usual semantic certificates; never returned by `proven_type()`. |
 
 Per-method ivars describe exit state, not view-entry dominance. Calls kill
@@ -100,9 +100,16 @@ type union and proof separate from precision.
 - Controller actions and method-based `before_action` callbacks have roles
   in the model. Their returns remain `untyped` unless a simple body is known;
   an action is not assumed to return the HTTP response.
-- Each named route gets `Lowrail::RouteHelpers#name_path -> String`.
+- Each named route gets `Lowrail::RouteHelpers#name_path` and `#name_url -> String`,
+  included in the exported controller declarations.
   Parameters are permissive because route facts do not describe the full
   polymorphic/positional/keyword calling convention.
+- Source-matched Sorbet wrappers recover adjacent `sig` declarations and the
+  original `def` parameter shape with Prism, including inherited controller
+  copies. Known class names, Boolean, nilable/unions, arrays/hashes and bounded
+  static type aliases are advisory `static`, source **`sorbet sig`**, never
+  proof. Unsupported expressions remain `untyped`; `void` does not constrain
+  the Ruby result. No sig block or application method is executed.
 
 Boot method parameters replace guessed parameter lists where available;
 owner/source-matched Rails API signatures replace generic delegation shapes.
@@ -291,8 +298,8 @@ identities leave enum predicates untyped rather than skipping a possible overrid
 `render`, parameter extraction, macro results and wrapped `redirect_to` retain
 `untyped`; known call shape is useful without pretending to know its result.
 No upstream RBS distribution is imported or installed in the app. Full
-collection import, enum mappings/bang methods, callback block-self typing,
-controller-to-view flow and Sorbet-wrapper recovery remain follow-ups.
+collection import, enum mappings/bang methods and controller-to-view flow
+remain follow-ups. The next section records Sorbet and callback-self recovery.
 
 | App | Signatures before → after | Proven/static/observed/unknown before → after |
 |---|---:|---|
@@ -322,6 +329,75 @@ Steep logs are retained privately in `.lowrail/private/type-sources/`.
 `observe`, strict mode, seed 1729): **21 runs, 246 assertions, 0 failures/errors**,
 one named optional skip (`MaterializeCorpusTest#test_campfire`, app absent).
 Both apps' real MCP exports equal the split CLI files and standalone stdout.
+
+## Sorbet and framework signatures follow-up — 2026-10-21
+
+Same unchanged facts/observation snapshots and corpus revisions as above;
+Ruby 4.0.7, RBS 4.2.0 and Steep 2.1.0. This is advisory type tooling only:
+runtime loading, guards and lowering are unchanged. No measurement cohorts
+were run. Public source contains no app snapshots or private logs.
+
+Prism recovers **all 693 original wrapped Wikino methods**, using declared
+sigs rather than method names or wrapper bodies. Of their original 2,772
+unknown slots, **517 return slots become static**; the other **176 returns
+remain unknown** (110 explicit `T.untyped`, 66 `void`). Their **2,079 wrapper
+forwarding placeholders disappear**, replaced by **136 real, statically typed
+arguments**. Placeholder removal is a shape correction, not 2,079 recovered
+argument value types. Another **397 previously unmodeled declared methods**
+become visible. Across all 1,090 recovered signatures, **777 returns + 431
+arguments = 1,208 slots** have static Sorbet types. Sources retain the sig
+file/line, expression, alias locations where used, and boot gem version.
+
+The optional boot-registry reader inspects **already-built** entries of
+`sorbet-runtime 0.5.12435` only. It does not call `signature_for_method`, run
+pending sigs, initialize lazy type objects, require/autoload constants or call
+application methods. Raw simple types and original parameters/source survive
+as `sorbet_sig` method metadata; other versions/layouts and stale entries are
+refused. Source parsing is preferred. **These Wikino gains use Prism alone**
+on the existing snapshot; registry recovery is checked with real Sorbet in a
+separate subprocess. Sorbet is a pinned **development**, not runtime, dependency.
+Checks and declarations are not proof, even with a literal body or runtime
+validation enabled. Generic/proc/dynamic forms, missing constants and ambiguous
+declarations remain unknown or unmodeled, with provenance/diagnostics retained.
+Samples preserve counts and contradictions without mistaking `::String` for
+a different class or pretending an Array/Hash class sample describes elements.
+
+Booted named routes supply both path and URL signatures and controller mixins.
+Source/version-matched advisory support adds Turbo `broadcasts_to` and
+`broadcast_replace_to` (blog **turbo-rails 2.0.23**) and Importmap
+`stale_when_importmap_changes` (**importmap-rails 2.2.3**). Results stay
+`untyped`. Supported catalog families are Turbo 2.0.x and Importmap 2.1/2.2.x;
+overridden owners/sources or other versions do not receive these signatures.
+AR 8.0/8.1 `after_create_commit`/`after_destroy_commit` use RBS's explicit
+block `[self: ::Model]`, rather than silencing the callback body with `untyped`.
+
+| App | Signatures before → after | Proven/static/observed/unknown before → after |
+|---|---:|---|
+| Blog | 167 → 197 | 2/69/7/158 → **2/99/7/188** |
+| Wikino | 1,504 → 1,937 | 0/471/1/3,545 → **0/1,715/1/1,129** |
+
+Blog's added 30 URL helpers each introduce a static return and a permissive
+unknown argument: the denominator grows; none of its old unknown slots is
+claimed recovered. Wikino likewise adds 36 URL helpers. Framework support
+members are excluded from app-slot coverage as before. Proven counts stay
+**2 and 0**, conflicts stay zero, and Wikino's 38 raw-template diagnostics
+remain visible. Both apps pass `rbs -I OUT validate`; real MCP and split/standalone
+CLI exports agree.
+
+The old blog export reproduces **6 Steep problems / 4 files**, exit 1; the
+new export has **2 problems / 1 file**, also exit 1. The remaining diagnostics
+are `Comment`'s two callback calls to `article.broadcast_replace_to`: self is
+now correctly `Comment`, but `article` is honestly **`Article | nil`**. Article's
+Turbo method is declared; nil has none. Even though the app rescues these calls,
+Steep still reports them. Do not narrow the association or suppress the errors
+to manufacture a green gate. The cumulative change is **51 → 6 → 2**,
+still advisory/non-gating.
+
+Validation: `cargo test --locked` **48 passed**; affected gem tests (`facts`,
+`materialize`, `observe`, strict, seed 1729) **22 runs / 255 assertions / no
+failures or errors**, one named optional skip (Campfire app absent). Disposable
+Steep copies are removed; exact inputs, full exports, slot-identity transitions
+and logs remain ignored, not published.
 
 ## Type quality ledger — 2026-10-20
 

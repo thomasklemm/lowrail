@@ -118,9 +118,28 @@ inheritance and empty helpers so known APIs can actually be used by Steep.
 Same-snapshot unknown slots: blog **176 → 158**, Wikino **3,707 → 3,545**;
 most of the net reduction is correcting delegation parameter shape, not
 recovering argument value types. Blog Steep **51 → 6**, still failing and
-non-gating. Full RBS-collection import and recovery through Sorbet wrappers
-remain follow-ups, not claims. Runtime/lowering and measurement work are
+non-gating. Full RBS-collection import remains a follow-up. Runtime/lowering and measurement work are
 untouched. [Classification, exact slot counts and limitations](types.md#rails-api-follow-up--2026-10-21).
+
+### Recover declarations through Sorbet, never certify them (2026-10-21)
+
+Use Prism to associate adjacent sig/def pairs with booted Sorbet wrappers,
+retaining lexical type aliases, actual parameters and inherited method lookup.
+Every recovered type is advisory `static`, source `sorbet sig`, regardless of
+runtime checking. Unsupported expressions stay untyped, and `void` says nothing
+about the returned Ruby value. The optional registry reader only inspects
+already-built raw entries of the pinned 0.5.12435 layout; it never invokes
+pending sigs, lazy type initialization or app code. No new proof or lowering.
+
+Of Wikino's original 2,772 wrapped unknown slots, 517 returns become static;
+2,079 forwarding placeholders are replaced by 136 typed real arguments, not
+counted as recovered values. All recovered declarations contribute 1,208
+static slots. Wikino coverage is now **0/1,715/1/1,129**, blog
+**2/99/7/188** (proven/static/observed/unknown). Blog's unknown increase is
+30 newly exported URL-helper arguments, not lost types. Booted routes and
+source/versioned Turbo/Importmap support reduce blog Steep **6 → 2**. Correct
+RBS callback self exposes two real nullable `article` calls; keep those visible.
+[Inputs, denominator accounting and checks](types.md#sorbet-and-framework-signatures-follow-up--2026-10-21).
 
 ## Sealed verification: external production scenarios, first slice rejected (2026-10-21)
 

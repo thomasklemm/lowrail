@@ -283,6 +283,93 @@ fn template_source_locations_are_not_parsed_as_ruby() {
 }
 
 #[test]
+fn sorbet_declarations_recover_shapes_inheritance_and_registry_without_proof() {
+    let dir = std::env::temp_dir().join(format!("lowrail-sorbet-types-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join("app")).unwrap();
+    let file = dir.join("app/contracts.rb");
+    let source = r#"module Contract
+  Token = T.type_alias { String }
+  sig(:final) { params(id: Token, tags: T::Array[T.nilable(Integer)], flags: T::Hash[Symbol, T.any(Integer, T::Array[String])], extra: T.untyped).returns(T.nilable(T.any(String, Integer))) }
+  private def fetch(id, tags = [], flags: {}, **extra); external; end
+  sig { void }
+  def ignored; external; end
+  sig { returns(T.proc.void) }
+  def opaque; external; end
+  sig { type_parameters(:X).returns(T.type_parameter(:X)) }
+  def generic; external; end
+  sig { returns(Integer).checked(:never) }
+  def literal = 42
+  sig { returns(Integer) }
+  def duplicate = 1
+  sig { returns(String) }
+  def duplicate = 'two'
+end
+class Controller
+  def literal = 'override'
+end
+class Shadow
+  String = 7
+  module Types; end
+  sig { returns(String) }
+  def scalar; external; end
+  sig { returns(Types::Token) }
+  def qualified; external; end
+end
+module Types
+  Token = T.type_alias { String }
+end
+"#;
+    std::fs::write(&file, source).unwrap();
+    let mut methods: Vec<_> = ["fetch","ignored","opaque","generic","literal","duplicate"].iter().map(|name|
+        json!({"name":name,"owner":"Contract","source_location":"/sorbet/lib/types/private/methods/_methods.rb:257",
+            "parameters":[["rest","args"],["keyrest","**"],["block","blk"]]})).collect();
+    methods.push(json!({"name":"runtime","owner":"Contract","source_location":"/sorbet/lib/types/private/methods/call_validation.rb:120",
+        "sorbet_sig":{"version":"0.5.12435","source_location":format!("{}:1",file.display()),"parameters":[["req","value"]],
+            "parameter_types":{"value":"Symbol"},"return_type":"Integer"}}));
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"gems":[{"name":"sorbet-runtime","version":"0.5.12435","path":"/sorbet"}],
+        "controllers":[{"name":"Controller","actions":["fetch","literal"]}],
+        "modules":[{"name":"Contract","kind":"module","const_source_location":format!("{}:1",file.display()),"methods":methods},
+            {"name":"Controller","kind":"class","ancestors":["Controller","Contract"],"const_source_location":format!("{}:18",file.display()),
+                "methods":[{"name":"literal","owner":"Controller","source_location":format!("{}:19",file.display())}]},
+            {"name":"Shadow","kind":"class","const_source_location":format!("{}:21",file.display()),"methods":[
+                {"name":"scalar","owner":"Shadow","source_location":"/sorbet/lib/types/private/methods/_methods.rb:257"},
+                {"name":"qualified","owner":"Shadow","source_location":"/sorbet/lib/types/private/methods/_methods.rb:257"}]},
+            {"name":"Shadow::Types","kind":"module"},
+            {"name":"String","kind":"class"},{"name":"Integer","kind":"class"},{"name":"Symbol","kind":"class"}]})).unwrap();
+    let mut model = TypeModel::from_facts(&facts);
+    assert_eq!(model.lookup("Controller#fetch").unwrap().signature(), "(::String, ?Array[::Integer?], ?flags: Hash[::Symbol, (::Integer | Array[::String])], **untyped) -> (::String | ::Integer)?");
+    assert_eq!(model.fact("Contract#literal","return").unwrap().evidence, Evidence::Static);
+    assert_eq!(model.fact("Controller#literal","return").unwrap().name, "String");
+    assert_eq!(model.fact("Contract#runtime","arg:value").unwrap().name, "::Symbol");
+    for target in ["Contract#ignored","Contract#opaque","Shadow#scalar","Shadow#qualified"] { assert_eq!(model.fact(target,"return").unwrap().name, "untyped", "{target}"); }
+    assert!(model.lookup("Contract#generic").is_none());
+    assert!(model.lookup("Contract#duplicate").is_none());
+    assert!(model.diagnostics.iter().any(|d| d.contains("ambiguous declarations")));
+    let samples = json!({"format":1,"app_root":dir,"types":[
+        {"module":"Contract","name":"fetch","calls":3,
+            "args":{"id":{"String":3},"tags":{"Array":3},"flags":{"Hash":1,"Array":2}},
+            "returns":{"String":2,"NilClass":1}},
+        {"module":"Contract","name":"runtime","calls":1,"args":{"value":{"Symbol":1}},"returns":{"Integer":1}}
+    ]});
+    model.merge_observed(&facts, samples.to_string().as_bytes()).unwrap();
+    assert_eq!(model.conflicts.len(), 1, "root names, unions and opaque container elements are not contradictions");
+    assert_eq!((model.conflicts[0].slot.as_str(),model.conflicts[0].observed_class.as_str(),model.conflicts[0].count), ("arg:flags","Array",2));
+    assert_eq!(model.fact("Contract#fetch","return").unwrap().evidence, Evidence::Static);
+    let export = serde_json::to_value(model.export_rbs(&facts)).unwrap();
+    let slot = &export["signatures"]["Controller#fetch"]["slots"]["arg:id"];
+    assert_eq!(slot["status"], "static");
+    assert_eq!(slot["fact"]["provenance"][0]["source"], "sorbet sig");
+    assert!(slot["fact"]["provenance"].as_array().unwrap().iter().any(|p| p["detail"].as_str().unwrap().contains("type alias Contract::Token")));
+    assert_eq!(export["signatures"]["Contract#opaque"]["slots"]["return"]["status"], "unknown");
+    model.write_rbs(&facts, &dir.join("sig")).unwrap();
+    if std::process::Command::new("rbs").arg("--version").output().is_ok() {
+        let check = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
+        assert!(check.status.success(), "{}{}", String::from_utf8_lossy(&check.stdout), String::from_utf8_lossy(&check.stderr));
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
     let dir = std::env::temp_dir().join(format!("lowrail-type-observed-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();

@@ -54,6 +54,11 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
     );
     let app_rbs = std::fs::read_to_string(out.join("app.rbs")).unwrap();
     let support_rbs = std::fs::read_to_string(out.join("lowrail_support.rbs")).unwrap();
+    assert_eq!(types["methods"]["Lowrail::RouteHelpers#article_url"]["return_type"]["name"], "String");
+    assert!(app_rbs.contains("include ::Lowrail::RouteHelpers"));
+    assert!(support_rbs.contains("[self: ::Comment]"));
+    assert!(support_rbs.contains("def self.broadcasts_to:"));
+    assert!(support_rbs.contains("def self.stale_when_importmap_changes:"));
     let coverage = app_rbs.lines().find_map(|line| line.strip_prefix("# lowrail coverage: ")).unwrap();
     assert_eq!(serde_json::from_str::<Value>(coverage).unwrap(), types["coverage"]);
     let stdout_rbs = Command::new(bin).args(["types", "--rbs"]).arg(&app).output().unwrap();

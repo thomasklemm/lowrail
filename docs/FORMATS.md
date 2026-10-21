@@ -127,6 +127,14 @@ Rules the dumper follows:
   reflection is bound (`Module.instance_method(:name).bind_call(mod)`), so
   modules overriding `name`, `inspect`, `respond_to?`, `method`, … and
   `BasicObject` subclasses are handled.
+- **Sorbet declarations.** Optional method `sorbet_sig` contains `version`,
+  original `source_location`, original `parameters`, a parameter-name → type
+  expression `parameter_types` map, and `return_type`. This is a read-only snapshot of an
+  already-built `sorbet-runtime 0.5.12435` signature, never a call to build a
+  pending signature or initialize lazy types. Only raw simple type names are
+  recovered here; other types stay `T.untyped`. The nested source location
+  follows the same app-relative persistence rules. Missing metadata is valid
+  and requires no format bump; type export prefers static Prism declarations.
 - **Anonymous modules** are counted, not listed (except the synthetic
   ones below); so are modules whose name
   is nested in an anonymous one (`#<Class:0x…>::Config`, `anonymous_rooted`)

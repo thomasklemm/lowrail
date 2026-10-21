@@ -92,9 +92,10 @@ pub(super) fn signature(sig: &Signature) -> String {
         "({}){} -> {}",
         params.join(", "),
         if block {
-            " ?{ (*untyped) -> untyped }"
+            let self_type = sig.block_self.as_deref().map(|ty| format!(" [self: {ty}]")).unwrap_or_default();
+            format!(" ?{{ (*untyped){self_type} -> untyped }}")
         } else {
-            ""
+            String::new()
         },
         sig.return_type.name
     )
@@ -105,6 +106,7 @@ struct Declaration<'a> {
     kind: &'static str,
     generics: &'static str,
     superclass: Option<String>,
+    includes: Vec<String>,
     children: BTreeMap<String, Declaration<'a>>,
     methods: Vec<&'a Signature>,
 }
@@ -129,6 +131,7 @@ impl<'a> Declaration<'a> {
             };
             let parent = node.superclass.as_deref().map(|s| format!(" < ::{s}")).unwrap_or_default();
             let _ = writeln!(out, "{indent}{kind} {name}{}{parent}", node.generics);
+            for include in &node.includes { let _ = writeln!(out, "{indent}  include ::{include}"); }
             for sig in &node.methods {
                 for (name, slot) in slots(sig) {
                     let _ = writeln!(out, "{indent}  # lowrail {name}: {}", serde_json::to_string(&slot).unwrap());
@@ -177,6 +180,9 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
     }
     for controller in facts.controllers.iter().filter(|c| observed::constant(&c.name)) {
         root.at(&controller.name).kind = "class";
+        if model.methods.values().any(|s| s.receiver == "Lowrail::RouteHelpers") {
+            root.at(&controller.name).includes.push("Lowrail::RouteHelpers".into());
+        }
     }
     let mut signatures = BTreeMap::new();
     for sig in model.methods.values() {
@@ -233,8 +239,9 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
     proxy.superclass = Some("ActiveRecord::Relation[Elem]".into());
     for sig in model.methods.values() {
         for ty in std::iter::once(&sig.return_type).chain(sig.parameters.iter().map(|p| &p.ty)) {
-            if !ty.provenance.iter().any(|p| p.source == Source::Observed) { continue; }
+            if !ty.provenance.iter().any(|p| matches!(p.source, Source::Observed | Source::SorbetSig)) { continue; }
             for name in ty.name.split(|c: char| !c.is_ascii_alphanumeric() && c != '_' && c != ':') {
+                let name = name.trim_start_matches("::");
                 if !name.contains("::") || !observed::constant(name)
                     || matches!(name, "Thread::Queue" | "ActiveSupport::TimeWithZone" | "ActiveRecord::Relation" | "ActiveRecord::Associations::CollectionProxy")
                     || root.existing(name).is_some()

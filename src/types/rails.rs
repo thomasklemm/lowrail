@@ -14,6 +14,7 @@ fn signature(receiver: &str, name: &str, singleton: bool, ty: Type) -> Signature
         ivars: BTreeMap::new(),
         observation: None,
         roles: vec![],
+        block_self: None,
     }
 }
 
@@ -31,16 +32,25 @@ fn parameter(sig: &mut Signature, kind: &str, name: &str, ty: &str) {
 
 fn source(facts: &Facts, method: &Method, gem: &str, file: &str) -> Option<String> {
     let spec = facts.gems.iter().find(|g| g.name == gem)?;
-    if !(spec.version.starts_with("8.0.") || spec.version.starts_with("8.1.")) {
+    let supported = match gem {
+        "activerecord" | "actionpack" => {
+            spec.version.starts_with("8.0.") || spec.version.starts_with("8.1.")
+        }
+        "turbo-rails" => spec.version.starts_with("2.0."),
+        "importmap-rails" => spec.version.starts_with("2.1.") || spec.version.starts_with("2.2."),
+        _ => false,
+    };
+    if !supported {
         return None;
     }
     let (path, _) = split_location(method.source_location.as_deref()?)?;
-    (Path::new(path) == Path::new(&spec.path).join("lib").join(file)).then(|| {
-        format!(
-            "{gem} {} lib/{file}; boot owner {}",
-            spec.version, method.owner
-        )
-    })
+    let file = if file.starts_with("app/") {
+        file.into()
+    } else {
+        format!("lib/{file}")
+    };
+    (Path::new(path) == Path::new(&spec.path).join(&file))
+        .then(|| format!("{gem} {} {file}; boot owner {}", spec.version, method.owner))
 }
 
 /// Lookup may use a generic relation receiver, whose element type comes from
@@ -169,6 +179,32 @@ pub(super) fn lookup(
                     ("opt", "response_options", "untyped"),
                 ],
             ),
+            ("Turbo::Broadcastable::ClassMethods", "broadcasts_to") => (
+                "turbo-rails",
+                "app/models/concerns/turbo/broadcastable.rb",
+                "untyped".into(),
+                &[
+                    ("req", "stream", "untyped"),
+                    ("key", "inserts_by", "untyped"),
+                    ("key", "target", "untyped"),
+                    ("keyrest", "rendering", "untyped"),
+                ],
+            ),
+            ("Turbo::Broadcastable", "broadcast_replace_to") => (
+                "turbo-rails",
+                "app/models/concerns/turbo/broadcastable.rb",
+                "untyped".into(),
+                &[
+                    ("rest", "streamables", "untyped"),
+                    ("keyrest", "rendering", "untyped"),
+                ],
+            ),
+            ("Importmap::Freshness", "stale_when_importmap_changes") => (
+                "importmap-rails",
+                "app/controllers/importmap/freshness.rb",
+                "untyped".into(),
+                &[],
+            ),
             _ => return None,
         };
     let detail = source(facts, method, gem, file)?;
@@ -229,6 +265,54 @@ pub(super) fn seed(facts: &Facts, model: &mut TypeModel) {
 /// preferable; omit this support file when loading one.
 pub(super) fn support(facts: &Facts) -> Vec<Signature> {
     let mut out = Vec::new();
+    for record in &facts.models {
+        for (name, singleton) in [("broadcasts_to", true), ("broadcast_replace_to", false)] {
+            if let Some(sig) = lookup(facts, &record.name, name, singleton) {
+                out.push(sig);
+            }
+        }
+        for name in ["after_create_commit", "after_destroy_commit"] {
+            if let Some((_, method)) = resolve(facts, &record.name, name, true)
+                && method.owner == "ActiveRecord::Transactions::ClassMethods"
+                && let Some(detail) = source(
+                    facts,
+                    method,
+                    "activerecord",
+                    "active_record/transactions.rb",
+                )
+            {
+                let mut sig = signature(
+                    &record.name,
+                    name,
+                    true,
+                    Type::new("untyped", Source::RailsApi, detail),
+                );
+                for p in &method.parameters {
+                    if let Some(kind) = p.first() {
+                        parameter(
+                            &mut sig,
+                            kind,
+                            p.get(1).map(String::as_str).unwrap_or("arg"),
+                            "untyped",
+                        );
+                    }
+                }
+                if !sig.parameters.iter().any(|p| p.kind == "block") {
+                    parameter(&mut sig, "block", "block", "untyped");
+                }
+                sig.block_self = Some(format!("::{}", record.name));
+                out.push(sig);
+            }
+        }
+    }
+    if let Some(sig) = lookup(
+        facts,
+        "ActionController::Base",
+        "stale_when_importmap_changes",
+        true,
+    ) {
+        out.push(sig);
+    }
     for (receiver, singleton, names) in [
         (
             "ActiveRecord::Relation[Elem]",
