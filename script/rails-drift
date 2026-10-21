@@ -1,0 +1,149 @@
+#!/usr/bin/env ruby
+# Source-only early warning, never an admission certificate or a benchmark.
+# mise exec ruby@4.0.7 -- ruby script/rails-drift RAILS_REPO BASE HEAD OUTPUT_PREFIX
+require "json"
+require "digest"
+require "open3"
+require "tmpdir"
+require "fileutils"
+require "prism"
+
+module RailsDrift
+  # Conservative envelopes, derived from the builders' manifest sources/facts.
+  # Broad inventories deliberately include unreachable members: a changed file
+  # invalidates a source certificate even when the folded method is unchanged.
+  FRAMEWORK = %w[actionview actionpack activemodel activerecord activesupport].freeze
+  AR = %w[activerecord activemodel activesupport].freeze
+  VERSION_SOURCES = %w[railties/lib/rails/version.rb railties/lib/rails/gem_version.rb].freeze
+  UNITS = {
+    "view/link_to" => [%w[actionview actionpack activesupport], "src/lower/view.rs: LINK_TO_VIEW_DEPS / TAG_BUILDER_DEPS; quarantined"],
+    "route/path" => [%w[actionpack activesupport], "src/lower/route.rs: RAILS_DEPS and receiver/model facts; quarantined"],
+    "memo/uri_join" => [[], "gem/lib/lowrail/memo_facts.rb: URI/Ruby certificate, no Rails source dependency"],
+    "memo/sha256" => [[], "gem/lib/lowrail/memo_facts.rb: Digest/Ruby certificate, no Rails source dependency"],
+    "digest/file_memo" => [[], "gem/lib/lowrail/digest_memo_build.rb: File/Digest/Pathname and external gem sources, no Rails source dependency"],
+    "active_record/preload_plans" => [AR + %w[activestorage actiontext], "gem/lib/lowrail/preload_build.rb / preload_facts.rb: all preloader/Relation/reflection/type methods and generated attachment scopes"],
+    "active_record/instantiate" => [AR, "gem/lib/lowrail/ar_instantiate_build.rb: AUDITED, attributes_builder, instantiate_instance_of, alpha_dependencies"],
+    "active_record/ar_plans" => [AR + %w[activestorage actiontext], "gem/lib/lowrail/ar_plan_build.rb: QueryMethods, relations, association/reflection/type, concrete adapter and all Arel methods"],
+    "inertia/config_bind" => [%w[activesupport], "gem/lib/lowrail/inertia_config_build.rb: Hash#extract!; Inertia/Ruby sources are outside Rails"],
+    "inertia/props" => [[], "gem/lib/lowrail/inertia_props_build.rb: Inertia/Ruby iterator certificate, no Rails source dependency"],
+    "endpoint/action" => [FRAMEWORK, "gem/lib/lowrail/endpoint_build.rb: controller process, view _run, link helper, compiled app templates; conservative envelope"],
+    "sealed/link_to" => [%w[actionview actionpack activesupport], "gem/lib/lowrail/sealed_build.rb: STOCK, VIEW, BUILDER, dispatch, literal escaping/tables"],
+    "sealed/form_scaffold" => [FRAMEWORK, "gem/lib/lowrail/form_scaffold_inventory.rb: STOCK hashes every lib/**/*.rb in these five Rails gems; methods, constants and generated readers"],
+    "sealed/token_tag" => [FRAMEWORK, "gem/lib/lowrail/render_units_build.rb: full FormScaffoldInventory plus token_tag/tag/escaping facts"],
+    "sealed/collection_render" => [FRAMEWORK, "gem/lib/lowrail/render_units_build.rb: full FormScaffoldInventory plus CollectionRenderer#collection_with_template"]
+  }.freeze
+
+  module_function
+
+  def git(repo, *args)
+    out, err, status = Open3.capture3("git", "-C", repo, *args)
+    raise "git #{args.first}: #{err.strip}" unless status.success?
+    out
+  end
+
+  def members(source)
+    parsed = Prism.parse(source, version: "4.0")
+    raise "Rails source does not parse: #{parsed.errors.map(&:message).join('; ')}" unless parsed.success?
+    result = {}
+    occurrences = Hash.new(0)
+    add = ->(kind, name, node) do
+      key = "#{kind}:#{name}"
+      occurrences[key] += 1
+      key += "@#{occurrences[key]}"
+      result[key] = {"line" => node.location.start_line, "sha256" => Digest::SHA256.hexdigest(node.location.slice)}
+    end
+    visit = ->(node, scope) do
+      case node
+      when Prism::ClassNode, Prism::ModuleNode
+        name = node.constant_path.location.slice
+        name = [scope, name].reject(&:empty?).join("::") unless name.start_with?("::")
+        visit.call(node.body, name) if node.body
+      when Prism::SingletonClassNode
+        visit.call(node.body, "#{scope}.singleton(#{node.expression.location.slice})") if node.body
+      when Prism::DefNode
+        separator = node.receiver ? ".#{node.receiver.location.slice}." : "#"
+        add.call("method", "#{scope}#{separator}#{node.name}", node)
+        # The entire definition pins dynamic/nested definitions too.
+      else
+        if node.type.to_s.match?(/\Aconstant(?:_path)?_(?:write|or_write|and_write|operator_write)_node\z/)
+          name = node.respond_to?(:name) ? node.name.to_s : node.target.location.slice
+          add.call("constant", "#{scope}::#{name}", node)
+        elsif Prism::CallNode === node && %i[attr_reader attr_writer attr_accessor class_attribute delegate alias_method define_method define_singleton_method class_eval module_eval autoload include prepend extend].include?(node.name)
+          add.call("generated", "#{scope}:#{node.name}", node)
+        end
+        node.compact_child_nodes.each { visit.call(_1, scope) }
+      end
+    end
+    visit.call(parsed.value, "")
+    result
+  end
+
+  def compare(repo, base, head, prefix)
+    registry = File.read(File.join(__dir__, "../src/passes.rs")).scan(/Pass \{ name: "([^"]+)"/).flatten
+    raise "pass registry changed; review drift inventory" unless registry.sort == UNITS.keys.sort
+    base = git(repo, "rev-parse", "--verify", "#{base}^{commit}").strip
+    head = git(repo, "rev-parse", "--verify", "#{head}^{commit}").strip
+    roots = UNITS.values.flat_map(&:first).uniq.sort
+    files = {}
+    Dir.mktmpdir("lowrail-rails-drift-") do |tmp|
+      trees = [base, head].each_with_index.map do |ref, i|
+        dest = File.join(tmp, i.to_s)
+        FileUtils.mkdir_p(dest)
+        statuses = Open3.pipeline(["git", "-C", repo, "archive", ref, *roots.map { "#{_1}/lib" }, *VERSION_SOURCES], ["tar", "-x", "-C", dest])
+        raise "cannot extract Rails #{ref}" unless statuses.all?(&:success?)
+        dest
+      end
+      paths = (trees.flat_map { |tree| Dir.glob("{#{roots.join(',')}}/lib/**/*.{rb,erb}", base: tree) } + VERSION_SOURCES).uniq.sort
+      paths.each do |path|
+        contents = trees.map { |tree| File.binread(File.join(tree, path)) if File.file?(File.join(tree, path)) }
+        before, after = contents
+        status = before.nil? ? "added" : after.nil? ? "removed" : before == after ? "unchanged" : "changed"
+        row = {"status" => status, "sha256" => contents.map { _1 && Digest::SHA256.hexdigest(_1) }}
+        if path.end_with?(".rb")
+          old, new = contents.map { _1 ? members(_1) : {} }
+          row["members"] = (old.keys | new.keys).sort.to_h do |name|
+            a, b = old[name], new[name]
+            state = a.nil? ? "added" : b.nil? ? "removed" : a["sha256"] == b["sha256"] ? "unchanged" : "changed"
+            [name, {"status" => state, "lines" => [a&.fetch("line"), b&.fetch("line")]}]
+          end
+        end
+        if status != "unchanged"
+          row["diff"] = git(repo, "diff", "--no-ext-diff", "--unified=3", base, head, "--", path)
+        end
+        files[path] = row
+      end
+    end
+    units = UNITS.to_h do |name, (components, evidence)|
+      sources = files.select { |path, _| components.include?(path.split("/").first) || (!components.empty? && VERSION_SOURCES.include?(path)) }
+      changed = sources.reject { |_, row| row["status"] == "unchanged" }
+      member_counts = sources.values.flat_map { _1.fetch("members", {}).values }.group_by { _1["status"] }.transform_values(&:size)
+      [name, {"status" => sources.empty? ? "unchanged" : changed.empty? ? "unchanged" : "changed",
+        "evidence" => evidence, "scope" => "conservative source envelope, not a reachable-call or semantic-equivalence claim",
+        "sources" => sources.keys, "source_counts" => sources.values.group_by { _1["status"] }.transform_values(&:size),
+        "member_counts" => member_counts, "changed_sources" => changed.keys,
+        "recertification" => components.empty? ? "no Rails certificate; external gem/Ruby and app admission still required" : "required before 8.2 admission, including unchanged members"}]
+    end
+    report = {"format" => 1, "base" => base, "head" => head, "prism" => Prism::VERSION,
+      "limitations" => ["Source comparison only; no app boot, admission changes, measurements or certification.",
+        "Full-file equality covers comments, generated definitions, inheritance, require/include order and templates that named-method comparison cannot prove.",
+        "App templates, routes, schema/config, I18n, Ruby and external gems are outside the Rails tree; they still need their original certificates.",
+        "Method identities are lexical file/holder/name/occurrence, not effective dispatch; moves appear as removed/added. Whole-source coverage is authoritative.",
+        "Broad envelopes intentionally over-report changes. All 15 registered passes are listed, including quarantined and external-only passes."],
+      "units" => units, "files" => files}
+    File.write("#{prefix}.json", JSON.generate(report) + "\n")
+    table = ["# Rails source drift", "", "`#{base}` → `#{head}`. Source-only, conservative early warning; **not admission**.", "",
+      "| Unit | Status | Changed / removed / added source files | Changed / removed members | 8.2 action |", "|---|---|---:|---:|---|"]
+    units.each do |name, row|
+      counts, members = row.values_at("source_counts", "member_counts")
+      table << "| `#{name}` | #{row['status']} | #{%w[changed removed added].map { counts.fetch(_1, 0) }.join(' / ')} | #{%w[changed removed].map { members.fetch(_1, 0) }.join(' / ')} | #{row['sources'].empty? ? 'External/app checks' : 'Re-certify; keep refused'} |"
+    end
+    File.write("#{prefix}.md", table.join("\n") + "\n")
+    puts table.join("\n")
+    report
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  abort "usage: rails-drift RAILS_REPO BASE_SHA_OR_TAG HEAD_SHA OUTPUT_PREFIX" unless ARGV.size == 4
+  RailsDrift.compare(*ARGV)
+end

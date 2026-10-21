@@ -1,0 +1,173 @@
+diff --git a/.ruby-version b/.ruby-version
+index 7921bd0..43beb40 100644
+--- a/.ruby-version
++++ b/.ruby-version
+@@ -1 +1 @@
+-3.4.8
++4.0.7
+diff --git a/Gemfile b/Gemfile
+index 20989cf..6a5c7ff 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -6,7 +6,7 @@ ruby file: ".ruby-version"
+ 
+ git_source(:bc) { |repo| "https://github.com/basecamp/#{repo}" }
+ 
+-gem "rails", github: "rails/rails", branch: "main"
++gem "rails", github: "rails/rails", ref: "36e0f96b9d7a022755a53a2a9fb7a67ad4e3669e"
+ 
+ # Assets & front end
+ gem "importmap-rails"
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 6f057ea..f17a6e0 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -21,8 +21,8 @@ GIT
+ 
+ GIT
+   remote: https://github.com/rails/rails.git
+-  revision: 4658033fa3b391ab8a928994e12a30257a0afa22
+-  branch: main
++  revision: 36e0f96b9d7a022755a53a2a9fb7a67ad4e3669e
++  ref: 36e0f96b9d7a022755a53a2a9fb7a67ad4e3669e
+   specs:
+     actioncable (8.2.0.alpha)
+       actionpack (= 8.2.0.alpha)
+@@ -224,14 +224,14 @@ GEM
+     globalid (1.4.0)
+       activesupport (>= 6.1)
+     hashdiff (1.2.1)
+-    herb (0.11.0-aarch64-linux-gnu)
+-    herb (0.11.0-aarch64-linux-musl)
+-    herb (0.11.0-arm-linux-gnu)
+-    herb (0.11.0-arm-linux-musl)
+-    herb (0.11.0-arm64-darwin)
+-    herb (0.11.0-x86_64-darwin)
+-    herb (0.11.0-x86_64-linux-gnu)
+-    herb (0.11.0-x86_64-linux-musl)
++    herb (0.11.1-aarch64-linux-gnu)
++    herb (0.11.1-aarch64-linux-musl)
++    herb (0.11.1-arm-linux-gnu)
++    herb (0.11.1-arm-linux-musl)
++    herb (0.11.1-arm64-darwin)
++    herb (0.11.1-x86_64-darwin)
++    herb (0.11.1-x86_64-linux-gnu)
++    herb (0.11.1-x86_64-linux-musl)
+     i18n (1.15.2)
+       concurrent-ruby (~> 1.0)
+     image_processing (2.2.0)
+@@ -310,18 +310,18 @@ GEM
+     msgpack (1.8.5)
+     net-http-persistent (4.0.8)
+       connection_pool (>= 2.2.4, < 4)
+-    net-imap (0.6.6)
++    net-imap (0.6.8)
+       date
+       net-protocol
+     net-pop (0.1.2)
+       net-protocol
+-    net-protocol (0.2.2)
++    net-protocol (0.4.0)
+       timeout
+     net-scp (4.1.0)
+       net-ssh (>= 2.6.5, < 8.0.0)
+     net-sftp (4.0.0)
+       net-ssh (>= 5.0.0, < 8.0.0)
+-    net-smtp (0.5.1)
++    net-smtp (0.5.2)
+       net-protocol
+     net-ssh (7.3.3)
+     nio4r (2.7.5)
+@@ -372,7 +372,7 @@ GEM
+     rack-session (2.1.2)
+       base64 (>= 0.1.0)
+       rack (>= 3.0.0)
+-    rack-test (2.2.0)
++    rack-test (2.3.0)
+       rack (>= 1.3)
+     rackup (2.3.1)
+       rack (>= 3)
+@@ -499,7 +499,7 @@ GEM
+       tzinfo (>= 1.0.0)
+     unicode-display_width (3.2.0)
+       unicode-emoji (~> 4.1)
+-    unicode-emoji (4.1.0)
++    unicode-emoji (4.3.0)
+     uri (1.1.2)
+     vcr (6.4.0)
+     web-push (3.1.0)
+@@ -615,7 +615,6 @@ CHECKSUMS
+   bootsnap (1.26.0) sha256=ca96237015e6cd74a02963d5821cf00ac5ea134653b323e8cd6d702a7718bf1b
+   brakeman (8.1.0) sha256=cfa9e5214e4925842f4bc849a64f8a7e6c5d0425fe98eac8d7b7bc60fdc17e07
+   builder (3.3.0) sha256=497918d2f9dca528fdca4b88d84e4ef4387256d984b8154e9d5d3fe5a9c8835f
+-  bundler (4.0.18) sha256=02d9a17429de1847b4e0c9f27a9ee4b20c0a74c0a641b4e77195d6019e3618ac
+   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
+   capybara (3.40.0) sha256=42dba720578ea1ca65fd7a41d163dd368502c191804558f6e0f71b391054aeef
+   childprocess (5.1.0) sha256=9a8d484be2fd4096a0e90a0cd3e449a05bc3aa33f8ac9e4d6dcef6ac1455b6ec
+@@ -645,14 +644,14 @@ CHECKSUMS
+   geared_pagination (1.2.0) sha256=16dc25b28e9d6945df27e9bcc6ed298d66eb9493ba45bf987037010724120cc7
+   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
+   hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
+-  herb (0.11.0-aarch64-linux-gnu) sha256=7d8244655bb99a50b2d52ea13408c2a76b3fbd70bcca8ccee4229d3e1902bb0b
+-  herb (0.11.0-aarch64-linux-musl) sha256=8b19e8ce70cae1a016468cd6c3a88a051e47fd68f3f8b1bd3ffb751a62109982
+-  herb (0.11.0-arm-linux-gnu) sha256=8fd8e3c4d45c3b6bc8a2b7f056ac4bf961cfb03407fef26f7e1d5ef69406bf5d
+-  herb (0.11.0-arm-linux-musl) sha256=0ac4e441389d8e67ef1afcabdb1bff94f5b7cd1c2811159647f61fc7bc241f8d
+-  herb (0.11.0-arm64-darwin) sha256=8972ac3e5a7ee7296a89d78fceb40d8fb85c3ea8d40c9781a9c8db3e58194501
+-  herb (0.11.0-x86_64-darwin) sha256=2eb9db026a1949cb2ad8cfa1944ef8402feab784c7d37a35c48575a9e0d79912
+-  herb (0.11.0-x86_64-linux-gnu) sha256=aba19094bc1618e1bc0fb59db52ba251c93a24598f5228815616b282f10bb8a0
+-  herb (0.11.0-x86_64-linux-musl) sha256=e27a08fe72304c8043e851b568ed30eaa45f06b5333d151939a7834e936c01aa
++  herb (0.11.1-aarch64-linux-gnu) sha256=5484e0fc0bd5d040380cbbf503e86dccf3fc1d33428b7ad02715ee7dcaa018f9
++  herb (0.11.1-aarch64-linux-musl) sha256=1113663d5e7832dad601547edb4606557ac84def516479ee5136fc7072747a58
++  herb (0.11.1-arm-linux-gnu) sha256=849d49d6ec27aaf5a9ea07e66434fbb16a8c599b287e8f24f7478d6b358666da
++  herb (0.11.1-arm-linux-musl) sha256=de283c299df16c089e209dbc461fe003d4b3fbf100168637c8f983cc97186b5e
++  herb (0.11.1-arm64-darwin) sha256=c5d3c1d5f88a504bcfa6a4bb52f56650dc40345e23cdf051b02f3390cf184d9e
++  herb (0.11.1-x86_64-darwin) sha256=f73cad010299bf998bd4ead676b80ae2c1f0ff5487a2ef852e8d83652f74ced0
++  herb (0.11.1-x86_64-linux-gnu) sha256=e3104c5dab07300a2ea6fc3898014cf57db978fbf09f5554a2a6ef6c46f973f8
++  herb (0.11.1-x86_64-linux-musl) sha256=0c687b667b612e7cc2403e9991ee7c8e8d10cfef026cf41165f9d99284630b09
+   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
+   image_processing (2.2.0) sha256=e0cb9892a4395ac2b7bb2fac5c6f5bc63361f2f18ed08773e21fce5b111c6974
+   importmap-rails (2.2.3) sha256=7101be2a4dc97cf1558fb8f573a718404c5f6bcfe94f304bf1f39e444feeb16a
+@@ -681,12 +680,12 @@ CHECKSUMS
+   mocha (3.1.0) sha256=75f42d69ebfb1f10b32489dff8f8431d37a418120ecdfc07afe3bc183d4e1d56
+   msgpack (1.8.5) sha256=97419eaa7b35dfe3e462c0e6c1a3dfdcbfc8756605c09e46e4c6daef127517ba
+   net-http-persistent (4.0.8) sha256=ef3de8319d691537b329053fae3a33195f8b070bbbfae8bf1a58c796081960e6
+-  net-imap (0.6.6) sha256=96aa4ee50df3060203e649efc341f53480b791d49e150f2fdebf68beb141a8df
++  net-imap (0.6.8) sha256=eb30bb62227b64a3af6b518b04b2375113d69f68f15de59b0193b07d98acf6d9
+   net-pop (0.1.2) sha256=848b4e982013c15b2f0382792268763b748cce91c9e91e36b0f27ed26420dff3
+-  net-protocol (0.2.2) sha256=aa73e0cba6a125369de9837b8d8ef82a61849360eba0521900e2c3713aa162a8
++  net-protocol (0.4.0) sha256=f9f90c8c6f64794a45160bf422177a336db12809de3beeeaa26b88fcd2e8c853
+   net-scp (4.1.0) sha256=a99b0b92a1e5d360b0de4ffbf2dc0c91531502d3d4f56c28b0139a7c093d1a5d
+   net-sftp (4.0.0) sha256=65bb91c859c2f93b09826757af11b69af931a3a9155050f50d1b06d384526364
+-  net-smtp (0.5.1) sha256=ed96a0af63c524fceb4b29b0d352195c30d82dd916a42f03c62a3a70e5b70736
++  net-smtp (0.5.2) sha256=35103cc04d6b2d94632f9928ede07483c24b70b9c0db1f231fea43909b678f3c
+   net-ssh (7.3.3) sha256=831def58b2c51dcef66ec00d29397d4f210de89c19fe78f95873ca30f386e86a
+   nio4r (2.7.5) sha256=6c90168e48fb5f8e768419c93abb94ba2b892a1d0602cb06eef16d8b7df1dca1
+   nokogiri (1.19.4-aarch64-linux-gnu) sha256=1269fb644a6de405057a53dd5c762b1209b43ca7424f839454d3dbc677c31a8f
+@@ -714,7 +713,7 @@ CHECKSUMS
+   rack (3.2.7) sha256=93e13e1c24f93556671d85d2d79fa228c3485815c50d7e2f265b5330c6528fb7
+   rack-mini-profiler (5.0.0) sha256=99c5ba087fa91c8d9ba80a43f6b2213f1ebead6e863d49286170129d391302e1
+   rack-session (2.1.2) sha256=595434f8c0c3473ae7d7ac56ecda6cc6dfd9d37c0b2b5255330aa1576967ffe8
+-  rack-test (2.2.0) sha256=005a36692c306ac0b4a9350355ee080fd09ddef1148a5f8b2ac636c720f5c463
++  rack-test (2.3.0) sha256=b118d177cc002c572fc1b6fd8d19c9ed5881a36e8d6f689f9e618f9f861241e8
+   rackup (2.3.1) sha256=6c79c26753778e90983761d677a48937ee3192b3ffef6bc963c0950f94688868
+   ractor-dispatch (0.3.0) sha256=cd2d46743303e00fe500df168b4dde85080160fd9f04539cada4b4dd5e588f68
+   rails (8.2.0.alpha)
+@@ -773,7 +772,7 @@ CHECKSUMS
+   tzinfo (2.0.6) sha256=8daf828cc77bcf7d63b0e3bdb6caa47e2272dcfaf4fbfe46f8c3a9df087a829b
+   tzinfo-data (1.2026.5) sha256=0bdc3c5a540b1704f73a7b5c9be5c90bd0a5866c8e9e8e8a7885977d23a81645
+   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
+-  unicode-emoji (4.1.0) sha256=4997d2d5df1ed4252f4830a9b6e86f932e2013fbff2182a9ce9ccabda4f325a5
++  unicode-emoji (4.3.0) sha256=11c02fa73290378c066bb0562cd4c87d8e1b706fbbe0059ca12746a4244de8ce
+   uri (1.1.2) sha256=89292e98eabbef6248b0a0ed5e7e398e152f83f17560023a6d94a7f492b169fb
+   useragent (0.16.11)
+   vcr (6.4.0) sha256=077ac92cc16efc5904eb90492a18153b5e6ca5398046d8a249a7c96a9ea24ae6
+@@ -788,7 +787,7 @@ CHECKSUMS
+   zip_kit (6.4.1) sha256=6cbc9362c2b7ca7827826c708fd6cc3ab2c2a61b8f07c4cd8e0c4182b30e7b01
+ 
+ RUBY VERSION
+-  ruby 3.4.8
++  ruby 4.0.7
+ 
+ BUNDLED WITH
+-  4.0.18
++  4.0.20
