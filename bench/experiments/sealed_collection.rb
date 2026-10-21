@@ -10,7 +10,7 @@ module SealedCollectionCost
     attr_reader :sources
 
     def prepare
-      raise "only stock blog / Rails 8.1.4" unless Rails.version == "8.1.4" && Rails.application.class.name == "RealBlogR4::Application"
+      raise "only selected blog / Rails 8.1.4" unless Rails.version == "8.1.4" && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
       require "objspace"
       require "digest"
       @sources = %w[helpers/rendering_helper.rb renderer/renderer.rb renderer/abstract_renderer.rb renderer/partial_renderer.rb

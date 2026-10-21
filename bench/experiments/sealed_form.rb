@@ -10,7 +10,7 @@ module SealedFormCost
     attr_accessor :hits, :capture
 
     def prepare
-      raise "only stock blog / Rails 8.1.4" unless Rails.version == "8.1.4" && Rails.application.class.name == "RealBlogR4::Application"
+      raise "only selected blog / Rails 8.1.4" unless Rails.version == "8.1.4" && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
       require "objspace"
       @holder = ObjectSpace.method(:internal_class_of)
       @view_class = ArticlesController.view_context_class

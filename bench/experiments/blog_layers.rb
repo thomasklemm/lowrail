@@ -333,7 +333,7 @@ module BlogLayers
 
   def self.install(layer)
     raise "only Rails 8.1.4" unless Rails.version == "8.1.4"
-    raise "only real-blog-r4" unless Rails.application.class.name == "RealBlogR4::Application"
+    raise "only selected blog" unless Rails.root.realpath.to_s == File.realpath(Dir.pwd)
     Rails.application.eager_load!
     original = Rails.application.app
     case layer

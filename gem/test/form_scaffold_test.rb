@@ -9,7 +9,7 @@ class FormScaffoldTest < Minitest::Test
     skip "sealed form fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
     corpus = File.join(CORPUS_ROOT, "real-blog-r4")
     checker = File.expand_path("../../bench/experiments/blog_endpoint_check.rb", __dir__)
-    skip "no #{corpus} (see script/corpus)" unless File.file?(File.join(corpus, "config/environment.rb"))
+    missing_prerequisite "no #{corpus} (see script/corpus)" unless File.file?(File.join(corpus, "config/environment.rb"))
     bin = lowrail_cli
     realpath_tmpdir do |dir|
       app = File.join(dir, "blog")
@@ -203,6 +203,23 @@ class FormScaffoldTest < Minitest::Test
           hits: Lowrail::Stats.unit_hits.fetch(id, 0), fallbacks: Lowrail::Stats.unit_fallbacks.fetch(id, 0))
       RUBY
       assert_equal({"application" => "RenamedFormFixture::Application", "status" => 200, "hits" => 1, "fallbacks" => 0}, renamed_result)
+      output = File.join(dir, "renamed")
+      out, err, status = Open3.capture3(build_env.merge("LOWRAIL_SEALED" => "1", "LOWRAIL_FORM_CHECK" => "1"),
+        RUBY, checker, app, output, "none", File.join(app, ".lowrail"))
+      assert status.success?, "#{out}\n#{err}\n#{Dir[File.join(output, '*.log')].map { File.read(_1) }.join("\n")}"
+      assert_includes out, "192 isolated pairs identical"
+      renamed_on = JSON.parse(File.read(File.join(output, "on.json")))
+      assert_operator renamed_on.fetch("form_hits"), :>, 0
+      assert_equal 0, renamed_on.fetch("fallbacks").fetch(renamed_form.fetch("id").to_s, 0)
+      # Off-only reproduction must still check the certified identity, even
+      # though Lowrail itself is not loaded in this worker.
+      stale = File.join(dir, "stale")
+      FileUtils.mkdir_p(stale)
+      File.write(File.join(stale, "manifest.json"), JSON.generate(artifact))
+      out, err, status = ruby(checker, "worker", File.join(dir, "stale.json"), chdir: app, setup: false,
+        env: build_env.merge("LOWRAIL" => "0", "LOWRAIL_FORM_CHECK" => "1", "LOWRAIL_DIR" => stale))
+      refute status.success?, "a certificate for a different application must not validate the off arm"
+      assert_includes err, "certified application differs"
       # Same literal form and model, but a builder that adds observable output.
       # The public build must explain its refusal, not certify the customized
       # framework body or rely on a test-only installer.

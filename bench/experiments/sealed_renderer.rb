@@ -148,7 +148,7 @@ module SealedRenderer
 
   def self.install(stage)
     raise "unknown stage" unless STAGES.include?(stage)
-    raise "only real-blog-r4 / Rails 8.1.4" unless Rails.version == "8.1.4" && Rails.application.class.name == "RealBlogR4::Application"
+    raise "only selected blog / Rails 8.1.4" unless Rails.version == "8.1.4" && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
     self.stage = stage
     Rails.application.eager_load!
     require "rack/mock"

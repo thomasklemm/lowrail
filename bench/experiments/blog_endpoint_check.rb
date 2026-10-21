@@ -60,7 +60,20 @@ require "rack/mock"
 Rails.application.eager_load!
 Rails.logger.level = :error
 ActiveRecord::Base.logger = nil
-raise "wrong app" unless Rails.version == "8.1.4" && Rails.application.class.name == "RealBlogR4::Application"
+raise "wrong app" unless Rails.version == "8.1.4" && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
+# A copied Rails app need not share the namespace of the corpus directory.
+# Read the certificate directly so the off worker checks the same identity.
+manifest_path = File.join(ENV["LOWRAIL_DIR"] || Rails.root.join(".lowrail"), "manifest.json")
+if File.file?(manifest_path)
+  manifest = JSON.parse(File.read(manifest_path))
+  form = manifest.fetch("units").find { _1["pass"] == "sealed/form_scaffold" }
+  if form
+    application_class = form.fetch("data").fetch("inventory").fetch("application_class")
+    raise "certified application differs: expected #{application_class}, got #{Rails.application.class.name}" unless
+      Rails.application.class.name == application_class
+  end
+end
+raise "form certificate missing" if ENV["LOWRAIL_FORM_CHECK"] && !form
 
 module EndpointEntropy
   def random_bytes(n = 16)
