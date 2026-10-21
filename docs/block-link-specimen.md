@@ -286,13 +286,25 @@ accepts a direction, not a production certificate or measured cohort.
 
 ## Executed bench-only gates
 
-The [pinned machine report](fizzy-link-gates.json) records **40 untimed
+The [pinned machine report](fizzy-link-gates.json) records **42 untimed
 workers**, all run from the clean detached harness
-[`6c3342f`](https://github.com/thomasklemm/lowrail/commit/6c3342fd77b90557b8da0133bbc296013aad42d4).
+[`da5fe91`](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577).
 This is not the eventual documentation commit or a floating local main.
 Each worker records its harness SHA, source/native/artifact/context hashes,
 Fizzy source/lock fingerprints, and (for companions) the entropy-policy hash.
 App and dependency pins remain the unchanged corpus fixture above.
+
+The previous 40-worker run used a **local, pre-rebase** frozen commit,
+`6c3342fd77b90557b8da0133bbc296013aad42d4`, not a published GitHub revision.
+Its report remains in the history at
+[`87356dd`](https://github.com/thomasklemm/lowrail/commit/87356dd9b4f2aefb5c65ed69b85cf20a57c6bc95).
+The exact local commit is preserved in
+`.lowrail/private/fizzy-link-gates-executed.bundle`, SHA-256
+`7bbe6db52290ae9bafb0e4c705176e2b61e9c9f4a6b881758f5f048efdae55ba`,
+with prerequisite
+[`ea44cf3`](https://github.com/thomasklemm/lowrail/commit/ea44cf3e3c03d37595294512edbc9da0ab498073).
+The refreshed export retains that run's raw-worker hashes and rejections;
+the later SQL agreement does not erase the earlier failure.
 
 Discovery, in a separate original process, froze **24 contexts across23
 sites** before gate workers. A successful original call is still required
@@ -331,12 +343,15 @@ are explicitly uncovered rather than invented.
 
 Both complete comparisons remain **`rejected_off_control`**:
 
-- Other-thread SolidCache1.0.6 size-estimation SQL can interleave with
-  request-thread SQL. Seed0 rejects SQL order; seed1 happens to agree, which
-  does not establish a completed/ordered cache boundary.
+- SQL order agrees for both seeds at the refreshed pin. In the retained
+  earlier run, other-thread SolidCache1.0.6 size-estimation SQL interleaves
+  with request SQL: seed0 rejects SQL order and seed1 agrees. Neither run
+  establishes a completed/ordered cache boundary.
 - Cache writes contain `STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')`; fixing Ruby's
   Time.now does not fix SQLite's clock. Cache row timestamps/state differ
-  even off/off. No timestamps, queries or database rows are discarded.
+  even off/off. At the refreshed pin, all four seed/comparison pairs differ
+  only in `created_at` on the nine `solid_cache_entries` rows. No timestamps,
+  queries or database rows are discarded.
 
 Compared event fields are controller/action/method/path/format/status,
 identifier/layout/count/cache_hits plus captured flash. Arbitrary subscriber
@@ -344,26 +359,37 @@ payloads, controller assigns and cached Proc bind values remain uncovered.
 Asynchronous SolidCache completion is outside the completion adapter and
 remains a separate explicit gap. No general equivalence claim follows.
 
-### Separate boundary controls:17 paired cases pass
+### Separate boundary controls:18 paired cases pass
 
-Each of34 fresh processes naturally signs in and visits /buckets, then
+Each of36 fresh processes naturally signs in and visits /buckets, then
 renders the pinned labelled bench template on that already-used view. Only
 the external control harness temporarily holds the view; the admission
 registry retains no view/request/model/Proc graph. The control has its own
 frozen context, first-original witness, and an exercised normal fast call
 before the mutation. It supplies no Fizzy authorization or coverage.
 
-All17 off/on outcome comparisons and independently specified checks pass:
+All18 off/on outcome comparisons and independently specified checks pass:
 normal, nil, whitespace, unsafe/safe Strings, nested capture, next,
 raise/throw/break/return, saved-builder replacement, a new singleton method
 on the saved builder, output-buffer replacement, foreign builder, streaming,
-and a URL error before the block. Captured bytes/encoding and tag safety,
-once-only effects and completed-hit deltas are checked. Saved-builder and
+native-predicate replacement, and a URL error before the block. Captured
+bytes/encoding and tag safety, once-only effects and completed-hit deltas
+are checked. Saved-builder and
 buffer replacement remain correct fast cases; singleton/foreign/streaming
 cases exercise the saved receiver's live fallback. The streaming constructor
 setup error from the earlier draft is retained as rejected setup, not a pass.
 Its corrected case actually runs the block once and takes the buffer-
 provenance refusal after the positive fast prelude.
+
+The native control reproduces a bench dependency defect, not a new native
+authority: replacing `Native.exact_class?` with `{ |*| true }` previously
+left `dependencies?` true. The specimen now retains the originally loaded
+native Method, uses that Method for holder observations, and checks its
+effective identity after block work. The unchanged block dispatches `<<`
+on an opaque local whose control-only method replaces the primitive.
+After the fast normal prelude, the mutated call executes its block once,
+adds no hit, takes the saved receiver's original suffix once, and preserves
+the exact result. No Proc/binding/constructor authority is added.
 
 Warm vectors complete **24 suffix hits across19 identities**, identically
 in both seeds and both warm repetitions. Cold has5 hits after24 successful
@@ -407,3 +433,72 @@ There is no cohort launcher in this slice. An unapproved invocation refuses
 before starting a counter or creating worker state; that refusal was checked.
 The measured path has not run. **No cohort approval, measurement, production
 registration, form change or app patch is included.**
+
+## Cache/clock decision before a cohort request
+
+The actual frozen bundle is **SolidCache 1.0.6 / concurrent-ruby 1.3.4 /
+sqlite3 gem 2.5.0 / SQLite 3.47.2**. This is not a conclusion from another
+sqlite3 or SolidCache release. Source hashes are in the machine report.
+
+**Completion is possible, but does not make this workload deterministic.**
+SolidCache's existing
+[`@background`](https://github.com/rails/solid_cache/blob/v1.0.6/lib/solid_cache/store/execution.rb)
+is a one-thread `FixedThreadPool` with queue capacity 100 and discard fallback.
+Its own tests wait for completed/scheduled counter equality. A separately
+source-pinned adapter could read that already-existing pool after request
+submission stops, or terminally shut it down and wait. This can attest only
+accepted tasks, not discarded posts, swallowed failures, or work arriving
+after the boundary. It must not post a sentinel, create an executor, force
+cache/model loading, or claim that every requested expiry ran. No such
+adapter was added here; **SolidCache completion remains uncovered**.
+
+That boundary cannot recover a single exact SQL ordering or final cache
+state. Expiry reads current ids and sizes; its moving-average estimator
+also upserts a cache entry. Sampling/deletes and request writes can therefore
+observe different database states. Comparing SQL as a set/multiset would
+hide relevant ordering, not prove equality. Waiting after every request
+would instead define a new, explicitly serialized workload. Neither is a
+silent repair of the existing six-request vector; no pool/scheduler/cache
+policy is changed. The historical interleaving rejection is accepted as
+a **named off/off rejection**, not an equality pass.
+
+**No supported fixed DB-clock option exists in this pinned driver.**
+[`Database#initialize`](https://github.com/sparklemotion/sqlite3-ruby/blob/v2.5.0/lib/sqlite3/database.rb)
+can select an already-registered VFS by name; it exposes no Ruby VFS clock
+setter. Stock SQL `now` reads the VFS clock, not Ruby `Time.now`. A real
+in-memory probe fixed Ruby to `2026-01-02 00:00:00 UTC` while two SQL
+`strftime` reads still returned changing `2026-10-21` timestamps. Minimal
+probe, outside any app:
+
+```ruby
+require "sqlite3" # the frozen bundle's 2.5.0, loaded SQLite 3.47.2
+db = SQLite3::Database.new(":memory:")
+class << Time
+  def now = at(1767312000)
+end
+sql = "SELECT strftime('%Y-%m-%d %H:%M:%f', 'now')"
+p [Time.now.utc, db.get_first_value(sql)]
+sleep 0.02
+p [Time.now.utc, db.get_first_value(sql)]
+```
+
+Replacing SQL functions, building a custom VFS, or adding a process-clock
+interposer would change the harness/input provider, not use a stock app/DB
+setting. None is installed or proposed as an unreviewed workaround. Keep
+the SQLite timestamp difference as the second named, accepted off/off
+rejection under the coordinator's scoped-rejection instruction. **The cold
+status stays red**, and arbitrary payload/assigns, cached lazy-bind values
+and SolidCache completion stay explicitly uncovered.
+
+A request for **one interpreter-Ir cohort**, not authorization to run it,
+can name the published harness above, the app/lock/native/artifact/context
+pins in the JSON, and the full 23-site warm map. One iteration is six GETs:
+24 completed suffix hits over 19 identities, including three bucket-partial
+sites with 2 hits each and the tray site with 3; fifteen sites have 1 and four
+cache-elided sites have 0. N=50 therefore expects 1200 hits across 300 GETs in
+each warm on window, not 1200 admitted source sites. Every per-hit context,
+guard, observation, literal/dependency check and counter stays inside the
+workload. First-original acquisition/setup precedes the warm windows and
+is not a cold-start price. A/A, heap, mode and per-site mix gates remain
+mandatory; no retries/exclusions, YJIT cohort, production promotion or
+measurement approval follows from the accepted off/off rejection ledger.

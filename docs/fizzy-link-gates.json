@@ -7,7 +7,7 @@
     "overlay": "frozen Rails 8.1.4 corpus dependency overlay"
   },
   "pins": {
-    "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+    "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
     "harness_root": "/home/user/workspace/lowrail-block-link-harness",
     "app_source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
     "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
@@ -34,9 +34,9 @@
       "gem/lib/lowrail/native/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/lowrail_native.so": "a3669eda9f150f05bec4d7663859693266bd1e0fcd58b02769caa95bf58e9c8a"
     },
     "sources": {
-      "bench/experiments/block_link_controls.rb": "1236319d59a5a9812a943caea8d27da2dd712efa9e26425ec94cbe2eb99b4f2e",
+      "bench/experiments/block_link_controls.rb": "93d4fe5b6e8f9e9f2e970e124b567aef0d40ad5e95cc753836ebf4df67ce967a",
       "bench/experiments/block_link_delivery.rb": "c999db1017da1a3f1d23a625d0c61e0f081cc5358ac17fd3622a6fd38aefe39c",
-      "bench/experiments/block_link_specimen.rb": "d6322023a6a331921aa0805656ee91f129921781b6c0d00821ed4f972288006f",
+      "bench/experiments/block_link_specimen.rb": "ed8934795d8e6b44746bfcae84cbd7a1be242b4b50cdb1fa4b6aa2b839688b84",
       "bench/experiments/fizzy_link_check.rb": "44164d2f2d4d5dab72c16f16c5018605d9999eabcb351a218e46aadc1c3139ec",
       "bench/experiments/fizzy_link_completion.rb": "03cc59120d9f82f479746639b1e6a4922695a800cce89d02a59164adea07f985",
       "bench/experiments/fizzy_link_fixture.rb": "2a396ed02e2c93509bb5b1ffe990ab2c5d26d16850732ea9bb79e22ce62b34ed",
@@ -143,8 +143,8 @@
           "off_on": true
         },
         "sql": {
-          "off_off": false,
-          "off_on": false
+          "off_off": true,
+          "off_on": true
         },
         "events": {
           "off_off": true,
@@ -179,8 +179,8 @@
         "same_entropy_trace": true
       },
       "sql_events": [
-        647,
-        647,
+        642,
+        642,
         642
       ],
       "cached_unavailable_binds": [
@@ -290,10 +290,10 @@
       "seed": 1
     }
   ],
-  "accepted_rejection_decision": "coordinator review pending; no differences filtered or treated as equal",
+  "accepted_rejection_decision": "retained as named accepted off/off rejections under the coordinator's scoped-rejection instruction; cold status remains red, not equality or cohort approval",
   "named_off_off_rejections": [
-    "SolidCache 1.0.6 background size-estimation SQL interleaving differs; asynchronous cache completion is not certified by the Cable/queue adapter",
-    "SolidCache writes SQLite STRFTIME(%Y-%m-%d %H:%M:%f, NOW) timestamps; fixed Ruby Time.now does not fix the database clock"
+    "SQLite SQL NOW: nine SolidCache created_at values differ in both seeds and both off/off and off/on comparisons; no supported stock driver clock setter",
+    "Historical SolidCache 1.0.6 interleaving: order-sensitive estimation SQL/state, not normalized to a set; not observed in the refreshed run and not proved absent"
   ],
   "warm_completed_hits_per_site": {
     "app/views/buckets/index.html.erb:5": 1,
@@ -337,7 +337,7 @@
   "negative_controls": {
     "pass": true,
     "separate_from_Fizzy_coverage": true,
-    "fresh_processes": 34,
+    "fresh_processes": 36,
     "rows": [
       {
         "mode": "break",
@@ -498,6 +498,54 @@
             "unwind_not_completed": true,
             "exact_link_result": true,
             "fresh_safe_tag_type": true
+          }
+        },
+        "outcome": {
+          "result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPgo="
+          },
+          "log": [
+            "block"
+          ],
+          "before": "<a class=\"literal\" href=\"/target?x=1&amp;y=2\">héllo<&</a>\n",
+          "link_result": {
+            "type": "String",
+            "encoding": "UTF-8",
+            "base64": "PGEgY2xhc3M9ImxpdGVyYWwiIGhyZWY9Ii90YXJnZXQ/eD0xJmFtcDt5PTIiPmjDqWxsbzwmPC9hPg=="
+          },
+          "link_class": "ActiveSupport::SafeBuffer",
+          "link_safe": true,
+          "old_after_link": "",
+          "replacement_after_link": null,
+          "replacement": null,
+          "builder_replaced": null
+        }
+      },
+      {
+        "mode": "native",
+        "same_outcomes": true,
+        "checks": {
+          "off": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "native_dependency_fallback": true
+          },
+          "on": {
+            "completed_first_original": true,
+            "exercised_fast_prelude": true,
+            "block_exactly_once": true,
+            "completed_hit_delta": true,
+            "unwind_not_completed": true,
+            "exact_link_result": true,
+            "fresh_safe_tag_type": true,
+            "native_dependency_fallback": true
           }
         },
         "outcome": {
@@ -1088,169 +1136,659 @@
     ]
   },
   "workers": {
-    "fizzy-link-final-controls/break-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "e573172e408149a11078afb3a91e2bbd6f48b42f7218b2ade1f842b800d50eee"
+    "fizzy-link-holder-cold/0-off_a.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "d7dc26137fd0537ea9de9eeb2cbb986d1d44623b9840308b3f916ec3bd51e2de"
     },
-    "fizzy-link-final-controls/break-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "7012ca6216d0a759ce7a652bea1e4fd678b177ab44bf99d8ddd8b56d197e4ac1"
+    "fizzy-link-holder-cold/0-off_b.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "4c35799ca2c9006bda00f265a191253f139b2bf10ee6f7dafef08dac8c13f31d"
     },
-    "fizzy-link-final-controls/buffer-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "8a01426e4165acfacc7885b62e51d75454805bff03a93cc9ea21eea9f5827538"
+    "fizzy-link-holder-cold/0-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "dc208868bd550708320c5e265f0a1cbd2ab8bb24530c7412cedd74fc24d934f7"
     },
-    "fizzy-link-final-controls/buffer-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "9d465c20bb554e7ddbcf2ab1c4b6f1394cf096d7173163066e4763744fd3370f"
+    "fizzy-link-holder-cold/1-off_a.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "a3eb6151cdff04bd946fd70836c90db2def42e91c80ca64b284321168788f647"
     },
-    "fizzy-link-final-controls/builder-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "97a99967be850158057b822a242412003b6dba5a9cee9900387266909a9289d7"
+    "fizzy-link-holder-cold/1-off_b.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "5c92112e0e6863d5fd8d11dc6e02f2ea8f748535f4a684d4c03396e92e1abb30"
     },
-    "fizzy-link-final-controls/builder-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "1f71d690b052efb8125c1ea0d975e951dc211644fa4b1862ec8e8dde04d64b10"
+    "fizzy-link-holder-cold/1-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "d1e93c5c4120d72c79d04aa900f9913b1581ae41e12142c31562cb5d91196bc8"
     },
-    "fizzy-link-final-controls/foreign-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "1f30146ba795a2f67818182723fdcd361d19caee82474c10adbb621b81e5f1a7"
+    "fizzy-link-holder-controls/break-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "a63498d81867d6adfe43c84489c66e2091591a2bd0b8c2d25479d358ac4a446f"
     },
-    "fizzy-link-final-controls/foreign-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "40adf730654df93c9180400462a0346415b37547d3e9a34dd21cfe4916f41788"
+    "fizzy-link-holder-controls/break-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "a989bf75cf2d9b8c1dcf229a8be5737d5f4d4cf41fecd09d41fb8488c807204c"
     },
-    "fizzy-link-final-controls/nested-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "8ce199a038adb1b8beefca97faf121a7e84dda3ed28f999c9dc60d197413ec6e"
+    "fizzy-link-holder-controls/buffer-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "797100fc0efd5044ce7872fa08ccebc4840473489d2bcaf88c1e0161a08d259d"
     },
-    "fizzy-link-final-controls/nested-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "23e419bdecd96354ac8f46462ff4652ced2152090c47f411120315860bed4511"
+    "fizzy-link-holder-controls/buffer-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "02f18f5ea6961f54d3bd1ce8fbb646a272b12eb2741aee05e479792df458ae1e"
     },
-    "fizzy-link-final-controls/next-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "19036ba4ba781b1c9153db2fdc203ebd46f8651b5a6bb08f0e36516fd8d94e8b"
+    "fizzy-link-holder-controls/builder-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "6a3cd1c8f644397dd108e6490ebee0652ef1fc4cc955537857ae657071429d4b"
     },
-    "fizzy-link-final-controls/next-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "08c0e28409acb46dfe49f3b2a78c573fa52f0d713a7a043be24f32ff615f7679"
+    "fizzy-link-holder-controls/builder-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "8ca0e953af52ff8693f957b4061bfac05e7f16c7ab41f68a3ce297b795323deb"
     },
-    "fizzy-link-final-controls/nil-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "f234d81558766544ae2d67f62630916e32abbaa19f1305a1b1cf2ae866fe8409"
+    "fizzy-link-holder-controls/foreign-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "a9d6e733b04ef081aefc34669e7699699821220649a810163db154ee19b867ae"
     },
-    "fizzy-link-final-controls/nil-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "af7e30a311d421cb36a73c28ac43976f8ac160aa5d681238974782e5aea114c1"
+    "fizzy-link-holder-controls/foreign-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "26ab8f76bb477d5d1b97d7f33715cf1d36e63e1f7af3e473d1682b9944ba87eb"
     },
-    "fizzy-link-final-controls/normal-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "e52535dafabe3ce5cc344d13969fb19291c14108adbf39934f1fbda7a8b38d01"
+    "fizzy-link-holder-controls/native-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "ce3c876f04153e9d0d435bb02d1d948ade4d4b93cc738e76bd5639b74ec1956b"
     },
-    "fizzy-link-final-controls/normal-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "5306bad6b0e7642a08698e91c57041787bb89692121e133c6e3fc54bfc3ab585"
+    "fizzy-link-holder-controls/native-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "48993860e30661497135f718d670a7bb52218cc5b0a6584be973eb8b66e70908"
     },
-    "fizzy-link-final-controls/raise-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "57ca4153b015a648f218fa34436cc6c1ac886d4892c908f328048a86d01a3dfa"
+    "fizzy-link-holder-controls/nested-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "b0cde18e7542565c48c847b95dce5ecf6f8905b43ce07cb6072af3120f185bb5"
     },
-    "fizzy-link-final-controls/raise-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "55d27d7f11db546d021d0adfdf70f6ba3692021082cc48101a342892288884f4"
+    "fizzy-link-holder-controls/nested-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "bd6c535d96c804d81937621d2d2c9591bf96252664b795a55348b721095b33cb"
     },
-    "fizzy-link-final-controls/return-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "09b3c3b03aaba9a384ae1a2fffe5ac517152247a8e99afd0e7681ca9c3aad577"
+    "fizzy-link-holder-controls/next-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "0b7e9da7c7b34de0d9411d8cbca7abacb2f2f6bdc8ebc047b8343e6cf0ac5087"
     },
-    "fizzy-link-final-controls/return-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "d23545bc7d9bdf376bf0a19f7ffc5559bdbce096f6391501e9328869d89fa5cc"
+    "fizzy-link-holder-controls/next-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "cf2d9babb8394bfc218f168d9310bcdd83e33e166b855ccd2d6aa2fcf7905f80"
     },
-    "fizzy-link-final-controls/safe-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "314ed45ed4af465eec2f04a651b417b0721f03b0524aa0d718b014df43d78990"
+    "fizzy-link-holder-controls/nil-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "8c952b36ae36026527ca1177c785c301077680cf7faff7f8b965f75fbfbbe85d"
     },
-    "fizzy-link-final-controls/safe-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "8cd86ce3fae726b3dae75db1cab56905b72ef37dbe8bc8b0a01bcf976ed2fea4"
+    "fizzy-link-holder-controls/nil-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "c3d734f6426336cbb947c4776646382a293ad4cad0b2b193608fcafbf2e7ff87"
     },
-    "fizzy-link-final-controls/singleton-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "acd9f19cc889a19d92a7b329bfd42ce8350c9ace089a3e681ea558c9ef7dc525"
+    "fizzy-link-holder-controls/normal-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "aaf85fb8aa9a0fcb8ac7caaa3217c4e23fa608adec01dea4dae7acee470d5ac5"
     },
-    "fizzy-link-final-controls/singleton-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "6484906979f4150097579b03b46f2b6775231d30e197f8a751b5ff78396654bb"
+    "fizzy-link-holder-controls/normal-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "3d0f4a6fb552d42a1deb8b1ae8f92827257f258206a52ebf5a3fdef4dd393901"
     },
-    "fizzy-link-final-controls/streaming-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "65ccd8ecd32b5d79e530c645265840b205483c711fd2fecd09c5707baf081db0"
+    "fizzy-link-holder-controls/raise-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "07a2119c90bde39d27db4dd0c0272d8e5bf9cf0ab1c91bfb9d1fc4a7c4daea54"
     },
-    "fizzy-link-final-controls/streaming-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "23e572cf84b2375f6fb959b3e17447756c3b5d04d9340ac2bac3cceb58c742d6"
+    "fizzy-link-holder-controls/raise-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "bb909a48bef686083e12db5fec0e587122034092f52e0ec7bd134f4e3a3104e9"
     },
-    "fizzy-link-final-controls/throw-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "4898d7f9f9665116070da4d16e151e06007740587e650f0b2112b5c06a430319"
+    "fizzy-link-holder-controls/return-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "0bdfd1b6e7769ab31f96f96c4caec04a769d7258557b6eed8a5b0fdc0a9200d4"
     },
-    "fizzy-link-final-controls/throw-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "b44781b36094e33a8d257b696bfe7b937d76175f2408632b24b914542e1a1086"
+    "fizzy-link-holder-controls/return-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "45cc3aa3b01d6f1a6a7f51a527408032bf83f4166215dbe2ea8f08685a3caab3"
     },
-    "fizzy-link-final-controls/unsafe-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "a07450fd423f5e168b36855bb3059d38e144cfad9e074de8a1026d0c9f75b8af"
+    "fizzy-link-holder-controls/safe-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "48402ec7e78bf1652c516c71c0958042bbd8e73430badcb584bee3edb77e69bf"
     },
-    "fizzy-link-final-controls/unsafe-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "ecc56eb3a52797b61e16ec5105a7cb1c6f1e69267313338c41643e7aa93a924e"
+    "fizzy-link-holder-controls/safe-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "fc378b3e64f200e2114ed21197028fa133745061e79b26326c5c53d97fbe1828"
     },
-    "fizzy-link-final-controls/url_error-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "928f96b7af7baf1dbe403bda06bbf51415b49f47eab643ceb132c380189a2195"
+    "fizzy-link-holder-controls/singleton-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "402dcf2a5b90ab514325b7d7bdbec26190187ef5934b1d726d4e7117865cf19e"
     },
-    "fizzy-link-final-controls/url_error-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "994400f6f3c90b5e538399d0c488288bc3dfa111d5ded242e9cd81824cf81fd7"
+    "fizzy-link-holder-controls/singleton-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "34f9f8c16c37008c5b463de0a87a8cee86c469cfc50b0d8dd9d3e9b7aba56e7f"
     },
-    "fizzy-link-final-controls/whitespace-off.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "ab801b947ad47d51b842247985b6fd0a94a464e37f1a925a2201a749478b8f92"
+    "fizzy-link-holder-controls/streaming-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "db05e85069e2fac8e8a2b00bc22ce3a7e960debb7c43366cd8325acbba2cec77"
     },
-    "fizzy-link-final-controls/whitespace-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "13b907119c1391b2abf7e5b11a66aeb32c44d686ba220bbdaf4cca02d699e5f7"
+    "fizzy-link-holder-controls/streaming-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "0db4790ad336cb90c2a3b7a5d12e804ff74934c2fe6cd5d639feaecfd3eeda9b"
     },
-    "fizzy-link-final-gates/0-off_a.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "18ddab6b9244f855a3f59a91b232468fc323b216bb88c2fae0b9bc565fb072ac"
+    "fizzy-link-holder-controls/throw-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "8c510c025378b0a23a0ee9d9b87f6af80495b1ea6e2fdbbe3659b992286b34b2"
     },
-    "fizzy-link-final-gates/0-off_b.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "b3eaff39482c7f1f8a07fb1f85d5c51904bc49e1f804b4853e7d9fb415e47775"
+    "fizzy-link-holder-controls/throw-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "9f91681c0b54e3ba57908e54a3a3de97cdeca61ea94009a5168c4b4305f68407"
     },
-    "fizzy-link-final-gates/0-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "d31dbd4f47484113b1ad01d0d538b79953320e8f3ff8bbf97e1c29cda7f8f018"
+    "fizzy-link-holder-controls/unsafe-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "075d9edd5532f432e633e76d090d5bf026c4f99a23629760ba5ea47f16738aea"
     },
-    "fizzy-link-final-gates/1-off_a.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "7643d6502107cf356ffe9ac1e4049b8063f1245b83d66cc3b8060902761303c7"
+    "fizzy-link-holder-controls/unsafe-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "5f0e4ad36f6e97f79c390d84cffea95d51499e0dc285dcf714c608bbb756f28e"
     },
-    "fizzy-link-final-gates/1-off_b.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "02b6c1bdef95d1759524b1430e13f020c81ca770a304542e054aa3e602f18105"
+    "fizzy-link-holder-controls/url_error-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "0f96f68ed4a10839e016d9304c05068485e59f0f771c8d1dbfa17ad2cba5fe2b"
     },
-    "fizzy-link-final-gates/1-on.json": {
-      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
-      "raw_sha256": "5d4d90f8b16ea6651346d1644def31c6074bf4ebdf50b26b7d48c4f83070a5fa"
+    "fizzy-link-holder-controls/url_error-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "42f5a0931e0be3a48055c0a574f7a8983c55988a881302966ee279f398b83e5f"
+    },
+    "fizzy-link-holder-controls/whitespace-off.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "9b7612736eebac4e54df4edaf363d76b6016b49d0307042f46ffe522854cb1f7"
+    },
+    "fizzy-link-holder-controls/whitespace-on.json": {
+      "harness_sha": "da5fe91e2f04a27acef1f7245efa7f39a7332577",
+      "raw_sha256": "fb8da5fad5fe4001fbe27e4e4b2651b0809a778b437a2fbc1f2668de5acb0bbe"
     }
   },
   "production_changes": false,
   "app_patches": false,
   "measurements_run": false,
-  "cohort_authorized": false
+  "cohort_authorized": false,
+  "historical_run": {
+    "pins": {
+      "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+      "harness_root": "/home/user/workspace/lowrail-block-link-harness",
+      "app_source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+      "contexts_sha256": "7a874ed1294aec928a8302c716250e8b41558f08bb7f504e177cd0145cc88928",
+      "artifact": {
+        "0.rb": "f4b29282e15dc0c1749d4e983a0a10e6683d2a7ad02cc34e2dc28a6ab4387611",
+        "1.rb": "5166836669a97b51e94bc8f36478c30097866c27072f7e2b4f6c84d5b19f4aab",
+        "2.rb": "4f3bc4d019ec3baca925f2bcff381ec581e1e0b281a3554d510b8f879c7912c4",
+        "3.rb": "3a6f994f65650e10216492d80ddb39e8d32678b688f65f50cbd47a05df138aea",
+        "4.rb": "26cc20eedca714797ca2a6b3623fe915b5d4de09230ea7da08b0aa77e110850f",
+        "5.rb": "5696efed8a494fa1625938a36ca9ec507e4d131594bbb115f7fb712bd6022aea",
+        "audit-sources.json": "30d6d3c484dd942f24c89b783a5da6976901280703e9f2e386baad2d797c6af9",
+        "expected-methods.json": "cbd18116c5f3da45af9d71c4f5a496ebde59c255efefa3efe7cd93aa8796b758",
+        "iseq/071d0dfce20cdfe74ae5777982e9975a88a97db87bd6cf0c88997cae0e24fb02.bin": "071d0dfce20cdfe74ae5777982e9975a88a97db87bd6cf0c88997cae0e24fb02",
+        "iseq/1402d24464182ceb619d02a086af737f498050ff6be456c5dd6ced29c35c451b.bin": "1402d24464182ceb619d02a086af737f498050ff6be456c5dd6ced29c35c451b",
+        "iseq/3aa97bb8190b56508f23f815839f4ca7e78c0c1d25d3b6381cb489f9f74ca25e.bin": "3aa97bb8190b56508f23f815839f4ca7e78c0c1d25d3b6381cb489f9f74ca25e",
+        "iseq/a5aeaa496299b9471e1eac098dbf19dc35ce2c7967088712c9d8d0fc405d8aa2.bin": "a5aeaa496299b9471e1eac098dbf19dc35ce2c7967088712c9d8d0fc405d8aa2",
+        "iseq/ac72c8f8fdb888f1e21675f66f52be5793430b845c3df4af5e201bd68950c1be.bin": "ac72c8f8fdb888f1e21675f66f52be5793430b845c3df4af5e201bd68950c1be",
+        "iseq/f9218f76c017c0df270b43f77d96897d957d082bbdf531ad30111b402e4097f0.bin": "f9218f76c017c0df270b43f77d96897d957d082bbdf531ad30111b402e4097f0",
+        "ledger.json": "eebc13cb36eb4a9a08bbd792fd76b220fa59e19425f19835767e1110371caeed",
+        "manifest.json": "53cbdc4e438b1b0761e9dba863c2bd973aa64be6c39eaf0716347a0346382b4a"
+      },
+      "native": {
+        "gem/lib/lowrail/native/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/lowrail_native.so": "a3669eda9f150f05bec4d7663859693266bd1e0fcd58b02769caa95bf58e9c8a"
+      },
+      "sources": {
+        "bench/experiments/block_link_controls.rb": "1236319d59a5a9812a943caea8d27da2dd712efa9e26425ec94cbe2eb99b4f2e",
+        "bench/experiments/block_link_delivery.rb": "c999db1017da1a3f1d23a625d0c61e0f081cc5358ac17fd3622a6fd38aefe39c",
+        "bench/experiments/block_link_specimen.rb": "d6322023a6a331921aa0805656ee91f129921781b6c0d00821ed4f972288006f",
+        "bench/experiments/fizzy_link_check.rb": "44164d2f2d4d5dab72c16f16c5018605d9999eabcb351a218e46aadc1c3139ec",
+        "bench/experiments/fizzy_link_completion.rb": "03cc59120d9f82f479746639b1e6a4922695a800cce89d02a59164adea07f985",
+        "bench/experiments/fizzy_link_fixture.rb": "2a396ed02e2c93509bb5b1ffe990ab2c5d26d16850732ea9bb79e22ce62b34ed",
+        "bench/experiments/fizzy_link_http.rb": "aee546bdaa1e601e2c65455bb86b2c942a034f4f48204a4eb062a5c0079fbd6e",
+        "bench/experiments/fizzy_link_vector.rb": "54f834b57f0749e72ab33cf1b1cc6595ea564f794d6514b83bea068dc32b8e2d",
+        "bench/heap_windows.rb": "b4f3bfa341ba37d09f3d84b7c77dd629aa7b87c36d80805b3bca37836f2b32d6",
+        "bench/jit_stability.rb": "743649435ea5af8e3902d35516e592e522afa7ed8b74135b491b6559496ca1a9",
+        "bench/request_pairs.rb": "d390a08c3d2f05046bd41e3985aece1a1b4d7f638c84598cb792b6d55ebf20d9",
+        "bench/worker_placement.rb": "d6d63ec89aa6e6652f70048f05dd682a25e6ebd77a41839c62a7eb6ab9867aa8"
+      },
+      "entropy_policy_sha256": "190ec133a693e833e0c70a16a011bc0408677446debcf38941a2dd4d71400c6e"
+    },
+    "cold": [
+      {
+        "status": "rejected_off_control",
+        "fields": {
+          "initial_effects": {
+            "off_off": true,
+            "off_on": true
+          },
+          "steps": {
+            "off_off": true,
+            "off_on": true
+          },
+          "sql": {
+            "off_off": false,
+            "off_on": false
+          },
+          "events": {
+            "off_off": true,
+            "off_on": true
+          },
+          "completed_effects": {
+            "off_off": false,
+            "off_on": false
+          },
+          "completion": {
+            "off_off": true,
+            "off_on": true
+          },
+          "loads": {
+            "off_off": true,
+            "off_on": true
+          },
+          "features": {
+            "off_off": true,
+            "off_on": true
+          },
+          "ancestry": {
+            "off_off": true,
+            "off_on": true
+          }
+        },
+        "controls": {
+          "same_clean_harness": true,
+          "completed_cable_queue": true,
+          "no_capture_errors": true,
+          "no_undeclared_entropy": true,
+          "same_entropy_trace": true
+        },
+        "sql_events": [
+          647,
+          647,
+          642
+        ],
+        "cached_unavailable_binds": [
+          168,
+          168,
+          168
+        ],
+        "compared_payload_fields": [
+          [
+            "controller",
+            "action",
+            "method",
+            "path",
+            "format",
+            "status",
+            "identifier",
+            "layout",
+            "count",
+            "cache_hits"
+          ]
+        ],
+        "uncovered": [
+          "arbitrary render subscriber payloads/controller assigns are not fully captured",
+          "cached lazy SQL-bind Proc values are explicitly unavailable; only SQL text/cache hit compared",
+          "source-only prototype has no production passive admission authority",
+          "SolidCache background completion is outside the Cable/queue-only adapter; cache SQL/state remain compared, never discarded"
+        ],
+        "seed": 0
+      },
+      {
+        "status": "rejected_off_control",
+        "fields": {
+          "initial_effects": {
+            "off_off": true,
+            "off_on": true
+          },
+          "steps": {
+            "off_off": true,
+            "off_on": true
+          },
+          "sql": {
+            "off_off": true,
+            "off_on": true
+          },
+          "events": {
+            "off_off": true,
+            "off_on": true
+          },
+          "completed_effects": {
+            "off_off": false,
+            "off_on": false
+          },
+          "completion": {
+            "off_off": true,
+            "off_on": true
+          },
+          "loads": {
+            "off_off": true,
+            "off_on": true
+          },
+          "features": {
+            "off_off": true,
+            "off_on": true
+          },
+          "ancestry": {
+            "off_off": true,
+            "off_on": true
+          }
+        },
+        "controls": {
+          "same_clean_harness": true,
+          "completed_cable_queue": true,
+          "no_capture_errors": true,
+          "no_undeclared_entropy": true,
+          "same_entropy_trace": true
+        },
+        "sql_events": [
+          642,
+          642,
+          642
+        ],
+        "cached_unavailable_binds": [
+          168,
+          168,
+          168
+        ],
+        "compared_payload_fields": [
+          [
+            "controller",
+            "action",
+            "method",
+            "path",
+            "format",
+            "status",
+            "identifier",
+            "layout",
+            "count",
+            "cache_hits"
+          ]
+        ],
+        "uncovered": [
+          "arbitrary render subscriber payloads/controller assigns are not fully captured",
+          "cached lazy SQL-bind Proc values are explicitly unavailable; only SQL text/cache hit compared",
+          "source-only prototype has no production passive admission authority",
+          "SolidCache background completion is outside the Cable/queue-only adapter; cache SQL/state remain compared, never discarded"
+        ],
+        "seed": 1
+      }
+    ],
+    "named_off_off_rejections": [
+      "SolidCache 1.0.6 background size-estimation SQL interleaving differs; asynchronous cache completion is not certified by the Cable/queue adapter",
+      "SolidCache writes SQLite STRFTIME(%Y-%m-%d %H:%M:%f, NOW) timestamps; fixed Ruby Time.now does not fix the database clock"
+    ],
+    "workers": {
+      "fizzy-link-final-controls/break-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "e573172e408149a11078afb3a91e2bbd6f48b42f7218b2ade1f842b800d50eee"
+      },
+      "fizzy-link-final-controls/break-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "7012ca6216d0a759ce7a652bea1e4fd678b177ab44bf99d8ddd8b56d197e4ac1"
+      },
+      "fizzy-link-final-controls/buffer-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "8a01426e4165acfacc7885b62e51d75454805bff03a93cc9ea21eea9f5827538"
+      },
+      "fizzy-link-final-controls/buffer-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "9d465c20bb554e7ddbcf2ab1c4b6f1394cf096d7173163066e4763744fd3370f"
+      },
+      "fizzy-link-final-controls/builder-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "97a99967be850158057b822a242412003b6dba5a9cee9900387266909a9289d7"
+      },
+      "fizzy-link-final-controls/builder-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "1f71d690b052efb8125c1ea0d975e951dc211644fa4b1862ec8e8dde04d64b10"
+      },
+      "fizzy-link-final-controls/foreign-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "1f30146ba795a2f67818182723fdcd361d19caee82474c10adbb621b81e5f1a7"
+      },
+      "fizzy-link-final-controls/foreign-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "40adf730654df93c9180400462a0346415b37547d3e9a34dd21cfe4916f41788"
+      },
+      "fizzy-link-final-controls/nested-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "8ce199a038adb1b8beefca97faf121a7e84dda3ed28f999c9dc60d197413ec6e"
+      },
+      "fizzy-link-final-controls/nested-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "23e419bdecd96354ac8f46462ff4652ced2152090c47f411120315860bed4511"
+      },
+      "fizzy-link-final-controls/next-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "19036ba4ba781b1c9153db2fdc203ebd46f8651b5a6bb08f0e36516fd8d94e8b"
+      },
+      "fizzy-link-final-controls/next-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "08c0e28409acb46dfe49f3b2a78c573fa52f0d713a7a043be24f32ff615f7679"
+      },
+      "fizzy-link-final-controls/nil-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "f234d81558766544ae2d67f62630916e32abbaa19f1305a1b1cf2ae866fe8409"
+      },
+      "fizzy-link-final-controls/nil-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "af7e30a311d421cb36a73c28ac43976f8ac160aa5d681238974782e5aea114c1"
+      },
+      "fizzy-link-final-controls/normal-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "e52535dafabe3ce5cc344d13969fb19291c14108adbf39934f1fbda7a8b38d01"
+      },
+      "fizzy-link-final-controls/normal-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "5306bad6b0e7642a08698e91c57041787bb89692121e133c6e3fc54bfc3ab585"
+      },
+      "fizzy-link-final-controls/raise-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "57ca4153b015a648f218fa34436cc6c1ac886d4892c908f328048a86d01a3dfa"
+      },
+      "fizzy-link-final-controls/raise-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "55d27d7f11db546d021d0adfdf70f6ba3692021082cc48101a342892288884f4"
+      },
+      "fizzy-link-final-controls/return-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "09b3c3b03aaba9a384ae1a2fffe5ac517152247a8e99afd0e7681ca9c3aad577"
+      },
+      "fizzy-link-final-controls/return-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "d23545bc7d9bdf376bf0a19f7ffc5559bdbce096f6391501e9328869d89fa5cc"
+      },
+      "fizzy-link-final-controls/safe-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "314ed45ed4af465eec2f04a651b417b0721f03b0524aa0d718b014df43d78990"
+      },
+      "fizzy-link-final-controls/safe-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "8cd86ce3fae726b3dae75db1cab56905b72ef37dbe8bc8b0a01bcf976ed2fea4"
+      },
+      "fizzy-link-final-controls/singleton-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "acd9f19cc889a19d92a7b329bfd42ce8350c9ace089a3e681ea558c9ef7dc525"
+      },
+      "fizzy-link-final-controls/singleton-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "6484906979f4150097579b03b46f2b6775231d30e197f8a751b5ff78396654bb"
+      },
+      "fizzy-link-final-controls/streaming-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "65ccd8ecd32b5d79e530c645265840b205483c711fd2fecd09c5707baf081db0"
+      },
+      "fizzy-link-final-controls/streaming-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "23e572cf84b2375f6fb959b3e17447756c3b5d04d9340ac2bac3cceb58c742d6"
+      },
+      "fizzy-link-final-controls/throw-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "4898d7f9f9665116070da4d16e151e06007740587e650f0b2112b5c06a430319"
+      },
+      "fizzy-link-final-controls/throw-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "b44781b36094e33a8d257b696bfe7b937d76175f2408632b24b914542e1a1086"
+      },
+      "fizzy-link-final-controls/unsafe-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "a07450fd423f5e168b36855bb3059d38e144cfad9e074de8a1026d0c9f75b8af"
+      },
+      "fizzy-link-final-controls/unsafe-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "ecc56eb3a52797b61e16ec5105a7cb1c6f1e69267313338c41643e7aa93a924e"
+      },
+      "fizzy-link-final-controls/url_error-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "928f96b7af7baf1dbe403bda06bbf51415b49f47eab643ceb132c380189a2195"
+      },
+      "fizzy-link-final-controls/url_error-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "994400f6f3c90b5e538399d0c488288bc3dfa111d5ded242e9cd81824cf81fd7"
+      },
+      "fizzy-link-final-controls/whitespace-off.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "ab801b947ad47d51b842247985b6fd0a94a464e37f1a925a2201a749478b8f92"
+      },
+      "fizzy-link-final-controls/whitespace-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "13b907119c1391b2abf7e5b11a66aeb32c44d686ba220bbdaf4cca02d699e5f7"
+      },
+      "fizzy-link-final-gates/0-off_a.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "18ddab6b9244f855a3f59a91b232468fc323b216bb88c2fae0b9bc565fb072ac"
+      },
+      "fizzy-link-final-gates/0-off_b.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "b3eaff39482c7f1f8a07fb1f85d5c51904bc49e1f804b4853e7d9fb415e47775"
+      },
+      "fizzy-link-final-gates/0-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "d31dbd4f47484113b1ad01d0d538b79953320e8f3ff8bbf97e1c29cda7f8f018"
+      },
+      "fizzy-link-final-gates/1-off_a.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "7643d6502107cf356ffe9ac1e4049b8063f1245b83d66cc3b8060902761303c7"
+      },
+      "fizzy-link-final-gates/1-off_b.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "02b6c1bdef95d1759524b1430e13f020c81ca770a304542e054aa3e602f18105"
+      },
+      "fizzy-link-final-gates/1-on.json": {
+        "harness_sha": "6c3342fd77b90557b8da0133bbc296013aad42d4",
+        "raw_sha256": "5d4d90f8b16ea6651346d1644def31c6074bf4ebdf50b26b7d48c4f83070a5fa"
+      }
+    },
+    "publication": "87356dd9b4f2aefb5c65ed69b85cf20a57c6bc95",
+    "pin_status": "local pre-rebase commit, preserved in verified Git bundle; not a published GitHub commit",
+    "bundle_sha256": "7bbe6db52290ae9bafb0e4c705176e2b61e9c9f4a6b881758f5f048efdae55ba",
+    "controls": {
+      "pass": true,
+      "paired_cases": 17
+    }
+  },
+  "fixture_seed_sha256": {
+    "cable.sqlite3": "cc370630956b3cb862b43fd8e52fa12c647715a39420545bc35d32748fadf68d",
+    "cache.sqlite3": "d6f23a5710e241cc5dbc7b543eb176ea71ff78e2834c8fafbbf09bf617fd8908",
+    "login.json": "16cf92642c6b8e9dbf6fac6146dd6853392d00578f07c29dc92be494c14c3a43",
+    "primary.sqlite3": "d7ab4b97e463e336fd6927461e82a8212a065edcb726ad5f0eae222b4ab3d11e",
+    "queue.sqlite3": "475fab85d5713bbf089d2ce03a993fe1d0115a7b16ec92b48554ab36f06e985a",
+    "secret_key_base": "19741a8b2f270c69c29afda1715ec9e845368946079ed4377ef5e4acbf0fd76b",
+    "vector.json": "50bbd33af2bef5e9d90de0c168f1612871c0d5e1098cdfa0ba720e1e87de71b9"
+  },
+  "control_contexts_sha256": "b412609ff76e21435958620fa93d772daee91ae7377486a893d96c8d741b0ed3",
+  "cache_clock_decision": {
+    "versions": {
+      "solid_cache": "1.0.6",
+      "concurrent-ruby": "1.3.4",
+      "sqlite3": "2.5.0"
+    },
+    "sqlite_compile_version": "3.47.2",
+    "sqlite_loaded_version": "3.47.2",
+    "completion": "Existing accepted-task completion can be observed without posting work, but does not attest discarded/swallowed work or recover a single SQL ordering/state. No adapter added; completion remains uncovered.",
+    "ordering": "No SQL set/multiset normalization. Waiting after every request would be a different serialized workload, not this vector.",
+    "clock": "No supported SQL-now clock setter in locked sqlite3 2.5.0. Fixed Ruby Time.now leaves stock SQLite VFS time live. No SQL replacement, custom VFS or process-clock interposer installed.",
+    "sources": {
+      "solid_cache:lib/solid_cache/store/execution.rb": "21901d4fa6b1e78046e13faacb44472e4b379079ef8f548bb80d4ea90a10433d",
+      "solid_cache:lib/solid_cache/store/expiry.rb": "1064acfd1c3bc1ad439b7800c61757ed8297346ed83a3443b7b4deef3cd69f69",
+      "solid_cache:app/models/solid_cache/entry.rb": "def3059092cc1a21b4708401444e2c839f58eca64363e379e273132a14b94bb2",
+      "solid_cache:app/models/solid_cache/entry/size/moving_average_estimate.rb": "6a56fa3428d9c731b83d19ee331820ac5ca95227f8cd161f0b2bcee9d72aa43a",
+      "concurrent-ruby:lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb": "5b594fc10ebdcde182f116c9ee8ba60d3331c3b678b3c0b8604ec2be24599c89",
+      "concurrent-ruby:lib/concurrent-ruby/concurrent/executor/ruby_executor_service.rb": "a6b7a63d3e6d57504d46eb08c33d800db7bc95cc6be03380cba2a0e6f9f5109c",
+      "concurrent-ruby:lib/concurrent-ruby/concurrent/executor/abstract_executor_service.rb": "6f619e3de05197e40d5782aff745a3f64ba3a2d57ed13dd61dd3a96bea3bbfc2",
+      "sqlite3:lib/sqlite3/database.rb": "a13321f4534ea46527840edf94add9066280b2dc50042ba6ee16169805eecb42",
+      "sqlite3:ext/sqlite3/database.c": "9e4455ad9ec3676ee29bee83a740bd590220c74fda781d8061f056a9968e69d4",
+      "sqlite3:ext/sqlite3/sqlite3.c": "64a0b93fa0c8760619f6497dd3da42cc4334aba6289a1e3817d398d69ea43d9f"
+    }
+  },
+  "completed_state_differences": [
+    {
+      "seed": 0,
+      "comparison": "off_b",
+      "differences": {
+        "cache.solid_cache_entries": {
+          "rows": [
+            9,
+            9
+          ],
+          "different_columns": {
+            "created_at": 9
+          }
+        }
+      }
+    },
+    {
+      "seed": 0,
+      "comparison": "on",
+      "differences": {
+        "cache.solid_cache_entries": {
+          "rows": [
+            9,
+            9
+          ],
+          "different_columns": {
+            "created_at": 9
+          }
+        }
+      }
+    },
+    {
+      "seed": 1,
+      "comparison": "off_b",
+      "differences": {
+        "cache.solid_cache_entries": {
+          "rows": [
+            9,
+            9
+          ],
+          "different_columns": {
+            "created_at": 9
+          }
+        }
+      }
+    },
+    {
+      "seed": 1,
+      "comparison": "on",
+      "differences": {
+        "cache.solid_cache_entries": {
+          "rows": [
+            9,
+            9
+          ],
+          "different_columns": {
+            "created_at": 9
+          }
+        }
+      }
+    }
+  ],
+  "native_guard_regression": {
+    "before": {
+      "native_identity_changed": true,
+      "dependencies_still_accepted": true
+    },
+    "probe_sha256": "26af71ff1908b0f08cd5902d11e4242873e81210571f5ae62987cfa31517fdda",
+    "after": "normal original, normal hit, mutation: block once, zero added hits, one saved-receiver dependency fallback, exact output"
+  }
 }
