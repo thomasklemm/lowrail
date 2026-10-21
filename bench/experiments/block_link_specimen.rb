@@ -63,8 +63,10 @@ module BlockLinkSpecimen
       controller = ivar(view, :@_controller)
       controller_class = klass(controller)
       cached_view = ivar(controller_class, :@view_context_class)
-      return entry.merge!(reason: "unnatural view/compiler context") unless sequence && exact(view, cached_view) &&
-        ivar(template, :@compiled) && ivar(template, :@handler).equal?(ActionView::Template::Handlers::ERB) && source
+      return entry.merge!(reason: "view differs from naturally cached controller holder") unless exact(view, cached_view)
+      return entry.merge!(reason: "compiled template ISeq unavailable") unless sequence && ivar(template, :@compiled)
+      return entry.merge!(reason: "nonstock template handler") unless ivar(template, :@handler).equal?(ActionView::Template::Handlers::ERB)
+      return entry.merge!(reason: "natural source compilation not observed") unless source
       keys, template_locals, strict_locals = KEYS.bind_call(locals), ivar(template, :@locals), ivar(template, :@strict_locals)
       return entry.merge!(reason: "unsupported locals metadata") unless keys.all? { Symbol === _1 || exact(_1, String) } &&
         exact(template_locals, Array) && template_locals.all? { exact(_1, String) } &&
