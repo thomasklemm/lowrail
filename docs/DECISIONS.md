@@ -58,6 +58,24 @@ not a remeasurement. Token/collection test admission remains separate; the
 blog test configuration disables forgery protection, so empty-token hits
 cannot cover protected-token assembly. Form remains refused in that tier.
 
+## Corrected-source interpreter re-price accepted (2026-10-21)
+
+The separately authorized **one** interpreter cohort at published `553e7aa`
+includes the token continuation fix: production form/token/collection on
+**BlogShowGetOnly GET /articles/1**, Ruby 4.0.7 / Rails 8.1.4, **−15.23% total
+Ir [−15.25, −15.21]**, **−15.25% GC-excluded Ir**. This replaces the earlier
+price for the corrected specimen; −15.49% remains historical at `ae025b0`.
+It is not a native-latency, YJIT, test-tier or whole-app claim.
+
+Six rounds, seed 41231, 18 sequential workers, identical accepted N0/50,
+fixed-heap/exact-page/brk512 method. Both A/A controls contain zero within
+±0.5%; all gates pass. All 72 dumps and 36 subtractions independently reconcile,
+every worker pins the clean detached SHA before/after, and pre/post cold,
+192+192, native/deopt controls pass. No retry/exclusions; slot 1 is released.
+No production/default/quarantine change. The YJIT candidate remains rejected;
+the separately authorized scratch native caller diagnostic is not a price
+or a v2 execution. [Protocol and complete export](passes/production-interpreter-reprice.md).
+
 ## Current production YJIT method: native candidate rejected (2026-10-21)
 
 Untimed only, at pinned `f34a35c`: mode-certified production form/token/collection

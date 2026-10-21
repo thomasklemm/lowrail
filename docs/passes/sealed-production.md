@@ -7,8 +7,10 @@ units are separate from the rejected [combined pricing specimen](sealed-combined
 That specimen stays rejected and is not measured again. This is not a Rails
 throughput/latency claim or a whole-app result. No default-tier, quarantine or
 guarded-pass behavior changes. The later token-continuation safety fix changes
-the runtime source; the accepted price remains scoped to `ae025b0`, not the
-corrected runtime. No new price is claimed.
+the runtime source; the historical −15.49% remains scoped to `ae025b0`.
+The separately authorized [corrected-source re-price](production-interpreter-reprice.md)
+at `553e7aa` is **−15.23% total interpreter Ir [−15.25, −15.21]**, with both
+A/A controls and pre/post correctness gates passing. No YJIT price is claimed.
 
 ## What is certified
 
