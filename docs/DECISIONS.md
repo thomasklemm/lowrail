@@ -13,6 +13,27 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Campfire r81 instantiation: companions accepted, screen before price (2026-10-21)
+
+The single authorized companion rerun exits 0 for both seeds, off/off/on:
+HTTP bytes, SQLite, loads/non-Lowrail feature order, events and completed/exit
+state agree under the declared controls. **Named items stay next to this result:**
+browser other-thread nondeterminism; raw CSRF/cookie/ETag/runtime/session-clock
+rejections; Redis `rate-limit:sessions` expiry accepted off/off rejection;
+the blog's path/hash-pinned Lowrail feature exemption; ten cached lazy-Proc
+binds/worker unavailable, never evaluated. All 42 Redis key names/values and
+41 other expiries remain exact. Cold login+room has 103 hits, outside warm work.
+
+The warm target remains 52 hits (Account5/User5/Message40/Boost1/Session1) plus
+two Room STI fallbacks, **only campfire-r81 02023b0, not the Oct-8 fixture**.
+Both phase orders retain the frozen pages in 16 exact-worker tool=none windows.
+Slot 2 was assigned; its launcher fails before any counted Callgrind worker or
+window. Its initial log was overwritten; the cause remains unconfirmed.
+The new **screen first, price rarely** policy arrives before
+measurement: no cohort retry or price; use the shared native YJIT wall/alloc/
+exact-output screen once published. No runtime/default/quarantine or app patch.
+[Evidence, exclusions and private-receipt hashes](campfire-bench.md#12-one-authorized-companion-rerun-accepted-with-named-items).
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

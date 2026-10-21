@@ -15,11 +15,33 @@ live in the linked docs; numbers come from executed runs, dated.
 | Accepted request work | corrected blog `GET /articles/1` production form/token/collection at [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65), published [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); post-fix Starter `GET /dashboard` JSON config binding. Exact values/intervals and pins: [generated README table](../README.md#current-results-2026-10-21). Each is one endpoint/fixture, interpreter Ir not latency, opt-in sealed; no YJIT claim or config promotion |
 | Not production request prices | production YJIT method stage 1 rejected; [reaper-driven late compilation](passes/production-yjit-method.md) explains the native rejection, not a price. [Frozen props](passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred) is an isolated micro, integration deferred. Fizzy N=50 **INVALID** (heap); N=10 accepted only as a scoped warm bench price, an instruction increase, not production admission ([specimen](block-link-specimen.md#replacement-result-scoped-warm-bench-price-not-a-win)) |
 | Verification-only test tier | AR Article/Comment coverage, not production admission; link/form/token/collection/preload remain refused. [Explicit-path eager-load coverage](test-certificate.md#documented-explicit-path-invocation-actual-eager-loading) at [9773980](https://github.com/thomasklemm/lowrail/commit/97739801174c015e948428c2f35fcb777a888b02); [ccea6df](https://github.com/thomasklemm/lowrail/commit/ccea6df6addc6958b6dbdadccc5e6c6f11727032) retains the fixed timeout diagnosis, without erasing the earlier failure |
+| Campfire r81 | 52 warm instantiation hits + 2 Room STI fallbacks; companions accepted with named browser/entropy/Redis-expiry rejections, blog Lowrail-feature exemption and 10 cached-bind gaps. Cold login+room 103 hits is outside warm windows. No price: screen-first policy before any counted Callgrind worker/window ([evidence](campfire-bench.md#12-one-authorized-companion-rerun-accepted-with-named-items)) |
 | Historical upper bounds | endpoint render path, −26 %/−37 % handwritten specimens, not supported passes or current prices; caller-side certification loses (0fbb909) |
 | Types/MCP | source-backed Sorbet + Rails signatures; blog slots 2/99/7/188, Wikino 0/1,715/1/1,129 (proven/static/observed/unknown); 517 original wrapped returns → static, forwarding placeholders removed; blog Steep 51 → 6 → 2, still non-gating ([details](types.md#sorbet-and-framework-signatures-follow-up--2026-10-21)) |
 | Prism 2 | Ruby dev + Rust 2.0.0; explicit target grammar, unknown versions refuse. Census/delivered bytes and Rust facts/types/MCP match; both Ruby axes tested, named production-fixture skips preserved. No Prism.find witness adoption or speed claim ([evidence](prism-2.md)) |
 | Rails 8.2 alpha | [Pinned corpus, source drift and fixed-count follow-up](rails-8.2.md); Campfire load/SQL variation reproduced off/off; Writebook lock corrected, baseline failures/Fizzy residuals retained; support blocked, sealed re-certification waits for beta/RC |
 | Limits / next work | default/quarantine unchanged; broader sealed admission and active own-suite coverage remain incomplete; frozen-props integration deferred; Ruby 4.1/ZJIT remains a separate matrix |
+
+## Campfire r81 companion follow-up (2026-10-21)
+
+One authorized rerun, exit 0: both seeds match HTTP status/header/body bytes,
+SQLite schema/all rows, loads, ordered non-Lowrail features, observed events
+and completed/post-exit state off/off/on. The 52-hit warm instantiation target
+is unchanged; 103 cold login+room hits are outside the proposed windows.
+**Named qualifications:** browser other-thread test nondeterminism; raw CSRF/
+cookie/ETag/runtime/session-clock rejections; accepted off/off Redis absolute
+expiry (`rate-limit:sessions` only, all 42 names/values and 41 other expiries
+exact); exact blog Lowrail feature rule with path/content hashes; ten cached
+lazy-Proc bind values unavailable/worker (153 SQL records retained, never
+evaluated/recast). This is not active sealed own-suite or cold raw support.
+
+All 16 exact-worker tool=none windows preserve frozen pages and the closed
+52-hit/two-STI map. Slot 2 was assigned, but its launcher stops before any
+counted Callgrind worker/window (initial log overwritten, cause unconfirmed).
+The new screen-first policy now
+requires a cheap native YJIT wall/alloc/exact-output screen before pricing.
+No speed claim, retry, app patch, runtime/default/quarantine change, or Oct-8-app
+equivalence. [Full retained evidence and hashes](campfire-bench.md#12-one-authorized-companion-rerun-accepted-with-named-items).
 
 ## Fizzy block-link heap protocol (2026-10-21)
 
