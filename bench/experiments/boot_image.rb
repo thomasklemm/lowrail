@@ -231,10 +231,12 @@ module BootImage
 
   def puma(config, output)
     FileUtils.mkdir_p(output)
+    File.write(File.join(output, "started"), ENV.fetch("LOWRAIL_PREFORK_STARTED", Process.clock_gettime(Process::CLOCK_MONOTONIC).to_s))
     worker(config.merge("census" => false), "plain", File.join(output, "boot.json"), "unused")
     require "puma"
     require "puma/configuration"
     require "puma/launcher"
+    require File.join(ROOT, "gem/lib/lowrail/puma")
     treatment = config.fetch("treatment")
     app = lambda do |env|
       restore_database(config) unless @puma_fixture_restored
@@ -255,8 +257,11 @@ module BootImage
       server.preload_app!
       server.before_fork do
         GC.start
-        GC.compact if treatment != "none"
-        Process.warmup if treatment == "warmup"
+        started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        completed = Lowrail::Puma.warmup if treatment == "warmup"
+        GC.compact if treatment == "compact"
+        File.write(File.join(output, "hook.json"), JSON.generate({"treatment" => treatment,
+          "warmup_completed" => completed, "hook_ms" => (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000}))
         File.write(File.join(output, "master.pid"), Process.pid)
       end
       server.on_worker_boot do |index|
@@ -273,11 +278,13 @@ module BootImage
       sleep 0.1
     end
     counts, statuses = Hash.new(0), Hash.new(0)
+    first_ms = nil
     200.times do
       socket = UNIXSocket.new(File.join(output, "puma.sock"))
       socket.write("GET #{path} HTTP/1.1\r\nHost: localhost\r\nX-Forwarded-Proto: https\r\nUser-Agent: Mozilla/5.0 Firefox/140.0\r\nAccept: text/html\r\nConnection: close\r\n\r\n")
       headers = socket.read.split("\r\n\r\n", 2).first
       socket.close
+      first_ms ||= (Process.clock_gettime(Process::CLOCK_MONOTONIC) - File.read(File.join(output, "started")).to_f) * 1000
       statuses[headers.lines.first.split[1]] += 1
       pid = headers[/^x-boot-probe-pid: (\d+)/i, 1] or raise "worker header missing"
       counts[pid] += 1
@@ -285,7 +292,8 @@ module BootImage
     end
     raise "both workers must warm" unless counts.size == 2 && counts.values.min >= 10
     master = File.read(File.join(output, "master.pid")).strip
-    result = {"statuses" => statuses, "requests_by_worker" => counts,
+    result = {"statuses" => statuses, "requests_by_worker" => counts, "first_ms" => first_ms,
+      "hook" => JSON.parse(File.read(File.join(output, "hook.json"))),
       "master" => memory(master), "workers" => counts.keys.map { memory(_1) }}
     File.write(File.join(output, "memory.json"), JSON.pretty_generate(result))
     puts JSON.generate(result)
@@ -341,7 +349,8 @@ if $PROGRAM_NAME == __FILE__
   when "puma-start"
     config = JSON.parse(File.read(arguments.fetch(0)))
     env = config.fetch("env").merge("RAILS_ENV" => "production", "RACK_ENV" => "production",
-      "LOWRAIL" => "0", "DISABLE_BOOTSNAP" => "1")
+      "LOWRAIL" => "0", "DISABLE_BOOTSNAP" => "1",
+      "LOWRAIL_PREFORK_STARTED" => Process.clock_gettime(Process::CLOCK_MONOTONIC).to_s)
     exec(env, RbConfig.ruby, "-rbundler/setup", File.expand_path(__FILE__), "puma", *arguments.map { File.expand_path(_1) })
   else abort "usage: boot_image.rb run CONFIG_JSON NEW_OUTPUT_DIRECTORY"
   end
