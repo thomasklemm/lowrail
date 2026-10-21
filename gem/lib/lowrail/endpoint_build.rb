@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "digest"
-require "prism"
+require_relative "prism_grammar"
 require_relative "manifest"
 require_relative "endpoint"
 
@@ -61,7 +61,7 @@ module Lowrail
         template = resolver.send(:build_unbound_template, path).bind_locals(locals)
         handler = template.handler.call(template, template.send(:encode!))
         compiled = template.send(:compiled_source)
-        definition = Prism.parse(compiled, version: "current").value.statements.body.fetch(0)
+        definition = Prism.parse(compiled, version: PrismGrammar.version).value.statements.body.fetch(0)
         raise "unsupported compiled template" unless Prism::DefNode === definition && !template.strict_locals?
         source = definition.body.location.slice
         lowered, sites = lower(source, expand: expand_helper)
@@ -100,7 +100,7 @@ module Lowrail
       location = method.source_location
       return false unless location && File.file?(location.first)
       source = File.read(location.first)
-      node = Prism.parse(source, version: "current").value
+      node = Prism.parse(source, version: PrismGrammar.version).value
       definitions = Class.new(Prism::Visitor) do
         attr_reader :definitions
         def initialize = @definitions = []
@@ -111,7 +111,7 @@ module Lowrail
       end.new
       node.accept(definitions)
       definition = definitions.definitions.find { _1.name == :link_to && _1.location.start_line == method.source_location.last }
-      tokens = ->(text) { Prism.lex(text, version: "current").value.map(&:first).reject { |token| %i[COMMENT NEWLINE NEWLINE_TERMINATOR IGNORED_NEWLINE SEMICOLON EOF].include?(token.type) }.map { |token| [token.type, token.value] } }
+      tokens = ->(text) { Prism.lex(text, version: PrismGrammar.version).value.map(&:first).reject { |token| %i[COMMENT NEWLINE NEWLINE_TERMINATOR IGNORED_NEWLINE SEMICOLON EOF].include?(token.type) }.map { |token| [token.type, token.value] } }
       definition && tokens.call(definition.location.slice) == tokens.call(<<~'RUBY')
         def link_to(name = nil, options = nil, html_options = nil, &block)
           html_options, options, name = options, name, block if block_given?
@@ -126,7 +126,7 @@ module Lowrail
 
     def lower(source, expand: true)
       wrapper = "def __lowrail_view__;"
-      parsed = Prism.parse("#{wrapper}#{source}\nend", version: "current")
+      parsed = Prism.parse("#{wrapper}#{source}\nend", version: PrismGrammar.version)
       raise "compiled ERB does not parse" unless parsed.success?
       calls = Calls.new
       parsed.value.accept(calls)
@@ -172,9 +172,9 @@ module Lowrail
       # Each template has its own method scope: partial locals must not become
       # lexical locals in the parent template. Unknown shapes keep Rails' _run.
       extra = %w[method template locals buffer add_to_stack has_strict_locals block __method__ __callee__ binding eval local_variables]
-      tokens = Prism.lex(source, version: "current").value.map { _1.first.type }
+      tokens = Prism.lex(source, version: PrismGrammar.version).value.map { _1.first.type }
       raise "compiled template uses super" if (tokens & %i[KEYWORD_SUPER]).any?
-      parsed = Prism.parse("def __lowrail_view__;#{original}\nend", version: "current")
+      parsed = Prism.parse("def __lowrail_view__;#{original}\nend", version: PrismGrammar.version)
       calls = Class.new(Prism::Visitor) do
         attr_reader :names
         def initialize = @names = []

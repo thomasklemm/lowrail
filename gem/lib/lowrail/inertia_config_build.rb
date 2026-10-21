@@ -44,8 +44,8 @@ module Lowrail
           %i[keys default default_proc compare_by_identity? delete has_key? empty? []= class].map { [Hash, _1, false] }
         extract_path = Hash.instance_method(:extract!).source_location&.first
         expected_extract = 'def extract!(*keys); keys.each_with_object(self.class.new) { |key, result| result[key] = delete(key) if has_key?(key) }; end'
-        require "prism"
-        tokens = ->(src) { Prism.lex(src, version: "current").value.map(&:first).reject { |t| %i[COMMENT NEWLINE NEWLINE_TERMINATOR IGNORED_NEWLINE SEMICOLON EOF].include?(t.type) }.map { |t| [t.type, t.value] } }
+        require_relative "prism_grammar"
+        tokens = ->(src) { Prism.lex(src, version: PrismGrammar.version).value.map(&:first).reject { |t| %i[COMMENT NEWLINE NEWLINE_TERMINATOR IGNORED_NEWLINE SEMICOLON EOF].include?(t.type) }.map { |t| [t.type, t.value] } }
         extract_source = extract_path && File.read(extract_path)[/  def extract!\(\*keys\).*?^  end/m]
         decline.call("constructor_override") unless extract_source && tokens.call(extract_source) == tokens.call(expected_extract)
         facts = dependencies.map do |mod, name, singleton|

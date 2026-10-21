@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "prism"
+require_relative "prism_grammar"
 require_relative "form_scaffold"
 require_relative "form_scaffold_inventory"
 require_relative "form_scaffold_admission"
@@ -39,7 +39,7 @@ module Lowrail
       return refusal.call("unknown form shape; use the fixed blank-comment scaffold or keep Rails") unless source.scan(SOURCE).size == 1
       line = source[0...source.index(SOURCE)].count("\n") + 1
       code = FormScaffoldInventory.template(path)
-      parsed = Prism.parse("def __lowrail_form__;#{code}\nend", version: "current")
+      parsed = Prism.parse("def __lowrail_form__;#{code}\nend", version: PrismGrammar.version)
       return refusal.call("unsupported compiled template") unless parsed.success?
       calls = []
       visit = ->(node) {

@@ -13,10 +13,10 @@ module Lowrail
       if PreloadFacts.certified_scope?(reflection)
         return [{ "generated_name" => PreloadFacts.scope_name(reflection), "columns" => ["name"] }, nil]
       end
-      require "prism"
+      require_relative "prism_grammar"
       file, line = scope.source_location
       return [nil, "scope source unavailable"] unless file && File.file?(file)
-      parsed = Prism.parse_file(file, version: "current")
+      parsed = Prism.parse_file(file, version: PrismGrammar.version)
       return [nil, "scope source does not parse"] unless parsed.success?
       nodes = []
       visit = lambda do |node|

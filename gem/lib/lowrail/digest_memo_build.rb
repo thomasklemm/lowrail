@@ -2,7 +2,7 @@
 
 require "json"
 require "digest"
-require "prism"
+require_relative "prism_grammar"
 require_relative "../lowrail"
 
 module Lowrail
@@ -68,7 +68,7 @@ module Lowrail
         next unless path && File.file?(path)
         original = File.read(path, encoding: Encoding::UTF_8)
         definitions = Definitions.new
-        parsed = Prism.parse(original, version: "current")
+        parsed = Prism.parse(original, version: PrismGrammar.version)
         next unless parsed.success?
         parsed.value.accept(definitions)
         calls = methods.flat_map do |_, method|
@@ -101,7 +101,7 @@ module Lowrail
         end
         parts << original.b.byteslice(offset..).force_encoding(Encoding::UTF_8)
         lowered = parts.map { Integer === _1 ? "0" : _1 }.join
-        raise "digest lowering changed source lines" unless lowered.count("\n") == original.count("\n") && Prism.parse(lowered, version: "current").success?
+        raise "digest lowering changed source lines" unless lowered.count("\n") == original.count("\n") && Prism.parse(lowered, version: PrismGrammar.version).success?
         files << {path: path, original: original, parts: parts}
         units << {"kind" => "file", "file" => path, "pass" => PASS,
           "sites" => calls.size, "facts" => facts, "digest_memo" => {"sources" => sources,
@@ -143,10 +143,10 @@ module Lowrail
       ruby_methods.zip(expected).each do |method, body|
         path, line = method.source_location
         definitions = Definitions.new
-        Prism.parse_file(path, version: "current").value.accept(definitions)
+        Prism.parse_file(path, version: PrismGrammar.version).value.accept(definitions)
         definition = definitions.definitions.find { _1.name == method.name && _1.location.start_line == line }
         # Token comparison ignores whitespace/comments, not literals or calls.
-        tokens = ->(source) { Prism.lex(source, version: "current").value.map(&:first).reject { |token| %i[COMMENT NEWLINE NEWLINE_TERMINATOR IGNORED_NEWLINE SEMICOLON EOF].include?(token.type) }.map { |token| [token.type, token.value] } }
+        tokens = ->(source) { Prism.lex(source, version: PrismGrammar.version).value.map(&:first).reject { |token| %i[COMMENT NEWLINE NEWLINE_TERMINATOR IGNORED_NEWLINE SEMICOLON EOF].include?(token.type) }.map { |token| [token.type, token.value] } }
         raise ArgumentError, "non-certified Digest file implementation" unless definition && tokens.call(definition.location.slice) == tokens.call(body)
       end
       facts.each do |entry|

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "prism"
+require_relative "prism_grammar"
 require_relative "seal_rules"
 
 module Lowrail
@@ -91,7 +91,7 @@ module Lowrail
       return [SealRules.finding("SEAL007", confidence: "hint", file: file, line: 1, root: root,
         target: file.delete_prefix("#{root}/"))] if file.end_with?(".erb") && !source.match?(/<%#\s*locals:\s*\(/)
       return [] if file.end_with?(".erb")
-      parsed = Prism.parse(source, version: "current")
+      parsed = Prism.parse(source, version: PrismGrammar.version)
       raise "#{file}: Prism parse failed: #{parsed.errors.first.message}" unless parsed.success?
       scan = Scan.new(source, file: file, root: root)
       parsed.value.accept(scan)

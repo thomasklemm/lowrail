@@ -18,6 +18,16 @@ timing/RSS sample, exact manifest differences and read-only find counts.
 The accompanying thread evidence archive retains raw before/after census,
 delivered files/manifests, probe source/results and gate logs.
 
+**App-bundle compatibility correction:** the original `version: "current"`
+choice below is historical. Prism 1.4 rejects that spelling on Ruby 4.0.7.
+Gem builders and `script/helper-census` now probe the app's loaded Prism with
+the explicit running `RUBY_VERSION`, memoizing success or a named
+`unsupported_prism_grammar` refusal, never falling back to another grammar.
+Parser-independent builders continue. The retained published blog's delivered
+ISeqs/source and complete census data remain identical. See the
+[compatibility regression and receipts](campfire-bench.md#app-locked-prism-exact-grammar-or-explicit-refusal).
+Diagnostic-only `bench/` callers are not changed by that fix.
+
 ## Taken and deferred
 
 - Pin Ruby Prism **2.0.0 as a development dependency only**. A locked app may

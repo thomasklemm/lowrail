@@ -533,7 +533,12 @@ helper/model names, paths, exceptions and probe differences.
 
 All passes may use `denylisted` (verify's bisection), `builder_error` (a
 rescued build exception) or `unclassified` (a new unmapped explanation,
-never discarded). Plain successful source/digest sites use `lowered`;
+never discarded). Ruby parser consumers also use `unsupported_prism_grammar`
+when the app's loaded Prism rejects the explicit running `RUBY_VERSION`.
+The detail names both versions; no latest/nearest/other grammar is substituted.
+Non-parser builders still run. Existing per-source refusals retain their sites;
+an escaping grammar refusal is attributed to the selected builder's real pass.
+Plain successful source/digest sites use `lowered`;
 preload eligibility uses `runtime_tree`, AR scoped readers `scoped_reader`,
 and instantiation `homogeneous_results`.
 

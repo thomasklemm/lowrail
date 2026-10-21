@@ -50,6 +50,45 @@ class CompilerTest < Minitest::Test
     end
   end
 
+  def test_sealed_build_respects_the_app_locked_prism_grammar
+    bin = lowrail_cli
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
+    missing_prerequisite "install Prism 1.4.0 for the locked-bundle regression" if Gem::Specification.find_all_by_name("prism", "1.4.0").empty?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'minitest', '5.27.0'\ngem 'prism', '1.4.0'\n",
+        "config/database.yml" => "production:\n  adapter: sqlite3\n  database: ':memory:'\n")
+      out, err, status = Open3.capture3(CLEAN_ENV, "bundle", "lock", "--local", chdir: dir)
+      assert status.success?, "fixture lock failed:\n#{out}\n#{err}"
+      env = CLEAN_ENV.merge("BUNDLE_GEMFILE" => File.join(dir, "Gemfile"), "RAILS_ENV" => "production")
+      probe, err, status = Open3.capture3(env, "bundle", "exec", RUBY, "-rprism", "-rjson", "-e", <<~'RUBY', chdir: dir)
+        supported = begin
+          Prism.parse("", version: RUBY_VERSION)
+          true
+        rescue ArgumentError
+          false
+        end
+        puts JSON.generate(version: Prism::VERSION, supported: supported)
+      RUBY
+      assert status.success?, err
+      grammar = JSON.parse(probe)
+      assert_equal "1.4.0", grammar.fetch("version")
+      out, err, status = Open3.capture3(env, bin, "build", dir, "--sealed", "--env", "production", "--jit", "interpreter")
+      assert status.success?, "an unsupported parser must refuse, not crash the public build:\n#{out}\n#{err}"
+      manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
+      ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
+      assert manifest.fetch("units").any? { _1["pass"] == "active_record/instantiate" && _1.dig("ar_instantiate", "model") == "Widget" },
+        "the parser-independent instantiation builder must still finish"
+      unless grammar.fetch("supported")
+        refute manifest.fetch("units").any? { _1["pass"] == "active_record/ar_plans" }
+        refusal = ledger.find { _1["reason"] == "unsupported_prism_grammar" }
+        refute_nil refusal, ledger.inspect
+        assert_includes refusal.fetch("detail"), "Prism 1.4.0"
+        assert_includes refusal.fetch("detail"), "Ruby #{RUBY_VERSION}"
+      end
+    end
+  end
+
   # compile(src, path, path, 1) must give the same instructions as the
   # compiler `require`/Bootsnap use (compile_file_prism), magic comments
   # included. Only the top-level label differs ("<compiled>" vs "<main>").

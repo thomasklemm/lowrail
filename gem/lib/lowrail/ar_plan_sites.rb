@@ -2,7 +2,7 @@
 
 # A source inventory, NOT certification or a lowering pass. No app writes.
 # Each syntactic query primitive is counted separately.
-require "prism"
+require_relative "prism_grammar"
 require "json"
 
 class Lowrail::ARPlanSites < Prism::Visitor
@@ -65,7 +65,7 @@ class Lowrail::ARPlanSites < Prism::Visitor
 
   def self.inventory(app)
     Dir[File.join(app, "app/**/*.rb")].sort.reject { _1.match?(%r{/app/(assets|javascript)/}) }.flat_map do |file|
-      result = Prism.parse_file(file, version: "current")
+      result = Prism.parse_file(file, version: Lowrail::PrismGrammar.version)
       abort "cannot survey #{file}: #{result.errors.inspect}" unless result.success?
       visitor = new(file)
       visitor.visit(result.value)

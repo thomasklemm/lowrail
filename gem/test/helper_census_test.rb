@@ -88,12 +88,11 @@ class HelperCensusTest < Minitest::Test
       script = File.expand_path("../script/helper-census", GEM_ROOT)
       out, err, status = ruby("-e", <<~'RUBY', script, "fixture=#{root}", setup: false)
         require "prism"
-        # Simulate a future current syntax at the version lookup boundary;
-        # keep the real parser and its unsupported-version rejection. Changing
-        # RUBY_VERSION cannot simulate this in CEXT (it reads ruby_version).
+        # Simulate an unsupported running grammar at the lookup boundary;
+        # keep the real parser and its unsupported-version rejection.
         Prism.singleton_class.prepend(Module.new do
           def parse(source, **options)
-            options[:version] = "99.0" if options[:version] == "current"
+            options[:version] = "99.0" if options[:version] == RUBY_VERSION
             super(source, **options)
           end
         end)
@@ -103,6 +102,7 @@ class HelperCensusTest < Minitest::Test
       refute status.success?, err
       report = JSON.parse(out).fetch("apps").fetch("fixture")
       assert_empty report.fetch("sites")
+      assert_equal "unsupported_prism_grammar", report.fetch("errors").first.fetch("reason")
       assert_includes report.fetch("errors").first.fetch("message"), "invalid version: 99.0"
     end
   end

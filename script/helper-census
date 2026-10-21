@@ -6,7 +6,7 @@
 require "json"
 require "digest"
 require "open3"
-require "prism"
+require_relative "../gem/lib/lowrail/prism_grammar"
 require "action_view"
 require "action_view/template/handlers/erb"
 
@@ -155,7 +155,7 @@ module HelperCensus
       end
       # A method wrapper allows template yield/return without evaluating it;
       # the same-line prefix retains ERB line numbers.
-      parsed = Prism.parse(path.end_with?(".rb") ? compiled : "def __census_template__;#{compiled}\nend", version: "current")
+      parsed = Prism.parse(path.end_with?(".rb") ? compiled : "def __census_template__;#{compiled}\nend", version: Lowrail::PrismGrammar.version)
       unless parsed.success?
         errors << {"file" => relative, "reason" => "prism_parse_error", "messages" => parsed.errors.map(&:message)}
         next
@@ -163,6 +163,8 @@ module HelperCensus
       visitor = Calls.new(relative)
       parsed.value.accept(visitor)
       sites.concat(visitor.sites)
+    rescue Lowrail::PrismGrammar::Unsupported => error
+      errors << {"file" => relative, "reason" => "unsupported_prism_grammar", "message" => error.message}
     rescue StandardError, ScriptError => error
       errors << {"file" => relative, "reason" => "template_compile_error", "message" => "#{error.class}: #{error.message}"}
     end

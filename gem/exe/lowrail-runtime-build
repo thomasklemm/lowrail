@@ -19,9 +19,12 @@ mode = Lowrail::BuildJit.prepare(request["certification_jit"])
 require File.expand_path("config/environment", Dir.pwd)
 Rails.application.eager_load!
 Lowrail::BuildJit.check(mode)
+require_relative "../lib/lowrail/prism_grammar"
 results = request.fetch("builders").map do |builder|
   require_relative "../lib/lowrail/#{builder.fetch("file")}"
   Lowrail.const_get(builder.fetch("module"), false).build(denied: request.fetch("denied"))
+rescue Lowrail::PrismGrammar::Unsupported => error
+  {units: [], ledger: [{"pass" => builder.fetch("pass"), "method" => builder.fetch("module"), "outcome" => error.message}]}
 end
 Lowrail::BuildJit.check(mode)
 output.puts(JSON.generate(results))

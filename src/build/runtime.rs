@@ -38,7 +38,7 @@ pub struct LoweredSource {
 pub fn run(app: &Path, env: &str, passes: &Selection, denied: &[Value], certification_jit: &str, verification_test: bool) -> Result<Vec<Output>, String> {
     let builders: Vec<_> = passes.iter().filter(|p| p.kind == Kind::Runtime).map(|p| {
         let Builder::Runtime { file, module } = p.builder else { unreachable!() };
-        json!({"file": file, "module": module})
+        json!({"file": file, "module": module, "pass": p.name})
     }).collect();
     if builders.is_empty() { return Ok(vec![]); }
     let mut child = Command::new("bundle")
