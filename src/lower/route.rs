@@ -314,7 +314,7 @@ fn collect(node: &Node, code: &str, template: bool, out: &mut Vec<Candidate>) {
     impl<'pr> ruby_prism::Visit<'pr> for V<'_> {
         fn visit_class_node(&mut self, node: &ruby_prism::ClassNode<'pr>) {
             let l = node.constant_path().location();
-            self.names.push((self.code[l.start_offset()..l.end_offset()].to_string(), true));
+            self.names.push((self.code[l.start() as usize..l.end() as usize].to_string(), true));
             self.ctx.push(Ctx::Body);
             ruby_prism::visit_class_node(self, node);
             self.ctx.pop();
@@ -322,7 +322,7 @@ fn collect(node: &Node, code: &str, template: bool, out: &mut Vec<Candidate>) {
         }
         fn visit_module_node(&mut self, node: &ruby_prism::ModuleNode<'pr>) {
             let l = node.constant_path().location();
-            self.names.push((self.code[l.start_offset()..l.end_offset()].to_string(), false));
+            self.names.push((self.code[l.start() as usize..l.end() as usize].to_string(), false));
             self.ctx.push(Ctx::Body);
             ruby_prism::visit_module_node(self, node);
             self.ctx.pop();
@@ -347,8 +347,8 @@ fn collect(node: &Node, code: &str, template: bool, out: &mut Vec<Candidate>) {
             if (name.ends_with("_path") || name.ends_with("_url")) && !node.is_attribute_write() {
                 let loc = node.location();
                 self.out.push(Candidate {
-                    start: loc.start_offset(),
-                    end: loc.end_offset(),
+                    start: loc.start() as usize,
+                    end: loc.end() as usize,
                     name: name.clone(),
                     has_receiver: node.receiver().is_some(),
                     instance: *self.ctx.last().unwrap() == Ctx::Instance,
@@ -376,7 +376,7 @@ fn arg_ranges(call: &ruby_prism::CallNode) -> Result<Vec<(usize, usize)>, String
             return Err("splat or forwarded arguments".into());
         }
         let l = a.location();
-        out.push((l.start_offset(), l.end_offset()));
+        out.push((l.start() as usize, l.end() as usize));
     }
     Ok(out)
 }

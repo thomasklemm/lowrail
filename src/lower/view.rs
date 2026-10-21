@@ -80,7 +80,7 @@ pub(super) fn template_parse_refusal(code: &str) -> Site {
     let wrapped = format!("def __lowrail_template__;{code}\nend");
     let result = ruby_prism::parse(wrapped.as_bytes());
     let outcome = match result.errors().next() {
-        Some(error) => format!("template source does not parse in method context: {}", error.message()),
+        Some(error) => format!("template source does not parse in method context: {}", String::from_utf8_lossy(error.message())),
         None => "template requires method context; diagnostic only, original handler retained".into(),
     };
     Site { line: 1, helper: "compiled_body".into(), outcome }
@@ -112,13 +112,13 @@ pub fn lower_template(original: &str, locals: &[String], unit: usize, oracle: &m
     let mut needs_link_to_deps = false;
     let mut route_helpers: Vec<String> = Vec::new();
     for call in calls {
-        let start = call.location().start_offset();
+        let start = call.location().start() as usize;
         let line = code[..start].matches('\n').count() + 1;
         let helper = name_of(&call);
         match lower_link_to(code, &call, unit, oracle, &mut route_helpers) {
             Ok(replacement) => {
                 needs_link_to_deps = true;
-                edits.push((start, call.location().end_offset(), replacement));
+                edits.push((start, call.location().end() as usize, replacement));
                 out.sites.push(Site { line, helper, outcome: "lowered".into() });
             }
             Err(reason) => out.sites.push(Site { line, helper, outcome: reason }),
@@ -214,7 +214,7 @@ pub(super) fn name_of(call: &ruby_prism::CallNode) -> String {
 
 pub(super) fn text<'a>(code: &'a str, node: &Node) -> &'a str {
     let l = node.location();
-    &code[l.start_offset()..l.end_offset()]
+    &code[l.start() as usize..l.end() as usize]
 }
 
 /// A value Rails sees as the same constant every time.

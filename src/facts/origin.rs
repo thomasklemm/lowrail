@@ -550,10 +550,10 @@ impl<'pr> Visit<'pr> for Indexer {
     fn visit_def_node(&mut self, node: &ruby_prism::DefNode<'pr>) {
         let loc = node.location();
         let name = String::from_utf8_lossy(node.name().as_slice()).into_owned();
-        let first = self.lines.line(loc.start_offset());
+        let first = self.lines.line(loc.start() as usize);
         let last = self
             .lines
-            .line(loc.end_offset().saturating_sub(1).max(loc.start_offset()));
+            .line(loc.end().saturating_sub(1).max(loc.start()) as usize);
         let sep = if node.receiver().is_some() || self.singleton > 0 {
             "."
         } else {
@@ -563,7 +563,7 @@ impl<'pr> Visit<'pr> for Indexer {
         self.index
             .def_spans
             .entry((first, name.clone()))
-            .or_insert((loc.start_offset(), loc.end_offset()));
+            .or_insert((loc.start() as usize, loc.end() as usize));
         self.index.defs.entry(first).or_default().push(name);
         self.index.def_ranges.push((first, last, qualified));
         ruby_prism::visit_def_node(self, node);
@@ -572,14 +572,14 @@ impl<'pr> Visit<'pr> for Indexer {
     fn visit_call_node(&mut self, node: &ruby_prism::CallNode<'pr>) {
         let name = String::from_utf8_lossy(node.name().as_slice()).into_owned();
         let recv_less = node.receiver().is_none();
-        let start = self.lines.line(node.location().start_offset());
+        let start = self.lines.line(node.location().start() as usize);
         self.index
             .call_spans
             .entry(start)
-            .or_insert((node.location().start_offset(), node.location().end_offset()));
+            .or_insert((node.location().start() as usize, node.location().end() as usize));
         let msg = node
             .message_loc()
-            .map(|l| self.lines.line(l.start_offset()))
+            .map(|l| self.lines.line(l.start() as usize))
             .unwrap_or(start);
         for line in if msg == start {
             vec![start]

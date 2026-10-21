@@ -34,7 +34,7 @@ pub fn lower(code: &str, id: usize, oracle: &mut dyn Oracle, certificate: &mut O
             ruby_prism::visit_def_node(self, n);
             if self.calls.len() + self.sites.len() > before {
                 self.sites.push(Site {
-                    line: 1 + self.code[..n.location().start_offset()].bytes().filter(|b| *b == b'\n').count(),
+                    line: 1 + self.code[..n.location().start() as usize].bytes().filter(|b| *b == b'\n').count(),
                     helper: String::from_utf8_lossy(n.name().as_slice()).into_owned(),
                     outcome: "whole method lacks a purity certificate; only independently certified expressions may be memoized".into(),
                 });
@@ -46,9 +46,9 @@ pub fn lower(code: &str, id: usize, oracle: &mut dyn Oracle, certificate: &mut O
                 self.refined = true; // cannot prove absence of caller-local refinement activation
             }
             let receiver = n.receiver().map(|r| {
-                let l = r.location(); &self.code[l.start_offset()..l.end_offset()]
+                let l = r.location(); &self.code[l.start() as usize..l.end() as usize]
             });
-            let line = 1 + self.code[..n.location().start_offset()].bytes().filter(|b| *b == b'\n').count();
+            let line = 1 + self.code[..n.location().start() as usize].bytes().filter(|b| *b == b'\n').count();
             let (target, method, arity, runtime, _) = self.intrinsic.spec();
             let helper = format!("{target}.{method}");
             if name == method && receiver.is_some_and(|r| r.trim_start_matches("::") == target) {
@@ -61,10 +61,10 @@ pub fn lower(code: &str, id: usize, oracle: &mut dyn Oracle, certificate: &mut O
                 if let Some(reason) = reason {
                     self.sites.push(Site { line, helper, outcome: reason.into() });
                 } else {
-                    let first = args[0].location().start_offset();
-                    let last = args[arity - 1].location().end_offset();
+                    let first = args[0].location().start() as usize;
+                    let last = args[arity - 1].location().end() as usize;
                     let params = if arity == 2 { "__lrm_b, __lrm_u" } else { "__lrm_b" };
-                    self.calls.push((n.location().start_offset(), n.location().end_offset(), line,
+                    self.calls.push((n.location().start() as usize, n.location().end() as usize, line,
                         format!("::Lowrail::Memo.{runtime}({}, {}, {}) {{ |__lrm_r, {params}| __lrm_r.{method}({params}) }}", self.id, receiver.unwrap(), &self.code[first..last])));
                 }
             } else if matches!(self.intrinsic, Intrinsic::UriJoin) && (matches!(name.as_str(), "digest" | "hexdigest" | "to_json") ||

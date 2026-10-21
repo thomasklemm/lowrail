@@ -90,7 +90,7 @@ fn parameters(def: &ruby_prism::DefNode<'_>) -> Option<Vec<(String, String)>> {
         .chain(params.posts().iter())
         .chain(params.keywords().iter())
         .chain(params.keyword_rest())
-        .chain(params.block().map(|n| n.as_node()));
+        .chain(params.block());
     for node in nodes {
         let (kind, name) = if let Some(n) = node.as_required_parameter_node() {
             ("req", n.name())
@@ -116,7 +116,7 @@ fn parameters(def: &ruby_prism::DefNode<'_>) -> Option<Vec<(String, String)>> {
 
 impl Index {
     fn location(&self, node: &Node<'_>) -> String {
-        let line = self.source[..node.location().start_offset()]
+        let line = self.source[..node.location().start() as usize]
             .iter()
             .filter(|&&b| b == b'\n')
             .count()

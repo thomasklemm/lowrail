@@ -67,7 +67,7 @@ fn parse(files: &[String]) -> Result<(), String> {
         if !errors.is_empty() {
             failed += 1;
             for err in errors {
-                eprintln!("{path}:{}: {}", err.location().start_offset(), err.message());
+                eprintln!("{path}:{}: {}", err.location().start(), String::from_utf8_lossy(err.message()));
             }
         }
     }

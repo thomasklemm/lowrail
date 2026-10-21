@@ -612,9 +612,9 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "ruby-prism"
-version = "1.9.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b302f00359d0b5423a600314935ca5f994484e15da2db5345631d28c6e029d6"
+checksum = "e292a6139b28657899a18778d281cd4829d5e46ccc060edc1d0cdcd6b1fae774"
 dependencies = [
  "ruby-prism-sys",
  "serde",
@@ -623,12 +623,12 @@ dependencies = [
 
 [[package]]
 name = "ruby-prism-sys"
-version = "1.9.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f85fd9571455bdca2b3bf0b2f543cd13ac39d5de0026a8eb2deb94ffd264f00"
+checksum = "0080aa6a022c43438c9f33533e2da926407776e96583be67d7864c4037fb84b3"
 dependencies = [
- "bindgen",
  "cc",
+ "shlex 2.0.1",
 ]
 
 [[package]]
@@ -654,8 +654,8 @@ dependencies = [
 
 [[package]]
 name = "rubydex"
-version = "0.4.1"
-source = "git+https://github.com/Shopify/rubydex?rev=d8ff47595223571588ae40cb748f43cef6a9dfaf#d8ff47595223571588ae40cb748f43cef6a9dfaf"
+version = "0.4.2"
+source = "git+https://github.com/Shopify/rubydex?rev=c69a742c9097a2a5c13f97726abda55b0507121b#c69a742c9097a2a5c13f97726abda55b0507121b"
 dependencies = [
  "bitflags",
  "bytecount",

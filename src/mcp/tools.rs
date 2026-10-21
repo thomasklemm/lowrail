@@ -256,9 +256,9 @@ fn method_span(facts: &Facts, target: &str) -> Option<(String, u64, u64)> {
     struct Span<'a> { source: &'a [u8], name: &'a str, line: u64, end: Option<u64> }
     impl<'pr> Visit<'pr> for Span<'_> {
         fn visit_def_node(&mut self, node: &ruby_prism::DefNode<'pr>) {
-            let start = self.source[..node.location().start_offset()].iter().filter(|b| **b == b'\n').count() as u64 + 1;
+            let start = self.source[..node.location().start() as usize].iter().filter(|b| **b == b'\n').count() as u64 + 1;
             if start == self.line && node.name().as_slice() == self.name.as_bytes() {
-                self.end = Some(self.source[..node.location().end_offset()].iter().filter(|b| **b == b'\n').count() as u64 + 1);
+                self.end = Some(self.source[..node.location().end() as usize].iter().filter(|b| **b == b'\n').count() as u64 + 1);
             }
             ruby_prism::visit_def_node(self, node);
         }

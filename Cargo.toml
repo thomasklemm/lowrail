@@ -8,9 +8,9 @@ publish = false
 
 [dependencies]
 libc = "0.2"
-ruby-prism = "1.9.0"
-# Same pin as Roundhouse; move to a release once one includes it.
-rubydex = { git = "https://github.com/Shopify/rubydex", rev = "d8ff47595223571588ae40cb748f43cef6a9dfaf" }
+ruby-prism = "=2.0.0"
+# Upstream v0.4.2 includes #1077; its Prism rc2 range accepts stable 2.0.
+rubydex = { git = "https://github.com/Shopify/rubydex", rev = "c69a742c9097a2a5c13f97726abda55b0507121b" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"

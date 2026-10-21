@@ -123,7 +123,7 @@ impl<'pr> Visit<'pr> for Index {
     }
 
     fn visit_def_node(&mut self, n: &ruby_prism::DefNode<'pr>) {
-        let line = self.source[..n.location().start_offset()]
+        let line = self.source[..n.location().start() as usize]
             .iter()
             .filter(|b| **b == b'\n')
             .count() as u32
