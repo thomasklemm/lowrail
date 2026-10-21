@@ -354,6 +354,209 @@ logs are `native-full-r4-final.log`, `native-full-r41.log`, the retained
 `native-full-r41-missing-herb.log` and `native-package.log` under
 `.lowrail/private/`.
 
+## Blog write and model scenarios
+
+The next bounded C slice ports the **19 remaining ordinary IDs** and the
+server-side workflows of both system IDs. It does not turn assertion coverage
+into an equivalence certificate: **the raw gate and both declared companions
+remain `rejected_off_control`**. There are no SQL, timestamp, event or effect
+exclusions, and no measurement cohort or performance claim.
+
+```sh
+mise exec -- ruby script/blog-production-verify run \
+  .corpus/real-blog-r4 .lowrail/private/blog-breadth-NEW \
+  --entropy-companions --breadth
+```
+
+The [scenario driver](../fixtures/corpus/blog_scenarios.rb) maps each source
+test ID to concrete production assertions. Every additional case starts a
+**fresh production/YJIT worker**, after restoring the same four closed SQLite
+files and clearing tmp. There are 24 workers per arm (one legacy two-GET
+worker plus 23 isolated cases), **216 workers** across raw/seed-0/seed-1
+off/off/on groups. No test runtime, fixture transaction, callback suppression,
+job-adapter replacement or upstream application modification is involved.
+
+### Boundaries and declared inputs
+
+* Writes use the real Rack/Rails middleware stack, actual encrypted session
+  cookies and the hidden CSRF/`_method` inputs from each arm's natural form.
+  PATCH/DELETE take Rails' ordinary method-override path. Follow redirects,
+  compare every intermediate response (status, all headers/cookies and body
+  bytes/encoding), and assert flash survival and consumption. Invalid article
+  create/update re-render with 422 and leave stored values unchanged. Missing
+  and invalid CSRF are two supplemental cases: both must reject with 422 and
+  persist no article.
+* Capture exact ordered SQL with adapter-produced bind values and database
+  identity, including other-thread SQL. Retain an ordered whole-worker stream
+  and separate boot/scenario/post-scenario phases. SQL after the driver returns
+  is **late SQL, not boot SQL**. No ordering, schema-query or thread exemption.
+* Snapshot all four databases' schemas and rows (including primary sequences,
+  queue/cable/cache tables), plus non-SQLite storage-file hashes, at each step.
+  These in-process snapshots are provisional when background work is running.
+  After each worker exits, the parent independently reads persisted DB/storage
+  state into `exit_effects`, which is also compared exactly. There is **no
+  asynchronous drain/completion claim**: process exit is not proof that every
+  enqueued callback or broadcast finished. No file uploads are exercised.
+* Preserve the raw unpinned run and all worker reports. The existing pinned
+  secret, CSRF/session/IV streams and Rack-runtime controls remain visible in
+  each companion. RNG streams now continue across each workflow's session
+  round trips. The additional declared ActiveJob UUID site is the 16-byte
+  SecureRandom call in pinned `activejob/core.rb#initialize`; no arbitrary RNG
+  call-site fallback. Flash middleware and ActiveJob source hashes are pinned.
+* **Additional breadth-only wall-clock input:** every `Time.now` read on the
+  active scenario thread returns epoch **1767312000 (2026-01-02 UTC)**, covering
+  AR/job timestamps and cookie expiry. Actual clock reads and call sites are
+  retained separately. This is an explicitly artificial companion input, not
+  output normalization or a timing measurement. Raw workers, legacy GET wall
+  clocks and **all background-thread clocks stay real**. RackRuntime still
+  requires exactly two controlled reads per declared request. The complete
+  [policy](../fixtures/corpus/blog-entropy-controls.json), source/lock pins and
+  driver content hashes are in the report; a pin mismatch refuses the control.
+
+### Result and the remaining blocker
+
+All **225 scenario oracle results** pass: 25 cases × three arms × three groups,
+including the supplemental bad-CSRF cases. Capture errors are empty. All 21
+ordinary source IDs now complete their translated assertions in every arm;
+the two system workflows complete their **server assertions only**. These
+numbers describe executed assertions, **not accepted differential coverage**.
+
+Within each pinned runtime, aggregated on-arm counts are identical in raw,
+seed 0 and seed 1. The fresh passive-form integration is recorded separately
+from the earlier conservative-refusal result:
+
+| Unit | Pass / target | Census base 7f9f97c: hits / fallbacks | Passive base 91d76da: hits / fallbacks |
+|---|---|---|---|
+| 0 | Article preload plan | 7 / 7 | 7 / 7 |
+| 1 | Article instantiation | 59 / 0 | 59 / 0 |
+| 2 | Comment instantiation | 31 / 0 | 31 / 0 |
+| 10 | SolidQueue::Job instantiation | 8 / 0 | 8 / 0 |
+| 18 | Sealed link | 104 / 4 | 104 / 4 |
+| 19 | Sealed form | 0 / 0, explicit effectful-recertification refusal | 12 / 1 |
+| 3–9, 11–17 | Other instantiation units | 0 / 0 | 0 / 0 |
+
+These totals include model/oracle calls and the two partial server workflows,
+not just HTTP action bodies. Link retains **index/show 5/2 hits, zero
+fallbacks** in the legacy GETs; its four breadth fallbacks remain recorded.
+The original cold index/show still have **0/0 form hits**: the first natural
+show admits passively, rather than being counted as a hit. The wider workflows
+supply later natural uses. The one form fallback is in
+`ArticlesSystemTest#test_full_article_lifecycle`, with recorded input reason
+**`unknown form site/options`**. Cases without a natural certified form retain
+the explicit **`pending first natural certified form; this request runs
+original`** reason. No artifact/link, pending-form or input refusal is hidden.
+Boot SQL is empty in all 216 workers of each rebuild; the late SQL distinction
+does not change that into a claim of no asynchronous SQL.
+
+Negative controls replayed against the real captured create-article reports
+start from exact off/off agreement; off/on already rejects its ancestry.
+Separately alter the second off report's body, bind, event order, persisted
+queue effect or hook. Every alteration introduces the corresponding off/off
+difference and rejects, without removing the baseline off/on failure. This
+checks the capture comparator, **not an injected application mutation**.
+The same boundaries have permanent regressions, including encrypted cookies,
+redirect status, flash, incomplete assertions and parent-read worker-exit
+effects.
+
+The write extension exposes an uncontrolled asynchronous boundary even with
+the declared scenario-thread inputs. In a separate off-only diagnostic, Cable
+INSERTs execute on the actual **`solid_cable_writer`** thread, from
+`SolidCable::BatchedBroadcaster#flush` into
+`SolidCable::Message.broadcast_batch`. Its `created_at` uses real time outside
+the declared control. Off/off comparisons retain different Cable rows and SQL
+literals, as well as different interleavings of writer/schema/trim SQL with
+request SQL. Article/comment destruction, comment creation, dependent model
+destruction/association creation and the two system workflows expose this
+boundary. Neither different timestamps nor late SQL are relabeled equivalent.
+The earlier diagnostic report also retained late SQL under its old `boot_sql`
+label; the final capture separates it without dropping or exempting queries.
+
+The blog uses **Solid Queue** for enqueued Turbo jobs; those persisted queue
+rows are compared, not executed by this slice. The asynchronous Cable writer
+is a separate mechanism, not evidence that the app uses the Rails async job
+adapter. Process exit snapshots retain persisted effects but do not supply a
+causal job/broadcast completion boundary. A failing off/off control prevents
+attributing these off/on differences to Lowrail.
+
+Private evidence retains the initial `blog-breadth-v1/` rejection, the
+phase-corrected `blog-breadth-v2/` run, the fresh-native
+`blog-breadth-native-final/` run and the separate
+`blog-breadth-dev/cable-thread-diagnostic.jsonl` source/thread witness. No
+companion clock/thread scope was silently broadened to obtain a passing gate.
+
+A complete fresh rebuild/capture with the full ancestry census on
+[`7f9f97c`](https://github.com/thomasklemm/lowrail/commit/7f9f97c19e13be2ab047d83e5fda8768cc112147)
+is retained in `blog-breadth-ancestry-final/` (manifest SHA-256
+`07e4df0ed67784dce547b5a2c31952cbac3c34bb9dfa708e5c7315c5693f889e`).
+It repeats all 216 workers, 225 passing oracle results, zero capture errors,
+zero boot SQL and the counts above. Literal HTTP responses and flash match
+in both seeded off/off and off/on projections; the `response` wrapper can
+still differ because it also contains provisional step effects. This is a
+diagnostic projection, **not another gate or an exclusion**. The full gate
+retains SQL/effect interleavings and the on-only Template/Preloader chains;
+the named census also records the on-only definitions of
+`Lowrail::ARPlans::RelationHook` and `Lowrail::PreloadPlans::Hook`. The capture
+mutation controls are retained in `blog-breadth-ancestry-capture-controls.json`.
+
+After pulling passive admission
+[`91d76da`](https://github.com/thomasklemm/lowrail/commit/91d76dad0f2615d69a90f515106fc84e05cbacc0),
+the merged harness preserves its targeted form-seam observer and every census
+field. A second complete fresh rebuild/capture, `blog-breadth-passive-final/`,
+again executes **216 workers / 225 passing oracle results**, with no capture
+errors or boot SQL. All three gates remain `rejected_off_control`; the seeded
+literal HTTP/flash projections still match. The table above records the
+recovered form coverage without treating it as accepted differential coverage.
+Its manifest SHA-256 is
+`59492be7bd68c6ffc4455e9797a1b987a42618c2db230859fe88d432c46a2067`.
+The five capture-mutation controls repeat successfully on these new reports,
+retaining the baseline ancestry rejection. No older artifact was reused.
+
+The real-app GET slice is **deferred**, because this blog step did not pass its
+off/off controls. Before widening further, design an explicit asynchronous
+completion boundary and its off/off controls; do not disable broadcasts,
+autotrim or jobs, or normalize their outputs.
+
+Strict full gem validation of this slice on the census base: Ruby 4.0.7 has
+**169 tests / 7,018 assertions, one failure, no errors/skips**. The failure is
+the unchanged all-sealed cold ancestry assertion, not made green or skipped.
+Preview covers all **169 tests / 6,161 assertions, zero failures/errors** in
+two batches (166 / 6,144 plus Rails-report 3 / 17), with the three existing
+4.0-only sealed-fixture skips. No test file is omitted. Preview uses private
+source-platform SQLite/Nokogiri/FFI bundles and the actual platform Tailwind
+executable; generated test lockfiles must not inherit global frozen/platform
+settings. Earlier dependency/frozen-mode setup failures remain in the private
+logs. Canonical source/entropy pins are unchanged. `cargo test` passes
+**38 unit + 1 types/MCP + 8 verify** tests.
+
+After the passive/advisory-types rebase, affected facts/blog checks are
+**19 tests / 253 assertions, one unchanged cold ancestry failure**, no
+errors/skips on 4.0.7; preview is **19 / 173, zero failures/errors**, with the
+one existing 4.0-only cold skip. Updated Cargo is **39 + 1 + 8**, all passing.
+These supplement, not relabel, the pinned full runs above. The shared worker's
+signature and actual-production/YJIT assertion are unchanged; an explicit
+interpreter caller is a separate follow-up.
+
+### Remaining source IDs and non-ID gaps
+
+The uncovered list shrinks from **19 ordinary + 2 system IDs to 0 ordinary +
+2 partial system IDs**, explicitly retained as uncovered:
+
+| Source ID | What remains uncovered |
+|---|---|
+| `ArticlesSystemTest#test_full_article_lifecycle` | Real browser/JS/Turbo navigation and confirmation dialog; only its server workflow/assertions ran. |
+| `ArticlesSystemTest#test_article_with_comments` | Real browser/JS/Turbo interaction and confirmation dialog; only its server workflow/assertions ran. |
+
+Other explicit gaps: background job execution and broadcast completion,
+Puma/real HTTP, WebSockets/streaming, uploads/external services, dynamic test
+discovery and arbitrary subscriber payloads. Full Object/Kernel/BasicObject
+and certified-holder ancestry now participates in every cold comparison (see
+[the census above](#full-ancestry-census)). The on-only Template/Preloader
+chains remain real exactness failures, independently of the asynchronous
+off/off rejection; passing scenario assertions do not excuse them. The
+original app suite and all existing strict verify/admission assertions remain
+separate and unchanged, including the red all-sealed cold regression. No
+whole-app support, seal certification or unsampled-input claim follows.
+
 ## The evidence gap and the claim we can actually make
 
 [`Manifest`](../gem/lib/lowrail/manifest.rb) admits sealed-v1 only with the
@@ -754,12 +957,14 @@ next retained undeclared Rails-session/stdlib-IV call-site errors. Their
 rejections are preserved in private `blog-production-entropy-v1`/`v2` evidence;
 the corrected declared sites, not output normalization, enabled the comparison.
 
-### Explicit uncovered denominator
+### Historical two-GET uncovered denominator
 
 Mapped IDs: `ArticlesControllerTest#test_should_get_index` and
 `ArticlesControllerTest#test_should_show_article`. Of 21 ordinary suite IDs,
-19 are **not ported**, plus both active system tests below. These are not
-passes inferred from HTTP status or zero hits:
+19 were **not ported** in that first slice, plus both active system tests below.
+The [write/model extension](#blog-write-and-model-scenarios) updates this
+denominator without deleting the historical result. These are not passes
+inferred from HTTP status or zero hits:
 
 ```text
 ArticlesControllerTest#test_should_get_new

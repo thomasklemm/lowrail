@@ -9,6 +9,7 @@ if ARGV.shift == "worker"
   BlogProduction.worker(*ARGV)
 else
   companions = !!ARGV.delete("--entropy-companions")
-  abort "usage: script/blog-production-verify run BLOG NEW_OUTPUT_DIRECTORY [--entropy-companions]" unless ARGV.size == 2
-  exit(BlogProduction.run(*ARGV, entropy_companions: companions) ? 0 : 1)
+  breadth = !!ARGV.delete("--breadth")
+  abort "usage: script/blog-production-verify run BLOG NEW_OUTPUT_DIRECTORY [--entropy-companions] [--breadth]" unless ARGV.size == 2
+  exit(BlogProduction.run(*ARGV, entropy_companions: companions, breadth: breadth) ? 0 : 1)
 end

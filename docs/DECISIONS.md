@@ -194,6 +194,26 @@ no exemption or support claim. Wider request/job replay and explaining those
 cold findings remain follow-ups, not implemented admission gates.
 [Trade-offs, results, hits/refusals and explicit uncovered IDs](sealed-verification.md).
 
+The next blog-only C extension ports all **19 remaining ordinary IDs**, plus
+server-only workflows for both system IDs and two bad-CSRF controls. Fresh
+restored production workers retain every response/redirect/cookie/flash,
+SQL/bind/event and four-DB/storage effect, including parent-read persisted
+effects after worker exit. All **225 scenario oracle results** pass, but raw
+and both seeded off/off/on groups remain **`rejected_off_control`**. Declared
+workflow-thread clocks/UUID streams do not control Cable's separate writer:
+real timestamps and asynchronous SQL/effect interleavings remain visible.
+Do not disable broadcasts, exclude rows/SQL, widen clocks silently or infer
+equivalence from passing assertions. Two system IDs remain explicitly partial
+and uncovered (browser/Turbo/dialogs); jobs, asynchronous completion and real
+HTTP remain gaps. The expanded cold ancestry census also retains the on-only
+Template/Preloader seams as independent correctness failures, not entropy.
+Fresh rebuilding after passive form admission preserves these rejections:
+form coverage changes **0/0 → 12/1 hits/fallbacks**, link stays **104/4**
+(legacy index/show **5/2 hits**). Keep the pending and input-refusal reasons.
+Defer the real-app slice until these failures and the asynchronous boundary
+have explicit solutions; no support/promotion or measurement claim
+([bounded result](sealed-verification.md#blog-write-and-model-scenarios)).
+
 ## One read-only explanation surface (2026-10-21)
 
 `lowrail explain`, MCP `explain_unit`/`explain_site` and doctor's build section

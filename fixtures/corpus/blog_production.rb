@@ -8,6 +8,7 @@ require "open3"
 require "rbconfig"
 require "yaml"
 require_relative "blog_entropy"
+require_relative "blog_scenarios"
 
 # A bounded, untimed production Rack-boundary experiment, not a replacement
 # for lowrail verify or a whole-suite/SEAL001–009 certificate. No test runtime.
@@ -20,6 +21,13 @@ module BlogProduction
     {"id" => "ArticlesControllerTest#test_should_show_article", "path" => "/articles/1"}
   ].freeze
   DATABASES = %w[production production_cache production_queue production_cable].freeze
+
+  def self.driver_sources
+    %w[script/blog-production-verify fixtures/corpus/blog_production.rb fixtures/corpus/blog_scenarios.rb
+       fixtures/corpus/blog_entropy.rb fixtures/corpus/blog-entropy-controls.json].to_h do |path|
+      [path, Digest::SHA256.file(File.join(ROOT, path)).hexdigest]
+    end
+  end
 
   # Untimed cold-activation witness, shared by all workers. Observe actual
   # executions, including callbacks registered after boot; do not replay hooks.
@@ -110,6 +118,10 @@ module BlogProduction
       fields = payload.select { |key, _| FIELDS.include?(key) }.to_h do |key, entry|
         [key.to_s, entry.is_a?(Symbol) ? {"symbol" => entry.name} : BlogProduction.value(entry)]
       end
+      if phase == "finish" && name == "process_action.action_controller"
+        flash = payload[:request]&.get_header("action_dispatch.request.flash_hash")
+        fields["flash"] = BlogProduction.value(flash.to_hash) if flash
+      end
       events << {"phase" => phase, "name" => name, "payload" => fields,
         "thread" => Thread.current.equal?(thread) ? "request" : "other"}
     end
@@ -123,6 +135,9 @@ module BlogProduction
       {"type" => "String", "encoding" => item.encoding.name, "base64" => Base64.strict_encode64(item)}
     when Float
       {"type" => "Float", "bits" => [item].pack("G").unpack1("H*")}
+    when Time
+      {"type" => item.class.name, "seconds" => item.to_i, "nanoseconds" => item.nsec,
+        "utc_offset" => item.utc_offset, "zone" => value(item.zone)}
     when Integer, TrueClass, FalseClass, NilClass
       {"type" => item.class.name, "value" => item}
     when Array
@@ -134,10 +149,10 @@ module BlogProduction
     end
   end
 
-  def self.effects
+  def self.effects(root = Dir.pwd)
     require "sqlite3"
     databases = DATABASES.to_h do |name|
-      file = "storage/#{name}.sqlite3"
+      file = File.join(root, "storage/#{name}.sqlite3")
       raise "missing effects database #{file}" unless File.file?(file)
       db = SQLite3::Database.new(file, readonly: true)
       begin
@@ -152,8 +167,8 @@ module BlogProduction
         db.close
       end
     end
-    files = Dir.glob("storage/**/*", File::FNM_DOTMATCH).select { File.file?(_1) && !_1.match?(/\.sqlite3(?:-wal|-shm)?\z/) }
-    {"databases" => databases, "storage_files" => files.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }}
+    files = Dir.glob(File.join(root, "storage/**/*"), File::FNM_DOTMATCH).select { File.file?(_1) && !_1.match?(/\.sqlite3(?:-wal|-shm)?\z/) }
+    {"databases" => databases, "storage_files" => files.sort.to_h { [_1.delete_prefix(root + "/"), Digest::SHA256.file(_1).hexdigest] }}
   end
 
   def self.worker(phase, destination, entropy_seed = nil)
@@ -169,7 +184,7 @@ module BlogProduction
     require File.expand_path("config/application")
     seam_trace = TracePoint.new(:call) { capture_form_seam(_1.self) }
     seam_trace.enable(target: Lowrail::FormScaffold::Variant.instance_method(:form_with))
-    events, boot_events, errors = [], [], []
+    events, boot_events, late_events, sql_stream, errors = [], [], [], [], []
     callbacks = []
     ActiveSupport::LazyLoadHooks.prepend(ColdHooks)
     ActiveSupport.on_load(:before_eager_load, yield: true) { |app| callbacks << ["early_eager", app.class.name] }
@@ -177,6 +192,7 @@ module BlogProduction
     app_events = AppEvents.new
     ActiveSupport::Notifications.subscribe(/\.(?:action_controller|action_view)\z/, app_events)
     request_thread = nil
+    boot_complete = false
     # Register before initialize!/the seal, without referencing an AR target.
     # Rails has already computed this exact array for the adapter. Do not call
     # value_for_database again, or evaluate the lazy Proc used by cached SQL.
@@ -185,11 +201,16 @@ module BlogProduction
       begin
         binds = payload[:type_casted_binds]
         raise "unavailable adapter bind values (#{binds.class})" unless Array === binds
-        (request_thread ? events : boot_events) << {"sql" => value(payload.fetch(:sql)), "binds" => value(binds),
+        context = request_thread
+        booted = boot_complete
+        sql_phase = context ? "scenario" : booted ? "post_scenario" : "boot"
+        event = {"sql" => value(payload.fetch(:sql)), "binds" => value(binds),
           "database" => payload[:connection]&.pool&.db_config&.name,
           "name" => value(payload[:name]), "cached" => !!payload[:cached],
           "row_count" => payload[:row_count], "affected_rows" => payload[:affected_rows],
-          "thread" => Thread.current.equal?(request_thread) ? "request" : "other"}
+          "thread" => Thread.current.equal?(context) ? "request" : "other"}
+        (context ? events : booted ? late_events : boot_events) << event
+        sql_stream << {"phase" => sql_phase, **event}
       rescue StandardError => error
         errors << "SQL capture: #{error.message}"
       end
@@ -223,23 +244,36 @@ module BlogProduction
     cold_witness = {"hooks" => cold_hooks.dup, "callbacks" => callbacks.dup, "features" => cold_features}
     Lowrail::VerifyLoads.capture("cold_boot")
     initial = effects
-    responses = SCENARIOS.map do |scenario|
+    boot_complete = true
+    scenarios = phase.start_with?("case:") ? [Breadth::CASES.find { _1.fetch("key") == phase.delete_prefix("case:") } || raise("unknown scenario #{phase}")] : SCENARIOS
+    responses = scenarios.map do |scenario|
       events.clear
       app_events.events.clear
       Lowrail::Stats.reset_counts! if defined?(Lowrail::Stats) && Lowrail::Stats.enabled?
       request_thread = Thread.current
       app_events.thread = request_thread
-      request = -> { Rack::MockRequest.new(Rails.application).get(scenario.fetch("path"),
-        "HTTP_HOST" => "localhost", "HTTPS" => "on", "HTTP_X_REQUEST_ID" => scenario.fetch("id")) }
-      response, entropy = entropy_seed ? Entropy.with(Integer(entropy_seed), scenario.fetch("id"), &request) : [request.call, nil]
+      driver = Breadth::Driver.new(scenario.fetch("id"), app_events) if scenario["key"]
+      request = if driver
+        -> do
+          driver.run(scenario.fetch("key"))
+        rescue StandardError, ScriptError => error
+          errors << "#{scenario.fetch('id')}: #{error.class}: #{error.message}"
+          {"completed" => false, "steps" => driver.steps, "checks" => driver.checks}
+        end
+      else
+        -> { Rack::MockRequest.new(Rails.application).get(scenario.fetch("path"),
+          "HTTP_HOST" => "localhost", "HTTPS" => "on", "HTTP_X_REQUEST_ID" => scenario.fetch("id")) }
+      end
+      response, entropy = entropy_seed ? Entropy.with(Integer(entropy_seed), scenario.fetch("id"), requests: driver ? 0 : 1, wall_clock: !!driver, &request) : [request.call, nil]
       request_thread = nil
       app_events.thread = nil
       errors.concat(entropy.fetch("errors")) if entropy
       Lowrail::VerifyLoads.capture(scenario.fetch("id"))
-      {"id" => scenario.fetch("id"), "response" => {"status" => response.status,
+      {"id" => scenario.fetch("id"), "response" => driver ? response : {"status" => response.status,
         "headers" => value(response.headers.to_h), "body" => value(response.body)},
         "sql" => events.dup, "events" => app_events.events.dup, "effects" => effects,
         "entropy_trace" => entropy&.fetch("trace"), "clock_observations" => entropy&.fetch("clock_reads"),
+        "wall_clock_observations" => entropy&.fetch("wall_clock_reads"),
         "hits" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.unit_hits : {},
         "fallbacks" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.unit_fallbacks : {}}
     end
@@ -248,8 +282,9 @@ module BlogProduction
       [name, mod&.refusal]
     end
     form = Lowrail.loaded_constant("Lowrail::FormScaffold")
-    File.write(destination, JSON.pretty_generate({"initial_effects" => initial, "scenarios" => responses,
-      "boot_sql" => boot_events, "cold_witness" => cold_witness.merge("after_requests" => cold_features,
+    File.write(destination, JSON.pretty_generate({"driver_sources" => driver_sources, "initial_effects" => initial, "scenarios" => responses,
+      "boot_sql" => boot_events, "late_sql" => late_events, "sql_stream" => sql_stream,
+      "cold_witness" => cold_witness.merge("after_requests" => cold_features,
         "natural_form_seams" => natural_form_seams),
       "unit_refusals" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.snapshot.fetch("unit_refusals") : {},
       "loads" => Lowrail::VerifyLoads.snapshot.fetch("stages"), "features" => $LOADED_FEATURES.reject { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) },
@@ -260,13 +295,16 @@ module BlogProduction
 
   # Public report contract. A failing off/off control prevents attribution to
   # Lowrail even when off/on differs. Zero hits cannot be sealed coverage.
-  def self.compare(runs)
+  def self.compare(runs, scenarios: SCENARIOS)
     raise "three workers required" unless runs.size == 3
-    raise "missing/reordered scenarios" unless runs.all? { |run| run.fetch("scenarios").map { _1.fetch("id") } == SCENARIOS.map { _1.fetch("id") } }
+    raise "missing/reordered scenarios" unless runs.all? { |run| run.fetch("scenarios").map { _1.fetch("id") } == scenarios.map { _1.fetch("id") } }
     differences = %w[off_control off_on].zip([runs[1], runs[2]]).to_h do |label, other|
       baseline = runs.fetch(0)
       mismatches = []
       %w[initial_effects loads features boot_sql cold_witness].each { mismatches << _1 unless baseline.fetch(_1) == other.fetch(_1) }
+      %w[late_sql sql_stream exit_effects].each { mismatches << _1 unless baseline[_1] == other[_1] }
+      mismatches << "cold_cases" unless baseline["cold_cases"] == other["cold_cases"]
+      mismatches << "driver_sources" unless baseline["driver_sources"] == other["driver_sources"]
       baseline.fetch("scenarios").zip(other.fetch("scenarios")).each do |left, right|
         %w[response sql effects events entropy_trace].each do |field|
           mismatches << "#{left.fetch('id')}:#{field}" unless left.fetch(field) == right.fetch(field)
@@ -292,6 +330,10 @@ module BlogProduction
     require "nokogiri"
     run.fetch("scenarios").map.with_index do |scenario, index|
       response = scenario.fetch("response")
+      if response.key?("checks")
+        next {"id" => scenario.fetch("id"), "passed" => response.fetch("completed") && response.fetch("checks").any? && response.fetch("checks").all? { _1.fetch("passed") },
+          "checks" => response.fetch("checks")}
+      end
       document = Nokogiri::HTML(Base64.strict_decode64(response.fetch("body").fetch("base64")))
       success = response.fetch("status") == 200 && if index.zero?
         document.at_css("h1")&.text == "Articles" && document.css("#articles h2").size >= 1
@@ -302,7 +344,7 @@ module BlogProduction
     end
   end
 
-  def self.run(source, output, entropy_companions: false, cli: File.join(ROOT, "target/release/lowrail"))
+  def self.run(source, output, entropy_companions: false, breadth: false, cli: File.join(ROOT, "target/release/lowrail"))
     source = File.realpath(source)
     output = File.expand_path(output)
     raise "output must be new and outside the source app" if File.exist?(output) || output.start_with?(source + "/")
@@ -325,27 +367,56 @@ module BlogProduction
       extra = {"LOWRAIL" => enabled}
       extra.merge!("SECRET_KEY_BASE_DUMMY" => nil, "SECRET_KEY_BASE" => Entropy::SECRET) if companion_seed
       execute.call(label, [RbConfig.ruby, "--yjit", SCRIPT, "worker", phase, File.join(output, "#{label}.json"), *companion_seed&.to_s], extra)
+      if phase == "run" || phase.start_with?("case:")
+        # The worker has exited: preserve persisted effects as well as the
+        # provisional in-process step snapshots. This is not an async drain.
+        path = File.join(output, "#{label}.json")
+        record = JSON.parse(File.read(path))
+        record["exit_effects"] = effects(app)
+        File.write(path, JSON.pretty_generate(record))
+      end
     }
     worker.call("prepare", "prepare", "0")
     seed = File.join(output, "seed")
     FileUtils.cp_r(File.join(app, "storage"), seed)
     execute.call("build", [cli, "build", app, "--env", "production", "--sealed", "--jit", "yjit"], "LOWRAIL" => "0", "RUBYOPT" => nil)
     execute.call("explain", [cli, "explain", app, "--json"], "LOWRAIL" => "0", "RUBYOPT" => nil)
+    scenarios = SCENARIOS + (breadth ? Breadth::CASES : [])
+    restore = -> do
+      FileUtils.rm_rf(File.join(app, "storage"))
+      FileUtils.cp_r(seed, File.join(app, "storage"))
+      FileUtils.rm_rf(File.join(app, "tmp"))
+    end
     sequence = ->(prefix, companion_seed = nil) do
       %w[off1 off2 on].map do |arm|
         label = "#{prefix}#{arm}"
         # No worker is live during restore, including the build's Ruby oracle.
-        FileUtils.rm_rf(File.join(app, "storage"))
-        FileUtils.cp_r(seed, File.join(app, "storage"))
-        FileUtils.rm_rf(File.join(app, "tmp"))
+        restore.call
         worker.call(label, "run", arm == "on" ? "1" : "0", companion_seed)
-        JSON.parse(File.read(File.join(output, "#{label}.json")))
+        record = JSON.parse(File.read(File.join(output, "#{label}.json")))
+        if breadth
+          record["case_diagnostics"] = []
+          record["cold_cases"] = Breadth::CASES.map do |scenario|
+            restore.call
+            case_label = "#{label}-#{scenario.fetch('key')}"
+            worker.call(case_label, "case:#{scenario.fetch('key')}", arm == "on" ? "1" : "0", companion_seed)
+            other = JSON.parse(File.read(File.join(output, "#{case_label}.json")))
+            record.fetch("scenarios").concat(other.fetch("scenarios"))
+            record.fetch("errors").concat(other.fetch("errors") + other.fetch("loads").values.flat_map { _1.fetch("errors", []) })
+            record.fetch("case_diagnostics") << {"id" => scenario.fetch("id"), "worker" => "#{case_label}.json",
+              **other.slice("refusals", "unit_refusals", "jit")}
+            {"id" => scenario.fetch("id"), **other.slice("driver_sources", "initial_effects", "loads", "features", "boot_sql", "late_sql", "sql_stream", "exit_effects", "cold_witness")}
+          end
+          File.write(File.join(output, "#{label}.json"), JSON.pretty_generate(record))
+        end
+        record
       end
     end
     runs = sequence.call("")
     title = YAML.safe_load_file(File.join(app, "test/fixtures/articles.yml")).fetch("one").fetch("title")
     assertions = runs.map { oracles(_1, title) }
-    report = compare(runs)
+    report = compare(runs, scenarios: scenarios)
+    report["raw_status"] = report.fetch("status")
     report["status"] = "rejected_oracles" unless assertions.flatten.all? { _1.fetch("passed") }
     companions = []
     if entropy_companions
@@ -356,10 +427,11 @@ module BlogProduction
           prefix = "companion-#{companion_seed}-"
           records = sequence.call(prefix, companion_seed)
           checks = records.map { oracles(_1, title) }
-          companion = compare(records)
+          companion = compare(records, scenarios: scenarios)
           companion["status"] = "rejected_oracles" unless checks.flatten.all? { _1.fetch("passed") }
           companions << companion.merge("seed" => companion_seed, "controls" => control,
             "workers" => %w[off1 off2 on].map { "#{prefix}#{_1}.json" }, "oracles" => checks,
+            "case_diagnostics" => records.map { _1["case_diagnostics"] },
             "refusals" => records.map { _1.fetch("refusals") }, "worker_modes" => records.map { _1.fetch("jit") },
             "unit_counts" => records.last.fetch("scenarios").map { _1.slice("id", "hits", "fallbacks") })
         end
@@ -380,7 +452,11 @@ module BlogProduction
       text.scan(/^\s*test "([^"]+)" do/).flatten.map do |name|
         id = "#{klass}#test_#{name.tr(' ', '_')}"
         {"id" => id, "source" => file.delete_prefix(app + "/"),
-          "reason" => file.include?("/system/") ? "browser/JS lifecycle not ported" : "not ported in two-GET slice"}
+          "reason" => if file.include?("/system/")
+            breadth ? "server workflow replayed only; browser/JS, Turbo and confirmation dialogs not exercised" : "browser/JS lifecycle not ported"
+          else
+            breadth ? "scenario did not complete all source assertions in every observed arm" : "not ported in two-GET slice"
+          end}
       end
     end
     raise "scenario source test missing" unless SCENARIOS.all? { |scenario| inventory.any? { _1.fetch("id") == scenario.fetch("id") } }
@@ -389,9 +465,12 @@ module BlogProduction
     source_hashes = Dir[File.join(app, "{app,config,db,test}/**/*")].select { File.file?(_1) }.sort.to_h do |file|
       [file.delete_prefix(app + "/"), Digest::SHA256.file(file).hexdigest]
     end
+    checks_by_id = (assertions.flatten + companions.flat_map { _1.fetch("oracles", []).flatten }).group_by { _1.fetch("id") }
+    complete = scenarios.reject { |scenario| scenario["boundary"] == "server_workflow_only" ||
+      !checks_by_id.fetch(scenario.fetch("id")).all? { _1.fetch("passed") } }
     report.merge!("format" => 1, "mode" => "production/yjit", "transport" => "Rack::MockRequest, full Rails middleware; no HTTP server",
       "controls" => {"comparison" => "raw_unpinned", "secret_key_base" => "Rails DUMMY: independently generated per process, not pinned",
-        "session_csrf" => "fresh session each GET; normal SecureRandom", "clock_x_runtime" => "real clock, header compared exactly",
+        "session_csrf" => "legacy GETs fresh; breadth workflows retain actual encrypted session cookie and submit natural form tokens; normal raw SecureRandom", "clock_x_runtime" => "real clock, header compared exactly",
         "request_id" => "caller-supplied scenario ID", "database" => "four restored SQLite files, no live worker during restore",
         "entropy_companion" => entropy_companions ? "separate declared workers below; raw rejection retained" : "not requested; raw gate unchanged"},
       "entropy_companions" => companions,
@@ -403,10 +482,14 @@ module BlogProduction
       "seed_sha256" => Digest::SHA256.file(File.join(output, "prepare.json")).hexdigest,
       "scenario_source_sha256" => Digest::SHA256.file(File.join(app, "test/controllers/articles_controller_test.rb")).hexdigest,
       "oracles" => assertions, "units" => units, "worker_modes" => runs.map { _1.fetch("jit") },
-      "refusals" => runs.map { _1.fetch("refusals") }, "covered" => SCENARIOS,
-      "uncovered" => inventory.reject { |test| SCENARIOS.any? { _1.fetch("id") == test.fetch("id") } },
-      "limitations" => ["No writes/jobs/JS/HTTP server/streaming; no external service equivalence", "Shared observers/setup: no true no-gem observer-transparency control", "No extra warm/control repeats beyond one off/off/on sequence", "Source-declared test inventory only, no dynamic test discovery", "No SEAL001–009 or unsampled-input certification"])
-    report["raw_status"] = report.fetch("status")
+      "refusals" => runs.map { _1.fetch("refusals") }, "case_diagnostics" => runs.map { _1["case_diagnostics"] },
+      "driver_sources" => driver_sources, "covered" => complete.select { |scenario| inventory.any? { _1.fetch("id") == scenario.fetch("id") } },
+      "supplemental" => scenarios.select { _1.fetch("id").start_with?("BlogProductionControl#") },
+      "partial" => scenarios.select { _1["boundary"] == "server_workflow_only" },
+      "uncovered" => inventory.reject { |test| complete.any? { _1.fetch("id") == test.fetch("id") } },
+      "effects_boundary" => "Exact provisional step snapshots plus parent-read persisted DB/storage state after worker exit; no asynchronous drain or quiescence claim",
+      "sql_boundary" => "Ordered whole-worker capture through report serialization, including other threads; boot, scenario and post-scenario phases retained separately",
+      "limitations" => [breadth ? "Writes and enqueued job/cable rows captured, but no job execution, async completion guarantee, browser/JS, HTTP server, streaming or external service equivalence" : "No writes/jobs/JS/HTTP server/streaming; no external service equivalence", "Shared observers/setup: no true no-gem observer-transparency control", "No extra warm/control repeats beyond one off/off/on sequence", "Source-declared test inventory only, no dynamic test discovery", "No SEAL001–009 or unsampled-input certification"])
     if report.fetch("status") == "equivalent_for_executed_scenarios" && companions.any? { _1.fetch("status") != "equivalent_for_executed_scenarios" }
       report["status"] = "rejected_companion"
     end

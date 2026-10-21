@@ -22,6 +22,7 @@ class BlogProductionTest < Minitest::Test
           assert_empty record.fetch("errors")
           assert_empty record.fetch("boot_sql"), "no primary/cache/queue/cable probes before the app's requests"
           assert_equal baseline.fetch("cold_witness"), record.fetch("cold_witness")
+          assert_equal baseline.fetch("exit_effects"), record.fetch("exit_effects"), "persisted state read after worker exit"
           features = record.fetch("cold_witness").fetch("features")
           assert_equal({"api_loaded" => false, "objspace" => []}, features.slice("api_loaded", "objspace"))
           %w[Object Kernel BasicObject].each do |holder|
@@ -64,6 +65,32 @@ class BlogProductionTest < Minitest::Test
         refute on.fetch("unit_refusals").key?(link_id)
       end
       assert_equal 2, report.fetch("entropy_companions").size, "both declared seeds must run"
+      %w[article_create csrf_missing csrf_invalid].each do |key|
+        scenario = BlogProduction::Breadth::CASES.find { _1.fetch("key") == key }
+        records = %w[off1 off2 on].map do |arm|
+          app = File.join(output, "app")
+          FileUtils.rm_rf(File.join(app, "storage"))
+          FileUtils.cp_r(File.join(output, "seed"), File.join(app, "storage"))
+          FileUtils.rm_rf(File.join(app, "tmp"))
+          destination = File.join(output, "#{key}-#{arm}.json")
+          out, err, status = ruby("--yjit", BlogProduction::SCRIPT, "worker", "case:#{key}", destination, "0",
+            chdir: app, env: {"RAILS_ENV" => "production", "RACK_ENV" => "production", "LOWRAIL_ROOT" => app,
+              "LOWRAIL" => arm == "on" ? "1" : "0", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "",
+              "RAILS_LOG_LEVEL" => "fatal", "SECRET_KEY_BASE_DUMMY" => nil, "SECRET_KEY_BASE" => BlogProduction::Entropy::SECRET})
+          assert status.success?, "#{key}/#{arm}: #{err}\n#{out}"
+          JSON.parse(File.read(destination))
+        end
+        comparison = BlogProduction.compare(records, scenarios: [scenario])
+        assert_empty comparison.fetch("differences").fetch("off_control"), key
+        assert_empty comparison.fetch("differences").fetch("off_on"), key
+        assert_empty comparison.fetch("capture_errors"), key
+        assert records.all? { BlogProduction.oracles(_1, "unused").all? { |check| check.fetch("passed") } }, key
+        if key == "article_create"
+          assert_equal "equivalent_for_executed_scenarios", comparison.fetch("status")
+          assert_equal [200, 302, 200, 200], records.last.fetch("scenarios").first.fetch("response").fetch("steps").map { _1.fetch("response").fetch("status") }
+          assert records.last.fetch("scenarios").first.fetch("sql").any? { _1.fetch("database") == "queue" }, "after_commit broadcast persisted"
+        end
+      end
     end
   end
 
@@ -93,6 +120,9 @@ class BlogProductionTest < Minitest::Test
       "sql_order" => ->(run) { run.fetch("scenarios").first.fetch("sql").reverse! },
       "events" => ->(run) { run.fetch("scenarios").first.fetch("events").reverse! },
       "boot_sql" => ->(run) { run.fetch("boot_sql") << {"database" => "queue", "sql" => "SELECT sqlite_version(*)"} },
+      "late_sql" => ->(run) { run["late_sql"] = [{"database" => "cable", "sql" => "INSERT INTO solid_cable_messages VALUES ('late')"}] },
+      "sql_stream" => ->(run) { run["sql_stream"] = [{"phase" => "post_scenario", "thread" => "other"}] },
+      "exit_effects" => ->(run) { run["exit_effects"] = {"cable" => ["persisted after report"]} },
       "cold_hook" => ->(run) { run.fetch("cold_witness").fetch("hooks") << "before_eager_load" },
       "cold_feature" => ->(run) { run.fetch("cold_witness").fetch("features")["api_loaded"] = true },
       "cold_ancestry" => ->(run) { run.fetch("cold_witness").fetch("features")["holder_ancestry"] = {"Object" => %w[Object Kernel Lowrail::Guard::ObjectHooks BasicObject]} },
@@ -133,6 +163,36 @@ class BlogProductionTest < Minitest::Test
       changed.last.fetch("scenarios").first[field] = "real mismatch, not excused by entropy policy"
       assert_equal "rejected", BlogProduction.compare(changed).fetch("status"), field
     end
+  end
+
+  def test_write_workflows_compare_intermediate_redirects_flash_and_queue_effects
+    records = runs
+    records.each do |run|
+      run.fetch("scenarios").first["response"] = {"completed" => true,
+        "checks" => [{"name" => "created once", "passed" => true}], "steps" => [
+          {"kind" => "request", "response" => {"status" => 302, "headers" => {"location" => "/articles/3", "set-cookie" => "exact-cookie"}, "body" => ""},
+            "flash" => {"notice" => "created"}, "effects" => {"articles" => [1, 2, 3], "queue" => [{"job_id" => "exact-id", "arguments" => "exact"}]}},
+          {"kind" => "request", "response" => {"status" => 200, "headers" => {}, "body" => "Created"}, "flash" => {"notice" => "created"}}
+        ]}
+      run["cold_cases"] = [{"id" => "write", "boot_sql" => [], "initial_effects" => {"articles" => [1, 2]}}]
+    end
+    assert_equal "equivalent_for_executed_scenarios", BlogProduction.compare(records).fetch("status")
+    changes = [
+      ->(run) { run.fetch("scenarios").first.fetch("response").fetch("steps").first.fetch("response")["status"] = 303 },
+      ->(run) { run.fetch("scenarios").first.fetch("response").fetch("steps").first.fetch("response").fetch("headers")["set-cookie"] = "different" },
+      ->(run) { run.fetch("scenarios").first.fetch("response").fetch("steps").first.fetch("flash")["notice"] = "wrong flash" },
+      ->(run) { run.fetch("scenarios").first.fetch("response").fetch("steps").first.fetch("effects").fetch("queue").clear },
+      ->(run) { run.fetch("cold_cases").first.fetch("initial_effects")["articles"] = [1] }
+    ]
+    changes.each do |change|
+      altered = Marshal.load(Marshal.dump(records))
+      change.call(altered.last)
+      assert_equal "rejected", BlogProduction.compare(altered).fetch("status")
+    end
+    incomplete = Marshal.load(Marshal.dump(records))
+    incomplete.last.fetch("scenarios").first.fetch("response")["completed"] = false
+    probe = {"scenarios" => [incomplete.last.fetch("scenarios").first]}
+    refute BlogProduction.oracles(probe, "unused").first.fetch("passed"), "partial checks cannot claim completed source coverage"
   end
 
   def test_entropy_pins_stop_applying_when_source_or_lock_changes

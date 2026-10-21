@@ -49,19 +49,37 @@ module BlogProduction
       SecureRandom.singleton_class.prepend(Bytes)
       OpenSSL::Random.singleton_class.prepend(Bytes)
       Rack::Utils.singleton_class.prepend(RuntimeClock)
+      Time.singleton_class.prepend(WallClock) if policy["wall_clock"]
+      @wall_clock = policy["wall_clock"]
     end
 
-    def self.with(seed, scenario)
+    def self.with(seed, scenario, requests: 1, wall_clock: false)
       raise "nested entropy control" if Thread.current.thread_variable_get(CONTEXT)
-      context = {"seed" => seed, "scenario" => scenario, "rngs" => {}, "trace" => [], "clock_reads" => [], "errors" => []}
+      context = {"seed" => seed, "scenario" => scenario, "requests" => requests, "wall_clock" => wall_clock,
+        "rngs" => {}, "trace" => [], "clock_reads" => [], "wall_clock_reads" => [], "errors" => []}
       Thread.current.thread_variable_set(CONTEXT, context)
       result = yield
-      if context.fetch("clock_reads").size != 2
-        context.fetch("errors") << "expected exactly two Rack::Runtime clock reads"
+      if context.fetch("clock_reads").size != 2 * context.fetch("requests")
+        context.fetch("errors") << "expected exactly two Rack::Runtime clock reads per declared request"
       end
-      [result, context.reject { %w[rngs seed scenario].include?(_1) }]
+      [result, context.reject { %w[rngs seed scenario requests].include?(_1) }]
     ensure
       Thread.current.thread_variable_set(CONTEXT, nil)
+    end
+
+    def self.expect_request!
+      context = Thread.current.thread_variable_get(CONTEXT)
+      context["requests"] += 1 if context
+    end
+
+    def self.wall_clock(real, callers, options)
+      context = Thread.current.thread_variable_get(CONTEXT)
+      return real unless context && context["wall_clock"] && @wall_clock
+      pinned = Time.at(@wall_clock.fetch("epoch"), **options)
+      context.fetch("wall_clock_reads") << {"real" => real.to_f, "pinned" => pinned.to_i, "caller" => callers.first.to_s}
+      context.fetch("trace") << {"site" => "Time.now", "epoch" => pinned.to_i,
+        "caller" => callers.first.to_s}
+      pinned
     end
 
     def self.bytes(provider, size, callers)
@@ -102,6 +120,12 @@ module BlogProduction
     module RuntimeClock
       def clock_time
         Entropy.clock(super, caller_locations(1, 1).first)
+      end
+    end
+
+    module WallClock
+      def now(**options)
+        Entropy.wall_clock(super, caller_locations(1, 1), options)
       end
     end
   end
