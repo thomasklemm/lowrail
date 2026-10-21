@@ -8,7 +8,8 @@ latency claim. An instruction increase cannot be hidden by fewer allocations.
 ## Protocol
 
 Use the shared `script/screen` from `thomasklemm/native-yjit-bench`
-(`ff46f99517f6a1fcb9dfc3ab3e132616be100457`), not another request harness.
+(`bfc682b97dbebdb1082d4f54e8ed426e7ff27c27`, including the pre-boot fixture
+secret and Lobsters validation fixes), not another request harness.
 Every comparison retains all three off-A/on/off-B rounds, a separate counted
 probe, raw A/A spread, integer allocation samples, GC counts/time, RSS, boot
 and actual YJIT state. Use larger declared warmup/sample counts than the short
@@ -79,8 +80,43 @@ duplicate their implementation work.
 
 ## Measurements and pricing decision
 
-Local screens are being prepared. No stack saving, additive interaction,
-cross-app win, native latency gain or supported component is claimed yet.
+### First full-stack screen: pre-dispatch-fix, provisional
+
+Three rounds, **200 warmups / 300 samples**, CPU 2, Ruby 4.0.7 / Rails 8.1.4,
+actual native YJIT. Full blog stack is form/token/collection plus 17 normally
+built AR model units. No guards removed. All 18 measured two-seed response
+comparisons pass: status, body and every header digest. All four DBs and
+storage-file snapshots are unchanged by the checked GETs and identical across
+all arms/seeds/rounds. This does not certify writes, arbitrary app behavior or
+the active own suite.
+
+| Blog `GET /articles/1` | off-A | off-B | full stack |
+|---|---:|---:|---:|
+| Integer objects/request, median | 2,412 | 2,412 | 2,019 |
+| Native wall, mean of worker medians (µs) | 1,965.24 | 1,882.28 | 1,659.58 |
+
+**−393 objects/request (−16.29%)** is a deterministic screen reduction.
+Native paired wall is −14.90%, but A/A max absolute round spread is **13.76%**;
+the effect is **unresolved**, not a wall win. Per-request counted hits:
+Article 1, Comment 2, form 1, token 4, collection 1; zero fallbacks.
+
+The known P1 `view.send` dispatch defect is not exercised by this fixture.
+The coordinator requires a published fix and a fresh sealed-component screen
+before admission. Existing results remain explicitly **pre-dispatch-fix**.
+The active own-suite gap independently prevents admission/pricing.
+
+Sanitized raw evidence, GC counts/time, RSS, per-unit coverage and all refused
+comparisons: [stack-results.json](stack-results.json). Private fixture secrets,
+response bodies/cookies and raw app logs are excluded. Export with:
+
+```sh
+mise exec ruby@4.0.7 -- ruby docs/stack-report.rb docs/stack-results.json \
+  .lowrail/stack/screen-*
+```
+
+Cross-app AR screens and standalone/leave-one-out attribution are pending.
+No additive interaction, cross-app win, native latency gain or supported
+component is claimed yet.
 Propose at most **one** whole-stack Callgrind/README price to the coordinator
 only after a clear screen (>3× A/A wall noise or solid deterministic reduction)
 and the correctness/admission boundaries are resolved. No Callgrind is launched
