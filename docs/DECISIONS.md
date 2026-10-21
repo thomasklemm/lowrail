@@ -4,6 +4,34 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
+
+The token-only +32 objects/request is traced to per-hit view-context constant
+caches and Kernel-owned `IVAR.bind_call` method entries, not warm admission
+witnesses. A live-prefix/normal-suffix split and one literal view ivar read
+remove about 32 objects/request, leaving token-only allocation-neutral,
+not a win. Remaining guard reads stay exact; no native API/admission/default
+or quarantine change. Strict production regressions **2/201** pass; independent
+Thermos reviews approve. [Allocation trace and limits](passes/token-allocation.md).
+
+**Before counting:** the owner authorizes exactly one new blog interpreter
+cohort in slot 1 on the published fixed source, isolated form/token/collection
+artifact, under a new A/A decision rule. Both total and no-GC A/A nominal
+95% intervals must lie **wholly within ±0.1%**; containing zero is **not**
+required. The prior no-GC interval **[+0.009283,+0.062511]%** is noise far below
+the effect being priced: the old rule rejected precision rather than material
+bias. This is a prospective rule, **not a re-score**: the `62f8a6b` cohort
+stays rejected under its original rule and is never pooled with the new one.
+
+All other historical-method gates stay fixed: six rounds / seed 41231,
+18 serial workers / jobs=1, N0/N50, warmup50, floors
+`[1000000,250000,100000,20000,10000]`, identical pinned brk512 tool and worker,
+actual interpreter/no JIT, exact pages/heap ranges/brk, fresh pre/post cold
+seeds 0/1, both 192-pair controls, native coverage and epoch deopt. Retain all
+rounds and accept or reject the whole cohort; **no retry or exclusions**.
+Only this driver's summary policy changes, not other shared-harness gates.
+YJIT seam work stays paused; no README/results edit by this worker.
+
 ## Production sealed helper dispatch safety (2026-10-21)
 
 Production token admission did not refuse an existing view `send` override
