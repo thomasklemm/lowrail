@@ -42,6 +42,9 @@ module PassProbe
         entry && entry.id == unit.fetch("id")
       when "sealed/link_to"
         defined?(Lowrail::Sealed) && Lowrail::Sealed::ACTIVE[0] && Lowrail::Sealed.refusal.nil?
+      when "sealed/form_scaffold"
+        defined?(Lowrail::FormScaffold) && Lowrail::FormScaffold.instance_variable_get(:@active) &&
+          Lowrail::FormScaffold.refusal.nil?
       else
         raise "no activation adapter for runtime pass #{unit.fetch('pass')}" if %w[runtime method model].include?(unit["kind"])
         # Source/call-site passes are delivered lazily. Zero route coverage is

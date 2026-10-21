@@ -41,6 +41,13 @@ class FormScaffoldTest < Minitest::Test
           assert on.fetch("responses").any? { _1.fetch("headers")["x-render-observer"] == "live" }
         end
       end
+      out, err, status = ruby("--disable-yjit", "--disable-zjit", File.expand_path("../../bench/pass_probe.rb", __dir__),
+        "GET:/articles/1", chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1",
+          "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "BENCH_JIT" => "0", "BENCH_UNITS" => form.fetch("id").to_s})
+      assert status.success?, "#{out}\n#{err}"
+      coverage = JSON.parse(out.lines.find { _1.start_with?("LOWRAIL_BENCH ") }.delete_prefix("LOWRAIL_BENCH "))
+      assert_equal [{"id" => form.fetch("id"), "pass" => "sealed/form_scaffold", "hits_per_request" => 1.0,
+        "fallbacks_per_request" => 0.0}], coverage.fetch("units")
       replay = ruby_json(<<~'RUBY', chdir: app, env: {"RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
         require "./config/application"
         Rails.application.config.yjit = false
