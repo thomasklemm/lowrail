@@ -7,6 +7,7 @@ pub(super) fn list() -> Vec<Value> {
     let string = json!({"type":"string"});
     [
         ("type_of", "Signature/provenance, or a typed fact at slot return, arg:name, ivar:@name", json!({"target":string,"slot":string}), vec!["target"]),
+        ("export_rbs", "Read-only RBS files and per-slot proven/static/observed/unknown evidence from existing facts and samples; no whole-signature certification", json!({}), vec![]),
         ("method_facts", "Resolved boot method and its origin/generator", json!({"target":string}), vec!["target"]),
         ("model", "Model columns, associations, callbacks and available validations", json!({"name":string}), vec!["name"]),
         ("routes", "Routes filtered by name/path/controller substrings (AND)", json!({"name":string,"path":string,"controller":string}), vec![]),
@@ -142,6 +143,7 @@ impl Data {
         } else { None };
         let snapshot = self.refresh()?;
         match name {
+            "export_rbs" => serde_json::to_value(snapshot.types.export_rbs(&snapshot.facts)).map_err(|e| e.to_string()),
             "type_of" => {
                 let target = required("target")?;
                 let sig = snapshot

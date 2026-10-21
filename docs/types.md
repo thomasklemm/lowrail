@@ -5,6 +5,7 @@ Target: Ruby 3.4+ (development pins 4.0.7), Rails 8.1+.
 ```sh
 script/corpus real-blog
 cargo run -- facts .corpus/real-blog
+lowrail types --rbs .corpus/real-blog > /tmp/lowrail-app.rbs
 cargo run -- types .corpus/real-blog --rbs .corpus/real-blog/sig/lowrail
 rbs -I .corpus/real-blog/sig/lowrail validate
 ```
@@ -110,9 +111,40 @@ or validation of source freshness. Regenerate facts after changing the app.
 
 ## RBS output
 
-`--rbs OUT_DIR` creates `OUT_DIR/app.rbs` and `lowrail_support.rbs` (normally
-choose an app `sig/` subdirectory). Output is deterministic. Provenance is
-also emitted as comments. The support file supplies minimal Rails relation,
+`lowrail types --rbs APP` writes standalone RBS to **stdout**, without changing
+the app or booting Ruby. It concatenates the support declarations followed by
+the app declarations. The existing `lowrail types APP --rbs OUT_DIR` interface
+still writes separate `OUT_DIR/app.rbs` and `lowrail_support.rbs`, with the
+type model as JSON on stdout. Both use the same renderer as MCP `export_rbs`.
+Output is deterministic for the same facts, source and observation snapshots.
+
+Each **slot**, not the whole signature, has a JSON RBS comment:
+
+```rbs
+# lowrail return: {"status":"static","scope":null,"sample_count":0,"fact":{"name":"String?","provenance":[{"source":"schema","detail":"articles.title: type=Some(\"string\"), null=true"}],"evidence":"static","samples":{}}}
+def title: () -> String?
+```
+
+| Slot status | Meaning |
+|---|---|
+| `proven` | Existing `ProvenBody` evidence, with an explicit **body-local** scope. This does not certify effective lookup, unchanged source or the surrounding execution, much less a whole signature. |
+| `static` | Advisory schema, boot catalog or inference; original sources/details are retained. Schema nullability is a storage fact, not an invariant of every unsaved Ruby object. **Static is not certified.** |
+| `observed` | Sample-derived type. `sample_count` and the original class histogram remain visible; neither finite samples nor saturation prove exhaustive coverage. |
+| `unknown` | `untyped`, including unknown/custom types and unsupported bodies. No guessed value or element type. |
+
+Comments and MCP JSON use exactly the same slot object. Static slots may also
+have samples, without becoming observed-only or narrowing their static type.
+Contradictions stay in `conflicts` and withdraw body proof. Parameters use
+`arg:NAME` slots, including untyped rest/block parameters; RBS block input and
+return types stay untyped. There is **no whole-signature status**.
+
+MCP `export_rbs` takes no arguments and returns `format: 1`, `files` (the two
+RBS filenames mapped to content), `signatures` (method IDs mapped to `rbs`
+and `slots`), `diagnostics`, and `conflicts`. It reads the server's existing
+facts/samples, refreshes on content changes and never writes files. For example:
+`{"name":"export_rbs","arguments":{}}`.
+
+The support file supplies minimal Rails relation,
 TimeWithZone, Date, BigDecimal and Tempfile declarations and name-only stubs for
 namespaced external classes introduced by observations (e.g. strong parameters
 and safe strings). Array, Hash, Set and Queue samples do not infer element
@@ -122,6 +154,36 @@ signatures. This is generated member information,
 not a complete Rails signature distribution. Existing files with these two
 names in the chosen output directory are overwritten; other files are left
 alone. Tests invoke `rbs validate` when the executable is available.
+
+Unrepresentable receiver names such as `Pagy.ancestors[0]` remain explicit
+export diagnostics, not invalid RBS declarations or invented constant names.
+The JSON type model still preserves the original entries.
+
+### Export validation — 2026-10-21
+
+Ruby 4.0.7 / RBS 4.2.0: both split files and concatenated stdout parse with
+`RBS::Parser.parse_signature`; split exports pass `rbs -I DIR validate`.
+The real MCP text/structured output round-trips, its files equal the legacy
+file export, and their concatenation equals `types --rbs APP` byte for byte.
+Steep is not installed; this is signature validation, not a complete Rails
+type-checking result. All exports and logs are outside the source apps.
+
+| App | Exported signatures | Proven / static / observed / unknown **slots** | Diagnostics / conflicts |
+|---|---:|---:|---:|
+| Rails 8.1.4 blog (`real-blog-r4`) | 161 | 2 / 55 / 11 / 176 | 0 / 0 |
+| Wikino Rails 8.0.5.1 ([pinned source](https://github.com/wikinoapp/wikino/commit/25255d2d6c808df6672e293661ea797a76c6d2a9), `rails/`) | 1,436 | 0 / 367 / 1 / 3,707 | 38 / 0 |
+
+Observations: `LOWRAIL=0`, types-only recorder, four samples/method, seed
+41231, one worker. Blog: 21 tests/54 assertions pass, 13 sampled methods;
+Wikino: **11-example subset** (topic card component and attachment processing
+service), all pass, two sampled methods. These are bounded untimed inputs,
+not measured cohorts, exhaustive type coverage or lowering support claims.
+The blog's first merge correctly refused a legacy facts snapshot from a
+different root; a fresh facts dump was used, not rewritten evidence.
+Wikino's 38 existing raw-ERB inference diagnostics remain visible; no ERB
+type is fabricated to silence them. Regressions cover a schema reader,
+observed return/argument counts, body-local proof, unknown helper slots,
+contradictions, invalid receiver diagnostics and read-only MCP refresh.
 
 ## Type quality ledger — 2026-10-20
 
@@ -191,6 +253,7 @@ Tools:
 | Tool | Arguments | Result |
 |---|---|---|
 | `type_of` | `target`: `Article#title`, `Article.all` or `article_path`; optional `slot`: `return`, `arg:name`, `ivar:@name` | Signature/types, provenance, counts, evidence, conflicts; a slot query includes `proven_type` (name or null) |
+| `export_rbs` | none | RBS files and the same per-slot proven/static/observed/unknown evidence as RBS comments, plus diagnostics/conflicts; no writes |
 | `method_facts` | `target`: `Class#method` or `Class.method` | Resolved boot method, owner/source/parameters/ISeq kind and existing origin classifier result |
 | `model` | `name`: model class | Raw columns, attributes, associations, callbacks; validations if recorded in the facts |
 | `routes` | optional `name`, `path`, `controller` substrings (combined with AND) | Matching routes, in route-set order |
@@ -320,3 +383,11 @@ production check has identical outcomes/4 queries but form **0 hits/0 fallbacks*
 relabel those observations.
 Actual interpreter-artifact/YJIT-startup refusal is separately recorded. No
 measured cohort or speed/support claim follows.
+
+Follow-up: both probe examples **do render** the show form. With the original
+Minitest/reporters preload, the archived interpreter artifact refuses form
+activation (`boot inventory changed; rebuild`), so `form_with` stays owned by
+Rails and records 0/0. Without that preload the same artifact activates
+`FormScaffold::Variant` and records a form hit. This is not the independent
+`RealBlogR4` link pilot restriction. The activation mismatch and explanation
+were handed to the sealed owner; no sealed/runtime check was relaxed here.

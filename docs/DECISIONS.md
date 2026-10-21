@@ -13,6 +13,18 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## RBS exports preserve slot evidence, not signature certification (2026-10-21)
+
+Reuse the existing TypeModel and renderer for `types --rbs APP`, legacy split
+files and read-only MCP `export_rbs`. Each return/argument slot is `proven`
+(explicitly body-local), advisory `static`, sample-derived `observed` with
+counts, or `unknown`/untyped. Preserve original sources and contradictions;
+never call schema storage nullability or finite observations a runtime type
+certificate. There is no whole-signature status. Unsupported receiver names
+remain diagnostics rather than invented RBS constants. Blog and Wikino parse
+and validate with RBS; this is tooling, not lowering support or speed evidence.
+[Contract and bounded checks](types.md#rbs-output).
+
 ## One read-only explanation surface (2026-10-21)
 
 `lowrail explain`, MCP `explain_unit`/`explain_site` and doctor's build section

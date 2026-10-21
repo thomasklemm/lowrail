@@ -359,6 +359,10 @@ impl TypeModel {
             "conflicts":self.conflicts, "diagnostics":self.diagnostics})
     }
 
+    pub fn export_rbs(&self, facts: &Facts) -> rbs::Export<'_> {
+        rbs::export(self, facts)
+    }
+
     pub fn write_rbs(&self, facts: &Facts, out: &Path) -> Result<(), String> {
         rbs::write(self, facts, out)
     }
@@ -388,7 +392,15 @@ fn nullable(ty: &str, null: bool) -> String {
 }
 
 pub fn cli(args: &[String]) -> Result<(), String> {
-    let usage = "usage: lowrail types APP [--rbs OUT_DIR]";
+    let usage = "usage: lowrail types --rbs APP (standalone RBS to stdout) | types APP [--rbs OUT_DIR] (JSON and optional RBS files)";
+    if let [flag, app] = args && flag == "--rbs" {
+        let facts = facts::load(Path::new(app).join(".lowrail/facts.json"))?;
+        let model = TypeModel::load(Path::new(app), &facts)?;
+        let export = model.export_rbs(&facts);
+        print!("{}{}", export.files["lowrail_support.rbs"], export.files["app.rbs"]);
+        for diagnostic in export.diagnostics { eprintln!("RBS: {diagnostic}"); }
+        return Ok(());
+    }
     let (app, rest) = args.split_first().ok_or(usage)?;
     if !(rest.is_empty() || rest.len() == 2 && rest[0] == "--rbs") {
         return Err(usage.into());

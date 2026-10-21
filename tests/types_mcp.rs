@@ -52,6 +52,11 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
         types["methods"]["Lowrail::RouteHelpers#article_path"]["return_type"]["name"],
         "String"
     );
+    let app_rbs = std::fs::read_to_string(out.join("app.rbs")).unwrap();
+    let support_rbs = std::fs::read_to_string(out.join("lowrail_support.rbs")).unwrap();
+    let stdout_rbs = Command::new(bin).args(["types", "--rbs"]).arg(&app).output().unwrap();
+    assert!(stdout_rbs.status.success());
+    assert_eq!(String::from_utf8(stdout_rbs.stdout).unwrap(), format!("{support_rbs}{app_rbs}"));
     if Command::new("rbs").arg("--version").output().is_ok() {
         let validation = Command::new("rbs")
             .arg("-I")
@@ -102,6 +107,7 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
             "tools/call",
             json!({"name":"type_of","arguments":{"target":"Article#title"}}),
         ),
+        (4, "tools/call", json!({"name":"export_rbs","arguments":{}})),
     ] {
         writeln!(
             input,
@@ -115,7 +121,14 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
         let response: Value = serde_json::from_str(&line).unwrap();
         assert_eq!(response["id"], id);
         if id == 2 {
-            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 12);
+            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 13);
+        } else if id == 4 {
+            assert_eq!(response["result"]["isError"], false);
+            let export = &response["result"]["structuredContent"];
+            assert_eq!(export["files"]["app.rbs"], app_rbs);
+            assert_eq!(export["files"]["lowrail_support.rbs"], support_rbs);
+            assert_eq!(export["signatures"]["Article#title"]["slots"]["return"]["status"], "static");
+            assert_eq!(serde_json::from_str::<Value>(response["result"]["content"][0]["text"].as_str().unwrap()).unwrap(), *export);
         } else {
             assert_eq!(response["result"]["isError"], false);
             assert_eq!(

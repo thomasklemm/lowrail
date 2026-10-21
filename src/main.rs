@@ -23,6 +23,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   bench APP (--pass NAME | --passes SET --default-build DIR) [--path PATH]
                        controlled pass/request measurements; --budgets JSON for additivity
   types APP [--rbs DIR] derive types from boot facts, optionally write RBS
+  types --rbs APP      export standalone RBS to stdout with per-slot evidence
   mcp APP              serve read-only type/fact tools over stdio
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes
   seal-check APP       run APP's tests and report post-seal contract observations

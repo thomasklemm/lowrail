@@ -22,7 +22,7 @@ fn protocol_errors_notifications_and_tool_discovery() {
     assert_eq!(responses[2]["error"]["code"], -32000);
     assert_eq!(responses[3]["result"]["protocolVersion"], "2025-06-18");
     let tools = responses[4]["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 12);
+    assert_eq!(tools.len(), 13);
     assert!(tools.iter().any(|t| t["name"] == "type_of"));
     assert_eq!(responses[5]["error"]["code"], -32602);
     assert_eq!(responses[6]["result"], json!({}));
@@ -101,14 +101,23 @@ fn data_tools_refresh_facts_and_ledger_without_serving_stale_answers() {
     );
     let observed = dir.join(".lowrail/observed.json");
     std::fs::write(&observed, json!({"format":1,"types":[{"module":"Article","name":"title",
-        "returns":{"Integer":3},"calls":3}]}).to_string()).unwrap();
+        "returns":{"Integer":3},"calls":3}, {"module":"Article","name":"seen","returns":{"String":2},"calls":2}]}).to_string()).unwrap();
     let ty = data.call("type_of", &json!({"target":"Article#title","slot":"return"})).unwrap();
     assert_eq!(ty["fact"]["name"], "bool?");
     assert_eq!(ty["fact"]["samples"]["Integer"], 3);
     assert_eq!(ty["proven_type"], Value::Null);
     assert_eq!(ty["conflicts"][0]["count"], 3);
+    let export = data.call("export_rbs", &json!({})).unwrap();
+    assert_eq!(export["signatures"]["Article#title"]["slots"]["return"]["status"], "static");
+    assert_eq!(export["signatures"]["Article#seen"]["rbs"], "(*untyped) -> String");
+    assert_eq!(export["signatures"]["Article#seen"]["slots"]["return"]["status"], "observed");
+    assert_eq!(export["signatures"]["Article#seen"]["slots"]["return"]["sample_count"], 2);
+    assert_eq!(export["signatures"]["Article#title="]["slots"]["return"]["status"], "unknown");
+    assert_eq!(export["signatures"]["Article#title="]["rbs"], "(untyped) -> untyped");
+    assert!(!dir.join("sig").exists(), "MCP export is read-only");
     std::fs::write(&observed, "{").unwrap();
     assert!(data.call("type_of", &json!({"target":"Article#title"})).is_err());
+    assert!(data.call("export_rbs", &json!({})).is_err(), "corrupt samples cannot serve a stale export");
     std::fs::remove_file(&observed).unwrap();
     assert_eq!(data.call("diagnostics", &json!({})).unwrap()["conflicts"], json!([]));
     assert_eq!(data.call("lowering_status", &json!({"target":"Article#title"})).unwrap()["sites"], ledger);

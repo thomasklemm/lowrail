@@ -191,15 +191,18 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
     let dir = std::env::temp_dir().join(format!("lowrail-type-observed-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let file = dir.join("article.rb");
-    std::fs::write(&file, "class Article\n def literal = 7\n def caller = literal\n def dynamic(value); value.to_s; end\n def self.list = @articles = all\n def exit_literal = @n = 3\n def mutate; @n = 3; literal; @n; end\nend\n").unwrap();
+    std::fs::write(&file, "class Article\n def literal = 7\n def caller = literal\n def dynamic(value); value.to_s; end\n def self.list = @articles = all\n def exit_literal = @n = 3\n def mutate; @n = 3; literal; @n; end\nend\nmodule ExportHelper\n def undecided(value); external(value); end\nend\n").unwrap();
     let methods: Vec<_> = [("literal",2,false),("caller",3,false),("dynamic",4,false),
         ("list",5,true),("exit_literal",6,false),("mutate",7,false)].into_iter()
         .map(|(name,line,singleton)| json!({"name":name,"singleton":singleton,
             "source_location":format!("{}:{line}",file.display()),
             "parameters":if name == "dynamic" { json!([["req","value"]]) } else { json!([]) }})).collect();
     let facts: Facts = serde_json::from_value(json!({"app_root":dir,
-        "models":[{"name":"Article","columns":[{"name":"title","type":"string","null":true}]}],
+        "models":[{"name":"Article","columns":[{"name":"title","type":"string","null":true}]},
+            {"name":"Anonymous.ancestors[0]"}],
         "modules":[{"name":"Article","methods":methods},
+            {"name":"ExportHelper","kind":"module","methods":[{"name":"undecided",
+                "source_location":format!("{}:10",file.display()),"parameters":[["req","value"]]}]},
             {"name":"Outer","kind":"class"},
             {"name":"Outer::Item","kind":"class"},
             {"name":"Outer::Parameters","kind":"class"}]})).unwrap();
@@ -244,6 +247,22 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
     let input = model.typed_facts();
     assert_eq!(input["format"], 1);
     assert_eq!(input["methods"]["Article#dynamic"]["return_type"]["evidence"], "observed");
+    let export = serde_json::to_value(model.export_rbs(&facts)).unwrap();
+    let signatures = &export["signatures"];
+    assert_eq!(signatures["Article#title"]["slots"]["return"]["status"], "static", "schema plus samples is not certified or narrowed");
+    assert_eq!(signatures["Article#title"]["rbs"], "() -> String?");
+    assert_eq!(signatures["Article#dynamic"]["slots"]["return"]["status"], "observed");
+    assert_eq!(signatures["Article#dynamic"]["slots"]["return"]["sample_count"], 3);
+    assert_eq!(signatures["Article#dynamic"]["slots"]["arg:value"]["status"], "observed");
+    assert_eq!(signatures["Article#exit_literal"]["slots"]["return"]["status"], "proven");
+    assert!(signatures["Article#exit_literal"]["slots"]["return"]["scope"].as_str().unwrap().starts_with("body-local"));
+    assert_eq!(signatures["Article#mutate"]["slots"]["return"]["status"], "unknown");
+    assert_eq!(signatures["Article#mutate"]["rbs"], "() -> untyped");
+    assert_eq!(signatures["ExportHelper#undecided"]["rbs"], "(untyped) -> untyped");
+    assert_eq!(signatures["ExportHelper#undecided"]["slots"]["arg:value"]["status"], "unknown");
+    assert!(signatures["Article#dynamic"].get("status").is_none(), "no whole-signature proof");
+    assert!(export["diagnostics"].as_array().unwrap().iter().any(|d| d.as_str().unwrap().contains("RBS cannot declare receiver Anonymous.ancestors[0]")));
+    assert!(!export["files"]["app.rbs"].as_str().unwrap().contains("ancestors[0]"), "unrepresentable receivers remain diagnostics, not broken RBS declarations");
     model.write_rbs(&facts, &dir.join("sig")).unwrap();
     if std::process::Command::new("rbs").arg("--version").output().is_ok() {
         let validation = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
