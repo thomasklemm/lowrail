@@ -13,7 +13,7 @@ live in the linked docs; numbers come from executed runs, dated.
 | Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; hook-free delivery preserves loader selection; Redprints' strict load census passes with targeted Bundlebun refusal, **0 hits** ([compatibility report](compat.md)) |
 | Opt-in passes | guarded selection: only props + endpoint; seven cached-fact passes sealed-only after suppressed-hook audit; see [DECISIONS](DECISIONS.md#passes) |
 | Accepted request work | corrected blog `GET /articles/1` production form/token/collection at [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65), published [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); post-fix Starter `GET /dashboard` JSON config binding. Exact values/intervals and pins: [generated README table](../README.md#current-results-2026-10-21). Each is one endpoint/fixture, interpreter Ir not latency, opt-in sealed; no YJIT claim or config promotion |
-| Not request prices | production YJIT method stage 1 rejected; [reaper-driven late compilation](passes/production-yjit-method.md) explains the native rejection, not a price. [Frozen props](passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred) is an isolated micro, integration deferred. Fizzy N=50 **INVALID** (heap); N=10 untimed fixed-page checks pass, new cohort awaiting approval ([specimen](block-link-specimen.md)) |
+| Not request prices | production YJIT method stage 1 rejected; [reaper-driven late compilation](passes/production-yjit-method.md) explains the native rejection, not a price. [Frozen props](passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred) is an isolated micro, integration deferred. Fizzy N=50 **INVALID** (heap), final diagnostics published; exactly one N=10 replacement approved, no result yet ([specimen](block-link-specimen.md)) |
 | Verification-only test tier | AR Article/Comment coverage, not production admission; link/form/token/collection/preload remain refused. [Explicit-path eager-load coverage](test-certificate.md#documented-explicit-path-invocation-actual-eager-loading) at [9773980](https://github.com/thomasklemm/lowrail/commit/97739801174c015e948428c2f35fcb777a888b02); [ccea6df](https://github.com/thomasklemm/lowrail/commit/ccea6df6addc6958b6dbdadccc5e6c6f11727032) retains the fixed timeout diagnosis, without erasing the earlier failure |
 | Historical upper bounds | endpoint render path, −26 %/−37 % handwritten specimens, not supported passes or current prices; caller-side certification loses (0fbb909) |
 | Types/MCP | source-backed Sorbet + Rails signatures; blog slots 2/99/7/188, Wikino 0/1,715/1/1,129 (proven/static/observed/unknown); 517 original wrapped returns → static, forwarding placeholders removed; blog Steep 51 → 6 → 2, still non-gating ([details](types.md#sorbet-and-framework-signatures-follow-up--2026-10-21)) |
@@ -24,17 +24,23 @@ live in the linked docs; numbers come from executed runs, dated.
 
 **Decision rule first:** any pin/mode/brk/exact-page/mix violation invalidates
 the whole cohort; both total/no-GC A/A 95% intervals must contain zero wholly
-within ±0.5%. The one authorized N=0/50 interpreter cohort is **INVALID**:
-both off/on grow beyond the declared heap pages. It finishes untouched for
-diagnostics; its deltas are neither prices nor direction claims.
+within ±0.5%. The completed N=0/50 interpreter cohort is **INVALID**:
+both off/on grow beyond the declared heap pages. **Diagnostics only, not a
+price or direction claim:** total Δ +0.415777% [+0.364704, +0.733074],
+no-GC Δ +0.413692% [+0.364724, +0.448149]. A/A, pins, mode, brk and exact
+1200-hit mix pass, but heap failure invalidates the whole cohort. All 18
+workers / 72 dumps / 36 subtractions reconcile; no retry/exclusions. Its
+service/slot is released. [Complete INVALID export](fizzy-link-ir-invalid.json).
 
 Untimed **Valgrind tool=none** off-only whole-window budgeting at N=0/10
 freezes the common init slots at `3350000,300000,460000,30000,20000` (254 MB of
 slots), rather than mistaking init floors for hard caps. Fresh off/on workers
 in both phase orders retain exact pages with zero page additions in all 16
 windows. Full on windows have exactly **240 hits/19 identities**, preserving
-the four explicit zeros. No app/config/GC-policy changes, higher-segment tool
-or new Ir cohort. **One new cohort is requested, not approved.**
+the four explicit zeros. No app/config/GC-policy changes or higher-segment
+tool. **Exactly one N=0/10 replacement is approved**, six rounds / seed
+41231 / off_a/off_b/on / jobs=1, after the original slot release. No result
+yet; no pooling with invalid N=50 data.
 
 Cold off/off/on stays **RED**. Accepted named off/off rejections: nine
 SolidCache `created_at` values and historical order-sensitive estimation SQL

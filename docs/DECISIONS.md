@@ -42,13 +42,18 @@ relaxation. `Prism.find` has 17 source-backed agreements but generated ERB
 and isolated Proc probes return nil: no witness adoption. Full inventory,
 limitations and machine evidence: [prism-2.md](prism-2.md).
 
-## Fizzy block links: invalid N=50, untimed N=10 proposal (2026-10-21)
+## Fizzy block links: N=50 INVALID; N=10 replacement approved (2026-10-21)
 
 **Rule before numbers:** any pin/mode/brk/exact-page/mix violation invalidates
 the whole cohort; both total/no-GC A/A 95% intervals must contain zero wholly
-within ±0.5%. No exclusions or retry-to-green. The one authorized N=0/50
-cohort is **INVALID**: heap pages grow in both off and on. It finishes
-unchanged for diagnostic export, never a price or direction claim.
+within ±0.5%. No exclusions or retry-to-green. The completed N=0/50 cohort
+is **INVALID**: heap pages grow in both off and on. **Diagnostic numbers
+only, never a price or direction claim:** total Δ +0.415777%
+[+0.364704, +0.733074], no-GC Δ +0.413692% [+0.364724, +0.448149].
+Both A/A controls pass, as do pins/mode/brk and the exact 1200-hit mix;
+the heap failure still invalidates everything. All 18 workers, 72 dumps and
+36 N0 subtractions independently reconcile. No retry/exclusions. The old
+service/slot is released. [Complete INVALID export](fizzy-link-ir-invalid.json).
 
 Init slots are floors, not caps. Untimed off-only whole-window allocation
 budgeting with N=0/10 yields fixed init slots
@@ -56,8 +61,10 @@ budgeting with N=0/10 yields fixed init slots
 both phase orders retain exact pages and add none inside all 16 windows;
 full on windows have exactly 240 hits/19 identities with four explicit zeros.
 Same brk512 tool and detached worker harness; no app/config/GC-policy change
-or higher-segment tool. **One new interpreter cohort is requested, not
-approved or run.** No pooling with invalid N=50 data.
+or higher-segment tool. **Exactly one N=0/10 replacement is now approved**,
+six rounds / seed 41231 / off_a/off_b/on / jobs=1, after the old slot release.
+No result yet; no pooling with invalid N=50 data. The untimed report retains
+the original request-only proposal as historical evidence.
 
 Cold off/off/on remains **RED**. Accepted named off/off rejections: nine
 SolidCache `created_at` values and historical order-sensitive estimation SQL

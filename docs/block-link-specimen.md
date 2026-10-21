@@ -523,11 +523,25 @@ The decision rule, full map, fixture and harness/tool/input hashes were
 written before counters started. The source-pinned brk512 build and real
 production allocation preflight pass.
 
-**INVALID: the mandatory fixed-heap gate already fails in both arms.**
-The run is finishing untouched for diagnostics; no delta can be accepted as
-a price or a direction claim. Pool0 grows beyond 611 pages and pool2 beyond 246
-in the completed workers. Full diagnostic export follows completion; no
-worker is excluded or replaced. Cold off/off/on remains RED. Accepted
+**Completed INVALID: the mandatory fixed-heap gate fails in both arms.**
+All 18 workers finished untouched. The [full diagnostic export](fizzy-link-ir-invalid.json)
+retains every worker, source/tool/input pin, window, per-site ledger and raw
+dump digest; 72 independent self-cost sums match dump totals and windows,
+36 N0 subtractions reconcile, and a separate bootstrap reproduces every
+reported estimate. No delta is a price or direction claim. Pool0 grows beyond
+611 pages and pool2 beyond 246; there are 114 exact-page boundary violations.
+
+| INVALID diagnostic only | On/A Δ% [95% interval] | Off-B/A Δ% [95% interval] |
+|---|---:|---:|
+| Total Ir | +0.415777 [+0.364704, +0.733074] | −0.006604 [−0.054151, +0.004149] |
+| GC-excluded Ir | +0.413692 [+0.364724, +0.448149] | −0.006938 [−0.059915, +0.001993] |
+| Allocations, diagnostic | +0.538933 [+0.536155, +0.540132] | +0.000221 [−0.001859, +0.001633] |
+
+Both A/A controls, interpreter mode, all pins, brk and the exact 1200-hit
+full-on-window map pass; none rescues the failed heap precondition. Units
+are Ir per **six-GET vector**, not one GET. Total/no-GC are separate
+executions, not a GC-saving decomposition. The original service and slot
+are released. No exclusions or retry. Cold off/off/on remains RED. Accepted
 off/off rejections remain the nine cache-row `created_at` values and the
 historical order-sensitive SolidCache SQL interleaving. Payload/assigns,
 lazy cached-bind values and SolidCache completion remain uncovered. No
@@ -536,7 +550,7 @@ is introduced by the pricing run.
 
 ## Untimed heap preconditioning: prefer N=10 on the existing tool
 
-**No new Ir cohort has run or been approved.** The tracked
+**Untimed evidence; the subsequent N=10 approval is recorded below.** The tracked
 [`fizzy_link_heap.rb`](../bench/experiments/fizzy_link_heap.rb) uses
 **Valgrind tool=none**, never starts an Ir cohort, and exports every window's
 pages and exact hit ledger. The [machine report](fizzy-link-heap.json) retains
@@ -612,12 +626,15 @@ with two counter-dependent skips because this test shell does not put
 Valgrind on PATH. The actual heap probes above explicitly select the pinned
 Valgrind tool=none. No extra instruction workers were started by the tests.
 
-**Request only:** one new six-round interpreter cohort, seed 41231,
-N=0/10, off_a/off_b/on, one slot, the frozen floors above and the same tool.
+**Exactly one replacement now approved:** six rounds, seed 41231,
+N=0/10, off_a/off_b/on, jobs=1, reusing the released original slot, the frozen
+floors above and the same tool. The original untimed JSON retains its
+request-only proposal as historical evidence; approval does not alter those
+probe bytes. The replacement is not pooled with N=50 and has no result yet.
 The exact on-window gate scales to 240, not 1200; its 23-site map and four zeros
 are unchanged. Both total/no-GC A/A 95% intervals must contain zero wholly
 within ±0.5%, with all pin/mode/brk/heap/mix gates; no retry, exclusions,
-YJIT or pooling with invalid N=50 data. No new cohort until explicit approval.
+YJIT or another N after a failed A/A. A failed A/A is reported REJECTED.
 Even an accepted result would only be a scoped warm bench comparison of
 these six GETs, not production admission or cold-start cost. Cold remains
 RED with the named timestamp/interleaving rejections above; payload/assigns,
