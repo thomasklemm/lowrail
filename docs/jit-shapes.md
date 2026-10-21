@@ -174,6 +174,23 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
     warmed Array#each certificate invalidated by real Rails late enablement.
     This closes admission/attribution, not the rejected cohort or promotion.
 
+12. **Prove live authorization before pricing a guarded shape.** Source-active
+    or installed is insufficient: a stale micro manifest can make every call
+    fall back, and can short-circuit reflection so a purported checks-only arm
+    omits its expensive predicates. The first ordinary-def props interpreter
+    cohort passed numerical controls but used format 1 against a format-2
+    reader: **0 hits / 20 fallbacks** in ten untimed resolutions. It is retained
+    as invalid pricing, not a complete-guard cost. Use the runtime's format
+    constant and explicit actual mode, reject admission failure, then require
+    positive authorizations / expected fallbacks for every guarded arm in
+    source-pinned native companions **before any measured window**. Keep Stats
+    out of measured processes; it replaces methods and cannot be undone by
+    toggling a flag. Corrected props probes authorize 20/20 with zero fallbacks
+    in both modes on both Rubies. Historical micros lacking this gate remain
+    coverage-unproven, not retroactively rescored; inspect their **paired
+    factory/reader pins**, not today's reader or their publication date.
+    [Failure, correction and admission-factory audit](passes/yjit-regression.md#first-pricing-attempt-numerically-green-invalid-fast-path-pricing).
+
 ## Concrete Lowrail audit and exact alternatives (not implemented)
 
 | Current place / cost | Alternative and required boundary |

@@ -19,15 +19,20 @@ module YjitRegression
     built = build.build
     raise built[:ledger].inspect unless built[:units].size == 1
     built[:units][0]["id"] = 0
-    manifest = Lowrail::Manifest.new({"format" => 1, "ruby_description" => RUBY_DESCRIPTION,
+    manifest = Lowrail::Manifest.new({"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
+      "certification_jit" => Lowrail.jit_mode,
       "compile_option" => Lowrail::Manifest.compile_option_fingerprint,
-      "files" => {}, "units" => built[:units]}, Dir.pwd)
+      "files" => {}, "units" => built[:units]}, Dir.pwd, root: Dir.pwd)
+    raise "micro artifact refused: #{manifest.refusal_reason}" if manifest.refusal_reason
+    raise "incompatible micro artifact" unless manifest.compatible?
     Lowrail::Guard.install(manifest)
+    raise "micro unit 0 certificate declined" unless Lowrail::Guard.validate(0)
     runtime.install(manifest.units)
     [built, runtime]
   end
 
   def self.setup(group, arm, out = nil)
+    raise "unknown arm #{group}/#{arm}" unless GROUPS.fetch(group).include?(arm)
     require "active_support/all"
     gem "inertia_rails", "3.22.0"
     require "inertia_rails/configuration"
@@ -49,6 +54,7 @@ module YjitRegression
     runner = specimen.new
     runner.config, runner.controller = config, controller
     runner.options = config.instance_variable_get(:@options)
+    guard_valid = nil
     body = case group
     when "config"
       # Both sides dispatch through the public binder with the same signature.
@@ -176,6 +182,11 @@ module YjitRegression
       end
       File.write(File.join(out, "props-lowered.rb"), lowered) if out
       props = {left: 11, right: {name: "asymmetric", age: 37}, list: [2, 5], empty: {}, flag: false}
+      # Recheck admission in each uncounted worker, without manufacturing Hash
+      # eigenclasses in original/unchecked controls. Only positive per-entry
+      # counts in the companion below prove actual receiver reflection.
+      guard_valid = !!(runtime.active?(0) && Lowrail::Guard.validate(0))
+      raise "props admission guard declined" unless guard_valid
       runner.instance_variable_set(:@props, props)
       runner.instance_variable_set(:@resolver, InertiaRails::PropsResolver.new(props, evaluator: ->(x) { x }))
       if arm == "checks"
@@ -207,15 +218,47 @@ module YjitRegression
     end
     after = RubyVM::YJIT.runtime_stats if before
     activation = before && after.select { |_, v| v.is_a?(Numeric) }.to_h { |k, v| [k, v - before.fetch(k, 0)] }
-    [runner, {group: group, arm: arm, operation_source: body, activation_delta: activation}]
+    [runner, {group: group, arm: arm, guard_valid: guard_valid, operation_source: body, activation_delta: activation}]
   end
+
+  def self.liveness(group, arm)
+    runner, metadata = setup(group, arm)
+    # This is a separate native companion, NEVER an instrumented phase of a
+    # measured process: Stats replaces methods and cannot simply be disabled.
+    require "lowrail/stats"
+    Lowrail::Stats.enable!
+    Lowrail::Stats.reset_counts!
+    runner.run(10)
+    hits, fallbacks = Lowrail::Stats.unit_hits, Lowrail::Stats.unit_fallbacks
+    expected = %w[props props_variant].include?(group) && %w[guarded split checks checks_original].include?(arm)
+    pass = fallbacks.empty? && (expected ? metadata.fetch(:guard_valid) && hits.fetch("0", 0).positive? : hits.empty?)
+    metadata.merge(ruby: RUBY_DESCRIPTION, actual_jit: JitStability.actual, manifest_format: Lowrail::Guard.manifest&.format,
+      certification_jit: Lowrail::Guard.manifest&.certification_jit, operations: 10,
+      fast_authorization_expected: expected, hits: hits, fallbacks: fallbacks, pass: pass)
+  end
+end
+
+if ARGV.first == "--liveness"
+  JitStability.assert_mode!
+  result = YjitRegression.liveness(*ARGV.drop(1))
+  puts JSON.generate(result)
+  abort "untimed liveness failed; no measured window permitted" unless result.fetch(:pass)
+  exit
 end
 
 if %w[--worker --stats].include?(ARGV.first)
   stats = ARGV.shift == "--stats"
   group, arm = ARGV
   JitStability.assert_mode! unless stats
+  unless stats
+    proof = JSON.parse(File.read(ENV.fetch("YJIT_DIAG_LIVENESS")))
+    claim = proof.fetch("arms").fetch(arm)
+    raise "missing or stale untimed liveness proof" unless claim.fetch("pass") && claim.fetch("group") == group &&
+      claim.fetch("actual_jit") == JitStability.mode &&
+      proof.fetch("sources").all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha }
+  end
   runner, metadata = YjitRegression.setup(group, arm)
+  raise "Stats must be disabled in measured workers" if !stats && defined?(Lowrail::Stats) && Lowrail::Stats.enabled?
   runner.run(2000)
   warm = JitStability.warm { |n| runner.run(n) } if JitStability.enabled?
   if stats
@@ -247,15 +290,32 @@ FileUtils.mkdir_p(out, mode: 0o700)
 base = {"RUBYOPT" => nil, "LOWRAIL_STATS" => nil, "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_JIT_DIAGNOSTICS" => nil}
 environments = (%w[off_a off_b] + YjitRegression::GROUPS.fetch(group).drop(1)).to_h do |label|
   arm = label.start_with?("off_") ? "original" : label
-  [label, base.merge("YJIT_DIAG_GROUP" => group, "YJIT_DIAG_ARM" => arm)]
+  [label, base.merge("YJIT_DIAG_GROUP" => group, "YJIT_DIAG_ARM" => arm,
+    "YJIT_DIAG_LIVENESS" => File.join(out, "liveness.json"))]
 end
 # request_pairs passes a route argument; a tiny launcher avoids changing its API.
 launcher = File.join(out, "worker.rb")
 File.write(launcher, "ARGV.replace(['--worker', ENV.fetch('YJIT_DIAG_GROUP'), ENV.fetch('YJIT_DIAG_ARM')]); load #{File.expand_path(__FILE__).dump}\n")
 sources = [__FILE__, File.expand_path("props_variant.rb", __dir__),
-  *Dir[File.expand_path("../../gem/lib/lowrail/{inertia*,guard,manifest}.rb", __dir__)],
+  *Dir[File.expand_path("../../gem/lib/**/*.rb", __dir__)],
   *%w[request_pairs heap_windows jit_stability].map { File.expand_path("../#{_1}.rb", __dir__) }].to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
-metadata = {seed: 41231, rounds: 6, workers: {}, sources: sources, group: group, diagnosis_only: true}
+# Complete every counted admission probe before even the Valgrind preflight.
+# The original/unchecked controls must have zero authorizations and fallbacks;
+# exact-guard arms must positively authorize with zero fallbacks. Retain failed
+# output, but refuse to launch a cohort. Measured workers recheck guard_valid.
+liveness = YjitRegression::GROUPS.fetch(group).to_h do |arm|
+  stdout, stderr, status = Open3.capture3(base, RbConfig.ruby, *JitStability.flags,
+    __FILE__, "--liveness", group, arm)
+  File.write(File.join(out, "liveness-#{arm}.stdout"), stdout)
+  File.write(File.join(out, "liveness-#{arm}.log"), stderr)
+  raise "#{arm}: untimed liveness refused; no cohort started; inspect #{out}" unless status.success?
+  result = JSON.parse(stdout.lines.last)
+  raise "#{arm}: liveness/JIT mismatch" unless result.fetch("pass") && result.fetch("actual_jit") == JitStability.mode
+  [arm, result]
+end
+raise "sources changed during liveness" unless sources.all? { |p, sha| Digest::SHA256.file(p).hexdigest == sha }
+File.write(File.join(out, "liveness.json"), JSON.pretty_generate(arms: liveness, sources: sources))
+metadata = {seed: 41231, rounds: 6, workers: {}, sources: sources, group: group, diagnosis_only: true, liveness: liveness}
 accepted = RequestPairs.heap_instructions(environments, Dir.pwd, out, "unused", metadata,
   worker: launcher, requests: Integer(ENV.fetch("BENCH_REQUESTS", "1000")))
 raise "sources changed" unless sources.all? { |p, sha| Digest::SHA256.file(p).hexdigest == sha }

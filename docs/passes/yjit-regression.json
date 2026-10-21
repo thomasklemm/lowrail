@@ -1,5 +1,39 @@
 {
   "diagnosis_only": true,
+  "props_variant_invalid_pricing": {
+    "boundary": "d7b232f",
+    "mode": "interpreter",
+    "rounds": 6,
+    "seed": 41231,
+    "operations_per_window": 1000,
+    "max_callgrind_workers": 3,
+    "numeric_verdict_accepted": true,
+    "pricing_valid": false,
+    "reason": "Format-1 synthetic manifest refused by the format-2 reader; guarded/split price fallback dispatch and checks_original short-circuits before receiver reflection",
+    "untimed_replay": {
+      "requested_format": 1,
+      "current_format": 2,
+      "source_active": true,
+      "guard_valid": false,
+      "operations": 10,
+      "hits": {},
+      "fallbacks": {"0": 20},
+      "refusal": "unsupported manifest format 1; rebuild for relocatable format 2"
+    },
+    "raw_diagnostic_total_ir": {
+      "split_delta_pct": {"median": 8.379852, "ci95": [8.323976, 8.432090]},
+      "incomplete_checks_excess": {"median": 7393.607, "ci95": [7389.607, 7419.607]},
+      "unchecked_iteration_saving": {"median": 4445.573, "ci95": [4393.369, 4495.471]}
+    },
+    "raw_sha256": {
+      "samples.json": "1ec1137cfdc1081b257df2f0f359991dd92c0fb87957654162a3d95c494a51f9",
+      "summary.json": "9196f7f1cc9e87aaa03932aea1f7ef0f6473759c52ecc6fa96796afd5307826e",
+      "verdict.json": "2138a11fc6c3a0d27bce80ff497665670427e603fbb57dc8c186f09541bb59e9",
+      "activation.json": "a60c1c10b787b19e25a895738f9f14fdb6e18dc45c806178817c8c56f881fb8e"
+    },
+    "yjit_cohort_started": false,
+    "rescored": false
+  },
   "post_fix_request_checks": {
     "boundary": "ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e",
     "app": "react-starter-kit",

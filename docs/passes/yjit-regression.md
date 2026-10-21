@@ -445,12 +445,111 @@ BENCH_JIT=0 mise exec -- ruby bench/experiments/props_variant.rb --check /tmp/NE
 BENCH_JIT=1 mise exec -- ruby bench/experiments/props_variant.rb --check /tmp/NEW-props-check-yjit
 ```
 
-No `props_variant` Callgrind cohort has run; worker authorization remains
-held. When released, the prepared group uses the pinned Valgrind and the
-same finite A/A/heap/brk/JIT-flat protocol, with at most four workers. If
-checks alone exceed the potential saving, stop at design; an ordinary `def`
-does not make expensive reflection cheap. No speed claim or pass change
-follows from an untimed correctness check.
+### First pricing attempt: numerically green, invalid fast-path pricing
+
+The one finite interpreter cohort on
+[d7b232f](https://github.com/thomasklemm/lowrail/commit/d7b232f)
+used three workers, six rounds, seed 41231, N=1,000 and pinned brk512
+Valgrind. Both A/A controls, five heaps, brk and actual-mode gates passed.
+**It is nevertheless invalid pricing, not a losing complete fast path.**
+The shared micro factory still wrote `format: 1`; the runtime required
+`Lowrail::FORMAT == 2`. `Manifest` refused, `Guard.validate(0)` returned
+false, and props short-circuited before its receiver reflection. Source
+activation alone remained true. A separate ten-operation replay records
+**guard_valid=false, 0 hits / 20 fallbacks**, with refusal
+`unsupported manifest format 1; rebuild for relocatable format 2`.
+The public lifetime fixture used the current format, explaining why its
+478-comparison gate did not catch this different pricing factory.
+
+Raw split-vs-original total Ir is +8.380% [8.324, 8.432]; raw
+checks_original excess is 7,393.607 [7,389.607, 7,419.607] Ir, versus
+4,445.573 [4,393.369, 4,495.471] unchecked iteration saving. These remain
+**fallback/incomplete-check diagnostics**, not the price of exact reflection
+or a stop-at-design verdict. No rescore, no retry of that cohort. Its raw
+numeric verdict is retained separately from `pricing_valid:false` in the
+[export](yjit-regression.json). The YJIT cohort never started.
+
+The corrected factory uses **`Lowrail::FORMAT`**, records its actual
+`certification_jit`, and refuses incompatible manifests/facts before a pass
+installer. It does not add a sealed tier to synthetic manifests: legacy
+config/global/check arms requiring sealed config-bind now refuse explicitly,
+rather than bypassing the production contract.
+
+Before any Callgrind preflight or window, **every arm** runs a separate native
+`--liveness` companion in the requested, observed mode. The exact-guard props
+arms require `guard_valid=true`, positive unit-0 authorizations and zero
+fallbacks. Original/unchecked controls require zero counts. Thus
+`checks_original` executes the complete positive reflection at each recursive
+entry, then the original work; its hits still mean authorization only.
+Each measured worker requires the saved source-pinned liveness proof and
+rechecks its own guard. Stats is **never enabled in a measured process**:
+enabling then disabling counters would leave counting method replacements.
+Failed companion stdout/stderr are retained and the cohort is not launched.
+
+Untimed probes on both Ruby targets, interpreter and YJIT: ten resolutions
+give **20 authorizations / 0 fallbacks** in guarded, split and checks_original;
+controls have zero counts. The retained regression covers current-format
+admission, malformed-format refusal, original-only emission falsely presented
+as either candidate, missing preflight proof, and driver refusal before any
+pricing tool starts. Run it without Valgrind:
+
+```sh
+mise exec -- ruby bench/experiments/yjit_regression_test.rb --seed=1729
+mise exec ruby@4.1.0-preview1 -- ruby bench/experiments/yjit_regression_test.rb --seed=1729
+BENCH_JIT=1 mise exec -- ruby --yjit bench/experiments/yjit_regression.rb --liveness props_variant checks_original
+```
+
+The corrected-code interpreter cohort, then the unused YJIT micro, each need
+the explicit worker release after the levers v3 validation. No new measured
+run was started for this fix/audit. Use at most the three authorized workers,
+one finite cohort per mode, no retry-to-green. Production reflection and
+delivery remain uncertified; this is pricing only, not a pass.
+
+### Admission-factory audit since format 2
+
+Exact searches of `bench/` manifest constructors/writers/readers and the
+[format-2 change](https://github.com/thomasklemm/lowrail/commit/db2209275ba5fda0cc0c793e5f64ad5b910518c1)
+find **one remaining hardcoded format-1 factory**, the shared factory fixed
+above. The audit also checks tier, JIT mode, relocation, certificate copying
+and pre-window coverage, rather than assuming a current format is sufficient.
+
+| Factory / consumer | Admission inputs and liveness boundary |
+|---|---|
+| `experiments/yjit_regression.rb` | Fixed above. The old props variant interpreter run demonstrably priced fallback dispatch. Sealed-only config units are now refused, not synthetically admitted. |
+| `inertia_config.rb` micro | Uses `Lowrail::FORMAT`; no sealed tier, so today's config-bind unit refuses. Its existing **pre-timing G[0] assertion** stops the micro. `check` instead uses a public artifact and asserts positive hits / no fallbacks. |
+| `ar_equivalence_runtime.rb`, persisted by `ar_rails_suite.rb` | Both use the constant. Synthetic framework/test units have no sealed production tier (or JIT certificate); the adapter explicitly skips installation on refusal. Intentional original-only correctness coverage, not an accepted speed cohort. |
+| `guard_cost.rb`, `guard_breakdown.rb` | Use the constant, local non-pass `@self` probe facts, no sealed/JIT/root certificate. Direct Guard installation, not public artifact admission. Warmup calls are **not assertions of true guards**; no counted pre-window liveness. Flag historical accepted guard prices as lacking that coverage, not as demonstrated format refusals. |
+| `experiments/guard_inline_cache.rb` | Same local probe format constant and missing liveness assertion; explicitly inexact K-cache prototype, not a production candidate. |
+| `speculation_holes.rb` (both factories) | Uses the constant; non-pass probe facts. Asserts positive boot guards before mutation and counterexample results afterward. No measured cohort. |
+| `experiments/endpoint_bodies.rb`, `experiments/sealed_provenance.rb` | Real Compiler writes current format, observed JIT mode and delivery certificates; experimental unit names are **not** sealed-only production units. Setup and actual delivery witnesses must succeed. Their broad diagnostic return observers remain a separate reason not to reuse them as post-fix pricing. No format literal found. |
+| `experiments/speculative_build.rb`, `speculation.rb` | Recompile original `units.json` through Compiler; preserve mode/tier/root inputs and produce a deliberately incompatible unsafe marker. The ancestry-scoped reader retains format checks. This is an explicit unsafe ablation, never a guarded candidate. |
+| `request_pairs.rb` | Copies complete public artifacts; empty control clears units/files/templates and their path-pointer targets without stripping mode/tier metadata. The published LOWRAIL_DIR seam keeps the real app root. No hand-built version or certificate replacement. |
+| `pass.rb` / `pass_probe.rb` | Public artifact preflight checks format/refusal/source certificates; actual setup/probe rejects JIT mismatch/drift before request pricing. Method micros have runtime activity checks and a separate counted sample **after** timing, not the new per-arm pre-window positive-count guarantee. Request coverage alone does not prove a particular micro hits. |
+| Other manifest readers (`ar_instantiate_runs.rb`, allocation/hotspot studies, `yjit_study.rb`, `yjit_request_probe.rb`) | Select/pin existing public artifacts rather than inventing format metadata. Instantiate checks a live selected plan; discovery/diagnostic studies are not new accepted guarded-pass prices. The old config request's 0/9,911 fallback attribution is already recorded above. |
+
+**Historical accepted micros without this new liveness gate:** config-yjit,
+config-interpreter, props-yjit, global-yjit and shapes-yjit in the existing
+export; the guard-cost/breakdown prices in [speculation](speculation.md#fixed-heap-guard-micro-costs)
+and [the 4.1 study](../ruby-4.1.md) also lack counted pre-window assertions.
+Global/ordinary shape bodies do not claim a pass hit; `cached_guard`/unchecked
+arms deliberately bypass checks. Guard-dependent arms are flagged as
+**historical fast-path coverage unproven**, not retroactively certified by
+today's positive probes. None was rescored or rerun.
+
+Do **not** infer historical format refusal from the publication date or from
+the current reader. The old config/props/shape export pins factory
+`dfb4fe05…` **together with reader `45dabea6…`**. The latter exactly matches
+`manifest.rb` at
+[45fd07a](https://github.com/thomasklemm/lowrail/commit/45fd07a), whose direct
+constructor did not refuse format 1 or enforce the later sealed tier.
+Its guard pin `189ad92f…` matches the historical guard and only declines a
+manifest's recorded refusal. Consequently this new format-2 failure is
+**not established for those historical cohorts**. The missing liveness
+evidence leaves possible inactivity unexcluded; it does not prove fallback
+pricing. In contrast, d7b232f's recorded reader is `47da0de0…`, which does
+refuse format 1, and its separate replay confirms zero hits. Keep both code
+states and verdicts distinct. The original source map omitted core
+`lowrail.rb`/pass-registry pins; the corrected harness now pins them too.
 
 ## Doctor: detect sticky tracing from any gem
 
