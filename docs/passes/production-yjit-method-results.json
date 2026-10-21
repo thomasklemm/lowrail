@@ -1,0 +1,2035 @@
+{
+  "scope": "untimed YJIT native research on BlogShowGetOnly GET /articles/1; no price, no A/A cohort",
+  "measured": false,
+  "status": "rejected_warmup",
+  "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+  "retry": false,
+  "excluded": [],
+  "actual_mode": "yjit",
+  "counters": [
+    "compiled_iseq_count",
+    "compiled_iseq_entry",
+    "compiled_block_count",
+    "compiled_blockid_count",
+    "invalidation_count",
+    "code_gc_count",
+    "compile_time_ns",
+    "compile_log_bytes"
+  ],
+  "fixture": {
+    "name": "BlogShowGetOnly",
+    "sha256": "21a0de39f113d57e9303967b801c7b34d86aca7bcfcbe8c3d94013914cf5c970"
+  },
+  "app_source_sha256": "86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf",
+  "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+  "manifest_sha256": "822ec9f50b670360774236fd863ccd25aeaf6cf567f4030332e492dc60a2f5ff",
+  "native_binary": [
+    "f3056ad41f398339366ec61274cedb366767e9531940822fc377e9723397aa62"
+  ],
+  "native_gate": {
+    "jit": {
+      "certification": "yjit",
+      "admission": "yjit",
+      "current": "yjit",
+      "after_initialize": "yjit",
+      "drift": null,
+      "refusal": null
+    },
+    "hits": {
+      "sealed/form_scaffold": 50,
+      "sealed/token_tag": 200,
+      "sealed/collection_render": 50
+    },
+    "fallbacks": {
+      "sealed/form_scaffold": 0,
+      "sealed/token_tag": 0,
+      "sealed/collection_render": 0
+    },
+    "deopt_fallbacks": {
+      "0": 1,
+      "1": 4,
+      "2": 1
+    }
+  },
+  "cold": {
+    "raw": "rejected_off_control",
+    "companions": [
+      {
+        "seed": 0,
+        "status": "equivalent_for_executed_scenarios",
+        "cold_equal": true,
+        "forbidden_chains_absent": true
+      },
+      {
+        "seed": 1,
+        "status": "equivalent_for_executed_scenarios",
+        "cold_equal": true,
+        "forbidden_chains_absent": true
+      }
+    ]
+  },
+  "pairs": {
+    "none": {
+      "pairs": 192,
+      "hits": {
+        "0": 104,
+        "1": 398,
+        "2": 87
+      },
+      "fallbacks": {
+        "2": 62
+      }
+    },
+    "render_subscriber": {
+      "pairs": 192,
+      "hits": {
+        "0": 104,
+        "1": 398,
+        "2": 87
+      },
+      "fallbacks": {
+        "2": 62
+      }
+    }
+  },
+  "flatness": {
+    "requested_jit": "yjit",
+    "diagnostic_only": false,
+    "requested_yjit": true,
+    "actual_yjit": [
+      true
+    ],
+    "actual_jit": [
+      "yjit"
+    ],
+    "pass": false,
+    "workers": {
+      "off_b-order1": {
+        "actual_jit": "yjit",
+        "actual_yjit": true,
+        "missing_counters": [],
+        "mode_matched": true,
+        "warmup_stable": true,
+        "windows_stable": true,
+        "pass": true
+      },
+      "production-order0": {
+        "actual_jit": "yjit",
+        "actual_yjit": true,
+        "missing_counters": [],
+        "mode_matched": true,
+        "warmup_stable": false,
+        "windows_stable": true,
+        "pass": false
+      },
+      "off_a-order0": {
+        "actual_jit": "yjit",
+        "actual_yjit": true,
+        "missing_counters": [],
+        "mode_matched": true,
+        "warmup_stable": true,
+        "windows_stable": true,
+        "pass": true
+      },
+      "off_a-order1": {
+        "actual_jit": "yjit",
+        "actual_yjit": true,
+        "missing_counters": [],
+        "mode_matched": true,
+        "warmup_stable": true,
+        "windows_stable": true,
+        "pass": true
+      },
+      "off_b-order0": {
+        "actual_jit": "yjit",
+        "actual_yjit": true,
+        "missing_counters": [],
+        "mode_matched": true,
+        "warmup_stable": true,
+        "windows_stable": true,
+        "pass": true
+      },
+      "production-order1": {
+        "actual_jit": "yjit",
+        "actual_yjit": true,
+        "missing_counters": [],
+        "mode_matched": true,
+        "warmup_stable": true,
+        "windows_stable": true,
+        "pass": true
+      }
+    }
+  },
+  "workers": {
+    "off_b-order1": {
+      "exitstatus": 0,
+      "pin_before": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "pin_after": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "quiet_intervals": 10,
+      "warmup_stable": true,
+      "rehearsal_requests": 10000,
+      "certification_requests": 2000,
+      "certification_history": [
+        {
+          "requests": 0,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 200,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 400,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 600,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 800,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 1000,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 1200,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 1400,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 1600,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 1800,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        },
+        {
+          "requests": 2000,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42791,
+            "compiled_blockid_count": 31463,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1656147593,
+            "compile_log_bytes": 7254944
+          }
+        }
+      ],
+      "discarded_compile_events": [
+        {
+          "byte": 4017415,
+          "stage": "before_certification",
+          "event": "1792604164.133730: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4017619,
+          "stage": "before_certification",
+          "event": "1792604164.133752: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4017823,
+          "stage": "before_certification",
+          "event": "1792604164.133776: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4018027,
+          "stage": "before_certification",
+          "event": "1792604164.133799: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4018231,
+          "stage": "before_certification",
+          "event": "1792604164.133844: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:578 (index: 5)"
+        },
+        {
+          "byte": 4632950,
+          "stage": "before_certification",
+          "event": "1792604164.297523: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4633154,
+          "stage": "before_certification",
+          "event": "1792604164.297563: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        }
+      ],
+      "windows": [
+        {
+          "mode": "no_gc",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1399,
+            "compiled_block_count": 42792,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 993,
+            "code_gc_count": 0,
+            "compile_time_ns": 1657333150,
+            "compile_log_bytes": 7255092
+          },
+          "gc_segments": 0
+        }
+      ],
+      "worker_log_sha256": "7d008ae273ac72419ab6939f1f7b8e8fa5551f8c18749179d0c4772af16fed16",
+      "compile_log_sha256": "be22ff314378daae458776fcefbf087180bfe38f223800ed46605a719401499f"
+    },
+    "production-order0": {
+      "exitstatus": 0,
+      "pin_before": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "pin_after": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "quiet_intervals": 8,
+      "warmup_stable": false,
+      "rehearsal_requests": 10000,
+      "certification_requests": 2000,
+      "certification_history": [
+        {
+          "requests": 0,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41932,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774436172,
+            "compile_log_bytes": 7059777
+          }
+        },
+        {
+          "requests": 200,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41932,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774436172,
+            "compile_log_bytes": 7059777
+          }
+        },
+        {
+          "requests": 400,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 600,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 800,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 1000,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 1200,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 1400,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 1600,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 1800,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        },
+        {
+          "requests": 2000,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          }
+        }
+      ],
+      "discarded_compile_events": [
+        {
+          "byte": 3990978,
+          "stage": "before_certification",
+          "event": "1792604239.861228: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 3991182,
+          "stage": "before_certification",
+          "event": "1792604239.861250: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 3991386,
+          "stage": "before_certification",
+          "event": "1792604239.861276: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 3991590,
+          "stage": "before_certification",
+          "event": "1792604239.861298: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 3991794,
+          "stage": "before_certification",
+          "event": "1792604239.861346: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:578 (index: 5)"
+        },
+        {
+          "byte": 7059777,
+          "stage": "certification_or_later",
+          "event": "1792604298.816410: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 7059981,
+          "stage": "certification_or_later",
+          "event": "1792604298.816543: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        }
+      ],
+      "windows": [
+        {
+          "mode": "total",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1345,
+            "compiled_block_count": 41934,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1774654113,
+            "compile_log_bytes": 7060185
+          },
+          "gc_segments": 0
+        }
+      ],
+      "worker_log_sha256": "014d833e7aace08942847fdcf36ca0bdcf32343fb2f4713235604baee41363f6",
+      "compile_log_sha256": "82a3e2e28fd1b787696be57fd2d3bf7e97b4b8517ebecb97d8eded1109bfed9b"
+    },
+    "off_a-order0": {
+      "exitstatus": 0,
+      "pin_before": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "pin_after": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "quiet_intervals": 10,
+      "warmup_stable": true,
+      "rehearsal_requests": 10000,
+      "certification_requests": 2000,
+      "certification_history": [
+        {
+          "requests": 0,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 200,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 400,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 600,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 800,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 1000,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 1200,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 1400,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 1600,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 1800,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        },
+        {
+          "requests": 2000,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1810550500,
+            "compile_log_bytes": 7251800
+          }
+        }
+      ],
+      "discarded_compile_events": [
+        {
+          "byte": 4017583,
+          "stage": "before_certification",
+          "event": "1792604309.795011: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4017787,
+          "stage": "before_certification",
+          "event": "1792604309.795036: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4017991,
+          "stage": "before_certification",
+          "event": "1792604309.795072: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4018195,
+          "stage": "before_certification",
+          "event": "1792604309.795115: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4018399,
+          "stage": "before_certification",
+          "event": "1792604309.795179: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:578 (index: 5)"
+        },
+        {
+          "byte": 4633118,
+          "stage": "before_certification",
+          "event": "1792604309.993776: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4633322,
+          "stage": "before_certification",
+          "event": "1792604309.993809: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        }
+      ],
+      "windows": [
+        {
+          "mode": "total",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1812120071,
+            "compile_log_bytes": 7251948
+          },
+          "gc_segments": 0
+        }
+      ],
+      "worker_log_sha256": "f45399256b83cff9698915c13b3bea2c0e8e0c0db89143f34e7915b5ba1552c5",
+      "compile_log_sha256": "7781d5ac9f59bd03ca5e1484d48269c7e0ab7596dd3d4fb26c4e35cbea80d18e"
+    },
+    "off_a-order1": {
+      "exitstatus": 0,
+      "pin_before": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "pin_after": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "quiet_intervals": 10,
+      "warmup_stable": true,
+      "rehearsal_requests": 10000,
+      "certification_requests": 2000,
+      "certification_history": [
+        {
+          "requests": 0,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 200,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 400,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 600,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 800,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 1000,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 1200,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 1400,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 1600,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 1800,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        },
+        {
+          "requests": 2000,
+          "counters": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42773,
+            "compiled_blockid_count": 31464,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1676111623,
+            "compile_log_bytes": 7251943
+          }
+        }
+      ],
+      "discarded_compile_events": [
+        {
+          "byte": 4017583,
+          "stage": "before_certification",
+          "event": "1792604391.228960: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4017787,
+          "stage": "before_certification",
+          "event": "1792604391.228981: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4017991,
+          "stage": "before_certification",
+          "event": "1792604391.229003: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4018195,
+          "stage": "before_certification",
+          "event": "1792604391.229030: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4018399,
+          "stage": "before_certification",
+          "event": "1792604391.229069: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:578 (index: 5)"
+        },
+        {
+          "byte": 4633118,
+          "stage": "before_certification",
+          "event": "1792604391.394081: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4633322,
+          "stage": "before_certification",
+          "event": "1792604391.394110: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        }
+      ],
+      "windows": [
+        {
+          "mode": "no_gc",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2958,
+            "compiled_iseq_entry": 1394,
+            "compiled_block_count": 42774,
+            "compiled_blockid_count": 31465,
+            "invalidation_count": 994,
+            "code_gc_count": 0,
+            "compile_time_ns": 1677702996,
+            "compile_log_bytes": 7252091
+          },
+          "gc_segments": 0
+        }
+      ],
+      "worker_log_sha256": "69be0c140d736315247744a1f93204ec0ec01b5af01ba6f27c7d3f4880fcc700",
+      "compile_log_sha256": "4a57e3bb6518a4b53e63fbbbcc981c0a9cb046a6c57394c8c4cc05bc504eaedc"
+    },
+    "off_b-order0": {
+      "exitstatus": 0,
+      "pin_before": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "pin_after": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "quiet_intervals": 10,
+      "warmup_stable": true,
+      "rehearsal_requests": 10000,
+      "certification_requests": 2000,
+      "certification_history": [
+        {
+          "requests": 0,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 200,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 400,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 600,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 800,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 1000,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 1200,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 1400,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 1600,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 1800,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        },
+        {
+          "requests": 2000,
+          "counters": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42807,
+            "compiled_blockid_count": 31461,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1799275749,
+            "compile_log_bytes": 7257474
+          }
+        }
+      ],
+      "discarded_compile_events": [
+        {
+          "byte": 4015912,
+          "stage": "before_certification",
+          "event": "1792604469.496290: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4016116,
+          "stage": "before_certification",
+          "event": "1792604469.496312: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4016320,
+          "stage": "before_certification",
+          "event": "1792604469.496335: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4016524,
+          "stage": "before_certification",
+          "event": "1792604469.496356: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 4016728,
+          "stage": "before_certification",
+          "event": "1792604469.496393: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:578 (index: 5)"
+        },
+        {
+          "byte": 4631447,
+          "stage": "before_certification",
+          "event": "1792604469.677569: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 4631651,
+          "stage": "before_certification",
+          "event": "1792604469.677603: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        }
+      ],
+      "windows": [
+        {
+          "mode": "total",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2957,
+            "compiled_iseq_entry": 1397,
+            "compiled_block_count": 42808,
+            "compiled_blockid_count": 31462,
+            "invalidation_count": 991,
+            "code_gc_count": 0,
+            "compile_time_ns": 1800870611,
+            "compile_log_bytes": 7257622
+          },
+          "gc_segments": 0
+        }
+      ],
+      "worker_log_sha256": "d8eedf68e6c4551b2d3c570f7c885895f0ad35fd84706259258f1af8832f04c2",
+      "compile_log_sha256": "9b45ee50d38056909a0785566f5f4e47bcf51cd30ef218afd680657c73302de1"
+    },
+    "production-order1": {
+      "exitstatus": 0,
+      "pin_before": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "pin_after": {
+        "revision": "f34a35c578937ead3853d2b10290d57ead862a06",
+        "detached": true,
+        "clean": true,
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+        "executable_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+        "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c"
+      },
+      "quiet_intervals": 10,
+      "warmup_stable": true,
+      "rehearsal_requests": 10000,
+      "certification_requests": 2000,
+      "certification_history": [
+        {
+          "requests": 0,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 200,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 400,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 600,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 800,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 1000,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 1200,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 1400,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 1600,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 1800,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        },
+        {
+          "requests": 2000,
+          "counters": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41938,
+            "compiled_blockid_count": 30839,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1696071507,
+            "compile_log_bytes": 7061413
+          }
+        }
+      ],
+      "discarded_compile_events": [
+        {
+          "byte": 3990435,
+          "stage": "before_certification",
+          "event": "1792604546.352147: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 3990639,
+          "stage": "before_certification",
+          "event": "1792604546.352169: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 3990843,
+          "stage": "before_certification",
+          "event": "1792604546.352193: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 3991047,
+          "stage": "before_certification",
+          "event": "1792604546.352215: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        },
+        {
+          "byte": 3991251,
+          "stage": "before_certification",
+          "event": "1792604546.352253: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:578 (index: 5)"
+        },
+        {
+          "byte": 7060709,
+          "stage": "before_certification",
+          "event": "1792604605.435413: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 0)"
+        },
+        {
+          "byte": 7060913,
+          "stage": "before_certification",
+          "event": "1792604605.435547: discarded?@activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:577 (index: 3)"
+        }
+      ],
+      "windows": [
+        {
+          "mode": "no_gc",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "no_gc",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 0,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "gc_segments": 0
+        },
+        {
+          "mode": "total",
+          "requests": 50,
+          "jit_before": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "jit_after": {
+            "compiled_iseq_count": 2861,
+            "compiled_iseq_entry": 1344,
+            "compiled_block_count": 41939,
+            "compiled_blockid_count": 30840,
+            "invalidation_count": 965,
+            "code_gc_count": 0,
+            "compile_time_ns": 1697631930,
+            "compile_log_bytes": 7061561
+          },
+          "gc_segments": 0
+        }
+      ],
+      "worker_log_sha256": "49bf462fe8fe19a98e4091372c2bcf5ed01837a47793909cd71b070ab64dce8d",
+      "compile_log_sha256": "01e04521649c6575d0ba241e46cefd7c12a88741578ed3c82117a99a985fc02e"
+    }
+  },
+  "raw_result_sha256": "f8fc6b2f8b3aa6050ea9d1a6410a8b785c4a248629e2dcd24c821ec7feeda562",
+  "gates_sha256": "da6f5bb1df5c9ec5c679557c629d87842f0e6297a5942dcd5b31dfd3ba0810ec",
+  "pins_sha256": "80d34126c9276d9d40af24f7af92cbbc6068dedf722db5d844e471f59409c20c",
+  "retained_preflight_refusal": "LOWRAIL_SEALED missing; no native worker launched",
+  "retained_launch_failure": {
+    "revision": "a50532c885c20a6aa509ffd47250e080905f9e69",
+    "reason": "relative worker path after chdir",
+    "workers": 6,
+    "app_boots": 0,
+    "raw_result_sha256": "b20c8327849440d05fb7d604c360f3b843977cb7244e6ff1b4019f8b948e44dd"
+  },
+  "notes": [
+    "Log transition first visible at certification request 400 represents requests 201-400, not exact request attribution.",
+    "No pending-entry census or complete compiler-attempt proof.",
+    "All 24 native windows flat does not override one failed warmup or certify a Valgrind process."
+  ]
+}

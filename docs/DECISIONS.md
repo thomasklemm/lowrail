@@ -58,6 +58,29 @@ not a remeasurement. Token/collection test admission remains separate; the
 blog test configuration disables forgery protection, so empty-token hits
 cannot cover protected-token assembly. Form remains refused in that tier.
 
+## Current production YJIT method: native candidate rejected (2026-10-21)
+
+Untimed only, at pinned `f34a35c`: mode-certified production form/token/collection
+on BlogShowGetOnly show passes seeded cold off/off/on, both 192-pair controls,
+and native/deopt. Warm per-request hits are 1/4/1 with zero fallbacks. All six
+native dry processes exit 0 and all 24 actual windows have flat compilation,
+entry, invalidation, code-GC, compiler-time and full-log observations.
+Nevertheless the registered fixed 10,000+2,000 candidate **rejects**:
+production/order0 has only **8/10** quiet certification intervals. At the
+request-400 sample (requests 201–400), `ConnectionPool#discarded?` adds one
+entry/two blocks and **408 log bytes**. No extension, retry, exclusions,
+Callgrind/timing cohort or new price. Flat windows do not rescue warmup.
+
+Retained logs show the same extra entry in every off/on worker, but earlier
+in off; production phase timing is asymmetric. A periodic/reaper-triggered
+threshold crossing is a hypothesis, not a recorded caller/count. The v2 note
+proposes K=10 consecutive quiet intervals under request/time caps, explicitly
+unimplemented/unexecuted. This guarantees only the observed quiet-prefix
+predicate on successful completion, not termination, future flatness or A/A.
+`835cf16` stays parked; no YJIT stage 2. A separately authorized interpreter-only
+reprice uses the previously accepted method, not this candidate.
+[Method, exact-SHA export, causal limits and design-only v2](passes/production-yjit-method.md).
+
 ## Combined specimen must pass its own cold gate (2026-10-21)
 
 Form+token+collection is a single whole-request interpreter experiment, not

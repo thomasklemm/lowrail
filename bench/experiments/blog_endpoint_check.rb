@@ -63,7 +63,10 @@ ActiveRecord::Base.logger = nil
 raise "wrong app" unless Rails.version == "8.1.4" && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
 if ENV["LOWRAIL_FORM_CHECK"]
   expected_jit = ENV.fetch("BENCH_JIT", "interpreter")
-  raise "form checker JIT mode mismatch" unless Lowrail.jit_mode == expected_jit
+  yjit = RubyVM::YJIT.enabled?
+  zjit = defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+  raise "form checker JIT mode mismatch" unless %w[interpreter yjit].include?(expected_jit) &&
+    (expected_jit == "yjit" ? yjit : !yjit) && !zjit
 end
 # A copied Rails app need not share the namespace of the corpus directory.
 # Read the certificate directly so the off worker checks the same identity.
