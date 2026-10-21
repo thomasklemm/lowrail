@@ -230,6 +230,12 @@ if ENV["SEALED_RENDERER_STAGE"]
   elsif ENV["SEALED_RENDERER_STAGE"] == "collection_site"
     require_relative "sealed_collection"
     SealedCollectionCost.install("candidate") if ENV.fetch("SEALED_RENDERER_ARM") == "on"
+  elsif ENV["SEALED_RENDERER_STAGE"] == "token_site"
+    require_relative "sealed_tokens"
+    SealedTokenCost.install("candidate") if ENV.fetch("SEALED_RENDERER_ARM") == "on"
+  elsif ENV["SEALED_RENDERER_STAGE"] == "filter_site"
+    require_relative "sealed_filters"
+    SealedFilterCost.install if ENV.fetch("SEALED_RENDERER_ARM") == "on"
   else
     require_relative "sealed_renderer"
     SealedRenderer.install(ENV.fetch("SEALED_RENDERER_STAGE")) if ENV.fetch("SEALED_RENDERER_ARM") == "on"
@@ -267,8 +273,16 @@ end
 endpoint_fallbacks = units.to_h do |unit|
   [unit.fetch("target"), Lowrail::Stats.unit_fallbacks.fetch(unit.fetch("id").to_s, 0)]
 end
+specimen = case ENV["SEALED_RENDERER_STAGE"]
+when "token_site" then SealedTokenCost
+when "filter_site" then SealedFilterCost
+when "collection_site" then SealedCollectionCost
+when "form_site" then SealedFormCost
+else defined?(SealedRenderer) && SealedRenderer
+end
 File.write(destination, JSON.generate({responses: responses, endpoint_hits: endpoint_hits, endpoint_fallbacks: endpoint_fallbacks,
   form_hits: defined?(Lowrail::Stats) && Lowrail.manifest ? Lowrail.manifest.units.select { _1["pass"] == "sealed/form_scaffold" }.sum { Lowrail::Stats.unit_hits.fetch(_1.fetch("id").to_s, 0) } : 0,
-  specimen_hits: defined?(SealedCollectionCost) ? SealedCollectionCost.hits : defined?(SealedFormCost) ? SealedFormCost.hits : defined?(SealedRenderer) ? SealedRenderer.hits : 0,
+  specimen_hits: specimen ? specimen.hits : 0,
+  specimen_fallbacks: specimen.respond_to?(:fallbacks) ? specimen.fallbacks : 0,
   hits: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {},
   fallbacks: defined?(Lowrail::Stats) ? Lowrail::Stats.unit_fallbacks : {}}))

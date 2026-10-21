@@ -232,8 +232,9 @@ checks two/one/zero comments, output class/safety/encoding, real token
 validity and holder/owner/epoch refusals. Source/lock/fixture and eight
 framework-file hashes are retained for a future finite six-round interpreter
 micro; existing A/A/heap/mode controls are not relaxed. **No cohort or new
-instruction windows have run.** It remains behind the form-YJIT, new form
-budget and config-bind work in the owner's four-worker queue.
+instruction windows have run.** The current worker queue is props interpreter,
+collection fusion, then the token/filter preparation below. Form YJIT goes
+ahead of those as soon as a YJIT measurement method is accepted.
 
 ```sh
 SEALED_RENDERER_STAGE=collection_site mise exec -- ruby bench/experiments/blog_endpoint_check.rb \
@@ -242,6 +243,78 @@ SEALED_RENDERER_STAGE=collection_site mise exec -- ruby bench/experiments/blog_e
 LOWRAIL=0 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
 SEALED_COLLECTION_WORKER=candidate SEALED_COLLECTION_CHECK=1 \
   ruby /path/to/lowrail/bench/experiments/sealed_collection.rb
+```
+
+## Next isolated prices: hidden tokens and filters (prepared, not measured)
+
+These are two **independent** specimens on stock blog show, not additional
+stages stacked on the handwritten renderer, collection fusion or form pass.
+No runtime, registry, inventory, default or quarantine changes are involved.
+The old 81,417/45,154 Ir cumulative-stage differences motivate pricing; they
+are **not** new prices, additive budgets or speed claims.
+
+The [hidden-token micro](../../bench/experiments/sealed_tokens.rb) replaces
+only `token_tag`'s hidden-input composition at nil-token sites. Protection
+checks, `form_authenticity_token`, per-form HMAC/masking, request/session,
+token-name conversion, escaping, autocomplete configuration and fresh output
+remain live and ordered. Rails' extra quote escaping of `html_safe` attribute
+values is retained. Explicit false/true/literal tokens, nonordinary option
+hashes, foreign view holders and an epoch change use the original helper.
+Its replay captures the four actual show calls (three DELETE, one POST),
+duplicates their options in **every** arm, and generates real independent
+masks. Original/checks/residue/complete-candidate arms are prepared; separate
+arm medians must not be added. Only native replay comparisons normalize
+independent token values, after decoding and validating each real token.
+
+The [filter specimen](../../bench/experiments/sealed_filters.rb) removes only
+the generic callback sequence interpreter for the observed six-entry chain.
+It keeps the **actual compiled Before/After objects**: conditions, browser
+filter, `performed?` terminator, halted-callback hook and skipped after callbacks
+are not hand-waved away. The real Action Text Proc and Turbo around method
+wrap the original action/render block; exceptions unwind through their real
+ensure bodies, and the after callback is not moved into an ensure. Unknown
+chain/condition/sequence/around-argument shapes refuse at preparation; epoch,
+holder and chain-identity checks guard each candidate entry. Pricing is
+prepared as stock-A/stock-B/checked-candidate **fresh full requests**, retaining
+real SQL, renders, events, sessions and dispatch. It does not replay a stale
+controller or claim a callback-only per-hit budget. This intentionally keeps
+more live work than the old flattened-filter upper-bound specimen.
+
+Both isolated stages pass **192 ordinary + 192 header-writing-subscriber
+pairs**: raw status/body/all headers, ordered SQL/binds/cache flags, complete
+controller/render events and assigns/AR/query-cache/transaction state.
+Token/filter on processes complete **285/108** replacements respectively,
+including materialization; all those runs record zero candidate fallbacks.
+Untimed native checks run 50 fresh successful show requests: **200 token hits,
+0 fallbacks**, and **50 filter hits, 0 fallbacks**. Separate epoch/changed-chain
+controls then confirm original fallback. Token checks also cover real token
+validity and mask freshness, explicit tokens, autocomplete, escaped safe token
+names, disabled protection and singleton option hashes. Additional public
+request controls compare normal execution, early/inner halts, before/action
+exceptions and a blocked old browser: same callback traces and statuses
+(200/202/409/500/500/406), no after callback on halt/exception, and restored
+Action Text/Turbo context in every arm.
+
+The private preparation ledger pins specimen/harness, lock/fixture and live
+framework sources and retains the raw paired/native controls. Future drivers
+also enforce source/fixture/lock agreement across workers. These observations
+are **not a production certificate**: independent source/config/effective-body
+inventories would still be needed before building either pass. **No instruction
+cohort or windows have run**, and the finite pricing gates remain unchanged.
+
+```sh
+# Run each stage with both none and render_subscriber; each output must be new.
+SEALED_RENDERER_STAGE=token_site mise exec -- ruby bench/experiments/blog_endpoint_check.rb \
+  .corpus/real-blog-r4 /tmp/NEW-token-check render_subscriber
+SEALED_RENDERER_STAGE=filter_site mise exec -- ruby bench/experiments/blog_endpoint_check.rb \
+  .corpus/real-blog-r4 /tmp/NEW-filter-check render_subscriber
+# Untimed only, from the prepared blog application directory:
+LOWRAIL=0 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
+SEALED_TOKEN_WORKER=candidate SEALED_TOKEN_CHECK=1 \
+  ruby /path/to/lowrail/bench/experiments/sealed_tokens.rb
+LOWRAIL=0 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
+SEALED_FILTER_WORKER=candidate SEALED_FILTER_CHECK=1 \
+  ruby /path/to/lowrail/bench/experiments/sealed_filters.rb
 ```
 
 ## Reproduction and evidence
