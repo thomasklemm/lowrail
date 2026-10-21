@@ -95,7 +95,7 @@ when scope or acceptance changes; retain superseded records as historical.
 ┌──────────────────────┐   at boot: certify guards
 │ RUBYOPT=             │──▶   ├─ exact  ─▶ install lowered code
 │  -rlowrail/setup     │      └─ failed ─▶ keep original Rails
-└──────────┬───────────┘                  method (refusal visible)
+└──────────┬───────────┘                   method (refusal visible)
            ▼
 ┌──────────────────────┐   your own suite, Lowrail off vs on:
 │   lowrail verify     │──▶ identical per-test outcomes + ordered SQL
