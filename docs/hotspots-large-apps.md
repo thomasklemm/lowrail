@@ -121,9 +121,13 @@ All cells use exclusive self attribution, not inclusive wrapper time.
 | Explicit sampler residual | 0 / 0 / 0 | 0 / 0.0072 / 0 | 0 / 0 / 0 |
 
 `AR instantiation/attributes` is a source-area bucket, **not** a measurement
-of `instantiate_instance_of` alone. Custom typed-store gems remain in other
-gems. Utilities such as escaping can belong to Active Support even when a
-view called them. Notifications are attributed before the broader AS bucket.
+of `instantiate_instance_of` alone. Classification follows source namespaces:
+for example, the custom typed-store gem's `active_record/typed_store` files
+land in AR other/persistence, not exclusively row instantiation. The controller
+callbacks bucket includes shared callback-engine self work and is not an
+action-controller-only reachability census. Utilities such as escaping can
+belong to Active Support even when a view called them. Notifications are
+attributed before the broader AS bucket.
 The exporter owns the deterministic classification; original frames remain
 available to regroup it. This refines the preliminary broad Fizzy AR figure
 sent during discovery: **25.69% query building**, not 30.63%; attributes,
