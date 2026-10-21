@@ -33,6 +33,31 @@ historical pricing specimen below stays rejected. Test-certificate AR review
 comes next, then design-only token/collection test admission; neither follows
 from this price. [Exact scope, gates and numeric export](passes/sealed-production.md).
 
+## Token continuation safety after the measured revision (2026-10-21)
+
+Live token generation can replace the actual view's `@tag_builder` without
+changing any method, constant or boot config. The entry holder check therefore
+does not authorize literal tag assembly after generation. Recheck the actual
+builder holder/context after generation, name conversion and autocomplete
+policy, then use stock `tag` with the saved values when it no longer matches.
+Never replay token generation or conversion. A foreign builder is a local
+input fallback, not a sticky dependency retirement; restoring the stock
+builder permits another hit.
+
+The production regression installs its generator and replacement builder
+class before boot/admission. Stock output is
+`<input data-probe="late-builder" />`; the old specialization incorrectly
+emits a literal hidden input. The regression checks output equality, one
+generation per arm, the fallback and subsequent stock-builder hit.
+
+**This safety fix changes the measured source.** The accepted −15.49% price
+above remains scoped to `ae025b0`, interpreter Ir on one blog endpoint and
+fixture. It is not a price for the corrected runtime. No new cohort, cost or
+speed claim is made. Production equivalence gates are correctness evidence,
+not a remeasurement. Token/collection test admission remains separate; the
+blog test configuration disables forgery protection, so empty-token hits
+cannot cover protected-token assembly. Form remains refused in that tier.
+
 ## Combined specimen must pass its own cold gate (2026-10-21)
 
 Form+token+collection is a single whole-request interpreter experiment, not

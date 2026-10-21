@@ -180,10 +180,12 @@ module Lowrail
         value = view.form_authenticity_token(form_options: options.merge(authenticity_token: nil))
         name = view.send(:request_forgery_protection_token).to_s
         remove_autocomplete = ActionView::Base.remove_hidden_field_autocomplete
-        unless @epoch[0].zero? && @holder.call(name, String) && @holder.call(value, String)
+        builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
+        unless @epoch[0].zero? && @holder.call(name, String) && @holder.call(value, String) &&
+            @holder.call(builder, @builder_class) && RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
           # Continue AFTER live generation/conversion. Re-entering token_tag
           # would generate/mask a token twice and replay app-defined effects.
-          count(false, "live token/name holder or seal epoch changed")
+          count(false, "live token/name/builder holder or seal epoch changed")
           attributes = {type: "hidden", name: name, value: value}
           attributes[:autocomplete] = "off" unless remove_autocomplete
           return view.send(:tag, :input, **attributes)

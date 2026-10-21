@@ -6,7 +6,9 @@ build/runtime certificates. The measured production form/token/collection
 units are separate from the rejected [combined pricing specimen](sealed-combined.md).
 That specimen stays rejected and is not measured again. This is not a Rails
 throughput/latency claim or a whole-app result. No default-tier, quarantine or
-guarded-pass behavior changes.
+guarded-pass behavior changes. The later token-continuation safety fix changes
+the runtime source; the accepted price remains scoped to `ae025b0`, not the
+corrected runtime. No new price is claimed.
 
 ## What is certified
 
@@ -22,10 +24,14 @@ probing or on-only prepend. Build-only inventory remains build-only.
 - **Token:** retain live protection policy, token generation/masking, name
   conversion and autocomplete policy. Literal tag output requires plain
   String name/value, the exact cached view/tag-builder context and the known
-  action/method options. Unknown inputs or epoch changes after generation
-  continue at stock `tag` with the already generated/converted values; they
-  do not replay generation or conversion. SafeBuffer, Array, Regexp and nil
-  values are original tag continuations, not forced into a String shortcut.
+  action/method options. Recheck the actual builder holder/context after the
+  live generation/conversion/config reads: entry-time checks do not cover a
+  generator replacing `@tag_builder`. Unknown inputs, a replacement outside
+  the certified holder/context, or epoch changes continue at stock `tag` with
+  the already generated/converted values; they do not replay generation or
+  conversion. A foreign builder causes local fallback, not terminal retirement;
+  a later stock builder can hit again. SafeBuffer, Array, Regexp and nil values
+  are original tag continuations, not forced into a String shortcut.
 - **Collection:** specialize only stock `collection_with_template` with a
   nonnil template and no layout. Keep live collection derivation/loading,
   lookup, iterator/preloading, local-name/cache-key effects, `Template#render`,
@@ -90,6 +96,17 @@ then runs restored production workers, not a pricing installer:
    once-only generation/name conversion. Tampered observer certificates leave
    three successful original requests, zero token/collection hits and explicit
    terminal refusals. No wrong-answer special cases are added.
+
+The token-continuation safety-fix rerun passed **2 tests / 123 assertions,
+zero failures/errors/skips**, including all the production gates above with
+the same hit/fallback counts. Its new boot-installed-generator regression
+first failed against the old runtime: stock returned
+`<input data-probe="late-builder" />`, but specialization emitted the literal
+hidden input. With the fix both return the stock output, generating once per
+arm; the foreign-builder call records zero hits/one fallback. Restoring the
+stock builder records one hit/zero fallbacks without reauthorization. No
+dependency or seal epoch is reset. The historical numeric exports remain
+unchanged; this is correctness evidence for changed source, not a new price.
 
 Reproduce the self-contained build/fixture/gate regression under the repository
 Ruby with an available `real-blog-r4` corpus:

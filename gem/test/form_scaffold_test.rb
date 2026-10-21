@@ -88,6 +88,66 @@ class FormScaffoldTest < Minitest::Test
         assert_equal 2, record.fetch("generated"), "one generation in each arm, no replay after fallback"
         assert_equal 2, record.fetch("converted"), "one live name conversion in each arm"
       end
+
+      # Install the live generator before boot/admission. Replacing its view's
+      # builder later is input state, not a post-seal method/config mutation.
+      replaced = ruby_json(<<~'RUBY', chdir: app, env: boot_env)
+        require "./config/application"
+        Rails.application.config.yjit = false
+        module LiveTokenGenerator
+          def form_authenticity_token(**options)
+            probe = Thread.current[:token_builder_probe]
+            return super unless probe
+            probe[:calls] += 1
+            probe.fetch(:view).instance_variable_set(:@tag_builder, probe.fetch(:builder))
+            "live-token"
+          end
+        end
+        ActiveSupport.on_load(:action_controller) { prepend LiveTokenGenerator }
+        ActiveSupport.on_load(:action_view) do
+          Object.const_set(:ReplacementTagBuilder, Class.new(ActionView::Helpers::TagHelper::TagBuilder) do
+            def tag_options(_options, escape = true)
+              ' data-probe="late-builder"'
+            end
+          end)
+        end
+        require "./config/environment"
+        require "rack/mock"
+        view = nil
+        trace = TracePoint.new(:call) { |event| view = event.self }
+        trace.enable(target: Lowrail::TokenTag::Variant.instance_method(:token_tag))
+        Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
+        trace.disable
+        raise "not naturally admitted" unless Lowrail::TokenTag.admitted?
+        original = view.method(:token_tag).super_method
+        plain = view.instance_variable_get(:@tag_builder)
+        id = Lowrail.manifest.units.find { _1.fetch("pass") == "sealed/token_tag" }.fetch("id").to_s
+        options = {action: "/articles/1/comments", method: "post"}
+        records = [ReplacementTagBuilder.new(view), plain].map do |builder|
+          before = [Lowrail::Stats.unit_hits.fetch(id, 0), Lowrail::Stats.unit_fallbacks.fetch(id, 0)]
+          outputs = [false, true].map do |fast|
+            view.instance_variable_set(:@tag_builder, plain)
+            probe = {view: view, builder: builder, calls: 0}
+            Thread.current[:token_builder_probe] = probe
+            output = fast ? view.send(:token_tag, nil, form_options: options) : original.call(nil, form_options: options)
+            Thread.current[:token_builder_probe] = nil
+            {output: output, generated: probe.fetch(:calls)}
+          end
+          {outputs: outputs, hits: Lowrail::Stats.unit_hits.fetch(id, 0) - before[0],
+            fallbacks: Lowrail::Stats.unit_fallbacks.fetch(id, 0) - before[1]}
+        end
+        puts JSON.generate(records: records, admitted: Lowrail::TokenTag.admitted?)
+      RUBY
+      foreign, restored = replaced.fetch("records")
+      assert_equal '<input data-probe="late-builder" />', foreign.fetch("outputs").first.fetch("output")
+      replaced.fetch("records").each do |record|
+        assert_equal record.fetch("outputs").first.fetch("output"), record.fetch("outputs").last.fetch("output")
+        assert_equal [1, 1], record.fetch("outputs").map { _1.fetch("generated") }, "one generation per arm, no replay"
+      end
+      assert_equal [0, 1], foreign.values_at("hits", "fallbacks")
+      assert_equal [1, 0], restored.values_at("hits", "fallbacks"), "a foreign input must not retire the unit"
+      assert replaced.fetch("admitted")
+
       bad = Marshal.load(Marshal.dump(manifest))
       bad.fetch("units").reject { _1["pass"] == "sealed/form_scaffold" }.each { _1.fetch("data").fetch("observer")["iseq"] = "changed" }
       File.write(manifest_path, JSON.generate(bad))
