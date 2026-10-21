@@ -6,6 +6,35 @@ setup described in the [Campfire M0](m0/campfire.md). Ruby 3.4+ is required;
 these runs use the repository's Ruby 4.0.7. **Callgrind instructions are the
 primary work metric; native YJIT CPU/wall time and allocations are secondary.**
 
+## Untimed worker placement observations (2026-10-21)
+
+Fixed-heap workers now snapshot every live Linux thread before and after each
+window, symmetrically in every arm: PID/TID/birth ticks, last CPU, allowed CPU
+list, and the kernel `nr_migrations` counter when exposed. The proc reads,
+monotonic clocks and parent-side overlap calculation are **outside** instruction
+and allocation endpoints. They do not pin affinity, disable GC, alter ordering,
+change controls or authorize a cohort. Observation paths are warmed before JIT
+certification; the existing flatness and heap gates remain mandatory.
+
+`placement.counter_envelope_ns` brackets the start/finish client requests using
+the host monotonic clock. Parent-recorded `process_envelope_ns` brackets spawn
+through observed exit, so it includes boot, preparation and idle work. After
+all workers exit, `peer_processes` records overlapping worker envelopes and
+`peer_windows` records overlapping counter envelopes. These are conservative
+intervals, not exact instruction-time scheduling, exclusive CPU time, or a
+census of unrelated host load. Scheduling snapshots also include their own
+short uncounted observation gaps. Transient threads between endpoints are not
+covered; TID reuse is checked using birth ticks.
+
+Missing proc information/counters are recorded as **unavailable**, never zero.
+This orb exposes affinity/last CPU but not `/proc/.../sched`; migration counts
+are therefore null with an explicit reason here. Equal endpoint CPUs do not
+prove zero migrations; context switches and `schedstat` are not substituted.
+No privilege/kernel setting is changed to obtain missing data. Native no-app
+validation uses a stub client seam, not Valgrind or reserved measurement slots.
+Historical samples, including the rejected combined pricing specimen, remain
+unchanged and cannot acquire these observations retrospectively.
+
 ## Valgrind brk reservation correction (2026-10-20)
 
 **The ordinary request worker is affected, not only a profiler.** A short

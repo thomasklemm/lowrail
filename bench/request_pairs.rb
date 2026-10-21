@@ -404,14 +404,17 @@ module RequestPairs
             env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
               "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension,
               "BENCH_IDLE_CENSUS" => nil, "BENCH_YJIT_LOG_FILE" => jit_log)
+            process_start = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
             ok = system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
               RbConfig.ruby, *worker_jit_flags, File.expand_path(worker, __dir__), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
+            process_end = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
             check_valgrind_log!(out, label)
             raise "Callgrind failed: #{label}; inspect logs" unless ok
             result = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
             result = JSON.parse(result.to_s.delete_prefix("LOWRAIL_BENCH "))
+            result["process_envelope_ns"] = [process_start, process_end]
             result["jit_compile_log"] = { "path" => File.basename(jit_log), "sha256" => Digest::SHA256.file(jit_log).hexdigest } if compile_log
             raise "AR build did not activate" if layer == "instantiate" && result.fetch("ar_installed").zero?
             windows = result.fetch("windows")
@@ -451,6 +454,8 @@ module RequestPairs
       File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
       warn "fixed-heap Callgrind round #{round + 1}/#{metadata.fetch(:rounds)}"
     end
+    WorkerPlacement.overlaps!(metadata.fetch(:workers))
+    File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
     # Only after every Ir worker finishes: traced companion processes must
     # neither perturb a measured YJIT process nor contend with its workload.
     idle_observed = metadata.fetch(:workers).values.any? { _1.fetch("windows").any? { |window| window.key?("idle_connections") } }

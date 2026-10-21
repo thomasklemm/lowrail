@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "worker_placement"
+
 # Shared fixed-heap preparation/window seam for requests and operation replays.
 module HeapWindows
   def self.floors
@@ -18,7 +20,8 @@ module HeapWindows
     keys.product(order, [0, n]).map do |key, mode, count|
       { unit: key, mode: mode, requests: count, before: GC.stat, after: GC.stat,
         pools_before: GC.stat_heap.keys.to_h { [_1, GC.stat_heap(_1)] },
-        pools_after: GC.stat_heap.keys.to_h { [_1, GC.stat_heap(_1)] } }
+        pools_after: GC.stat_heap.keys.to_h { [_1, GC.stat_heap(_1)] },
+        placement: {"counter_envelope_ns" => [0, 0]} }
     end
   end
 
@@ -77,6 +80,15 @@ module HeapWindows
     observe_pools = ->(pools) { pools.each { |pool, stats| GC.stat_heap(pool, stats) } }
     clock = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) } if idle_connections
     realtime = -> { Process.clock_gettime(Process::CLOCK_REALTIME, :nanosecond) } if ENV["BENCH_YJIT_LOG_FILE"]
+    placement_clock = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) }
+    200.times do
+      # Consume the result too: YJIT's unused-return specialization otherwise
+      # leaves the actual snapshot-producing path cold at the first window.
+      windows.first[:placement]["before"] = WorkerPlacement.snapshot
+      windows.first[:placement]["after"] = WorkerPlacement.snapshot
+      windows.first[:placement]["counter_envelope_ns"][0] = placement_clock.call
+      windows.first[:placement]["counter_envelope_ns"][1] = placement_clock.call
+    end
     # Warm the exact observation signatures, not just the workload. Ruby's
     # two-argument stat_heap wrapper can otherwise compile inside the gate.
     if observe
@@ -105,16 +117,20 @@ module HeapWindows
       window[:jit_log_start_realtime_ns] = realtime.call if realtime
       window[:jit_before] = observe.call if observe
       observe_pools.call(window[:pools_before])
+      window[:placement]["before"] = WorkerPlacement.snapshot
+      window[:placement]["counter_envelope_ns"][0] = placement_clock.call
       GC.stat(window[:before])
       LowrailCallgrindBench.start(window[:mode] == "no_gc")
       yield window.fetch(:requests), window[:unit]
       segments = LowrailCallgrindBench.finish
       GC.stat(window[:after])
+      window[:placement]["counter_envelope_ns"][1] = placement_clock.call
       observe_pools.call(window[:pools_after])
       window[:wall_end_ns] = clock.call if clock
       window[:jit_after] = observe.call if observe
       window[:jit_log_end_realtime_ns] = realtime.call if realtime
       window[:gc_segments] = segments
+      window[:placement]["after"] = WorkerPlacement.snapshot
     end
     anchors.size
   end

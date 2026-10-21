@@ -65,6 +65,10 @@ class RequestPairsTest < Minitest::Test
         result.fetch("windows").each do |window|
           assert_equal certified, window.fetch("jit_before"), "no harness compilation after certification"
           assert_equal window.fetch("jit_before"), window.fetch("jit_after"), window.slice("mode", "requests").inspect
+          placement = window.fetch("placement")
+          assert_operator placement.fetch("counter_envelope_ns").last, :>=, placement.fetch("counter_envelope_ns").first
+          assert_equal placement.fetch("before").fetch("pid"), placement.fetch("after").fetch("pid")
+          assert placement.fetch("before").key?("threads")
           if log
             assert_operator window.fetch("jit_before").fetch("compile_log_bytes"), :>, 0
             assert_operator window.fetch("jit_log_end_realtime_ns"), :>=, window.fetch("jit_log_start_realtime_ns")
@@ -74,6 +78,35 @@ class RequestPairsTest < Minitest::Test
           end
         end
       end
+    end
+  end
+
+  def test_worker_overlap_distinguishes_window_work_from_boot_and_unknown_migrations
+    snapshot = ->(count, birth = 7) { {"threads" => {"42" => {"birth_ticks" => birth, "migrations" => {"count" => count}}}} }
+    worker = ->(bounds, interval, before, after) {
+      {"process_envelope_ns" => bounds, "windows" => [{"placement" => {
+        "counter_envelope_ns" => interval, "before" => before, "after" => after}}]}
+    }
+    workers = {
+      "a" => worker.call([0, 100], [20, 50], snapshot.call(3), snapshot.call(8)),
+      "b" => worker.call([10, 90], [40, 80], snapshot.call(nil), snapshot.call(nil)),
+      "c" => worker.call([50, 120], [80, 95], snapshot.call(1), snapshot.call(2, 9))
+    }
+    WorkerPlacement.overlaps!(workers)
+    a, b, c = workers.values.map { _1.fetch("windows").first.fetch("placement") }
+    assert_equal [{"worker" => "b", "overlap_ns" => 30}], a.fetch("peer_processes")
+    assert_equal [{"worker" => "b", "window" => 0, "overlap_ns" => 10}], a.fetch("peer_windows")
+    assert_equal 5, a.fetch("thread_migrations").fetch("42").fetch("count")
+    assert_nil b.fetch("thread_migrations").fetch("42").fetch("count"), "unknown is not zero"
+    assert_nil c.fetch("thread_migrations").fetch("42").fetch("count"), "reused TID is not the same thread"
+    assert_empty c.fetch("peer_windows"), "touching windows do not overlap"
+    live = WorkerPlacement.snapshot
+    assert_equal Process.pid, live.fetch("pid")
+    live.fetch("threads").each_value do |thread|
+      next if thread["unavailable"]
+      assert_operator thread.fetch("cpu"), :>=, 0
+      assert_match(/\A\d+(?:[-,]\d+)*\z/, thread.fetch("allowed_cpus"))
+      assert thread.fetch("migrations").key?("count") || thread.fetch("migrations").key?("unavailable")
     end
   end
 
