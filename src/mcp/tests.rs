@@ -33,7 +33,7 @@ fn data_tools_refresh_facts_and_ledger_without_serving_stale_answers() {
     let dir = std::env::temp_dir().join(format!("lowrail-mcp-{}", std::process::id()));
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
     let path = dir.join(".lowrail/facts.json");
-    let mut facts = json!({"format":1,
+    let mut facts = json!({"format":1,"ruby_description":"ruby 4.0.7",
         "models":[{"name":"Article","columns":[{"name":"title","type":"string","null":true}],
             "validations":[{"kind":"presence","attributes":["title"]}]}],
         "modules":[{"name":"Article","ancestors":["Override","Article"],"methods":[{"name":"secret","owner":"Article"}]},
@@ -142,7 +142,7 @@ fn method_status_does_not_attribute_neighboring_sites_to_a_method() {
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
     let source = dir.join("article.rb");
     std::fs::write(&source, "class Article\n def first\n  article_path(1)\n end\n def second\n  article_path(2)\n end\nend\n").unwrap();
-    std::fs::write(dir.join(".lowrail/facts.json"), json!({"format":2,"app_root":"..",
+    std::fs::write(dir.join(".lowrail/facts.json"), json!({"format":2,"app_root":"..","ruby_description":"ruby 4.0.7",
         "app_paths":{"values":["/modules/0/methods/0/source_location","/modules/0/methods/1/source_location"],"keys":[]},
         "modules":[{"name":"Article","methods":[
         {"name":"first","source_location":"article.rb:2"},

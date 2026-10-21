@@ -85,8 +85,8 @@ pub struct SourceIndex {
 }
 
 impl SourceIndex {
-    pub fn parse(source: &[u8]) -> SourceIndex {
-        let result = ruby_prism::parse(source);
+    pub fn parse(source: &[u8], parser: &crate::parser::Parser) -> SourceIndex {
+        let result = parser.parse(source);
         let mut v = Indexer {
             lines: LineMap::new(source),
             index: SourceIndex::default(),
@@ -189,27 +189,27 @@ const SITE_GENERATORS: &[(&str, &str)] = &[
 ];
 
 /// Classifies methods against their source, caching parsed files.
-pub struct Classifier<'f> {
+pub struct Classifier<'f, 'p> {
     facts: &'f Facts,
-    app_root: PathBuf,
     cache: HashMap<String, Option<SourceIndex>>,
-    generated: Generated<'f>,
+    generated: Generated<'f, 'p>,
+    parser: &'p crate::parser::Parser,
 }
 
-impl<'f> Classifier<'f> {
-    pub fn new(facts: &'f Facts) -> Self {
+impl<'f, 'p> Classifier<'f, 'p> {
+    pub fn new(facts: &'f Facts, parser: &'p crate::parser::Parser) -> Self {
         Classifier {
             facts,
-            app_root: PathBuf::from(&facts.app_root),
             cache: HashMap::new(),
-            generated: Generated::new(facts, PathBuf::new()),
+            generated: Generated::new(facts, PathBuf::new(), parser),
+            parser,
         }
     }
 
     /// Reads generated script sources from `dir` (`generated/` next to
     /// facts.json) to attach generated bodies.
     pub fn with_generated_dir(mut self, dir: impl AsRef<Path>) -> Self {
-        self.generated = Generated::new(self.facts, dir);
+        self.generated = Generated::new(self.facts, dir, self.parser);
         self
     }
 
@@ -220,11 +220,7 @@ impl<'f> Classifier<'f> {
 
     /// Is `path` app source (under the app root, but not vendored)?
     pub fn in_app(&self, path: &str) -> bool {
-        let p = Path::new(path);
-        p.starts_with(&self.app_root)
-            && !["vendor", "node_modules", "tmp", ".lowrail"]
-                .iter()
-                .any(|d| p.starts_with(self.app_root.join(d)))
+        self.facts.in_app(path)
     }
 
     /// Is the module app-owned: defined in app source, or nested in an
@@ -368,7 +364,7 @@ impl<'f> Classifier<'f> {
     fn index(&mut self, path: &str) -> Option<&SourceIndex> {
         self.cache
             .entry(path.to_string())
-            .or_insert_with(|| std::fs::read(path).ok().map(|src| SourceIndex::parse(&src)))
+            .or_insert_with(|| std::fs::read(path).ok().map(|src| SourceIndex::parse(&src, &self.parser)))
             .as_ref()
     }
 
@@ -648,7 +644,8 @@ end
 
     #[test]
     fn index_and_classify_lines() {
-        let idx = SourceIndex::parse(APP_SRC.as_bytes());
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
+        let idx = SourceIndex::parse(APP_SRC.as_bytes(), &parser);
         assert_eq!(
             classify_line(&idx, 9, "summary", true, false),
             Some(LineOrigin::Def)
@@ -686,7 +683,7 @@ end
         assert_eq!(classify_line(&idx, 8, "x", true, false), None);
         assert_eq!(idx.enclosing_def(16), Some("Article.recent"));
 
-        let gem = SourceIndex::parse(GEM_SRC.as_bytes());
+        let gem = SourceIndex::parse(GEM_SRC.as_bytes(), &parser);
         assert_eq!(
             classify_line(&gem, 6, "published", false, false),
             Some(LineOrigin::InsideDef(
@@ -762,6 +759,7 @@ end
         };
         let facts = Facts {
             app_root: app.display().to_string(),
+            ruby_description: "ruby 4.0.7".into(),
             gems: vec![Gem {
                 name: "activerecord".into(),
                 version: "8.1.4".into(),
@@ -784,7 +782,8 @@ end
             ..Default::default()
         };
 
-        let mut c = Classifier::new(&facts);
+        let parser = crate::parser::Parser::for_runtime(&facts.ruby_description).unwrap();
+        let mut c = Classifier::new(&facts, &parser);
         let got: Vec<(String, Origin)> = c
             .app_relevant()
             .into_iter()

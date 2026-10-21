@@ -37,6 +37,7 @@ struct Snapshot {
     facts: Facts,
     models: Vec<Value>,
     types: TypeModel,
+    parser: crate::parser::Parser,
 }
 
 pub(super) struct Data {
@@ -65,7 +66,8 @@ impl Data {
                 models: Vec<Value>,
             }
             let models: Models = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
-            let mut types = TypeModel::from_facts(&facts);
+            let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
+            let mut types = TypeModel::from_facts(&facts)?;
             if let Some(bytes) = &observed { types.merge_observed(&facts, bytes)?; }
             self.snapshot = Some(Snapshot {
                 bytes,
@@ -73,6 +75,7 @@ impl Data {
                 facts,
                 models: models.models,
                 types,
+                parser,
             });
         }
         Ok(self.snapshot.as_ref().unwrap())
@@ -165,7 +168,7 @@ impl Data {
                 let Some(ledger) = ledger else {
                     return Ok(json!({"available":false,"target":target,"status":"not_recorded"}));
                 };
-                let span = method_span(&snapshot.facts, target);
+                let span = method_span(&snapshot.facts, target, &snapshot.parser);
                 let entries: Vec<_> = ledger.iter().filter(|entry| {
                     entry["target"] == target || entry["method"] == target || span.as_ref().is_some_and(|(path, start, end)| {
                         (entry["target"] == path.as_str() || entry["file"] == path.as_str())
@@ -190,7 +193,7 @@ impl Data {
                 };
                 let (module, method) = resolve(&snapshot.facts, receiver, method, singleton)
                     .ok_or_else(|| format!("no boot method for {target}"))?;
-                let origin = Classifier::new(&snapshot.facts).classify(module, method);
+                let origin = Classifier::new(&snapshot.facts, &snapshot.parser).classify(module, method);
                 Ok(
                     json!({"target":target,"resolved_module":module.name,"method":method,"origin":origin_json(origin)}),
                 )
@@ -244,14 +247,14 @@ fn read_optional(path: &std::path::Path) -> Result<Option<Vec<u8>>, String> {
 }
 
 /// Match the actual def span, never the whole containing file.
-fn method_span(facts: &Facts, target: &str) -> Option<(String, u64, u64)> {
+fn method_span(facts: &Facts, target: &str, parser: &crate::parser::Parser) -> Option<(String, u64, u64)> {
     use ruby_prism::Visit;
     let (receiver, name, singleton) = target.rsplit_once('#').map(|(c, m)| (c, m, false))
         .or_else(|| target.rsplit_once('.').map(|(c, m)| (c, m, true)))?;
     let (_, method) = resolve(facts, receiver, name, singleton)?;
     let (path, line) = crate::facts::schema::split_location(method.source_location.as_deref()?)?;
     let source = std::fs::read(path).ok()?;
-    let parsed = ruby_prism::parse(&source);
+    let parsed = parser.parse(&source);
     if parsed.errors().next().is_some() { return None; }
     struct Span<'a> { source: &'a [u8], name: &'a str, line: u64, end: Option<u64> }
     impl<'pr> Visit<'pr> for Span<'_> {

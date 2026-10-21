@@ -76,9 +76,9 @@ impl Lowered {
 
 /// Diagnose handler bodies in Action View's method context, without expanding
 /// the existing source passes' lowering eligibility (or adding fast-path hits).
-pub(super) fn template_parse_refusal(code: &str) -> Site {
+pub(super) fn template_parse_refusal(code: &str, parser: &crate::parser::Parser) -> Site {
     let wrapped = format!("def __lowrail_template__;{code}\nend");
-    let result = ruby_prism::parse(wrapped.as_bytes());
+    let result = parser.parse(wrapped.as_bytes());
     let outcome = match result.errors().next() {
         Some(error) => format!("template source does not parse in method context: {}", String::from_utf8_lossy(error.message())),
         None => "template requires method context; diagnostic only, original handler retained".into(),
@@ -96,14 +96,14 @@ const TAG_BUILDER_DEPS: &[&str] = &["content_tag_string", "tag_options", "tag_op
 /// of the code so Prism reads them as variables; the emitted guard re-checks
 /// `defined?(x) == "local-variable"`, because the same template compiled for
 /// another locals set would turn `x` into a method call.
-pub fn lower_template(original: &str, locals: &[String], unit: usize, oracle: &mut dyn Oracle) -> Lowered {
+pub fn lower_template(original: &str, locals: &[String], unit: usize, oracle: &mut dyn Oracle, parser: &crate::parser::Parser) -> Lowered {
     let prefix: String = locals.iter().map(|l| format!("{l} = nil; ")).collect();
     let src = format!("{prefix}{original}");
     let code = src.as_str();
-    let result = ruby_prism::parse(code.as_bytes());
+    let result = parser.parse(code.as_bytes());
     let mut out = Lowered::default();
     if result.errors().next().is_some() {
-        return Lowered { code: original.to_string(), sites: vec![template_parse_refusal(code)], deps: vec![] };
+        return Lowered { code: original.to_string(), sites: vec![template_parse_refusal(code, parser)], deps: vec![] };
     }
     let mut calls = Vec::new();
     collect_appended_calls(&result.node(), &mut calls);
@@ -479,8 +479,9 @@ mod tests {
 
     #[test]
     fn lowers_link_to_record_and_keeps_lines() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "@output_buffer.safe_append='<p>\n'.freeze; @output_buffer.append=( link_to \"Show\", article, class: \"a&b\" ); @output_buffer.safe_append='\n'.freeze;\n@output_buffer";
-        let out = lower_template(code, &["article".into()], 3, &mut Fake);
+        let out = lower_template(code, &["article".into()], 3, &mut Fake, &parser);
         assert_eq!(out.lowered_count(), 1, "{:?}", out.sites);
         assert_eq!(out.code.matches('\n').count(), code.matches('\n').count());
         assert!(out.code.contains("(self.class.equal?(::Lowrail::K[3]) || ::Lowrail.ok?(3, self.class)) && defined?(article) == \"local-variable\" && article.instance_of?(::Article) && article.persisted?"));
@@ -491,8 +492,9 @@ mod tests {
 
     #[test]
     fn lowers_dynamic_name_with_route_helper() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "@output_buffer.append=( link_to article.title, edit_article_path(article) );";
-        let out = lower_template(code, &["article".into()], 0, &mut Fake);
+        let out = lower_template(code, &["article".into()], 0, &mut Fake, &parser);
         assert_eq!(out.lowered_count(), 1, "{:?}", out.sites);
         assert!(out.code.contains("__lrn = article.title; __lru = edit_article_path(article);"), "{}", out.code);
         assert!(out.code.contains("#{::Lowrail::Html.content((__lrn || __lru))}"));
@@ -500,8 +502,9 @@ mod tests {
 
     #[test]
     fn refuses_unknown_shapes() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "@output_buffer.append=( link_to \"x\", foo.bar, class: dynamic );";
-        let out = lower_template(code, &["article".into()], 0, &mut Fake);
+        let out = lower_template(code, &["article".into()], 0, &mut Fake, &parser);
         assert_eq!(out.lowered_count(), 0);
         assert_eq!(out.code, code);
         assert_eq!(out.sites[0].outcome, "link_to: html options are not literal");
@@ -510,12 +513,13 @@ mod tests {
     #[test]
     fn layout_yield_and_invalid_handler_have_refusals_without_new_lowerings() {
         use super::super::route;
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         for (code, reason) in [
             ("@output_buffer.append=(link_to \"Home\", articles_path);\n@output_buffer.append=(yield :sidebar);\n@output_buffer", "template requires method context"),
             ("@output_buffer.append=(link_to \"Home\", articles_path);\n@output_buffer.append=(yield :sidebar);\nif", "template source does not parse"),
         ] {
-            let view = lower_template(code, &[], 0, &mut Fake);
-            let route = route::lower(code, &route::Mode::Template { locals: &[] }, 0, &mut Fake, &mut route::Cache::default());
+            let view = lower_template(code, &[], 0, &mut Fake, &parser);
+            let route = route::lower(code, &route::Mode::Template { locals: &[] }, 0, &mut Fake, &mut route::Cache::default(), &parser);
             for out in [view, route] {
                 assert_eq!(out.code, code);
                 assert_eq!(out.lowered_count(), 0);

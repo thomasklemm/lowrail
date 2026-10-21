@@ -159,13 +159,12 @@ impl<'a> Declaration<'a> {
 pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
     let mut root = Declaration::default();
     let mut diagnostics = model.diagnostics.clone();
-    let classifier = facts::Classifier::new(facts);
     // Empty app classes/helpers still need declarations. Their real booted
     // superclass supplies inherited Rails APIs; do not guess from naming.
     for module in &facts.modules {
         if observed::constant(&module.name)
             && module.const_source_location.as_deref().and_then(crate::facts::schema::split_location)
-                .is_some_and(|(path, _)| classifier.in_app(path))
+                .is_some_and(|(path, _)| facts.in_app(path))
         {
             root.at(&module.name).kind = if module.kind == "class" { "class" } else { "module" };
         }

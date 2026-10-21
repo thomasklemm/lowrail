@@ -37,6 +37,7 @@ pub struct RubyOracle {
     next_id: u64,
     pub rails_env: String,
     pub certification_jit: String,
+    pub ruby_description: String,
 }
 
 impl RubyOracle {
@@ -71,12 +72,13 @@ impl RubyOracle {
             .map_err(|e| format!("starting oracle: {e}"))?;
         drop(command); // Close the parent's copy of the child end, including on failed boot.
         let mut oracle = Self { child, channel: BufReader::new(parent), next_id: 0,
-            rails_env: String::new(), certification_jit: String::new() };
+            rails_env: String::new(), certification_jit: String::new(), ruby_description: String::new() };
         let mut line = String::new();
         oracle.channel.read_line(&mut line).map_err(|e| e.to_string())?;
         let ready: Value = serde_json::from_str(&line).map_err(|e| format!("oracle did not start: {e}: {line}"))?;
         oracle.certification_jit = ready["certification_jit"].as_str().ok_or("oracle missing certification JIT mode")?.to_string();
         oracle.rails_env = ready["rails_env"].as_str().unwrap_or("").to_string();
+        oracle.ruby_description = ready["ruby"].as_str().ok_or("oracle missing target Ruby")?.to_string();
         Ok(oracle)
     }
 }

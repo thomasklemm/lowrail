@@ -5,6 +5,59 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 #[test]
+fn target_ruby_grammar_is_explicit_in_parse_types_and_mcp() {
+    let dir = std::env::temp_dir().join(format!("lowrail-target-grammar-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
+    let source = dir.join("example.rb");
+    // &nil is accepted by Ruby 4.1, not 4.0. Plain Prism parse() accepts it.
+    std::fs::write(&source, "class Example\n def value(&nil); 7; end\nend\n").unwrap();
+    let bin = env!("CARGO_BIN_EXE_lowrail");
+    let mut facts = json!({"format":1,"app_root":dir,
+        "modules":[{"name":"Example","kind":"class","methods":[
+            {"name":"value","source_location":format!("{}:2", source.display())}]}]});
+    for (runtime, accepted) in [("ruby 4.0.7 (revision fixture)", false), ("ruby 4.1.0preview1 (revision fixture)", true)] {
+        let parsed = Command::new(bin).args(["parse", "--ruby-version", runtime]).arg(&source).output().unwrap();
+        assert_eq!(parsed.status.success(), accepted, "{runtime}: {:?}", parsed);
+        facts["ruby_description"] = json!(runtime);
+        std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+        let output = Command::new(bin).arg("types").arg(&dir).output().unwrap();
+        assert!(output.status.success(), "{:?}", output);
+        let types: Value = serde_json::from_slice(&output.stdout).unwrap();
+        if accepted {
+            assert_eq!(types["methods"]["Example#value"]["return_type"]["name"], "Integer");
+            assert_eq!(types["diagnostics"], json!([]));
+        } else {
+            assert_eq!(types["methods"]["Example#value"], Value::Null);
+            assert_eq!(types["diagnostics"], json!([format!("cannot infer from invalid Ruby: {}", source.display())]));
+        }
+    }
+    let missing = Command::new(bin).arg("parse").arg(&source).output().unwrap();
+    assert!(!missing.status.success());
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("target Ruby required"));
+    for runtime in ["", "3.5.0", "4.0", "4.0.future", "4.0.7garbage", "4.2.0", "99.0.0"] {
+        let parsed = Command::new(bin).args(["parse", "--ruby-version", runtime]).arg(&source).output().unwrap();
+        assert!(!parsed.status.success());
+        assert!(String::from_utf8_lossy(&parsed.stderr).contains("unsupported target Ruby"));
+        facts["ruby_description"] = json!(runtime);
+        std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+        let output = Command::new(bin).arg("types").arg(&dir).output().unwrap();
+        assert!(!output.status.success());
+        assert!(String::from_utf8_lossy(&output.stderr).contains("unsupported target Ruby"));
+        let mut server = Command::new(bin).arg("mcp").arg(&dir).stdin(Stdio::piped()).stdout(Stdio::piped()).spawn().unwrap();
+        let mut input = server.stdin.take().unwrap();
+        writeln!(input, "{}", json!({"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}})).unwrap();
+        writeln!(input, "{}", json!({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"type_of","arguments":{"target":"Example#value"}}})).unwrap();
+        drop(input);
+        let output = server.wait_with_output().unwrap();
+        assert!(output.status.success());
+        let response: Value = serde_json::from_slice(output.stdout.split(|&b| b == b'\n').nth(1).unwrap()).unwrap();
+        assert_eq!(response["result"]["isError"], true);
+        assert!(response["result"]["content"][0]["text"].as_str().unwrap().contains("unsupported target Ruby"));
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
     let root = std::env::var_os("LOWRAIL_TEST_CORPUS_ROOT").map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(".corpus"));

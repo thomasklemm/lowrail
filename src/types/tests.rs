@@ -10,9 +10,9 @@ fn coverage_counts_return_and_argument_slots_not_samples_or_ivars() {
     let methods: Vec<_> = [("proven",2),("inferred",3),("sampled",4),("unknown",5)].into_iter()
         .map(|(name,line)| json!({"name":name,"source_location":format!("{}:{line}",file.display()),
             "parameters":if name == "sampled" { json!([["req","value"]]) } else { json!([]) }})).collect();
-    let facts: Facts = serde_json::from_value(json!({"app_root":dir,
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
         "modules":[{"name":"Example","kind":"class","methods":methods}]})).unwrap();
-    let mut model = TypeModel::from_facts(&facts);
+    let mut model = TypeModel::from_facts(&facts).unwrap();
     model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":[
         {"module":"Example","name":"sampled","calls":3,"returns":{"String":3},
             "args":{"value":{"Symbol":3}},"ivars":{"@extra":{"Integer":3}}}
@@ -32,6 +32,7 @@ fn coverage_counts_return_and_argument_slots_not_samples_or_ivars() {
 #[test]
 fn schema_nullability_associations_routes_and_roles() {
     let facts: Facts = serde_json::from_value(json!({
+        "ruby_description":"ruby 4.0.7",
         "models": [{"name":"Article", "table":"articles", "columns":[
             {"name":"title", "type":"string", "null":true},
             {"name":"count", "type":"integer", "null":false},
@@ -45,7 +46,7 @@ fn schema_nullability_associations_routes_and_roles() {
             {"kind":"before", "filter":"load_article", "filter_type":"method"}]}],
         "routes":[{"name":"article", "path":"/articles/:id(.:format)"}]
     })).unwrap();
-    let model = TypeModel::from_facts(&facts);
+    let model = TypeModel::from_facts(&facts).unwrap();
     for (query, ty) in [
         ("Article#title", "String?"),
         ("Article#count", "Integer?"),
@@ -107,7 +108,7 @@ fn prism_fixpoint_overrides_and_unsupported_control_flow() {
     })
     .collect();
     methods.push(json!({"name":"published", "singleton":true, "owner":"#<Class:Article>", "source_location":"/rails/named.rb:1", "iseq_kind":"block"}));
-    let facts: Facts = serde_json::from_value(json!({"app_root":dir,
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
         "models":[{"name":"Article", "columns":[{"name":"title", "type":"string"},
             {"name":"status", "type":"integer"}, {"name":"external", "type":"string"}],
             "attribute_aliases":{"state":"status"}}],
@@ -115,7 +116,7 @@ fn prism_fixpoint_overrides_and_unsupported_control_flow() {
             {"name":"Override", "methods":[{"name":"title", "source_location":format!("{}:12",file.display())},
                 {"name":"external", "owner":"Override", "iseq_kind":"cfunc"}]}]
     })).unwrap();
-    let model = TypeModel::from_facts(&facts);
+    let model = TypeModel::from_facts(&facts).unwrap();
     for query in ["Article#title", "Article#label", "Article#banner"] {
         assert_eq!(
             model.lookup(query).unwrap().return_type.name,
@@ -189,12 +190,13 @@ fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides()
     let file = dir.join("article.rb");
     let source = "class Article\n def self.make = new(title: 'hello')\n def self.list = includes(:comments).order(created_at: :desc)\n def self.early = new(title: (external ? (return 7) : 'ok'))\n def self.nested = new(title: helper(external ? (return 7) : 'ok'))\n def self.blocked = new { break 7 }\n def self.custom = Other.new\n def live? = 'override'\nend\nclass Other\n def self.new = 'not an instance'\nend\n";
     std::fs::write(&file, source).unwrap();
-    assert!(ruby_prism::parse(source.as_bytes()).errors().next().is_none());
+    let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
+    assert!(parser.parse(source.as_bytes()).errors().next().is_none());
     let mut methods: Vec<_> = [("make",2),("list",3),("early",4),("nested",5),("blocked",6),("custom",7)]
         .into_iter().map(|(name,line)| json!({"name":name,"singleton":true,
             "source_location":format!("{}:{line}",file.display())})).collect();
     methods.push(json!({"name":"live?","owner":"Article","source_location":format!("{}:8",file.display())}));
-    let mut facts: Facts = serde_json::from_value(json!({"app_root":dir,
+    let mut facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
         "gems":[{"name":"activerecord","version":"8.1.4","path":"/rails"}],
         "models":[{"name":"Article","primary_key":"id","columns":[{"name":"id","type":"uuid","null":false}]}],
         "modules":[
@@ -210,7 +212,7 @@ fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides()
                 {"name":"in-progress?","owner":"#<Enum:0x>","source_location":"/rails/lib/active_record/enum.rb:307"},
                 {"name":"live?","owner":"#<Enum:0x>","source_location":"/rails/lib/active_record/enum.rb:307"}]}
         ]})).unwrap();
-    let model = TypeModel::from_facts(&facts);
+    let model = TypeModel::from_facts(&facts).unwrap();
     for (target, expected) in [("Article.new","Article"),("Article.make","Article"),
         ("Article.list","ActiveRecord::Relation[Article]"),("Article.custom","String"),
         ("Article#draft?","bool"),("Article#live?","String"),("Article#id","String?")] {
@@ -234,19 +236,19 @@ fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides()
     // the catalog: neither is evidence for the stock constructor contract.
     facts.modules.iter_mut().find(|m| m.name == "ActiveRecord::Inheritance::ClassMethods").unwrap()
         .methods[0].source_location = Some("/custom/inheritance.rb:56".into());
-    assert!(TypeModel::from_facts(&facts).lookup("Article.new").is_none());
+    assert!(TypeModel::from_facts(&facts).unwrap().lookup("Article.new").is_none());
     facts.gems[0].version = "9.0.0".into();
-    assert!(TypeModel::from_facts(&facts).lookup("Article#draft?").is_none());
+    assert!(TypeModel::from_facts(&facts).unwrap().lookup("Article#draft?").is_none());
     facts.gems[0].version = "8.1.4".into();
     // Erased anonymous owner IDs must not turn a shadowed enum into bool.
     facts.modules[0].ancestors.insert(0, "#<Module:0x>".into());
     facts.modules.push(serde_json::from_value(json!({"name":"Article.ancestors[0]","synthetic":true,
         "methods":[{"name":"draft?","owner":"#<Module:0x>"}]})).unwrap());
-    assert_eq!(TypeModel::from_facts(&facts).fact("Article#draft?","return").unwrap().name, "untyped");
+    assert_eq!(TypeModel::from_facts(&facts).unwrap().fact("Article#draft?","return").unwrap().name, "untyped");
     facts.modules[0].ancestors.remove(0);
     facts.modules.pop();
     facts.modules[0].ancestors.push("#<Enum:0x>".into());
-    assert_eq!(TypeModel::from_facts(&facts).fact("Article#draft?","return").unwrap().name, "untyped");
+    assert_eq!(TypeModel::from_facts(&facts).unwrap().fact("Article#draft?","return").unwrap().name, "untyped");
     std::fs::remove_dir_all(dir).unwrap();
 }
 
@@ -260,7 +262,7 @@ fn template_source_locations_are_not_parsed_as_ruby() {
     std::fs::write(&template, "<h1><%= 42 %></h1>").unwrap();
     std::fs::write(&raw, "self.addEventListener('fetch', () => {});").unwrap();
     std::fs::write(&invalid, "def broken(").unwrap();
-    let facts: Facts = serde_json::from_value(json!({"app_root":dir,
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
         "templates":[{"identifier":template}, {"identifier":raw}],
         "modules":[
             {"name":"Views", "const_source_location":format!("{}:1",template.display()),
@@ -269,7 +271,7 @@ fn template_source_locations_are_not_parsed_as_ruby() {
             {"name":"Broken", "methods":[{"name":"broken", "source_location":format!("{}:1",invalid.display())}]}
         ]
     })).unwrap();
-    let model = TypeModel::from_facts(&facts);
+    let model = TypeModel::from_facts(&facts).unwrap();
     assert_eq!(
         model.diagnostics,
         [format!(
@@ -326,7 +328,7 @@ end
     methods.push(json!({"name":"runtime","owner":"Contract","source_location":"/sorbet/lib/types/private/methods/call_validation.rb:120",
         "sorbet_sig":{"version":"0.5.12435","source_location":format!("{}:1",file.display()),"parameters":[["req","value"]],
             "parameter_types":{"value":"Symbol"},"return_type":"Integer"}}));
-    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"gems":[{"name":"sorbet-runtime","version":"0.5.12435","path":"/sorbet"}],
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7","gems":[{"name":"sorbet-runtime","version":"0.5.12435","path":"/sorbet"}],
         "controllers":[{"name":"Controller","actions":["fetch","literal"]}],
         "modules":[{"name":"Contract","kind":"module","const_source_location":format!("{}:1",file.display()),"methods":methods},
             {"name":"Controller","kind":"class","ancestors":["Controller","Contract"],"const_source_location":format!("{}:18",file.display()),
@@ -336,7 +338,7 @@ end
                 {"name":"qualified","owner":"Shadow","source_location":"/sorbet/lib/types/private/methods/_methods.rb:257"}]},
             {"name":"Shadow::Types","kind":"module"},
             {"name":"String","kind":"class"},{"name":"Integer","kind":"class"},{"name":"Symbol","kind":"class"}]})).unwrap();
-    let mut model = TypeModel::from_facts(&facts);
+    let mut model = TypeModel::from_facts(&facts).unwrap();
     assert_eq!(model.lookup("Controller#fetch").unwrap().signature(), "(::String, ?Array[::Integer?], ?flags: Hash[::Symbol, (::Integer | Array[::String])], **untyped) -> (::String | ::Integer)?");
     assert_eq!(model.fact("Contract#literal","return").unwrap().evidence, Evidence::Static);
     assert_eq!(model.fact("Controller#literal","return").unwrap().name, "String");
@@ -380,7 +382,7 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
         .map(|(name,line,singleton)| json!({"name":name,"singleton":singleton,
             "source_location":format!("{}:{line}",file.display()),
             "parameters":if name == "dynamic" { json!([["req","value"]]) } else { json!([]) }})).collect();
-    let facts: Facts = serde_json::from_value(json!({"app_root":dir,
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
         "models":[{"name":"Article","columns":[{"name":"title","type":"string","null":true}]},
             {"name":"Anonymous.ancestors[0]"}],
         "modules":[{"name":"Article","methods":methods},
@@ -389,7 +391,7 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
             {"name":"Outer","kind":"class"},
             {"name":"Outer::Item","kind":"class"},
             {"name":"Outer::Parameters","kind":"class"}]})).unwrap();
-    let mut model = TypeModel::from_facts(&facts);
+    let mut model = TypeModel::from_facts(&facts).unwrap();
     assert_eq!(model.fact("Article#literal", "return").unwrap().proven_type(), Some("Integer"));
     assert_eq!(model.fact("Article#caller", "return").unwrap().proven_type(), None);
     assert_eq!(model.fact("Article#exit_literal", "ivar:@n").unwrap().proven_type(), Some("Integer"));

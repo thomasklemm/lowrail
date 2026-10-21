@@ -75,11 +75,15 @@ pub fn build(app: &Path, env: &str, passes: &Selection, target_root: Option<&Pat
         facts::dump(app, &facts_path)?;
     }
     let facts = facts::load(&facts_path)?;
+    let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
     // Shared advisory input, available before any builder runs. It grants
     // no authority to lower; pass-specific certificates still own that.
     let typed_facts = crate::types::TypeModel::load(app, &facts)?.typed_facts();
     write_atomic(&dir.join("typed_facts.json"), &serde_json::to_string_pretty(&typed_facts).unwrap())?;
     let mut oracle = RubyOracle::start(app, env, jit)?;
+    if parser.version() != crate::parser::Parser::for_runtime(&oracle.ruby_description)?.version() {
+        return Err(format!("target Ruby grammar mismatch: facts {:?}, build {:?}; refresh boot facts", facts.ruby_description, oracle.ruby_description));
+    }
     let certification_jit = oracle.certification_jit.clone();
     let mut routes = route::Cache::default();
     let mut memo_certificate = None;
@@ -122,8 +126,8 @@ pub fn build(app: &Path, env: &str, passes: &Selection, target_root: Option<&Pat
             }
             let unit = units.len();
             let lowered = match pass.builder {
-                Builder::View => view::lower_template(&code, &locals, unit, &mut oracle),
-                Builder::Route => route::lower(&code, &route::Mode::Template { locals: &locals }, unit, &mut oracle, &mut routes),
+                Builder::View => view::lower_template(&code, &locals, unit, &mut oracle, &parser),
+                Builder::Route => route::lower(&code, &route::Mode::Template { locals: &locals }, unit, &mut oracle, &mut routes, &parser),
                 _ => unreachable!(),
             };
             record(&mut ledger, "template", &t.identifier, pass.name, &lowered.sites);
@@ -158,7 +162,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection, target_root: Option<&Pat
             let unit = units.len();
             match pass.builder {
                 Builder::Route => {
-                    let lowered = route::lower(&code, &route::Mode::RubyFile, unit, &mut oracle, &mut routes);
+                    let lowered = route::lower(&code, &route::Mode::RubyFile, unit, &mut oracle, &mut routes, &parser);
                     record(&mut ledger, "file", &file, pass.name, &lowered.sites);
                     if lowered.lowered_count() > 0 {
                         units.push(unit_json(unit, "file", &file, pass.name, &lowered));
@@ -167,7 +171,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection, target_root: Option<&Pat
                 }
                 Builder::Memo(intrinsic) => {
                     let cache = match intrinsic { memo::Intrinsic::UriJoin => &mut memo_certificate, memo::Intrinsic::Sha256 => &mut digest_certificate };
-                    let lowered = memo::lower(&code, unit, &mut oracle, cache, intrinsic);
+                    let lowered = memo::lower(&code, unit, &mut oracle, cache, intrinsic, &parser);
                     record(&mut ledger, "file", &file, pass.name, &lowered.sites);
                     let sites = lowered.sites.iter().filter(|s| s.outcome == "lowered").count();
                     if sites > 0 {

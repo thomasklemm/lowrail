@@ -206,14 +206,15 @@ pub fn resolve<'a>(
 
 impl TypeModel {
     pub fn load(app: &Path, facts: &Facts) -> Result<Self, String> {
-        let mut model = Self::from_facts(facts);
+        let mut model = Self::from_facts(facts)?;
         if let Some(bytes) = observed::read(app)? {
             model.merge_observed(facts, &bytes)?;
         }
         Ok(model)
     }
 
-    pub fn from_facts(facts: &Facts) -> Self {
+    pub fn from_facts(facts: &Facts) -> Result<Self, String> {
+        let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
         let mut out = Self::default();
         for model in &facts.models {
             for column in &model.columns {
@@ -308,8 +309,8 @@ impl TypeModel {
             }
         }
         rails::seed(facts, &mut out);
-        infer::analyze(facts, &mut out);
-        out
+        infer::analyze(facts, &mut out, &parser);
+        Ok(out)
     }
 
     fn role(&mut self, receiver: &str, method: &str, role: &str) {

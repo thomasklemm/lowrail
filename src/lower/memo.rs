@@ -25,7 +25,7 @@ impl Intrinsic {
     }
 }
 
-pub fn lower(code: &str, id: usize, oracle: &mut dyn Oracle, certificate: &mut Option<Result<Value, String>>, intrinsic: Intrinsic) -> Lowered {
+pub fn lower(code: &str, id: usize, oracle: &mut dyn Oracle, certificate: &mut Option<Result<Value, String>>, intrinsic: Intrinsic, parser: &crate::parser::Parser) -> Lowered {
     struct V<'a> { code: &'a str, id: usize, intrinsic: Intrinsic, refined: bool, calls: Vec<(usize, usize, usize, String)>, sites: Vec<Site> }
     impl<'pr> Visit<'pr> for V<'_> {
         fn visit_defined_node(&mut self, _: &ruby_prism::DefinedNode<'pr>) {}
@@ -77,7 +77,7 @@ pub fn lower(code: &str, id: usize, oracle: &mut dyn Oracle, certificate: &mut O
             ruby_prism::visit_call_node(self, n);
         }
     }
-    let parsed = ruby_prism::parse(code.as_bytes());
+    let parsed = parser.parse(code.as_bytes());
     let (target, method, _, _, builder) = intrinsic.spec();
     let helper = format!("{target}.{method}");
     let mut v = V { code, id, intrinsic, refined: false, calls: vec![], sites: vec![] };
@@ -117,31 +117,33 @@ mod tests {
 
     #[test]
     fn expressions_keep_evaluation_order_lines_and_uncertified_calls() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let source = "def locations; URI.join(base(), url()); end\nURI.join(URI.join(a, b), c)\nURI.join(a, *b)\ndefined?(URI.join(a, b))\nURI.join(a, '{ID}')\n";
         let mut cert = Some(Ok(serde_json::json!({"facts": []})));
-        let result = lower(source, 17, &mut NoOracle, &mut cert, Intrinsic::UriJoin);
+        let result = lower(source, 17, &mut NoOracle, &mut cert, Intrinsic::UriJoin, &parser);
         assert!(result.code.starts_with("def locations; ::Lowrail::Memo.join(17, URI, base(), url()) { |__lrm_r, __lrm_b, __lrm_u| __lrm_r.join(__lrm_b, __lrm_u) }; end\n"));
         assert!(result.code.contains("URI.join(::Lowrail::Memo.join(17, URI, a, b) { |__lrm_r, __lrm_b, __lrm_u| __lrm_r.join(__lrm_b, __lrm_u) }, c)"));
         assert!(result.code.contains("URI.join(a, *b)\ndefined?(URI.join(a, b))"));
         assert!(result.code.contains("::Lowrail::Memo.join(17, URI, a, '{ID}')"));
         assert_eq!(result.code.lines().count(), source.lines().count());
-        assert!(ruby_prism::parse(result.code.as_bytes()).errors().next().is_none());
+        assert!(parser.parse(result.code.as_bytes()).errors().next().is_none());
         let refined = "using CustomURI; URI.join(a, b)";
-        assert_eq!(lower(refined, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin).code, refined);
-        let digest = lower("Digest::SHA256.base64digest(input())", 18, &mut NoOracle, &mut cert, Intrinsic::Sha256);
+        assert_eq!(lower(refined, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin, &parser).code, refined);
+        let digest = lower("Digest::SHA256.base64digest(input())", 18, &mut NoOracle, &mut cert, Intrinsic::Sha256, &parser);
         assert_eq!(digest.code, "::Lowrail::Memo.digest(18, Digest::SHA256, input()) { |__lrm_r, __lrm_b| __lrm_r.base64digest(__lrm_b) }");
     }
 
     #[test]
     fn public_inertia_vite_fixture_is_refused_not_assumed_pure() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         for source in [include_str!("../../tests/fixtures/memo/inertia_version.rb"), include_str!("../../tests/fixtures/memo/inertia_eager_version.rb")] {
-            let result = lower(source, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin);
+            let result = lower(source, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin, &parser);
             assert_eq!(result.code, source);
             assert!(result.certificate.is_none());
             assert!(result.sites.iter().any(|s| s.helper == "digest" && s.outcome.contains("no purity certificate")));
         }
         let binding = "configuration.bind_controller(controller)";
-        let result = lower(binding, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin);
+        let result = lower(binding, 0, &mut NoOracle, &mut None, Intrinsic::UriJoin, &parser);
         assert_eq!(result.code, binding);
         assert!(result.sites.iter().any(|s| s.outcome.contains("request-bound controller")));
     }

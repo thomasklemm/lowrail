@@ -248,6 +248,7 @@ fn type_name(
     facts: &Facts,
     provenance: &mut Vec<Provenance>,
     depth: usize,
+    parser: &crate::parser::Parser,
 ) -> Option<String> {
     if depth > 12 {
         return None;
@@ -309,7 +310,7 @@ fn type_name(
                     source: Source::SorbetSig,
                     detail: format!("type alias {name} at {location}"),
                 });
-                return parse_type(expr, scopes, index, facts, provenance, depth + 1);
+                return parse_type(expr, scopes, index, facts, provenance, depth + 1, parser);
             }
             if let Some(module) = facts.modules.iter().find(|m| m.name == name) {
                 // A module constraint is not a concrete class return type in RBS.
@@ -340,13 +341,13 @@ fn type_name(
         .unwrap_or_default();
     let name = call.name();
     if receiver == "T" && name.as_slice() == b"nilable" && args.len() == 1 {
-        let ty = type_name(&args[0], scopes, index, facts, provenance, depth + 1)?;
+        let ty = type_name(&args[0], scopes, index, facts, provenance, depth + 1, parser)?;
         return Some(nullable(&ty, true));
     }
     if receiver == "T" && name.as_slice() == b"any" && !args.is_empty() {
         let types: Option<Vec<_>> = args
             .iter()
-            .map(|n| type_name(n, scopes, index, facts, provenance, depth + 1))
+            .map(|n| type_name(n, scopes, index, facts, provenance, depth + 1, parser))
             .collect();
         let types = types?;
         return Some(if types.iter().any(|t| t == "untyped") {
@@ -367,7 +368,7 @@ fn type_name(
         let types: Vec<_> = args
             .iter()
             .map(|n| {
-                type_name(n, scopes, index, facts, provenance, depth + 1)
+                type_name(n, scopes, index, facts, provenance, depth + 1, parser)
                     .unwrap_or_else(|| "untyped".into())
             })
             .collect();
@@ -383,14 +384,15 @@ fn parse_type(
     facts: &Facts,
     provenance: &mut Vec<Provenance>,
     depth: usize,
+    parser: &crate::parser::Parser,
 ) -> Option<String> {
-    let parsed = ruby_prism::parse(expr.as_bytes());
+    let parsed = parser.parse(expr.as_bytes());
     if parsed.errors().next().is_some() {
         return None;
     }
     let program = parsed.node().as_program_node()?;
     let node = program.statements().body().iter().next()?;
-    type_name(&node, scopes, index, facts, provenance, depth)
+    type_name(&node, scopes, index, facts, provenance, depth, parser)
 }
 
 fn files(dir: &Path, out: &mut BTreeSet<std::path::PathBuf>) {
@@ -409,19 +411,18 @@ fn files(dir: &Path, out: &mut BTreeSet<std::path::PathBuf>) {
     }
 }
 
-pub(super) fn seed(facts: &Facts, model: &mut TypeModel) {
+pub(super) fn seed(facts: &Facts, model: &mut TypeModel, parser: &crate::parser::Parser) {
     let Some(gem) = facts.gems.iter().find(|g| g.name == "sorbet-runtime") else {
         return;
     };
     let mut paths = BTreeSet::new();
     files(&Path::new(&facts.app_root).join("app"), &mut paths);
-    let classifier = facts::Classifier::new(facts);
     for module in &facts.modules {
         if let Some((path, _)) = module
             .const_source_location
             .as_deref()
             .and_then(split_location)
-            && classifier.in_app(path)
+            && facts.in_app(path)
             && path.ends_with(".rb")
         {
             paths.insert(path.into());
@@ -432,7 +433,7 @@ pub(super) fn seed(facts: &Facts, model: &mut TypeModel) {
         let Ok(bytes) = std::fs::read(&path) else {
             continue;
         };
-        let parsed = ruby_prism::parse(&bytes);
+        let parsed = parser.parse(&bytes);
         if parsed.errors().next().is_some() {
             model
                 .diagnostics
@@ -470,7 +471,7 @@ pub(super) fn seed(facts: &Facts, model: &mut TypeModel) {
                 let Some((path, _)) = split_location(&sig.source_location) else {
                     continue;
                 };
-                if !classifier.in_app(path) {
+                if !facts.in_app(path) {
                     continue;
                 }
                 Declaration {
@@ -497,7 +498,7 @@ pub(super) fn seed(facts: &Facts, model: &mut TypeModel) {
                         method.source_location.as_deref().unwrap()
                     ),
                 }];
-                let name = parse_type(expr, &decl.scopes, &index, facts, &mut provenance, 0)
+                let name = parse_type(expr, &decl.scopes, &index, facts, &mut provenance, 0, parser)
                     .unwrap_or_else(|| "untyped".into());
                 Type {
                     name,

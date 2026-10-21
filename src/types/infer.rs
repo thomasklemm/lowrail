@@ -170,11 +170,11 @@ impl Index {
         };
     }
 
-    fn load(path: &str, diagnostics: &mut Vec<String>) -> Self {
+    fn load(path: &str, diagnostics: &mut Vec<String>, parser: &crate::parser::Parser) -> Self {
         let mut index = Index::default();
         match std::fs::read(path) {
             Ok(source) => {
-                let parsed = ruby_prism::parse(&source);
+                let parsed = parser.parse(&source);
                 if parsed.errors().next().is_none() {
                     index.source = source.clone();
                     index.visit(&parsed.node());
@@ -188,8 +188,7 @@ impl Index {
     }
 }
 
-pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
-    let classifier = facts::Classifier::new(facts);
+pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::parser::Parser) {
     // Template methods keep the template's source location, not a Ruby file.
     // Their handler output is a different program with different line offsets;
     // do not diagnose raw ERB/JS as invalid Ruby or infer bodies from it.
@@ -205,12 +204,12 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             .const_source_location
             .as_deref()
             .and_then(split_location)
-            && classifier.in_app(path)
+            && facts.in_app(path)
             && !templates.contains(path)
         {
             indexes
                 .entry(path.to_owned())
-                .or_insert_with(|| Index::load(path, &mut model.diagnostics));
+                .or_insert_with(|| Index::load(path, &mut model.diagnostics, parser));
         }
     }
     for module in &facts.modules {
@@ -219,12 +218,12 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             else {
                 continue;
             };
-            if !classifier.in_app(path) || templates.contains(path) {
+            if !facts.in_app(path) || templates.contains(path) {
                 continue;
             }
             let index = indexes
                 .entry(path.to_owned())
-                .or_insert_with(|| Index::load(path, &mut model.diagnostics));
+                .or_insert_with(|| Index::load(path, &mut model.diagnostics, parser));
             if let Some(body) = index.defs.get(&(line, method.def_name().to_owned())) {
                 let id = key(&module.name, &method.name, method.singleton);
                 let sig = model.insert(
@@ -299,7 +298,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel) {
             }
         }
     }
-    sorbet::seed(facts, model);
+    sorbet::seed(facts, model, parser);
     // Boot parameters and ownership override catalog guesses, including custom
     // readers. Resolve ancestor methods for model accessors as well.
     let ids: Vec<_> = model.methods.keys().cloned().collect();

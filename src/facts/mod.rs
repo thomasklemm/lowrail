@@ -149,10 +149,11 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     }
     let facts = load(&out)?;
     let size = std::fs::metadata(&out).map(|m| m.len()).unwrap_or(0);
-    print!("{}", summary(&facts, &out, size));
+    print!("{}", summary(&facts, &out, size)?);
     let gen_dir = generated_dir(&out);
     if list_origins {
-        for o in Classifier::new(&facts).with_generated_dir(&gen_dir).app_relevant() {
+        let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
+        for o in Classifier::new(&facts, &parser).with_generated_dir(&gen_dir).app_relevant() {
             let sep = if o.method.singleton { "." } else { "#" };
             let body = o
                 .generated
@@ -193,7 +194,8 @@ pub fn show_method(facts: &Facts, gen_dir: &Path, spec: &str) -> Result<String, 
         .iter()
         .find(|x| x.name == name && x.singleton == singleton)
         .ok_or_else(|| format!("{spec}: no such method"))?;
-    let mut c = Classifier::new(facts).with_generated_dir(gen_dir);
+    let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
+    let mut c = Classifier::new(facts, &parser).with_generated_dir(gen_dir);
     let mut s = String::new();
     let _ = writeln!(s, "{spec}  owner {}  source {}", meth.owner, meth.source_location.as_deref().unwrap_or("-"));
     let _ = writeln!(s, "  origin: {:?}", c.classify(m, meth));
@@ -226,7 +228,7 @@ pub fn show_method(facts: &Facts, gen_dir: &Path, spec: &str) -> Result<String, 
 }
 
 /// Human-readable summary: counts, timings, and origins of app methods.
-pub fn summary(facts: &Facts, path: &Path, size: u64) -> String {
+pub fn summary(facts: &Facts, path: &Path, size: u64) -> Result<String, String> {
     use std::fmt::Write;
     let mut s = String::new();
     let w = &mut s;
@@ -262,14 +264,13 @@ pub fn summary(facts: &Facts, path: &Path, size: u64) -> String {
         methods().count(),
         counts(methods().map(|m| m.iseq_kind.clone()))
     );
-    let classifier = Classifier::new(facts);
     let app_owned: Vec<_> = methods()
         .filter(|m| {
             m.source_location
                 .as_deref()
                 .map(|l| l.strip_prefix("(eval at ").unwrap_or(l))
                 .and_then(schema::split_location)
-                .is_some_and(|(p, _)| classifier.in_app(p))
+                .is_some_and(|(p, _)| facts.in_app(p))
         })
         .collect();
     let _ = writeln!(
@@ -344,7 +345,8 @@ pub fn summary(facts: &Facts, path: &Path, size: u64) -> String {
         let _ = writeln!(w, "  error: {}: {}", e.r#where, e.error);
     }
 
-    let mut classifier = Classifier::new(facts).with_generated_dir(generated_dir(path));
+    let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
+    let mut classifier = Classifier::new(facts, &parser).with_generated_dir(generated_dir(path));
     let origins = classifier.app_relevant();
     let _ = writeln!(w, "origins of app-relevant methods: {}", origins.len());
     let linked: Vec<_> = origins.iter().filter_map(|o| o.generated.as_ref()).collect();
@@ -389,7 +391,7 @@ pub fn summary(facts: &Facts, path: &Path, size: u64) -> String {
         };
         let _ = writeln!(w, "  {cat}: {} {detail}", list.len());
     }
-    s
+    Ok(s)
 }
 
 /// "{a: 3, b: 1}" ordered by count, then name.
@@ -459,7 +461,8 @@ mod corpus_tests {
         assert!(facts.materialize.iter().any(|s| s.step == "templates"));
         assert!(facts.generated_scripts.len() > 500, "{}", facts.generated_scripts.len());
 
-        let mut c = Classifier::new(&facts).with_generated_dir(generated_dir(&out));
+        let parser = crate::parser::Parser::for_runtime(&facts.ruby_description).unwrap();
+        let mut c = Classifier::new(&facts, &parser).with_generated_dir(generated_dir(&out));
         let attrs = facts
             .modules
             .iter()
@@ -479,7 +482,7 @@ mod corpus_tests {
             assert_eq!(templates, 0, "no identity-based template attribution");
             assert!(facts.compiled_templates.iter().filter(|t| t.in_app == Some(true)).count() >= 10);
             assert!(origins.iter().filter_map(|o| o.generated.as_ref()).all(|g| g.via == Via::Location));
-            assert!(summary(&facts, &out, 0).contains(reason));
+            assert!(summary(&facts, &out, 0).unwrap().contains(reason));
         } else {
             assert_eq!(g.via, Via::Identity);
             assert!(templates >= 10, "{templates} template methods");

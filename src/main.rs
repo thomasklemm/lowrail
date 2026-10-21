@@ -8,6 +8,7 @@ mod facts;
 mod lower;
 mod mcp;
 mod observe;
+mod parser;
 mod passes;
 mod seal;
 mod types;
@@ -16,7 +17,7 @@ mod verify;
 use std::process::ExitCode;
 
 const USAGE: &str = "usage: lowrail <command> [args]
-  parse FILE...        check that files parse with Prism
+  parse --ruby-version VERSION FILE...  check files with explicit target Ruby syntax
   facts APP            boot APP, write APP/.lowrail/facts.json, print a summary
   build APP            lower APP using its facts, write ISeqs + manifest
   explain APP          explain current build units/sites, guards, refusals and recorded counters
@@ -58,11 +59,18 @@ fn main() -> ExitCode {
     }
 }
 
-fn parse(files: &[String]) -> Result<(), String> {
+fn parse(args: &[String]) -> Result<(), String> {
+    let [flag, version, files @ ..] = args else {
+        return Err("usage: lowrail parse --ruby-version VERSION FILE... (target Ruby required)".into());
+    };
+    if flag != "--ruby-version" || files.is_empty() {
+        return Err("usage: lowrail parse --ruby-version VERSION FILE... (target Ruby required)".into());
+    }
+    let parser = parser::Parser::for_runtime(version)?;
     let mut failed = 0;
     for path in files {
         let source = std::fs::read(path).map_err(|e| format!("{path}: {e}"))?;
-        let result = ruby_prism::parse(&source);
+        let result = parser.parse(&source);
         let errors: Vec<_> = result.errors().collect();
         if !errors.is_empty() {
             failed += 1;

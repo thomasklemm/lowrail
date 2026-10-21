@@ -176,7 +176,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         let facts_path = facts_path.unwrap_or_else(|| lowrail_dir.join("facts.json"));
         if facts_path.exists() {
             let facts = crate::facts::load(&facts_path)?;
-            observed.comparison = Some(compare(&observed, &facts, &facts_path, Some(&lowrail_dir.join("generated"))));
+            observed.comparison = Some(compare(&observed, &facts, &facts_path, Some(&lowrail_dir.join("generated")))?);
         }
         let out = lowrail_dir.join("observed.json");
         if let Ok(prev) = std::fs::read(&out)
@@ -220,7 +220,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let facts_path = facts_path.unwrap_or_else(|| lowrail_dir.join("facts.json"));
     if facts_path.exists() {
         let facts = crate::facts::load(&facts_path)?;
-        observed.comparison = Some(compare(&observed, &facts, &facts_path, Some(&lowrail_dir.join("generated"))));
+        observed.comparison = Some(compare(&observed, &facts, &facts_path, Some(&lowrail_dir.join("generated")))?);
     }
     let out = lowrail_dir.join("observed.json");
     let json = serde_json::to_vec(&observed).map_err(|e| e.to_string())?;
@@ -358,7 +358,10 @@ fn add_counts(into: &mut BTreeMap<String, u64>, from: &BTreeMap<String, u64>) {
 /// have.
 /// `observed_generated` holds the run's generated sources (for matching
 /// generated defs by text); the facts' are next to `facts_path`.
-pub fn compare(o: &Observed, facts: &Facts, facts_path: &Path, observed_generated: Option<&Path>) -> Comparison {
+pub fn compare(o: &Observed, facts: &Facts, facts_path: &Path, observed_generated: Option<&Path>) -> Result<Comparison, String> {
+    // Each source is parsed under the runtime that produced its capture.
+    let facts_parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
+    let observed_parser = crate::parser::Parser::for_runtime(&o.ruby_description)?;
     let mut known: HashSet<(&str, bool, &str)> = HashSet::new();
     for m in &facts.modules {
         for x in &m.methods {
@@ -395,10 +398,11 @@ pub fn compare(o: &Observed, facts: &Facts, facts_path: &Path, observed_generate
     };
     let mut facts_defs: Option<HashSet<(String, String)>> = None;
     let observed_facts = Facts {
+        ruby_description: o.ruby_description.clone(),
         generated_scripts: o.generated_scripts.clone(),
         ..Default::default()
     };
-    let mut observed_gen = observed_generated.map(|d| Generated::new(&observed_facts, d));
+    let mut observed_gen = observed_generated.map(|d| Generated::new(&observed_facts, d, &observed_parser));
     for m in &o.defined_after_boot {
         if known.contains(&(m.module.as_str(), m.singleton, m.name.as_str())) {
             c.in_facts += 1;
@@ -411,7 +415,7 @@ pub fn compare(o: &Observed, facts: &Facts, facts_path: &Path, observed_generate
         if m.script.is_some()
             && let Some(g) = observed_gen.as_mut()
         {
-            let defs = facts_defs.get_or_insert_with(|| generated_defs(facts, facts_path));
+            let defs = facts_defs.get_or_insert_with(|| generated_defs(facts, facts_path, &facts_parser));
             let method = Method {
                 name: m.name.clone(),
                 source_location: m.source_location.clone(),
@@ -447,12 +451,12 @@ pub fn compare(o: &Observed, facts: &Facts, facts_path: &Path, observed_generate
             source_location: m.source_location.clone(),
         });
     }
-    c
+    Ok(c)
 }
 
 /// (def name, def text) of every facts method with a generated body.
-fn generated_defs(facts: &Facts, facts_path: &Path) -> HashSet<(String, String)> {
-    let mut g = Generated::new(facts, crate::facts::generated_dir(facts_path));
+fn generated_defs(facts: &Facts, facts_path: &Path, parser: &crate::parser::Parser) -> HashSet<(String, String)> {
+    let mut g = Generated::new(facts, crate::facts::generated_dir(facts_path), parser);
     let mut out = HashSet::new();
     for m in facts.modules.iter().flat_map(|m| &m.methods) {
         if m.script.is_none() {
@@ -628,6 +632,7 @@ mod tests {
         };
         let p1 = Partial {
             pid: 1,
+            ruby_description: "ruby 4.0.7 (revision fixture)".into(),
             app_root: "/app".into(),
             defined_after_boot: vec![
                 om("Article", "title", Some("/gems/am/attr.rb:1"), None),
@@ -646,6 +651,7 @@ mod tests {
         };
         let p2 = Partial {
             pid: 2,
+            ruby_description: "ruby 4.0.7 (revision fixture)".into(),
             app_root: "/app".into(),
             generated_stats: GeneratedStats {
                 linking_decline: Some("iseq_identity_unavailable: fresh wrappers".into()),
@@ -679,6 +685,7 @@ mod tests {
         assert_eq!((t.calls, t.saturated, t.returns.len()), (3, true, 2));
 
         let facts = Facts {
+            ruby_description: "ruby 4.0.7 (revision fixture)".into(),
             modules: vec![Module {
                 name: "Article".into(),
                 methods: vec![Method {
@@ -698,7 +705,7 @@ mod tests {
             }],
             ..Default::default()
         };
-        let c = compare(&o, &facts, Path::new("facts.json"), None);
+        let c = compare(&o, &facts, Path::new("facts.json"), None).unwrap();
         assert_eq!((c.in_facts, c.templates_compiled_in_facts, c.not_in_facts), (1, 1, 4));
         let src = |name: &str| c.methods.iter().find(|m| m.name == name).unwrap().source.clone();
         assert_eq!(src("_row_9"), "template");

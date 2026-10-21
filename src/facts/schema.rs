@@ -35,6 +35,17 @@ pub struct Facts {
     pub generated_stats: Option<GeneratedStats>,
 }
 
+impl Facts {
+    /// App source excludes vendored, generated and temporary directories.
+    pub fn in_app(&self, path: &str) -> bool {
+        let root = std::path::Path::new(&self.app_root);
+        let path = std::path::Path::new(path);
+        path.starts_with(root)
+            && !["vendor", "node_modules", "tmp", ".lowrail"]
+                .iter().any(|d| path.starts_with(root.join(d)))
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct MaterializeStep {

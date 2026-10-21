@@ -58,16 +58,17 @@ pub fn is_template(s: &GeneratedScript) -> bool {
             .is_some_and(|c| c.contains("action_view/template.rb"))
 }
 
-pub struct Generated<'f> {
+pub struct Generated<'f, 'p> {
     dir: PathBuf,
     by_sha: HashMap<&'f str, Vec<&'f GeneratedScript>>,
     by_path: HashMap<&'f str, Vec<&'f GeneratedScript>>,
     sources: HashMap<String, Option<(Vec<u8>, SourceIndex)>>,
+    parser: &'p crate::parser::Parser,
 }
 
-impl<'f> Generated<'f> {
+impl<'f, 'p> Generated<'f, 'p> {
     /// `dir` holds `<sha256>.rb` files (normally next to facts.json).
-    pub fn new(facts: &'f Facts, dir: impl AsRef<Path>) -> Self {
+    pub fn new(facts: &'f Facts, dir: impl AsRef<Path>, parser: &'p crate::parser::Parser) -> Self {
         let mut by_sha: HashMap<&str, Vec<&GeneratedScript>> = HashMap::new();
         let mut by_path: HashMap<&str, Vec<&GeneratedScript>> = HashMap::new();
         for s in &facts.generated_scripts {
@@ -79,6 +80,7 @@ impl<'f> Generated<'f> {
             by_sha,
             by_path,
             sources: HashMap::new(),
+            parser,
         }
     }
 
@@ -135,7 +137,7 @@ impl<'f> Generated<'f> {
             .entry(script.sha256.clone())
             .or_insert_with(|| {
                 let src = std::fs::read(&file).ok()?;
-                let index = SourceIndex::parse(&src);
+                let index = SourceIndex::parse(&src, &self.parser);
                 Some((src, index))
             })
             .as_ref()?;
@@ -190,6 +192,7 @@ mod tests {
         std::fs::create_dir_all(dir).unwrap();
         std::fs::write(dir.join(format!("{sha}.rb")), SCRIPT).unwrap();
         let facts = Facts {
+            ruby_description: "ruby 4.0.7".into(),
             generated_scripts: vec![GeneratedScript {
                 sha256: sha.clone(),
                 lines: 7,
@@ -218,7 +221,8 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("lowrail-gen-{}", std::process::id()));
         // module_eval(src, "/gems/ar/attribute_methods.rb", 40)
         let (facts, sha) = fixture(&dir, "/gems/ar/attribute_methods.rb", 40);
-        let mut g = Generated::new(&facts, &dir);
+        let parser = crate::parser::Parser::for_runtime(&facts.ruby_description).unwrap();
+        let mut g = Generated::new(&facts, &dir, &parser);
 
         let d = g
             .link(&method("title", "/gems/ar/attribute_methods.rb:40", Some(&sha)))
@@ -249,7 +253,8 @@ mod tests {
     fn links_eval_paths_and_templates() {
         let dir = std::env::temp_dir().join(format!("lowrail-gen2-{}", std::process::id()));
         let (facts, _) = fixture(&dir, "(eval at /app/models/a.rb:3)", 1);
-        let mut g = Generated::new(&facts, &dir);
+        let parser = crate::parser::Parser::for_runtime(&facts.ruby_description).unwrap();
+        let mut g = Generated::new(&facts, &dir, &parser);
         let d = g
             .link(&method("title", "(eval at /app/models/a.rb:3):1", None))
             .unwrap();
@@ -258,7 +263,7 @@ mod tests {
 
         // A template compiled with offset 0: method reported at line 0.
         let (facts, sha) = fixture(&dir, "/app/views/a/index.html.erb", 0);
-        let mut g = Generated::new(&facts, &dir);
+        let mut g = Generated::new(&facts, &dir, &parser);
         let d = g
             .link(&method("title", "/app/views/a/index.html.erb:0", Some(&sha)))
             .unwrap();

@@ -121,18 +121,18 @@ pub struct Cache {
     resolves: HashMap<(String, String), Option<String>>,
 }
 
-pub fn lower(original: &str, mode: &Mode, unit: usize, oracle: &mut dyn Oracle, cache: &mut Cache) -> Lowered {
+pub fn lower(original: &str, mode: &Mode, unit: usize, oracle: &mut dyn Oracle, cache: &mut Cache, parser: &crate::parser::Parser) -> Lowered {
     let prefix: String = match mode {
         Mode::Template { locals } => locals.iter().map(|l| format!("{l} = nil; ")).collect(),
         Mode::RubyFile => String::new(),
     };
     let src = format!("{prefix}{original}");
     let code = src.as_str();
-    let result = ruby_prism::parse(code.as_bytes());
+    let result = parser.parse(code.as_bytes());
     let unchanged = || Lowered { code: original.to_string(), ..Default::default() };
     if result.errors().next().is_some() {
         if matches!(mode, Mode::Template { .. }) {
-            return Lowered { code: original.to_string(), sites: vec![super::view::template_parse_refusal(code)], deps: vec![] };
+            return Lowered { code: original.to_string(), sites: vec![super::view::template_parse_refusal(code, parser)], deps: vec![] };
         }
         return unchanged();
     }
@@ -203,7 +203,7 @@ pub fn lower(original: &str, mode: &Mode, unit: usize, oracle: &mut dyn Oracle, 
         lowered.replace_range(s..e, &r);
     }
     // The result must still parse and keep every line where it was.
-    let check = ruby_prism::parse(lowered.as_bytes());
+    let check = parser.parse(lowered.as_bytes());
     if check.errors().next().is_some() || lowered.matches('\n').count() != code.matches('\n').count() {
         out.sites.iter_mut().filter(|s| s.outcome == "lowered").for_each(|s| s.outcome = "lowered code did not re-parse with the same lines".into());
         return Lowered { code: original.to_string(), sites: out.sites, deps: vec![] };
@@ -637,8 +637,9 @@ mod tests {
 
     #[test]
     fn lowers_ruby_file_sites_and_keeps_lines() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let mut fake = Fake::default();
-        let out = lower(RB, &Mode::RubyFile, 4, &mut fake, &mut Cache::default());
+        let out = lower(RB, &Mode::RubyFile, 4, &mut fake, &mut Cache::default(), &parser);
         let outcome = |line: usize| out.sites.iter().find(|s| s.line == line).map(|s| s.outcome.clone()).unwrap_or_default();
         assert_eq!(out.code.matches('\n').count(), RB.matches('\n').count());
         assert_eq!(outcome(3), "lowered");
@@ -737,9 +738,10 @@ mod tests {
 
     #[test]
     fn custom_blocks_are_not_treated_as_named_route_aliases() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "def x = fresh_article_path(@article)\n";
         let mut fake = Fake::default();
-        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default());
+        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default(), &parser);
         assert_eq!(out.code, code);
         assert_eq!(out.sites[0].outcome, "fresh_article_path: block-backed direct/resolve helper; result-helper and argument/option mapping are not guarded");
         assert!(out.deps.is_empty());
@@ -748,9 +750,10 @@ mod tests {
 
     #[test]
     fn arity_refusals_distinguish_defaults_optional_segments_and_recall() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "def defaults = user_profile_path\ndef recall = article_comment_path(comment)\ndef format = article_path(article, :json)\n";
         let mut fake = Fake::default();
-        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default());
+        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default(), &parser);
         assert_eq!(out.code, code);
         assert_eq!(out.sites.len(), 3);
         assert!(out.sites[0].outcome.contains("default-backed required parts: [user_id], optional segments: [format]"));
@@ -763,9 +766,10 @@ mod tests {
 
     #[test]
     fn template_vcall_checks_for_a_local() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "@output_buffer.append=( link_to \"Back\", articles_path, class: \"x\" );\n@output_buffer.append=( article_comment_path(comment.article, comment) );";
         let locals = vec!["comment".to_string()];
-        let out = lower(code, &Mode::Template { locals: &locals }, 0, &mut Fake::default(), &mut Cache::default());
+        let out = lower(code, &Mode::Template { locals: &locals }, 0, &mut Fake::default(), &mut Cache::default(), &parser);
         assert_eq!(out.lowered_count(), 2, "{:?}", out.sites);
         assert!(out.code.contains("((self.class.equal?(::Lowrail::K[0]) || ::Lowrail.ok?(0, self.class)) && defined?(articles_path) == \"method\")"), "{}", out.code);
         assert!(out.code.contains("__lr1a0 = comment.article; __lr1a1 = comment; "), "{}", out.code);
@@ -776,17 +780,19 @@ mod tests {
 
     #[test]
     fn nested_calls_lower_the_inner_one() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "def x\n  article_path(article_path(1))\nend\n";
-        let out = lower(code, &Mode::RubyFile, 0, &mut Fake::default(), &mut Cache::default());
+        let out = lower(code, &Mode::RubyFile, 0, &mut Fake::default(), &mut Cache::default(), &parser);
         let outcomes: Vec<_> = out.sites.iter().map(|s| s.outcome.as_str()).collect();
         assert_eq!(outcomes, vec!["an argument contains another route helper call (the inner one is lowered)", "lowered"]);
     }
 
     #[test]
     fn probe_mismatch_refuses_and_leaves_code() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let mut fake = Fake { mismatch: true, ..Default::default() };
         let code = "def x = article_path(@a)\n";
-        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default());
+        let out = lower(code, &Mode::RubyFile, 0, &mut fake, &mut Cache::default(), &parser);
         assert_eq!(out.code, code);
         assert_eq!(out.sites[0].outcome, "probe mismatch: view, args nil: differs");
         assert!(out.deps.is_empty());
@@ -794,16 +800,18 @@ mod tests {
 
     #[test]
     fn known_class_must_resolve_to_the_route() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "class Webhook < ApplicationRecord\n  def payload = article_path(self)\nend\nmodule Helper\n  def x = article_path(@a)\nend\n";
-        let out = lower(code, &Mode::RubyFile, 0, &mut Fake::default(), &mut Cache::default());
+        let out = lower(code, &Mode::RubyFile, 0, &mut Fake::default(), &mut Cache::default(), &parser);
         let outcomes: Vec<_> = out.sites.iter().map(|s| s.outcome.as_str()).collect();
         assert_eq!(outcomes, vec!["Webhook#message_path is defined by Webhook, not the route set", "lowered"]);
     }
 
     #[test]
     fn defined_is_left_alone() {
+        let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
         let code = "def x = defined?(articles_path) && articles_path\n";
-        let out = lower(code, &Mode::RubyFile, 0, &mut Fake::default(), &mut Cache::default());
+        let out = lower(code, &Mode::RubyFile, 0, &mut Fake::default(), &mut Cache::default(), &parser);
         assert_eq!(out.lowered_count(), 1);
         assert!(out.code.starts_with("def x = defined?(articles_path) && (("));
     }
