@@ -1,6 +1,6 @@
 # Loader composition and compile options
 
-Checked 2026-10-20 on MRI 4.0.7 and 4.1.0-preview1 (`2d08b5f42f`). Lowrail
+Checked 2026-10-21 on MRI 4.0.7 and 4.1.0-preview1 (`2d08b5f42f`). Lowrail
 preserves per-file compiler policy; it does **not** enable frozen string
 literals for the app. Neither build capture nor runtime delivery defines a
 `load_iseq` method. The existing method's owner, source location and method
@@ -231,12 +231,14 @@ safety and baseline literal behavior.
   inner-compiler regression fails without its recipe guard: original `1`
   becomes `false` from an incorrectly compiled introduced string.
 
-Loader suite: **13 tests, 2,039 assertions** on 4.0.7; **13 tests, 1,452
+Loader suite: **13 tests, 2,047 assertions** on 4.0.7; **13 tests, 1,460
 assertions** on 4.1-preview; no failures/errors/skips.
 
-The load-state regression fails against unchanged main because build capture
-adds its own `load_iseq` method. Earlier loader-policy and cached-hijack
-regressions remain in the suite. Reproduce with installed app dependencies:
+The load-state regression fails against pre-change main
+([cb83265](https://github.com/thomasklemm/lowrail/commit/cb832658d52e0a9f440d51ccac7dd985ceb09f2a))
+because build capture adds its own `load_iseq` method. Earlier loader-policy
+and cached-hijack regressions remain in the suite. Reproduce with installed
+app dependencies:
 
 ```sh
 gem install freezolite require-hooks bootsnap --no-document

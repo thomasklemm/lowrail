@@ -322,11 +322,16 @@ the actual compilation policy is no longer observable.
 
 Same-root native compilation is observed at `translate`, without runtime
 recompilation or binary normalization. Standalone builds may also record an
-optional `native_iseq_sha256`, captured before evaluation through a guarded native
-load: native and explicit compiler APIs have different top-level labels.
+optional `native_iseq_sha256`, captured before evaluation through a guarded
+native load: native and explicit compiler APIs have different top-level labels.
 Either complete binary fingerprint is accepted under the same recorded
 recipe and unchanged source digest. A missing native certificate safely
 misses native delivery until rebuilt.
+
+An optional top-level `delivery_refusal` records a whole-artifact no-op before
+runtime installers load. Bundlebun's order-sensitive integration loading uses
+`bundlebun_load_order`; the same reason appears in the delivery ledger and
+runtime stats. Removing the dependency does not clear a saved refusal: rebuild.
 
 The top-level `compile_option` remains build-process metadata, not a file
 delivery guard. Format-1 manifests now refuse as a whole with a recorded

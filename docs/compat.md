@@ -55,11 +55,11 @@ Ruby-version overlays were retried on 4.0.7 **without Lowrail**:
 ## Results
 
 The hit-bearing tables below record the pre-quarantine activation/delivery
-cohorts. The subsequent six-pass quarantine removes memo, digest, AR and config
-candidates from guarded `all-opt-in`; those historical hits are not current
-support claims. The loader's synthetic matrix still exercises real lowered
-delivery independently of pass eligibility. Final integrated checks are
-reported separately, without reactivating sealed-only passes in test apps.
+cohorts. The subsequent cached-fact quarantine removes memo, digest, AR and
+config candidates from guarded `all-opt-in`; those historical hits are not
+current support claims. The loader's synthetic matrix still exercises real
+lowered delivery independently of pass eligibility. Final integrated checks
+are reported separately, without reactivating sealed-only passes in test apps.
 
 Commands use `RAILS_ENV=test`, seed **41231**, one Minitest worker, strict AR
 shadow checking through verify, and **`LOWRAIL_VERIFY_LOADS=1`**. First run
@@ -110,6 +110,77 @@ seed. The separately scheduled all-opt-in cohort passes with 126,101 queries,
 does not erase the default failure. No app/test/RNG workaround or SQL
 normalization was added. The full requested unchanged-app gate cannot be
 called green from this cohort.
+
+### Integrated main recheck (2026-10-21)
+
+Hook-free delivery was integrated after the six additional sealed-only flags,
+the TracePoint activation/delivery fix, identity-keyed replacement tracking
+and binary checks, format 2 and the `LOWRAIL_DIR` harness boundary. The code
+tested here is
+[7d0ea95](https://github.com/thomasklemm/lowrail/commit/7d0ea95dfd5b5c57e2bc1bb1cc226f9f78a94354),
+based on
+[cb83265](https://github.com/thomasklemm/lowrail/commit/cb832658d52e0a9f440d51ccac7dd985ceb09f2a).
+The final rebase also includes upstream docs and the separate sealed-form
+experiment through
+[71a0ae9](https://github.com/thomasklemm/lowrail/commit/71a0ae9);
+the tested gem, Rust, script and fixture contents are unchanged. Cargo and
+the affected gem checks are rerun after that rebase; no measured cohorts run.
+These are fresh `all-opt-in` builds, **not** reactivation of the historical
+sealed-only hit maps above. Outcomes are identical per test; the table keeps
+baseline skips/errors and SQL/load advisories explicit.
+
+| App / suite | Outcomes in each mode | SQL traces | Load differences / unstable entries | Hits / fallbacks |
+|---|---|---|---|---|
+| Real Blog | 21 pass | 125, identical | 0 / 0 | 0 / 0 |
+| Campfire | 632 pass, 2 skip | 15,109, identical | 0 / 0 | 0 / 0 |
+| PingCRM | 1 pass | 4, identical | 0 / 0 | 0 / 0 |
+| Redprints CFP | 50 pass | 692, identical | 0 / 32 | 0 / 0; Bundlebun refused |
+| React Starter Kit | 36 pass | 264, identical | 0 / 8 | 30 / 0 (`inertia/props`, unit 0) |
+| CASA, non-system | 2,971 pass, 21 pending | 126,101; 46 noisy identities advisory | 0 / 8 | 0 / 0 |
+| CASA, system | 769 pass | 62,268; 5 noisy identities advisory | 0 / 8 | 0 / 0 |
+| Writebook, non-system | 119 pass | 8,028, identical | 0 / 8 | 0 / 0 |
+| Writebook, system | 2 pass | 217, identical | 0 / 8 | 0 / 0 |
+| Fizzy | 117 pass, 7 errors | 5,322, identical | 0 / 8 | 0 / 0 |
+| CodeTriage | 222 pass | 2,871 each; 2 noisy identities and 1 further difference advisory | 0 / 24 | 0 / 0 |
+
+The CASA browser result above uses `TEST_ENV_NUMBER=100` (port 7754) and a
+separate database/copy. Two earlier attempts overlapped on the app's fixed
+port 7654 and are **invalid**, including the frozen run owning that listener:
+the fresh copy was stopped in its first off run; the frozen browser report
+has 5 outcome differences (1 off failure, 4 on failures). Neither is evidence
+about the loader. Their logs, frozen JSON, inspected sign-in redirect capture
+and reason are retained in the thread's `loader-port-collision` artifacts.
+The same failed off example passes with the port offset; the full rerun and
+both repeat controls pass all 769 examples. No app/test patch was needed.
+
+CodeTriage's forked parse-docs child makes verify's process count two despite
+`PARALLEL_WORKERS=1`. The further SQL advisory is
+`UserMailerTest#test_sends_issues`: 22 queries in each mode, with different
+cached/noncached query order. Four finite **off-only** full-suite controls
+reproduce both exact digests (three of one, one of the other), with all 222
+tests passing. This establishes off-only variation, not its precise cause.
+No SQL suppression or normalization was added, and the multi-process report
+is not represented as a strict single-process SQL gate. The earlier rejected
+CASA default cohort remains rejected; this later scheduled integration run
+does not erase it. Fizzy's seven baseline errors remain a negative control.
+
+For Fizzy, the archived levers sweep on
+[4eb7b58](https://github.com/thomasklemm/lowrail/commit/4eb7b58) reported **18
+stable load differences**, already with all seven sealed-only flags and a
+format-1 manifest containing `files: {}`, `units: []`, `passes: {}`. Our frozen
+integration based on `ed7cbbe` and the cb83265-based run above both have **0
+stable / 8 unstable** differences, format-2 manifests with empty files/units
+and zero hits. The quarantine does **not** explain 18→0: setup/runtime changes
+include format 2, the TracePoint fix and hook-free delivery. This remains
+**unattributed**, not a claim that the delivery seam alone fixed it.
+
+The integrated full gem suite passes **138 tests / 6,199 assertions**, with
+no failures/errors/skips, including cold sealed delivery, `exit_trace_leave`,
+replacement identity, binary tampering, wrong-root refusal and relocation.
+Cargo passes **39 tests** (35 unit, 1 CLI and 3 verify integration); release
+build passes. Both Ruby loader matrices pass without skips: **13 / 2,047**
+on 4.0.7 and **13 / 1,460** on 4.1-preview. These are correctness checks, not
+measured performance cohorts or a renewed claim for zero-hit passes.
 
 ### Facts and build cost
 
@@ -319,8 +390,13 @@ done
 For Writebook/Fizzy/CodeTriage the suite command is
 `bundle exec rails test --seed 41231`; Writebook's browser command is
 `bundle exec rails test:system --seed 41231`. Use a separate database/copy
-for concurrently running system and non-system suites. Chrome/driver and
-libvips/ImageMagick must be installed as required by the apps' own tests.
+for concurrently running system and non-system suites. CASA also fixes its
+Capybara server port to `7654 + TEST_ENV_NUMBER.to_i`: concurrent browser
+copies need distinct offsets as well as databases (for example,
+`TEST_ENV_NUMBER=100`, with an explicit isolated `DATABASE_URL`). A collided
+browser cohort is invalid, including the run owning the shared listener;
+retain its log and reason rather than counting its outcomes. Chrome/driver
+and libvips/ImageMagick must be installed as required by the apps' own tests.
 `LOWRAIL_SQL_TRACE=full` retains query lines for diagnosis. Census overhead
 on three alternating Real Blog off/on pairs: observer disabled
 1.83/1.80/1.85 s, enabled 1.94/2.05/1.95 s, median **+0.12 s / +6.6%**;
