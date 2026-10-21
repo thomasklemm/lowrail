@@ -1,0 +1,1564 @@
+{
+  "helper_commit": "4cb1c8b5b22c3f8bf1798b8ad3bd7f9ba6ac6102",
+  "ruby": "4.0.7",
+  "rails": "8.1.4",
+  "protocol": {
+    "rounds": 3,
+    "order": "off_a/warmup/off_b rotated per round",
+    "workers": 2,
+    "threads_per_worker": 1,
+    "warm_requests_minimum_each_worker": 10,
+    "master_warm_requests": 11,
+    "forced_worker_gc_at_request": 10,
+    "bootsnap": false,
+    "yjit": true,
+    "rps_status": "blog/Campfire cohorts running with published 96b447f; Fizzy/Lobsters HTTP adapters unavailable",
+    "exact_output_status": "memory trees check HTTP status only; separate RPS validator results pending"
+  },
+  "apps": {
+    "blog": {
+      "records": [
+        {
+          "statuses": {
+            "200": 20
+          },
+          "requests_by_worker": {
+            "59873": 10,
+            "59879": 10
+          },
+          "first_ms": 3412.604780000038,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.038794999909441685
+          },
+          "master": {
+            "Rss": 163564,
+            "Pss": 96469,
+            "Shared_Dirty": 75468,
+            "Private_Dirty": 45828
+          },
+          "workers": [
+            {
+              "Rss": 141608,
+              "Pss": 80074,
+              "Shared_Dirty": 75584,
+              "Private_Dirty": 50752
+            },
+            {
+              "Rss": 141644,
+              "Pss": 80106,
+              "Shared_Dirty": 75592,
+              "Private_Dirty": 50780
+            }
+          ],
+          "round": 0,
+          "arm": "off_a",
+          "total_pss_kib": 256649,
+          "mean_worker_rss_kib": 141626
+        },
+        {
+          "statuses": {
+            "200": 23
+          },
+          "requests_by_worker": {
+            "60153": 13,
+            "60148": 10
+          },
+          "first_ms": 3795.75378599975,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 209.66147500030274
+          },
+          "master": {
+            "Rss": 154780,
+            "Pss": 91969,
+            "Shared_Dirty": 69048,
+            "Private_Dirty": 43536
+          },
+          "workers": [
+            {
+              "Rss": 134596,
+              "Pss": 77123,
+              "Shared_Dirty": 69136,
+              "Private_Dirty": 49916
+            },
+            {
+              "Rss": 134492,
+              "Pss": 77001,
+              "Shared_Dirty": 69172,
+              "Private_Dirty": 49776
+            }
+          ],
+          "round": 0,
+          "arm": "warmup",
+          "total_pss_kib": 246093,
+          "mean_worker_rss_kib": 134544
+        },
+        {
+          "statuses": {
+            "200": 21
+          },
+          "requests_by_worker": {
+            "60399": 10,
+            "60405": 11
+          },
+          "first_ms": 3596.066200000223,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012718999641947448
+          },
+          "master": {
+            "Rss": 163872,
+            "Pss": 96434,
+            "Shared_Dirty": 75964,
+            "Private_Dirty": 45480
+          },
+          "workers": [
+            {
+              "Rss": 142056,
+              "Pss": 79983,
+              "Shared_Dirty": 76096,
+              "Private_Dirty": 50460
+            },
+            {
+              "Rss": 142080,
+              "Pss": 80031,
+              "Shared_Dirty": 76048,
+              "Private_Dirty": 50532
+            }
+          ],
+          "round": 0,
+          "arm": "off_b",
+          "total_pss_kib": 256448,
+          "mean_worker_rss_kib": 142068
+        },
+        {
+          "statuses": {
+            "200": 31
+          },
+          "requests_by_worker": {
+            "61163": 10,
+            "61157": 21
+          },
+          "first_ms": 3636.9330340003216,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012787999821739504
+          },
+          "master": {
+            "Rss": 163516,
+            "Pss": 96451,
+            "Shared_Dirty": 75692,
+            "Private_Dirty": 45680
+          },
+          "workers": [
+            {
+              "Rss": 141928,
+              "Pss": 80157,
+              "Shared_Dirty": 75832,
+              "Private_Dirty": 50632
+            },
+            {
+              "Rss": 143196,
+              "Pss": 81747,
+              "Shared_Dirty": 75188,
+              "Private_Dirty": 52544
+            }
+          ],
+          "round": 1,
+          "arm": "off_a",
+          "total_pss_kib": 258355,
+          "mean_worker_rss_kib": 142562
+        },
+        {
+          "statuses": {
+            "200": 24
+          },
+          "requests_by_worker": {
+            "60659": 14,
+            "60664": 10
+          },
+          "first_ms": 3722.983337000187,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 207.1768460000385
+          },
+          "master": {
+            "Rss": 154600,
+            "Pss": 91682,
+            "Shared_Dirty": 69400,
+            "Private_Dirty": 43228
+          },
+          "workers": [
+            {
+              "Rss": 134468,
+              "Pss": 77004,
+              "Shared_Dirty": 69460,
+              "Private_Dirty": 49704
+            },
+            {
+              "Rss": 134200,
+              "Pss": 76690,
+              "Shared_Dirty": 69552,
+              "Private_Dirty": 49344
+            }
+          ],
+          "round": 1,
+          "arm": "warmup",
+          "total_pss_kib": 245376,
+          "mean_worker_rss_kib": 134334
+        },
+        {
+          "statuses": {
+            "200": 68
+          },
+          "requests_by_worker": {
+            "60908": 58,
+            "60903": 10
+          },
+          "first_ms": 3426.020362000145,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.013573000160249649
+          },
+          "master": {
+            "Rss": 163448,
+            "Pss": 98884,
+            "Shared_Dirty": 76056,
+            "Private_Dirty": 45368
+          },
+          "workers": [
+            {
+              "Rss": 151696,
+              "Pss": 100665,
+              "Shared_Dirty": 59640,
+              "Private_Dirty": 76656
+            },
+            {
+              "Rss": 141980,
+              "Pss": 82679,
+              "Shared_Dirty": 76180,
+              "Private_Dirty": 50400
+            }
+          ],
+          "round": 1,
+          "arm": "off_b",
+          "total_pss_kib": 282228,
+          "mean_worker_rss_kib": 146838
+        },
+        {
+          "statuses": {
+            "200": 24
+          },
+          "requests_by_worker": {
+            "61691": 14,
+            "61686": 10
+          },
+          "first_ms": 3925.3673169996546,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.013784000202576863
+          },
+          "master": {
+            "Rss": 163476,
+            "Pss": 96228,
+            "Shared_Dirty": 75820,
+            "Private_Dirty": 45468
+          },
+          "workers": [
+            {
+              "Rss": 141920,
+              "Pss": 80130,
+              "Shared_Dirty": 75648,
+              "Private_Dirty": 50776
+            },
+            {
+              "Rss": 141800,
+              "Pss": 79852,
+              "Shared_Dirty": 75964,
+              "Private_Dirty": 50340
+            }
+          ],
+          "round": 2,
+          "arm": "off_a",
+          "total_pss_kib": 256210,
+          "mean_worker_rss_kib": 141860
+        },
+        {
+          "statuses": {
+            "200": 40
+          },
+          "requests_by_worker": {
+            "61950": 30,
+            "61955": 10
+          },
+          "first_ms": 3842.3149779996493,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 209.52781699998013
+          },
+          "master": {
+            "Rss": 154972,
+            "Pss": 91973,
+            "Shared_Dirty": 69472,
+            "Private_Dirty": 43156
+          },
+          "workers": [
+            {
+              "Rss": 141044,
+              "Pss": 83676,
+              "Shared_Dirty": 68892,
+              "Private_Dirty": 56552
+            },
+            {
+              "Rss": 134504,
+              "Pss": 76789,
+              "Shared_Dirty": 69580,
+              "Private_Dirty": 49320
+            }
+          ],
+          "round": 2,
+          "arm": "warmup",
+          "total_pss_kib": 252438,
+          "mean_worker_rss_kib": 137774
+        },
+        {
+          "statuses": {
+            "200": 23
+          },
+          "requests_by_worker": {
+            "61416": 13,
+            "61411": 10
+          },
+          "first_ms": 3612.3526269998365,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.01264100001208135
+          },
+          "master": {
+            "Rss": 163592,
+            "Pss": 96375,
+            "Shared_Dirty": 75828,
+            "Private_Dirty": 45460
+          },
+          "workers": [
+            {
+              "Rss": 141828,
+              "Pss": 80102,
+              "Shared_Dirty": 75656,
+              "Private_Dirty": 50768
+            },
+            {
+              "Rss": 141832,
+              "Pss": 79976,
+              "Shared_Dirty": 75904,
+              "Private_Dirty": 50516
+            }
+          ],
+          "round": 2,
+          "arm": "off_b",
+          "total_pss_kib": 256453,
+          "mean_worker_rss_kib": 141830
+        }
+      ],
+      "paired_pss_percent": [
+        -4.075447722360492,
+        -9.218010925241826,
+        -1.5189315398224545
+      ],
+      "aa_pss_percent": [
+        -0.07831707896777118,
+        9.240386290182112,
+        0.0948440732211786
+      ],
+      "all_three_rounds_lower_than_both_controls": true,
+      "summary": {
+        "off": {
+          "n": 6,
+          "total_pss_mib": 250.5380859375,
+          "mean_worker_rss_mib": 138.63671875,
+          "first_ms": 3604.2094135000298,
+          "hook_ms": 0.013180499990994576,
+          "responses": 187,
+          "5xx": 0
+        },
+        "warmup": {
+          "n": 3,
+          "total_pss_mib": 240.3251953125,
+          "mean_worker_rss_mib": 131.390625,
+          "first_ms": 3795.75378599975,
+          "hook_ms": 209.52781699998013,
+          "responses": 87,
+          "5xx": 0
+        }
+      }
+    },
+    "campfire": {
+      "records": [
+        {
+          "statuses": {
+            "200": 33
+          },
+          "requests_by_worker": {
+            "62237": 23,
+            "62231": 10
+          },
+          "first_ms": 4195.143043999906,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012320000223553507
+          },
+          "master": {
+            "Rss": 177148,
+            "Pss": 109173,
+            "Shared_Dirty": 77196,
+            "Private_Dirty": 57724
+          },
+          "workers": [
+            {
+              "Rss": 160456,
+              "Pss": 99009,
+              "Shared_Dirty": 74412,
+              "Private_Dirty": 69880
+            },
+            {
+              "Rss": 157068,
+              "Pss": 94169,
+              "Shared_Dirty": 77316,
+              "Private_Dirty": 63588
+            }
+          ],
+          "round": 0,
+          "arm": "off_a",
+          "total_pss_kib": 302351,
+          "mean_worker_rss_kib": 158762
+        },
+        {
+          "statuses": {
+            "200": 26
+          },
+          "requests_by_worker": {
+            "62524": 10,
+            "62519": 16
+          },
+          "first_ms": 4370.000186999732,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 235.92237599996224
+          },
+          "master": {
+            "Rss": 167064,
+            "Pss": 98533,
+            "Shared_Dirty": 77324,
+            "Private_Dirty": 47600
+          },
+          "workers": [
+            {
+              "Rss": 150392,
+              "Pss": 87131,
+              "Shared_Dirty": 77416,
+              "Private_Dirty": 56980
+            },
+            {
+              "Rss": 151016,
+              "Pss": 87865,
+              "Shared_Dirty": 77196,
+              "Private_Dirty": 57824
+            }
+          ],
+          "round": 0,
+          "arm": "warmup",
+          "total_pss_kib": 273529,
+          "mean_worker_rss_kib": 150704
+        },
+        {
+          "statuses": {
+            "200": 31
+          },
+          "requests_by_worker": {
+            "62952": 21,
+            "62946": 10
+          },
+          "first_ms": 4005.0705149997157,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.011696999990817858
+          },
+          "master": {
+            "Rss": 174068,
+            "Pss": 107971,
+            "Shared_Dirty": 74104,
+            "Private_Dirty": 58000
+          },
+          "workers": [
+            {
+              "Rss": 157144,
+              "Pss": 96692,
+              "Shared_Dirty": 73120,
+              "Private_Dirty": 68012
+            },
+            {
+              "Rss": 154096,
+              "Pss": 93102,
+              "Shared_Dirty": 74212,
+              "Private_Dirty": 63876
+            }
+          ],
+          "round": 0,
+          "arm": "off_b",
+          "total_pss_kib": 297765,
+          "mean_worker_rss_kib": 155620
+        },
+        {
+          "statuses": {
+            "200": 36
+          },
+          "requests_by_worker": {
+            "63822": 26,
+            "63817": 10
+          },
+          "first_ms": 4241.170303999752,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012233999768795911
+          },
+          "master": {
+            "Rss": 172884,
+            "Pss": 107870,
+            "Shared_Dirty": 73072,
+            "Private_Dirty": 57680
+          },
+          "workers": [
+            {
+              "Rss": 158804,
+              "Pss": 101109,
+              "Shared_Dirty": 68976,
+              "Private_Dirty": 73808
+            },
+            {
+              "Rss": 153332,
+              "Pss": 93547,
+              "Shared_Dirty": 73156,
+              "Private_Dirty": 64156
+            }
+          ],
+          "round": 1,
+          "arm": "off_a",
+          "total_pss_kib": 302526,
+          "mean_worker_rss_kib": 156068
+        },
+        {
+          "statuses": {
+            "200": 74
+          },
+          "requests_by_worker": {
+            "63260": 64,
+            "63254": 10
+          },
+          "first_ms": 4477.420040000197,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 252.3480230001951
+          },
+          "master": {
+            "Rss": 167324,
+            "Pss": 98841,
+            "Shared_Dirty": 77248,
+            "Private_Dirty": 47876
+          },
+          "workers": [
+            {
+              "Rss": 166756,
+              "Pss": 103658,
+              "Shared_Dirty": 76856,
+              "Private_Dirty": 73716
+            },
+            {
+              "Rss": 150604,
+              "Pss": 87258,
+              "Shared_Dirty": 77336,
+              "Private_Dirty": 57076
+            }
+          ],
+          "round": 1,
+          "arm": "warmup",
+          "total_pss_kib": 289757,
+          "mean_worker_rss_kib": 158680
+        },
+        {
+          "statuses": {
+            "200": 26
+          },
+          "requests_by_worker": {
+            "63536": 16,
+            "63543": 10
+          },
+          "first_ms": 4243.673261999902,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.011653999990812736
+          },
+          "master": {
+            "Rss": 173980,
+            "Pss": 107389,
+            "Shared_Dirty": 74424,
+            "Private_Dirty": 57496
+          },
+          "workers": [
+            {
+              "Rss": 154200,
+              "Pss": 92730,
+              "Shared_Dirty": 74424,
+              "Private_Dirty": 63604
+            },
+            {
+              "Rss": 154060,
+              "Pss": 92553,
+              "Shared_Dirty": 74504,
+              "Private_Dirty": 63388
+            }
+          ],
+          "round": 1,
+          "arm": "off_b",
+          "total_pss_kib": 292672,
+          "mean_worker_rss_kib": 154130
+        },
+        {
+          "statuses": {
+            "200": 22
+          },
+          "requests_by_worker": {
+            "64367": 10,
+            "64361": 12
+          },
+          "first_ms": 3971.4855939996596,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.011127000107080676
+          },
+          "master": {
+            "Rss": 172760,
+            "Pss": 107172,
+            "Shared_Dirty": 73188,
+            "Private_Dirty": 57552
+          },
+          "workers": [
+            {
+              "Rss": 153056,
+              "Pss": 92639,
+              "Shared_Dirty": 73236,
+              "Private_Dirty": 63960
+            },
+            {
+              "Rss": 153096,
+              "Pss": 92669,
+              "Shared_Dirty": 73256,
+              "Private_Dirty": 63980
+            }
+          ],
+          "round": 2,
+          "arm": "off_a",
+          "total_pss_kib": 292480,
+          "mean_worker_rss_kib": 153076
+        },
+        {
+          "statuses": {
+            "200": 26
+          },
+          "requests_by_worker": {
+            "64689": 10,
+            "64684": 16
+          },
+          "first_ms": 4603.9702499997475,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 239.5484840003519
+          },
+          "master": {
+            "Rss": 166756,
+            "Pss": 98351,
+            "Shared_Dirty": 77212,
+            "Private_Dirty": 47700
+          },
+          "workers": [
+            {
+              "Rss": 150336,
+              "Pss": 87174,
+              "Shared_Dirty": 77344,
+              "Private_Dirty": 57068
+            },
+            {
+              "Rss": 151184,
+              "Pss": 88124,
+              "Shared_Dirty": 77140,
+              "Private_Dirty": 58120
+            }
+          ],
+          "round": 2,
+          "arm": "warmup",
+          "total_pss_kib": 273649,
+          "mean_worker_rss_kib": 150760
+        },
+        {
+          "statuses": {
+            "200": 26
+          },
+          "requests_by_worker": {
+            "64095": 16,
+            "64090": 10
+          },
+          "first_ms": 4047.0733269999073,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012431999948603334
+          },
+          "master": {
+            "Rss": 173904,
+            "Pss": 107618,
+            "Shared_Dirty": 74004,
+            "Private_Dirty": 57868
+          },
+          "workers": [
+            {
+              "Rss": 153968,
+              "Pss": 93110,
+              "Shared_Dirty": 73912,
+              "Private_Dirty": 64184
+            },
+            {
+              "Rss": 153704,
+              "Pss": 92768,
+              "Shared_Dirty": 74068,
+              "Private_Dirty": 63764
+            }
+          ],
+          "round": 2,
+          "arm": "off_b",
+          "total_pss_kib": 293496,
+          "mean_worker_rss_kib": 153836
+        }
+      ],
+      "paired_pss_percent": [
+        -8.841290683801128,
+        -2.6350894996286955,
+        -6.6006116291452255
+      ],
+      "aa_pss_percent": [
+        -1.5167801660983415,
+        -3.2572406999728964,
+        0.3473741794310703
+      ],
+      "all_three_rounds_lower_than_both_controls": true,
+      "summary": {
+        "off": {
+          "n": 6,
+          "total_pss_mib": 288.70166015625,
+          "mean_worker_rss_mib": 151.2451171875,
+          "first_ms": 4121.1081854999065,
+          "hook_ms": 0.011965499879806885,
+          "responses": 174,
+          "5xx": 0
+        },
+        "warmup": {
+          "n": 3,
+          "total_pss_mib": 267.2353515625,
+          "mean_worker_rss_mib": 147.2265625,
+          "first_ms": 4477.420040000197,
+          "hook_ms": 239.5484840003519,
+          "responses": 126,
+          "5xx": 0
+        }
+      }
+    },
+    "fizzy": {
+      "records": [
+        {
+          "statuses": {
+            "200": 35
+          },
+          "requests_by_worker": {
+            "64960": 25,
+            "64964": 10
+          },
+          "first_ms": 4116.097890000219,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.011407999863877194
+          },
+          "master": {
+            "Rss": 168760,
+            "Pss": 91338,
+            "Shared_Dirty": 102164,
+            "Private_Dirty": 46968
+          },
+          "workers": [
+            {
+              "Rss": 167328,
+              "Pss": 92424,
+              "Shared_Dirty": 100124,
+              "Private_Dirty": 56096
+            },
+            {
+              "Rss": 164392,
+              "Pss": 88338,
+              "Shared_Dirty": 102424,
+              "Private_Dirty": 50860
+            }
+          ],
+          "round": 0,
+          "arm": "off_a",
+          "total_pss_kib": 272100,
+          "mean_worker_rss_kib": 165860
+        },
+        {
+          "statuses": {
+            "200": 21
+          },
+          "requests_by_worker": {
+            "65247": 11,
+            "65243": 10
+          },
+          "first_ms": 4266.9660749998,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 272.3550549999345
+          },
+          "master": {
+            "Rss": 154312,
+            "Pss": 84688,
+            "Shared_Dirty": 90448,
+            "Private_Dirty": 44628
+          },
+          "workers": [
+            {
+              "Rss": 151284,
+              "Pss": 82965,
+              "Shared_Dirty": 90536,
+              "Private_Dirty": 49884
+            },
+            {
+              "Rss": 151280,
+              "Pss": 82899,
+              "Shared_Dirty": 90660,
+              "Private_Dirty": 49756
+            }
+          ],
+          "round": 0,
+          "arm": "warmup",
+          "total_pss_kib": 250552,
+          "mean_worker_rss_kib": 151282
+        },
+        {
+          "statuses": {
+            "200": 24
+          },
+          "requests_by_worker": {
+            "65517": 10,
+            "65521": 14
+          },
+          "first_ms": 4048.7350139997034,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012845000128436368
+          },
+          "master": {
+            "Rss": 162348,
+            "Pss": 90071,
+            "Shared_Dirty": 94044,
+            "Private_Dirty": 48696
+          },
+          "workers": [
+            {
+              "Rss": 157444,
+              "Pss": 86589,
+              "Shared_Dirty": 94332,
+              "Private_Dirty": 52228
+            },
+            {
+              "Rss": 157752,
+              "Pss": 86966,
+              "Shared_Dirty": 94216,
+              "Private_Dirty": 52664
+            }
+          ],
+          "round": 0,
+          "arm": "off_b",
+          "total_pss_kib": 263626,
+          "mean_worker_rss_kib": 157598
+        },
+        {
+          "statuses": {
+            "200": 20
+          },
+          "requests_by_worker": {
+            "66375": 10,
+            "66379": 10
+          },
+          "first_ms": 4266.666681000061,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012276000234123785
+          },
+          "master": {
+            "Rss": 168584,
+            "Pss": 91138,
+            "Shared_Dirty": 101800,
+            "Private_Dirty": 47324
+          },
+          "workers": [
+            {
+              "Rss": 163872,
+              "Pss": 87827,
+              "Shared_Dirty": 102036,
+              "Private_Dirty": 50912
+            },
+            {
+              "Rss": 163852,
+              "Pss": 87807,
+              "Shared_Dirty": 102036,
+              "Private_Dirty": 50892
+            }
+          ],
+          "round": 1,
+          "arm": "off_a",
+          "total_pss_kib": 266772,
+          "mean_worker_rss_kib": 163862
+        },
+        {
+          "statuses": {
+            "200": 27
+          },
+          "requests_by_worker": {
+            "65811": 17,
+            "65806": 10
+          },
+          "first_ms": 4376.804696999898,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 274.1650729999492
+          },
+          "master": {
+            "Rss": 155792,
+            "Pss": 85786,
+            "Shared_Dirty": 90964,
+            "Private_Dirty": 45376
+          },
+          "workers": [
+            {
+              "Rss": 152772,
+              "Pss": 84606,
+              "Shared_Dirty": 90420,
+              "Private_Dirty": 51576
+            },
+            {
+              "Rss": 151892,
+              "Pss": 83326,
+              "Shared_Dirty": 91220,
+              "Private_Dirty": 49896
+            }
+          ],
+          "round": 1,
+          "arm": "warmup",
+          "total_pss_kib": 253718,
+          "mean_worker_rss_kib": 152332
+        },
+        {
+          "statuses": {
+            "200": 20
+          },
+          "requests_by_worker": {
+            "66095": 10,
+            "66091": 10
+          },
+          "first_ms": 3992.30678899994,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012603999948623823
+          },
+          "master": {
+            "Rss": 168776,
+            "Pss": 91115,
+            "Shared_Dirty": 102080,
+            "Private_Dirty": 47044
+          },
+          "workers": [
+            {
+              "Rss": 164052,
+              "Pss": 87919,
+              "Shared_Dirty": 102300,
+              "Private_Dirty": 50924
+            },
+            {
+              "Rss": 164036,
+              "Pss": 87903,
+              "Shared_Dirty": 102300,
+              "Private_Dirty": 50908
+            }
+          ],
+          "round": 1,
+          "arm": "off_b",
+          "total_pss_kib": 266937,
+          "mean_worker_rss_kib": 164044
+        },
+        {
+          "statuses": {
+            "200": 22
+          },
+          "requests_by_worker": {
+            "66937": 10,
+            "66942": 12
+          },
+          "first_ms": 4007.1898189999047,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012210000022605527
+          },
+          "master": {
+            "Rss": 168752,
+            "Pss": 91156,
+            "Shared_Dirty": 102000,
+            "Private_Dirty": 47124
+          },
+          "workers": [
+            {
+              "Rss": 164124,
+              "Pss": 87953,
+              "Shared_Dirty": 102276,
+              "Private_Dirty": 50916
+            },
+            {
+              "Rss": 164172,
+              "Pss": 88021,
+              "Shared_Dirty": 102236,
+              "Private_Dirty": 51004
+            }
+          ],
+          "round": 2,
+          "arm": "off_a",
+          "total_pss_kib": 267130,
+          "mean_worker_rss_kib": 164148
+        },
+        {
+          "statuses": {
+            "200": 22
+          },
+          "requests_by_worker": {
+            "67219": 10,
+            "67223": 12
+          },
+          "first_ms": 4212.661682000089,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 276.36901599998964
+          },
+          "master": {
+            "Rss": 154860,
+            "Pss": 84731,
+            "Shared_Dirty": 90936,
+            "Private_Dirty": 44472
+          },
+          "workers": [
+            {
+              "Rss": 151852,
+              "Pss": 83028,
+              "Shared_Dirty": 91204,
+              "Private_Dirty": 49708
+            },
+            {
+              "Rss": 151872,
+              "Pss": 83098,
+              "Shared_Dirty": 91104,
+              "Private_Dirty": 49828
+            }
+          ],
+          "round": 2,
+          "arm": "warmup",
+          "total_pss_kib": 250857,
+          "mean_worker_rss_kib": 151862
+        },
+        {
+          "statuses": {
+            "200": 22
+          },
+          "requests_by_worker": {
+            "66665": 12,
+            "66669": 10
+          },
+          "first_ms": 4448.952394000116,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012571999832289293
+          },
+          "master": {
+            "Rss": 168656,
+            "Pss": 91161,
+            "Shared_Dirty": 101832,
+            "Private_Dirty": 47256
+          },
+          "workers": [
+            {
+              "Rss": 163864,
+              "Pss": 87802,
+              "Shared_Dirty": 102064,
+              "Private_Dirty": 50880
+            },
+            {
+              "Rss": 163828,
+              "Pss": 87750,
+              "Shared_Dirty": 102096,
+              "Private_Dirty": 50812
+            }
+          ],
+          "round": 2,
+          "arm": "off_b",
+          "total_pss_kib": 266713,
+          "mean_worker_rss_kib": 163846
+        }
+      ],
+      "paired_pss_percent": [
+        -6.462632017113224,
+        -4.922720059058405,
+        -6.018436131971383
+      ],
+      "aa_pss_percent": [
+        -3.114296214626977,
+        0.06185056902523467,
+        -0.1561037697001444
+      ],
+      "all_three_rounds_lower_than_both_controls": true,
+      "summary": {
+        "off": {
+          "n": 6,
+          "total_pss_mib": 260.60009765625,
+          "mean_worker_rss_mib": 160.1103515625,
+          "first_ms": 4082.4164519999613,
+          "hook_ms": 0.01242400003320654,
+          "responses": 143,
+          "5xx": 0
+        },
+        "warmup": {
+          "n": 3,
+          "total_pss_mib": 244.9775390625,
+          "mean_worker_rss_mib": 148.302734375,
+          "first_ms": 4266.9660749998,
+          "hook_ms": 274.1650729999492,
+          "responses": 70,
+          "5xx": 0
+        }
+      }
+    },
+    "lobsters": {
+      "records": [
+        {
+          "statuses": {
+            "200": 21
+          },
+          "requests_by_worker": {
+            "67550": 11,
+            "67546": 10
+          },
+          "first_ms": 4776.8010910003795,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.011939000160055002
+          },
+          "master": {
+            "Rss": 214916,
+            "Pss": 122045,
+            "Shared_Dirty": 124424,
+            "Private_Dirty": 71060
+          },
+          "workers": [
+            {
+              "Rss": 259080,
+              "Pss": 167021,
+              "Shared_Dirty": 124364,
+              "Private_Dirty": 122312
+            },
+            {
+              "Rss": 259064,
+              "Pss": 166949,
+              "Shared_Dirty": 124476,
+              "Private_Dirty": 122184
+            }
+          ],
+          "round": 0,
+          "arm": "off_a",
+          "total_pss_kib": 456015,
+          "mean_worker_rss_kib": 259072
+        },
+        {
+          "statuses": {
+            "200": 20
+          },
+          "requests_by_worker": {
+            "67841": 10,
+            "67845": 10
+          },
+          "first_ms": 4641.476844999943,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 301.6979489998448
+          },
+          "master": {
+            "Rss": 196456,
+            "Pss": 100578,
+            "Shared_Dirty": 128692,
+            "Private_Dirty": 48192
+          },
+          "workers": [
+            {
+              "Rss": 245124,
+              "Pss": 149992,
+              "Shared_Dirty": 128704,
+              "Private_Dirty": 103796
+            },
+            {
+              "Rss": 245200,
+              "Pss": 150056,
+              "Shared_Dirty": 128728,
+              "Private_Dirty": 103848
+            }
+          ],
+          "round": 0,
+          "arm": "warmup",
+          "total_pss_kib": 400626,
+          "mean_worker_rss_kib": 245162
+        },
+        {
+          "statuses": {
+            "200": 49
+          },
+          "requests_by_worker": {
+            "68136": 10,
+            "68132": 39
+          },
+          "first_ms": 4534.213870000258,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.012458000128390267
+          },
+          "master": {
+            "Rss": 212440,
+            "Pss": 120040,
+            "Shared_Dirty": 124056,
+            "Private_Dirty": 68740
+          },
+          "workers": [
+            {
+              "Rss": 256944,
+              "Pss": 165230,
+              "Shared_Dirty": 124136,
+              "Private_Dirty": 120076
+            },
+            {
+              "Rss": 260188,
+              "Pss": 169878,
+              "Shared_Dirty": 121328,
+              "Private_Dirty": 126128
+            }
+          ],
+          "round": 0,
+          "arm": "off_b",
+          "total_pss_kib": 455148,
+          "mean_worker_rss_kib": 258566
+        },
+        {
+          "statuses": {
+            "200": 27
+          },
+          "requests_by_worker": {
+            "69018": 17,
+            "69021": 10
+          },
+          "first_ms": 4448.618655000246,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.013215999842941528
+          },
+          "master": {
+            "Rss": 212212,
+            "Pss": 118765,
+            "Shared_Dirty": 125216,
+            "Private_Dirty": 67548
+          },
+          "workers": [
+            {
+              "Rss": 256936,
+              "Pss": 164363,
+              "Shared_Dirty": 125108,
+              "Private_Dirty": 119424
+            },
+            {
+              "Rss": 256756,
+              "Pss": 164121,
+              "Shared_Dirty": 125232,
+              "Private_Dirty": 119120
+            }
+          ],
+          "round": 1,
+          "arm": "off_a",
+          "total_pss_kib": 447249,
+          "mean_worker_rss_kib": 256846
+        },
+        {
+          "statuses": {
+            "200": 21
+          },
+          "requests_by_worker": {
+            "68430": 11,
+            "68435": 10
+          },
+          "first_ms": 4750.836917000015,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 282.5060099999064
+          },
+          "master": {
+            "Rss": 196956,
+            "Pss": 101067,
+            "Shared_Dirty": 128748,
+            "Private_Dirty": 48684
+          },
+          "workers": [
+            {
+              "Rss": 247072,
+              "Pss": 152119,
+              "Shared_Dirty": 128836,
+              "Private_Dirty": 105916
+            },
+            {
+              "Rss": 247064,
+              "Pss": 152101,
+              "Shared_Dirty": 128856,
+              "Private_Dirty": 105888
+            }
+          ],
+          "round": 1,
+          "arm": "warmup",
+          "total_pss_kib": 405287,
+          "mean_worker_rss_kib": 247068
+        },
+        {
+          "statuses": {
+            "200": 26
+          },
+          "requests_by_worker": {
+            "68718": 16,
+            "68714": 10
+          },
+          "first_ms": 4460.916243000156,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.01199000007545692
+          },
+          "master": {
+            "Rss": 211212,
+            "Pss": 118835,
+            "Shared_Dirty": 123536,
+            "Private_Dirty": 68188
+          },
+          "workers": [
+            {
+              "Rss": 255704,
+              "Pss": 164113,
+              "Shared_Dirty": 123548,
+              "Private_Dirty": 119668
+            },
+            {
+              "Rss": 255556,
+              "Pss": 163937,
+              "Shared_Dirty": 123584,
+              "Private_Dirty": 119468
+            }
+          ],
+          "round": 1,
+          "arm": "off_b",
+          "total_pss_kib": 446885,
+          "mean_worker_rss_kib": 255630
+        },
+        {
+          "statuses": {
+            "200": 25
+          },
+          "requests_by_worker": {
+            "69609": 10,
+            "69612": 15
+          },
+          "first_ms": 4783.151008000004,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.014151999948808225
+          },
+          "master": {
+            "Rss": 214608,
+            "Pss": 120590,
+            "Shared_Dirty": 125864,
+            "Private_Dirty": 69160
+          },
+          "workers": [
+            {
+              "Rss": 258792,
+              "Pss": 165629,
+              "Shared_Dirty": 125888,
+              "Private_Dirty": 120364
+            },
+            {
+              "Rss": 258960,
+              "Pss": 165869,
+              "Shared_Dirty": 125744,
+              "Private_Dirty": 120676
+            }
+          ],
+          "round": 2,
+          "arm": "off_a",
+          "total_pss_kib": 452088,
+          "mean_worker_rss_kib": 258876
+        },
+        {
+          "statuses": {
+            "200": 33
+          },
+          "requests_by_worker": {
+            "69908": 23,
+            "69904": 10
+          },
+          "first_ms": 4642.501411000467,
+          "hook": {
+            "treatment": "warmup",
+            "warmup_completed": true,
+            "hook_ms": 253.69526200029213
+          },
+          "master": {
+            "Rss": 197168,
+            "Pss": 100943,
+            "Shared_Dirty": 129296,
+            "Private_Dirty": 48312
+          },
+          "workers": [
+            {
+              "Rss": 258360,
+              "Pss": 163026,
+              "Shared_Dirty": 129212,
+              "Private_Dirty": 116684
+            },
+            {
+              "Rss": 247372,
+              "Pss": 152010,
+              "Shared_Dirty": 129268,
+              "Private_Dirty": 105640
+            }
+          ],
+          "round": 2,
+          "arm": "warmup",
+          "total_pss_kib": 415979,
+          "mean_worker_rss_kib": 252866
+        },
+        {
+          "statuses": {
+            "200": 26
+          },
+          "requests_by_worker": {
+            "69310": 16,
+            "69314": 10
+          },
+          "first_ms": 4374.875405000239,
+          "hook": {
+            "treatment": "none",
+            "warmup_completed": null,
+            "hook_ms": 0.01816199983295519
+          },
+          "master": {
+            "Rss": 211332,
+            "Pss": 119481,
+            "Shared_Dirty": 122820,
+            "Private_Dirty": 69136
+          },
+          "workers": [
+            {
+              "Rss": 255704,
+              "Pss": 164853,
+              "Shared_Dirty": 122732,
+              "Private_Dirty": 120712
+            },
+            {
+              "Rss": 255540,
+              "Pss": 164627,
+              "Shared_Dirty": 122856,
+              "Private_Dirty": 120424
+            }
+          ],
+          "round": 2,
+          "arm": "off_b",
+          "total_pss_kib": 448961,
+          "mean_worker_rss_kib": 255622
+        }
+      ],
+      "paired_pss_percent": [
+        -12.062715452668737,
+        -9.345355394157927,
+        -7.667840483702881
+      ],
+      "aa_pss_percent": [
+        -0.19012532482484135,
+        -0.08138643127206802,
+        -0.6916794960273198
+      ],
+      "all_three_rounds_lower_than_both_controls": true,
+      "summary": {
+        "off": {
+          "n": 6,
+          "total_pss_mib": 439.96533203125,
+          "mean_worker_rss_mib": 251.666015625,
+          "first_ms": 4497.565056500207,
+          "hook_ms": 0.012836999985665898,
+          "responses": 174,
+          "5xx": 0
+        },
+        "warmup": {
+          "n": 3,
+          "total_pss_mib": 395.7880859375,
+          "mean_worker_rss_mib": 241.27734375,
+          "first_ms": 4642.501411000467,
+          "hook_ms": 282.5060099999064,
+          "responses": 74,
+          "5xx": 0
+        }
+      }
+    }
+  }
+}

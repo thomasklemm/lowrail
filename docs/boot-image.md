@@ -6,7 +6,9 @@ Warm Bootsnap already removes much of the observed startup cost. The image
 with path caching and consumed-blob release is still 8–13% slower on the
 four successful full-page screens and retains more RSS. It also bypasses a
 foreign loader in a concrete counterexample. Nothing here changes the runtime
-gem, app code/config, default passes, or production admission.
+delivery, app code/config, default passes, or production admission. The later
+branch-only opt-in Puma helper is separate from replay; see the bounded
+follow-up below.
 
 Work stays on `thomasklemm/boot-image`. Initial probe:
 [`ff15690`](https://github.com/thomasklemm/lowrail/commit/ff15690);
@@ -218,6 +220,84 @@ losing, non-exact experiment is not sent through those promotion gates.
 | Arbitrary frozen literals | Compiling `"a" << "b"` yields `"ab"` normally, **FrozenError** with freezing | **Kill blanket app freezing**. Existing generated code already uses scoped frozen-literal policy; no additional saving measured |
 | Fewer duplicated method bodies / smaller ISeqs | Packing ISeqs does not deduplicate installed methods or dynamic eval bodies; not implemented | **Defer**, no claimed byte/RSS reduction |
 | Prefork compact + warmup | Successful-page trees show 4.2–11.4% lower total PSS; n=1 each; compact alone inconsistent | **Keep candidate**, independently validate DB/output/own suites and realistic worker lifetime before proposing server integration |
+
+## Bounded follow-up: explicit Puma warmup
+
+Owner-approved follow-up, still **branch only**. The gem now offers an
+independent opt-in helper; normal `lowrail/setup` never loads or calls it:
+
+```ruby
+require "lowrail/puma"
+preload_app!
+before_fork { Lowrail::Puma.warmup }
+```
+
+`warmup` attempts `GC.compact` + `Process.warmup` once per process. It returns
+true on completion, false for a repeat, missing API or rescued StandardError;
+a partial failure is not retried by another hook in that process. It neither
+loads Rails/Puma nor changes the GC on require. This explicit API is independent
+of lowering and `LOWRAIL`; the caller must opt in. Two public-interface tests
+pass (six assertions), exercising real compaction/idempotence and failure/
+unavailable-API behavior. Helper commit:
+[`4cb1c8b`](https://github.com/thomasklemm/lowrail/commit/4cb1c8b).
+
+### Repeated process trees
+
+One fixed cohort: three rounds/app, each with **off-A / warmup / off-B** in
+rotated order, **36 fresh process trees** total. Two Puma workers × one thread;
+six off trees and three warmup trees per app. Same fixture routes and upstream
+dependency pins as the original memory screen. Both arms require the helper;
+only the warmup arm invokes it, through the real Puma `before_fork`. All 12
+warmup invocations report completion. No replay, lowering, app/config-file
+patch, added GC disabling or retry-to-green.
+
+PSS/worker RSS below are medians across trees. Paired PSS percentages compare
+each warmup tree with the mean of its two off controls; ranges retain every
+round, including uneven worker request distributions and the large blog A/A
+outlier. Warmup is lower than **both** controls in every round for all four
+apps. This passes the requested repeatability screen, not a precision memory
+or server-capacity claim. [All 36 records](prefork-warmup-results.json).
+
+| App | Total PSS off → warmup, MiB | Mean worker RSS off → warmup, MiB | Paired PSS change, three-round range | First Puma response off → warmup, s | 5xx / responses |
+|---|---:|---:|---:|---:|---:|
+| Blog | 250.5 → 240.3 | 138.6 → 131.4 | −9.2% … −1.5% | 3.604 → 3.796 | 0 / 274 |
+| Campfire | 288.7 → 267.2 | 151.2 → 147.2 | −8.8% … −2.6% | 4.121 → 4.477 | 0 / 300 |
+| Fizzy | 260.6 → 245.0 | 160.1 → 148.3 | −6.5% … −4.9% | 4.082 → 4.267 | 0 / 213 |
+| Lobsters | 440.0 → 395.8 | 251.7 → 241.3 | −12.1% … −7.7% | 4.498 → 4.643 | 0 / 248 |
+
+Startup is measured from just before exec of the app Ruby process through
+the first completed **Puma** response, including the master's original eleven
+Rack warmup requests, server startup, readiness detection and sampling-client
+startup. It is not the initial table's first Rack response. Hook medians alone
+are **210 / 240 / 274 / 283 ms**, in app order. Worker GC still runs at request
+ten and routing can send more requests to one worker; all actual counts remain
+in the export. Blog's off/off PSS spread reaches 9.24%; it is not discarded.
+No steady-state worker lifetime or additional workers-per-box is inferred.
+
+### Real-server RPS and exact-output gate
+
+One cohort per supported app uses published `script/rps`
+[`96b447f`](https://github.com/thomasklemm/lowrail/commit/96b447f730fcba7e698ad76ae55c740de2fca82f)
+in an isolated detached worktree, not a merge of bet-A changes. The external
+[Puma adapter](../bench/experiments/prefork_puma.rb) enables preloading and the
+same observer in every arm, calling the helper only for `on`. It records each
+actual master hook's completion/time outside app state. No app Puma/config.ru
+file is edited. Public compiler-created empty YJIT artifacts (zero files/units)
+prevent another Lowrail pass from confounding the treatment.
+
+Protocol fixed before load: **ten rotated off-A/on/off-B rounds**, four
+workers × one thread, concurrency 16, 5-second warmup and 20-second timed
+windows, server CPUs 0–3/client 4–7, pinned oha 1.14.0. Retained blog fixture
+and fresh GET-only seed for `/articles/1`; canonical Campfire dependency-only
+overlay and fresh authenticated room fixture for `/rooms/486777696`.
+Cold/warm exact samples use bet A's two-seed validator with all Rack headers;
+timed HTTP uses natural entropy. A regression beyond the cohort's A/A band
+kills the candidate; a failed exact gate is never a throughput win.
+
+**Status:** blog/Campfire RPS cohorts in progress. No throughput or exact-output
+claim yet. Published bet A has **no Fizzy/Lobsters HTTP validation adapters**;
+their requested RPS checks are blocked, not substituted with login/empty pages
+or the in-process Rack screen. No four-app promotion can follow these runs.
 
 ## Reproduction and retained boundaries
 
