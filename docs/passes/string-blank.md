@@ -210,3 +210,19 @@ leaking `BUNDLE_FROZEN=true` into the unit suite prevents three temporary view
 fixtures from creating their locks. The final full run uses the prepared
 source overlay, no global frozen flag and no exclusions. No pass, app policy,
 production default or measured cohort changed to obtain these results.
+
+## Publication gates after the hook-free loader
+
+Rebased onto the published loader boundary
+[`2d1ad72`](https://github.com/thomasklemm/lowrail/commit/2d1ad72), the complete
+Ruby suites pass with no exclusions: **4.0.7: 139 tests / 5,294 assertions,
+zero failures/errors, 5 skips; 4.1-preview1: 139 / 4,349, zero failures/errors,
+12 skips**. The same original-corpus/source-overlay split above is retained;
+these are not new app or acceleration support claims. Cargo passes **35 +
+1 + 3** tests. After rebasing again onto the independently published doctor
+change [`01cfc45`](https://github.com/thomasklemm/lowrail/commit/01cfc45), Cargo
+passes unchanged and the affected seal/doctor tests pass **18 / 93, no skips**
+on each Ruby. The full suites were on the loader boundary, not falsely
+attributed to the later doctor head. Only the test observer, regression,
+audit specimen and documentation are published by this work; no blank pass,
+production wrapper, application timeout change or measurement cohort.
