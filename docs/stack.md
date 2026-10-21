@@ -42,13 +42,13 @@ synergy. Do not sum isolated micro results or mix fixtures/modes.
 | Existing sealed form scaffold | Blog show, retained fixture only | — | — | — | Pending local screen; active own-suite gap retained |
 | Existing sealed token tag | Blog show, retained fixture only | — | — | — | Pending local screen; live-token continuations retained |
 | Existing sealed collection render | Blog show, retained fixture only | — | — | — | Pending local screen; live lookup/events retained |
-| Existing sealed AR instantiation | Blog / Campfire r81 / Fizzy / Lobsters: determine natural hits | — | — | — | Pending per-app admission; historical blog instruction loss is not erased |
+| Existing sealed AR instantiation | Blog / Campfire r81 / Fizzy / Lobsters: determine natural hits | Campfire room/pagination/sidebar/search +51/+46/+8/+19 objects/request before shadow fix | — | — | Campfire exclusion provisional: coordinator identified per-hit disabled-shadow allocation; retest published fix before deciding |
 | Props `frozen_split` (`dd844dd`) | None of these four apps use Inertia | Isolated interpreter micro −0.460571% Ir, not request credit | — | — | Excluded: frozen-holder tier not implemented; do not freeze app holders to admit it |
 | B fused views | Blog show/index | +113.14 / +136.20 objects/request in B's screen | B's fused+sealed screen still increases objects | — | Excluded: killed at deterministic cost gate; no integration |
 | D freeze method epoch | None | TracePoint +71.326 objects/request; incomplete singleton seal | — | — | Excluded: killed as unsafe; visibility/refinement/suppressed-hook holes |
-| E subset callbacks | None admitted | — | — | — | Await exact screened result; census is not a certificate |
-| F AR callsite compile | None admitted | Query micros only, not request credit | — | — | Await request screen and active own-suite/DB gates |
-| G framework fold | None admitted | — | — | — | Notification/CSP elisions fail exactness witnesses; no candidate delivered |
+| E subset callbacks | None admitted | Blog show/index: zero objects saved in E's corrected exact screen | — | — | Coordinator killed: no deterministic saving, wall unresolved; census retained |
+| F AR callsite compile | None admitted | F's request screens include Fizzy +9/+15 objects on two routes; Lobsters story −8, front zero | — | — | No admitted candidate: incomplete exactness/own-suite gates; micros not additive request credit |
+| G framework fold | None admitted | — | — | — | Closed: notification/CSP elisions fail exactness in all four boots; no remaining qualifying slice |
 | H boot image | None admitted | — | — | — | Await successful boot screen and correctness gates |
 | Fizzy bench block-link | None | +0.403071% interpreter Ir (`8385e0c`) | — | — | Excluded: deterministic loss and no production admission |
 
@@ -104,6 +104,31 @@ The known P1 `view.send` dispatch defect is not exercised by this fixture.
 The coordinator requires a published fix and a fresh sealed-component screen
 before admission. Existing results remain explicitly **pre-dispatch-fix**.
 The active own-suite gap independently prevents admission/pricing.
+
+### Campfire AR: provisional exclusion before the shadow allocation fix
+
+Same three-round 200/300 protocol, four GETs (POST omitted: queued work has
+no completion certificate). Nineteen normally built AR units. Median object
+counts and independent counted hits are:
+
+| Route | Off-A / off-B / on objects | On minus off-A | AR hits / request |
+|---|---|---:|---:|
+| room | 15,528 / 15,528 / 15,579 | +51 | 52 |
+| pagination | 6,811 / 6,810 / 6,857 | +46 | 46 |
+| sidebar | 9,110 / 9,110 / 9,118 | +8 | 8 |
+| search | 8,126 / 8,125 / 8,145 | +19 | 19 |
+
+All mean-allocation paired intervals are positive. Sidebar passes both-seed
+exact status/body/header comparisons. Room/pagination/search retain body or
+header differences in **off/off as well as on/off**; no candidate-specific
+correctness diagnosis follows. All wall effects are unresolved against A/A.
+
+The coordinator identified `ARShadow.enabled?`'s per-call `%w[1 strict]`
+Array as an existing main allocation bug and is publishing its allocation-free
+fix in the Campfire thread. The caller exists on the measured per-row path;
+these excesses approximately track hits. **Exclusion is provisional**, not a
+final AR negative: rerun on the published correction, without a local duplicate
+implementation. Retain this entire original screen, including exactness RED.
 
 Sanitized raw evidence, GC counts/time, RSS, per-unit coverage and all refused
 comparisons: [stack-results.json](stack-results.json). Private fixture secrets,
