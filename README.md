@@ -21,22 +21,48 @@ for the other projects we learned from.
 
 ## Current results (2026-10-21)
 
-**Accepted warm-request instruction results, including increases—not latency or throughput claims.**
-**Ir instructions, not latency · no YJIT claim yet · opt-in research, not default**.
-Blog and Starter each cover one endpoint/fixture in the sealed tier; Fizzy
-covers a fixed six-GET vector in a bench-only specimen, not production admission.
-Both total and GC-excluded A/A, fixed-heap, brk and actual-mode gates pass.
+### Warm-request instruction counts
+
+**Warm-request instruction results, including increases and historical records—not latency or throughput claims.**
+**Ir instructions, not latency · no YJIT instruction claim yet · opt-in research, not default**.
+Blog and Starter each cover one endpoint/fixture in the sealed tier. Fizzy has
+a fixed six-GET block-link vector and a separate one-route branch prototype;
+both are bench-only, not production admission.
+Current prices pass total and GC-excluded A/A, fixed-heap, brk and actual-mode
+gates. Each price applies only to its named endpoint/fixture and tier.
 
 <!-- current-results:start -->
 | Date | App / endpoint | Ruby / Rails | Mode / tier | Ir Δ vs no Lowrail [95% interval] | Measured / published |
 |---|---|---|---|---|---|
-| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection; measured on pre-fix source; re-price pending | **Total −15.225536% [−15.253476, −15.205974]**; GC-excluded −15.254650% [−15.278100, −15.199984] | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
-| 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.156% [−10.219, −10.084]**; GC-excluded −10.161% [−10.254, −10.105] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
-| 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.403071% [+0.386235, +0.429585]**; GC-excluded +0.402000% [+0.380081, +0.421142] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
+| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-aa01-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection | **Total −15.02% [−15.05, −15.00]**; GC-excluded −15.02% [−15.04, −14.97] | [b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c) / [602e20c](https://github.com/thomasklemm/lowrail/commit/602e20c5b22c912bb3ef050949271a68395a1bba); [JSON](https://github.com/thomasklemm/lowrail/blob/602e20c5b22c912bb3ef050949271a68395a1bba/docs/passes/production-aa01-reprice-results.json) |
+| 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.16% [−10.22, −10.08]**; GC-excluded −10.16% [−10.25, −10.11] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
+| 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.40% [+0.39, +0.43]**; GC-excluded +0.40% [+0.38, +0.42] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
+| 2026-10-21 | [Fizzy (bet F), `GET /buckets`](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry) | 4.0.7 / 8.1.4 | Interpreter; Guarded DirectSite call-site query programs; branch prototype, bench-only, one route, not on main, not admission | **Total −5.49% [−5.58, −5.42]**; GC-excluded −5.50% [−5.55, −5.45] | [87c3c19](https://github.com/thomasklemm/lowrail/commit/87c3c1974c424eabef5178f518641d013dd601b3) / [f2e2e35](https://github.com/thomasklemm/lowrail/commit/f2e2e35b4d6372e8d67d285f329f0c93823ba259); runtime [addf55e](https://github.com/thomasklemm/lowrail/commit/addf55e00b080d2627503b7f10a74bbe68e17ed1); [JSON](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.json) |
 <!-- current-results:end -->
 
-The blog row includes the token-continuation safety fix; the earlier
-**−15.49%** is historical, valid only at
+Displayed values are rounded; exact values are in the linked JSON exports.
+
+**Blog A/A rule change, 2026-10-21:** set prospectively before counting, both
+total and GC-excluded nominal 95% intervals must lie wholly within **±0.1%**;
+zero containment is no longer required
+([preregistration](https://github.com/thomasklemm/lowrail/blob/b059fc9fbcdbc4cff6a7bc523defb01e7783385c/docs/DECISIONS.md#token-allocation-fix-and-one-new-rule-blog-cohort-preregistered-2026-10-21)).
+
+Bet F's per-metric A/A gates both pass within ±0.1%. The linked branch JSON
+documents a cosmetic `project_aa` field overwrite; the table uses the per-metric
+records, not that field. Accepted off/off rejections remain: **login rate-limit
+cache `expires_at`** and **SolidCache `created_at`**. This is not a whole-DB
+certificate or admission.
+
+**Blog history:** **−15.23%** at
+[`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
+published in
+[`47f8e7b`](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16),
+was measured on defective source only, before the dispatch fixes. The
+[`62f8a6b` cohort](docs/passes/production-dispatch-reprice.md) remains rejected
+under its old zero-containment/±0.5% A/A rule
+([`673b1cc`](https://github.com/thomasklemm/lowrail/commit/673b1cc3cbbb341a6956e027e54bc2a18049bde0));
+it was not rescored or pooled into the new cohort. The earlier **−15.49%**
+is historical, valid only at
 [`ae025b0`](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
 not the corrected source. [Protocol and historical records](docs/bench.md#current-accepted-request-results).
 
@@ -45,16 +71,46 @@ not the corrected source. [Protocol and historical records](docs/bench.md#curren
 frozen props is an accepted isolated micro only, with integration deferred
 ([scope](docs/passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred)).
 
-Fizzy's accepted N=10 warm bench price above is an **instruction INCREASE
+Fizzy's block-link N=10 warm bench price above is an **instruction INCREASE
 (Lowrail slower here)** under fixed init-slot floors, not production
 admission or cold-start performance; **cold still RED**.
 The [first N=50 cohort remains INVALID (heap growth)](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51),
 without a credited price or direction claim ([scope and evidence](docs/block-link-specimen.md)).
 
+### Full-request throughput (real Puma)
+
+<!-- throughput-results:start -->
+**2026-10-21 · [Blog (bet A), `GET /articles/1`](https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.md#confirmatory-result-throughput-gate-passes-p99-is-higher) · Ruby / Rails 4.0.7 / 8.1.4 · Stock Ruby YJIT.**
+
+**Sealed opt-in: production form/token/collection; one route, one orb, exploration harness on a branch; not whole-app, capacity or production-admission evidence.** Measured on [487bec5](https://github.com/thomasklemm/lowrail/commit/487bec5065e7d9bec5d1b2df48831eb926e457cb); does **not** include [b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c).
+Puma 4 workers × 1 thread, c16, 5 s warmup / 20 s load, 20 rotated off-A/on/off-B rounds.
+Protocol [44a33c4](https://github.com/thomasklemm/lowrail/commit/44a33c4967d27db5c91e8954c7736fd97d3e9da9); published [51801ed](https://github.com/thomasklemm/lowrail/commit/51801edc3aab276da3538763257d7d12921aa37f); [exact JSON](https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.json).
+
+**RPS A/A +0.37% [−1.24, +2.18].** The preregistered rule passes: A/A contains zero and the on/off RPS lower bound exceeds the A/A upper bound.
+This does not establish ±2% resolution or a latency gate.
+
+| Metric | Paired on/off Δ [95% interval] | off-A | on | off-B |
+|---|---|---:|---:|---:|
+| **RPS** | **+10.46% [+8.11, +12.81]** | 1613.8 | 1782.7 | 1611.2 |
+| **p50, ms** | **−8.67% [−11.04, −6.17]** | 9.2 | 8.4 | 9.1 |
+| **p90, ms** | **−12.90% [−16.62, −9.10]** | 15.8 | 14.0 | 15.8 |
+| **p99, ms** | **+12.73% [+1.13, +24.78]** | 26.0 | 29.9 | 26.0 |
+| **GC collections / 1,000 requests** | — | 18.7 | 24.0 | 18.9 |
+| **Allocations / request** | — | 2679 | 2333 | 2679 |
+
+**Not uniformly faster: p99 increases despite lower p50/p90 and higher RPS. GC collections increase despite fewer allocations; the cause is not established.**
+Arm values are medians of windows; paired deltas are means of within-round ratios, not ratios of those medians. GC/allocations are load-bracketing four-process diagnostics including metrics/background work, not exclusive request counters.
+<!-- throughput-results:end -->
+
 To update: publish the accepted export first, edit only the metadata/source
 paths in [docs/results.json](docs/results.json), then run
 `python3 docs/render-results.py` (`--check` detects drift). Numbers are read
-from the original exports, never copied into the index. Refresh the short
+from the original exports, never copied into the index. Pinned exports use
+an explicit `source_commit` matching the full publication SHA; fetch bet F's
+branch with `git fetch origin thomasklemm/ar-callsite-compile` and bet A's with
+`git fetch origin thomasklemm/native-yjit-bench` before rendering.
+They are read from that commit, never substituted from the main worktree.
+Refresh the short
 [status](docs/STATUS.md#at-a-glance-2026-10-21) and [benchmark summary](docs/bench.md#current-accepted-request-results)
 when scope or acceptance changes; retain superseded records as historical.
 
@@ -77,20 +133,27 @@ when scope or acceptance changes; retain superseded records as historical.
 
 ## How it works
 
-```
- your Rails app ──► lowrail facts  ──► boot facts (schema, routes, config,
- (source + boot)                       method table, templates, loaders)
-                         │
-                         ▼
-                   lowrail build   ──► .lowrail/  manifest + lowered ISeqs,
-                         │                        each with the guards it assumes
-                         ▼
- RUBYOPT=-rlowrail/setup ──► at boot: certify guards, install what is exact,
-                              refuse the rest (visibly), keep originals as fallback
-                         │
-                         ▼
-                   lowrail verify  ──► your own suite, Lowrail off vs on:
-                                       identical per-test outcomes + ordered SQL
+```text
+┌──────────────────────┐
+│   Your Rails app     │  source + boot
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐   boot facts: schema · routes · config ·
+│   lowrail facts      │──▶ method table · templates · loaders
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐   .lowrail/ manifest + lowered ISeqs,
+│   lowrail build      │──▶ each carrying the guards it assumes
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐   at boot: certify guards
+│ RUBYOPT=             │──▶   ├─ exact  ─▶ install lowered code
+│  -rlowrail/setup     │      └─ failed ─▶ keep original Rails
+└──────────┬───────────┘                   method (refusal visible)
+           ▼
+┌──────────────────────┐   your own suite, Lowrail off vs on:
+│   lowrail verify     │──▶ identical per-test outcomes + ordered SQL
+└──────────────────────┘
 ```
 
 The Rust CLI parses with [Prism](https://github.com/ruby/prism) and indexes

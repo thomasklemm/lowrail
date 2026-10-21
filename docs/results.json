@@ -4,12 +4,18 @@
     "app_endpoint": "BlogShowGetOnly (blog), `GET /articles/1`",
     "ruby_rails": "4.0.7 / 8.1.4",
     "mode": "Interpreter",
-    "tier": "Sealed opt-in: production form/token/collection; measured on pre-fix source; re-price pending",
-    "revision": "553e7aafa88754fd32359e5e11ba0cc5bfcd6f65",
-    "publication": "47f8e7bc2f6084181369d82846645a19c3a31f16",
-    "report": "docs/passes/production-interpreter-reprice.md",
-    "source": "docs/passes/production-interpreter-reprice-results.json",
+    "tier": "Sealed opt-in: production form/token/collection",
+    "revision": "b059fc9fbcdbc4cff6a7bc523defb01e7783385c",
+    "publication": "602e20c5b22c912bb3ef050949271a68395a1bba",
+    "report": "docs/passes/production-aa01-reprice.md",
+    "source": "docs/passes/production-aa01-reprice-results.json",
+    "source_commit": "602e20c5b22c912bb3ef050949271a68395a1bba",
     "accepted": "result.accepted",
+    "required_gates": [
+      "summary.aa.pass",
+      "summary.aa.metrics.instructions_total",
+      "summary.aa.metrics.instructions_no_gc"
+    ],
     "revision_field": "measurement_revision",
     "total": "summary.layers.production.instructions_total.delta_pct",
     "no_gc": "summary.layers.production.instructions_no_gc.delta_pct",
@@ -47,5 +53,49 @@
     "total": "summary.layers.on.instructions_total.delta_pct",
     "no_gc": "summary.layers.on.instructions_no_gc.delta_pct",
     "decimals": 6
+  },
+  {
+    "date": "2026-10-21",
+    "app_endpoint": "Fizzy (bet F), `GET /buckets`",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Interpreter",
+    "tier": "Guarded DirectSite call-site query programs; branch prototype, bench-only, one route, not on main, not admission",
+    "revision": "87c3c1974c424eabef5178f518641d013dd601b3",
+    "runtime_revision": "addf55e00b080d2627503b7f10a74bbe68e17ed1",
+    "publication": "f2e2e35b4d6372e8d67d285f329f0c93823ba259",
+    "report": "https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry",
+    "source": "docs/ar-callsite.json",
+    "source_commit": "f2e2e35b4d6372e8d67d285f329f0c93823ba259",
+    "accepted": "request_pivot.ir.decision.accepted_ir_win",
+    "required_gates": [
+      "request_pivot.ir.decision.gates_pass",
+      "request_pivot.ir.legacy_summary_unmodified.aa.metrics.instructions_total",
+      "request_pivot.ir.legacy_summary_unmodified.aa.metrics.instructions_no_gc"
+    ],
+    "revision_field": "request_pivot.ir.protocol.harness_sha",
+    "total": "request_pivot.ir.decision.effects.instructions_total.effect",
+    "no_gc": "request_pivot.ir.decision.effects.instructions_no_gc.effect"
+  },
+  {
+    "kind": "throughput",
+    "date": "2026-10-21",
+    "app_endpoint": "Blog (bet A), `GET /articles/1`",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Stock Ruby YJIT",
+    "tier": "Sealed opt-in: production form/token/collection; one route, one orb, exploration harness on a branch; not whole-app, capacity or production-admission evidence",
+    "revision": "487bec5065e7d9bec5d1b2df48831eb926e457cb",
+    "excluded_revision": "b059fc9fbcdbc4cff6a7bc523defb01e7783385c",
+    "publication": "51801edc3aab276da3538763257d7d12921aa37f",
+    "report": "https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.md#confirmatory-result-throughput-gate-passes-p99-is-higher",
+    "source": "docs/native-bench.json",
+    "source_commit": "51801edc3aab276da3538763257d7d12921aa37f",
+    "accepted": "rps_confirmatory_blog.predeclared_decision.accepted_scoped_throughput",
+    "required_gates": [
+      "rps_confirmatory_blog.passed",
+      "rps_confirmatory_blog.predeclared_decision.aa_contains_zero",
+      "rps_confirmatory_blog.predeclared_decision.on_off_lower_exceeds_aa_upper"
+    ],
+    "revision_field": "rps_confirmatory_blog.base_main_revision",
+    "result": "rps_confirmatory_blog"
   }
 ]

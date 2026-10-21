@@ -16,6 +16,8 @@ if [ ! -x "$HOME/.local/bin/mise" ]; then
   curl -fsSL https://mise.run | sh
 fi
 "$HOME/.local/bin/mise" install ruby@4.0.7
+# Cache the fork only on explicit opt-in; stock Ruby stays the default PATH.
+if [[ ${LOWRAIL_TOKEN_RUBY:-0} == 1 ]]; then "$root/script/token-ruby"; fi
 ruby_bin="$("$HOME/.local/bin/mise" where ruby@4.0.7)/bin"
 export PATH="$ruby_bin:$HOME/.cargo/bin:$PATH"
 if [ ! -x "$HOME/.cargo/bin/cargo" ]; then

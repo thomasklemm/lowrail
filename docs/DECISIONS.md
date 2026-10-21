@@ -44,6 +44,54 @@ Token alone adds 32; LOO independently attributes a −32 saving to retaining to
 Collection and AR have active hits but zero standalone/LOO allocation deltas; signed costs compose additively, with no measured GC synergy.
 All favorable screens remain provisional pending active own suites; wall remains unresolved, no whole-stack price. [Living ledger and evidence](stack.md).
 
+## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
+
+The token-only +32 objects/request is traced to per-hit view-context constant
+caches and Kernel-owned `IVAR.bind_call` method entries, not warm admission
+witnesses. A live-prefix/normal-suffix split and one literal view ivar read
+remove about 32 objects/request, leaving token-only allocation-neutral,
+not a win. Remaining guard reads stay exact; no native API/admission/default
+or quarantine change. Strict production regressions **2/201** pass; independent
+Thermos reviews approve. [Allocation trace and limits](passes/token-allocation.md).
+
+**Before counting:** the owner authorizes exactly one new blog interpreter
+cohort in slot 1 on the published fixed source, isolated form/token/collection
+artifact, under a new A/A decision rule. Both total and no-GC A/A nominal
+95% intervals must lie **wholly within ±0.1%**; containing zero is **not**
+required. The prior no-GC interval **[+0.009283,+0.062511]%** is noise far below
+the effect being priced: the old rule rejected precision rather than material
+bias. This is a prospective rule, **not a re-score**: the `62f8a6b` cohort
+stays rejected under its original rule and is never pooled with the new one.
+
+All other historical-method gates stay fixed: six rounds / seed 41231,
+18 serial workers / jobs=1, N0/N50, warmup50, floors
+`[1000000,250000,100000,20000,10000]`, identical pinned brk512 tool and worker,
+actual interpreter/no JIT, exact pages/heap ranges/brk, fresh pre/post cold
+seeds 0/1, both 192-pair controls, native coverage and epoch deopt. Retain all
+rounds and accept or reject the whole cohort; **no retry or exclusions**.
+Only this driver's summary policy changes, not other shared-harness gates.
+YJIT seam work stays paused; no README/results edit by this worker.
+
+## Blog new-rule interpreter re-price: ACCEPTED (2026-10-21)
+
+The one prospective cohort on clean detached `b059fc9` completes: **−15.022961%
+total Ir [−15.051352,−14.996655]**, no-GC **−15.021453%
+[−15.044109,−14.967704]**. Both A/A intervals are wholly within the
+preregistered ±0.1%: total **[−0.068389,+0.004169]%**, no-GC
+**[−0.077337,+0.033586]%**. All other gates pass: heap/exact pages/brk,
+actual interpreter, fresh pre/post cold seeds, 192+192 observable pairs,
+native/deopt. Independently reconciled 72 dumps/self-cost sums, 36 subtractions,
+18 source certificates and 681 pins. Exactly six rounds / 18 serial workers;
+no measurement retry/exclusions. Launcher refusals before counter work and
+after completion are retained; service stopped and slot 1 released.
+
+This replaces the defective-source headline **only for this three-unit blog
+endpoint/fixture**. The old `62f8a6b` rejection is not rescored; `553e7aa` stays
+historical/defective-source only. Token-only is allocation-neutral, not a win;
+do not attribute the entire cross-source difference to it. No latency/YJIT,
+whole-app, test-tier or default promotion claim. README/results remain with
+the docs owner. [Protocol and complete accepted export](passes/production-aa01-reprice.md).
+
 ## Production sealed helper dispatch safety (2026-10-21)
 
 Production token admission did not refuse an existing view `send` override
@@ -70,10 +118,32 @@ remains a separate, unpublished review and will consume this one primitive.
 **The accepted −15.225536% was measured at
 [`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
 which had this dispatch defect. It remains a price for that exact source and
-specimen only, not the fixed runtime.** No re-price, YJIT cohort or slot is
-authorized by this fix. Default/quarantine/guarded passes are unchanged;
+specimen only, not the fixed runtime.** The separately authorized replacement
+cohort at `62f8a6b` is rejected below. The later prospective `b059fc9` cohort
+above is the accepted replacement, not a reclassification of that rejection.
+Default/quarantine/guarded passes are unchanged;
 YJIT seam work stays paused and `835cf16` parked.
 [Dispatch sweep and correctness gates](passes/sealed-production.md#helper-dispatch-safety).
+
+## Dispatch-corrected interpreter re-price: REJECTED A/A (2026-10-21)
+
+The prerequisite screen passes exact status/body/all-header checks and the
+fixed allocation rule: off-A/off-B/on **2412/2412/2069** objects/request,
+343 saved (14.220564%); S's earlier on median was 2019, 50 lower. Same active
+Article/Comment/form/token/collection counts **1/2/1/4/1**, no fallbacks.
+The twenty-unit full-stack screen is not the three-unit interpreter specimen
+or a paired causal attribution of those 50 objects. Native wall is not priced.
+
+Exactly one historical-method cohort at clean detached `62f8a6b`, six rounds,
+18 serial workers, slot 1: total A/A passes **[−0.008722,+0.064901]%**, but
+GC-excluded A/A **[+0.009283,+0.062511]% excludes zero**. **Reject the whole
+cohort; no replacement price, retry, exclusions or relaxed rule.** Diagnostic
+only: total **−14.536782% [−14.552516,−14.507619]**, no-GC **−14.537277%**.
+Heaps/exact pages/brk/mode pass; 72 dumps/self-cost sums, 36 subtractions,
+18 certificates and 681 source pins independently reconcile. Pre/post cold,
+192+192 observable pairs and native/deopt gates pass; raw entropy still rejects.
+Slot 1 is released. No YJIT or default/quarantine change. The old −15.225536%
+stays defective-source only. [Method, rejection and complete export](passes/production-dispatch-reprice.md).
 
 Working assumption: many small exact passes (each < 2 %) should **stack**.
 `lowrail bench --passes SET --default-build DIR` (8db84d8) measures a pass set as one layer against no-setup and a separate default
@@ -234,7 +304,7 @@ not a remeasurement. Token/collection test admission remains separate; the
 blog test configuration disables forgery protection, so empty-token hits
 cannot cover protected-token assembly. Form remains refused in that tier.
 
-## Corrected-source interpreter re-price accepted (2026-10-21)
+## Historical pre-dispatch-fix interpreter re-price (2026-10-21)
 
 The separately authorized **one** interpreter cohort at published `553e7aa`
 includes the token continuation fix: production form/token/collection on
@@ -242,6 +312,9 @@ includes the token continuation fix: production form/token/collection on
 Ir [−15.25, −15.21]**, **−15.25% GC-excluded Ir**. This replaces the earlier
 price for the corrected specimen; −15.49% remains historical at `ae025b0`.
 It is not a native-latency, YJIT, test-tier or whole-app claim.
+The later dispatch defect means it is not a price for today's runtime;
+the [dispatch-corrected replacement attempt](passes/production-dispatch-reprice.md)
+is rejected, not another accepted result.
 
 Six rounds, seed 41231, 18 sequential workers, identical accepted N0/50,
 fixed-heap/exact-page/brk512 method. Both A/A controls contain zero within
@@ -875,7 +948,7 @@ retry or clean-arm salvage. [Experiment, ablations and controls](passes/sealed-r
 | `active_record/ar_plans` | **sealed-only**, guarded/opt-in refused | Suppress the visitor owner's `method_added`, replace `visit_Arel_Nodes_SelectStatement` with an SQL-comment-producing body: original SQL changes, cached plan SQL does not. Same visitor identity and unchanged AR epochs 52/55 do not rescue the certificate. SEAL001 required; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `inertia/config_bind` | **sealed-only**, promotion blocked | Warmed suppressed `Hash.method_added` defeats the guarded certificate. Pre-fix JSON interpreter −6.947%, HTML −0.275%; accepted YJIT **+16.339% / +16.459%** included sticky global tracing. Post-fix JSON interpreter **−10.156% accepted**; YJIT rejected A/A/flatness and a separate untimed probe has zero hits (JIT-mode fact mismatch). No accepted post-fix YJIT non-regression proof, no promotion. #437 open/unmerged; 3.23.0 lacks it; future fixed bodies refuse ([diagnosis](passes/yjit-regression.md), [old prices](passes/next-levers.md), [audit](passes/suppressed-hooks.md)) |
 | `inertia/props` | opt-in experiment; exact-guard ordinary-def alternative **stopped at price**; no promotion | Ordinary-Hash tuple iteration only; original prop body/lexical scope and fallback retained, actual iterator/visibility checked at every traversal after app code. Five-app 779 outcomes and own-thread SQL identical, nonzero hits in all three Inertia apps. Historical draft +0.873% interpreter / +0.976% YJIT cohorts stay rejected after safety fixes changed fingerprints ([retained evidence](passes/props.md)). Final-runtime brk512 request recheck: interpreter +4.364% [+4.292, +4.462] accepted; YJIT diagnostic +31.043% rejected (5/36 non-flat workers; [recheck](bench.md#decision-critical-512-mib-remeasurement-2026-10-20)). Separate corrected ordinary-def micro: +22.594% interpreter [22.496, 22.731], complete checks cost 6.857× the iteration saving; YJIT micro **cancelled**, invalid earlier fallback price retained ([stop and pins](passes/yjit-regression.md#corrected-interpreter-pricing-stop-at-price)). No credited gain or retry. |
-| `sealed/token_tag` / `sealed/collection_render` | passive production units; **accepted scoped interpreter price**, sealed-only | Natural first-original witnesses, exact native/source/stock-body certificates and identical off/on seams; no runtime objspace/materialization/lookup or on-only prepend. Live token generation/name conversion and stock continuation for unknown values; collection retains live lookup, iterator/preload, locals/cache-key effects, Template rendering/events. **Interpreter Ir on one blog endpoint and fixture**: production form/token/collection on **BlogShowGetOnly GET /articles/1**. Current corrected-source price: [553e7aa report](passes/production-interpreter-reprice.md), [generated results index](../README.md#current-results-2026-10-21). Historical ae025b0: −15.49% total [−15.51, −15.46], −15.51% no-GC, not the corrected source; both A/A controls and heap/brk/mode gates pass. Cold and 192+192 gates pass; native hits 50/200/50, zero fallbacks, epoch deopt 1/4/1. Old six-pending-Turbo-job seed remains a named async refusal; old pricing specimen stays rejected. No cross-fixture, native-latency, YJIT or test-tier claim ([boundary and gates](passes/sealed-production.md)). |
+| `sealed/token_tag` / `sealed/collection_render` | passive production units; **no accepted dispatch-corrected price**, sealed-only | Natural first-original witnesses, exact native/source/stock-body certificates and identical off/on seams; no runtime objspace/materialization/lookup or on-only prepend. Live token generation/name conversion and stock continuation for unknown values; collection retains live lookup, iterator/preload, locals/cache-key effects, Template rendering/events. On **BlogShowGetOnly GET /articles/1**, the [62f8a6b re-price](passes/production-dispatch-reprice.md) is **rejected no-GC A/A**; diagnostic total −14.536782% is not a price. Historical [553e7aa −15.225536%](passes/production-interpreter-reprice.md) is defective-source only, and ae025b0 −15.49% is not current either. Pre/post cold and 192+192 gates pass; native hits 50/200/50, zero fallbacks, epoch deopt 1/4/1. Old six-pending-Turbo-job seed remains a named async refusal; old pricing specimen stays rejected. No cross-fixture, native-latency, YJIT or test-tier claim ([boundary and gates](passes/sealed-production.md)). |
 | Whole compiled ERB specialization | surveyed; no pass | I18n epoch not closed; Campfire URLs have 7 valid guards but 0 completed lowerings/request. No credited saving; [profile and refusals](passes/erb.md) |
 | Literal-run ERB | rejected | 2 sites across five apps; two append calls saved per rendered layout do not justify a pass/guard ([survey](passes/erb.md)) |
 | Route pass with host/protocol `default_url_options` | parked | Widening the optimized predicate is not exact (`to_param` ordering counterexample); scalar-only args cover 1/4 Campfire path calls, base-AR `to_param` certification would cover 4/4, but the ceiling is ~0.3 % of an uncached room request (19 calls × ~2 µs). Revisit as a stacking item once per-hit route budgets exist ([route-helpers.md](passes/route-helpers.md)) |

@@ -9,11 +9,13 @@ live in the linked docs; numbers come from executed runs, dated.
 
 | Area | State |
 |---|---|
-| Production dispatch safety | Sealed token's preexisting private-helper / reflective-send P1 fixed with captured stock `BasicObject#instance_exec` fcalls; same primitive covers form helpers (except the named route's original public dispatch) and the separate link fix, collection unchanged. **−15.225536% remains the price of defective source [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65), not these fixes**. No new price; YJIT seam paused, `835cf16` parked. [Sweep and gates](passes/sealed-production.md#helper-dispatch-safety) |
+| Token allocation / current blog price | Token-only +32/request traced and removed; now approximately allocation-neutral, not a standalone win. The one prospective `b059fc9` cohort is **accepted: −15.022961% total interpreter Ir [−15.051352,−14.996655]**, no-GC −15.021453%. Both A/A intervals wholly within preregistered ±0.1%; all other gates pass, no measurement retry/exclusions, slot 1 released. One three-unit endpoint/fixture only. [Trace](passes/token-allocation.md), [price and export](passes/production-aa01-reprice.md) |
+| Production dispatch safety | Sealed token's preexisting private-helper / reflective-send P1 fixed with captured stock `BasicObject#instance_exec` fcalls; same primitive covers form helpers (except the named route's original public dispatch) and the separate link fix, collection unchanged. **−15.225536% remains defective-source only**. The [62f8a6b attempt](passes/production-dispatch-reprice.md) stays **rejected no-GC A/A**, not rescored by the later accepted cohort; YJIT seam paused, `835cf16` parked. [Sweep and gates](passes/sealed-production.md#helper-dispatch-safety) |
 | Default build | lowers nothing: `view/link_to` and `route/path` quarantined (45fd07a); five-app manifests have 0 units |
 | Correctness gates | original five-app outcomes/SQL and Rails 8.1.4 AP/AV/AR outcomes identical; hook-free delivery preserves loader selection; Redprints' strict load census passes with targeted Bundlebun refusal, **0 hits** ([compatibility report](compat.md)) |
 | Opt-in passes | guarded selection: only props + endpoint; seven cached-fact passes sealed-only after suppressed-hook audit; see [DECISIONS](DECISIONS.md#passes) |
-| Accepted request work | corrected blog `GET /articles/1` production form/token/collection at [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65), published [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); post-fix Starter `GET /dashboard` JSON config binding. Exact values/intervals and pins: [generated README table](../README.md#current-results-2026-10-21). Each is one endpoint/fixture, interpreter Ir not latency, opt-in sealed; no YJIT claim or config promotion |
+| Accepted request work | post-fix Starter `GET /dashboard` JSON config binding and [current-source blog form/token/collection](passes/production-aa01-reprice.md), each one endpoint/fixture, interpreter Ir not latency, sealed-only and not promoted. README/results refresh belongs to the docs owner. Blog's old defective-source price stays historical and its first corrected-source cohort stays rejected. No YJIT instruction claim |
+| Real-Puma throughput | [Separate scoped result and tradeoffs](../README.md#full-request-throughput-real-puma): blog sealed opt-in, stock Ruby YJIT; preregistered RPS rule passes, **p99 and GC collections increase, cause not established**. One route, one orb, branch harness on older measured main; not whole-app, capacity or admission evidence |
 | Not production request prices | production YJIT method stage 1 rejected; [reaper-driven late compilation](passes/production-yjit-method.md) explains the native rejection, not a price. [Frozen props](passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred) is an isolated micro, integration deferred. Fizzy N=50 **INVALID** (heap); N=10 accepted only as a scoped warm bench price, an instruction increase, not production admission ([specimen](block-link-specimen.md#replacement-result-scoped-warm-bench-price-not-a-win)) |
 | Verification-only test tier | AR Article/Comment coverage, not production admission; link/form/token/collection/preload remain refused. [Explicit-path eager-load coverage](test-certificate.md#documented-explicit-path-invocation-actual-eager-loading) at [9773980](https://github.com/thomasklemm/lowrail/commit/97739801174c015e948428c2f35fcb777a888b02); [ccea6df](https://github.com/thomasklemm/lowrail/commit/ccea6df6addc6958b6dbdadccc5e6c6f11727032) retains the fixed timeout diagnosis, without erasing the earlier failure |
 | Campfire r81 | **KILLED after screen + one branch-only allocation variant; slot 2 released, no Ir.** Original adds ~52 objects/request; variant removes those but has no clear wall win (−4.168%, A/A 4.293%). Both screens reject body/headers even off/off. 52 warm hits + 2 STI fallbacks; cold 103 hits outside windows. Named browser/entropy/Redis-expiry rejections, blog feature exemption and 10 cached-bind gaps remain ([evidence](campfire-bench.md#13-screen-one-allocation-only-variant-then-kill)) |
@@ -22,6 +24,38 @@ live in the linked docs; numbers come from executed runs, dated.
 | Prism 2 | Ruby dev + Rust 2.0.0; explicit target grammar, unknown versions refuse. Census/delivered bytes and Rust facts/types/MCP match; both Ruby axes tested, named production-fixture skips preserved. No Prism.find witness adoption or speed claim ([evidence](prism-2.md)) |
 | Rails 8.2 alpha | [Pinned corpus, source drift and fixed-count follow-up](rails-8.2.md); Campfire load/SQL variation reproduced off/off; Writebook lock corrected, baseline failures/Fizzy residuals retained; support blocked, sealed re-certification waits for beta/RC |
 | Limits / next work | default/quarantine unchanged; broader sealed admission and active own-suite coverage remain incomplete; frozen-props integration deferred; Ruby 4.1/ZJIT remains a separate matrix |
+
+## Blog prospective new-rule re-price: accepted (2026-10-21)
+
+On clean detached `b059fc9`, **−15.022961% total Ir
+[−15.051352,−14.996655]**, no-GC **−15.021453%
+[−15.044109,−14.967704]**. Both A/A intervals lie wholly within the
+prospectively published ±0.1%: total [−0.068389,+0.004169]%, no-GC
+[−0.077337,+0.033586]%. All heap/exact-page/brk/mode and fresh pre/post cold,
+192+192, native/deopt gates pass. Exactly 18 serial workers / six rounds;
+72 dump totals/self sums, 36 subtractions, 18 certificates and 681 pins
+independently reconcile. Launcher refusals outside counter work are retained;
+no measurement retry/exclusions, service stopped and slot 1 released.
+
+Token-only's traced +32 allocations/request is removed, leaving it neutral,
+not a standalone win. The stack allocates 2281.25 → 1903.90/request
+(diagnostic). This is a three-unit endpoint/fixture interpreter price, not
+latency, YJIT, test-tier support or whole-app promotion. The prior rejection
+below is unchanged, never rescored. [Protocol and complete accepted export](passes/production-aa01-reprice.md).
+
+## Blog first dispatch-corrected re-price: rejected (2026-10-21)
+
+The screen is exact and saves **343 objects/request** (2412/2412/2069
+off-A/off-B/on), versus the earlier S reference saving 393. The single
+authorized historical-method interpreter cohort at clean detached `62f8a6b`
+then fails **GC-excluded A/A [+0.009283,+0.062511]%**, which excludes zero.
+Total A/A, heaps/exact pages/brk/mode pass. **No accepted replacement price**:
+raw total **−14.536782% [−14.552516,−14.507619]** and no-GC **−14.537277%**
+are diagnostics only. All 72 dumps/self-cost sums, 36 subtractions, 18 source
+certificates and 681 pins reconcile. Pre/post seeded cold, 192+192 observable
+pairs and native/deopt gates pass; raw entropy still rejects. No retry,
+exclusions, new cohort or YJIT; slot 1 released. The prior −15.225536% remains
+defective-source only. [Protocol and complete data](passes/production-dispatch-reprice.md).
 
 ## Campfire r81: companions accepted, native bet killed (2026-10-21)
 

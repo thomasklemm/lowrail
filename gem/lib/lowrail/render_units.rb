@@ -174,33 +174,35 @@ module Lowrail
       end
 
       def render(view, options)
-        unit, epoch, holder, builder_class = self, @epoch, @holder, @builder_class
-        Sealed::VIEW_CONTEXT.bind_call(view) do
-          unless defined?(protect_against_forgery?) && protect_against_forgery?
-            unit.count(true)
-            next ""
-          end
+        value = name = remove_autocomplete = builder = nil
+        protected = Sealed::VIEW_CONTEXT.bind_call(view) do
+          next false unless defined?(protect_against_forgery?) && protect_against_forgery?
           value = form_authenticity_token(form_options: options.merge(authenticity_token: nil))
           name = request_forgery_protection_token.to_s
           remove_autocomplete = ActionView::Base.remove_hidden_field_autocomplete
-          builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
-          unless epoch[0].zero? && holder.call(name, String) && holder.call(value, String) &&
-              holder.call(builder, builder_class) && RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
-            # Continue AFTER live generation/conversion. Re-entering token_tag
-            # would generate/mask a token twice and replay app-defined effects.
-            unit.count(false, "live token/name/builder holder or seal epoch changed")
-            attributes = {type: "hidden", name: name, value: value}
-            attributes[:autocomplete] = "off" unless remove_autocomplete
-            next tag(:input, **attributes)
-          end
-          unit.count(true)
-          autocomplete = remove_autocomplete ? "" : ' autocomplete="off"'
-          name = ERB::Util.unwrapped_html_escape(name)
-          name = name.gsub('"', "&quot;") if name.include?('"')
-          value = ERB::Util.unwrapped_html_escape(value)
-          value = value.gsub('"', "&quot;") if value.include?('"')
-          %(<input type="hidden" name="#{name}" value="#{value}"#{autocomplete} />).html_safe
+          builder = @tag_builder
+          true
         end
+        unless protected
+          count(true)
+          return ""
+        end
+        unless @epoch[0].zero? && @holder.call(name, String) && @holder.call(value, String) &&
+            @holder.call(builder, @builder_class) && RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
+          # Continue AFTER live generation/conversion. Re-entering token_tag
+          # would generate/mask a token twice and replay app-defined effects.
+          count(false, "live token/name/builder holder or seal epoch changed")
+          attributes = {type: "hidden", name: name, value: value}
+          attributes[:autocomplete] = "off" unless remove_autocomplete
+          return Sealed::VIEW_CONTEXT.bind_call(view) { tag(:input, **attributes) }
+        end
+        count(true)
+        autocomplete = remove_autocomplete ? "" : ' autocomplete="off"'
+        name = ERB::Util.unwrapped_html_escape(name)
+        name = name.gsub('"', "&quot;") if name.include?('"')
+        value = ERB::Util.unwrapped_html_escape(value)
+        value = value.gsub('"', "&quot;") if value.include?('"')
+        %(<input type="hidden" name="#{name}" value="#{value}"#{autocomplete} />).html_safe
       end
     end
   end
