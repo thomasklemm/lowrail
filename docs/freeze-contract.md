@@ -7,7 +7,7 @@ App evidence uses study base
 [`e32040d`](https://github.com/thomasklemm/lowrail/commit/e32040da3682ca79ee60aa658da16370ef1746a3);
 it does not describe later sealed/form admission changes.
 
-## Primary result: the production paths tolerate freezing, within this slice
+## Blog production: zero violations in the sampled paths
 
 **Zero observed FrozenErrors** on the blog's two production request paths,
 with lowering off **and** on, for all three candidate sets. This supports
@@ -72,12 +72,97 @@ lists. Complete private per-process reports retain **every** FrozenError
 raise event with its full backtrace, including rescued/re-raised errors.
 Counts are raise events, not unique mutation operations or failing tests.
 
+## Fizzy production/jobs follow-up: warmup cannot remove recurring writes
+
+The follow-up uses Lowrail
+[`83bf0ba`](https://github.com/thomasklemm/lowrail/commit/83bf0baa9c21d86955e31f626bbc466b60c41f9d),
+the same pinned Fizzy revision and Rails/Ruby versions, a disposable production
+copy, precompiled assets and four SQLite databases. `SKIP_TELEMETRY=1` avoids
+external Sentry delivery. Neither app nor framework source is patched.
+The ordinary default build has **zero units** (existing quarantine/refusals):
+both `LOWRAIL=0` and `1` exercise original Rails under the same explicit freeze,
+not a new fast-path/support claim. The selected set is a **scenario-holder
+probe**, not a claimed certificate: Bubble/User/Bucket/Event/Notification,
+ApplicationController/ApplicationJob, the three app jobs and the seven
+symmetric runtime definitions. Full ordinary/singleton ancestry is frozen.
+
+Each process attempts seven real GETs: health, login, authenticated buckets,
+bubbles, bubble detail, notifications and events. Authentication uses a real
+Session and signed cookie, not an app authentication bypass. A testing request
+helper only constructs the cookie; no test framework or exclusions are used.
+The three actual jobs run via `perform_now`, with the production Solid Queue
+adapter still configured: `AutoPopAllDueJob`, `RemoveAbandonedCreationsJob`,
+`GenerateNotificationsJob`. Positive controls verify a due bubble is popped,
+an abandoned creation is deleted and a reader receives a notification.
+Enqueue callbacks write to the disposable Solid Queue database, but no worker
+is started: queue claiming, GlobalID deserialization, scheduled polling and
+downstream Turbo broadcast execution remain **uncovered**.
+
+FrozenError **raise events per process**, off / on:
+
+| Cumulative warm recipe | Selected holders | App/framework/bundle | Plus core |
+|---|---:|---:|---:|
+| Fixtures and seven request warm steps, one GET each | 22 / 22 | 22 / 22 | 22 / 22 |
+| Additionally three job warm steps, one `perform_now` each | 19 / 19 | 19 / 19 | 19 / 19 |
+| Additionally seven populated-request steps, one GET each | **9 / 9** | **11 / 11** | **11 / 11** |
+
+The second recipe creates fresh job inputs after warming jobs. The final
+recipe also renders pages with the resulting event/message data before the
+freeze; empty-page warming had not exercised those paths. Each warm step and
+its count is retained. This is a finite three-recipe census, not a retry until
+green. There are **126 post-freeze request attempts and 54 real job attempts**
+across 18 processes. Both raw request-only and final populated unfrozen
+controls complete all ten scenarios successfully in both Lowrail arms.
+Every frozen process reaches all ten attempts but exits nonzero.
+
+Final selected-holder failures are the bubbles page and the auto-pop/delete
+jobs: **nine** raises in `query_constraints_list`, `persistence.rb:224`.
+The broad/core sets additionally hit **two** raises in
+`SolidCache::Entry.connection_class`, `core.rb:230`, on bubble detail.
+Off/on named inventories match exactly: 351 / 9,702 / 9,703 named holders.
+Full ancestor closure is reported complete; no holder was silently excluded.
+
+These two remaining patterns **cannot be fixed just by warming**:
+
+```ruby
+@query_constraints_list ||= if base_class? || primary_key != base_class.primary_key
+  primary_key if primary_key.is_a?(Array)
+else
+  base_class.query_constraints_list
+end
+
+@connection_class ||= false
+```
+
+For the observed scalar-key models the first expression keeps assigning nil;
+the second keeps assigning false. Both write again after successful prior
+calls, and frozen classes reject the write. The final populated run witnesses
+that failure, not just a source-level hypothesis. Do not set a fake truthy
+memo or invent query constraints to get green. Freezing these model holders
+needs a reviewed app/framework change that preserves memo semantics, or
+refusal of that holder-dependent contract. Static doctor can flag falsey
+`||=` class memos and known scalar-key model facts; the live path supplies
+the evidence. Earlier lazy attributes/builders/relation delegates are warmable
+for this finite slice, but removing their first failure only exposes the next.
+
+[`fizzy_freeze.rb`](../bench/experiments/fizzy_freeze.rb) is the reproducible
+worker (requires an explicit disposable-app marker). Its `FREEZE_WARM_JOBS`
+levels are 0/1/2; restore the four empty prepared databases between processes.
+The [sanitized event census](freeze-fizzy-production.json) preserves each event
+and its full backtrace by hash reference, outcomes, warm steps and source pins.
+Private logs retain response/SQL diagnostics; they are not published.
+The [reviewed integration proposal](freeze-integration.md) keeps preflight
+refusal distinct from irreversible freeze failure. Fizzy narrows the earlier
+blog feasibility result: a complete ancestor closure alone does not make
+freezing arbitrary Rails model holders production-compatible.
+
 ## Suites: onboarding evidence, not the production decision
 
 Blog baseline: **21 tests / 54 assertions, green**. Fizzy baseline:
 **124 tests / 458 assertions, seven existing `Current#reset_all` errors**.
 Neither app source is patched. Fizzy is the coordinator-approved additional
-app for this first census; Wikino/CRM and production Fizzy/jobs are not tested.
+app for the initial census; Wikino/CRM are not tested. The production/job
+follow-up above is separate from these initial test-suite observations.
 
 The raw initial targeted freeze, after loading the suites and generating
 attributes/schema/model names, records **21 blog / 124 Fizzy** timestamp
@@ -160,9 +245,10 @@ unit refusal; repeatedly warming it is not a repair.
    Kernel/Object, may be called “covered”. No automatic pass activation.
 2. **The app owns the seal point.** Boot, eager load, declared natural request
    warmup and job warmup precede it, identically with lowering off/on. Run
-   production scenario audits before deployment, with jobs still an explicit
-   gap here. A violation raises; it is not rescued into a fictitious safe
-   continuation. Freezing is irreversible for that process.
+   production scenario audits before deployment; full job-worker lifecycle
+   coverage remains an explicit gap here. A violation raises; it is not
+   rescued into a fictitious safe continuation. Freezing is irreversible for
+   that process.
 3. **Retain actual receiver selection at each live boundary.** The published
    `Lowrail::Native.exact_class?(object, expected)` rejects singleton methods,
    singleton prepends/extend, even an empty eigenclass, and later subclasses.
@@ -223,6 +309,54 @@ freeze would enforce its method part, not eliminate a new repeated census.
 The form remains inactive at this source version. Do not claim removing
 per-hit form checks that are not executing. The earlier props 6.857× price
 remains unchanged; this spike does not re-price it or promote a pass.
+
+### Prepared props companion: unpriced; counting selection is separate work
+
+[`props_freeze.rb`](../bench/experiments/props_freeze.rb) pins and reuses the
+published `83bf0ba` `PropsVariant.source` and `YjitRegression.setup` factory.
+It evaluates only the pinned definitions prefix of the latter CLI, never its
+driver/worker entrypoint. All eight arms use the same fresh nested input per
+resolve and freeze Hash/Enumerable plus complete ordinary/singleton ancestry
+at the same post-setup point, without a TracePoint. No measured entrypoint is
+provided. `frozen_split` and `frozen_checks_original` replace only the method
+census with **one `Native.exact_class?` per recursive entry**. Main-Ractor,
+active-unit, mutable Guard state/validation and Stats behavior remain intact.
+
+```sh
+LOWRAIL_FREEZE=1 BENCH_JIT=0 mise exec -- ruby bench/experiments/props_freeze.rb --liveness frozen_split
+LOWRAIL_FREEZE=1 BENCH_JIT=0 mise exec -- ruby bench/experiments/props_freeze.rb --check /private/NEW-proof
+mise exec -- ruby bench/experiments/props_freeze_test.rb --seed=1729
+```
+
+The primary interpreter lifetime gate passes **478 comparisons** across the
+same three Inertia versions and two frozen shapes. Checked arms must produce
+exactly **20 authorizations / ten resolves**, no fallbacks; original/each
+controls produce zero counts. Forced-false receiver authorization fails the
+liveness gate. Separate off/on contract witnesses preserve callback order,
+once-only evaluation and legal late per-instance mutation, while global Hash
+mutation raises identically. They do not pretend forbidden mutations are
+ordinary native-only lifetime cases.
+
+One declared warm prerequisite was discovered: **first Ractor startup** tries
+to prepend Kernel and fails after the full chain is frozen. That failed run
+is retained. The Ractor case now performs one bootstrap Ractor before freezing
+in **both** arms, then checks non-main fallback normally. This is not permission
+to create Ractors cold after freezing or to omit Kernel from the closure.
+
+The native study's accepted interpreter result still loses about 1.38%.
+Its retained-window accounting attributes **1,132 Ir/resolve** to the two
+native predicates: 454 BASIC lookup + 602 visibility lookup + 76 scaffolding;
+**4,717.248 Ir** remains outside them. Predicate removal alone cannot close
+the paired 1,427.777-Ir gap. Disabled Stats also accounts for 630 Ir inside
+four `vm_defined` calls, plus VM opcodes. These are the native study's numbers,
+not a price for this freeze specimen; see [props-native](passes/props-native.md).
+
+The coordinator approved preparing **one combined** freeze/receiver/late-counter
+specimen. The native study owns counting/non-counting selection, late Stats
+activation witnesses and integration; it received these exact freeze-only
+sources, dedicated witnesses and full source-pinned lifetime proof. That work
+is not duplicated here. No cohort or slot request is made by this spike, and
+there is no demonstrated combined win or production guard change.
 
 ## Tooling and boundaries
 
