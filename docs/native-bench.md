@@ -72,8 +72,9 @@ compare **Lowrail**, not interpreter versus YJIT.
   original external `CampfireScenario` fixture/authentication. Public sealed
   instantiation-only artifact, not the zero-unit all-opt-in selection.
   Room, pagination, sidebar, search and POST from [the route study](campfire-bench.md).
-  Expected warm room: 52 completions, two Room STI fallbacks. Other routes
-  must be counted, not assumed zero. Dedicated localhost Redis only; reset
+  Native YJIT smoke coverage: room 52 completions, pagination 46, sidebar 8,
+  search 19, POST 3 per request; two Room STI fallbacks on room. Other routes
+  are not zero-hit controls. Dedicated localhost Redis only; reset
   its disposable DB between processes. No worker drains queued push jobs;
   POST measures the response path, not eventual delivery/completion. Its
   increasing HQ rows are not a fixed-size write steady state. Cold entropy
@@ -127,6 +128,19 @@ CAMPFIRE_DISPOSABLE_REDIS=1 mise exec ruby@4.0.7 -- \
   script/native-bench run CONFIG.json NEW_PRIVATE_OUTPUT
 mise exec ruby@4.0.7 -- ruby bench/native_bench_test.rb
 ```
+
+Other exploration branches may set `exploration_setup` to an absolute Ruby
+file defining `NativeBench::Exploration.install(config:, state:, arm:)`.
+It is required and invoked **in every arm**, after production boot and before
+route construction/login/warmup. `arm` is exactly `off_a`, `off_b` or `on`.
+An optional `NativeBench::Exploration.counts` returns JSON-safe snapshots,
+replacing the ordinary coverage provider. Its counters/guards must charge
+the same real hot-path work in all arms; the runner does not authorize an
+unchecked specialization. `exploration_setup_ms` records require/install
+cost separately from Rails boot. List any further setup dependencies in
+`exploration_sources`; the setup file, listed files and effective lock are
+hashed before execution and checked after every worker. The callback is
+bench-only and gives no production admission authority.
 
 Output retains protocol/schedule before execution, per-worker request samples,
 GC/RSS/boot/JIT metrics and raw-log digests, source/lock/artifact/runtime/native

@@ -101,7 +101,9 @@ module NativeBench
   end
 
   def counts
-    if defined?(BlockLinkSpecimen) && BlockLinkSpecimen.counts
+    if defined?(Exploration) && Exploration.respond_to?(:counts)
+      JSON.parse(JSON.generate(Exploration.counts))
+    elsif defined?(BlockLinkSpecimen) && BlockLinkSpecimen.counts
       JSON.parse(JSON.generate(BlockLinkSpecimen.counts))
     elsif defined?(Lowrail::Stats) && Lowrail::Stats.enabled?
       {"hits" => Lowrail::Stats.unit_hits.dup, "fallbacks" => Lowrail::Stats.unit_fallbacks.dup}
@@ -117,8 +119,15 @@ module NativeBench
     end
     require File.join(config.fetch("app"), "config/environment")
     boot_ms = (clock - started) * 1000
+    BlockLinkSpecimen.dependencies! if config.fetch("workload") == "fizzy"
     raise "production Ruby 4.0.7 / Rails 8.1.4 / YJIT required" unless RUBY_VERSION == "4.0.7" &&
       Rails.version == "8.1.4" && Rails.env.production? && RubyVM::YJIT.enabled? && !jit.fetch("zjit")
+    setup_started = clock
+    if config["exploration_setup"]
+      require config.fetch("exploration_setup")
+      Exploration.install(config: config, state: state, arm: arm)
+    end
+    setup_ms = (clock - setup_started) * 1000
     workload = routes(config, state, arm)
     invoke = ->(call) { response = call.call; raise "HTTP #{response.status}" if response && response.status != 200 }
     config.fetch("warmup").times { workload.each_value { invoke.call(_1) } }
@@ -142,7 +151,7 @@ module NativeBench
         "jit_before" => before_jit, "jit_after" => jit, "counts_before" => before_counts, "counts_after" => counts}]
     end
     File.write(destination, JSON.pretty_generate({"arm" => arm, "coverage" => coverage,
-      "boot_ms" => boot_ms, "ruby" => RUBY_DESCRIPTION, "rails" => Rails.version,
+      "boot_ms" => boot_ms, "exploration_setup_ms" => setup_ms, "ruby" => RUBY_DESCRIPTION, "rails" => Rails.version,
       "affinity" => File.read("/proc/self/status")[/^Cpus_allowed_list:.*$/], "routes" => rows,
       "refusal" => Lowrail.refusal_reason, "jit" => jit}), perm: 0o600)
   end
@@ -187,7 +196,8 @@ module NativeBench
     raise "dedicated disposable corpus app required" unless config.fetch("app").start_with?(File.join(ROOT, ".corpus/"))
     raise "output must be outside app and seed" if [config.fetch("app"), config.fetch("seed")].any? { output.start_with?(_1 + "/") }
     raise "acknowledge dedicated disposable Redis with CAMPFIRE_DISPOSABLE_REDIS=1" if config.fetch("workload") == "campfire" && ENV["CAMPFIRE_DISPOSABLE_REDIS"] != "1"
-    %w[contexts gemfile].each { config[_1] = File.realpath(config[_1]) if config[_1] }
+    %w[contexts gemfile exploration_setup].each { config[_1] = File.realpath(config[_1]) if config[_1] }
+    config["exploration_sources"] = config.fetch("exploration_sources", []).map { File.realpath(_1) }
     config = {"rounds" => 12, "warmup" => 200, "samples" => 300, "seed_number" => 41231, "cpu" => 2}.merge(config)
     raise "at least two rounds and positive warmup/samples required" unless config.fetch("rounds") >= 2 &&
       config.fetch("warmup").positive? && config.fetch("samples").positive?
@@ -202,6 +212,9 @@ module NativeBench
       "lock_sha256" => Digest::SHA256.file(config.fetch("gemfile", File.join(config.fetch("app"), "Gemfile")) + ".lock").hexdigest,
       "ruby_sha256" => Digest::SHA256.file(RbConfig.ruby).hexdigest,
       "seed_sha256" => Dir[File.join(config.fetch("seed"), "**/*")].select { File.file?(_1) }.sort.to_h { [_1.delete_prefix(config.fetch("seed") + "/"), Digest::SHA256.file(_1).hexdigest] },
+      "artifact_sha256" => Dir[File.join(config.fetch("artifact"), "**/*")].select { File.file?(_1) }.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] },
+      "extra_files_sha256" => (%w[contexts gemfile exploration_setup].filter_map { config[_1] } +
+        [config.fetch("gemfile", File.join(config.fetch("app"), "Gemfile")) + ".lock"] + config.fetch("exploration_sources")).to_h { [_1, Digest::SHA256.file(_1).hexdigest] },
       "files_sha256" => Dir[File.join(ROOT, "{gem/lib,bench}/**/*.{rb,so}")].sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }}
     File.write(File.join(output, "config.json"), JSON.pretty_generate(config), perm: 0o600)
     report = {"scope" => "exploratory native YJIT; not a published price or support certification",
@@ -247,7 +260,7 @@ module NativeBench
       raise "worker #{label} failed; retained #{log}" unless ok
       raise "app source or artifact changed" unless sources.call == pin.fetch("source_sha256") && Digest::SHA256.file(manifest).hexdigest == pin.fetch("manifest_sha256")
       raise "harness or runtime changed" unless Digest::SHA256.file(SCRIPT).hexdigest == pin.fetch("script_sha256") &&
-        pin.fetch("files_sha256").all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha }
+        %w[files_sha256 artifact_sha256 extra_files_sha256].all? { |kind| pin.fetch(kind).all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha } }
       report.fetch("workers") << JSON.parse(File.read(destination)).merge("round" => round, "log_sha256" => Digest::SHA256.file(log).hexdigest)
       File.write(File.join(output, "progress.json"), JSON.pretty_generate(report), perm: 0o600)
       warn "native-bench #{label}: complete"
