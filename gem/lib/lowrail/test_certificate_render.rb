@@ -36,6 +36,7 @@ module Lowrail
       # observes both actual holders after the complete original operation,
       # without changing that shared seam or retaining a renderer/request.
       @collection_trace = TracePoint.new(:return) do |event|
+        next unless Ractor.current.equal?(Ractor.main) && TestCertificate.active?
         next unless TestCertificate::IVAR.bind_call(CollectionRender, :@pending) &&
           TestCertificate::CLASS.bind_call(event.return_value).equal?(Array)
         frame = event.binding
@@ -113,17 +114,19 @@ module Lowrail
           return unless @pending
           native = Lowrail.loaded_constant("Lowrail::Native")
           exact = native&.method(:exact_class?)
+          @admission = {state: "pending", attempts: @admission.fetch(:attempts) + 1}.freeze
+          return retire_render("actual-holder primitive changed") unless exact && Sealed.signature(exact) == @data.fetch("native_method")
+          binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
+          return retire_render("actual-holder binary not certified") unless @data.fetch("sources").key?(binary)
+          return retire_render("source changed") unless @data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha }
           controller = Lowrail.loaded_constant("ArticlesController")
           view_class = controller && TestCertificate::IVAR.bind_call(controller, :@view_context_class)
           # A foreign/missing context is local, not a mutation of this unit.
-          return unless exact && view_class && exact.call(view, view_class)
+          return unless view_class && exact.call(view, view_class)
           if equal?(CollectionRender)
             renderer_class = Lowrail.loaded_constant("ActionView::CollectionRenderer")
             return unless renderer_class && exact.call(renderer, renderer_class)
           end
-          @admission = {state: "pending", attempts: @admission.fetch(:attempts) + 1}.freeze
-          return retire_render("actual-holder primitive changed") unless Sealed.signature(exact) == @data.fetch("native_method")
-          return retire_render("source changed") unless @data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha }
           holders, names = [native.singleton_class], [:exact_class?]
           @data.fetch("methods").each do |entry|
             type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))

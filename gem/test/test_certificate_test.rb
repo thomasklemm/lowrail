@@ -289,6 +289,20 @@ class TestCertificateTest < Minitest::Test
         layout = Object.new
         layout.define_singleton_method(:render) { |*args, &block| "wrapped:#{block.call}" }
         layouts = [false, true].map { render_collection.call(_1, layout) }
+        nested = nil
+        during_render = -> { during_render = nil; nested = render_collection.call(true) }
+        reentrant = [render_collection.call(true), nested]
+        errors = [false, true].map do |fast|
+          events.clear
+          during_render = -> { raise ArgumentError, "live template failure" }
+          begin
+            render_collection.call(fast)
+          rescue ArgumentError => error
+            [error.message, events.dup]
+          ensure
+            during_render = nil
+          end
+        end
         # Unrelated live rows/subscribers and a new unknown view are not a
         # mutation of the accepted holder. A foreign input stays local.
         subscriber = ActiveSupport::Notifications.subscribe("render_partial.action_view") { |*| }
@@ -297,7 +311,7 @@ class TestCertificateTest < Minitest::Test
         foreign = ActionView::Base.empty
         foreign_output = foreign.send(:token_tag, false, form_options: options)
         render_collection.call(true)
-        result = {tokens: tokens, rendered: rendered, layouts: layouts, foreign: foreign_output,
+        result = {tokens: tokens, rendered: rendered, layouts: layouts, reentrant: reentrant, errors: errors, foreign: foreign_output,
           production_epoch: Lowrail::Sealed::EPOCH[0],
           admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
       RUBY
@@ -313,6 +327,8 @@ class TestCertificateTest < Minitest::Test
       assert_equal ["left/0/2", "right/1/2"], result.dig("rendered", 0, "output")
       assert_equal ["size", "iterator", "left", "right"], result.dig("rendered", 0, "events")
       assert_equal [["wrapped:left/0/2", "wrapped:right/1/2"]] * 2, result.fetch("layouts")
+      assert_equal [["left/0/2", "right/1/2"]] * 2, result.fetch("reentrant")
+      assert_equal [["live template failure", ["size", "iterator", "left"]]] * 2, result.fetch("errors")
       assert_equal "", result.fetch("foreign")
       assert_equal 97, result.fetch("production_epoch")
       assert_equal [true, true], result.fetch("admitted")
@@ -322,7 +338,7 @@ class TestCertificateTest < Minitest::Test
 
   def test_render_mutation_and_fork_authority_are_sticky_and_unit_local
     with_render_certificate do |dir, boot|
-      %w[method continuation table lexical tier opt_in fork].each do |mutation|
+      %w[method continuation table lexical size tier opt_in fork].each do |mutation|
         result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir).merge("MUTATION" => mutation))
           before = Lowrail::Stats.snapshot
           case ENV.fetch("MUTATION")
@@ -350,11 +366,20 @@ class TestCertificateTest < Minitest::Test
             holder.send(:remove_const, :TAG_TYPES)
             holder.const_set(:TAG_TYPES, saved.merge(name: :boolean).freeze)
             restore = -> { holder.send(:remove_const, :TAG_TYPES); holder.const_set(:TAG_TYPES, saved) }
-          when "lexical"
+          when "lexical", "size"
             holder = ActionView::CollectionRenderer
-            holder.const_set(:PartialIteration, Class.new(ActionView::PartialIteration) do
-              def index = super + 7
-            end)
+            mutate = -> do
+              during_size = nil
+              holder.const_set(:PartialIteration, Class.new(ActionView::PartialIteration) do
+                def index = super + 7
+              end)
+            end
+            if ENV.fetch("MUTATION") == "size"
+              during_size = mutate
+              size_output = render_collection.call(true)
+            else
+              mutate.call
+            end
             restore = -> { holder.send(:remove_const, :PartialIteration) }
           when "tier"
             ENV["RAILS_ENV"] = "production"
@@ -395,7 +420,8 @@ class TestCertificateTest < Minitest::Test
           view.send(:token_tag, nil, form_options: options)
           render_collection.call(true)
           result = {before: before, token: token_pair, collection: collection_pair,
-            generation: generation, admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
+            generation: generation, size_output: size_output,
+            admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
         RUBY
         if mutation == "fork"
           assert_equal [true, true], result.fetch("admitted")
@@ -415,14 +441,19 @@ class TestCertificateTest < Minitest::Test
           if mutation == "continuation"
             assert_equal '<input data-probe="mutated" />', result.fetch("token").last
             assert_equal 1, result.fetch("generation"), "mutation must not replay live generation"
+          elsif mutation == "size"
+            assert_equal ["left/0/2", "right/1/2"], result.fetch("size_output"), "lookup precedes the live size callback"
+            assert_equal ["left/7/2", "right/8/2"], result.fetch("collection").last
           end
-          expected = %w[tier opt_in].include?(mutation) ? [false, false] : mutation == "lexical" ? [true, false] : [false, true]
+          expected = %w[tier opt_in].include?(mutation) ? [false, false] : %w[lexical size].include?(mutation) ? [true, false] : [false, true]
           assert_equal expected, result.fetch("admitted"), mutation
           expected.each_with_index do |active, index|
             id = (4 + index).to_s
             assert_equal(active ? 0 : 1, result.dig("stats", "unit_deopts").fetch(id, 0), mutation)
             next if active
-            assert_equal result.dig("before", "unit_hits", id), result.dig("stats", "unit_hits", id), mutation
+            prior = result.dig("before", "unit_hits", id)
+            prior += 1 if mutation == "size" && index == 1
+            assert_equal prior, result.dig("stats", "unit_hits", id), mutation
             refute_empty result.dig("stats", "unit_refusals", id), mutation
           end
         end
@@ -523,6 +554,15 @@ class TestCertificateTest < Minitest::Test
         Lowrail::TestCertificate.test_initialized!
         raise "authority before original operation" if Lowrail::TokenTag.admitted? || Lowrail::CollectionRender.admitted?
         ActiveRecord::FixtureSet.create_fixtures(Rails.root.join("test/fixtures"), %w[articles comments])
+        # Completing an inherited body on a foreign renderer cannot witness
+        # the canonical renderer. The later real request must supply that.
+        foreign_renderer = Class.new(ActionView::CollectionRenderer).allocate
+        foreign_renderer.instance_variable_set(:@locals, {})
+        empty = Object.new
+        empty.define_singleton_method(:size) { 0 }
+        empty.define_singleton_method(:each_with_info) { [] }
+        foreign_renderer.send(:collection_with_template, ArticlesController.new.view_context, Object.new, nil, empty)
+        raise "foreign renderer authorized canonical context" if Lowrail::CollectionRender.admitted?
         require "rack/mock"
         view = nil
         trace = TracePoint.new(:call) { |event| view = event.self }
@@ -534,8 +574,9 @@ class TestCertificateTest < Minitest::Test
         ids = Lowrail.manifest.units.to_h { [_1.fetch("pass"), _1.fetch("id").to_s] }
         options = {action: "/articles/1/comments", method: "post"}
         events = []
+        during_size = during_render = nil
         iterator = Object.new
-        iterator.define_singleton_method(:size) { events << "size"; 2 }
+        iterator.define_singleton_method(:size) { events << "size"; during_size&.call; 2 }
         iterator.define_singleton_method(:each_with_info) do
           events << "iterator"
           [["left", ["shared", :item, :item_counter, :item_iteration]], ["right", ["shared", :item, :item_counter, :item_iteration]]]
@@ -543,6 +584,7 @@ class TestCertificateTest < Minitest::Test
         template = Object.new
         template.define_singleton_method(:render) do |_view, locals, implicit_locals:|
           events << locals.fetch(:item)
+          during_render&.call
           "#{locals.fetch(:item)}/#{locals.fetch(implicit_locals.first)}/#{locals.fetch(implicit_locals.last).size}"
         end
         render_collection = ->(fast, layout = nil) do
