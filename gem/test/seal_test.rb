@@ -142,6 +142,46 @@ class SealTest < Minitest::Test
     end
   end
 
+  def test_global_regexp_timeout_changes_are_proven_even_when_restored_before_checkpoint
+    Dir.mktmpdir do |dir|
+      data = ruby_json(<<~'RUBY', setup: false, env: {"OUTPUT" => dir, "RUBYOPT" => "-I#{GEM_LIB}"})
+        require 'json'
+        require 'lowrail/seal'
+        Regexp.timeout = nil
+        setter = Regexp.method(:timeout=)
+        Lowrail::Seal.install(dir: ENV.fetch('OUTPUT'), targets: [])
+        Lowrail::Seal.activate
+        Lowrail::Seal.start_test('unchanged')
+        setter.call(nil)
+        begin
+          setter.call(-1)
+        rescue ArgumentError
+        end
+        Lowrail::Seal.finish_test
+        unchanged_epoch = Lowrail::Seal::EPOCH[0]
+        Lowrail::Seal.start_test('changed and restored')
+        setter.call(0.001)
+        setter.call(nil)
+        Lowrail::Seal.finish_test
+        Lowrail::Seal.start_test('later')
+        Lowrail::Seal.finish_test
+        puts JSON.generate('unchanged_epoch' => unchanged_epoch, 'epoch' => Lowrail::Seal::EPOCH[0],
+          'ledger' => Lowrail::Seal.ledger, 'tests' => Lowrail::Seal.tests, 'timeout' => Regexp.timeout)
+      RUBY
+      assert_equal 0, data.fetch("unchanged_epoch")
+      assert_equal 2, data.fetch("epoch")
+      assert_nil data.fetch("timeout")
+      rows = data.fetch("ledger")
+      assert_equal 2, rows.size
+      assert rows.all? { _1.values_at("rule", "confidence", "target", "operation", "test") ==
+        ["SEAL005", "proven", "Regexp.timeout", "timeout=", "changed and restored"] }
+      assert_equal [[nil, 0.001], [0.001, nil]], rows.map { _1.values_at("before", "after") }
+      assert_equal "optimized eligible (not coverage)", data.dig("tests", "unchanged")
+      assert_equal "this test runs unoptimized", data.dig("tests", "changed and restored")
+      assert_equal "this test runs unoptimized", data.dig("tests", "later")
+    end
+  end
+
   def test_destination_snapshot_not_source_callback_proves_suppressed_edits
     Dir.mktmpdir do |dir|
       data = ruby_json(<<~'RUBY', setup: false, env: {"OUTPUT" => dir, "RUBYOPT" => "-I#{GEM_LIB}"})

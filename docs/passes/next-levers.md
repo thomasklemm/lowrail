@@ -177,8 +177,9 @@ agree, yet subclass primitive overrides, constant replacement and regexp
 observation differ. Normal VM dispatch correctly handles a later `blank?`
 redefinition; that one fact does not close the rest of the certificate.
 
-Owner decision: **third sealed candidate**, after link_to and config bind,
-with a micro budget of **−118,626 interpreter / −155,248 YJIT Ir** on show,
+Final owner decision: **park sealed candidate #3**, after link_to and config
+bind; do not implement either delivery variant. The micro budget is
+**−118,626 interpreter / −155,248 YJIT Ir** on show,
 zero objects (roughly 1.4% of the interpreter request, not a measured sealed
 request win). SEAL001 covers post-seal method/visibility/refinement changes;
 SEAL001/008 cover rebinding `BLANK_RE` and mutation of the encoding map, whose
@@ -190,26 +191,46 @@ for `ascii_only?`, `getbyte`, `match?` and `empty?`; refuse if overridden.
 Also inventory already-existing String-instance singleton overrides: a
 subclass-only scan misses those. No eigenclass creation is needed to inspect
 an existing effective method through captured native reflection. New unknown
-receivers must stay original unless the contract/certificate covers them.
+receiver boundaries must refuse the pass unless the contract certifies them.
 
 **Timeout refusal also applies to sealed mode.** Native million-byte ASCII
 inputs reproduce old `Regexp::TimeoutError` versus main true/false on both
 Ruby targets under a preexisting global timeout; a frozen same-source Regexp
 with a local timeout reproduces it even with global nil. Require independent
 nil checks on global policy, `BLANK_RE` and cached encoding regexps; do not
-disable timeout policy or add a second old-body path. The current seal
-detector misses a post-seal global setter (epoch 0 → 0, empty ledger), whereas
-URI memo performs a live per-call check. This is a recorded SEAL005/008 gap.
+disable timeout policy or add a second old-body path. The original seal
+detector missed a post-seal global setter (epoch 0 → 0, empty ledger), whereas
+URI memo performs a live per-call check. The independent SEAL005 fix now
+compares the captured native getter at setter return and records proven
+changes, including restoration before a checkpoint; it is test observation,
+not guardless production enforcement.
 All five core apps actually boot production with global timeout **1.0 s**,
-so the proposed refusal excludes the priced blog workload. The micro budget
-is not an eligible request win; see the [facts and probes](string-blank.md#timeout-policy-refuse-including-in-sealed-mode).
+so **zero of five are eligible**, including the priced blog workload. The
+micro budget is also below the 2% threshold and is not an eligible request
+win; see the [global/per-Regexp evidence and app policy table](string-blank.md#timeout-policy-refuse-including-in-sealed-mode).
 
-Build only **after** the central production TracePoint fix, the six additional
-sealed-only quarantines, and the sealed owner's published generic eligibility
-boundary. Reuse that tier/manifest mechanism; do not invent a third delivery
-path or a test-certificate override. Complete seal-time/actual-input refusal,
-installed framework and app/compat gates precede fresh finite show request
-cohorts. No runtime implementation or default change is in this design step.
+Lowering-off boot facts on Ruby 4.0.7, **not support certificates**:
+
+| App | Environment | Global `Regexp.timeout` | `BLANK_RE.timeout` |
+|---|---|---:|---|
+| Blog | production | 1.0 s | nil |
+| Campfire | production | 1.0 s | nil |
+| PingCRM | production | 1.0 s | nil |
+| Redprints | production | 1.0 s | nil |
+| Starter | production | 1.0 s | nil |
+| CASA / Fizzy / CodeTriage | test only | 1.0 s each | nil each |
+| Writebook | test only | nil | nil |
+
+If ever revived, the required delivery shape is **original throughout boot,
+certify at the seal, then an ordinary `def`** with original owner, name,
+source path and parameters: no prepend, hot guard or second old-body path.
+Refuse escaped pre-seal `Method`/`UnboundMethod` handles. A cold `load_iseq`
+rewrite is not sufficient: it changes pre-seal boot behavior before the
+subclass, constants and timeout facts can be certified, and saved handles
+could already have escaped. Reuse generic sealed eligibility and the
+after-initialize seam, not a new delivery tier or test-certificate bypass.
+Neither that activation-seam variant nor the cold-ISeq variant is built;
+upgrading to the upstream Rails body remains the path. No request cohort.
 
 ## Protocol, invalid attempt, and retained evidence
 
@@ -255,9 +276,10 @@ warmup removes its one-time allocation; the equality threshold was not widened.
    Lowrail guard. The interpreter show opportunity is about 1.36% before a
    hypothetical Lowrail certificate, not the entire 2.88% self share. Keep
    the guarded Lowrail budget at zero until the full certificate is priced;
-   the guardless design is refused. Candidate #3 additionally needs nil-timeout
-   eligibility and policy detection; the actual five production app policies
-   currently refuse it. Do not change those policies to create a win.
+   the guardless design is refused. **Candidate #3 is parked in the stacking
+   backlog:** nil-timeout eligibility excludes all five production apps and
+   its micro-only budget is <2%. Do not change those policies to create a
+   win or build either proposed delivery variant.
 2. **Config bind is the second sealed candidate, but hold promotion and
    deployment.** Its measured interpreter benefit already includes the
    existing checks; the missing suppressed-hook certificate would add cost

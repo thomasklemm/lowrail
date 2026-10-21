@@ -1,6 +1,6 @@
-# String blank backport: stop at the guardless design gate
+# String blank backport: parked on timeout semantics
 
-2026-10-20. **No pass implemented, no request cohort started.** The positive
+2026-10-21. **Parked; no pass implemented, no request cohort started.** The positive
 [micro price](next-levers.md) prompted a proposed guarded-tier
 `backport/string_blank`: deliver the Rails-main body as the original
 `String#blank?` definition in Active Support 8.1.4's `object/blank.rb` ISeq,
@@ -90,11 +90,20 @@ contract. At seal time inventory effective owners/bodies/visibility of
 existing instance singleton overrides, as well as the native String/Regexp/
 Integer dependencies and original constants. Refuse on an existing override
 or an unproved receiver boundary. An ObjectSpace/subclass scan alone must not
-be described as proving unseen future instances; preserve an original-only
-input path unless the contract actually certifies them. Encoding-map cache
+be described as proving unseen future instances; refuse an unproved input
+boundary rather than adding a second old-body path. Encoding-map cache
 population remains live and needs an explicit policy, not an indiscriminate
 freeze of that working framework cache. The [main report](next-levers.md#sealed-candidate-3-not-a-guardless-backport)
 records the sequence; no new delivery tier is proposed.
+
+The delivery analysis remains a prerequisite **if revived**, not permission
+to implement it. Keep the original body for the entire boot; certify at seal
+time, refusing escaped `Method`/`UnboundMethod` handles, then install an ordinary
+`def` with the original owner/name/source path/parameters. No prepend or hot
+guard. Cold `load_iseq` substitution fails this boundary because it changes
+boot behavior before the seal-time facts can be checked; a later refusal
+cannot undo those effects or recall saved handles. Neither that variant nor
+an activation-seam implementation is built.
 
 ### Timeout policy: refuse, including in sealed mode
 
@@ -118,23 +127,31 @@ and nil local timeouts on every already-cached `ENCODED_BLANKS` Regexp, with
 the original map/default factory so future entries preserve that policy.
 Do not disable an app's timeout to manufacture eligibility or a benchmark.
 
-Post-seal policy remains a separate gap. `memo/uri_join` calls a captured
+Post-seal policy was a separate detector gap. `memo/uri_join` calls a captured
 native global timeout getter **on every entry**, so nil → nonnil resumes the
 original operation even without an invalidation hook. That is a live runtime
 check, not seal detection. The proposed wrapper-free blank body has no such
 check. With `Regexp` and `String` explicitly inventoried, a public
 `Seal.install` / `activate` / test checkpoint probe sets the global timeout
-after sealing and observes **epoch 0 → 0, empty ledger** on both targets.
-The current detector neither traces this setter nor snapshots its value.
-Record this as an additional **SEAL005/008 policy-detection gap**, not a
-passed certificate. Closing it must retain all existing nil/refusal and
-subclass/constant/regexp/encoding boundaries.
+after sealing and originally observed **epoch 0 → 0, empty ledger** on both
+targets. The independent seal-check fix captures the native timeout getter
+and compares its result at setter return. Real changes emit **proven SEAL005**
+rows with before/after values and advance the epoch. The regression first
+fails with epoch zero, then passes on both Rubies: nil → 0.001 → nil emits
+two proofs even when restoration occurs before a checkpoint and the setter
+was saved before the seal. Same-value and rejected-negative assignments
+remain clean. This is test-only observation, not production enforcement or
+a `blank?` certificate; all refusal boundaries above remain required.
 
 Actual boot observations, Ruby 4.0.7, lowering off (not support claims):
 
 | Apps / boot environment | Global timeout | `BLANK_RE.timeout` | Cached encoded regexps |
 |---|---|---|---|
-| Blog, Campfire, PingCRM, Redprints, Starter / production | **1.0 s each** | nil each | empty where inspected (Campfire/PingCRM/Redprints/Starter) |
+| Blog / production | **1.0 s** | nil | not recorded |
+| Campfire / production | **1.0 s** | nil | empty |
+| PingCRM / production | **1.0 s** | nil | empty |
+| Redprints / production | **1.0 s** | nil | empty |
+| Starter / production | **1.0 s** | nil | empty |
 | CASA, Fizzy, CodeTriage / test | **1.0 s each** | nil each | empty |
 | Writebook / test | nil | nil | empty |
 
@@ -142,7 +159,11 @@ These are real `config/environment` boots; CASA explicitly uses the overlay's
 Ruby 4.0.7 rather than its stale 4.0.6 mise pin. The four compatibility rows
 are test-environment facts only, not production certificates. In particular,
 the priced blog show is **ineligible under the nil-global-timeout refusal**.
-No new request cohort starts and no Lowrail request saving is credited.
+Final owner decision: park candidate #3 in the stacking backlog. **Zero of
+five core apps are eligible**, and the conditional show budget is <2%, micro
+only. Keep the upstream Rails body as the upgrade path. Do not change app
+policy, implement a pass or start a request cohort; no Lowrail request saving
+is credited.
 
 Reproduce with the pinned main file downloaded to a scratch path:
 

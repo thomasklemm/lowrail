@@ -19,6 +19,7 @@ module Lowrail
     HASH_PAIRS = Hash.instance_method(:to_a)
     HASH_DEFAULT = Hash.instance_method(:default)
     HASH_DEFAULT_PROC = Hash.instance_method(:default_proc)
+    REGEXP_TIMEOUT = Regexp.method(:timeout)
     MUTATIONS = %i[define_method define_singleton_method alias_method remove_method undef_method
                    include prepend extend append_features prepend_features extend_object
                    class_eval module_eval class_exec module_exec eval const_set remove_const autoload
@@ -107,6 +108,7 @@ module Lowrail
         attach_tests
         @boot&.disable
         @targets.each_key { |holder| @structural[holder] = SealSnapshot.capture(holder) }
+        @regexp_timeout = REGEXP_TIMEOUT.call
         @sealed = true
         @trace = TracePoint.new(:call, :c_call, :return, :c_return) { observe(_1) }
         @trace.enable
@@ -147,6 +149,15 @@ module Lowrail
         method = event.method_id
         receiver = event.self
         if event.event == :return || event.event == :c_return
+          if receiver.equal?(::Regexp) && method == :timeout=
+            current = REGEXP_TIMEOUT.call
+            if current != @regexp_timeout
+              record("config_changed", "Regexp.timeout", method, event, confidence: "proven",
+                before: @regexp_timeout, after: current,
+                detail: "Native global timeout policy changed at setter return, even if restored before a checkpoint.")
+              @regexp_timeout = current
+            end
+          end
           # Values inserted into an already-watched config remain watched.
           if CONTAINERS.include?(method) && (label = @containers[receiver])
             case receiver
@@ -186,7 +197,8 @@ module Lowrail
         end
       end
 
-      def record(pattern, target, operation, event)
+      def record(pattern, target, operation, event, confidence: "hint",
+          detail: "API/callback observed; state change is not yet confirmed.", **facts)
         EPOCH[0] += 1
         locations = caller_locations(2, 40)
         context = locations.reject { _1.path == __FILE__ }.first(24).map { {"file" => _1.path, "line" => _1.lineno, "label" => _1.base_label} }
@@ -198,14 +210,14 @@ module Lowrail
         @tests[test] = "this test runs unoptimized" if test
         # An API/callback is a candidate, not proof that its receiver changed.
         # In particular append_features/extend_object run on the source module.
-        finding = SealRules.finding(SealRules::PATTERNS.fetch(pattern), confidence: "hint",
+        finding = SealRules.finding(SealRules::PATTERNS.fetch(pattern), confidence: confidence,
           file: event.path, line: event.lineno, root: @root, target: target,
           pattern: pattern, operation: operation.to_s, test: test, test_double: stub,
           observed_at: "#{event.path}:#{event.lineno}", caller_file: file, caller_line: line,
-          context: context, detail: "API/callback observed; state change is not yet confirmed.")
+          context: context, detail: detail, **facts)
         finding["remedy"] = "Keep the test double; this test runs unoptimized (process-wide deopt persists after restoration)." if stub
         @ledger << finding
-        @candidates[target] << finding
+        @candidates[target] << finding if confidence == "hint"
       end
 
       def start_test(key)
