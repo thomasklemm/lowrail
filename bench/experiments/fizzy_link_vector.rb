@@ -25,9 +25,17 @@ module FizzyLinkVector
       db = SQLite3::Database.new(File.join(state, "#{name}.sqlite3"), readonly: true)
       begin
         schema = db.execute("SELECT type,name,sql FROM sqlite_master ORDER BY type,name")
+        table_list = db.execute("PRAGMA table_list")
         tables = schema.select { _1.first == "table" }.to_h do |_, table, _|
           identifier = '"' + table.gsub('"', '""') + '"'
-          [table, BlogProduction.value(db.execute2("SELECT * FROM #{identifier} ORDER BY rowid"))]
+          without_rowid = table_list.find { _1[0] == "main" && _1[1] == table }.fetch(4) == 1
+          order = if without_rowid
+            db.execute("PRAGMA table_info(#{identifier})").select { _1[5].positive? }.sort_by { _1[5] }.map { '"' + _1[1].gsub('"', '""') + '"' }.join(",")
+          else
+            "rowid"
+          end
+          raise "snapshot order unavailable #{table}" if order.empty?
+          [table, BlogProduction.value(db.execute2("SELECT #{without_rowid ? '*' : 'rowid,*'} FROM #{identifier} ORDER BY #{order}"))]
         end
         [name, {"schema" => BlogProduction.value(schema), "tables" => tables}]
       ensure
