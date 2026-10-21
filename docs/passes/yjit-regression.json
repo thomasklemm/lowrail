@@ -1,5 +1,136 @@
 {
   "diagnosis_only": true,
+  "props_variant_corrected_pricing": {
+    "boundary": "fb07512d06ca217ec1fdb1e49e0cd24ab4fa8345",
+    "mode": "interpreter",
+    "rounds": 6,
+    "seed": 41231,
+    "operations_per_window": 1000,
+    "max_callgrind_workers": 4,
+    "workers": 36,
+    "windows": 144,
+    "accepted": true,
+    "pricing_valid": true,
+    "decision": "stop_at_price_exact_guard_shape",
+    "promotion": false,
+    "production_reflection_or_delivery_certified": false,
+    "retried": false,
+    "yjit_cohort_started": false,
+    "yjit_cohort_disposition": "cancelled_not_held",
+    "earlier_invalid_cohort_disposition": "props_variant_invalid_pricing remains invalid and not rescored",
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+    "ruby_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895",
+    "inertia_rails": {
+      "version": "3.22.0",
+      "props_resolver_sha256": "48957d68dc3b619ca5a9de807c74ab12d425304592b410a95684d0bd89be32af"
+    },
+    "valgrind": {
+      "version": "3.19.0",
+      "brk_reservation_mib": 512,
+      "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+      "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+      "tool_sha256": "5fe02646537c5669b032c5146665728f9dab384918fea30118b7c7df3dc30ad7"
+    },
+    "heap_floors": [1000000, 250000, 100000, 20000, 10000],
+    "gates": {
+      "aa_total": true,
+      "aa_no_gc": true,
+      "aa_tolerance_pct": 0.5,
+      "five_heaps_matched": true,
+      "brk_preflight_and_all_workers": true,
+      "brk_logs_audited": 37,
+      "actual_interpreter_mode_all_workers": true,
+      "pre_window_liveness_all_arms": true,
+      "guard_valid_all_36_workers": true,
+      "raw_windows_audited": 144,
+      "raw_slopes_audited": 72,
+      "claims_yjit_or_warmup_v3_acceptance": false
+    },
+    "liveness": {
+      "operations_per_arm": 10,
+      "manifest_format": 2,
+      "certification_jit": "interpreter",
+      "actual_jit": "interpreter",
+      "guard_valid_all_arms": true,
+      "authorizations": {"original": 0, "guarded": 20, "split": 20, "checks_original": 20, "each": 0},
+      "fallbacks_all_arms": 0,
+      "stats_in_measured_processes": false
+    },
+    "untimed_correctness": {
+      "interpreter_comparisons": 478,
+      "inertia_versions": ["3.21.2", "3.22.0", "3.23.0"],
+      "factory_regression_tests": 5,
+      "factory_regression_assertions": 135,
+      "failures": 0,
+      "errors": 0
+    },
+    "estimator": "Median of six within-round paired deltas or differences; 5000 whole-round bootstrap draws, seed 41231; ratios paired before estimation",
+    "results": {
+      "instructions_total": {
+        "aa_delta_pct": {"median": -0.025039832112933036, "ci95": [-0.05008040650035239, 0.02505237825984885]},
+        "split_delta_pct": {"median": 22.59420177870126, "ci95": [22.496182918361985, 22.7310284513242]},
+        "guarded_delta_pct": {"median": 22.55780870934064, "ci95": [22.447224268158415, 22.658682488710735]},
+        "checks_original_delta_pct": {"median": 29.364787454919927, "ci95": [29.102427378660277, 29.592409150988495]},
+        "unchecked_delta_pct": {"median": -4.281463518595629, "ci95": [-4.3073159692790295, -4.281333556221661]},
+        "exact_checks_cost": {"median": 30482.986500000006, "ci95": [30218.377999999982, 30726.692999999985]},
+        "unchecked_iteration_saving": {"median": 4445.573000000004, "ci95": [4445.369000000006, 4471.471000000005]},
+        "checks_to_available_saving_ratio": {"median": 6.8570870741261105, "ci95": [6.758421049537095, 6.911750858663204]},
+        "split_minus_guarded_pct": {"median": 0.036996344328987796, "ci95": [0.017961354985729372, 0.07370712602937646]}
+      },
+      "instructions_no_gc": {
+        "aa_delta_pct": {"median": -0.025039832112933036, "ci95": [-0.05008003536310923, 0.02505274976909444]},
+        "split_delta_pct": {"median": 22.61360567056858, "ci95": [22.469216945317296, 22.738649851041245]},
+        "guarded_delta_pct": {"median": 22.5498737580789, "ci95": [22.42132248797851, 22.692894272529827]},
+        "checks_original_delta_pct": {"median": 29.355290965862324, "ci95": [29.0555123639853, 29.644532859129768]},
+        "unchecked_delta_pct": {"median": -4.281333556221661, "ci95": [-4.307576346187569, -4.281203593847693]},
+        "exact_checks_cost": {"median": 30480.709999999985, "ci95": [30169.66399999999, 30773.098999999987]},
+        "unchecked_iteration_saving": {"median": 4445.471000000005, "ci95": [4445.369000000006, 4471.573000000004]},
+        "checks_to_available_saving_ratio": {"median": 6.817779844423213, "ci95": [6.786762583713512, 6.920999722645418]},
+        "split_minus_guarded_pct": {"median": 0.03572276210376257, "ci95": [0.019547366142280698, 0.07313318336625851]}
+      }
+    },
+    "paired_samples": {
+      "instructions_total": {
+        "off_a": [103833.023, 103782.562, 103833.023, 103834.562, 103833.023, 103834.562],
+        "off_b": [103833.023, 103834.562, 103781.023, 103782.562, 103781.023, 103834.562],
+        "guarded": [127336.218, 127116.539, 127332.61, 127172.539, 127384.218, 127112.539],
+        "split": [127381.337, 127143.375, 127437.337, 127191.375, 127433.337, 127195.375],
+        "checks_original": [134524.491, 134057.067, 134533.716, 134052.012, 134585.716, 134053.868],
+        "each": [99387.45, 99337.193, 99387.45, 99389.193, 99387.45, 99337.193]
+      },
+      "instructions_no_gc": {
+        "off_a": [103834.562, 103781.023, 103834.562, 103833.023, 103834.562, 103833.023],
+        "off_b": [103834.562, 103833.023, 103782.562, 103781.023, 103782.562, 103833.023],
+        "guarded": [127116.522, 127335.84, 127114.766, 127391.84, 127164.522, 127331.84],
+        "split": [127139.375, 127385.337, 127195.375, 127433.337, 127191.375, 127437.337],
+        "checks_original": [134002.584, 134578.528, 134005.868, 134571.137, 134057.868, 134581.716],
+        "each": [99389.193, 99335.45, 99389.193, 99387.45, 99389.193, 99335.45]
+      }
+    },
+    "allocations_per_resolve": {"off_a": 55, "off_b": 55, "guarded": 64, "split": 64, "checks_original": 75, "each": 46},
+    "source_sha256": {
+      "bench/experiments/yjit_regression.rb": "663a47051b8800e79155793e8db21dfc3ecfe45b799a76dfa2d0c41a8f23fa91",
+      "bench/experiments/props_variant.rb": "62fa0d1b93a6ead3117d77ea669a29affa4bc3bb9a4b413b9bf1f683fcd4dbc7",
+      "bench/request_pairs.rb": "c582902248a5465c22bbd56b15238e4262211fd83c033e72fd7d621f6fcb13cc",
+      "bench/heap_windows.rb": "dc8d7e8e2e47db8c398f823f82fd1fa07147ce6e62d38feee336c5204e0365c2",
+      "bench/jit_stability.rb": "743649435ea5af8e3902d35516e592e522afa7ed8b74135b491b6559496ca1a9",
+      "gem/lib/lowrail.rb": "06df3faa296b54feec2bb8b463a5dfbc6ed0d04f4df4b7a35600efe137cff100",
+      "gem/lib/lowrail/manifest.rb": "47da0de0660452d77d278b813bba25b5ed77c8ab4786db3814955c479faac31f",
+      "gem/lib/lowrail/guard.rb": "189ad92f5963f57bdd4d0528fbc9a4fcb2ae15db2e1aa2666210f4b86a74f3fc",
+      "gem/lib/lowrail/inertia_props.rb": "2063023df8f23ef89c46abdfa448693166efdb1c5c0eb1d0546f64ffae4d8259",
+      "gem/lib/lowrail/inertia_props_build.rb": "15eae72432076a3b8f567737ac9e26d074ac152b5f10b174ad42a2833ce422e5",
+      "gem/lib/lowrail/stats.rb": "d1a7924403ddc296abab4fdd85ef8b18428d8a0632bab9a32d3e2683b6f0a311"
+    },
+    "raw_sha256": {
+      "samples.json": "d37ed9df3a8afd95f8bc8a41336c42699c23388f1b6410b13fd80467d09e4928",
+      "summary.json": "4adb1783a53184c1a621d561d4ae7ba25ff8024578fad5aadc8a95e9e60e275d",
+      "verdict.json": "2138a11fc6c3a0d27bce80ff497665670427e603fbb57dc8c186f09541bb59e9",
+      "liveness.json": "2f77e5fe94279954365e141b7b6f06fc0c4b12fa935a6508682edc5f5365d25c",
+      "valgrind-preflight.json": "154f89f53dabb3e46f5397c2a3edaf636696bdee03865069172391e9b98959ed",
+      "lowrail_callgrind.so": "6cf59ad0d495ad9ac48572769478f4e6401cc887e714e74a8159bb485d6604b5",
+      "correctness/verdict.json": "5d65d2acd0768e2bd2530d74d1b5cd1949e67c63e6f1d741885c40e66a83de72"
+    }
+  },
   "props_variant_invalid_pricing": {
     "boundary": "d7b232f",
     "mode": "interpreter",

@@ -114,6 +114,28 @@ the distinction. Deploy YJIT at startup (`RUBY_YJIT_ENABLE=1` or `--yjit`) and
 rebuild `--jit yjit`. Both early mismatch directions and real Rails late
 enablement have regression coverage; no new measured cohort was started.
 
+## Guarded props ordinary-def: stop at price (2026-10-21)
+
+**Stop this exact-guard shape; no promotion. Cancel its YJIT micro, not merely
+hold it.** One corrected-code interpreter cohort on clean
+[fb07512](https://github.com/thomasklemm/lowrail/commit/fb07512d06ca217ec1fdb1e49e0cd24ab4fa8345)
+passes both A/A, five heaps, brk, mode and pre-window liveness gates. Ruby
+4.0.7, Inertia 3.22.0, pinned Valgrind 3.19/brk512; six rounds, seed 41231,
+N=1,000, at most four workers, no retry. Split ordinary-def versus original
+loses **+22.594% total Ir [22.496, 22.731]** and **+22.614% GC-excluded
+[22.469, 22.739]**; inline guarded loses +22.558% total [22.447, 22.659].
+Complete checks cost 30,482.987 Ir/resolve against 4,445.573 available unchecked
+iteration saving: **6.857× [6.758, 6.912]**. Moving the fallback to another
+method does not close the guard deficit. This is a micro price, not a new
+request result or production reflection/delivery certificate.
+
+The earlier format-1 cohort remains **invalid fallback/incomplete-check
+pricing**, not a second accepted fast-path loss and not rescored. No guard is
+weakened and the existing opt-in pass is unchanged. A VM-owned non-callback
+dispatch certificate is a backlog question only, not an implementation or
+priced alternative. Config-bind YJIT stays on hold until its measurement
+method is accepted. [Pins, paired estimates, controls and backlog boundary](passes/yjit-regression.md#corrected-interpreter-pricing-stop-at-price).
+
 ## Relocatable delivery (2026-10-20)
 
 Use typed app-root-relative metadata and explicit AOT `build --target-root`
@@ -238,7 +260,7 @@ retry or clean-arm salvage. [Experiment, ablations and controls](passes/sealed-r
 | `active_record/preload_plans` | **sealed-only**, guarded/opt-in refused | Suppressed model singleton hook plus replaced `scope_for_association` filters original rows but not fast rows. AR epochs remain 52/55, so the epoch is not complete coverage of suppressed dependency mutation. SEAL001 required; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `active_record/ar_plans` | **sealed-only**, guarded/opt-in refused | Suppress the visitor owner's `method_added`, replace `visit_Arel_Nodes_SelectStatement` with an SQL-comment-producing body: original SQL changes, cached plan SQL does not. Same visitor identity and unchanged AR epochs 52/55 do not rescue the certificate. SEAL001 required; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `inertia/config_bind` | **sealed-only**, promotion blocked | Warmed suppressed `Hash.method_added` defeats the guarded certificate. Pre-fix JSON interpreter −6.947%, HTML −0.275%; accepted YJIT **+16.339% / +16.459%** included sticky global tracing. Post-fix JSON interpreter **−10.156% accepted**; YJIT rejected A/A/flatness and a separate untimed probe has zero hits (JIT-mode fact mismatch). No accepted post-fix YJIT non-regression proof, no promotion. #437 open/unmerged; 3.23.0 lacks it; future fixed bodies refuse ([diagnosis](passes/yjit-regression.md), [old prices](passes/next-levers.md), [audit](passes/suppressed-hooks.md)) |
-| `inertia/props` | opt-in experiment; no promotion | Ordinary-Hash tuple iteration only; original prop body/lexical scope and fallback retained, actual iterator/visibility checked at every traversal after app code. Five-app 779 outcomes and own-thread SQL identical, nonzero hits in all three Inertia apps. Historical draft +0.873% interpreter / +0.976% YJIT cohorts stay rejected after safety fixes changed fingerprints ([retained evidence](passes/props.md)). One new final-runtime brk512 cohort/mode: interpreter +4.364% [+4.292, +4.462] accepted; YJIT diagnostic +31.043% rejected (5/36 non-flat workers). No credited gain or retry ([recheck](bench.md#decision-critical-512-mib-remeasurement-2026-10-20)) |
+| `inertia/props` | opt-in experiment; exact-guard ordinary-def alternative **stopped at price**; no promotion | Ordinary-Hash tuple iteration only; original prop body/lexical scope and fallback retained, actual iterator/visibility checked at every traversal after app code. Five-app 779 outcomes and own-thread SQL identical, nonzero hits in all three Inertia apps. Historical draft +0.873% interpreter / +0.976% YJIT cohorts stay rejected after safety fixes changed fingerprints ([retained evidence](passes/props.md)). Final-runtime brk512 request recheck: interpreter +4.364% [+4.292, +4.462] accepted; YJIT diagnostic +31.043% rejected (5/36 non-flat workers; [recheck](bench.md#decision-critical-512-mib-remeasurement-2026-10-20)). Separate corrected ordinary-def micro: +22.594% interpreter [22.496, 22.731], complete checks cost 6.857× the iteration saving; YJIT micro **cancelled**, invalid earlier fallback price retained ([stop and pins](passes/yjit-regression.md#corrected-interpreter-pricing-stop-at-price)). No credited gain or retry. |
 | Whole compiled ERB specialization | surveyed; no pass | I18n epoch not closed; Campfire URLs have 7 valid guards but 0 completed lowerings/request. No credited saving; [profile and refusals](passes/erb.md) |
 | Literal-run ERB | rejected | 2 sites across five apps; two append calls saved per rendered layout do not justify a pass/guard ([survey](passes/erb.md)) |
 | Route pass with host/protocol `default_url_options` | parked | Widening the optimized predicate is not exact (`to_param` ordering counterexample); scalar-only args cover 1/4 Campfire path calls, base-AR `to_param` certification would cover 4/4, but the ceiling is ~0.3 % of an uncached room request (19 calls × ~2 µs). Revisit as a stacking item once per-hit route budgets exist ([route-helpers.md](passes/route-helpers.md)) |

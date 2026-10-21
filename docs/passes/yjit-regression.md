@@ -499,11 +499,90 @@ mise exec ruby@4.1.0-preview1 -- ruby bench/experiments/yjit_regression_test.rb 
 BENCH_JIT=1 mise exec -- ruby --yjit bench/experiments/yjit_regression.rb --liveness props_variant checks_original
 ```
 
-The corrected-code interpreter cohort, then the unused YJIT micro, each need
-the explicit worker release after the levers v3 validation. No new measured
-run was started for this fix/audit. Use at most the three authorized workers,
-one finite cohort per mode, no retry-to-green. Production reflection and
-delivery remain uncertified; this is pricing only, not a pass.
+### Corrected interpreter pricing: stop at price
+
+**One finite corrected-code cohort is accepted; the exact-guard ordinary-def
+shape loses. Stop at price, no promotion. The YJIT props micro is cancelled,
+not held, and never started.** The earlier format-1 cohort above remains
+invalid fallback/incomplete-check pricing, unchanged and not rescored.
+
+Measured clean
+[fb07512](https://github.com/thomasklemm/lowrail/commit/fb07512d06ca217ec1fdb1e49e0cd24ab4fa8345),
+Ruby **4.0.7**, revision `229531a6cf`, x86_64 Linux, inertia_rails **3.22.0**.
+The resolver SHA-256 is
+`48957d68dc3b619ca5a9de807c74ab12d425304592b410a95684d0bd89be32af`.
+Pinned Valgrind **3.19.0 / 512 MiB brk**, upstream archive SHA-256
+`dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02`,
+patch SHA-256
+`ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1`,
+Callgrind binary SHA-256
+`5fe02646537c5669b032c5146665728f9dab384918fea30118b7c7df3dc30ad7`.
+The numeric export additionally pins the Ruby binary and specimen/runtime
+sources. These are this orb's binaries, not universal binary hashes.
+
+The new worker release allowed **four** concurrent workers for this
+interpreter cohort only: six randomized rounds, seed **41231**, N=**1,000**,
+36 fresh-process workers and 144 measured N=0/N=1,000 windows. Every worker
+freshly builds its micro manifest/emission with the current runtime format
+constant. This is not certification of production artifact delivery. The
+fixed heap floors remain **1,000,000 / 250,000 / 100,000 / 20,000 / 10,000**;
+the existing micro A/A, heap, brk, mode and c9d2397-lineage window gates are
+unchanged. This is not a warmup-v3 or YJIT acceptance result.
+
+Before Callgrind, all five arms have **guard_valid=true**. Ten fresh native
+resolutions authorize **20 times / 0 fallbacks** in each of `guarded`, `split`
+and `checks_original`; original/unchecked controls have zero counts. All 36
+measured workers recheck the guard; Stats never enters measured processes.
+Current-head preparation also passes **478** lifetime/mutation comparisons
+over all three audited Inertia versions and **5 tests / 135 assertions** for
+factory/liveness refusal. No failed worker or cohort was replaced.
+
+| Comparison | Total Ir, paired estimate [95% CI] | GC-excluded Ir, paired estimate [95% CI] |
+|---|---:|---:|
+| Split ordinary-def vs original | **+22.594% [22.496, 22.731]** | **+22.614% [22.469, 22.739]** |
+| Existing inline guarded vs original | +22.558% [22.447, 22.659] | +22.550% [22.421, 22.693] |
+| Unchecked `each` vs original, upper bound only | −4.281% [−4.307, −4.281] | −4.281% [−4.308, −4.281] |
+| Complete checks cost: `checks_original − original`, Ir/resolve | **30,482.987 [30,218.378, 30,726.693]** | **30,480.710 [30,169.664, 30,773.099]** |
+| Available saving: `original − each`, Ir/resolve | **4,445.573 [4,445.369, 4,471.471]** | **4,445.471 [4,445.369, 4,471.573]** |
+| Checks cost / available saving | **6.857× [6.758, 6.912]** | **6.818× [6.787, 6.921]** |
+| Split vs inline guarded | +0.037% [0.018, 0.074] | +0.036% [0.020, 0.073] |
+
+Estimates pair within each of six rounds; intervals resample whole rounds
+5,000 times with seed 41231, not individual operations. Ratios and differences
+are computed per round, not from the displayed marginal medians. Allocations
+per resolution are 55 original, 64 inline, 64 split, 75 checks-original and 46
+unchecked. Common fresh-input/resolver construction is not available saving.
+Exact reflection and its receiver-shape side effects overwhelm the iterator
+budget; merely moving the fallback to an ordinary def does not help.
+
+Both A/A controls pass: total −0.025040% [−0.050080, +0.025052], GC-excluded
+−0.025040% [−0.050080, +0.025053], containing zero within ±0.5%. All five heap
+pools match, all 36 workers attest interpreter mode, and the Valgrind
+preflight plus all 36 worker logs are brk-clean. An independent retained-data
+audit checks every raw window total and all 72 slopes. The
+[numeric export](yjit-regression.json) keeps both valid and invalid cohorts,
+paired samples, source/tool pins, liveness and raw-file hashes. Raw files stay
+under the ignored workspace-local
+`.lowrail/diagnostics/props-corrected-interpreter-fb07512/`; no rerun is needed
+to inspect them. All four slots were released.
+
+**Decision:** stop this exact-guard shape at price; no pass implementation,
+promotion, native-throughput or request-win claim. Production reflection and
+delivery remain uncertified. The older request measurements remain separate.
+Config-bind YJIT stays on hold until the YJIT measurement method is accepted;
+the props YJIT cancellation is not a new authorization for that cohort.
+
+**Backlog only, not implemented or priced:** a VM-owned, non-callback query
+for an actual receiver's effective iterator bodies and visibility could avoid
+creating an eigenclass and batch the reflective checks. It would need a
+supported exact certificate for existing singleton methods, suppressed hooks,
+alias/undef/visibility changes and the Ractor boundary, rechecked at every
+recursive entry after app code. A complete VM mutation token is another form
+of that requirement, not a Ruby hook cache. No supported cheap certificate
+is established; the checks need roughly **85.4%** less work just to fit the
+measured saving. The earlier `public_method`/`unbind` shortcut can execute
+`respond_to_missing?` and is not an exact replacement. No freezing app inputs,
+weakened guards, runtime extension or new pricing run follows from this note.
 
 ### Admission-factory audit since format 2
 

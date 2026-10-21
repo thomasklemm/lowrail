@@ -191,3 +191,24 @@ RAILS_ENV=test SEED=41231 SPEC_OPTS='--seed 41231' LOWRAIL_SQL_TRACE=full \
   mise exec -- target/debug/lowrail verify .corpus/react-starter-kit -- \
   bundle exec rspec --seed 41231
 ```
+
+## Ordinary-def follow-up: stopped at price (2026-10-21)
+
+The separate exact-guard ordinary-def specimen is **stopped at price**, not
+implemented as a pass. One valid corrected-code interpreter micro on
+[fb07512](https://github.com/thomasklemm/lowrail/commit/fb07512d06ca217ec1fdb1e49e0cd24ab4fa8345)
+loses **+22.594% total Ir [22.496, 22.731]** and **+22.614% GC-excluded
+[22.469, 22.739]** versus original. Its unchanged exact checks cost
+**6.857× [6.758, 6.912]** the available unchecked iteration saving. The inline
+guarded control loses +22.558% total [22.447, 22.659]; method separation does
+not fix the deficit. All micro controls and pre-window positive liveness
+pass, with no fallback pricing. These fresh-input micros are not re-scores
+of the earlier request results.
+
+The first format-1 micro remains **invalid fallback/incomplete-check pricing**;
+it is not promoted to valid evidence by the corrected cohort. The props YJIT
+micro is **cancelled before starting**, not merely held. No retry, promotion,
+weaker guard or production reflection/delivery certification follows. The
+existing opt-in pass is unchanged. A cheaper VM-owned dispatch certificate
+is a backlog question only, without implementation or pricing.
+[Full pins, both metric intervals, liveness, controls and numeric export](yjit-regression.md#corrected-interpreter-pricing-stop-at-price).
