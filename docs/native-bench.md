@@ -434,3 +434,127 @@ better. There is no measured ±2% recommendation to publish. Prefer cheap
 exactness/allocation screens and report wall as coarse/unresolved for small
 bets; a tighter wall claim needs an independently justified environment or
 predeclared method, not selective deletion or another run until green.
+
+## Full-request HTTP throughput (`script/rps`)
+
+Owner follow-up: real-server RPS is the final performance target; the Rack
+medians and interpreter Ir above remain screens, not server capacity.
+
+### Public Campfire methodology, checked at source
+
+The shared public verification repository was inspected at
+[`ec02debb`](https://github.com/basecamp/once-campfire-verification/commit/ec02debb3e44f40b8778a6a42db3c4515b2f9eaf).
+Its [`bench/compare.rb`](https://github.com/basecamp/once-campfire-verification/blob/ec02debb3e44f40b8778a6a42db3c4515b2f9eaf/bench/compare.rb#L13-L18)
+defaults to three alternating rounds, 16 concurrent clients, 8-second
+samples. Per route it first uses **four clients for two seconds** of warmup
+([loop](https://github.com/basecamp/once-campfire-verification/blob/ec02debb3e44f40b8778a6a42db3c4515b2f9eaf/bench/compare.rb#L167-L207)).
+The external client is its own locked Rust/hyper `loadgen`, not wrk:
+HTTP/1.1 keep-alive, one connection/client, gzip by default, route-contract
+validation on every response. Apps run serially on CPUs 8–11; the generator
+uses CPUs 12–15. The five headline routes are room, messages-before cursor,
+sidebar, coffee search and POST message. Avatar, CSS and `/up` also appear
+in the default eight-route run but not the headline table.
+
+The harness launches the unchanged Rails Docker image: **Thruster → Puma**,
+plus Redis and resque-pool. Harness defaults are three Puma workers × five
+threads, overriding the env fixture. Importantly, the **current published
+Rails table** instead uses **four workers × one thread**, three *solo*
+rounds and source `0aa339d`, not one new alternating eight-app experiment.
+The report pins its measured harness to `70e612c`, not the latest HEAD:
+[topology and session distinctions](https://github.com/basecamp/once-campfire-verification/blob/ec02debb3e44f40b8778a6a42db3c4515b2f9eaf/docs/performance-review.md#L18-L35),
+[reproduction env](https://github.com/basecamp/once-campfire-verification/blob/ec02debb3e44f40b8778a6a42db3c4515b2f9eaf/docs/performance-review.md#L229-L246).
+
+Roundhouse's separate
+[`scripts/bench-campfire`](https://github.com/rubys/roundhouse/blob/74dec12e287afae9ce50586c3bab709ec320f824/scripts/bench-campfire)
+uses **wrk, two client threads, c=16, 20-second warmups and 3×20-second
+samples**, median RPS, identity encoding by default, lanes measured
+sequentially. Its deployed Rails lane uses Thruster/Puma with the app's
+processor-derived worker count, not the emit lanes' `workers=1` diagnostic.
+These are two different protocols and fixtures, neither reproduced by our
+orb numbers.
+
+### Reusable orb protocol
+
+`script/rps --config CONFIG.json --output NEW_PRIVATE_DIRECTORY` supports
+the retained blog and Campfire GET fixtures. It starts production Puma
+**using the app's unchanged `config/puma.rb` and `config.ru`**, including
+Campfire's Deflater. No app config patch, server stub, response cache or
+in-process request timing. Services use `amp orb service start/stop` and are
+stopped even on a failed gate. Dedicated disposable app/DB/Redis only.
+
+- Pinned external **oha 1.14.0**, Linux amd64 release binary SHA256
+  `6fc16b5f9901fd2266b1a2b49b1689f76f91ddc7c96f2d0d08b161a870f7ef18`:
+  [release](https://github.com/hatoo/oha/releases/tag/v1.14.0),
+  [JSON schema](https://github.com/hatoo/oha/blob/v1.14.0/schema.json).
+  Download the `oha-linux-amd64` release asset and check that digest before
+  running; the harness refuses other bytes. It normalizes `NO_COLOR=true`
+  for oha's Boolean env parser (the orb supplies `1`).
+- Defaults: **ten rounds**, each with all three fresh-server arms, order
+  `off-A/on/off-B`, then rotated each round. Four workers × one request
+  thread through the apps' existing env knobs; server CPU set 0–3, generator
+  4–7. **16 closed-loop HTTP/1.1 keep-alive clients**, five-second warmup,
+  20-second measured send window. `-w` drains in-flight requests and charges
+  their completion time. Timeout 30 seconds, redirects disabled, identity
+  encoding. RPS is completed responses / actual elapsed (including drain).
+  All non-200 statuses and transport failures count as errors.
+- Report per-window RPS and p50/p90/p99, median of each arm's window RPS and
+  latency percentiles, plus paired-round percentage deltas and the existing
+  fixed-seed 5,000-bootstrap 95% band. The A/A band is reported **first**;
+  max absolute round spread is retained too. Latency summaries are medians
+  of window percentiles, not a pretend pooled histogram.
+- Exact preflight uses separate stats-enabled servers. Two-seed **actual
+  HTTP requests**, including Campfire's natural CSRF/cookie login, enter
+  the existing pinned `BlogProduction::Entropy` controls only during
+  designated untimed samples. An outer Rack observer consumes/closes the
+  real body and records literal status/body/all-Rack-header digests, without
+  deleting or normalizing fields. The notification instrumenter is initialized
+  on that Puma request thread before the controlled sample; otherwise its
+  lazy, non-output `SecureRandom.hex(10)` would be an undeclared RNG site.
+  Existing entropy policies are unchanged. Cold and post-warmup samples
+  compare separately; failures refuse timing by default. An explicit
+  `diagnostic_load_on_exact_failure: true` retains a failed gate and exit 2,
+  allowing noise calibration only, never a speed/support claim.
+- Puma-added transport headers (notably real `Date`) are separately digested
+  exactly as received; no literal transport-header equality is claimed.
+  The exact gate covers the Rack response actually served, not SQL, complete
+  DB state, async completion or the app's own suite. Timed requests have no
+  validation header, seed or clock/RNG pin; their cookies come from a separate
+  natural login. Public hit counters are off in every timed server.
+
+Start with the existing native app/seed/rebuilt-artifact config, replacing
+its screening `rounds` value explicitly and adding:
+
+```json
+{
+  "path": "/articles/1",
+  "rounds": 10,
+  "oha": "/absolute/oha-1.14.0",
+  "validation_policy": "/absolute/repo/fixtures/corpus/blog-entropy-controls.json",
+  "fixture_secret_key_base": "the disposable BlogProduction::Entropy::SECRET"
+}
+```
+
+For Campfire use `/rooms/486777696`, `campfire-entropy-controls.json`, the
+seed's existing secret (no blog secret override), and acknowledge the
+dedicated localhost Redis with `CAMPFIRE_DISPOSABLE_REDIS=1`.
+
+External prototypes may use the existing post-boot `exploration_setup` hook.
+An optional **external Puma setup** file is required in every arm, after the
+unchanged app Puma config is evaluated. It defines:
+
+```ruby
+module NativeRps::PumaSetup
+  def self.configure(puma:, config:, arm:)
+    # Explicit caller policy, not automatic production activation:
+    return unless arm == "on"
+    puma.before_fork { MyExperiment.prepare }
+  end
+end
+```
+
+Set `puma_setup` to its absolute path and list further dependencies in
+`exploration_sources`. The setup, app/Puma config, runtime, artifact, lock,
+seed and policies are hashed; any drift stops the run. Fizzy/Lobsters HTTP
+login/validation adapters are not yet implemented by this bounded first
+version; the existing Rack screen still supports them. Do not silently
+substitute unauthenticated/zero-hit HTTP routes for those studies.

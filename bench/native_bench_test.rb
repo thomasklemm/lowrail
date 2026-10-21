@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "minitest/autorun"
-load File.expand_path("../script/screen", __dir__)
+load File.expand_path("../script/rps", __dir__)
 
 class NativeBenchTest < Minitest::Test
   def test_screen_checks_actual_responses_both_seeds_every_round_and_control_evidence
@@ -59,5 +59,37 @@ class NativeBenchTest < Minitest::Test
     workers.first.fetch("routes").fetch("GET /example").fetch("rss_after_kib")["VmRSS"] += 1
     rss = NativeBench.summarize(workers).fetch("GET /example").fetch("rss_kib")
     assert_in_delta 250 + 1.0 / 6, rss.fetch("arm_means").fetch("off_a"), 1e-10
+  end
+
+  def test_http_summary_pairs_rounds_and_exact_gate_includes_login_and_both_seeds
+    rows = 3.times.flat_map do |round|
+      %w[off_a on off_b].map do |arm|
+        base = [100, 1000, 250][round]
+        rate = base * {"off_a" => 1, "off_b" => 1.01, "on" => 1.2}.fetch(arm)
+        samples = [0, 1].to_h do |seed|
+          response = {"status" => 200, "body_sha256" => "body-#{seed}", "headers_sha256" => "headers",
+            "evidence" => {"passed" => true}}
+          [seed.to_s, response.merge("workflow" => {"login" => response.dup, "route" => response.dup})]
+        end
+        {"arm" => arm, "round" => round, "samples" => samples,
+          "warmup" => {"errors" => 0}, "timed" => {"rps" => rate, "errors" => 0,
+            "latency_ms" => {"p50" => 1, "p90" => 2, "p99" => 4}}}
+      end
+    end
+    summary = NativeRps.summary(rows)
+    assert_in_delta 1, summary.fetch("aa").fetch("delta_pct"), 1e-10
+    assert_in_delta 20, summary.fetch("on_off").fetch("delta_pct"), 1e-10
+    assert_equal 300, summary.fetch("median_rps").fetch("on")
+    assert_equal({"p50" => 1, "p90" => 2, "p99" => 4}, summary.fetch("median_latency_ms").fetch("off_b"))
+    assert NativeRps.exact_checks(rows).values.all? { _1.fetch("passed") }
+    login = rows.last.fetch("samples").fetch("1").fetch("workflow").fetch("login")
+    login["headers_sha256"] = "different cookie"
+    assert_equal [true, false], NativeRps.exact_checks(rows).values.map { _1.fetch("passed") }
+    login["headers_sha256"] = "headers"
+    login.fetch("evidence")["passed"] = false
+    refute NativeRps.exact_checks(rows).fetch("1").fetch("passed")
+    rows.first.fetch("warmup")["errors"] = 3
+    rows.last.fetch("timed")["errors"] = 2
+    assert_equal 5, NativeRps.summary(rows).fetch("errors")
   end
 end
