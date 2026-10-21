@@ -294,10 +294,19 @@ Cold/warm exact samples use bet A's two-seed validator with all Rack headers;
 timed HTTP uses natural entropy. A regression beyond the cohort's A/A band
 kills the candidate; a failed exact gate is never a throughput win.
 
-**Status:** blog/Campfire RPS cohorts in progress. No throughput or exact-output
-claim yet. Published bet A has **no Fizzy/Lobsters HTTP validation adapters**;
-their requested RPS checks are blocked, not substituted with login/empty pages
-or the in-process Rack screen. No four-app promotion can follow these runs.
+**Blog complete:** A/A −0.10% [−4.32%, +4.94%], noise floor **4.94%**.
+On/off +6.09% [+3.00%, +9.05%] is **not a resolved speed win** because its
+whole interval does not clear that floor. No detected RPS regression.
+Median off-A / on / off-B is **1550.8 / 1654.0 / 1553.3 RPS**. Cold samples
+from all 33 servers and warm samples from all 30 timed servers pass both seeds'
+exact status/body/all Rack-header checks. All eleven on-arm master hooks completed;
+controls never invoke warmup. **951,540 timed + 193,418 warmup HTTP200**,
+zero load/transport errors. [Sanitized windows and paired summary](prefork-rps-results.json).
+
+**Status:** Campfire RPS cohort running. Published bet A currently has **no
+Fizzy/Lobsters HTTP validation adapters**; their requested RPS checks are
+blocked pending those adapters, not substituted with login/empty pages or the
+in-process Rack screen. No four-app promotion can follow the current results.
 
 ## Reproduction and retained boundaries
 
