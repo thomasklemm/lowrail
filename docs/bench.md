@@ -42,7 +42,7 @@ records or copy new numbers into every summary.
   **cold still RED** ([specimen and export](block-link-specimen.md#replacement-result-scoped-warm-bench-price-not-a-win)).
 
 Blog and Starter each cover **one endpoint and fixture**; Fizzy covers six GETs.
-All are **Ir instructions, not latency · no YJIT claim yet · opt-in, not default**.
+All are **Ir instructions, not latency · no YJIT instruction claim yet · opt-in, not default**.
 Current accepted prices pass total/GC-excluded A/A, fixed-heap, brk and
 actual-mode gates. Warm windows exclude boot and
 one-time admission; total and GC-excluded are separate executions, not a
@@ -50,6 +50,14 @@ GC-saving subtraction. The default build still lowers nothing. Correctness
 across apps and the AR-only verification test certificate are separate
 [compatibility](compat.md) / [test-coverage](test-certificate.md) evidence,
 not more performance measurements.
+
+Separately, the [real-Puma throughput result](../README.md#full-request-throughput-real-puma)
+passes its prospectively declared RPS rule on stock Ruby YJIT, but **p99 and
+GC collections increase**. It covers one blog route on one orb, using a
+branch harness and older measured main source, not whole-app performance,
+capacity or production admission. Its pinned export, protocol, A/A band and
+all tradeoffs render beside the instruction results; it is not an Ir or
+uniform-latency claim.
 
 ### Historical and non-request evidence
 
