@@ -18,16 +18,18 @@ class MethodSealTest < Minitest::Test
         def value = 7
         def self.method_added(*)
           $seen = $seal.active[0] if $seal
+          $reentrant = $resolve.call if $resolve
         end
       end
       $seal = MethodSeal::Session.new(holders: [Subject]).start!
+      $resolve = -> { $seal.active[0] ? 7 : Subject.new.value }
       Subject.instance_variable_set(:@nil_memo, nil)
       Subject.instance_variable_set(:@false_memo, false)
       before = $seal.active[0]
       Subject.class_eval { def value = 19 }
-      puts JSON.generate([before, $seen, Subject.new.value, $seal.finish!])
+      puts JSON.generate([before, $seen, $reentrant, Subject.new.value, $seal.finish!])
     RUBY
-    assert_equal [true, false, 19], result.first(3)
+    assert_equal [true, false, 19, 19], result.first(4)
     assert_equal "deoptimized", result.last.fetch("status")
     assert_includes error, "VIOLATION"
   end
@@ -58,5 +60,35 @@ class MethodSealTest < Minitest::Test
     RUBY
     assert_equal [false, 43], result.first(2)
     refute result.last.fetch("enforced")
+  end
+
+  def test_aliased_callbacks_ancestry_and_singleton_changes_withdraw_authorization
+    ["Subject.class_eval { def value = 29 }",
+      "Subject.prepend(Module.new { def value = 31 })",
+      "Subject.new.define_singleton_method(:value) { 37 }"].each do |mutation|
+      result, = run_case(<<~RUBY)
+        class Subject
+          def value = 7
+          def self.ignored(*) = nil
+          singleton_class.alias_method :method_added, :ignored
+        end
+        seal = MethodSeal::Session.new(holders: [Subject]).start!
+        #{mutation}
+        puts JSON.generate([seal.active[0], seal.finish!])
+      RUBY
+      refute result.first
+      assert_equal "deoptimized", result.last.fetch("status")
+    end
+  end
+
+  def test_an_unrelated_class_is_not_a_target_just_because_class_is_an_ancestor
+    result, = run_case(<<~'RUBY')
+      class Subject; def value = 7; end
+      class Unrelated; end
+      seal = MethodSeal::Session.new(holders: [Subject]).start!
+      Unrelated.class_eval { def other = 29 }
+      puts JSON.generate([seal.active[0], Subject.new.value])
+    RUBY
+    assert_equal [true, 7], result
   end
 end

@@ -14,7 +14,7 @@ FileUtils.mkdir_p(output, mode: 0o700)
 records = []
 apps.each do |app|
   directory = File.join(corpus, app)
-  args = app == "casa" ? %w[--seed 41231 --exclude-pattern spec/system/**/*_spec.rb] : []
+  args = app == "casa" ? %w[spec --seed 41231 --exclude-pattern spec/system/**/*_spec.rb] : []
   ENV.fetch("METHOD_SEAL_MODES", "baseline,freeze,warm_freeze,selective,tripwire").split(",").each do |mode|
     label = "#{app}-#{mode}"
     prefix = File.join(output, label)

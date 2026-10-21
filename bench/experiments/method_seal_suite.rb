@@ -72,12 +72,18 @@ end
 
 if File.directory?("spec")
   require "rspec/core"
-  RSpec.configure { |config| config.before(:suite) { seal.call } }
+  RSpec.configure do |config|
+    config.before(:suite) do
+      raise "empty suite cannot certify a contract" if RSpec.world.example_count.zero?
+      seal.call
+    end
+  end
   exit RSpec::Core::Runner.run(ARGV)
 else
   $LOAD_PATH.unshift(File.expand_path("test"))
   require "rails/test_unit/runner"
   Rails::TestUnit::Runner.load_tests(ARGV)
+  raise "empty suite cannot certify a contract" if Minitest::Runnable.runnables.all? { _1.runnable_methods.empty? }
   ARGV.replace(%w[--seed 41231])
   seal.call
 end
