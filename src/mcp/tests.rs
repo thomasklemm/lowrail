@@ -22,7 +22,7 @@ fn protocol_errors_notifications_and_tool_discovery() {
     assert_eq!(responses[2]["error"]["code"], -32000);
     assert_eq!(responses[3]["result"]["protocolVersion"], "2025-06-18");
     let tools = responses[4]["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 13);
+    assert_eq!(tools.len(), 14);
     assert!(tools.iter().any(|t| t["name"] == "type_of"));
     assert_eq!(responses[5]["error"]["code"], -32602);
     assert_eq!(responses[6]["result"], json!({}));
@@ -70,6 +70,12 @@ fn data_tools_refresh_facts_and_ledger_without_serving_stale_answers() {
     let doctor = json!({"format":1,"boot_ok":true,"baseline_ok":true,"static":{"hints":[]}});
     std::fs::write(dir.join(".lowrail/doctor.json"), doctor.to_string()).unwrap();
     assert_eq!(data.call("doctor", &json!({})).unwrap()["report"], doctor);
+    assert_eq!(data.call("subset_doctor", &json!({})).unwrap()["available"], false);
+    let subset = json!({"format":1,"actions":[{"target":"ArticlesController#show","compliant":false}]});
+    std::fs::write(dir.join(".lowrail/subset.json"), subset.to_string()).unwrap();
+    assert_eq!(data.call("subset_doctor", &json!({})).unwrap()["report"], subset);
+    std::fs::write(dir.join(".lowrail/subset.json"), "{").unwrap();
+    assert!(data.call("subset_doctor", &json!({})).is_err(), "corrupt reports cannot serve stale success");
     let ledger = json!([{"method":"Article#title","reason":"unsupported"}]);
     std::fs::write(dir.join(".lowrail/ledger.json"), ledger.to_string()).unwrap();
     assert_eq!(

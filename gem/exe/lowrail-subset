@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+require "fileutils"
+require_relative "../lib/lowrail/subset"
+
+root, output, mode, input = ARGV
+raise "usage: lowrail-subset APP OUTPUT [--static | --boot-only | --boot-json FILE]" unless root && output &&
+  [nil, "--static", "--boot-only", "--boot-json"].include?(mode) && (mode != "--boot-json" || input)
+root = File.expand_path(root)
+boot = error = nil
+if mode == "--boot-json"
+  snapshot = JSON.parse(File.read(input))
+  boot, error = snapshot.values_at("boot", "boot_error")
+elsif mode != "--static"
+  begin
+    require File.join(root, "config/environment")
+    # Explicit diagnostic boot, not runtime activation; does not claim to
+    # preserve lazy load order. Ordinary Lowrail/setup never requires this.
+    Rails.application.eager_load!
+    require_relative "../lib/lowrail/facts"
+    boot = {"rails" => Rails.version, "environment" => Rails.env.to_s,
+      "controllers" => Lowrail::Facts.controllers.reject { _1["abstract"] }.map do |row|
+        klass = row.fetch("name").constantize
+        row.merge("controller_path" => klass.controller_path)
+      end, "routes" => Lowrail::Facts.routes,
+      "limitations" => "Eager diagnostic boot inventories callbacks, not their request-time effects; no test suite executed."}
+  rescue StandardError, LoadError => exception
+    error = {"class" => exception.class.name, "message" => exception.message}
+  end
+end
+if mode == "--boot-only"
+  FileUtils.mkdir_p(File.dirname(output))
+  File.write(output, JSON.pretty_generate({"boot" => boot, "boot_error" => error}))
+  exit(error ? 1 : 0)
+end
+report = Lowrail::Subset::Report.new(root, boot: boot, boot_error: error).run
+FileUtils.mkdir_p(File.dirname(output))
+File.write(output, JSON.pretty_generate(report))
+puts "subset doctor: #{report['actions'].size} actions; #{report['summary']}; boot=#{!boot.nil?}"
+puts "#{output}\nAdvisory only: structural candidates are not certified compliant actions."
+exit 1 if error || !report.fetch("errors").empty?

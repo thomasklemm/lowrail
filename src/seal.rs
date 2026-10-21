@@ -93,6 +93,9 @@ pub fn static_check(app: &Path) -> Result<Value, String> {
 }
 
 pub fn doctor(args: &[String]) -> Result<(), String> {
+    if args.iter().take_while(|arg| arg.as_str() != "--").any(|arg| arg == "--subset") {
+        return subset_doctor(args);
+    }
     let usage = "usage: lowrail doctor APP [--seal-check] [--trace-check [--path PATH]] [-- TEST COMMAND...]";
     let mut args = args.iter();
     let app = PathBuf::from(args.next().ok_or(usage)?).canonicalize().map_err(|e| e.to_string())?;
@@ -181,4 +184,41 @@ pub fn doctor(args: &[String]) -> Result<(), String> {
         return Err("doctor incomplete or baseline failed; report retained".into());
     }
     Ok(())
+}
+
+fn subset_doctor(args: &[String]) -> Result<(), String> {
+    let usage = "usage: lowrail doctor APP --subset [--static] [--out JSON]";
+    let mut args = args.iter();
+    let app = PathBuf::from(args.next().ok_or(usage)?).canonicalize().map_err(|e| e.to_string())?;
+    let mut static_only = false;
+    let mut output = app.join(".lowrail/subset.json");
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--subset" => (),
+            "--static" => static_only = true,
+            "--out" => output = PathBuf::from(args.next().ok_or(usage)?),
+            _ => return Err(usage.into()),
+        }
+    }
+    let output = if output.is_absolute() { output } else {
+        std::env::current_dir().map_err(|e| e.to_string())?.join(output)
+    };
+    // Separate diagnostic boot from parsing: an app may pin an older Prism.
+    // Do not change its bundle or silently select the parser's latest grammar.
+    let executable = crate::facts::gem_dir().join("exe/lowrail-subset");
+    let boot_output = output.with_extension("boot.json");
+    let boot_ok = if static_only { true } else {
+        if boot_output.exists() { std::fs::remove_file(&boot_output).map_err(|e| e.to_string())?; }
+        Command::new("bundle").args(["exec", "ruby"]).arg(&executable).arg(&app)
+            .arg(&boot_output).arg("--boot-only").current_dir(&app).env("LOWRAIL", "0")
+            .status().map_err(|e| format!("subset boot: {e}"))?.success()
+    };
+    let mut command = Command::new("ruby");
+    command.arg(&executable).arg(&app).arg(output);
+    if static_only || !boot_output.exists() { command.arg("--static"); }
+    else { command.arg("--boot-json").arg(&boot_output); }
+    let status = command.current_dir(&app).env("LOWRAIL", "0")
+        .env_remove("RUBYOPT").env_remove("BUNDLE_GEMFILE").env_remove("BUNDLE_BIN_PATH")
+        .status().map_err(|e| format!("subset doctor: {e}"))?;
+    if status.success() && boot_ok { Ok(()) } else { Err("subset doctor incomplete; report retained when available".into()) }
 }

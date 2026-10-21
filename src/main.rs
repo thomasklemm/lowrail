@@ -29,6 +29,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   verify APP           run APP's tests with LOWRAIL=0 and 1, compare outcomes
   seal-check APP       run APP's tests and report post-seal contract observations
   doctor APP           boot, baseline tests, hints; optional --seal-check / --trace-check
+  doctor APP --subset [--static] [--out JSON]  advisory per-action subset census
   observe APP          run APP's tests with the recorder, write .lowrail/observed.json";
 
 fn main() -> ExitCode {

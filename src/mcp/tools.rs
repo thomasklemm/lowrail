@@ -14,6 +14,7 @@ pub(super) fn list() -> Vec<Value> {
         ("lowering_ledger", "Current lowering ledger, including reasons not lowered", json!({}), vec![]),
         ("seal_ledger", "Last seal-check observations, affected tests and remedies; not proof of contract enforcement", json!({}), vec![]),
         ("doctor", "Last onboarding report: boot, baseline suite, static hints, optional seal-check and grouped guarded refusals", json!({}), vec![]),
+        ("subset_doctor", "Last per-action subset report: source/boot inventory, broken rules, rewrites and evidence; advisory, not an admission certificate", json!({}), vec![]),
         ("explain_unit", "Read-only build certification, guards, ledger sites and recorded unit counters; never evaluates guards", json!({"id":{"type":"integer","minimum":0},"dir":string,"stats":string}), vec!["id"]),
         ("explain_site", "Explain an exact path:line (or explicitly not recorded), preserving refusals and unit provenance", json!({"location":string,"dir":string,"stats":string}), vec!["location"]),
         ("lowering_status", "Per-method ledger sites: lowered/refused and original reasons; not_recorded is not refused", json!({"target":string}), vec!["target"]),
@@ -110,11 +111,15 @@ impl Data {
             let location = if name == "explain_site" { Some(required("location")?) } else { None };
             return serde_json::to_value(crate::explain::read(&self.app, dir, stats, id, location, None)?).map_err(|e| e.to_string());
         }
-        if name == "seal_ledger" || name == "doctor" {
-            let file = if name == "doctor" { "doctor.json" } else { "seal.json" };
+        if matches!(name, "seal_ledger" | "doctor" | "subset_doctor") {
+            let (file, command) = match name {
+                "doctor" => ("doctor.json", "doctor APP"),
+                "subset_doctor" => ("subset.json", "doctor APP --subset"),
+                _ => ("seal.json", "seal-check APP"),
+            };
             return match read_optional(&self.app.join(".lowrail").join(file))? {
                 Some(bytes) => Ok(json!({"available":true,"report":serde_json::from_slice::<Value>(&bytes).map_err(|e| e.to_string())?})),
-                None => Ok(json!({"available":false,"reason":format!("no {file}; run lowrail {} APP", if name == "doctor" { "doctor" } else { "seal-check" })})),
+                None => Ok(json!({"available":false,"reason":format!("no {file}; run lowrail {command}")})),
             };
         }
         if name == "lowering_ledger" {

@@ -181,7 +181,7 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
         let response: Value = serde_json::from_str(&line).unwrap();
         assert_eq!(response["id"], id);
         if id == 2 {
-            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 13);
+            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 14);
         } else if id == 4 {
             assert_eq!(response["result"]["isError"], false);
             let export = &response["result"]["structuredContent"];

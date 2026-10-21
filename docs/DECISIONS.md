@@ -13,6 +13,14 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Bet E: per-action callback selection — KILL (2026-10-21)
+
+Selected copied Rails callback chains per action; retained stock Proc/around execution and real action/render pipeline.
+Three-round native YJIT show/index wall deltas +2.271%/+2.796% are inside A/A 4.085%/12.874%; no direction claim.
+Allocation medians are identical in every arm: 2,387/show and 2,488/index; no measurable allocation work removed.
+Exact status/body/all headers and validation DB checks pass after a symmetric Turbo signing-input correction; rejected first screen retained.
+Killed by owner decision: keep [doctor/census](lowrail-subset.md) (856 actions, 0 certified, SUB003 blocks 747); no further variants, main promotion or whole-action AOT claim.
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

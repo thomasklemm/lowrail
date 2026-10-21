@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Summarize already-executed doctor reports, never silently boot/fix an app.
+# Usage: ruby script/subset-census OUTPUT APP=APP/.lowrail/subset.json ...
+require "json"
+require "digest"
+require "open3"
+
+output, *inputs = ARGV
+raise "usage: subset-census OUTPUT APP=REPORT..." unless output && !inputs.empty?
+apps = inputs.to_h do |input|
+  name, path = input.split("=", 2)
+  raise "expected APP=REPORT" unless path
+  report = JSON.parse(File.read(path))
+  root = report.fetch("root")
+  git, status = Open3.capture2("git", "-C", root, "rev-parse", "HEAD", err: File::NULL)
+  marker = File.join(root, ".lowrail-corpus-source")
+  actions = report.fetch("actions").map do |action|
+    action.slice("target", "status", "classification", "rewrite_size", "compliant", "pending_certificates", "model_references").merge(
+      "findings" => action.fetch("rules_broken").map { |row| row.slice("rule", "effort", "line", "detail").merge("file" => row["file"]&.delete_prefix("#{root}/")) },
+      "templates" => action.fetch("templates").map { _1.delete_prefix("#{root}/") },
+      "benefit" => action.fetch("benefit").slice("estimated_speedup_pct", "reason", "observed_action_samples"))
+  end
+  hashes = report.fetch("source_sha256").transform_keys { _1.delete_prefix("#{root}/") }
+  # Generated apps live under the Lowrail checkout, but its HEAD is not their
+  # source revision. The generator marker is the provenance in that case.
+  generated = File.file?(marker) && !File.exist?(File.join(root, ".git"))
+  [name, {"source_revision" => status.success? && !generated ? git.strip : nil,
+    "source_marker" => File.file?(marker) ? File.read(marker).strip : nil,
+    "lock_sha256" => File.file?(File.join(root, "Gemfile.lock")) ? Digest::SHA256.file(File.join(root, "Gemfile.lock")).hexdigest : nil,
+    "source_tree_sha256" => Digest::SHA256.hexdigest(JSON.generate(hashes.sort.to_h)),
+    "boot_ok" => !report["boot"].nil?, "boot_error_class" => report.dig("boot_error", "class"),
+    "rails" => report.dig("boot", "rails"), "environment" => report.dig("boot", "environment"),
+    "inventory" => report.fetch("inventory"), "template_scope" => report.fetch("template_scope"),
+    "summary" => report.fetch("summary"), "actions" => actions,
+    "errors" => report.fetch("errors").map { _1.merge("file" => _1.fetch("file").delete_prefix("#{root}/")) }}]
+end
+all = apps.flat_map { |name, app| app.fetch("actions").map { [name, _1] } }
+ranked = all.flat_map { |app, action| action.fetch("findings").map { _1.fetch("rule") }.uniq.map { [_1, "#{app}:#{action.fetch('target')}"] } }
+  .group_by(&:first).map { |rule, rows| {"rule" => rule, "actions_blocked" => rows.size, "actions" => rows.map(&:last).sort} }
+  .sort_by { [-_1.fetch("actions_blocked"), _1.fetch("rule")] }
+result = {"format" => 1, "kind" => "advisory_subset_census", "ruby" => RUBY_DESCRIPTION,
+  "rules" => JSON.parse(File.read(inputs.first.split("=", 2).last)).fetch("rules"),
+  "totals" => {"apps" => apps.size, "actions" => all.size,
+    "certified_compliant" => all.count { |_, action| action.fetch("compliant") },
+    "statuses" => all.group_by { |_, action| action.fetch("status") }.transform_values(&:size)},
+  "rule_ranking" => ranked, "apps" => apps,
+  "limits" => ["Counts overlap across rules; each action counted at most once per rule.",
+    "Source-only and booted inventories differ; do not treat the former as all routed actions.",
+    "Callbacks are a controller-wide conservative inventory, not path-sensitive condition execution.",
+    "SUB001 contract and SUB008 transitive effects remain pending for every action, independently of syntactic blockers.",
+    "None-detected means no syntactic blocker found, not compliant or zero-rewrite adoption.",
+    "App suites/production readiness/complete AR modeling are not certified by this diagnostic boot."]}
+File.write(output, JSON.pretty_generate(result) + "\n")
+puts JSON.pretty_generate(result.slice("totals", "rule_ranking").merge("rule_ranking" => ranked.map { _1.except("actions") }))
