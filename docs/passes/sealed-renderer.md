@@ -196,6 +196,54 @@ design and quarantine/default decisions unchanged. This negative finite
 result does **not** prove every more aggressive sealed renderer incapable
 of 2×; it provides no evidence to justify building that new tier now.
 
+## Next isolated price: collection fusion (prepared, not measured)
+
+After the separately accepted [form scaffold](sealed-form.md), collection
+fusion has the largest remaining specimen budget: **217,108 Ir**, about
+2.5% of the old off-request baseline. Filters (45,154) and hidden-token tag
+composition (81,417) are smaller. These are historical cumulative-stage
+differences, **not** a price or stacking claim for a new production pass.
+
+The [isolated micro](../../bench/experiments/sealed_collection.rb) is prepared
+against stock `view.render(article.comments)`, with the actual captured
+view/parent and **stock compiled partial**, not the specimen's handwritten
+comment. It retains real SQL/AR objects, collection-event payload/timing,
+locals/`PartialIteration`, `Template#render`, nested notifications, escaping,
+URL helpers, per-form CSRF masking and fresh output. Empty collections keep
+the original `nil` result. Both replay arms reset the association and load
+fresh Comment instances on every invocation; a loaded collection is not
+reused to pretend that SQL disappeared. Reset is common charged setup, not
+a claimed request saving.
+
+The complete candidate includes main-Ractor/epoch, actual view/proxy/parent
+holders, literal view context, HTML/English/current-scope and row-holder
+checks. Separate checks/residue arms are diagnostic, **not additive**. A
+production generator would still need a real boot inventory for effective
+rendering methods, reflection/scopes/callbacks, template/compiler/details,
+locale and configuration. The micro is not that certificate. Unknown
+holders/scopes, singleton rows and nonmatching contexts stay original;
+there is no production pass, registry entry or activation change.
+
+Preparation passes **192 ordinary + 192 header-writing-subscriber pairs**:
+raw body, all headers, ordered SQL, controller/render events and assign/AR/
+query-cache/transaction state. Each on process completes **105** collection
+replacements, including materialization requests. The native untimed worker
+checks two/one/zero comments, output class/safety/encoding, real token
+validity and holder/owner/epoch refusals. Source/lock/fixture and eight
+framework-file hashes are retained for a future finite six-round interpreter
+micro; existing A/A/heap/mode controls are not relaxed. **No cohort or new
+instruction windows have run.** It remains behind the form-YJIT, new form
+budget and config-bind work in the owner's four-worker queue.
+
+```sh
+SEALED_RENDERER_STAGE=collection_site mise exec -- ruby bench/experiments/blog_endpoint_check.rb \
+  .corpus/real-blog-r4 /tmp/NEW-collection-check render_subscriber
+# Untimed only, from the prepared blog application directory:
+LOWRAIL=0 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
+SEALED_COLLECTION_WORKER=candidate SEALED_COLLECTION_CHECK=1 \
+  ruby /path/to/lowrail/bench/experiments/sealed_collection.rb
+```
+
 ## Reproduction and evidence
 
 Prepare `script/corpus real-blog real-blog-r4`, production database and assets
