@@ -7,7 +7,7 @@ class DigestMemoTest < Minitest::Test
 
   def test_public_lazy_version_fixture_is_sealed_only_and_test_mode_stays_original
     root = File.expand_path("..", GEM_ROOT)
-    binary = File.join(root, "target/release/lowrail")
+    binary = File.join(root, "target/debug/lowrail")
     skip "build the Rust CLI to run the digest fixture" unless File.executable?(binary)
     %w[rails rails_vite inertia_rails vite_ruby].each do |name|
       skip "#{name} is not installed" if Gem::Specification.find_all_by_name(name).empty?
@@ -26,7 +26,7 @@ class DigestMemoTest < Minitest::Test
       out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--passes", "default,+digest_memo")
       refute status.success?, "guarded selection must refuse"
       assert_match(/--sealed/, err)
-      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--sealed", "--env", "production")
+      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--sealed", "--env", "production", "--jit", "yjit")
       assert status.success?, "#{err}\n#{out}"
       out, err, status = Open3.capture3(CLEAN_ENV, binary, "verify", dir, "--bisect", "--", RUBY, "bin/rails", "test", "--seed", "1729")
       assert status.success?, "#{err}\n#{out}"
@@ -45,7 +45,18 @@ class DigestMemoTest < Minitest::Test
       report = JSON.parse(File.read(File.join(dir, ".lowrail/verify/outcomes-1.json")))
       assert_empty report.fetch("unit_hits")
 
-      result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL_SEALED" => "1", "LOWRAIL" => "1", "LOWRAIL_STATS" => File.join(dir, "guard-stats")})
+      # Admission observes launch mode, not the YJIT enable Rails does later.
+      refused = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL_SEALED" => "1", "LOWRAIL" => "1", "LOWRAIL_STATS" => "", "RUBYOPT" => "--disable-yjit --disable-zjit #{SETUP_OPT}"})
+        require_relative "config/environment"
+        puts JSON.generate(admitted: !Lowrail.manifest.nil?, reason: Lowrail.refusal_reason,
+          hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks)
+      RUBY
+      refute refused.fetch("admitted")
+      assert_includes refused.fetch("reason"), "certification JIT mode mismatch: built yjit, running interpreter"
+      assert_empty refused.fetch("hits")
+      assert_empty refused.fetch("fallbacks")
+
+      result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL_SEALED" => "1", "LOWRAIL" => "1", "LOWRAIL_STATS" => File.join(dir, "guard-stats"), "RUBYOPT" => "--yjit #{SETUP_OPT}"})
         require_relative "config/environment"
         FileUtils.mkdir_p(File.dirname(RailsVite.config.manifest_path))
         File.write(RailsVite.config.manifest_path, '{"audit":"production file bytes"}')
@@ -121,7 +132,7 @@ class DigestMemoTest < Minitest::Test
 
       # An accepted source artifact still references its runtime when all
       # units are isolated away. Exercise production delivery, not refusal.
-      result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL_SEALED" => "1", "LOWRAIL" => "1", "LOWRAIL_UNITS" => "999999", "LOWRAIL_STATS" => ""})
+      result = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL_SEALED" => "1", "LOWRAIL" => "1", "LOWRAIL_UNITS" => "999999", "LOWRAIL_STATS" => "", "RUBYOPT" => "--yjit #{SETUP_OPT}"})
         require_relative "config/environment"
         expected = Digest::MD5.file(RailsVite.config.manifest_path).hexdigest
         raise "isolated source differs" unless RailsVite::Manifest.new(RailsVite.config.manifest_path).digest == expected
@@ -152,7 +163,7 @@ class DigestMemoTest < Minitest::Test
           end
         end
       RUBY
-      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--sealed", "--env", "production")
+      out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir, "--sealed", "--env", "production", "--jit", "yjit")
       assert status.success?, "#{err}\n#{out}"
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
       assert ledger.any? { _1["pass"] == "digest/file_memo" && _1["outcome"] == "refused" && _1["reason"] == "refinements" && _1["detail"] == "refined gem source" }
