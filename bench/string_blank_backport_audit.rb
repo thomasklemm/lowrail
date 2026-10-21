@@ -10,7 +10,7 @@ require "json"
 require "digest"
 
 def blank_node(source)
-  tree = Prism.parse(source).value
+  tree = Prism.parse(source, version: "current").value
   string = tree.statements.body.find { _1.is_a?(Prism::ClassNode) && _1.constant_path.location.slice == "String" }
   string.body.body.find { _1.is_a?(Prism::DefNode) && _1.name == :blank? }
 end

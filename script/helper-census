@@ -155,7 +155,7 @@ module HelperCensus
       end
       # A method wrapper allows template yield/return without evaluating it;
       # the same-line prefix retains ERB line numbers.
-      parsed = Prism.parse(path.end_with?(".rb") ? compiled : "def __census_template__;#{compiled}\nend")
+      parsed = Prism.parse(path.end_with?(".rb") ? compiled : "def __census_template__;#{compiled}\nend", version: "current")
       unless parsed.success?
         errors << {"file" => relative, "reason" => "prism_parse_error", "messages" => parsed.errors.map(&:message)}
         next

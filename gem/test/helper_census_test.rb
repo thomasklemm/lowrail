@@ -61,4 +61,49 @@ class HelperCensusTest < Minitest::Test
     assert_equal "prism_parse_error", report.fetch("errors").first.fetch("reason")
     assert_equal "app/helpers/broken.rb", report.fetch("errors").first.fetch("file")
   end
+
+  def test_census_uses_running_ruby_syntax_not_the_latest_prism_grammar
+    source = 'def navigation(&nil); link_to "Next", "/next", class: "nav"; end'
+    accepted = begin
+      RubyVM::InstructionSequence.compile(source)
+      true
+    rescue SyntaxError
+      false
+    end
+    report, status, err = census("app/helpers/navigation.rb" => source)
+    assert_equal accepted, status.success?, err
+    if accepted
+      assert_empty report.fetch("errors")
+      assert_equal 1, report.fetch("helpers").fetch("link_to").fetch("total")
+    else
+      assert_equal "prism_parse_error", report.fetch("errors").first.fetch("reason")
+      assert_equal 0, report.fetch("helpers").fetch("link_to").fetch("total")
+    end
+  end
+
+  def test_unknown_current_syntax_refuses_instead_of_silently_clamping
+    realpath_tmpdir do |root|
+      FileUtils.mkdir_p(File.join(root, "app/helpers"))
+      File.write(File.join(root, "app/helpers/navigation.rb"), 'def nav; link_to "Next", "/"; end')
+      script = File.expand_path("../script/helper-census", GEM_ROOT)
+      out, err, status = ruby("-e", <<~'RUBY', script, "fixture=#{root}", setup: false)
+        require "prism"
+        # Simulate a future current syntax at the version lookup boundary;
+        # keep the real parser and its unsupported-version rejection. Changing
+        # RUBY_VERSION cannot simulate this in CEXT (it reads ruby_version).
+        Prism.singleton_class.prepend(Module.new do
+          def parse(source, **options)
+            options[:version] = "99.0" if options[:version] == "current"
+            super(source, **options)
+          end
+        end)
+        $0 = ARGV.shift
+        load $0
+      RUBY
+      refute status.success?, err
+      report = JSON.parse(out).fetch("apps").fetch("fixture")
+      assert_empty report.fetch("sites")
+      assert_includes report.fetch("errors").first.fetch("message"), "invalid version: 99.0"
+    end
+  end
 end

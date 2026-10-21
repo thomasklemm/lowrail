@@ -65,7 +65,7 @@ class Lowrail::ARPlanSites < Prism::Visitor
 
   def self.inventory(app)
     Dir[File.join(app, "app/**/*.rb")].sort.reject { _1.match?(%r{/app/(assets|javascript)/}) }.flat_map do |file|
-      result = Prism.parse_file(file)
+      result = Prism.parse_file(file, version: "current")
       abort "cannot survey #{file}: #{result.errors.inspect}" unless result.success?
       visitor = new(file)
       visitor.visit(result.value)

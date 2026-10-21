@@ -22,7 +22,7 @@ module PropsVariant
 
   def self.source(original, shape:, id: 0)
     nodes = Lowrail::InertiaPropsBuild::Definitions.new
-    Prism.parse(original).value.accept(nodes)
+    Prism.parse(original, version: "current").value.accept(nodes)
     node = nodes.nodes.find { _1.name == :deep_transform_props }
     raise "missing audited resolver" unless node
     definition = node.location.slice
@@ -59,7 +59,7 @@ module PropsVariant
     end
     result = original.byteslice(0...node.location.start_offset) + replacement +
       original.byteslice(node.location.end_offset..)
-    raise "invalid specimen" unless Prism.parse(result).success?
+    raise "invalid specimen" unless Prism.parse(result, version: "current").success?
     result
   end
 end

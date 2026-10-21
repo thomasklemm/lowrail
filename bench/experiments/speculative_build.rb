@@ -13,7 +13,7 @@ module SpeculativeBuild
   GLOBAL = /\A::Lowrail::G\[(\d+)\] \|\| ::Lowrail\.check\(\1\)\z/
 
   def self.elide(source, ids, counts)
-    parsed = Prism.parse(source)
+    parsed = Prism.parse(source, version: "current")
     raise "cannot parse lowered source" unless parsed.success?
     nodes = [parsed.value]
     edits = []

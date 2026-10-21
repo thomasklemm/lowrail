@@ -40,7 +40,7 @@ module Lowrail
         decline.call("resolver_override") unless klass.private_method_defined?(:deep_transform_props)
         method = klass.instance_method(:deep_transform_props)
         definitions = Definitions.new
-        Prism.parse(original).value.accept(definitions)
+        Prism.parse(original, version: "current").value.accept(definitions)
         node = definitions.nodes.find { _1.name == :deep_transform_props }
         decline.call("resolver_override") unless node && method.owner.equal?(klass) &&
           method.original_name == :deep_transform_props && method.source_location == [path, node.location.start_line]
@@ -67,7 +67,7 @@ module Lowrail
           original.byteslice(header_end...node.end_keyword_loc.start_offset), "end; ",
           original.byteslice(node.end_keyword_loc.start_offset..)]
         lowered = parts.map { Integer === _1 ? "0" : _1 }.join
-        raise "invalid prop lowering" unless Prism.parse(lowered).success? && lowered.count("\n") == original.count("\n")
+        raise "invalid prop lowering" unless Prism.parse(lowered, version: "current").success? && lowered.count("\n") == original.count("\n")
         sources = [path, __FILE__, File.join(__dir__, "inertia_props.rb")].to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
         files << {path: path, original: original, parts: parts}
         units << {"pass" => PASS, "kind" => "file", "target" => target, "file" => path,

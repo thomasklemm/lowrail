@@ -16,7 +16,7 @@ module Lowrail
       require "prism"
       file, line = scope.source_location
       return [nil, "scope source unavailable"] unless file && File.file?(file)
-      parsed = Prism.parse_file(file)
+      parsed = Prism.parse_file(file, version: "current")
       return [nil, "scope source does not parse"] unless parsed.success?
       nodes = []
       visit = lambda do |node|

@@ -12,7 +12,7 @@ module OperationCapture
 
     def initialize(code, path, units)
       @code, @path, @specs = code, path, []
-      parsed = Prism.parse(code)
+      parsed = Prism.parse(code, version: "current")
       raise "cannot parse budget source: #{path}" unless parsed.success?
       visit = ->(node) {
         id, original = nil, nil
@@ -82,7 +82,7 @@ module OperationCapture
         end
         node.compact_child_nodes.each { visit.call(_1) }
       }
-      visit.call(Prism.parse(text).value)
+      visit.call(Prism.parse(text, version: "current").value)
       nodes.sort_by { _1.location.start_offset }.reverse_each do |node|
         location = node.location
         text.bytesplice(location.start_offset, location.length, "(::OperationCapture.#{callback}(#{spec.fetch(:id)}); #{location.slice})")
@@ -97,12 +97,12 @@ module OperationCapture
         body = counted(spec, body, "request_completed")
         "::OperationCapture.record(#{spec.fetch(:key).dump}, binding) { #{body} }"
       }
-      location = Prism.parse(code).value.location
+      location = Prism.parse(code, version: "current").value.location
       code.dup.bytesplice(location.start_offset, location.length, replace(location, specs) { wrap.call(_1) })
     end
 
     def literal_policy
-      magic = Prism.parse(code).magic_comments.find { _1.key == "frozen_string_literal" }
+      magic = Prism.parse(code, version: "current").magic_comments.find { _1.key == "frozen_string_literal" }
       value = if path.end_with?(".erb")
         ActionView::Template.frozen_string_literal
       elsif magic

@@ -40,7 +40,7 @@ class ARDiagnosticsTest < Minitest::Test
       owner.children.where.not(id: key)
       records.select { it.enabled? }
     RUBY
-    parsed = Prism.parse(source)
+    parsed = Prism.parse(source, version: "current")
     assert parsed.success?
     visitor = Lowrail::ARPlanSites.new("app/models/example.rb")
     visitor.visit(parsed.value)

@@ -91,7 +91,7 @@ module Lowrail
       return [SealRules.finding("SEAL007", confidence: "hint", file: file, line: 1, root: root,
         target: file.delete_prefix("#{root}/"))] if file.end_with?(".erb") && !source.match?(/<%#\s*locals:\s*\(/)
       return [] if file.end_with?(".erb")
-      parsed = Prism.parse(source)
+      parsed = Prism.parse(source, version: "current")
       raise "#{file}: Prism parse failed: #{parsed.errors.first.message}" unless parsed.success?
       scan = Scan.new(source, file: file, root: root)
       parsed.value.accept(scan)

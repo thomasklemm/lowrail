@@ -13,5 +13,7 @@ Gem::Specification.new do |spec|
   # dependency: a missing compiler must not prevent the Ruby gem from loading.
   spec.files = Dir["lib/**/*.rb", "ext/**/*.{c,rb}", "Rakefile"]
   spec.add_development_dependency "minitest-mock", "~> 5.27"
+  # Build/discovery tooling; do not force an application's locked Prism forward.
+  spec.add_development_dependency "prism", "2.0.0"
   spec.add_development_dependency "sorbet-runtime", "0.5.12435"
 end

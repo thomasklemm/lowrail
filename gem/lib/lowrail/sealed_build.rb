@@ -149,7 +149,7 @@ module Lowrail
       return refuse.call("custom dispatch") unless dispatch.owner.equal?(ActionController::Metal) && stock?(dispatch)
       dispatch_file, dispatch_line = dispatch.source_location
       dispatch_source = File.read(dispatch_file)
-      definition = find_definition(Prism.parse(dispatch_source).value, :dispatch, dispatch_line)
+      definition = find_definition(Prism.parse(dispatch_source, version: "current").value, :dispatch, dispatch_line)
       return refuse.call("stock dispatch changed") unless definition && definition.body
       original = definition.location.slice
       prefix = "__lowrail_request_"
@@ -209,7 +209,7 @@ module Lowrail
 
     def lower(source)
       wrapper = "def __lowrail_view__;"
-      parsed = Prism.parse("#{wrapper}#{source}\nend")
+      parsed = Prism.parse("#{wrapper}#{source}\nend", version: "current")
       return [source, [{"helper" => "link_to", "line" => 1, "outcome" => "unsupported compiled template"}]] unless parsed.success?
       visitor = Calls.new
       parsed.value.accept(visitor)
