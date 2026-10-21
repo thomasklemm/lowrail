@@ -35,7 +35,7 @@ revalidating assumptions. The C check of a genuine token allocates nothing
 and invokes no Ruby callback. Acquisition does not call the target or
 `method_missing`; Ruby name coercion may execute Ruby or raise.
 
-Review of [this proposal](https://bugs.ruby-lang.org/issues/22459) found a
+Review of the first prototype found a
 reproducible `Cannot malloc during GC`: `st_insert` can grow even when replacing
 an existing registry head. The follow-up retains the registry but uses
 existing-only `st_update` for destruction and existing-list registration,
