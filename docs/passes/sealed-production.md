@@ -1,10 +1,12 @@
 # Passive production token and collection units
 
-**Correctness work, not a speed result.** `sealed/token_tag` and
-`sealed/collection_render` now have public build/runtime certificates. They
-are separate from the rejected [combined pricing specimen](sealed-combined.md).
-That specimen stays rejected and is not measured again. No default-tier,
-quarantine or guarded-pass behavior changes.
+**One accepted whole-request price: interpreter Ir on one blog endpoint and
+fixture.** `sealed/token_tag` and `sealed/collection_render` have public
+build/runtime certificates. The measured production form/token/collection
+units are separate from the rejected [combined pricing specimen](sealed-combined.md).
+That specimen stays rejected and is not measured again. This is not a Rails
+throughput/latency claim or a whole-app result. No default-tier, quarantine or
+guarded-pass behavior changes.
 
 ## What is certified
 
@@ -130,22 +132,75 @@ Actual counter/placement regressions pass **3/155**; the separately pinned
 512-MiB-brk counter regression passes **1/13**, with zero skips. These are
 untimed prerequisites, not an app cohort or a speed result.
 
-## One proposed production cohort — awaiting authorization
+## Accepted finite interpreter cohort
 
-**Not started; no slots used or reserved.** After publication and the final
-published-head gate, propose one finite interpreter cohort of the real
-production form/token/collection units on **BlogShowGetOnly**. No pricing
-adapter is loaded. The exact artifact, fixture, runtime, harness, app, lock,
-native primitive and gate hashes must match the published export before and
-after execution; any source change requires fresh correctness gates and
-review before counters.
+Measured commit:
+[`ae025b0`](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
+Ruby **4.0.7**, Rails **8.1.4**, actual **interpreter**, production
+`GET /articles/1` on **BlogShowGetOnly** only. The three-unit manifest is
+`5271a66ff71c44f4276363adef136f65cadc2e1b7729ef6f2e953dd0d212d7e6`;
+the fixture is
+`21a0de39f113d57e9303967b801c7b34d86aca7bcfcbe8c3d94013914cf5c970`.
+Full runtime, harness, app, lock, native and tool pins are in the
+[numeric export](sealed-production-results.json), alongside all six round
+rows, complete summaries and all 18 worker records / 72 windows.
 
-Use the shared `RequestPairs.heap_instructions` worker with three arms
-(off-A/off-B/production), six randomized rounds, seed 41231, N=0/50 subtraction,
-at most two separately granted slots, actual interpreter, real entropy and
-the unchanged five fixed heap floors / 512-MiB-brk tool. Keep total **and**
-GC-excluded A/A (including zero in the interval), heap/brk/JIT/idle checks,
-untimed independent hit/fallback/refusal counts, and placement envelopes.
-Reject and retain the whole cohort on any failed control; no retry, excluded
-round, rescore or comparison with old fixtures. This is a new candidate, not
-a retry of the rejected specimen and not a request for immediate execution.
+One separately authorized cohort used slots 1+2, six randomized rounds,
+seed **41231**, off-A/off-B/production, **N=0/50** subtraction, real entropy,
+the unchanged five heap floors and the pinned **512-MiB-brk** tool. Maximum
+observed worker-process envelope concurrency is **two**. Both slots were
+released after all 18 workers finished. No retry, excluded round, rescore,
+older-price comparison or additional cohort. **No YJIT cohort**; that method
+is parked and interpreter Ir remains primary.
+
+The harness ran from a **clean detached worktree at the measured commit**.
+Each worker recorded its actual revision, clean state, harness aggregate,
+Ruby description and private metadata-wrapper SHA before and after execution.
+The original source-path runtime worktree was also clean at that commit; its
+bytes and the artifact were not rebuilt or relocated. The wrapper only checks
+pins outside the unchanged shared worker's windows; it installs no pricing
+adapter. Its executed source and the driver's source are retained in the export.
+Source, framework, native, tool and artifact hashes match before and after.
+
+The first command **refused `RAILS_ENV=nil`** at parent manifest preflight,
+before creating a cohort directory or any counter worker. Only the explicit
+production command environment was corrected. This was not a counter retry.
+
+### Result and gates
+
+**Accepted by the shared harness: total AND GC-excluded A/A pass.** Values
+below are per-request medians and nominal 95% bootstrap intervals over the six
+independent round pairs, not independent samples for each request.
+
+| Metric | Off-A / request | Production / request | Production Δ% [95% interval] | Off-B/A Δ% [95% interval] |
+|---|---:|---:|---:|---:|
+| Total Ir | 8,803,370.57 | 7,440,039.03 | **−15.492980 [−15.511296, −15.461565]** | −0.029975 [−0.047392, +0.028585] |
+| GC-excluded Ir | 8,804,989.22 | 7,439,041.47 | **−15.509265 [−15.527966, −15.471767]** | −0.037196 [−0.055493, +0.015382] |
+| Allocated objects (diagnostic only) | 2,281.14 | 1,870.60 | −17.994038 [−18.012700, −17.977800] | +0.003945 [−0.010521, +0.015785] |
+
+- Both instruction A/A intervals contain zero and stay within **±0.5%**.
+  All five slot-range/exact-page heap gates, brk preflight/worker checks and
+  actual-interpreter/JIT-state checks pass. All 72 counter dumps independently
+  reconcile with exported totals and all 36 N=0 subtractions reconcile.
+- Every window has **zero minor/major collections**. Total and GC-excluded
+  windows are separate executions, not one trace with GC removed. Their
+  difference is not GC savings. The allocation figure is diagnostic only.
+- The **JIT-specific idle companion is not applicable to interpreter** and
+  was not run (`idle_boundary` is absent); it is not relabeled an executed
+  pass. The normal request-settle seam ran in every worker.
+- All 72 windows retain symmetric thread CPU/affinity and overlap endpoints:
+  affinity `0-7`, 32 windows overlap a peer counter envelope and 48 overlap
+  a peer worker-process envelope. These are conservative envelopes, not a
+  census of unrelated host load. **Migration counts remain null/unavailable**;
+  equal endpoint CPUs do not establish zero migrations.
+- All six on workers finish with all three production admissions active and
+  no refusal. Post-cohort untimed cold and **192+192** controls pass again,
+  with paired hits **104/398/87**, 62 collection fallbacks retained, and
+  native 50-show hits **50/200/50**, zero fallbacks/refusals. Witness work is
+  outside warm windows, not a controlled cold-latency estimate.
+
+This establishes reduced **interpreter instruction work for this one endpoint
+and fixture** with these production units. It does not establish native
+latency, YJIT performance, arbitrary subscribers/apps, test-tier admission or
+the broader all-sealed ancestry gate. No comparison with another fixture or
+the rejected pricing specimen follows.
