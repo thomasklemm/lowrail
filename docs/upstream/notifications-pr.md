@@ -14,10 +14,11 @@ it. Nonempty groups still instantiate the same groups and Handle in the same
 order. Empty groups return the existing `NullHandle` without the mapping.
 
 `groups_for` still runs on every invocation, including its live `silenced?`
-checks. Subscriptions, unsubscriptions and silence changes are not cached or
-short-circuited. This is a small follow-up to #59095, which removed a different
-array in `groups_for`, not in `build_handle`. The existing top-level
-`Notifications.instrument` listening check is unchanged.
+checks. Existing subscription-group caches and their invalidation are
+unchanged; this does not cache the absence of active listeners. This is a
+small follow-up to #59095, which removed a different array in `groups_for`,
+not in `build_handle`. The existing top-level `Notifications.instrument`
+listening check is unchanged.
 
 ### Benchmark
 
@@ -39,10 +40,12 @@ No dependency installs or test suites ran alongside these measurements.
 | Silenced + timed | 7 → 7 | 477.779k ±3.9% → 463.933k ±2.7% | 810.768k ±2.6% → 839.447k ±5.6% |
 
 No-subscriber throughput is 1.59× interpreter / 2.46× YJIT, and fully silenced
-throughput is 1.34× / 1.77×, in this microbenchmark. All active-only and mixed
-comparisons fall within benchmark-ips's reported error, including the lower
-Event-object interpreter point estimate. Active-case allocations are
-unchanged. No request-level improvement is claimed.
+throughput is 1.34× / 1.77×, in these exploratory microbenchmark runs. All
+active-only and mixed comparisons have overlapping reported standard-
+deviation ranges, including the lower Event-object interpreter estimate.
+This does not prove performance equivalence. Active-case allocations are
+unchanged. No stable speedup guarantee or request-level improvement is
+claimed.
 
 Save the following as `notifications_bench.rb`. Install `benchmark-ips` and
 the checkout's runtime dependencies. Run against two checkouts with the same

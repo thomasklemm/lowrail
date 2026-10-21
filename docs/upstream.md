@@ -67,7 +67,8 @@ sequences or the exact internal Enumerable call trace is claimed.
 The existing public `thomasklemm/rails` fork was verified as a fork of
 `rails/rails` and reused; its main branch was not changed. Each fix has one
 independent commit, authored and committed by Thomas Klemm
-`<github@tklemm.eu>`, with the Amp thread trailer and no co-author trailer:
+`<github@tklemm.eu>`. Later message-only replacements and upstream merges
+are recorded in the delivery section below:
 
 - [CurrentAttributes defaults](https://github.com/thomasklemm/rails/tree/thomasklemm/current-attributes-default-iteration)
   — [PR description draft](upstream/current-attributes-pr.md),
@@ -147,3 +148,167 @@ tree**, because framework worker frames remain in the cleaned backtrace.
 The focused file passes 32 / 45 serially, and the full serial suites retain
 every test. No assertion, skip policy, filter or framework source was changed
 to obtain a passing run.
+
+## Retroactive review gate and upstream delivery (2026-10-21)
+
+Every future proposed PR gets its own Thermos correctness/security and
+maintainability reviews, an independent oracle review of intent, semantics,
+benchmark methodology and claims, and the project's contributing/style/commit
+checks **before** it is sent to the coordinator to open. Confirmed findings
+are fixed or explicitly explained. At most two of our PRs may be open in any
+one repository. Only the coordinator opens PRs; review findings do not grant
+permission to push to an open PR or publish comments.
+
+### Delivered Rails fixes
+
+| PR | Exact reviewed code / message-only replacement | Gate and delivery |
+|---|---|---|
+| [#59235 — notification handles](https://github.com/rails/rails/pull/59235) | Reviewed [161b372](https://github.com/thomasklemm/rails/commit/161b37229dc53460283ba56ac2db3634012ead91) against canonical main [0f19d01](https://github.com/rails/rails/commit/0f19d01ab94a6a7d8d5021585aaa9a3a9a39e3f5). Replacement [2cb58de](https://github.com/thomasklemm/rails/commit/2cb58de16d78d0eea6f2689ef7b1dc54d5341903) has the identical parent and tree. | Thermos: no supported-contract correctness/security or maintainability blocker. Oracle: no production-code blocker. **Merged by amatsuda at 12:33:51Z**, [206f2c9](https://github.com/rails/rails/commit/206f2c927a91226563af383df871aad745a36eb1), with parents [6c4743b](https://github.com/rails/rails/commit/6c4743b) and the original reviewed head. |
+| [#59236 — CurrentAttributes defaults](https://github.com/rails/rails/pull/59236) | Reviewed [62a35b5](https://github.com/thomasklemm/rails/commit/62a35b53bb2c04353b89cc57383abf9e88b6e521) against the same main. Replacement [2de8815](https://github.com/thomasklemm/rails/commit/2de881564ae5f095579ffce20af30b1aed9f5293) has the identical parent and tree. | Thermos: no supported-contract correctness/security or maintainability blocker. Oracle: no production-code blocker. **Merged at 12:46:29Z**, [596da00](https://github.com/rails/rails/commit/596da00373ca9606a4d7741289203fe62d6ce12b), using the clean replacement head. |
+
+The owner authorized exact-lease message-only pushes, which completed before
+the subsequent withdrawal. No production-code review fix was included.
+Both commits have Thomas Klemm `<github@tklemm.eu>` as author and committer,
+with no attribution/tool trailers in their stored messages. GitHub's fork
+refs and commit API confirm both replacements. `gh pr view --json
+headRefOid,commits` confirms the replacement on #59236. #59235 had **already
+merged** before its fork-branch update, so its PR metadata correctly retains
+the original head; no attempt was made to change the merged PR or upstream
+history. No comment, reopen, merge, or CI rerun was performed by this work.
+
+Current canonical main at the final check was
+[07dccb8](https://github.com/rails/rails/commit/07dccb80b11968ad58e0e16e17155179fb40e97e).
+The two changed framework files match the accepted implementations. GitHub
+reports successful checks/statuses for #59236's exact replacement head;
+that rollup is not a claim that every database/toolchain matrix was run here.
+Automatic follow-up subscriptions could not be installed because the
+integration lacks access to `rails/rails`; read-only GitHub CLI inspection
+was used instead. No ongoing automated monitoring is claimed.
+
+### Findings, dispositions and evidence limits
+
+- **Notification semantics:** `groups_for` is still invoked once per handle;
+  silence checks and subscription-cache invalidation remain live. Group
+  hashes are frozen cache results or call-local copies, so ordinary
+  subscribe/unsubscribe does not mutate a returned grouping between its
+  emptiness check and mapping. In-flight handles retain the same listeners
+  and payload references. The correctness reviewer reproduced payload
+  mutation, grouped exception isolation, `finish_with_values`, interleaved
+  subscribe/unsubscribe, silence transitions, a subclass calling `super`,
+  nested instrumentation and a bounded concurrency smoke test against both
+  bodies. This is not a proof of every possible thread interleaving.
+- **CurrentAttributes semantics:** the filter and live value operations are
+  unchanged. The correctness reviewer reproduced all six allocation counts,
+  nil/false/unset membership, mutable and SafeBuffer copies, callable and
+  `dup` exceptions, callbacks, subclasses/prepend, existing-key mutation,
+  in-iteration insertion errors and replacement of the defaults Hash.
+  Ordinary Hash iteration order and mutation behavior remain unchanged.
+  A default Proc replacing `defaults` affects the next reset, not the Hash
+  already being traversed. Existing shared nested values/Proc results do not
+  acquire new thread-safety or deep-copy guarantees.
+- **Internal-override boundary, not a confirmed supported API regression:**
+  a custom `groups_for` returning an Enumerator or lying about `empty?`
+  can differ; its documented internal result is a Hash. A defaults object
+  overriding `each_with_object`, making `each` private or branching on block
+  arity can differ; framework-generated defaults are ordinary Hashes. These
+  artificial iterator contracts are not preserved by the refactors. No
+  first-party consumer requires them. Neither review recommended adding
+  speculative compatibility branches or changing the accepted code.
+- **Benchmark comparison dispute resolved:** two reviewers initially
+  inferred that a single report label prevents cross-process comparison.
+  This is incorrect for benchmark-ips **2.15.1**: `save!` with the same fresh
+  prefix loads the saved earlier result before the later job runs. The
+  executed logs contain both labels in their Comparison sections, and both
+  oracle reviews independently checked the upstream implementation. There
+  is no benchmark-script fix for that allegation.
+- **Timing caveat:** benchmark-ips's default ± values are within-run standard
+  deviations, not confidence intervals for treatment effects. Overlapping
+  ranges do not prove equivalence or absence of regression. These short
+  single-process-pair timings are illustrative helper measurements, not
+  stable speedup guarantees, request measurements or JIT-flat certificates.
+  SQL is a caller, but Active Record's RuntimeRegistry normally installs an
+  active SQL subscriber; no claim that ordinary SQL hits the empty case.
+- **Text clarification, not a code fix:** the notification draft now says
+  the existing grouping caches/invalidation are unchanged, rather than
+  suggesting subscriptions are uncached. Both local drafts explicitly label
+  timings exploratory. These are local document changes only; published PR
+  descriptions were not edited or commented on.
+- **Conventions:** CONTRIBUTING and the guide's benchmark, style, changelog
+  and commit sections were checked. RuboCop found no offenses in either
+  changed source. One focused commit per fix and benchmark/motivation in
+  the body match the project. Subjects exceeding the guide's *ideal* 50
+  characters, and a few long body lines, are advisory style nits; neighboring
+  commits also exceed that preference. No cosmetic rewrite is warranted.
+  No new feature/behavior/changelog or permanent allocation assertion was
+  added. Branch-specific AS and combined AS/AV/AR suite results above remain
+  distinct; static review is not a new independent run of those suites.
+
+Future commits use `/usr/bin/git -c core.hooksPath=/dev/null` with explicit
+Thomas author/committer identity; inspect the real stored message and both
+identities before publication. The orb's Git wrapper can append a trailer
+even with hooks disabled. No already-published Lowrail history was rewritten.
+
+## Falsy memo and additional gem follow-ups (2026-10-21)
+
+| Candidate | Current upstream evidence | Gate / disposition |
+|---|---|---|
+| `query_constraints_list ||= nil` on models such as Bucket/Bubble | Main's `Persistence#query_constraints_list` uses the live explicit definition or `schema_context.query_constraints_list`. [#58767](https://github.com/rails/rails/pull/58767), merged as [3f51c57](https://github.com/rails/rails/commit/3f51c579b73a4be2f5e3e6eb4a20f353b26de0bd), moved derivation into `SchemaContext#load_schema!`, storing nil as well as Arrays. `primary_key=` and `query_constraints` invalidate loaded schema contexts. | **Already fixed upstream; no duplicate PR.** A nil memo backport without the invalidation path is not established as equivalent. |
+| `SolidCache::Entry.connection_class ||= false` | Solid Cache main [da70ef4](https://github.com/rails/solid_cache/commit/da70ef4f8f9c5ad6490b3994cd4d67dcf5e3659a) does not define this getter in Entry or Record. It inherits `ActiveRecord::Core.connection_class`, whose false-write remains on Rails main. Searches of open/closed Rails and Solid Cache PRs found no matching fix. | This is a **Rails**, not Solid Cache, candidate. Do not open a Solid Cache duplicate. |
+| Read-only flag, `@connection_class || false` | One-line local experiment based on canonical [206f2c9](https://github.com/rails/rails/commit/206f2c927a91226563af383df871aad745a36eb1). All sequential returned values, live setter changes and ordinary subclass/predicate dispatch agree, but absence/nil state and frozen-class errors differ. | **Fails the strict unconditional gate and performance admission; not published, no PR-ready draft.** Thermos maintainability passes; Thermos correctness does not recommend submission because of the interpreter regression. Oracle rejects the strict equivalence claim. |
+| StoreModel `_read_attribute(*)` forwarding, revisited | Current master [c868dc0](https://github.com/DmitryTsepelev/store_model/commit/c868dc0f3edc15ff20d8b5305280742452cdc2b3) still uses the rest wrapper plus replaceable `tap`/parent assignment. [#229](https://github.com/DmitryTsepelev/store_model/pull/229) is merged. Replacing `*` with `...` changes keyword forwarding to a keyword-aware overridden super method; removing `tap` bypasses a returned value's override. | **No unconditional replacement established.** Concrete Ruby controls distinguish both proposed shortcuts; no StoreModel change or PR. |
+
+### Reproduction and rejected flag measurements
+
+[Minimal reproduction](../bench/upstream/falsy_memos.rb), Ruby 4.0.7:
+
+```sh
+ruby bench/upstream/falsy_memos.rb /path/to/rails-before
+ruby bench/upstream/falsy_memos.rb /path/to/rails-experiment
+```
+
+On the real AR subclass, the old getter defines an absent ivar and changes
+an explicit nil to false; the experiment does neither. Freezing the class
+object with the built-in `Object#freeze` after setting false makes the old
+getter raise `FrozenError`, but the experiment returns false. The oracle
+also identified a changed non-main-Ractor write error; that additional
+Ractor case was not executed here. These differences might be desirable
+upstream design changes, but cannot be sold here as unconditional semantics
+preservation. A `defined?` memo returning an explicit nil would additionally
+change the boolean getter result; it is not an equivalent drop-in solution.
+
+The same reproduction records the keyword/replaceable-`tap` counterexamples
+for the StoreModel proposals. This establishes why those shortcuts were
+refused, not a support/benchmark claim about a modified StoreModel release.
+
+[Standalone flag benchmark](../bench/upstream/connection_class.rb): stock
+Rails, benchmark-ips 2.15.1, Ruby 4.0.7, 2 s warmup / 5 s timing, 100,000
+warmed GC-enabled operations for allocations. One serial idle pair per mode;
+no repeated-until-green selection. The measurements used base
+[0f19d01](https://github.com/rails/rails/commit/0f19d01ab94a6a7d8d5021585aaa9a3a9a39e3f5)
+and that checkout with the one-line edit. The exact same `core.rb` base blob
+is present in the later reviewed canonical base; the intervening five-file
+upstream update is not represented as a fresh benchmark run.
+
+| Operation | Objects/op, before → after | Interpreter i/s, before → after | YJIT i/s, before → after |
+|---|---:|---:|---:|
+| Explicit false flag | ~0 → ~0 | 13.860M ±1.2% → 15.674M ±1.9% | 24.657M ±4.7% → 30.093M ±1.0% |
+| True flag control | 0 → 0 | 16.801M ±0.2% → 16.458M ±4.4% | 29.691M ±5.7% → 29.928M ±2.3% |
+| Ancestor connection-class lookup | 0 → 0 | **1.963M ±0.2% → 1.765M ±2.3%** | 11.240M ±7.9% → 14.618M ±3.2% |
+| Live true/false setter + predicate cycle | 0 → 0 | 5.540M ±2.0% → 6.042M ±0.5% | 13.457M ±0.9% → 14.666M ±0.6% |
+
+The false-flag counter has one measurement-floor object per 100,000 calls
+on both arms (0.00001/op), not an allocation saving. The actual ancestor
+path is **about 10% slower in the interpreter**; direct-read gains do not
+override that result. The intermediate class has an unset flag: the old
+warmup materializes false while the experiment leaves it undefined. This is
+a concrete hypothesis for the difference, not a demonstrated cause. No
+further timing was selected to make it disappear, because the strict
+semantic gate already fails. No application/request gain is claimed.
+
+The reviewed local experiment is one clean commit on `206f2c9`, with Thomas
+as author/committer and no tool/co-author trailer. The complete AR SQLite
+suite ran on that head: **10,131 tests / 36,090 assertions, zero
+failures/errors, 52 conditional skips**. RuboCop: **one file, no offenses**.
+This is not the earlier 36,120-assertion combined-tree run, a hosted-CI claim,
+or evidence against the reproduced semantic differences. No new fork branch
+was pushed and no draft was offered as having passed the gate.

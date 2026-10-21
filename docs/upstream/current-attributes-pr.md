@@ -36,7 +36,10 @@ No dependency installs or test suites ran alongside these measurements.
 | Ten mixed | 17 → 6 | 206.013k ±2.6% → 268.852k ±1.7% | 244.775k ±2.9% → 308.213k ±3.3% |
 
 The ten-entry mixed case is 1.31× interpreter / 1.26× YJIT throughput in
-this microbenchmark. These are not application request measurements.
+these exploratory microbenchmark runs. These are single-process-pair point
+estimates, not stable speedup guarantees or application request measurements.
+The reported ± values are within-run standard deviations, not confidence
+intervals for the before/after difference.
 
 Save the following as `current_attributes_bench.rb`. Install `benchmark-ips`
 and the checkout's runtime dependencies. Run against two checkouts, using the
