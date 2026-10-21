@@ -9,26 +9,35 @@ primary work metric; native YJIT CPU/wall time and allocations are secondary.**
 ## Current accepted request results
 
 The [README table](../README.md#current-results-2026-10-21) is the current
-results index: exact deltas/intervals, dates, endpoints, Ruby/Rails versions,
+results index: rounded deltas/intervals (exact values in linked JSON), dates,
+endpoints, Ruby/Rails versions,
 mode, tier, measured commits and publication links. Its numbers render
 directly from accepted JSON exports via [results.json](results.json) and
 `python3 docs/render-results.py`; `--check` detects stale output. Publish the
 export, update that metadata once, then render. Do not replace original
 records or copy new numbers into every summary.
 
-- **Blog:** the corrected production form/token/collection record at
+- **Blog: no current-source price.** The historical form/token/collection record at
   [`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
   published in
   [`47f8e7b`](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16),
-  includes the token-continuation safety fix
-  ([report and export](passes/production-interpreter-reprice.md)).
+  includes the token-continuation safety fix but predates the dispatch fixes
+  ([historical report and export](passes/production-interpreter-reprice.md)).
+  The post-fix re-price cohort was **rejected on its preregistered no-GC A/A
+  gate**, not accepted as a replacement price
+  ([publication](https://github.com/thomasklemm/lowrail/commit/673b1cc3cbbb341a6956e027e54bc2a18049bde0),
+  [report and export](passes/production-dispatch-reprice.md)).
 - **Starter:** the post-TracePoint-fix JSON config-binding record remains
   accepted in interpreter mode, sealed-only, **not promoted**
   ([report and export](passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode)).
+- **Fizzy:** accepted scoped warm bench price, an **instruction increase**,
+  for a fixed six-GET vector; bench-only block-link, not production admission,
+  **cold still RED** ([specimen and export](block-link-specimen.md#replacement-result-scoped-warm-bench-price-not-a-win)).
 
-Each is **one endpoint and fixture · Ir instructions, not latency · no YJIT
-claim yet · opt-in sealed tier, not default**. Both total/GC-excluded A/A,
-fixed-heap, brk and actual-mode gates pass. Warm windows exclude boot and
+Blog and Starter each cover **one endpoint and fixture**; Fizzy covers six GETs.
+All are **Ir instructions, not latency · no YJIT claim yet · opt-in, not default**.
+Current accepted prices pass total/GC-excluded A/A, fixed-heap, brk and
+actual-mode gates. Warm windows exclude boot and
 one-time admission; total and GC-excluded are separate executions, not a
 GC-saving subtraction. The default build still lowers nothing. Correctness
 across apps and the AR-only verification test certificate are separate
@@ -44,7 +53,7 @@ not more performance measurements.
 | Isolated token **−11.1%**, collection **−9.9%** | Earlier separate interpreter operations, not endpoint savings and not additive; [exact micro records](passes/sealed-form.md#separate-collection-token-and-filter-prices-2026-10-21) retained |
 | Production YJIT method stage 1 | **Rejected**, no request price. [Method and reaper diagnosis](passes/production-yjit-method.md), source map [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65), diagnosis [6df1873](https://github.com/thomasklemm/lowrail/commit/6df18738e2d4c99ba4708ca5f57fcd6c2d659396); late compilation prevents acceptance, not a reason to exclude compiler work |
 | Frozen props **−0.460571%** total Ir [−0.508479, −0.408556] | Accepted isolated interpreter resolver micro at [d97df0a](https://github.com/thomasklemm/lowrail/commit/d97df0ab7fcc840c98de2885ce23e54ab5a5952b), 2026-10-21, Ruby 4.0.7 / Inertia 3.22.0, no app endpoint; [frozen-holder contract](passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred), integration deferred until the opt-in sealed freeze tier exists. Not latency, YJIT or request performance |
-| Fizzy block-link specimen | **No accepted Fizzy price yet**; scoped warm bench cohort in progress/pending publication. [Discovery-owned record](block-link-specimen.md); no unpublished numbers |
+| First Fizzy block-link cohort, N=50 | **INVALID (heap growth)**, no price; [publication](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51). The accepted N=10 replacement is a scoped warm bench instruction increase, not production admission ([discovery-owned record](block-link-specimen.md)) |
 
 ## Untimed worker placement observations (2026-10-21)
 

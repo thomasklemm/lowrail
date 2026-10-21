@@ -11,6 +11,34 @@ class AREquivalenceTest < Minitest::Test
     AREquivalence.schema
   RUBY
 
+  def test_shadow_modes_remain_live_and_unset_mode_allocates_nothing
+    output = ruby_json(<<~'RUBY', setup: false, env: { "RUBYLIB" => GEM_LIB })
+      require "lowrail/ar_shadow"
+      require "json"
+      modes = [nil, "", "0", "1", "strict", "STRICT", "true"].map do |value|
+        value ? ENV["LOWRAIL_SHADOW"] = value : ENV.delete("LOWRAIL_SHADOW")
+        Lowrail::ARShadow.enabled?
+      end
+      ENV.delete("LOWRAIL_SHADOW")
+      def allocations
+        before = GC.stat(:total_allocated_objects)
+        1_000.times { Lowrail::ARShadow.enabled? }
+        GC.stat(:total_allocated_objects) - before
+      end
+      allocations # Warm the predicate, loop and GC.stat call sites.
+      allocated = allocations
+      # Keep the original literal receivers, not an app's nil equality.
+      class NilClass
+        def ==(other) = true
+      end
+      puts JSON.generate("modes" => modes, "allocations" => allocated,
+        "unset_with_nil_override" => Lowrail::ARShadow.enabled?)
+    RUBY
+    assert_equal [false, false, false, true, true, false, false], output.fetch("modes")
+    assert_equal 0, output.fetch("allocations")
+    assert_equal false, output.fetch("unset_with_nil_override")
+  end
+
   def test_sealed_only_candidates_refuse_without_changing_queries_cache_records_or_callbacks
     scenario = PRELUDE + <<~'RUBY'
       $callbacks = 0
