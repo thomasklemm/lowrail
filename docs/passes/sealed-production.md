@@ -153,6 +153,9 @@ untimed prerequisites, not an app cohort or a speed result.
 
 ## Accepted finite interpreter cohort
 
+**Historical at ae025b0; superseded for the corrected source by the
+[accepted re-price](production-interpreter-reprice.md).**
+
 Measured commit:
 [`ae025b0`](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
 Ruby **4.0.7**, Rails **8.1.4**, actual **interpreter**, production

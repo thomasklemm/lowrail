@@ -1,11 +1,13 @@
 # Sealed new-comment form scaffold
 
-**Current runtime: passive-v1 natural admission; not yet priced.** The first
+**Current runtime: passive-v1 natural admission.** Its combined production
+form/token/collection [corrected-source interpreter price](production-interpreter-reprice.md)
+is now accepted for one blog endpoint and fixture, not form alone. The first
 natural certified form is wholly original. Its completed render supplies the
 read-only witness; only a later entry may specialize. Old effectful
 certificates still refuse. The guarded default, quarantine, and per-hit form
 input/epoch/actual-holder checks are unchanged. The accepted measurements
-below remain pinned historical prices, **not prices of this admission path**.
+below remain pinned historical form-only prices, **not current combined prices**.
 See the [review gates and coverage](../sealed-verification.md#passive-form-v1-review-gates).
 
 ## Passive form v1
@@ -123,7 +125,7 @@ neither a sum nor an inferred request percentage is credited here.
 
 ## Historical form prices
 
-**Latest accepted interpreter request saving: −14.457% [−14.474, −14.410].**
+**Historical form-only interpreter request saving: −14.457% [−14.474, −14.410].**
 The new budget-plus-request run uses **8.750826 → 7.485376 M Ir/request**,
 with **`measurement_complete:true`** and no unmodeled units. The earlier
 −14.405% request result remains unchanged, not rescored.

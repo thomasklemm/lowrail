@@ -19,6 +19,55 @@ for the other projects we learned from.
 > **Research prototype.** Lowrail is not published as a gem and gives no
 > production speedup by default today. Use it on a copy of your app or in CI.
 
+## Current results (2026-10-21)
+
+**Accepted warm-request work reductions, not latency or throughput claims.**
+Each row: **one endpoint and fixture · Ir instructions, not latency · no YJIT claim yet · opt-in sealed tier, not default**.
+Both total and GC-excluded A/A, fixed-heap, brk and actual-mode gates pass.
+
+<!-- current-results:start -->
+| Date | App / endpoint | Ruby / Rails | Mode / tier | Ir Δ vs no Lowrail [95% interval] | Measured / published |
+|---|---|---|---|---|---|
+| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-interpreter-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection | **Total −15.225536% [−15.253476, −15.205974]**; GC-excluded −15.254650% [−15.278100, −15.199984] | [553e7aa](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65) / [47f8e7b](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16); [JSON](docs/passes/production-interpreter-reprice-results.json) |
+| 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.156% [−10.219, −10.084]**; GC-excluded −10.161% [−10.254, −10.105] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
+<!-- current-results:end -->
+
+The blog row includes the token-continuation safety fix; the earlier
+**−15.49%** is historical, valid only at
+[`ae025b0`](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
+not the corrected source. [Protocol and historical records](docs/bench.md#current-accepted-request-results).
+
+**Not request prices:** production YJIT method stage 1 is rejected
+([retained method and reaper-driven late-entry diagnosis](docs/passes/production-yjit-method.md));
+frozen props is an accepted isolated micro only, with integration deferred
+([scope](docs/passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred)).
+There is **no accepted Fizzy price yet**; its scoped warm bench cohort is
+in progress/pending publication ([specimen](docs/block-link-specimen.md)).
+
+To update: publish the accepted export first, edit only the metadata/source
+paths in [docs/results.json](docs/results.json), then run
+`python3 docs/render-results.py` (`--check` detects drift). Numbers are read
+from the original exports, never copied into the index. Refresh the short
+[status](docs/STATUS.md#at-a-glance-2026-10-21) and [benchmark summary](docs/bench.md#current-accepted-request-results)
+when scope or acceptance changes; retain superseded records as historical.
+
+### Supported and unsupported today
+
+- **Default:** lowers nothing; original Rails remains in control. The
+  [corpus compatibility report](docs/compat.md) distinguishes identical
+  outcomes/SQL, baseline errors, bounded subsets, safe refusals and actual hits.
+- **Opt-in:** sealed production units require the [separate contract](docs/sealed.md)
+  and exact passive admission. The two measured rows do not imply arbitrary
+  endpoint coverage or config promotion. A separate
+  [verification-only AR test certificate](docs/test-certificate.md) exercises
+  naturally ready Article/Comment units, including true eager-load coverage;
+  it is not production admission or link/form/token/collection test coverage.
+- **Refused or quarantined:** the old source link/route passes remain
+  quarantined, including old mixed artifacts; seven cached-fact passes are
+  sealed-only, not ordinary guarded opt-ins. Unsupported shapes, stale or
+  mode-mismatched artifacts, and the Bundlebun boundary stay original
+  ([pass ledger](docs/DECISIONS.md#passes), [loaders](docs/loaders.md)).
+
 ## How it works
 
 ```
@@ -79,18 +128,18 @@ or incompatible build is a silent no-op. More options are in the
   comparisons are not a universal support claim.
 - **The default build lowers nothing.** Every guarded specialization tried so
   far was either unsafe under mid-request mutation or its guard cost more than
-  it saved; for example the guarded props variant loses 22.6 % because its
-  checks cost 6.9× the saving ([DECISIONS](docs/DECISIONS.md)).
-- **The sealed tier (opt-in, production only) has measured wins** in
-  interpreter instruction counts: the new-comment form scaffold −14.5 % per
-  show request and `inertia/config_bind` −10.2 % per JSON request, plus
-  isolated operations (hidden tokens −11.1 %, collection fusion −9.9 %).
-  Admission must be passive, so the form is currently refused until passive
-  activation lands; `link_to` admits again through the native predicate
-  ([sealed-verification.md](docs/sealed-verification.md)).
-- **YJIT measurement is not yet trustworthy.** Late JIT compilation in
-  unrelated framework code rejects whole-request YJIT cohorts, including
-  Lowrail-off arms ([bench.md](docs/bench.md)).
+  it saved ([DECISIONS](docs/DECISIONS.md)).
+- **The sealed tier has scoped interpreter results**, shown in
+  [Current results](#current-results-2026-10-21). Passive production form,
+  token and collection admission is implemented; the separate test certificate
+  remains AR-only ([production](docs/passes/sealed-production.md),
+  [test coverage](docs/test-certificate.md)).
+- **No whole-request YJIT gain is established.** Retained cohorts/methods
+  fail the strict compilation or A/A gates, including Lowrail-off arms
+  ([bench.md](docs/bench.md)).
+- **Prism 2 is adopted** in Ruby tooling and Rust, with explicit target
+  grammar and refusal for unknown versions; app bundles are not forced to
+  upgrade ([implementation and evidence](docs/prism-2.md)).
 - **Types and MCP work.** `lowrail types`, `lowrail explain` and
   `lowrail mcp` serve boot facts, per-slot types (proven, static, observed or
   unknown), refusal reasons and recorded hits ([types.md](docs/types.md)).
@@ -197,7 +246,9 @@ Short aliases are `memo`, `preload_plans`, `ar_instantiate`, `ar_plans`,
 `endpoint` remain eligible for guarded selection. The others refuse even in
 `all-opt-in`; old mixed artifacts refuse as a whole. Sealed research builds
 use `--sealed --env production` and require explicit production acceptance
-of the [sealed contract](docs/sealed.md); test processes stay original-only.
+of the [sealed contract](docs/sealed.md). Production artifacts refuse in test;
+the separate opt-in [verification-only AR certificate](docs/test-certificate.md)
+does not bypass that boundary.
 File formats are documented in [docs/FORMATS.md](docs/FORMATS.md).
 
 `LOWRAIL_VERIFY_LOADS=1 lowrail verify APP` also compares non-autoloading
