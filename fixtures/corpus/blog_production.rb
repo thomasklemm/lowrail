@@ -64,8 +64,24 @@ module BlogProduction
     holders
   end
 
+  # Untimed targeted observer, identical in both workers. Observe every
+  # form entry, not only pending admission: active calls bypass #observe.
+  # Never construct a view or wrap its app-visible method for the witness.
+  def self.capture_form_seam(view)
+    natural_form_seams << {"bound_owner" => view.method(:form_with).owner.name,
+      "instance_source_location" => view.class.instance_method(:form_with).source_location,
+      "ancestors" => view.class.ancestors.map(&:name)}
+  end
+
+  def self.natural_form_seams = @natural_form_seams ||= []
+
   def self.cold_features
+    helper = Lowrail.loaded_constant("ActionView::Helpers::FormHelper")
+    method = helper&.instance_method(:form_with)
     {"api_loaded" => !!Lowrail.loaded_constant("ActionController::API"),
+      "form_seam" => method && {"owner" => method.owner.name, "source_location" => method.source_location,
+        "ancestors" => helper.ancestors.map(&:name)},
+      "seam_features" => $LOADED_FEATURES.grep(%r{/lowrail/(?:form_scaffold(?:_inventory|_admission)?|load_hooks)\.rb\z}).sort,
       "objspace" => $LOADED_FEATURES.grep(%r{/(?:objspace\.rb|objspace\.(?:so|bundle))\z}),
       "holder_ancestry" => holder_ancestry}
   end
@@ -151,6 +167,8 @@ module BlogProduction
     require "lowrail/verify_loads"
     Lowrail::VerifyLoads.install
     require File.expand_path("config/application")
+    seam_trace = TracePoint.new(:call) { capture_form_seam(_1.self) }
+    seam_trace.enable(target: Lowrail::FormScaffold::Variant.instance_method(:form_with))
     events, boot_events, errors = [], [], []
     callbacks = []
     ActiveSupport::LazyLoadHooks.prepend(ColdHooks)
@@ -231,7 +249,8 @@ module BlogProduction
     end
     form = Lowrail.loaded_constant("Lowrail::FormScaffold")
     File.write(destination, JSON.pretty_generate({"initial_effects" => initial, "scenarios" => responses,
-      "boot_sql" => boot_events, "cold_witness" => cold_witness.merge("after_requests" => cold_features),
+      "boot_sql" => boot_events, "cold_witness" => cold_witness.merge("after_requests" => cold_features,
+        "natural_form_seams" => natural_form_seams),
       "unit_refusals" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.snapshot.fetch("unit_refusals") : {},
       "loads" => Lowrail::VerifyLoads.snapshot.fetch("stages"), "features" => $LOADED_FEATURES.reject { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) },
       "entropy_seed" => entropy_seed && Integer(entropy_seed), "entropy_control" => control,

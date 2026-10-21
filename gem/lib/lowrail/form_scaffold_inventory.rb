@@ -85,7 +85,7 @@ module Lowrail
           html_options_for_form_with html_options_for_form extra_tags_for_form
           form_tag_with_body form_tag_html label text_field text_area submit_tag label_tag content_tag tag token_tag
           field_name field_id set_default_disable_with safe_join prevent_content_exfiltration _object_for_form_builder
-          polymorphic_path polymorphic_mapping]],
+          polymorphic_path polymorphic_mapping _routes]],
         form.name => [form, %i[initialize label text_field text_area submit objectify_options convert_to_legacy_options multipart?]],
         tags::Base.name => [tags::Base, tags::Base.instance_methods(false) + tags::Base.private_instance_methods(false)],
         tags::Label.name => [tags::Label, tags::Label.instance_methods(false) + tags::Label.private_instance_methods(false)],
@@ -103,6 +103,8 @@ module Lowrail
         ActiveModel::Name.name => [ActiveModel::Name, %i[param_key route_key singular_route_key i18n_key]],
         ActiveModel::Errors.name => [ActiveModel::Errors, %i[empty?]],
         I18n::Backend::Simple.name => [I18n::Backend::Simple, %i[translate lookup resolve default interpolate]],
+        I18n::Config.name => [I18n::Config, %i[locale default_locale backend owned_by?]],
+        ActionView::I18nProxy.name => [ActionView::I18nProxy, %i[locale default_locale backend]],
         "Comment" => [Comment, %i[initialize errors persisted? to_model to_key model_name _read_attribute attribute_before_type_cast
           attribute_came_from_user? commenter body commenter_before_type_cast body_before_type_cast commenter_came_from_user? body_came_from_user?]],
         "Article" => [Article, %i[persisted? to_model to_param model_name]]
@@ -167,9 +169,10 @@ module Lowrail
       return "custom polymorphic path cache" unless holder.call(cached).equal?(polymorphic) &&
         cached.prefix == "" && cached.suffix == "path" && holder.call(key).equal?(Proc) &&
         RubyVM::InstructionSequence.of(key)&.to_a == RubyVM::InstructionSequence.of(canonical_key)&.to_a
-      primitives = {Array => %i[each each_with_index map last first size == empty? join], Hash => %i[[] []= == each_pair stringify_keys transform_keys
-        stringify_keys! deep_stringify_keys slice except merge merge! delete empty?], String => %i[to_s == html_safe html_safe? empty? gsub sub! end_with? humanize delete_suffix],
-        Symbol => %i[to_s name], Object => %i[class instance_of? instance_variable_get respond_to?], Class => %i[new]}
+      primitives = {Array => %i[each each_with_index map last first size == empty? join], Hash => %i[[] []= == each_pair fetch default default_proc stringify_keys transform_keys
+        stringify_keys! deep_stringify_keys slice except merge merge! delete empty?], String => %i[to_s == html_safe html_safe? empty? gsub sub sub! end_with? humanize delete_suffix],
+        Symbol => %i[to_s name], Object => %i[class instance_of? instance_variable_get respond_to?], Class => %i[new],
+        Module => %i[class_variable_get], Proc => %i[source_location]}
       primitives.each do |type, names|
         facts[type.name] = names.to_h do |method_name|
           method = type.instance_method(method_name)
@@ -211,18 +214,11 @@ module Lowrail
       if !path || path.start_with?("<internal:")
         return Sealed.signature(method) if !sequence && method.owner.equal?(ActionView::Helpers::FormHelper) &&
           method.original_name == :_default_form_builder
-        return nil unless [Array, Hash, String, Symbol, Class, Enumerable, Kernel, BasicObject, Object].include?(method.owner)
+        return nil unless [Array, Hash, String, Symbol, Class, Module, Proc, Enumerable, Kernel, BasicObject, Object].include?(method.owner)
         # VM builtins serialize an ASLR-dependent C address. The pinned Ruby
         # executable owns these internal bodies; retain builtin name/index/
         # arity and all instructions, but not the process-local address.
-        builtin = ->(value) do
-          case value
-          when Array then value.map { builtin.call(_1) }
-          when Hash then value.reject { |key, _| key == :func_ptr }.transform_values { builtin.call(_1) }
-          else value
-          end
-        end
-        return Sealed.signature(method, sequence: builtin.call(sequence&.to_a))
+        return runtime_fact(method)
       end
       return nil unless @roots.values.any? { path.start_with?(_1 + "/lib/") }
       unless sequence
@@ -262,6 +258,20 @@ module Lowrail
       end
       return nil unless expected_array && Sealed.signature(method, sequence: expected_array) == Sealed.signature(method)
       Sealed.signature(method)
+    end
+
+    # Compare an existing body to the independently audited build fact. This
+    # never compiles or reads source. Builtin addresses vary with ASLR; retain
+    # the same name/index/arity/instructions used by the build-only audit.
+    def runtime_fact(method)
+      builtin = ->(value) do
+        case value
+        when Array then value.map { builtin.call(_1) }
+        when Hash then value.reject { |key, _| key == :func_ptr }.transform_values { builtin.call(_1) }
+        else value
+        end
+      end
+      Sealed.signature(method, sequence: builtin.call(RubyVM::InstructionSequence.of(method)&.to_a))
     end
 
     def find(sequence, label, line)

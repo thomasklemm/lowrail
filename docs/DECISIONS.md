@@ -13,6 +13,35 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Passive form admission, not runtime recertification (2026-10-21)
+
+Use the first **natural, wholly original** certified form render as a read-only
+admission witness. Build-time synthetic auditing remains separate. Require the
+published native `exact_class?` and exact binary/method/source/block/cache facts;
+never replace missing facts with runtime loading, SQL, compilation, view
+construction, I18n lookup or replayed hooks. Old certificates stay refused.
+Install the same observation seam with explicit sealed opt-in in both arms,
+including LOWRAIL=0. One try-lock-protected witness attempt/process, active
+publication last; concurrent entries run original, failure is terminal and
+visible in explain/doctor/MCP, another setup does not reset the budget.
+
+The isolated form/link/default full-chain cold witnesses have no ancestry or
+other recorded off/off/on differences. Form has zero source/template delivery,
+so neither older all-sealed seam is selected. Blog C's first show remains
+original (0 hits); the natural repeat gets 1. Both 192-pair controls retain
+all recorded outputs/events/assigns with **104 hits/0 fallbacks**, not the
+historical 105: one render pays admission. Eight concurrent first renders
+remain original and exact, ninth hits once. PingCRM's lazy-build refusal stays
+visible; Wikino absent. The all-sealed Template/Preloader failures remain real
+and red, scoped to a separate follow-up after the combined cohort.
+
+This is **not a new speed claim or production promotion**. Report the review
+gates before the next allocation; only one whole-request interpreter show
+cohort with form+token+collection together can price their combined effect.
+No flattened-filter stage, additive micro arithmetic, or new YJIT cohort.
+[Admission, evidence and limits](sealed-verification.md#passive-form-v1-review-gates),
+[certificate and historical prices](passes/sealed-form.md).
+
 ## Full ancestry is observable (2026-10-21)
 
 Do not normalize Lowrail modules out of `Object.ancestors`, view ancestry or
@@ -45,9 +74,10 @@ dependencies/cached view class; the app may supply them naturally before a
 later request, otherwise refuse. Do not prepare the off arm to hide the change.
 
 **The accepted interpreter form saving (−14.457%, earlier −14.405%) remains
-measured, unchanged and not rescored, but is currently NOT ACTIVATABLE IN
-PRODUCTION pending passive activation.** The existing form certificate needs
-controller/view/I18n/ERB effects to recertify, so refuse it conservatively.
+measured, unchanged and not rescored; that runtime was NOT ACTIVATABLE IN
+PRODUCTION after the readiness correction.** Its old form certificate needs
+controller/view/I18n/ERB effects to recertify and still refuses conservatively.
+Only the separately versioned passive certificate above can now admit naturally.
 Build-time certification and its tests remain; no guard weakening or effectful
 recertification. The historical table/cohorts below describe their pinned
 runtimes, not current activation. The sealed owner's YJIT cohort remains

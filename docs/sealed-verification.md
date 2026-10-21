@@ -8,6 +8,99 @@ Use captured replay where it is faithful, adapters where the suite depends
 on process-local test machinery, and an explicit uncovered ledger everywhere
 else. Do not admit a production artifact into `RAILS_ENV=test` to get hits.
 
+## Passive form v1 review gates
+
+Untimed review on base
+[`7f9f97c`](https://github.com/thomasklemm/lowrail/commit/7f9f97c19e13be2ab047d83e5fda8768cc112147)
+plus the passive-form change, fresh native binary and fresh artifacts. This
+does not rescore any historical cohort. The form-only artifact contains one
+facts-free unit, **zero delivered files/templates**: it selects neither of
+the known all-sealed Template/Preloader seams below.
+
+| Approved gate | Observed result |
+|---|---|
+| Passive/symmetric observation | With `LOWRAIL_SEALED=1` in both arms, the effective `form_with` owner is `Lowrail::FormScaffold::Variant`, with identical instance-method source location, full inherited view/helper chains and seam loaded features. Every natural entry is captured by the same untimed targeted observer, including active entries. No ancestry filtering. |
+| Cold behavior | Isolated form, link and empty default: zero differences in complete Object/Kernel/BasicObject/certificate-holder/view ancestry, before and after requests. Boot SQL is **0 in every arm**; no extra app hook execution, API load or objspace require. Exact source-pinned seed-0 off/off/on comparison of index, original show and natural repeat show: form/link `equivalent_for_executed_scenarios`; default `unexercised`, not optimized coverage. |
+| Concurrent publication | Eight first renders, forced to overlap the one witness: exact off/on status/all headers/body; **0 hits before publication and across all eight**, then one hit on the ninth. Attempts=1; no second witness. |
+| Failed/bounded admission | Corrupt native method metadata: three requests still return original 200/forms, zero hits, the same terminal state and attempts=1. A second public setup cannot reset the budget. |
+| Existing observable controls | **192+192** ordinary/header-writing-subscriber pairs agree exactly in status/body/all headers, SQL, captured events and assigns; **104 form hits/0 fallbacks each**. Historical pre-correction 105 → correction 0 → passive 104; one request is now original admission, not a lost optimized result hidden as a hit. |
+| Actual holder | Published native `exact_class?` only; exact binary/method certificate, no objspace or weaker reflection fallback. |
+
+Blog C's original two-GET cold slice has **index/show form 0/0 hits**. Admission
+completes during that original show; a third, naturally repeated show records
+**one hit, zero fallbacks**, with exact off/off/on recorded fields. Link-only
+has **5/2/2 hits**, zero fallbacks. The one-time form witness took **0.109717 s**
+in this untimed, contended diagnostic run, recorded separately from all per-hit
+prices; it is not a benchmark or a warm-request cost estimate.
+
+Every real-app pending/refusal reached in these probes:
+
+- Blog's fresh passive artifact: `pending first natural certified form; this
+  request runs original` → active on its one witness; no terminal refusal or
+  input fallback in the executed scenarios.
+- PingCRM production inventory: `eager-loaded targets required; keep lazy
+  applications original` **at build**, no passive runtime unit/admission.
+  Do not eager-load the app to turn this into coverage.
+- Wikino is absent from this orb, so no claim or invented probe.
+- The changed-native-metadata terminal reason is an intentional negative
+  control on the real blog, not a naturally occurring app defect:
+  **`actual-holder primitive changed; rebuild; terminal admission, attempts=1/1`**.
+
+That exact terminal string appears in recorded `stats.unit_refusals` on
+`lowrail explain`, `lowrail doctor` and actual MCP `explain_unit` stdio output.
+Each is bound to the current manifest in the retained negative-control report;
+none executes admission. Doctor's production boot and ordinary 21-test
+baseline succeed. Static build eligibility, historical refusals, current
+pending/active state and request hits remain separate concepts.
+
+Retained private evidence: `.lowrail/private/passive-form-review-2/`, including
+`isolated-summary.json`, all off/off/on workers/artifacts, `terminal.json`,
+`terminal-explain.json`, `terminal-doctor.{json,log}`, `terminal-mcp.jsonl`.
+Fresh form/link/default manifest SHA-256 respectively:
+`e88bb98cf769ff3c77cfc66a3dd444a28bb49c52db52d32faaec441a1d753339`,
+`d7b02e4502e0fcd677092712b5f7dc180ee4556b2a3ac5869ca88c101caf8888`,
+`a5ae24ba6080652b8c4b07ec358f8844f70608b48687256069410de418532f92`.
+The initial active-repeat development check rejected only its incomplete
+seam recorder (off captured two entries, on one); that evidence remains in
+`passive-form-review-1`. The corrected observer records both original and
+active entries without wrapping the method or suppressing chain differences.
+
+The all-sealed raw run still reports `rejected_off_control`; seeds 0 and 1
+still reject `cold_witness` for the known Template/Preloader ancestry failures.
+The full-chain test remains red, not weakened or skipped. These older seams
+are a separate follow-up after the combined cohort, as scoped. No pricing,
+production promotion or whole-app support claim follows from these gates.
+
+The full strict Ruby 4.0.7 suite (`rake test TESTOPTS='--verbose --seed=1729'`,
+with the canonical corpus and Rails checkout) completed **168 tests / 5,822
+assertions: one failure, zero errors or skips**. The named failure is
+`BlogProductionTest#test_cold_sealed_admission_does_not_prepare_the_app`, at
+the complete off/on cold-witness equality assertion, for those same all-sealed
+Template/Preloader differences. All other tests pass; this is not a green
+full-suite result. The combined pricing artifact must independently pass its
+full-ancestry off/off/on gate, selecting neither asymmetric seam, before any
+counter run. The form-only result does not certify a larger combination.
+
+After rebasing onto the newer advisory-types/freeze documentation main,
+the affected form/guard/facts/manifest subset passes **24 tests / 281 assertions,
+zero skips**, and `cargo test --locked` passes **39 + 1 + 8 tests**. These
+post-rebase checks supplement, not silently replace, the broad run above.
+
+Ruby 4.1-preview1 broad coverage is **not green**: after installing the app-test
+gems once and booting the documented source Nokogiri/FFI/SQLite blog overlay,
+the same broad command completed **168 tests / 6,076 assertions, four failures,
+zero errors, six skips**. `RailsSuiteReportTest#test_profiling_preserves_backtrace_cleaner_results`
+is uncovered: the frozen Rails component bundle could not be prepared because
+its lock omits `x86_64-linux`; the existing dependency lock was not redesigned.
+Both `RSpecReporterTest` cases and
+`MemoTest#test_public_inertia_vite_version_keeps_its_own_file_and_time_semantics`
+also fail; no claim is made that these are caused by passive admission.
+Three skips name the 4.0.7-only blog cold/link/form fixtures; the other three
+name unavailable preview corpus paths for blog observation and blog/Campfire
+materialization. The separate preview guard/native subset passes **18 tests /
+303 assertions**. These limitations remain explicit and do not certify preview
+form support or replace the primary interpreter gates.
+
 ## Full ancestry census
 
 The cold observer now records **complete inherited ancestry**, without
@@ -66,6 +159,10 @@ Private retained workers/artifacts: `.lowrail/private/hook-census-1/`;
 
 ## Current runtime: passive admission or explicit refusal
 
+This section records the original readiness correction and old-certificate
+policy. Passive-v1 above supersedes its form-activation status; the cold bug,
+coverage losses and historical rejection evidence below are retained.
+
 The cold findings below exposed a correctness bug, not a fair-comparison
 artifact. Runtime `Sealed.activate` used `Materialize.run`: on performed **81
 boot SQL reads** (primary 15, cache 6, queue 54, cable 6), repeated eager-load
@@ -80,12 +177,12 @@ hooks or constructs that cache. The existing request entry can retry after
 the **app itself** supplies prerequisites; all source/body/visibility/delivery/
 literal-state guards still apply. A missing prerequisite is a visible refusal.
 
-The current form certificate has no passive equivalent for its synthetic
-probes. It is therefore **not activatable in production**, even after a
-natural form render. `FormScaffold.activate` and runtime inventory checks
-refuse with: **"form certification requires runtime controller/view/I18n/ERB
+The then-current form certificate had no passive equivalent for its synthetic
+probes. It was therefore **not activatable in production**, even after a
+natural form render. That `FormScaffold.activate` and runtime inventory check
+refused with: **"form certification requires runtime controller/view/I18n/ERB
 effects; passive activation unavailable; keep original"**. No helper variant
-is installed. A form's intentional 0 hits / 0 fallbacks is a **coverage
+was installed. A form's intentional 0 hits / 0 fallbacks is a **coverage
 rejection**, not an activation or support claim. Build eligibility and its
 renamed-app/custom-builder tests remain intact; this is not a weakened audit.
 

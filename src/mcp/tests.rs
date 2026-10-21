@@ -204,7 +204,7 @@ fn explanation_round_trip_preserves_certificates_refusals_and_counter_provenance
     assert_eq!(value["units"][0]["counts"], json!({"hits":17,"fallbacks":3}));
     assert_eq!(value["units"][0]["certificates"]["data"]["inventory"]["audited"], "retained");
     assert_eq!(value["units"][0]["activation_refusal"]["code"], "effectful_form_certification");
-    assert!(value["units"][0]["activation_refusal"]["detail"].as_str().unwrap().contains("controller/view/I18n/ERB effects"));
+    assert!(value["units"][0]["activation_refusal"]["detail"].as_str().unwrap().contains("old effectful form certificate"));
     assert!(typed.render().contains("current runtime policy refuses [effectful_form_certification]"));
     assert!(typed.render().contains("Hook dependency: none for this unit"));
     assert_eq!(value["sites"].as_array().unwrap().len(), 1, "neighboring refusal/warning must not inherit counters");
@@ -249,6 +249,11 @@ fn explanation_round_trip_preserves_certificates_refusals_and_counter_provenance
     assert_eq!(unbound["stats"]["unit_hits"]["18"], 29);
     assert_eq!(unbound["stats"]["unit_refusals"]["18"], json!(["passive activation unavailable"]));
     assert_eq!(unbound["units"][0]["counts"], Value::Null, "unbound raw counts stay visible, not attributed to this artifact");
+    manifest["units"][0]["data"]["passive"] = json!({"version":1});
+    std::fs::write(artifact.join("manifest.json"), manifest.to_string()).unwrap();
+    let passive = data.call("explain_unit", &json!({"id":18,"stats":".lowrail/stats.json.123"})).unwrap();
+    assert_eq!(passive["units"][0]["activation_refusal"], Value::Null, "eligibility is not a live activation claim");
+    assert_eq!(passive["stats"]["unit_refusals"]["18"], json!(["passive activation unavailable"]), "keep observed terminal refusals visible");
     // A compiler-dropped unit leaves its successful ledger row intact, but
     // cannot be reported as delivered or assigned old unit counters.
     manifest["units"] = json!([]);

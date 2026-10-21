@@ -1,12 +1,60 @@
 # Sealed new-comment form scaffold
 
-**Current runtime status: refused, pending passive activation.** The build-time
-certificate/audit remains, but reproducing its controller/view/I18n/ERB probes
-inside the app changes cold behavior. Current production runtime refuses with
-that explicit reason and installs no form variant. The accepted measurements
-below belong to their pinned historical runtimes; they are **not rescored or
-deleted**, and are not a claim that today's artifact can activate. See the
-[cold witness and coverage losses](../sealed-verification.md#current-runtime-passive-admission-or-explicit-refusal).
+**Current runtime: passive-v1 natural admission; not yet priced.** The first
+natural certified form is wholly original. Its completed render supplies the
+read-only witness; only a later entry may specialize. Old effectful
+certificates still refuse. The guarded default, quarantine, and per-hit form
+input/epoch/actual-holder checks are unchanged. The accepted measurements
+below remain pinned historical prices, **not prices of this admission path**.
+See the [review gates and coverage](../sealed-verification.md#passive-form-v1-review-gates).
+
+## Passive form v1
+
+Build time retains the synthetic stock audit, and separately records the
+compiled original form block, pure class-attribute readers, literal translation
+and polymorphic caches, source digests and native method/binary identity.
+Runtime does not repeat the audit. It reads only app-populated state after a
+successful natural form render: the controller's cached view class, generated
+model/schema caches, already-initialized I18n state, route/config tables and
+the original block's ISeq. The audited stock `_routes` getter reads an ivar or
+its captured RouteSet; it does not construct one. Missing or changed facts
+refuse; they never authorize require/autoload, compilation, SQL, view/model
+construction, hook replay or weaker actual-holder introspection.
+
+`Lowrail::Native.exact_class?(object, expected)` is mandatory. There is no
+objspace fallback. The whole loaded native binary and C method metadata are
+certified. Different Ruby/native/source/JIT builds need a fresh certificate.
+Generated template method labels alone are process-local; the block signature
+replaces only that label, retaining instructions, operands, locals, catches,
+line events and source paths. This is not arbitrary compiled-body normalization.
+
+The observer is installed via the existing natural Action View load boundary
+with explicit `LOWRAIL_SEALED=1`, **including LOWRAIL=0**. Both arms load the
+same seam files and inherit the same `FormScaffold::Variant`; off never
+configures admission or enables its fast path. Default/guarded setup is not
+changed. The cold witness records bound method owner, instance-method source,
+full inherited ancestry and seam loaded features, not just direct ancestors.
+
+Admission has **one witness attempt per process**, guarded by `Mutex#try_lock`.
+Concurrent entries choose original before publication; `@active` is published
+last, only after every check and the seal-epoch check. A failed attempt is
+terminal; another setup refuses rather than resetting the budget. Pending
+noncertified forms do not run the witness. Runtime state exposes attempts and
+the successful one-time wall duration; that diagnostic cost is not per-hit
+pricing. Explain/doctor/MCP read recorded pending/refused reasons without
+executing a witness. Terminal messages include the exhausted attempt budget.
+
+The eight-thread witness holds admission while seven other first renders
+finish: all eight remain original, with zero prepublication hits; the ninth
+gets one hit. Both 192-pair controls (ordinary and header-writing subscriber)
+retain byte-identical responses, every header, SQL, events and assigns, with
+**104 hits and zero form fallbacks each**: the historical 105th hit is now the
+original admission render. The blog C cold show remains zero, then a natural
+repeat gets one. These are bounded behavioral checks, not a whole-app support
+claim. Known all-sealed Template/Preloader ancestry differences remain red;
+the isolated form artifact selects neither seam. No filter flattening is
+included. Token/collection micros below remain measurement specimens, not
+silently added production stages or additive request savings.
 
 ## Separate collection, token and filter prices (2026-10-21)
 
@@ -67,8 +115,8 @@ with `RAILS_ENV=production LOWRAIL=0 BENCH_JIT=0 BENCH_ROUNDS=6
 BENCH_SEED=41231 BENCH_JOBS=3` and the pinned Valgrind on PATH/CPATH.
 These measurement-only specimens are not production installers.
 
-Current production form activation remains refused. The next priced target,
-**only after passive-admission review gates pass and a new allocation**, is
+Old effectful form certificates remain refused. The next priced target,
+**only after passive-admission review gates are reported and a new allocation**, is
 one whole-request interpreter show cohort with form, token and collection
 active together. Only that run can establish their actual combined price;
 neither a sum nor an inferred request percentage is credited here.

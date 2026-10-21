@@ -126,9 +126,9 @@ pub fn read(app: &Path, dir: Option<&Path>, stats: Option<&Path>, id: Option<u64
             certificates: u.as_object().ok_or("unit must be an object")?.iter()
                 .filter(|(k, _)| !["id", "pass", "target", "file", "kind", "sites", "facts"].contains(&k.as_str()))
                 .map(|(k, v)| (k.clone(), v.clone())).collect(),
-            guards: guards(u, &manifest), activation_refusal: (name == "sealed/form_scaffold").then(|| Reason {
+            guards: guards(u, &manifest), activation_refusal: (name == "sealed/form_scaffold" && u["data"]["passive"]["version"] != 1).then(|| Reason {
                 code: "effectful_form_certification".into(),
-                detail: "form certification requires runtime controller/view/I18n/ERB effects; passive activation unavailable; keep original".into(),
+                detail: "old effectful form certificate; rebuild for passive admission; keep original".into(),
             }), counts });
     }
     let mut sites = Vec::new();
@@ -261,11 +261,11 @@ fn guards(unit: &Value, manifest: &Value) -> Vec<Guard> {
     }
     if unit["pass"] == "sealed/form_scaffold" {
         for (phase, requirement) in [
-            ("activation", "FormScaffold.activate: currently refuses; build-time inventory is retained, never replayed in the application"),
-            ("call", "Dormant candidate FormScaffold.valid?: main Ractor, active variant, seal epoch zero; original model/options/block site, exact view/model/builder/buffer holders, stock default form builder, English locale, persisted article and blank unpersisted error-free child; otherwise super. No variant is installed by the current runtime"),
+            ("activation", "Passive v1 certificate: first natural certified form runs original. One atomic read-only witness per process; concurrent prepublication calls run original, failed admission is terminal. No runtime Materialize, requires, schema probes, compiler or hook replay. LOWRAIL=0 has the identical observation seam; recorded unit_refusals are historical pending/refused reasons, not a live admission check"),
+            ("call", "FormScaffold.valid?: main Ractor, published admission, seal epoch zero; original model/options/block site, native exact view/model/builder/buffer holders, stock default form builder, English locale, persisted article and blank unpersisted error-free child; otherwise super"),
         ] { result.push(Guard { phase: phase.into(), requirement: requirement.into() }); }
     } else if unit["pass"] == "sealed/link_to" {
-        result.push(Guard { phase: "activation".into(), requirement: "Sealed.activate: objspace primitive, helper dependencies and cached controller view class must already exist; no runtime Materialize, require or view-class construction. Retry at natural request entry; exact source/body/visibility/delivery/literal-table guards remain".into() });
+        result.push(Guard { phase: "activation".into(), requirement: "Sealed.activate: certified Native.exact_class? primitive, helper dependencies and cached controller view class must already exist; no runtime Materialize, require or view-class construction. Retry at natural request entry; exact source/body/visibility/delivery/literal-table guards remain".into() });
     } else if unit.as_object().is_some_and(|o| o.keys().any(|k| !["id", "kind", "pass", "target", "file", "sites", "facts"].contains(&k.as_str()))) {
         result.push(Guard { phase: "activation".into(), requirement: "Pass-specific runtime certificate and input checks apply; complete recorded payloads are in certificates, not advisory inferred types".into() });
     }

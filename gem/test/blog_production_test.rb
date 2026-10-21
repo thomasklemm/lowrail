@@ -33,6 +33,11 @@ class BlogProductionTest < Minitest::Test
           # must not add an off/on chain difference; compare like stages.
           assert_equal baseline.fetch("cold_witness").fetch("after_requests"), after
           assert_equal features.slice("api_loaded", "objspace"), after.slice("api_loaded", "objspace")
+          assert_equal "Lowrail::FormScaffold::Variant", features.fetch("form_seam").fetch("owner")
+          seams = record.fetch("cold_witness").fetch("natural_form_seams")
+          assert_equal 1, seams.size
+          assert_equal "Lowrail::FormScaffold::Variant", seams.first.fetch("bound_owner")
+          assert_equal features.fetch("form_seam").fetch("source_location"), seams.first.fetch("instance_source_location")
           assert_equal %w[early_controller early_eager late_eager late_controller].sort,
             record.fetch("cold_witness").fetch("callbacks").map(&:first).sort
           assert_equal [14, 2], record.fetch("scenarios").map { _1.fetch("sql").size }
@@ -44,14 +49,16 @@ class BlogProductionTest < Minitest::Test
         end
         on = records.last
         assert_nil on.fetch("refusals").fetch("Lowrail::Sealed")
-        refute_nil on.fetch("refusals").fetch("Lowrail::FormScaffold")
+        assert_nil on.fetch("refusals").fetch("Lowrail::FormScaffold")
         form = report.fetch("units").find { _1.fetch("pass") == "sealed/form_scaffold" }
         link = report.fetch("units").find { _1.fetch("pass") == "sealed/link_to" }
         refute_nil form, "build-time form certification remains intact"
         refute_nil link
         form_id, link_id = [form, link].map { _1.fetch("id").to_s }
+        # The first natural show is still original. This cold slice alone is
+        # not fast-path coverage; the 192-pair and threaded witnesses cover it.
         assert on.fetch("scenarios").all? { _1.fetch("hits").fetch(form_id, 0).zero? && _1.fetch("fallbacks").fetch(form_id, 0).zero? }
-        refute_empty on.fetch("unit_refusals").fetch(form_id)
+        refute on.fetch("unit_refusals").key?(form_id)
         assert_equal [5, 2], on.fetch("scenarios").map { _1.fetch("hits").fetch(link_id, 0) }
         assert on.fetch("scenarios").all? { _1.fetch("fallbacks").fetch(link_id, 0).zero? }
         refute on.fetch("unit_refusals").key?(link_id)
