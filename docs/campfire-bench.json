@@ -1,7 +1,7 @@
 {
   "format": "lowrail-campfire-discovery-v1",
   "date": "2026-10-21",
-  "status": "blocked_before_pricing",
+  "status": "conditionally_preapproved_blocked_cold_companions",
   "timing_cohort_run": false,
   "callgrind_run": false,
   "runtime_changes": true,
@@ -6364,6 +6364,90 @@
       "prism-retained-after-fixed-cli/artifact.json": "9434a2c4aa9670b5a2a6d904b332ba037a8ed5cbf19ee93b5b1a12d463c0cab2",
       "prism-retained-before-native/census.json": "5013c958afd27b8c8fbdfaeffbbb9a561469c6774a068e3be5ab8e8778ddc7d5",
       "prism-retained-after-fixed-cli/census.json": "9e893ebf6e186fb50aca7b912cbb30d54770ceb5cb5df7db0a25de28833824d2"
+    }
+  },
+  "browser_and_cold_follow_up": {
+    "base_sha": "2f749c13256ef8876f6065a1173d62969328e76c",
+    "status": "negative_results_published_before_one_authorized_rule_rerun",
+    "browser": {
+      "test": "SendingMessagesTest#test_sending_messages_between_two_users",
+      "seed": 41231,
+      "serial": true,
+      "fixed_pairs": 6,
+      "processes": 12,
+      "tests_per_process": 1,
+      "assertions_per_process": 9,
+      "classification": "named_test_other_thread_nondeterminism_accepted_by_coordinator",
+      "zero_hit_lowrail_effect_attributed": false,
+      "own_digest_all_runs": "7f5b7ea6640de35d66da2155e7a5d4a319b12d93116f4c89355a84dc9bc04902",
+      "loads_sha256_all_runs": "d610cc4c893d1156c9c90b8b38fe3d7d14065e13deceede23210aa7c3e0db112",
+      "hits_all_runs": 0,
+      "off_off": [
+        {"own": [3, 3], "other": [499, 502], "total": [502, 505]},
+        {"own": [3, 3], "other": [499, 502], "total": [502, 505]},
+        {"own": [3, 3], "other": [499, 499], "total": [502, 502]}
+      ],
+      "off_on": [
+        {"own": [3, 3], "other": [502, 502], "total": [505, 505]},
+        {"own": [3, 3], "other": [502, 502], "total": [505, 505]},
+        {"own": [3, 3], "other": [499, 502], "total": [502, 505]}
+      ],
+      "retries": 0,
+      "original_strict_rejection_retained": true,
+      "sql_trace_contract": "existing normalized lines, own ordered and other sorted; own+other counts exact; no verifier changes"
+    },
+    "negative_companions": {
+      "command_exit": 2,
+      "pass": false,
+      "groups": ["raw", "companion-0", "companion-1"],
+      "workers_per_group": ["off_a", "off_b", "on"],
+      "routes": ["GET /session/new", "POST /session", "GET /rooms/486777696"],
+      "response_statuses": [200, 302, 200],
+      "companion_seeds": [0, 1],
+      "companion_exact_fields_off_off_on": ["all HTTP status/header/body bytes", "SQLite schema/all rows", "load snapshots", "observed events", "ancestry", "declared entropy traces", "captured SQL events with explicit unavailable-bind markers"],
+      "raw_http_rejections": ["CSRF meta", "hidden authenticity tokens", "ETag", "Set-Cookie", "X-Runtime", "session timestamps/token"],
+      "raw_body_remainder_bytes_equal": true,
+      "raw_responses_rewritten_or_filtered": false,
+      "sql_events_per_worker": 153,
+      "cached_lazy_bind_gaps_per_worker": 10,
+      "lazy_binds_evaluated_or_recast": false,
+      "redis_keys": 42,
+      "companion_redis_names_and_values_equal": true,
+      "companion_redis_expiry_difference": "rate-limit:sessions: expires_at_ms",
+      "companion_other_redis_expiries_equal": 41,
+      "on_only_features": ["gem/lib/lowrail/ar_shadow.rb", "gem/lib/lowrail/ar_instantiate.rb", "gem/lib/lowrail/ar_guard.rb"],
+      "first_command_filters_lowrail_features": false,
+      "no_other_feature_difference": true,
+      "completion": {"all_workers": "completed", "resque_queues": {}, "web_push_scheduled_completed_queued_threads": 0, "cable": "not_started", "reported_errors": []},
+      "completed_and_exit_effects_equal_within_each_worker": true,
+      "on_login_plus_cold_room_hits": 103,
+      "warm_hit_claim_changed": false,
+      "undeclared_entropy_corrected_final": 0,
+      "development_failures_retained": ["relative worker path v1", "copied stdlib OpenSSL path versus loaded app-bundle OpenSSL 3.3.0 v2"],
+      "gates_rejected": ["Redis absolute expiry off/off", "three Lowrail-only features off/on", "cached lazy-Proc bind coverage unavailable"]
+    },
+    "coordinator_next_decision": {
+      "one_companion_rerun_authorized": true,
+      "not_yet_run_with_new_rules": true,
+      "redis_absolute_expiry": "named accepted off/off rejection; retain comparing/reporting it; no clock interposer",
+      "features": "reuse exactly existing blog Lowrail-own feature rule, with path/content hashes and excluded-file list; all other features/order/loads exact",
+      "cached_binds": "named uncovered binds_unavailable gap; SQL text/cache flags retained, Proc never evaluated",
+      "publish_negative_results_first": true,
+      "cohort": "campfire-r81-room-instantiate-v1 preapproved only after rule-rerun passes and Fizzy N10 slot release",
+      "runtime_or_app_changes_authorized": false
+    },
+    "native_yjit_exploration": {"harness_on_main_at_check": false, "checked_main_sha": "2f749c13256ef8876f6065a1173d62969328e76c", "run": false, "price": false},
+    "timing_cohort_run": false,
+    "callgrind_run": false,
+    "harness_sha256": {
+      "bench/experiments/campfire_room_companion.rb": "1bd967d82fc6c4331cbbf87e81d5af1b6ebbb3b5076a0d03c154cba525dd9bd7",
+      "fixtures/corpus/campfire-entropy-controls.json": "e6a9d27dc4b1befc59f6e913044e8352bbc088da474cbec24a11036eda1b9122"
+    },
+    "private_receipt_sha256": {
+      "campfire-r81-browser-sql-fixed/protocol.json": "ed9ebd55c1a9d76501d5b94e5822f44446c9fbc8737ade8d86b27d204815caa4",
+      "campfire-r81-browser-sql-fixed/results.json": "e29118129bbcdc874658835e94479950aef8f951fa477080e3b14044498d81cb",
+      "campfire-r81-room-companions-final/summary.json": "e12a82b8324d904bff3d59c314cc1463eaf3cddf3f7c63dfa1036a0248753413",
+      "campfire-r81-room-companions-final/classification.json": "da95abca6eb033e41208f82b37d07d6c06051c3f86b8d7fe14389c450d1a24cb"
     }
   }
 }

@@ -12,11 +12,14 @@ and complete verifier receipts remain private under `.lowrail/private/`.
 sealed artifact completing **52 of 54 reachable rows per warm room request**.
 N=10 fixed-heap preflight passes off/on in both phase orders. The non-system
 suite is green off/on with the production artifact refusing in test. Browser
-outcomes pass, but strict verification rejects a query-count difference;
-raw cold HTTP identity also rejects entropy. **Pricing remains unapproved and
-blocked.** Sections 1–9 retain the initial discovery/failed prerequisites;
+outcomes pass; the fixed browser diagnostic classifies the query-count
+rejection as test/other-thread nondeterminism. Raw cold HTTP identity rejects
+entropy. The first complete companions also reject Redis expiry, internal
+features and unavailable cached binds. **Pricing is conditionally pre-approved
+but remains blocked and unrun.** Sections 1–9 retain the initial discovery/failed prerequisites;
 [§10](#10-authorized-prerequisite-follow-up) supersedes their zero-hit/build/heap
-status without discarding the original failures.
+status without discarding the original failures; §11 records the bounded
+diagnostic and first negative companion results.
 
 ## 1. Which requests do public benchmarks exercise?
 
@@ -480,12 +483,100 @@ placement, brk512, exact-page, A/A ±0.5% interval and all rejected-round gates
 from the accepted blog protocol. Price only live sealed AR instantiation,
 including its guards; no preload/helper/endpoint unit or cache-policy change.
 
-**Not ready to execute.** The coordinator must first decide the bounded next
-diagnostic for the browser SQL rejection and the full cold entropy/exit/load
-companion gates. Existing raw rejections are not approvals. Once those gates
-pass, seek explicit approval for exactly this one cohort, **after Fizzy's
-approved N=10 cohort releases the slot**. No speed estimate is inferred from
+**Not ready to execute.** The coordinator subsequently pre-approved exactly
+this cohort, conditional on the browser classification, cold companions, and
+**Fizzy's approved N=10 cohort releasing the slot**. The first cold companions
+fail (§11), so no cohort starts. No speed estimate is inferred from
 52 hits or the blog's −15.23%. No further runtime change is authorized here.
+
+## 11. Fixed browser diagnostic and negative cold companions
+
+The coordinator authorized exactly three off/off and three off/on pairs of
+`SendingMessagesTest#test_sending_messages_between_two_users`, serial, seed
+41231. No verifier retries or other browser tests run in this diagnostic.
+Each of the twelve fresh processes passes **1 test / 9 assertions**, zero
+hits; the production artifact refuses in test. Full normalized query lines
+are retained privately with `LOWRAIL_SQL_TRACE=full`.
+
+| Pair | Arms | Own queries A / B | Other-thread A / B | Total A / B |
+|---|---|---:|---:|---:|
+| 1 | off/off | 3 / 3 | 499 / 502 | 502 / 505 |
+| 2 | off/off | 3 / 3 | 499 / 502 | 502 / 505 |
+| 3 | off/off | 3 / 3 | 499 / 499 | 502 / 502 |
+| 4 | off/on | 3 / 3 | 502 / 502 | 505 / 505 |
+| 5 | off/on | 3 / 3 | 502 / 502 | 505 / 505 |
+| 6 | off/on | 3 / 3 | 499 / 502 | 502 / 505 |
+
+Every own-thread digest is the prior `7f5b7ea6…`; every complete load snapshot
+has digest `d610cc4c…`. Other-thread digests also vary between off workers.
+The coordinator accepts **named test/other-thread nondeterminism**, not an
+attributed zero-hit Lowrail effect. The original strict rejection remains in
+the ledger; no comparator, test, app code or query-count gate was changed.
+
+`campfire_room_companion.rb` adds separate raw and declared seed-0/seed-1
+off/off/on workers for the natural sign-in GET/POST and one room GET. It
+reuses the blog's entropy machinery, byte/encoding-preserving values and
+notification projection. A new pinned policy covers this app/lock, the loaded
+OpenSSL 3.3.0 (not the stdlib lookalike), and Ruby 4's base58 session-token
+`gen_random` path. Unknown entropy refuses. All original body/header bytes
+and real clock observations survive in private receipts.
+
+**Negative result:** the companion command exits **2**, with `pass: false`.
+Both seeds have exactly matching full response bodies/headers (200/302/200),
+all SQLite schema/rows, observed events, load snapshots, ancestry and entropy
+traces in off/off/on. All 153 SQL event records agree, but ten cached events
+per worker have unevaluated lazy-Proc binds: agreement of the uncovered marker
+is **not** coverage of those bind values. Login plus cold room completes 103
+hits on; that is not the warm room's 52-hit priced map.
+
+The remaining differences/gaps are retained, not converted to success:
+
+1. Redis has the same **42 key names and values**, but the absolute expiry of
+   `rate-limit:sessions` differs **already off/off**. The other 41 expiries
+   agree. Completed and post-process-exit states match within each worker.
+2. Full feature lists differ on by `lowrail/ar_shadow.rb`,
+   `lowrail/ar_instantiate.rb`, `lowrail/ar_guard.rb`, in that order. No other
+   feature differs. This first command compares **all** features, stricter
+   than the blog's existing Lowrail-internal feature exclusion; it does not
+   silently apply that exclusion or suppress the three files.
+3. All ten lazy cached bind-value gaps remain errors; the SQL text, cache
+   flags and remaining fields are retained. No Proc is called or bind recast.
+
+Completion is a bounded no-work certificate for this GET/login worker:
+Resque queues empty, both WebPush executors have zero scheduled/completed
+tasks, queue entries and threads, Cable listener/worker/event loop unstarted,
+and no `Rails.error` reports. No thread kill, fabricated job execution or
+cache clear occurs between requests. Redis is restored only between fresh
+workers, as before. Raw HTTP remains rejected at named CSRF/token/cookie/
+ETag/runtime/session-clock fields; all body byte chunks **outside** the named
+CSRF values agree. That diagnostic never rewrites a response or clears a raw
+rejection. Raw Redis fragment values also retain their clock differences.
+
+Retained harness-development failures: v1 used a relative worker path after
+changing working directory; v2's copied cookie-IV policy named the stdlib
+OpenSSL path while the app actually loaded the identically hashed gem file.
+The corrected final policy has **zero undeclared entropy** but still fails
+the three gates above. No cohort is run or retried.
+
+The coordinator accepts the browser classification and next authorizes one
+companion rerun: retain Redis expiry as a named accepted off/off rejection,
+reuse exactly the blog's Lowrail-own feature rule with path/content pins and
+an explicit excluded-file list, and retain lazy binds as a named uncovered
+gap. **These negative results are published before that rerun.** All other
+fields, non-Lowrail feature order, loads and DB values must still match;
+there is no Redis clock interposer or new runtime/default/quarantine change.
+Only if that rerun passes and Fizzy releases the slot may the pre-approved
+cohort start. Bet A's `script/native-bench` was absent from `origin/main` at
+the check for this negative report, so native YJIT exploration has not run.
+
+Reproduction (same dedicated Redis and fixture environment as below):
+
+```sh
+CAMPFIRE_DISPOSABLE_REDIS=1 BUNDLE_GEMFILE=/absolute/APP/Gemfile \
+  mise exec ruby@4.0.7 -- bundle exec ruby \
+  bench/experiments/campfire_room_companion.rb run APP SEED NEW_PRIVATE_OUTPUT
+# Exit 2 is an honest rejected gate, not an install or performance result.
+```
 
 ## Reproduction boundaries
 
