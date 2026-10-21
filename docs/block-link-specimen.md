@@ -502,3 +502,123 @@ workload. First-original acquisition/setup precedes the warm windows and
 is not a cold-start price. A/A, heap, mode and per-site mix gates remain
 mandatory; no retries/exclusions, YJIT cohort, production promotion or
 measurement approval follows from the accepted off/off rejection ledger.
+
+## One authorized interpreter cohort (2026-10-21)
+
+**Decision rule, before the result:** exact per-site mix, harness/input pins,
+interpreter mode, fixed heap/pages and brk checks are mandatory. Any mix
+deviation makes the cohort INVALID, not a different-priced workload. Both
+total and GC-excluded A/A 95% intervals must include zero and lie wholly
+within ±0.5%; either failure rejects the whole comparison. No retries,
+exclusions, replacement cohort or YJIT run.
+
+The coordinator authorized exactly one slot and one six-round cohort,
+seed 41231, N=0/50, arms off_a/off_b/on, using the clean detached published
+[`da5fe91`](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577)
+harness and unchanged Fizzy/Ruby/Rails pins above. Workers run
+sequentially. Each N=50 on window must complete exactly 1200 suffix hits:
+50 times the preregistered 23-site map (24 hits/19 identities per six GETs),
+including the four explicit zeros. N=0 and both off arms must add zero hits.
+The decision rule, full map, fixture and harness/tool/input hashes were
+written before counters started. The source-pinned brk512 build and real
+production allocation preflight pass.
+
+**INVALID: the mandatory fixed-heap gate already fails in both arms.**
+The run is finishing untouched for diagnostics; no delta can be accepted as
+a price or a direction claim. Pool0 grows beyond 611 pages and pool2 beyond 246
+in the completed workers. Full diagnostic export follows completion; no
+worker is excluded or replaced. Cold off/off/on remains RED. Accepted
+off/off rejections remain the nine cache-row `created_at` values and the
+historical order-sensitive SolidCache SQL interleaving. Payload/assigns,
+lazy cached-bind values and SolidCache completion remain uncovered. No
+completion adapter, serialization barrier, clock interposer or app patch
+is introduced by the pricing run.
+
+## Untimed heap preconditioning: prefer N=10 on the existing tool
+
+**No new Ir cohort has run or been approved.** The tracked
+[`fizzy_link_heap.rb`](../bench/experiments/fizzy_link_heap.rb) uses
+**Valgrind tool=none**, never starts an Ir cohort, and exports every window's
+pages and exact hit ledger. The [machine report](fizzy-link-heap.json) retains
+failed experiments as well as the final two phase-order pairs.
+
+The invalid precondition was treating init slots as a fixed capacity. Ruby
+4.0.7's
+[`heap_prepare`](https://github.com/ruby/ruby/blob/229531a6cfbf07e3caef30dbac24a2a3f3fed482/gc/default/default.c#L2061-L2088)
+grows toward the init floor, but can then consume global growth credits;
+sweep completion and lazy-sweep page claiming can add pages too. The shared
+preparer fills to declared pages and retains sparse anchors, but cannot turn
+the floor into a cap. Both off and on grow. A native trace of each added page
+was not captured; the report distinguishes those source mechanisms from the
+observed page/credit counters.
+
+Three untimed alternatives failed and remain recorded: four times observed
+capacity still grows in both arms; three extra minor collections still grow;
+an N=50 whole-window budget needs 988 MB of slots and hits the existing tool's
+`VG_N_SEGMENTS` host-map limit before a worker result. No larger-segment tool
+was built or used. Do not change the tool or use a failed run's delta.
+
+Instead budget the **entire N=10 window**, not its post-collection live heap.
+For each pool, take the maximum over the original untimed off worker's full
+windows of `start live slots + all allocations`, add 50% headroom, preserve
+the original floor and round upward to 10000 slots. Freeze this one policy
+before the revised on worker; never calibrate independently per arm. It is
+a finite observed-workload envelope, **not a Ruby hard heap cap or a universal
+allocation bound**; unchanged exact gates still refuse any later growth.
+
+| Pool / slot bytes | Off uncollected N=10 budget | Frozen init slots | Exact pages |
+|---|---:|---:|---:|
+| 0 / 40 | 2,226,770 | 3,350,000 | 2047 |
+| 1 / 80 | 196,392 | 300,000 | 367 |
+| 2 / 160 | 305,686 | 460,000 | 1128 |
+| 3 / 320 | 13,452 | 30,000 | 148 |
+| 4 / 640 | 7,166 | 20,000 | 199 |
+
+This reserves 254,000,000 slot bytes, about 242 MiB before metadata. A new
+untimed off/on pair passes. Fresh final off/on pairs in **both** shared-driver
+phase orders also pass every before/after page target, with **zero additions
+to any pool's `total_allocated_pages` inside all 16 windows**. Each full on
+window completes exactly 240 hits across 19 identities, including the same
+four explicit zero sites; N=0/off adds zero. The tool remains the published
+brk512 build: Callgrind binary SHA256
+`025bec186951cffc94b2ccb000c0edb53e48d594a56d25f16dc641eec26c0d36`.
+
+The worker harness remains the clean detached
+[`da5fe91`](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577).
+Only N and the identical process heap-init environment change. App source,
+config, fixture, guards/witness, natural sign-in, two-vector warmup, three full
+collections per window, settle vector and counter/estimator seams stay the
+same. No compaction, per-request collection, GC disabling or clock adapter.
+
+Reproduce untimed, using the same frozen corpus bundle and native extension:
+
+```sh
+# BUNDLE_GEMFILE=$APP/Gemfile; BUNDLE_FROZEN=true; Ruby 4.0.7.
+# PATH/CPATH select the existing pinned brk512 tool; every OUT must be new.
+ruby bench/experiments/fizzy_link_heap.rb baseline 10 \
+  "$APP" "$SEED" "$ARTIFACT" "$CONTEXTS" "$HITS" "$HARNESS" "$PIN" "$BASE"
+for phase in 0 1; do
+  BENCH_PHASE_ORDER=$phase ruby bench/experiments/fizzy_link_heap.rb verify 10 \
+    "$APP" "$SEED" "$ARTIFACT" "$CONTEXTS" "$HITS" "$HARNESS" "$PIN" \
+    "$OUT-$phase" "$BASE/result.json"
+done
+```
+
+Validation: Ruby 4.0.7 syntax passes; an independent report audit checks all
+four final workers / 16 windows, exact pages, zero additions, both window
+modes and the complete per-site maps. `CPATH="$TOOL/include" ruby
+bench/request_pairs_test.rb --verbose` passes 17 tests / 317 assertions,
+with two counter-dependent skips because this test shell does not put
+Valgrind on PATH. The actual heap probes above explicitly select the pinned
+Valgrind tool=none. No extra instruction workers were started by the tests.
+
+**Request only:** one new six-round interpreter cohort, seed 41231,
+N=0/10, off_a/off_b/on, one slot, the frozen floors above and the same tool.
+The exact on-window gate scales to 240, not 1200; its 23-site map and four zeros
+are unchanged. Both total/no-GC A/A 95% intervals must contain zero wholly
+within ±0.5%, with all pin/mode/brk/heap/mix gates; no retry, exclusions,
+YJIT or pooling with invalid N=50 data. No new cohort until explicit approval.
+Even an accepted result would only be a scoped warm bench comparison of
+these six GETs, not production admission or cold-start cost. Cold remains
+RED with the named timestamp/interleaving rejections above; payload/assigns,
+lazy cached-bind values and SolidCache completion remain uncovered.

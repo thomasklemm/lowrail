@@ -42,6 +42,30 @@ relaxation. `Prism.find` has 17 source-backed agreements but generated ERB
 and isolated Proc probes return nil: no witness adoption. Full inventory,
 limitations and machine evidence: [prism-2.md](prism-2.md).
 
+## Fizzy block links: invalid N=50, untimed N=10 proposal (2026-10-21)
+
+**Rule before numbers:** any pin/mode/brk/exact-page/mix violation invalidates
+the whole cohort; both total/no-GC A/A 95% intervals must contain zero wholly
+within ±0.5%. No exclusions or retry-to-green. The one authorized N=0/50
+cohort is **INVALID**: heap pages grow in both off and on. It finishes
+unchanged for diagnostic export, never a price or direction claim.
+
+Init slots are floors, not caps. Untimed off-only whole-window allocation
+budgeting with N=0/10 yields fixed init slots
+`3350000,300000,460000,30000,20000` (254 MB of slots). Fresh off/on workers in
+both phase orders retain exact pages and add none inside all 16 windows;
+full on windows have exactly 240 hits/19 identities with four explicit zeros.
+Same brk512 tool and detached worker harness; no app/config/GC-policy change
+or higher-segment tool. **One new interpreter cohort is requested, not
+approved or run.** No pooling with invalid N=50 data.
+
+Cold off/off/on remains **RED**. Accepted named off/off rejections: nine
+SolidCache `created_at` values and historical order-sensitive estimation SQL
+interleaving. Payload/assigns, lazy cached-bind values and SolidCache
+completion remain uncovered. No production admission or cold-start claim.
+[Protocol, failures and reproduction](block-link-specimen.md#untimed-heap-preconditioning-prefer-n10-on-the-existing-tool),
+[all untimed window evidence](fizzy-link-heap.json).
+
 ## First accepted whole-request price (2026-10-21)
 
 **Historical at ae025b0; the corrected-source re-price below supersedes it.**
