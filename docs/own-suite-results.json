@@ -1,0 +1,471 @@
+{
+  "format": 1,
+  "recorded_utc": "2026-10-21T12:58:45.800649+00:00",
+  "tested_revision": "74abb60fa1f24dff3618ccef70b21b91ac61fc08",
+  "environment": {
+    "ruby": "4.0.7",
+    "rails": "8.1.4",
+    "RAILS_ENV": "test",
+    "RUBY_YJIT_ENABLE": "1",
+    "MT_CPU": "1",
+    "PARALLEL_WORKERS": "1",
+    "seed": 41231,
+    "LOWRAIL_VERIFY_LOADS": false,
+    "sealed_verify_LOWRAIL_SEALED": "1",
+    "browser": "Chrome for Testing 155.0.8059.79; matching Selenium driver; --no-sandbox --disable-dev-shm-usage"
+  },
+  "scope": "Own-suite identity/outcome gate only. Default artifacts have zero units. Sealed production artifacts refuse in test; no active sealed equivalence claim. No new normalization, exclusions or measurement cohorts.",
+  "tree_hash_recipe": "SHA256 of sorted relative path + NUL + file bytes + NUL for every file. app_source_tree excludes generated assets/builds/ only.",
+  "result_cell": [
+    "result",
+    "failure_first_line_or_empty"
+  ],
+  "columns": [
+    "test_identity",
+    "native_plain",
+    "default_off",
+    "default_on",
+    "sealed_off",
+    "sealed_on"
+  ],
+  "apps": {
+    "blog": {
+      "source": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:scripts/create-blog; Rails 8.1.4; RealBlogR4",
+      "Gemfile.lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+      "test_tree_sha256": "7319d5ecb319a7dcb622f3b6e8d18ad7753460e0b1766174183ee6dbc1ddbed1",
+      "app_source_tree_sha256": "18e3bbfdc8d878773d90b116f90596b99f56bb5e569de061bf5b99e873b42d29",
+      "builds": {
+        "default": {
+          "manifest_sha256": "969250d24cd91d3095b98a7d02cbe0b4185a6b904d67e60bd6925c317ad7def3",
+          "rails_env": "test",
+          "tier": null,
+          "units": 0,
+          "passes": {}
+        },
+        "sealed": {
+          "manifest_sha256": "7a2cbed37db4027d16dfa431f0249221c1f74dcca63c97f4e7a0f2a95f924362",
+          "rails_env": "production",
+          "tier": "sealed-v1",
+          "units": 20,
+          "passes": {
+            "active_record/preload_plans": 1,
+            "active_record/instantiate": 17,
+            "sealed/link_to": 1,
+            "sealed/form_scaffold": 1
+          }
+        }
+      }
+    },
+    "fizzy": {
+      "source": "https://github.com/basecamp/fizzy@6f1d200316ec3bae91d32c557d88647300807ee9",
+      "Gemfile.lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+      "test_tree_sha256": "20dcb01fb1fcf34ae847c46372dcc95301faa2d2e13f9296358ac40ab2016444",
+      "app_source_tree_sha256": "044290853ff493e7c9627b0f4186ad2142bced73673c3c1a0b265df0e36b0b18",
+      "builds": {
+        "default": {
+          "manifest_sha256": "e4179b689a2a3e71412b9819775107ce17cef990901616226643be5d35039f29",
+          "rails_env": "test",
+          "tier": null,
+          "units": 0,
+          "passes": {}
+        },
+        "sealed": {
+          "manifest_sha256": "17494992340ed6d2c0131267a5ec12af8a5b400bea722d28834fb95db7494f5c",
+          "rails_env": "production",
+          "tier": "sealed-v1",
+          "units": 0,
+          "passes": {}
+        }
+      },
+      "dependency_overlay": {
+        "path": "fixtures/corpus/fizzy.patch",
+        "sha256": "78d3b143055f5157eb017584aba3b574fc753cb2610598235ec69d0aec4cdb08"
+      },
+      "system_tests": "No tests at this pin (test/system/.keep only); browser behavior uncovered."
+    }
+  },
+  "suites": [
+    {
+      "app": "blog",
+      "command": [
+        "bin/rails",
+        "test",
+        "--seed",
+        "41231"
+      ],
+      "native_plain_extra_flags": [
+        "--verbose"
+      ],
+      "native_plain_exit_status": 0,
+      "native_plain_console_log_sha256": "f4130c1b90392c0840aa9494a69374811f70725ed03cecc2a2eeb2475cb74e34",
+      "counts_each_arm": {
+        "pass": 21
+      },
+      "on_only_differences": [],
+      "pairs": {
+        "default": {
+          "verifier_exit_status": 0,
+          "console_log_sha256": "ea21e2f2bb0b5316d566b028e9a31ff55b67da84e04ef46633b314531e309e10",
+          "sql_queries_each": 125,
+          "raw_own_thread_sql_equal": true,
+          "arms": {
+            "off": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                null
+              ]
+            },
+            "on": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                null
+              ]
+            }
+          }
+        },
+        "sealed": {
+          "verifier_exit_status": 0,
+          "console_log_sha256": "44ebbbca13ab158e07a404998db5a86ebd8ac450a8908c674693599f2312103a",
+          "sql_queries_each": 125,
+          "raw_own_thread_sql_equal": true,
+          "arms": {
+            "off": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+              ]
+            },
+            "on": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+              ]
+            }
+          }
+        }
+      },
+      "tests": [
+        ["ArticleTest#test_creates_an_article_with_valid_attributes", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticleTest#test_destroys_comments_when_article_is_destroyed", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticleTest#test_validates_body_minimum_length", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticleTest#test_validates_title_presence", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_create_article", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_destroy_article", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_get_edit", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_get_index", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_get_new", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_not_create_article_with_invalid_params", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_not_update_article_with_invalid_params", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_show_article", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesControllerTest#test_should_update_article", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentTest#test_belongs_to_article_association", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentTest#test_creates_a_comment_on_an_article", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentTest#test_requires_body", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentTest#test_requires_commenter", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentTest#test_requires_valid_article", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentsControllerTest#test_should_create_comment", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentsControllerTest#test_should_destroy_comment", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentsControllerTest#test_should_not_create_comment_with_invalid_params", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]]
+      ]
+    },
+    {
+      "app": "blog",
+      "command": [
+        "bin/rails",
+        "test:system",
+        "--seed",
+        "41231"
+      ],
+      "native_plain_extra_flags": [
+        "--verbose"
+      ],
+      "native_plain_exit_status": 0,
+      "native_plain_console_log_sha256": "43b7fd43f1bf232cd1928a912d64c0324066ef21dc3d7494bda4b71411c9e3dc",
+      "counts_each_arm": {
+        "pass": 2
+      },
+      "on_only_differences": [],
+      "pairs": {
+        "default": {
+          "verifier_exit_status": 0,
+          "console_log_sha256": "d824599c50888d84287c5acc151f6d98d075f05a0cd9691315abb1279588346f",
+          "sql_queries_each": 55,
+          "raw_own_thread_sql_equal": true,
+          "arms": {
+            "off": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                null
+              ]
+            },
+            "on": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                null
+              ]
+            }
+          }
+        },
+        "sealed": {
+          "verifier_exit_status": 0,
+          "console_log_sha256": "ea66283f74ac52ce8e5c8a73f3f025236942abe63eb9488cb8e9434a6d2911ac",
+          "sql_queries_each": 55,
+          "raw_own_thread_sql_equal": true,
+          "arms": {
+            "off": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+              ]
+            },
+            "on": {
+              "exit_ok": true,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+              ]
+            }
+          }
+        }
+      },
+      "tests": [
+        ["ArticlesSystemTest#test_article_with_comments", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ArticlesSystemTest#test_full_article_lifecycle", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]]
+      ]
+    },
+    {
+      "app": "fizzy",
+      "command": [
+        "bin/rails",
+        "test",
+        "--seed",
+        "41231"
+      ],
+      "native_plain_extra_flags": [
+        "--verbose"
+      ],
+      "native_plain_exit_status": 1,
+      "native_plain_console_log_sha256": "18d461b203178a94519ce3fe99baf869ad8f2b6ff2dc6478a22321d316938194",
+      "counts_each_arm": {
+        "pass": 117,
+        "error": 7
+      },
+      "on_only_differences": [],
+      "pairs": {
+        "default": {
+          "verifier_exit_status": 0,
+          "console_log_sha256": "7ef5326cfc05187632d5397946d7ce3a6b9775c850bf9a24c51d18badddec683",
+          "sql_queries_each": 5322,
+          "raw_own_thread_sql_equal": true,
+          "arms": {
+            "off": {
+              "exit_ok": false,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                null
+              ]
+            },
+            "on": {
+              "exit_ok": false,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                null
+              ]
+            }
+          }
+        },
+        "sealed": {
+          "verifier_exit_status": 0,
+          "console_log_sha256": "a06647c07cad8777b1b2709325034d24296f643fd5b63cb999dc0f5fe3242800",
+          "sql_queries_each": 5322,
+          "raw_own_thread_sql_equal": true,
+          "arms": {
+            "off": {
+              "exit_ok": false,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+              ]
+            },
+            "on": {
+              "exit_ok": false,
+              "processes": 1,
+              "unit_hits": {},
+              "unit_fallbacks": {},
+              "unit_refusals": {},
+              "admission_refusals": [
+                "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
+              ]
+            }
+          }
+        }
+      },
+      "tests": [
+        ["Assignments::TogglesControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BoostsControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BoostsControllerTest#test_create_with_value", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::AssignableTest#test_assigning_a_user_makes_them_watch_the_bubble", ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"]],
+        ["Bubble::CommentableTest#test_creating_a_comment_on_a_bubble_makes_the_creator_watch_the_bubble", ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"]],
+        ["Bubble::MessagesTest#test_creating_a_bubble_does_not_create_a_message_by_default", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::MessagesTest#test_creating_a_bubble_with_an_initial_draft_comment", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::MessagesTest#test_omitting_the_draft_comment_does_not_remove_it", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::MessagesTest#test_setting_the_draft_comment_to_be_blank_removes_it", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::MessagesTest#test_updating_the_draft_comment", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::PoppableTest#test_auto_pop_all_due", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::PoppableTest#test_popped_scope", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::PoppableTest#test_popping", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::ScorableTest#test_a_bubble_has_a_score_that_increases_with_activity", ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"]],
+        ["Bubble::ScorableTest#test_commenting_on_a_bubble_boosts_its_score_more_than_boosting_it", ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"]],
+        ["Bubble::ScorableTest#test_recent_activity_counts_more_than_older_activity_in_the_ordering", ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"]],
+        ["Bubble::SearchableTest#test_a_search_with_no_valid_terms_returns_empty_results", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::SearchableTest#test_sanitizing_search_query", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::SearchableTest#test_searching_by_comment", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::SearchableTest#test_searching_by_title", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::StatusesTest#test_bubbles_are_only_visible_to_the_creator_when_drafted", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::StatusesTest#test_bubbles_are_visible_to_everyone_when_published", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::StatusesTest#test_bubbles_start_out_in_a_`creating`_state", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::StatusesTest#test_can_recover_abandoned_creation?", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::StatusesTest#test_recover_abandoned_creation", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::StatusesTest#test_remove_abandoned_creations", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::WatchableTest#test_bubbles_are_initially_watched_by_their_creator", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::WatchableTest#test_watched_by?", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::WatchableTest#test_watched_by?_when_subscribed_to_the_bucket", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubble::WatchableTest#test_watchers_and_subscribers", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_active", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_assigned_by", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_assigned_to", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_assignment_states", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_assignment_toggling", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_boosting", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_capturing_messages", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_in_bucket", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_mentioning", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_ordering_by_boosts", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_ordering_by_comments", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_popped", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_searchable_by_title", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_tag_toggling", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_tagged_states", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_tagged_with", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubbleTest#test_unassigned", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubbles::PopsControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubbles::PopsControllerTest#test_destroy", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubbles::PublishesControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubbles::WatchesControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Bubbles::WatchesControllerTest#test_destroy", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubblesControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubblesControllerTest#test_edit", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubblesControllerTest#test_filtered_index", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubblesControllerTest#test_index", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubblesControllerTest#test_show", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubblesControllerTest#test_update", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BubblesControllerTest#test_users_can_only_see_bubbles_in_buckets_they_have_access_to", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketTest#test_grants_access_to_everyone_after_creation", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketTest#test_grants_access_to_everyone_after_update", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketTest#test_revising_access", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Buckets::SubscriptionsControllerTest#test_subscribing_to_a_bucket", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Buckets::SubscriptionsControllerTest#test_unsubscribing_from_a_bucket", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketsControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketsControllerTest#test_destroy", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketsControllerTest#test_edit", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketsControllerTest#test_index", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketsControllerTest#test_new", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketsControllerTest#test_update", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["BucketsControllerTest#test_update_all_access", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentTest#test_first_by_author_on_bubble?", ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"]],
+        ["CommentTest#test_follows_comment_by_another_author?", ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"], ["error", "NoMethodError: undefined method 'reset_all' for an instance of Current"]],
+        ["CommentTest#test_searchable_by_body", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentTest#test_updating_bubble_counter", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Comments::ReactionsControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Comments::ReactionsControllerTest#test_destroy", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentsControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentsControllerTest#test_update", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["CommentsControllerTest#test_update_another_user's_comment", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["EventSummaryTest#test_body", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["EventsControllerTest#test_index", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["EventsControllerTest#test_index_with_a_specific_timezone", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["EventsControllerTest#test_only_displays_events_from_filtered_buckets", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_bubbles", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_cacheability", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_can't_see_bubbles_in_buckets_that_aren't_accessible", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_duplicate_filters_are_removed_after_a_resource_is_destroyed", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_params_without_a_key-value_pair", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_remembering_equivalent_filters", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_remembering_equivalent_filters_for_different_users", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_resource_removal", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_summary", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_terms", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FilterTest#test_turning_into_params", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FiltersControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FiltersControllerTest#test_destroy", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FirstRunsControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FirstRunsControllerTest#test_show", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["FirstRunsControllerTest#test_show_after_completion", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Notifications::MarkAllReadsControllerTest#test_show", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Notifications::TraysControllerTest#test_show", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["NotifierTest#test_creates_a_notification_for_each_watcher,_other_than_the_event_creator", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["NotifierTest#test_for_does_not_raise_an_error_when_the_event_is_not_notifiable", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["NotifierTest#test_for_returns_the_matching_notifier_class_for_the_event", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["NotifierTest#test_generate_does_not_create_notifications_if_the_event_was_system-generated", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["NotifierTest#test_links_to_the_bubble", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["QrCodeLinkTest#test_links_can_be_signed_and_verified", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["ReadingsControllerTest#test_index", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Sessions::TransfersControllerTest#test_show_renders_when_not_signed_in", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Sessions::TransfersControllerTest#test_update_establishes_a_session_when_the_code_is_valid", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["SessionsControllerTest#test_create_with_invalid_credentials", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["SessionsControllerTest#test_create_with_valid_credentials", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["SessionsControllerTest#test_destroy", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["SessionsControllerTest#test_new", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["SessionsControllerTest#test_new_enforces_browser_compatibility", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["Taggings::TogglesControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["UploadsControllerTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["UploadsControllerTest#test_show", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["UserTest#test_create", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["UserTest#test_creation_gives_access_to_all_access_buckets", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["UserTest#test_deactivate", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["UserTest#test_initials", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]],
+        ["UserTest#test_system_user", ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""], ["pass", ""]]
+      ]
+    }
+  ]
+}

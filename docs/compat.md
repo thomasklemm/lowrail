@@ -1,5 +1,9 @@
 # Gem-breadth compatibility corpus — 2026-10-20
 
+The latest [blog/Fizzy own-suite contract check](#own-suite-product-contract-recheck--2026-10-21)
+compares every test identity, including blog's browser suite, and separates
+default no-op compatibility from refused sealed artifacts.
+
 This is a compatibility experiment, **not** a claim that every Rails app or
 every listed gem is supported. Four real app pins extend `script/corpus`;
 three have green upgraded baselines; Fizzy is a useful negative control. The
@@ -738,3 +742,125 @@ on three alternating Real Blog off/on pairs: observer disabled
 1.83/1.80/1.85 s, enabled 1.94/2.05/1.95 s, median **+0.12 s / +6.6%**;
 snapshots themselves about 0.05 s. This is why the census is opt-in rather
 than hidden in ordinary verify overhead.
+
+## Own-suite product-contract recheck — 2026-10-21
+
+### What already existed
+
+- `src/verify/mod.rs` runs the app's command off, then on (default
+  `bin/rails test`), comparing test identities, outcomes, failure descriptions
+  and exit success. Missing identities reject. Minitest/RSpec reporters retain
+  per-unit hits/fallbacks and admission refusals. `--bisect` can isolate an
+  on-only difference. `script/corpus` fetches pins and dependency overlays;
+  it is setup, not an automatic all-app suite runner.
+- The latest preceding integrated own-suite record is the **2026-10-21**
+  [7d0ea95 recheck](#integrated-main-recheck-2026-10-21): blog, Campfire,
+  PingCRM, Redprints, Starter, CASA, Writebook, Fizzy and CodeTriage, with CASA
+  and Writebook system suites separately recorded. Those fresh `all-opt-in`
+  builds mostly had zero units; only Starter recorded hits. Earlier default
+  runs and historical pre-quarantine hits are not current active coverage.
+  Wikino, RubyToolbox and Fat Free CRM have bounded RSpec subsets, not complete
+  own suites. Baseline errors/skips and SQL/load advisories remain explicit.
+- `gem/test/e2e_test.rb#test_real_blog_outcomes_identical_with_hooks` checks
+  the 21-test blog suite with a compatible **empty** manifest, not sealed
+  lowering or browser tests. Synthetic runtime/verify tests and the seeded AR
+  differential harness in `bench/ar_equivalence.rb` are not corpus-own suites.
+  `script/rails-suite` / `bench/ar_rails_suite.rb` run **Rails framework** tests;
+  request/measurement harnesses in `bench/` do not establish app-suite parity.
+- `script/blog-production-verify` is a two-GET external production driver,
+  not `bin/rails test`. Its latest documented entropy-companion gates still
+  reject SQL/load differences. `fixtures/corpus/breadth_production_spec.rb`
+  likewise supplies narrow production probes, not full-suite coverage.
+  [DECISIONS](DECISIONS.md#sealed-verification-external-production-scenarios-first-slice-rejected-2026-10-21)
+  keeps wider production replay/test seams open. There was **no active sealed
+  whole-own-suite gate** for blog or Fizzy, and this check does not create one.
+
+### Fresh results
+
+Executed on [74abb60](https://github.com/thomasklemm/lowrail/commit/74abb60fa1f24dff3618ccef70b21b91ac61fc08),
+Ruby **4.0.7**, Rails **8.1.4**, startup YJIT enabled in every arm, seed
+**41231**, one worker. The subsequent pull through
+[d5fbdf1](https://github.com/thomasklemm/lowrail/commit/d5fbdf1)
+changes experiments/docs only, not the tested runtime, verifier or corpus
+inputs. No app/test implementation was patched. Fizzy is the pinned
+[6f1d200](https://github.com/basecamp/fizzy/commit/6f1d200316ec3bae91d32c557d88647300807ee9)
+with exactly `fixtures/corpus/fizzy.patch`; blog is an isolated copy of the
+Rails 8.1.4 Roundhouse-generated `real-blog-r4` app, retaining `RealBlogR4`.
+
+Each cell below is the result in **each** off/on arm, not a totals-only
+comparison. The [machine-readable evidence](own-suite-results.json) retains
+every literal test identity and its result/failure in the native plain arm
+and all four verify arms, plus artifact/input hashes and native exit codes.
+
+| App / complete command | Plain, no preload | Default off / on | Sealed artifact off / on | On-only differences |
+|---|---|---|---|---|
+| Blog `bin/rails test` | 21 pass | 21 pass / 21 pass | 21 pass / 21 pass; refused | 0 |
+| Blog `bin/rails test:system` | 2 pass | 2 pass / 2 pass | 2 pass / 2 pass; refused | 0 |
+| Fizzy `bin/rails test` | 117 pass, 7 error | 117 pass, 7 error / same | 117 pass, 7 error / same; refused | 0 |
+
+All verify commands exit 0; the native Fizzy commands exit **1 in every
+arm**, and blog exits 0. Fizzy's seven unchanged errors all say
+`NoMethodError: undefined method 'reset_all' for an instance of Current`, at
+`test/test_helpers/session_test_helper.rb:22`; exact identities/messages are
+in the evidence. **Fizzy is not green or supported.** Blog's native Capybara /
+Selenium system tests ran with Chrome for Testing **155.0.8059.79** and the
+matching driver. Fizzy's `test/system` contains no tests, so no Fizzy browser
+behavior is covered.
+
+Both default manifests have **0 units, 0 hits, 0 fallbacks, no refusal**.
+After `rake compile`, blog's combined production sealed artifact contains
+20 units: one `sealed/link_to`, one `sealed/form_scaffold`, one preload plan
+and 17 instantiate units. Fizzy has 0 eligible units: the link/form builders
+require the blog's loaded `ArticlesController` / model/template inventory.
+With `RAILS_ENV=test LOWRAIL_SEALED=1`, **both entire artifacts refuse**:
+`sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized`.
+All sealed-arm hits/fallbacks are 0. This verifies **safe refusal**, not active
+link/form equivalence; production admission was not bypassed. The earlier
+missing-native build attempt is retained locally, not presented as an active
+link test. Active sealed whole-suite coverage remains **uncovered**, not a
+passing release gate.
+
+No on-only outcome difference was found to reduce. Own-thread SQL maps also
+match exactly (blog 125 queries, system 55, Fizzy 5,322), with no unstable
+identities or declared controls. No new normalization, filtering, RNG
+companions, Callgrind or measurement cohorts were used. The existing reporter
+stores the exception's first line and masks object addresses; these seven
+messages contain no addresses and also match the unmodified plain logs.
+This is an outcome gate, not a new load-census or production-behavior claim.
+
+### Reproduce this gate
+
+Use fresh disposable copies/databases, the pins above and Ruby 4.0.7. Preserve
+the blog's generated application module; do not rename it to gain admission.
+Set `RAILS_ENV=test RUBY_YJIT_ENABLE=1 MT_CPU=1 PARALLEL_WORKERS=1 SEED=41231`;
+unset inherited `RUBYOPT`, `LOWRAIL_DIR`, `LOWRAIL_ROOT`, `LOWRAIL_UNITS`,
+`LOWRAIL_VERIFY_LOADS` and companion variables. From the repo root:
+
+```sh
+cargo build --locked
+(cd gem && rake compile)
+bash script/corpus fizzy  # exact pin, dependency patch, schema and assets
+# Prepare blog's test DB with its own bin/rails db:prepare.
+# APP is one disposable app path; repeat separately for blog and Fizzy.
+(cd "$APP" && LOWRAIL=0 bin/rails test --seed 41231 --verbose)
+target/debug/lowrail facts "$APP"
+target/debug/lowrail build "$APP" --jit yjit
+target/debug/lowrail verify "$APP" -- bin/rails test --seed 41231
+# Blog only: repeat plain + verify with bin/rails test:system --seed 41231.
+# Archive APP/.lowrail/verify before each next verify overwrites it.
+# Prepare the disposable blog production DB with its own db:prepare first.
+RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 target/debug/lowrail build "$APP" \
+  --sealed --env production --jit yjit
+LOWRAIL_SEALED=1 target/debug/lowrail verify "$APP" -- bin/rails test --seed 41231
+# Blog only: repeat sealed verify with bin/rails test:system --seed 41231.
+# Expect a whole-artifact refusal in test, not optimized execution.
+```
+
+The orb's Chrome wrapper adds `--no-sandbox --disable-dev-shm-usage` and is
+selected through Selenium's `SE_BROWSER_PATH`, with an isolated
+`SE_CACHE_PATH`; no app driver code changes. Compare every identity and
+result/failure across plain, default-off/on and sealed-off/on before reading
+totals. Cargo tests and the Minitest reporter's 4 tests / 83 assertions also
+pass. The complete strict E2E file passes 18 tests / 345 assertions with no
+skips, including its existing 21-test blog hook gate. Runtime, lowering,
+admission and reporter code are unchanged.
