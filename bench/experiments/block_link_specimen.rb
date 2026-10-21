@@ -14,6 +14,7 @@ module BlockLinkSpecimen
   EPOCH = [0]
   BUILDERS = ObjectSpace::WeakKeyMap.new
   VIEWS = ObjectSpace::WeakKeyMap.new
+  SOURCES = ObjectSpace::WeakKeyMap.new
   THREAD_TEMPLATE = :__bench_block_link_template
   THREAD_LINK = :__bench_block_link_call
 
@@ -41,13 +42,21 @@ module BlockLinkSpecimen
     def exact(value, type) = Lowrail::Native.exact_class?(value, type)
     def signature(sequence, method_name) = Lowrail::FormScaffoldAdmission.block_signature(sequence, method_name.to_s)
 
+    def template_source(template, source)
+      return unless exact(template, ActionView::Template) && exact(source, String)
+      # The actual encoded input at normal compilation, not Template#source
+      # (which can perform another file read) or an invoked compiler/handler.
+      SOURCES[template] = {"source_sha256" => Digest::SHA256.hexdigest(source),
+        "source_encoding" => source.encoding.name}.freeze
+    end
+
     def template_enter(view, method_name, template, locals, buffer, strict)
       previous = Thread.current[THREAD_TEMPLATE]
       entry = {previous: previous, view: view, reason: "not a selected template"}
       Thread.current[THREAD_TEMPLATE] = entry
       return entry unless @catalog && @catalog.keys.any? { _1.first == ivar(template, :@identifier) }
       return entry.merge!(reason: "custom template/locals/buffer") unless exact(template, ActionView::Template) && exact(locals, Hash) && exact(buffer, ActionView::OutputBuffer)
-      source = ivar(template, :@source)
+      source = SOURCES[template]
       path = ivar(template, :@identifier)
       compiled = METHOD.bind_call(view, method_name)
       sequence = RubyVM::InstructionSequence.of(compiled)
@@ -55,13 +64,13 @@ module BlockLinkSpecimen
       controller_class = klass(controller)
       cached_view = ivar(controller_class, :@view_context_class)
       return entry.merge!(reason: "unnatural view/compiler context") unless sequence && exact(view, cached_view) &&
-        ivar(template, :@compiled) && ivar(template, :@handler).equal?(ActionView::Template::Handlers::ERB) && exact(source, String)
+        ivar(template, :@compiled) && ivar(template, :@handler).equal?(ActionView::Template::Handlers::ERB) && source
       keys, template_locals, strict_locals = KEYS.bind_call(locals), ivar(template, :@locals), ivar(template, :@strict_locals)
       return entry.merge!(reason: "unsupported locals metadata") unless keys.all? { Symbol === _1 || exact(_1, String) } &&
         exact(template_locals, Array) && template_locals.all? { exact(_1, String) } &&
         (strict_locals.nil? || exact(strict_locals, String))
       descriptor = {"controller" => controller_class.name, "file" => path.delete_prefix(@app + "/"),
-        "source_sha256" => Digest::SHA256.hexdigest(source), "source_encoding" => source.encoding.name,
+        **source,
         "disk_sha256" => Digest::SHA256.file(path).hexdigest,
         "template_locals" => template_locals.map(&:dup), "locals" => keys.map { Symbol === _1 ? _1.name : _1.dup },
         "strict" => strict, "strict_locals" => strict_locals&.dup,

@@ -11,13 +11,13 @@ require_relative "../../gem/lib/lowrail/sealed"
 module BlockLinkDelivery
   STOCK = {
     "base.rb" => "f4f6e92b471923d4ad89205fa7ed8f60b005bdb5de33bf8c9e93bf7303aa0e4c",
+    "template.rb" => "defe875aa54871a597eb37c846636cce70ba782d61bb39cd8e5332acbda0a3c6",
     "buffers.rb" => "3273ae55826b56e2e86e0d71fbb2dea8faa2a2eb468951714760a55e501abe70",
     "helpers/url_helper.rb" => "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
     "helpers/tag_helper.rb" => "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
     "helpers/capture_helper.rb" => "9cc89ba1f287b09e79569f61500e2652d9d169a962e7ea6217a3f1920cbda76b"
   }.freeze
   AUDIT = {
-    "actionview:lib/action_view/template.rb" => "defe875aa54871a597eb37c846636cce70ba782d61bb39cd8e5332acbda0a3c6",
     "actionview:lib/action_view/template/handlers/erb.rb" => "1eb6d4ba4690103fc161eb9d5ef7d79d4b977cc04bbbfa3482e17270c2ef988d",
     "actionview:lib/action_view/template/handlers/erb/erubi.rb" => "a8f9d22dfce5478e89815c96a9b2035ca7c2dd0fbabe4774b2e30f0e9f99bf49",
     "activesupport:lib/active_support/core_ext/object/blank.rb" => "203eefc5b094f4a0f5bf68b4c34198891127f52ed7825e146c2fa089a46f8ec7",
@@ -44,6 +44,8 @@ module BlockLinkDelivery
         code = replace(source, "@output_buffer = buffer\n", "@output_buffer = buffer; __bl_context = ::BlockLinkSpecimen.template_enter(self, method, template, locals, buffer, has_strict_locals)\n")
         replace(code, "@output_buffer, @virtual_path, @current_template = _old_output_buffer, _old_virtual_path, _old_template",
           "::BlockLinkSpecimen.template_leave(__bl_context); @output_buffer, @virtual_path, @current_template = _old_output_buffer, _old_virtual_path, _old_template")
+      when "template.rb"
+        replace(source, "source = encode!\n", "source = encode!; ::BlockLinkSpecimen.template_source(self, source)\n")
       when "buffers.rb"
         code = replace(source, "old_buffer, @raw_buffer = @raw_buffer, new_buffer",
           "old_buffer, @raw_buffer = @raw_buffer, new_buffer; __bl_buffer = ::BlockLinkSpecimen.buffer_enter(self, old_buffer, new_buffer)")
