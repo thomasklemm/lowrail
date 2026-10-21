@@ -282,7 +282,7 @@ callable helper entries. No supported direct main-Ractor predicate was
 found in the installed public/exported C API; this report does not propose
 copying VM structs or making the existing unsafe extension Ractor-safe.
 
-### Concrete next candidate, not implemented or priced
+### Candidate budget before combined-specimen preparation
 
 First remove **only disabled instrumentation dispatch**: provide ordinary
 non-counting/counting guard definitions, selected when installed and when
@@ -321,6 +321,104 @@ authorizations / 0 fallbacks** per ten resolves on both Rubies. The current
 This refresh does not change the historical cohort's source certificate.
 No new Callgrind worker, slot, YJIT run or production change was used for
 this attribution.
+
+## Combined frozen-holder and selected-counting specimen
+
+**Untimed preparation only; no combined cohort, integration or speed claim.**
+The independently published freeze-only base is
+[d5fbdf1](https://github.com/thomasklemm/lowrail/commit/d5fbdf13081a30b91b0430a353ab2fe412adbec2).
+The combined specimen extends that same `bench/experiments/props_freeze.rb`,
+not a parallel candidate or a changed `yjit_regression.rb` factory. Its
+`frozen_split` and `frozen_checks_original` arms retain the main-Ractor,
+source activation, current Guard state/cold validation and actual receiver
+checks at every recursive entry. Only the frozen method census and disabled
+Stats dispatch are removed. No admission boolean or receiver authorization
+is carried across app callbacks.
+
+`Hash`, `Enumerable` and their complete ordinary/singleton ancestry are
+frozen without an observer in **every** arm at the declared preparation
+point. The native original-iterator/public-visibility precondition must pass
+before freezing. Per-instance singleton mutations remain legal and force
+the original fallback; forbidden holder mutations raise symmetrically.
+This is the explicit frozen contract, not transparent behavior for mutable
+apps. First Ractor startup is warmed symmetrically only in the Ractor
+lifetime witness: its cold Kernel prepend after freezing remains a refusal.
+
+Two ordinary guard definitions are selected by alias at installation and
+late `Stats.enable!`. Neither definition tests `defined?/enabled?` on its
+warm path: the counted one counts directly, the uncounted one never counts.
+The Stats library and selection hook are explicitly preloaded in **all**
+arms without enabling counters. This declared setup differs from the old
+Stats-absent cohort; do not silently reuse its price for the new shape.
+There is no production Stats change or global lazy-require observer.
+
+**Alias-only selection is insufficient.** Enabling Stats from inside an
+already executing guard loses its current authorization: the negative
+control reports one hit instead of two. The specimen records one completion
+marker in the uncounted frame. Only when Stats is enabled, a return observer
+targets that retired guard ISeq, preserving pending normal decisions while
+new entries use the counted definition. Early non-main returns and rescued
+guard errors are not counted. The observer is never enabled globally and
+does not exist in a Stats-disabled pricing process. Its marker/local cost
+is part of the future price, not an excluded cost or a free saving.
+
+Both Rubies pass the focused **6 tests / 115 assertions**: eight-arm 20/0
+liveness with zero-count controls, forced-false refusal, symmetric forbidden
+mutation, initial-off/late-on/already-on/repeated enable/reset, once-only
+callback enable plus receiver mutation, and in-flight positive/refused/error
+decisions against the existing inline-Stats native guard. Stats has no public
+disable API; these witnesses do not invent an unsupported off toggle.
+The strict native/guard/freeze tests also pass **16 / 239, no skips** per
+Ruby; Cargo passes **39 + 1 + 8**. Disassembly and a trapped `Stats.enabled?`
+confirm that the disabled warm guard has no Stats test/count opcode or
+enabled observer.
+
+All four complete interpreter matrices pass **478 / 478 comparisons each**:
+Ruby 4.0.7 and 4.1 preview, each with counting enabled and with the actual
+non-counting guard. That is **1,912 comparisons**, covering Inertia
+3.21.2/3.22.0/3.23.0, both frozen shapes, every discovered mutation boundary,
+callbacks, receiver overrides/visibility, stale/malformed facts and the
+explicitly bootstrapped non-main-Ractor witness. These are lifetime proofs,
+not a measured cohort; no Callgrind slots were used.
+
+The preparation retains these SHA-256 pins, including the unchanged factory
+and iteration emitter. Both native binaries are built separately, not copied
+between Rubies; private paths and raw per-case files stay local.
+
+| Combined preparation input | SHA-256 |
+|---|---|
+| `bench/experiments/yjit_regression.rb` | `dfa1a3ee0d9bcdb4a4730dbf14b6d0e2092faba4dad0fe64ee51832e486d2422` |
+| `bench/experiments/props_variant.rb` | `e6be6f9060798195719536e3dab348ed6359f8bfaf88630a97530ba350ddcbeb` |
+| `bench/experiments/props_freeze.rb` | `35a0a66ea1349a71c559cb7f0baa73d63161a48bc992541bdf5ddf5ec54830f6` |
+| `bench/experiments/props_freeze_test.rb` | `29d23691beb2c64f22c30c3058ccc2a27473b567d8dd4984962ec5b0b943c7a7` |
+| `gem/lib/lowrail/guard.rb` | `9f0f1d99ee6593ac4594e5e0b092f2543195482e1523ceb15d7593624ce64437` |
+| `gem/lib/lowrail/stats.rb` | `d1a7924403ddc296abab4fdd85ef8b18428d8a0632bab9a32d3e2683b6f0a311` |
+| `gem/lib/lowrail/freeze_audit.rb` | `8446079e2924aea41b806bb2485136e4ae6376d04655feacf8ec2e7ac9fcf87e` |
+| `gem/ext/lowrail_native/lowrail_native.c` | `c6d69bf723c3f5c942d3ea1ebfbebe8ce17978b57fca86b2bd3338a7f70c2b10` |
+| Ruby 4.0.7 `229531a6cf` native binary | `38f0f5b540a44e7e1c2597b04d0664b2e5ca194b65e736c50a1e506517a34f6a` |
+| Ruby 4.1 preview `2d08b5f42f` native binary | `956dd758c2970ebba428365d87bd9832ee45affa423f6149656520e030972169` |
+
+Run the complete three-version lifetime matrix separately for each selected
+guard definition, under each Ruby:
+
+```sh
+BENCH_JIT=0 LOWRAIL_FREEZE=1 mise exec -- ruby \
+  bench/experiments/props_freeze_test.rb --seed=1729
+BENCH_JIT=0 LOWRAIL_FREEZE=1 mise exec -- ruby \
+  bench/experiments/props_freeze.rb --check NEW_COUNTED_OUTDIR
+BENCH_JIT=0 LOWRAIL_FREEZE=1 mise exec -- ruby \
+  bench/experiments/props_freeze.rb --check-uncounted NEW_UNCOUNTED_OUTDIR
+# Repeat under: mise exec ruby@4.1.0-preview1 -- ruby ...
+```
+
+The uncounted matrix uses **untimed targeted return receipts**, not Stats
+activation, to satisfy the pinned gate's positive-authorization checks while
+executing the actual non-counting ISeq. No such observer belongs in a priced
+worker. Proofs retain the statistics mode and current specimen/factory,
+Guard, runtime, native C/build/binary fingerprints. Liveness additionally
+requires current manifest format and interpreter certification/actual mode.
+No measured-worker/cohort entrypoint is added here; request a separate
+two-worker allocation only after these proofs pass.
 
 ## Strict-gate provenance
 

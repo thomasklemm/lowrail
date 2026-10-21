@@ -12,17 +12,72 @@ module PropsFreeze
     SPECIMEN => "e6be6f9060798195719536e3dab348ed6359f8bfaf88630a97530ba350ddcbeb"}.freeze
   ARMS = %w[original split native_split frozen_split checks_original native_checks_original frozen_checks_original each].freeze
 
-  # Identical to PropsVariant.valid_native? except for its native predicate.
-  # Freeze is established once before any candidate operations, in every arm.
-  def self.valid?(id, props)
+  # Ordinary-def variants, not a per-entry Stats test or a super/wrapper frame.
+  # The marker lets a late enable count an ALREADY executing uncounted frame.
+  # It is deliberately part of the future price, not hidden bookkeeping.
+  def self.valid_uncounted?(id, props)
     return false unless ::Ractor.current.equal?(::Ractor.main)
     ok = ::Lowrail::Passes::InertiaProps.active?(id) &&
       (::Lowrail::Guard.state[id] || (::Lowrail::Guard.state[id] = ::Lowrail::Guard.validate(id))) &&
       ::Lowrail::Native.exact_class?(props, ::Hash)
-    ::Lowrail::Stats.count(id, !!ok) if defined?(::Lowrail::Stats) && ::Lowrail::Stats.enabled?
+    __lowrail_countable = true
     ok
   rescue TypeError, NameError
     false
+  end
+
+  def self.valid_counted?(id, props)
+    return false unless ::Ractor.current.equal?(::Ractor.main)
+    ok = ::Lowrail::Passes::InertiaProps.active?(id) &&
+      (::Lowrail::Guard.state[id] || (::Lowrail::Guard.state[id] = ::Lowrail::Guard.validate(id))) &&
+      ::Lowrail::Native.exact_class?(props, ::Hash)
+    ::Lowrail::Stats.count(id, !!ok)
+    ok
+  rescue TypeError, NameError
+    false
+  end
+
+  class << self
+    alias_method :valid?, :valid_uncounted?
+  end
+
+  module StatsSelection
+    def enable!
+      return super if enabled?
+      # Watch before super: it publishes @enabled before finishing its hooks.
+      # No observer exists in a stats-disabled pricing process. Once selected,
+      # new entries run the counted ISeq, never this retired-ISeq observer.
+      ::PropsFreeze.watch_uncounted!
+      begin
+        super
+      ensure
+        ::PropsFreeze.select_guard!
+      end
+    end
+  end
+
+  def self.watch_uncounted!
+    return if @retired_returns
+    @retired_returns = TracePoint.new(:return) do |event|
+      if event.binding.local_variable_get(:__lowrail_countable) && ::Lowrail::Stats.enabled?
+        ::Lowrail::Stats.count(event.binding.local_variable_get(:id), !!event.return_value)
+      end
+    end
+    # Target only the retired guard, never global return/end/class events.
+    # The marker excludes early non-main returns and rescued guard errors.
+    @retired_returns.enable(target: method(:valid_uncounted?))
+  end
+
+  def self.select_guard!
+    counted = ::Lowrail::Stats.enabled?
+    return if @counted_guard == counted
+    singleton_class.alias_method(:valid?, counted ? :valid_counted? : :valid_uncounted?)
+    @counted_guard = counted
+  end
+
+  def self.install_selection!
+    ::Lowrail::Stats.singleton_class.prepend(StatsSelection) unless ::Lowrail::Stats.singleton_class < StatsSelection
+    select_guard!
   end
 
   module Source
@@ -38,6 +93,14 @@ module PropsFreeze
 
   def self.check_pins!
     raise "published props factory/specimen changed; review before use" unless PINS.all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha }
+  end
+
+  def self.source_proof
+    paths = [__FILE__, *PINS.keys, File.expand_path("../../gem/lib/lowrail.rb", __dir__),
+      *Dir[File.expand_path("../../gem/lib/lowrail/{inertia_props*,guard,manifest,preload_facts,stats,freeze_audit}.rb", __dir__)],
+      *Dir[File.expand_path("../../gem/ext/lowrail_native/*.{c,rb}", __dir__)],
+      *Dir[File.expand_path("../../gem/lib/lowrail/native/**/*.{so,bundle,dll}", __dir__)]]
+    paths.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
   end
 
   def self.freeze!
@@ -57,6 +120,11 @@ module PropsFreeze
     prefix, tail = File.read(FACTORY).split("\nif ARGV.first == \"--census\"\n", 2)
     raise "factory entrypoint changed" unless tail
     eval(prefix, TOPLEVEL_BINDING, FACTORY) unless defined?(YjitRegression)
+    # Declare this preload symmetrically, even in original/unchecked controls.
+    # Selection hooks are installed explicitly: no global tracing/require hook.
+    require "lowrail"
+    require "lowrail/stats"
+    install_selection!
     factory_arm = arm.sub("frozen_", "")
     if arm.start_with?("frozen_")
       # Select our emitter only inside this disposable specimen process.
@@ -69,12 +137,11 @@ module PropsFreeze
     end
     runner, metadata = YjitRegression.setup("props_native", factory_arm)
     if counted
-      require "lowrail/stats"
       Lowrail::Stats.enable!
       Lowrail::Stats.reset_counts!
     end
     session = freeze!
-    [runner, metadata.merge(arm: arm, contract: session.finish!, measured: false)]
+    [runner, metadata.merge(arm: arm, contract: session.finish!, measured: false, sources: source_proof)]
   end
 
   def self.liveness(arm)
@@ -82,12 +149,15 @@ module PropsFreeze
     runner.run(10)
     hits, fallbacks = Lowrail::Stats.unit_hits, Lowrail::Stats.unit_fallbacks
     expected = !%w[original each].include?(arm)
-    pass = metadata.fetch(:guard_valid) && fallbacks.empty? && hits == (expected ? {"0" => 20} : {})
+    manifest = Lowrail::Guard.manifest
+    pass = metadata.fetch(:guard_valid) && fallbacks.empty? && hits == (expected ? {"0" => 20} : {}) &&
+      JitStability.actual == "interpreter" && manifest.certification_jit == "interpreter" && manifest.format == Lowrail::FORMAT
     metadata.merge(operations: 10, hits: hits, fallbacks: fallbacks, pass: pass,
-      actual_jit: JitStability.actual, sources: PINS)
+      ruby: RUBY_DESCRIPTION, actual_jit: JitStability.actual, manifest_format: manifest.format,
+      certification_jit: manifest.certification_jit)
   end
 
-  def self.check(out)
+  def self.check(out, counted: true)
     check_pins!
     # Reuse the entire published 478-comparison gate. Only select our emitter
     # and insert the SAME contract into original and candidate child processes.
@@ -98,15 +168,34 @@ module PropsFreeze
     gate = "if true\n" + gate
     gate = gate.sub('shapes = mode == "--check-native" ? %w[native_split native_checks_original] : %w[split checks_original]',
       'shapes = %w[frozen_split frozen_checks_original]')
-    gate = gate.sub('  prefix = <<~RUBY', <<~'RUBY'.lines.map { "  " + _1 }.join.chomp)
+    stats_setup = "::PropsFreeze.install_selection!; "
+    stats_setup += if counted
+      "Lowrail::Stats.enable!"
+    else
+      # Untimed receipts only, to reuse the pinned gate's authorization checks
+      # while exercising the actual non-counting ISeq. No observer in pricing.
+      <<~'RUBY'
+        __lowrail_receipts = TracePoint.new(:return) do |event|
+          if event.binding.local_variable_get(:__lowrail_countable)
+            ::Lowrail::Stats.count(event.binding.local_variable_get(:id), !!event.return_value)
+          end
+        end
+        __lowrail_receipts.enable(target: ::PropsFreeze.method(:valid_uncounted?))
+      RUBY
+    end
+    insertion = <<~'RUBY'
       fixture = "require #{File.expand_path('props_freeze.rb', __dir__).dump}\n" + fixture
+      fixture = fixture.sub('Lowrail::Stats.enable!', __STATS_SETUP_LITERAL__)
       # First Ractor startup lazily prepends Kernel in MRI. Explicitly warm it
       # in BOTH arms of this witness; cold post-freeze startup is a refusal.
       fixture = fixture.sub('if ENV["RACTOR"]', 'Ractor.new { nil }.value if ENV.fetch("RACTOR", nil); ::PropsFreeze.freeze!; if ENV["RACTOR"]')
       prefix = <<~RUBY
     RUBY
+    gate = gate.sub('  prefix = <<~RUBY', insertion.sub('__STATS_SETUP_LITERAL__', stats_setup.dump).lines.map { "  " + _1 }.join.chomp)
     gate = gate.sub('sources = [File.expand_path(__FILE__),',
-      "sources = [#{File.expand_path(__FILE__).dump}, #{File.expand_path('../../gem/lib/lowrail/freeze_audit.rb', __dir__).dump}, File.expand_path(__FILE__),")
+      'sources = [*::PropsFreeze.source_proof.keys, File.expand_path(__FILE__),')
+    gate = gate.sub('cases: records.size, records: records, measured: false',
+      "statistics_mode: #{(counted ? 'enabled' : 'disabled_with_untimed_receipts').dump}, cases: records.size, records: records, measured: false")
     ARGV.replace(["--check-native", out])
     eval(gate, TOPLEVEL_BINDING, SPECIMEN)
   end
@@ -122,9 +211,9 @@ if $PROGRAM_NAME == __FILE__
     result = PropsFreeze.liveness(ARGV.fetch(1))
     puts JSON.generate(result)
     abort "untimed liveness failed; no pricing permitted" unless result.fetch(:pass)
-  when "--check"
-    PropsFreeze.check(ARGV.fetch(1))
+  when "--check", "--check-uncounted"
+    PropsFreeze.check(ARGV.fetch(1), counted: ARGV.first == "--check")
   else
-    abort "preparation only: --liveness ARM or --check NEW_OUTDIR; no pricing entrypoint"
+    abort "preparation only: --liveness ARM or --check|--check-uncounted NEW_OUTDIR; no pricing entrypoint"
   end
 end

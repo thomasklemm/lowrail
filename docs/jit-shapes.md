@@ -199,6 +199,20 @@ These are implementation-specific preferences, not permanent Ruby restrictions.
     factory/reader pins**, not today's reader or their publication date.
     [Failure, correction and admission-factory audit](passes/yjit-regression.md#first-pricing-attempt-numerically-green-invalid-fast-path-pricing).
 
+13. **Select instrumentation outside the warm path, but preserve active
+    frames on late enable.** Retained native-props interpreter dumps charge
+    630 Ir/resolve inside the disabled Stats constant checks alone. Separate
+    ordinary counting/non-counting definitions remove that warm conditional;
+    alias selection alone is not exact when enable happens inside an already
+    executing guard (one authorization instead of two). The frozen-holder
+    specimen witnesses both definitions, with a completion marker and a
+    targeted retired-ISeq return observer only after Stats activation. Its
+    disabled worker has neither a Stats query nor a trace. Keep main-Ractor,
+    admission and actual receiver checks at every recursive entry. This is
+    untimed correctness evidence and an interpreter cost target, **not a
+    combined or YJIT saving**. The marker and replacement call shape still
+    need pricing. [Accounting and specimen](passes/props-native.md#combined-frozen-holder-and-selected-counting-specimen).
+
 ## Concrete Lowrail audit and exact alternatives (not implemented)
 
 | Current place / cost | Alternative and required boundary |

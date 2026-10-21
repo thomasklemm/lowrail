@@ -312,6 +312,18 @@ lifetime behavior before requesting a cohort. No runtime integration or
 speed claim follows from the 1,686-Ir combined target budget.
 [Machine-function accounting, census and candidate](passes/props-native.md#untimed-attribution-of-the-remaining-checks).
 
+The **combined specimen is prepared, still unpriced**: frozen holders plus
+ordinary counting/non-counting definitions selected on installation/late
+Stats enable, retaining every recursive-entry Ractor/admission/receiver
+check. Both Rubies pass 478 lifetime comparisons in each counting mode
+(**1,912 total**), plus exact late/in-flight counters and positive 20/0
+liveness. Alias-only selection loses an in-flight authorization; the
+specimen preserves pending decisions with a targeted retired-ISeq observer
+only after Stats activation, and charges its completion marker to any future
+price. Disabled workers have no observer or Stats query. No Callgrind slots,
+YJIT run or production edits; request two slots for one finite interpreter
+cohort only after publication. [Contract, witnesses and pins](passes/props-native.md#combined-frozen-holder-and-selected-counting-specimen).
+
 ## Relocatable delivery (2026-10-20)
 
 Use typed app-root-relative metadata and explicit AOT `build --target-root`

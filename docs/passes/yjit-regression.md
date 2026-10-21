@@ -768,6 +768,8 @@ untimed companion first. This audit starts no measured cohort.
 | `experiments/sealed_links.rb` | Same historical global `:call` capture; provenance variant additionally uses the next row's observer. No new clean-VM price on this factory as written. |
 | `experiments/sealed_provenance.rb` | Historical global `:return` delivery witness and global constructor `:call/:return/:c_call/:c_return` semantics probe. The former also contaminates its historical pricing caller; production now records delivery directly. Retain as historical evidence, not a current pricing seam. |
 | `experiments/endpoint_bodies.rb` | Historical global `:return` delivery witness, global `:line/:call/:c_call` contract observer (two enable sites), and global `:call` link capture. Contract events are intentionally global semantics evidence. The priced worker's boot/capture is contaminated and cannot price a clean production shape as written. |
+| `experiments/props_freeze.rb` | `:return` **targeted** at the retired non-counting guard, only after Stats activation to retain in-flight decisions. A separate targeted receipt observer runs only in the untimed non-counting lifetime matrix. Neither exists in a Stats-disabled pricing worker. |
+| `experiments/props_freeze_test.rb` | Global `:c_call` in a disposable child, stopped at the chosen native-call boundary to enable Stats inside an executing guard. Deliberate correctness stimulus; never part of the specimen's setup or a measured worker. |
 
 No additional runtime `set_trace_func` or `trace_var` invocation exists in
 these directories. No historical result was rerun, promoted or assigned a
