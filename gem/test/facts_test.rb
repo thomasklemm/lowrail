@@ -146,8 +146,10 @@ class FactsTest < Minitest::Test
   end
 end
 
-# Integration: boot the real-blog corpus app (skipped when it is absent).
+# Integration: real-blog is a required prerequisite for strict full gates.
 class FactsRealBlogTest < Minitest::Test
+  include LowrailTest
+
   APP = File.join(LowrailTest::CORPUS_ROOT, "real-blog")
   EXE = File.expand_path("../exe/lowrail-facts", __dir__)
 
@@ -161,7 +163,7 @@ class FactsRealBlogTest < Minitest::Test
   end
 
   def setup
-    skip "no #{APP} (see script/corpus)" unless File.exist?(File.join(APP, "Gemfile.lock"))
+    missing_prerequisite "no #{APP}; run bash script/corpus real-blog" unless File.exist?(File.join(APP, "Gemfile.lock"))
     @f = self.class.facts
     refute_empty @f, "lowrail-facts failed in #{APP}"
   end

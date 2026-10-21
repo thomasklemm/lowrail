@@ -46,11 +46,27 @@ Repository fixtures are copied into disposable directories. The sealed form
 test creates its own production schema and rows there, without depending on
 or modifying a developer's corpus production database.
 
-External apps/checkouts remain optional. Prepare them with `script/corpus`
-and `script/rails-suite` when their integration coverage is required. Use
+**The four `real-blog` gates are required in strict mode.** Prepare them from
+the repository root with:
+
+```sh
+bash script/corpus real-blog
+```
+
+This fetches the pinned Roundhouse generator, generates a Rails 8.1.4 blog,
+installs its bundle and prepares its database. In the prepared orb it took
+about **28 seconds**, so its absence is not an expensive-setup exemption.
+The separate `real-blog-r4` used by sealed experiments does not satisfy the
+`real-blog` test path. Missing source/lock/bundle and `LOWRAIL_REAL_BLOG=0`
+fail these strict gates; ordinary partial runs can still skip them by name.
+Install the generated bundle for each Ruby being tested, in a disposable
+copy if its platform lock needs adjustment.
+
+Other external apps/checkouts remain optional. Prepare them with
+`script/corpus` and `script/rails-suite` when their coverage is required. Use
 `LOWRAIL_TEST_CORPUS_ROOT` and `LOWRAIL_RAILS_CHECKOUT` for prepared copies.
 An app that is present but fails boot/tests is **not** converted into a skip
-(apart from E2ETest's existing, explicitly named unavailable-bundle control).
+(an unavailable real-blog bundle is a missing required prerequisite).
 For a preview Ruby whose native gems are unavailable as binary packages,
 prepare a disposable corpus copy and build its native gems from source;
 do not rewrite the primary corpus locks. Prefer per-gem
@@ -73,6 +89,8 @@ mode. CLI prerequisites are built automatically as described above.
 | `DigestMemoTest#test_public_lazy_version_fixture_is_sealed_only_and_test_mode_stays_original` | Debug CLI; rails, rails_vite, inertia_rails or vite_ruby (names reported individually); other locked dependencies fail bundle preparation |
 | `E2ETest#test_late_rails_yjit_enable_reports_drift_and_keeps_fact_checks` | railties |
 | `E2ETest#test_fast_path_stub_and_restore` | minitest/mock (minitest-mock on Minitest 6) |
+| `E2ETest#test_real_blog_outcomes_identical_with_hooks` | `real-blog` source/bundle for the running Ruby; also fails strict mode if disabled with `LOWRAIL_REAL_BLOG=0` |
+| `FactsRealBlogTest#test_rails_sections`; `#test_templates`; `#test_app_methods` | `real-blog/Gemfile.lock` and working bundle (`bash script/corpus real-blog`) |
 | `InertiaConfigTest#test_binding_contract_across_supported_gems` | inertia_rails 3.21.2 / 3.22.0 / 3.23.0; missing versions listed |
 | `InertiaConfigTest#test_plain_and_stale_build_controls`; `#test_private_binding_and_overridden_schema_are_not_installed` | inertia_rails 3.23.0 |
 | `InertiaPropsTest#test_public_contract_and_every_post_entry_dispatch_boundary`; `#test_each_mutation_private_visibility_and_stale_fallback`; `#test_nonmain_ractor_keeps_the_original_resolver` | inertia_rails 3.21.2 / 3.22.0 / 3.23.0; missing versions listed |
@@ -100,10 +118,8 @@ mode. CLI prerequisites are built automatically as described above.
 
 | Test(s) | Reason |
 |---|---|
-| `FactsRealBlogTest#test_rails_sections`; `#test_templates`; `#test_app_methods` | `real-blog/Gemfile.lock` absent under the corpus root |
 | `MaterializeCorpusTest#test_real_blog`; `#test_campfire` | Corresponding `real-blog-r4` / `campfire` corpus lock absent |
 | `ObserveCorpusTest#test_real_blog_suite` | `real-blog-r4/Gemfile.lock` absent |
-| `E2ETest#test_real_blog_outcomes_identical_with_hooks` | `real-blog` directory absent; explicit `LOWRAIL_REAL_BLOG=0`; or its bundle unavailable for the running Ruby |
 | `RailsSuiteReportTest#test_separate_build_does_not_change_view_primary_key_results` | Rails checkout `RAILS_VERSION` absent (`script/rails-suite`) |
 | `RailsSuiteReportTest#test_profiling_preserves_backtrace_cleaner_results` | Rails checkout or prepared `.lowrail/rails-suite/Gemfile` absent |
 | `SealedLinkTest#test_cold_opt_in_delivery_preserves_response_effects_and_refuses_foreign_receivers` | Fixture is certified only on Ruby 4.0.7; other Ruby version printed |

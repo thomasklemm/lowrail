@@ -436,10 +436,10 @@ class E2ETest < Minitest::Test
 
   # The hooks (with a compatible, empty manifest) must not change any
   # outcome of a real Rails suite, and the reporter must load via RUBYOPT
-  # alone. LOWRAIL_REAL_BLOG=0 skips it.
+  # alone. LOWRAIL_REAL_BLOG=0 skips partial runs, but fails strict gates.
   def test_real_blog_outcomes_identical_with_hooks
-    skip "real-blog corpus not fetched (script/corpus)" unless File.directory?(REAL_BLOG)
-    skip "LOWRAIL_REAL_BLOG=0" if ENV["LOWRAIL_REAL_BLOG"] == "0"
+    missing_prerequisite "real-blog corpus not fetched; run bash script/corpus real-blog" unless File.directory?(REAL_BLOG)
+    missing_prerequisite "LOWRAIL_REAL_BLOG=0 disables the required real-blog gate; unset it" if ENV["LOWRAIL_REAL_BLOG"] == "0"
     realpath_tmpdir do |dir|
       FileUtils.mkdir_p(File.join(dir, ".lowrail"))
       require "lowrail/compiler"
@@ -448,7 +448,7 @@ class E2ETest < Minitest::Test
         out_path = File.join(dir, "outcomes-#{mode}.json")
         out, err, status = ruby("bin/rails", "test", chdir: REAL_BLOG,
                                 env: { "LOWRAIL" => mode, "LOWRAIL_ROOT" => dir, "LOWRAIL_OUTCOMES" => out_path })
-        skip "real-blog bundle not installed for #{RUBY_VERSION}" if err.include?("Could not find") || err.include?("Bundler::")
+        missing_prerequisite "real-blog bundle not installed for #{RUBY_VERSION}" if err.include?("Could not find") || err.include?("Bundler::")
         assert status.success?, "real-blog LOWRAIL=#{mode} failed:\n#{out}\n#{err}"
         assert_match(/21 runs, \d+ assertions, 0 failures, 0 errors, 0 skips/, out)
         [mode, JSON.parse(File.read(out_path))]
