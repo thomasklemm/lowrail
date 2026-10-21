@@ -21,6 +21,14 @@ Early Article/Comment attribute generation adds 267 method rows; blanket app fre
 Keep compact + `Process.warmup` only as a separate candidate: five two-worker Puma screens show 4.2–11.4% lower total PSS, n=1 each.
 No runtime/main promotion; CASA sign-in stays HTTP 500, full outputs/DB/own suites/Thermos remain unmet. [Tables, refusals and deferred pieces](boot-image.md).
 
+## Bet H bounded prefork follow-up (2026-10-21)
+
+Keep branch-only candidate: 36 fresh Puma trees, warmup lower PSS than both off controls in all three rounds on Blog/Campfire/Fizzy/Lobsters; zero 5xx/1,035 responses.
+Median total PSS MiB off→warmup: 250.5→240.3 / 288.7→267.2 / 260.6→245.0 / 440.0→395.8; extra first response 0.15–0.36 s; opt-in helper never runs automatically.
+Blog/Campfire real-Puma RPS +6.09% [+3.00,+9.05] / +1.11% [−0.92,+3.29], A/A floors 4.94% / 4.64%; no detected loss beyond A/A, no resolved gain or non-inferiority proof.
+Both exact cold/warm two-seed status/body/all-header gates pass, zero load errors; Campfire's biased off/off interval is retained; Fizzy/Lobsters RPS await published HTTP adapters.
+No main/runtime promotion: full outputs/DB state, constants/method/features, own suites and Thermos remain unmet. [Tables and sanitized records](boot-image.md#bounded-follow-up-explicit-puma-warmup).
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust

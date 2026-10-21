@@ -303,10 +303,32 @@ exact status/body/all Rack-header checks. All eleven on-arm master hooks complet
 controls never invoke warmup. **951,540 timed + 193,418 warmup HTTP200**,
 zero load/transport errors. [Sanitized windows and paired summary](prefork-rps-results.json).
 
-**Status:** Campfire RPS cohort running. Published bet A currently has **no
-Fizzy/Lobsters HTTP validation adapters**; their requested RPS checks are
-blocked pending those adapters, not substituted with login/empty pages or the
-in-process Rack screen. No four-app promotion can follow the current results.
+**Campfire complete:** A/A −2.54% [−4.64%, −0.51%], noise floor **4.64%**.
+The off/off interval excludes zero: this bias remains recorded, with no
+repeat or removed round. On/off +1.11% [−0.92%, +3.29%] is unresolved, with
+no detected regression beyond the A/A floor; this does not prove equality.
+Median off-A / on / off-B is **222.1 / 225.4 / 218.4 RPS**. All two-seed
+cold samples from 33 servers and warm samples from 30 timed servers match
+exact status/body/all Rack headers, including natural HTTP login's GET/POST
+companions. All eleven on-arm hooks completed. **132,912 timed + 22,395 warmup
+HTTP200**, zero load/transport errors.
+
+| App | A/A paired RPS Δ [95% interval] | A/A floor | Warmup/off RPS Δ [95% interval] | Decision |
+|---|---:|---:|---:|---|
+| Blog | −0.10% [−4.32%, +4.94%] | 4.94% | +6.09% [+3.00%, +9.05%] | No detected loss; gain unresolved against A/A |
+| Campfire | −2.54% [−4.64%, −0.51%] | 4.64% | +1.11% [−0.92%, +3.29%] | No detected loss; unresolved; off/off bias retained |
+| Fizzy | — | — | — | Blocked: HTTP/validation adapter absent in published harness |
+| Lobsters | — | — | — | Blocked: HTTP/validation adapter absent in published harness |
+
+Neither completed cohort triggers the owner's kill rule. Keep the repeatable
+PSS saving as a **candidate**, charging **0.15–0.36 seconds** extra first-response
+time in the memory screen. The coarse/biased A/A controls do not establish a
+published speed win or formal throughput non-inferiority. `passed:true` in the
+RPS export means exact samples and zero load errors, not a speed/control pass.
+The two remaining RPS checks await bet A's adapters, not substituted login/
+empty pages or in-process Rack timings. Full outputs/DB state, app own suites,
+constant/method/feature-table equality after warmup and Thermos have **not**
+been established. Nothing is promoted to main or enabled automatically.
 
 ## Reproduction and retained boundaries
 
