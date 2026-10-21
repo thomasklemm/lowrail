@@ -229,15 +229,18 @@ module CampfireScenario
       require "stackprof"
     end
     boot(app)
-    driver = Driver.new(state, record: %w[cold census].include?(mode), validate: %w[cold census].include?(mode))
+    recorded = %w[cold census room_cold room_census].include?(mode)
+    driver = Driver.new(state, record: recorded, validate: recorded)
     driver.login
     report = {"pins" => pins(app), "mode" => mode}
     case mode
-    when "cold"
-      %w[room pagination sidebar search post rooms_index refresh].each { driver.run(_1) }
+    when "cold", "room_cold"
+      routes = mode == "room_cold" ? %w[room] : %w[room pagination sidebar search post rooms_index refresh]
+      routes.each { driver.run(_1) }
       report["steps"] = driver.steps
-    when "census"
-      report["routes"] = %w[room pagination sidebar search rooms_index refresh post].to_h do |id|
+    when "census", "room_census"
+      routes = mode == "room_census" ? %w[room] : %w[room pagination sidebar search rooms_index refresh post]
+      report["routes"] = routes.to_h do |id|
         [id, %w[cold warm repeat].to_h { |phase| [phase, census(driver, id)] }]
       end
       report["lowrail_stats"] = defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.snapshot : nil
@@ -275,24 +278,31 @@ module CampfireScenario
       end
     when "heap"
       # Deliberately tool=none, not Callgrind; no start/finish client seam.
-      # The same five-pool preparation and N=0/50 loops precede any cohort.
+      # Floors are derived off-only and frozen by campfire_heap.rb before on.
       require_relative "../heap_windows"
+      count = Integer(ENV.fetch("CAMPFIRE_HEAP_REQUESTS", "50"))
+      raise "positive request count required" unless count.positive?
+      phases = %w[total no_gc]
+      phases.reverse! if ENV.fetch("BENCH_PHASE_ORDER", "0") == "1"
       50.times { driver.run("room") }
       anchors = HeapWindows.prepare_heap
       report["targets"] = HeapWindows.page_targets
       report["anchors"] = anchors.size
-      report["windows"] = %w[total no_gc].product([0, 50]).map do |phase, count|
+      report["windows"] = phases.product([0, count]).map do |phase, requests|
         HeapWindows.collect
         driver.run("room")
+        hits = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {}
         before = GC.stat_heap
         begin
           GC.disable if phase == "no_gc"
-          count.times { driver.run("room") }
+          requests.times { driver.run("room") }
         ensure
           GC.enable
         end
         after = GC.stat_heap
-        {"mode" => phase, "requests" => count, "before" => before, "after" => after,
+        completed = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {}
+        {"mode" => phase, "requests" => requests, "before" => before, "after" => after,
+          "completed_hits" => (hits.keys | completed.keys).to_h { [_1, completed.fetch(_1, 0) - hits.fetch(_1, 0)] },
           "pages_equal" => before.all? { |pool, stats| stats[:heap_eden_pages] == after.fetch(pool)[:heap_eden_pages] }}
       end
       report["stable"] = report.fetch("windows").all? { _1.fetch("pages_equal") }
@@ -308,7 +318,7 @@ end
 
 if $PROGRAM_NAME == __FILE__
   mode, app, state, output = ARGV
-  abort "usage: campfire_scenario.rb prepare|cold|census|profile|heap APP STATE [PRIVATE_JSON]" unless mode && app && state
+  abort "usage: campfire_scenario.rb prepare|cold|census|room_cold|room_census|profile|heap APP STATE [PRIVATE_JSON]" unless mode && app && state
   app, state = [app, state].map { File.expand_path(_1) }
   mode == "prepare" ? CampfireScenario.prepare(app, state) : CampfireScenario.worker(mode, app, state, output)
 end

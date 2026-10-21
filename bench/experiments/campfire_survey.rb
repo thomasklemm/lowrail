@@ -15,7 +15,7 @@ module CampfireSurvey
         run.fetch("exit_ok") && !run.fetch("tests").empty? && run.fetch("tests").values.all? { %w[pass skip].include?(_1.first) }
       end
     raise "new private output required" if File.exist?(output)
-    raise "unknown untimed mode" unless %w[cold census profile heap].include?(mode)
+    raise "unknown untimed mode" unless %w[cold census room_cold room_census profile heap].include?(mode)
     raise "heap preflight requires Valgrind tool=none" if mode == "heap" && !valgrind
     manifest = File.join(app, ".lowrail/manifest.json")
     artifact_sha = Digest::SHA256.file(manifest).hexdigest
@@ -26,8 +26,8 @@ module CampfireSurvey
       env = CampfireScenario.environment(app, state).merge(
         "LOWRAIL" => arm == "on" ? "1" : "0", "LOWRAIL_SEALED" => "1",
         "LOWRAIL_ROOT" => app, "LOWRAIL_DIR" => File.join(app, ".lowrail"),
-        "LOWRAIL_STATS" => mode == "census" ? File.join(output, "#{arm}-stats") : nil,
-        "RUBYOPT" => "-I#{CampfireScenario::ROOT}/gem/lib -rlowrail/setup")
+        "LOWRAIL_STATS" => mode.end_with?("census") ? File.join(output, "#{arm}-stats") : nil,
+        "RUBYOPT" => "-rbundler/setup -I#{CampfireScenario::ROOT}/gem/lib -rlowrail/setup")
       # This dedicated local service belongs to the survey, never a real cache.
       require "redis"
       Redis.new(url: env.fetch("REDIS_URL")).flushdb
@@ -64,7 +64,7 @@ module CampfireSurvey
       record
     end
     summary = {"mode" => mode, "artifact_sha256" => artifact_sha, "arms" => records.map { _1.except("steps", "routes") }}
-    if mode == "cold"
+    if mode.end_with?("cold")
       base = records.first.fetch("steps")
       summary["comparisons"] = records.drop(1).map do |record|
         steps = record.fetch("steps")
@@ -94,6 +94,6 @@ end
 
 if $PROGRAM_NAME == __FILE__
   mode, app, seed, output, suite, valgrind = ARGV
-  abort "usage: campfire_survey.rb cold|census|profile|heap APP SEED NEW_PRIVATE_OUTPUT GREEN_SUITE_JSON [VALGRIND]" unless suite
+  abort "usage: campfire_survey.rb cold|census|room_cold|room_census|profile|heap APP SEED NEW_PRIVATE_OUTPUT GREEN_SUITE_JSON [VALGRIND]" unless suite
   CampfireSurvey.run(*[app, seed, output, suite].map { File.expand_path(_1) }, mode, valgrind)
 end

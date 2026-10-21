@@ -1,18 +1,22 @@
-# Campfire: benchmark routes, reachability, and a blocked pricing request
+# Campfire: benchmark routes, certified reachability, and a pricing request
 
 2026-10-21. **Untimed discovery, not a speed or sealed-support claim.** No
 Callgrind run, counter window, timing cohort or measurement slot was used.
-No Lowrail runtime/default/quarantine code or upstream app code was changed.
+The authorized follow-up changes only Ruby parser compatibility in Lowrail;
+no default, quarantine, admission inventory or upstream app code was changed.
 The machine-readable [appendix](campfire-bench.json) retains the counts,
 pins, refusals and failed gates. Raw responses, cookies, database snapshots
 and complete verifier receipts remain private under `.lowrail/private/`.
 
-**Conclusion:** the public benchmark routes exist at a separately named,
-Rails-8.1-compatible Campfire pin. Its own tests are green off/on. Native
-fragment caching removes most helper work on warm reads; all current Lowrail
-fast-path counts are zero. A public sealed build fails before publication,
-and the first untimed Valgrind fixed-heap preflight fails in every arm.
-Do not reserve a pricing slot yet.
+**Conclusion:** the separately pinned Rails-8.1 app now has an instantiation-only
+sealed artifact completing **52 of 54 reachable rows per warm room request**.
+N=10 fixed-heap preflight passes off/on in both phase orders. The non-system
+suite is green off/on with the production artifact refusing in test. Browser
+outcomes pass, but strict verification rejects a query-count difference;
+raw cold HTTP identity also rejects entropy. **Pricing remains unapproved and
+blocked.** Sections 1–9 retain the initial discovery/failed prerequisites;
+[§10](#10-authorized-prerequisite-follow-up) supersedes their zero-hit/build/heap
+status without discarding the original failures.
 
 ## 1. Which requests do public benchmarks exercise?
 
@@ -342,6 +346,146 @@ The separate original production sealed build emits only one SHA memo unit;
 the blog-only helper certificates refuse the framework/application domain.
 No hit-bearing request or full sealed suite was claimed. **No Rails 8.2
 support or speed claim** follows from this evidence.
+
+## 10. Authorized prerequisite follow-up
+
+Only the parser compatibility fix and untimed prerequisites were authorized.
+No helper/token/collection domain was broadened. No POST message or Cable
+experiment was added; room-only modes still perform the natural login POST.
+
+### App-locked Prism: exact grammar or explicit refusal
+
+The failing public build loads **the app bundle's Prism 1.4.0**, not Lowrail's
+development Prism 2.0.0. Its first failing call was
+`ARPlanSites.inventory` → `Prism.parse_file(..., version: "current")`.
+1.4 rejects `current`, `4.0.7`, and `4.0` on this Ruby; selecting an older
+development grammar or `latest` would not meet the exactness contract.
+
+All 20 existing Ruby parse/lex sites in `gem/lib/lowrail` and the public helper census
+now obtain an explicit **`RUBY_VERSION`** from one build/discovery-only admission
+check. It memoizes success or refusal. The app's loaded parser is never
+replaced. Unsupported grammar becomes `unsupported_prism_grammar`, naming
+both versions; parser-independent builders still finish. Existing per-source
+refusals keep their sites; an escaping refusal names the actual selected pass.
+Diagnostic-only `bench/` parser callers remain outside this runtime fix.
+
+The new public sealed-build regression locks a real app bundle to Prism
+1.4.0: it fails on the base at `invalid version: current`; after the fix it
+passes **1 test / 11 assertions**, including surviving Widget instantiation.
+Thermos correctness and maintainability reviews ran independently. The
+maintainability follow-up confirmed its failed-probe caching and hidden-pass
+findings resolved, with no remaining material defect. Rust tests pass
+**39 + 2 + 8**. The affected gem run passes **40 / 720**, with seven named
+dependency skips. With all three supported Inertia gems installed, the separate
+Inertia run passes **6 / 2,480**, with no failures, errors or skips.
+The broad developer run is **not green**: 186 tests, seven failures, one
+error, 23 skips. All eight failing identities reproduce on the untouched base
+(mixed Minitest 5/6 and regenerated-blog provenance); none was suppressed.
+
+The **owner-retained published blog source**, not the regenerated app, was
+transferred by verified archive hash `56d74970…`, with source pin `86ebd4a8…`
+and original lock `570c9c31…`. Before/after public builds at the same app path
+isolate the four sealed rendering units. Both delivered ISeqs and lowered
+sources are byte-identical; complete census `apps` data is identical, digest
+`85e9bcc3e1618bea9ef2c48ac059518b6c8a14c00026df01f3515ea95b53615a`.
+The delivered ISeq digests remain the published `d95122f0…` / `bea055e8…`.
+Manifest build-source certificates change normally; no old certificate is
+whitelisted. Retained failed proof attempts include a missing baseline native
+extension and a shared Cargo target selecting the baseline CLI; only the
+corrected pair with verified implementation source paths counts.
+
+### Off-only fixed-heap calibration, N=10
+
+The original N=50 all-arm page growth remains rejected. Before enabling on,
+declare the smaller **N=10** finite window and apply the off-only method from
+[00f2bff](https://github.com/thomasklemm/lowrail/commit/00f2bffb1bfa7e7dfb8287cbed2b02306e22d96f):
+maximum start-live slots plus all full-window allocations, 50% headroom,
+rounded up to 10,000, never below the original floors. GC/window policy is
+unchanged. This is calibration, not repeated performance cohorts.
+
+| Pool | Off whole-window slot budget | Frozen init slots | Exact eden pages |
+|---|---:|---:|---:|
+| 0 | 362,016 | 1,000,000 | 611 |
+| 1 | 85,807 | 250,000 | 306 |
+| 2 | 62,083 | 100,000 | 246 |
+| 3 | 2,562 | 20,000 | 99 |
+| 4 | 1,415 | 10,000 | 100 |
+
+These derived floors equal the original floors: no arm-specific adjustment.
+The same **Valgrind 3.19.0 / brk512** installation runs `--tool=none` only.
+Four fresh serial workers (off/on × both phase orders) pass all **16** N0/N10
+total/no-GC windows: exact target pages at every boundary, zero additional
+allocated pages, no brk overflow. Each on full window completes 520 hits;
+N0 and off have zero. No Callgrind extension, client requests, Ir or timing
+counters are used. A startup JSON-version conflict is retained as a harness
+failure; loading Bundler before Lowrail fixes it without an app change.
+
+### Actual artifact, hits, and remaining refusals
+
+The public `build --sealed --env production --jit interpreter` uses a normal
+denylist to exclude every non-instantiation pass; no manifest pruning.
+It emits **19 model units, zero delivered files**, manifest SHA256
+`855ab8aa9ea5ef0f18154439530389b973281b4564bce90bb95e7e5ddf47b94b`.
+
+| Model | Completed hits / warm room request |
+|---|---:|
+| Account | 5 |
+| User | 5 |
+| Message | 40 |
+| Boost | 1 |
+| Session | 1 |
+| All other certified models | 0 |
+| **Total** | **52** |
+
+The remaining **two Room rows fall back for STI**; the inherited discriminator
+column requires Rails' `instantiate` path. Warm and repeat agree, as do both
+heap phase orders. Cold room has 94 hits and two STI fallbacks; cold work is
+not the priced mix. Warm room still makes 18 SQL events, 16 preload entries,
+three links and one form/token call. Those helper/preload calls are **not**
+optimized by this artifact. The AR-plan survey now explicitly refuses Prism
+1.4's unsupported grammar; other passes remain denylisted/quarantined or
+outside the blog-only certificates, not silently admitted.
+
+Raw cold off-A/off-B/on retains all headers/body. Status sequence is
+200/302/200 (sign-in GET/POST, room GET). Both comparisons reject: sign-in
+and room bodies differ at CSRF metadata and respectively one / 322 hidden
+tokens; ETag, Set-Cookie and X-Runtime differ. Exit `sessions` differs in
+`created_at`, `last_active_at`, `updated_at`, and `token`; queues/thread summaries
+agree. Nothing is removed to produce an accepted HTTP comparison.
+Separate census SQL/events are identical
+off/off/on: cold **117 / 619**, warm/repeat **18 / 38**. These observer-based
+comparisons are not complete arbitrary payload or bind-value coverage.
+
+For this exact artifact, the non-system own suite passes **234 / 671** per
+arm, 5,643 identical query counts/traces, zero load differences and zero hits.
+Production sealed delivery explicitly refuses in test, as designed: this is
+compatibility, not active sealed own-suite support.
+
+The browser rerun passes **8 / 60** in both arms, zero hits/loads, but strict
+verification **rejects** `SendingMessagesTest#test_sending_messages_between_two_users`
+at **496 → 499** queries. Its own-thread SQL digest is identical
+(`7f5b7ea6…`); the recorded `n` includes *both* own and other-thread events,
+and the verifier gates `(own_digest, n)`. Three tests also have other-thread
+digest advisories. No full-query lines were captured, so the extra queries
+cannot be attributed to specific calls; no Lowrail effect or harmlessness is
+claimed. No retry-to-green, control exemption or verifier change was made.
+
+### Revised request: one conditional interpreter-Ir cohort
+
+`campfire-r81-room-instantiate-v1`, **N0/N10**, off-A/off-B/on, six randomized
+serial rounds, seed 41231, balanced total/no-GC phase order; exact app/lock,
+artifact and harness digests in the appendix. Warm expected map is fixed at
+**52** above (Room two fallbacks), floors/pages as above. Preserve interpreter,
+placement, brk512, exact-page, A/A ±0.5% interval and all rejected-round gates
+from the accepted blog protocol. Price only live sealed AR instantiation,
+including its guards; no preload/helper/endpoint unit or cache-policy change.
+
+**Not ready to execute.** The coordinator must first decide the bounded next
+diagnostic for the browser SQL rejection and the full cold entropy/exit/load
+companion gates. Existing raw rejections are not approvals. Once those gates
+pass, seek explicit approval for exactly this one cohort, **after Fizzy's
+approved N=10 cohort releases the slot**. No speed estimate is inferred from
+52 hits or the blog's −15.23%. No further runtime change is authorized here.
 
 ## Reproduction boundaries
 
