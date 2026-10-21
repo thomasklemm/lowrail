@@ -1,0 +1,1594 @@
+{
+  "status": "pass",
+  "cold": {
+    "raw": {
+      "status": "rejected_off_control",
+      "differences": {
+        "off_control": [
+          "ArticlesControllerTest#test_should_get_index:response",
+          "ArticlesControllerTest#test_should_show_article:response",
+          "production_natural_repeat_show:response"
+        ],
+        "off_on": [
+          "ArticlesControllerTest#test_should_get_index:response",
+          "ArticlesControllerTest#test_should_show_article:response",
+          "production_natural_repeat_show:response"
+        ]
+      },
+      "capture_errors": [],
+      "async_refusals": [],
+      "hit_units": [
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    "companions": [
+      {
+        "status": "equivalent_for_executed_scenarios",
+        "differences": {
+          "off_control": [],
+          "off_on": []
+        },
+        "capture_errors": [],
+        "async_refusals": [],
+        "hit_units": [
+          "0",
+          "1",
+          "2"
+        ],
+        "seed": 0,
+        "cold_equal": true,
+        "forbidden_chains_absent": true,
+        "hits": [
+          {
+            "1": 2
+          },
+          {
+            "1": 4,
+            "2": 1
+          },
+          {
+            "0": 1,
+            "1": 4,
+            "2": 1
+          }
+        ],
+        "fallbacks": [
+          {},
+          {},
+          {}
+        ],
+        "admissions": {
+          "Lowrail::FormScaffold": {
+            "state": "active",
+            "attempts": 1,
+            "witness_seconds": 0.026826610002899542
+          },
+          "Lowrail::TokenTag": {
+            "state": "active",
+            "attempts": 1,
+            "witness_seconds": 0.0038223119991016574
+          },
+          "Lowrail::CollectionRender": {
+            "state": "active",
+            "attempts": 1,
+            "witness_seconds": 0.0020858630014117807
+          }
+        },
+        "refusals": [
+          {
+            "Lowrail::FormScaffold": null,
+            "Lowrail::TokenTag": null,
+            "Lowrail::CollectionRender": null
+          },
+          {
+            "Lowrail::FormScaffold": null,
+            "Lowrail::TokenTag": null,
+            "Lowrail::CollectionRender": null
+          },
+          {
+            "Lowrail::FormScaffold": null,
+            "Lowrail::TokenTag": null,
+            "Lowrail::CollectionRender": null
+          }
+        ]
+      },
+      {
+        "status": "equivalent_for_executed_scenarios",
+        "differences": {
+          "off_control": [],
+          "off_on": []
+        },
+        "capture_errors": [],
+        "async_refusals": [],
+        "hit_units": [
+          "0",
+          "1",
+          "2"
+        ],
+        "seed": 1,
+        "cold_equal": true,
+        "forbidden_chains_absent": true,
+        "hits": [
+          {
+            "1": 2
+          },
+          {
+            "1": 4,
+            "2": 1
+          },
+          {
+            "0": 1,
+            "1": 4,
+            "2": 1
+          }
+        ],
+        "fallbacks": [
+          {},
+          {},
+          {}
+        ],
+        "admissions": {
+          "Lowrail::FormScaffold": {
+            "state": "active",
+            "attempts": 1,
+            "witness_seconds": 0.026741601999674458
+          },
+          "Lowrail::TokenTag": {
+            "state": "active",
+            "attempts": 1,
+            "witness_seconds": 0.004003907997685019
+          },
+          "Lowrail::CollectionRender": {
+            "state": "active",
+            "attempts": 1,
+            "witness_seconds": 0.002169018000131473
+          }
+        },
+        "refusals": [
+          {
+            "Lowrail::FormScaffold": null,
+            "Lowrail::TokenTag": null,
+            "Lowrail::CollectionRender": null
+          },
+          {
+            "Lowrail::FormScaffold": null,
+            "Lowrail::TokenTag": null,
+            "Lowrail::CollectionRender": null
+          },
+          {
+            "Lowrail::FormScaffold": null,
+            "Lowrail::TokenTag": null,
+            "Lowrail::CollectionRender": null
+          }
+        ]
+      }
+    ]
+  },
+  "pairs": {
+    "none": {
+      "pairs": 192,
+      "hits": {
+        "0": 104,
+        "1": 398,
+        "2": 87
+      },
+      "fallbacks": {
+        "2": 62
+      }
+    },
+    "render_subscriber": {
+      "pairs": 192,
+      "hits": {
+        "0": 104,
+        "1": 398,
+        "2": 87
+      },
+      "fallbacks": {
+        "2": 62
+      }
+    }
+  },
+  "native": {
+    "hits": {
+      "sealed/form_scaffold": 50,
+      "sealed/token_tag": 200,
+      "sealed/collection_render": 50
+    },
+    "fallbacks": {
+      "sealed/form_scaffold": 0,
+      "sealed/token_tag": 0,
+      "sealed/collection_render": 0
+    },
+    "deopt_fallbacks": {
+      "0": 1,
+      "1": 4,
+      "2": 1
+    },
+    "admissions": {
+      "Lowrail::FormScaffold": {
+        "state": "active",
+        "attempts": 1,
+        "witness_seconds": 0.027796050999313593
+      },
+      "Lowrail::TokenTag": {
+        "state": "active",
+        "attempts": 1,
+        "witness_seconds": 0.0039930130005814135
+      },
+      "Lowrail::CollectionRender": {
+        "state": "active",
+        "attempts": 1,
+        "witness_seconds": 0.0022262310012592934
+      }
+    },
+    "native_binary": {
+      "/home/user/workspace/repo/.lowrail/private/passive-form-worktree/gem/lib/lowrail/native/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/lowrail_native.so": "f3056ad41f398339366ec61274cedb366767e9531940822fc377e9723397aa62"
+    }
+  },
+  "fixture": {
+    "name": "BlogShowGetOnly",
+    "sha256": "21a0de39f113d57e9303967b801c7b34d86aca7bcfcbe8c3d94013914cf5c970"
+  },
+  "manifest_sha256": "5271a66ff71c44f4276363adef136f65cadc2e1b7729ef6f2e953dd0d212d7e6",
+  "runtime_files_sha256": {
+    "lowrail.rb": "3254454f203897b1d11ecfb9505f29a0453af71faaf745da4547ddc108aaf482",
+    "lowrail/ar_guard.rb": "056647c46829f7013031e392342239513ca73ba4f599e634c83b8f82c73b133f",
+    "lowrail/ar_instantiate.rb": "5d59e8983fa6781977ac1743f0d2e4f79acf1083f0748756d322125c3f44314f",
+    "lowrail/ar_instantiate_build.rb": "0bb41782f7c2bf7ad975177c1f03986b1d7c38c560e0bc11fa8ae008efbde1f8",
+    "lowrail/ar_plan_build.rb": "20606044a887d968156d498a61216961fe8f49cac349a416ebbb798c22fe45fc",
+    "lowrail/ar_plan_facts.rb": "dfd04d08ab7e74a7ed7b30fcf53ff2bc6001d3ade6b85644ca12c372ead47d9a",
+    "lowrail/ar_plan_sites.rb": "0bf7051d9af853c832c69426623ccb920490c3c05b136738c84457601c7d2dcb",
+    "lowrail/ar_plans.rb": "899a94ad12d1f2c45b5dda3f0cb74ae88dee61756404b0c7b6d45cffc827e8a6",
+    "lowrail/ar_shadow.rb": "6d95adb126d88f62c74bc9c5858bdffe2d41a017ae19e030f9b375b277afb422",
+    "lowrail/build_jit.rb": "f559c807f2c2ad4fe752be18fb41226003439ef4c2e25cb49c20832faa74e858",
+    "lowrail/compilation.rb": "57897144c65f2f912d2b493b63c061b86d71c368ca144fe371b6b3324fbf37f1",
+    "lowrail/compiler.rb": "26a4158e886f553e570e6fddba4839418caf7617243a7a470bde23f467eccd3c",
+    "lowrail/digest_memo.rb": "affea7b66a0cb357b2e81b49453dd5d5a856e983b25ecf58637b5a590ce34475",
+    "lowrail/digest_memo_build.rb": "473cb2383546b0f674d9e3bae970603230dbc8289768fe0d11ec85eec9ede2fa",
+    "lowrail/endpoint.rb": "0e76c7dc06f71af7498759041655b33b0eef07b4cd8c147152be86669445f90a",
+    "lowrail/endpoint_build.rb": "f879fc7ea70028062daea277b2235703a8b91e71151b8f68edc90e85e3fc2063",
+    "lowrail/facts.rb": "a6e37769bc9a1a2b3ae63374f9426d2888111d12572c5da53e3d8525726ba7d3",
+    "lowrail/form_scaffold.rb": "8187712fd019c8890e462c98cd74a94c1118091c98bb2ffe84dfef43c9465c3b",
+    "lowrail/form_scaffold_admission.rb": "22d445a3e673a0a057cbd6cec874711799920e241a7c05a3f27a002b99505570",
+    "lowrail/form_scaffold_build.rb": "ec88f33b760a8b358cc220bb8a0e0cdd9b98889e71870b64b826be56e316c76b",
+    "lowrail/form_scaffold_inventory.rb": "f8f9a2af0069234b5ad679f28c0d9cd80c47c1f2d76aeee30aaec7d66644a9a3",
+    "lowrail/freeze_audit.rb": "8446079e2924aea41b806bb2485136e4ae6376d04655feacf8ec2e7ac9fcf87e",
+    "lowrail/guard.rb": "9f0f1d99ee6593ac4594e5e0b092f2543195482e1523ceb15d7593624ce64437",
+    "lowrail/inertia_config.rb": "270bbcc9621cb5512f8b0777fdd5f2772d2f1e9ef7a54e3cd5446480b668e7ff",
+    "lowrail/inertia_config_build.rb": "d4ac21ee498700ec426c96b7d7efceacf5cea9b627ee484278a6a9827d9af3bd",
+    "lowrail/inertia_props.rb": "2063023df8f23ef89c46abdfa448693166efdb1c5c0eb1d0546f64ffae4d8259",
+    "lowrail/inertia_props_build.rb": "15eae72432076a3b8f567737ac9e26d074ac152b5f10b174ad42a2833ce422e5",
+    "lowrail/jit_diagnostics.rb": "b9fdf0f399e6ef35f4451589a2e30758a91b6fe14b4f1746fa3b888d98fb5a9c",
+    "lowrail/jit_shapes.rb": "046d58ec87e394fbad13974bd4d8abae2361e8b3aaacdc664072c5f7f0e57ffb",
+    "lowrail/load_hooks.rb": "7b9a49ae7349b8faa421ff582470cb7960a4ea35ce99f23224536a5f93ad3091",
+    "lowrail/loader.rb": "65f63010722cf36554499071ef70f6e0e247abdd8b3ce7147ec7696bb329b1f8",
+    "lowrail/manifest.rb": "47da0de0660452d77d278b813bba25b5ed77c8ab4786db3814955c479faac31f",
+    "lowrail/materialize.rb": "1c5e0f460103b3e5b3c3b5455f7cc67135fd18068505bb4041a522e47f75a2ed",
+    "lowrail/memo.rb": "2cb8bd2fc14cb0dd91419d8e493dd94c60337fd0844730c03ef6d693ae6ed381",
+    "lowrail/memo_facts.rb": "75a40a2bad4fb0a118d970db55e2728587a101fdbec28e0515ecb7c02cbe2018",
+    "lowrail/minitest.rb": "602b187259464b2330dfdc1c9864b0fea218af5484c0ec23cada573328ed1341",
+    "lowrail/observe.rb": "aa25c1e137426e82a72e30a292233de3435061fb38bcc30faea297ded575374f",
+    "lowrail/oracle_routes.rb": "3e5543c327ea86c306f288df386e98efc14d7741541ed6e7d2caea252b354802",
+    "lowrail/passes.rb": "c59b2b4c7bad2938c911f9b07cbdeb92cea3dd3e5eb2f74ff82d02e05f4821e2",
+    "lowrail/paths.rb": "7b593eb4bf81399ab33603f8fea705ef58f54d81d3ea2ca3e407a305879baecb",
+    "lowrail/preload_build.rb": "5d562d1c33884481c73ca3f0fd89f33d776dfa01fbdc3267880a24e6e2021b28",
+    "lowrail/preload_facts.rb": "89f08a90fc97e4a1e502bae7803fcc369bb2d57bf58d29b79eaa643c1cd5c099",
+    "lowrail/preload_plans.rb": "427b19500eb8e346aab995798c309fd37c0a06a5a8e49600e9a1676a6f16c501",
+    "lowrail/render_units.rb": "bdcb1b43b7ec30b1bb49af130d66783747ce9e3776edec5c2e1b4c0fe1c11dbf",
+    "lowrail/render_units_build.rb": "a4820ef8e742c20d4f214ed32015dffec6a82a52312ff853f1754a494eaf1cf6",
+    "lowrail/routes.rb": "4c5b749e77209c7a306d6c716e4d37dfe14d53e80847b7a0f9ad714eb54c0f85",
+    "lowrail/rspec.rb": "a816c99eec56eda9788d80bfe040b1f96111aba18196446c73cceffdebc0eade",
+    "lowrail/script_capture.rb": "027a119d9b2bbf342fa44fa276f22c86b9643d8cffd632d78187eae25a53153c",
+    "lowrail/seal.rb": "1f6a7c32805a1f1c1e3232a6890610a7f5308b644087256aa32fa6cc62db1da4",
+    "lowrail/seal_rules.rb": "96d7ed8f0681e70600d1a12c9269aa201af7902886c3b23949cea892d11c48b6",
+    "lowrail/seal_snapshot.rb": "85e14c98ac1ddcfe0405c6ae7c742b0c101dbcf52a668fccdc55ee82ede304e4",
+    "lowrail/seal_static.rb": "981e5f9cfa1d68ebb5809f46fed1cd97bbb2fc8232d353eb69a0b1c463a82c7a",
+    "lowrail/sealed.rb": "c6c2079721650b5ccca61f722d3776e4dbbe9acfb8e3c46bde0ffa57fa064b73",
+    "lowrail/sealed_build.rb": "028acaadf158bad2c4ea9d5a3e3ce4519359d7c8fed9eb6d6b1eb66fe9e8c626",
+    "lowrail/setup.rb": "e7f0c8c1bf0102431fe765f1ef9cd7bd90b9d79cceb1a06a6a9874a67df7e1b1",
+    "lowrail/sql_trace.rb": "b3a0dc848066e77735dc53911a29a9bb2d44863a8cb49b08240b862d258d327c",
+    "lowrail/stats.rb": "b523b74e7a3d80c475551565820b5a5e7056b379ed0f13eb1af300614609ab48",
+    "lowrail/templates.rb": "713367d0c9f2fcfc1c0841bde7f5ae3b40b5e35dcd6c1aeacbb92d3588356ed3",
+    "lowrail/verify_loads.rb": "7bacbc8177efaa2065c24054830d85f5f85895fca28eab5ac7e2de85699a0ffc",
+    "minitest/lowrail_plugin.rb": "9f05c90d5c1fd15acceeb54f75b16e57e2cde4fe796fe97f6f3f70f3e7119911"
+  },
+  "harness_files_sha256": {
+    "ar_cached_reader.rb": "6e8c9b6083643c3405dfdff1e8a25e3cb660c57827163108141530a25e10f8f3",
+    "ar_chain_ceiling.rb": "394745f0125c081d4215f38711ad8f6a8c90cf97ec3e2671742b9d71648c5837",
+    "ar_equivalence.rb": "26a6dcaffc41e9ece189cb1dfb3c64ec512f21a731a0cc3ac05321eca31b21c3",
+    "ar_equivalence_models.rb": "6289c9a3188e409fcb121d7b6e8b2e2114cf43b2b31092f460f8b381e176b582",
+    "ar_equivalence_runtime.rb": "cc766d2128b3bb3d0a32b4401454373253a306ec4c71420d47d25d5f3d47e2af",
+    "ar_instantiate.rb": "f11054e3422991ccf2ecbe73c09d2289ffd3c86cee28967ddd2855a3b13ef38b",
+    "ar_instantiate_runs.rb": "be152c93857f34044ed39fb4b478d997dcb0f19c4d468b33e70770d32432c68f",
+    "ar_plans.rb": "bb233f137e1d24aef6eecf8971c899f7ad7643adb2b27f7d10287f954453ed45",
+    "ar_plans_runs.rb": "c15c5c874bb7e2930d278332abf0dc4d67736e0ac44e3394589f7cc3a2790cb3",
+    "ar_profile_summary.rb": "80d9c050004e7ab17adc175529d631f6943d87a34077a8f6c8c5e7ba5277a924",
+    "ar_rails_suite.rb": "d80a1c507fb8ba50d23bc9059db4d0ab4680fcf6ad9af8eb7d8c21b5d7d786d6",
+    "ar_request_hits.rb": "98eddd64861bb96e6d2af3bfcd3d240d71821a0c94b1f21cbc59bb2d7ec7ecdf",
+    "ar_shadow_cost.rb": "115134b1a8675592ac5a71d2eaa6a710b534d15ecd5a648ad4253b1b06da1910",
+    "ar_survey.rb": "14db5b6e70fa2bf7d636d5bbc1ef3bba3fe7a0713fe2c62eb295a7b8cdd5deb9",
+    "callback_survey.rb": "0f214ef1a9b75f681ec1ca0317176d50c6cb760b905b3e19aabb6264c7378bc6",
+    "callgrind.c": "b6d7ddf7667884c32b6c363f4e3a718e5ac5a8b75ce550e4d236fe6b4baec2a1",
+    "campfire_setup.rb": "2de60b8446780177daccceb761073b27deedacfcdc19276e3f2896fcc5aa2e34",
+    "experiments/allocations.rb": "757793e1ae8decd5f7a696010580e4281d715ad12b10d310e65f7ba9e445a93f",
+    "experiments/allocations_micro.rb": "6278da0b6778a0c8200c0f5d30dc8e900109ab0dc6a7adf6846ec8c2f27e130f",
+    "experiments/allocations_micro_study.rb": "ba0b22ad79aa2f909ff24145392831fe62954d4cfb691659df0ccfe63c29ba60",
+    "experiments/allocations_report.rb": "e0ce9021f82c6c499429d62de08d0b1299fea1d73fb8c7dc87059ba054ee0e43",
+    "experiments/allocations_study.rb": "f056add0e8463d283c475f0d29888ddaf56ac7190658f3bfbe684a61d82aec6c",
+    "experiments/blog_ablation.rb": "28ace24f1f206689b20c2360d4283d713f9d76abeec5870c6f6b703444cc1491",
+    "experiments/blog_check.rb": "81200ab7e575e4cd3275ffe11ac6f220e2c8fb4c01ce5788d66d6310b340396a",
+    "experiments/blog_decompose.rb": "12624e24a7aa6904245a829fe10023dc1eb5d5d63fc118f0d4a50f172448bb54",
+    "experiments/blog_endpoint_check.rb": "d8dd1afe139cf670713878e5124fb57df167238e9b91555145a01089d3d52aa0",
+    "experiments/blog_eventful.rb": "fdacc686e5e076e26255d5ff4a90e958d524725e9f1b062b3fa2b742c8269693",
+    "experiments/blog_events_check.rb": "b297d1e8ac6a7462e10c3e7265b5327b4a82b4f1aeb49304773fd5ab85b14c53",
+    "experiments/blog_layers.rb": "6a06767c4c1ff6a73e3fad20ee637591002a36e7e091f2c785cbe1a6822f116a",
+    "experiments/blog_profile.rb": "aab936b0c27a1364aa507e6f8a82750d18ef7611b67124345ff73c0c9e9c1f06",
+    "experiments/blog_study.rb": "f36aa5be8a6a76fc56f7bf7c610b48dc7917787999fbe550392e64cd4e50b1e2",
+    "experiments/blog_test_shapes.rb": "78293e0f4f478a6ea4f92a6debe5b23bad5ebd82a42cb38d77f0189247edede8",
+    "experiments/constant_epoch.rb": "e4c295b4eee8522326d4a2c70f6d362bc1705afb5f49f6c782e5cb9e89da36be",
+    "experiments/endpoint_bodies.rb": "d8eb742ab59343070bcfc63688c6abb18d88514bcf4cbcadabfe3048d6b0f11d",
+    "experiments/endpoint_sections.rb": "ffc007801cf4fe5cc5d4815c23af9c4092dc8b1957d7e69cbef682016e11c6ff",
+    "experiments/fizzy_freeze.rb": "fe7a030243f4ab971be8c841f96c685581d9000c3d2ab7157648ccc4af1c8dcc",
+    "experiments/freeze_guard_census.rb": "3fe4fcaa7e719e9ba01a2020f005907f1d70dfccb9915185e789960b14b6c539",
+    "experiments/guard_inline_cache.rb": "52fb6c860944f4dcf1c3b08233180f926d867a0c5b178c21327495bbd213bc99",
+    "experiments/hotspots.c": "d67ddb204ce939bcb189387fb31c01ba9f86dd14976ce330b77c416eef90da9c",
+    "experiments/hotspots.rb": "92f05e5ab76dfc9740959cc734b869d73c14580c8fbc735ff20978d6314d528d",
+    "experiments/hotspots_detail.c": "9051968f268a831fbf1eb00d182a9b0cf8911459fd810e9f6f139ff25964025c",
+    "experiments/hotspots_detail.rb": "cf0c76ffbf3f843ec9e788db34871f58363a4d51f7af1acab68bd88123775777",
+    "experiments/hotspots_report.rb": "e55d647850ebe1ea76296fa1a2eae511035961b1069db23f33eb427141b468fd",
+    "experiments/hotspots_study.rb": "98358b204bc148a95a10d9d42fa987512c3a6e3a27e4c57a9e44cc947a9aa875",
+    "experiments/props_freeze.rb": "35a0a66ea1349a71c559cb7f0baa73d63161a48bc992541bdf5ddf5ec54830f6",
+    "experiments/props_freeze_price.rb": "fdaa43bccb075b6ab5f873a77480b7dd2ca8a2d7b1cd976e4f3340c43d6660ef",
+    "experiments/props_variant.rb": "e6be6f9060798195719536e3dab348ed6359f8bfaf88630a97530ba350ddcbeb",
+    "experiments/sealed_collection.rb": "88466d3a75bbf3864a5d7827fd2bcc5fddea4bc67e2e368eacc70142a8273532",
+    "experiments/sealed_combined.rb": "eca9725f609b102ccdd411193f030702d874dfb39b102fd8889e03a3d05fef52",
+    "experiments/sealed_combined_check.rb": "8938b3f49453827095167fab9f3ae0b53799c1d63ab81caec3fc16a84bc1e35f",
+    "experiments/sealed_filters.rb": "2825251bb82cc453954530f2da98fee9fdd2597f9638f091a512a945a6e9f4b8",
+    "experiments/sealed_form.rb": "f57800e39b797ef5bd0d08e675f9b323bb36eb7a601ec2f832ee2d67c4fb956f",
+    "experiments/sealed_helpers.rb": "92bcf073df06fda701e8759a4b3e43248a1b3caa71ed9afa6861e02449a6c4b8",
+    "experiments/sealed_links.rb": "951ea314ef5026e10a17d1bcfb366a322b1d0aa0f7450c2a5e66225560dc4ad8",
+    "experiments/sealed_production_check.rb": "03106deabfa9b7627e6d7bc21b271a110c507ee96ba600c0c828669d3cd733a6",
+    "experiments/sealed_provenance.rb": "4548a32a7a1d2dcc0da61c86ed53454892c5d93dc0fcaca6ab6c4a89ce9c225d",
+    "experiments/sealed_renderer.rb": "96bc3a26a5fb3325b3ab43b3e05deaa6a6d6f6146c37e11d39b32c7141ff388f",
+    "experiments/sealed_renderer_report.rb": "596b2e68fc548c4654d2c43dd3c13a5bd8c120de1e1ef606b05c382e2dcc4b52",
+    "experiments/sealed_renderer_study.rb": "b4496601feac67c8896ed27c71804b7c9f52c33e8aa7d2936e745978ad214b31",
+    "experiments/sealed_renderer_worker.rb": "25481a79f80d9ab0d043d30742097a05b92433616c6355e118c489118cae4059",
+    "experiments/sealed_residual.c": "fbacc18f67ce5ebad2fa082dff09434e51f6ced737ef094761cf8006e48b891b",
+    "experiments/sealed_residual.rb": "383b13320effdab80e3bd3ed8c359929ace2bcea161d62f29e35c7c4c9535fb9",
+    "experiments/sealed_tokens.rb": "dbabbfc28c590ea7025e23c8c33b1ef49a8ccce6d44a6c1377a7bf80ebef0e7e",
+    "experiments/speculation_context.rb": "8e4474bd364581ac8c24e5b25cf7cd9802940f5f53404990be7f37c372a99271",
+    "experiments/speculative_build.rb": "1765156b4c113084b5471ff0341cc199f382eab94c69ab63eb04c403f3ca5834",
+    "experiments/trace_stickiness.rb": "421d1971cfd4d3b7ae034d5ef928eb724a82242da6175299cb753436bc338a96",
+    "experiments/vm_epoch.rb": "67f79131db4f08d27dbe41ab143d4f335bfd9d01a192f5e27afa8e453c2e5570",
+    "experiments/vm_epoch_census.rb": "96cc6bb833e1bdb3e964d047d13be4dac4b81672d7c955d6f99253072907d10a",
+    "experiments/vm_epoch_fizzy_setup.rb": "1ea71e4bd731af38686d8e13eb1573d84ea1bff655f00355d15466708d012841",
+    "experiments/vm_epoch_writes.rb": "422941d642fa72a1526240235ac2105e06654cd37a4d6cfaca5be6440529e7c2",
+    "experiments/vm_token_cost.rb": "54fb45234557da3cc39a51b1afa4cfea928c259859d14c4cc5c1541dd49c8331",
+    "experiments/vm_token_native.c": "02bc907d0417abfeed244659f5ccd75275ae8ed73c6ca792206e0630cb59a2a7",
+    "experiments/yjit_entries.rb": "661b673ad86c6821730601ce89e07b4f1fc38a1bd28c7963d0927e040ad01176",
+    "experiments/yjit_entry_paths.rb": "693176b99914ec0906117aae1a8e64d4f5ddc3962bbe51fa55620b2f517515eb",
+    "experiments/yjit_entry_reader.rb": "b6400d8036c5d237186302de5f8244c08950b9951027bc58388db632d6ca0efe",
+    "experiments/yjit_pending_entries.rb": "92edfaebb4e61a63382e5993366246897e338cc2d563a8d8b505d8484c0ff0d6",
+    "experiments/yjit_regression.rb": "dfa1a3ee0d9bcdb4a4730dbf14b6d0e2092faba4dad0fe64ee51832e486d2422",
+    "experiments/yjit_request_entries.rb": "bdb516b62e1303cd248ddbb86cca8f5cea98229c49a399d7f3396daa41a36e24",
+    "experiments/yjit_request_probe.rb": "1fb5f9cbd466acf098768c01b576be0a002a5df675a834e318441f0366d5052b",
+    "experiments/yjit_study.rb": "a5d44d311f9b4500faa639800553dae5d79faaf9432505cf89addd92bc0dab80",
+    "gc_requests.rb": "44da6cc09a6c74cedb882041afe9a742d6174a46bcc9a6e78f266784ebfa9203",
+    "guard_breakdown.rb": "c257e65f68bd9b68a3b5973daa6acabb79dce967545a88d99119880ccaa431bf",
+    "guard_cost.rb": "d7d47ba9c13db7ccf015ecd637d6b67a994ef11688345b000d2caa4dd09e135e",
+    "heap_operations.rb": "a5df4b172e52e084aca5ab0c8b8bda7b22b374debf8928cf167ac4eb1e786814",
+    "heap_requests.rb": "9b7c67a3d6ae5bf5663c48a62d8af4a8d0610a33d7ed421e5bdd63dfeb139678",
+    "heap_windows.rb": "b4f3bfa341ba37d09f3d84b7c77dd629aa7b87c36d80805b3bca37836f2b32d6",
+    "importmap.rb": "f935e15582b0852e2c8f8d62a162518dcfbd9d6b5ecc1627ca0d08ff74c7a039",
+    "inertia_config.rb": "90cf5d636a027e0ee83acff43081f8d9440f11ee512ce7a380171940b864979a",
+    "inertia_setup.rb": "ed465ba324c31ca11c3704c5893ec94b9dde20aef9a3ee86cc02cde5b80d2e37",
+    "instruction_budget.rb": "7835780b63d22624f98fc6de5fdda2786e2f4a91162a87882f3acc33578eabb2",
+    "jit_stability.rb": "743649435ea5af8e3902d35516e592e522afa7ed8b74135b491b6559496ca1a9",
+    "memo_check.rb": "19a6ac35b9b9fb55424cca1702ba049e9605177d4dc3c62ce1b5460d824dcde5",
+    "operation_capture.rb": "68effaa907332b57b4b04969733854598e576173d76d738c932ae9e3b99ebaf5",
+    "pass.rb": "fb3b91b60da28da224ddfbece1868dca96a06050528bd952b764c4776bc2cdd8",
+    "pass_probe.rb": "a3cd0cb91d8702cf40d57d849cd7bef1272d5948e00e4a9140a505e615415d7c",
+    "preload_paths.rb": "635c89211fab02b46e3fda04ce0a5714a0565e9be9577a54ecd4029b6c0421f1",
+    "profile_summary.rb": "37befeeca1315c6c3e8fa6c00b11e2bac8f87c7ed0648bb64bd8f29c618eb702",
+    "rails_suite_profiles.rb": "40a8c03f5bafc1ffee8aed8d9693827ad71bca7dddfbeebfddc82fad127d5f41",
+    "rails_suite_report.rb": "d772c6c9f3edc27df5c8864ddc3ea33ff88c176e9bf7c20cf9e5dc11c2b892bc",
+    "request_pairs.rb": "d390a08c3d2f05046bd41e3985aece1a1b4d7f638c84598cb792b6d55ebf20d9",
+    "requests.rb": "80163b27f03a96b35e197a18c6ab0c4832707a509a43edd5a613f2197a320bfd",
+    "routes.rb": "57979254f6912136d73a23b50a5cb8fcfc78b902ffe5a44f13782d238fad1154",
+    "speculation.rb": "fccada3c2c0321515c561cd27293786e133a5be984015645007dc0a9e704efc6",
+    "speculation_holes.rb": "c2e5afaa123266e897c27e32060991bff38060a5afc7e92c9401b92cd6c0d19e",
+    "stack_budget.rb": "ef70371c84b6bd8127c8266f867d0293d6966aaf0581e074b4504c7fa6032450",
+    "string_blank_backport_audit.rb": "3870474c90f71e7add5c078d7f3e49a2f2aac3106b5ac445677f607cb01b1254",
+    "upstream/connection_class.rb": "3858be4f0fec1ab627ec2eab05a88ca36b3116081cdf016873af137cc4869a9c",
+    "upstream/current_attributes.rb": "e78b12ec28a62da5898f4fb4a66f228c4a9168cb252ae66c6cac24ddb09d262b",
+    "upstream/falsy_memos.rb": "e6f4586d59722a713da8f14cedc4f520f09a5c44c3676b03f4e92233313968db",
+    "upstream/notifications.rb": "d8b99a2e6e8c5800290b87401fcc50c02d87bc6500be1596d8bc7c74f2a2dcb0",
+    "worker_placement.rb": "d6d63ec89aa6e6652f70048f05dd682a25e6ebd77a41839c62a7eb6ab9867aa8"
+  },
+  "gate_source_sha256": "03106deabfa9b7627e6d7bc21b271a110c507ee96ba600c0c828669d3cd733a6",
+  "provenance": {
+    "revision": "9fe952dbf445c1181f8bff6e388deeffbd83dd2b",
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+    "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+    "app_source_sha256": "86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf"
+  },
+  "scope": "Untimed correctness only; isolated passive production form/token/collection. No pricing adapter, cohort or speed claim. Default/quarantine unchanged.",
+  "measured": false,
+  "pins": {
+    "gate_report_sha256": "f4d49e3fe3f5901683fcf9caeee8519941db93ae0c866d5c3407f430afe27d87",
+    "runtime_map_sha256": "bed7bdd2905f0ee06cbf78a39882b103612da69c9e8871fc1c2c02af280a3eab",
+    "harness_map_sha256": "7d1e8ce29ee00b7e69ddded8acc60b5acf4f6b1f750224233f7c10c2d1dd01d7",
+    "raw_captures_sha256": {
+      "cold.json": "a6bfb8c0018e1a0fbfb2841d5af47a88a5a413406767472b5ca7fe1e69e0ac71",
+      "gates.json": "f4d49e3fe3f5901683fcf9caeee8519941db93ae0c866d5c3407f430afe27d87",
+      "pairs-none-off.json": "762621b8c890aa0d53f1d374d167279859a0eff3938073366b748bbf0eaec956",
+      "pairs-none-on.json": "342f49764d9e0433d7a847c4aa438d1e6d3f801b6c45b35536b0c30bec42d686",
+      "pairs-render_subscriber-off.json": "aa6240347805dbd5d0fc6a940feed8d0824c3735ae5134a2bcab7d31ac2f53c9",
+      "pairs-render_subscriber-on.json": "054a4276ca834b170970ca2b5380f092919af397ed9e8a5bc757900749aedf51",
+      "raw-off1.json": "123be04fcd35fd581fbd6c9fb6ab454bce8b8db4cc7fde48b5fb75deccc1352f",
+      "raw-off2.json": "30178bdee5e5705a1476b10648cab02f7a3a7b3504cae60c178129adba87ecd5",
+      "raw-on.json": "894d1e3a22be53ed2782d55785cd76651c8288c8002b403dbc96b62388632347",
+      "seed-0-off1.json": "4c658c7b8318210a182c860898749cdedb4ef47a9ef51fcc175b057ee92fd798",
+      "seed-0-off2.json": "19a1c574dd2996f60f10990af3f549674be1bd586bc3a85cbff9598c709ad0eb",
+      "seed-0-on.json": "b62e68ff3aa459bc39a8027f5f5b603727eface2e877a568823136b0bdf1c0bc",
+      "seed-1-off1.json": "b92a157d671296be774faaef36f4bbab11f01543301c6c97b73c9924e6e93cb5",
+      "seed-1-off2.json": "0b8434c24588a1252185112efd5ebb1f8706c877375408de568726e7bb07c217",
+      "seed-1-on.json": "4ec2b4f674b9df84350aef05a1939ee93661f331178aeb5ea21c5adc361c317f"
+    }
+  },
+  "retained_failure": {
+    "name": "historical_seed_six_unfinished_turbo_jobs",
+    "fixture": "historical db/seeds.rb snapshot, NOT BlogShowGetOnly",
+    "retained": true,
+    "retried_for_measurement": false,
+    "comparisons": {
+      "raw": {
+        "status": "rejected_off_control",
+        "differences": {
+          "off_control": [
+            "ArticlesControllerTest#test_should_get_index:response",
+            "ArticlesControllerTest#test_should_show_article:response",
+            "production_natural_repeat_show:response"
+          ],
+          "off_on": [
+            "ArticlesControllerTest#test_should_get_index:response",
+            "ArticlesControllerTest#test_should_show_article:response",
+            "production_natural_repeat_show:response"
+          ]
+        },
+        "capture_errors": [],
+        "async_refusals": [
+          {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          }
+        ],
+        "hit_units": [
+          "0",
+          "1",
+          "2"
+        ]
+      },
+      "companions": [
+        {
+          "status": "rejected_async_completion",
+          "differences": {
+            "off_control": [],
+            "off_on": []
+          },
+          "capture_errors": [],
+          "async_refusals": [
+            {
+              "status": "refused",
+              "deadline_seconds": 2.0,
+              "reasons": [
+                "Solid Queue jobs unfinished; no supervisor in Rack worker"
+              ],
+              "sources": {
+                "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+                "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+                "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+                "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+                "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+                "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+              },
+              "cable": "not_started",
+              "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+              "pending_jobs": [
+                [
+                  1,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  2,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  3,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  4,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  5,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  6,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ]
+              ],
+              "queue_states": {
+                "ready": 6,
+                "claimed": 0,
+                "scheduled": 0,
+                "blocked": 0,
+                "failed": 0,
+                "batch": 0
+              },
+              "queue_processes": 0,
+              "reported_errors": []
+            },
+            {
+              "status": "refused",
+              "deadline_seconds": 2.0,
+              "reasons": [
+                "Solid Queue jobs unfinished; no supervisor in Rack worker"
+              ],
+              "sources": {
+                "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+                "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+                "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+                "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+                "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+                "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+              },
+              "cable": "not_started",
+              "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+              "pending_jobs": [
+                [
+                  1,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  2,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  3,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  4,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  5,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  6,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ]
+              ],
+              "queue_states": {
+                "ready": 6,
+                "claimed": 0,
+                "scheduled": 0,
+                "blocked": 0,
+                "failed": 0,
+                "batch": 0
+              },
+              "queue_processes": 0,
+              "reported_errors": []
+            },
+            {
+              "status": "refused",
+              "deadline_seconds": 2.0,
+              "reasons": [
+                "Solid Queue jobs unfinished; no supervisor in Rack worker"
+              ],
+              "sources": {
+                "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+                "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+                "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+                "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+                "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+                "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+              },
+              "cable": "not_started",
+              "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+              "pending_jobs": [
+                [
+                  1,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  2,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  3,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  4,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  5,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  6,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ]
+              ],
+              "queue_states": {
+                "ready": 6,
+                "claimed": 0,
+                "scheduled": 0,
+                "blocked": 0,
+                "failed": 0,
+                "batch": 0
+              },
+              "queue_processes": 0,
+              "reported_errors": []
+            }
+          ],
+          "hit_units": [
+            "0",
+            "1",
+            "2"
+          ],
+          "seed": 0,
+          "cold_equal": true,
+          "forbidden_chains_absent": true,
+          "hits": [
+            {
+              "1": 2
+            },
+            {
+              "1": 4,
+              "2": 1
+            },
+            {
+              "0": 1,
+              "1": 4,
+              "2": 1
+            }
+          ],
+          "fallbacks": [
+            {},
+            {},
+            {}
+          ],
+          "admissions": {
+            "Lowrail::FormScaffold": {
+              "state": "active",
+              "attempts": 1,
+              "witness_seconds": 0.039210593997268006
+            },
+            "Lowrail::TokenTag": {
+              "state": "active",
+              "attempts": 1,
+              "witness_seconds": 0.0038604559958912432
+            },
+            "Lowrail::CollectionRender": {
+              "state": "active",
+              "attempts": 1,
+              "witness_seconds": 0.0021553410042542964
+            }
+          },
+          "refusals": [
+            {
+              "Lowrail::FormScaffold": null,
+              "Lowrail::TokenTag": null,
+              "Lowrail::CollectionRender": null
+            },
+            {
+              "Lowrail::FormScaffold": null,
+              "Lowrail::TokenTag": null,
+              "Lowrail::CollectionRender": null
+            },
+            {
+              "Lowrail::FormScaffold": null,
+              "Lowrail::TokenTag": null,
+              "Lowrail::CollectionRender": null
+            }
+          ]
+        },
+        {
+          "status": "rejected_async_completion",
+          "differences": {
+            "off_control": [],
+            "off_on": []
+          },
+          "capture_errors": [],
+          "async_refusals": [
+            {
+              "status": "refused",
+              "deadline_seconds": 2.0,
+              "reasons": [
+                "Solid Queue jobs unfinished; no supervisor in Rack worker"
+              ],
+              "sources": {
+                "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+                "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+                "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+                "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+                "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+                "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+              },
+              "cable": "not_started",
+              "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+              "pending_jobs": [
+                [
+                  1,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  2,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  3,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  4,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  5,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  6,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ]
+              ],
+              "queue_states": {
+                "ready": 6,
+                "claimed": 0,
+                "scheduled": 0,
+                "blocked": 0,
+                "failed": 0,
+                "batch": 0
+              },
+              "queue_processes": 0,
+              "reported_errors": []
+            },
+            {
+              "status": "refused",
+              "deadline_seconds": 2.0,
+              "reasons": [
+                "Solid Queue jobs unfinished; no supervisor in Rack worker"
+              ],
+              "sources": {
+                "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+                "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+                "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+                "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+                "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+                "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+              },
+              "cable": "not_started",
+              "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+              "pending_jobs": [
+                [
+                  1,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  2,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  3,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  4,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  5,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  6,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ]
+              ],
+              "queue_states": {
+                "ready": 6,
+                "claimed": 0,
+                "scheduled": 0,
+                "blocked": 0,
+                "failed": 0,
+                "batch": 0
+              },
+              "queue_processes": 0,
+              "reported_errors": []
+            },
+            {
+              "status": "refused",
+              "deadline_seconds": 2.0,
+              "reasons": [
+                "Solid Queue jobs unfinished; no supervisor in Rack worker"
+              ],
+              "sources": {
+                "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+                "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+                "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+                "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+                "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+                "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+              },
+              "cable": "not_started",
+              "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+              "pending_jobs": [
+                [
+                  1,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  2,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  3,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  4,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  5,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ],
+                [
+                  6,
+                  "Turbo::Streams::ActionBroadcastJob"
+                ]
+              ],
+              "queue_states": {
+                "ready": 6,
+                "claimed": 0,
+                "scheduled": 0,
+                "blocked": 0,
+                "failed": 0,
+                "batch": 0
+              },
+              "queue_processes": 0,
+              "reported_errors": []
+            }
+          ],
+          "hit_units": [
+            "0",
+            "1",
+            "2"
+          ],
+          "seed": 1,
+          "cold_equal": true,
+          "forbidden_chains_absent": true,
+          "hits": [
+            {
+              "1": 2
+            },
+            {
+              "1": 4,
+              "2": 1
+            },
+            {
+              "0": 1,
+              "1": 4,
+              "2": 1
+            }
+          ],
+          "fallbacks": [
+            {},
+            {},
+            {}
+          ],
+          "admissions": {
+            "Lowrail::FormScaffold": {
+              "state": "active",
+              "attempts": 1,
+              "witness_seconds": 0.03771995099668857
+            },
+            "Lowrail::TokenTag": {
+              "state": "active",
+              "attempts": 1,
+              "witness_seconds": 0.003874039997754153
+            },
+            "Lowrail::CollectionRender": {
+              "state": "active",
+              "attempts": 1,
+              "witness_seconds": 0.0021341290048439987
+            }
+          },
+          "refusals": [
+            {
+              "Lowrail::FormScaffold": null,
+              "Lowrail::TokenTag": null,
+              "Lowrail::CollectionRender": null
+            },
+            {
+              "Lowrail::FormScaffold": null,
+              "Lowrail::TokenTag": null,
+              "Lowrail::CollectionRender": null
+            },
+            {
+              "Lowrail::FormScaffold": null,
+              "Lowrail::TokenTag": null,
+              "Lowrail::CollectionRender": null
+            }
+          ]
+        }
+      ]
+    },
+    "records": {
+      "0": {
+        "off1": {
+          "capture_sha256": "ea70f6a075241ba41638021a230f824273639905e93fe53035eba5d9b9777d57",
+          "completion": {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          "completed_effects": null,
+          "capture_errors": [],
+          "boot_sql": []
+        },
+        "off2": {
+          "capture_sha256": "845cc63a2d88ac8c56caef72b6016db02e4b3eb7c3bfec86125661a449370471",
+          "completion": {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          "completed_effects": null,
+          "capture_errors": [],
+          "boot_sql": []
+        },
+        "on": {
+          "capture_sha256": "776bd78cb44798fec7221c654f2b1fe7169ec162a492fca35193af7acf3cfd60",
+          "completion": {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          "completed_effects": null,
+          "capture_errors": [],
+          "boot_sql": []
+        }
+      },
+      "1": {
+        "off1": {
+          "capture_sha256": "36bf22961de21dd1c18e7caa62726f74ddd49d8d8018095ade42468a12ef2e06",
+          "completion": {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          "completed_effects": null,
+          "capture_errors": [],
+          "boot_sql": []
+        },
+        "off2": {
+          "capture_sha256": "ef07c45c745e543619a98f22641bb9376326fb53d81dedc5369c1d2004924dd8",
+          "completion": {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          "completed_effects": null,
+          "capture_errors": [],
+          "boot_sql": []
+        },
+        "on": {
+          "capture_sha256": "8e7e2a2fda2cd918eaedb1f0c852c7edd2058f8fe3f0ad6aae7943385e351a09",
+          "completion": {
+            "status": "refused",
+            "deadline_seconds": 2.0,
+            "reasons": [
+              "Solid Queue jobs unfinished; no supervisor in Rack worker"
+            ],
+            "sources": {
+              "actioncable:lib/action_cable.rb": "ff9b2a44d4e088bbb19455386619da308a17d44df98cdb827572a7da0aa9247b",
+              "actioncable:lib/action_cable/server/base.rb": "f427cc28f1770ee0ee55a8e5aaf024cde517b00ff564054be37155c5bd341d54",
+              "solid_cable:lib/action_cable/subscription_adapter/solid_cable.rb": "9ad4ab7bad574fc1b5f53396a6563f5a7a70d74b2ed6cffcf3b61e3d2b719499",
+              "solid_cable:lib/solid_cable/batched_broadcaster.rb": "7456a1b0e79d467ecd9bfa99df8375564f246af0ac441053c78d35a0d8754eb0",
+              "solid_cable:lib/solid_cable/trimming.rb": "ecfe9b44ad2d28c55a95d3c1d83d53354e46199cfcb0f65eaac58e5350f2a84b",
+              "solid_queue:lib/active_job/queue_adapters/solid_queue_adapter.rb": "bc0667666abf9d7fe0432bf2657d05bfefc66ddf9cec177236a43493212aa288"
+            },
+            "cable": "not_started",
+            "job_adapter": "ActiveJob::QueueAdapters::SolidQueueAdapter",
+            "pending_jobs": [
+              [
+                1,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                2,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                3,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                4,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                5,
+                "Turbo::Streams::ActionBroadcastJob"
+              ],
+              [
+                6,
+                "Turbo::Streams::ActionBroadcastJob"
+              ]
+            ],
+            "queue_states": {
+              "ready": 6,
+              "claimed": 0,
+              "scheduled": 0,
+              "blocked": 0,
+              "failed": 0,
+              "batch": 0
+            },
+            "queue_processes": 0,
+            "reported_errors": []
+          },
+          "completed_effects": null,
+          "capture_errors": [],
+          "boot_sql": []
+        }
+      }
+    },
+    "cold_report_sha256": "d1d28b52c9193417cea3d94bd0e381c72a48da3a94e73b7c2f2136221e27c6e5"
+  },
+  "counter_prerequisite": {
+    "scope": "Actual counter and placement regressions only; no app pricing, measurement slots or cohort",
+    "native_and_counter": {
+      "command": "ruby bench/request_pairs_test.rb --name \"/gc_exclusion|worker_overlap|native_no_app/\"",
+      "runs": 3,
+      "assertions": 155,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "log_sha256": "cb3acc98612c859252f2d62344df9d4274c0c44e7f63dcce35dee227d5d5887b"
+    },
+    "pinned_brk512_counter": {
+      "command": "ruby bench/request_pairs_test.rb --name /gc_exclusion/",
+      "runs": 1,
+      "assertions": 13,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "log_sha256": "78d626c494701591ad7eaeeb3cd90d4d3a32b1fa51cb9f817eb972bc5c06d795",
+      "tool": {
+        "version": "3.19.0",
+        "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+        "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+        "brk_reservation_mib": 512,
+        "tool": "libexec/valgrind/callgrind-amd64-linux",
+        "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+        "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+        "libc": "glibc 2.36"
+      }
+    },
+    "migrations": {
+      "count": null,
+      "reason": "proc sched counter unavailable; not inferred from endpoint CPU or switches"
+    }
+  },
+  "proposed_cohort": {
+    "authorized": false,
+    "executed": false,
+    "candidate": "passive production form/token/collection, NOT rejected pricing specimen",
+    "fixture": "BlogShowGetOnly",
+    "rounds": 6,
+    "seed": 41231,
+    "requests": [
+      0,
+      50
+    ],
+    "arms": [
+      "off_a",
+      "off_b",
+      "production"
+    ],
+    "max_workers_if_allocated": 2,
+    "jit": "interpreter",
+    "heap_slots": [
+      1000000,
+      250000,
+      100000,
+      20000,
+      10000
+    ],
+    "controls": [
+      "total_AA",
+      "GC_excluded_AA",
+      "fixed_heaps",
+      "brk",
+      "actual_JIT",
+      "idle",
+      "source_pins",
+      "unit_hits_fallbacks_refusals"
+    ],
+    "comparisons_with_older_fixtures": false,
+    "retry": false
+  },
+  "validation": {
+    "initial_full_primary": {
+      "runs": 173,
+      "assertions": 5918,
+      "failures": 3,
+      "errors": 0,
+      "skips": 2,
+      "log_sha256": "dfc1720e956d65230122e56eda2c6a5047790df31cb11da9e0620d3396a1c979",
+      "failures_named": [
+        "retained all-sealed cold ancestry",
+        "explicit manifest matrix 27 vs 33",
+        "extra boot TracePoint retired memo fast path"
+      ]
+    },
+    "corrected_strict_primary": {
+      "runs": 170,
+      "assertions": 3552,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "log_sha256": "bd474125232fccb803369065a2a2ccbe94c97c2c29148fd51027e665fccf4219",
+      "command": "LOWRAIL_TEST_CORPUS_ROOT=PRIVATE_CORPUS LOWRAIL_RAILS_CHECKOUT=PRIVATE_RAILS LOWRAIL_STRICT_GATES=1 mise exec -- ruby -w -Ilib -Itest -e 'Dir[\"test/*_test.rb\"].sort.reject { _1 == \"test/inertia_props_test.rb\" }.each { require_relative _1 }' -- --seed 53298",
+      "failure": "BlogProductionTest#test_cold_sealed_admission_does_not_prepare_the_app: retained Template/Preloader ancestry",
+      "excluded_file": "unchanged inertia_props_test.rb: three tests passed in initial full primary run"
+    },
+    "fixed_compatibility": {
+      "runs": 8,
+      "assertions": 178,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "log_sha256": "58f8bf025848c7c3451d0e745c5935fc3008cfbc999478b2d42f227af600ad41"
+    },
+    "clean_main_control": {
+      "runs": 1,
+      "assertions": 91,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "log_sha256": "1c18ae4a94e3f87ee8eac333384c79d33f5d000c0fa1bbec7156e694a86b4889"
+    },
+    "cargo": {
+      "command": "cargo test --locked",
+      "passed": [
+        39,
+        1,
+        8
+      ],
+      "failures": 0
+    },
+    "counter_and_placement": {
+      "runs": 3,
+      "assertions": 155,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "log_sha256": "cb3acc98612c859252f2d62344df9d4274c0c44e7f63dcce35dee227d5d5887b"
+    },
+    "pinned_brk512_counter": {
+      "runs": 1,
+      "assertions": 13,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "log_sha256": "78d626c494701591ad7eaeeb3cd90d4d3a32b1fa51cb9f817eb972bc5c06d795"
+    }
+  }
+}

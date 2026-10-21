@@ -122,6 +122,14 @@ dedicated Rails report rerun passes **3/17**, zero skips. The final affected
 suite and published source/artifact pins are recorded in the numeric export;
 the original failed run remains reported, not relabeled green.
 
+The corrected strict run records **170 tests / 3,552 assertions, one failure,
+zero errors/skips**: only the retained all-sealed cold-ancestry failure above.
+It includes every gem test file except the unchanged `inertia_props_test.rb`
+(its three tests passed in the initial full run). Cargo passes **39 + 1 + 8**.
+Actual counter/placement regressions pass **3/155**; the separately pinned
+512-MiB-brk counter regression passes **1/13**, with zero skips. These are
+untimed prerequisites, not an app cohort or a speed result.
+
 ## One proposed production cohort — awaiting authorization
 
 **Not started; no slots used or reserved.** After publication and the final
