@@ -20635,5 +20635,5011 @@
         "unstable_sql": []
       }
     }
+  },
+  "dispatch_followup": {
+    "base": "1b108ad7c51293810eec39f678569c73bce3f435",
+    "runtime_revision": "d0cb874153a2b432a398b34e0218d375b80c21ee",
+    "scope": "Isolated corrected verification-only candidate for sealed re-review, not main-integration or publication approval",
+    "published_dispatch_sources": [
+      "1c99962e3f8d83dc0c303c2a403f9453249182e0",
+      "62f8a6bbbecabb21df218a01b121299fee726eff"
+    ],
+    "baseline": {
+      "reviewed_head": "50ecec89d6ba556db95e92c41015fcc27930d0aa",
+      "regressions": {
+        "tests": 2,
+        "assertions": 9,
+        "failures": 2,
+        "errors": 0,
+        "skips": 0,
+        "log": "dispatch-exact-50ecec8-before.log",
+        "sha256": "884a8db05555f8217e34ff0bc415f32eafe697fd1b783f868fb7224c54488bab"
+      },
+      "private_failure": "effective view generator private before witness: stock succeeds, fast raises NoMethodError",
+      "name_failure": "existing send override: stock generation/conversion/send 1/1/0, fast wrong-name 1/0/1"
+    },
+    "checks": {
+      "certificate": {
+        "tests": 11,
+        "assertions": 306,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "log": "shared-dispatch-certificate.log",
+        "sha256": "2a484507ed0c5c3503c53a113bebbdd1a5550b540803a65b71e329dedad1ca23"
+      },
+      "sealed_original_review_probes": {
+        "tests": 3,
+        "assertions": 31,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "log": "shared-dispatch-sealed-probes.log",
+        "sha256": "cadbf0aa49f5f0373dba24caa77180395127808df773676399ab8f06138dd7b8"
+      },
+      "missing_protection_control": {
+        "tests": 1,
+        "assertions": 8,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "log": "shared-dispatch-missing-protection.log",
+        "sha256": "f407f2f57a267c4395f645fc4d271e85fd0403c36edb57421f2f4fdeed1053c1"
+      },
+      "affected_initial": {
+        "tests": 42,
+        "assertions": 1500,
+        "failures": 1,
+        "errors": 0,
+        "skips": 0,
+        "log": "shared-dispatch-affected-gem.log",
+        "sha256": "55896d94ff4c934a0a48a30b191ca617ea6597a3c4b89e8fb6ba2cd473d3dfd4"
+      },
+      "locked_parser_after_prism_install": {
+        "tests": 1,
+        "assertions": 1,
+        "failures": 1,
+        "errors": 0,
+        "skips": 0,
+        "log": "shared-dispatch-prism-prerequisite-rerun.log",
+        "sha256": "fbe60aa47a33f27dc44266d9e56ab8b698c83757cdb09dc2f8567bce8555d7a2"
+      },
+      "locked_parser_after_both_prerequisites": {
+        "tests": 1,
+        "assertions": 11,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "log": "shared-dispatch-prism-prerequisites-fixed.log",
+        "sha256": "08637b4c6d2e98cb365ba6ce1e2d6756658ab2cf76e93e3bbf3931cfbd4b5c02"
+      },
+      "affected_interpretation": "41 other checks pass in the 42-test run; one missing-Prism failure retained. Focused retry exposes missing Minitest 5.27.0. After installing both pinned prerequisites, unchanged locked-parser test passes. Separate runs, not a single all-green combined run.",
+      "cargo_passed": [
+        39,
+        2,
+        8
+      ],
+      "rbs": {
+        "version": "4.2.0",
+        "command": "rbs -I OUT validate",
+        "exit": 0
+      }
+    },
+    "matrices": {
+      "default": {
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+        "workers": 1,
+        "seed": 41231,
+        "invocation": "default",
+        "scope": "unchanged own suites; no speed/production/parallel claim",
+        "cases": {
+          "ci-unset-test": {
+            "eager_load": false,
+            "command": [
+              "bin/rails",
+              "test",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 14,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 161851,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 14,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 3,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 11,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 161878,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 3,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 11,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 11,
+                    "fallbacks": 3,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 3,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 11,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 161906,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 3,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 11,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 11,
+                    "fallbacks": 3,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          },
+          "ci-unset-test-system": {
+            "eager_load": false,
+            "command": [
+              "bin/rails",
+              "test:system",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 28,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 161947,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 28,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 162235,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 162529,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          },
+          "ci-1-test": {
+            "eager_load": false,
+            "command": [
+              "bin/rails",
+              "test",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 14,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 162849,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 14,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 3,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 11,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 162892,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 3,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 11,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 11,
+                    "fallbacks": 3,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 3,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 11,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 163185,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 3,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 11,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 11,
+                    "fallbacks": 3,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          },
+          "ci-1-test-system": {
+            "eager_load": false,
+            "command": [
+              "bin/rails",
+              "test:system",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 28,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 163212,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 28,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 163486,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 163766,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          }
+        }
+      },
+      "eager": {
+        "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+        "workers": 1,
+        "seed": 41231,
+        "invocation": "explicit_paths",
+        "scope": "unchanged own suites; no speed/production/parallel claim",
+        "cases": {
+          "ci-unset-test": {
+            "eager_load": false,
+            "command": [
+              "bin/rails",
+              "test",
+              "test/controllers/articles_controller_test.rb",
+              "test/controllers/comments_controller_test.rb",
+              "test/models/article_test.rb",
+              "test/models/comment_test.rb",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 14,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 164579,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 14,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 3,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 11,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 164598,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 3,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 11,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 11,
+                    "fallbacks": 3,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 3,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 11,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 164620,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 3,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 11,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 11,
+                    "fallbacks": 3,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          },
+          "ci-unset-test-system": {
+            "eager_load": false,
+            "command": [
+              "bin/rails",
+              "test",
+              "test/system/",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 28,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 164675,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 28,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 164927,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": false,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 165165,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          },
+          "ci-1-test": {
+            "eager_load": true,
+            "command": [
+              "bin/rails",
+              "test",
+              "test/controllers/articles_controller_test.rb",
+              "test/controllers/comments_controller_test.rb",
+              "test/models/article_test.rb",
+              "test/models/comment_test.rb",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": true,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ActionMailbox::InboundEmail",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionMailbox::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::EncryptedRichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::RichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Attachment",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Blob",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::VariantRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "SolidCable::Message",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCable::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Entry",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Batch",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BatchExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BlockedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ClaimedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Execution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::FailedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Job",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Pause",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Process",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ReadyExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringTask",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ScheduledExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Semaphore",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 14,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 165914,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 14,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": true,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ActionMailbox::InboundEmail",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionMailbox::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::EncryptedRichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::RichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Attachment",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Blob",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::VariantRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "SolidCable::Message",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCable::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Entry",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Batch",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BatchExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BlockedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ClaimedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Execution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::FailedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Job",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Pause",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Process",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ReadyExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringTask",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ScheduledExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Semaphore",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 13,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 165932,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 13,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 13,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "CommentsControllerTest#test_should_create_comment": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "CommentsControllerTest#test_should_destroy_comment": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_new": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_index": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_create_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_destroy_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_get_edit": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_show_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_update_article": {
+                    "result": "pass"
+                  },
+                  "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_creates_an_article_with_valid_attributes": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_body_minimum_length": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_validates_title_presence": {
+                    "result": "pass"
+                  },
+                  "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_commenter": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_valid_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_belongs_to_article_association": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_creates_a_comment_on_an_article": {
+                    "result": "pass"
+                  },
+                  "CommentTest#test_requires_body": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": true,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ActionMailbox::InboundEmail",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionMailbox::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::EncryptedRichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::RichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Attachment",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Blob",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::VariantRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "SolidCable::Message",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCable::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Entry",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Batch",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BatchExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BlockedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ClaimedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Execution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::FailedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Job",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Pause",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Process",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ReadyExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringTask",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ScheduledExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Semaphore",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 13,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 165937,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 13,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 30,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 9,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 23,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 13,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 1,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          },
+          "ci-1-test-system": {
+            "eager_load": true,
+            "command": [
+              "bin/rails",
+              "test",
+              "test/system/",
+              "--seed",
+              "41231"
+            ],
+            "runs": {
+              "off": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": true,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ActionMailbox::InboundEmail",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionMailbox::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::EncryptedRichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::RichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Attachment",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Blob",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::VariantRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "SolidCable::Message",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCable::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Entry",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Batch",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BatchExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BlockedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ClaimedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Execution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::FailedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Job",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Pause",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Process",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ReadyExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringTask",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ScheduledExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Semaphore",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 28,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 0,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 165956,
+                    "unit_deopts": {},
+                    "unit_refusals": {},
+                    "unit_pending": {
+                      "4": "verification_original_operation_pending",
+                      "5": "verification_original_operation_pending"
+                    },
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 28,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 0,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 0,
+                    "fallbacks": 0,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-cold": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": true,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ActionMailbox::InboundEmail",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionMailbox::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::EncryptedRichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::RichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Attachment",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Blob",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::VariantRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "SolidCable::Message",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCable::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Entry",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Batch",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BatchExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BlockedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ClaimedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Execution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::FailedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Job",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Pause",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Process",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ReadyExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringTask",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ScheduledExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Semaphore",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 166213,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              },
+              "on-warm": {
+                "exit": 0,
+                "outcomes": {
+                  "ArticlesSystemTest#test_article_with_comments": {
+                    "result": "pass"
+                  },
+                  "ArticlesSystemTest#test_full_article_lifecycle": {
+                    "result": "pass"
+                  }
+                },
+                "natural_state": {
+                  "eager_load": true,
+                  "rake_eager_load": false,
+                  "models": [
+                    {
+                      "name": "ActionMailbox::InboundEmail",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionMailbox::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::EncryptedRichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActionText::RichText",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Attachment",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Blob",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ActiveStorage::VariantRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "ApplicationRecord",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "Article",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "Comment",
+                      "schema_loaded": true,
+                      "attributes_generated": true
+                    },
+                    {
+                      "name": "SolidCable::Message",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCable::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Entry",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidCache::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Batch",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BatchExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::BlockedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ClaimedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Execution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::FailedExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Job",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Pause",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Process",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ReadyExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Record",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::RecurringTask",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::ScheduledExecution",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    },
+                    {
+                      "name": "SolidQueue::Semaphore",
+                      "schema_loaded": false,
+                      "attributes_generated": false
+                    }
+                  ],
+                  "token_branches": {
+                    "original_generation": 0,
+                    "original_tag": 0,
+                    "original_empty": 1,
+                    "protected_fast": 0,
+                    "continuation_fallback": 0,
+                    "empty_fast": 27,
+                    "empty_retired": 0,
+                    "unknown_original_source": 0
+                  }
+                },
+                "verification_test": [
+                  {
+                    "state": "active",
+                    "pid": 166525,
+                    "unit_deopts": {},
+                    "unit_refusals": {
+                      "2": [
+                        "verification_literal_table_observer_unavailable"
+                      ],
+                      "3": [
+                        "verification_form_config_schema_translation_observer_unavailable"
+                      ]
+                    },
+                    "unit_pending": {},
+                    "token_branches": {
+                      "original_generation": 0,
+                      "original_tag": 0,
+                      "original_empty": 1,
+                      "protected_fast": 0,
+                      "continuation_fallback": 0,
+                      "empty_fast": 27,
+                      "empty_retired": 0,
+                      "unknown_original_source": 0
+                    }
+                  }
+                ],
+                "units": [
+                  {
+                    "id": "0",
+                    "pass": "active_record/instantiate",
+                    "target": "Article",
+                    "hits": 18,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "1",
+                    "pass": "active_record/instantiate",
+                    "target": "Comment",
+                    "hits": 8,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "2",
+                    "pass": "sealed/link_to",
+                    "target": "ArticlesController",
+                    "hits": 0,
+                    "fallbacks": 43,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_literal_table_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "pass": "sealed/form_scaffold",
+                    "target": "ArticlesController#form_with",
+                    "hits": 0,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": [
+                      "verification_form_config_schema_translation_observer_unavailable"
+                    ]
+                  },
+                  {
+                    "id": "4",
+                    "pass": "sealed/token_tag",
+                    "target": "ArticlesController#token_tag",
+                    "hits": 27,
+                    "fallbacks": 1,
+                    "deopts": 0,
+                    "refusals": []
+                  },
+                  {
+                    "id": "5",
+                    "pass": "sealed/collection_render",
+                    "target": "ActionView::CollectionRenderer#collection_with_template",
+                    "hits": 4,
+                    "fallbacks": 6,
+                    "deopts": 0,
+                    "refusals": []
+                  }
+                ]
+              }
+            },
+            "on_only_differences": {
+              "on-cold": {},
+              "on-warm": {}
+            },
+            "optimized_execution": {
+              "on-cold": true,
+              "on-warm": true
+            }
+          }
+        }
+      }
+    },
+    "artifact_pins": {
+      "default": {
+        "ci-unset": {
+          "manifest_sha256": "51c39700c225caeb1d8cbdf7fe722a011e919ebddcd58dafcd9fa6fd1c6a02f7",
+          "ledger_sha256": "e85322fa5d1c1dc1e27844b9811577f30b48eac2abf9f588a6db6d34cb653d43",
+          "view_context_facts": [
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            },
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            }
+          ],
+          "preload_refusals": [
+            {
+              "outcome": "refused",
+              "pass": "PreloadBuild",
+              "reason": "verification-only passive certificate not implemented for this pass"
+            }
+          ]
+        },
+        "ci-1": {
+          "manifest_sha256": "02b6e03fd92f2691de6223720fff66789e64280c686365e15539a6c6fdd1dd21",
+          "ledger_sha256": "e85322fa5d1c1dc1e27844b9811577f30b48eac2abf9f588a6db6d34cb653d43",
+          "view_context_facts": [
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            },
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            }
+          ],
+          "preload_refusals": [
+            {
+              "outcome": "refused",
+              "pass": "PreloadBuild",
+              "reason": "verification-only passive certificate not implemented for this pass"
+            }
+          ]
+        }
+      },
+      "eager": {
+        "ci-unset": {
+          "manifest_sha256": "cea34484e52da16449ea037ab6ead275bd43671e5dc4db47c4f6ed6e14b5a9f0",
+          "ledger_sha256": "e85322fa5d1c1dc1e27844b9811577f30b48eac2abf9f588a6db6d34cb653d43",
+          "view_context_facts": [
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            },
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            }
+          ],
+          "preload_refusals": [
+            {
+              "outcome": "refused",
+              "pass": "PreloadBuild",
+              "reason": "verification-only passive certificate not implemented for this pass"
+            }
+          ]
+        },
+        "ci-1": {
+          "manifest_sha256": "7e67de757e973cd7e1dd458b0580c6e3424b0cd3d7536f6f07fdeccfac51ae4f",
+          "ledger_sha256": "429d66085c2b04836913c1b0731d6bd1a8017b6f1a9fb8577f32e7b678ca1af7",
+          "view_context_facts": [
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            },
+            {
+              "iseq": null,
+              "original_name": "instance_exec",
+              "owner": "BasicObject",
+              "parameters": [
+                [
+                  "rest"
+                ]
+              ],
+              "source_location": null
+            }
+          ],
+          "preload_refusals": [
+            {
+              "outcome": "refused",
+              "pass": "PreloadBuild",
+              "reason": "verification-only passive certificate not implemented for this pass"
+            }
+          ]
+        }
+      }
+    },
+    "source_digests": {
+      "gem/lib/lowrail/manifest.rb": "5cd1ab733f5ed6b97ef6e471e99bbeafc9a4e50d87d67cd937b4c2b815359012",
+      "gem/lib/lowrail/test_certificate.rb": "02e9099363c6cc8210d3968ac858ba526e96116229a149bf9371ae2d9f282fdc",
+      "gem/lib/lowrail/test_certificate_build.rb": "ded2d5c0db66c2a8885a3411e4a2603059419b9401bee6939d2e957c42ca45bc",
+      "gem/lib/lowrail/test_certificate_render.rb": "cb7e2344db3a54f9c6ea63874235366a494d882903be779d3c3e82d03f355a9b",
+      "gem/lib/lowrail/test_certificate_render_build.rb": "d26178ba0cee5fd4aa632126654d7cba15160ac166f8e77e745ebc04b4729d1a",
+      "gem/lib/lowrail/test_certificate_runtime.rb": "04a2c1c20294e3d8dad4ae93705d4b8b0646edfd6b182e4d84182c0d98aaedf5",
+      "gem/test/test_certificate_test.rb": "6bd6df607e56148421e8215e9eec1745926410920a307e9aa0f71e08930f8f0c",
+      "script/blog-test-certificate": "b811b5a9a54c140e8bf731b6a87517d73ff05812fb7553ddd7e949ab7e389f62"
+    },
+    "unchanged_production_sources": {
+      "gem/lib/lowrail/sealed.rb": "b946948df0adbc8c14ea312990433657e77a6b100e8fdd0c0a69913f6d5f1be8",
+      "gem/lib/lowrail/sealed_build.rb": "2119e8736497729b7cda4c8f7928c753b6fab53ce83d79485763555fa6adc404",
+      "gem/lib/lowrail/render_units.rb": "f21a1f621f75470d4e980cce70cf92f7a09c0ef6c4f95f001c35d8999cd53d42",
+      "gem/lib/lowrail/render_units_build.rb": "e138f680606832ae9de354440e5741b78845c5ba509443234a9c1f8760b37a5c",
+      "gem/lib/lowrail/form_scaffold.rb": "0f80b2dc9222f6d6135f509a4012ab6ba6133bc6bc270621be83a3c7fd8f763d",
+      "gem/lib/lowrail/form_scaffold_build.rb": "faf62aefce7fe482df0c8f4ac5db7990ba270b4223254a601095bf11a5820519",
+      "gem/lib/lowrail/form_scaffold_admission.rb": "15ff56d224e324376098e679a586dbcda198d798c1f43ffdf11c2009d2d84b05"
+    },
+    "validation_log_sha256": {
+      "dispatch-exact-50ecec8-before.log": "884a8db05555f8217e34ff0bc415f32eafe697fd1b783f868fb7224c54488bab",
+      "matrix-shared-dispatch-default.log": "d1ac6b59a3838774cb6dca51b65ed268f53d7af4dc28c0a88ba46a918ac28333",
+      "matrix-shared-dispatch-eager.log": "d1ac6b59a3838774cb6dca51b65ed268f53d7af4dc28c0a88ba46a918ac28333",
+      "minitest-5.27-prerequisite.log": "ac21a817602d391c239f48b43d8a5674b6e2cebd1fc39137d33abbf6b6c6c8c9",
+      "prism-1.4-prerequisite.log": "3b91d060b5e50b25dd77d37fbde7a7d54384c61b94accf8ebe528d09f2bbe09a",
+      "shared-dispatch-affected-gem.log": "55896d94ff4c934a0a48a30b191ca617ea6597a3c4b89e8fb6ba2cd473d3dfd4",
+      "shared-dispatch-cargo.log": "b4912bf81b7851ef8373713a4c78d9773af67a87e851a6665f9619b8d6b6d08a",
+      "shared-dispatch-certificate.log": "2a484507ed0c5c3503c53a113bebbdd1a5550b540803a65b71e329dedad1ca23",
+      "shared-dispatch-matrix-audit.log": "db11b635411e4a9e175956ebce4dd63533afb8e203843674dcafdcf77ce3d8d2",
+      "shared-dispatch-missing-protection.log": "f407f2f57a267c4395f645fc4d271e85fd0403c36edb57421f2f4fdeed1053c1",
+      "shared-dispatch-prism-prerequisite-rerun.log": "fbe60aa47a33f27dc44266d9e56ab8b698c83757cdb09dc2f8567bce8555d7a2",
+      "shared-dispatch-prism-prerequisites-fixed.log": "08637b4c6d2e98cb365ba6ce1e2d6756658ab2cf76e93e3bbf3931cfbd4b5c02",
+      "shared-dispatch-rbs.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared-dispatch-render.log": "b2f6067a73b25d5ed2a56b7a4bbddd1a58e929e17617c7d0453f7fd67bd8cef6",
+      "shared-dispatch-sealed-probes.log": "cadbf0aa49f5f0373dba24caa77180395127808df773676399ab8f06138dd7b8",
+      "shared-dispatch-matrix-contract.log": "b6cf20d47b5f83dab5a91721b3f28e2c786c5ad70b96c95759a183e77e604b01"
+    },
+    "fallback_accounting": {
+      "evidence_scope": "sealed reviewer's retained observation fixture; distinct from original matrix fixture",
+      "ordinary_token": [
+        "2 noncanonical pending view contexts",
+        "first canonical complete original witness"
+      ],
+      "system_collection": [
+        "first complete original witness",
+        "5 no-template local fallbacks"
+      ]
+    },
+    "limits": [
+      "protected token branches zero in every unchanged own-suite arm; test.rb unchanged and CSRF disabled",
+      "link/form/preload refused",
+      "worker 1/nonforked only, no parallel or production admission claim",
+      "no measurements or price claim",
+      "default Rake CI arms eager_load=false; true eager only explicit-path CI=1; 31 named models but AR authority only Article/Comment"
+    ],
+    "historical_records": "All original matrices/failures/source identities above remain historical; not relabeled as corrected-source validation"
   }
 }
