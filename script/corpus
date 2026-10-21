@@ -1,10 +1,35 @@
 #!/usr/bin/env bash
 # Fetch a pinned corpus app into .corpus/<name> (not checked in) and install
-# its bundle. Usage: script/corpus APP [DIRNAME]
+# its bundle. Usage: script/corpus APP [DIRNAME] [--source-only|--casa-production-boot-fixture]
+# --source-only fetches the exact source and dependency overlay, without
+# installing its bundle, preparing databases or building assets. The generated
+# blog must already exist: its ordinary generator itself prepares a database.
+# --casa-production-boot-fixture uses external throwaway credentials and loads
+# only the schema into an explicitly supplied empty local disposable database.
+# This is a boot fixture, not the app's credentials. See docs/helper-discovery.md.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 name=${1:?app name}
-dest="$root/.corpus/${2:-$name}"
+shift
+dirname=$name
+source_only=false
+casa_boot_fixture=false
+for arg in "$@"; do
+  case "$arg" in
+    --source-only) source_only=true ;;
+    --casa-production-boot-fixture) casa_boot_fixture=true ;;
+    --*) echo "unknown option: $arg" >&2; exit 2 ;;
+    *) dirname=$arg ;;
+  esac
+done
+if "$casa_boot_fixture"; then
+  if [ "$name" != casa ] || "$source_only"; then
+    echo "--casa-production-boot-fixture requires casa and cannot combine with --source-only" >&2
+    exit 2
+  fi
+  : "${LOWRAIL_CORPUS_DATABASE_URL:?supply an empty local lowrail_corpus_casa_* database; see docs/helper-discovery.md}"
+fi
+dest="$root/.corpus/$dirname"
 mkdir -p "$root/.corpus"
 ruby_version=4.0.7
 mise=$(command -v mise || true)
@@ -54,8 +79,17 @@ case "$name" in
     rev=d1868f8634e97a111a7fca49d58cc776d206007e
     repo=https://github.com/codetriage/codetriage
     sub=. ;;
+  wikino)
+    # Rails app lives in rails/; dependency-only wrapper in fixtures/corpus.
+    rev=25255d2d6c808df6672e293661ea797a76c6d2a9
+    repo=https://github.com/wikinoapp/wikino
+    sub=. ;;
   *) echo "unknown corpus app: $name" >&2; exit 2 ;;
 esac
+if "$source_only" && [ "$name" = real-blog ] && [ ! -d "$dest" ]; then
+  echo "generated_blog_requires_prepared_source: run script/corpus real-blog $dirname without --source-only first" >&2
+  exit 2
+fi
 if [ ! -d "$dest" ]; then
   tmp=$(mktemp -d)
   git -C "$tmp" init -q
@@ -65,7 +99,9 @@ if [ ! -d "$dest" ]; then
     # real-blog is generated, not checked in: Roundhouse's create-blog runs
     # `rails new` plus scaffolds against the pinned Rails version.
     RAILS_NEW_VERSION=8.1.4 "$tmp/scripts/create-blog" "$dest" >/dev/null
-    (cd "$dest" && bin/rails db:prepare >/dev/null)
+    if ! "$source_only"; then
+      (cd "$dest" && bin/rails db:prepare >/dev/null)
+    fi
   else
     cp -r "$tmp/$sub" "$dest"
   fi
@@ -88,7 +124,21 @@ if [ "$name" != real-blog ]; then
         exit 1
       fi
     fi
+    if "$source_only"; then
+      exit 0
+    fi
+    if [ "$name" = wikino ]; then
+      [ "$dirname" = wikino ] || { echo "Wikino's frozen wrapper requires the default dirname" >&2; exit 2; }
+      export BUNDLE_GEMFILE="$root/fixtures/corpus/wikino.Gemfile"
+      cd rails
+    fi
     BUNDLE_FROZEN=true bundle install --quiet
+    if "$casa_boot_fixture"; then
+      env -u RUBYOPT -u RAILS_MASTER_KEY LOWRAIL=0 BUNDLE_FROZEN=true \
+        RAILS_ENV=production RACK_ENV=production RUBY_YJIT_ENABLE=1 SECRET_KEY_BASE_DUMMY=1 \
+        bundle exec ruby "$root/fixtures/corpus/casa_production_boot.rb"
+      exit 0
+    fi
     case "$name" in
       casa)
         node_version=24.22.0
@@ -118,7 +168,7 @@ if [ "$name" != real-blog ]; then
       RAILS_ENV=production npx vite build --ssr
     fi
   )
-else
+elif ! "$source_only"; then
   (cd "$dest" && bundle install --quiet)
 fi
 echo "$dest"

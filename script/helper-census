@@ -1,0 +1,216 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Static discovery only. Compile template syntax, never evaluate app code or
+# boot Rails. Usage: ruby script/helper-census NAME=APP_ROOT [NAME=APP_ROOT ...]
+require "json"
+require "digest"
+require "open3"
+require "prism"
+require "action_view"
+require "action_view/template/handlers/erb"
+
+module HelperCensus
+  HELPERS = %i[link_to button_to form_with form_for].freeze
+  HASHES = [Prism::HashNode, Prism::KeywordHashNode].freeze
+
+  module_function
+
+  def hash?(node) = HASHES.any? { _1 === node }
+
+  def literal?(node)
+    case node
+    when Prism::StringNode, Prism::SymbolNode, Prism::IntegerNode, Prism::FloatNode,
+      Prism::TrueNode, Prism::FalseNode, Prism::NilNode then true
+    when Prism::ArrayNode then node.elements.all? { literal?(_1) }
+    when *HASHES then node.elements.all? { Prism::AssocNode === _1 && literal?(_1.key) && literal?(_1.value) }
+    else false
+    end
+  end
+
+  def kind(node)
+    case node
+    when nil then "absent"
+    when Prism::StringNode then "literal_string"
+    when Prism::InterpolatedStringNode then "interpolated_string"
+    when *HASHES then literal?(node) ? "literal_hash" : "dynamic_hash"
+    when Prism::ArrayNode then "polymorphic_array"
+    when Prism::InstanceVariableReadNode, Prism::LocalVariableReadNode then "record_shaped_reference"
+    when Prism::CallNode
+      if node.name.to_s.match?(/_(?:path|url)\z/)
+        args = node.arguments&.arguments || []
+        return "path_helper_no_arguments" if args.empty?
+        args.all? { literal?(_1) } ? "path_helper_literal_arguments" : "path_helper_dynamic_arguments"
+      elsif node.receiver.nil? && node.arguments.nil? && node.block.nil?
+        "bare_call_or_local_reference"
+      else
+        "other_call"
+      end
+    else literal?(node) ? "other_literal" : node.type.to_s
+    end
+  end
+
+  def options(node)
+    return {"shape" => "none", "keys" => [], "values" => "none"} unless node
+    return {"shape" => "expression", "keys" => [], "values" => "dynamic"} unless hash?(node)
+    keys = node.elements.map do |pair|
+      Prism::AssocNode === pair && [Prism::SymbolNode, Prism::StringNode].any? { _1 === pair.key } ? pair.key.unescaped : "<dynamic>"
+    end
+    {"shape" => keys.include?("<dynamic>") ? "dynamic_keys" : "literal_keys", "keys" => keys.sort,
+      "values" => node.elements.all? { Prism::AssocNode === _1 && literal?(_1.value) } ? "literal" : "dynamic"}
+  end
+
+  class Calls < Prism::Visitor
+    attr_reader :sites
+
+    def initialize(file)
+      @file, @sites, @link_depth = file, [], 0
+    end
+
+    def visit_call_node(node)
+      @sites << describe(node) if HELPERS.include?(node.name)
+      nested = node.name == :link_to && node.receiver.nil?
+      @link_depth += 1 if nested
+      super
+    ensure
+      @link_depth -= 1 if nested
+    end
+
+    def describe(node)
+      args = node.arguments&.arguments || []
+      link = %i[link_to button_to].include?(node.name)
+      block = !node.block.nil?
+      name = link && !block ? args[0] : nil
+      target = args[link && !block ? 1 : 0]
+      opts = args[link && !block ? 2 : 1]
+      target_keywords = {}
+      if node.name == :form_with
+        opts = args.last
+        pairs = hash?(opts) ? opts.elements.select { Prism::AssocNode === _1 && Prism::SymbolNode === _1.key && %w[model url].include?(_1.key.unescaped) } : []
+        target_keywords = pairs.to_h { [_1.key.unescaped, HelperCensus.kind(_1.value)] }
+        pair = pairs.find { _1.key.unescaped == "url" } || pairs.first
+        target = pair&.value
+      end
+      option = HelperCensus.options(opts)
+      pair = hash?(opts) && opts.elements.size == 1 && opts.elements.first
+      splat = args.any? { Prism::SplatNode === _1 || Prism::BlockArgumentNode === _1 || Prism::ForwardingArgumentsNode === _1 }
+      current_shape = node.name == :link_to && node.receiver.nil? && !block && args.size == 3 &&
+        Prism::StringNode === name && Prism::AssocNode === pair && Prism::SymbolNode === pair.key &&
+        pair.key.unescaped == "class" && Prism::StringNode === pair.value && !splat
+      reasons = []
+      reasons << "explicit_receiver_uncertified" if node.receiver
+      case node.name
+      when :link_to
+        reasons << "link_block_uncertified" if block
+        reasons << "link_name_not_literal_string" unless block || Prism::StringNode === name
+        reasons << "link_argument_shape_uncertified" unless args.size == 3
+        reasons << "link_splat_or_forwarding_uncertified" if splat
+        reasons << "link_options_not_single_literal_class" unless Prism::AssocNode === pair &&
+          Prism::SymbolNode === pair.key && pair.key.unescaped == "class" && Prism::StringNode === pair.value
+        reasons << "nested_link_not_visited_by_current_builder" if @link_depth > 0
+        reasons << "template_delivery_not_views_html_erb" unless @file.start_with?("app/views/") && @file.end_with?(".html.erb")
+      when :button_to then reasons << "button_to_generator_not_implemented"
+      when :form_for then reasons << "form_for_generator_not_implemented"
+      when :form_with then reasons << "form_requires_exact_scaffold_body_and_build_certificate"
+      end
+      {"file" => @file, "line" => node.location.start_line,
+        "line_basis" => @file.end_with?(".slim") ? "generated_ruby" : "source",
+        "helper" => node.name.to_s, "receiver" => node.receiver ? "explicit" : "bare", "block" => block,
+        "block_kind" => node.block&.type&.to_s,
+        "name" => link ? (block ? "block" : HelperCensus.kind(name)) : "not_applicable",
+        "argument_kinds" => args.map { HelperCensus.kind(_1) },
+        "literal_argument_count" => args.count { HelperCensus.literal?(_1) },
+        "target" => HelperCensus.kind(target), "target_keywords" => target_keywords,
+        "target_arguments" => Prism::CallNode === target ? (target.arguments&.arguments || []).map { HelperCensus.kind(_1) } : [],
+        "options" => option,
+        "partial" => File.basename(@file).start_with?("_"), "layout" => @file.start_with?("app/views/layouts/"),
+        "current_link_shape" => !!current_shape,
+        "current_link_delivery_candidate" => !!current_shape && reasons.empty?,
+        "discovery" => reasons.empty? ? "candidate_requires_boot_and_runtime_certificate" : "refused_by_current_generator",
+        "reasons" => reasons}
+    end
+
+    def hash?(node) = HelperCensus.hash?(node)
+  end
+
+  def histogram(rows)
+    rows.tally.sort_by { |key, count| [-count, key.to_s] }.to_h
+  end
+
+  def scan(root)
+    root = File.realpath(root)
+    raise ArgumentError, "missing app directory: #{root}" unless File.directory?(File.join(root, "app"))
+    files = %w[app config lib].flat_map { Dir[File.join(root, _1, "**/*.{rb,erb,slim}")] }.sort
+    sources, sites, errors = {}, [], []
+    files.each do |path|
+      relative = path.delete_prefix(root + "/")
+      source = File.read(path)
+      sources[relative] = Digest::SHA256.hexdigest(source)
+      compiled = case File.extname(path)
+      when ".erb" then ActionView::Template::Handlers::ERB::Erubi.new(source).src
+      when ".slim"
+        require "slim"
+        Slim::Engine.new.call(source)
+      else source
+      end
+      # A method wrapper allows template yield/return without evaluating it;
+      # the same-line prefix retains ERB line numbers.
+      parsed = Prism.parse(path.end_with?(".rb") ? compiled : "def __census_template__;#{compiled}\nend")
+      unless parsed.success?
+        errors << {"file" => relative, "reason" => "prism_parse_error", "messages" => parsed.errors.map(&:message)}
+        next
+      end
+      visitor = Calls.new(relative)
+      parsed.value.accept(visitor)
+      sites.concat(visitor.sites)
+    rescue StandardError, ScriptError => error
+      errors << {"file" => relative, "reason" => "template_compile_error", "message" => "#{error.class}: #{error.message}"}
+    end
+    repo = [root, File.dirname(root)].find { File.exist?(File.join(_1, ".git")) }
+    revision = repo && Open3.capture2("git", "-C", repo, "rev-parse", "HEAD").first.strip
+    marker = [root, File.dirname(root)].map { File.join(_1, ".lowrail-corpus-source") }.find { File.file?(_1) }
+    lock = File.join(root, "Gemfile.lock")
+    {"revision" => revision, "corpus_source" => marker && File.read(marker).strip,
+      "lock_sha256" => File.file?(lock) && Digest::SHA256.file(lock).hexdigest,
+      "source_sha256" => Digest::SHA256.hexdigest(JSON.generate(sources)), "sources" => sources,
+      "scanned_files" => histogram(files.map { File.extname(_1) }), "errors" => errors,
+      "helpers" => HELPERS.to_h do |helper|
+        rows = sites.select { _1["helper"] == helper.to_s }
+        [helper.to_s, {"total" => rows.size,
+          "current_link_shape" => rows.count { _1["current_link_shape"] },
+          "current_link_delivery_candidates" => rows.count { _1["current_link_delivery_candidate"] },
+          "name" => histogram(rows.map { _1["name"] }), "block" => histogram(rows.map { _1["block"] }),
+          "arguments" => histogram(rows.map { _1["argument_kinds"] }).map { |shape, count| {"shape" => shape, "count" => count} },
+          "target" => histogram(rows.map { _1["target"] }),
+          "target_arguments" => histogram(rows.map { _1["target_arguments"] }).map { |shape, count| {"shape" => shape, "count" => count} },
+          "target_keywords" => histogram(rows.map { _1["target_keywords"] }).map { |shape, count| {"shape" => shape, "count" => count} },
+          "options" => histogram(rows.map { _1["options"] }).map { |shape, count| {"shape" => shape, "count" => count} },
+          "partial" => histogram(rows.map { _1["partial"] }), "layout" => histogram(rows.map { _1["layout"] }),
+          "shapes" => histogram(rows.map { _1.values_at("receiver", "name", "block", "target", "options") }).map { |shape, count| {"shape" => shape, "count" => count} },
+          "refusals" => histogram(rows.flat_map { _1["reasons"] })}]
+      end, "sites" => sites}
+  end
+
+  def run(arguments)
+    raise ArgumentError, "usage: ruby script/helper-census NAME=APP_ROOT [...]" if arguments.empty?
+    apps = arguments.to_h do |argument|
+      name, root = argument.split("=", 2)
+      raise ArgumentError, "expected NAME=APP_ROOT: #{argument}" unless root && !name.empty?
+      [name, scan(root)]
+    end
+    {"format" => 1, "ruby" => RUBY_DESCRIPTION, "prism" => Prism::VERSION,
+      "analyzer_sha256" => Digest::SHA256.file(__FILE__).hexdigest,
+      "compilers" => %w[actionview erubi slim temple tilt sass].filter_map { |name| spec = Gem.loaded_specs[name]; spec && [name, spec.version.to_s] }.to_h,
+      "scope" => "app/config/lib Ruby, ERB and Slim source; no boot, evaluation, JS/Vue/TSX or dynamic-send inference",
+      "limitations" => ["Syntactic helper names, not resolved dispatch or runtime frequency.",
+        "Record-shaped/path-helper dynamic arguments do not prove record types.",
+        "Static syntax uses the reported compiler versions, not the app's certified runtime compiler.",
+        "Candidates are not units, admission, hit counts, support or equivalence."], "apps" => apps}
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  report = HelperCensus.run(ARGV)
+  puts JSON.pretty_generate(report)
+  exit(report.fetch("apps").values.any? { !_1.fetch("errors").empty? } ? 1 : 0)
+end
