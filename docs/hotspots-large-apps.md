@@ -24,6 +24,13 @@ savings or claimed eligible coverage. Rank 3 is deliberately behind the much
 larger relation and render programs. Generic cache codecs, ETag fusion and GC
 policy changes are not recommended Lowrail passes from this evidence.
 
+**Rank-3 follow-up:** the [Lobsters fixed URL-program screen](lobsters-url-program.md)
+saved 165/800 objects before guards, but its conservative Ruby certificate
+raises medians from 14,306/14,739 to 239,236/187,347 objects per request with
+exact output. That implementation is killed; no Callgrind or production pass.
+This disposition does not change the original profile measurements or imply
+that all possible native/VM-epoch certificates have the same cost.
+
 ## What was actually run
 
 | App | Exact source | Dependency input / data / requests |

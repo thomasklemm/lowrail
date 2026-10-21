@@ -5,13 +5,48 @@ Bet G owns middleware/notifications/callbacks, not URL generation. This study
 does not touch the quarantined `route/path` pass or install a production unit.
 No Callgrind, app patches, configuration overlays or upstream posts.
 
-## First result: allocation lead, not a speed win
+## Final result: guarded Ruby prototype killed
 
-**Promote only to a guarded follow-up.** The unguarded program saves objects
-with exact output; it has not paid production guards. The coordinator approved
-guarding it, probing mid-request mutations and rerunning this exact screen.
-Only a retained allocation win on **both** routes permits one interpreter-Ir
-cohort. Main and defaults remain untouched.
+**Stop; no Callgrind.** The corrected guarded candidate at
+[`919931e`](https://github.com/thomasklemm/lowrail/commit/919931e0f02b338aadc6045e0290a7b70bb59a3e)
+fails the agreed allocation gate on both routes. Paying effective-method,
+visibility and mutable-state certificates at entry and after live URL options
+costs much more than this program saves. Main and defaults remain untouched.
+
+| Route | Pooled median objects off-A / off-B / on | Added/request | Native Δ (diagnostic) | Max A/A round spread |
+|---|---:|---:|---:|---:|
+| `/newest` | 14,306 / 14,306 / 239,236 | +224,930 | +232.191% [224.178, 236.477] | 4.379% |
+| `/hottest` | 14,739 / 14,739 / 187,347 | +172,608 | +134.306% [115.905, 148.112] | 11.458% |
+
+The identical 500-warmup/600-sample, three-round screen took **817.60 s**.
+An independent raw-worker audit confirms all **36 measured-worker seed/route
+responses** have matching status, whole-body and all-header digests, with no
+entropy errors. Each arm/route contributes 1,800 allocation samples. Separate
+coverage still records **91 / 50 hits/request**, zero fallbacks and zero off
+hits: this is guard cost, not an inactive program. Off/on GC time/request grows
+from **0.714 to 12.547 ms** and **0.844 to 5.574 ms** respectively. The native
+regressions exceed this screen's A/A spread, but remain direction-finding
+observations, not an accepted price or a JIT-flat claim. The allocation gate
+alone decides the kill; there is no retry-to-green or instruction cohort.
+
+The certificate is intentionally conservative: repeated intrinsic reflection,
+typed mutable-state copies and generic-path facts also checked on optimized
+paths. This result rejects **this Ruby implementation**, not every possible
+native/VM-epoch certificate or a separately sealed contract. All 80 mutation
+pairs and live mount/host/protocol checks pass, including 40 post-boundary
+fallbacks; that finite evidence is not production admission. No own-suite or
+Thermos/main integration is claimed.
+
+[Guarded export](lobsters-url-guard-results.json) contains the full corrected
+screen and raw workers, independent audit, mutation rows and source hashes,
+the failing-before-fix counterexample, and the separately rejected partial
+run with its old sources. Nothing from the rejected run is pooled here.
+
+## Historical first result: allocation lead, not a speed win
+
+The unguarded program saved objects with exact output before paying production
+guards. The coordinator approved the guard-cost follow-up above, with an
+allocation win on **both** routes required before any interpreter-Ir cohort.
 
 | Route | Median objects off-A / off-B / on | Saved/request | Native Δ (diagnostic) | Max A/A round spread |
 |---|---:|---:|---:|---:|
@@ -200,11 +235,13 @@ mise exec ruby@4.0.7 -- ruby "$TOOLS/script/screen" "$APP" /newest /hottest \
   --warmup 500 --samples 600
 ```
 
-## Exactness boundary before a real pass
+## Remaining exactness boundary before a real pass
 
 Finite matching outputs do **not** certify mid-request mutation, arbitrary
-helper receivers or unsupported route shapes. No guard cost is included.
-Promotion needs route/default/requirements/format generations, actual helper
+helper receivers or unsupported route shapes. The historical first screen
+includes no guard cost; the guarded follow-up includes the conservative
+certificate described above and is killed. Any future production admission
+still needs route/default/requirements/format facts, actual helper
 and primitive method/body/visibility facts, and the live receiver's dispatch.
 After `url_options` or another app-evaluating boundary, recertify everything
 the remainder skips; a route formatter replaced there cannot be ignored.

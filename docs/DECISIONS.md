@@ -13,6 +13,14 @@ the current bench work. Promotion to
 default still follows [ARCHITECTURE.md §4](ARCHITECTURE.md), applied to the
 stacked set as well as to single passes.
 
+## Lobsters fixed URL program: guarded Ruby screen killed (2026-10-21)
+
+Whole fixed URL programs: unguarded −165/−800 objects per `/newest`/`/hottest` request.
+Guarded 500/600 × three rounds: 14,306→239,236 / 14,739→187,347 median objects/request.
+Exact status/body/all headers pass; 80 mutation pairs pass, including 40 boundary fallbacks.
+Repeated method/visibility/state certificates overwhelm savings; native +232.191/+134.306% is diagnostic only.
+Kill this Ruby implementation; no Callgrind/main/default change or universal guard lower bound ([evidence](lobsters-url-program.md)).
+
 ## Prism 2 adoption and target grammar (2026-10-21)
 
 Adopt Ruby Prism 2.0.0 for development (app bundles may retain 1.9), and Rust
