@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Fork-only Linux x86_64 / glibc 2.36+ Ruby. Does not change the caller's PATH.
+# Usage: script/token-ruby [NEW_PREFIX [LOCAL_ARCHIVE]]
+set -euo pipefail
+revision=274022581f7f446f603820f718cefeb0740cd741
+tag=lowrail-token-4.0.7-274022581f
+asset=ruby-4.0.7-token-274022581f-linux-x86_64.tar.gz
+sha=8f5d57cedf52249e014849ef1af57d4a2b7a0076a5ff64601a2167bb74c7549e
+prefix=$(realpath -m "${1:-$HOME/.rubies/ruby-4.0.7-token}")
+cache=${XDG_CACHE_HOME:-$HOME/.cache}/lowrail/token-ruby
+archive=${2:-$cache/$asset}
+if [[ $(uname -s)-$(uname -m) != Linux-x86_64 ]]; then
+  echo 'token-ruby: this asset supports Linux x86_64 only' >&2; exit 1
+fi
+glibc=$(getconf GNU_LIBC_VERSION 2>/dev/null || true)
+if [[ $glibc != glibc\ * ]] || [[ $(printf '%s\n' 2.36 "${glibc#glibc }" | sort -V | head -1) != 2.36 ]]; then
+  echo 'token-ruby: glibc 2.36 or newer is required' >&2; exit 1
+fi
+if [[ ! -f $archive ]]; then
+  if (($# > 1)); then echo "token-ruby: no archive: $archive" >&2; exit 1; fi
+  mkdir -p "$cache"
+  partial=$(mktemp "$cache/.download.XXXXXX")
+  trap 'rm -f "$partial"' EXIT
+  curl --fail --location --retry 3 --proto '=https' --tlsv1.2 \
+    "https://github.com/thomasklemm/ruby/releases/download/$tag/$asset" -o "$partial"
+  mv "$partial" "$archive"
+  trap - EXIT
+fi
+actual=$(sha256sum "$archive" | cut -d' ' -f1)
+if [[ $actual != "$sha" ]]; then
+  echo "token-ruby: SHA256 mismatch; refusing to extract or install $archive" >&2; exit 1
+fi
+if [[ -e $prefix ]]; then
+  if [[ ! -f $prefix/.lowrail-token-sha256 ]] || [[ $(cat "$prefix/.lowrail-token-sha256") != "$sha" ]]; then
+    echo "token-ruby: refusing to overwrite existing $prefix; choose a new prefix" >&2; exit 1
+  fi
+else
+  mkdir -p "$(dirname "$prefix")"
+  stage=$(mktemp -d "$(dirname "$prefix")/.token-ruby.XXXXXX")
+  trap 'rm -rf "$stage"' EXIT
+  tar --no-same-owner -xzf "$archive" --strip-components=1 -C "$stage"
+  "$stage/bin/ruby" --yjit -ropenssl -rpsych -rfiddle -e \
+    'abort "wrong token Ruby" unless RUBY_VERSION == "4.0.7" && RUBY_REVISION == ARGV[0] && RubyVM::YJIT.enabled?' "$revision"
+  printf '%s\n' "$sha" > "$stage/.lowrail-token-sha256"
+  mv "$stage" "$prefix"
+  trap - EXIT
+fi
+"$prefix/bin/ruby" --yjit -e \
+  'abort "wrong token Ruby" unless RUBY_VERSION == "4.0.7" && RUBY_REVISION == ARGV[0] && RubyVM::YJIT.enabled?' "$revision"
+printf 'Installed fork-only Ruby (C API; compile Lowrail native support with this Ruby).\n' >&2
+printf 'export PATH=%q:"$PATH"\n' "$prefix/bin"
