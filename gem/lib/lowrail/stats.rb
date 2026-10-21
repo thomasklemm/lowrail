@@ -112,6 +112,14 @@ module Lowrail
           end
         end if Lowrail.manifest
         data["refusal_reason"] = Lowrail.refusal_reason if Lowrail.refusal_reason
+        if defined?(TestCertificate) && TestCertificate.requested?
+          evidence = TestCertificate.evidence
+          evidence.fetch("unit_refusals").each do |id, reasons|
+            data["unit_refusals"][id] = data["unit_refusals"].fetch(id, []) | reasons
+          end
+          data["verification_test"] = evidence
+          data["unit_deopts"] = evidence.fetch("unit_deopts")
+        end
         data
       end
 

@@ -5,6 +5,11 @@
 # The explicitly unsafe experiment below fails closed instead.
 require_relative "../lowrail"
 
+if ENV["LOWRAIL_VERIFY_TEST"] == "1"
+  require_relative "test_certificate"
+  Lowrail::TestCertificate.observe_boot
+end
+
 if ENV["LOWRAIL_SPECULATE"] && ENV["LOWRAIL"] == "0"
   # The off side of differential verification must be genuinely unmodified.
   ENV.delete("LOWRAIL_SPECULATE")

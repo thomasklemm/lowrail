@@ -6,6 +6,7 @@
 
 mod ledger;
 mod runtime;
+mod verification;
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -23,6 +24,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let mut env = "test".to_string();
     let mut passes = Selection::default();
     let mut sealed = false;
+    let mut verify_test = false;
     let mut explicit_passes = false;
     let mut target_root = None;
     let mut jit = None;
@@ -32,6 +34,7 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             "--env" => env = it.next().ok_or("--env needs a value")?.clone(),
             "--passes" => { passes = Selection::parse(it.next().ok_or("--passes needs a value")?)?; explicit_passes = true; }
             "--sealed" => sealed = true,
+            "--verify-test" => verify_test = true,
             "--jit" => {
                 let mode = it.next().ok_or("--jit needs interpreter|yjit|zjit")?;
                 if !matches!(mode.as_str(), "interpreter" | "yjit" | "zjit") { return Err("--jit needs interpreter|yjit|zjit".into()); }
@@ -42,7 +45,11 @@ pub fn cli(args: &[String]) -> Result<(), String> {
             _ => return Err(format!("unexpected argument {a}")),
         }
     }
-    if sealed {
+    if verify_test {
+        if !sealed || explicit_passes || env != "test" || target_root.is_some() {
+            return Err("--verify-test requires --sealed --env test, without --passes or --target-root; verification only".into());
+        }
+    } else if sealed {
         if explicit_passes || env != "production" {
             return Err("--sealed requires --env production and cannot be combined with --passes; see docs/sealed.md".into());
         }
@@ -52,6 +59,10 @@ pub fn cli(args: &[String]) -> Result<(), String> {
     let app = app.canonicalize().map_err(|e| format!("{}: {e}", app.display()))?;
     if target_root.as_ref().is_some_and(|p| !p.is_absolute()) {
         return Err("--target-root needs an absolute deploy path (it need not exist at build time)".into());
+    }
+    if verify_test {
+        println!("{}", verification::build(&app, jit)?);
+        return Ok(());
     }
     println!("{}", build(&app, &env, &passes, target_root.as_deref(), jit)?);
     Ok(())
@@ -179,7 +190,7 @@ pub fn build(app: &Path, env: &str, passes: &Selection, target_root: Option<&Pat
     }
     drop(oracle);
 
-    for output in runtime::run(app, env, passes, &denied, &certification_jit)? {
+    for output in runtime::run(app, env, passes, &denied, &certification_jit, false)? {
         let sources = runtime::merge(&mut units, &mut ledger, output)?;
         for source in sources {
             let dest = src_dir.join(format!("runtime__{}.rb", files.len()));

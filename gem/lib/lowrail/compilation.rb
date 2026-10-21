@@ -31,6 +31,35 @@ module Lowrail
         @paths = nil
       end
 
+      # Verification observes compilation during the unchanged original suite,
+      # including lazily loaded files. No Lowrail eager_load! or JIT preparation.
+      # Register before Minitest autorun and retain capture until it finishes.
+      def boot_test(input, &finish)
+        require "tmpdir"
+        require_relative "test_certificate"
+        TestCertificate.observe_boot
+        @paths = Array(input["files"]).to_h { [_1.fetch("path"), true] }
+        @booted = true
+        RubyVM::InstructionSequence.singleton_class.prepend(Capture)
+        ENV["RAILS_ENV"], ENV["LOWRAIL"] = "test", "0"
+        previous = ENV["BOOTSNAP_CACHE_DIR"]
+        cache = Dir.mktmpdir("lowrail-test-compile")
+        ENV["BOOTSNAP_CACHE_DIR"] = cache
+        at_exit do
+          begin
+            raise "test policy/source changed between discovery and compilation" unless
+              TestCertificate.certificate(Dir.pwd) == input.fetch("verification_test")
+            finish.call
+          ensure
+            ENV["BOOTSNAP_CACHE_DIR"] = previous
+            @paths = nil
+            FileUtils.remove_entry(cache)
+          end
+        end
+        ARGV.replace(["test", "--seed", "41231"])
+        load File.expand_path("bin/rails")
+      end
+
       def tracked?(path)
         @paths ? @paths.key?(path) : (defined?(Loader) && Loader.manifest&.lowered?(path))
       end

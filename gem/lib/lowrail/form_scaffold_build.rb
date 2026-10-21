@@ -26,13 +26,13 @@ module Lowrail
 
     module_function
 
-    def build(denied: [])
+    def build(denied: [], verification_test: false)
       pass = FormScaffold::PASS
       path = Rails.root.join("app/views/articles/show.html.erb").to_s
       refusal = ->(reason) { {units: [], files: [], ledger: [{"pass" => pass, "file" => path,
         "helper" => "form_with", "outcome" => reason}]} }
       return refusal.call("denylisted by verify --bisect") if denied.any? { _1["pass"] == pass }
-      inventory = FormScaffoldInventory.check
+      inventory = FormScaffoldInventory.check(verification_test: verification_test)
       return refusal.call(inventory) if String === inventory
       return refusal.call("unknown template; only the literal blank-comment form is certified") unless File.file?(path)
       source = File.read(path)

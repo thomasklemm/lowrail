@@ -65,7 +65,8 @@ module Lowrail
 
       def activate
         return false if @reinstalled
-        return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production"
+        return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production" ||
+          (defined?(TestCertificate) && TestCertificate.active?)
         return decline("old effectful form certificate; rebuild for passive admission; keep original") unless @data.dig("passive", "version") == 1
         return decline("missing actual-holder primitive; keep original") unless Lowrail.loaded_constant("Lowrail::Native")
         @site = @data.fetch("site")

@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Untimed own-suite gate. This never changes app sources, calls seal-check,
+# runs measurements, or treats an on arm without hits as optimized coverage.
+require "json"
+require "fileutils"
+require "open3"
+require "rbconfig"
+require "tmpdir"
+require "shellwords"
+
+app, out, chrome = ARGV
+abort "usage: script/blog-test-certificate APP NEW_RESULTS_DIR CHROME_BINARY" unless app && out && chrome
+app, out, chrome = [app, out, chrome].map { File.expand_path(_1) }
+abort "results directory must not exist" if File.exist?(out)
+abort "Ruby 4.0.7 required" unless RUBY_VERSION == "4.0.7"
+abort "Chrome binary unavailable" unless File.executable?(chrome)
+root = File.expand_path("..", __dir__)
+cli = File.join(root, "target/debug/lowrail")
+abort "cargo build --locked first" unless File.executable?(cli)
+FileUtils.mkdir_p(out)
+summary = {"ruby" => RUBY_DESCRIPTION, "workers" => 1, "seed" => 41231,
+  "scope" => "unchanged own suites; no speed/production/parallel claim", "cases" => {}}
+Dir.mktmpdir("lowrail-test-browser") do |scratch|
+  wrapper = File.join(scratch, "chrome")
+  File.write(wrapper, "#!/bin/sh\nexec #{Shellwords.escape(chrome)} --no-sandbox --disable-dev-shm-usage \"$@\"\n")
+  File.chmod(0o755, wrapper)
+  base = {"RAILS_ENV" => "test", "RACK_ENV" => nil, "PARALLEL_WORKERS" => "1", "MT_CPU" => "1",
+    "LOWRAIL_BUILD_JIT" => nil, "RUBY_YJIT_ENABLE" => nil, "RUBY_ZJIT_ENABLE" => nil,
+    "RUBYOPT" => "-I#{root}/gem/lib -rlowrail/setup", "LOWRAIL_SEALED" => "1", "LOWRAIL_VERIFY_TEST" => "1",
+    "LOWRAIL_SQL_TRACE" => "0", "LOWRAIL_UNITS" => nil, "LOWRAIL_DEBUG" => nil,
+    "LOWRAIL_OUTCOMES" => nil, "LOWRAIL_STATS" => nil, "LOWRAIL_DIR" => nil,
+    "SE_BROWSER_PATH" => wrapper, "SE_CACHE_PATH" => File.join(out, "selenium")}
+  [["ci-unset", nil], ["ci-1", "1"]].each do |label, ci|
+    env = base.merge("CI" => ci)
+    build_log = File.join(out, "#{label}-build.log")
+    built = system(env.merge("RUBYOPT" => nil, "LOWRAIL" => "0"), cli, "build", app,
+      "--sealed", "--verify-test", "--env", "test", "--jit", "interpreter", chdir: app,
+      out: build_log, err: [:child, :out])
+    abort "build failed: #{build_log}" unless built
+    artifact = File.join(out, "#{label}-artifact")
+    FileUtils.cp_r(File.join(app, ".lowrail/verification-test"), artifact)
+    manifest = JSON.parse(File.read(File.join(artifact, "manifest.json")))
+    %w[test test:system].each do |suite|
+      key = "#{label}-#{suite.tr(':', '-')}"
+      cell = {"eager_load" => manifest.dig("verification_test", "policy", "config", "eager_load"), "runs" => {}}
+      summary["cases"][key] = cell
+      %w[off on-cold on-warm].each do |arm|
+        path = File.join(out, "#{key}-#{arm}.json")
+        cache = File.join(out, "#{key}-#{arm == 'off' ? 'off' : 'on'}-bootsnap")
+        command = [RbConfig.ruby, "bin/rails", suite, "--seed", "41231"]
+        system(env.merge("LOWRAIL" => arm == "off" ? "0" : "1", "LOWRAIL_DIR" => artifact,
+          "LOWRAIL_ROOT" => app, "LOWRAIL_OUTCOMES" => path, "LOWRAIL_STATS" => path + ".stats",
+          "BOOTSNAP_CACHE_DIR" => cache), *command, chdir: app, out: path + ".log", err: [:child, :out])
+        status = $?.exitstatus
+        data = File.file?(path) ? JSON.parse(File.read(path)) : nil
+        cell["runs"][arm] = {"exit" => status, "outcomes" => data&.fetch("tests"),
+          "verification_test" => data&.fetch("verification_test", nil),
+          "units" => manifest.fetch("units").map do |unit|
+            id = unit.fetch("id").to_s
+            {"id" => id, "pass" => unit.fetch("pass"), "target" => unit["target"] || unit["file"],
+              "hits" => data&.dig("unit_hits", id) || 0, "fallbacks" => data&.dig("unit_fallbacks", id) || 0,
+              "deopts" => data&.dig("unit_deopts", id) || 0, "refusals" => data&.dig("unit_refusals", id) || []}
+          end}
+        puts "#{key} #{arm}: exit #{status}; #{data&.fetch('tests')&.size || 0} identities"
+        $stdout.flush
+      end
+      off = cell.fetch("runs").fetch("off")
+      cell["on_only_differences"] = %w[on-cold on-warm].to_h do |arm|
+        on = cell.fetch("runs").fetch(arm)
+        left, right = off["outcomes"] || {}, on["outcomes"] || {}
+        [arm, (left.keys | right.keys).filter_map { |id| [id, {"off" => left[id], "on" => right[id]}] unless left[id] == right[id] }.to_h]
+      end
+      cell["optimized_execution"] = %w[on-cold on-warm].to_h do |arm|
+        [arm, cell.fetch("runs").fetch(arm).fetch("units").any? { _1.fetch("hits") > 0 }]
+      end
+      File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary) + "\n")
+    end
+  end
+end
+passed = summary.fetch("cases").values.all? do |cell|
+  cell.fetch("on_only_differences").values.all?(&:empty?) &&
+    cell.fetch("runs").values.all? { _1["exit"] == 0 && _1["outcomes"] && !_1["outcomes"].empty? } &&
+    cell.fetch("optimized_execution").values.all?
+end
+exit(passed ? 0 : 1)

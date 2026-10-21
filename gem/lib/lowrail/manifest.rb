@@ -88,7 +88,7 @@ module Lowrail
   # Each file names its ISeq binary and the original source's SHA-256.
   # Units are the guarded specializations, each with the facts it assumes.
   class Manifest
-    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method, :refusal_reason, :certification_jit
+    attr_reader :dir, :format, :ruby_description, :compile_option, :files, :templates, :rails_env, :units, :units_by_method, :refusal_reason, :certification_jit, :verification_test
 
     QUARANTINED_PASSES = %w[view/link_to route/path].freeze
 
@@ -127,6 +127,15 @@ module Lowrail
             @rails_env == "production" && @units.all? { Passes.sealed_only?(_1["pass"]) }
           @refusal_reason = "sealed artifact requires LOWRAIL_SEALED=1, production, and the separate SEAL001–009 contract; this test runs unoptimized"
         end
+      elsif data["tier"] == "sealed-test-v1"
+        require_relative "test_certificate"
+        @verification_test = data["verification_test"]
+        unless ENV["LOWRAIL_SEALED"] == "1" && TestCertificate.requested? && ENV["RAILS_ENV"] == "test" &&
+            @rails_env == "test" && ENV["PARALLEL_WORKERS"] == "1" &&
+            @verification_test&.dig("version") == 1 && @verification_test["mode"] == "verification-only" &&
+            @units.all? { TestCertificate::PASSES.include?(_1["pass"]) }
+          @refusal_reason = "verification-only artifact requires test, LOWRAIL_SEALED=1 LOWRAIL_VERIFY_TEST=1, explicit PARALLEL_WORKERS=1 and a supported passive certificate"
+        end
       elsif data["tier"] || sealed_units
         names = @units.filter_map { _1["pass"] if Passes.sealed_only?(_1["pass"]) }.uniq
         @refusal_reason = "unknown or missing sealed artifact version (sealed-only: #{names.join(', ')}); cached hooks cannot certify post-seal mutations (SEAL001); rebuild with --sealed required"
@@ -159,6 +168,7 @@ module Lowrail
     # was lowered, else nil (the caller compiles the source normally).
     def iseq_for(source_path, original: nil, compile_option: nil)
       return nil if @refusal_reason
+      return nil if @verification_test && !TestCertificate.delivery_allowed?
       entry = @files[source_path] or return nil
       return Lowrail.refuse("source missing: #{source_path}") unless File.file?(source_path)
       unless Manifest.sha256_file(source_path) == entry.fetch("source_sha256")

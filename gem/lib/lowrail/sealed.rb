@@ -61,7 +61,8 @@ module Lowrail
       end
 
       def activate
-        return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production"
+        return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production" ||
+          (defined?(TestCertificate) && TestCertificate.active?)
         return decline("unsupported Ruby/Rails") unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
         return decline("application class differs from certificate") unless Rails.application.class.name == @data.fetch("application_class")
         # Certification may prepare a disposable build process. Admission may

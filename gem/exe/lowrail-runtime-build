@@ -10,6 +10,11 @@ $stdout.reopen($stderr) # App initializers/loggers must not corrupt the JSON.
 ENV["LOWRAIL"] = "0"
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../lib/lowrail/build_jit"
+if request["verification_test"]
+  require_relative "../lib/lowrail/test_certificate_build"
+  Lowrail::TestCertificateBuild.run(request, output)
+  exit
+end
 mode = Lowrail::BuildJit.prepare(request["certification_jit"])
 require File.expand_path("config/environment", Dir.pwd)
 Rails.application.eager_load!

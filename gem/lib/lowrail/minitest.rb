@@ -74,6 +74,10 @@ module Lowrail
           "unit_refusals" => stats.fetch("unit_refusals", {}),
           "jit_modes" => [Lowrail.jit_status.merge("pid" => Process.pid)],
           "sql" => SqlTrace.snapshot }
+        if stats["verification_test"]
+          data["verification_test"] = stats["verification_test"]
+          data["unit_deopts"] = stats.fetch("unit_deopts")
+        end
         data["jit_diagnostics"] = [JitDiagnostics.snapshot] if defined?(JitDiagnostics)
         data["verify_loads"] = VerifyLoads.snapshot if defined?(VerifyLoads)
         data["companion_rng"] = SqlTrace.companion_rng if ENV["LOWRAIL_COMPANION_SEED"]
@@ -96,6 +100,7 @@ module Lowrail
       def start; end
 
       def prerecord(_klass, _name)
+        TestCertificate.test_initialized! if defined?(TestCertificate) && TestCertificate.requested?
         VerifyLoads.capture("first_test") if defined?(VerifyLoads)
       end
 
@@ -154,6 +159,11 @@ module Lowrail
         data["unit_hits"]&.each { |id, n| merged["unit_hits"][id] += n }
         data["unit_fallbacks"]&.each { |id, n| merged["unit_fallbacks"][id] += n }
         data["unit_refusals"]&.each { |id, reasons| merged["unit_refusals"][id] = (merged["unit_refusals"].fetch(id, []) | reasons) }
+        if data["verification_test"]
+          (merged["verification_test"] ||= []) << data["verification_test"]
+          deopts = (merged["unit_deopts"] ||= Hash.new(0))
+          data.fetch("unit_deopts").each { |id, n| deopts[id] += n }
+        end
         merged["processes"] << data["pid"]
         (merged["ruby_descriptions"] ||= []) << data["ruby"] if data["ruby"]
         (merged["jit_modes"] ||= []).concat(data["jit_modes"]) if data["jit_modes"]

@@ -46,11 +46,15 @@ module Lowrail
         Sealed.signature(method) == edited_signature(method, File.read(path))
     end
 
-    def build(denied: [])
+    def build(denied: [], verification_test: false)
       ledger = []
       refuse = ->(reason) { {units: [], files: [], ledger: [{"pass" => PASS, "method" => "ArticlesController", "outcome" => reason}]} }
       return refuse.call("sealed pilot requires production Ruby 4.0.7 / Rails 8.1.4 blog") unless
-        ENV["RAILS_ENV"] == "production" && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
+        (ENV["RAILS_ENV"] == "production" || (verification_test && ENV["RAILS_ENV"] == "test")) && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
+      if verification_test
+        return refuse.call("verification helper holders not naturally available") unless
+          %w[ArticlesController ActionView::Helpers::TagHelper::TagBuilder ActionView::Helpers::UrlHelper ERB::Util].all? { Lowrail.loaded_constant(_1) }
+      end
       return refuse.call("denylisted by verify --bisect") if denied.any? { _1["pass"] == PASS }
       native = Lowrail.loaded_constant("Lowrail::Native")
       return refuse.call("Lowrail native actual-holder primitive unavailable; run rake compile; keep original") unless native

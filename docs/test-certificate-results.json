@@ -1,0 +1,1278 @@
+{
+  "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+  "workers": 1,
+  "seed": 41231,
+  "scope": "unchanged own suites; no speed/production/parallel claim",
+  "cases": {
+    "ci-unset-test": {
+      "eager_load": false,
+      "runs": {
+        "off": {
+          "exit": 0,
+          "outcomes": {
+            "CommentsControllerTest#test_should_create_comment": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_destroy_comment": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_new": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_index": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_create_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_destroy_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_edit": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_show_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_update_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticleTest#test_creates_an_article_with_valid_attributes": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_body_minimum_length": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_title_presence": {
+              "result": "pass"
+            },
+            "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_commenter": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_valid_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_belongs_to_article_association": {
+              "result": "pass"
+            },
+            "CommentTest#test_creates_a_comment_on_an_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_body": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 84741,
+              "unit_deopts": {},
+              "unit_refusals": {}
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            }
+          ]
+        },
+        "on-cold": {
+          "exit": 0,
+          "outcomes": {
+            "CommentsControllerTest#test_should_create_comment": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_destroy_comment": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_new": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_index": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_create_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_destroy_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_edit": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_show_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_update_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticleTest#test_creates_an_article_with_valid_attributes": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_body_minimum_length": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_title_presence": {
+              "result": "pass"
+            },
+            "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_commenter": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_valid_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_belongs_to_article_association": {
+              "result": "pass"
+            },
+            "CommentTest#test_creates_a_comment_on_an_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_body": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 84769,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 30,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 8,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 23,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        },
+        "on-warm": {
+          "exit": 0,
+          "outcomes": {
+            "CommentsControllerTest#test_should_create_comment": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_destroy_comment": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_new": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_index": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_create_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_destroy_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_edit": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_show_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_update_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticleTest#test_creates_an_article_with_valid_attributes": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_body_minimum_length": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_title_presence": {
+              "result": "pass"
+            },
+            "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_commenter": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_valid_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_belongs_to_article_association": {
+              "result": "pass"
+            },
+            "CommentTest#test_creates_a_comment_on_an_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_body": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 84797,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 30,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 8,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 23,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        }
+      },
+      "on_only_differences": {
+        "on-cold": {},
+        "on-warm": {}
+      },
+      "optimized_execution": {
+        "on-cold": true,
+        "on-warm": true
+      }
+    },
+    "ci-unset-test-system": {
+      "eager_load": false,
+      "runs": {
+        "off": {
+          "exit": 0,
+          "outcomes": {
+            "ArticlesSystemTest#test_article_with_comments": {
+              "result": "pass"
+            },
+            "ArticlesSystemTest#test_full_article_lifecycle": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 84825,
+              "unit_deopts": {},
+              "unit_refusals": {}
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            }
+          ]
+        },
+        "on-cold": {
+          "exit": 0,
+          "outcomes": {
+            "ArticlesSystemTest#test_article_with_comments": {
+              "result": "pass"
+            },
+            "ArticlesSystemTest#test_full_article_lifecycle": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 85125,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 15,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 12,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 43,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 6,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        },
+        "on-warm": {
+          "exit": 0,
+          "outcomes": {
+            "ArticlesSystemTest#test_article_with_comments": {
+              "result": "pass"
+            },
+            "ArticlesSystemTest#test_full_article_lifecycle": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 85386,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 15,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 12,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 43,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 6,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        }
+      },
+      "on_only_differences": {
+        "on-cold": {},
+        "on-warm": {}
+      },
+      "optimized_execution": {
+        "on-cold": true,
+        "on-warm": true
+      }
+    },
+    "ci-1-test": {
+      "eager_load": false,
+      "runs": {
+        "off": {
+          "exit": 0,
+          "outcomes": {
+            "CommentsControllerTest#test_should_create_comment": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_destroy_comment": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_new": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_index": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_create_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_destroy_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_edit": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_show_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_update_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticleTest#test_creates_an_article_with_valid_attributes": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_body_minimum_length": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_title_presence": {
+              "result": "pass"
+            },
+            "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_commenter": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_valid_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_belongs_to_article_association": {
+              "result": "pass"
+            },
+            "CommentTest#test_creates_a_comment_on_an_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_body": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 85717,
+              "unit_deopts": {},
+              "unit_refusals": {}
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            }
+          ]
+        },
+        "on-cold": {
+          "exit": 0,
+          "outcomes": {
+            "CommentsControllerTest#test_should_create_comment": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_destroy_comment": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_new": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_index": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_create_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_destroy_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_edit": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_show_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_update_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticleTest#test_creates_an_article_with_valid_attributes": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_body_minimum_length": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_title_presence": {
+              "result": "pass"
+            },
+            "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_commenter": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_valid_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_belongs_to_article_association": {
+              "result": "pass"
+            },
+            "CommentTest#test_creates_a_comment_on_an_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_body": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 85753,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 30,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 8,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 23,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        },
+        "on-warm": {
+          "exit": 0,
+          "outcomes": {
+            "CommentsControllerTest#test_should_create_comment": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_not_create_comment_with_invalid_params": {
+              "result": "pass"
+            },
+            "CommentsControllerTest#test_should_destroy_comment": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_update_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_new": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_index": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_create_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_destroy_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_get_edit": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_show_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_update_article": {
+              "result": "pass"
+            },
+            "ArticlesControllerTest#test_should_not_create_article_with_invalid_params": {
+              "result": "pass"
+            },
+            "ArticleTest#test_creates_an_article_with_valid_attributes": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_body_minimum_length": {
+              "result": "pass"
+            },
+            "ArticleTest#test_validates_title_presence": {
+              "result": "pass"
+            },
+            "ArticleTest#test_destroys_comments_when_article_is_destroyed": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_commenter": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_valid_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_belongs_to_article_association": {
+              "result": "pass"
+            },
+            "CommentTest#test_creates_a_comment_on_an_article": {
+              "result": "pass"
+            },
+            "CommentTest#test_requires_body": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 85780,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 30,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 8,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 23,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 1,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        }
+      },
+      "on_only_differences": {
+        "on-cold": {},
+        "on-warm": {}
+      },
+      "optimized_execution": {
+        "on-cold": true,
+        "on-warm": true
+      }
+    },
+    "ci-1-test-system": {
+      "eager_load": false,
+      "runs": {
+        "off": {
+          "exit": 0,
+          "outcomes": {
+            "ArticlesSystemTest#test_article_with_comments": {
+              "result": "pass"
+            },
+            "ArticlesSystemTest#test_full_article_lifecycle": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 85806,
+              "unit_deopts": {},
+              "unit_refusals": {}
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 0,
+              "deopts": 0,
+              "refusals": []
+            }
+          ]
+        },
+        "on-cold": {
+          "exit": 0,
+          "outcomes": {
+            "ArticlesSystemTest#test_article_with_comments": {
+              "result": "pass"
+            },
+            "ArticlesSystemTest#test_full_article_lifecycle": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 86068,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 15,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 12,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 43,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 6,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        },
+        "on-warm": {
+          "exit": 0,
+          "outcomes": {
+            "ArticlesSystemTest#test_article_with_comments": {
+              "result": "pass"
+            },
+            "ArticlesSystemTest#test_full_article_lifecycle": {
+              "result": "pass"
+            }
+          },
+          "verification_test": [
+            {
+              "state": "active",
+              "pid": 86343,
+              "unit_deopts": {
+                "0": 1,
+                "1": 1
+              },
+              "unit_refusals": {
+                "2": [
+                  "verification_literal_table_observer_unavailable"
+                ],
+                "3": [
+                  "verification_form_config_schema_translation_observer_unavailable"
+                ],
+                "0": [
+                  "dependent_state_mutation:define_method_attribute="
+                ],
+                "1": [
+                  "dependent_state_mutation:define_method_attribute="
+                ]
+              }
+            }
+          ],
+          "units": [
+            {
+              "id": "0",
+              "pass": "active_record/instantiate",
+              "target": "Article",
+              "hits": 1,
+              "fallbacks": 15,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "1",
+              "pass": "active_record/instantiate",
+              "target": "Comment",
+              "hits": 1,
+              "fallbacks": 12,
+              "deopts": 1,
+              "refusals": [
+                "dependent_state_mutation:define_method_attribute="
+              ]
+            },
+            {
+              "id": "2",
+              "pass": "sealed/link_to",
+              "target": "ArticlesController",
+              "hits": 0,
+              "fallbacks": 43,
+              "deopts": 0,
+              "refusals": [
+                "verification_literal_table_observer_unavailable"
+              ]
+            },
+            {
+              "id": "3",
+              "pass": "sealed/form_scaffold",
+              "target": "ArticlesController#form_with",
+              "hits": 0,
+              "fallbacks": 6,
+              "deopts": 0,
+              "refusals": [
+                "verification_form_config_schema_translation_observer_unavailable"
+              ]
+            }
+          ]
+        }
+      },
+      "on_only_differences": {
+        "on-cold": {},
+        "on-warm": {}
+      },
+      "optimized_execution": {
+        "on-cold": true,
+        "on-warm": true
+      }
+    }
+  }
+}

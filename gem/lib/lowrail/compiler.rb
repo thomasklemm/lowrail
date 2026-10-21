@@ -35,6 +35,14 @@ module Lowrail
         input = argv.first or (err.puts("usage: lowrail-compile UNITS_JSON"); return 2)
         input = JSON.parse(File.read(input))
         input["delivery_refusal"] = Lowrail.delivery_refusal(Dir.pwd)
+        if input["verification_test"]
+          Compilation.boot_test(input) do
+            BuildJit.check(input["certification_jit"])
+            manifest = compile(input, err: err)
+            err.puts "[lowrail] verification compiled #{manifest['files'].size} file(s), #{manifest['units'].size} unit(s)"
+          end
+          return 0
+        end
         mode = nil
         if input["rails_env"] && File.file?("config/environment.rb")
           Compilation.boot(input) { mode = BuildJit.prepare(input["certification_jit"]) }
@@ -102,6 +110,7 @@ module Lowrail
         }
         manifest["rails_env"] = input["rails_env"] if input["rails_env"]
         manifest["tier"] = input["tier"] if input["tier"]
+        manifest["verification_test"] = input["verification_test"] if input["verification_test"]
         manifest["selected_passes"] = input["selected_passes"] if input["selected_passes"]
         manifest["templates"] = templates unless templates.empty?
         manifest["delivery_refusal"] = input["delivery_refusal"] if input["delivery_refusal"]

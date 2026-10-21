@@ -20,15 +20,15 @@ module Lowrail
 
     module_function
 
-    def check(runtime: false)
+    def check(runtime: false, verification_test: false)
       # The current certificate has no read-only witness for these synthetic
       # probes. Do not try to produce one by executing them in the app. Until
       # such a certificate exists, exact-or-refuse means the original form.
       return "form certification requires runtime controller/view/I18n/ERB effects; passive activation unavailable; keep original" if runtime
       return "source inventory released; restart to recertify" if @released
-      return "requires production Ruby 4.0.7 / Rails 8.1.4 blog" unless ENV["RAILS_ENV"] == "production" &&
+      return "requires production Ruby 4.0.7 / Rails 8.1.4 blog" unless (ENV["RAILS_ENV"] == "production" || (verification_test && ENV["RAILS_ENV"] == "test")) &&
         RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
-      return "eager-loaded targets required; keep lazy applications original" unless Rails.application.config.eager_load &&
+      return "eager-loaded targets required; keep lazy applications original" unless (verification_test || Rails.application.config.eager_load) &&
         %w[Article Comment ArticlesController].all? { Lowrail.loaded_constant(_1) }
       @roots = STOCK.keys.to_h { |name| [name, Gem.loaded_specs.fetch(name).full_gem_path] }
       @compiled = {}

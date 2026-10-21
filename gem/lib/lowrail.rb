@@ -192,6 +192,12 @@ module Lowrail
         refuse("certification JIT mode mismatch: built #{@certification_jit || 'unknown'}, running #{@admission_jit}; rebuild with --jit #{@admission_jit} and matching deployment startup flags")
         return false
       end
+      if manifest.verification_test
+        require_relative "lowrail/test_certificate_runtime"
+        require_relative "lowrail/guard"
+        Guard.singleton_class.prepend(TestCertificateRuntime::GuardGate)
+        TestCertificate.configure(manifest, root)
+      end
       unless enabled
         unless manifest.units.empty?
           require_relative "lowrail/guard"

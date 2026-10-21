@@ -17,14 +17,22 @@ module Lowrail
     }.freeze
     module_function
 
-    def build(denied: [])
+    def build(denied: [], verification_test: false)
       units, ledger = [], []
       pass = ARInstantiate::PASS
       unless defined?(ActiveRecord::Base)
         return {units: units, ledger: [{"pass" => pass, "outcome" => "refused", "reason" => "framework_absent"}]}
       end
       ActiveRecord::Base.descendants.sort_by { _1.name.to_s }.each do |klass|
-        next if klass.abstract_class? || !klass.name || !klass.table_exists?
+        if verification_test
+          next if klass.instance_variable_get(:@abstract_class) || !klass.name
+          unless klass.instance_variable_get(:@schema_loaded) && klass.instance_variable_get(:@attribute_methods_generated)
+            ledger << {"pass" => pass, "file" => klass.name, "outcome" => "refused", "reason" => "schema/attribute methods not naturally available"}
+            next
+          end
+        else
+          next if klass.abstract_class? || !klass.name || !klass.table_exists?
+        end
         reason = nil
         reason = "denylisted by verify --bisect" if denied.any? { _1["pass"] == pass && _1["file"] == klass.name }
         original = klass.method(:_load_from_sql)
@@ -59,7 +67,7 @@ module Lowrail
         ledger << { "file" => klass.name, "method" => "#{klass.name}._load_from_sql", "pass" => pass,
           "outcome" => reason || "lowered (homogeneous results only)" }
         next if reason
-        klass.define_attribute_methods
+        klass.define_attribute_methods unless verification_test
         facts = %i[attributes_builder instantiate_instance_of].map do |name|
           PreloadFacts.method_fact(klass, name, singleton: true)
         end
