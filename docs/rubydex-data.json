@@ -1,0 +1,2386 @@
+{
+  "format": 1,
+  "captured_at": "2026-10-21T17:10:10Z",
+  "scope": "Source-only Rubydex research; not Lowrail support or request-speed evidence",
+  "lowrail_revision": "060f85e21e35f192ac6312f6bb2499b130b32dac",
+  "rubydex_revisions": {
+    "pinned": {
+      "sha": "d8ff47595223571588ae40cb748f43cef6a9dfaf",
+      "prism": "1.9.0"
+    },
+    "inspected_main": {
+      "sha": "c69a742c9097a2a5c13f97726abda55b0507121b",
+      "prism": "2.0.0-rc.2"
+    },
+    "pr1078": {
+      "sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+      "prism": "2.0.0"
+    }
+  },
+  "environment": {
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+    "inventory_prism": "1.9.0",
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "1.99.1 (5f94df478 2026-08-27)",
+    "os": "Linux x86_64 E2B orb",
+    "visible_cpus": 8,
+    "mem_total_kib": 16392004
+  },
+  "methodology": {
+    "rounds_per_arm": 3,
+    "alternating_arm_order": "pinned,pr1078 / pr1078,pinned / pinned,pr1078",
+    "command": [
+      "/usr/bin/time",
+      "-f",
+      "%M",
+      "-o",
+      "RSS_FILE",
+      "RUBYDEX_CLI",
+      "ABS_APP",
+      "--stats"
+    ],
+    "primary_rss": "external_max_rss_bytes (GNU time); binary internal max_rss_bytes also retained",
+    "wall": "Python perf_counter surrounding subprocess including wrapper and CLI output",
+    "backend": "RubyIndexer",
+    "dependencies_indexed": false,
+    "erb_indexed": false,
+    "cache_flushed": false,
+    "cpu_pinned": false,
+    "builds_overlapped": false,
+    "initial_invalid_rss_trial_excluded": true,
+    "invalid_trial_reason": "exec inherited Python parent RSS high-water mark; corrected with separate GNU time process",
+    "source_manifest_algorithm": "SHA256(JSON of sorted [relative path,SHA256(file bytes),byte count] triples), see inventory.rb",
+    "snapshot_hash_limit": "Absolute input URIs and Rust Debug representation make hashes path/build dependent"
+  },
+  "apps": [
+    {
+      "app": "rubydex-blog",
+      "file_count": 41,
+      "bytes": 39982,
+      "manifest_sha256": "8d2080430bb0ac3b1719c6efe64a2bb39dc9effe02471c023dda49f1b1fd2c91",
+      "defs": 15,
+      "parse_errors": [],
+      "source_pin": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+      "calls": {
+        "include": 0,
+        "prepend": 0,
+        "extend": 0,
+        "included": 0,
+        "class_methods": 0,
+        "delegate": 0,
+        "define_method": 0,
+        "attr_reader": 0,
+        "attr_writer": 0,
+        "attr_accessor": 0,
+        "has_many": 1,
+        "has_one": 0,
+        "belongs_to": 1,
+        "scope": 0,
+        "enum": 0,
+        "attribute": 0,
+        "sig": 0
+      },
+      "root": ".corpus/rubydex-blog",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 8.752965999974549,
+          "wall_min_ms": 6.6341729998384835,
+          "wall_max_ms": 8.975078000048597,
+          "external_rss_median_mib": 5.0390625
+        },
+        "pr1078": {
+          "wall_median_ms": 6.268200999784312,
+          "wall_min_ms": 5.828773999837722,
+          "wall_max_ms": 8.093229999985851,
+          "external_rss_median_mib": 5.05078125
+        }
+      }
+    },
+    {
+      "app": "fizzy",
+      "file_count": 276,
+      "bytes": 185576,
+      "manifest_sha256": "6181458683df4454178f0d852ed9fdd56629ad527ecf2617250b746b0e7bee71",
+      "defs": 437,
+      "parse_errors": [],
+      "source_pin": "https://github.com/basecamp/fizzy@6f1d200316ec3bae91d32c557d88647300807ee9:.",
+      "calls": {
+        "include": 35,
+        "prepend": 0,
+        "extend": 37,
+        "included": 34,
+        "class_methods": 11,
+        "delegate": 6,
+        "define_method": 3,
+        "attr_reader": 3,
+        "attr_writer": 0,
+        "attr_accessor": 0,
+        "has_many": 37,
+        "has_one": 8,
+        "belongs_to": 36,
+        "scope": 41,
+        "enum": 2,
+        "attribute": 2,
+        "sig": 0
+      },
+      "root": ".corpus/fizzy",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 16.670613000087542,
+          "wall_min_ms": 15.713949000200955,
+          "wall_max_ms": 18.750586999885854,
+          "external_rss_median_mib": 7.77734375
+        },
+        "pr1078": {
+          "wall_median_ms": 14.1641189998154,
+          "wall_min_ms": 14.083607000202392,
+          "wall_max_ms": 15.134137999893937,
+          "external_rss_median_mib": 7.36328125
+        }
+      }
+    },
+    {
+      "app": "casa",
+      "file_count": 1183,
+      "bytes": 2319462,
+      "manifest_sha256": "3a1495893a16ba9273db7ed730d2f7d53c734b222359488a37be2f47f3b9e128",
+      "defs": 1806,
+      "parse_errors": [],
+      "source_pin": "https://github.com/rubyforgood/casa@b584d2e6e6ebffe382f34c2ec202d20384d035ca:.",
+      "calls": {
+        "include": 633,
+        "prepend": 6,
+        "extend": 16,
+        "included": 8,
+        "class_methods": 0,
+        "delegate": 3,
+        "define_method": 0,
+        "attr_reader": 39,
+        "attr_writer": 1,
+        "attr_accessor": 7,
+        "has_many": 73,
+        "has_one": 25,
+        "belongs_to": 78,
+        "scope": 109,
+        "enum": 4,
+        "attribute": 0,
+        "sig": 0
+      },
+      "root": ".corpus/casa",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 88.96487099991646,
+          "wall_min_ms": 88.17107200002283,
+          "wall_max_ms": 99.09020999998575,
+          "external_rss_median_mib": 27.953125
+        },
+        "pr1078": {
+          "wall_median_ms": 66.34193299987601,
+          "wall_min_ms": 66.10198199996375,
+          "wall_max_ms": 67.96770400001151,
+          "external_rss_median_mib": 26.11328125
+        }
+      }
+    },
+    {
+      "app": "writebook",
+      "file_count": 141,
+      "bytes": 120304,
+      "manifest_sha256": "ad2790439be002b4ebffc5963017353e43915cedf6267a85dfa59796e0778165",
+      "defs": 252,
+      "parse_errors": [],
+      "source_pin": "https://github.com/basecamp/writebook@be1f8fcf1b0fc8064011c2d29d75133885b182e2:.",
+      "calls": {
+        "include": 24,
+        "prepend": 2,
+        "extend": 18,
+        "included": 16,
+        "class_methods": 8,
+        "delegate": 2,
+        "define_method": 3,
+        "attr_reader": 1,
+        "attr_writer": 0,
+        "attr_accessor": 0,
+        "has_many": 7,
+        "has_one": 3,
+        "belongs_to": 6,
+        "scope": 20,
+        "enum": 5,
+        "attribute": 1,
+        "sig": 0
+      },
+      "root": ".corpus/writebook",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 11.106950000112192,
+          "wall_min_ms": 10.96541500010062,
+          "wall_max_ms": 13.591698000027463,
+          "external_rss_median_mib": 6.59765625
+        },
+        "pr1078": {
+          "wall_median_ms": 10.234399999944799,
+          "wall_min_ms": 9.939318000078856,
+          "wall_max_ms": 11.735652999959711,
+          "external_rss_median_mib": 6.515625
+        }
+      }
+    },
+    {
+      "app": "wikino",
+      "file_count": 336,
+      "bytes": 597357,
+      "manifest_sha256": "564e111aa0af742b57d0a14afb5eac69719433e137273d3502a45c0de024b46e",
+      "defs": 470,
+      "parse_errors": [],
+      "source_pin": "https://github.com/wikinoapp/wikino@25255d2d6c808df6672e293661ea797a76c6d2a9:.",
+      "calls": {
+        "include": 314,
+        "prepend": 0,
+        "extend": 52,
+        "included": 7,
+        "class_methods": 0,
+        "delegate": 7,
+        "define_method": 0,
+        "attr_reader": 134,
+        "attr_writer": 0,
+        "attr_accessor": 10,
+        "has_many": 26,
+        "has_one": 2,
+        "belongs_to": 27,
+        "scope": 19,
+        "enum": 5,
+        "attribute": 19,
+        "sig": 582
+      },
+      "root": ".corpus/wikino/rails",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 38.20317199983947,
+          "wall_min_ms": 37.170280000054845,
+          "wall_max_ms": 41.86076599989974,
+          "external_rss_median_mib": 12.5625
+        },
+        "pr1078": {
+          "wall_median_ms": 34.110600999838425,
+          "wall_min_ms": 31.61634299999605,
+          "wall_max_ms": 38.7827469999138,
+          "external_rss_median_mib": 11.87890625
+        }
+      }
+    },
+    {
+      "app": "codetriage",
+      "file_count": 263,
+      "bytes": 289428,
+      "manifest_sha256": "15245ef64e0e78c7263d2857ee1bfe74751efcfaa478119403ec36883cc2e4a2",
+      "defs": 463,
+      "parse_errors": [],
+      "source_pin": "https://github.com/codetriage/codetriage@d1868f8634e97a111a7fca49d58cc776d206007e:.",
+      "calls": {
+        "include": 22,
+        "prepend": 2,
+        "extend": 0,
+        "included": 0,
+        "class_methods": 0,
+        "delegate": 3,
+        "define_method": 0,
+        "attr_reader": 12,
+        "attr_writer": 0,
+        "attr_accessor": 4,
+        "has_many": 22,
+        "has_one": 2,
+        "belongs_to": 18,
+        "scope": 8,
+        "enum": 0,
+        "attribute": 0,
+        "sig": 0
+      },
+      "root": ".corpus/codetriage",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 17.669990000058533,
+          "wall_min_ms": 17.024128000002747,
+          "wall_max_ms": 18.419283999946856,
+          "external_rss_median_mib": 8.2265625
+        },
+        "pr1078": {
+          "wall_median_ms": 17.505229999869698,
+          "wall_min_ms": 16.12963899992792,
+          "wall_max_ms": 19.8597860000973,
+          "external_rss_median_mib": 8.08203125
+        }
+      }
+    },
+    {
+      "app": "pingcrm",
+      "file_count": 66,
+      "bytes": 81325,
+      "manifest_sha256": "b623692c4dd4a442b9b0e62a54f914bb6b7aaf4d8bfdb9222485a5b282370d8f",
+      "defs": 59,
+      "parse_errors": [],
+      "source_pin": "https://github.com/ledermann/pingcrm@22464f822dcf59c4425993dd623780ad44497fda:.",
+      "calls": {
+        "include": 11,
+        "prepend": 1,
+        "extend": 5,
+        "included": 4,
+        "class_methods": 0,
+        "delegate": 0,
+        "define_method": 0,
+        "attr_reader": 0,
+        "attr_writer": 0,
+        "attr_accessor": 0,
+        "has_many": 7,
+        "has_one": 0,
+        "belongs_to": 9,
+        "scope": 10,
+        "enum": 0,
+        "attribute": 0,
+        "sig": 0
+      },
+      "root": ".corpus/pingcrm",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 6.755879999900571,
+          "wall_min_ms": 6.659352000042418,
+          "wall_max_ms": 7.019432999868513,
+          "external_rss_median_mib": 5.44140625
+        },
+        "pr1078": {
+          "wall_median_ms": 6.720046000054936,
+          "wall_min_ms": 6.713933999890287,
+          "wall_max_ms": 7.602053000027809,
+          "external_rss_median_mib": 5.34765625
+        }
+      }
+    },
+    {
+      "app": "redprints-cfp",
+      "file_count": 149,
+      "bytes": 138073,
+      "manifest_sha256": "2d2538e0616add5cb75b7e9468897f238a33f0330eab68b2b35862442f11890c",
+      "defs": 195,
+      "parse_errors": [],
+      "source_pin": "https://github.com/evilmartians/redprints-cfp@6080fc24fbf0015f7e5a5ae932e903731502c65a:.",
+      "calls": {
+        "include": 21,
+        "prepend": 1,
+        "extend": 2,
+        "included": 2,
+        "class_methods": 1,
+        "delegate": 4,
+        "define_method": 0,
+        "attr_reader": 8,
+        "attr_writer": 1,
+        "attr_accessor": 3,
+        "has_many": 10,
+        "has_one": 2,
+        "belongs_to": 16,
+        "scope": 4,
+        "enum": 4,
+        "attribute": 36,
+        "sig": 0
+      },
+      "root": ".corpus/redprints-cfp",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 11.777273999996396,
+          "wall_min_ms": 10.512129000062487,
+          "wall_max_ms": 11.914611000065634,
+          "external_rss_median_mib": 6.69140625
+        },
+        "pr1078": {
+          "wall_median_ms": 10.781973999883121,
+          "wall_min_ms": 9.85906599998998,
+          "wall_max_ms": 11.90365100001145,
+          "external_rss_median_mib": 6.70703125
+        }
+      }
+    },
+    {
+      "app": "react-starter-kit",
+      "file_count": 55,
+      "bytes": 54992,
+      "manifest_sha256": "65688b16ec21ee3bb68d63c7c45aef8231354eb699f0361aa118bec4bfeacb67",
+      "defs": 50,
+      "parse_errors": [],
+      "source_pin": "https://github.com/inertia-rails/react-starter-kit@f8081935e9bda68f8ef1ec53dc7eed19c819ee68:.",
+      "calls": {
+        "include": 3,
+        "prepend": 0,
+        "extend": 0,
+        "included": 0,
+        "class_methods": 0,
+        "delegate": 1,
+        "define_method": 0,
+        "attr_reader": 0,
+        "attr_writer": 0,
+        "attr_accessor": 0,
+        "has_many": 1,
+        "has_one": 0,
+        "belongs_to": 1,
+        "scope": 0,
+        "enum": 0,
+        "attribute": 2,
+        "sig": 0
+      },
+      "root": ".corpus/react-starter-kit",
+      "summary": {
+        "pinned": {
+          "wall_median_ms": 7.180689000051643,
+          "wall_min_ms": 6.548859000076845,
+          "wall_max_ms": 7.21605300009287,
+          "external_rss_median_mib": 5.19921875
+        },
+        "pr1078": {
+          "wall_median_ms": 7.162977000007231,
+          "wall_min_ms": 6.372104000092804,
+          "wall_max_ms": 8.932751999964239,
+          "external_rss_median_mib": 5.19921875
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "app": "rubydex-blog",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.008975078000048597,
+      "max_rss_bytes": 5074944,
+      "external_max_rss_bytes": 5279744,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.004
+      },
+      "files_reported": 42,
+      "declarations": 68,
+      "definitions": 54,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "rubydex-blog",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.0062682009997843124,
+      "max_rss_bytes": 5074944,
+      "external_max_rss_bytes": 5271552,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 42,
+      "declarations": 68,
+      "definitions": 54,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.015713949000200955,
+      "max_rss_bytes": 7962624,
+      "external_max_rss_bytes": 8155136,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.008,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.012
+      },
+      "files_reported": 277,
+      "declarations": 914,
+      "definitions": 788,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.0141641189998154,
+      "max_rss_bytes": 7647232,
+      "external_max_rss_bytes": 7720960,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.006,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.01
+      },
+      "files_reported": 277,
+      "declarations": 914,
+      "definitions": 788,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.08817107200002283,
+      "max_rss_bytes": 29589504,
+      "external_max_rss_bytes": 29589504,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.068,
+        "resolution": 0.011,
+        "querying": 0.001,
+        "total:": 0.083
+      },
+      "files_reported": 1184,
+      "declarations": 3474,
+      "definitions": 3314,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.06634193299987601,
+      "max_rss_bytes": 27697152,
+      "external_max_rss_bytes": 27697152,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.046,
+        "resolution": 0.011,
+        "querying": 0.001,
+        "total:": 0.06
+      },
+      "files_reported": 1184,
+      "declarations": 3474,
+      "definitions": 3314,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.01096541500010062,
+      "max_rss_bytes": 6807552,
+      "external_max_rss_bytes": 6918144,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.004,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.007
+      },
+      "files_reported": 142,
+      "declarations": 532,
+      "definitions": 443,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.009939318000078856,
+      "max_rss_bytes": 6803456,
+      "external_max_rss_bytes": 6832128,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.003,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.007
+      },
+      "files_reported": 142,
+      "declarations": 532,
+      "definitions": 443,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.03820317199983947,
+      "max_rss_bytes": 13430784,
+      "external_max_rss_bytes": 13430784,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.024,
+        "resolution": 0.007,
+        "querying": 0.0,
+        "total:": 0.034
+      },
+      "files_reported": 337,
+      "declarations": 1491,
+      "definitions": 1526,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.0387827469999138,
+      "max_rss_bytes": 12374016,
+      "external_max_rss_bytes": 12455936,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.019,
+        "resolution": 0.013,
+        "querying": 0.001,
+        "total:": 0.034
+      },
+      "files_reported": 337,
+      "declarations": 1491,
+      "definitions": 1526,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.017024128000002747,
+      "max_rss_bytes": 8359936,
+      "external_max_rss_bytes": 8507392,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.008,
+        "resolution": 0.003,
+        "querying": 0.0,
+        "total:": 0.013
+      },
+      "files_reported": 264,
+      "declarations": 977,
+      "definitions": 926,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.01612963899992792,
+      "max_rss_bytes": 8212480,
+      "external_max_rss_bytes": 8474624,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.008,
+        "resolution": 0.003,
+        "querying": 0.0,
+        "total:": 0.012
+      },
+      "files_reported": 264,
+      "declarations": 977,
+      "definitions": 926,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.0070194329998685134,
+      "max_rss_bytes": 5570560,
+      "external_max_rss_bytes": 5705728,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.002,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 67,
+      "declarations": 145,
+      "definitions": 115,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.006713933999890287,
+      "max_rss_bytes": 5398528,
+      "external_max_rss_bytes": 5607424,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.001,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 67,
+      "declarations": 145,
+      "definitions": 115,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.011914611000065634,
+      "max_rss_bytes": 6889472,
+      "external_max_rss_bytes": 7016448,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.005,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.008
+      },
+      "files_reported": 150,
+      "declarations": 470,
+      "definitions": 395,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.010781973999883121,
+      "max_rss_bytes": 6909952,
+      "external_max_rss_bytes": 7049216,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.005,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.007
+      },
+      "files_reported": 150,
+      "declarations": 470,
+      "definitions": 395,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pinned",
+      "round": 0,
+      "wall_seconds": 0.007180689000051643,
+      "max_rss_bytes": 5066752,
+      "external_max_rss_bytes": 5414912,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.002,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.004
+      },
+      "files_reported": 56,
+      "declarations": 114,
+      "definitions": 96,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pr1078",
+      "round": 0,
+      "wall_seconds": 0.008932751999964239,
+      "max_rss_bytes": 5169152,
+      "external_max_rss_bytes": 5529600,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.003,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.005
+      },
+      "files_reported": 56,
+      "declarations": 114,
+      "definitions": 96,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "rubydex-blog",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.005828773999837722,
+      "max_rss_bytes": 5013504,
+      "external_max_rss_bytes": 5296128,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 42,
+      "declarations": 68,
+      "definitions": 54,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "rubydex-blog",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.0066341729998384835,
+      "max_rss_bytes": 5099520,
+      "external_max_rss_bytes": 5361664,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 42,
+      "declarations": 68,
+      "definitions": 54,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.014083607000202392,
+      "max_rss_bytes": 7684096,
+      "external_max_rss_bytes": 7786496,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.006,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.011
+      },
+      "files_reported": 277,
+      "declarations": 914,
+      "definitions": 788,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.016670613000087542,
+      "max_rss_bytes": 7815168,
+      "external_max_rss_bytes": 8122368,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.009,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.013
+      },
+      "files_reported": 277,
+      "declarations": 914,
+      "definitions": 788,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.06610198199996375,
+      "max_rss_bytes": 27381760,
+      "external_max_rss_bytes": 27381760,
+      "stages_seconds": {
+        "listing": 0.003,
+        "indexing": 0.046,
+        "resolution": 0.012,
+        "querying": 0.001,
+        "total:": 0.061
+      },
+      "files_reported": 1184,
+      "declarations": 3474,
+      "definitions": 3314,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.09909020999998575,
+      "max_rss_bytes": 29310976,
+      "external_max_rss_bytes": 29310976,
+      "stages_seconds": {
+        "listing": 0.003,
+        "indexing": 0.077,
+        "resolution": 0.012,
+        "querying": 0.001,
+        "total:": 0.093
+      },
+      "files_reported": 1184,
+      "declarations": 3474,
+      "definitions": 3314,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.011735652999959711,
+      "max_rss_bytes": 6852608,
+      "external_max_rss_bytes": 6873088,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.004,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.008
+      },
+      "files_reported": 142,
+      "declarations": 532,
+      "definitions": 443,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.013591698000027463,
+      "max_rss_bytes": 7041024,
+      "external_max_rss_bytes": 7069696,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.005,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.009
+      },
+      "files_reported": 142,
+      "declarations": 532,
+      "definitions": 443,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.03161634299999605,
+      "max_rss_bytes": 12017664,
+      "external_max_rss_bytes": 12075008,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.018,
+        "resolution": 0.008,
+        "querying": 0.0,
+        "total:": 0.027
+      },
+      "files_reported": 337,
+      "declarations": 1491,
+      "definitions": 1526,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.037170280000054845,
+      "max_rss_bytes": 12898304,
+      "external_max_rss_bytes": 13066240,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.022,
+        "resolution": 0.008,
+        "querying": 0.001,
+        "total:": 0.033
+      },
+      "files_reported": 337,
+      "declarations": 1491,
+      "definitions": 1526,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.017505229999869698,
+      "max_rss_bytes": 8253440,
+      "external_max_rss_bytes": 8355840,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.009,
+        "resolution": 0.003,
+        "querying": 0.0,
+        "total:": 0.014
+      },
+      "files_reported": 264,
+      "declarations": 977,
+      "definitions": 926,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.017669990000058533,
+      "max_rss_bytes": 8577024,
+      "external_max_rss_bytes": 8626176,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.009,
+        "resolution": 0.003,
+        "querying": 0.0,
+        "total:": 0.014
+      },
+      "files_reported": 264,
+      "declarations": 977,
+      "definitions": 926,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.007602053000027809,
+      "max_rss_bytes": 5398528,
+      "external_max_rss_bytes": 5525504,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.002,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.004
+      },
+      "files_reported": 67,
+      "declarations": 145,
+      "definitions": 115,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.006755879999900571,
+      "max_rss_bytes": 5488640,
+      "external_max_rss_bytes": 5582848,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 67,
+      "declarations": 145,
+      "definitions": 115,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.01190365100001145,
+      "max_rss_bytes": 6893568,
+      "external_max_rss_bytes": 7032832,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.005,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.008
+      },
+      "files_reported": 150,
+      "declarations": 470,
+      "definitions": 395,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.011777273999996396,
+      "max_rss_bytes": 6959104,
+      "external_max_rss_bytes": 7122944,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.005,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.008
+      },
+      "files_reported": 150,
+      "declarations": 470,
+      "definitions": 395,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pr1078",
+      "round": 1,
+      "wall_seconds": 0.007162977000007231,
+      "max_rss_bytes": 5107712,
+      "external_max_rss_bytes": 5431296,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.004
+      },
+      "files_reported": 56,
+      "declarations": 114,
+      "definitions": 96,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pinned",
+      "round": 1,
+      "wall_seconds": 0.00721605300009287,
+      "max_rss_bytes": 5189632,
+      "external_max_rss_bytes": 5537792,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.002,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.004
+      },
+      "files_reported": 56,
+      "declarations": 114,
+      "definitions": 96,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "rubydex-blog",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.008752965999974549,
+      "max_rss_bytes": 5005312,
+      "external_max_rss_bytes": 5283840,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.003,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.005
+      },
+      "files_reported": 42,
+      "declarations": 68,
+      "definitions": 54,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "rubydex-blog",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.008093229999985851,
+      "max_rss_bytes": 4984832,
+      "external_max_rss_bytes": 5320704,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.004
+      },
+      "files_reported": 42,
+      "declarations": 68,
+      "definitions": 54,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.018750586999885854,
+      "max_rss_bytes": 8028160,
+      "external_max_rss_bytes": 8298496,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.01,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.014
+      },
+      "files_reported": 277,
+      "declarations": 914,
+      "definitions": 788,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.015134137999893937,
+      "max_rss_bytes": 7606272,
+      "external_max_rss_bytes": 7708672,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.007,
+        "resolution": 0.002,
+        "querying": 0.0,
+        "total:": 0.011
+      },
+      "files_reported": 277,
+      "declarations": 914,
+      "definitions": 788,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.08896487099991646,
+      "max_rss_bytes": 28590080,
+      "external_max_rss_bytes": 28590080,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.068,
+        "resolution": 0.012,
+        "querying": 0.001,
+        "total:": 0.083
+      },
+      "files_reported": 1184,
+      "declarations": 3474,
+      "definitions": 3314,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.06796770400001151,
+      "max_rss_bytes": 27377664,
+      "external_max_rss_bytes": 27377664,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.047,
+        "resolution": 0.012,
+        "querying": 0.001,
+        "total:": 0.063
+      },
+      "files_reported": 1184,
+      "declarations": 3474,
+      "definitions": 3314,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.011106950000112192,
+      "max_rss_bytes": 6643712,
+      "external_max_rss_bytes": 6742016,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.004,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.008
+      },
+      "files_reported": 142,
+      "declarations": 532,
+      "definitions": 443,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.010234399999944799,
+      "max_rss_bytes": 6524928,
+      "external_max_rss_bytes": 6590464,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.003,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.006
+      },
+      "files_reported": 142,
+      "declarations": 532,
+      "definitions": 443,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.04186076599989974,
+      "max_rss_bytes": 12926976,
+      "external_max_rss_bytes": 13172736,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.026,
+        "resolution": 0.009,
+        "querying": 0.001,
+        "total:": 0.037
+      },
+      "files_reported": 337,
+      "declarations": 1491,
+      "definitions": 1526,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.034110600999838425,
+      "max_rss_bytes": 12435456,
+      "external_max_rss_bytes": 12627968,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.019,
+        "resolution": 0.008,
+        "querying": 0.0,
+        "total:": 0.03
+      },
+      "files_reported": 337,
+      "declarations": 1491,
+      "definitions": 1526,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.018419283999946856,
+      "max_rss_bytes": 8658944,
+      "external_max_rss_bytes": 8699904,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.01,
+        "resolution": 0.003,
+        "querying": 0.0,
+        "total:": 0.014
+      },
+      "files_reported": 264,
+      "declarations": 977,
+      "definitions": 926,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.0198597860000973,
+      "max_rss_bytes": 8396800,
+      "external_max_rss_bytes": 8544256,
+      "stages_seconds": {
+        "listing": 0.002,
+        "indexing": 0.011,
+        "resolution": 0.003,
+        "querying": 0.0,
+        "total:": 0.016
+      },
+      "files_reported": 264,
+      "declarations": 977,
+      "definitions": 926,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.006659352000042418,
+      "max_rss_bytes": 5652480,
+      "external_max_rss_bytes": 5816320,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.002,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 67,
+      "declarations": 145,
+      "definitions": 115,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.006720046000054936,
+      "max_rss_bytes": 5627904,
+      "external_max_rss_bytes": 5726208,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.002,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.004
+      },
+      "files_reported": 67,
+      "declarations": 145,
+      "definitions": 115,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.010512129000062487,
+      "max_rss_bytes": 6811648,
+      "external_max_rss_bytes": 6934528,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.004,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.007
+      },
+      "files_reported": 150,
+      "declarations": 470,
+      "definitions": 395,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.00985906599998998,
+      "max_rss_bytes": 6565888,
+      "external_max_rss_bytes": 6766592,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.004,
+        "resolution": 0.001,
+        "querying": 0.0,
+        "total:": 0.006
+      },
+      "files_reported": 150,
+      "declarations": 470,
+      "definitions": 395,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pinned",
+      "round": 2,
+      "wall_seconds": 0.006548859000076845,
+      "max_rss_bytes": 5165056,
+      "external_max_rss_bytes": 5451776,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 56,
+      "declarations": 114,
+      "definitions": 96,
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pr1078",
+      "round": 2,
+      "wall_seconds": 0.006372104000092804,
+      "max_rss_bytes": 5066752,
+      "external_max_rss_bytes": 5451776,
+      "stages_seconds": {
+        "listing": 0.001,
+        "indexing": 0.001,
+        "resolution": 0.0,
+        "querying": 0.0,
+        "total:": 0.003
+      },
+      "files_reported": 56,
+      "declarations": 114,
+      "definitions": 96,
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "snapshots": [
+    {
+      "app": "rubydex-blog",
+      "arm": "pinned",
+      "sha256": "8b93a2b3bae07a9a5a7cc6a060226972c2935895492eccdbcb694ca0c7491d94",
+      "rows": 1087,
+      "diagnostics": 1,
+      "stderr": ""
+    },
+    {
+      "app": "rubydex-blog",
+      "arm": "pr1078",
+      "sha256": "8b93a2b3bae07a9a5a7cc6a060226972c2935895492eccdbcb694ca0c7491d94",
+      "rows": 1087,
+      "diagnostics": 1,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pinned",
+      "sha256": "9f7915d88cd86c60e8a1d4efbf33fa82d2f72f077dd64d3b517f945b8baf8b65",
+      "rows": 9250,
+      "diagnostics": 6,
+      "stderr": ""
+    },
+    {
+      "app": "fizzy",
+      "arm": "pr1078",
+      "sha256": "124a7c6bb81c05bc3331b618843db309ffa258b53dad8cf79882db1bd39b9ef8",
+      "rows": 9248,
+      "diagnostics": 4,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pinned",
+      "sha256": "512265203975b997ce83b8f3b7eb2af4b1b969e99cf2fccbbb2865292ca23642",
+      "rows": 94693,
+      "diagnostics": 610,
+      "stderr": ""
+    },
+    {
+      "app": "casa",
+      "arm": "pr1078",
+      "sha256": "512265203975b997ce83b8f3b7eb2af4b1b969e99cf2fccbbb2865292ca23642",
+      "rows": 94693,
+      "diagnostics": 610,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pinned",
+      "sha256": "026c2e0adbbbd995bdc4b4e3fd292cde2a285fbde66a6e397ab1349f482797bc",
+      "rows": 5893,
+      "diagnostics": 10,
+      "stderr": ""
+    },
+    {
+      "app": "writebook",
+      "arm": "pr1078",
+      "sha256": "8cb9e4ff0664460175aca70c77cc80c028ba55f2e353765406d4d9f7c2699e80",
+      "rows": 5890,
+      "diagnostics": 7,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pinned",
+      "sha256": "e4d119b1525d4beef919bc9972ee352fcb426b5259b8913f810cee5215cf460a",
+      "rows": 24876,
+      "diagnostics": 159,
+      "stderr": ""
+    },
+    {
+      "app": "wikino",
+      "arm": "pr1078",
+      "sha256": "e4d119b1525d4beef919bc9972ee352fcb426b5259b8913f810cee5215cf460a",
+      "rows": 24876,
+      "diagnostics": 159,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pinned",
+      "sha256": "4c036a471af256afc752a08cc24520deb5889f7da547a29e8b6a9bb199cf0f81",
+      "rows": 11217,
+      "diagnostics": 23,
+      "stderr": ""
+    },
+    {
+      "app": "codetriage",
+      "arm": "pr1078",
+      "sha256": "4c036a471af256afc752a08cc24520deb5889f7da547a29e8b6a9bb199cf0f81",
+      "rows": 11217,
+      "diagnostics": 23,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pinned",
+      "sha256": "82d25703c618e6a622123267fac8cab9ba5c8a6ff8e54c24c005eb407c070a64",
+      "rows": 2124,
+      "diagnostics": 0,
+      "stderr": ""
+    },
+    {
+      "app": "pingcrm",
+      "arm": "pr1078",
+      "sha256": "82d25703c618e6a622123267fac8cab9ba5c8a6ff8e54c24c005eb407c070a64",
+      "rows": 2124,
+      "diagnostics": 0,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pinned",
+      "sha256": "51bc48c080523b52997578a4b1c53efe0ff4146841d8b2fc613f664a488f2fdb",
+      "rows": 6328,
+      "diagnostics": 8,
+      "stderr": ""
+    },
+    {
+      "app": "redprints-cfp",
+      "arm": "pr1078",
+      "sha256": "51bc48c080523b52997578a4b1c53efe0ff4146841d8b2fc613f664a488f2fdb",
+      "rows": 6328,
+      "diagnostics": 8,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pinned",
+      "sha256": "f1ce67ee2011faed40732c48458cc9c6adc60d5fdfb4944e8822f4c92537fd6e",
+      "rows": 1779,
+      "diagnostics": 0,
+      "stderr": ""
+    },
+    {
+      "app": "react-starter-kit",
+      "arm": "pr1078",
+      "sha256": "f1ce67ee2011faed40732c48458cc9c6adc60d5fdfb4944e8822f4c92537fd6e",
+      "rows": 1779,
+      "diagnostics": 0,
+      "stderr": ""
+    }
+  ],
+  "comparisons": [
+    {
+      "app": "rubydex-blog",
+      "full_projection_equal": true,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [],
+      "added_rows": []
+    },
+    {
+      "app": "fizzy",
+      "full_projection_equal": false,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [
+        "diagnostic=Diagnostic { rule: ParseWarning, uri_id: Id { value: 12475253915307320092, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 824, end: 825 }, message: \"ambiguous `/`; wrap regexp in parentheses or add a space after `/` operator\" }",
+        "diagnostic=Diagnostic { rule: ParseWarning, uri_id: Id { value: 13648689180036796500, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 258, end: 259 }, message: \"ambiguous `/`; wrap regexp in parentheses or add a space after `/` operator\" }"
+      ],
+      "added_rows": []
+    },
+    {
+      "app": "casa",
+      "full_projection_equal": true,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [],
+      "added_rows": []
+    },
+    {
+      "app": "writebook",
+      "full_projection_equal": false,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [
+        "diagnostic=Diagnostic { rule: ParseWarning, uri_id: Id { value: 11980355329818248375, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 832, end: 833 }, message: \"ambiguous `/`; wrap regexp in parentheses or add a space after `/` operator\" }",
+        "diagnostic=Diagnostic { rule: ParseWarning, uri_id: Id { value: 14797962044789213794, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 154, end: 155 }, message: \"ambiguous `/`; wrap regexp in parentheses or add a space after `/` operator\" }",
+        "diagnostic=Diagnostic { rule: ParseWarning, uri_id: Id { value: 14797962044789213794, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 208, end: 209 }, message: \"ambiguous `/`; wrap regexp in parentheses or add a space after `/` operator\" }"
+      ],
+      "added_rows": []
+    },
+    {
+      "app": "wikino",
+      "full_projection_equal": true,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [],
+      "added_rows": []
+    },
+    {
+      "app": "codetriage",
+      "full_projection_equal": true,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [],
+      "added_rows": []
+    },
+    {
+      "app": "pingcrm",
+      "full_projection_equal": true,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [],
+      "added_rows": []
+    },
+    {
+      "app": "redprints-cfp",
+      "full_projection_equal": true,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [],
+      "added_rows": []
+    },
+    {
+      "app": "react-starter-kit",
+      "full_projection_equal": true,
+      "non_diagnostic_projection_equal": true,
+      "removed_rows": [],
+      "added_rows": []
+    }
+  ],
+  "oracle": {
+    "ruby": "4.0.7",
+    "active_support": "8.1.4",
+    "child_ancestors": [
+      "Top",
+      "Child",
+      "Left",
+      "Right",
+      "Parent",
+      "Object",
+      "Kernel",
+      "BasicObject"
+    ],
+    "child_singleton_ancestors": [
+      null,
+      "ClassMethods",
+      null,
+      null,
+      null,
+      "Class",
+      "Module",
+      "Object",
+      "Kernel",
+      "BasicObject"
+    ],
+    "child_private_methods": [
+      "copied",
+      "literal",
+      "original",
+      "token"
+    ],
+    "host_ancestors": [
+      "Host",
+      "Second",
+      "Left",
+      "First",
+      "Object",
+      "Kernel",
+      "BasicObject"
+    ],
+    "concern_class_owner": "First::ClassMethods",
+    "zeitwerk": "2.8.3",
+    "zeitwerk_distinct_namespaces": [
+      "Child::Tasks",
+      "Child::Tasks::Worker",
+      "Parent::Tasks::Worker"
+    ]
+  },
+  "probe_outputs": {
+    "probe-pinned.txt": "Annotated visibility=Some(Public) ancestors=Some([\"Annotated\", \"Object\", \"Kernel\", \"BasicObject\"])\nAnnotated#transform() visibility=Some(Public) ancestors=None\nApplicationRecord visibility=Some(Public) ancestors=Some([\"ApplicationRecord\", \"Object\", \"Kernel\", \"BasicObject\"])\nBasicObject visibility=Some(Public) ancestors=Some([\"BasicObject\"])\nBasicObject::<BasicObject> visibility=None ancestors=Some([\"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nChild visibility=Some(Public) ancestors=Some([\"Top\", \"Child\", \"Left\", \"Right\", \"Parent\", \"Object\", \"Kernel\", \"BasicObject\"])\nChild#copied() visibility=Some(Private) ancestors=None\nChild#original() visibility=Some(Private) ancestors=None\nChild#token() visibility=Some(Private) ancestors=None\nChild::<Child> visibility=None ancestors=Some([\"Child::<Child>\", \"ClassMethods\", \"Parent::<Parent>\", \"Object::<Object>\", \"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nClass visibility=Some(Public) ancestors=Some([\"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nClassMethods visibility=Some(Public) ancestors=Some([\"ClassMethods\"])\nClassMethods#class_api() visibility=Some(Public) ancestors=None\nFirst visibility=Some(Public) ancestors=Some([\"First\", \"Left\"])\nFirst#from_concern() visibility=Some(Public) ancestors=None\nFirst::<First> visibility=None ancestors=Some([\"First::<First>\", \"<partial>\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nGSD visibility=Some(Public) ancestors=Some([\"GSD\"])\nGSD::ApplicationRecord visibility=Some(Public) ancestors=Some([\"GSD::ApplicationRecord\", \"Object\"])\nHost visibility=Some(Public) ancestors=Some([\"Host\", \"Second\", \"First\", \"Left\", \"Object\", \"Kernel\", \"BasicObject\"])\nKernel visibility=Some(Public) ancestors=Some([\"Kernel\"])\nLeft visibility=Some(Public) ancestors=Some([\"Left\"])\nModule visibility=Some(Public) ancestors=Some([\"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nObject visibility=Some(Public) ancestors=Some([\"Object\", \"Kernel\", \"BasicObject\"])\nObject::<Object> visibility=None ancestors=Some([\"Object::<Object>\", \"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nParent visibility=Some(Public) ancestors=Some([\"Parent\", \"Object\", \"Kernel\", \"BasicObject\"])\nParent::<Parent> visibility=None ancestors=Some([\"Parent::<Parent>\", \"Object::<Object>\", \"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nRight visibility=Some(Public) ancestors=Some([\"Right\"])\nSecond visibility=Some(Public) ancestors=Some([\"Second\", \"First\", \"Left\"])\nSecond::<Second> visibility=None ancestors=Some([\"Second::<Second>\", \"<partial>\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nTop visibility=Some(Public) ancestors=Some([\"Top\"])\nconstant_reference=ConstantReference { name_id: Id { value: 10030526670968532689, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 68, end: 85 } }\nconstant_reference=ConstantReference { name_id: Id { value: 10379714167133356360, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 180, end: 192 } }\nconstant_reference=ConstantReference { name_id: Id { value: 10850129819646887273, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 160, end: 173 } }\nconstant_reference=ConstantReference { name_id: Id { value: 11165382877191271571, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 151, end: 156 } }\nconstant_reference=ConstantReference { name_id: Id { value: 11208759042077222337, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 116, end: 122 } }\nconstant_reference=ConstantReference { name_id: Id { value: 12473945088348449713, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 224, end: 230 } }\nconstant_reference=ConstantReference { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 88, end: 99 } }\nconstant_reference=ConstantReference { name_id: Id { value: 13419222344296700380, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 160, end: 182 } }\nconstant_reference=ConstantReference { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 193, end: 199 } }\nconstant_reference=ConstantReference { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 155, end: 161 } }\nconstant_reference=ConstantReference { name_id: Id { value: 4802393153660491337, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 71, end: 75 } }\nconstant_reference=ConstantReference { name_id: Id { value: 485639326939731366, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 167, end: 170 } }\nconstant_reference=ConstantReference { name_id: Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 47, end: 81 } }\nconstant_reference=ConstantReference { name_id: Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 84, end: 132 } }\nconstant_reference=ConstantReference { name_id: Id { value: 7072381319565784152, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 22, end: 44 } }\nconstant_reference=ConstantReference { name_id: Id { value: 7140254137220290731, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 193, end: 198 } }\nconstant_reference=ConstantReference { name_id: Id { value: 7791290949831418336, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 145, end: 149 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 258, end: 289 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 292, end: 333 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 336, end: 368 } }\nconstant_reference=ConstantReference { name_id: Id { value: 9297303067469080703, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 22, end: 35 } }\nconstant_reference=ConstantReference { name_id: Id { value: 9691442157868484299, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 128, end: 134 } }\ndefinition=AttrReader(AttrReaderDefinition { str_id: Id { value: 8690041577447827176, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 218, end: 223 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8731968382917533504, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), visibility: Private })\ndefinition=Class(ClassDefinition { name_id: Id { value: 10030526670968532689, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 42, end: 90 }, name_offset: Offset { start: 48, end: 65 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 5935461028830074308, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), members: [], superclass_ref: Some(Id { value: 3326947951962182606, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 7, end: 34 }, name_offset: Offset { start: 13, end: 24 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 13410662759887820711, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 203, end: 234 }, name_offset: Offset { start: 209, end: 213 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 4808899227787686099, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 15273225185506244723, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 179, end: 209 }, name_offset: Offset { start: 185, end: 190 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 8092465407804613224, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 140, end: 171 }, name_offset: Offset { start: 146, end: 152 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 16141283421595028589, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 73, end: 132 }, name_offset: Offset { start: 79, end: 85 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 6633133069698157844, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 690572549040976578, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 4621110286530527368, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 114, end: 372 }, name_offset: Offset { start: 120, end: 125 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 9301214903021074927, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }, Id { value: 13939726112220964977, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }, Id { value: 15393369426152156890, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: Some(Id { value: 16629186011900409732, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 230020520376326075, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Include(IncludeDefinition { constant_reference_id: Id { value: 9761499050529233430, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Prepend(PrependDefinition { constant_reference_id: Id { value: 15423012970286535481, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Extend(ExtendDefinition { constant_reference_id: Id { value: 14363478944035902254, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 6567211563831128619, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 10373207992642926290, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 129 }, name_offset: Offset { start: 6, end: 15 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 6765848181448880957, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 9086740802843927598, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 28 }, name_offset: Offset { start: 6, end: 23 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 9691442157868484299, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 96, end: 113 }, name_offset: Offset { start: 102, end: 108 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Method(MethodDefinition { str_id: Id { value: 15729641190819578356, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 226, end: 255 }, name_offset: Offset { start: 230, end: 238 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8731968382917533504, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([RequiredKeyword(ParameterStruct { offset: Offset { start: 239, end: 240 }, str: Id { value: 16929150178197425425, _marker: PhantomData<rubydex::model::ids::StringMarker> } }), RestKeyword(ParameterStruct { offset: Offset { start: 245, end: 249 }, str: Id { value: 15148053840992835829, _marker: PhantomData<rubydex::model::ids::StringMarker> } })]), visibility: Private, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 4632866308523894694, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 73, end: 91 }, name_offset: Offset { start: 77, end: 86 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 502135520216047447, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 4651954219920696275, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 10373207992642926290, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 18, end: 125 }, name_offset: Offset { start: 22, end: 31 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8780064975211803105, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Overloaded([[RequiredPositional(ParameterStruct { offset: Offset { start: 41, end: 46 }, str: Id { value: 8325862483950887671, _marker: PhantomData<rubydex::model::ids::StringMarker> } }), RequiredKeyword(ParameterStruct { offset: Offset { start: 48, end: 55 }, str: Id { value: 16489008341009727047, _marker: PhantomData<rubydex::model::ids::StringMarker> } })], [RequiredPositional(ParameterStruct { offset: Offset { start: 109, end: 114 }, str: Id { value: 8325862483950887671, _marker: PhantomData<rubydex::model::ids::StringMarker> } })]]), visibility: Public, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 8224776103889928593, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 105, end: 126 }, name_offset: Offset { start: 109, end: 121 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8202547582233145182, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=MethodAlias(MethodAliasDefinition { new_name_str_id: Id { value: 11828766157058070967, _marker: PhantomData<rubydex::model::ids::StringMarker> }, old_name_str_id: Id { value: 15729641190819578356, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 258, end: 289 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8731968382917533504, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), receiver: None })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 12400787681032259886, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 35, end: 50 }, name_offset: Offset { start: 42, end: 45 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 14309243116603295297, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 16 }, name_offset: Offset { start: 7, end: 11 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 15108226835485882698, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 137, end: 202 }, name_offset: Offset { start: 144, end: 150 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [Extend(ExtendDefinition { constant_reference_id: Id { value: 15820885705959994462, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Include(IncludeDefinition { constant_reference_id: Id { value: 6220568085341197908, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 16721861653946036838, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 42, end: 65 }, name_offset: Offset { start: 49, end: 55 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 17564232768421502380, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 17, end: 34 }, name_offset: Offset { start: 24, end: 29 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 2343633596127429276, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 136 }, name_offset: Offset { start: 7, end: 12 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 10059022197661756358, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], mixins: [Extend(ExtendDefinition { constant_reference_id: Id { value: 15759364512020817769, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Include(IncludeDefinition { constant_reference_id: Id { value: 17965209076224409433, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 4057495326711049048, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 51, end: 95 }, name_offset: Offset { start: 58, end: 70 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 14888575921236515429, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 9351197865651316046, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 29, end: 94 }, name_offset: Offset { start: 36, end: 39 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 603278026459488143, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], mixins: [] })\nmethod_reference=MethodRef { str: Id { value: 10114892077429392278, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 47, end: 55 }, receiver: Some(Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 15729641190819578356, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 281, end: 289 }, receiver: Some(Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 1878871322343067333, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 292, end: 305 }, receiver: Some(Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 2662883072409934932, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 336, end: 344 }, receiver: Some(Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 5353696225670945369, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 84, end: 97 }, receiver: Some(Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\ndiagnostics=[]\nincremental_comment_semantics_equal=true\nincremental_comment_semantics_equal=true\nincremental_comment_semantics_equal=true\nincremental_comment_semantics_equal=true\n",
+    "probe-pr1078.txt": "Annotated visibility=Some(Public) ancestors=Some([\"Annotated\", \"Object\", \"Kernel\", \"BasicObject\"])\nAnnotated#transform() visibility=Some(Public) ancestors=None\nApplicationRecord visibility=Some(Public) ancestors=Some([\"ApplicationRecord\", \"Object\", \"Kernel\", \"BasicObject\"])\nBasicObject visibility=Some(Public) ancestors=Some([\"BasicObject\"])\nBasicObject::<BasicObject> visibility=None ancestors=Some([\"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nChild visibility=Some(Public) ancestors=Some([\"Top\", \"Child\", \"Left\", \"Right\", \"Parent\", \"Object\", \"Kernel\", \"BasicObject\"])\nChild#copied() visibility=Some(Private) ancestors=None\nChild#original() visibility=Some(Private) ancestors=None\nChild#token() visibility=Some(Private) ancestors=None\nChild::<Child> visibility=None ancestors=Some([\"Child::<Child>\", \"ClassMethods\", \"Parent::<Parent>\", \"Object::<Object>\", \"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nClass visibility=Some(Public) ancestors=Some([\"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nClassMethods visibility=Some(Public) ancestors=Some([\"ClassMethods\"])\nClassMethods#class_api() visibility=Some(Public) ancestors=None\nFirst visibility=Some(Public) ancestors=Some([\"First\", \"Left\"])\nFirst#from_concern() visibility=Some(Public) ancestors=None\nFirst::<First> visibility=None ancestors=Some([\"First::<First>\", \"<partial>\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nGSD visibility=Some(Public) ancestors=Some([\"GSD\"])\nGSD::ApplicationRecord visibility=Some(Public) ancestors=Some([\"GSD::ApplicationRecord\", \"Object\"])\nHost visibility=Some(Public) ancestors=Some([\"Host\", \"Second\", \"First\", \"Left\", \"Object\", \"Kernel\", \"BasicObject\"])\nKernel visibility=Some(Public) ancestors=Some([\"Kernel\"])\nLeft visibility=Some(Public) ancestors=Some([\"Left\"])\nModule visibility=Some(Public) ancestors=Some([\"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nObject visibility=Some(Public) ancestors=Some([\"Object\", \"Kernel\", \"BasicObject\"])\nObject::<Object> visibility=None ancestors=Some([\"Object::<Object>\", \"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nParent visibility=Some(Public) ancestors=Some([\"Parent\", \"Object\", \"Kernel\", \"BasicObject\"])\nParent::<Parent> visibility=None ancestors=Some([\"Parent::<Parent>\", \"Object::<Object>\", \"BasicObject::<BasicObject>\", \"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nRight visibility=Some(Public) ancestors=Some([\"Right\"])\nSecond visibility=Some(Public) ancestors=Some([\"Second\", \"First\", \"Left\"])\nSecond::<Second> visibility=None ancestors=Some([\"Second::<Second>\", \"<partial>\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nTop visibility=Some(Public) ancestors=Some([\"Top\"])\nconstant_reference=ConstantReference { name_id: Id { value: 10030526670968532689, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 68, end: 85 } }\nconstant_reference=ConstantReference { name_id: Id { value: 10379714167133356360, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 180, end: 192 } }\nconstant_reference=ConstantReference { name_id: Id { value: 10850129819646887273, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 160, end: 173 } }\nconstant_reference=ConstantReference { name_id: Id { value: 11165382877191271571, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 151, end: 156 } }\nconstant_reference=ConstantReference { name_id: Id { value: 11208759042077222337, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 116, end: 122 } }\nconstant_reference=ConstantReference { name_id: Id { value: 12473945088348449713, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 224, end: 230 } }\nconstant_reference=ConstantReference { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 88, end: 99 } }\nconstant_reference=ConstantReference { name_id: Id { value: 13419222344296700380, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 160, end: 182 } }\nconstant_reference=ConstantReference { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 193, end: 199 } }\nconstant_reference=ConstantReference { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 155, end: 161 } }\nconstant_reference=ConstantReference { name_id: Id { value: 4802393153660491337, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 71, end: 75 } }\nconstant_reference=ConstantReference { name_id: Id { value: 485639326939731366, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 167, end: 170 } }\nconstant_reference=ConstantReference { name_id: Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 47, end: 81 } }\nconstant_reference=ConstantReference { name_id: Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 84, end: 132 } }\nconstant_reference=ConstantReference { name_id: Id { value: 7072381319565784152, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 22, end: 44 } }\nconstant_reference=ConstantReference { name_id: Id { value: 7140254137220290731, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 193, end: 198 } }\nconstant_reference=ConstantReference { name_id: Id { value: 7791290949831418336, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 145, end: 149 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 258, end: 289 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 292, end: 333 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 336, end: 368 } }\nconstant_reference=ConstantReference { name_id: Id { value: 9297303067469080703, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 22, end: 35 } }\nconstant_reference=ConstantReference { name_id: Id { value: 9691442157868484299, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 128, end: 134 } }\ndefinition=AttrReader(AttrReaderDefinition { str_id: Id { value: 8690041577447827176, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 218, end: 223 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8731968382917533504, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), visibility: Private })\ndefinition=Class(ClassDefinition { name_id: Id { value: 10030526670968532689, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 42, end: 90 }, name_offset: Offset { start: 48, end: 65 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 5935461028830074308, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), members: [], superclass_ref: Some(Id { value: 3326947951962182606, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 7, end: 34 }, name_offset: Offset { start: 13, end: 24 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 13410662759887820711, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 203, end: 234 }, name_offset: Offset { start: 209, end: 213 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 4808899227787686099, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 15273225185506244723, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 179, end: 209 }, name_offset: Offset { start: 185, end: 190 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 8092465407804613224, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 140, end: 171 }, name_offset: Offset { start: 146, end: 152 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 16141283421595028589, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 73, end: 132 }, name_offset: Offset { start: 79, end: 85 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 6633133069698157844, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 690572549040976578, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 4621110286530527368, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 114, end: 372 }, name_offset: Offset { start: 120, end: 125 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 9301214903021074927, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }, Id { value: 13939726112220964977, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }, Id { value: 15393369426152156890, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: Some(Id { value: 16629186011900409732, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 230020520376326075, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Include(IncludeDefinition { constant_reference_id: Id { value: 9761499050529233430, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Prepend(PrependDefinition { constant_reference_id: Id { value: 15423012970286535481, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Extend(ExtendDefinition { constant_reference_id: Id { value: 14363478944035902254, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 6567211563831128619, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 10373207992642926290, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 129 }, name_offset: Offset { start: 6, end: 15 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 6765848181448880957, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 9086740802843927598, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 28 }, name_offset: Offset { start: 6, end: 23 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 9691442157868484299, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 96, end: 113 }, name_offset: Offset { start: 102, end: 108 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Method(MethodDefinition { str_id: Id { value: 15729641190819578356, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 226, end: 255 }, name_offset: Offset { start: 230, end: 238 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8731968382917533504, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([RequiredKeyword(ParameterStruct { offset: Offset { start: 239, end: 240 }, str: Id { value: 16929150178197425425, _marker: PhantomData<rubydex::model::ids::StringMarker> } }), RestKeyword(ParameterStruct { offset: Offset { start: 245, end: 249 }, str: Id { value: 15148053840992835829, _marker: PhantomData<rubydex::model::ids::StringMarker> } })]), visibility: Private, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 4632866308523894694, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 73, end: 91 }, name_offset: Offset { start: 77, end: 86 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 502135520216047447, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 4651954219920696275, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 10373207992642926290, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 18, end: 125 }, name_offset: Offset { start: 22, end: 31 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8780064975211803105, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Overloaded([[RequiredPositional(ParameterStruct { offset: Offset { start: 41, end: 46 }, str: Id { value: 8325862483950887671, _marker: PhantomData<rubydex::model::ids::StringMarker> } }), RequiredKeyword(ParameterStruct { offset: Offset { start: 48, end: 55 }, str: Id { value: 16489008341009727047, _marker: PhantomData<rubydex::model::ids::StringMarker> } })], [RequiredPositional(ParameterStruct { offset: Offset { start: 109, end: 114 }, str: Id { value: 8325862483950887671, _marker: PhantomData<rubydex::model::ids::StringMarker> } })]]), visibility: Public, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 8224776103889928593, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 105, end: 126 }, name_offset: Offset { start: 109, end: 121 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8202547582233145182, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=MethodAlias(MethodAliasDefinition { new_name_str_id: Id { value: 11828766157058070967, _marker: PhantomData<rubydex::model::ids::StringMarker> }, old_name_str_id: Id { value: 15729641190819578356, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 258, end: 289 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 8731968382917533504, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), receiver: None })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 12400787681032259886, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 35, end: 50 }, name_offset: Offset { start: 42, end: 45 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 14309243116603295297, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 16 }, name_offset: Offset { start: 7, end: 11 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 15108226835485882698, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 137, end: 202 }, name_offset: Offset { start: 144, end: 150 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [Extend(ExtendDefinition { constant_reference_id: Id { value: 15820885705959994462, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Include(IncludeDefinition { constant_reference_id: Id { value: 6220568085341197908, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 16721861653946036838, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 42, end: 65 }, name_offset: Offset { start: 49, end: 55 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 17564232768421502380, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 17, end: 34 }, name_offset: Offset { start: 24, end: 29 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 2343633596127429276, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 136 }, name_offset: Offset { start: 7, end: 12 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 10059022197661756358, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], mixins: [Extend(ExtendDefinition { constant_reference_id: Id { value: 15759364512020817769, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } }), Include(IncludeDefinition { constant_reference_id: Id { value: 17965209076224409433, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 4057495326711049048, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 51, end: 95 }, name_offset: Offset { start: 58, end: 70 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 14888575921236515429, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 9351197865651316046, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 6882305554093014158, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 29, end: 94 }, name_offset: Offset { start: 36, end: 39 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 603278026459488143, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], mixins: [] })\nmethod_reference=MethodRef { str: Id { value: 10114892077429392278, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 47, end: 55 }, receiver: Some(Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 15729641190819578356, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 281, end: 289 }, receiver: Some(Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 1878871322343067333, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 292, end: 305 }, receiver: Some(Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 2662883072409934932, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5633568702250743531, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 336, end: 344 }, receiver: Some(Id { value: 8657810464881457283, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\nmethod_reference=MethodRef { str: Id { value: 5353696225670945369, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 746565808107863412, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 84, end: 97 }, receiver: Some(Id { value: 5813459372490085588, _marker: PhantomData<rubydex::model::ids::NameMarker> }) }\ndiagnostics=[]\nincremental_comment_semantics_equal=true\nincremental_comment_semantics_equal=true\nincremental_comment_semantics_equal=true\nincremental_comment_semantics_equal=true\n",
+    "zeitwerk-unseeded.txt": "BasicObject visibility=Some(Public) ancestors=Some([\"BasicObject\"])\nClass visibility=Some(Public) ancestors=Some([\"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nKernel visibility=Some(Public) ancestors=Some([\"Kernel\"])\nModule visibility=Some(Public) ancestors=Some([\"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceChild visibility=Some(Public) ancestors=Some([\"NamespaceChild\", \"NamespaceParent\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceParent visibility=Some(Public) ancestors=Some([\"NamespaceParent\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceParent::Tasks visibility=Some(Public) ancestors=Some([\"NamespaceParent::Tasks\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceParent::Tasks::Worker visibility=Some(Public) ancestors=Some([\"NamespaceParent::Tasks::Worker\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceParent::Tasks::Worker#run() visibility=Some(Public) ancestors=None\nObject visibility=Some(Public) ancestors=Some([\"Object\", \"Kernel\", \"BasicObject\"])\nconstant_reference=ConstantReference { name_id: Id { value: 11208759042077222337, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 116, end: 122 } }\nconstant_reference=ConstantReference { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 88, end: 99 } }\nconstant_reference=ConstantReference { name_id: Id { value: 15687423311344192126, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 183, end: 188 } }\nconstant_reference=ConstantReference { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 193, end: 199 } }\nconstant_reference=ConstantReference { name_id: Id { value: 17516765415822316811, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 128, end: 133 } }\nconstant_reference=ConstantReference { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 155, end: 161 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 111, end: 126 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 33, end: 48 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 84, end: 99 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8425204486542890785, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 167, end: 181 } }\ndefinition=Class(ClassDefinition { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 7, end: 34 }, name_offset: Offset { start: 13, end: 24 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 15273225185506244723, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 179, end: 209 }, name_offset: Offset { start: 185, end: 190 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 8092465407804613224, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 140, end: 171 }, name_offset: Offset { start: 146, end: 152 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 16141283421595028589, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 17516765415822316811, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 27, end: 60 }, name_offset: Offset { start: 50, end: 55 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 3048091188887745091, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 105, end: 160 }, name_offset: Offset { start: 135, end: 141 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 4177859415073137673, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 73, end: 132 }, name_offset: Offset { start: 79, end: 85 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 6633133069698157844, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 690572549040976578, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 5035577560590326031, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 161, end: 215 }, name_offset: Offset { start: 190, end: 196 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 9028906958473298006, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 26 }, name_offset: Offset { start: 6, end: 21 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 8425204486542890785, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 61, end: 104 }, name_offset: Offset { start: 67, end: 81 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 3153147533686415844, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Method(MethodDefinition { str_id: Id { value: 2750463985191011369, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 144, end: 156 }, name_offset: Offset { start: 148, end: 151 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 1516561887881995804, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 2750463985191011369, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 199, end: 211 }, name_offset: Offset { start: 203, end: 206 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 15089317830253158011, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 16721861653946036838, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 42, end: 65 }, name_offset: Offset { start: 49, end: 55 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndiagnostics=[]\nincremental_comment_semantics_equal=true\n",
+    "zeitwerk-seeded.txt": "BasicObject visibility=Some(Public) ancestors=Some([\"BasicObject\"])\nClass visibility=Some(Public) ancestors=Some([\"Class\", \"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nKernel visibility=Some(Public) ancestors=Some([\"Kernel\"])\nModule visibility=Some(Public) ancestors=Some([\"Module\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceChild visibility=Some(Public) ancestors=Some([\"NamespaceChild\", \"NamespaceParent\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceChild::Tasks visibility=Some(Public) ancestors=Some([\"NamespaceChild::Tasks\"])\nNamespaceChild::Tasks::Worker visibility=Some(Public) ancestors=Some([\"NamespaceChild::Tasks::Worker\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceChild::Tasks::Worker#run() visibility=Some(Public) ancestors=None\nNamespaceParent visibility=Some(Public) ancestors=Some([\"NamespaceParent\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceParent::Tasks visibility=Some(Public) ancestors=Some([\"NamespaceParent::Tasks\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceParent::Tasks::Worker visibility=Some(Public) ancestors=Some([\"NamespaceParent::Tasks::Worker\", \"Object\", \"Kernel\", \"BasicObject\"])\nNamespaceParent::Tasks::Worker#run() visibility=Some(Public) ancestors=None\nObject visibility=Some(Public) ancestors=Some([\"Object\", \"Kernel\", \"BasicObject\"])\nconstant_reference=ConstantReference { name_id: Id { value: 11208759042077222337, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 116, end: 122 } }\nconstant_reference=ConstantReference { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 88, end: 99 } }\nconstant_reference=ConstantReference { name_id: Id { value: 15687423311344192126, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 183, end: 188 } }\nconstant_reference=ConstantReference { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 193, end: 199 } }\nconstant_reference=ConstantReference { name_id: Id { value: 17516765415822316811, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 128, end: 133 } }\nconstant_reference=ConstantReference { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 155, end: 161 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 111, end: 126 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 33, end: 48 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 84, end: 99 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8425204486542890785, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 13344286184219259675, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 7, end: 21 } }\nconstant_reference=ConstantReference { name_id: Id { value: 8425204486542890785, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 167, end: 181 } }\ndefinition=Class(ClassDefinition { name_id: Id { value: 13267136077050139355, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 7, end: 34 }, name_offset: Offset { start: 13, end: 24 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 15273225185506244723, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 179, end: 209 }, name_offset: Offset { start: 185, end: 190 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 8092465407804613224, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 17261595021814780941, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 140, end: 171 }, name_offset: Offset { start: 146, end: 152 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 16141283421595028589, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 17516765415822316811, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 27, end: 60 }, name_offset: Offset { start: 50, end: 55 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 3048091188887745091, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 105, end: 160 }, name_offset: Offset { start: 135, end: 141 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 4177859415073137673, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 4439561318080221221, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 73, end: 132 }, name_offset: Offset { start: 79, end: 85 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 6633133069698157844, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [Include(IncludeDefinition { constant_reference_id: Id { value: 690572549040976578, _marker: PhantomData<rubydex::model::ids::ConstantMarker> } })] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 5035577560590326031, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 161, end: 215 }, name_offset: Offset { start: 190, end: 196 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [Id { value: 9028906958473298006, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 8160316011613506565, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 26 }, name_offset: Offset { start: 6, end: 21 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: None, mixins: [] })\ndefinition=Class(ClassDefinition { name_id: Id { value: 8425204486542890785, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 61, end: 104 }, name_offset: Offset { start: 67, end: 81 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], superclass_ref: Some(Id { value: 3153147533686415844, _marker: PhantomData<rubydex::model::ids::ConstantMarker> }), mixins: [] })\ndefinition=Method(MethodDefinition { str_id: Id { value: 2750463985191011369, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 144, end: 156 }, name_offset: Offset { start: 148, end: 151 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 1516561887881995804, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=Method(MethodDefinition { str_id: Id { value: 2750463985191011369, _marker: PhantomData<rubydex::model::ids::StringMarker> }, uri_id: Id { value: 5883838948376324494, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 199, end: 211 }, name_offset: Offset { start: 203, end: 206 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: Some(Id { value: 15089317830253158011, _marker: PhantomData<rubydex::model::ids::DefinitionMarker> }), signatures: Simple([]), visibility: Public, receiver: None })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 15687423311344192126, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 13344286184219259675, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 0, end: 33 }, name_offset: Offset { start: 23, end: 28 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndefinition=Module(ModuleDefinition { name_id: Id { value: 16721861653946036838, _marker: PhantomData<rubydex::model::ids::NameMarker> }, uri_id: Id { value: 2949580762700601325, _marker: PhantomData<rubydex::model::ids::UriMarker> }, offset: Offset { start: 42, end: 65 }, name_offset: Offset { start: 49, end: 55 }, flags: DefinitionFlags(0x0), comments: [], lexical_nesting_id: None, members: [], mixins: [] })\ndiagnostics=[]\nincremental_comment_semantics_equal=true\nincremental_comment_semantics_equal=true\n"
+  },
+  "upstream": [
+    {
+      "number": 1077,
+      "url": "https://github.com/Shopify/rubydex/pull/1077",
+      "title": "Upgrade Prism to v2.0.0-rc2",
+      "state": "closed",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": "2026-10-20T13:46:22Z",
+      "updated_at": "2026-10-20T13:46:25Z"
+    },
+    {
+      "number": 1078,
+      "url": "https://github.com/Shopify/rubydex/pull/1078",
+      "title": "Upgrade Prism to v2.0.0",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-10-21T15:06:36Z"
+    },
+    {
+      "number": 1080,
+      "url": "https://github.com/Shopify/rubydex/pull/1080",
+      "title": "Make sure that on-demand resolve handles nesting and parent scopes",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-10-21T15:39:00Z"
+    },
+    {
+      "number": 1074,
+      "url": "https://github.com/Shopify/rubydex/pull/1074",
+      "title": "fix(resolution): resolve namesake superclass references",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-10-17T04:55:33Z"
+    },
+    {
+      "number": 1073,
+      "url": "https://github.com/Shopify/rubydex/issues/1073",
+      "title": "Incorrect resolved superclass name",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-10-19T16:05:32Z"
+    },
+    {
+      "number": 1063,
+      "url": "https://github.com/Shopify/rubydex/issues/1063",
+      "title": "`resolve_constant` returns nil for names with three or more segments",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-10-05T12:44:59Z"
+    },
+    {
+      "number": 1064,
+      "url": "https://github.com/Shopify/rubydex/pull/1064",
+      "title": "Index ERB documents",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-10-06T00:24:19Z"
+    },
+    {
+      "number": 1030,
+      "url": "https://github.com/Shopify/rubydex/pull/1030",
+      "title": "Prototype resolution-dependent DSL compiler boundary for #958",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": true,
+      "merged_at": null,
+      "updated_at": "2026-08-31T18:55:04Z"
+    },
+    {
+      "number": 958,
+      "url": "https://github.com/Shopify/rubydex/issues/958",
+      "title": "DSL handling",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-08-31T19:17:31Z"
+    },
+    {
+      "number": 997,
+      "url": "https://github.com/Shopify/rubydex/issues/997",
+      "title": "Rubydex ignores Zeitwerk implicit namespaces during constant resolution",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-08-10T16:06:10Z"
+    },
+    {
+      "number": 960,
+      "url": "https://github.com/Shopify/rubydex/issues/960",
+      "title": "Redesign incremental computation algorithm",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-07-29T14:32:14Z"
+    },
+    {
+      "number": 957,
+      "url": "https://github.com/Shopify/rubydex/issues/957",
+      "title": "Graph sharing mechanism",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-08-18T20:22:09Z"
+    },
+    {
+      "number": 1009,
+      "url": "https://github.com/Shopify/rubydex/pull/1009",
+      "title": "Add graph serialization",
+      "state": "closed",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-10-06T16:01:25Z"
+    },
+    {
+      "number": 583,
+      "url": "https://github.com/Shopify/rubydex/issues/583",
+      "title": "Support `define_method`",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-02-25T21:51:41Z"
+    },
+    {
+      "number": 937,
+      "url": "https://github.com/Shopify/rubydex/pull/937",
+      "title": "Propagate singleton class creation to descendants",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-07-30T20:19:43Z"
+    },
+    {
+      "number": 837,
+      "url": "https://github.com/Shopify/rubydex/pull/837",
+      "title": "Expose mixin locations",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-09-25T20:18:04Z"
+    },
+    {
+      "number": 835,
+      "url": "https://github.com/Shopify/rubydex/issues/835",
+      "title": "Add API for getting the source code of an entity",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-06-12T14:08:00Z"
+    },
+    {
+      "number": 844,
+      "url": "https://github.com/Shopify/rubydex/issues/844",
+      "title": "Expose the location range of a constant's assigned value",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-06-23T18:09:16Z"
+    },
+    {
+      "number": 628,
+      "url": "https://github.com/Shopify/rubydex/issues/628",
+      "title": "Index class/module references in RBS files",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-03-03T07:55:31Z"
+    },
+    {
+      "number": 826,
+      "url": "https://github.com/Shopify/rubydex/issues/826",
+      "title": "Add interface for collecting performance metrics",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-06-25T17:09:16Z"
+    },
+    {
+      "number": 864,
+      "url": "https://github.com/Shopify/rubydex/issues/864",
+      "title": "Track total memory used by the graph",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-06-16T21:18:23Z"
+    },
+    {
+      "number": 869,
+      "url": "https://github.com/Shopify/rubydex/pull/869",
+      "title": "Add opt-in client/server mode to the rdx executable",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": null,
+      "updated_at": "2026-08-06T14:02:28Z"
+    },
+    {
+      "number": 979,
+      "url": "https://github.com/Shopify/rubydex/pull/979",
+      "title": "Update the graph when the workspace changes",
+      "state": "open",
+      "kind": "pull_request",
+      "draft": true,
+      "merged_at": null,
+      "updated_at": "2026-08-04T23:16:47Z"
+    },
+    {
+      "number": 669,
+      "url": "https://github.com/Shopify/rubydex/issues/669",
+      "title": "Ruby LSP adoption",
+      "state": "open",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-10-19T18:56:00Z"
+    },
+    {
+      "number": 418,
+      "url": "https://github.com/Shopify/rubydex/issues/418",
+      "title": "Explore indexer plugins",
+      "state": "closed",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-07-28T18:59:00Z"
+    },
+    {
+      "number": 497,
+      "url": "https://github.com/Shopify/rubydex/issues/497",
+      "title": "Experiment generalizing DSL definitions",
+      "state": "closed",
+      "kind": "issue",
+      "draft": null,
+      "merged_at": null,
+      "updated_at": "2026-07-28T19:00:35Z"
+    },
+    {
+      "number": 798,
+      "url": "https://github.com/Shopify/rubydex/pull/798",
+      "title": "Add operation-based indexing pipeline",
+      "state": "closed",
+      "kind": "pull_request",
+      "draft": false,
+      "merged_at": "2026-05-27T17:55:24Z",
+      "updated_at": "2026-05-27T17:55:27Z"
+    }
+  ],
+  "pr1078_status": {
+    "head": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+    "mergeable": true,
+    "mergeable_state": "blocked",
+    "exact_remaining_gate": "unverified; branch protection/rules unavailable",
+    "submitted_reviews": [],
+    "check_run_count": 36,
+    "checks": [
+      {
+        "name": "Graphite / mergeability_check",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/runs/119308975801"
+      },
+      {
+        "name": "CodeQL",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/runs/119300440111"
+      },
+      {
+        "name": "dependabot",
+        "status": "completed",
+        "conclusion": "skipped",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622736490/job/119300207628"
+      },
+      {
+        "name": "Ruby 3.3 on windows-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151515"
+      },
+      {
+        "name": "Ruby 4.0 on windows-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151483"
+      },
+      {
+        "name": "Ruby 3.4 on ubuntu-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151366"
+      },
+      {
+        "name": "Ruby 3.3 on macos-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151312"
+      },
+      {
+        "name": "Ruby 3.4 on windows-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151300"
+      },
+      {
+        "name": "Ruby 3.4 on macos-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151260"
+      },
+      {
+        "name": "Ruby 4.0 on ubuntu-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151241"
+      },
+      {
+        "name": "memleak (thread)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739276/job/119300151240"
+      },
+      {
+        "name": "Ruby 3.3 on ubuntu-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151238"
+      },
+      {
+        "name": "indexing_top_gems",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739315/job/119300151218"
+      },
+      {
+        "name": "Ruby 4.0 on macos-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300151169"
+      },
+      {
+        "name": "memleak (memory)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739276/job/119300150969"
+      },
+      {
+        "name": "lint",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739348/job/119300150882"
+      },
+      {
+        "name": "memleak (leak)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622739276/job/119300150733"
+      },
+      {
+        "name": "cla",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622736464/job/119300143182"
+      },
+      {
+        "name": "Analyze (ruby)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622732814/job/119300135897"
+      },
+      {
+        "name": "Analyze (actions)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622732814/job/119300135442"
+      },
+      {
+        "name": "Analyze (rust)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622732814/job/119300135251"
+      },
+      {
+        "name": "Analyze (c-cpp)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622732814/job/119300135243"
+      },
+      {
+        "name": "Ruby 3.4 on windows-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969765"
+      },
+      {
+        "name": "Ruby 3.3 on windows-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969514"
+      },
+      {
+        "name": "Ruby 4.0 on windows-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969376"
+      },
+      {
+        "name": "Ruby 3.3 on ubuntu-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969373"
+      },
+      {
+        "name": "Ruby 3.4 on ubuntu-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969367"
+      },
+      {
+        "name": "Ruby 3.3 on macos-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969335"
+      },
+      {
+        "name": "Ruby 4.0 on macos-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969327"
+      },
+      {
+        "name": "Ruby 4.0 on ubuntu-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969254"
+      },
+      {
+        "name": "Ruby 3.4 on macos-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299969174"
+      },
+      {
+        "name": "memleak (memory)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685760/job/119299968992"
+      },
+      {
+        "name": "memleak (leak)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685760/job/119299968903"
+      },
+      {
+        "name": "lint",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685737/job/119299968873"
+      },
+      {
+        "name": "indexing_top_gems",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685771/job/119299968646"
+      },
+      {
+        "name": "memleak (thread)",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "06e61c1400cf3751a3aa4b42fd815b82b3909b43",
+        "url": "https://github.com/Shopify/rubydex/actions/runs/39622685760/job/119299968536"
+      }
+    ]
+  },
+  "validation": {
+    "command": "CARGO_TARGET_DIR=target-main cargo test --locked --manifest-path pr1078/rust/Cargo.toml --lib",
+    "rubydex_passed": 1157,
+    "rubydex_sys_passed": 12,
+    "failures": 0,
+    "lowrail_verify_run": false
+  },
+  "reproduction_sources": {
+    "inventory.rb": "require \"prism\"\nrequire \"json\"\nrequire \"digest\"\n\nclass Inventory < Prism::Visitor\n  attr_reader :calls, :defs\n  def initialize\n    @calls = Hash.new(0)\n    @defs = 0\n  end\n  def visit_call_node(node)\n    @calls[node.name.to_s] += 1\n    super\n  end\n  def visit_def_node(node)\n    @defs += 1\n    super\n  end\nend\n\nrows = ARGV.map do |root|\n  files = Dir.glob(\"#{root}/**/*\", File::FNM_DOTMATCH).select do |path|\n    File.file?(path) && !path.split(\"/\").any? { |p| %w[.git .bundle .claude .github .ruby-lsp .vscode log node_modules tmp .lowrail].include?(p) } && %w[.rb .rake .rbs .ru].include?(File.extname(path))\n  end.sort\n  visitor = Inventory.new\n  errors = []\n  manifest = files.map do |path|\n    bytes = File.binread(path)\n    unless path.end_with?(\".rbs\")\n      result = Prism.parse(bytes)\n      errors.concat(result.errors.map { |e| {file: path.delete_prefix(root + \"/\"), line: e.location.start_line, message: e.message} })\n      visitor.visit(result.value)\n    end\n    [path.delete_prefix(root + \"/\"), Digest::SHA256.hexdigest(bytes), bytes.bytesize]\n  end\n  {app: File.basename(root) == \"rails\" ? \"wikino\" : File.basename(root), file_count: files.size,\n   bytes: manifest.sum { |x| x[2] }, manifest_sha256: Digest::SHA256.hexdigest(JSON.generate(manifest)),\n   defs: visitor.defs, calls: visitor.calls.sort.to_h, parse_errors: errors,\n   source_pin: File.read(File.join(File.basename(root) == \"rails\" ? File.dirname(root) : root, \".lowrail-corpus-source\")).strip}\nend\nputs JSON.pretty_generate({ruby: RUBY_DESCRIPTION, prism: Prism::VERSION, apps: rows})\n",
+    "measure.py": "import hashlib\nimport json\nimport pathlib\nimport re\nimport statistics\nimport subprocess\nimport time\n\nroot = pathlib.Path('/home/user/workspace/repo')\nout = pathlib.Path('/tmp/lowrail-rubydex-research')\napps = ['rubydex-blog', 'fizzy', 'casa', 'writebook', 'wikino', 'codetriage', 'pingcrm', 'redprints-cfp', 'react-starter-kit']\nbinaries = {\n    'pinned': out / 'pinned/rust/target/release/rubydex_cli',\n    'pr1078': out / 'target-main/release/rubydex_cli',\n}\nresults = []\nfor round_ in range(3):\n    for app in apps:\n        path = root / '.corpus' / app\n        if app == 'wikino':\n            path = path / 'rails'\n        order = list(binaries) if round_ % 2 == 0 else list(reversed(binaries))\n        for arm in order:\n            started = time.perf_counter()\n            rss_path = out / 'rss.txt'\n            result = subprocess.run(['/usr/bin/time', '-f', '%M', '-o', str(rss_path), str(binaries[arm]), str(path), '--stats'], capture_output=True, text=True)\n            wall = time.perf_counter() - started\n            text = result.stdout\n            metric = lambda regex: re.search(regex, text).group(1)\n            stages = {stage.lower(): float(metric(r'  ' + stage + r'\\s+([0-9.]+)s')) for stage in ['Listing', 'Indexing', 'Resolution', 'Querying', 'Total:']}\n            row = dict(app=app, arm=arm, round=round_, wall_seconds=wall,\n                       max_rss_bytes=int(metric(r'Maximum RSS: ([0-9]+) bytes')),\n                       external_max_rss_bytes=int(rss_path.read_text().strip())*1024,\n                       stages_seconds=stages, files_reported=int(metric(r'Indexed (\\d+) files')),\n                       declarations=int(metric(r'Found (\\d+) names')),\n                       definitions=int(metric(r'Found (\\d+) definitions')),\n                       exit_code=result.returncode, stderr=result.stderr)\n            results.append(row)\n            (out / 'measurements-raw.json').write_text(json.dumps(results, indent=2) + '\\n')\n            print(app, arm, round_, f'{wall:.4f}s', f'{row[\"max_rss_bytes\"]/1048576:.2f}MiB', row['exit_code'], flush=True)\nfor app in apps:\n    for arm in binaries:\n        runs = [x for x in results if x['app'] == app and x['arm'] == arm]\n        print('SUMMARY', app, arm,\n              'wall', round(statistics.median(x['wall_seconds'] for x in runs), 4),\n              'rss', round(statistics.median(x['max_rss_bytes'] for x in runs)/1048576, 2),\n              'files', [x['files_reported'] for x in runs],\n              'defs', [x['definitions'] for x in runs], flush=True)\n",
+    "probe.rs": "use rubydex::{\n    config::Config,\n    indexing::{index_files, index_source, IndexerBackend, LanguageId},\n    listing,\n    model::{declaration::Ancestor, graph::Graph},\n    resolution::Resolver,\n};\n\nfn snapshot(graph: &Graph) -> Vec<String> {\n    let mut rows = Vec::new();\n    for (id, decl) in graph.declarations() {\n        let ancestors = decl.as_namespace().map(|ns| ns.ancestors().iter().map(|a| {\n            match a {\n                Ancestor::Complete(id) => graph.declarations().get(id).unwrap().name().to_string(),\n                Ancestor::Partial(_) => \"<partial>\".to_string(),\n            }\n        }).collect::<Vec<_>>());\n        rows.push(format!(\"{} visibility={:?} ancestors={:?}\", decl.name(), graph.visibility(id), ancestors));\n    }\n    for def in graph.definitions().values() {\n        rows.push(format!(\"definition={def:?}\"));\n    }\n    for reference in graph.constant_references().values() {\n        rows.push(format!(\"constant_reference={reference:?}\"));\n    }\n    for reference in graph.method_references().values() {\n        rows.push(format!(\"method_reference={reference:?}\"));\n    }\n    for diagnostic in graph.all_diagnostics() {\n        rows.push(format!(\"diagnostic={diagnostic:?}\"));\n    }\n    rows.sort();\n    rows\n}\n\nfn main() {\n    let args: Vec<_> = std::env::args().collect();\n    let mut graph = Graph::new();\n    if args[1] == \"--corpus\" {\n        let path = std::path::Path::new(&args[2]);\n        graph.load_config(&Config::load(path).unwrap());\n        let (paths, errors) = listing::collect_file_paths(vec![args[2].clone()], &graph.excluded_patterns());\n        assert!(errors.is_empty(), \"{errors:?}\");\n        let errors = index_files(&mut graph, paths, IndexerBackend::RubyIndexer);\n        assert!(errors.is_empty(), \"{errors:?}\");\n        Resolver::new(&mut graph).resolve();\n        for row in snapshot(&graph) { println!(\"{row}\"); }\n        return;\n    }\n    for path in &args[1..] {\n        let source = std::fs::read_to_string(path).unwrap();\n        let lang = if path.ends_with(\".rbs\") { LanguageId::Rbs } else { LanguageId::Ruby };\n        index_source(&mut graph, format!(\"file://{path}\").into(), &source, &lang);\n    }\n    Resolver::new(&mut graph).resolve();\n    for row in snapshot(&graph) { println!(\"{row}\"); }\n    println!(\"diagnostics={:?}\", graph.all_diagnostics());\n    for path in &args[1..] {\n        let source = std::fs::read_to_string(path).unwrap();\n        let lang = if path.ends_with(\".rbs\") { LanguageId::Rbs } else { LanguageId::Ruby };\n        let before = snapshot(&graph);\n        index_source(&mut graph, format!(\"file://{path}\").into(), &(source + \"\\n# trailing comment\\n\"), &lang);\n        Resolver::new(&mut graph).resolve();\n        println!(\"incremental_comment_semantics_equal={}\", before == snapshot(&graph));\n    }\n}\n",
+    "language.rb": "module Left; end\nmodule Right; end\nmodule Top; end\nmodule ClassMethods\n  def class_api; end\nend\nclass Parent; end\nclass Child < Parent\n  include Left, Right\n  prepend Top\n  extend ClassMethods\n  private\n  attr_reader :token\n  def original(x:, **rest); end\n  alias_method :copied, :original\n  define_method(:literal) { |value| value }\n  delegate :forwarded, to: :target\nend\n",
+    "concern.rb": "module First\n  extend ActiveSupport::Concern\n  included do\n    include Left\n  end\n  class_methods do\n    def from_concern; end\n  end\nend\nmodule Second\n  extend ActiveSupport::Concern\n  include First\nend\nclass Host\n  include Second\nend\n",
+    "types.rbs": "class Annotated\n  def transform: (String input, retries: Integer) -> Array[String]\n               | (Integer input) -> String\nend\n",
+    "namesake.rb": "class ApplicationRecord; end\nmodule GSD\n  class ApplicationRecord < ApplicationRecord; end\nend\n",
+    "zeitwerk-parent.rb": "class NamespaceParent; end\nclass NamespaceParent::Tasks; end\nclass NamespaceChild < NamespaceParent; end\nclass NamespaceParent::Tasks::Worker\n  def run; end\nend\nclass NamespaceChild::Tasks::Worker\n  def run; end\nend\n",
+    "zeitwerk-seed.rb": "module NamespaceChild::Tasks; end\n",
+    "resolution.rs": "//! Dependency-resolution probe only; no runtime code.\n"
+  },
+  "dependency_resolution_probes": {
+    "command": "cargo metadata --offline --format-version 1 --manifest-path resolve-ARM/Cargo.toml",
+    "pinned": {
+      "exit_code": 101,
+      "stderr": "error: failed to select a version for `ruby-prism-sys`.\n    ... required by package `ruby-prism v1.9.0`\n    ... which satisfies dependency `ruby-prism = \"^1.9.0\"` of package `rubydex v0.4.1 (/tmp/lowrail-rubydex-research/pinned/rust/rubydex)`\n    ... which satisfies path dependency `rubydex` of package `lowrail-prism-resolution-probe-pinned v0.0.0 (/tmp/lowrail-rubydex-research/resolve-pinned)`\nversions that meet the requirements `^1.9.0` are: 1.9.0\n\npackage `ruby-prism-sys` links to the native library `prism`, but it conflicts with a previous package which links to `prism` as well:\npackage `ruby-prism-sys v2.0.0`\n    ... which satisfies dependency `ruby-prism-sys = \"^2.0.0\"` of package `ruby-prism v2.0.0`\n    ... which satisfies dependency `ruby-prism = \"^2.0.0\"` of package `lowrail-prism-resolution-probe-pinned v0.0.0 (/tmp/lowrail-rubydex-research/resolve-pinned)`\nnote: only one package in the dependency graph may specify the same links value to ensure that only one copy of a native library is linked in the final binary\nfor more information, see https://doc.rust-lang.org/cargo/reference/resolver.html#links\nhelp: try to adjust your dependencies so that only one package uses the `links = \"prism\"` value\n\nfailed to select a version for `ruby-prism-sys` which could resolve this conflict\n",
+      "manifest": "[package]\nname = \"lowrail-prism-resolution-probe-pinned\"\nversion = \"0.0.0\"\nedition = \"2024\"\n\n[lib]\npath = \"../resolution.rs\"\n\n[dependencies]\nruby-prism = \"2.0.0\"\nrubydex = { path = \"../pinned/rust/rubydex\" }\n"
+    },
+    "main": {
+      "exit_code": 0,
+      "stderr": "     Locking 107 packages to highest Rust 1.99.1 compatible versions\n",
+      "manifest": "[package]\nname = \"lowrail-prism-resolution-probe-main\"\nversion = \"0.0.0\"\nedition = \"2024\"\n\n[lib]\npath = \"../resolution.rs\"\n\n[dependencies]\nruby-prism = \"2.0.0\"\nrubydex = { path = \"../rubydex/rust/rubydex\" }\n",
+      "selected_parser_packages": [
+        {
+          "name": "ruby-prism",
+          "version": "2.0.0"
+        },
+        {
+          "name": "ruby-prism-sys",
+          "version": "2.0.0"
+        },
+        {
+          "name": "rubydex",
+          "version": "0.4.2"
+        }
+      ]
+    },
+    "scope": "Isolated path dependencies at the recorded exact source revisions; no Lowrail dependency changes or compilation of Lowrail",
+    "conclusion": "Newer main ^2.0.0-rc.2 accepts stable 2.0.0; #1078 merge is not a strict prerequisite"
+  },
+  "build_hashes": {
+    "pinned_cli": "38c5741852b17c39def9cce8718bbaca844dd6e5d6930b55de55e8cb3c521b1e",
+    "pr1078_cli": "f0def1f5aa3a5d2353e4ebe18e36ee94cfc3c105f31656fe53c5e7e31783052e",
+    "pinned_cargo_lock": "252c022159bddd8d60f4f05c4475b1ef5b356ecb43bbadaeb6f770de78f9b703",
+    "pr1078_cargo_lock": "54d2520592e0acf354bb57ba10eaf06455d3eafb46e6b7ca66fa3dcd8c050c46"
+  }
+}
