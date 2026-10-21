@@ -35,9 +35,51 @@ end
 # or arrays are allocated between each window's GC.stat endpoints.
 windows = HeapWindows.windows(n)
 counted_requests(Integer(ENV.fetch("BENCH_WARMUP", "50")), session, verb, path, headers)
+if ENV["BENCH_IDLE_CENSUS"] == "1"
+  # A separate untimed process only. Never enable hooks in an Ir worker.
+  census = { kind: "untimed_companion_not_measured_counts", idle_exercise: 0, counts: [] }
+end
+if census && defined?(ActiveRecord::Base)
+  require "digest"
+  owner = ActiveRecord::ConnectionAdapters::AbstractAdapter
+  method = owner.instance_method(:with_raw_connection)
+  source, line = method.source_location
+  target_line = line + 16
+  raise "uncertified AR idle census" unless ActiveRecord.version.to_s == "8.1.4" &&
+    File.readlines(source).fetch(target_line - 1).strip == "elsif reconnectable"
+  body = nil
+  RubyVM::InstructionSequence.of(method).each_child { body = _1 if _1.label == "block in with_raw_connection" }
+  raise "AR idle block unavailable" unless body
+  verify_paths = 0
+  trace = TracePoint.new(:line) { |event| verify_paths += 1 if event.path == source && event.lineno == target_line }
+  census.merge!(source_sha256: Digest::SHA256.file(source).hexdigest, target_line: target_line)
+end
+jit_warmup = nil
 if JitStability.enabled?
-  jit_warmup = JitStability.warm { |count| counted_requests(count, session, verb, path, headers) }
   observe = JitStability.method(:snapshot)
+  idle_connections = -> {
+    if defined?(ActiveRecord::Base)
+      ActiveRecord::Base.connection_handler.connection_pool_list(:all).flat_map(&:connections).map do |connection|
+        { verify_timeout: connection.verify_timeout, last_activity: connection.instance_variable_get(:@last_activity) }
+      end
+    else
+      []
+    end
+  }
+  warmup = -> {
+    timeouts = idle_connections.call.map { _1.fetch(:verify_timeout) }
+    idle = timeouts.empty? ? 0 : [timeouts.max, 0].max + 0.05
+    sleep idle if idle.positive?
+    if trace
+      trace.enable(target: body) { counted_requests(1, session, verb, path, headers) }
+      census[:idle_exercise] = verify_paths
+    else
+      counted_requests(1, session, verb, path, headers)
+    end
+    jit_warmup = JitStability.warm { |count| counted_requests(count, session, verb, path, headers) }
+    jit_warmup[:stage] = "post_heap_observer_idle"
+    jit_warmup[:idle_boundary] = { sleep_seconds: idle, verify_timeouts: timeouts }
+  }
 end
 
 # Init slots are lazy growth floors, not preallocated pages. Fill each pool
@@ -49,8 +91,15 @@ end
 # The GC pause can cross ActiveRecord's idle threshold. Settle only requests,
 # symmetrically before N=0/N=50 endpoints; operation workers own captured context.
 settle = -> { counted_requests(1, session, verb, path, headers) }
-anchors = HeapWindows.run(windows, observe: observe, settle: settle) do |count|
-  counted_requests(count, session, verb, path, headers)
+anchors = HeapWindows.run(windows, observe: observe, settle: settle, warmup: warmup,
+  idle_connections: idle_connections) do |count|
+  if trace
+    verify_paths = 0
+    trace.enable(target: body) { counted_requests(count, session, verb, path, headers) }
+  else
+    counted_requests(count, session, verb, path, headers)
+  end
+  census[:counts] << (trace ? verify_paths : 0) if census
 end
 ar_installed = 0
 if defined?(Lowrail::ARInstantiate)
@@ -62,4 +111,5 @@ end
 puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, windows: windows,
   lowrail_jit: defined?(Lowrail) && Lowrail.respond_to?(:jit_status) ? Lowrail.jit_status : nil,
   heap_anchors: anchors, ar_installed: ar_installed, jit_warmup: jit_warmup, request_settle: true,
+  idle_census: census,
   compiled_iseqs: RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats[:compiled_iseq_count] : 0)}"

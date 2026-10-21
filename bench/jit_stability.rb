@@ -50,19 +50,26 @@ module JitStability
   def self.warm
     size = Integer(ENV.fetch("BENCH_JIT_WINDOW", "200"))
     limit = Integer(ENV.fetch("BENCH_JIT_MAX_WARMUP", "20000"))
-    raise "JIT warmup needs positive windows and at least three windows" unless size.positive? && limit >= size * 3
+    raise "JIT warmup needs positive windows" unless size.positive?
+    required = [3, (2000 + size - 1) / size].max
+    raise "JIT warmup cap must allow 2000 quiet requests and at least three windows" unless limit >= size * required
     history = [{ requests: 0, counters: snapshot }]
     flat = 0
     (limit / size).times do |index|
       yield size
+      # The N=0 subtraction endpoint has its own lazy Integer#times exit.
+      # Certify it too; it must not first compile inside the empty window.
+      yield 0
       3.times { GC.start }
       current = snapshot
       flat = current == history.last.fetch(:counters) ? flat + 1 : 0
       history << { requests: (index + 1) * size, counters: current }
-      break if flat >= 3
+      break if flat >= required
     end
     missing = history.last.fetch(:counters).select { |_, value| !value.is_a?(Integer) }.keys
-    { stable: flat >= 3 && missing.empty?, observed_counters_flat: flat >= 3,
+    { method: "quiet-2000-v2", stable: flat >= required && missing.empty?, observed_counters_flat: flat >= required,
+      stop_reason: !missing.empty? ? "missing_counters" : flat >= required ? "quiescent" : "warmup_cap",
+      required_flat_windows: required, minimum_quiet_requests: 2000,
       missing_counters: missing, consecutive_flat_windows: flat, window_requests: size,
       max_requests: limit, history: history }
   end
@@ -76,7 +83,8 @@ module JitStability
       enabled = actual != "interpreter"
       keys = counters(actual)
       warm = worker["jit_warmup"]
-      warm_ok = !enabled || !!(warm && warm.fetch("stable") && warm.fetch("consecutive_flat_windows") >= 3)
+      required = warm ? [3, warm.fetch("required_flat_windows", 3)].max : 3
+      warm_ok = !enabled || !!(warm && warm.fetch("stable") && warm.fetch("consecutive_flat_windows") >= required)
       missing = enabled ? keys.reject { |key| worker.fetch("windows").all? { _1.dig("jit_before", key.to_s).is_a?(Integer) } } : []
       windows_ok = !enabled || worker.fetch("windows").all? do |window|
         before, after = window.values_at("jit_before", "jit_after")

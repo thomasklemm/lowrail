@@ -320,6 +320,49 @@ module RequestPairs
     result
   end
 
+  def self.idle_control(workers)
+    observations = workers.to_h do |name, worker|
+      companion = worker["idle_companion"]
+      counts = companion&.dig("idle_census", "counts")
+      windows = worker.fetch("windows").map.with_index do |window, index|
+        first, last, start, finish = window.values_at("last_request_start_ns", "last_request_end_ns", "wall_start_ns", "wall_end_ns")
+        ordered = [first, last, start, finish].all? { Integer === _1 } && first <= last && last <= start && start <= finish
+        gap = (start - first).fdiv(1e9) if ordered
+        duration = (finish - start).fdiv(1e9) if ordered
+        connections = window.fetch("idle_connections").map do |connection|
+          timeout, activity = connection.values_at("verify_timeout", "last_activity")
+          age = start.fdiv(1e9) - activity if ordered && Numeric === activity
+          pre = !!(age && age >= 0 && Numeric === timeout && timeout.positive? && gap < timeout && age < timeout)
+          { verify_timeout: timeout, age_at_start_seconds: age, pre_window_safe: pre,
+            whole_window_bounded: pre && age + duration < timeout }
+        end
+        pre = ordered && connections.all? { _1.fetch(:pre_window_safe) }
+        bounded = pre && connections.all? { _1.fetch(:whole_window_bounded) }
+        corresponding = companion && companion.fetch("windows")[index]
+        count = counts && counts[index]
+        census_ok = corresponding && corresponding.values_at("mode", "requests") == window.values_at("mode", "requests") &&
+          Integer === count && count >= 0
+        { mode: window.fetch("mode"), requests: window.fetch("requests"), pre_request_gap_seconds: gap,
+          timestamps_ns: { last_request_start: first, last_request_end: last, window_start: start, window_end: finish },
+          wall_duration_seconds: duration, connections: connections, pre_window_safe: pre,
+          whole_window_bounded: bounded, companion_required: !bounded,
+          companion_verify_path_executions: count, companion_valid: !!census_ok }
+      end
+      exercised = companion && (worker.fetch("windows").all? { _1.fetch("idle_connections").empty? } ||
+        companion.dig("idle_census", "idle_exercise").to_i.positive?)
+      [name, { windows: windows, boundary_exercised_in_companion: !!exercised,
+        pass: !!exercised && windows.all? { _1.fetch(:pre_window_safe) && _1.fetch(:companion_valid) } }]
+    end
+    symmetry = observations.group_by { |name, _| name.split("-", 2).first }.to_h do |round, entries|
+      signatures = entries.map do |_, observation|
+        observation.fetch(:windows).map { [_1.fetch(:mode), _1.fetch(:requests), _1.fetch(:companion_verify_path_executions)] }.sort
+      end
+      [round, signatures.uniq.size == 1]
+    end
+    { pass: !observations.empty? && observations.values.all? { _1.fetch(:pass) } && symmetry.values.all?,
+      counts_kind: "untimed_companion_not_measured_counts", companion_symmetry: symmetry, workers: observations }
+  end
+
   def self.heap_instructions(environments, app, out, route, metadata, worker: "heap_requests.rb",
     requests: Integer(ENV.fetch("BENCH_REQUESTS", "50")))
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
@@ -353,7 +396,8 @@ module RequestPairs
             data = File.join(out, "#{label}.callgrind")
             log = File.join(out, "#{label}.log")
             env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
-              "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension)
+              "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension,
+              "BENCH_IDLE_CENSUS" => nil)
             ok = system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
               RbConfig.ruby, *jit_flags, File.expand_path(worker, __dir__), route,
@@ -400,6 +444,25 @@ module RequestPairs
       File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
       warn "fixed-heap Callgrind round #{round + 1}/#{metadata.fetch(:rounds)}"
     end
+    # Only after every Ir worker finishes: traced companion processes must
+    # neither perturb a measured YJIT process nor contend with its workload.
+    idle_observed = metadata.fetch(:workers).values.any? { _1.fetch("windows").any? { |window| window.key?("idle_connections") } }
+    if idle_observed
+      metadata.fetch(:workers).each do |name, result|
+        round, layer = name.split("-", 2)
+        log = File.join(out, "#{name}-idle-census.log")
+        env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
+          "BENCH_PHASE_ORDER" => (round.to_i % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension,
+          "BENCH_IDLE_CENSUS" => "1")
+        ok = system(env, RbConfig.ruby, *jit_flags, File.expand_path(worker, __dir__), route,
+          chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
+        raise "Idle companion failed: #{name}; inspect #{log}" unless ok
+        line = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
+        companion = JSON.parse(line.to_s.delete_prefix("LOWRAIL_BENCH "))
+        result["idle_companion"] = companion.slice("windows", "idle_census", "jit_warmup")
+      end
+      File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
+    end
     summary = summarize(samples, seed: metadata.fetch(:seed), tolerance: Float(ENV.fetch("BENCH_AA_TOLERANCE", "0.5")),
       metrics: %w[instructions_total instructions_no_gc allocations], controls: %w[instructions_total instructions_no_gc])
     if environments.key?("before")
@@ -434,9 +497,11 @@ module RequestPairs
     end
     summary[:heap_matched] = summary[:heap_capacity].values.all? { _1.fetch(:matched) }
     summary[:jit] = JitStability.control(metadata.fetch(:workers), requested: jit)
+    summary[:idle_boundary] = idle_control(metadata.fetch(:workers)) if idle_observed
     File.write(File.join(out, "summary.json"), JSON.pretty_generate(summary))
     puts JSON.pretty_generate(summary)
-    summary.fetch(:aa).fetch(:pass) && summary.fetch(:heap_matched) && summary.fetch(:jit).fetch(:pass)
+    summary.fetch(:aa).fetch(:pass) && summary.fetch(:heap_matched) && summary.fetch(:jit).fetch(:pass) &&
+      (!idle_observed || summary.fetch(:idle_boundary).fetch(:pass))
   end
 
   # Legacy short-window diagnostic: includes boot-dependent GC phase.

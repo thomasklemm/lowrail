@@ -5,6 +5,60 @@ require_relative "request_pairs"
 require_relative "gc_requests"
 
 class RequestPairsTest < Minitest::Test
+  def test_quiet_warmup_does_not_stop_before_a_rare_block_and_reports_cap_exhaustion
+    program = <<~'RUBY'
+      require "json"
+      $requests = 0
+      def JitStability.snapshot
+        blocks = $always ? $requests : ($requests >= 700 ? 2 : 1)
+        {compiled_iseq_count: 1, compiled_block_count: blocks, invalidation_count: 0}
+      end
+      rare = JitStability.warm { $requests += _1 }
+      $requests, $always = 0, true
+      capped = JitStability.warm { $requests += _1 }
+      puts JSON.generate(rare: rare, capped: capped)
+    RUBY
+    text, status = Open3.capture2({ "BENCH_JIT_WINDOW" => "200", "BENCH_JIT_MAX_WARMUP" => "20000" },
+      RbConfig.ruby, "-r", File.expand_path("jit_stability", __dir__), "-e", program)
+    assert status.success?, text
+    data = JSON.parse(text)
+    assert data.dig("rare", "stable")
+    assert_equal 2800, data.dig("rare", "history").last.fetch("requests")
+    assert_equal 10, data.dig("rare", "consecutive_flat_windows")
+    refute data.dig("capped", "stable")
+    assert_equal "warmup_cap", data.dig("capped", "stop_reason")
+    assert_equal 20000, data.dig("capped", "history").last.fetch("requests")
+  end
+
+  def test_idle_clock_bound_and_companion_symmetry_are_independent
+    window = { "mode" => "total", "requests" => 50, "last_request_start_ns" => 900_000_000,
+      "last_request_end_ns" => 1_000_000_000, "wall_start_ns" => 1_100_000_000, "wall_end_ns" => 1_600_000_000,
+      "idle_connections" => [{ "verify_timeout" => 2, "last_activity" => 0.95 }] }
+    worker = { "windows" => [window], "idle_companion" => { "windows" => [window.dup],
+      "idle_census" => { "counts" => [0], "idle_exercise" => 1 } } }
+    workers = { "0-off_a" => worker, "0-off_b" => Marshal.load(Marshal.dump(worker)) }
+    result = RequestPairs.idle_control(workers)
+    assert result.fetch(:pass)
+    assert result.dig(:workers, "0-off_a", :windows, 0, :whole_window_bounded)
+    assert_equal 1_100_000_000, result.dig(:workers, "0-off_a", :windows, 0, :timestamps_ns, :window_start)
+
+    # Both gap and duration < 2s, but their sum and the real activity age
+    # are not: a companion may supplement this, never certify it as absent.
+    window.merge!("last_request_start_ns" => 0, "last_request_end_ns" => 100_000_000,
+      "wall_start_ns" => 1_500_000_000, "wall_end_ns" => 3_000_000_000)
+    window["idle_connections"][0]["last_activity"] = 0.0
+    result = RequestPairs.idle_control(workers)
+    assert result.fetch(:pass)
+    refute result.dig(:workers, "0-off_a", :windows, 0, :whole_window_bounded)
+    assert result.dig(:workers, "0-off_a", :windows, 0, :companion_required)
+
+    workers["0-off_b"]["idle_companion"]["idle_census"]["counts"] = [1]
+    refute RequestPairs.idle_control(workers).fetch(:pass), "asymmetric companions reject even with a safe pre-window gap"
+    workers["0-off_b"]["idle_companion"]["idle_census"]["counts"] = [0]
+    window["wall_start_ns"] = 2_100_000_000
+    refute RequestPairs.idle_control(workers).fetch(:pass), "a bad actual gap cannot be rescued by a zero-count companion"
+  end
+
   def test_jit_gate_rejects_wrong_modes_missing_counters_and_nonflat_windows
     { "yjit" => %w[compiled_iseq_count compiled_block_count invalidation_count],
       "zjit" => %w[compiled_iseq_count failed_iseq_count compiled_side_exit_count compile_time_ns invalidation_time_ns invalidation_count] }.each do |jit, keys|
@@ -240,13 +294,14 @@ class RequestPairsTest < Minitest::Test
             Object.new if id == 12
           end
         end
+        jit_warmup = nil
         if JitStability.enabled?
-          warmup = JitStability.warm { |count| ids.each { operation.call(count, _1) } }
+          warmup = -> { jit_warmup = JitStability.warm { |count| ids.each { operation.call(count, _1) } } }
           observe = JitStability.method(:snapshot)
         end
-        anchors = HeapWindows.run(windows, settle: settle, observe: observe, &operation)
+        anchors = HeapWindows.run(windows, settle: settle, observe: observe, warmup: warmup, &operation)
         puts "LOWRAIL_BENCH " + JSON.generate(**JitStability.state, windows: windows,
-          heap_anchors: anchors, jit_warmup: warmup, operations: ids.to_h { [_1, {}] })
+          heap_anchors: anchors, jit_warmup: jit_warmup, operations: ids.to_h { [_1, {}] })
       RUBY
       modes = %w[0 1]
       _, _, zjit = Open3.capture3({ "RUBYOPT" => nil }, RbConfig.ruby, "--disable-yjit", "--zjit", "-e", "exit(RubyVM::ZJIT.enabled? ? 0 : 1)")

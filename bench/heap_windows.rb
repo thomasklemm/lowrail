@@ -43,9 +43,10 @@ module HeapWindows
     anchors
   end
 
-  def self.run(windows, prepare: nil, observe: nil, settle: nil)
+  def self.run(windows, prepare: nil, observe: nil, settle: nil, warmup: nil, idle_connections: nil)
     anchors = prepare_heap
     observe_pools = ->(pools) { pools.each { |pool, stats| GC.stat_heap(pool, stats) } }
+    clock = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) } if idle_connections
     # Warm the exact observation signatures, not just the workload. Ruby's
     # two-argument stat_heap wrapper can otherwise compile inside the gate.
     if observe
@@ -53,12 +54,23 @@ module HeapWindows
         observe_pools.call(windows.first.fetch(:pools_before))
         GC.stat(windows.first.fetch(:before))
         observe.call
+        clock&.call
+        idle_connections&.call
       end
     end
+    # Certify the workload in the prepared heap, after observer compilation.
+    # Captured-operation workers supply their own context-preserving callback.
+    warmup&.call
     windows.each do |window|
       prepare&.call(window[:unit])
       3.times { GC.start }
+      window[:last_request_start_ns] = clock.call if clock
       settle&.call
+      if clock
+        window[:last_request_end_ns] = clock.call
+        window[:idle_connections] = idle_connections.call
+        window[:wall_start_ns] = clock.call
+      end
       window[:jit_before] = observe.call if observe
       observe_pools.call(window[:pools_before])
       GC.stat(window[:before])
@@ -67,6 +79,7 @@ module HeapWindows
       segments = LowrailCallgrindBench.finish
       GC.stat(window[:after])
       observe_pools.call(window[:pools_after])
+      window[:wall_end_ns] = clock.call if clock
       window[:jit_after] = observe.call if observe
       window[:gc_segments] = segments
     end

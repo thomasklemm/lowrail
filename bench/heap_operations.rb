@@ -96,16 +96,20 @@ operations.each do |id, calls|
 end
 n = Integer(ENV.fetch("BENCH_REQUESTS", "50"))
 windows = HeapWindows.windows(n, operations.keys)
+jit_warmup = nil
 if JitStability.enabled?
-  jit_warmup = JitStability.warm do |count|
-    operations.each do |id, calls|
-      OperationCapture.restore_context(id)
-      count.times { calls.each(&:call) }
+  warmup = -> {
+    jit_warmup = JitStability.warm do |count|
+      operations.each do |id, calls|
+        OperationCapture.restore_context(id)
+        count.times { calls.each(&:call) }
+      end
     end
-  end
+    jit_warmup[:stage] = "post_heap_observer_captured_context"
+  }
   observe = JitStability.method(:snapshot)
 end
-anchors = HeapWindows.run(windows, prepare: OperationCapture.method(:restore_context), observe: observe) do |count, id|
+anchors = HeapWindows.run(windows, prepare: OperationCapture.method(:restore_context), observe: observe, warmup: warmup) do |count, id|
   calls = operations.fetch(id)
   count.times { calls.each(&:call) }
 end

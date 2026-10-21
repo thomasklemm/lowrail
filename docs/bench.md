@@ -949,13 +949,94 @@ Neither interpreter nor YJIT instructions are native latency claims.
 ### Quiescent YJIT instruction mode
 
 `BENCH_JIT=1 lowrail bench ...` uses the same fixed heaps, N=0/50 subtraction,
-six fresh-process rounds and unchanged total/GC-excluded A/A gates. After the
-ordinary `BENCH_WARMUP` requests, each worker warms in 200-request windows until
+six fresh-process rounds and unchanged total/GC-excluded A/A gates. The
+historical method, retained for all older cohorts, warmed **before** heap
+preparation in 200-request windows until
 `RubyVM::YJIT.runtime_stats` reports **all three** of `compiled_iseq_count`,
 `compiled_block_count` and `invalidation_count` unchanged for **three consecutive
 windows**. Three full GCs precede each observation. Warmup is bounded at 20,000
 additional requests; hitting the limit without convergence rejects the cohort.
 The full counter history, including unsuccessful warmups, is retained.
+
+#### v2 declaration: prepared heap, idle boundary, 2,000 quiet requests
+
+This is a **new measurement method**, declared before its one finite off/off
+A/A validation. Old rejected cohorts remain rejected and are never re-scored.
+Validation is pending; no pass/default promotion follows from this declaration.
+The declared validation is Ruby 4.0.7 / Rails 8.1.4 blog `GET:/articles/1`,
+two identical no-setup/off arms, six fresh-process rounds, seed 41231, N=50,
+alternating total/no-GC phase order, the existing 1,000,000 / 250,000 / 100,000 /
+20,000 / 10,000 heap floors and 0.5% A/A tolerance. Use the pinned 512 MiB
+Valgrind below the four-worker cap, with no call-threshold/config change,
+one cohort and no retry. Pin the published method SHA and source fingerprints
+before launch; retain a failed result just as completely as a passed one.
+
+The retained config/link cohorts have 17 non-flat workers (10/24 Starter,
+6/36 blog index, 1/36 show). All 17 changed windows have zero measured GC,
+compaction and invalidation deltas; 14 add blocks without a new ISeq. They
+did not log compilation identities, so those counters do not identify sites
+or establish worker-order causality. New **untimed native** compilation-log
+probes (`--yjit-log`, drained with `RubyVM::YJIT.log`) on all three routes
+find no late framework/app targets in an immediate 5,000-request tail. A
+separate deliberate 65-second idle test compiles two targets on **request 1
+after the pause**, in each app: AR 8.1.4 `abstract_adapter.rb`, block in
+`with_raw_connection`, bytecode indexes **83/87**, source lines **1075/1076**.
+These are the aged/unverified-connection branch, not a cold method crossing
+its call threshold; effective `verify_timeout` is 2 seconds in these fixtures.
+This proves an elapsed-time lazy-target mechanism, **not** the identities of
+all old failures. Logger/introspection-loop compilations are not app evidence.
+The logs identify no additional cache-expiry/session/CSRF/time-policy targets;
+no wider time-dependent-behavior claim or speculative app change is made.
+
+The standard request worker now follows this sequence:
+
+1. Boot/eager-load and issue the ordinary 50 initial requests; prepare the
+   fixed heap and warm the exact endpoint observer/clock signatures.
+2. Read effective timeouts from already-open AR connections, idle longer
+   than their maximum (2.05 seconds for these fixtures), then issue one
+   request to exercise the aged branch. Do not change a timeout or YJIT option.
+3. Only **after** that step certify at least **2,000 consecutive quiet
+   requests**, in 200-request batches (ten flat observations). Every compile
+   or invalidation resets the quiet streak. The cap remains **20,000**;
+   missing counters/cap exhaustion are fail-closed, with history/stop reason.
+   Larger configured batches still require at least three flat observations.
+   Each batch exercises the zero-work endpoint too: the public operation
+   regression and an untimed compilation log caught Integer#times' lazy
+   zero-iteration exit at bytecode index 38 otherwise compiling in N=0.
+   These zero-work calls add no requests to the count or quiet-budget claim.
+4. Preserve three full GCs and the symmetric settling request before each
+   N=0/N=50 total/no-GC window. All original JIT-flat/A/A/heap/brk gates remain.
+
+`jit_warmup.method=quiet-2000-v2` plus
+`stage=post_heap_observer_idle` records this request protocol. Captured-operation
+workers also certify after preparation, but preserve their captured context;
+they do **not** issue an unrelated idle/settling request. Bespoke historical
+experiment scripts are not certified as the new request protocol just because
+they call the longer quiet-streak helper.
+
+There are **no trace hooks in measured workers**. Monotonic nanosecond stamps
+are recorded before/after the last pre-window request, at window start and at
+window end, strictly outside the instruction region. Loaded connections'
+actual `@last_activity` and effective timeout are observed outside it too.
+Reject any worker whose conservative request-start-to-window gap, or actual
+connection age at window start, reaches its timeout. Certify absence of the
+aged path only when **age at start + the entire window duration < timeout**
+for every observed connection. Separate gap/duration tests are insufficient
+near a boundary. Duration includes reporting/dump overhead conservatively.
+
+After **all** Ir workers finish, separate untimed companion processes replay
+the same four-window idle/GC/request schedule, tracing only the AR 8.1.4
+aged-decision line (1075). Their positive idle exercise must fire the counter;
+per-window counts must be symmetric across arms within each round or the
+cohort rejects. They are labeled `untimed_companion_not_measured_counts`,
+never reported as measured-window counts. If the whole-window time bound is
+too long, `companion_required=true` records that the only path-count evidence
+for that window is supplementary; it is **not an exact zero-path proof**.
+The main pre-window timing gate still cannot be rescued by a companion.
+`samples.json`, `summary.json` and the request export retain timestamps,
+actual ages/timeouts, conservative bounds, companion counts and symmetry.
+No compiler freezing, call-threshold change, app setting change, filtering,
+retry-until-flat or tolerance relaxation is part of v2.
 
 Warm the observer too: after heap preparation, an enabled observer gets 200
 untimed rounds of the **exact** `GC.stat_heap(pool, existing_hash)`,
@@ -982,7 +1063,8 @@ there is no filtering, automatic retry or widened tolerance. The untimed
 observer may compile during heap preparation, but not inside a measured window.
 
 `BENCH_JIT_WINDOW` and `BENCH_JIT_MAX_WARMUP` change the warmup window and bound;
-at least three windows are mandatory. `BENCH_JIT_CALL_THRESHOLD` optionally
+v2 requires at least 2,000 quiet workload iterations and three windows.
+`BENCH_JIT_CALL_THRESHOLD` optionally
 passes a positive `--yjit-call-threshold` to instruction workers. Default leaves
 Ruby's production threshold unchanged. Do not compare different thresholds as
 if they were one production configuration. YJIT statistics instrumentation is
