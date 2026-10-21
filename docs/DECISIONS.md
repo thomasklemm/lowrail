@@ -40,10 +40,18 @@ One unchanged-harness real-Puma check follows; no YJIT throughput, full DB-state
 ## Bet F: Puma fallback-only cohort and worker binding (2026-10-21)
 
 The first 30-server `/buckets` RPS cohort is fallback overhead, not optimized throughput: 397.44/394.19/368.15 off-A/off-B/on RPS, paired −8.30%, A/A [−3.95,+2.31]%; zero site hits.
-Retain all windows: four closed-connection transport errors occur in round4 on only; all off windows, other on windows and warmups have zero errors. Cold/warm exact workflows pass, overall result rejects.
+Guard-failing deployments pay guards plus stock Rails and can be slower. Retain all windows: four closed-connection errors occur in round4 on only; all four workers miss their heartbeat there, cause unverified; exact workflows pass, overall result rejects.
 Actual untimed Puma workers fail only connection/visitor identity (140 other facts pass). Bind once after fork under the same DB config and all original facts; keep the final identity guard and same-process switching refusal.
 Old source fails the fork regression on zero hits; fixed forked/unforked matrices pass 52 strict response/SQL comparisons, and real Puma responses match both seeds with positive hits/zero fallbacks; cache DB rejection remains.
 Authorize one new unchanged-harness RPS cohort with the same rule, now admitting all four coverage worker PIDs only on positive hits/zero fallbacks; no further retry, no new Ir price, no main integration ([details](ar-callsite.md#verified-fork-boundary-and-bounded-worker-local-fix)).
+
+## Bet F: finish worker-local RPS, no clear throughput claim (2026-10-21)
+
+Runtime d626df6, unchanged b1e239f harness: off-A/off-B/on 378.69/385.95/404.79 RPS; A/A +0.637% [−1.678,+3.351]%, on/off +5.650% [+0.636,+10.499]%.
+The whole on/off interval must exceed +10.054% under the predeclared rule; it does not. Median p99 378.31/353.57/346.82 ms is diagnostic; no clear native throughput win and no retry.
+All four coverage PIDs hit with zero fallback; both seeds' cold/warm status/body/all-header workflows match; 30 timed servers and 60 raw load receipts have zero errors, including every on window. The earlier on-only failure does not recur, cause remains unverified.
+A read-only packet observer added after initial windows shared client CPU7 (roughly4.5% of one core); keep this extra timing limitation, all windows and private request evidence, never export cookies or headers.
+Keep the old-runtime −5.486% interpreter price and −585-object guarded screen scoped to their checkpoints; branch only. DirectSite-active own-suite, whole DB state, lifecycle/purity certificates and full gates/Thermos are an integration proposal, not started ([final evidence](ar-callsite.md#worker-local-rps-cohort-exact-and-error-free-no-clear-throughput-win)).
 
 ## Prism 2 adoption and target grammar (2026-10-21)
 

@@ -340,12 +340,17 @@ The complete frozen 30-server cohort is retained, including the bad window:
 Median window p99 is **347.36 / 341.70 / 368.11 ms**, off-A/off-B/on.
 Both seeds pass cold and warm status/body/all-header workflows, but the on
 coverage snapshots have **zero hits, four fallbacks each**. This is a
-**fallback-overhead measurement, not optimized throughput**. The overall
+**fallback-overhead measurement, not optimized throughput**. Guard failure
+is not performance-neutral: this deployment pays the guards and then stock
+Rails, and is slower than stock in this run. Safe fallback is not free.
+The overall
 result is rejected: round 4 on records four `connection closed before message
 completed` transport errors. Every other on window and **all off windows**
 have zero errors; all warmups have zero errors. No non-200 response was
-recorded. No error cause is inferred from that distribution, and no worker
-is excluded to repair the result.
+recorded. The retained worker journal shows all four workers terminated for
+missing their 60-second heartbeat within the failing client window; why
+those heartbeats were missed is not established. No worker is excluded to
+repair the result.
 
 ### Verified fork boundary and bounded worker-local fix
 
@@ -380,8 +385,52 @@ same predeclared settings/rule, after this verified refusal. The external
 snapshots, then **every Puma worker PID**, must show positive bucket hits and
 zero fallbacks (bounded at 64 untimed requests on the separate coverage
 server). Otherwise stop before timed load. No shared harness/app/Puma source
-is changed, no error exclusions and no further retry. That cohort has not run
-at this checkpoint.
+is changed, no error exclusions and no further retry.
+
+### Worker-local RPS cohort: exact and error-free, no clear throughput win
+
+The final authorized cohort measured
+[`d626df6`](https://github.com/thomasklemm/lowrail/commit/d626df66e66f976d4246f72a80d9f48cb26c824d)
+with the same `b1e239f` harness, settings and predeclared decision rule.
+Before timing, both on seeds and **all four coverage worker PIDs** pass:
+one worker-local binding each, positive hits, zero fallbacks. Counters are
+disabled in timed servers, as in the unchanged shared harness; this is a
+coverage-worker certificate, not a claim of counted timed hits.
+
+| A/A RPS paired change [95%] | off-A / off-B / on median RPS | Paired on/off change [95%] |
+|---|---:|---:|
+| +0.637251% [−1.678046%, +3.351416%] | 378.69 / 385.95 / 404.79 | +5.649873% [+0.636168%, +10.499098%] |
+
+Median window p99 is **378.31 / 353.57 / 346.82 ms**, off-A/off-B/on.
+The entire effect interval would have to exceed **+10.054248%** (three times
+the largest absolute A/A bound). Its lower bound does not: **no clear
+throughput win under the predeclared rule**, and no further retry. Positive
+point estimates and a lower p99 do not override that decision.
+
+All **30 timed servers / 60 raw warmup-and-load receipts** have zero
+transport errors and zero non-200 responses, in **every arm**, including
+all on windows. The previous on-only transport failure did not recur; this
+does not explain its cause. Both seeds' cold and warm login/GET workflows
+match actual status/body/all-header digests. Independent reconciliation
+checks every receipt hash, request count, RPS, p99, paired mean and median;
+all **3,165 pinned files** still match. Every pre/post-load process snapshot
+covers the same four PIDs, with no observed worker replacement.
+
+Post-load sum-of-four-worker RSS medians are **855,688 / 880,726 / 852,888
+KiB**; summed worker GC-time deltas are **6,722 / 5,516.5 / 7,720.5 ms**
+(off-A/off-B/on). These retain process snapshots, not fixed-heap or JIT-flat
+controls and not isolated GC/retained-memory effects.
+
+**Additional timing limitation:** a read-only loopback packet observer was
+added after initial windows to capture any recurrence, on CPU 7 within the
+client's 4–7 affinity. Its observed cost was roughly 4.5% of one core. It
+changed no app/Puma/shared harness source, but was not predeclared or present
+for every window; therefore this is not an unchanged-observer timing
+comparison. The private capture retains request evidence; only its counts,
+timestamps and hash are exported, never session cookies or request headers.
+No window was excluded using the observer. The JSON retains both complete
+cohorts and the independent audit. The accepted interpreter price remains
+the earlier runtime's scoped price, not a price for the worker-binding fix.
 
 ## Exactness evidence and its boundary
 
@@ -447,3 +496,27 @@ The promising boundary is **before relation spawning**, not after it:
 The experiment supplies a narrow executable query-program seam and evidence
 for investing in source-level bind programs. It does not supply that general
 certificate, and the native screens below must not be promoted into prices.
+
+### Main-integration proposal, not work started
+
+Keep this experiment off main. A separately authorized integration would need:
+
+1. Run the unchanged app's own suite with **DirectSite itself active**, prove
+   non-zero eligible hits and identical per-test results/ordered SQL/binds,
+   and retain baseline failures. The earlier final-relation/lean suite runs
+   do not cover the request overlay or worker-local binding.
+2. Establish complete DB-state equivalence, including cache timestamps and
+   expiry payloads. Resolve the named off/off rejections with declared,
+   source-pinned controls; never normalize or exclude them into a pass.
+3. Replace handwritten source/purity assertions with compiler-owned
+   certificates for once-only evaluation, transitive methods, mid-request
+   mutation, lazy loading, reload and connection lifecycle. Extend the fork
+   regression to supported roles/shards/pools and concurrent first use;
+   one connection per single-thread worker is not general admission.
+4. Explain the original on-only transport failure before making a serving
+   correctness claim. Budget the observed fallback overhead, run full gates
+   and Thermos on the exact proposed head, and benchmark that final runtime
+   separately: the accepted interpreter price predates the fork fix.
+
+No integration, further cohort, own-suite rerun or Thermos review is started
+by this proposal. Main, production defaults and corpus app files stay unchanged.
