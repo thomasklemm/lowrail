@@ -1,0 +1,885 @@
+{
+  "feasibility": {
+    "scope": "Feasibility arithmetic only, no new app/VM runs. Existing native diagnostic envelopes, not a throughput estimate or measured Valgrind slowdown.",
+    "source_sha256": "938d7ab751891dc841fe20681845dd0380e779e53f72a7853fc8b7573d619898",
+    "assumptions": {
+      "slowdown": 50,
+      "reaper_seconds": 20,
+      "future_N50_windows": 36,
+      "uniform_phase_and_independent_windows": "hypothetical model, not established; real phases may correlate"
+    },
+    "windows": [
+      {
+        "worker": "off_b-order1",
+        "mode": "no_gc",
+        "requests": 0,
+        "native_envelope_seconds": 1.5576e-05,
+        "projected_seconds_at_50x": 0.0007788000000000001,
+        "expected_ticks_at_20_seconds": 3.894e-05
+      },
+      {
+        "worker": "off_b-order1",
+        "mode": "no_gc",
+        "requests": 50,
+        "native_envelope_seconds": 0.096469149,
+        "projected_seconds_at_50x": 4.82345745,
+        "expected_ticks_at_20_seconds": 0.24117287250000002
+      },
+      {
+        "worker": "off_b-order1",
+        "mode": "total",
+        "requests": 0,
+        "native_envelope_seconds": 1.242e-05,
+        "projected_seconds_at_50x": 0.000621,
+        "expected_ticks_at_20_seconds": 3.105e-05
+      },
+      {
+        "worker": "off_b-order1",
+        "mode": "total",
+        "requests": 50,
+        "native_envelope_seconds": 0.090865837,
+        "projected_seconds_at_50x": 4.54329185,
+        "expected_ticks_at_20_seconds": 0.2271645925
+      },
+      {
+        "worker": "production-order0",
+        "mode": "total",
+        "requests": 0,
+        "native_envelope_seconds": 1.3725e-05,
+        "projected_seconds_at_50x": 0.00068625,
+        "expected_ticks_at_20_seconds": 3.43125e-05
+      },
+      {
+        "worker": "production-order0",
+        "mode": "total",
+        "requests": 50,
+        "native_envelope_seconds": 0.0759383,
+        "projected_seconds_at_50x": 3.796915,
+        "expected_ticks_at_20_seconds": 0.18984574999999998
+      },
+      {
+        "worker": "production-order0",
+        "mode": "no_gc",
+        "requests": 0,
+        "native_envelope_seconds": 1.1628e-05,
+        "projected_seconds_at_50x": 0.0005813999999999999,
+        "expected_ticks_at_20_seconds": 2.9069999999999998e-05
+      },
+      {
+        "worker": "production-order0",
+        "mode": "no_gc",
+        "requests": 50,
+        "native_envelope_seconds": 0.08401012,
+        "projected_seconds_at_50x": 4.200506,
+        "expected_ticks_at_20_seconds": 0.2100253
+      },
+      {
+        "worker": "off_a-order0",
+        "mode": "total",
+        "requests": 0,
+        "native_envelope_seconds": 1.3917e-05,
+        "projected_seconds_at_50x": 0.00069585,
+        "expected_ticks_at_20_seconds": 3.47925e-05
+      },
+      {
+        "worker": "off_a-order0",
+        "mode": "total",
+        "requests": 50,
+        "native_envelope_seconds": 0.089109792,
+        "projected_seconds_at_50x": 4.4554896,
+        "expected_ticks_at_20_seconds": 0.22277448
+      },
+      {
+        "worker": "off_a-order0",
+        "mode": "no_gc",
+        "requests": 0,
+        "native_envelope_seconds": 9.8e-06,
+        "projected_seconds_at_50x": 0.00049,
+        "expected_ticks_at_20_seconds": 2.45e-05
+      },
+      {
+        "worker": "off_a-order0",
+        "mode": "no_gc",
+        "requests": 50,
+        "native_envelope_seconds": 0.090121784,
+        "projected_seconds_at_50x": 4.5060892,
+        "expected_ticks_at_20_seconds": 0.22530445999999998
+      },
+      {
+        "worker": "off_a-order1",
+        "mode": "no_gc",
+        "requests": 0,
+        "native_envelope_seconds": 1.4739e-05,
+        "projected_seconds_at_50x": 0.00073695,
+        "expected_ticks_at_20_seconds": 3.68475e-05
+      },
+      {
+        "worker": "off_a-order1",
+        "mode": "no_gc",
+        "requests": 50,
+        "native_envelope_seconds": 0.088933078,
+        "projected_seconds_at_50x": 4.4466539,
+        "expected_ticks_at_20_seconds": 0.22233269500000002
+      },
+      {
+        "worker": "off_a-order1",
+        "mode": "total",
+        "requests": 0,
+        "native_envelope_seconds": 1.151e-05,
+        "projected_seconds_at_50x": 0.0005755,
+        "expected_ticks_at_20_seconds": 2.8774999999999998e-05
+      },
+      {
+        "worker": "off_a-order1",
+        "mode": "total",
+        "requests": 50,
+        "native_envelope_seconds": 0.088067058,
+        "projected_seconds_at_50x": 4.4033529,
+        "expected_ticks_at_20_seconds": 0.220167645
+      },
+      {
+        "worker": "off_b-order0",
+        "mode": "total",
+        "requests": 0,
+        "native_envelope_seconds": 1.7458e-05,
+        "projected_seconds_at_50x": 0.0008729,
+        "expected_ticks_at_20_seconds": 4.3645e-05
+      },
+      {
+        "worker": "off_b-order0",
+        "mode": "total",
+        "requests": 50,
+        "native_envelope_seconds": 0.09757561,
+        "projected_seconds_at_50x": 4.8787804999999995,
+        "expected_ticks_at_20_seconds": 0.24393902499999998
+      },
+      {
+        "worker": "off_b-order0",
+        "mode": "no_gc",
+        "requests": 0,
+        "native_envelope_seconds": 1.1359e-05,
+        "projected_seconds_at_50x": 0.00056795,
+        "expected_ticks_at_20_seconds": 2.83975e-05
+      },
+      {
+        "worker": "off_b-order0",
+        "mode": "no_gc",
+        "requests": 50,
+        "native_envelope_seconds": 0.09718143,
+        "projected_seconds_at_50x": 4.8590715,
+        "expected_ticks_at_20_seconds": 0.24295357499999998
+      },
+      {
+        "worker": "production-order1",
+        "mode": "no_gc",
+        "requests": 0,
+        "native_envelope_seconds": 1.3759e-05,
+        "projected_seconds_at_50x": 0.00068795,
+        "expected_ticks_at_20_seconds": 3.43975e-05
+      },
+      {
+        "worker": "production-order1",
+        "mode": "no_gc",
+        "requests": 50,
+        "native_envelope_seconds": 0.078105191,
+        "projected_seconds_at_50x": 3.9052595500000002,
+        "expected_ticks_at_20_seconds": 0.19526297750000002
+      },
+      {
+        "worker": "production-order1",
+        "mode": "total",
+        "requests": 0,
+        "native_envelope_seconds": 1.0519e-05,
+        "projected_seconds_at_50x": 0.0005259500000000001,
+        "expected_ticks_at_20_seconds": 2.6297500000000004e-05
+      },
+      {
+        "worker": "production-order1",
+        "mode": "total",
+        "requests": 50,
+        "native_envelope_seconds": 0.07676007,
+        "projected_seconds_at_50x": 3.8380035,
+        "expected_ticks_at_20_seconds": 0.191900175
+      }
+    ],
+    "N50_expected_ticks_range": [
+      0.18984574999999998,
+      0.24393902499999998
+    ],
+    "expected_ticks_over_36_windows": 7.898530642500001,
+    "hypothetical_probability_any_overlap": 0.9998672462331132,
+    "chosen_variant": "request-thread primary; background separate and bounded; zero-overlap would likely reject whole cohort, not every individual window"
+  },
+  "validation": {
+    "scope": "Untimed synthetic attribution validation, no app/YJIT/cohort/price/slot",
+    "status": "pass",
+    "mapping": {
+      "request": {
+        "thread": 1,
+        "lwp": 409951
+      },
+      "background": {
+        "thread": 2,
+        "lwp": 409952
+      }
+    },
+    "windows": {
+      "empty": {
+        "expected_request_work": 3,
+        "expected_background_work": 3,
+        "activity_endpoints": [
+          0,
+          0,
+          1,
+          1
+        ],
+        "threads": [
+          {
+            "file": "control.cg.1-01",
+            "thread": 1,
+            "Ir": 24637,
+            "request_work": 3,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "ca7e96987e4f69e2a7f033cd652098f0cc5b300154ee63cf63f9b42a1d1845ea"
+          },
+          {
+            "file": "control.cg.1-02",
+            "thread": 2,
+            "Ir": 144,
+            "request_work": 0,
+            "background_work": 3,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "c925e1f4a527b5376d6141d8239fb5de51e027f122661b0e76004cadef567932"
+          }
+        ],
+        "process_Ir": 24781
+      },
+      "asymmetric_a": {
+        "expected_request_work": 151,
+        "expected_background_work": 681,
+        "activity_endpoints": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "threads": [
+          {
+            "file": "control.cg.2-01",
+            "thread": 1,
+            "Ir": 24124,
+            "request_work": 151,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "525f695025d5ca8786af5cdc7e98193d0747f20c40cc5235c1e7dfbea21718ad"
+          },
+          {
+            "file": "control.cg.2-02",
+            "thread": 2,
+            "Ir": 828,
+            "request_work": 0,
+            "background_work": 681,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "88dfecdfac13523158eadab37415237928fef30ea95918d1daf956bb36936b92"
+          }
+        ],
+        "process_Ir": 24952
+      },
+      "asymmetric_b": {
+        "expected_request_work": 1031,
+        "expected_background_work": 117,
+        "activity_endpoints": [
+          2,
+          2,
+          3,
+          3
+        ],
+        "threads": [
+          {
+            "file": "control.cg.3-01",
+            "thread": 1,
+            "Ir": 25004,
+            "request_work": 1031,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "3dbc981ad761d503cfb3ae8e8bb8b97bfcb4fb4220a51ece52720f4c3650ac55"
+          },
+          {
+            "file": "control.cg.3-02",
+            "thread": 2,
+            "Ir": 264,
+            "request_work": 0,
+            "background_work": 117,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "142270b2c31e1a5c3cf9dbc88621bd5001698f9e72faf715205cfecbd499e38b"
+          }
+        ],
+        "process_Ir": 25268
+      },
+      "reset_all": {
+        "expected_request_work": 31,
+        "expected_background_work": 249,
+        "activity_endpoints": [
+          4,
+          4,
+          5,
+          5
+        ],
+        "threads": [
+          {
+            "file": "control.cg.4-01",
+            "thread": 1,
+            "Ir": 24006,
+            "request_work": 31,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "355d4dbc0fe471afb3c1f96b9b8b43506e2914cb1e3a9f1b435b010d6c4f5005"
+          },
+          {
+            "file": "control.cg.4-02",
+            "thread": 2,
+            "Ir": 398,
+            "request_work": 0,
+            "background_work": 249,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "25495acfad3e1000977e88f22c1e6496ea15a1cb8b4e96808bfd756614f7747a"
+          }
+        ],
+        "process_Ir": 24404
+      },
+      "dump_rebaseline": {
+        "expected_request_work": 39,
+        "expected_background_work": 405,
+        "activity_endpoints": [
+          5,
+          5,
+          6,
+          6
+        ],
+        "threads": [
+          {
+            "file": "control.cg.5-01",
+            "thread": 1,
+            "Ir": 51258,
+            "request_work": 39,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "16fd54d8f4c9af4f9c101049554c527b767ccf07c8437b3dfb82261c273a7a44"
+          },
+          {
+            "file": "control.cg.5-02",
+            "thread": 2,
+            "Ir": 552,
+            "request_work": 0,
+            "background_work": 405,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "95a4d3fa0b2c6344bb537c8308e641c2e073d7953f3dfca90442643eda7f20ae"
+          }
+        ],
+        "process_Ir": 51810
+      },
+      "negative_current_reset": {
+        "expected_request_work": 31,
+        "expected_background_work": 9246,
+        "activity_endpoints": [
+          6,
+          6,
+          8,
+          8
+        ],
+        "threads": [
+          {
+            "file": "control.cg.6-01",
+            "thread": 1,
+            "Ir": 10463,
+            "request_work": 31,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "51b8027503ec20975287ee197301724872dd4b9add93c31af277b8f3e5e2a241"
+          },
+          {
+            "file": "control.cg.6-02",
+            "thread": 2,
+            "Ir": 9540,
+            "request_work": 0,
+            "background_work": 9246,
+            "tick_begin_Ir": 6,
+            "tick_end_Ir": 6,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "5e0886ad6edb9042944001a6e5b59e83b36f51a758cec4474a27a5b18ca432c2"
+          }
+        ],
+        "process_Ir": 20003
+      },
+      "negative_current_dump": {
+        "expected_request_work": 151,
+        "expected_background_work": null,
+        "activity_endpoints": null,
+        "threads": [
+          {
+            "file": "control.cg.7-01",
+            "thread": 1,
+            "Ir": 13856,
+            "request_work": 151,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "260d039dedcc9fb51544c2383f4836fe9d5f096b65decaed280bfcc273c3e9ea"
+          }
+        ],
+        "process_Ir": 13856
+      },
+      "negative_dump_background_retained": {
+        "expected_request_work": 0,
+        "expected_background_work": 681,
+        "activity_endpoints": [
+          8,
+          8,
+          9,
+          9
+        ],
+        "threads": [
+          {
+            "file": "control.cg.8-01",
+            "thread": 1,
+            "Ir": 11077,
+            "request_work": 0,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "07c44f5db6d077d9b1ef94fbd8edc2ee239f43f7a4afabdac39d21a84cfd0aed"
+          },
+          {
+            "file": "control.cg.8-02",
+            "thread": 2,
+            "Ir": 828,
+            "request_work": 0,
+            "background_work": 681,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "ff2adf26d98a5ff49ac54ea2869add2d55616b1fcb627e2295e027e1312a3fc6"
+          }
+        ],
+        "process_Ir": 11905
+      },
+      "request_only_exclusion": {
+        "expected_request_work": 31,
+        "expected_background_work": 177,
+        "activity_endpoints": [
+          9,
+          9,
+          10,
+          10
+        ],
+        "threads": [
+          {
+            "file": "control.cg.9-01",
+            "thread": 1,
+            "Ir": 23866,
+            "request_work": 31,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "2d3d54656a28600d012ae9ac6ea95dc58ac4ade0baa16be43db76ca3bdc0445b"
+          },
+          {
+            "file": "control.cg.9-02",
+            "thread": 2,
+            "Ir": 324,
+            "request_work": 0,
+            "background_work": 177,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "53929202f29ac2143817a292ea4ec8ba7c7b23dc730dcfb56420447ff2f52e76"
+          }
+        ],
+        "process_Ir": 24190
+      },
+      "parked_background": {
+        "expected_request_work": 175,
+        "expected_background_work": 0,
+        "activity_endpoints": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "threads": [
+          {
+            "file": "control.cg.10-01",
+            "thread": 1,
+            "Ir": 23999,
+            "request_work": 175,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "3a1ba9c6425f2ad4a0da6c80a257041b277841a70e897278da44bab68d18da4b"
+          },
+          {
+            "file": "control.cg.10-02",
+            "thread": 2,
+            "Ir": 0,
+            "request_work": 0,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "d2693cbabb77f039aa33d965c1b75987709aa8cc7fe8e2226f81905dfbb7fc2b"
+          }
+        ],
+        "process_Ir": 23999
+      },
+      "calibrate_off_a": {
+        "expected_request_work": 151,
+        "expected_background_work": 300003,
+        "activity_endpoints": [
+          10,
+          10,
+          11,
+          11
+        ],
+        "threads": [
+          {
+            "file": "control.cg.11-01",
+            "thread": 1,
+            "Ir": 24124,
+            "request_work": 151,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "ed60bba7b39e5a7a9e959792e2649c31b7d17515f63f3622bb41b85ed031b8c8"
+          },
+          {
+            "file": "control.cg.11-02",
+            "thread": 2,
+            "Ir": 300150,
+            "request_work": 0,
+            "background_work": 300003,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "e7126ce32678b45674d287126394e13bd12fcf51ab513113e8acc8090fbd5330"
+          }
+        ],
+        "process_Ir": 324274
+      },
+      "calibrate_off_b": {
+        "expected_request_work": 40003,
+        "expected_background_work": 300003,
+        "activity_endpoints": [
+          11,
+          11,
+          12,
+          12
+        ],
+        "threads": [
+          {
+            "file": "control.cg.12-01",
+            "thread": 1,
+            "Ir": 63976,
+            "request_work": 40003,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "b28403dc20127aab6d3812dae4e7b47b868845cd4af5f12701de55c89ac9cc9f"
+          },
+          {
+            "file": "control.cg.12-02",
+            "thread": 2,
+            "Ir": 300150,
+            "request_work": 0,
+            "background_work": 300003,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "5578a1618db82b7f5a918d325da059ded4d9eb9780af8d206a6da365d0d1ccff"
+          }
+        ],
+        "process_Ir": 364126
+      },
+      "calibrate_on": {
+        "expected_request_work": 80003,
+        "expected_background_work": 300003,
+        "activity_endpoints": [
+          12,
+          12,
+          13,
+          13
+        ],
+        "threads": [
+          {
+            "file": "control.cg.13-01",
+            "thread": 1,
+            "Ir": 103976,
+            "request_work": 80003,
+            "background_work": 0,
+            "tick_begin_Ir": 0,
+            "tick_end_Ir": 0,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "993a1c12e774c58e3e4c36530b0aacf0a98d03c5cc951de8577d8fafb74acbdd"
+          },
+          {
+            "file": "control.cg.13-02",
+            "thread": 2,
+            "Ir": 300150,
+            "request_work": 0,
+            "background_work": 300003,
+            "tick_begin_Ir": 3,
+            "tick_end_Ir": 3,
+            "tick_C_entry_Ir": {
+              "tick_begin": 0,
+              "tick_end": 0
+            },
+            "sha256": "d150a62ac7c9c5514e35ff4865854ee9a50c3322bc6924a332a5a8fcb13f6d11"
+          }
+        ],
+        "process_Ir": 404126
+      }
+    },
+    "api_smoke": true,
+    "native_refusal": true,
+    "api_profiles": [
+      {
+        "file": "api.cg.1-01",
+        "thread": 1,
+        "Ir": 62005,
+        "request_work": 0,
+        "background_work": 0,
+        "tick_begin_Ir": 8,
+        "tick_end_Ir": 8,
+        "tick_C_entry_Ir": {
+          "tick_begin": 61,
+          "tick_end": 47
+        },
+        "sha256": "debdd80b18542d7d33cac9e279b4496429a989ba49c2a45d1b079fe38c649149"
+      },
+      {
+        "file": "api.cg.2-01",
+        "thread": 1,
+        "Ir": 40671,
+        "request_work": 0,
+        "background_work": 0,
+        "tick_begin_Ir": 8,
+        "tick_end_Ir": 8,
+        "tick_C_entry_Ir": {
+          "tick_begin": 61,
+          "tick_end": 47
+        },
+        "sha256": "67aa3797e07f27250f83d16044109518e3fe47d5ba2a04e9f87cb839c470cf1b"
+      }
+    ],
+    "calibration": {
+      "whole_background_Ir_per_tick": [
+        300150,
+        300150,
+        300150
+      ],
+      "relative_spread_percent": 0,
+      "tolerance_percent": 1
+    },
+    "source_sha256": {
+      "all_thread_callgrind.h": "de8348effafb385316aeb7428cb9a777c786dd47f200a018a708e25c9877502a",
+      "all_thread_callgrind.c": "cc6ade7d4fda57df6cf5da9e17be02e3fabbfbe856921fc2480c3d230428a359",
+      "all_thread_control.c": "476f96d30003c47609f174e9aba59840ce1c8a95441598ec020a2e306b76491b",
+      "all_thread_attribution.rb": "997c557a016eab0af92664f49c3e630050c70389e7ba2995a316df9dcf89ace5"
+    },
+    "analysis_driver_sha256": "ea77e4f2722bf2e19116eb5abbd0af0342be5a107d1a5d6c39aabd12a247dd8d",
+    "evidence_sha256": {
+      "api.cg": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "api.cg-01": "d10dfccccada17373c590cf2cbe3768cb3cbe13a87ade0a924b84a74c25f9ecc",
+      "api.cg.1-01": "debdd80b18542d7d33cac9e279b4496429a989ba49c2a45d1b079fe38c649149",
+      "api.cg.2-01": "67aa3797e07f27250f83d16044109518e3fe47d5ba2a04e9f87cb839c470cf1b",
+      "api.log": "50eecad6dd107acba81b247d0fbbc54ebc99580a41fbfe713a5692e54b016f12",
+      "api.status.json": "6a6c2717b26b0fcf94ee3723a74b1ca8faf129491c43c597b7ff2c27a54b7390",
+      "control": "678f10c60e12bb6c51b0ea97e7d0f947907b830d9be7ea812f00ea10d0d56770",
+      "control.cg": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control.cg-01": "6cc2aea93e6f1cad49798abfd338f3cde756967bf83ad9e67790ff7ce3100642",
+      "control.cg-02": "d17e2a405b7080c3fc2a1324e4781471250fafb5869843f3e979d7e103816f22",
+      "control.cg.1-01": "ca7e96987e4f69e2a7f033cd652098f0cc5b300154ee63cf63f9b42a1d1845ea",
+      "control.cg.1-02": "c925e1f4a527b5376d6141d8239fb5de51e027f122661b0e76004cadef567932",
+      "control.cg.10-01": "3a1ba9c6425f2ad4a0da6c80a257041b277841a70e897278da44bab68d18da4b",
+      "control.cg.10-02": "d2693cbabb77f039aa33d965c1b75987709aa8cc7fe8e2226f81905dfbb7fc2b",
+      "control.cg.11-01": "ed60bba7b39e5a7a9e959792e2649c31b7d17515f63f3622bb41b85ed031b8c8",
+      "control.cg.11-02": "e7126ce32678b45674d287126394e13bd12fcf51ab513113e8acc8090fbd5330",
+      "control.cg.12-01": "b28403dc20127aab6d3812dae4e7b47b868845cd4af5f12701de55c89ac9cc9f",
+      "control.cg.12-02": "5578a1618db82b7f5a918d325da059ded4d9eb9780af8d206a6da365d0d1ccff",
+      "control.cg.13-01": "993a1c12e774c58e3e4c36530b0aacf0a98d03c5cc951de8577d8fafb74acbdd",
+      "control.cg.13-02": "d150a62ac7c9c5514e35ff4865854ee9a50c3322bc6924a332a5a8fcb13f6d11",
+      "control.cg.2-01": "525f695025d5ca8786af5cdc7e98193d0747f20c40cc5235c1e7dfbea21718ad",
+      "control.cg.2-02": "88dfecdfac13523158eadab37415237928fef30ea95918d1daf956bb36936b92",
+      "control.cg.3-01": "3dbc981ad761d503cfb3ae8e8bb8b97bfcb4fb4220a51ece52720f4c3650ac55",
+      "control.cg.3-02": "142270b2c31e1a5c3cf9dbc88621bd5001698f9e72faf715205cfecbd499e38b",
+      "control.cg.4-01": "355d4dbc0fe471afb3c1f96b9b8b43506e2914cb1e3a9f1b435b010d6c4f5005",
+      "control.cg.4-02": "25495acfad3e1000977e88f22c1e6496ea15a1cb8b4e96808bfd756614f7747a",
+      "control.cg.5-01": "16fd54d8f4c9af4f9c101049554c527b767ccf07c8437b3dfb82261c273a7a44",
+      "control.cg.5-02": "95a4d3fa0b2c6344bb537c8308e641c2e073d7953f3dfca90442643eda7f20ae",
+      "control.cg.6-01": "51b8027503ec20975287ee197301724872dd4b9add93c31af277b8f3e5e2a241",
+      "control.cg.6-02": "5e0886ad6edb9042944001a6e5b59e83b36f51a758cec4474a27a5b18ca432c2",
+      "control.cg.7-01": "260d039dedcc9fb51544c2383f4836fe9d5f096b65decaed280bfcc273c3e9ea",
+      "control.cg.8-01": "07c44f5db6d077d9b1ef94fbd8edc2ee239f43f7a4afabdac39d21a84cfd0aed",
+      "control.cg.8-02": "ff2adf26d98a5ff49ac54ea2869add2d55616b1fcb627e2295e027e1312a3fc6",
+      "control.cg.9-01": "2d3d54656a28600d012ae9ac6ea95dc58ac4ade0baa16be43db76ca3bdc0445b",
+      "control.cg.9-02": "53929202f29ac2143817a292ea4ec8ba7c7b23dc730dcfb56420447ff2f52e76",
+      "control.log": "3a9aa53a3f3b748fc008a4279686e6e3ba890e13ac0ee581eb069073f94e2b90",
+      "control.status.json": "a1fd73d2f057e68678528a4354142774fbc6db3a69fe3bc313f7e661b22b03af",
+      "lowrail_all_thread_callgrind.so": "1491efbdaa48870960e5244bb079d1184bda0bc5ebdf91afd73f31fd37cb385f",
+      "native_refusal.log": "88f03ae581de27179cfafb9cd01b3e130feb22f2500e954e9610ac90bd168341",
+      "native_refusal.status.json": "be2b18550cd5c5841daf50294a1552a7e05f746e184cb99e33401f7f86a23f95",
+      "valgrind.json": "ce1b5ffe540d14f3b7a3520e153b9c8fdaaabaed6393f3151a047ffddec4c65a"
+    }
+  },
+  "valgrind": {
+    "version": "3.19.0",
+    "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+    "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+    "brk_reservation_mib": 512,
+    "tool": "libexec/valgrind/callgrind-amd64-linux",
+    "tool_sha256": "5edddeee9ee49e9d4ff2188c7d01ea03e389a5acf091af4c465d04e52fda9588",
+    "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+    "libc": "glibc 2.36"
+  },
+  "preregistered_rule": {
+    "primary": "request-thread Ir; usual N50 minus N0, separately per mode",
+    "background_share_max_percent": 0.5,
+    "pooled_reaper_Ir_per_completed_tick_spread_max_percent": 1,
+    "zero_tick_denominator": "refuse",
+    "partial_tick_or_unknown_mapping": "refuse entire cohort",
+    "process_wide_JIT_flatness": "required for every window/envelope",
+    "reaper_seam": "proposal only; not installed; owner approval required",
+    "executed_validation_processes": 3,
+    "repeated_validation_processes": 0,
+    "Rails_or_YJIT_app_workers": 0,
+    "priced_cohorts": 0,
+    "slots": 0
+  },
+  "reaper_source": {
+    "rails": "8.1.4",
+    "path": "activerecord/lib/active_record/connection_adapters/abstract/connection_pool/reaper.rb",
+    "sha256": "7393e4ee78442cf76b5eb3124a57250a26f3533c0a82cdae01455905cea8b722",
+    "start": "after original sleep returns; before refs=nil",
+    "completion": "after original mutex/filter and maintenance; before next while test",
+    "C_entry_Ir_per_tick_from_interpreter_API": 108,
+    "excludes": [
+      "Ruby/JIT dispatch",
+      "constant lookup",
+      "first registration",
+      "changed JIT topology"
+    ]
+  },
+  "source_state": {
+    "base": "d9016cd43604c18b18f000bb7aee04d3af55dabc",
+    "executed": "uncommitted, snapshotted and hashed source; not a run at the later publication commit",
+    "parser_changes": "reanalysis of retained dumps only; no native C/header changes or process reruns"
+  },
+  "runtime": {
+    "ruby": "4.0.7",
+    "ruby_binary_sha256": "fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895"
+  },
+  "artifacts": {
+    "archive": ".amp/in/artifacts/production-yjit-attribution-validation.tar.gz",
+    "sha256": "fb69eb4625b505d62af82f3ba3729bc0d749783af97c9962a4fea6e6c3aaebf9"
+  }
+}

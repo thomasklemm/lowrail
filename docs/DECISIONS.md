@@ -132,12 +132,30 @@ stop and was not rerun. Off caller provenance is unavailable, not inferred.
 V2 now requires K=10 quiet intervals **inside each Valgrind worker**, plus an
 80-second quiet minimum for these frequencies, under preregistered request/time
 caps; native calibration is not a certificate. Actual windows must be flat.
-A proposed zero-reaper-work window-envelope bound needs a validated all-thread
-attribution adapter: merely enabling separate-thread Callgrind dumps would
-lose other threads at the current client endpoints. The adapter and v2 remain
-unimplemented/unexecuted, pending owner review. Quiet is not compiler closure
-or guaranteed A/A. `835cf16` stays parked; no YJIT stage 2. The separately
-accepted interpreter re-price does not rescue this candidate.
+The zero-overlap proposal is superseded by **request-thread-primary Ir** with
+all-thread background reporting. Existing native N50 envelopes are 0.076–0.098 s;
+the hypothetical 50× projection is already 3.8–4.9 s, not 190–245 s. Actual
+Valgrind duration/ticks must be recorded. Raw background share is capped at
+**0.5% per worker/mode**; pooled completed-reaper-tick Ir rates must agree across
+off-A/off-B/on within **1% per mode**, with no partial ticks or unknown mappings.
+The tolerance formula was preregistered before synthetic validation; three
+equal-background/different-request controls each gave **300,150 Ir/tick**,
+0% spread and the fixed minimum 1%. Sparse/zero-denominator data rejects.
+
+The standalone bench-only all-thread adapter passes its one authorized
+two-pthread process (**13 windows, 25 files**), interpreter-only API smoke
+(two files) and native refusal. Known asymmetric instruction costs, all-thread
+reset/rebaselining, request-only exclusion and negative current-thread-only
+controls all reconcile; no background work is lost. This is mechanical evidence,
+not Rails/YJIT thread mapping or a cohort. The source-pinned reaper overlay seam
+remains a **proposal, not installed**: native marks after the real sleep and
+after original maintenance, identical in all arms, no app method callback.
+The API's C-entry cost is **108 Ir/tick**, excluding Ruby/JIT dispatch,
+registration and topology effects; all observer costs must stay charged.
+Owner review of that seam, lifetime mapping and the final v2 rule is still
+required; **no Rails/YJIT app worker or cohort ran**. Quiet is not compiler
+closure or guaranteed A/A. `835cf16` stays parked; no YJIT stage 2. The accepted
+interpreter re-price does not rescue the rejected candidate.
 [Method, exact-SHA export, causal limits and design-only v2](passes/production-yjit-method.md).
 
 ## Combined specimen must pass its own cold gate (2026-10-21)

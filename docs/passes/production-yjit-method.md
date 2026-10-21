@@ -141,7 +141,11 @@ interpreter production regressions pass **2 runs / 123 assertions / 0 failures,
 errors or skips** after that correction. The completed dry run is attributed
 to its actual SHA, not that subsequent checker fix or upstream updates.
 
-## V2 design only — not implemented or executed
+## V2 design — no app worker or cohort executed
+
+The mechanical all-thread adapter below is now validated on synthetic controls.
+It is not wired into the shared price worker, and no Rails reaper seam is
+installed. V2 execution still needs owner approval.
 
 ### What the retained evidence actually explains
 
@@ -270,35 +274,172 @@ Proposed preregistration for a separately reviewed candidate:
 ### Background work: attribution prerequisite and symmetric bound
 
 JIT flatness does **not** say that the reaper did no already-compiled work.
-The conservative proposed bound is **zero reaper-thread work in the envelope
-of every window**, in every arm including N0. An overlap, unavailable thread
-identity, new/unmapped thread or unavailable exact counter rejects the **whole
-cohort**. Do not move/repeat a window to dodge a tick or drop its Ir afterward.
-This policy can reject a perfectly correct specimen; that is a reported result,
-not a reason to weaken the rule. Keep the primary Ir total process-wide, with
-all background and observer work charged. No main-thread-only speed claim.
+The earlier **zero-overlap** proposal is superseded by the owner-accepted
+**request-thread-primary, background-separate-and-bounded** variant. This
+changes the estimand; it is not a total-process or native-latency price.
 
-This needs an independently validated **bench-only all-thread attribution
-adapter**, not the scratch native recorder in a price worker. The existing
-Linux CPU endpoints are too coarse to prove zero short reaper work. Simply
-adding `--separate-threads=yes` to the current worker is also **incorrect**:
-Callgrind's [client dump/zero requests](https://valgrind.org/docs/manual/cl-manual.html#cl-manual.clientrequests)
-then cover only the issuing thread, while external monitor dumps cover all
-threads. Before any cohort approval, an adapter must establish stable
-Ruby/LWP/Valgrind thread mapping and all-thread reset/dump envelope semantics,
-retain every thread's costs, and demonstrate that background-only work is
-detected without losing it from the primary total. An external monitor scrape
-may conservatively bracket the real counter endpoints, but may not be treated
-as an exact endpoint or used to erase work. Missing capability means refusal.
-**No such adapter was implemented or executed here.** No production method or
-app config change is proposed; any additional runtime seam needs prior approval.
+#### Feasibility, from existing logs only
+
+The retained native N50 counter envelopes are **0.075938300–0.097575610 s**.
+At the hypothetical 50× slowdown they become **3.796915–4.8787805 s**, or
+**0.190–0.244 expected 20-second ticks/window**. The 3.8–4.9 seconds already
+includes that multiplication; 190–245 seconds would apply it twice. Independent
+wall and realtime-log brackets agree with the native inputs. This is arithmetic,
+not a measured Valgrind slowdown. Actual duration and ticks must be recorded in
+each future Valgrind worker.
+
+Across 36 N50 windows the hypothetical uniform-independent-phase model gives
+7.90 expected ticks and 99.9867% probability of at least one overlap. Real phases
+may correlate; this does **not** prove overlap in every window or predict a
+cohort's result. It does make zero-overlap a poor whole-cohort prerequisite.
+[Inputs, arithmetic and adapter export](production-yjit-attribution-results.json).
+
+#### Final preregistered rule, pending execution approval
+
+1. Capture **every thread's raw Ir** at synchronous all-thread reset/dump
+   endpoints. For the primary statistic, use only the identified request
+   thread's usual \((N_{50} - N_0) / 50\), separately in total and request-GC-excluded
+   modes. Background GC/work stays fully counted in the background report in
+   both modes. Both original statistical A/A gates still apply to the primary
+   statistic; neither is replaced by this rule.
+2. Retain raw N0/N50 rows per thread, mapped Ruby identity/name, native LWP,
+   Valgrind ID and lifetime, actual window duration, and monotonic tick-start/
+   completion snapshots. No unknown/new/unmapped/reused identity, missing file,
+   failed self-cost reconciliation or partial tick is accepted. Activity changes
+   while bracketing a reset/dump also reject. No moving/repeating windows to
+   avoid background work; any failure rejects the whole finite cohort.
+3. Per worker and mode, aggregate the raw N0+N50 request Ir Q and all background
+   Ir B. Require \(B / (Q + B) \le 0.005\). Report reaper and non-reaper rows
+   separately; their combined cap bounds each as well. Never subtract N0 from
+   background or hide unknown costs in the request statistic.
+4. Within each mode, pool **raw reaper-thread Ir / completed ticks** separately
+   for off-A, off-B and on across all rounds and both window lengths. Require
+   \((r_{\max} - r_{\min}) / r_{\min} \le 0.01\). A zero denominator
+   or no completed ticks in an arm is unavailable evidence and rejects, not
+   an invented zero rate. Tick counts may differ: a shorter on arm naturally
+   gets less wall-clock exposure. A raw share-symmetry rule would confound this
+   exposure with cost and is deliberately not used.
+5. The tolerance formula was fixed **before** validation: relative max−min
+   whole-background Ir/tick in three equal-background/different-request-work
+   synthetic controls, rounded up to a whole percentage point, minimum 1%.
+   Calibration above 1% refuses rather than granting a larger tolerance.
+   The observed calibration is **300,150 / 300,150 / 300,150 Ir/tick**,
+   spread **0%**, hence the fixed **1%** bound. This validates mechanical
+   attribution, not that Ruby's real maintenance must be that symmetric.
+6. Require the same process-wide JIT-flat counters/logs in every actual window
+   and conservative envelope, even for compilation on an excluded background
+   thread. Keep the in-Valgrind quiet-prefix rule, hard caps, cold off/off/on,
+   both 192-pair controls, heap controls, exact per-worker SHA/artifact/source
+   pins and all-or-nothing decision. No retries or selected subset.
+
+The primary does **not** cover total-process work, shared-state effects of
+background compilation/GC, GVL contention, scheduling latency or a native
+throughput benefit. The separate share/rate bounds and process-wide flatness
+limit some confounds; they do not prove them absent. Sparse ticks, ordinary
+maintenance variability or a correct app can reject this conservative design.
+
+### Mechanical adapter: one bounded synthetic validation
+
+The alternative [extension](../../bench/experiments/all_thread_callgrind.c)
+uses `VALGRIND_MONITOR_COMMAND("zero")` and `"dump lowrail-window"` in the
+client process. In pinned Valgrind 3.19 these synchronous monitor handlers cover
+all registered threads, unlike ordinary `CALLGRIND_ZERO_STATS`/`DUMP_STATS`
+under `--separate-threads=yes`. No external vgdb timing assumption. The host
+identity callback returns only the scheduler ThreadId; native `gettid` supplies
+the LWP. Outside Valgrind it refuses, rather than trusting the monitor macro's
+default success return. Tick counters are atomic, explicit marks, not an
+inference from sleep calls, time or Ir. Snapshot sandwiches detect activity
+crossing endpoints; partial/lifetime/mapping classification remains mandatory
+in the future consumer. Registration is bounded and overflow refuses.
+
+Exactly the authorized **one two-pthread C process, one interpreter-only Ruby
+API smoke, one native refusal process** ran. No Rails, YJIT app, timing/price
+cohort or slot. The [driver](../../bench/experiments/all_thread_attribution.rb)
+retains source snapshots, native binaries, commands, dumps, logs and hashes;
+`--resume` reanalyses successful retained commands without executing them again.
+The later parser-only addition reports C-entry costs from those same dumps;
+all three executed C/header hashes still equal the published source bytes.
+
+Command: `ruby bench/experiments/all_thread_attribution.rb NEW_OUTPUT`.
+Decisive output: **`ALL_THREAD_ATTRIBUTION_PASS 13 windows; exact 4n/6n work;
+all-thread reset/dump and negative controls`**. The two live native threads map
+to different Valgrind IDs/LWPs. All 25 synthetic window files and two Ruby API
+window files independently reconcile self costs to reported Ir. Known x86-64
+assembly costs are \(3+4n\) request / \(3+6n\) background, checked against disassembly:
+
+| Control | Request function Ir | Background function Ir | What it distinguishes |
+|---|---:|---:|---|
+| asymmetric A / B | 151 / 1,031 | 681 / 117 | Swapped roles or lost background work |
+| all-thread reset after discarded work | 31 | 249 | Stale background counters |
+| next dump without explicit zero | 39 | 405 | All-thread dump must rebaseline both |
+| wrong current-thread-only reset | 31 | **9,246**, not 249 | Negative control retains old background work |
+| wrong current-thread-only dump | 151 | **file absent** | Negative control loses the other thread |
+| following all-thread dump | 0 | 681 | The omitted work still exists |
+| request-only collection pause | 31 | 177 | Background stays counted during request exclusion |
+| parked background | 175 | **0, file present** | Zero work is not a missing thread |
+| three calibration cases | 151 / 40,003 / 80,003 | 300,003 each | Whole-background rows 300,150 each, one tick each |
+
+Every marked control has matched monotonic starts/completions; the deliberately
+wrong reset contains two ticks, parked contains zero, ordinary controls one.
+The Ruby API exercises both modes, real GC, owner identity and 0→1→2 tick
+snapshots; native `start` raises `Callgrind required`. This proves the endpoint
+mechanism on those controls, **not** real Rails thread/lifetime/tick mapping,
+production reaper attribution, YJIT flatness or app equivalence. No claim that
+the synthetic share itself meets a production gate.
+
+### Reaper tick seam proposal — not installed; separate approval required
+
+Use only Rails **8.1.4**
+`activerecord/lib/active_record/connection_adapters/abstract/connection_pool/reaper.rb`,
+SHA256 **7393e4ee78442cf76b5eb3124a57250a26f3533c0a82cdae01455905cea8b722**.
+Match the original `spawn_thread` block by exact source bytes. Mark a start
+immediately after the **real** `sleep t` returns, before `refs = nil`; mark
+completion after the original mutex/filter and `if running` maintenance body,
+before the next `while` test. Thus an empty/terminating iteration counts, while
+an exception leaves an incomplete tick and rejects. No `ensure` that rewrites
+original error flow, sleep replacement, frequency change, pool operation replay
+or inference from ten `discarded?` calls.
+
+Proposed installation is a **private locked framework-gem overlay** in the
+bench worker, not a repository/runtime production edit: copy the exact original
+file and add only semicolon-separated calls to the two extension C methods on
+the existing boundary lines. Pin original and modified bytes, diff, overlay
+load path, actual loaded feature and C binary before boot in every off-A/off-B/on
+worker. All arms use the same overlay and ordinary Ruby require/compilation;
+no on-only installer, wrapper, TracePoint, Binding or request-path callback.
+The C methods perform native registration once and atomic scalar increments;
+on the valid path they call no app/Ruby methods and allocate no Ruby objects.
+They are C entries called **by the background loop**, not Ruby callbacks
+inserted into app methods. Their calls still change that loop's ISeq/JIT profile;
+this is not an invisible or zero-cost observation seam. Tracing/replacement of
+the observer or a changed source/registration/mapping refuses.
+
+The native control's counter primitive self cost is **3+3 Ir/tick**; the PIC
+extension's is **8+8**, excluding its TLS callees. The real interpreter API
+dump reports **61 Ir begin + 47 Ir end = 108 Ir/tick inclusive of their native
+callees**, in both modes. **Ruby/JIT dispatch, constant lookup, first registration
+and changed JIT topology are not included in that 108**; no Rails/YJIT worker
+ran to price them. All such costs must stay charged to the background rows,
+not subtracted. Snapshot/monitor request-thread bookkeeping also remains charged
+and is covered by the existing N0 and A/A controls, not declared free.
+
+Before execution, the seam must also supply stable Ruby/LWP/Valgrind lifetime
+mapping without request-method callbacks (native thread lifecycle events plus
+outside-window metadata reconciliation; carrier migration/reuse refuses).
+This integration is **not implemented or validated** by the two-thread test.
+Fresh mode-certified builds and the unchanged correctness/entropy pins must
+accept the observer-equipped artifact; any mismatch refuses, never loosens a
+pin. A resulting future price describes the observer-equipped benchmark and
+request-thread estimand, not untouched total production cost. Owner review of
+this seam, missing dispatch-cost evidence and final rule is required before
+any app worker. No implicit authority to install the overlay or run a cohort.
 
 The successful stop condition constructs only an **observed quiet prefix**,
 not termination, pending-entry closure, future flatness or symmetry of ticks.
 A/A may be **expected only conditionally**, never guaranteed. The same reaper
 tick is wall-clock driven in all arms, and equal tick counts would not alone
-prove equal work or clean windows. The zero-overlap attribution prerequisite
-is additional to both statistical A/A intervals, not a replacement for them.
+prove equal work or clean windows. The attribution/share/per-tick gates are
+additional to both statistical A/A intervals, not replacements for them.
 
 **Stop for owner review. No YJIT v2 execution, measurement cohort or further
 native retry is authorized by this note.** Interpreter Ir remains primary.
