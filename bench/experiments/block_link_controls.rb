@@ -31,6 +31,8 @@ module BlockLinkControls
       outcome = {"throw" => outcome} unless Hash === outcome
       outcome.merge("log" => log, "before" => observations[:before]&.raw_buffer,
         "link_result" => BlogProduction.value(observations[:link_result]),
+        "link_class" => BlockLinkSpecimen.klass(observations[:link_result]).name,
+        "link_safe" => String === observations[:link_result] && observations[:link_result].html_safe?,
         "old_after_link" => observations[:old_after_link], "replacement_after_link" => observations[:replacement_after_link],
         "replacement" => observations[:replacement]&.raw_buffer,
         "builder_replaced" => observations[:saved] && !observations[:saved].equal?(BlockLinkSpecimen.ivar(view, :@tag_builder)))
@@ -59,7 +61,9 @@ module BlockLinkControls
       expected = mode == "singleton" ? "new saved receiver" : mode == "break" ? "broken" : "#{anchor}#{content}</a>"
       unless %w[raise throw return url_error].include?(mode)
         encoded = outcome["link_result"]
-        checks["exact_link_result"] = encoded && encoded["base64"] && Base64.strict_decode64(encoded["base64"]) == expected
+        checks["exact_link_result"] = encoded && encoded["base64"] &&
+          encoded["encoding"] == "UTF-8" && Base64.strict_decode64(encoded["base64"]).b == expected.b
+        checks["fresh_safe_tag_type"] = outcome.values_at("link_class", "link_safe") == ["ActiveSupport::SafeBuffer", true] unless mode == "break"
       end
       checks["new_saved_method_once"] = outcome["log"] == ["block", "new saved method"] if mode == "singleton"
       checks["old_buffer_restored"] = outcome["old_after_link"] == "old" && outcome["replacement_after_link"] == "new+block" if mode == "buffer"
@@ -70,7 +74,7 @@ module BlockLinkControls
 
     def run(app, state, artifact, contexts, arm, mode, destination, discover: false)
       raise "unknown control" unless MODES.include?(mode)
-      pin = FizzyLinkVector.pin!
+      pin = FizzyLinkVector.pin!(app: app, artifact: artifact, contexts: contexts)
       pin["control_template_sha256"] = Digest::SHA256.file(TEMPLATE).hexdigest
       FizzyLinkFixture.environment(app, state).each { |key, value| value ? ENV[key] = value : ENV.delete(key) }
       require File.join(app, "config/boot")

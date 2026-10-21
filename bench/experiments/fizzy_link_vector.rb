@@ -9,13 +9,17 @@ require_relative "fizzy_link_completion"
 module FizzyLinkVector
   module_function
 
-  def pin!
+  def pin!(app:, artifact:, contexts:)
     root = File.expand_path("../..", __dir__)
     sha = IO.popen(["git", "-C", root, "rev-parse", "HEAD"], &:read).strip
     dirty = IO.popen(["git", "-C", root, "status", "--porcelain"], &:read)
     branch = IO.popen(["git", "-C", root, "branch", "--show-current"], &:read).strip
     raise "clean detached harness required" unless dirty.empty? && branch.empty? && sha == ENV.fetch("BENCH_HARNESS_SHA")
     {"harness_sha" => sha, "harness_root" => root,
+      "app_source_sha256" => BlogProduction::Entropy.source_pin(app),
+      "lock_sha256" => Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest,
+      "contexts_sha256" => Digest::SHA256.hexdigest(JSON.generate(contexts)),
+      "artifact" => Dir[File.join(artifact, "**/*")].select { File.file?(_1) }.sort.to_h { [_1.delete_prefix(artifact + "/"), Digest::SHA256.file(_1).hexdigest] },
       "native" => Dir[File.join(root, "gem/lib/lowrail/native/**/*.so")].sort.to_h { [_1.delete_prefix(root + "/"), Digest::SHA256.file(_1).hexdigest] },
       "sources" => (Dir[File.join(__dir__, "{block_link_*,fizzy_link_*}.rb")] +
         %w[request_pairs heap_windows jit_stability worker_placement].map { File.expand_path("../#{_1}.rb", __dir__) }).sort.to_h { [_1.delete_prefix(root + "/"), Digest::SHA256.file(_1).hexdigest] }}
@@ -97,7 +101,7 @@ module FizzyLinkVector
   end
 
   def cold(app, state, artifact, manifest, arm, destination, discover: false)
-    pin = pin!
+    pin = pin!(app: app, artifact: artifact, contexts: manifest)
     FizzyLinkFixture.environment(app, state).each { |key, value| value ? ENV[key] = value : ENV.delete(key) }
     require File.join(app, "config/boot")
     entropy_seed = ENV["BENCH_ENTROPY_SEED"]
@@ -187,7 +191,8 @@ module FizzyLinkVector
   # Extension point consumed by RequestPairs.heap_instructions(worker: ...).
   # NO caller here launches a cohort; coordinator approval remains required.
   def heap_worker(app, state, artifact, manifest, arm)
-    pin = pin!
+    raise "cohort requires separate coordinator approval for this exact pin" unless ENV["BENCH_BLOCK_LINK_COHORT_APPROVED"] == ENV.fetch("BENCH_HARNESS_SHA")
+    pin = pin!(app: app, artifact: artifact, contexts: manifest)
     require_relative "../jit_stability"
     require_relative "../heap_windows"
     require ENV.fetch("BENCH_CALLGRIND_EXTENSION")
@@ -196,16 +201,41 @@ module FizzyLinkVector
     JitStability.assert_mode!
     driver.login
     2.times { driver.vector }
-    workload = ->(count, _unit = nil) { count.times { driver.vector } }
+    expected_path = ENV.fetch("BENCH_FIZZY_WARM_HITS")
+    expected = JSON.parse(File.read(expected_path))
+    pin["expected_warm_hits_sha256"] = Digest::SHA256.file(expected_path).hexdigest
+    ledgers = []
+    workload = lambda do |count, _unit = nil|
+      # Fixed per-window bookkeeping is present in N=0 and N=N alike. The
+      # actual guards/witness and completed-hit counters remain in the price.
+      before = BlockLinkSpecimen.counts.transform_values { _1.fetch("hits", 0) }
+      count.times { driver.vector }
+      delta = BlockLinkSpecimen.counts.to_h { |site, row| [site, row.fetch("hits", 0) - before.fetch(site, 0)] }
+      raise "completed warm site mix changed" unless delta == expected.transform_values { arm == "on" ? _1 * count : 0 }
+      ledgers << {vectors: count, completed_hits: delta}
+    end
     windows = HeapWindows.windows(Integer(ENV.fetch("BENCH_REQUESTS")))
     anchors = HeapWindows.run(windows, settle: -> { driver.vector }, &workload)
     puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION,
       windows: windows, heap_anchors: anchors, heap_page_targets: HeapWindows.page_targets,
-      ar_installed: 0, pins: pin, specimen: BlockLinkSpecimen.report, vector_size: 6, request_settle: true)}"
+      ar_installed: 0, pins: pin, specimen: BlockLinkSpecimen.report, vector_size: 6,
+      vector_ledgers: ledgers, request_settle: true)}"
   end
 end
 
 if $PROGRAM_NAME == __FILE__
+  if ARGV == ["VECTOR:fizzy-links"]
+    # RequestPairs passes exactly one route argument. A worker receives a
+    # pristine, isolated state copy; no cache/database is shared by workers.
+    raise "cohort is not approved" unless ENV["BENCH_BLOCK_LINK_COHORT_APPROVED"] == ENV.fetch("BENCH_HARNESS_SHA")
+    app = File.realpath(ENV.fetch("BENCH_FIZZY_APP"))
+    state = File.join(File.realpath(ENV.fetch("BENCH_STATE_ROOT")), "worker-#{Process.pid}")
+    raise "new worker state required" if File.exist?(state)
+    FileUtils.cp_r(File.realpath(ENV.fetch("BENCH_STATE_SEED")), state)
+    FizzyLinkVector.heap_worker(app, state, File.realpath(ENV.fetch("BENCH_FIZZY_ARTIFACT")),
+      JSON.parse(File.read(ENV.fetch("BENCH_FIZZY_CONTEXTS"))), ENV.fetch("BENCH_FIZZY_ARM"))
+    exit
+  end
   mode, app, state, artifact, manifest_path, arm, destination = ARGV
   abort "usage: fizzy_link_vector.rb cold|discover|heap APP STATE ARTIFACT CONTEXTS_JSON ARM [DESTINATION]" unless
     %w[cold discover heap].include?(mode) && arm
