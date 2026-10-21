@@ -52,5 +52,27 @@
     "total": "summary.layers.on.instructions_total.delta_pct",
     "no_gc": "summary.layers.on.instructions_no_gc.delta_pct",
     "decimals": 6
+  },
+  {
+    "date": "2026-10-21",
+    "app_endpoint": "Fizzy (bet F), `GET /buckets`",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Interpreter",
+    "tier": "Guarded DirectSite call-site query programs; branch prototype, bench-only, one route, not on main, not admission",
+    "revision": "87c3c1974c424eabef5178f518641d013dd601b3",
+    "runtime_revision": "addf55e00b080d2627503b7f10a74bbe68e17ed1",
+    "publication": "f2e2e35b4d6372e8d67d285f329f0c93823ba259",
+    "report": "https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry",
+    "source": "docs/ar-callsite.json",
+    "source_commit": "f2e2e35b4d6372e8d67d285f329f0c93823ba259",
+    "accepted": "request_pivot.ir.decision.accepted_ir_win",
+    "required_gates": [
+      "request_pivot.ir.decision.gates_pass",
+      "request_pivot.ir.legacy_summary_unmodified.aa.metrics.instructions_total",
+      "request_pivot.ir.legacy_summary_unmodified.aa.metrics.instructions_no_gc"
+    ],
+    "revision_field": "request_pivot.ir.protocol.harness_sha",
+    "total": "request_pivot.ir.decision.effects.instructions_total.effect",
+    "no_gc": "request_pivot.ir.decision.effects.instructions_no_gc.effect"
   }
 ]
