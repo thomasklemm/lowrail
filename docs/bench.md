@@ -1338,6 +1338,37 @@ Use the repository-pinned Ruby. Parent `RAILS_ENV` must explicitly match
 the manifest; preflight now rejects missing/mismatched values **before
 manifest activation or setup**, rather than silently defaulting them.
 
+**Native late-entry finding; no gate relaxation.** The next form-only
+v3+log cohort on
+[`88506d9`](https://github.com/thomasklemm/lowrail/commit/88506d9b10a5177fee768b64fa6f02440e7f0d47)
+finished rejected: only `0-off_b / total / N50` fails among 144 windows
+(+17 blocks/+3,260 log bytes, no new ISeq/invalidation, all windows GC-free).
+Its log names five stylesheet/preload/response methods at previously logged
+locations. A native v3 replay finds all five at **119/120 interpreter-entry
+calls, with compiled payloads but no interpreter entries** after windows.
+A controlled native `Method#call` on the unchanged nonce reader reproduces
+entry installation at 120 with +1 block but no new ISeq/invalidation.
+This supports a mechanism, not the historical caller/trigger or exact
+17-block group; the historical entry counters were not recorded. See the
+[mechanism, limitations and executable-pinned probe sources](passes/yjit-regression.md#late-asset-helper-entries-native-mechanism-historical-trigger-still-open).
+
+Excluding compiler instructions would not preserve steady-state execution:
+the isolated call executes 27 YJIT bytecodes before entry installation,
+29 afterwards. That is an execution-mix change, **not** two machine
+instructions or a request price. No compiler-exclusion relaxation and no
+longer-quiet-only cohort is declared. Existing v3+log gates stay unchanged.
+
+Longer warmup alone is not a demonstrated cure: JIT-to-JIT repetition can
+leave the native-entry counters untouched. The 36 workers consumed 253,000
+certification requests plus 360,000 rehearsal requests; none of their
+retained prefixes establishes 10,000 quiet requests. Eight would need at
+least 20,600–26,000 certification requests for that quiet suffix, even
+without future changes, exceeding the 20,000 cap. For 36 workers the
+current maximum is 1,080,000 rehearsal+certification requests and 32,400
+explicit warmup GC calls; a hypothetical 40,000 cap permits 1,800,000 and
+43,200. Neither bounds wall time; uncapped quiet certification is unbounded.
+Pending-entry census remains native-only research, not v4 certification.
+
 Warm the observer too: after heap preparation, an enabled observer gets 200
 untimed rounds of the **exact** `GC.stat_heap(pool, existing_hash)`,
 `GC.stat(existing_hash)` and JIT snapshot signatures used at the endpoints.

@@ -774,6 +774,95 @@ new score by this audit. Keep the earlier missing-liveness audit distinct
 from this tracing audit: an unproven hit is not proof of fallback pricing,
 and a traced specimen is not evidence about an untraced VM.
 
+## Late asset-helper entries: native mechanism, historical trigger still open
+
+The finished form-only v3+full-log cohort on
+[`88506d9`](https://github.com/thomasklemm/lowrail/commit/88506d9b10a5177fee768b64fa6f02440e7f0d47)
+is **rejected**, without retry, rescoring or clean-window salvage. Its sole
+failure among 144 windows is `0-off_b / total / N50`: +17 blocks, +3,260
+compile-log bytes, zero new ISeqs/invalidation; all 144 windows are GC-free.
+The independently downloaded log hashes to
+`fdb146f04d27a1f08544561830b772b9b5a3476450e946e4c23d130358299bc1`.
+Bytes [7254172,7257432) name `compute_asset_host`,
+`auto_include_nonce_for_styles`, `apply_stylesheet_media_default`,
+`send_preload_links_header`, and `Response#sending?`. All 17
+method/location/bytecode-index pairs already occur earlier in the file.
+None has positive `chain_depth`. Location is not a unique ISeq identity.
+Timestamps place them inside the outside-region snapshot envelope only,
+not an exact counted region, thread or request.
+
+**Reproduced mechanism: a JIT-to-JIT callee can have compiled blocks but
+no interpreter entry.** Ruby 4.0.7 counts interpreter-origin entries
+separately; reaching the native threshold of 120 can install an entry with
+a generic context and another version of existing blocks, without a new
+ISeq or invalidation. See pinned Ruby
+[`yjit_compile`](https://github.com/ruby/ruby/blob/229531a6cfbf07e3caef30dbac24a2a3f3fed482/vm.c#L515-L528),
+[`rb_yjit_compile_iseq`](https://github.com/ruby/ruby/blob/229531a6cfbf07e3caef30dbac24a2a3f3fed482/yjit.c#L404-L420),
+and [`gen_entry_point`](https://github.com/ruby/ruby/blob/229531a6cfbf07e3caef30dbac24a2a3f3fed482/yjit/src/core.rs#L3224-L3300).
+
+An untimed native v3 replay, with extra diagnostic observers, executes
+12,155 requests (10,000 rehearsal + 2,000 certification plus surrounding
+requests). After its windows, **all five named methods have a YJIT payload,
+no interpreter entry, and 119 interpreter-origin calls**. A subsequent
+ordinary stylesheet helper call stays flat: more JIT-to-JIT calls need not
+advance those counters. Request sources/configuration, lockfile, schema,
+production database and harness match the specimen; absolute app path,
+unrelated credentials/unused databases and diagnostic allocations differ.
+This is not a bit-identical historical worker.
+
+The controlled reproduction uses the unchanged nonce reader on a real
+`ApplicationController.new.view_context`, not the singleton-extended
+`.helpers` proxy. Prime a caller before taking its helper branch; 10,000
+JIT-to-JIT calls leave the callee with payload, no entry, count 0. After
+17 native-dispatch prefill calls, recorded `Method#call` 103 changes its
+counter **119→120** and entry pointer absent→present: +1 installed entry,
++1 block, +198 log bytes, **0 new block IDs/ISeqs/invalidation**.
+Stable native-dispatch observations execute **27 YJIT bytecodes before,
+29 after** entry installation. The extra two are the reader's unchanged
+`getclassvariable/leave`, not two machine instructions or an Ir price.
+
+The executable SHA-256 is
+`fa450b858aa41a97d0f839a4fce6a4a33e07c5da0dc7374330bbf58e39bfc895`.
+The [read-only DWARF reader](../../bench/experiments/yjit_entry_reader.rb)
+refuses any other executable **before pointer access**. Its offsets are not
+a portable Ruby API. Committed portable-path probe sources:
+[controlled entry](../../bench/experiments/yjit_entries.rb) and
+[native request replay](../../bench/experiments/yjit_request_entries.rb).
+The latter pins the historical worker source; point `YJIT_PROBE_REPO` at
+a disposable historical `bench/` snapshot, preload Fiddle before Bundler,
+and use the production blog as cwd with `LOWRAIL=0`, `BENCH_JIT=yjit`,
+the published five heap floors, `BENCH_CALLGRIND_EXTENSION` and
+`BENCH_YJIT_LOG_FILE`. Run native Ruby with `--yjit --disable-zjit
+--yjit-log=FILE`; only the isolated entry probe adds `--yjit-stats=quiet`
+and `DIAG_LOG=FILE`. The native extension endpoints do not launch Valgrind.
+The original post-window reader loaded Fiddle after windows; the published
+request probe preloads it to avoid bundle-dependent load paths. Neither is
+an observer-free acceptance test. Raw private logs are not published.
+
+**Not established:** which historical caller entered the interpreter, or
+whether this mechanism produced the exact historical 17-block group.
+Historical per-ISeq counts and `compiled_iseq_entry` were not retained.
+This is the first reproduced mechanism consistent with a named site, not
+proof of a rare branch, Reaper tick, lowering defect or historical trigger.
+
+**Decision: retain strict JIT-flatness.** Compiler exclusion cannot freeze
+the rest of a window's execution mix (27→29 above); historical residual
+request count and Ir are unknown. Counting emitted blocks alone also misses
+failed attempts and prologue-only reuse, and coverage would need normal and
+exceptional entries, entry/branch stubs and nesting-safe GC interaction.
+No compiler-exclusion relaxation or longer-quiet-only cohort is authorized.
+
+The 36 workers used 253,000 certification requests (min/median/max
+2,000/4,900/18,000), plus 360,000 rehearsal requests. None of the retained
+prefixes proves 10,000 quiet requests. Eight last-observed changes put even
+the earliest possible 10,000-quiet completion at 20,600–26,000, beyond the
+20,000 cap. Existing rehearsal+certification maxima are 1,080,000 requests
+and 32,400 explicit warmup `GC.start` calls; a hypothetical 40,000 cap
+allows 1,800,000 and 43,200. These exclude boot/heap preparation and automatic
+GC; they bound work, **not wall time**. Uncapped quiet certification is
+unbounded, and JIT-to-JIT repetition may leave entry counters at 119 forever.
+Pending-entry census is a native-only research question, not a new gate or v4.
+
 ## Reproduction and evidence
 
 [Numeric export](yjit-regression.json) retains per-arm estimates, all gate
