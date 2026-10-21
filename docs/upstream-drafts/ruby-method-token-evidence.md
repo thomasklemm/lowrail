@@ -4,8 +4,10 @@
 This document is self-contained and may be attached to a Ruby Feature ticket.
 
 Posted by the owner as [Feature #22459](https://bugs.ruby-lang.org/issues/22459).
-The posted description is historical; the review correction below has not
-been posted by this thread. **The pinned final-source read-cost cohort passed.**
+The posted description is historical. The unposted
+[replacement description](ruby-method-token-description.md) and
+[journal note](ruby-method-token-journal-note.md) supersede the two-comment
+handoff. **The pinned final-source read-cost cohort passed.**
 
 **Recommendation:** discuss scoped method-validity tokens, not a global
 mutation counter. A production-mode request invalidated the global snapshot

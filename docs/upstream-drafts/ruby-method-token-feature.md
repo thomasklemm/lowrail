@@ -4,6 +4,12 @@ Posted by the owner as [Feature #22459](https://bugs.ruby-lang.org/issues/22459)
 The original description below is preserved, not rewritten. Its costs and
 main-Ractor wording describe the original prototype, not the reviewed fix.
 
+**Superseded handoff:** the owner chose one description replacement and a
+short journal note instead of the two comments below. Use the ready-to-post
+[replacement description](ruby-method-token-description.md) and
+[journal note](ruby-method-token-journal-note.md). The older drafts remain
+only as history; this thread has posted nothing.
+
 ## Correction comment draft — prepared before remeasurement
 
 Prepared and delivered while pricing was pending. The cost follow-up below

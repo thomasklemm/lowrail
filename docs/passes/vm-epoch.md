@@ -15,7 +15,8 @@ cohort passed A/A, heap and JIT gates: token read/guard **184/202 interpreter,
 103/106 YJIT Ir**, direct C **26 Ir**. The first attempt remains INVALID for
 harness drift; its prices are not claimed.
 See the [current evidence](../upstream-drafts/ruby-method-token-evidence.md)
-and [unposted correction draft](../upstream-drafts/ruby-method-token-feature.md).
+and unposted [replacement description](../upstream-drafts/ruby-method-token-description.md)
+and [journal note](../upstream-drafts/ruby-method-token-journal-note.md).
 The numbers and prototype below describe the historical 4.0.7 experiment,
 not the reviewed token implementation. The global epoch is a rejected
 alternative, not the proposed API.
