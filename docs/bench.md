@@ -1269,8 +1269,14 @@ Declared after the finite v3 result, before the next cohort. Opt in with
 The driver passes Ruby 4.0.7 `--yjit-log=OUT/ROUND-ARM.yjit.log` to **every
 measured arm**, retaining each entire file and its SHA-256. No rotation,
 memory-only log, window deletion, retry or relaxed gate. The next authorized
-cohort is the sealed thread's form-only show run with its separately pinned
-`411eb71` artifact/runtime, not another validation cohort. If all gates pass,
+cohort is the sealed thread's form-only show run with a **fresh form-only
+`--sealed --env production --jit yjit` artifact built on its exact published
+measurement head**, not another validation cohort. The earlier `411eb71`
+artifact is stale: the subsequent link fix changes its `sealed.rb` source
+pin. Do not bypass the stale-source gate or use a historical runtime override.
+Pin the fresh artifact/runtime/harness, pass the untimed native admission
+(form hits > 0, zero fallbacks, `exit_trace_leave=0`, `certification_jit=yjit`)
+and preflight before the one finite four-worker cohort. If all gates pass,
 it counts; otherwise the files supply late-site identities. The old rejected
 cohort is not re-scored.
 
@@ -1316,7 +1322,8 @@ pages, zero post-certification compilation, and realtime envelopes. A gate
 regression rejects byte growth with flat installed-block counters.
 
 Driver flags for the next authorized form cohort, with its own fresh output
-directory and correctly pinned artifact/runtime:
+directory and correctly pinned artifact/runtime. These flags are head-agnostic:
+`APP` must point to that fresh disposable app/artifact, not a retained old build.
 
 ```sh
 PATH="/tmp/vg/bin:$PATH" CPATH="/tmp/vg/include${CPATH:+:$CPATH}" \
