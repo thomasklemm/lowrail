@@ -11,6 +11,8 @@ class BlogProductionTest < Minitest::Test
       "scenarios" => BlogProduction::SCENARIOS.map { |scenario| {
         "id" => scenario.fetch("id"), "response" => {"status" => 200, "headers" => {"etag" => "literal"}, "body" => "<p>article</p>"},
         "sql" => [{"sql" => "SELECT * FROM articles WHERE id = ?", "binds" => [1]}, {"sql" => "SELECT * FROM comments", "binds" => []}],
+        "events" => [{"phase" => "start", "name" => "render_template.action_view"}, {"phase" => "finish", "name" => "render_template.action_view"}],
+        "entropy_trace" => nil,
         "effects" => {"articles" => [1, 2], "jobs" => [], "files" => {}}, "hits" => {}, "fallbacks" => {}} }}
     result = Array.new(3) { Marshal.load(Marshal.dump(baseline)) }
     result.last.fetch("scenarios").first["hits"] = {"18" => 2}
@@ -25,6 +27,7 @@ class BlogProductionTest < Minitest::Test
       "response_header" => ->(run) { run.fetch("scenarios").first.fetch("response").fetch("headers")["etag"] = "different" },
       "effects" => ->(run) { run.fetch("scenarios").first.fetch("effects")["jobs"] = ["duplicate broadcast"] },
       "sql_order" => ->(run) { run.fetch("scenarios").first.fetch("sql").reverse! },
+      "events" => ->(run) { run.fetch("scenarios").first.fetch("events").reverse! },
       "loads" => ->(run) { run.fetch("loads").fetch("cold_boot")["load_events"] = ["0 hook active_record", "1 load Article"] }
     }
     changes.each do |field, change|
@@ -45,6 +48,42 @@ class BlogProductionTest < Minitest::Test
     assert_equal ["ArticlesControllerTest#test_should_get_index:response"], report.fetch("differences").fetch("off_control")
     assert_empty report.fetch("differences").fetch("off_on")
     assert_equal ["18"], report.fetch("hit_units")
+  end
+
+  def test_companions_keep_exact_body_sql_events_and_entropy_order_despite_recorded_real_clock
+    records = runs
+    records.each_with_index do |run, index|
+      run["entropy_seed"] = 1
+      run.fetch("scenarios").each do |scenario|
+        scenario["entropy_trace"] = [{"site" => "csrf_mask", "sha256" => "same-controlled-bytes"}]
+        scenario["clock_observations"] = [{"real" => 42.5 + index, "pinned" => 1000.0}]
+      end
+    end
+    assert_equal "equivalent_for_executed_scenarios", BlogProduction.compare(records).fetch("status")
+    %w[response sql events entropy_trace].each do |field|
+      changed = Marshal.load(Marshal.dump(records))
+      changed.last.fetch("scenarios").first[field] = "real mismatch, not excused by entropy policy"
+      assert_equal "rejected", BlogProduction.compare(changed).fetch("status"), field
+    end
+  end
+
+  def test_entropy_pins_stop_applying_when_source_or_lock_changes
+    Dir.mktmpdir do |app|
+      FileUtils.mkdir_p(File.join(app, "app"))
+      File.write(File.join(app, "app/article.rb"), "class Article; end")
+      lock = File.join(app, "Gemfile.lock")
+      File.write(lock, "pinned lock")
+      policy = {"app_source_sha256" => BlogProduction::Entropy.source_pin(app),
+        "lock_sha256" => Digest::SHA256.file(lock).hexdigest, "ruby_version" => RUBY_VERSION, "runtime_sources" => {}}
+      assert BlogProduction::Entropy.validate(app, policy: policy).fetch("active")
+      File.write(lock, "new lock")
+      report = BlogProduction::Entropy.validate(app, policy: policy)
+      refute report.fetch("active")
+      assert_equal "lockfile pin mismatch", report.fetch("reason")
+      File.write(File.join(app, "app/article.rb"), "class Different; end")
+      assert_equal "app source pin mismatch", BlogProduction::Entropy.validate(app, policy: policy).fetch("reason")
+      refute BlogProduction::Entropy.validate(app, policy: {}).fetch("active")
+    end
   end
 
   def test_zero_hits_missing_scenarios_and_capture_errors_cannot_pass

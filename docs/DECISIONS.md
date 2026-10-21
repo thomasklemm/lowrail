@@ -38,8 +38,14 @@ the first two-GET blog Rack-boundary runner restores four databases and runs
 sequential production/YJIT off/off/on workers, outside the test runtime.
 Its raw off/off comparison rejects natural response entropy; no exclusions
 or support claim. Retain the cold 14-off/3-on SQL and extra load-hook findings,
-and the unattributed form-inventory refusal. Wider request/job replay and
-visible pinned entropy companions remain follow-ups, not implemented gates.
+and the original unattributed form-inventory refusal. A fresh exact-334f49a
+recheck has form19 show 1/0, index 0/0 and every refusal null; record that
+before/after evidence without claiming an isolated cause. Explicit, pinned
+two-seed entropy companions now retain the raw rejection while comparing
+literal responses, SQL/binds, effects, captured events and loads. Their off/off
+controls agree, but both off/on gates still reject cold SQL/load differences;
+no exemption or support claim. Wider request/job replay and explaining those
+cold findings remain follow-ups, not implemented admission gates.
 [Trade-offs, results, hits/refusals and explicit uncovered IDs](sealed-verification.md).
 
 ## One read-only explanation surface (2026-10-21)

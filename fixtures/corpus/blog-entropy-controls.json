@@ -1,0 +1,34 @@
+{
+  "format": 1,
+  "app_source_sha256": "86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf",
+  "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+  "ruby_version": "4.0.7",
+  "seeds": [0, 1],
+  "evidence": "docs/sealed-verification.md#declared-blog-entropy-companions",
+  "scope": "Disposable blog two-GET experiment only; never use these predictable inputs in a deployed app",
+  "controls": {
+    "secret_key_base": "lowrail-disposable-blog-companion-only- repeated four times; DUMMY disabled",
+    "random": "Per-request, per-declared-site Random seeded with SHA256(seed/scenario ID/site); integer bytes, not OpenSSL RNG reseeding",
+    "runtime": "Only Rack::Runtime#call's two Rack::Utils.clock_time reads return 1000.000 and 1000.001; real reads retained separately; x-runtime remains a literal compared header, not a performance measurement",
+    "request_id": "Caller-supplied original test ID",
+    "session": "Fresh session per GET, identical declared session ID/CSRF/cookie-IV streams; not a round-trip security test",
+    "state": "Same closed four-SQLite-file snapshot and cleared tmp before each sequential worker"
+  },
+  "runtime_sources": {
+    "ruby:random/formatter.rb": "9a787be99c281f98c8abc34ab67521be733a7297f156a7df496df2ccb417437e",
+    "ruby:openssl/cipher.rb": "087436098382bbe93b90cacad6b33b7ed63acf7c7014bdfe89b0d515c1e0259b",
+    "securerandom:lib/securerandom.rb": "2a99f878e3cf2d92b88dad1512c9c86272ca8679af9a8a1d5790f7c37a9d40a4",
+    "rack:lib/rack/runtime.rb": "c07bc0de1850728c77b2e5436c930abdfc3b0decb036a27dc7d77a58c28122bf",
+    "rack:lib/rack/utils.rb": "82ab7360295a67ebfe3a9dd0502eba3377dc453bf2b9bf778f5dd2a6bd4db18e",
+    "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb": "a9fe0df38a05ce2ee4486c801ce78719afe239abf66b01a388c61c27ed1f6b4d",
+    "actionpack:lib/action_controller/metal/request_forgery_protection.rb": "01af4e9a30bc81f78ead041c27f8571c9f01a68f94d6c9450abd2e594209d051",
+    "actionpack:lib/action_dispatch/middleware/cookies.rb": "9db3611f9911521c8f3959b38d0e2025697f9449e7bb8555c0e7b9d70e5333ea",
+    "activesupport:lib/active_support/message_encryptor.rb": "f23ae37f44fa36b9cbc8f189a4d5e0d753b1b0a99e3bf76b835b804739935d61"
+  },
+  "random_sites": [
+    {"name": "csrf_token", "provider": "SecureRandom", "source": "actionpack:lib/action_controller/metal/request_forgery_protection.rb", "method": "generate_csrf_token", "bytes": 32},
+    {"name": "csrf_mask", "provider": "SecureRandom", "source": "actionpack:lib/action_controller/metal/request_forgery_protection.rb", "method": "mask_token", "bytes": 32},
+    {"name": "session_id", "provider": "SecureRandom", "source": "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb", "method": "generate_sid", "bytes": 16},
+    {"name": "cookie_iv", "provider": "OpenSSL::Random", "source": "ruby:openssl/cipher.rb", "method": "random_iv", "bytes": 12}
+  ]
+}

@@ -8,6 +8,7 @@ require_relative "../fixtures/corpus/blog_production"
 if ARGV.shift == "worker"
   BlogProduction.worker(*ARGV)
 else
-  abort "usage: script/blog-production-verify run BLOG NEW_OUTPUT_DIRECTORY" unless ARGV.size == 2
-  exit(BlogProduction.run(*ARGV) ? 0 : 1)
+  companions = !!ARGV.delete("--entropy-companions")
+  abort "usage: script/blog-production-verify run BLOG NEW_OUTPUT_DIRECTORY [--entropy-companions]" unless ARGV.size == 2
+  exit(BlogProduction.run(*ARGV, entropy_companions: companions) ? 0 : 1)
 end

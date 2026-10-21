@@ -7,10 +7,11 @@ require "fileutils"
 require "open3"
 require "rbconfig"
 require "yaml"
+require_relative "blog_entropy"
 
 # A bounded, untimed production Rack-boundary experiment, not a replacement
-# for lowrail verify or a whole-suite/SEAL001–009 certificate. No test runtime
-# or entropy shim is loaded in its production processes.
+# for lowrail verify or a whole-suite/SEAL001–009 certificate. No test runtime.
+# Raw workers are untouched; explicit entropy companions are separate workers.
 module BlogProduction
   ROOT = File.expand_path("../..", __dir__)
   SCRIPT = File.join(ROOT, "script/blog-production-verify")
@@ -19,6 +20,35 @@ module BlogProduction
     {"id" => "ArticlesControllerTest#test_should_show_article", "path" => "/articles/1"}
   ].freeze
   DATABASES = %w[production production_cache production_queue production_cable].freeze
+
+  # Event names/order and these scalar payload fields only, not full arbitrary
+  # subscriber payload equivalence (request objects, durations, allocations).
+  class AppEvents
+    FIELDS = %i[controller action method path format status identifier layout count cache_hits].freeze
+    attr_accessor :thread
+    attr_reader :events
+
+    def initialize
+      @events = []
+    end
+
+    def start(name, _id, payload)
+      record("start", name, payload)
+    end
+
+    def finish(name, _id, payload)
+      record("finish", name, payload)
+    end
+
+    def record(phase, name, payload)
+      return unless thread
+      fields = payload.select { |key, _| FIELDS.include?(key) }.to_h do |key, entry|
+        [key.to_s, entry.is_a?(Symbol) ? {"symbol" => entry.name} : BlogProduction.value(entry)]
+      end
+      events << {"phase" => phase, "name" => name, "payload" => fields,
+        "thread" => Thread.current.equal?(thread) ? "request" : "other"}
+    end
+  end
 
   # Preserve bytes AND encoding; no timestamp, token, ID or bind normalization.
   # Unknown SQL value types are a capture failure, never inspect/to_s guesses.
@@ -61,11 +91,20 @@ module BlogProduction
     {"databases" => databases, "storage_files" => files.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }}
   end
 
-  def self.worker(phase, destination)
+  def self.worker(phase, destination, entropy_seed = nil)
+    control = Entropy.validate(Dir.pwd) if phase == "entropy-pin" || entropy_seed
+    if phase == "entropy-pin"
+      File.write(destination, JSON.pretty_generate(control))
+      return
+    end
+    raise control.fetch("reason") if control && !control.fetch("active")
+    Entropy.install(control.fetch("policy")) if control
     require "lowrail/verify_loads"
     Lowrail::VerifyLoads.install
     require File.expand_path("config/application")
     events, errors = [], []
+    app_events = AppEvents.new
+    ActiveSupport::Notifications.subscribe(/\.(?:action_controller|action_view)\z/, app_events)
     request_thread = nil
     # Register before initialize!/the seal, without referencing an AR target.
     # Rails has already computed this exact array for the adapter. Do not call
@@ -112,15 +151,21 @@ module BlogProduction
     initial = effects
     responses = SCENARIOS.map do |scenario|
       events.clear
+      app_events.events.clear
       Lowrail::Stats.reset_counts! if defined?(Lowrail::Stats) && Lowrail::Stats.enabled?
       request_thread = Thread.current
-      response = Rack::MockRequest.new(Rails.application).get(scenario.fetch("path"),
-        "HTTP_HOST" => "localhost", "HTTPS" => "on", "HTTP_X_REQUEST_ID" => scenario.fetch("id"))
+      app_events.thread = request_thread
+      request = -> { Rack::MockRequest.new(Rails.application).get(scenario.fetch("path"),
+        "HTTP_HOST" => "localhost", "HTTPS" => "on", "HTTP_X_REQUEST_ID" => scenario.fetch("id")) }
+      response, entropy = entropy_seed ? Entropy.with(Integer(entropy_seed), scenario.fetch("id"), &request) : [request.call, nil]
       request_thread = nil
+      app_events.thread = nil
+      errors.concat(entropy.fetch("errors")) if entropy
       Lowrail::VerifyLoads.capture(scenario.fetch("id"))
       {"id" => scenario.fetch("id"), "response" => {"status" => response.status,
         "headers" => value(response.headers.to_h), "body" => value(response.body)},
-        "sql" => events.dup, "effects" => effects,
+        "sql" => events.dup, "events" => app_events.events.dup, "effects" => effects,
+        "entropy_trace" => entropy&.fetch("trace"), "clock_observations" => entropy&.fetch("clock_reads"),
         "hits" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.unit_hits : {},
         "fallbacks" => defined?(Lowrail::Stats) && Lowrail::Stats.enabled? ? Lowrail::Stats.unit_fallbacks : {}}
     end
@@ -131,6 +176,7 @@ module BlogProduction
     form = Lowrail.loaded_constant("Lowrail::FormScaffold")
     File.write(destination, JSON.pretty_generate({"initial_effects" => initial, "scenarios" => responses,
       "loads" => Lowrail::VerifyLoads.snapshot.fetch("stages"), "features" => $LOADED_FEATURES.reject { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) },
+      "entropy_seed" => entropy_seed && Integer(entropy_seed), "entropy_control" => control,
       "jit" => Lowrail.jit_status, "refusals" => refusals.merge("artifact" => Lowrail.refusal_reason,
         "form_input" => form&.input_refusal), "errors" => errors}))
   end
@@ -145,7 +191,7 @@ module BlogProduction
       mismatches = []
       %w[initial_effects loads features].each { mismatches << _1 unless baseline.fetch(_1) == other.fetch(_1) }
       baseline.fetch("scenarios").zip(other.fetch("scenarios")).each do |left, right|
-        %w[response sql effects].each do |field|
+        %w[response sql effects events entropy_trace].each do |field|
           mismatches << "#{left.fetch('id')}:#{field}" unless left.fetch(field) == right.fetch(field)
         end
       end
@@ -179,7 +225,7 @@ module BlogProduction
     end
   end
 
-  def self.run(source, output)
+  def self.run(source, output, entropy_companions: false)
     source = File.realpath(source)
     output = File.expand_path(output)
     raise "output must be new and outside the source app" if File.exist?(output) || output.start_with?(source + "/")
@@ -198,26 +244,52 @@ module BlogProduction
         raise "#{label} failed; see #{log.path}" unless system(env.merge(extra), *args, chdir: app, out: log, err: log)
       end
     end
-    worker = ->(label, phase, enabled) {
-      execute.call(label, [RbConfig.ruby, "--yjit", SCRIPT, "worker", phase, File.join(output, "#{label}.json")], "LOWRAIL" => enabled)
+    worker = ->(label, phase, enabled, companion_seed = nil) {
+      extra = {"LOWRAIL" => enabled}
+      extra.merge!("SECRET_KEY_BASE_DUMMY" => nil, "SECRET_KEY_BASE" => Entropy::SECRET) if companion_seed
+      execute.call(label, [RbConfig.ruby, "--yjit", SCRIPT, "worker", phase, File.join(output, "#{label}.json"), *companion_seed&.to_s], extra)
     }
     worker.call("prepare", "prepare", "0")
     seed = File.join(output, "seed")
     FileUtils.cp_r(File.join(app, "storage"), seed)
     execute.call("build", [File.join(ROOT, "target/release/lowrail"), "build", app, "--env", "production", "--sealed", "--jit", "yjit"], "LOWRAIL" => "0", "RUBYOPT" => nil)
     execute.call("explain", [File.join(ROOT, "target/release/lowrail"), "explain", app, "--json"], "LOWRAIL" => "0", "RUBYOPT" => nil)
-    runs = %w[off1 off2 on].map do |label|
-      # No worker is live during restore, including the build's Ruby oracle.
-      FileUtils.rm_rf(File.join(app, "storage"))
-      FileUtils.cp_r(seed, File.join(app, "storage"))
-      FileUtils.rm_rf(File.join(app, "tmp"))
-      worker.call(label, "run", label == "on" ? "1" : "0")
-      JSON.parse(File.read(File.join(output, "#{label}.json")))
+    sequence = ->(prefix, companion_seed = nil) do
+      %w[off1 off2 on].map do |arm|
+        label = "#{prefix}#{arm}"
+        # No worker is live during restore, including the build's Ruby oracle.
+        FileUtils.rm_rf(File.join(app, "storage"))
+        FileUtils.cp_r(seed, File.join(app, "storage"))
+        FileUtils.rm_rf(File.join(app, "tmp"))
+        worker.call(label, "run", arm == "on" ? "1" : "0", companion_seed)
+        JSON.parse(File.read(File.join(output, "#{label}.json")))
+      end
     end
+    runs = sequence.call("")
     title = YAML.safe_load_file(File.join(app, "test/fixtures/articles.yml")).fetch("one").fetch("title")
     assertions = runs.map { oracles(_1, title) }
     report = compare(runs)
     report["status"] = "rejected_oracles" unless assertions.flatten.all? { _1.fetch("passed") }
+    companions = []
+    if entropy_companions
+      worker.call("entropy-pin", "entropy-pin", "0")
+      control = JSON.parse(File.read(File.join(output, "entropy-pin.json")))
+      if control.fetch("active")
+        control.fetch("policy").fetch("seeds").each do |companion_seed|
+          prefix = "companion-#{companion_seed}-"
+          records = sequence.call(prefix, companion_seed)
+          checks = records.map { oracles(_1, title) }
+          companion = compare(records)
+          companion["status"] = "rejected_oracles" unless checks.flatten.all? { _1.fetch("passed") }
+          companions << companion.merge("seed" => companion_seed, "controls" => control,
+            "workers" => %w[off1 off2 on].map { "#{prefix}#{_1}.json" }, "oracles" => checks,
+            "refusals" => records.map { _1.fetch("refusals") }, "worker_modes" => records.map { _1.fetch("jit") },
+            "unit_counts" => records.last.fetch("scenarios").map { _1.slice("id", "hits", "fallbacks") })
+        end
+      else
+        companions << {"status" => "inactive_pin_mismatch", "controls" => control}
+      end
+    end
     explanation = JSON.parse(File.read(File.join(output, "explain.log")))
     units = explanation.fetch("units").map do |unit|
       id = unit.fetch("id").to_s
@@ -244,7 +316,10 @@ module BlogProduction
       "controls" => {"comparison" => "raw_unpinned", "secret_key_base" => "Rails DUMMY: independently generated per process, not pinned",
         "session_csrf" => "fresh session each GET; normal SecureRandom", "clock_x_runtime" => "real clock, header compared exactly",
         "request_id" => "caller-supplied scenario ID", "database" => "four restored SQLite files, no live worker during restore",
-        "entropy_companion" => "not implemented; raw rejection retained"},
+        "entropy_companion" => entropy_companions ? "separate declared workers below; raw rejection retained" : "not requested; raw gate unchanged"},
+      "entropy_companions" => companions,
+      "event_projection" => {"names" => "start/finish action_controller and action_view notifications in observed order",
+        "scalar_payload_fields" => AppEvents::FIELDS, "not_claimed" => "arbitrary object payloads, durations, allocations or full subscriber equivalence"},
       "source_revision" => revision, "source_files_sha256" => source_hashes,
       "lock_sha256" => Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest,
       "manifest_sha256" => Digest::SHA256.file(File.join(app, ".lowrail/manifest.json")).hexdigest,
@@ -254,6 +329,10 @@ module BlogProduction
       "refusals" => runs.map { _1.fetch("refusals") }, "covered" => SCENARIOS,
       "uncovered" => inventory.reject { |test| SCENARIOS.any? { _1.fetch("id") == test.fetch("id") } },
       "limitations" => ["No writes/jobs/JS/HTTP server/streaming; no external service equivalence", "Shared observers/setup: no true no-gem observer-transparency control", "No extra warm/control repeats beyond one off/off/on sequence", "Source-declared test inventory only, no dynamic test discovery", "No SEAL001–009 or unsampled-input certification"])
+    report["raw_status"] = report.fetch("status")
+    if report.fetch("status") == "equivalent_for_executed_scenarios" && companions.any? { _1.fetch("status") != "equivalent_for_executed_scenarios" }
+      report["status"] = "rejected_companion"
+    end
     File.write(File.join(output, "report.json"), JSON.pretty_generate(report))
     puts JSON.pretty_generate(report)
     report.fetch("status") == "equivalent_for_executed_scenarios"

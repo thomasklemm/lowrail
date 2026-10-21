@@ -318,9 +318,94 @@ files instead of attributing the containing Lowrail repository's revision to it.
 
 Form unit 19 reports `boot inventory changed; rebuild` under this observer;
 a separate, no-observer diagnostic boot activates the same artifact. **Cause
-unattributed**: await the independently owned tracing fix on origin/main, then
-rerun before attributing it. Link and artifact admission report no refusal.
+unattributed at that head**; the subsequent exact-head recheck is below.
+Link and artifact admission report no refusal.
 Recorded hits are exercised-path evidence, **not** an accepted equivalence gate.
+
+### Tracing-fix recheck on 334f49a
+
+Pulled [334f49a](https://github.com/thomasklemm/lowrail/commit/334f49a7630ea4556659f4cc8ecffbcb4630941e),
+rebuilt the release CLI and a fresh production/YJIT blog artifact on that exact
+head, then ran the **unchanged raw runner with the observer**, once off/off/on.
+Evidence: `.lowrail/private/blog-production-334f49a/`, including
+`{prepare,off1,off2,on,report}.json`, build/explain logs and `lowrail-head.txt`.
+
+Form unit **19 has index 0 hits / 0 fallbacks, show 1 hit / 0 fallbacks**.
+Every reported refusal is null: artifact, sealed, form and form input. The
+earlier inventory refusal is absent in this recheck. This records before/after
+evidence, not an independently isolated causal attribution. All six scenario
+assertions pass; effects remain unchanged; build/startup/after-initialize modes
+are YJIT and there are no capture errors. The raw gate still exits 1 with
+`rejected_off_control`. Cold index SQL remains **14/14/3** (off1/off2/on),
+show **2/2/2**, with **12 extra cold on-arm hook events**. Neither finding
+is excluded or explained away by the disappearance of the refusal.
+
+### Declared blog entropy companions
+
+Explicit opt-in, always **in addition to**, never instead of, the raw gate:
+
+```sh
+mise exec -- ruby script/blog-production-verify run \
+  .corpus/real-blog-r4 .lowrail/private/blog-production-entropy-NEW \
+  --entropy-companions
+```
+
+The [control declaration](../fixtures/corpus/blog-entropy-controls.json) is
+included verbatim in each companion report. It pins the generated app's source
+(SHA256 of the sorted relative-path/content-digest map for `.rb`, `.erb`,
+`.jbuilder`, `.yml` under app/config/db/test), its exact lock hash, Ruby 4.0.7,
+and the framework/stdlib source files at the controlled call sites. There is
+no invented app Git revision. A changed/missing pin makes companions visibly
+`inactive_pin_mismatch`; it does not grant an exemption or change the raw run.
+The two seeds are **0 and 1**, each with its own sequential cold off/off/on
+sequence and state restores. All nine scenario workers use the same artifact.
+
+Every controlled input is visible:
+
+| Input | Companion control; raw gate remains unpinned |
+|---|---|
+| Secret | `SECRET_KEY_BASE_DUMMY` unset; `SECRET_KEY_BASE` is the public, disposable string `lowrail-disposable-blog-companion-only-` repeated four times. **Never use this secret or these IVs in a deployment.** |
+| Session ID | Only `ActionDispatch::Session::Compatibility#generate_sid`'s `SecureRandom.hex(16)` byte source is seeded. |
+| CSRF | Only `generate_csrf_token` and `mask_token`'s 32-byte SecureRandom calls in the pinned Rails forgery-protection source are seeded. |
+| Cookie encryption IV | Only `OpenSSL::Cipher#random_iv`'s 12-byte `OpenSSL::Random.random_bytes` call in the pinned stdlib source is seeded. No OpenSSL RNG reseeding. |
+| Seed scope | A fresh `Random` per seed/scenario ID/declared site, seeded with SHA256 of those inputs; the ordered requested lengths/output digests are compared too. Only the current request thread is controlled. Unknown intercepted call sites delegate normally and **reject** with a visible capture error. |
+| Runtime header | Only Rack::Runtime's two `Rack::Utils.clock_time` reads return 1000.000 and 1000.001. The real reads are retained separately as `clock_observations`; the literal `x-runtime: 0.001000` header is still compared. Extra/missing reads reject. This is a declared artificial input, **not a timing measurement**. No Time/Process clock override. |
+| Request/session lifecycle | Original test ID supplied as request ID; fresh session per GET. No cookie reuse, CSRF submission/security or session round-trip claim. |
+| State | Same four closed SQLite files and fixture timestamp/IDs; clear tmp before every worker. No live worker during restore. |
+
+There is **no response rewriting, header deletion, SQL exclusion, load
+exemption or event-order normalization**. Status, every header/cookie, body
+bytes/encoding, SQL/bind values and effects use the same exact comparator in
+raw and companion runs. It now also compares ordered start/finish names for
+action_controller/action_view notifications and the explicitly listed scalar
+payload fields (controller/action/method/path/format/status/identifier/layout/
+count/cache_hits). Arbitrary object payloads, durations and allocation counts
+are **not captured**, so this is not full subscriber-payload equivalence.
+An actual body, bind, event/order, load or effect difference still rejects.
+`raw_status` is always retained; a companion failure cannot turn a raw success
+into a passing overall run either. This does not weaken ordinary `verify`.
+
+**Bounded result:** base 334f49a plus this harness change, fresh build;
+private evidence `.lowrail/private/blog-production-entropy-final/`.
+The raw off/off responses still differ; exit 1, `rejected_off_control`, retained.
+For **both** seeds, off/off agrees exactly in every compared field, with no
+capture errors. Off/on responses (including encrypted cookies, CSRF tokens,
+signed stream names, ETag and runtime header), captured events/entropy traces
+and effects agree exactly. Both companions nevertheless report **`rejected`**:
+cold SQL **14/14/3**, plus actual load-census/feature-order differences including
+the **12 extra cold hook events**, remain findings for the next follow-up.
+No exclusions and no accepted equivalence/support/certification claim.
+
+All **18** original scenario assertions pass across the nine workers; every
+runtime refusal is null. Form19 remains **index 0/0, show 1/0** in each on arm;
+other unit counts match the table above (units 3–17 remain unexercised).
+This is only the same two GETs; the uncovered denominator below is unchanged.
+The controls do not establish security, all random paths, concurrent schedules,
+observer transparency, arbitrary event payloads or whole-app behavior. The
+first development attempt refused a missing activated default-gem pin; the
+next retained undeclared Rails-session/stdlib-IV call-site errors. Their
+rejections are preserved in private `blog-production-entropy-v1`/`v2` evidence;
+the corrected declared sites, not output normalization, enabled the comparison.
 
 ### Explicit uncovered denominator
 
