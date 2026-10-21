@@ -7,6 +7,7 @@ description = "Guarded, boot-fact specialization of Rails apps delivered as ISeq
 publish = false
 
 [dependencies]
+libc = "0.2"
 ruby-prism = "1.9.0"
 # Same pin as Roundhouse; move to a release once one includes it.
 rubydex = { git = "https://github.com/Shopify/rubydex", rev = "d8ff47595223571588ae40cb748f43cef6a9dfaf" }

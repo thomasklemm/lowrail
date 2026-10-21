@@ -423,6 +423,19 @@ compiling (the current passes analyze disk source), or when its SHA-256 differs 
 the pass lowered. `templates` and `rails_env` are copied to the manifest;
 template units need no compiled file.
 
+### Private build-oracle protocol
+
+The Rust builder creates a duplex Unix socket pair for
+`bundle exec ruby gem/exe/lowrail-oracle`. Its child end is inherited at fd 3,
+explicitly named by `LOWRAIL_ORACLE_FD`. Ruby opens it before boot and marks it
+close-on-exec, so app subprocesses do not retain the channel. One JSON ready
+message, then newline-delimited JSON requests/responses, travel only there.
+The ready message includes the actual `certification_jit`; response IDs and
+Ruby values/errors retain their existing format. App stdin/stdout/stderr are
+inherited unchanged. Boot logs, banners, and output during oracle evaluation
+are diagnostics, never candidate protocol messages, even if they look like JSON.
+Rust owns child teardown, including when boot or its ready message fails.
+
 ### Build orchestration and private runtime-builder protocol
 
 `src/passes.rs` declares pass names, source/runtime kind, defaults, aliases

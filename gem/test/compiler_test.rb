@@ -7,6 +7,49 @@ require "stringio"
 class CompilerTest < Minitest::Test
   include LowrailTest
 
+  def test_public_build_keeps_boot_output_out_of_oracle_protocol
+    bin = File.expand_path("../../target/debug/lowrail", __dir__)
+    skip "cargo build and Rails/sqlite3/bcrypt are required" unless File.executable?(bin) && LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
+        # Keep ephemeral framework classes alive in both fact censuses. This
+        # fixture compares ALL facts, not GC-dependent ObjectSpace survivors.
+        "config/environment.rb" => "GC.disable\n" + LowrailTest::RAILS_APP.fetch("config/environment.rb"),
+        "config/initializers/boot_output.rb" => <<~'RUBY')
+          if ENV["ORACLE_BOOT_OUTPUT"]
+            $stdout.puts "app stdout, not oracle JSON"
+            STDOUT.puts '{"ready":false,"certification_jit":"bogus"}'
+            STDOUT.flush
+            $stderr.puts "app stderr, not oracle JSON"
+          end
+        RUBY
+      # ERB method names embed a per-process randomized hash, unrelated to IO.
+      FileUtils.rm_rf(File.join(dir, "app/views"))
+      out, err, status = Open3.capture3(CLEAN_ENV, "bundle", "lock", "--local", chdir: dir)
+      assert status.success?, "fixture lock failed:\n#{out}\n#{err}"
+      snapshots = [nil, "1"].map do |noise|
+        FileUtils.rm_rf(File.join(dir, ".lowrail"))
+        out, err, status = Open3.capture3(CLEAN_ENV.merge("ORACLE_BOOT_OUTPUT" => noise),
+          bin, "build", dir, "--jit", "interpreter")
+        assert status.success?, "build failed:\n#{out}\n#{err}"
+        if noise
+          assert_includes out, "app stdout, not oracle JSON"
+          assert_includes out, '{"ready":false,"certification_jit":"bogus"}'
+          assert_includes err, "app stderr, not oracle JSON"
+        end
+        facts = JSON.parse(File.read(File.join(dir, ".lowrail/facts.json")))
+        manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
+        assert_equal "interpreter", manifest.fetch("certification_jit")
+        facts.fetch("generated_stats").delete("hook_seconds") # Wall time, not a boot fact.
+        facts.fetch("materialize").each { _1.delete("seconds"); _1.delete("census_seconds") }
+        [facts.reject { |key, _| key == "timings" }, manifest.fetch("units"),
+          JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))]
+      end
+      assert_equal snapshots.first, snapshots.last, "boot output must not change build facts or decisions"
+    end
+  end
+
   # compile(src, path, path, 1) must give the same instructions as the
   # compiler `require`/Bootsnap use (compile_file_prism), magic comments
   # included. Only the top-level label differs ("<compiled>" vs "<main>").

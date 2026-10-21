@@ -5,14 +5,17 @@
 # context, so lowering passes can partially evaluate helpers with Rails' own
 # code instead of re-implementing escaping and tag rules.
 #
-# Run inside the app: bundle exec ruby /abs/gem/exe/lowrail-oracle
-# Protocol: one JSON request per line on stdin, one JSON response per line:
+# Run inside the app with LOWRAIL_ORACLE_FD set to an inherited duplex fd.
+# Protocol: one JSON request/response per line on that dedicated channel:
 #   {"id": 1, "code": "link_to(\"Show\", \"LRH0Q\", class: \"x\")"}
 #   {"id": 1, "ok": true, "value": "<a ...>", "class": "ActiveSupport::SafeBuffer", "html_safe": true}
 # Code runs with `self` = a view context of ApplicationController (or the
 # controller named in "controller"). Lowrail::OracleRoutes (route-helper
 # pass) is loaded.
 
+protocol = IO.new(Integer(ENV.fetch("LOWRAIL_ORACLE_FD")), "r+")
+protocol.sync = true
+protocol.close_on_exec = true
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../lib/lowrail/build_jit"
 mode = Lowrail::BuildJit.prepare(ARGV.first)
@@ -23,7 +26,6 @@ Lowrail::BuildJit.check(mode)
 
 require_relative "../lib/lowrail/oracle_routes"
 
-$stdout.sync = true
 LOWRAIL_VIEWS = views = Hash.new do |h, name|
   controller = Object.const_get(name).new
   request = ActionDispatch::TestRequest.create
@@ -32,16 +34,16 @@ LOWRAIL_VIEWS = views = Hash.new do |h, name|
   h[name] = controller.view_context
 end
 
-$stdout.puts JSON.generate({ ready: true, rails_env: Rails.env, rails: Rails.version, ruby: RUBY_DESCRIPTION,
+protocol.puts JSON.generate({ ready: true, rails_env: Rails.env, rails: Rails.version, ruby: RUBY_DESCRIPTION,
   certification_jit: Lowrail.jit_mode })
-$stdin.each_line do |line|
+protocol.each_line do |line|
   req = JSON.parse(line)
   begin
     view = views[req.fetch("controller", "ApplicationController")]
     value = view.instance_eval(req.fetch("code"), "(lowrail-oracle)", 1)
-    $stdout.puts JSON.generate({ id: req["id"], ok: true, value: value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(Numeric) || value == true || value == false || value.nil? ? value : value.inspect,
+    protocol.puts JSON.generate({ id: req["id"], ok: true, value: value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(Numeric) || value == true || value == false || value.nil? ? value : value.inspect,
                                  class: value.class.name, html_safe: value.respond_to?(:html_safe?) && value.html_safe? })
   rescue Exception => e # rubocop:disable Lint/RescueException
-    $stdout.puts JSON.generate({ id: req["id"], ok: false, error: "#{e.class}: #{e.message.lines.first&.chomp}" })
+    protocol.puts JSON.generate({ id: req["id"], ok: false, error: "#{e.class}: #{e.message.lines.first&.chomp}" })
   end
 end
