@@ -181,3 +181,32 @@ BLANK_FRAMEWORK_TEST="$PWD/.corpus/rails/activesupport/test/core_ext/object/blan
 The script prints `guardless_exact: false`; successful execution is not a
 passing exactness certificate. The [pricing report](next-levers.md) remains
 a positive native-input micro, not an exact guarded/default request win.
+
+## Timeout-observer verification before the hook-free-loader boundary
+
+The public regression fails without the detector (expected epoch 2, actual
+0), then the complete `gem/test/seal_test.rb` passes **16 tests / 62 assertions**
+on both Rubies. Full `gem` `rake test`, without test exclusions: **4.0.7:
+132 / 4,935, zero failures/errors, 6 skips; 4.1-preview1: 132 / 3,990, zero
+failures/errors, 13 skips**. Cargo: **35 unit + 1 corpus/MCP + 3 verifier**
+tests pass. These gates include the published targeted-initialize tracing
+change, but precede the pending hook-free-loader integration; they do not
+certify that later code state.
+
+The 4.0.7 run selects the original corpus; 4.1 uses disposable blog/Campfire
+copies with the documented [source-dependency overlay](../ruby-4.1.md#follow-up-step-2-source-dependency-workaround-and-correctness).
+Only those copies add exact Nokogiri 1.19.4 with `force_ruby_platform: true`
+and platform `ruby`; loaded SQLite/Nokogiri/FFI versions are unchanged.
+SHA256 checks confirm both original Gemfiles/locks are untouched. The three
+corpus tests also pass separately on the preview: **3 / 31, no skips**.
+The 13 full-suite skips are unavailable Freezolite/require-hooks (2), prepared
+framework fixtures (2), Vite-backed fixtures (2), RSpec (2), legacy real-blog
+paths (4), and the existing Ruby-4.0.7-only cold sealed-link fixture (1).
+
+Retained setup failures are not code regressions or passing support gates:
+initially selecting original native-gem bundles on 4.1 fails three corpus
+boots; an absent-overlay diagnostic skips those tests and is not credited;
+leaking `BUNDLE_FROZEN=true` into the unit suite prevents three temporary view
+fixtures from creating their locks. The final full run uses the prepared
+source overlay, no global frozen flag and no exclusions. No pass, app policy,
+production default or measured cohort changed to obtain these results.
