@@ -313,3 +313,64 @@ failures/errors, 52 conditional skips**. RuboCop: **one file, no offenses**.
 This is not the earlier 36,120-assertion combined-tree run, a hosted-CI claim,
 or evidence against the reproduced semantic differences. No new fork branch
 was pushed and no draft was offered as having passed the gate.
+
+## Collection proxy extension cache: overlap stop (2026-10-21)
+
+**No-go at gate 1; no Rails change or new PR.** The proposed replacement of
+per-instance `CollectionProxy#extend` with cached proxy subclasses directly
+overlaps [rails/rails#47314 — PoC: Cache Extended Collection
+Proxies](https://github.com/rails/rails/pull/47314), closed **unmerged** on
+2023-09-14. Both its description/discussion and its three-file diff were
+read. The patch removes `extend(*extensions)` from `CollectionProxy`, caches
+`Class.new(delegate_class).include(*extensions)` by class and extension
+Array, and selects that class from `CollectionAssociation#reader`. This is
+the same proposed design, not merely a related performance issue.
+
+The prior author's reported blocker was Marshal: extended objects can be
+serialized, while instances of anonymous subclasses cannot. The discussion
+considers eagerly named classes for `has_many extend:`, but does not resolve
+dynamic `Relation#extending`, default-scope extensions or deserialization in
+a fresh process. Those are findings from the earlier proposal, **not newly
+executed counterexamples or proof that every possible design is impossible**.
+
+Searches covered both open and closed Rails issues/PRs with these queries:
+
+```sh
+gh api -X GET search/issues -f q='repo:rails/rails CollectionProxy extend in:title,body' -f per_page=50
+gh api -X GET search/issues -f q='repo:rails/rails "proxy subclass"' -f per_page=50
+gh api -X GET search/issues -f q='repo:rails/rails "association extensions" performance' -f per_page=50
+gh pr view 47314 --repo rails/rails --json body,comments,commits,files,state,mergedAt
+gh pr diff 47314 --repo rails/rails
+```
+
+Canonical main was freshly fetched at
+[a5545972e7](https://github.com/rails/rails/commit/a5545972e7).
+Recent main commits and the histories of `collection_association.rb`,
+`collection_proxy.rb` and `relation/delegation.rb` were inspected. Main still
+uses `CollectionAssociation#reader` → `Delegation::ClassMethods#create` →
+`CollectionProxy#initialize`, which fetches `association.extensions` after
+`super` and calls `extend(*extensions)` when nonempty. The current extension
+tests still include `test_marshalling_extensions` and
+`test_marshalling_named_extensions`. The closed proposal has not removed
+this path on main; "overlap" does not mean "already fixed".
+
+The input report was five singleton classes, ten include entry/exit bumps
+and five method-cache clears per authenticated Fizzy `/bubbles` request
+(Fizzy `6f1d200`, Rails 8.1.4). That report was **not reproduced here** and
+does not establish an equivalent number of YJIT invalidations.
+
+| Measurement / gate | Result in this investigation |
+|---|---|
+| Interpreter / YJIT i/s and allocations, Ruby 4.0.7 | Not measured: stopped on direct overlap before implementing a candidate |
+| `RubyVM.stat` method-cache and YJIT invalidation deltas | Not measured; no invalidation or speed claim |
+| Singleton-method order, `instance_of?` / `is_a?`, inspect, reflection, `proxy_association` / `self`, runtime mutation/reloading, exceptions and thread safety | No new candidate evaluated; equivalence is not claimed |
+| Benchmark / behavior scripts | None created; overlap reproduction commands are recorded above |
+| AR SQLite suite / changed-file RuboCop | Not run: Rails sources are unchanged |
+| Thermos, oracle and Rails conventions review | Not run: no candidate diff or PR description was prepared after gate 1 failed |
+
+The owner's explicit overlap-stop rule takes precedence over the later
+pre-publication gates. Reopening this design would require a new decision
+about the existing upstream proposal and a fresh semantic investigation;
+it is not PR-ready. No fork branch, issue, comment, review or workflow was
+created, and fork main was not touched. Only this Lowrail findings record
+was changed.
