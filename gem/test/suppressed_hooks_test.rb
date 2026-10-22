@@ -175,7 +175,12 @@ class SuppressedHooksTest < Minitest::Test
         assert_equal off.fetch("after"), refused.fetch("after"), pass
         assert_equal 0, refused.fetch("hits"), pass
         assert_match(/sealed-only.*SEAL001/, refused.fetch("refusal"), pass)
-        assert_operator sealed.fetch("hits"), :>, 0, "public production activation: #{pass}"
+        if pass == "active_record/preload_plans"
+          assert_equal 0, sealed.fetch("hits"), "ancestry-unsafe preload delivery is refused even sealed"
+          assert_match(/app-visible ancestry delivery refused:/, sealed.fetch("refusal"))
+        else
+          assert_operator sealed.fetch("hits"), :>, 0, "public production activation: #{pass}"
+        end
         assert_equal off.fetch("before"), sealed.fetch("before"), pass
         assert_equal sealed.fetch("before"), sealed.fetch("after"), pass
       end

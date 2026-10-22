@@ -201,6 +201,10 @@ the normal/strict failure and optional-skip contracts in child suites.
 
 ## Main health check (2026-10-22)
 
+This is the pre-runtime-fix snapshot. The subsequent
+[whole-artifact refusal](#sealed-ancestry-runtime-refusal-2026-10-22) retains
+the failing witness and resolves it without claiming unsafe optimization.
+
 **The full primary gem gate is still red, not merely missing prerequisites.**
 With the retained fixture prepared, the all-sealed cold witness exposes
 `Templates::CompiledSource` on `ActionView::Template` and
@@ -273,3 +277,55 @@ byte-identical to the earlier certified specimen, without a previously
 prepared database or storage snapshot.
 The setup helper rejects an already generated/wrong fixture and an edited
 retained source without overwriting either one; it validates frozen locks.
+
+## Sealed-ancestry runtime refusal (2026-10-22)
+
+The [runtime fix](../DECISIONS.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)
+keeps the complete cold-witness comparison, all original 193 test identities
+(compared against `8009c3b`), and every response/SQL/effect/metadata assertion.
+Unsafe-delivery activation assertions now demand explicit whole-artifact
+refusal and zero hits, not an accepted ancestry difference. The original
+reproduction is **1 run / 86 assertions / 1 failure**; the unchanged full
+cold comparison after refusal is **1 run / 270 assertions / 0 failures**.
+The intentional optional Campfire skip remains; no assertion/test is removed
+or newly skipped. Corpus source/lock/entropy pins are unchanged.
+
+The full strict primary run, seed 1729, finishes in **934.06 seconds** with
+**193 runs / 6,792 assertions / 0 failures / 0 errors / 1 skip**. Its executed
+identities exactly equal the original inventory, not just its count.
+`cargo test --locked` passes **49 tests** (39 + 2 + 8); the release build passes.
+
+Use the same strict command and prepared prerequisites above. Rust checks
+must also run under the primary Ruby, because the integration suite invokes
+the CLI's Ruby facts collector:
+
+```sh
+mise exec ruby@4.0.7 -- cargo test --locked
+mise exec ruby@4.0.7 -- cargo build --release --locked
+mise exec ruby@4.0.7 -- ruby script/blog-production-verify run .corpus/real-blog-r4 NEW_OUTPUT --entropy-companions
+mise exec ruby@4.0.7 -- ruby script/blog-test-certificate APP NEW_DEFAULT_OUTPUT CHROME_BINARY
+mise exec ruby@4.0.7 -- ruby script/blog-test-certificate APP NEW_DIRECT_OUTPUT CHROME_BINARY --direct
+```
+
+`APP` is a disposable copy of the retained app, not an app/config patch.
+Both certificate modes pass with **21 ordinary + 2 browser identities**,
+CI unset/1, off/on-cold/on-warm, unchanged eager policy and nonzero optimized
+execution in every on cell. Discovery's link ledger explicitly says
+`outcome: refused`, `reason: verification_literal_table_observer_unavailable`;
+it emits no link files. Form still explicitly refuses. AR/token/collection
+authority, mutation, continuation and fork assertions all remain.
+
+The mixed production script intentionally still **exits 1**: raw off/off
+entropy is rejected and both declared seed companions are **unexercised**,
+although their comparison difference lists are empty and the full cold
+witness agrees. Its explicit artifact refusal and zero hits are not an
+optimized support claim. Do not change the script's acceptance gate.
+
+Separately, `bench/experiments/sealed_production_check.rb` on the isolated
+three-unit form/token/collection artifact **exits 0**. Both seeded full
+witnesses match; all **1,843 before / 1,857 after** named framework holders
+have identical complete chains in off-A/off-B/on, with neither forbidden
+prepend and identical loaded-feature order. Both 192-pair controls, native
+50-request coverage and epoch deopt pass. Raw entropy stays rejected.
+This checks the still-representative **−15.02%** priced path; no emitted
+priced body changed, no allocation screen or reprice was performed.

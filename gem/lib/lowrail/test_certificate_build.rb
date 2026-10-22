@@ -26,9 +26,11 @@ module Lowrail
             results << TestCertificateRenderBuild.build(pass, context: natural_render.fetch(pass), denied: request.fetch("denied"))
             next
           end
-          unless %w[ARInstantiateBuild SealedBuild FormScaffoldBuild].include?(name)
-            results << {units: [], ledger: [{"pass" => name, "outcome" => "refused",
-              "reason" => "verification-only passive certificate not implemented for this pass"}]}
+          unless %w[ARInstantiateBuild FormScaffoldBuild].include?(name)
+            pass = name == "SealedBuild" ? "sealed/link_to" : name
+            results << {units: [], ledger: [{"pass" => pass, "outcome" => "refused",
+              "reason" => TestCertificate::UNOBSERVED.fetch(pass,
+                "verification-only passive certificate not implemented for this pass")}]}
             next
           end
           # Builder-only synthetic form inventory remains builder-only. The

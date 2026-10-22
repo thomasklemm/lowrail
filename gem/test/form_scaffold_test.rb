@@ -348,6 +348,11 @@ class FormScaffoldTest < Minitest::Test
           "LOWRAIL_OUTCOMES" => File.join(dir, "inventory-outcomes"), "LOWRAIL_VERIFY_LOADS" => census))
         assert_equal inventory, reported, "reporter/census=#{census} changed the complete form inventory"
       end
+      # Exercise form admission, not an artifact that now refuses as a whole
+      # because it contains the legacy ancestry-changing delivery seams.
+      FileUtils.mkdir_p(File.join(app, ".lowrail"))
+      File.write(File.join(app, ".lowrail/denylist.json"), JSON.generate(
+        %w[active_record/preload_plans sealed/link_to].map { {"pass" => _1} }))
       build = -> {
         out, err, status = Open3.capture3(build_env, bin, "build", app, "--env", "production", "--sealed")
         assert status.success?, "#{out}\n#{err}"

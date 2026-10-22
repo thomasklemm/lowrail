@@ -4,6 +4,49 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
+
+The all-sealed cold failure is a runtime defect, not witness noise. On the
+retained blog, `Template#compiled_source` changes owner from
+`ActionView::Template` to `Lowrail::Templates::CompiledSource`, and Preloader's
+`#call` changes owner to `Lowrail::PreloadPlans::Hook`. The corresponding
+module case-membership checks change false → true, and ancestry/loaded
+features differ. `instance_of?` remains true in both arms; the two sampled
+inherited-constant probes remain false. That does not prove arbitrary
+constant lookup equivalent, nor excuse the demonstrated observations.
+
+Refuse **the complete artifact** at manifest admission when any unit is
+`active_record/preload_plans` or `sealed/link_to`, or its template table is
+nonempty. This precedes Guard/Loader/pass installation and source delivery,
+including mixed artifacts and selection of only a safe unit. Dropping an
+unsafe unit alone could leave its lowered files/templates executable. Keep
+the full witness unchanged; explicit `LOWRAIL=0` remains an original-only
+control. Symmetric sealed observers are still present in both arms, not
+on-only delivery. Build-time inventory/oracle code is retained, but its
+presence in a manifest is not production support.
+
+Verification-only discovery also refuses link through its existing
+`verification_literal_table_observer_unavailable` ledger path, without
+running that builder or emitting its files. An existing test checks the
+explicit refused outcome/reason and exact remaining unit inventory. This
+preserves passive AR/token/collection coverage rather than shipping a mixed
+artifact that must refuse wholesale. All original 193 gem test identities
+and their workloads/assertions remain, with unsafe activation assertions
+changed to explicit refusal; none are deleted or newly skipped.
+
+The isolated **form/token/collection** artifact still passes the same full
+cold witness at both seeds, extended to every already-loaded named
+Action*/Active*/Rails/Rack/Zeitwerk holder: **1,843 before / 1,857 after
+requests**, equal in off-A/off-B/on. Neither forbidden prepend occurs in
+any captured chain; loaded-holder census and loaded-feature order match.
+Both 192-pair controls retain hits **104/398/87** (collection's 62 explained
+fallbacks), native 50 requests retain **50/200/50** hits, zero fallbacks,
+and epoch deopt **1/4/1**. Its emitted bodies and admission are unchanged;
+the accepted **−15.02% interpreter Ir** price remains representative, with
+no allocation screen or reprice needed. Mixed all-sealed responses are exact
+at both seeds but **unexercised**, with zero hits, not recovered optimization
+coverage. Raw off/off entropy remains rejected, not normalized.
+
 ## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
 
 The token-only +32 objects/request is traced to per-hit view-context constant

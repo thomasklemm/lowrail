@@ -57,14 +57,16 @@ class BlogProductionTest < Minitest::Test
         link = report.fetch("units").find { _1.fetch("pass") == "sealed/link_to" }
         refute_nil form, "build-time form certification remains intact"
         refute_nil link
-        form_id, link_id = [form, link].map { _1.fetch("id").to_s }
-        # The first natural show is still original. This cold slice alone is
-        # not fast-path coverage; the 192-pair and threaded witnesses cover it.
-        assert on.fetch("scenarios").all? { _1.fetch("hits").fetch(form_id, 0).zero? && _1.fetch("fallbacks").fetch(form_id, 0).zero? }
-        refute on.fetch("unit_refusals").key?(form_id)
-        assert_equal [5, 2], on.fetch("scenarios").map { _1.fetch("hits").fetch(link_id, 0) }
-        assert on.fetch("scenarios").all? { _1.fetch("fallbacks").fetch(link_id, 0).zero? }
-        refute on.fetch("unit_refusals").key?(link_id)
+        # A mixed artifact must refuse before even installing its safe units:
+        # link's files/templates cannot be separated by just dropping its ID.
+        assert_match(/app-visible ancestry delivery refused:.*active_record\/preload_plans.*sealed\/link_to/,
+          on.fetch("refusals").fetch("artifact"))
+        assert_equal "unexercised", companion.fetch("status"), "original-only equivalence is not optimized coverage"
+        on.fetch("scenarios").each do |scenario|
+          assert_empty scenario.fetch("hits")
+          assert_empty scenario.fetch("fallbacks")
+        end
+        assert_empty on.fetch("unit_refusals")
       end
       assert_equal 2, report.fetch("entropy_companions").size, "both declared seeds must run"
     end
