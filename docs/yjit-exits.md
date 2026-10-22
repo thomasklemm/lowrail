@@ -259,6 +259,60 @@ The N=0 seam contains one-time JIT work, so do not pretend all three points
 are a single line through zero. This is an escaping micro, not a request
 RPS result or a headline ruby-bench result.
 
+## Independent stats-correctness follow-up
+
+**Confirmed, not part of the super fix.** The standalone
+[patch and test receipts](yjit-send-counter.json) are based on the same master pin,
+not on the super commit. It moves only the `num_send_dynamic` increment
+before `vm_sendish`, with one four-case regression test. The Ruby commit
+is local on `thomasklemm/yjit-send-counter`; no second fork branch or
+upstream PR was published. Thomas is author and committer, without trailers.
+
+Minimal repro with `ruby --yjit --yjit-stats=quiet`:
+
+```ruby
+target = Object.new
+def target.call
+  yield
+end
+def operation(target)
+  catch(:done) { target.call { throw :done, 13 } }
+end
+100.times { operation(target) }
+RubyVM::YJIT.reset_stats!
+1000.times { raise "wrong result" unless operation(target) == 13 }
+stats = RubyVM::YJIT.runtime_stats
+p stats.values_at(:send_singleton_class, :num_send_dynamic)
+```
+
+Before: **[1000, 0]**; after: **[1000, 1000]**. Separate warmed processes
+also exercise normal return, raise/rescue and block break. All four have
+1,000 singleton refusals. Normal return counts **1000 → 1000** dynamic
+sends; **raise, throw and break each count 0 → 1000**, with identical
+results (7,000 / 11,000 / 13,000 / 17,000). Counter-specific exit tracing
+also passes all four cases. These are dispatch attempts, not successful
+normal returns; no change in fallback choice or application behavior is
+intended. The real-request undercount remains the separately reconciled
+**5 / 2 attempts per blog / Fizzy request** in the finalized census.
+
+The kept regression fails on clean master (`[11, 10, 0]` rather than
+`[11, 10, 10]`) and passes with the patch. `make yjit-check`: **374 Rust,
+2,134 bootstrap, 150 Ruby YJIT tests / 714 assertions**, zero failures,
+one skip. Exception/iterator/Proc/call/super suites: **418 tests / 5,308
+assertions each** under interpreter, YJIT and ZJIT, zero failures or skips.
+All 763 collected open PR titles/bodies plus focused all-state GitHub and
+Ruby bug-tracker searches found no matching counter-placement correction.
+Closed #9022 is earlier send-counter reporting, not this correction.
+
+This is a diagnostic correction, **not a second runtime speed claim**.
+With stats off, the same fixed-seed escaping micro gives exactly the
+previous interpreter and ZJIT Ir at N=0/5,000/10,000. YJIT raw Ir becomes
+903,458 / 6,667,594 / 12,133,159: **+611 / +712 / +712** versus clean base.
+Thus the measured seam containing compilation changes slightly, while
+N=10,000 minus N=5,000 is **identical** (5,465,565 Ir) in both arms.
+Do not claim all raw YJIT counts are identical or discard that seam cost.
+There was no second timing cohort or whole-request speed measurement.
+
 ## Reproduction and handoff
 
 Use the Z3 source at
