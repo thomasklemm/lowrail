@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet L, Lobsters: KILLED after one collection extension (2026-10-22)
+
+- Main-tier off-A/off-B/on medians are 14,188/14,188/14,188 objects on `/`, 3,549/3,549/3,555 on `/s/enr7ye`; both two-seed exact controls pass.
+- Generalized only collection's blog inventory: one front-page hit/request, exact responses, but on stays at 14,188 objects in every round, never below both off arms; the loop/partials keep every allocating operation.
+- Collection's 72.00% inclusive allocation context is not removable credit (self 27 objects/request, retained); ranked AR, views/helpers, routing/URL, Rack and other caller-line evidence is in [the report](lobsters-sealed.md).
+- Native wall −1.111%/−1.400% stays inside A/A 4.098%/7.406%; no resolved allocation saving, no Ir/RPS cohort, retry, second variant or accepted real-app price.
+- Stop and retain branch-only evidence/prototype; no main promotion. Focused regression passes 1/14; broader gem checks fail, with one representative per failure group reproduced on unchanged main (details/export linked above).
+
 ## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
 
 The token-only +32 objects/request is traced to per-hit view-context constant
