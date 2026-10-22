@@ -101,6 +101,11 @@ module BlogProduction
       bytes
     end
 
+    # Materialize arguments/backtraces only in a controlled companion.
+    def self.controlled_random_bytes(provider, *args)
+      bytes(provider.name, args.fetch(0, 16), caller_locations(2, 12))
+    end
+
     def self.clock(real, caller)
       context = Thread.current.thread_variable_get(CONTEXT)
       return real unless context && caller.path == @runtime_path && caller.base_label == "call"
@@ -112,19 +117,22 @@ module BlogProduction
     end
 
     module Bytes
-      def random_bytes(*args)
-        Entropy.bytes(name, args.fetch(0, 16), caller_locations(1, 12)) || super
+      def random_bytes(...)
+        return super unless Thread.current.thread_variable_get(CONTEXT)
+        Entropy.controlled_random_bytes(self, ...) || super
       end
     end
 
     module RuntimeClock
       def clock_time
+        return super unless Thread.current.thread_variable_get(CONTEXT)
         Entropy.clock(super, caller_locations(1, 1).first)
       end
     end
 
     module WallClock
       def now(**options)
+        return super unless Thread.current.thread_variable_get(CONTEXT)
         Entropy.wall_clock(super, caller_locations(1, 1), options)
       end
     end

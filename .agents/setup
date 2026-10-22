@@ -3,7 +3,7 @@
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 packages=(build-essential libclang-dev libyaml-dev libssl-dev libreadline-dev
-  zlib1g-dev libffi-dev libsqlite3-dev libpq-dev postgresql libvips-dev)
+  zlib1g-dev libffi-dev libsqlite3-dev libpq-dev postgresql libvips-dev valgrind)
 missing=()
 for package in "${packages[@]}"; do
   dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")

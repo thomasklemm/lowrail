@@ -31,6 +31,13 @@ fn target_ruby_grammar_is_explicit_in_parse_types_and_mcp() {
             assert_eq!(types["diagnostics"], json!([format!("cannot infer from invalid Ruby: {}", source.display())]));
         }
     }
+    let external = dir.with_extension("facts.json");
+    std::fs::write(&external, facts.to_string()).unwrap();
+    std::fs::remove_file(dir.join(".lowrail/facts.json")).unwrap();
+    let external_result = Command::new(bin).arg("types").arg(&dir).arg("--facts").arg(&external).output().unwrap();
+    assert!(external_result.status.success(), "{}", String::from_utf8_lossy(&external_result.stderr));
+    assert!(!dir.join(".lowrail/facts.json").exists());
+    std::fs::remove_file(external).unwrap();
     let missing = Command::new(bin).arg("parse").arg(&source).output().unwrap();
     assert!(!missing.status.success());
     assert!(String::from_utf8_lossy(&missing.stderr).contains("target Ruby required"));
@@ -181,7 +188,7 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
         let response: Value = serde_json::from_str(&line).unwrap();
         assert_eq!(response["id"], id);
         if id == 2 {
-            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 13);
+            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 15);
         } else if id == 4 {
             assert_eq!(response["result"]["isError"], false);
             let export = &response["result"]["structuredContent"];

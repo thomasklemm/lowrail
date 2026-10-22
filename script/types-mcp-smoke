@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Read-only, source-checked MCP session for the pinned Fizzy corpus app."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("app", type=Path)
+parser.add_argument("--lowrail", default="target/debug/lowrail")
+options = parser.parse_args()
+app = options.app.resolve()
+source_path = app / "app/controllers/comments_controller.rb"
+source = source_path.read_bytes()
+lines = source.splitlines()
+
+
+def position(fragment, token):
+    matches = [(i + 1, row.index(token) + 1) for i, row in enumerate(lines) if fragment in row]
+    assert len(matches) == 1, (fragment, matches)
+    return matches[0]
+
+
+call_line, call_column = position(b"Comment.new(comment_params)", b"new")
+definition_line, _ = position(b"def new_comment", b"new_comment")
+dynamic_line, dynamic_column = position(b"@comment.update! comment_params", b"update!")
+assert b"class CommentsController < ApplicationController" in source
+assert lines[definition_line] == b"      Comment.new(comment_params)"
+process = subprocess.Popen([str(Path(options.lowrail).resolve()), "mcp", str(app)],
+                           stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+session = []
+
+
+def exchange(method, params):
+    request = {"jsonrpc": "2.0", "id": len(session) + 1, "method": method, "params": params}
+    process.stdin.write(json.dumps(request) + "\n")
+    process.stdin.flush()
+    response = json.loads(process.stdout.readline())
+    session.append({"request": request, "response": response})
+    assert response["id"] == request["id"] and "error" not in response, response
+    return response["result"]
+
+
+def call(name, arguments):
+    result = exchange("tools/call", {"name": name, "arguments": arguments})
+    assert not result["isError"], result
+    return result["structuredContent"]
+
+
+try:
+    assert exchange("initialize", {"protocolVersion": "2025-06-18",
+                    "clientInfo": {"name": "lowrail-fizzy-source-check", "version": "1"}})["serverInfo"]["name"] == "lowrail"
+    process.stdin.write(json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n")
+    tools = exchange("tools/list", {})["tools"]
+    assert {"type_at_position", "type_of", "find_definition"} <= {t["name"] for t in tools}
+    at = call("type_at_position", {"path": str(source_path.relative_to(app)),
+                                   "line": call_line, "column": call_column})
+    assert at["target"] == "Comment.new" and at["fact"]["name"] == "Comment", at
+    assert at["fact"]["evidence"] == "static" and at["proven_type"] is None, at
+    signature = call("type_of", {"target": "CommentsController#new_comment"})
+    assert signature["signature"] == "() -> Comment", signature
+    definition = call("find_definition", {"target": "CommentsController#new_comment"})
+    assert Path(definition["path"]) == source_path and definition["line"] == definition_line, definition
+    assert definition["origin"]["category"] == "def", definition
+    constructor = call("find_definition", {"target": "Comment.new"})
+    constructor_source = Path(constructor["path"]).read_bytes()
+    constructor_row = constructor_source.splitlines()[constructor["line"] - 1]
+    assert constructor["owner"] == "ActiveRecord::Inheritance::ClassMethods", constructor
+    assert b"def new(attributes = nil, &block)" in constructor_row, constructor_row
+    dynamic = call("type_at_position", {"path": str(source_path.relative_to(app)),
+                                        "line": dynamic_line, "column": dynamic_column})
+    assert dynamic["available"] is False, dynamic
+    assert source_path.read_bytes() == source, "source query modified the application"
+finally:
+    process.stdin.close()
+    assert process.wait(timeout=60) == 0
+
+print(json.dumps({"format": 1, "checks_passed": True,
+    "checks": ["type-at-position matches constructor source", "method signature matches body",
+               "definition matches exact source line", "constructor matches effective Rails source",
+               "dynamic receiver refused", "call type not promoted to proof", "source unchanged"],
+    "source": {"path": str(source_path.relative_to(app)), "sha256": hashlib.sha256(source).hexdigest(),
+               "call_line": call_line, "call_column": call_column, "definition_line": definition_line},
+    "constructor_source_sha256": hashlib.sha256(constructor_source).hexdigest(), "session": session}, indent=2))

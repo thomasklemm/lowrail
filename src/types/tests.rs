@@ -2,16 +2,68 @@ use super::*;
 use serde_json::json;
 
 #[test]
+fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() {
+    let dir = std::env::temp_dir().join(format!("lowrail-type-values-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("example.rb");
+    let bodies = [
+        ("tail", "external; 7", "Integer"),
+        ("array", "['hello', 7]", "Array[(Integer | String)]"),
+        ("hash", "{ label: 'hello', count: 7 }", "Hash[Symbol, (Integer | String)]"),
+        ("unknown_element", "[external]", "Array[untyped]"),
+        ("branches", "if external; 'yes'; else; 7; end", "(Integer | String)"),
+        ("missing_branch", "7 unless external", "(Integer | nil)"),
+        ("branch_locals", "if external; value = 7; else; value = 'yes'; end; value", "(Integer | String)"),
+        ("nested_union", "if external; if other; 7; else; 'yes'; end; else; 7; end", "(Integer | String)"),
+        ("nested_nil", "if external; 'yes'; elsif other; 'no'; end", "(String | nil)"),
+        ("container_union", "if external; ['yes', 7]; else; [false]; end", "(Array[(Integer | String)] | Array[bool])"),
+        ("nullable", "if external; text; else; nil; end", "String?"),
+        ("nullable_array", "[text]", "Array[String?]"),
+        ("datetime_array", "[created_at]", "Array[(Time | ActiveSupport::TimeWithZone)?]"),
+        ("datetime_both", "if external; created_at; else; created_at; end", "(Time | ActiveSupport::TimeWithZone)?"),
+        ("datetime_union", "if external; created_at; else; 'yes'; end", "((Time | ActiveSupport::TimeWithZone)? | String)"),
+        ("unknown_branch", "if external; 7; else; other; end", "untyped"),
+        ("interpolation", r#""value #{external}""#, "String"),
+        ("interpolation_escape", r##""#{external ? (return 7) : 'ok'}""##, "untyped"),
+        ("interpolation_mutation", r##"value = 7; "#{object}"; value"##, "untyped"),
+        ("hash_mutation", "value = 7; { external => 1 }; value", "untyped"),
+        ("autoload_mutation", "value = 7; Other.new; value", "untyped"),
+        ("early", "[external ? (return 7) : 'ok']; 'tail'", "untyped"),
+        ("nested_early", "{ value: helper(external ? (return 7) : 'ok') }; 'tail'", "untyped"),
+        ("block", "external { return 7 }; 'tail'", "untyped"),
+        ("stale_ivar", "@value = 7; external; @value", "untyped"),
+        ("stale_local", "value = 7; external(binding); value", "untyped"),
+    ];
+    let source = bodies.iter().map(|(name, body, _)| format!("def {name}; {body}; end\n")).collect::<String>();
+    let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
+    assert!(parser.parse(source.as_bytes()).errors().next().is_none());
+    std::fs::write(&file, source).unwrap();
+    let methods: Vec<_> = bodies.iter().enumerate().map(|(i, (name, _, _))|
+        json!({"name":name,"source_location":format!("{}:{}",file.display(),i+1)})).collect();
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "models":[{"name":"Example","columns":[{"name":"text","type":"string"},
+            {"name":"created_at","type":"datetime"}]}],
+        "modules":[{"name":"Example","kind":"class","methods":methods}]})).unwrap();
+    let model = TypeModel::from_facts(&facts).unwrap();
+    for (name, _, expected) in bodies {
+        let ty = model.fact(&format!("Example#{name}"), "return").unwrap();
+        assert_eq!(ty.name, expected, "{name}");
+        assert_eq!(ty.proven_type(), None, "{name} is not a call/context proof");
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn coverage_counts_return_and_argument_slots_not_samples_or_ivars() {
     let dir = std::env::temp_dir().join(format!("lowrail-type-coverage-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let file = dir.join("example.rb");
-    std::fs::write(&file, "class Example\n def proven = 7\n def inferred = proven\n def sampled(value); external(value); end\n def unknown; external; end\nend\n").unwrap();
+    std::fs::write(&file, "class Example < Struct\n def proven = 7\n def inferred = proven\n def sampled(value); external(value); end\n def unknown; external; end\nend\n").unwrap();
     let methods: Vec<_> = [("proven",2),("inferred",3),("sampled",4),("unknown",5)].into_iter()
         .map(|(name,line)| json!({"name":name,"source_location":format!("{}:{line}",file.display()),
             "parameters":if name == "sampled" { json!([["req","value"]]) } else { json!([]) }})).collect();
     let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
-        "modules":[{"name":"Example","kind":"class","methods":methods}]})).unwrap();
+        "modules":[{"name":"Example","kind":"class","superclass":"Struct","methods":methods}]})).unwrap();
     let mut model = TypeModel::from_facts(&facts).unwrap();
     model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":[
         {"module":"Example","name":"sampled","calls":3,"returns":{"String":3},
@@ -21,6 +73,8 @@ fn coverage_counts_return_and_argument_slots_not_samples_or_ivars() {
     assert_eq!(model.typed_facts()["coverage"], expected);
     let export = serde_json::to_value(model.export_rbs(&facts)).unwrap();
     assert_eq!(export["coverage"], expected);
+    assert!(export["files"]["app.rbs"].as_str().unwrap().contains("class Example < ::Struct[untyped]"));
+    assert!(!export["files"]["app.rbs"].as_str().unwrap().contains("class Struct\n"));
     let comment = export["files"]["app.rbs"].as_str().unwrap().lines()
         .find_map(|line| line.strip_prefix("# lowrail coverage: ")).unwrap();
     assert_eq!(serde_json::from_str::<serde_json::Value>(comment).unwrap(), expected);
@@ -189,10 +243,12 @@ fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides()
     std::fs::create_dir_all(&dir).unwrap();
     let file = dir.join("article.rb");
     let source = "class Article\n def self.make = new(title: 'hello')\n def self.list = includes(:comments).order(created_at: :desc)\n def self.early = new(title: (external ? (return 7) : 'ok'))\n def self.nested = new(title: helper(external ? (return 7) : 'ok'))\n def self.blocked = new { break 7 }\n def self.custom = Other.new\n def live? = 'override'\nend\nclass Other\n def self.new = 'not an instance'\nend\n";
-    std::fs::write(&file, source).unwrap();
+    let source = format!("{source}class Article\n def self.filtered = where(title: 'hello').exists?\n def self.chain = where\n def self.nil_condition = where(nil).order(:title)\n def self.wrong_chain = where.order(:title)\nend\n");
+    std::fs::write(&file, &source).unwrap();
     let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
     assert!(parser.parse(source.as_bytes()).errors().next().is_none());
-    let mut methods: Vec<_> = [("make",2),("list",3),("early",4),("nested",5),("blocked",6),("custom",7)]
+    let mut methods: Vec<_> = [("make",2),("list",3),("early",4),("nested",5),("blocked",6),("custom",7),
+        ("filtered",14),("chain",15),("nil_condition",16),("wrong_chain",17)]
         .into_iter().map(|(name,line)| json!({"name":name,"singleton":true,
             "source_location":format!("{}:{line}",file.display())})).collect();
     methods.push(json!({"name":"live?","owner":"Article","source_location":format!("{}:8",file.display())}));
@@ -203,8 +259,10 @@ fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides()
             {"name":"Article","kind":"class","ancestors":["Article","#<Enum:0x>","Trailing"],"singleton_ancestors":["#<Class:Article>","ActiveRecord::Inheritance::ClassMethods","ActiveRecord::Querying"],"methods":methods},
             {"name":"Other","kind":"class","methods":[{"name":"new","singleton":true,"source_location":format!("{}:11",file.display())}]},
             {"name":"ActiveRecord::Inheritance::ClassMethods","methods":[{"name":"new","owner":"ActiveRecord::Inheritance::ClassMethods","source_location":"/rails/lib/active_record/inheritance.rb:56"}]},
-            {"name":"ActiveRecord::Querying","methods":[{"name":"includes","owner":"ActiveRecord::Querying","source_location":"/rails/lib/active_record/querying.rb:24","parameters":[["rest","args"],["keyrest","kwargs"],["block","block"]]}]},
-            {"name":"ActiveRecord::Relation","kind":"class","ancestors":["ActiveRecord::QueryMethods"]},
+            {"name":"ActiveRecord::Querying","methods":[{"name":"includes","owner":"ActiveRecord::Querying","source_location":"/rails/lib/active_record/querying.rb:24","parameters":[["rest","args"],["keyrest","kwargs"],["block","block"]]},
+                {"name":"where","owner":"ActiveRecord::Querying","source_location":"/rails/lib/active_record/querying.rb:24"}]},
+            {"name":"ActiveRecord::Relation","kind":"class","ancestors":["ActiveRecord::QueryMethods","ActiveRecord::FinderMethods"]},
+            {"name":"ActiveRecord::FinderMethods","methods":[{"name":"exists?","owner":"ActiveRecord::FinderMethods","source_location":"/rails/lib/active_record/relation/finder_methods.rb:357"}]},
             {"name":"ActiveRecord::QueryMethods","methods":[{"name":"order","owner":"ActiveRecord::QueryMethods","source_location":"/rails/lib/active_record/relation/query_methods.rb:1"}]},
             {"name":"Trailing","methods":[{"name":"draft?","owner":"Trailing"}]},
             {"name":"Article._enum_methods_module","synthetic":true,"methods":[
@@ -215,12 +273,14 @@ fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides()
     let model = TypeModel::from_facts(&facts).unwrap();
     for (target, expected) in [("Article.new","Article"),("Article.make","Article"),
         ("Article.list","ActiveRecord::Relation[Article]"),("Article.custom","String"),
+        ("Article.filtered","bool"),("Article.chain","ActiveRecord::QueryMethods::WhereChain"),
+        ("Article.nil_condition","ActiveRecord::Relation[Article]"),
         ("Article#draft?","bool"),("Article#live?","String"),("Article#id","String?")] {
         let ty = model.fact(target,"return").unwrap_or_else(|| panic!("missing {target}"));
         assert_eq!(ty.name, expected, "{target}");
         if !matches!(target, "Article#live?") { assert_eq!(ty.proven_type(), None, "{target}"); }
     }
-    for target in ["Article.early","Article.nested","Article.blocked"] {
+    for target in ["Article.early","Article.nested","Article.blocked","Article.wrong_chain"] {
         assert_eq!(model.fact(target,"return").unwrap().name, "untyped", "{target}");
     }
     assert!(model.fact("Article.make","return").unwrap().provenance.iter().any(|p| p.source == Source::RailsApi && p.detail.contains("8.1.4")));

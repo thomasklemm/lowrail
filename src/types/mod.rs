@@ -1,6 +1,7 @@
 //! Boot-first advisory types. These are not guards and never authorize lowering.
 mod infer;
 mod observed;
+mod position;
 mod rails;
 mod rbs;
 mod sorbet;
@@ -389,6 +390,10 @@ impl TypeModel {
             "coverage":rbs::coverage(self), "conflicts":self.conflicts, "diagnostics":self.diagnostics})
     }
 
+    pub fn type_at_position(&self, facts: &Facts, path: &str, line: u64, column: u64) -> Result<serde_json::Value, String> {
+        position::query(self, facts, path, line, column)
+    }
+
     pub fn export_rbs(&self, facts: &Facts) -> rbs::Export<'_> {
         rbs::export(self, facts)
     }
@@ -422,7 +427,7 @@ fn nullable(ty: &str, null: bool) -> String {
 }
 
 pub fn cli(args: &[String]) -> Result<(), String> {
-    let usage = "usage: lowrail types --rbs APP (standalone RBS to stdout) | types APP [--rbs OUT_DIR] (JSON and optional RBS files)";
+    let usage = "usage: lowrail types --rbs APP (standalone RBS to stdout) | types APP [--facts PATH] [--rbs OUT_DIR] (JSON and optional RBS files)";
     if let [flag, app] = args && flag == "--rbs" {
         let facts = facts::load(Path::new(app).join(".lowrail/facts.json"))?;
         let model = TypeModel::load(Path::new(app), &facts)?;
@@ -432,13 +437,21 @@ pub fn cli(args: &[String]) -> Result<(), String> {
         return Ok(());
     }
     let (app, rest) = args.split_first().ok_or(usage)?;
-    if !(rest.is_empty() || rest.len() == 2 && rest[0] == "--rbs") {
-        return Err(usage.into());
+    let mut facts_path = Path::new(app).join(".lowrail/facts.json");
+    let mut out = None;
+    let mut options = rest.chunks_exact(2);
+    for pair in &mut options {
+        match pair[0].as_str() {
+            "--facts" => facts_path = pair[1].clone().into(),
+            "--rbs" => out = Some(Path::new(&pair[1])),
+            _ => return Err(usage.into()),
+        }
     }
-    let facts = facts::load(Path::new(app).join(".lowrail/facts.json"))?;
+    if !options.remainder().is_empty() { return Err(usage.into()); }
+    let facts = facts::load(facts_path)?;
     let model = TypeModel::load(Path::new(app), &facts)?;
-    if rest.len() == 2 {
-        model.write_rbs(&facts, Path::new(&rest[1]))?;
+    if let Some(out) = out {
+        model.write_rbs(&facts, out)?;
     }
     println!(
         "{}",
