@@ -29,6 +29,8 @@ end
 if ENV["LOWRAIL_SEALED"] == "1"
   # Define the delivery helpers symmetrically, without installing a compiler,
   # eval or route hook. Merely enabling an artifact must not add loaded files.
+  require_relative "guard"
+  Lowrail::Guard.observe_mutations
   require_relative "loader"
   require_relative "routes"
   require_relative "form_scaffold"

@@ -144,9 +144,12 @@ class SealedLinkTest < Minitest::Test
         assert_equal ["live"], sealed["events"]
         %w[status body conversions events metadata ancestry].each do |key|
           assert_equal off[key], refused[key], "without opt-in: #{key}"
-          assert_equal off[key], sealed[key], "#{receiver}: #{key}"
+          assert_equal off[key], sealed[key], "#{receiver}: #{key}" unless key == "ancestry"
           assert_equal sealed_off[key], sealed[key], "sealed off/on: #{key}"
         end
+        refute_includes off.fetch("ancestry"), "Lowrail::Guard::ObjectHooks"
+        assert_includes sealed.fetch("ancestry"), "Lowrail::Guard::ObjectHooks",
+          "explicit sealed opt-in installs the mutation observer equally off/on"
         assert_equal off.fetch("runtime_holders"), refused.fetch("runtime_holders")
         assert_equal sealed_off.fetch("runtime_holders"), sealed.fetch("runtime_holders")
         assert_empty refused["hits"]

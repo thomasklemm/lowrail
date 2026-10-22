@@ -46,9 +46,11 @@ module Lowrail
       view_class = controller && IVAR.bind_call(controller, :@view_context_class)
       return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("application_class")
+      mutation_holders = {native => [:exact_class?], BasicObject => [:instance_exec]}
       data.fetch("methods").each do |entry|
         type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))
         return "dependency #{entry['holder']} not already loaded; keep original" unless type
+        (mutation_holders[type] ||= []) << entry.fetch("method")
         method = entry["singleton"] ? type.method(entry.fetch("method")) : type.instance_method(entry.fetch("method"))
         if [TokenTag::Variant, CollectionRender::Variant].include?(method.owner)
           return "observer body changed; rebuild" unless Sealed.signature(method) == data.fetch("observer")
@@ -60,7 +62,7 @@ module Lowrail
         return "visibility #{entry['holder']}##{entry['method']} changed; rebuild" if expected["visibility"] &&
           Sealed.visibility(type, entry.fetch("method")) != expected.fetch("visibility")
       end
-      {holder: exact, view_class: view_class}
+      {holder: exact, view_class: view_class, mutation_holders: mutation_holders}
     end
 
     module Admission
@@ -105,9 +107,11 @@ module Lowrail
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = RenderUnits.check(@data, view)
           return decline(result) if String === result
+          mutation_holders = result.delete(:mutation_holders)
           result.each { |key, value| instance_variable_set(:"@#{key}", value) }
           reason = witness(view)
           return decline(reason) if reason
+          Sealed.watch(mutation_holders, @epoch)
           return decline("seal epoch changed during admission; keep original") unless @epoch[0].zero?
           @refusal = nil
           @pending = false

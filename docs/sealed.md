@@ -34,6 +34,42 @@ An app may adapt its code to this contract, or narrow its certified set. It
 need not adopt sealed mode to use Lowrail. A known violation refuses the
 sealed artifact/region and runs original code, with a ledger explanation.
 
+### Production mutation tripwire (not enforcement)
+
+After successful passive admission, the form, token and collection units
+register their certified call names on each holder and its existing ancestors.
+The link unit uses the same mechanism if admitted. `method_missing` and
+`respond_to_missing?` are tracked too. Ordinary method definition, alias,
+removal/undef and singleton-method callbacks for those names trip the existing
+process-wide Seal/Sealed epoch; include/prepend/extend on a registered
+destination trips regardless of the source module's names. Later entries take
+their original bodies and count fallbacks. Restoration does not reauthorize.
+The other sealed-only passes retain ordinary Guard fact invalidation.
+
+These hooks reuse Guard's Module/BasicObject chains, installed identically in
+both explicit sealed arms before application boot. Guard owns the single
+holder/name registry and notification path: the sealed tier registers an epoch
+invalidation client, alongside ordinary fact invalidation, not another hook
+chain or registry. Admission adds no wrapper to an application holder and
+creates no singleton class. The fast paths keep
+their existing epoch reads: no per-call identity check, request-completion
+observer or additional hot-path guard. A new Rails compiled-template method
+is not a certified helper name and therefore does not retire the process;
+first rendering another route/partial/layout remains lazy.
+
+This is a cheap backstop for plain contract breaches, **not a VM mutation
+barrier**. Suppressed callbacks, saved `UnboundMethod#bind_call` bypasses,
+native writes, refinements, constant/config/table changes and standalone
+visibility edits are still contract-only, not detected by this production
+tripwire. Ruby's visibility setters emit no mutation callback; wrapping lexical
+argument-less `private`/`protected`/`public` in Ruby changes its semantics.
+Unknown instance singleton mutations likewise have no complete callback
+coverage here; existing actual-holder/input checks remain necessary. The
+diagnostic `seal-check` snapshots described below are a separate test tool,
+not production coverage of these gaps. In-flight mutations still require the
+existing post-live-call epoch check and a valid continuation; this does not
+make arbitrary expanded regions safe.
+
 ### Rule IDs and additional boundaries
 
 The single rule catalog is [`SealRules::RULES`](../gem/lib/lowrail/seal_rules.rb):

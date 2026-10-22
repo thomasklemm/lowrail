@@ -34,6 +34,7 @@ module Lowrail
     MOD_NAME = Module.instance_method(:name)
     SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
     ARRAY_EACH = Array.instance_method(:each)
+    ANCESTORS = Module.instance_method(:ancestors)
 
     class << self
       attr_reader :manifest, :state
@@ -43,6 +44,8 @@ module Lowrail
         @state = state
         @units = manifest.units.to_h { |u| [u.fetch("id"), u] }
         @names = manifest.units_by_method
+        @targets ||= {}.compare_by_identity
+        @targets[nil] = @names # Ordinary facts invalidate by name, on any holder.
         @overrides = {} # name => ObjectSpace::WeakMap{obj => true}
         # Compiler refusals can leave gaps in the manifest's unit IDs.
         K.replace(Array.new((@units.keys.max || -1) + 1, NO_RECEIVER))
@@ -55,9 +58,8 @@ module Lowrail
         install_hooks(manifest)
       end
 
-      # Only selected method facts need invalidation. Facts-free sealed units
-      # use their own certificates, not these hooks. Source delivery also needs
-      # ModuleHooks to rehook a later Bootsnap prepend. Install the same chain
+      # Only selected method facts need ordinary invalidation. Source delivery
+      # also needs ModuleHooks to rehook a later Bootsnap prepend. Install the same chain
       # in the explicit off arm; its empty indexes leave app methods untouched.
       def install_hooks(manifest)
         return if manifest.refusal_reason
@@ -65,13 +67,49 @@ module Lowrail
         invalidation = manifest.units.any? do |unit|
           (!selected || selected.include?(unit.fetch("id"))) && !unit.fetch("facts").empty?
         end
+        sealed = ENV["LOWRAIL_SEALED"] == "1"
+        if invalidation || !manifest.files.empty? || sealed
+          observe_mutations(singletons: invalidation || sealed)
+        end
+      end
+
+      # One installer and one target table for ordinary facts and holder-scoped
+      # clients. Explicit sealed setup calls this equally in both arms before
+      # boot; publishing a client never changes an application holder.
+      def observe_mutations(singletons: true)
         @names ||= {}
-        if invalidation || !manifest.files.empty?
-          Module.prepend(ModuleHooks) unless Module < ModuleHooks
+        @targets ||= {}.compare_by_identity
+        @targets[nil] = @names
+        Module.prepend(ModuleHooks) unless Module < ModuleHooks
+        BasicObject.prepend(ObjectHooks) if singletons && !(BasicObject < ObjectHooks)
+      end
+
+      # Clients supply only the invalidation action. Guard owns holder/name
+      # registration, inherited dispatch and mutation notification. nil names
+      # register ancestry changes; unrelated lazy method definitions stay live.
+      def watch(facts, &client)
+        resolved = {}.compare_by_identity
+        facts.each do |holder, names|
+          names = [*names.map(&:to_sym), :method_missing, :respond_to_missing?, nil].to_h { [_1, true] }
+          ANCESTORS.bind_call(holder).each { (resolved[_1] ||= {}).merge!(names) }
         end
-        if invalidation
-          BasicObject.prepend(ObjectHooks) unless BasicObject < ObjectHooks
+        # Enumerate only already-existing eigenclasses. Calling singleton_class
+        # here would itself change the holder/ancestry surface we must preserve.
+        ObjectSpace.each_object(Class) do |holder|
+          next unless holder.singleton_class? && (names = resolved[holder.attached_object])
+          ANCESTORS.bind_call(holder).each { (resolved[_1] ||= {}).merge!(names) }
         end
+        resolved.each do |holder, names|
+          targets = (@targets[holder] ||= {})
+          names.each_key { |name| (targets[name] ||= []) << client unless targets[name]&.include?(client) }
+        end
+      end
+
+      def changed(holder, name = nil)
+        reset_method(name) if name
+        return unless @targets && Module === holder
+        names = @targets[holder] || holder.singleton_class? && @targets[holder.attached_object]
+        invalidate(names[name]) if names
       end
 
       def installed? = !@manifest.nil?
@@ -88,10 +126,20 @@ module Lowrail
 
       # Hot at boot: called for every method definition in the process.
       def reset_method(name)
-        ids = @names[name] or return
+        invalidate(@names[name])
+      end
+
+      def invalidate(clients)
+        return unless clients
         # Late YJIT.enable temporarily undefines Array#each while replacing it.
         # Invalidation must not dispatch through the method being invalidated.
-        ARRAY_EACH.bind_call(ids) { |id| @state[id] = nil; V[id] = nil; K[id] = NO_RECEIVER }
+        ARRAY_EACH.bind_call(clients) do |client|
+          if Integer === client
+            @state[client] = nil; V[client] = nil; K[client] = NO_RECEIVER
+          else
+            client.call
+          end
+        end
       end
 
       # A module was included/prepended/extended: every tracked name it (or
@@ -269,26 +317,28 @@ module Lowrail
       private
 
       def method_added(name)
-        Guard.reset_method(name)
+        Guard.changed(self, name)
         super
       end
 
       def method_removed(name)
-        Guard.reset_method(name)
+        Guard.changed(self, name)
         super
       end
 
       def method_undefined(name)
-        Guard.reset_method(name)
+        Guard.changed(self, name)
         super
       end
 
       def append_features(base)
+        Guard.changed(base)
         Guard.reset_module(self)
         super
       end
 
       def prepend_features(base)
+        Guard.changed(base)
         Guard.reset_module(self)
         result = super
         Loader.prepended_to(base, self) if defined?(Loader)
@@ -296,11 +346,30 @@ module Lowrail
       end
 
       def extend_object(obj)
+        Guard.changed(obj)
         if Module === obj
           Guard.reset_module(self)
         else
           Guard.note_extend(self, obj)
         end
+        super
+      end
+
+      # Completion callbacks also cover modules that override the feature hook
+      # without super. An ancestry notification is conservative, not a claim
+      # that Ruby necessarily changed the destination's ancestor chain.
+      def included(base)
+        Guard.changed(base)
+        super
+      end
+
+      def prepended(base)
+        Guard.changed(base)
+        super
+      end
+
+      def extended(obj)
+        Guard.changed(obj)
         super
       end
     end
@@ -328,10 +397,9 @@ module Lowrail
     end
 
     def self.singleton_changed(obj, name)
-      return unless @names.key?(name)
       if Module === obj
-        reset_method(name)
-      else
+        changed(obj, name)
+      elsif @names.key?(name)
         note_override(obj, name)
       end
     end

@@ -83,10 +83,12 @@ module Lowrail
       return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("inventory").fetch("application_class")
 
+      mutation_holders = {native => [:exact_class?], BasicObject => [:instance_exec]}
       data.fetch("inventory").fetch("methods").each do |name, expected|
         if name == "template_compiler"
           type = Lowrail.loaded_constant("ActionView::Template")
           return "template dependency not already loaded" unless type
+          (mutation_holders[type] ||= []) << :compiled_source
           method = type.instance_method(:compiled_source)
           method = method.super_method if defined?(Templates::CompiledSource) && method.owner.equal?(Templates::CompiledSource)
           return "template compiler changed; rebuild" unless FormScaffoldInventory.runtime_fact(method) == expected
@@ -98,6 +100,7 @@ module Lowrail
         type = target == "view" ? view_class : Lowrail.loaded_constant(target)
         return "dependency #{target} not already loaded; keep original" unless type
         facts = constructor ? {"new" => expected} : expected
+        (mutation_holders[type] ||= []).concat(facts.keys)
         facts.each do |method_name, fact|
           method = singleton || constructor ? type.method(method_name) : type.instance_method(method_name)
           method = method.super_method if target == "view" && method_name == "form_with" && method.owner.equal?(FormScaffold::Variant)
@@ -129,6 +132,7 @@ module Lowrail
         type_name, method_name = target.split(".", 2)
         type = Lowrail.loaded_constant(type_name)
         return "cache owner #{type_name} not already loaded" unless type
+        (mutation_holders[type] ||= []) << method_name
         method = type.method(method_name)
         return "cache reader #{target} changed; rebuild" unless Sealed.signature(method) == expected
         [target, method.call]
@@ -212,7 +216,8 @@ module Lowrail
       return "natural form body differs; rebuild" unless sequence && block_signature(sequence, ivar(template, :@method_name)) == passive.fetch("block_iseq")
       {holder: exact, view_class: view_class, article_class: article, model_class: comment,
         form_class: builder, builder_class: Lowrail.loaded_constant("ActionView::Helpers::TagHelper::TagBuilder"),
-        buffer_class: Lowrail.loaded_constant("ActionView::OutputBuffer"), table: ActionView::Helpers::TagHelper::PRE_CONTENT_STRINGS}.freeze
+        buffer_class: Lowrail.loaded_constant("ActionView::OutputBuffer"), table: ActionView::Helpers::TagHelper::PRE_CONTENT_STRINGS,
+        mutation_holders: mutation_holders}
     rescue StandardError, ScriptError => error
       "passive admission: #{error.class}: #{error.message.lines.first&.strip}; keep original"
     end

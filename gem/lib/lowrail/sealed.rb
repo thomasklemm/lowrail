@@ -3,8 +3,8 @@
 module Lowrail
   # The first sealed pilot is deliberately narrower than the contract: stock
   # Rails 8.1.4 blog views, literal link names/classes, and live URL generation.
-  # No invalidation claim: production must honor SEAL001–009. Test processes
-  # refuse this delivery; seal-check observes their original executions.
+  # Mutation callbacks trip the existing epoch, not a complete VM barrier:
+  # production must still honor SEAL001–009. Test processes refuse delivery.
   module Sealed
     PASS = "sealed/link_to"
     ACTIVE = [false]
@@ -55,6 +55,12 @@ module Lowrail
         Lowrail.debug("sealed refused: #{reason}")
       end
 
+      # A Guard client, not a second mutation registry or hook chain. The
+      # admitted unit keeps its existing epoch read as the only hot-path cost.
+      def watch(holders, epoch)
+        Guard.watch(holders) { epoch[0] += 1 }
+      end
+
       # The default preserves the separate build-time form audit. Link always
       # supplies its native predicate; it never falls back to objspace.
       def literal_state?(exact_class: ->(object, expected) { ObjectSpace.internal_class_of(object).equal?(expected) })
@@ -93,6 +99,9 @@ module Lowrail
         return decline("controller missing") unless controller
         @view_class = controller.instance_variable_get(:@view_context_class)
         return decline("view context class not already materialized; keep original") unless @view_class
+        mutation_holders = {native => [:exact_class?], BasicObject => [:instance_exec],
+          @view_class => @data.fetch("view_methods").keys,
+          ActionView::Helpers::TagHelper::TagBuilder => [*@data.fetch("builder_methods").keys, :new]}
         @data.fetch("view_methods").each do |name, expected|
           actual = @view_class.instance_method(name)
           return decline("view method #{name}") unless signature(actual) == expected.fetch("signature") &&
@@ -105,6 +114,7 @@ module Lowrail
         end
         @data.fetch("primitive_methods").each do |expected|
           holder = Lowrail.loaded_constant(expected.fetch("holder"))
+          (mutation_holders[holder] ||= []) << expected.fetch("method")
           actual = expected["singleton"] ? holder.method(expected.fetch("method")) : holder.instance_method(expected.fetch("method"))
           return decline("primitive #{expected['holder']}##{expected['method']}") unless signature(actual) == expected.fetch("signature")
         end
@@ -112,6 +122,7 @@ module Lowrail
           holder = Lowrail.loaded_constant(expected.fetch("holder"))
           return decline("edited body #{expected['method']}") unless holder &&
             signature(holder.instance_method(expected.fetch("method"))) == expected.fetch("signature")
+          (mutation_holders[holder] ||= []) << expected.fetch("method")
         end
         builder = ActionView::Helpers::TagHelper::TagBuilder
         return decline("custom constructor") unless signature(builder.method(:new)) == @data.fetch("constructor")
@@ -122,6 +133,8 @@ module Lowrail
         @epoch = defined?(Lowrail::Seal) ? Lowrail::Seal::EPOCH : EPOCH
         require_relative "templates"
         Templates.install(Lowrail.manifest.templates.merge(@data.fetch("templates")))
+        watch(mutation_holders, @epoch)
+        return decline("seal epoch changed; keep original") unless @epoch[0].zero?
         ACTIVE[0] = true
         @refusal = nil
       rescue StandardError, ScriptError => error
@@ -151,8 +164,8 @@ module Lowrail
       end
 
       def link?(view, url, html, css)
-        # Recheck diagnostic deopt after live conversion/URL code. It is NOT
-        # a structural VM epoch and cannot enforce the production promise.
+        # Recheck callback/diagnostic deopt after live conversion/URL code.
+        # This is not a structural VM epoch or complete contract enforcement.
         return count(false) unless @epoch[0].zero? && String === url &&
           ENCODING.bind_call(url) == Encoding::UTF_8 && VALID.bind_call(url) &&
           html.size == 2 && html["class"] == css && html["href"].equal?(url)
