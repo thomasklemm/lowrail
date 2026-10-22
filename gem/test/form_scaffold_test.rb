@@ -5,6 +5,76 @@ require_relative "test_helper"
 class FormScaffoldTest < Minitest::Test
   include LowrailTest
 
+  def test_collection_admission_outside_blog_keeps_live_helpers_and_layout_fallback
+    skip "sealed collection requires Ruby 4.0.7" unless RUBY_VERSION == "4.0.7"
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |app|
+      LowrailTest.write_rails_app(app,
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
+        "Gemfile.lock" => "",
+        "config/application.rb" => <<~'RUBY',
+          require "rails"
+          require "active_record/railtie"
+          require "action_controller/railtie"
+          require "action_view/railtie"
+          class CollectionApp < Rails::Application
+            config.root = File.expand_path("..", __dir__)
+            config.eager_load = true
+            config.logger = Logger.new(nil)
+            config.secret_key_base = "x" * 64
+            config.yjit = false
+          end
+        RUBY
+        "config/environment.rb" => "require_relative 'application'\nRails.application.initialize!\n",
+        "config/database.yml" => "production:\n  adapter: sqlite3\n  database: database.sqlite3\n",
+        "config/routes.rb" => "Rails.application.routes.draw { get '/pages', to: 'pages#index'; get '/other', to: 'other_pages#index' }",
+        "app/controllers/pages_controller.rb" => <<~'RUBY',
+          class PagesController < ApplicationController
+            helper_method :decorate
+            def index
+              @items = ["left<&", "right>"]
+              render "pages/index"
+            end
+            def decorate(value)
+              @calls = (@calls || 0) + 1
+              "#{params[:marker]}:#{value}:#{@calls}"
+            end
+          end
+        RUBY
+        "app/controllers/other_pages_controller.rb" => "class OtherPagesController < PagesController; end\n",
+        "app/views/pages/index.html.erb" => '<%= render partial: "pages/item", collection: @items, as: :entry, layout: params[:layout] ? "pages/wrap" : nil %>',
+        "app/views/pages/_item.html.erb" => '<%= decorate(entry) %>:<%= entry_counter %>:<%= entry_iteration.index %>|',
+        "app/views/pages/_wrap.html.erb" => '<section><%= yield %></section>')
+      env = CLEAN_ENV.merge("RAILS_ENV" => "production", "LOWRAIL_BUILD_JIT" => "0")
+      out, err, status = Open3.capture3(env, lowrail_cli, "build", app, "--sealed", "--env", "production")
+      assert status.success?, "#{out}\n#{err}"
+      units = JSON.parse(File.read(File.join(app, ".lowrail/manifest.json"))).fetch("units")
+      assert_equal ["sealed/collection_render"], units.map { _1.fetch("pass") }
+      scenario = <<~'RUBY'
+        require "./config/environment"
+        require "rack/mock"
+        rack = Rack::MockRequest.new(Rails.application)
+        paths = ["/pages?marker=A", "/pages?marker=B", "/other?marker=C", "/pages?marker=D&layout=1"]
+        responses = paths.map do |path|
+          response = rack.get(path, "HTTP_HOST" => "example.org")
+          [response.status, response.body]
+        end
+        puts JSON.generate(responses: responses, hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks)
+      RUBY
+      off, on = %w[0 1].map do |enabled|
+        ruby_json(scenario, chdir: app, env: env.merge("RUBYOPT" => SETUP_OPT,
+          "LOWRAIL" => enabled, "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""))
+      end
+      assert_equal off.fetch("responses"), on.fetch("responses")
+      assert_equal [200, 200, 200, 200], on.fetch("responses").map(&:first)
+      assert_includes on.fetch("responses")[2][1], "C:left&lt;&amp;:1:0:0|C:right&gt;:2:1:1|"
+      assert_includes on.fetch("responses")[3][1], "<section>D:left&lt;&amp;:1:0:0|</section>"
+      assert_empty off.fetch("hits")
+      assert_equal 2, on.fetch("hits").values.sum
+      assert_equal 1, on.fetch("fallbacks").values.sum
+    end
+  end
+
   def test_passive_production_token_and_collection_public_artifact
     skip "sealed rendering fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
     corpus = File.join(CORPUS_ROOT, "real-blog-r4")

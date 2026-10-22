@@ -42,9 +42,12 @@ module Lowrail
       binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
       return "actual-holder binary not certified; rebuild" unless data.fetch("sources").key?(binary)
       return "stale sources; rebuild" unless data.fetch("sources").all? { |file, sha| File.file?(file) && Manifest.sha256_file(file) == sha }
-      controller = Lowrail.loaded_constant("ArticlesController")
-      view_class = controller && IVAR.bind_call(controller, :@view_context_class)
-      return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
+      view_class = nil
+      if (controller_name = data.fetch("controller"))
+        controller = Lowrail.loaded_constant(controller_name)
+        view_class = controller && IVAR.bind_call(controller, :@view_context_class)
+        return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
+      end
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("application_class")
       data.fetch("methods").each do |entry|
         type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))
@@ -249,10 +252,12 @@ module Lowrail
         nil
       end
 
-      def valid?(renderer, view, template, layout)
+      def valid?(renderer, _view, template, layout)
         return count(false, "seal epoch changed or foreign Ractor") unless Ractor.current.equal?(Ractor.main) && @epoch[0].zero?
-        count(template && !layout && @holder.call(renderer, @renderer_class) && @holder.call(view, @view_class),
-          "unknown renderer/view holder, missing template or layout")
+        # The view is opaque to this expansion; Template#render receives the
+        # original object and all its live behavior, including custom helpers.
+        count(template && !layout && @holder.call(renderer, @renderer_class),
+          "unknown renderer holder, missing template or layout")
       end
     end
   end
