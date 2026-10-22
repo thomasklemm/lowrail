@@ -1,0 +1,2147 @@
+{
+  "format": 1,
+  "lowrail_base": "14d8cf0a3b392f3ebe4094f0f6e94a3f7c9c88c3",
+  "interpreter": "Ruby 4.0.7",
+  "native_ruby_commit": "5f2bc22560e9063fb8dec736afbf378251cad3ec",
+  "fork_commit": "https://github.com/thomasklemm/importmap-rails/commit/cf3d93370011b00f90312d3290b571a7f7edb036",
+  "files_sha256": {
+    "bench/upstream/actionview_collection_controls.rb": "3fd213c346ddd1faddab9119bbdae160d69fdb33d88871d91b35082ccf047ee0",
+    "bench/upstream/actionview_collections.rb": "3487aeab0484b5b80437e88922a90a2a1fec4f4cf9ba10d0ec0a95d4ac9be436",
+    "bench/upstream/actionview_helper_controls.rb": "7459c9206db108639b19198ce7ab8d9dfe7ef49ead32a600f5443077a0d7655a",
+    "bench/upstream/actionview_helpers.rb": "7b72073a6c5c9e76fbd349aac0253e2aa7bb967aad509a73cdcc6e4cced06f9d",
+    "bench/upstream/connection_class.rb": "3858be4f0fec1ab627ec2eab05a88ca36b3116081cdf016873af137cc4869a9c",
+    "bench/upstream/current_attributes.rb": "e78b12ec28a62da5898f4fb4a66f228c4a9168cb252ae66c6cac24ddb09d262b",
+    "bench/upstream/falsy_memos.rb": "e6f4586d59722a713da8f14cedc4f520f09a5c44c3676b03f4e92233313968db",
+    "bench/upstream/gem_candidate.rb": "2c742a95fa2aaa3b4f9d6ecfb0b8dd8e79a47accf578ea7751540bbaf134d06e",
+    "bench/upstream/gem_candidate_pairs.rb": "256c63c1d0437dafe12856fc389ff5d548090c9f58e3e6caf8c55a4ebb1232d0",
+    "bench/upstream/gem_census.rb": "fa478acfb1b72a497a69f0500f8758b861ba53654fd6a6770cdaa2c93dcb0b21",
+    "bench/upstream/gem_census_rank.rb": "fa2887fc27d10a5a369e74f62162eaede2029954838abc74e39afc9e47db00f8",
+    "bench/upstream/gem_ownership_boundaries.rb": "dca36c06f5708b6971c1b592e4bd965bf20a12ba9855970dfaffbacfc5d5fe87",
+    "bench/upstream/gem_request_screen.rb": "2ab8eafc1e7bd7178e37ebab2b38735edee2a9aa347e4c533eb35c8d8eb1884c",
+    "bench/upstream/importmap_ownership.rb": "6eaecd967123d7934764f47d00638906c3d1b93d7a182362d8dcfcfd1cbfa44b",
+    "bench/upstream/notifications.rb": "d8b99a2e6e8c5800290b87401fcc50c02d87bc6500be1596d8bc7c74f2a2dcb0",
+    "fixtures/corpus/blog_entropy.rb": "5dd9b1ad590a8674a410533a52dbb63d3062782b85f521b71baf495f9ef63993",
+    "gem/lib/lowrail.rb": "45c51b39cf5c8864ec9040dfbfd478be143ba3fc30dfabac7502d5b0d8cca6fc"
+  },
+  "suite_logs": {
+    "importmap-tests-before.log": "Run options: --seed 41231\n\n# Running:\n\n......................................../home/user/workspace/repo/.lowrail/private/gem-census/importmap-base/test/importmap_ractor_test.rb:7: warning: Ractor API is experimental and may change in future versions of Ruby.\n................................................................\n\nFinished in 15.012115s, 6.9277 runs/s, 23.3145 assertions/s.\n\n104 runs, 350 assertions, 0 failures, 0 errors, 0 skips\n",
+    "importmap-tests-after.log": "Run options: --seed 41231\n\n# Running:\n\n......................................../home/user/workspace/repo/.lowrail/private/gem-census/importmap-rails/test/importmap_ractor_test.rb:7: warning: Ractor API is experimental and may change in future versions of Ruby.\n................................................................\n\nFinished in 10.834630s, 9.5989 runs/s, 32.3038 assertions/s.\n\n104 runs, 350 assertions, 0 failures, 0 errors, 0 skips\n",
+    "importmap-tests-exact-head.log": "Run options: --seed 41231\n\n# Running:\n\n......................................../home/user/workspace/repo/.lowrail/private/gem-census/importmap-rails/test/importmap_ractor_test.rb:7: warning: Ractor API is experimental and may change in future versions of Ruby.\n................................................................\n\nFinished in 10.992998s, 9.4606 runs/s, 31.8384 assertions/s.\n\n104 runs, 350 assertions, 0 failures, 0 errors, 0 skips\n",
+    "useragent-tests-before.log": "\nRandomized with seed 41231\n.........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\n\nFinished in 0.17688 seconds (files took 0.1475 seconds to load)\n1321 examples, 0 failures\n\nRandomized with seed 41231\n\n",
+    "useragent-tests-after-r407.log": "/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby -w -I/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rspec-core-3.13.6/lib:/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rspec-core-3.13.6/exe/rspec --pattern spec/\\*\\*\\{,/\\*/\\*\\*\\}/\\*_spec.rb\n.........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\n\nFinished in 0.15611 seconds (files took 0.14373 seconds to load)\n1321 examples, 0 failures\n\n"
+  },
+  "native_protocol": {
+    "ruby": "/home/user/workspace/repo/.lowrail/private/gem-census/ruby-install/bin/ruby",
+    "seed": 41231,
+    "rounds": 8,
+    "cpu": 2,
+    "aa_tolerance_cpu_pct": 5,
+    "bootstrap": 5000,
+    "scope": "operation diagnostic; allocations primary; CPU informational; ZJIT invalidation counter unavailable",
+    "worker_sha256": "2c742a95fa2aaa3b4f9d6ecfb0b8dd8e79a47accf578ea7751540bbaf134d06e",
+    "candidates": {
+      "useragent": {
+        "base": "/home/user/workspace/repo/.lowrail/private/gem-census/useragent-base",
+        "before": "/home/user/workspace/repo/.lowrail/private/gem-census/useragent-before.rb",
+        "after": "/home/user/workspace/repo/.lowrail/private/gem-census/useragent/lib/user_agent/version.rb"
+      },
+      "importmap": {
+        "base": "/home/user/workspace/repo/.lowrail/private/gem-census/importmap-base",
+        "before": "/home/user/workspace/repo/.lowrail/private/gem-census/importmap-before.rb",
+        "after": "/home/user/workspace/repo/.lowrail/private/gem-census/importmap-rails/app/helpers/importmap/importmap_tags_helper.rb"
+      }
+    },
+    "setup_note": "First worker in candidate-cohort failed before any measurements: missing useragent load path on isolated Ruby 4.1. Corrected source load path; no counted result replaced."
+  },
+  "ownership": {
+    "importmap-ownership-after.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    },
+    "importmap-ownership-before.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    },
+    "importmap-ownership-interpreter-after.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    },
+    "importmap-ownership-interpreter-before.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    },
+    "importmap-ownership-yjit-after.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    },
+    "importmap-ownership-yjit-before.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    },
+    "importmap-ownership-zjit-after.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    },
+    "importmap-ownership-zjit-before.json": {
+      "array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "frozen_array": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "array_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "hash": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        null
+      ],
+      "hash_subclass": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        null
+      ],
+      "pair_like": [
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/module?x=&lt;1&gt;&amp;y=2\" nonce=\"nonce&lt;&amp;\" integrity=\"sha384-&lt;&amp;\">",
+        "ActiveSupport::SafeBuffer",
+        true,
+        false,
+        null,
+        2
+      ],
+      "live_paths_and_nonce": [
+        "<link rel=\"modulepreload\" href=\"/first.js\" nonce=\"nonce&lt;&amp;\">",
+        "<link rel=\"modulepreload\" href=\"/second.js\" nonce=\"new nonce\">"
+      ],
+      "nil_request": "<link rel=\"modulepreload\" href=\"/frozen.js\">",
+      "retained_tag_options": {
+        "first": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "second": "modulepreload|/a.js|builder nonce|builder integrity\nmodulepreload|/b.js|builder nonce|builder integrity",
+        "events": [
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link",
+          "integrity",
+          "tag",
+          "link"
+        ],
+        "nonce_calls": 2,
+        "distinct_options": true,
+        "keyword_order": [
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ],
+          [
+            "rel",
+            "href",
+            "nonce",
+            "integrity"
+          ]
+        ]
+      }
+    }
+  },
+  "rejection_boundaries": {
+    "useragent": {
+      "input": "String subclass retaining scan result",
+      "before": [
+        140,
+        2,
+        31
+      ],
+      "after_clearing_scan": [
+        140,
+        2,
+        31
+      ],
+      "map_bang_would_alias": true,
+      "unicode": {
+        "product": "ß",
+        "lookup": "SS",
+        "downcase_equal": false,
+        "casecmp_equal": true
+      }
+    },
+    "mini_profiler": {
+      "before": "articles/_card.html.erb",
+      "frozen_input": "articles/_card.html.erb",
+      "reused_value": "articles/_card.html.erb",
+      "retained_split_before": [
+        "",
+        "app",
+        "views",
+        "articles",
+        "_card.html.erb"
+      ],
+      "retained_split_after_reuse": [
+        "articles",
+        "_card.html.erb"
+      ],
+      "equivalent_retained_state": false
+    },
+    "propshaft": {
+      "second_after_clearing_first": "/assets/app-digest.js",
+      "after_mutating_retained_prefix": "/changed/app-digest.js",
+      "frozen_prefix": "/frozen/app-digest.js",
+      "join_slashes": "/assets/app.js",
+      "interpolated_slashes": "/assets///app.js"
+    }
+  },
+  "useragent_alias_failure": {
+    "public_input": "String subclass retaining its ordinary scan result",
+    "before": [
+      140,
+      2,
+      31
+    ],
+    "after": [],
+    "equivalent": false
+  },
+  "useragent_unicode_failure": {
+    "product": "ß",
+    "lookup": "SS",
+    "actual_respond_to": false,
+    "proposed_casecmp": true,
+    "actual_downcase_equal": false
+  },
+  "helper_snapshots": {
+    "importmap-snapshot-before.json": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "gem": "importmap",
+      "source_sha256": "b24d56f3f1070b2869f1f5c413b94ff8b6366bef8cf7fe99a2a2ae289fbbe392",
+      "mode": "interpreter",
+      "snapshot": [
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ]
+      ]
+    },
+    "importmap-snapshot-after.json": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "gem": "importmap",
+      "source_sha256": "9252ca2ac50829171bfaed98124333bc65c3cb41f541c144a2cf6a02c98a0131",
+      "mode": "interpreter",
+      "snapshot": [
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ]
+      ]
+    }
+  },
+  "importmap_patch": "diff --git a/app/helpers/importmap/importmap_tags_helper.rb b/app/helpers/importmap/importmap_tags_helper.rb\nindex 295b6dc..af16ab8 100644\n--- a/app/helpers/importmap/importmap_tags_helper.rb\n+++ b/app/helpers/importmap/importmap_tags_helper.rb\n@@ -27,12 +27,17 @@ module Importmap::ImportmapTagsHelper\n   def javascript_importmap_module_preload_tags(importmap = Rails.application.importmap, entry_point: \"application\")\n     packages = importmap.preloaded_module_packages(resolver: self, entry_point:, cache_key: entry_point)\n \n-    _generate_preload_tags(packages) { |path, package| [path, { integrity: package.integrity }] }\n+    _generate_preload_tags(packages) do |(path, package), nonce|\n+      integrity = package.integrity\n+      tag.link rel: \"modulepreload\", href: path, nonce: nonce, integrity: integrity\n+    end\n   end\n \n   # Link tag(s) for preloading the JavaScript module residing in `*paths`. Will return one link tag per path element.\n   def javascript_module_preload_tag(*paths)\n-    _generate_preload_tags(paths) { |path| [path, {}] }\n+    _generate_preload_tags(paths) do |path, nonce|\n+      tag.link rel: \"modulepreload\", href: path, nonce: nonce\n+    end\n   end\n \n   private\n@@ -40,8 +45,7 @@ module Importmap::ImportmapTagsHelper\n       content_security_policy_nonce = request&.content_security_policy_nonce\n \n       safe_join(Array(items).collect { |item|\n-        path, options = yield(item)\n-        tag.link rel: \"modulepreload\", href: path, nonce: content_security_policy_nonce, **options\n+        yield(item, content_security_policy_nonce)\n       }, \"\\n\")\n     end\n end\n",
+  "rejected_useragent_patch": "diff --git a/lib/user_agent/version.rb b/lib/user_agent/version.rb\nindex 5bc32d8..22bcac9 100644\n--- a/lib/user_agent/version.rb\n+++ b/lib/user_agent/version.rb\n@@ -24,7 +24,7 @@ class UserAgent\n         @comparable = false\n       elsif str =~ /^\\d+$/ || str =~ /^\\d+\\./\n         @nil        = false\n-        @sequences  = str.scan(/\\d+|[A-Za-z][0-9A-Za-z-]*$/).map { |s| s =~ /^\\d+$/ ? s.to_i : s }\n+        @sequences  = str.scan(/\\d+|[A-Za-z][0-9A-Za-z-]*$/).map! { |s| s =~ /^\\d+$/ ? s.to_i : s }\n         @comparable = true\n       else\n         @nil        = false\n",
+  "open_importmap_helper_patches": [
+    {
+      "pr": "333",
+      "change": {
+        "filename": "app/helpers/importmap/importmap_tags_helper.rb",
+        "patch": "@@ -1,6 +1,9 @@\n module Importmap::ImportmapTagsHelper\n   # Setup all script tags needed to use an importmap-powered entrypoint (which defaults to application.js)\n   def javascript_importmap_tags(entry_point = \"application\", importmap: Rails.application.importmap)\n+    preloaded = importmap.preloaded_module_packages(resolver: self, entry_point:, cache_key: entry_point)\n+    Importmap::EarlyHints.send_modulepreload_links(self, preloaded)\n+\n     safe_join [\n       javascript_inline_importmap_tag(importmap.to_json(resolver: self)),\n       javascript_importmap_module_preload_tags(importmap, entry_point:),"
+      }
+    },
+    {
+      "pr": "103",
+      "change": {
+        "filename": "app/helpers/importmap/importmap_tags_helper.rb",
+        "patch": "@@ -20,7 +20,7 @@ def javascript_inline_importmap_tag(importmap_json = Rails.application.importmap\n   # Configure es-modules-shim with nonce support if the application is using a content security policy.\n   def javascript_importmap_shim_nonce_configuration_tag\n     if content_security_policy?\n-      tag.script({ nonce: content_security_policy_nonce }.to_json.html_safe, \n+      tag.script({ nonce: content_security_policy_nonce }.to_json.html_safe,\n         type: \"esms-options\", nonce: content_security_policy_nonce)\n     end\n   end\n@@ -34,7 +34,7 @@ def javascript_importmap_shim_tag(minimized: true)\n   # Import a named JavaScript module(s) using a script-module tag.\n   def javascript_import_module_tag(*module_names)\n     imports = Array(module_names).collect { |m| %(import \"#{m}\") }.join(\"\\n\")\n-    tag.script imports.html_safe, \n+    tag.script imports.html_safe,\n       type: \"module\", nonce: content_security_policy_nonce\n   end\n "
+      }
+    }
+  ],
+  "closed_importmap_preload_search": [
+    {
+      "number": 329,
+      "title": "Warm cache and handle frozen import maps",
+      "url": "https://github.com/rails/importmap-rails/pull/329"
+    },
+    {
+      "number": 218,
+      "title": "Preload all by default",
+      "url": "https://github.com/rails/importmap-rails/pull/218"
+    },
+    {
+      "number": 310,
+      "title": "Keep options when updating packages in importmap",
+      "url": "https://github.com/rails/importmap-rails/pull/310"
+    },
+    {
+      "number": 304,
+      "title": "Implement SRI support in importmap-rails",
+      "url": "https://github.com/rails/importmap-rails/pull/304"
+    },
+    {
+      "number": 298,
+      "title": "Add `--preload` option to pin command",
+      "url": "https://github.com/rails/importmap-rails/pull/298"
+    },
+    {
+      "number": 305,
+      "title": "Warn about vendored versionless packages",
+      "url": "https://github.com/rails/importmap-rails/pull/305"
+    },
+    {
+      "number": 266,
+      "title": "Use entry_point as cache_key when generating preload tags",
+      "url": "https://github.com/rails/importmap-rails/pull/266"
+    },
+    {
+      "number": 274,
+      "title": "Carry over pin options when pinning an existing pin",
+      "url": "https://github.com/rails/importmap-rails/pull/274"
+    },
+    {
+      "number": 253,
+      "title": "Allows preload to be determined by provided entry_point",
+      "url": "https://github.com/rails/importmap-rails/pull/253"
+    },
+    {
+      "number": 241,
+      "title": "Allow multiple importmaps in config/importmaps/",
+      "url": "https://github.com/rails/importmap-rails/pull/241"
+    },
+    {
+      "number": 220,
+      "title": "Fix wording in preloading pinned modules docs",
+      "url": "https://github.com/rails/importmap-rails/pull/220"
+    },
+    {
+      "number": 211,
+      "title": "Changes the default for preloading pins",
+      "url": "https://github.com/rails/importmap-rails/pull/211"
+    },
+    {
+      "number": 69,
+      "title": "Proposal to facilitate multiple import maps",
+      "url": "https://github.com/rails/importmap-rails/pull/69"
+    },
+    {
+      "number": 176,
+      "title": "Accept Cache Key for Inline & Preloaded Module in Importmap Tag",
+      "url": "https://github.com/rails/importmap-rails/pull/176"
+    },
+    {
+      "number": 37,
+      "title": "es-module-shims@1.0.4",
+      "url": "https://github.com/rails/importmap-rails/pull/37"
+    }
+  ],
+  "preparation_failures": [
+    "Native first worker: useragent load path missing, no measurements; corrected before finite cohort.",
+    "Request first untimed budget: relative worker path missing.",
+    "Request second untimed budget: audit needed loaded_constant; loaded inactive runtime, never setup.",
+    "First counted invocation: wrong absolute worker path, before worker boot or windows; all dumps empty, no measurements."
+  ],
+  "scope": "No upstream PR, issue, comment or main write. Original rejected native CPU A/A controls retained; no CPU speed claim.",
+  "request_helper_coverage": {
+    "before": {
+      "status": 200,
+      "calls": [
+        {
+          "source": "/home/user/workspace/repo/.lowrail/private/gem-census/importmap-before.rb",
+          "items": 7,
+          "class": "Hash"
+        }
+      ]
+    },
+    "after": {
+      "status": 200,
+      "calls": [
+        {
+          "source": "/home/user/workspace/repo/.lowrail/private/gem-census/importmap-rails/app/helpers/importmap/importmap_tags_helper.rb",
+          "items": 7,
+          "class": "Hash"
+        }
+      ]
+    }
+  },
+  "stock_explanation": {
+    "before": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "gem": "importmap",
+      "source_sha256": "b24d56f3f1070b2869f1f5c413b94ff8b6366bef8cf7fe99a2a2ae289fbbe392",
+      "mode": "interpreter",
+      "snapshot": [
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ]
+      ],
+      "cases": {
+        "packages_8": {
+          "allocations": 138.0005,
+          "cpu_us": 42.87413149999997,
+          "jit_warmup": null,
+          "jit_before": null,
+          "jit_after": null
+        },
+        "paths_8": {
+          "allocations": 120,
+          "cpu_us": 36.08842800000001,
+          "jit_warmup": null,
+          "jit_before": null,
+          "jit_after": null
+        },
+        "empty_control": {
+          "allocations": 6,
+          "cpu_us": 0.9683010000000047,
+          "jit_warmup": null,
+          "jit_before": null,
+          "jit_after": null
+        }
+      }
+    },
+    "after": {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "gem": "importmap",
+      "source_sha256": "9252ca2ac50829171bfaed98124333bc65c3cb41f541c144a2cf6a02c98a0131",
+      "mode": "interpreter",
+      "snapshot": [
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"nonce&lt;&amp;&quot;\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "",
+          "ActiveSupport::SafeBuffer",
+          "US-ASCII",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/alpha.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/a?x=1&amp;y=&lt;2&gt;\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/already&amp;.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ],
+        [
+          "<link rel=\"modulepreload\" href=\"/é.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">\n<link rel=\"modulepreload\" href=\"https://cdn.example/x.js\" nonce=\"second-nonce\" integrity=\"sha384-&lt;&amp;&quot;\">",
+          "ActiveSupport::SafeBuffer",
+          "UTF-8",
+          true,
+          false,
+          1
+        ]
+      ],
+      "cases": {
+        "packages_8": {
+          "allocations": 122.0005,
+          "cpu_us": 39.54028050000002,
+          "jit_warmup": null,
+          "jit_before": null,
+          "jit_after": null
+        },
+        "paths_8": {
+          "allocations": 104,
+          "cpu_us": 33.231624499999945,
+          "jit_warmup": null,
+          "jit_before": null,
+          "jit_after": null
+        },
+        "empty_control": {
+          "allocations": 6,
+          "cpu_us": 0.6216384999999658,
+          "jit_warmup": null,
+          "jit_before": null,
+          "jit_after": null
+        }
+      }
+    }
+  },
+  "lowrail_validation": {
+    "request_pairs": "Run options: --verbose --seed=1729\n\n# Running:\n\nRequestPairsTest#test_brk_overflow_rejects_the_cohort_in_preflight_or_a_successful_worker = 0.36 s = .\nRequestPairsTest#test_gc_exclusion_preserves_mutator_work_between_incremental_segments = 9.40 s = .\nRequestPairsTest#test_wide_control_is_not_equivalence = 0.20 s = .\nRequestPairsTest#test_jit_gate_requires_actual_mode_and_flat_warmup_and_measurement = 0.00 s = .\nRequestPairsTest#test_partial_zjit_flatness_never_substitutes_for_missing_invalidation_proof = 0.00 s = .\nRequestPairsTest#test_memory_attribution_deduplicates_containers_without_following_weak_references = 0.00 s = .\nRequestPairsTest#test_instruction_control_ignores_emulation_time = 0.04 s = .\nRequestPairsTest#test_operation_windows_sum_allocations_and_keep_zero_allocation_reports_finite = 14.28 s = .\nRequestPairsTest#test_comparisons_refuse_an_ar_build_that_would_silently_decline = 0.00 s = .\nRequestPairsTest#test_paired_bootstrap_removes_round_drift_but_not_a_real_effect = 0.65 s = .\nRequestPairsTest#test_native_no_app_harness_is_flat_and_keeps_its_explicit_pages = 2.38 s = .\nRequestPairsTest#test_repeated_blocks_do_not_hide_process_specific_bias = 0.05 s = .\nRequestPairsTest#test_worker_overlap_distinguishes_window_work_from_boot_and_unknown_migrations = 0.00 s = .\nRequestPairsTest#test_instruction_reader_uses_self_totals_not_wrapped_summary = 0.00 s = .\nRequestPairsTest#test_idle_clock_bound_and_companion_symmetry_are_independent = 0.00 s = .\nRequestPairsTest#test_jit_gate_rejects_wrong_modes_missing_counters_and_nonflat_windows = 0.00 s = .\nRequestPairsTest#test_quiet_warmup_does_not_stop_before_a_rare_block_and_reports_cap_exhaustion = 1.82 s = .\n\nFinished in 29.183474s, 0.5825 runs/s, 10.6910 assertions/s.\n\n17 runs, 312 assertions, 0 failures, 0 errors, 0 skips\n",
+    "screen": "Run options: --verbose --seed=1729\n\n# Running:\n\nScreenTest#test_conflicting_companion_epoch_refuses_before_output_or_app_boot = 0.00 s = .\nScreenTest#test_actual_cache_events_detect_regeneration_and_same_size_byte_replacement = 0.12 s = .\nScreenTest#test_storage_seed_aliases_relatives_and_ancestors_cannot_erase_the_seed = 0.00 s = .\nScreenTest#test_clock_preserves_ttl_and_independent_graphs_across_real_elapsed_time = 0.30 s = .\nScreenTest#test_prospective_aa_rule_distinguishes_positive_negative_and_either_failed_metric = 1.73 s = .\n\nFinished in 2.156691s, 2.3184 runs/s, 44.0490 assertions/s.\n\n5 runs, 95 assertions, 0 failures, 0 errors, 0 skips\n"
+  }
+}
