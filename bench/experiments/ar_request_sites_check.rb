@@ -6,6 +6,7 @@
 require "json"
 require "fileutils"
 require "digest"
+require_relative "ar_request_sites_db"
 load ENV.fetch("JIT_GUARDS_HARNESS")
 
 module ARSiteChecks
@@ -108,9 +109,19 @@ module ARSiteChecks
       ActionView::Template.prepend(MidRequest)
       ActionView::Template::Handlers::ERB.prepend(SourceMismatch)
       app_pin = BlogProduction::Entropy.source_pin(config.fetch("app"))
+      random_seed = ENV["AR_GUARD_RANDOM_SEED"]&.then { Integer(_1) }
+      Kernel.srand(random_seed) if random_seed
       if ENV["AR_GUARD_NATIVE_WARM"] == "1"
-        workload = NativeBench.routes(config, state, arm)
-        50.times { workload.each_value { raise "warm GET failed" unless _1.call.status == 200 } }
+        warm = -> do
+          workload = NativeBench.routes(config, state, arm)
+          50.times { workload.each_value { raise "warm GET failed" unless _1.call.status == 200 } }
+        end
+        if random_seed
+          _, warm_evidence = BlogProduction::Entropy.with(random_seed, "db-warm", requests: 52, wall_clock: true, &warm)
+          raise "controlled warmup entropy failed" unless warm_evidence.fetch("errors").empty?
+        else
+          warm.call
+        end
       end
       rows = CASES.to_h do |name|
         self.current, self.entered, self.undo = name, 0, nil
@@ -145,6 +156,7 @@ module ARSiteChecks
           [seed, NativeBench.response_digest(response).merge("evidence" => evidence,
             "counts_delta" => delta, "sql_trace" => trace,
             "sql_capture" => NativeBench::Exploration.sql_value(trace),
+            "db_audit" => DirectSiteDB.capture(databases),
             "db_components_sha256" => databases.transform_values { Digest::SHA256.hexdigest(JSON.generate(_1)) },
             "db_sha256" => Digest::SHA256.hexdigest(JSON.generate(databases)))]
         ensure
@@ -155,7 +167,8 @@ module ARSiteChecks
         [name, seeds]
       end
       raise "application source changed" unless BlogProduction::Entropy.source_pin(config.fetch("app")) == app_pin
-      {"arm" => arm, "source_sha256" => app_pin, "yjit" => RubyVM::YJIT.enabled?, "cases" => rows}
+      {"arm" => arm, "source_sha256" => app_pin, "yjit" => RubyVM::YJIT.enabled?,
+        "kernel_random_seed" => random_seed, "warm_entropy" => warm_evidence, "cases" => rows}
     end
   end
 
@@ -217,7 +230,10 @@ elsif $PROGRAM_NAME == __FILE__
     end]
   end
   passed = checks.values.all? { _1.values.all? { |row| row.fetch("passed") } }
-  File.write("#{output}/result.json", JSON.pretty_generate("passed" => passed, "checks" => checks, "workers" => results))
+  db_audit = DirectSiteDB.compare(results)
+  File.write("#{output}/result.json", JSON.pretty_generate("passed" => passed, "checks" => checks,
+    "db_audit" => db_audit, "workers" => results))
+  puts "complete DB audit with declared off/off exclusions: #{db_audit.fetch('passed_with_declared_exclusions') ? 'PASS' : 'FAIL'}"
   checks.each { |name, seeds| puts "#{name}: #{seeds.values.all? { _1.fetch('passed') } ? 'PASS' : 'FAIL'}" }
   exit(passed ? 0 : 2)
 end

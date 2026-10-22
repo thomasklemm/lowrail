@@ -344,3 +344,69 @@ BUNDLER_VERSION=4.0.20 RUBY_YJIT_ENABLE=1 RAILS_ENV=test \
 BUNDLER_VERSION=4.0.20 mise exec ruby@4.0.7 -- ruby \
   bench/experiments/jit_guards_admission.rb "$HARNESS/script/rps" CONFIG NEW_OUTPUT
 ```
+
+## Opt-in prerequisites, step 2: complete DB audit with a named boundary
+
+Two new **untimed** controls seed `Kernel.srand(0)` and `Kernel.srand(1)`
+identically in off-A/on/off-B. The existing source-pinned entropy harness
+also fixes Ruby wall time during the natural login plus 50 warm GETs, not
+only the later sampled requests. No application/configuration patch or
+SolidCache method replacement is involved. Each run then executes all 19
+mutation controls at both response seeds in fresh forked workers, with
+actual YJIT asserted in each worker. All **38 responses and ordered SQL
+traces per run** match. Baseline/warm/restored controls each complete two
+hits and two strict shadows per request; invalidated controls refuse.
+
+The typed snapshots cover schema and every row in **68 tables**: primary
+46, cache 4, queue 14, cable 4, including SQLite sequences and internal
+metadata. **Primary, queue and cable match completely, with no exclusions.**
+Primary session `created_at` and `updated_at` remain compared: the extended
+warmup clock control removes their earlier variation at its source.
+
+Exactly **one column is excluded** in the separate declared-exclusion
+comparison: `cache.solid_cache_entries.created_at`. Its column hashes differ
+off/off in every compared case, and every on difference is also an off/off
+difference. SQL inserts use SQLite's
+`STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')`, not Ruby `Time.now`; neither the
+Ruby clock control nor `Kernel.srand` fixes SQLite's clock. Every other
+cache column, including every raw value byte, remains compared. No payload,
+expiry, session column or sequence is normalized away. The original
+**raw whole-DB checker still exits 2** for this timestamp difference;
+`passed_with_declared_exclusions` is a distinct, explicitly labeled result.
+
+The alternate **split certificate** also passes: complete primary/queue/
+cable, exact cache schema/metadata and every app-written cache key/value.
+The single named internal key
+`__solid_cache_entry_size_moving_average_estimates` is decoded and retained
+separately, together with its row hash, presence and SQLite sequence hash.
+This is a **store-internal boundary, not noise** and not unrestricted
+full-cache determinism. With RNG seed 0 it is absent in all arms; with seed
+1 its raw ASCII payload decodes to **[189] in all arms**. Its own accounted
+row size is **192**, making current total size **381**, not 189: 49 key
+bytes + 3 payload bytes + SolidCache's 140-byte row overhead. The estimate
+is calculated before writing the bookkeeping row.
+
+SolidCache 1.0.10's [write-triggered expiry sampling](https://github.com/rails/solid_cache/blob/v1.0.10/lib/solid_cache/store/expiry.rb)
+uses `rand`; its [moving-average store](https://github.com/rails/solid_cache/blob/v1.0.10/app/models/solid_cache/entry/size/moving_average_estimate.rb)
+writes pipe-delimited decimal estimates directly. The earlier unseeded
+off-B-only row is preserved privately as mechanism evidence, not relabeled
+an on effect or an allowed arbitrary cache-value difference. The two
+controlled runs exercise both absent and present branches. The DB-audit
+regression rejects changed application cache values and primary rows; only
+the explicitly separate split certificate allows the named internal row.
+
+[Durable DB export](jit-guards-db.json) retains every response/SQL digest,
+complete table inventories, full and comparison hashes, the excluded-column
+hashes, decoded internal estimates, coverage and original receipt hashes.
+Raw DB values, cookies, SQL binds and entropy traces remain private. Earlier
+cold/unseeded/draft-audit failures are retained, not retroactively passed.
+
+```sh
+JIT_GUARDS_HARNESS="$HARNESS/script/native-bench" BUNDLER_VERSION=4.0.20 \
+  AR_GUARD_FORK=1 AR_GUARD_NATIVE_WARM=1 AR_GUARD_RANDOM_SEED=0 \
+  mise exec ruby@4.0.7 -- ruby bench/experiments/ar_request_sites_check.rb CONFIG NEW_SEED_0
+# Repeat once with RNG seed 1 and a different output directory.
+mise exec ruby@4.0.7 -- ruby bench/experiments/ar_request_sites_db.rb \
+  NEW_SEED_0/result.json NEW_SEED_1/result.json docs/jit-guards-db.json
+mise exec ruby@4.0.7 -- ruby bench/ar_request_sites_test.rb
+```
