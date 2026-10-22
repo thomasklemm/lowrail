@@ -964,3 +964,131 @@ the offline parser regression checks asymmetric Rack/remainder intervals,
 before/inside/after GC, keepalive ordinals, retransmission/sequence wrap and
 missing-record refusal. New artifact manifest SHA256
 `d8ee4ee316a056b7a3e47779dcdc6cae8294f96f164ced6d1c2f680ba0739a19`.
+
+### Final current-main result: A/A rejects the throughput price
+
+Completed the single cohort at protocol/harness
+[`544ad8d`](https://github.com/thomasklemm/lowrail/commit/544ad8d2fff455f33568c8f58a848ed09e775ce0),
+with the declared main/runtime and rebuilt artifact above. **A/A first:**
+paired mean RPS **+1.912% [95% CI +0.083%, +3.652%]**. The interval
+**excludes zero**, so the fixed decision rule **rejects this cohort as an
+accepted throughput price**. Maximum absolute round spread **9.794%** stays
+in the data. No retry, excluded window, alternative acceptance rule or
+pooling with the previous accepted cohort.
+
+Raw on/off RPS is **+12.205% [+9.931%, +14.380%]**. Although its lower bound
+exceeds the A/A upper bound, **both** preregistered conditions were required;
+the failed A/A condition is not waived. Do not replace the existing README
+price with this estimate or call it a current-main accepted speed claim.
+
+| Metric | off-A | on | off-B | Paired on/off Δ [95% interval] |
+|---|---:|---:|---:|---:|
+| Median window RPS | 1,650.03 | 1,844.70 | 1,695.03 | +12.205% [+9.931%, +14.380%], **control rejected** |
+| Median window p50, ms | 8.938 | 7.872 | 8.883 | −8.789% [−14.698%, −2.214%] |
+| Median window p90, ms | 15.389 | 14.046 | 15.490 | −7.992% [−15.429%, −0.467%] |
+| Median window p99, ms | 29.564 | 24.750 | 25.599 | **−7.575% [−19.628%, +5.878%]** |
+
+The earlier resolved p99 excess **does not reproduce as a resolved excess**;
+this is **not a demonstrated p99 improvement**, either. Its current interval
+includes zero and a +5.878% regression. The p99 A/A interval is
+[−15.764%, +5.364%]. Different runtime, heap histories and added observers
+prevent attributing the difference between cohorts to either runtime fix.
+Displayed arm medians are not the paired statistic; all latency intervals
+and round deltas are retained in the appendix.
+
+GC/heap descriptive medians across twenty windows per arm:
+
+| Four-worker diagnostic | off-A | on | off-B |
+|---|---:|---:|---:|
+| Allocated objects / completion | 2,679.12 | **2,301.14** | 2,679.17 |
+| Collections / 1,000 completions | 19.331 | **24.501** | 18.793 |
+| Minor / major collections / 1,000 | 17.991 / 0.943 | 23.137 / 1.127 | 18.020 / 0.659 |
+| GC ms / 1,000 completions | 209.604 | 203.259 | 172.524 |
+| Post-warmup heap live slots | 1,582,306 | 1,522,294 | 1,647,890.5 |
+| Post-warmup old objects | 1,262,565 | 1,280,509 | 1,262,523 |
+| Post-warmup malloc increase, bytes | 4,865,780 | 3,031,374.5 | 3,801,056.5 |
+| Post-warmup sum RSS, KiB | 716,606 | 710,548 | 719,896 |
+
+**More collections with fewer allocations reproduces; a resolved p99 excess
+does not.**
+Counter windows include metrics/background work, gauges are non-atomic
+four-worker sums, RSS double-counts shared pages, and separate medians need
+not add. No GC/heap tuning or forced collection. These are descriptive, not
+independently noise-resolved treatment effects.
+
+#### GC overlap and pre-Rack delay coexist; they are not exclusive causes
+
+All **2,068,219 / 2,068,219** timed HTTP completions join to native Rack
+records and passive wire spans. Zero kernel/native drops, sequence gaps,
+missing/count/order mismatches or open GC intervals across **60 captures /
+240 native worker receipts**. Largest realtime-versus-monotonic interval
+difference **145,987 ns**. This is not a keyed join to oha's individual
+client observations: wire p99 tails below are each window's own top 1%,
+not the unkeyed oha tail. Counts are descriptive, not bootstrap samples.
+
+| Per-window wire-tail diagnostic | off-A | on | off-B |
+|---|---:|---:|---:|
+| Tail requests, summed across windows | 6,600 | 7,394 | 6,719 |
+| Any assigned-worker GC-pause overlap | 97.97% | 99.24% | 95.39% |
+| GC-pause overlap **before** Rack | 97.73% | 99.05% | 95.01% |
+| GC-pause overlap inside Rack | 83.62% | 83.50% | 75.74% |
+| Wire-minus-Rack exceeds half wire span | 99.74% | 99.50% | 99.73% |
+| Median window tail median wire span, ms | 37.566 | 33.943 | 29.930 |
+| Median window tail median Rack span, ms | 8.091 | 7.311 | 3.757 |
+| Median window tail median remainder, ms | 31.334 | 27.239 | 26.101 |
+| Median window tail median GC overlap before Rack, ms | 19.391 | 17.647 | 11.892 |
+| Median window tail median GC overlap inside Rack, ms | 5.500 | 4.935 | 0.953 |
+
+Slow wire spans are predominantly **outside the current Rack call**, yet
+overlap substantial recorded GC pauses in the assigned worker, often
+**while waiting before Rack**. Calling them either “GC” or “queueing” would
+create a false dichotomy: GC can delay queued requests. The remainder also
+includes transport/scheduling/body/write work. This observation documents
+where pauses overlap this cohort's tail; it does not identify the historical
+excess's cause or show that a token/guard fix cured it. No runtime fix,
+compaction/freezing proposal or latency claim follows from these data.
+
+#### Observer cost and receipt integrity
+
+Observers run identically in every arm from its first measured window.
+Median recorder user+system CPU per 20-second window: **1.11 / 1.18 / 1.11 s**
+(off-A/on/off-B), **5.55% / 5.89% / 5.55% of one CPU**; maximum **6.30%**.
+CPU 7 shares the load-client CPU set because no spare CPU exists; it never
+shares the server CPU set. Summed native observer CPU per window is
+**140.6 / 156.1 / 141.9 ms**, roughly **0.18–0.20% of four-server-CPU
+capacity**. These are CPU-accounting measurements, **not a no-observer
+overhead ablation**; Ruby wrapper/clock-query remainder and kernel capture
+cost are excluded. Observer effects, including the shared client core,
+remain limitations. No late instrumentation, stats-on timed arm or source
+change during the cohort.
+
+All three coverage servers and sixty measured servers pass both seeds'
+literal cold status/body/all-Rack-header checks; all sixty also pass warm
+checks. Coverage reaches all three artifact units. **Zero HTTP/transport
+errors** over **2,068,219 timed + 402,352 warmup completions**. All four stable
+worker PIDs supply both snapshots per measured server (**480 snapshots**).
+Mode/refusal/input pins pass. Independent Python audit reconstructs raw
+oha RPS/counts/latencies, exact workflows, worker/record/drop counts,
+native/packet joins, source hashes and the paired bootstrap; Ruby supplies
+only the seeded resampling index stream. Harness checks still pass
+**4 runs / 64 assertions** plus the parser regression.
+
+**Launcher limitation:** after all sixty windows and `result.json` were
+complete, the supervised one-shot launcher auto-restarted. Duplicate-output
+guards rejected every subsequent launch **before app boot**; no extra
+measured window ran. These launches overwrote the launcher elapsed/log
+sidecars, **not** the retained per-window receipts or complete result. The
+supervisor is stopped. Protocol-to-result receipt span is **1,827.265 s
+(30.45 min)**, derived from file mtimes, not a recovered exact launcher
+duration. Launcher journal/error receipts are retained and hashed. Future
+supervised finite runs should idle after recording exit status rather than
+allow an automatic restart of the completed command.
+
+`rps_current_main_gc_tagged` in the JSON appendix retains the complete
+compacted export, per-window attribution, all sixty capture hashes and
+worker receipt hashes. Private complete result SHA256
+`0d890ec1f6c0f8a4adfbde4788faea5ef6db5941c91c26bee0914ad24bafb906`.
+Earlier sections remain unchanged. Branch-only exploration: **no accepted
+new price, main/README change, own-suite/complete DB-state certification,
+Thermos promotion, runtime fix or additional cohort**. Coordinator retains
+the publication decision.
