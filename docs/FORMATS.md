@@ -557,11 +557,16 @@ Plain successful source/digest sites use `lowered`;
 preload eligibility uses `runtime_tree`, AR scoped readers `scoped_reader`,
 and instantiation `homogeneous_results`.
 
-Every build now records whole-pass `quarantined` refusals for `view/link_to`
-and `route/path`, including when neither was selected. Neither can be opted
-in. An older manifest containing either pass is incompatible as a whole;
-`Lowrail.refusal_reason` and a boot warning explain why no units or templates
-were installed. See [the counterexamples](passes/endpoint.md#source-arm-quarantine).
+Every ordinary build records whole-pass `quarantined` refusals for `view/link_to`,
+`route/path`, `active_record/preload_plans` and `sealed/link_to`, including
+when not selected. The latter two refuse before their production builders
+run, even with `--sealed`: their hook/template delivery changes app-visible
+ancestry and method ownership. Each detail names the responsible seam.
+Verification-only builds retain their separate passive-certificate refusals.
+An older manifest containing any of these passes is incompatible as a whole;
+`Lowrail.refusal_reason` explains why no units or templates were installed.
+See [the counterexamples](passes/endpoint.md#source-arm-quarantine)
+and [sealed delivery](sealed.md#contract-and-the-work-it-can-remove).
 
 Template source passes also use `template_context` when a handler body parses
 inside Action View's method context but not at top level (for example a

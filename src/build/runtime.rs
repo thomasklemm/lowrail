@@ -6,7 +6,7 @@ use std::process::{Command, Stdio};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
-use crate::{facts, passes::{Builder, Kind, Selection}};
+use crate::{facts, passes::{Builder, Kind, Selection, delivery_refusal}};
 
 #[derive(Deserialize)]
 pub struct Output {
@@ -36,7 +36,11 @@ pub struct LoweredSource {
 }
 
 pub fn run(app: &Path, env: &str, passes: &Selection, denied: &[Value], certification_jit: &str, verification_test: bool) -> Result<Vec<Output>, String> {
-    let builders: Vec<_> = passes.iter().filter(|p| p.kind == Kind::Runtime).map(|p| {
+    // Refuse before loading a builder: dropping its units afterwards could
+    // still leave source files or templates that activate unsafe delivery.
+    // Verification has its own passive-certificate refusals and never runs
+    // these production builders; preserve its named ledger entries.
+    let builders: Vec<_> = passes.iter().filter(|p| p.kind == Kind::Runtime && (verification_test || delivery_refusal(p.name).is_none())).map(|p| {
         let Builder::Runtime { file, module } = p.builder else { unreachable!() };
         json!({"file": file, "module": module, "pass": p.name})
     }).collect();

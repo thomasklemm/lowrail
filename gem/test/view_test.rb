@@ -67,7 +67,7 @@ class ViewTest < Minitest::Test
       assert_empty manifest.fetch("units"), "default source passes are quarantined, not merely guarded"
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
       assert_equal %w[active_record/ar_plans active_record/instantiate active_record/preload_plans
-        digest/file_memo inertia/config_bind memo/sha256 memo/uri_join route/path view/link_to],
+        digest/file_memo inertia/config_bind memo/sha256 memo/uri_join route/path sealed/link_to view/link_to],
         ledger.select { _1["reason"] == "quarantined" }.map { _1.fetch("pass") }.sort
       refute manifest.fetch("units").any? { _1["pass"] == "endpoint/action" }
       scenario = <<~'RUBY'

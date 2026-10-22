@@ -19,6 +19,16 @@ by a generated unit. It includes framework dependencies, not just app classes.
 Uncertified paths stay original Rails. New/unknown inputs refuse before any
 side effect; fallback never replays a partially executed action or helper.
 
+`build --sealed` ledger-refuses `active_record/preload_plans` and
+`sealed/link_to` before running their builders: `PreloadPlans::Hook` and
+`Templates::CompiledSource` would change framework ancestry and method owners.
+Sealing does not prove that delivery observationally identical. Form, token
+and collection certification still runs normally; no denylist is needed to
+exclude those unsafe builders. Old or handwritten artifacts containing either
+pass or template delivery remain incompatible **as a whole**, before files or
+installers are loaded. These are delivery refusals, not proof that the
+underlying expansions could never help an app.
+
 | Promise, in production after the seal | What it unlocks; measured reason for it | Still live / not implied |
 |---|---|---|
 | Seal only after `after_initialize`, eager loading and lazy schema/attribute/route/view/template generation. Restart to change the certified inventory. | Build facts can select bodies ahead of time. Boot alone missed 1,438 blog / 4,446 Campfire methods seen by tests before materialization ([build surface](STATUS.md#build-surface-2026-10-20)). | Initializers and legitimate framework generation must finish, not be silently forbidden. Different locals sets may still generate methods. |

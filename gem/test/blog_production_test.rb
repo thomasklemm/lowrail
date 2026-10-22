@@ -14,6 +14,17 @@ class BlogProductionTest < Minitest::Test
       output = File.join(dir, "cold")
       capture_io { BlogProduction.run(source, output, entropy_companions: true, cli: lowrail_cli) }
       report = JSON.parse(File.read(File.join(output, "report.json")))
+      artifact = JSON.parse(File.read(File.join(output, "app/.lowrail/manifest.json")))
+      ledger = JSON.parse(File.read(File.join(output, "app/.lowrail/ledger.json")))
+      assert_empty artifact.fetch("templates", {}), "no ancestry-changing template delivery"
+      {"active_record/preload_plans" => "PreloadPlans::Hook", "sealed/link_to" => "Templates::CompiledSource"}.each do |pass, seam|
+        refute artifact.fetch("units").any? { _1.fetch("pass") == pass }
+        rows = ledger.select { _1.fetch("pass") == pass }
+        assert_equal 1, rows.size, "one whole-builder refusal, not post-build unit filtering"
+        assert_equal "refused", rows.first.fetch("outcome")
+        assert_equal "quarantined", rows.first.fetch("reason")
+        assert_includes rows.first.fetch("detail"), seam
+      end
       assert_equal "rejected_off_control", report.fetch("raw_status"), "raw entropy rejection is retained"
       report.fetch("entropy_companions").each do |companion|
         records = companion.fetch("workers").map { JSON.parse(File.read(File.join(output, _1))) }
@@ -53,17 +64,13 @@ class BlogProductionTest < Minitest::Test
         on = records.last
         assert_nil on.fetch("refusals").fetch("Lowrail::Sealed")
         assert_nil on.fetch("refusals").fetch("Lowrail::FormScaffold")
-        form = report.fetch("units").find { _1.fetch("pass") == "sealed/form_scaffold" }
-        link = report.fetch("units").find { _1.fetch("pass") == "sealed/link_to" }
-        refute_nil form, "build-time form certification remains intact"
-        refute_nil link
-        # A mixed artifact must refuse before even installing its safe units:
-        # link's files/templates cannot be separated by just dropping its ID.
-        assert_match(/app-visible ancestry delivery refused:.*active_record\/preload_plans.*sealed\/link_to/,
-          on.fetch("refusals").fetch("artifact"))
-        assert_equal "unexercised", companion.fetch("status"), "original-only equivalence is not optimized coverage"
+        assert_nil on.fetch("refusals").fetch("artifact")
+        assert_equal "equivalent_for_executed_scenarios", companion.fetch("status")
+        %w[sealed/form_scaffold sealed/token_tag sealed/collection_render].each do |pass|
+          unit = report.fetch("units").find { _1.fetch("pass") == pass }
+          refute_nil unit, "build-time certification remains intact: #{pass}"
+        end
         on.fetch("scenarios").each do |scenario|
-          assert_empty scenario.fetch("hits")
           assert_empty scenario.fetch("fallbacks")
         end
         assert_empty on.fetch("unit_refusals")

@@ -43,6 +43,14 @@ pub const REGISTRY: &[Pass] = &[
     Pass { name: "sealed/collection_render", kind: Kind::Runtime, default: false, sealed_only: true, builder: Builder::Runtime { file: "render_units_build", module: "CollectionRenderBuild" }, alias: "collection_render" },
 ];
 
+pub fn delivery_refusal(name: &str) -> Option<&'static str> {
+    match name {
+        "active_record/preload_plans" => Some("quarantined: PreloadPlans::Hook prepends into ActiveRecord::Associations::Preloader, changing app-visible ancestry and call ownership; sealing does not prove this delivery identical"),
+        "sealed/link_to" => Some("quarantined: Templates::CompiledSource prepends into ActionView::Template, changing app-visible ancestry and compiled_source ownership; sealing does not prove this delivery identical"),
+        _ => None,
+    }
+}
+
 pub fn quarantine_reason(name: &str) -> Option<&'static str> {
     match name {
         "view/link_to" | "route/path" => Some("quarantined: source arms lack exact receiver certificates and continuation after app-defined argument/conversion code"),

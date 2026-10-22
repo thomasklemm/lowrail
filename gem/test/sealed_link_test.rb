@@ -100,7 +100,11 @@ class SealedLinkTest < Minitest::Test
       manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
       assert_equal Lowrail::FORMAT, manifest["format"]
       assert_equal "sealed-v1", manifest["tier"]
-      link_unit = manifest.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("id").to_s
+      refute manifest.fetch("units").any? { _1["pass"] == "sealed/link_to" }
+      assert_empty manifest.fetch("templates", {})
+      ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
+      assert ledger.any? { _1["pass"] == "sealed/link_to" && _1["reason"] == "quarantined" &&
+        _1["detail"].include?("Templates::CompiledSource") }, ledger.inspect
       scenario = <<~'RUBY'
         Lowrail.send(:remove_const, :Native) if ENV["MISSING_NATIVE"] && defined?(Lowrail::Native)
         require "./config/environment"
@@ -157,7 +161,7 @@ class SealedLinkTest < Minitest::Test
         admitted = %w[stock send].include?(receiver)
         assert_empty sealed.fetch("hits"), "link template delivery is ancestry-unsafe, including stock receivers"
         assert_empty sealed.fetch("fallbacks")
-        assert_match(/app-visible ancestry delivery refused:.*sealed\/link_to/, sealed.fetch("refusal"))
+        assert_nil sealed.fetch("refusal"), "refused builders must not poison the safe artifact"
         refute_includes sealed.fetch("ancestry"), "Lowrail::Templates::CompiledSource"
         assert_equal [true, false, false], sealed.fetch("runtime_holders"), "Sealed is defined symmetrically by LOWRAIL_SEALED observers, never activated"
         assert_equal '<a class="one&quot;two" href="/target?x=&lt;&amp;q=&quot;">A&lt;&amp;</a>', sealed["body"] if admitted
@@ -168,33 +172,31 @@ class SealedLinkTest < Minitest::Test
       assert status.success?, "#{out}\n#{err}"
       manifest_path = File.join(dir, ".lowrail/manifest.json")
       certified = File.read(manifest_path)
-      renamed_unit = JSON.parse(certified).fetch("units").find { _1["pass"] == "sealed/link_to" }
-      refute_nil renamed_unit, "renaming the application must not refuse the stock link inventory"
-      assert_equal "RenamedLinkFixture::Application", renamed_unit.fetch("sealed").fetch("application_class")
-      link_unit = renamed_unit.fetch("id").to_s
+      refute JSON.parse(certified).fetch("units").any? { _1["pass"] == "sealed/link_to" },
+        "the delivery refusal is independent of the application name"
       off, sealed = %w[0 1].map do |mode|
         ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => mode,
           "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
       end
       %w[status body conversions events metadata].each { assert_equal off[_1], sealed[_1], "renamed: #{_1}" }
-      assert_equal 0, sealed.fetch("hits").fetch(link_unit, 0), sealed.inspect
-      assert_equal 0, sealed.fetch("fallbacks").fetch(link_unit, 0)
+      assert_empty sealed.fetch("hits")
+      assert_empty sealed.fetch("fallbacks")
       missing = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
         "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "MISSING_NATIVE" => "1"})
       %w[status body conversions events metadata].each { assert_equal off[_1], missing[_1], "missing native: #{_1}" }
-      assert_match(/app-visible ancestry delivery refused:/, missing.fetch("refusal"))
-      assert_equal 0, missing.fetch("hits").fetch(link_unit, 0)
+      assert_nil missing.fetch("refusal")
+      assert_empty missing.fetch("hits")
       assert_empty missing.fetch("objspace"), "objspace is never a fallback"
-      unpinned = JSON.parse(certified)
-      sources = unpinned.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("sealed").fetch("sources")
-      sources.delete_if { |path, _| path.start_with?("#{Lowrail::NATIVE_PATH}.") }
-      File.write(manifest_path, JSON.generate(unpinned))
+      # Old/handwritten combined artifacts still refuse before delivery. Do
+      # not run the quarantined builder just to manufacture such an artifact.
+      unsafe = JSON.parse(certified)
+      unsafe.fetch("units") << {"id" => 999, "pass" => "sealed/link_to", "facts" => []}
+      File.write(manifest_path, JSON.generate(unsafe))
       refused = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
         "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
-      %w[status body conversions events metadata].each { assert_equal off[_1], refused[_1], "uncertified native: #{_1}" }
-      assert_equal 0, refused.fetch("hits").fetch(link_unit, 0)
+      %w[status body conversions events metadata].each { assert_equal off[_1], refused[_1], "unsafe combined: #{_1}" }
+      assert_empty refused.fetch("hits")
       assert_match(/app-visible ancestry delivery refused:/, refused.fetch("refusal"))
-      File.write(manifest_path, certified)
       deferred = ruby_json(<<~'RUBY', chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
         require "./config/environment"
         ArticlesController.instance_variable_set(:@view_context_class, nil)
@@ -211,17 +213,6 @@ class SealedLinkTest < Minitest::Test
         "view_class" => nil, "features" => true}, deferred.fetch("refused"))
       assert_equal false, deferred.fetch("allowed")
       assert_match(/app-visible ancestry delivery refused:/, deferred.fetch("reason"))
-      ["WrongCertificate::Application", nil].each do |name|
-        changed = JSON.parse(certified)
-        data = changed.fetch("units").find { _1["pass"] == "sealed/link_to" }.fetch("sealed")
-        name ? data["application_class"] = name : data.delete("application_class")
-        File.write(manifest_path, JSON.generate(changed))
-        refused = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
-          "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => ""})
-        %w[status body conversions events metadata].each { assert_equal off[_1], refused[_1], "uncertified name: #{_1}" }
-        assert_equal 0, refused.fetch("hits").fetch(link_unit, 0)
-        assert_match(/app-visible ancestry delivery refused:/, refused.fetch("refusal"))
-      end
       File.write(manifest_path, certified)
       # disasm normalizes trace_leave to leave, so a text search is vacuous.
       # Exercise the executable VM state after real cold delivery/activation.
@@ -231,7 +222,7 @@ class SealedLinkTest < Minitest::Test
       traced = ruby_json(scenario, chdir: dir, env: {"RAILS_ENV" => "production", "LOWRAIL" => "1",
         "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "", "CHECK_YJIT_TRACE" => "1",
         "RUBYOPT" => "#{SETUP_OPT} --yjit --yjit-stats=quiet"})
-      assert_match(/app-visible ancestry delivery refused:/, traced.fetch("refusal"))
+      assert_nil traced.fetch("refusal")
       assert_empty traced.fetch("hits")
       assert_equal 0, traced.fetch("trace_exits"), "boot observers must not patch unrelated request ISeqs"
       FileUtils.mkdir_p(File.join(dir, "config/initializers"))
@@ -245,7 +236,10 @@ class SealedLinkTest < Minitest::Test
       refused = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
       refute refused.fetch("units").any? { _1["pass"] == "sealed/link_to" }
       ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
-      assert ledger.any? { _1["detail"] == "non-stock helper visibility" }, ledger.inspect
+      rows = ledger.select { _1["pass"] == "sealed/link_to" }
+      assert_equal 1, rows.size, "the builder must not run even to refuse its custom helper"
+      assert_equal "quarantined", rows.first.fetch("reason")
+      assert_includes rows.first.fetch("detail"), "Templates::CompiledSource"
     end
   end
 end
