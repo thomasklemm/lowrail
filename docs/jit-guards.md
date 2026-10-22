@@ -466,62 +466,47 @@ JIT_GUARDS_HARNESS="$HARNESS/script/native-bench" BUNDLER_VERSION=4.0.20 \
 
 ## Closure invalidation feasibility: no new timing
 
-**Verdict: not cleanly feasible at near-zero hot-path cost on stock Ruby
-4.0.7. Keep Y/F branch-only; no opt-in integration.** This is a bounded design
-assessment of the observed counterexample, not an implementation or new price.
+**Verdict: no clean incremental closure certificate in the present compiler;
+keep Y/F branch-only.** Reuse G's planned post-admission tripwire on
+`thomasklemm/sealed-tripwire` and the existing epoch, not a second invalidator
+or per-method hot polling. Per the coordinator, G owns the tripwire's mutation
+coverage/lifecycle contract. Its implementation was not yet published when
+this design was written; no G code is imported or certified here. The open
+question below is **which holders/methods the compiler can completely derive**.
 
-The missing certificate has two independent parts:
+**Proposed handoff:** emit one cold certificate per DirectSite program with
+effective receiver/selector/body/visibility facts and all lookup ancestries.
+Register its actual loaded classes, modules and existing model singleton
+holders through G's mechanism before publishing the plan. A relevant mutation
+bumps the shared epoch and refuses the plan; do not execute app scopes to
+renew it in a request. Reuse the epoch predicate at the consumer's guarded
+entry/use boundaries. Closure subscriptions add no hot traversal; DirectSite
+does not currently have that epoch predicate, so zero *total* guard cost is
+not claimed. Keep the existing live receiver/schema/scope/connection checks.
 
-1. **Derive the erased program, not just a list of scope names.** Starting
-   from each DirectSite chain, a compiler would need a worklist of effective
-   receiver/selector/visibility/lexical-lookup facts, including generated
-   delegates, `_exec_scope`, `super`, blocks, association construction,
-   predicate building, visitor/adapter code and all effects removed by SQL
-   reuse. An observed boot trace is not the closure: it misses alternate
-   values/branches. Ruby's dynamic sends, callbacks, eval, autoload and opaque
-   C calls require a closed modeled subset or refusal, not guessed edges.
-   Executing an arbitrary scope at boot to discover its closure is not a
-   purity proof and may advance effects or lazy loading. No such closed IR
-   and effect model exists for this specimen.
-2. **Revoke before the next affected use, independent of user callbacks.**
-   `method_added`/singleton and include/prepend callbacks can be suppressed;
-   own visibility changes have no corresponding callback. Lowrail's existing
-   [guard code](../gem/lib/lowrail/guard.rb) documents both holes, and the
-   [suppressed-hook audit](passes/suppressed-hooks.md) demonstrates stale
-   permission. JIT CME invalidation protects actual emitted sends, not a
-   cached plan that erased `_exec_scope`. Keeping that send live would retain
-   its normal invalidation, but would undo part of DirectSite's elimination.
-   The stock VM exposes no supported dependency-group subscription primitive
-   for Lowrail to reuse. A C extension wrapping Ruby callbacks does not make
-   them unsuppressible. Freezing the entire dependency graph instead changes
-   the application's mutation contract; it is not this guarded tier.
+**Why derivation blocks this specimen:**
+[ARPlanSites](../gem/lib/lowrail/ar_plan_sites.rb) is explicitly syntactic;
+[ARPlanFacts](../gem/lib/lowrail/ar_plan_facts.rb) recognizes a small fixed
+query chain; [ARPlanBuild](../gem/lib/lowrail/ar_plan_build.rb) gathers named
+holders/methods and source pins, not a transitive effect graph. DirectSite's
+manual list omits `_exec_scope`. A complete worklist must follow generated
+delegates, scope blocks, `super`, association construction, predicate/type
+building and visitor/adapter calls whose work the plan removes. Boot traces
+miss branches. Dynamic selectors/receivers, eval, autoload and opaque C calls
+need modeled contracts or refusal. Stable source locations are not purity;
+executing arbitrary scopes at boot is not a safe discovery substitute. No
+closed receiver/effect model for this Rails path exists here. Watching only
+today's list through a better tripwire still misses an unlisted dependency.
 
-**Cost estimate, structural rather than timing.** With \(M\) certified method
-lookups and \(E\) resolved call edges, worklist closure construction is
-\(O(M+E)\), plus parsing/effect analysis, and stores \(O(M+E)\) evidence.
-A reverse dependency index uses space proportional to total subscribed
-memberships. With a VM-owned group-valid bit, each structural mutation could
-revoke \(O(D)\) affected groups and each checkpoint could read one bit in
-\(O(1)\). That API does not exist here; publication, revocation-before-reentry,
-GC, reload, fork and thread/Ractor behavior would need their own certificates.
-No numerical memory/boot/write or near-zero latency estimate is justified.
-
-Existing **experimental patched-VM** individual method-token guards cost
-202 interpreter / 106 YJIT Ir per successful Ruby guard on their pinned
-master build ([evidence](upstream-drafts/ruby-method-token-description.md#costs-tests-and-patch)).
-Checking all \(M\) at \(C\) boundaries would scale as \(O(CM)\), roughly
-202\(CM\) / 106\(CM\) instructions before loop/receiver/data checks—not
-a stock-4.0.7 price or a demonstrated group primitive. A global epoch is not
-a scoped replacement: the existing Fizzy **`/bubbles`**, not `/buckets`,
-census sees 20 bumps/request; `/buckets` had zero in that census. Avoid
-extrapolating selected-token stability to a complete DirectSite closure.
-
-Even an ideal structural group does not cover mutable defaults/reflections,
-current scopes, role/shard/connection state, or an already-running fast region
-after arbitrary Ruby executes. Actual holder and data guards remain; every
-reentry needs a checkpoint and once-only local continuation or refusal.
-Adding `_exec_scope` alone to today's manual inventory would close one hole,
-not those obligations. No new hook, epoch or patched-Ruby dependency is added.
+**Cost estimate, no timing:** after dispatch resolution, a worklist over
+\(M\) method facts and \(E\) call edges takes \(O(M+E)\) cold work/storage,
+plus parsing/effect analysis. Deduplicating \(H\) holders/ancestors gives
+\(O(H)\) tripwire registrations; G owns their mutation-time cost. Additional
+closure work per request is **zero** with that cold registration; the required
+epoch check is \(O(1)\), not \(O(M)\) reflection. The unresolved cost is the
+new closed-subset compiler/modeling effort, not an extra guard loop. No
+credible numeric boot/memory or instruction price follows from this design.
+Adding `_exec_scope` manually would fix one input, not derive that closure.
 
 **Acceptance test retained:** run the unified negative check above, with
 shadows off, both seeds and an actual-YJIT post-fork worker in every arm.
