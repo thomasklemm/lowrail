@@ -55,6 +55,9 @@ fn source(facts: &Facts, method: &Method, gem: &str, file: &str) -> Option<Strin
 
 /// Lookup may use a generic relation receiver, whose element type comes from
 /// schema/association inference, never from samples.
+/// `call_arguments` describes only fixed arity: Some(false) has zero arguments,
+/// Some(true) has at least one (including nil), None requests the whole method.
+/// Callers refuse splats/forwarding/blocks before using this specialization.
 pub(super) fn lookup(
     facts: &Facts,
     receiver: &str,
@@ -388,6 +391,8 @@ pub(super) fn support(facts: &Facts) -> Vec<Signature> {
         (
             "ActionController::Parameters",
             false,
+            // Retain a shape-only fallback when permit's typed catalog entry
+            // refuses an unsupported version/source/owner above.
             &["expect", "require", "permit", "[]"][..],
         ),
     ] {

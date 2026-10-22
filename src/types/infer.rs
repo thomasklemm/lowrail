@@ -574,10 +574,38 @@ fn aggregate(name: &str, groups: Vec<Vec<Type>>) -> Type {
     ty
 }
 
+// Normalize the RBS names already used throughout the type model. Split only
+// top-level union arms, never unions inside generic arguments or singleton().
+fn union_members(name: &str, out: &mut BTreeSet<String>) {
+    let name = name.trim();
+    if let Some(inner) = name.strip_suffix('?') {
+        union_members(inner, out);
+        out.insert("nil".into());
+    } else if let Some(inner) = name.strip_prefix('(').and_then(|s| s.strip_suffix(')')) {
+        let mut depth = 0;
+        let mut start = 0;
+        for (index, byte) in inner.bytes().enumerate() {
+            match byte {
+                b'(' | b'[' => depth += 1,
+                b')' | b']' => depth -= 1,
+                b'|' if depth == 0 => {
+                    union_members(&inner[start..index], out);
+                    start = index + 1;
+                }
+                _ => {}
+            }
+        }
+        union_members(&inner[start..], out);
+    } else {
+        out.insert(name.into());
+    }
+}
+
 fn union(types: Vec<Type>) -> Type {
-    let names: BTreeSet<_> = types.iter().map(|ty| ty.name.as_str()).collect();
+    let mut names = BTreeSet::new();
+    for ty in &types { union_members(&ty.name, &mut names); }
     let name = if names.is_empty() || names.contains("untyped") { "untyped".into() }
-        else if names.len() == 1 { (*names.first().unwrap()).to_owned() }
+        else if names.len() == 1 { names.into_iter().next().unwrap() }
         else { format!("({})", names.into_iter().collect::<Vec<_>>().join(" | ")) };
     let mut ty = Type::new(name, Source::Inference, "advisory union; unknown members are not discarded");
     for source in types.into_iter().flat_map(|ty| ty.provenance) {

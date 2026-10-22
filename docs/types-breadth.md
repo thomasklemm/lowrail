@@ -37,6 +37,13 @@ example). These remain visible, not guessed: the new known slots with nested
 These 18 partially known slots are included in the 329, not complete element
 type recovery.
 
+These are effective receiver slots, **not 329 independent method bodies**.
+Counting their final recorded body source locations yields Fizzy 17, Campfire
+22, CASA 107, Writebook 11 and Lobsters 20. Concern methods inherited into many
+controllers explain much of Campfire/Writebook's gain. Keeping those public
+receiver signatures useful is real coverage, but does not imply many distinct
+analyses or a whole-program typing capability.
+
 The [machine-readable ledger](types-coverage.json) contains both snapshots'
 coverage, ranked causes, representative unknown slots, argument shapes/families,
 effective owners, **all 329 recovered slot identities**, evidence sources,
@@ -228,3 +235,24 @@ script/types-mcp-smoke .corpus/fizzy > /tmp/fizzy-mcp-session.json
 The companion review evidence contains full before/after type JSON and RBS,
 validation statuses/logs, the complete MCP transcript and test logs. Raw boot
 facts/application configuration are **not** published in that bundle.
+
+## Pre-integration Thermos follow-up
+
+The independent correctness/security review found no introduced blocker.
+The maintainability review raised three structural concerns. The confirmed
+output issue, redundant nested unions such as `((String | nil) | String)`, is
+normalized to `(String | nil)`, including nullable arms. Nested generic
+arguments remain intact, and unknown arms still dominate. New public-model
+regressions cover nested conditionals and unions of differently typed arrays.
+The six exports/ledger were regenerated; coverage counts are unchanged.
+
+The other two proposed redesigns are not adopted: `Option<Type>` deliberately
+distinguishes a normal-completing **unknown value** from unsupported control
+flow, and conservatively demotes rather than invents proof. Likewise the
+catalog's optional argument-presence fact describes only fixed arity: Rails
+`where()` is a WhereChain, but `where(nil)` is a Relation. Value inference is
+not required for this split; blocks/splats/forwarding are refused upstream.
+Those contracts are explicit, and the catalog retains a whole-method union.
+A complete new type AST/effect system would be broader than this change and
+the existing name-based type model. The `permit` shape-only fallback remains
+necessary when its typed catalog refuses unsupported sources/versions.
