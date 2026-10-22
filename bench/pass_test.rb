@@ -50,10 +50,21 @@ class PassBenchTest < Minitest::Test
   def test_stale_manifest_is_a_rejected_measurement_not_a_silent_noop
     run_rejection(manifest.merge("ruby_description" => "obsolete Ruby")) do |result|
       assert_includes result.fetch("error"), "incompatible Ruby/format"
+      refute result.key?("coverage"), "preflight must reject before probing or measuring"
     end
-    run_rejection(manifest.merge("units" => [{ "id" => 0, "pass" => "inertia/props", "facts" => [] }],
-      "templates" => { "/missing/template.erb" => { "source_sha256" => "stale" } })) do |result|
+    units = [{ "id" => 0, "pass" => "inertia/props", "facts" => [] }]
+    # An otherwise eligible artifact must still reach source staleness checks.
+    run_rejection(manifest.merge("units" => units,
+      "files" => { "/missing/source.rb" => { "source_sha256" => "stale" } })) do |result|
       assert_includes result.fetch("error"), "stale build"
+      refute result.key?("coverage"), "preflight must reject before probing or measuring"
+    end
+    run_rejection(manifest.merge("units" => units,
+      "templates" => { "/missing/template.erb" => { "source_sha256" => "stale" } })) do |result|
+      # Either preflight rejection is valid; no measurement may reach the
+      # runtime's original-only fallback, regardless of check order.
+      assert_match(/stale build|app-visible ancestry delivery refused: template delivery/, result.fetch("error"))
+      refute result.key?("coverage"), "preflight must reject before probing or measuring"
     end
   end
 

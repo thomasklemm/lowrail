@@ -14,6 +14,26 @@ mise exec -- cargo build --locked
 mise exec -- cargo test --locked
 ```
 
+The gem Rake task excludes `bench/`. Its benchmark-harness tests are a
+**separate required gate**, not optional coverage. From the repository root,
+run every top-level suite in its own process:
+
+```sh
+(
+  command -v valgrind >/dev/null || exit 1
+  for test in bench/*_test.rb; do
+    LOWRAIL_STRICT_GATES=1 mise exec ruby@4.0.7 -- ruby "$test" --verbose --seed=1729 || exit "$?"
+  done
+)
+```
+
+Valgrind and its headers are required for the counter-boundary tests;
+`.agents/setup` installs them. Without it, those bench tests currently skip
+even with `LOWRAIL_STRICT_GATES=1`, so a skipped run is not the full gate.
+`PassBenchTest` must preserve visible rejection of stale or refused artifacts
+before probing or measuring; a different first refusal reason is not a
+successful measurement or a reason to bypass preflight.
+
 From `gem/`, run both complete suites, without test filters:
 
 ```sh
