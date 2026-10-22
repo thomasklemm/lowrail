@@ -30,6 +30,7 @@ The merge links use GitHub's `mergeCommit`, not the contributor's pre-merge comm
 - [#59252](https://github.com/rails/rails/pull/59252), append error-translation keys without ancestor-pair arrays — GC-counter objects/lookup **169 → 167 / 246 → 243 / 398 → 393** for one/two/four ancestors; MemoryProfiler instead counts **1 / 2 / 4** fewer Arrays (**40 / 80 / 160 bytes**) because it excludes internal objects. The synthetic validation-error endpoint saves about **18 objects/request**; mixed timings and noisy A/A establish neither speed nor equivalence. [Merge 0213cf5](https://github.com/rails/rails/commit/0213cf5f4103e509e79f042e10a6297bd4ceaf50).
 - [#59270](https://github.com/rails/rails/pull/59270), reuse delegated-type helper names — **2 → 1 allocations/call** in interpreter/YJIT/ZJIT; median million helper calls/s **0.977 → 1.181 / 1.358 → 1.594 / 1.371 → 1.748**, respectively. Helper microbenchmarks only, not application-level speedups. [Merge ab5a78a](https://github.com/rails/rails/commit/ab5a78a7c221915cbf09c2824068c4479d144f91).
 - [#59274](https://github.com/rails/rails/pull/59274), reuse unique asset-tag source arrays — **one Array/helper call** saved in all nine cases and interpreter/YJIT/ZJIT (default **29 → 28**, three stylesheets **64 → 63**, preload-disabled/deferred **22 → 21**). Allocation-only: two ZJIT A/A timing controls exclude parity; no speedup/application saving claimed. [Merge e4fd6cb](https://github.com/rails/rails/commit/e4fd6cb9678755b209de3fbb79ccb36f4311e4dc).
+- [#59278](https://github.com/rails/rails/pull/59278), reuse PostgreSQL result fields while casting — **one Array per column-bearing result**, including zero rows: **11 → 10 / 10 → 9 / 72 → 71 / 16 → 15** objects/cast across the four fixtures; zero-column control unchanged. All 108 preregistered interpreter/YJIT/ZJIT workers retain the delta; noisy CPU intervals support **no speed or Ir claim**. [Merge fb7501a](https://github.com/rails/rails/commit/fb7501ad2d7f77713a7de4ed20db1d1d5b5f1c02).
 
 ### Prism — ruby/prism
 
@@ -46,10 +47,6 @@ These performance-related PRs were opened before the October 19–22 census.
 ## Open
 
 All entries in this section are **open, not merged; checked on 2026-10-22**.
-
-### Rails — rails/rails
-
-- [#59278](https://github.com/rails/rails/pull/59278), reuse PostgreSQL result fields while casting — **one Array per column-bearing result**, including zero rows: **11 → 10 / 10 → 9 / 72 → 71 / 16 → 15** objects/cast across the four fixtures; zero-column control unchanged. All 108 preregistered interpreter/YJIT/ZJIT workers retain the delta; noisy CPU intervals support **no speed or Ir claim**.
 
 ### Ruby — ruby/ruby
 
