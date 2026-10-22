@@ -4,6 +4,37 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Lobsters bet M: parked after rejected A/A (2026-10-22)
+
+The source-pinned sealed **bench-only** cache copy-plan prototype at
+[`42d3e5a`](https://github.com/thomasklemm/lowrail/commit/42d3e5ade83922afc1ed39c632cc3c8ecee0dcd0)
+saves **367 / 74 objects/request** on `/` / `/s/enr7ye`, with identical
+off controls. Both seeded responses, independent mutable graphs and external
+same-mtime rewrites pass; every fetch still reads FileStore bytes and retains
+original expiry/version checks. **Wall unresolved**, not negative evidence:
+the noisy A/A screen cannot resolve the smaller observed effects.
+
+One interpreter cohort was authorized prospectively despite that unresolved
+wall gate. It is **REJECTED** under the fixed rule requiring both total/no-GC
+A/A 95% intervals wholly within ±0.1%. **Diagnostics only, not accepted
+prices:** front total/no-GC **−5.199775% / −5.284598%**, story
+**−1.600255% / −1.651904%**. No retry, replacement, exclusions, RPS, runtime
+admission or main promotion; M stays on `thomasklemm/lobsters-cache`.
+
+Bounded read-only diagnosis of existing dumps: zero-based story total
+`0-off_b` **+1.397099%** and `2-off_b` **+1.378897%** drive the upper A/A
+tail. Each adds one Marshal.dump/deflate/binary write/atomic rename; other
+off-story total windows have none. No-GC has the same regeneration signature
+in `1-off_a` and `3-off_b`; all 24 off-story full windows record **zero GC**.
+This is differing stock cache-regeneration work, not a copy-plan effect or
+simple disk-read wait. Live 60-second cache TTL phase under instrumentation
+is the strongly supported explanation, but exact expiry timestamps/keys were
+not recorded, and residual smaller A/A differences remain unattributed.
+Future separately authorized pricing must first certify cache hit/regeneration
+mix and TTL phase without app-semantic changes. No corrected price is inferred.
+[Census, screen and diagnosis](lobsters-cache.md), [screen export](lobsters-cache.json),
+[complete rejected Ir export](lobsters-cache-ir.json).
+
 ## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
 
 The token-only +32 objects/request is traced to per-hit view-context constant
