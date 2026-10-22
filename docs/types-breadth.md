@@ -241,9 +241,14 @@ facts/application configuration are **not** published in that bundle.
 The independent correctness/security review found no introduced blocker.
 The maintainability review raised three structural concerns. The confirmed
 output issue, redundant nested unions such as `((String | nil) | String)`, is
-normalized to `(String | nil)`, including nullable arms. Nested generic
-arguments remain intact, and unknown arms still dominate. New public-model
-regressions cover nested conditionals and unions of differently typed arrays.
+normalized to `(String | nil)`. Existing `?` arms stay opaque/canonical:
+`Session? | nil` becomes `Session?`, and `Array[String?]` stays unchanged.
+Nested generic arguments remain intact, and unknown arms still dominate.
+Public-model regressions cover nested conditionals, differently typed arrays,
+and actual schema-produced nullable String and datetime-union types. The
+nullable datetime arms remain present in arrays, identical branches and a
+String alternative; a transient review claim of losing Time was not reproduced.
+The final focused maintainability follow-up approves the incremental fix.
 The six exports/ledger were regenerated; coverage counts are unchanged.
 
 The other two proposed redesigns are not adopted: `Option<Type>` deliberately

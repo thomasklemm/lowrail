@@ -17,6 +17,11 @@ fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() 
         ("nested_union", "if external; if other; 7; else; 'yes'; end; else; 7; end", "(Integer | String)"),
         ("nested_nil", "if external; 'yes'; elsif other; 'no'; end", "(String | nil)"),
         ("container_union", "if external; ['yes', 7]; else; [false]; end", "(Array[(Integer | String)] | Array[bool])"),
+        ("nullable", "if external; text; else; nil; end", "String?"),
+        ("nullable_array", "[text]", "Array[String?]"),
+        ("datetime_array", "[created_at]", "Array[(Time | ActiveSupport::TimeWithZone)?]"),
+        ("datetime_both", "if external; created_at; else; created_at; end", "(Time | ActiveSupport::TimeWithZone)?"),
+        ("datetime_union", "if external; created_at; else; 'yes'; end", "((Time | ActiveSupport::TimeWithZone)? | String)"),
         ("unknown_branch", "if external; 7; else; other; end", "untyped"),
         ("interpolation", r#""value #{external}""#, "String"),
         ("interpolation_escape", r##""#{external ? (return 7) : 'ok'}""##, "untyped"),
@@ -36,6 +41,8 @@ fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() 
     let methods: Vec<_> = bodies.iter().enumerate().map(|(i, (name, _, _))|
         json!({"name":name,"source_location":format!("{}:{}",file.display(),i+1)})).collect();
     let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "models":[{"name":"Example","columns":[{"name":"text","type":"string"},
+            {"name":"created_at","type":"datetime"}]}],
         "modules":[{"name":"Example","kind":"class","methods":methods}]})).unwrap();
     let model = TypeModel::from_facts(&facts).unwrap();
     for (name, _, expected) in bodies {
