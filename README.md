@@ -160,6 +160,21 @@ when scope or acceptance changes; retain superseded records as historical.
   boundary stay original
   ([pass ledger](docs/DECISIONS.md#passes), [loaders](docs/loaders.md)).
 
+### Also on main (2026-10-22)
+
+- **Sealed mutation tripwire** ([ce47c62](https://github.com/thomasklemm/lowrail/commit/ce47c620cfe85dbc939189e351e051db09e8c484)):
+  certified method/ancestor changes retire admitted units. This is a backstop,
+  not enforcement of the whole [sealed contract](docs/sealed.md#production-mutation-tripwire-not-enforcement).
+- **Advisory types contracts** ([07829bf](https://github.com/thomasklemm/lowrail/commit/07829bfa6dc170ae8100cc7b04a2e0ea98f985fa)):
+  +442 static slots and +843 observed argument slots across the fixed six-app
+  ledger; sampled types are not proofs or runtime specialization
+  ([evidence and limits](docs/types-contracts.md)).
+- **Generic sealed token/collection inventory** ([6436f9c](https://github.com/thomasklemm/lowrail/commit/6436f9c6d7354dbe654b63458f151e67d16209fd)):
+  allocation screens preserve the blog's ≈377 objects/request saving and save
+  ≈2–21 on five Fizzy routes. These are allocation-only screens, not new
+  instruction or throughput prices; form stays narrow and link/template
+  delivery stays quarantined ([scope](docs/generic-sealed.md)).
+
 ## How it works
 
 ```text
@@ -374,6 +389,19 @@ decision, and Lowrail works next to them:
   with it. Lowrail compiles each file with the same options the app's loaders
   use ([loaders.md](docs/loaders.md)).
 
+## Upstream contributions
+
+PR states checked on 2026-10-22. These are scoped upstream changes, not extra
+Lowrail request prices or whole-application speed claims.
+
+- **Merged:** [rails/rails#59270](https://github.com/rails/rails/pull/59270), delegated-type helper names — 2 → 1 allocations/call in interpreter/YJIT/ZJIT; helper microbenchmarks only ([merge ab5a78a](https://github.com/rails/rails/commit/ab5a78a7c221915cbf09c2824068c4479d144f91)).
+- **Open:** [rails/rails#59274](https://github.com/rails/rails/pull/59274), asset-tag source arrays — one Array/helper call saved in all nine cases and three modes; allocation-only, with two ZJIT A/A timing controls excluding parity.
+- **Open:** [ruby/ruby#19483](https://github.com/ruby/ruby/pull/19483), ZJIT protected sends — permission fallbacks/request 87 → 1 (blog), 353 → 9 (Fizzy); earlier stacked prototype, not the current master-based PR binary or a whole-app speed claim.
+- **Open:** [ruby/ruby#19484](https://github.com/ruby/ruby/pull/19484), explicit Proc block arguments in ZJIT — 27 final send fallbacks/request removed in Fizzy, none in the blog; earlier diagnostic measurements, not request-throughput evidence.
+- **Open:** [rails/importmap-rails#336](https://github.com/rails/importmap-rails/pull/336), modulepreload tags — 2 objects/module saved on Ruby 4.0.7 (3 on tested master 4.1), 15.75 objects/request in the seven-package blog screen; allocation/instruction evidence only, native CPU A/A failed.
+- **Open:** [sparklemotion/sqlite3-ruby#758](https://github.com/sparklemotion/sqlite3-ruby/pull/758), statement completion — one Array/completed statement saved, not per row; allocation-only, no speed, latency or CPU no-regression claim.
+- **Open:** [ruby/ruby#19478](https://github.com/ruby/ruby/pull/19478), ZJIT empty keyword-rest sends — warmed 2M-call micro 109.75 → 29.42 ms (−73.2%), fallbacks 2M → 0, allocations unchanged; micro only, not application speed.
+
 ## Docs
 
 | Read | For |
@@ -387,6 +415,7 @@ decision, and Lowrail works next to them:
 | [types.md](docs/types.md) | typed facts, MCP and RBS |
 | [docs/passes/](docs/passes/) | one study per pass or idea |
 | [rails-suite.md](docs/rails-suite.md), [ar-equivalence.md](docs/ar-equivalence.md) | framework-suite and Active Record gates |
+| [development/workflow.md](docs/development/workflow.md) | bet counterexamples, exact-head gates, review and publication rules |
 
 ## Acknowledgements
 

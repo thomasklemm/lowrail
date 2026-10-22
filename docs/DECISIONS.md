@@ -4,6 +4,24 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet C2 cache breadth: stop at census (2026-10-22)
+Nineteen production routes: Fizzy/Campfire/blog/CASA have zero cached-Marshal objects; CodeTriage has only 7/3/6, all transient at public cache return (2/1/1 internal to individual loads).
+Fizzy/blog use SolidCache; Campfire uses Redis, CASA FileStore, CodeTriage MemCacheStore; none of these measured production boots uses MemoryStore.
+Writebook's Redis workload is unmeasured: unchanged production boot refuses the removed `sqlite3_production_warning=` API, not a measured zero.
+The copy plan remains Lobsters-specific: no useful breadth ceiling, port, mutation variant, own-suite support claim or screen/Ir cohort; [branch census and unstarted main requirements](https://github.com/thomasklemm/lowrail/blob/490aef80cf974e8632431a21fc02368c25aab7f4/docs/cache-breadth.md).
+
+## Bet F2: stop DirectSite breadth at the screen (2026-10-22)
+Zero hits mostly mean no installed program; ranked Fizzy/Campfire construction pools are diagnostic, not savings; Writebook boot fails and CASA remains outside the SQLite gate.
+EventSummary specimen: ~30 fewer objects/request, 30 hits/30 fallbacks per ten GETs, failed two-seed off/off body/header and whole-SQL equality; bare-reader reuse changes loaded/strict-loading behavior.
+Fizzy own suite: 124 identical identities/outcomes (117 pass/seven baseline errors), 5,324 identical ordered queries, 19 new hits; equivalence is not a green suite or production support.
+Discard the specimen; no new support or Ir/RPS cohort. Y separately found an unguarded transitive `Relation#_exec_scope` replacement at [d3d3548](https://github.com/thomasklemm/lowrail/commit/d3d3548fd5dfa3d711c588f433c4dab64a5abb2c): future widening also needs compiler-derived guard closure. [Branch census, gates and evidence](https://github.com/thomasklemm/lowrail/blob/5327cd0c9f1adcc006f8ac2826b5fd7f14863dfc/docs/directsite-breadth.md).
+
+## Bet Y: retain the counterexample; stay branch-only (2026-10-22)
+The retained post-admission `Relation#_exec_scope` replacement changes on-only response bodies, headers and ordered SQL at both seeds, with two stale DirectSite hits and zero fallbacks.
+The handwritten dependency inventory misses this transitive method; adding one name or a better tripwire does not derive the compiler-owned receiver/effect closure.
+Keep Y/F bench-only and off main: no production admission, new timing or certificate waiver; the negative acceptance test stays red.
+Thermos follow-ups closed the harness/export findings, not the admission gap; [counterexample, missing closure and review outcome](https://github.com/thomasklemm/lowrail/blob/ec52cc529fc48781a7461d1c48a3ac05de0c58b7/docs/jit-guards.md#opt-in-prerequisite-3-refused-transitive-certificate).
+
 ## Bet G: retain generic inventory, kill literal options (2026-10-22)
 
 Keep token/collection's boot-derived inventory separate from the blog form and its irrelevant I18n source pin.
