@@ -405,16 +405,9 @@ decision, and Lowrail works next to them:
 
 ## Upstream contributions
 
-PR states checked on 2026-10-22. These are scoped upstream changes, not extra
-Lowrail request prices or whole-application speed claims.
-
-- **Merged:** [rails/rails#59270](https://github.com/rails/rails/pull/59270), delegated-type helper names — 2 → 1 allocations/call in interpreter/YJIT/ZJIT; helper microbenchmarks only ([merge ab5a78a](https://github.com/rails/rails/commit/ab5a78a7c221915cbf09c2824068c4479d144f91)).
-- **Open:** [rails/rails#59274](https://github.com/rails/rails/pull/59274), asset-tag source arrays — one Array/helper call saved in all nine cases and three modes; allocation-only, with two ZJIT A/A timing controls excluding parity.
-- **Open:** [ruby/ruby#19483](https://github.com/ruby/ruby/pull/19483), ZJIT protected sends — permission fallbacks/request 87 → 1 (blog), 353 → 9 (Fizzy); earlier stacked prototype, not the current master-based PR binary or a whole-app speed claim.
-- **Open:** [ruby/ruby#19484](https://github.com/ruby/ruby/pull/19484), explicit Proc block arguments in ZJIT — 27 final send fallbacks/request removed in Fizzy, none in the blog; earlier diagnostic measurements, not request-throughput evidence.
-- **Open:** [rails/importmap-rails#336](https://github.com/rails/importmap-rails/pull/336), modulepreload tags — 2 objects/module saved on Ruby 4.0.7 (3 on tested master 4.1), 15.75 objects/request in the seven-package blog screen; allocation/instruction evidence only, native CPU A/A failed.
-- **Open:** [sparklemotion/sqlite3-ruby#758](https://github.com/sparklemotion/sqlite3-ruby/pull/758), statement completion — one Array/completed statement saved, not per row; allocation-only, no speed, latency or CPU no-regression claim.
-- **Open:** [ruby/ruby#19478](https://github.com/ruby/ruby/pull/19478), ZJIT empty keyword-rest sends — warmed 2M-call micro 109.75 → 29.42 ms (−73.2%), fallbacks 2M → 0, allocations unchanged; micro only, not application speed.
+See the [upstream contributions ledger](docs/upstream/contributions.md) for
+merged and open PRs, their measured results and caveats, validation reviews,
+and investigations that did not become submissions.
 
 ## Docs
 
