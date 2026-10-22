@@ -291,7 +291,7 @@
       },
       "source_pin": "https://github.com/basecamp/fizzy@6f1d200316ec3bae91d32c557d88647300807ee9:.",
       "before_json_sha256": "b1a97bdfb89646deade1a2e9fe75da4de1a6c4d67402ed7c03f258afb8c90a5b",
-      "after_json_sha256": "44e56e602abc5aa2a11c447ff7c20d8d1822308dbbbc1f69e4ea52af93f46f73",
+      "after_json_sha256": "37f5357255cee7caf76eb2619c578126ddf2861188a38591e001c4221d2f4816",
       "before": {
         "coverage": {
           "observed": 0,
@@ -616,7 +616,7 @@
         ],
         "rbs_validate_exit": 0,
         "rbs_sha256": {
-          "app.rbs": "97f7430f64d5bccf726b15942793df64e53a40ad12d10d47b6e508d62f855fa1",
+          "app.rbs": "77a83128b704182542329e7af2b5fea19cccb6c6bfd8e675d9fce388a5f2b90b",
           "lowrail_support.rbs": "09b6316ed0701204c5c83650d912fdc469eebae2c923b2735c5264f7115e08b4"
         }
       },
@@ -634,7 +634,7 @@
         {
           "target": "Authentication::SessionLookup#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -800,7 +800,7 @@
       },
       "source_pin": "https://github.com/basecamp/once-campfire@02023b0f0cafc4d66e06e43be072cf4d6ca328fa:.",
       "before_json_sha256": "1879f521ff0bfea50859ef21f7950371e5f40a114a65bd81d2bd0372f0d2c6c8",
-      "after_json_sha256": "edad59190715fbb4f53da570acf372af906af851cb23d2c1e22f10cd1142a811",
+      "after_json_sha256": "3d040a0521a17b98549cd0e07016951fa94da6e361243ec202ad2d5bd0ba2913",
       "before": {
         "coverage": {
           "observed": 0,
@@ -1111,7 +1111,7 @@
         ],
         "rbs_validate_exit": 0,
         "rbs_sha256": {
-          "app.rbs": "727a5073f9ae70ffa81e54b5e3b850d638974b73c4c934ca01e7750ba697be9d",
+          "app.rbs": "6ca57ffaec7b96c6176d8c4555c59fbcd93d21fc2f71eb7f3031132f49ac4abf",
           "lowrail_support.rbs": "d02eae98d83b1c4413aa91a0c3a2b349d77066d0dd9774d13b6f946c6a095201"
         }
       },
@@ -1139,7 +1139,7 @@
         {
           "target": "Accounts::Bots::KeysController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1179,7 +1179,7 @@
         {
           "target": "Accounts::BotsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1219,7 +1219,7 @@
         {
           "target": "Accounts::CustomStylesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1259,7 +1259,7 @@
         {
           "target": "Accounts::JoinCodesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1299,7 +1299,7 @@
         {
           "target": "Accounts::LogosController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1339,7 +1339,7 @@
         {
           "target": "Accounts::UsersController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1379,7 +1379,7 @@
         {
           "target": "AccountsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1418,7 +1418,7 @@
         {
           "target": "ApplicationController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1438,7 +1438,7 @@
         {
           "target": "Authentication::SessionLookup#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1458,7 +1458,7 @@
         {
           "target": "Autocompletable::UsersController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1507,7 +1507,7 @@
         {
           "target": "FirstRunsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1527,7 +1527,7 @@
         {
           "target": "Message#to_key",
           "slot": "return",
-          "type": "Array[(String | nil)]",
+          "type": "Array[String?]",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1547,7 +1547,7 @@
         {
           "target": "Messages::BoostsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1587,7 +1587,7 @@
         {
           "target": "Messages::ByBotsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1627,7 +1627,7 @@
         {
           "target": "MessagesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1666,7 +1666,7 @@
         {
           "target": "PwaController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1696,7 +1696,7 @@
         {
           "target": "QrCodeController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1763,7 +1763,7 @@
         {
           "target": "Rooms::ClosedsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1803,7 +1803,7 @@
         {
           "target": "Rooms::DirectsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1853,7 +1853,7 @@
         {
           "target": "Rooms::InvolvementsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1893,7 +1893,7 @@
         {
           "target": "Rooms::OpensController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1923,7 +1923,7 @@
         {
           "target": "Rooms::RefreshesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -1963,7 +1963,7 @@
         {
           "target": "RoomsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2002,7 +2002,7 @@
         {
           "target": "SearchesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2032,7 +2032,7 @@
         {
           "target": "Sessions::TransfersController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2062,7 +2062,7 @@
         {
           "target": "SessionsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2092,7 +2092,7 @@
         {
           "target": "UnfurlLinksController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2140,7 +2140,7 @@
         {
           "target": "Users::AvatarsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2180,7 +2180,7 @@
         {
           "target": "Users::BansController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2210,7 +2210,7 @@
         {
           "target": "Users::ProfilesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2249,7 +2249,7 @@
         {
           "target": "Users::PushSubscriptions::TestNotificationsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2289,7 +2289,7 @@
         {
           "target": "Users::PushSubscriptionsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2319,7 +2319,7 @@
         {
           "target": "Users::SidebarsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2349,7 +2349,7 @@
         {
           "target": "UsersController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -2389,7 +2389,7 @@
         {
           "target": "WelcomeController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -3992,7 +3992,7 @@
       },
       "source_pin": "https://github.com/basecamp/writebook@be1f8fcf1b0fc8064011c2d29d75133885b182e2:.",
       "before_json_sha256": "d5b2b65ecbd4e06b7a41a0f767cfdb1ec3ab7d8e9cf4b3aea0781fd49e0fce5e",
-      "after_json_sha256": "2e0e05c00b511137fcaa56524b147ae8518b5829c957536d71105a523bc99599",
+      "after_json_sha256": "12419e680b95edf85c123de5fff4284c9b92bcd404cbdc8acdcd0d52a579aa25",
       "before": {
         "coverage": {
           "observed": 0,
@@ -4289,7 +4289,7 @@
         ],
         "rbs_validate_exit": 0,
         "rbs_sha256": {
-          "app.rbs": "bcf488a57bd85020ea71b1efbca8fdb51b67c85f915004d77f10ff5593068208",
+          "app.rbs": "71431026237589e0199a8dd5a9236b968b313cc22c921a2daf7d4a012e0b6664",
           "lowrail_support.rbs": "1cb1fde17a5dced9e4350bbef5417b01ed2685f1fb5c5f0eea474e57103ef6df"
         }
       },
@@ -4307,7 +4307,7 @@
         {
           "target": "Accounts::CustomStylesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4327,7 +4327,7 @@
         {
           "target": "Accounts::JoinCodesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4337,7 +4337,7 @@
         {
           "target": "ActionText::Markdown::UploadsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4347,7 +4347,7 @@
         {
           "target": "ApplicationController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4357,7 +4357,7 @@
         {
           "target": "Authentication::SessionLookup#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4367,7 +4367,7 @@
         {
           "target": "Books::BookmarksController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4387,7 +4387,7 @@
         {
           "target": "Books::Leaves::MovesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4407,7 +4407,7 @@
         {
           "target": "Books::PublicationsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4417,7 +4417,7 @@
         {
           "target": "Books::SearchesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4437,7 +4437,7 @@
         {
           "target": "BooksController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4456,7 +4456,7 @@
         {
           "target": "FirstRunsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4485,7 +4485,7 @@
         {
           "target": "LeafablesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4504,7 +4504,7 @@
         {
           "target": "Pages::EditsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4533,7 +4533,7 @@
         {
           "target": "PagesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4553,7 +4553,7 @@
         {
           "target": "PicturesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4563,7 +4563,7 @@
         {
           "target": "QrCodeController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4583,7 +4583,7 @@
         {
           "target": "SectionsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4593,7 +4593,7 @@
         {
           "target": "Sessions::TransfersController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4603,7 +4603,7 @@
         {
           "target": "SessionsController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4623,7 +4623,7 @@
         {
           "target": "Users::ProfilesController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
@@ -4643,7 +4643,7 @@
         {
           "target": "UsersController#find_session_by_cookie",
           "slot": "return",
-          "type": "(Session | nil)",
+          "type": "Session?",
           "evidence": "static",
           "sources": [
             "inference",
