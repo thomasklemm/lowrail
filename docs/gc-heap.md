@@ -41,3 +41,23 @@ before launch. A/A paired RPS 95% CI must contain zero and on/off lower bound
 must exceed A/A upper bound, existing seed41231/5,000-bootstrap mean paired
 percentage deltas. Report p50/p90/p99, all GC/RSS/heap effects and costs even
 if worse. No retries, exclusions, relaxed rule or README/main promotion.
+
+## Authorized bounded site diagnosis (declared after the screen)
+
+The smaller-heap screen fails its gate; **no shaping and no RPS cohort**.
+The coordinator authorizes one untimed allocation-site follow-up to the
+observed on-only 320-byte-pool `force_major_gc_count` increments. Run three
+fresh off-A/on/off-B workers with the same source/artifact/seed, counters off,
+stock YJIT and 500 real Rack warm requests. Trace boot/warm allocations;
+after three full collections, census their retained 320-byte objects. Then
+clear tracing metadata, disable GC only for twenty traced requests, and count
+sites by the dump's actual **`slot_size:320`**, not `memsize` alone. Restore
+GC, collect three times with FREEOBJ tracing active, and census survivors.
+Export only type/site/count/size metadata, no values, addresses or heap dumps.
+
+This deliberately perturbs heap history and removes Puma/background activity:
+it identifies allocations, **not** natural GC frequency, p99 or a causal
+explanation of the historical cohort. Compare each size pool's allocation
+counter with enumerated objects and retain any residual. No runtime change,
+heap variant or performance rerun follows. Keep the bet open only if the
+result names a concrete lowering-side fix; otherwise include it in the kill.
