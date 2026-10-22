@@ -1,0 +1,2547 @@
+{
+  "scope": "Bet Z2, diagnostic ZJIT compiler coverage. Draft eligible under owner micro-gain plus equal interpreter-Ir criterion; not a Lowrail fixed-heap/JIT-flat or whole-app speed claim.",
+  "ruby_base": "https://github.com/thomasklemm/ruby/commit/1918cede86eb25a8311c0330aa4a647f5a32db38",
+  "ruby_patch": "https://github.com/thomasklemm/ruby/commit/46631773dd402e769190decb23ea44f64cd69dfc",
+  "lowrail_base": "https://github.com/thomasklemm/lowrail/commit/26b1851a32138113d80ad03d8a61d28856d56879",
+  "native_harness": "https://github.com/thomasklemm/lowrail/commit/6510cd2f2cd4384fcf648c638f5f720d00c8d9c8",
+  "upstream_status": "Fork branches only; no new PR or upstream post; #19478 head unchanged at verification.",
+  "environment": {
+    "ruby_configure": "./configure --prefix=/tmp/betz2/install --enable-yjit=stats --enable-zjit=stats --disable-install-doc",
+    "cpu": 2,
+    "architecture": "x86_64",
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.60GHz",
+    "cc": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "valgrind": "valgrind-3.19.0",
+    "binaries": {
+      "base": {
+        "sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "description": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]"
+      },
+      "patch": {
+        "sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "description": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]"
+      }
+    },
+    "note": "Binaries built before source commit. Both retain the configure-time base revision string. Executable patch sources are identical to the committed four zjit/src files; binary SHA identifies each actual measured executable."
+  },
+  "micro": {
+    "config": {
+      "base": "/tmp/betz2/base-ruby",
+      "patched": "/tmp/betz2/patch-ruby",
+      "harness": "/tmp/betz2/native/script/native-bench",
+      "cpu": 2,
+      "micro_code": "# frozen_string_literal: true\n\n# Bet Z2's compiled-caller micro. Used by jit_hooks.rb via micro_code; the\n# same loop supplies the interpreter Callgrind window (second argument).\nrequire \"json\"\nrequire \"digest\"\nabort \"wrong JIT\" unless RubyVM::ZJIT.enabled? == (ARGV.fetch(0) == \"zjit\")\n\ndef literal_keywords(a: 13, **kwargs)\n  a + kwargs[:left] - kwargs[:right]\nend\n\ndef hot_loop(n)\n  i = 0\n  total = 0\n  while i < n\n    total += literal_keywords(right: 3, a: 17, left: 29)\n    i += 1\n  end\n  total\nend\n\n100.times { abort \"wrong warmup\" unless hot_loop(2_000) == 86_000 }\nGC.start\nn = ARGV[1] ? Integer(ARGV.fetch(1)) : 2_000_000\nif ENV[\"LOWRAIL_CALLGRIND_EXT\"]\n  require ENV.fetch(\"LOWRAIL_CALLGRIND_EXT\")\n  GC.disable\nend\nbefore = RubyVM::ZJIT.stats if RubyVM::ZJIT.enabled? && ENV[\"Z2_STATS\"]\nobjects = GC.stat(:total_allocated_objects)\nstarted = Process.clock_gettime(Process::CLOCK_MONOTONIC)\nLowrailCallgrindBench.start(false) if defined?(LowrailCallgrindBench)\nresult = hot_loop(n)\nLowrailCallgrindBench.finish if defined?(LowrailCallgrindBench)\nelapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started\nobjects = GC.stat(:total_allocated_objects) - objects\nafter = RubyVM::ZJIT.stats if before\nabort \"wrong result\" unless result == 43 * n\nputs JSON.generate(wall_seconds: elapsed, objects: objects, result: result,\n  jit: RubyVM::ZJIT.enabled?, binary_sha256: Digest::SHA256.file(\"/proc/self/exe\").hexdigest,\n  ruby: RUBY_DESCRIPTION,\n  jit_delta: before && after.select { |_, v| v.is_a?(Numeric) }.to_h { |k, v| [k, v - before.fetch(k, 0)] })\n"
+    },
+    "code": "# frozen_string_literal: true\n\n# Bet Z2's compiled-caller micro. Used by jit_hooks.rb via micro_code; the\n# same loop supplies the interpreter Callgrind window (second argument).\nrequire \"json\"\nrequire \"digest\"\nabort \"wrong JIT\" unless RubyVM::ZJIT.enabled? == (ARGV.fetch(0) == \"zjit\")\n\ndef literal_keywords(a: 13, **kwargs)\n  a + kwargs[:left] - kwargs[:right]\nend\n\ndef hot_loop(n)\n  i = 0\n  total = 0\n  while i < n\n    total += literal_keywords(right: 3, a: 17, left: 29)\n    i += 1\n  end\n  total\nend\n\n100.times { abort \"wrong warmup\" unless hot_loop(2_000) == 86_000 }\nGC.start\nn = ARGV[1] ? Integer(ARGV.fetch(1)) : 2_000_000\nif ENV[\"LOWRAIL_CALLGRIND_EXT\"]\n  require ENV.fetch(\"LOWRAIL_CALLGRIND_EXT\")\n  GC.disable\nend\nbefore = RubyVM::ZJIT.stats if RubyVM::ZJIT.enabled? && ENV[\"Z2_STATS\"]\nobjects = GC.stat(:total_allocated_objects)\nstarted = Process.clock_gettime(Process::CLOCK_MONOTONIC)\nLowrailCallgrindBench.start(false) if defined?(LowrailCallgrindBench)\nresult = hot_loop(n)\nLowrailCallgrindBench.finish if defined?(LowrailCallgrindBench)\nelapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started\nobjects = GC.stat(:total_allocated_objects) - objects\nafter = RubyVM::ZJIT.stats if before\nabort \"wrong result\" unless result == 43 * n\nputs JSON.generate(wall_seconds: elapsed, objects: objects, result: result,\n  jit: RubyVM::ZJIT.enabled?, binary_sha256: Digest::SHA256.file(\"/proc/self/exe\").hexdigest,\n  ruby: RUBY_DESCRIPTION,\n  jit_delta: before && after.select { |_, v| v.is_a?(Numeric) }.to_h { |k, v| [k, v - before.fetch(k, 0)] })\n",
+    "workers": [
+      {
+        "wall_seconds": 0.3091101449999769,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 0
+      },
+      {
+        "wall_seconds": 0.3288018559996999,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 0
+      },
+      {
+        "wall_seconds": 0.3067879929999435,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 0
+      },
+      {
+        "wall_seconds": 0.23038680599984218,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 0
+      },
+      {
+        "wall_seconds": 0.24318700399999216,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 0
+      },
+      {
+        "wall_seconds": 0.1286169449999761,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 0
+      },
+      {
+        "wall_seconds": 0.2334278160001304,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 1
+      },
+      {
+        "wall_seconds": 0.12537088999988555,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 1
+      },
+      {
+        "wall_seconds": 0.23173178600018218,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 1
+      },
+      {
+        "wall_seconds": 0.31703058100038106,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 1
+      },
+      {
+        "wall_seconds": 0.316119556999638,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 1
+      },
+      {
+        "wall_seconds": 0.2977119759998459,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 1
+      },
+      {
+        "wall_seconds": 0.34928996700000425,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 2
+      },
+      {
+        "wall_seconds": 0.300159105000148,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 2
+      },
+      {
+        "wall_seconds": 0.2973217050002859,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 2
+      },
+      {
+        "wall_seconds": 0.1361616980002509,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 2
+      },
+      {
+        "wall_seconds": 0.2563147939999908,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 2
+      },
+      {
+        "wall_seconds": 0.24680521500022223,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 2
+      },
+      {
+        "wall_seconds": 0.2776820809999663,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 3
+      },
+      {
+        "wall_seconds": 0.26090773799978706,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 3
+      },
+      {
+        "wall_seconds": 0.1441297870001108,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 3
+      },
+      {
+        "wall_seconds": 0.3137780299998667,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 3
+      },
+      {
+        "wall_seconds": 0.2952245450001101,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 3
+      },
+      {
+        "wall_seconds": 0.31927075100020375,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 3
+      },
+      {
+        "wall_seconds": 0.3001270419999855,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 4
+      },
+      {
+        "wall_seconds": 0.30033882599991557,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 4
+      },
+      {
+        "wall_seconds": 0.30432029000030525,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 4
+      },
+      {
+        "wall_seconds": 0.26232314400022005,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 4
+      },
+      {
+        "wall_seconds": 0.13886599099987507,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 4
+      },
+      {
+        "wall_seconds": 0.26200180400019235,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 4
+      },
+      {
+        "wall_seconds": 0.13800966799999514,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 5
+      },
+      {
+        "wall_seconds": 0.25151624799991623,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 5
+      },
+      {
+        "wall_seconds": 0.2501153749999503,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 5
+      },
+      {
+        "wall_seconds": 0.33519920299977457,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 5
+      },
+      {
+        "wall_seconds": 0.31218847199988886,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 5
+      },
+      {
+        "wall_seconds": 0.3081039610001426,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 5
+      },
+      {
+        "wall_seconds": 0.3120872730000883,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 6
+      },
+      {
+        "wall_seconds": 0.29215169099961713,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 6
+      },
+      {
+        "wall_seconds": 0.32226845900004264,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 6
+      },
+      {
+        "wall_seconds": 0.28152507400000104,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 6
+      },
+      {
+        "wall_seconds": 0.25197441000000254,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 6
+      },
+      {
+        "wall_seconds": 0.12661507299981167,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 6
+      },
+      {
+        "wall_seconds": 0.25080377699987366,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 7
+      },
+      {
+        "wall_seconds": 0.12980959100013933,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 7
+      },
+      {
+        "wall_seconds": 0.27044716000000335,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 7
+      },
+      {
+        "wall_seconds": 0.2976246429998355,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 7
+      },
+      {
+        "wall_seconds": 0.29579917499995645,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 7
+      },
+      {
+        "wall_seconds": 0.31446504899986394,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 7
+      },
+      {
+        "wall_seconds": 0.3199699239999063,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 8
+      },
+      {
+        "wall_seconds": 0.2966482389997509,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 8
+      },
+      {
+        "wall_seconds": 0.3009594290001587,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 8
+      },
+      {
+        "wall_seconds": 0.14928295600020647,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 8
+      },
+      {
+        "wall_seconds": 0.2641488809999828,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 8
+      },
+      {
+        "wall_seconds": 0.2508152450000125,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 8
+      },
+      {
+        "wall_seconds": 0.3370597690000068,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "zjit",
+        "round": 9
+      },
+      {
+        "wall_seconds": 0.25235617299995283,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "zjit",
+        "round": 9
+      },
+      {
+        "wall_seconds": 0.13190905700002986,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": true,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "zjit",
+        "round": 9
+      },
+      {
+        "wall_seconds": 0.29584201099987695,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_a",
+        "mode": "interpreter",
+        "round": 9
+      },
+      {
+        "wall_seconds": 0.33221122400027525,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "off_b",
+        "mode": "interpreter",
+        "round": 9
+      },
+      {
+        "wall_seconds": 0.30965326999967147,
+        "objects": 2000007,
+        "result": 86000000,
+        "jit": false,
+        "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+        "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+        "jit_delta": null,
+        "arm": "on",
+        "mode": "interpreter",
+        "round": 9
+      }
+    ],
+    "summary": {
+      "interpreter": {
+        "off_b": {
+          "delta_pct": 0.5318670876082354,
+          "ci95_pct": [
+            -2.926828952541329,
+            4.3042669982036195
+          ],
+          "round_deltas_pct": [
+            6.370451218844497,
+            6.4890251511229735,
+            -0.9452986608088021,
+            -5.912933101072914,
+            -1.3779061528613523,
+            -1.308347798232512,
+            -6.387822806367871,
+            -5.355255235387302,
+            1.453300385313061,
+            12.293457875532576
+          ],
+          "median_abs_round_delta_pct": 5.634094168230108
+        },
+        "on": {
+          "delta_pct": 3.946975326339853,
+          "ci95_pct": [
+            0.35859667168390097,
+            7.632550646313265
+          ],
+          "round_deltas_pct": [
+            -0.7512377182035124,
+            6.18301663477645,
+            16.3682730863127,
+            1.7505116595764703,
+            -1.3083136850276067,
+            7.370781775662083,
+            3.2622881100157652,
+            -5.935754723544995,
+            7.861730472020434,
+            4.668457651810742
+          ],
+          "median_abs_round_delta_pct": 5.302106187677868
+        }
+      },
+      "zjit": {
+        "off_b": {
+          "delta_pct": -5.183528048529187,
+          "ci95_pct": [
+            -10.493701261016934,
+            -0.8393389888005691
+          ],
+          "round_deltas_pct": [
+            5.555959658626786,
+            0.7318935521201553,
+            -3.710117099120269,
+            -6.040844601773654,
+            0.1226480104798977,
+            -0.556971174270382,
+            -10.496636615748978,
+            -7.26329793965278,
+            -5.047773039769621,
+            -25.13014123618302
+          ],
+          "median_abs_round_delta_pct": 5.301866349198203
+        },
+        "on": {
+          "delta_pct": -48.8548556092997,
+          "ci95_pct": [
+            -52.279799395667546,
+            -46.0018156626264
+          ],
+          "round_deltas_pct": [
+            -44.17347623628055,
+            -45.89827655331368,
+            -46.8771599659379,
+            -48.095395107569686,
+            -46.99807830339476,
+            -45.12892542829236,
+            -55.02529447881037,
+            -52.00186572484705,
+            -43.485296839013984,
+            -60.86478745553665
+          ],
+          "median_abs_round_delta_pct": 46.937619134666335
+        }
+      }
+    }
+  },
+  "micro_diagnostics_not_timing": {
+    "micro-stats-base-inline": {
+      "wall_seconds": 1.0207126889999927,
+      "objects": 2000007,
+      "result": 86000000,
+      "jit": true,
+      "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+      "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compile_time_ns": 0,
+        "invalidation_time_ns": 0,
+        "compiled_side_exit_count": 0,
+        "zjit_insn_count": 52000013,
+        "complex_arg_pass_param_post": 0,
+        "complex_arg_pass_param_kwrest": 2000000,
+        "complex_arg_pass_param_block": 0,
+        "complex_arg_pass_param_forwardable": 0,
+        "complex_arg_pass_accepts_no_block": 0,
+        "complex_arg_pass_does_not_use_block": 0,
+        "complex_arg_pass_caller_splat": 0,
+        "complex_arg_pass_caller_blockarg": 0,
+        "complex_arg_pass_caller_kwarg": 0,
+        "complex_arg_pass_caller_kw_splat": 0,
+        "complex_arg_pass_caller_tailcall": 0,
+        "complex_arg_pass_caller_super": 0,
+        "complex_arg_pass_caller_zsuper": 0,
+        "complex_arg_pass_caller_forwarding": 0,
+        "complex_arg_pass_keyword_to_positional_hash": 0,
+        "send_direct_fallback_context_send": 2000000,
+        "send_direct_fallback_context_super": 0,
+        "side_exit_count": 0,
+        "send_fallback_send_cfunc_not_variadic": 0,
+        "send_fallback_send_not_optimized_method_type_optimized": 0,
+        "send_fallback_operand_too_large": 0,
+        "send_fallback_send_operands_not_fixnum": 0,
+        "send_fallback_send_polymorphic_fallback": 0,
+        "send_fallback_send_direct_keyword_mismatch": 0,
+        "send_fallback_send_direct_keyword_count_mismatch": 0,
+        "send_fallback_send_direct_missing_keyword": 0,
+        "send_fallback_send_direct_too_many_keywords": 0,
+        "send_fallback_send_polymorphic": 0,
+        "send_fallback_send_megamorphic": 0,
+        "send_fallback_send_no_profiles": 0,
+        "send_fallback_send_not_optimized_method_type": 0,
+        "send_fallback_send_not_optimized_need_permission": 0,
+        "send_fallback_send_block_arg_not_nil": 0,
+        "send_fallback_argc_param_mismatch": 0,
+        "send_fallback_one_or_more_complex_arg_pass": 2000000,
+        "send_fallback_unexpected_keyword_args": 0,
+        "send_fallback_singleton_class_seen": 0,
+        "send_fallback_bmethod_non_iseq_proc": 0,
+        "send_fallback_obj_to_string_not_string": 0,
+        "send_fallback_send_cfunc_variadic": 0,
+        "send_fallback_send_cfunc_array_variadic": 0,
+        "send_fallback_super_call_with_block": 0,
+        "send_fallback_super_from_block": 0,
+        "send_fallback_super_class_not_found": 0,
+        "send_fallback_super_complex_args_pass": 0,
+        "send_fallback_super_fallback_no_profile": 0,
+        "send_fallback_super_not_optimized_method_type": 0,
+        "send_fallback_super_polymorphic": 0,
+        "send_fallback_super_target_not_found": 0,
+        "send_fallback_cannot_send_direct": 0,
+        "send_fallback_invokeblock_not_specialized": 0,
+        "send_fallback_invokeblock_polymorphic_miss": 0,
+        "send_fallback_sendforward_not_specialized": 0,
+        "send_fallback_invokesuperforward_not_specialized": 0,
+        "send_fallback_single_ractor_mode_required": 0,
+        "send_fallback_uncategorized": 0,
+        "iseq_optimized_send_count": 0,
+        "inline_cfunc_optimized_send_count": 14000001,
+        "inline_iseq_optimized_send_count": 0,
+        "non_variadic_cfunc_optimized_send_count": 0,
+        "variadic_cfunc_optimized_send_count": 0,
+        "block_iseq_direct_optimized_send_count": 0,
+        "optimized_send_count": 14000001,
+        "iseq_calls_count_literal_keywords@bench/experiments/jit_literal_kwrest.rb:10": 2000000,
+        "iseq_calls_count_hot_loop@bench/experiments/jit_literal_kwrest.rb:14": 1
+      }
+    },
+    "micro-stats-base-noinline": {
+      "wall_seconds": 0.9928135339996516,
+      "objects": 2000007,
+      "result": 86000000,
+      "jit": true,
+      "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+      "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compile_time_ns": 0,
+        "invalidation_time_ns": 0,
+        "compiled_side_exit_count": 0,
+        "zjit_insn_count": 52000013,
+        "complex_arg_pass_param_post": 0,
+        "complex_arg_pass_param_kwrest": 2000000,
+        "complex_arg_pass_param_block": 0,
+        "complex_arg_pass_param_forwardable": 0,
+        "complex_arg_pass_accepts_no_block": 0,
+        "complex_arg_pass_does_not_use_block": 0,
+        "complex_arg_pass_caller_splat": 0,
+        "complex_arg_pass_caller_blockarg": 0,
+        "complex_arg_pass_caller_kwarg": 0,
+        "complex_arg_pass_caller_kw_splat": 0,
+        "complex_arg_pass_caller_tailcall": 0,
+        "complex_arg_pass_caller_super": 0,
+        "complex_arg_pass_caller_zsuper": 0,
+        "complex_arg_pass_caller_forwarding": 0,
+        "complex_arg_pass_keyword_to_positional_hash": 0,
+        "send_direct_fallback_context_send": 2000000,
+        "send_direct_fallback_context_super": 0,
+        "side_exit_count": 0,
+        "send_fallback_send_cfunc_not_variadic": 0,
+        "send_fallback_send_not_optimized_method_type_optimized": 0,
+        "send_fallback_operand_too_large": 0,
+        "send_fallback_send_operands_not_fixnum": 0,
+        "send_fallback_send_polymorphic_fallback": 0,
+        "send_fallback_send_direct_keyword_mismatch": 0,
+        "send_fallback_send_direct_keyword_count_mismatch": 0,
+        "send_fallback_send_direct_missing_keyword": 0,
+        "send_fallback_send_direct_too_many_keywords": 0,
+        "send_fallback_send_polymorphic": 0,
+        "send_fallback_send_megamorphic": 0,
+        "send_fallback_send_no_profiles": 0,
+        "send_fallback_send_not_optimized_method_type": 0,
+        "send_fallback_send_not_optimized_need_permission": 0,
+        "send_fallback_send_block_arg_not_nil": 0,
+        "send_fallback_argc_param_mismatch": 0,
+        "send_fallback_one_or_more_complex_arg_pass": 2000000,
+        "send_fallback_unexpected_keyword_args": 0,
+        "send_fallback_singleton_class_seen": 0,
+        "send_fallback_bmethod_non_iseq_proc": 0,
+        "send_fallback_obj_to_string_not_string": 0,
+        "send_fallback_send_cfunc_variadic": 0,
+        "send_fallback_send_cfunc_array_variadic": 0,
+        "send_fallback_super_call_with_block": 0,
+        "send_fallback_super_from_block": 0,
+        "send_fallback_super_class_not_found": 0,
+        "send_fallback_super_complex_args_pass": 0,
+        "send_fallback_super_fallback_no_profile": 0,
+        "send_fallback_super_not_optimized_method_type": 0,
+        "send_fallback_super_polymorphic": 0,
+        "send_fallback_super_target_not_found": 0,
+        "send_fallback_cannot_send_direct": 0,
+        "send_fallback_invokeblock_not_specialized": 0,
+        "send_fallback_invokeblock_polymorphic_miss": 0,
+        "send_fallback_sendforward_not_specialized": 0,
+        "send_fallback_invokesuperforward_not_specialized": 0,
+        "send_fallback_single_ractor_mode_required": 0,
+        "send_fallback_uncategorized": 0,
+        "iseq_optimized_send_count": 0,
+        "inline_cfunc_optimized_send_count": 14000001,
+        "inline_iseq_optimized_send_count": 0,
+        "non_variadic_cfunc_optimized_send_count": 0,
+        "variadic_cfunc_optimized_send_count": 0,
+        "block_iseq_direct_optimized_send_count": 0,
+        "optimized_send_count": 14000001,
+        "iseq_calls_count_literal_keywords@bench/experiments/jit_literal_kwrest.rb:10": 2000000,
+        "iseq_calls_count_hot_loop@bench/experiments/jit_literal_kwrest.rb:14": 1
+      }
+    },
+    "micro-stats-patch-inline": {
+      "wall_seconds": 0.8462179069997546,
+      "objects": 2000007,
+      "result": 86000000,
+      "jit": true,
+      "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+      "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compile_time_ns": 0,
+        "invalidation_time_ns": 0,
+        "compiled_side_exit_count": 0,
+        "zjit_insn_count": 52000013,
+        "complex_arg_pass_param_post": 0,
+        "complex_arg_pass_param_kwrest": 0,
+        "complex_arg_pass_param_block": 0,
+        "complex_arg_pass_param_forwardable": 0,
+        "complex_arg_pass_accepts_no_block": 0,
+        "complex_arg_pass_does_not_use_block": 0,
+        "complex_arg_pass_caller_splat": 0,
+        "complex_arg_pass_caller_blockarg": 0,
+        "complex_arg_pass_caller_kwarg": 0,
+        "complex_arg_pass_caller_kw_splat": 0,
+        "complex_arg_pass_caller_tailcall": 0,
+        "complex_arg_pass_caller_super": 0,
+        "complex_arg_pass_caller_zsuper": 0,
+        "complex_arg_pass_caller_forwarding": 0,
+        "complex_arg_pass_keyword_to_positional_hash": 0,
+        "send_direct_fallback_context_send": 0,
+        "send_direct_fallback_context_super": 0,
+        "side_exit_count": 0,
+        "send_fallback_send_cfunc_not_variadic": 0,
+        "send_fallback_send_not_optimized_method_type_optimized": 0,
+        "send_fallback_operand_too_large": 0,
+        "send_fallback_send_operands_not_fixnum": 0,
+        "send_fallback_send_polymorphic_fallback": 0,
+        "send_fallback_send_direct_keyword_mismatch": 0,
+        "send_fallback_send_direct_keyword_count_mismatch": 0,
+        "send_fallback_send_direct_missing_keyword": 0,
+        "send_fallback_send_direct_too_many_keywords": 0,
+        "send_fallback_send_polymorphic": 0,
+        "send_fallback_send_megamorphic": 0,
+        "send_fallback_send_no_profiles": 0,
+        "send_fallback_send_not_optimized_method_type": 0,
+        "send_fallback_send_not_optimized_need_permission": 0,
+        "send_fallback_send_block_arg_not_nil": 0,
+        "send_fallback_argc_param_mismatch": 0,
+        "send_fallback_one_or_more_complex_arg_pass": 0,
+        "send_fallback_unexpected_keyword_args": 0,
+        "send_fallback_singleton_class_seen": 0,
+        "send_fallback_bmethod_non_iseq_proc": 0,
+        "send_fallback_obj_to_string_not_string": 0,
+        "send_fallback_send_cfunc_variadic": 0,
+        "send_fallback_send_cfunc_array_variadic": 0,
+        "send_fallback_super_call_with_block": 0,
+        "send_fallback_super_from_block": 0,
+        "send_fallback_super_class_not_found": 0,
+        "send_fallback_super_complex_args_pass": 0,
+        "send_fallback_super_fallback_no_profile": 0,
+        "send_fallback_super_not_optimized_method_type": 0,
+        "send_fallback_super_polymorphic": 0,
+        "send_fallback_super_target_not_found": 0,
+        "send_fallback_cannot_send_direct": 0,
+        "send_fallback_invokeblock_not_specialized": 0,
+        "send_fallback_invokeblock_polymorphic_miss": 0,
+        "send_fallback_sendforward_not_specialized": 0,
+        "send_fallback_invokesuperforward_not_specialized": 0,
+        "send_fallback_single_ractor_mode_required": 0,
+        "send_fallback_uncategorized": 0,
+        "iseq_optimized_send_count": 2000000,
+        "inline_cfunc_optimized_send_count": 14000001,
+        "inline_iseq_optimized_send_count": 0,
+        "non_variadic_cfunc_optimized_send_count": 0,
+        "variadic_cfunc_optimized_send_count": 0,
+        "block_iseq_direct_optimized_send_count": 0,
+        "optimized_send_count": 16000001,
+        "iseq_calls_count_literal_keywords@bench/experiments/jit_literal_kwrest.rb:10": 2000000,
+        "iseq_calls_count_hot_loop@bench/experiments/jit_literal_kwrest.rb:14": 1
+      }
+    },
+    "micro-stats-patch-noinline": {
+      "wall_seconds": 0.8717761060001976,
+      "objects": 2000007,
+      "result": 86000000,
+      "jit": true,
+      "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+      "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compile_time_ns": 0,
+        "invalidation_time_ns": 0,
+        "compiled_side_exit_count": 0,
+        "zjit_insn_count": 52000013,
+        "complex_arg_pass_param_post": 0,
+        "complex_arg_pass_param_kwrest": 0,
+        "complex_arg_pass_param_block": 0,
+        "complex_arg_pass_param_forwardable": 0,
+        "complex_arg_pass_accepts_no_block": 0,
+        "complex_arg_pass_does_not_use_block": 0,
+        "complex_arg_pass_caller_splat": 0,
+        "complex_arg_pass_caller_blockarg": 0,
+        "complex_arg_pass_caller_kwarg": 0,
+        "complex_arg_pass_caller_kw_splat": 0,
+        "complex_arg_pass_caller_tailcall": 0,
+        "complex_arg_pass_caller_super": 0,
+        "complex_arg_pass_caller_zsuper": 0,
+        "complex_arg_pass_caller_forwarding": 0,
+        "complex_arg_pass_keyword_to_positional_hash": 0,
+        "send_direct_fallback_context_send": 0,
+        "send_direct_fallback_context_super": 0,
+        "side_exit_count": 0,
+        "send_fallback_send_cfunc_not_variadic": 0,
+        "send_fallback_send_not_optimized_method_type_optimized": 0,
+        "send_fallback_operand_too_large": 0,
+        "send_fallback_send_operands_not_fixnum": 0,
+        "send_fallback_send_polymorphic_fallback": 0,
+        "send_fallback_send_direct_keyword_mismatch": 0,
+        "send_fallback_send_direct_keyword_count_mismatch": 0,
+        "send_fallback_send_direct_missing_keyword": 0,
+        "send_fallback_send_direct_too_many_keywords": 0,
+        "send_fallback_send_polymorphic": 0,
+        "send_fallback_send_megamorphic": 0,
+        "send_fallback_send_no_profiles": 0,
+        "send_fallback_send_not_optimized_method_type": 0,
+        "send_fallback_send_not_optimized_need_permission": 0,
+        "send_fallback_send_block_arg_not_nil": 0,
+        "send_fallback_argc_param_mismatch": 0,
+        "send_fallback_one_or_more_complex_arg_pass": 0,
+        "send_fallback_unexpected_keyword_args": 0,
+        "send_fallback_singleton_class_seen": 0,
+        "send_fallback_bmethod_non_iseq_proc": 0,
+        "send_fallback_obj_to_string_not_string": 0,
+        "send_fallback_send_cfunc_variadic": 0,
+        "send_fallback_send_cfunc_array_variadic": 0,
+        "send_fallback_super_call_with_block": 0,
+        "send_fallback_super_from_block": 0,
+        "send_fallback_super_class_not_found": 0,
+        "send_fallback_super_complex_args_pass": 0,
+        "send_fallback_super_fallback_no_profile": 0,
+        "send_fallback_super_not_optimized_method_type": 0,
+        "send_fallback_super_polymorphic": 0,
+        "send_fallback_super_target_not_found": 0,
+        "send_fallback_cannot_send_direct": 0,
+        "send_fallback_invokeblock_not_specialized": 0,
+        "send_fallback_invokeblock_polymorphic_miss": 0,
+        "send_fallback_sendforward_not_specialized": 0,
+        "send_fallback_invokesuperforward_not_specialized": 0,
+        "send_fallback_single_ractor_mode_required": 0,
+        "send_fallback_uncategorized": 0,
+        "iseq_optimized_send_count": 2000000,
+        "inline_cfunc_optimized_send_count": 14000001,
+        "inline_iseq_optimized_send_count": 0,
+        "non_variadic_cfunc_optimized_send_count": 0,
+        "variadic_cfunc_optimized_send_count": 0,
+        "block_iseq_direct_optimized_send_count": 0,
+        "optimized_send_count": 16000001,
+        "iseq_calls_count_hot_loop@bench/experiments/jit_literal_kwrest.rb:14": 1,
+        "iseq_calls_count_literal_keywords@bench/experiments/jit_literal_kwrest.rb:10": 2000000
+      }
+    }
+  },
+  "cohorts": {
+    "blog": {
+      "config": {
+        "app": "/home/user/workspace/repo/.corpus/real-blog-r4",
+        "workload": "blog",
+        "seed": "/tmp/betz2/state/blog",
+        "gemfile": "/tmp/betz2/bundles/blog/Gemfile",
+        "bundle_path": "/tmp/betz2/gems",
+        "harness": "/tmp/betz2/native/script/native-bench",
+        "ruby": "/tmp/betz2/base-ruby",
+        "flags": [
+          "--zjit"
+        ],
+        "stats_flags": [
+          "--zjit-stats-quiet"
+        ],
+        "warmup": 1200,
+        "samples": 300,
+        "phases": [
+          "exact",
+          "stats"
+        ],
+        "arms": {
+          "off_a": {},
+          "off_b": {},
+          "on": {
+            "ruby": "/tmp/betz2/patch-ruby"
+          }
+        },
+        "jit": "zjit",
+        "policy": "/tmp/betz2/blog-policy.json"
+      },
+      "workers": [
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "blog",
+          "phase": "exact",
+          "requests": 10,
+          "warmup": 1200,
+          "allocations_per_request": 2434.6,
+          "collections": 0,
+          "wall_us_per_request": null,
+          "exact": {
+            "0": {
+              "status": 200,
+              "body_sha256": "d4d3edf51fad0c4e9a3bf6d499752e2e95d3270db9bd4731b0b706e80dcd3617",
+              "headers_sha256": "c064b9439b40b2cf1a9b9381d3254b3f344832953dd34018da0f39a7a154acf8"
+            },
+            "1": {
+              "status": 200,
+              "body_sha256": "ece075c818dc209d5a74343b54a4d1b6e70625b6bedeca79ae7caeeed45766db",
+              "headers_sha256": "9080b0184bbcd84200b0aac2a0af25b7abf3659cf4141300152f677516764d48"
+            }
+          },
+          "calls_per_request": {},
+          "jit_delta": null,
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_a",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "blog",
+          "phase": "exact",
+          "requests": 10,
+          "warmup": 1200,
+          "allocations_per_request": 2433.7,
+          "collections": 0,
+          "wall_us_per_request": null,
+          "exact": {
+            "0": {
+              "status": 200,
+              "body_sha256": "d4d3edf51fad0c4e9a3bf6d499752e2e95d3270db9bd4731b0b706e80dcd3617",
+              "headers_sha256": "c064b9439b40b2cf1a9b9381d3254b3f344832953dd34018da0f39a7a154acf8"
+            },
+            "1": {
+              "status": 200,
+              "body_sha256": "ece075c818dc209d5a74343b54a4d1b6e70625b6bedeca79ae7caeeed45766db",
+              "headers_sha256": "9080b0184bbcd84200b0aac2a0af25b7abf3659cf4141300152f677516764d48"
+            }
+          },
+          "calls_per_request": {},
+          "jit_delta": null,
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_b",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "workload": "blog",
+          "phase": "exact",
+          "requests": 10,
+          "warmup": 1200,
+          "allocations_per_request": 2433.6,
+          "collections": 0,
+          "wall_us_per_request": null,
+          "exact": {
+            "0": {
+              "status": 200,
+              "body_sha256": "d4d3edf51fad0c4e9a3bf6d499752e2e95d3270db9bd4731b0b706e80dcd3617",
+              "headers_sha256": "c064b9439b40b2cf1a9b9381d3254b3f344832953dd34018da0f39a7a154acf8"
+            },
+            "1": {
+              "status": 200,
+              "body_sha256": "ece075c818dc209d5a74343b54a4d1b6e70625b6bedeca79ae7caeeed45766db",
+              "headers_sha256": "9080b0184bbcd84200b0aac2a0af25b7abf3659cf4141300152f677516764d48"
+            }
+          },
+          "calls_per_request": {},
+          "jit_delta": null,
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "on",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "blog",
+          "phase": "stats",
+          "requests": 300,
+          "warmup": 1200,
+          "allocations_per_request": 2306.233333333333,
+          "collections": 4,
+          "wall_us_per_request": null,
+          "exact": null,
+          "calls_per_request": {},
+          "jit_delta": {
+            "compiled_iseq_count": 2,
+            "compile_time_ns": 578376,
+            "invalidation_time_ns": 0,
+            "compiled_side_exit_count": 10,
+            "zjit_insn_count": 26510026,
+            "complex_arg_pass_param_post": 0,
+            "complex_arg_pass_param_kwrest": 18600,
+            "complex_arg_pass_param_block": 0,
+            "complex_arg_pass_param_forwardable": 0,
+            "complex_arg_pass_accepts_no_block": 0,
+            "complex_arg_pass_does_not_use_block": 0,
+            "complex_arg_pass_caller_splat": 5700,
+            "complex_arg_pass_caller_blockarg": 4800,
+            "complex_arg_pass_caller_kwarg": 6900,
+            "complex_arg_pass_caller_kw_splat": 21300,
+            "complex_arg_pass_caller_tailcall": 0,
+            "complex_arg_pass_caller_super": 0,
+            "complex_arg_pass_caller_zsuper": 0,
+            "complex_arg_pass_caller_forwarding": 0,
+            "complex_arg_pass_keyword_to_positional_hash": 0,
+            "send_direct_fallback_context_send": 18600,
+            "send_direct_fallback_context_super": 0,
+            "side_exit_count": 10801,
+            "send_fallback_send_cfunc_not_variadic": 0,
+            "send_fallback_send_not_optimized_method_type_optimized": 6300,
+            "send_fallback_operand_too_large": 0,
+            "send_fallback_send_operands_not_fixnum": 0,
+            "send_fallback_send_polymorphic_fallback": 19200,
+            "send_fallback_send_direct_keyword_mismatch": 0,
+            "send_fallback_send_direct_keyword_count_mismatch": 0,
+            "send_fallback_send_direct_missing_keyword": 0,
+            "send_fallback_send_direct_too_many_keywords": 0,
+            "send_fallback_send_polymorphic": 6600,
+            "send_fallback_send_megamorphic": 3300,
+            "send_fallback_send_no_profiles": 0,
+            "send_fallback_send_not_optimized_method_type": 8100,
+            "send_fallback_send_not_optimized_need_permission": 26100,
+            "send_fallback_send_block_arg_not_nil": 42900,
+            "send_fallback_argc_param_mismatch": 0,
+            "send_fallback_one_or_more_complex_arg_pass": 49500,
+            "send_fallback_unexpected_keyword_args": 0,
+            "send_fallback_singleton_class_seen": 0,
+            "send_fallback_bmethod_non_iseq_proc": 0,
+            "send_fallback_obj_to_string_not_string": 0,
+            "send_fallback_send_cfunc_variadic": 0,
+            "send_fallback_send_cfunc_array_variadic": 0,
+            "send_fallback_super_call_with_block": 600,
+            "send_fallback_super_from_block": 3000,
+            "send_fallback_super_class_not_found": 0,
+            "send_fallback_super_complex_args_pass": 8100,
+            "send_fallback_super_fallback_no_profile": 0,
+            "send_fallback_super_not_optimized_method_type": 300,
+            "send_fallback_super_polymorphic": 600,
+            "send_fallback_super_target_not_found": 0,
+            "send_fallback_cannot_send_direct": 0,
+            "send_fallback_invokeblock_not_specialized": 36300,
+            "send_fallback_invokeblock_polymorphic_miss": 89100,
+            "send_fallback_sendforward_not_specialized": 34200,
+            "send_fallback_invokesuperforward_not_specialized": 3600,
+            "send_fallback_single_ractor_mode_required": 0,
+            "send_fallback_uncategorized": 0,
+            "iseq_optimized_send_count": 652500,
+            "inline_cfunc_optimized_send_count": 2509875,
+            "inline_iseq_optimized_send_count": 1455000,
+            "non_variadic_cfunc_optimized_send_count": 488400,
+            "variadic_cfunc_optimized_send_count": 455400,
+            "block_iseq_direct_optimized_send_count": 25200,
+            "optimized_send_count": 5586375
+          },
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_a",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "blog",
+          "phase": "stats",
+          "requests": 300,
+          "warmup": 1200,
+          "allocations_per_request": 2306.5733333333333,
+          "collections": 5,
+          "wall_us_per_request": null,
+          "exact": null,
+          "calls_per_request": {},
+          "jit_delta": {
+            "compiled_iseq_count": 2,
+            "compile_time_ns": 562505,
+            "invalidation_time_ns": 0,
+            "compiled_side_exit_count": 10,
+            "zjit_insn_count": 26510026,
+            "complex_arg_pass_param_post": 0,
+            "complex_arg_pass_param_kwrest": 18600,
+            "complex_arg_pass_param_block": 0,
+            "complex_arg_pass_param_forwardable": 0,
+            "complex_arg_pass_accepts_no_block": 0,
+            "complex_arg_pass_does_not_use_block": 0,
+            "complex_arg_pass_caller_splat": 5700,
+            "complex_arg_pass_caller_blockarg": 4800,
+            "complex_arg_pass_caller_kwarg": 6900,
+            "complex_arg_pass_caller_kw_splat": 21300,
+            "complex_arg_pass_caller_tailcall": 0,
+            "complex_arg_pass_caller_super": 0,
+            "complex_arg_pass_caller_zsuper": 0,
+            "complex_arg_pass_caller_forwarding": 0,
+            "complex_arg_pass_keyword_to_positional_hash": 0,
+            "send_direct_fallback_context_send": 18600,
+            "send_direct_fallback_context_super": 0,
+            "side_exit_count": 10801,
+            "send_fallback_send_cfunc_not_variadic": 0,
+            "send_fallback_send_not_optimized_method_type_optimized": 6300,
+            "send_fallback_operand_too_large": 0,
+            "send_fallback_send_operands_not_fixnum": 0,
+            "send_fallback_send_polymorphic_fallback": 19200,
+            "send_fallback_send_direct_keyword_mismatch": 0,
+            "send_fallback_send_direct_keyword_count_mismatch": 0,
+            "send_fallback_send_direct_missing_keyword": 0,
+            "send_fallback_send_direct_too_many_keywords": 0,
+            "send_fallback_send_polymorphic": 6600,
+            "send_fallback_send_megamorphic": 3300,
+            "send_fallback_send_no_profiles": 0,
+            "send_fallback_send_not_optimized_method_type": 8100,
+            "send_fallback_send_not_optimized_need_permission": 26100,
+            "send_fallback_send_block_arg_not_nil": 42900,
+            "send_fallback_argc_param_mismatch": 0,
+            "send_fallback_one_or_more_complex_arg_pass": 49500,
+            "send_fallback_unexpected_keyword_args": 0,
+            "send_fallback_singleton_class_seen": 0,
+            "send_fallback_bmethod_non_iseq_proc": 0,
+            "send_fallback_obj_to_string_not_string": 0,
+            "send_fallback_send_cfunc_variadic": 0,
+            "send_fallback_send_cfunc_array_variadic": 0,
+            "send_fallback_super_call_with_block": 600,
+            "send_fallback_super_from_block": 3000,
+            "send_fallback_super_class_not_found": 0,
+            "send_fallback_super_complex_args_pass": 8100,
+            "send_fallback_super_fallback_no_profile": 0,
+            "send_fallback_super_not_optimized_method_type": 300,
+            "send_fallback_super_polymorphic": 600,
+            "send_fallback_super_target_not_found": 0,
+            "send_fallback_cannot_send_direct": 0,
+            "send_fallback_invokeblock_not_specialized": 36300,
+            "send_fallback_invokeblock_polymorphic_miss": 89100,
+            "send_fallback_sendforward_not_specialized": 34200,
+            "send_fallback_invokesuperforward_not_specialized": 3600,
+            "send_fallback_single_ractor_mode_required": 0,
+            "send_fallback_uncategorized": 0,
+            "iseq_optimized_send_count": 652500,
+            "inline_cfunc_optimized_send_count": 2509875,
+            "inline_iseq_optimized_send_count": 1455000,
+            "non_variadic_cfunc_optimized_send_count": 488400,
+            "variadic_cfunc_optimized_send_count": 455400,
+            "block_iseq_direct_optimized_send_count": 25200,
+            "optimized_send_count": 5586375
+          },
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_b",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "workload": "blog",
+          "phase": "stats",
+          "requests": 300,
+          "warmup": 1200,
+          "allocations_per_request": 2306.45,
+          "collections": 4,
+          "wall_us_per_request": null,
+          "exact": null,
+          "calls_per_request": {},
+          "jit_delta": {
+            "compiled_iseq_count": 2,
+            "compile_time_ns": 907435,
+            "invalidation_time_ns": 0,
+            "compiled_side_exit_count": 10,
+            "zjit_insn_count": 26510034,
+            "complex_arg_pass_param_post": 0,
+            "complex_arg_pass_param_kwrest": 9300,
+            "complex_arg_pass_param_block": 0,
+            "complex_arg_pass_param_forwardable": 0,
+            "complex_arg_pass_accepts_no_block": 0,
+            "complex_arg_pass_does_not_use_block": 0,
+            "complex_arg_pass_caller_splat": 5700,
+            "complex_arg_pass_caller_blockarg": 4800,
+            "complex_arg_pass_caller_kwarg": 6900,
+            "complex_arg_pass_caller_kw_splat": 21300,
+            "complex_arg_pass_caller_tailcall": 0,
+            "complex_arg_pass_caller_super": 0,
+            "complex_arg_pass_caller_zsuper": 0,
+            "complex_arg_pass_caller_forwarding": 0,
+            "complex_arg_pass_keyword_to_positional_hash": 0,
+            "send_direct_fallback_context_send": 9300,
+            "send_direct_fallback_context_super": 0,
+            "side_exit_count": 10801,
+            "send_fallback_send_cfunc_not_variadic": 0,
+            "send_fallback_send_not_optimized_method_type_optimized": 6300,
+            "send_fallback_operand_too_large": 0,
+            "send_fallback_send_operands_not_fixnum": 0,
+            "send_fallback_send_polymorphic_fallback": 19200,
+            "send_fallback_send_direct_keyword_mismatch": 0,
+            "send_fallback_send_direct_keyword_count_mismatch": 0,
+            "send_fallback_send_direct_missing_keyword": 0,
+            "send_fallback_send_direct_too_many_keywords": 0,
+            "send_fallback_send_polymorphic": 6600,
+            "send_fallback_send_megamorphic": 3300,
+            "send_fallback_send_no_profiles": 0,
+            "send_fallback_send_not_optimized_method_type": 8100,
+            "send_fallback_send_not_optimized_need_permission": 26100,
+            "send_fallback_send_block_arg_not_nil": 42900,
+            "send_fallback_argc_param_mismatch": 0,
+            "send_fallback_one_or_more_complex_arg_pass": 46800,
+            "send_fallback_unexpected_keyword_args": 0,
+            "send_fallback_singleton_class_seen": 0,
+            "send_fallback_bmethod_non_iseq_proc": 0,
+            "send_fallback_obj_to_string_not_string": 0,
+            "send_fallback_send_cfunc_variadic": 0,
+            "send_fallback_send_cfunc_array_variadic": 0,
+            "send_fallback_super_call_with_block": 600,
+            "send_fallback_super_from_block": 3000,
+            "send_fallback_super_class_not_found": 0,
+            "send_fallback_super_complex_args_pass": 8100,
+            "send_fallback_super_fallback_no_profile": 0,
+            "send_fallback_super_not_optimized_method_type": 300,
+            "send_fallback_super_polymorphic": 600,
+            "send_fallback_super_target_not_found": 0,
+            "send_fallback_cannot_send_direct": 0,
+            "send_fallback_invokeblock_not_specialized": 36300,
+            "send_fallback_invokeblock_polymorphic_miss": 89100,
+            "send_fallback_sendforward_not_specialized": 34200,
+            "send_fallback_invokesuperforward_not_specialized": 3600,
+            "send_fallback_single_ractor_mode_required": 0,
+            "send_fallback_uncategorized": 0,
+            "iseq_optimized_send_count": 655200,
+            "inline_cfunc_optimized_send_count": 2509877,
+            "inline_iseq_optimized_send_count": 1455000,
+            "non_variadic_cfunc_optimized_send_count": 488400,
+            "variadic_cfunc_optimized_send_count": 455400,
+            "block_iseq_direct_optimized_send_count": 25200,
+            "optimized_send_count": 5589077
+          },
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "on",
+          "round": 0
+        }
+      ],
+      "summary": {}
+    },
+    "fizzy": {
+      "config": {
+        "app": "/home/user/workspace/repo/.corpus/fizzy",
+        "workload": "fizzy",
+        "seed": "/tmp/betz2/state/fizzy",
+        "gemfile": "/tmp/betz2/bundles/fizzy/Gemfile",
+        "bundle_path": "/tmp/betz2/gems",
+        "harness": "/tmp/betz2/native/script/native-bench",
+        "ruby": "/tmp/betz2/base-ruby",
+        "flags": [
+          "--zjit"
+        ],
+        "stats_flags": [
+          "--zjit-stats-quiet"
+        ],
+        "warmup": 1200,
+        "samples": 300,
+        "phases": [
+          "exact",
+          "stats"
+        ],
+        "arms": {
+          "off_a": {},
+          "off_b": {},
+          "on": {
+            "ruby": "/tmp/betz2/patch-ruby"
+          }
+        },
+        "jit": "zjit",
+        "policy": "/tmp/betz2/fizzy-policy.json"
+      },
+      "workers": [
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "fizzy",
+          "phase": "exact",
+          "requests": 10,
+          "warmup": 1200,
+          "allocations_per_request": 3957.1,
+          "collections": 0,
+          "wall_us_per_request": null,
+          "exact": {
+            "0": {
+              "status": 200,
+              "body_sha256": "c95c4eee4bd3c491338570e94113ffba4180c7517e4dc8cd623538079a81dd0c",
+              "headers_sha256": "a5a3ef12e6d37da0912d99cb9d14f87574fe8496709ea3450b0e0b04fe311b3a"
+            },
+            "1": {
+              "status": 200,
+              "body_sha256": "eda1265ad1a09c971968c5d16d8ecccd1e8676a3058461c87e77c30e0caf4aa1",
+              "headers_sha256": "cf3f5fd56d3ea5547a2534d6a8a623a8141b2715b2f3ae8541bfc1536c51748b"
+            }
+          },
+          "calls_per_request": {},
+          "jit_delta": null,
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_a",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "fizzy",
+          "phase": "exact",
+          "requests": 10,
+          "warmup": 1200,
+          "allocations_per_request": 3957.5,
+          "collections": 0,
+          "wall_us_per_request": null,
+          "exact": {
+            "0": {
+              "status": 200,
+              "body_sha256": "c95c4eee4bd3c491338570e94113ffba4180c7517e4dc8cd623538079a81dd0c",
+              "headers_sha256": "a5a3ef12e6d37da0912d99cb9d14f87574fe8496709ea3450b0e0b04fe311b3a"
+            },
+            "1": {
+              "status": 200,
+              "body_sha256": "eda1265ad1a09c971968c5d16d8ecccd1e8676a3058461c87e77c30e0caf4aa1",
+              "headers_sha256": "cf3f5fd56d3ea5547a2534d6a8a623a8141b2715b2f3ae8541bfc1536c51748b"
+            }
+          },
+          "calls_per_request": {},
+          "jit_delta": null,
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_b",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "workload": "fizzy",
+          "phase": "exact",
+          "requests": 10,
+          "warmup": 1200,
+          "allocations_per_request": 3957.6,
+          "collections": 0,
+          "wall_us_per_request": null,
+          "exact": {
+            "0": {
+              "status": 200,
+              "body_sha256": "c95c4eee4bd3c491338570e94113ffba4180c7517e4dc8cd623538079a81dd0c",
+              "headers_sha256": "a5a3ef12e6d37da0912d99cb9d14f87574fe8496709ea3450b0e0b04fe311b3a"
+            },
+            "1": {
+              "status": 200,
+              "body_sha256": "eda1265ad1a09c971968c5d16d8ecccd1e8676a3058461c87e77c30e0caf4aa1",
+              "headers_sha256": "cf3f5fd56d3ea5547a2534d6a8a623a8141b2715b2f3ae8541bfc1536c51748b"
+            }
+          },
+          "calls_per_request": {},
+          "jit_delta": null,
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "on",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "fizzy",
+          "phase": "stats",
+          "requests": 300,
+          "warmup": 1200,
+          "allocations_per_request": 3871.2066666666665,
+          "collections": 4,
+          "wall_us_per_request": null,
+          "exact": null,
+          "calls_per_request": {},
+          "jit_delta": {
+            "compiled_iseq_count": 2,
+            "compile_time_ns": 1773696,
+            "invalidation_time_ns": 0,
+            "compiled_side_exit_count": 10,
+            "zjit_insn_count": 49941954,
+            "complex_arg_pass_param_post": 0,
+            "complex_arg_pass_param_kwrest": 102900,
+            "complex_arg_pass_param_block": 10800,
+            "complex_arg_pass_param_forwardable": 0,
+            "complex_arg_pass_accepts_no_block": 0,
+            "complex_arg_pass_does_not_use_block": 0,
+            "complex_arg_pass_caller_splat": 6600,
+            "complex_arg_pass_caller_blockarg": 5700,
+            "complex_arg_pass_caller_kwarg": 4500,
+            "complex_arg_pass_caller_kw_splat": 24600,
+            "complex_arg_pass_caller_tailcall": 0,
+            "complex_arg_pass_caller_super": 0,
+            "complex_arg_pass_caller_zsuper": 0,
+            "complex_arg_pass_caller_forwarding": 0,
+            "complex_arg_pass_keyword_to_positional_hash": 0,
+            "send_direct_fallback_context_send": 113700,
+            "send_direct_fallback_context_super": 0,
+            "side_exit_count": 14401,
+            "send_fallback_send_cfunc_not_variadic": 0,
+            "send_fallback_send_not_optimized_method_type_optimized": 28800,
+            "send_fallback_operand_too_large": 0,
+            "send_fallback_send_operands_not_fixnum": 0,
+            "send_fallback_send_polymorphic_fallback": 119400,
+            "send_fallback_send_direct_keyword_mismatch": 0,
+            "send_fallback_send_direct_keyword_count_mismatch": 0,
+            "send_fallback_send_direct_missing_keyword": 0,
+            "send_fallback_send_direct_too_many_keywords": 0,
+            "send_fallback_send_polymorphic": 24000,
+            "send_fallback_send_megamorphic": 17700,
+            "send_fallback_send_no_profiles": 0,
+            "send_fallback_send_not_optimized_method_type": 30300,
+            "send_fallback_send_not_optimized_need_permission": 105900,
+            "send_fallback_send_block_arg_not_nil": 67800,
+            "send_fallback_argc_param_mismatch": 0,
+            "send_fallback_one_or_more_complex_arg_pass": 76800,
+            "send_fallback_unexpected_keyword_args": 0,
+            "send_fallback_singleton_class_seen": 0,
+            "send_fallback_bmethod_non_iseq_proc": 0,
+            "send_fallback_obj_to_string_not_string": 0,
+            "send_fallback_send_cfunc_variadic": 0,
+            "send_fallback_send_cfunc_array_variadic": 0,
+            "send_fallback_super_call_with_block": 1500,
+            "send_fallback_super_from_block": 3600,
+            "send_fallback_super_class_not_found": 0,
+            "send_fallback_super_complex_args_pass": 11400,
+            "send_fallback_super_fallback_no_profile": 0,
+            "send_fallback_super_not_optimized_method_type": 300,
+            "send_fallback_super_polymorphic": 900,
+            "send_fallback_super_target_not_found": 0,
+            "send_fallback_cannot_send_direct": 0,
+            "send_fallback_invokeblock_not_specialized": 82800,
+            "send_fallback_invokeblock_polymorphic_miss": 156900,
+            "send_fallback_sendforward_not_specialized": 60000,
+            "send_fallback_invokesuperforward_not_specialized": 5700,
+            "send_fallback_single_ractor_mode_required": 0,
+            "send_fallback_uncategorized": 0,
+            "iseq_optimized_send_count": 1307400,
+            "inline_cfunc_optimized_send_count": 4462307,
+            "inline_iseq_optimized_send_count": 2655000,
+            "non_variadic_cfunc_optimized_send_count": 782700,
+            "variadic_cfunc_optimized_send_count": 913800,
+            "block_iseq_direct_optimized_send_count": 45000,
+            "optimized_send_count": 10166207
+          },
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_a",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "workload": "fizzy",
+          "phase": "stats",
+          "requests": 300,
+          "warmup": 1200,
+          "allocations_per_request": 3871.1766666666667,
+          "collections": 5,
+          "wall_us_per_request": null,
+          "exact": null,
+          "calls_per_request": {},
+          "jit_delta": {
+            "compiled_iseq_count": 2,
+            "compile_time_ns": 616527,
+            "invalidation_time_ns": 0,
+            "compiled_side_exit_count": 10,
+            "zjit_insn_count": 49941954,
+            "complex_arg_pass_param_post": 0,
+            "complex_arg_pass_param_kwrest": 102900,
+            "complex_arg_pass_param_block": 10800,
+            "complex_arg_pass_param_forwardable": 0,
+            "complex_arg_pass_accepts_no_block": 0,
+            "complex_arg_pass_does_not_use_block": 0,
+            "complex_arg_pass_caller_splat": 6600,
+            "complex_arg_pass_caller_blockarg": 5700,
+            "complex_arg_pass_caller_kwarg": 4500,
+            "complex_arg_pass_caller_kw_splat": 24600,
+            "complex_arg_pass_caller_tailcall": 0,
+            "complex_arg_pass_caller_super": 0,
+            "complex_arg_pass_caller_zsuper": 0,
+            "complex_arg_pass_caller_forwarding": 0,
+            "complex_arg_pass_keyword_to_positional_hash": 0,
+            "send_direct_fallback_context_send": 113700,
+            "send_direct_fallback_context_super": 0,
+            "side_exit_count": 14401,
+            "send_fallback_send_cfunc_not_variadic": 0,
+            "send_fallback_send_not_optimized_method_type_optimized": 28800,
+            "send_fallback_operand_too_large": 0,
+            "send_fallback_send_operands_not_fixnum": 0,
+            "send_fallback_send_polymorphic_fallback": 119400,
+            "send_fallback_send_direct_keyword_mismatch": 0,
+            "send_fallback_send_direct_keyword_count_mismatch": 0,
+            "send_fallback_send_direct_missing_keyword": 0,
+            "send_fallback_send_direct_too_many_keywords": 0,
+            "send_fallback_send_polymorphic": 24000,
+            "send_fallback_send_megamorphic": 17700,
+            "send_fallback_send_no_profiles": 0,
+            "send_fallback_send_not_optimized_method_type": 30300,
+            "send_fallback_send_not_optimized_need_permission": 105900,
+            "send_fallback_send_block_arg_not_nil": 67800,
+            "send_fallback_argc_param_mismatch": 0,
+            "send_fallback_one_or_more_complex_arg_pass": 76800,
+            "send_fallback_unexpected_keyword_args": 0,
+            "send_fallback_singleton_class_seen": 0,
+            "send_fallback_bmethod_non_iseq_proc": 0,
+            "send_fallback_obj_to_string_not_string": 0,
+            "send_fallback_send_cfunc_variadic": 0,
+            "send_fallback_send_cfunc_array_variadic": 0,
+            "send_fallback_super_call_with_block": 1500,
+            "send_fallback_super_from_block": 3600,
+            "send_fallback_super_class_not_found": 0,
+            "send_fallback_super_complex_args_pass": 11400,
+            "send_fallback_super_fallback_no_profile": 0,
+            "send_fallback_super_not_optimized_method_type": 300,
+            "send_fallback_super_polymorphic": 900,
+            "send_fallback_super_target_not_found": 0,
+            "send_fallback_cannot_send_direct": 0,
+            "send_fallback_invokeblock_not_specialized": 82800,
+            "send_fallback_invokeblock_polymorphic_miss": 156900,
+            "send_fallback_sendforward_not_specialized": 60000,
+            "send_fallback_invokesuperforward_not_specialized": 5700,
+            "send_fallback_single_ractor_mode_required": 0,
+            "send_fallback_uncategorized": 0,
+            "iseq_optimized_send_count": 1307400,
+            "inline_cfunc_optimized_send_count": 4462307,
+            "inline_iseq_optimized_send_count": 2655000,
+            "non_variadic_cfunc_optimized_send_count": 782700,
+            "variadic_cfunc_optimized_send_count": 913800,
+            "block_iseq_direct_optimized_send_count": 45000,
+            "optimized_send_count": 10166207
+          },
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "off_b",
+          "round": 0
+        },
+        {
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]",
+          "jit": "zjit",
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "workload": "fizzy",
+          "phase": "stats",
+          "requests": 300,
+          "warmup": 1200,
+          "allocations_per_request": 3870.9166666666665,
+          "collections": 4,
+          "wall_us_per_request": null,
+          "exact": null,
+          "calls_per_request": {},
+          "jit_delta": {
+            "compiled_iseq_count": 2,
+            "compile_time_ns": 545257,
+            "invalidation_time_ns": 0,
+            "compiled_side_exit_count": 10,
+            "zjit_insn_count": 49934454,
+            "complex_arg_pass_param_post": 0,
+            "complex_arg_pass_param_kwrest": 26400,
+            "complex_arg_pass_param_block": 10800,
+            "complex_arg_pass_param_forwardable": 0,
+            "complex_arg_pass_accepts_no_block": 0,
+            "complex_arg_pass_does_not_use_block": 0,
+            "complex_arg_pass_caller_splat": 6600,
+            "complex_arg_pass_caller_blockarg": 5700,
+            "complex_arg_pass_caller_kwarg": 4500,
+            "complex_arg_pass_caller_kw_splat": 24600,
+            "complex_arg_pass_caller_tailcall": 0,
+            "complex_arg_pass_caller_super": 0,
+            "complex_arg_pass_caller_zsuper": 0,
+            "complex_arg_pass_caller_forwarding": 0,
+            "complex_arg_pass_keyword_to_positional_hash": 0,
+            "send_direct_fallback_context_send": 37200,
+            "send_direct_fallback_context_super": 0,
+            "side_exit_count": 14401,
+            "send_fallback_send_cfunc_not_variadic": 0,
+            "send_fallback_send_not_optimized_method_type_optimized": 28800,
+            "send_fallback_operand_too_large": 0,
+            "send_fallback_send_operands_not_fixnum": 0,
+            "send_fallback_send_polymorphic_fallback": 119400,
+            "send_fallback_send_direct_keyword_mismatch": 0,
+            "send_fallback_send_direct_keyword_count_mismatch": 0,
+            "send_fallback_send_direct_missing_keyword": 0,
+            "send_fallback_send_direct_too_many_keywords": 0,
+            "send_fallback_send_polymorphic": 24000,
+            "send_fallback_send_megamorphic": 17700,
+            "send_fallback_send_no_profiles": 0,
+            "send_fallback_send_not_optimized_method_type": 30300,
+            "send_fallback_send_not_optimized_need_permission": 105900,
+            "send_fallback_send_block_arg_not_nil": 67800,
+            "send_fallback_argc_param_mismatch": 0,
+            "send_fallback_one_or_more_complex_arg_pass": 58200,
+            "send_fallback_unexpected_keyword_args": 0,
+            "send_fallback_singleton_class_seen": 0,
+            "send_fallback_bmethod_non_iseq_proc": 0,
+            "send_fallback_obj_to_string_not_string": 0,
+            "send_fallback_send_cfunc_variadic": 0,
+            "send_fallback_send_cfunc_array_variadic": 0,
+            "send_fallback_super_call_with_block": 1500,
+            "send_fallback_super_from_block": 3600,
+            "send_fallback_super_class_not_found": 0,
+            "send_fallback_super_complex_args_pass": 11100,
+            "send_fallback_super_fallback_no_profile": 0,
+            "send_fallback_super_not_optimized_method_type": 300,
+            "send_fallback_super_polymorphic": 900,
+            "send_fallback_super_target_not_found": 0,
+            "send_fallback_cannot_send_direct": 0,
+            "send_fallback_invokeblock_not_specialized": 82800,
+            "send_fallback_invokeblock_polymorphic_miss": 156900,
+            "send_fallback_sendforward_not_specialized": 60000,
+            "send_fallback_invokesuperforward_not_specialized": 5700,
+            "send_fallback_single_ractor_mode_required": 0,
+            "send_fallback_uncategorized": 0,
+            "iseq_optimized_send_count": 1325400,
+            "inline_cfunc_optimized_send_count": 4462007,
+            "inline_iseq_optimized_send_count": 2655000,
+            "non_variadic_cfunc_optimized_send_count": 782700,
+            "variadic_cfunc_optimized_send_count": 913800,
+            "block_iseq_direct_optimized_send_count": 45000,
+            "optimized_send_count": 10183907
+          },
+          "direct_site_counts": null,
+          "lowrail": null,
+          "arm": "on",
+          "round": 0
+        }
+      ],
+      "summary": {}
+    }
+  },
+  "omitted_counters": "Only complex-argument/send-fallback reasons, compilation/invalidation, optimized sends, side exits, instruction counts and micro caller/callee call deltas are retained. Other counters and jit_before are omitted, not zeroed.",
+  "interpreter_ir": {
+    "initial_unseeded": [
+      {
+        "arm": "base",
+        "calls": 0,
+        "ir": 2990,
+        "worker": {
+          "wall_seconds": 0.04177330399988932,
+          "objects": 12,
+          "result": 0,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "8d284a2f162de09b9765fda58a65ff677e6d783f48e7a20f836ba149718424ab"
+      },
+      {
+        "arm": "patch",
+        "calls": 0,
+        "ir": 2990,
+        "worker": {
+          "wall_seconds": 0.039653502000419394,
+          "objects": 12,
+          "result": 0,
+          "jit": false,
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "934a8e7e60370eee2a077edb03b18241f505bde1c94cdbb2657681cf39567ff5"
+      },
+      {
+        "arm": "base",
+        "calls": 5000,
+        "ir": 9678410,
+        "worker": {
+          "wall_seconds": 0.09949461699989115,
+          "objects": 5012,
+          "result": 215000,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "b6e5d59466ddf105d365ef3dcde23570feb8f909d26a5020dfb633ed21ba3126"
+      },
+      {
+        "arm": "patch",
+        "calls": 5000,
+        "ir": 9638410,
+        "worker": {
+          "wall_seconds": 0.09801489899973603,
+          "objects": 5012,
+          "result": 215000,
+          "jit": false,
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "1940d9db7a909c5db0611e8ed9dc3f35a8681f37adc01dc25c9cee21b80a311a"
+      },
+      {
+        "arm": "base",
+        "calls": 10000,
+        "ir": 19628965,
+        "worker": {
+          "wall_seconds": 0.14442360900011408,
+          "objects": 10012,
+          "result": 430000,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "a782cd015d545fcf9e2696d18e285c0d0c89df6fe03dd0bd10d13e92d7b32a00"
+      },
+      {
+        "arm": "patch",
+        "calls": 10000,
+        "ir": 19548965,
+        "worker": {
+          "wall_seconds": 0.15073225100013588,
+          "objects": 10012,
+          "result": 430000,
+          "jit": false,
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "6d7be7b696dc7a8c9c22a83a7342db83340d8481a5afddae987905a6c11fadba"
+      }
+    ],
+    "fixed_seed": [
+      {
+        "arm": "base",
+        "calls": 0,
+        "ir": 2990,
+        "worker": {
+          "wall_seconds": 0.04201561300033063,
+          "objects": 12,
+          "result": 0,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "f68f3ff9f4cdaa86ae1c56ff83104c38ced75000c78bc3a2a6d396a2a950de65"
+      },
+      {
+        "arm": "aa",
+        "calls": 0,
+        "ir": 2990,
+        "worker": {
+          "wall_seconds": 0.03940323000006174,
+          "objects": 12,
+          "result": 0,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "6cea6e4030c47fbf07f2750408376b2cb6e6938c621854a85c10b94554107991"
+      },
+      {
+        "arm": "patch",
+        "calls": 0,
+        "ir": 2990,
+        "worker": {
+          "wall_seconds": 0.04465843399975711,
+          "objects": 12,
+          "result": 0,
+          "jit": false,
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "a770d5029bee025413a1829294787eb6119a52fcc0d26cb337d5eedc5bace430"
+      },
+      {
+        "arm": "base",
+        "calls": 5000,
+        "ir": 9678410,
+        "worker": {
+          "wall_seconds": 0.09977166699991358,
+          "objects": 5012,
+          "result": 215000,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "1c6db1ff9141d9c3307389dcf59667103569387bcb3137a973419f49223fc85e"
+      },
+      {
+        "arm": "aa",
+        "calls": 5000,
+        "ir": 9678410,
+        "worker": {
+          "wall_seconds": 0.10014322100005302,
+          "objects": 5012,
+          "result": 215000,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "99f57e038c02c8438db47c1bed48ba89ad0735cca79cadd458f2889523c4ff4e"
+      },
+      {
+        "arm": "patch",
+        "calls": 5000,
+        "ir": 9678410,
+        "worker": {
+          "wall_seconds": 0.09898723399965093,
+          "objects": 5012,
+          "result": 215000,
+          "jit": false,
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "5b9b07cfd12f88a3ec749b00f793a57d8af4a37a1e9b8b4e952923ebbb4c9b60"
+      },
+      {
+        "arm": "base",
+        "calls": 10000,
+        "ir": 19628965,
+        "worker": {
+          "wall_seconds": 0.15272775699986596,
+          "objects": 10012,
+          "result": 430000,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "2e1cc016d9ecd8cfade50a5d4e39425798b5d293db691b8aa3f1ebd3dc9d0386"
+      },
+      {
+        "arm": "aa",
+        "calls": 10000,
+        "ir": 19628965,
+        "worker": {
+          "wall_seconds": 0.1562678870000127,
+          "objects": 10012,
+          "result": 430000,
+          "jit": false,
+          "binary_sha256": "675bb322c7733bb626d009c56a565dde604964b99a9a81601cdb35430439ad40",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "2fbb767a9f00e4da10e07f29dd535294c84006840e849d2a76e0527e9919c9b0"
+      },
+      {
+        "arm": "patch",
+        "calls": 10000,
+        "ir": 19628965,
+        "worker": {
+          "wall_seconds": 0.14879481399975703,
+          "objects": 10012,
+          "result": 430000,
+          "jit": false,
+          "binary_sha256": "f6b8d3fe37d799ddf845a847fcf037d2a7ec44a773aebf709f393baff987cc21",
+          "ruby": "ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]",
+          "jit_delta": null
+        },
+        "dump_sha256": "4512fe578cdffb0572b2a6652161e4f94469c9c2ea5bb27cd76c9797844c67a5"
+      }
+    ],
+    "initial_exclusive_function_count_differences": [
+      {
+        "function": "PROGRAM TOTALS",
+        "base": 19628965,
+        "patch": 19548965
+      },
+      {
+        "function": "/home/user/workspace/repos/ruby/hash.c:any_hash",
+        "base": 560000,
+        "patch": 480000
+      }
+    ],
+    "explanation": "The entire initial -8 Ir/call difference is in unchanged hash.c::any_hash: positive-hash sign normalization executes two extra machine instructions, four times per call. Fixed getrandom bytes keep Ruby's private startup hash salt equal. This shim is NOT used in elapsed, stats or app runs; it destroys randomness and must never be used in an app/production.",
+    "seed_source": "bench/experiments/jit_literal_kwrest_seed.c",
+    "window_source": "bench/experiments/jit_literal_kwrest.rb",
+    "extension_source": "bench/callgrind.c (unchanged)",
+    "seed_byte": "0x5a",
+    "gc": "Disabled only in interpreter Callgrind micro after warmup; N=0 seam retained.",
+    "fixed_hash_values": [
+      1898929536999514112,
+      1898929536999516468
+    ]
+  },
+  "tests": {
+    "zjit-check-final": {
+      "sha256": "6290932e3a7e57976c53daaaf9c0489150c1e4b0258c4674206c2331cd732453",
+      "receipt": "     Summary [  15.571s] 1891 tests run: 1891 passed, 15 skipped\n27 tests, 7394 assertions, 0 failures, 0 errors, 0 skips\nruby -v: ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +PRISM [x86_64-linux]\n"
+    },
+    "keyword-inline-on": {
+      "sha256": "57895ba6971a84806edf36ead2599e25c61b5d5054ab168bfc86fa981c27d36e",
+      "receipt": "  \"--ruby=./miniruby -I./lib -I. -I.ext/common  ./tool/runruby.rb --extout=.ext  -- --zjit\"\n280 tests, 4541 assertions, 0 failures, 0 errors, 0 skips\nruby -v: ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]\n"
+    },
+    "keyword-inline-off": {
+      "sha256": "6d33971fce5a16a003c3b151c2e059d9bcb77137c7d4717b973b33371162b4a4",
+      "receipt": "  \"--ruby=./miniruby -I./lib -I. -I.ext/common  ./tool/runruby.rb --extout=.ext  -- --zjit --zjit-inline-max-iterations=0\"\n280 tests, 4541 assertions, 0 failures, 0 errors, 0 skips\nruby -v: ruby 4.1.0dev (2026-10-22T11:45:11Z thomasklemm/zjit-literal-kwrest 1918cede86) +ZJIT stats +PRISM [x86_64-linux]\n"
+    },
+    "missing-stub-fix": {
+      "sha256": "15574f2b8d8beac648646f09c79f8fe1713b7e362fb0759a3a18924873b01f52",
+      "receipt": ".deps/depend:42: warning: overriding recipe for target '.deps/depend'\nuncommon.mk:2319: warning: ignoring old recipe for target '.deps/depend'\n.deps/depend:42: warning: overriding recipe for target 'update-dependencies'\nuncommon.mk:2319: warning: ignoring old recipe for target 'update-dependencies'\n/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby --disable=gems \"./tool/mkdepend.rb\" --root=\".\" \\\n     --scope=core --output=.deps\nbuilding YJIT and ZJIT (stats mode)\ntouch /home/user/workspace/repos/ruby/target/stats/libruby.a\npartial linking /home/user/workspace/repos/ruby/target/stats/libruby.a into /home/user/workspace/repos/ruby/target/stats/libruby.o\nlinking miniruby\nlinking static-library libminiruby.a\n   Compiling zjit v0.0.1 (/home/user/workspace/repos/ruby/zjit)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.45s\n────────────\n Nextest run ID 2d787ad7-41d6-45d7-9f25-2699b61e9aa6 with nextest profile: default\n    Starting 1 test across 1 binary (1905 tests skipped)\n        FAIL [   0.023s] (1/1) zjit codegen::tests::test_send_literal_kwrest_named_defaults_and_exit\n  stdout ───\n\n    running 1 test\n    test codegen::tests::test_send_literal_kwrest_named_defaults_and_exit ... FAILED\n\n    failures:\n\n    failures:\n        codegen::tests::test_send_literal_kwrest_named_defaults_and_exit\n\n    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1905 filtered out; finished in 0.01s\n\n  stderr ───\n    -e: warning: Ruby error: <compiled>:2:in 'Object#test': wrong argument type Hash (expected set) (TypeError)\n    from <compiled>:7:in 'Object#entry'\n    from <compiled>:1:in '<compiled>'\n    from -e:in 'RubyVM::InstructionSequence#eval'\n\n\n    thread 'codegen::tests::test_send_literal_kwrest_named_defaults_and_exit' (93487) panicked at zjit/src/cruby.rs:1360:13:\n    assertion `left == right` failed: Exceptional unwind in callback. Ruby exception?\n      left: 0\n     right: 6\n    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n────────────\n     Summary [   0.026s] 1 test run: 0 passed, 1 failed, 1905 skipped\n        FAIL [   0.023s] (1/1) zjit codegen::tests::test_send_literal_kwrest_named_defaults_and_exit\nerror: test run failed\nmake: *** [zjit/zjit.mk:80: zjit-test] Error 100\n"
+    }
+  },
+  "extra_validation": {
+    "source": "require \"json\"\ndef mark(value)\n  $effects << value\n  value\nend\ndef target(lead, a = mark(11), b = mark(23), *rest, post, required:, x: mark(31), y: mark(43), **kw)\n  [lead, a, b, rest, post, required, x, y, kw.to_a, kw.default, kw.default_proc, kw.frozen?]\nend\ndef anonymous(*, **kw) = kw.to_a\ndef plain(**kw) = kw.to_a\ndef forwarded(a: mark(53), **) = [a, plain(**)]\nvariants = [\n  \"target(3, 7, z: mark(59), required: mark(61), q: mark(67))\",\n  \"target(3, 13, 7, y: mark(71), required: mark(73), z: mark(79))\",\n  \"target(3, 13, 17, 7, x: mark(83), required: mark(89), q: mark(97))\",\n  \"target(3, 13, 17, 19, 29, 7, z: mark(101), y: mark(103), required: mark(107), q: mark(109))\",\n  \"target(3, 7, x: mark(113), required: mark(127), y: mark(131))\",\n  \"target(3, 7, z: mark(137), x: mark(139))\",\n  \"target(3, required: mark(149), q: mark(151))\",\n  \"anonymous(z: mark(157), q: mark(163))\",\n  \"plain(z: mark(167), q: mark(173))\",\n  \"forwarded(z: mark(179), a: mark(181), q: mark(191))\",\n  \"forwarded(z: mark(193), q: mark(197))\",\n  \"plain(**{z: mark(199), q: mark(211)})\",\n  \"plain(*[], z: mark(223), q: mark(227))\",\n  \"plain(z: mark(229), q: mark(233), &nil)\"\n]\nvariants.each_with_index { |source, i| eval(\"def call_#{i}; #{source}; rescue ArgumentError => e; [e.class.name, e.message]; end\") }\nreceipts = variants.each_index.map do |i|\n  outcomes = 100.times.map do\n    $effects = []\n    value = send(\"call_#{i}\")\n    [value, $effects]\n  end\n  abort \"unstable case #{i}\" unless outcomes.uniq.size == 1\n  outcomes.first\nend\nGC.verify_compaction_references(double_heap: true, toward: :empty)\nputs JSON.generate(receipts)\n",
+    "cases": 14,
+    "invocations_per_case": 100,
+    "modes": {
+      "exact-base-interpreter": "8cc27a261acb9791729cc37767bb79dd1dcc8f0f416d98884663389dbdbc2c77",
+      "exact-base-noinline": "8cc27a261acb9791729cc37767bb79dd1dcc8f0f416d98884663389dbdbc2c77",
+      "exact-base-zjit": "8cc27a261acb9791729cc37767bb79dd1dcc8f0f416d98884663389dbdbc2c77",
+      "exact-patch-interpreter": "8cc27a261acb9791729cc37767bb79dd1dcc8f0f416d98884663389dbdbc2c77",
+      "exact-patch-noinline": "8cc27a261acb9791729cc37767bb79dd1dcc8f0f416d98884663389dbdbc2c77",
+      "exact-patch-zjit": "8cc27a261acb9791729cc37767bb79dd1dcc8f0f416d98884663389dbdbc2c77"
+    },
+    "receipts": [
+      [
+        [
+          3,
+          11,
+          23,
+          [],
+          7,
+          61,
+          31,
+          43,
+          [
+            [
+              "z",
+              59
+            ],
+            [
+              "q",
+              67
+            ]
+          ],
+          null,
+          null,
+          false
+        ],
+        [
+          59,
+          61,
+          67,
+          11,
+          23,
+          31,
+          43
+        ]
+      ],
+      [
+        [
+          3,
+          13,
+          23,
+          [],
+          7,
+          73,
+          31,
+          71,
+          [
+            [
+              "z",
+              79
+            ]
+          ],
+          null,
+          null,
+          false
+        ],
+        [
+          71,
+          73,
+          79,
+          23,
+          31
+        ]
+      ],
+      [
+        [
+          3,
+          13,
+          17,
+          [],
+          7,
+          89,
+          83,
+          43,
+          [
+            [
+              "q",
+              97
+            ]
+          ],
+          null,
+          null,
+          false
+        ],
+        [
+          83,
+          89,
+          97,
+          43
+        ]
+      ],
+      [
+        [
+          3,
+          13,
+          17,
+          [
+            19,
+            29
+          ],
+          7,
+          107,
+          31,
+          103,
+          [
+            [
+              "z",
+              101
+            ],
+            [
+              "q",
+              109
+            ]
+          ],
+          null,
+          null,
+          false
+        ],
+        [
+          101,
+          103,
+          107,
+          109,
+          31
+        ]
+      ],
+      [
+        [
+          3,
+          11,
+          23,
+          [],
+          7,
+          127,
+          113,
+          131,
+          [],
+          null,
+          null,
+          false
+        ],
+        [
+          113,
+          127,
+          131,
+          11,
+          23
+        ]
+      ],
+      [
+        [
+          "ArgumentError",
+          "missing keyword: :required"
+        ],
+        [
+          137,
+          139
+        ]
+      ],
+      [
+        [
+          "ArgumentError",
+          "wrong number of arguments (given 1, expected 2+; required keyword: required)"
+        ],
+        [
+          149,
+          151
+        ]
+      ],
+      [
+        [
+          [
+            "z",
+            157
+          ],
+          [
+            "q",
+            163
+          ]
+        ],
+        [
+          157,
+          163
+        ]
+      ],
+      [
+        [
+          [
+            "z",
+            167
+          ],
+          [
+            "q",
+            173
+          ]
+        ],
+        [
+          167,
+          173
+        ]
+      ],
+      [
+        [
+          181,
+          [
+            [
+              "z",
+              179
+            ],
+            [
+              "q",
+              191
+            ]
+          ]
+        ],
+        [
+          179,
+          181,
+          191
+        ]
+      ],
+      [
+        [
+          53,
+          [
+            [
+              "z",
+              193
+            ],
+            [
+              "q",
+              197
+            ]
+          ]
+        ],
+        [
+          193,
+          197,
+          53
+        ]
+      ],
+      [
+        [
+          [
+            "z",
+            199
+          ],
+          [
+            "q",
+            211
+          ]
+        ],
+        [
+          199,
+          211
+        ]
+      ],
+      [
+        [
+          [
+            "z",
+            223
+          ],
+          [
+            "q",
+            227
+          ]
+        ],
+        [
+          223,
+          227
+        ]
+      ],
+      [
+        [
+          [
+            "z",
+            229
+          ],
+          [
+            "q",
+            233
+          ]
+        ],
+        [
+          229,
+          233
+        ]
+      ]
+    ],
+    "note": "Scratch validation, not added as a permanent test. Identical values, order, defaults, errors and side-effect sequences across both binaries in interpreter/ZJIT/no-inlining, plus compaction reference check."
+  },
+  "reproduction": {
+    "seed_preparation_source": "require \"active_record\"\nActiveRecord::Schema.verbose = false\n%w[schema cache_schema queue_schema cable_schema].zip(%w[primary cache queue cable]).each do |schema, name|\n  ActiveRecord::Base.establish_connection(adapter: \"sqlite3\", database: File.join(ARGV.fetch(0), \"#{name}.sqlite3\"))\n  load \"db/#{schema}.rb\"\n  ActiveRecord::Base.connection_pool.disconnect!\nend\nrequire \"./config/environment\"\nif ARGV.fetch(1) == \"blog\"\n  require \"/home/user/workspace/repo/fixtures/corpus/blog_show_get_only\"\n  Article.insert_all!(BlogShowGetOnly.rows(BlogShowGetOnly::ARTICLES))\n  Comment.insert_all!(BlogShowGetOnly.rows(BlogShowGetOnly::COMMENTS))\n  raise \"unexpected jobs\" unless SolidQueue::Job.count.zero?\nelse\n  require \"/home/user/workspace/repo/bench/experiments/vm_epoch_fizzy_setup\"\nend\nActiveRecord::Base.connection_handler.connection_pool_list.each(&:disconnect!)\nputs \"Closed disposable #{ARGV.fetch(1)} seed prepared\"\n",
+    "overlays_and_policies": "Reuse docs/jit-internals.json master_bundles.{blog,fizzy} and policies.{blog,fizzy} verbatim. External master overlays only; no app source/lock edit. Fizzy redcarpet 3.6.1.",
+    "fixture_seed_files": {
+      "blog": {
+        "cable.sqlite3": "80354b05a302bcbbf81d56de482fad5649b27fe872beb779331324483c4db1a0",
+        "cache.sqlite3": "55e271bf27e23518746a55a75850cfef8d2ed9bc14c073e269d2aa9b9bd2f3e5",
+        "primary.sqlite3": "2122db8c3065d98dcc5ab2827fb563c57faa2e6b36b5783e9ee353b6a1079559",
+        "queue.sqlite3": "92070622938a0e88dfa24fbaf7ac78d83f6c0ed281387338a06cc6d1ca24f583"
+      },
+      "fizzy": {
+        "cable.sqlite3": "8870bdd8f30c2adf71c7c36ce637ef2e47fed4ffa194079d6a9d878a6bc72f79",
+        "cache.sqlite3": "ff2c040f3d8d225bb847b8cf5dc24e04990c7cebf7146bfa1a4d673e12a3cac5",
+        "primary.sqlite3": "6383ab32b1fcd975b6868323a0907abb9180a11547969f62efc948630e8d9c51",
+        "queue.sqlite3": "9a7a0895255fc5731123cbfa7fad163cd8b8cb439b4fccaba113834e3d4a11b4"
+      }
+    },
+    "upstream_conventions_read": [
+      "https://github.com/ruby/ruby/pull/19441",
+      "https://github.com/ruby/ruby/pull/19428",
+      "https://github.com/ruby/ruby/pull/18606",
+      "https://github.com/ruby/ruby/pull/18180"
+    ]
+  }
+}

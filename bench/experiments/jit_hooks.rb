@@ -170,7 +170,7 @@ module JitHooks
 
   def micro(config, destination)
     load config.fetch("harness")
-    code = <<~'RUBY'
+    code = config["micro_code"] || <<~'RUBY'
       require "json"
       require "digest"
       abort "wrong JIT" unless RubyVM::ZJIT.enabled? == (ARGV.fetch(0) == "zjit")
