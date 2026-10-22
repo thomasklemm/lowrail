@@ -593,3 +593,39 @@ which keeps both refusal-order-independent rejection and an independent
 eligible-source staleness control. This is an **old-base test expectation**,
 not a newly fixed runtime defect in Y. Refresh by merging main, preserving
 published branch history; no rebase/force push or main write is needed.
+
+### Merged-tree verification (Ruby 4.0.7, Bundler 4.0.20)
+
+Main was merged at
+[`8b9cb6e`](https://github.com/thomasklemm/lowrail/commit/8b9cb6eb8c871142809f471e1d4a2dda12b07d1b),
+preserving published branch commits. The reviewed follow-up is
+[`2786f7f`](https://github.com/thomasklemm/lowrail/commit/2786f7fb49aa62fac337f91552fdc1c29299fe70).
+
+- `cargo test --locked`: **51 passed** (41 unit, 2 types/MCP, 8 verifier),
+  zero failures/ignored. Rust, gem and fixture inputs are unchanged by the
+  final bench/export follow-up.
+- Every `bench/*_test.rb` separately, with strict mode, Valgrind/headers and
+  seed 1729: **47 runs / 731 assertions**, zero failures/errors/skips across
+  eight suites. The stale-artifact test is included.
+- From `gem/`, `LOWRAIL_STRICT_GATES=1 BUNDLER_VERSION=4.0.20 mise exec
+  ruby@4.0.7 -- rake test TESTOPTS='--verbose --seed=1729'`: **193 runs /
+  6,932 assertions**, zero failures/errors, **three named optional skips**.
+  This began on `400fa41`; gem/runtime/test/fixture files stayed unchanged
+  through `2786f7f`. An earlier merged attempt was terminated by the executor
+  restart; it has no credited outcome. The supervised complete run exited 0
+  with no automatic restart. Its temporary services were stopped.
+
+The three skips are `MaterializeCorpusTest#test_campfire` (missing corpus),
+`RailsSuiteReportTest#test_separate_build_does_not_change_view_primary_key_results`
+(missing Rails checkout), and
+`RailsSuiteReportTest#test_profiling_preserves_backtrace_cleaner_results`
+(missing Rails bundle). They are **not coverage** of those integrations.
+
+Fresh header-aware RNG-0 and RNG-1 controls each preserve all 38 response/SQL
+checks and both declared/split DB comparisons; each still exits 2 for raw
+SQLite timestamps. The same-worker negative replay exits 3, with exact
+baseline/restored responses and hits, and two stale-plan hits/zero fallback
+only in the mutated case. Its committed public output regenerates byte-for-byte.
+The header-only regression fails against the previous comparator and passes
+now. No timing, new RPS cohort, app/configuration patch or production admission
+is part of these gates.
