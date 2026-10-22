@@ -4,6 +4,12 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet D: guard-free default tier stopped at census (2026-10-22)
+No exact candidate demonstrates ≥2–3% objects or interpreter Ir on two apps.
+Template String gross pools are 1.17/0.88/2.67/0.71%; self Ir is below 1% on all four.
+Larger helper pools require live sends/freshness; static text and tested dead syntax are already optimized.
+Keep runtime/default unchanged; [census and limits](default-tier-census.md), not an impossibility proof.
+
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
 
 The all-sealed cold failure is a runtime defect, not witness noise. On the
