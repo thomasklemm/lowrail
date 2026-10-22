@@ -145,3 +145,15 @@ lost a genuine Widget return and an intermediate fixture assumed all ensure
 returns are nil; both failed attempts are retained, not reported green.
 Full independent Thermos and exact-head gate results are recorded with the
 delivery report after review, not inferred from these focused checks.
+
+The maintainability review reproduced delayed hook retirement when return
+metadata sampling raises. Retirement now precedes that fallible work; an
+injected-error control changes enabled-after-drain from true to false without
+changing the business return. The initial claim of an uncounted return was
+withdrawn: entries were already counted before label sampling. The public
+reducer regression now checks compatible singleton relation withholding,
+unchanged static names, invalid/mismatched classifications and missing evidence.
+Method identity comes from the CLI's resolved observation, not a second
+Python implementation of singleton-owner normalization. The diagnostic
+`candidate` alias is deliberately retained before classification; it is not
+the published `returns` alias.

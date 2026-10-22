@@ -197,6 +197,7 @@ module Lowrail
             frame = frames.delete_at(index)
             @active_frames.delete(fiber) if frames.empty?
             pending -= 1
+            t.disable if rec["saturated"] && pending.zero?
             if frame.sampled
               if frame.tainted && KERNEL_IS_A.bind_call(t.return_value, NilClass)
                 rec["exception_tainted_returns"] += 1
@@ -208,7 +209,6 @@ module Lowrail
                 end
               end
             end
-            t.disable if rec["saturated"] && pending.zero?
           end
         rescue Exception # rubocop:disable Lint/RescueException
           nil

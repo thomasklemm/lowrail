@@ -50,6 +50,7 @@ fn return_reducer_refuses_unexplained_conflicts_before_publication() {
     let source = app.join("example.rb");
     std::fs::write(&source, "class Example\n def unknown(value); value; end\n def fixed; 7; end\nend\n").unwrap();
     let facts = json!({"format":1,"app_root":app,"ruby_description":"ruby 4.0.7",
+        "models":[{"name":"User"},{"name":"Admin"}],
         "modules":[{"name":"Example","kind":"class","methods":[
             {"name":"unknown","parameters":[["req","value"]],"source_location":format!("{}:2", source.display())},
             {"name":"fixed","source_location":format!("{}:3", source.display())}]}]});
@@ -63,28 +64,58 @@ fn return_reducer_refuses_unexplained_conflicts_before_publication() {
     let mut observed = json!({"format":1,"app_root":app,"exit_ok":true,"command":["unchanged-suite"],
         "samples_per_method":16,"return_sampling":"exception_tainted_nil_omitted_v1","types":[
             {"module":"Example","name":"unknown","singleton":false,"calls":1,"args":{"value":{"String":1}},"returns":{"String":1},"exception_tainted_returns":0},
-            {"module":"Example","name":"fixed","singleton":false,"calls":1,"returns":{"String":1},"exception_tainted_returns":0}]});
+            {"module":"Example","name":"fixed","singleton":false,"calls":1,"returns":{},"exception_tainted_returns":0},
+            {"module":"#<Class:User>","name":"all","singleton":true,"calls":1,"returns":{"Admin::ActiveRecord_Relation":1},"exception_tainted_returns":0}]});
     let scripts = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("script");
-    let run = |script: &str| Command::new("python3").arg(scripts.join(script))
-        .arg(external.parent().unwrap()).arg("app").arg("--lowrail").arg(bin).output().unwrap();
-    for conflict in [true, false] {
-        if !conflict { observed["types"][1]["returns"] = json!({}); }
+    let classifications = dir.join("classifications.json");
+    let run = |script: &str| {
+        let mut command = Command::new("python3");
+        command.arg(scripts.join(script)).arg(external.parent().unwrap()).arg("app").arg("--lowrail").arg(bin);
+        if script == "types-observed-returns" && classifications.exists() {
+            command.arg("--classifications").arg(&classifications);
+        }
+        command.output().unwrap()
+    };
+    let decision = json!({"app":"app","method":"User.all","slot":"return",
+        "static_type":"ActiveRecord::Relation[User]","observed_class":"Admin::ActiveRecord_Relation",
+        "classification":"compatible_relation_subtype","evidence":{"element":"Admin","expected_element":"User","subtype":true}});
+    let mut wrong_type = decision.clone();
+    wrong_type["static_type"] = json!("ActiveRecord::Relation[Admin]");
+    let mut wrong_classification = decision.clone();
+    wrong_classification["classification"] = json!("not_investigated");
+    let mut no_evidence = decision.clone();
+    no_evidence.as_object_mut().unwrap().remove("evidence");
+    for (fixed_class, classification, allowed) in [
+        ("String", None, false), ("Integer", None, false),
+        ("Integer", Some(wrong_type), false), ("Integer", Some(wrong_classification), false),
+        ("Integer", Some(no_evidence), false), ("Integer", Some(decision), true),
+    ] {
+        observed["types"][1]["returns"] = json!({fixed_class:1});
+        if let Some(classification) = classification {
+            std::fs::write(&classifications, json!({"slots":[classification]}).to_string()).unwrap();
+        }
         std::fs::write(external.join(".lowrail/observed.json"), observed.to_string()).unwrap();
         let arguments = run("types-observed-arguments");
         assert!(arguments.status.success(), "{:?}", arguments);
         let output = run("types-observed-returns");
-        assert_eq!(output.status.success(), !conflict, "{:?}", output);
-        if conflict {
+        assert_eq!(output.status.success(), allowed, "{:?}", output);
+        if !allowed {
             assert!(String::from_utf8_lossy(&output.stderr).contains("unexplained conflict"));
             assert!(!external.join("returns").exists());
         } else {
             let ledger: Value = serde_json::from_slice(&output.stdout).unwrap();
             assert_eq!(ledger["apps"]["app"]["return_slots_recovered"][0]["type"], "String");
             assert_eq!(ledger["apps"]["app"]["unexplained_conflicts"], 0);
+            assert_eq!(ledger["apps"]["app"]["classified_withheld_conflicts"][0]["method"], "User.all");
             let published: Value = serde_json::from_slice(&std::fs::read(external.join("returns.json")).unwrap()).unwrap();
             assert_eq!(published["coverage"]["observed"], 2);
             assert_eq!(published["methods"]["Example#fixed"]["return_type"]["name"], "Integer");
             assert_eq!(published["methods"]["Example#unknown"]["return_type"]["evidence"], "observed");
+            assert_eq!(published["methods"]["User.all"]["return_type"]["name"], "ActiveRecord::Relation[User]");
+            assert_eq!(published["methods"]["User.all"]["return_type"]["samples"], json!({}));
+            assert_eq!(published["methods"]["User.all"]["return_type"]["evidence"], "static");
+            assert_eq!(published["methods"]["User.all"]["observation"]["module"], "#<Class:User>");
+            assert_eq!(published["methods"]["User.all"]["observation"]["returns"], json!({}));
             assert!(!app.join(".lowrail").exists());
         }
     }

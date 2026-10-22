@@ -86,14 +86,13 @@ for app in options.apps:
         assert decision is not None, f"unexplained conflict; no new publication: {app}: {conflict}"
         assert conflict["slot"] == "return", "argument conflicts require a separate investigation"
         classified.append(dict(conflict, classification=decision["classification"], evidence=decision["evidence"]))
-    blocked = {c["method"] for c in classified}
-    published = []
-    for sample in samples:
-        receiver = sample["module"]
-        if sample["singleton"] and receiver.startswith("#<Class:") and receiver.endswith(">"):
-            receiver = receiver[8:-1]
-        target = receiver + ("." if sample["singleton"] else "#") + sample["name"]
-        published.append(dict(sample, returns={} if target in blocked else sample["returns"]))
+    blocked = set()
+    for conflict in classified:
+        # Use the CLI's resolved method identity, including singleton owners.
+        sample = candidate["methods"][conflict["method"]]["observation"]
+        blocked.add((sample["module"], sample["name"], sample["singleton"]))
+    published = [dict(t, returns={} if (t["module"], t["name"], t["singleton"]) in blocked else t["returns"])
+                 for t in samples]
     final = analyze("returns", published)
     after = slots(final)
     assert after.keys() == before.keys() and not final["conflicts"]
