@@ -22,7 +22,7 @@ fn protocol_errors_notifications_and_tool_discovery() {
     assert_eq!(responses[2]["error"]["code"], -32000);
     assert_eq!(responses[3]["result"]["protocolVersion"], "2025-06-18");
     let tools = responses[4]["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 13);
+    assert_eq!(tools.len(), 15);
     assert!(tools.iter().any(|t| t["name"] == "type_of"));
     assert_eq!(responses[5]["error"]["code"], -32602);
     assert_eq!(responses[6]["result"], json!({}));
@@ -133,6 +133,43 @@ fn data_tools_refresh_facts_and_ledger_without_serving_stale_answers() {
     assert_eq!(stats["passes"]["route/path"]["fallbacks"], 2);
     std::fs::write(dir.join(".lowrail/manifest.json"), "{}").unwrap();
     assert_eq!(data.call("verify_stats", &json!({})).unwrap()["matches_current_manifest"], false);
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn source_queries_resolve_known_calls_refuse_dynamic_self_and_refresh_changed_source() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-position-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
+    let file = dir.join("example.rb");
+    let source = "class Example\n def value = 7\n def caller = value\n def dynamic(arg) = arg.value\n def shifted = object.instance_exec { value }\nend\n";
+    std::fs::write(&file, source).unwrap();
+    let methods: Vec<_> = [("value",2),("caller",3),("dynamic",4),("shifted",5)].iter().map(|(name,line)|
+        json!({"name":name,"owner":"Example","source_location":format!("{}:{line}",file.display())})).collect();
+    std::fs::write(dir.join(".lowrail/facts.json"), json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[{"name":"Example","kind":"class","methods":methods}]}).to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    let position = json!({"path":"example.rb","line":3,"column":15});
+    let ty = data.call("type_at_position", &position).unwrap();
+    assert_eq!(ty["target"], "Example#value");
+    assert_eq!(ty["fact"]["name"], "Integer");
+    assert_eq!(ty["fact"]["evidence"], "static");
+    assert_eq!(ty["proven_type"], Value::Null);
+    let definition = data.call("find_definition", &json!({"target":"Example#caller"})).unwrap();
+    assert_eq!(definition["path"], file.to_str().unwrap());
+    assert_eq!(definition["line"], 3);
+    assert_eq!(definition["origin"]["category"], "def");
+    for (line, column) in [(4,25),(5,39)] {
+        assert_eq!(data.call("type_at_position", &json!({"path":"example.rb","line":line,"column":column})).unwrap()["available"], false);
+    }
+    for (line, column) in [(0,1),(99,1),(2,99)] {
+        assert!(data.call("type_at_position", &json!({"path":"example.rb","line":line,"column":column})).is_err());
+    }
+    assert!(data.call("type_at_position", &json!({"path":"/etc/passwd","line":1,"column":1})).is_err());
+    std::fs::write(&file, source.replace("= 7", "= 'changed'")).unwrap();
+    assert_eq!(data.call("type_of", &json!({"target":"Example#caller"})).unwrap()["signature"], "() -> String");
+    assert_eq!(data.call("type_at_position", &position).unwrap()["fact"]["name"], "String");
+    std::fs::write(&file, "def invalid(").unwrap();
+    assert!(data.call("type_at_position", &position).is_err());
     std::fs::remove_dir_all(dir).unwrap();
 }
 

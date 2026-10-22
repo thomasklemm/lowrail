@@ -60,6 +60,7 @@ pub(super) fn lookup(
     receiver: &str,
     name: &str,
     singleton: bool,
+    call_arguments: Option<bool>,
 ) -> Option<Signature> {
     let element = receiver
         .strip_prefix("ActiveRecord::Relation[")
@@ -120,6 +121,24 @@ pub(super) fn lookup(
                 nullable(record, name == "find_by"),
                 &[("rest", "conditions", "untyped")],
             ),
+            ("ActiveRecord::Querying", "where") | ("ActiveRecord::QueryMethods", "where") => (
+                "activerecord",
+                if method.owner == "ActiveRecord::Querying" { "active_record/querying.rb" }
+                    else { "active_record/relation/query_methods.rb" },
+                match call_arguments {
+                    Some(true) => relation,
+                    Some(false) => "ActiveRecord::QueryMethods::WhereChain".into(),
+                    None => format!("({relation} | ActiveRecord::QueryMethods::WhereChain)"),
+                },
+                &[("rest", "args", "untyped")],
+            ),
+            ("ActiveRecord::Querying", "exists?") | ("ActiveRecord::FinderMethods", "exists?") => (
+                "activerecord",
+                if method.owner == "ActiveRecord::Querying" { "active_record/querying.rb" }
+                    else { "active_record/relation/finder_methods.rb" },
+                "bool".into(),
+                &[("opt", "conditions", "untyped")],
+            ),
             ("ActiveRecord::Querying", "order" | "includes" | "joins" | "limit" | "none")
             | ("ActiveRecord::QueryMethods", "order" | "includes" | "joins" | "limit" | "none") => {
                 (
@@ -161,6 +180,12 @@ pub(super) fn lookup(
                 "action_controller/metal/strong_parameters.rb",
                 "ActionController::Parameters".into(),
                 &[],
+            ),
+            ("ActionController::Parameters", "permit") => (
+                "actionpack",
+                "action_controller/metal/strong_parameters.rb",
+                "ActionController::Parameters".into(),
+                &[("rest", "filters", "untyped")],
             ),
             ("ActionController::Head", "head") => (
                 "actionpack",
@@ -223,7 +248,7 @@ pub(super) fn lookup(
 pub(super) fn seed(facts: &Facts, model: &mut TypeModel) {
     for record in &facts.models {
         for name in ["new", "find", "find_by", "find_by!"] {
-            if let Some(sig) = lookup(facts, &record.name, name, true) {
+            if let Some(sig) = lookup(facts, &record.name, name, true, None) {
                 model.methods.insert(key(&record.name, name, true), sig);
             }
         }
@@ -241,7 +266,7 @@ pub(super) fn seed(facts: &Facts, model: &mut TypeModel) {
                 if source(facts, method, "activerecord", "active_record/enum.rb").is_some() {
                     model.methods.insert(
                         key(&record.name, &method.name, false),
-                        lookup(facts, &record.name, &method.name, false).unwrap_or_else(|| {
+                        lookup(facts, &record.name, &method.name, false, None).unwrap_or_else(|| {
                             signature(
                                 &record.name,
                                 &method.name,
@@ -267,7 +292,7 @@ pub(super) fn support(facts: &Facts) -> Vec<Signature> {
     let mut out = Vec::new();
     for record in &facts.models {
         for (name, singleton) in [("broadcasts_to", true), ("broadcast_replace_to", false)] {
-            if let Some(sig) = lookup(facts, &record.name, name, singleton) {
+            if let Some(sig) = lookup(facts, &record.name, name, singleton, None) {
                 out.push(sig);
             }
         }
@@ -310,6 +335,7 @@ pub(super) fn support(facts: &Facts) -> Vec<Signature> {
         "ActionController::Base",
         "stale_when_importmap_changes",
         true,
+        None,
     ) {
         out.push(sig);
     }
@@ -318,7 +344,7 @@ pub(super) fn support(facts: &Facts) -> Vec<Signature> {
             "ActiveRecord::Relation[Elem]",
             false,
             &[
-                "order", "includes", "joins", "limit", "none", "find", "find_by", "find_by!",
+                "order", "includes", "joins", "limit", "none", "find", "find_by", "find_by!", "where", "exists?",
             ][..],
         ),
         (
@@ -326,9 +352,10 @@ pub(super) fn support(facts: &Facts) -> Vec<Signature> {
             false,
             &["params", "head", "redirect_to"][..],
         ),
+        ("ActionController::Parameters", false, &["permit"][..]),
     ] {
         for name in names {
-            if let Some(sig) = lookup(facts, receiver, name, singleton) {
+            if let Some(sig) = lookup(facts, receiver, name, singleton, None) {
                 out.push(sig);
             }
         }
