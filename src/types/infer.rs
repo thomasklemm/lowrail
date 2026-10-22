@@ -14,6 +14,10 @@ enum Expr {
     Sequence(Vec<Expr>),
     Read(String),
     Write(String, Box<Expr>),
+    Array(Vec<Expr>),
+    Hash(Vec<(Expr, Expr)>),
+    Interpolation(Vec<Expr>),
+    Branch(Box<Expr>, Box<Expr>, Box<Expr>),
 }
 
 fn expression(node: Node<'_>) -> Expr {
@@ -39,6 +43,20 @@ fn expression(node: Node<'_>) -> Expr {
         )
     } else if let Some(n) = node.as_statements_node() {
         Expr::Sequence(n.body().iter().map(expression).collect())
+    } else if let Some(n) = node.as_if_node() {
+        Expr::Branch(Box::new(expression(n.predicate())), Box::new(statements(n.statements())),
+            Box::new(n.subsequent().map(expression).unwrap_or(Expr::Literal("nil"))))
+    } else if let Some(n) = node.as_unless_node() {
+        Expr::Branch(Box::new(expression(n.predicate())), Box::new(statements(n.statements())),
+            Box::new(n.else_clause().map(|n| statements(n.statements())).unwrap_or(Expr::Literal("nil"))))
+    } else if let Some(n) = node.as_else_node() {
+        statements(n.statements())
+    } else if let Some(n) = node.as_interpolated_string_node() {
+        Expr::Interpolation(n.parts().iter().map(expression).collect())
+    } else if let Some(n) = node.as_embedded_statements_node() {
+        statements(n.statements())
+    } else if let Some(n) = node.as_embedded_variable_node() {
+        expression(n.variable())
     } else if let Some(n) = node.as_local_variable_read_node() {
         Expr::Read(String::from_utf8_lossy(n.name().as_slice()).into())
     } else if let Some(n) = node.as_instance_variable_read_node() {
@@ -53,6 +71,21 @@ fn expression(node: Node<'_>) -> Expr {
             String::from_utf8_lossy(n.name().as_slice()).into(),
             Box::new(expression(n.value())),
         )
+    } else if let Some(n) = node.as_array_node() {
+        if n.elements().iter().all(argument) {
+            Expr::Array(n.elements().iter().map(expression).collect())
+        } else {
+            Expr::Unknown
+        }
+    } else if let Some(n) = node.as_hash_node() {
+        if argument(node) {
+            Expr::Hash(n.elements().iter().map(|n| {
+                let pair = n.as_assoc_node().unwrap();
+                (expression(pair.key()), expression(pair.value()))
+            }).collect())
+        } else {
+            Expr::Unknown
+        }
     } else if let Some(n) = node.as_call_node() {
         if n.block().is_none() && !n.is_safe_navigation()
             && n.arguments().is_none_or(|a| a.arguments().iter().all(argument))
@@ -71,10 +104,14 @@ fn expression(node: Node<'_>) -> Expr {
     }
 }
 
+fn statements(node: Option<ruby_prism::StatementsNode<'_>>) -> Expr {
+    node.map(|n| Expr::Sequence(n.body().iter().map(expression).collect())).unwrap_or(Expr::Literal("nil"))
+}
+
 // Only accept arguments without unsupported control flow (including a return
 // nested inside a hash or another call). Values are NOT inferred from argument
 // positions. Calls with blocks, splats, forwarding and safe navigation refuse.
-fn argument(node: Node<'_>) -> bool {
+pub(super) fn argument(node: Node<'_>) -> bool {
     if node.as_string_node().is_some() || node.as_symbol_node().is_some()
         || node.as_integer_node().is_some() || node.as_float_node().is_some()
         || node.as_true_node().is_some() || node.as_false_node().is_some()
@@ -84,6 +121,13 @@ fn argument(node: Node<'_>) -> bool {
             && observed::constant(String::from_utf8_lossy(node.location().as_slice()).trim_start_matches("::")))
         || node.as_local_variable_read_node().is_some() || node.as_instance_variable_read_node().is_some()
     { return true; }
+    if let Some(string) = node.as_interpolated_string_node() {
+        return string.parts().iter().all(argument);
+    }
+    if let Some(part) = node.as_embedded_statements_node() {
+        return part.statements().is_none_or(|n| n.body().iter().all(argument));
+    }
+    if let Some(part) = node.as_embedded_variable_node() { return argument(part.variable()); }
     if let Some(array) = node.as_array_node() {
         return array.elements().iter().all(argument);
     }
@@ -313,7 +357,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
             let own_key = key(&owner.name, &method.name, method.singleton);
             let body = bodies.get(&own_key).cloned();
             let sig = model.methods.get_mut(&id).unwrap();
-            let catalog = rails::lookup(facts, &sig.receiver, &sig.method, sig.singleton);
+            let catalog = rails::lookup(facts, &sig.receiver, &sig.method, sig.singleton, None);
             sig.parameters = method
                 .parameters
                 .iter()
@@ -417,7 +461,8 @@ fn evaluate(
             Source::Inference,
             "self",
         )),
-        Expr::Read(name) => locals.get(name).cloned(),
+        Expr::Read(name) => Some(locals.get(name).cloned().unwrap_or_else(||
+            Type::new("untyped", Source::Inference, format!("value unavailable: {name}")))),
         Expr::Write(name, value) => {
             let ty = evaluate(value, facts, model, receiver, singleton, locals)?;
             locals.insert(name.clone(), ty.clone());
@@ -425,16 +470,69 @@ fn evaluate(
         }
         Expr::Sequence(expressions) => {
             let mut last = Type::new("nil", Source::Inference, "empty body");
+            let mut advisory = false;
             for expr in expressions {
                 last = evaluate(expr, facts, model, receiver, singleton, locals)?;
+                advisory |= last.evidence != Evidence::ProvenBody;
             }
+            if advisory { last.evidence = Evidence::Static; }
             Some(last)
         }
-        Expr::Constant(_) => None,
+        Expr::Branch(predicate, yes, no) => {
+            evaluate(predicate, facts, model, receiver, singleton, locals)?;
+            let mut yes_locals = locals.clone();
+            let mut no_locals = locals.clone();
+            let yes = evaluate(yes, facts, model, receiver, singleton, &mut yes_locals)?;
+            let no = evaluate(no, facts, model, receiver, singleton, &mut no_locals)?;
+            locals.clear();
+            for (name, ty) in yes_locals {
+                if let Some(other) = no_locals.remove(&name) {
+                    locals.insert(name, union(vec![ty, other]));
+                }
+            }
+            Some(union(vec![yes, no]))
+        }
+        Expr::Interpolation(parts) => {
+            let mut values = Vec::new();
+            for expr in parts {
+                values.push(evaluate(expr, facts, model, receiver, singleton, locals)?);
+                // Interpolation invokes app-overridable to_s conversions.
+                locals.clear();
+            }
+            let mut ty = union(values);
+            ty.name = "String".into();
+            ty.provenance.push(Provenance { source: Source::Inference,
+                detail: "Ruby interpolation on normal completion; no control-flow escape modeled".into() });
+            Some(ty)
+        }
+        Expr::Array(elements) => {
+            let elements = elements.iter().map(|expr|
+                evaluate(expr, facts, model, receiver, singleton, locals)).collect::<Option<Vec<_>>>()?;
+            Some(aggregate("Array", vec![elements]))
+        }
+        Expr::Hash(pairs) => {
+            let mut keys = Vec::new();
+            let mut values = Vec::new();
+            for (key, value) in pairs {
+                keys.push(evaluate(key, facts, model, receiver, singleton, locals)?);
+                values.push(evaluate(value, facts, model, receiver, singleton, locals)?);
+                // Hash insertion can invoke a key's hash/eql? methods.
+                locals.clear();
+            }
+            Some(aggregate("Hash", vec![keys, values]))
+        }
+        Expr::Constant(name) => {
+            // Autoload/const_missing can run arbitrary code.
+            locals.clear();
+            Some(Type::new("untyped", Source::Inference, format!("constant value unavailable: {name}")))
+        }
         Expr::Call(target, name, arguments) => {
             let (class, single) = match target.as_deref() {
                 None | Some(Expr::Self_) => (receiver.to_owned(), singleton),
-                Some(Expr::Constant(class)) => (class.clone(), true),
+                Some(Expr::Constant(class)) => {
+                    locals.clear(); // autoload/const_missing, even before a zero-argument call
+                    (class.clone(), true)
+                }
                 Some(target) => (
                     evaluate(target, facts, model, receiver, singleton, locals)?.name,
                     false,
@@ -453,11 +551,37 @@ fn evaluate(
                 .and_then(|(owner, method)| model.get(&owner.name, &method.name, method.singleton));
             let mut ty = model.get(&class, name, single).or(inherited)
                 .map(|s| s.return_type.clone())
-                .or_else(|| rails::lookup(facts, &class, name, single).map(|s| s.return_type))?;
+                .or_else(|| rails::lookup(facts, &class, name, single, Some(*arguments)).map(|s| s.return_type))
+                .unwrap_or_else(|| Type::new("untyped", Source::Inference,
+                    format!("call contract unavailable: {}", key(&class, name, single))));
             // Even a literal-returning callee can be replaced at runtime.
             // No call/lookup proof is supplied by this advisory walker.
             ty.evidence = Evidence::Static;
-            (ty.name != "untyped").then_some(ty)
+            Some(ty)
         }
     }
+}
+
+fn aggregate(name: &str, groups: Vec<Vec<Type>>) -> Type {
+    let arguments: Vec<_> = groups.into_iter().map(union).collect();
+    let mut ty = Type::new(format!("{name}[{}]", arguments.iter().map(|ty| ty.name.as_str()).collect::<Vec<_>>().join(", ")),
+        Source::Inference, "Ruby container; element contracts advisory");
+    for element in arguments {
+        for source in element.provenance {
+            if !ty.provenance.contains(&source) { ty.provenance.push(source); }
+        }
+    }
+    ty
+}
+
+fn union(types: Vec<Type>) -> Type {
+    let names: BTreeSet<_> = types.iter().map(|ty| ty.name.as_str()).collect();
+    let name = if names.is_empty() || names.contains("untyped") { "untyped".into() }
+        else if names.len() == 1 { (*names.first().unwrap()).to_owned() }
+        else { format!("({})", names.into_iter().collect::<Vec<_>>().join(" | ")) };
+    let mut ty = Type::new(name, Source::Inference, "advisory union; unknown members are not discarded");
+    for source in types.into_iter().flat_map(|ty| ty.provenance) {
+        if !ty.provenance.contains(&source) { ty.provenance.push(source); }
+    }
+    ty
 }
