@@ -4,6 +4,12 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet F2: stop DirectSite breadth at the screen (2026-10-22)
+Zero hits mostly mean no installed program; ranked Fizzy/Campfire construction pools are diagnostic, not savings; Writebook boot fails and CASA remains outside the SQLite gate.
+EventSummary specimen: ~30 fewer objects/request, 30 hits/30 fallbacks per ten GETs, failed two-seed off/off body/header and whole-SQL equality; bare-reader reuse changes loaded/strict-loading behavior.
+Fizzy own suite: 124 identical identities/outcomes (117 pass/seven baseline errors), 5,324 identical ordered queries, 19 new hits; equivalence is not a green suite or production support.
+Discard the specimen; no new support or Ir/RPS cohort. Y separately found an unguarded transitive `Relation#_exec_scope` replacement at [d3d3548](https://github.com/thomasklemm/lowrail/commit/d3d3548fd5dfa3d711c588f433c4dab64a5abb2c): future widening also needs compiler-derived guard closure. [Census, gates and evidence](directsite-breadth.md).
+
 ## Bet Y: non-creating guards pass the scoped throughput rule (2026-10-22)
 Fizzy singleton-send fallbacks 469→243/request; ~90 fewer objects than F; incremental interpreter Ir −0.622%, all controls pass.
 One real-Puma cohort: A/A [−1.632,+0.801]%; RPS +7.827% [+6.131,+9.839], zero errors; all 623,992 completions join native/wire records.
