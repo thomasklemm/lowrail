@@ -95,7 +95,6 @@ module Lowrail
           # chose original, and failed attempts leave no half-active state.
           result.each { |key, value| instance_variable_set(:"@#{key}", value) }
           @ivars = FormScaffoldAdmission::IVAR
-          @escape = ERB::Util
           @pending = false
           @refusal = nil
           @admission = {state: "active", attempts: 1,
@@ -142,8 +141,6 @@ module Lowrail
 
       def render(view, article)
         table = @table
-        escape = @escape
-        path = token = fields = nil
         Sealed::VIEW_CONTEXT.bind_call(view) do
           # PolymorphicRoutes uses an explicit public_send with a newly
           # constructed String name. Unlike the implicit helpers below,
@@ -162,8 +159,8 @@ module Lowrail
 )
           path = url_for(path)
           token = token_tag(nil, form_options: {action: path, method: "post"})
+          %(<form class="space-y-4" action="#{ERB::Util.html_escape(path)}" accept-charset="UTF-8" method="post">#{token}#{fields}</form>).html_safe
         end
-        %(<form class="space-y-4" action="#{escape.html_escape(path)}" accept-charset="UTF-8" method="post">#{token}#{fields}</form>).html_safe
       end
     end
   end

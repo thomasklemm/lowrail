@@ -152,10 +152,6 @@ module Lowrail
     class << self
       def witness(view)
         @builder_class = Lowrail.loaded_constant("ActionView::Helpers::TagHelper::TagBuilder")
-        # The first original token already loaded this class. Cache its
-        # identity under SEAL001, not the live config getter's result.
-        @view_base = Lowrail.loaded_constant("ActionView::Base")
-        return "view base not naturally loaded; keep original" unless @view_base && @view_base.equal?(ActionView::Base)
         builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
         return "tag builder not naturally cached; keep original" unless @builder_class && @holder.call(builder, @builder_class) &&
           RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
@@ -179,12 +175,11 @@ module Lowrail
 
       def render(view, options)
         value = name = remove_autocomplete = builder = nil
-        view_base = @view_base
         protected = Sealed::VIEW_CONTEXT.bind_call(view) do
           next false unless defined?(protect_against_forgery?) && protect_against_forgery?
           value = form_authenticity_token(form_options: options.merge(authenticity_token: nil))
           name = request_forgery_protection_token.to_s
-          remove_autocomplete = view_base.remove_hidden_field_autocomplete
+          remove_autocomplete = ActionView::Base.remove_hidden_field_autocomplete
           builder = @tag_builder
           true
         end

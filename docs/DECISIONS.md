@@ -27,6 +27,14 @@ identities as locals, never caching the live config value or forcing autoload.
 Screen old-on A / candidate-on / old-on B so a whole-stack gain cannot mask
 the candidate's cost. The same allocation/counter and three-times-A/A rule applies.
 
+### Bet K result: KILLED (2026-10-22)
+
+One combined blog split/captured-constant candidate removes all five constant-cache exits/request, retaining the live getter and exact response companions.
+Total exits 16→11, ratio-in-YJIT 99.65859→99.70328%, allocations ≈1882.4→1877.7; counters alone are not a speed claim.
+Candidate wall +1.679% [−1.842,+3.819], A/A [−12.835,+4.127]: fails the 38.505% screen threshold; no RPS, retries or runtime promotion.
+Fizzy guard-created singleton classes nearly double singleton-send fallbacks, 243→469/request: a likely contributor to F's weak YJIT RPS, not an isolated causal price.
+The creating guards are `ARRequestSites.bucket_rows` (`@user_methods`) and `Site#eligible?` (`@readers`), both `SINGLETON.bind_call`; F stays parked/unchanged. [Evidence and limits](yjit-aware.md).
+
 ## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
 
 The token-only +32 objects/request is traced to per-hit view-context constant
