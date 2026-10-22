@@ -21,6 +21,12 @@ No RPS cohort without that clear screen win; if warranted, preregister exactly
 one using `script/rps` at 44a33c4/544ad8d, A/A first, retaining every window.
 ZJIT is a brief shape-parity note only; no default/admission/price promotion.
 
+The single combined blog candidate moves only the form's pure suffix out of
+`instance_exec` and passes passively witnessed `ActionView::Base` / `ERB::Util`
+identities as locals, never caching the live config value or forcing autoload.
+Screen old-on A / candidate-on / old-on B so a whole-stack gain cannot mask
+the candidate's cost. The same allocation/counter and three-times-A/A rule applies.
+
 ## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
 
 The token-only +32 objects/request is traced to per-hit view-context constant

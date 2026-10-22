@@ -109,6 +109,10 @@ module YjitAware
       File.join(config.fetch("app"), "Gemfile.lock"), *config.fetch("extra_sources", []),
       *Dir[File.join(ROOT, "gem/lib/**/*.{rb,so}")], *Dir[File.join(config.fetch("artifact"), "**/*")],
       *Dir[File.join(config.fetch("stats_artifact"), "**/*")]].select { File.file?(_1) }
+    if config["reference_lib"]
+      paths.concat(Dir[File.join(config.fetch("reference_lib"), "**/*.{rb,so}")])
+      %w[reference_artifact reference_stats_artifact].each { paths.concat(Dir[File.join(config.fetch(_1), "**/*")].select { |path| File.file?(path) }) }
+    end
     pins = paths.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
     source = BlogProduction::Entropy.source_pin(config.fetch("app"))
     File.write(File.join(output, "protocol.json"), JSON.pretty_generate(config: config, pins: pins, app_source: source))
@@ -128,10 +132,14 @@ module YjitAware
             FileUtils.cp_r(state, File.join(config.fetch("app"), "storage"))
           end
           FileUtils.rm_rf(File.join(config.fetch("app"), "tmp"))
-          env = NativeBench.environment(config, state).merge("LOWRAIL" => arm == "on" ? "1" : "0",
+          reference = arm != "on" && config["reference_lib"]
+          lib = reference || File.join(ROOT, "gem/lib")
+          artifact_key = phase == "stats" ? "stats_artifact" : "artifact"
+          artifact_key = "reference_#{artifact_key}" if reference
+          env = NativeBench.environment(config, state).merge("LOWRAIL" => arm == "on" || reference ? "1" : "0",
             "LOWRAIL_STATS" => phase == "coverage" ? "" : nil,
-            "LOWRAIL_DIR" => phase == "stats" ? config.fetch("stats_artifact") : config.fetch("artifact"),
-            "RUBYOPT" => "-rbundler/setup -I#{ROOT}/gem/lib -rlowrail/setup")
+            "LOWRAIL_DIR" => config.fetch(artifact_key),
+            "RUBYOPT" => "-rbundler/setup -I#{lib} -rlowrail/setup")
           binary = phase == "stats" ? config.fetch("stats_ruby") : RbConfig.ruby
           flags = ["--yjit", "--disable-zjit"]
           flags << "--yjit-stats=quiet" if phase == "stats"
