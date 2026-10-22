@@ -158,10 +158,24 @@ script/types-observed-arguments /tmp/types blog fizzy campfire casa writebook lo
 changed slot universes, changed returns or argument conflicts; it never boots
 an app or rewrites the raw recorder file. All generated files stay external.
 
-Candidate checks: `cargo test --locked` **42 + 2 + 8**, zero failures;
-**six static + five argument-only RBS validates**, all exit 0; the existing
-source-checked Fizzy MCP session passes (type-at-position, method signature,
-definition, dynamic-receiver refusal). No new Steep or performance claim.
+The rebased code candidate
+[`f507a89`](https://github.com/thomasklemm/lowrail/commit/f507a89263d6b53815ff1decb7e7b9eba1051003),
+based on main's screen-platform commit 14d8cf0, passed:
+
+- `cargo test --locked`: **42 + 2 + 8**, zero failures; real-blog corpus
+  integrations executed with the prepared external corpus root.
+- Full strict Ruby 4.0.7 gem suite, seed 1729: **193 / 6,932**, zero
+  failures/errors, the same three named optional skips detailed below.
+- All **seven** current bench suites: **44 / 736**, zero failures/errors/skips,
+  Minitest 6.0.6 with explicit `MT_CPU=16`; this includes `request_pairs`
+  **17 / 352** and the new screen suite **5 / 95**, with Valgrind installed.
+- **Six static + five argument-only RBS validates**, RBS 4.2.0, all exit 0.
+- Both source-checked Fizzy MCP sessions. The existing session covers
+  type-at-position, method signature, definition and dynamic-receiver refusal.
+  The frozen per-slot ledger is identical after rebase.
+
+The final follow-up changes only this documentation, not checked gate inputs.
+No new Steep, runtime-support or performance claim.
 
 A second Fizzy MCP session against the argument-only alias reports
 `AccessesHelper#access_menu_tag` as
@@ -180,9 +194,11 @@ Cargo was **41 + 2 + 8**, six static RBS directories validated, and the six
 original bench suites were **39 / 601**, zero failures/errors/skips.
 
 The other orb's 641 bench assertions differ only in `request_pairs`: its
-worker-overlap test makes four assertions per available OS thread. Local
-controlled censuses with `MT_CPU=8` and `16` saw 10 and 18 threads and 58 and
-98 assertions, respectively; the latter full suite reproduced **17 / 352**
+worker-overlap test makes **five counted assertions** per available OS thread
+on Minitest 6.0.6 (`assert_operator` and `assert_match` each count two), plus
+eight fixed assertions. Local controlled censuses with `MT_CPU=8` and `16`
+saw 10 and 18 threads and 58 and 98 assertions, respectively; the latter full
+suite reproduced **17 / 352**
 instead of **17 / 312**. Both Valgrind checks ran. The original other-orb
 historical thread census was not retained; that historical attribution is a
 reconstruction, while the local mechanism and difference were reproduced.
