@@ -3,6 +3,12 @@
 2026-10-22. **One protected-send prototype is draft-eligible; fork only.**
 No upstream PR, issue or comment was posted. No whole-request speed claim.
 
+Follow-up: a second owner-admitted candidate removes **27 Fizzy / 0 blog
+final sends per request** by admitting guarded Proc sends to explicit block
+parameters. Its [standalone-master commit, corrected site attribution and
+controls](zjit-block-param-send.md) are published separately. The original
+census below remains the pre-prototype control, not the combined result.
+
 The control is Ruby [46631773](https://github.com/thomasklemm/ruby/commit/46631773dd402e769190decb23ea44f64cd69dfc),
 including literal kwrest atop #19478. The Ruby and Lowrail evidence branches
 are both `thomasklemm/zjit-fallbacks-2`.
@@ -35,10 +41,10 @@ highest raw count.
 | 3. `send_not_optimized_need_permission` | 87 | 353 | Guard actual runtime caller self against defining class/module; keep receiver CME guards. InheritableOptions `_get` contributes 73/302, WhereClause `predicates` 8/18. Master still refuses; no matching focused open PR found, including inspection of #19389's diff. **Prototype: 87 -> 1 / 353 -> 9, draft-eligible.** |
 | 4. `invokeblock_not_specialized` | 121 | 276 | Extend exact-arity/simple-block specialization to additional argument/throw/handler shapes. `Array#map` is 54/188. Master has explicit simple-ISEQ/arity/auto-splat/throw restrictions; [#18244](https://github.com/ruby/ruby/pull/18244), #19389 and [#17864](https://github.com/ruby/ruby/pull/17864) overlap. **Defer: do not just remove refusal checks.** |
 | 5. `send_block_arg_not_nil` | 143 | 226 | Broaden passed-block support beyond current eligible ISEQ sends. `_read_attribute -> fetch_value` is 36/30, `mon_synchronize -> synchronize` 22/39. [#19077](https://github.com/ruby/ruby/pull/19077) handles inlined ISEQ `&proc`, explicitly not generic yield-on-Proc; [#19351](https://github.com/ruby/ruby/pull/19351) covers a literal proxy case. **Defer: generic C/block-handler semantics, not a safe blanket admission.** |
-| 6. `one_or_more_complex_arg_pass` | 156 | 194.96–195 | Split caller flags/callee setup before selecting a bounded subcase. `Rack#fetch_header -> fetch` is 29/26. Residual kwrest 31/88 includes runtime forwarding/splats/blocks, beyond the literal patch; RFC #19389 includes caller kw-splats. **Defer: no single simple change covers this bucket.** |
+| 6. `one_or_more_complex_arg_pass` | 156 | 194.96–195 | Split caller flags/callee setup before selecting a bounded subcase. `Rack#fetch_header -> fetch` is 29/26. Residual kwrest 31/88 includes runtime forwarding/splats/blocks, beyond the literal patch; RFC #19389 includes caller kw-splats. **Follow-up prototype: explicit block parameters remove 27 Fizzy sends, owner-admitted; other subcases deferred.** |
 | 7. `sendforward_not_specialized` | 114 | 200 | Profile forwarded callinfo and specialize simple positional forwarding. Fizzy WhereClause `empty?` alone is 31. Already open as [#18326](https://github.com/ruby/ruby/pull/18326); master still has the generic fallback. **Do not duplicate.** |
 | 8. `send_not_optimized_method_type` | 26.887–27 | 100.887–101 | Mostly null lookup (8.887–9 / 77.887–78) and optimized targets with blocks (18/23). Fizzy asset-host and relative-root misses are 34 each. Preserve method_missing and block semantics. **Defer: not a single unsupported method-type fix.** |
-| 9. `send_not_optimized_method_type_optimized` | 21 | 96 | Guard/profile the method name for dynamic `send`, plus separate block-call support. Subtypes are send 21/89 and block_call 0/7; Arel visitor `send` alone is 61 on Fizzy. Master handles Call/Struct access, not these cases. **Interesting next bounded investigation, not prototyped here.** |
+| 9. `send_not_optimized_method_type_optimized` | 21 | 96 | Guard/profile the method name for dynamic `send`, plus separate block-call support. Subtypes are send 21/89 and block_call 0/7; Arel visitor `send` alone is 61 on Fizzy. Master handles Call/Struct access, not these cases. **Investigated next: dynamic symbol-value profiling and call reshaping needed, not a small literal-symbol rewrite; deferred.** |
 | 10. `send_polymorphic` | 22 | 80 | Improve receiver specialization; tag `to_s` contributes 7/30. Existing profiling/shape PRs overlap partly. **Defer: profiling/code-size question.** |
 | 11. `send_megamorphic` | 11 | 59 | Guarded common-case dispatch may help selected sites, but raising the specialization limit is not a correctness/performance argument. **Defer.** |
 | 12. `super_complex_args_pass` | 27 | 37.977–38 | Needs positional/keyword/block super-call setup, not ordinary send admission. **Defer.** |
