@@ -12,8 +12,9 @@ module Lowrail
       return refusal.call("denylisted by verify --bisect") if denied.any? { _1["pass"] == pass }
       return refusal.call("requires production Ruby 4.0.7 / Rails 8.1.4") unless
         ENV["RAILS_ENV"] == "production" && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
-      reason = FormScaffoldInventory.source_inventory(gems: pass == TokenTag::PASS ? %w[actionview activesupport] : %w[actionview])
-      return refusal.call(reason) if reason
+      roots = FormScaffoldInventory.source_inventory(gems: pass == TokenTag::PASS ? %w[actionview activesupport] : %w[actionview])
+      return refusal.call(roots) if String === roots
+      compiled = {}
       context = Sealed.view_context_fact
       return refusal.call("custom view context dispatch; keep original") unless context
       native = Lowrail.loaded_constant("Lowrail::Native")
@@ -31,7 +32,7 @@ module Lowrail
           names = %i[token_tag tag tag_builder]
           expected = names.to_h do |name|
             method = view.instance_method(name)
-            fact = FormScaffoldInventory.stock_fact(method)
+            fact = FormScaffoldInventory.stock_fact(method, roots: roots, compiled: compiled)
             [name.to_s, fact && fact.merge("visibility" => Sealed.visibility(view, name))]
           end
           if expected.values.all?
@@ -50,7 +51,7 @@ module Lowrail
       end
       facts = methods.flat_map do |name, (type, names)|
         names.map do |method_name|
-          fact = FormScaffoldInventory.stock_fact(type.instance_method(method_name))
+          fact = FormScaffoldInventory.stock_fact(type.instance_method(method_name), roots: roots, compiled: compiled)
           return refusal.call("custom #{name}##{method_name}; keep original") unless fact
           {"holder" => name, "method" => method_name.to_s,
             "body" => fact.merge("visibility" => Sealed.visibility(type, method_name))}
@@ -58,7 +59,7 @@ module Lowrail
       end
       if pass == TokenTag::PASS
         %i[unwrapped_html_escape xml_name_escape].each do |method_name|
-          fact = FormScaffoldInventory.stock_fact(ERB::Util.method(method_name))
+          fact = FormScaffoldInventory.stock_fact(ERB::Util.method(method_name), roots: roots, compiled: compiled)
           return refusal.call("custom ERB escaping; keep original") unless fact
           facts << {"holder" => "ERB::Util", "method" => method_name.to_s, "singleton" => true, "body" => fact}
         end
@@ -71,9 +72,10 @@ module Lowrail
         *controllers.values.flat_map { |entries| entries.values.filter_map { _1.dig("source_location", 0) } }].uniq.select { File.file?(_1) }
       observer = pass == TokenTag::PASS ? TokenTag::Variant.instance_method(:token_tag) :
         CollectionRender::Variant.instance_method(:collection_with_template)
-      data = {"version" => 2, "application_class" => Rails.application.class.name, "controllers" => controllers,
+      data = {"version" => 2, "application_class" => Rails.application.class.name,
         "native_method" => Sealed.signature(exact), "observer" => Sealed.signature(observer), "view_context" => context,
         "sources" => sources.to_h { [_1, Manifest.sha256_file(_1)] }, "methods" => facts}
+      data["controllers"] = controllers if pass == TokenTag::PASS
       {units: [{"pass" => pass, "kind" => "method", "target" => pass == TokenTag::PASS ? "ActionView::Helpers::UrlHelper#token_tag" :
         "ActionView::CollectionRenderer#collection_with_template", "facts" => [], "data" => data}], files: [],
         ledger: ledger + [{"pass" => pass, "outcome" => "lowered"}]}

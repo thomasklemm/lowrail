@@ -21,6 +21,7 @@ class FormScaffoldTest < Minitest::Test
           require "active_record/railtie"
           require "action_controller/railtie"
           require "action_view/railtie"
+          require "action_mailer/railtie"
           class WidgetFixture < Rails::Application
             config.root = File.expand_path("..", __dir__)
             config.eager_load = true
@@ -66,6 +67,9 @@ class FormScaffoldTest < Minitest::Test
       scenario = <<~'RUBY'
         require "./config/environment"
         require "rack/mock"
+        foreign = ActionMailer::Base.new.view_context.send(:token_tag, nil,
+          form_options: {action: "/widgets", method: "post"})
+        first_admission = Lowrail::TokenTag.admission
         request = Rack::MockRequest.new(Rails.application)
         bodies = 3.times.map do
           response = request.get("/widgets", "HTTP_HOST" => "example.org")
@@ -74,7 +78,8 @@ class FormScaffoldTest < Minitest::Test
         end
         custom = request.get("/custom_widgets", "HTTP_HOST" => "example.org")
         raise "custom HTTP #{custom.status}" unless custom.status == 200
-        puts JSON.generate(bodies: bodies, custom: custom.body, blog: %w[Article Comment ArticlesController].any? { Object.const_defined?(_1) },
+        puts JSON.generate(bodies: bodies, custom: custom.body, foreign: foreign, first_admission: first_admission,
+          blog: %w[Article Comment ArticlesController].any? { Object.const_defined?(_1) },
           hits: Lowrail::Stats.unit_hits, refusal: Lowrail.refusal_reason,
           admissions: [Lowrail::TokenTag, Lowrail::CollectionRender].map { [_1.refusal, _1.admission] })
       RUBY
@@ -83,12 +88,32 @@ class FormScaffoldTest < Minitest::Test
           "LOWRAIL" => mode, "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "1"))
       end
       refute on.fetch("blog")
+      assert_equal "", on.fetch("foreign")
+      assert_equal off.fetch("foreign"), on.fetch("foreign")
+      assert_equal "pending", on.fetch("first_admission").fetch("state")
       assert_equal off.fetch("bodies"), on.fetch("bodies")
       assert_includes on.fetch("bodies").last, "left&lt;&amp;"
       assert_includes on.fetch("bodies").last, "live&lt;&amp;&quot;"
       assert_equal off.fetch("custom"), on.fetch("custom")
       assert_includes on.fetch("custom"), "controller-token"
       artifact.fetch("units").each { assert_operator on.fetch("hits").fetch(_1.fetch("id").to_s, 0), :>, 0, on.inspect }
+
+      # An incomplete token certificate is not an opaque-view collection
+      # certificate. Both absent and empty controller maps must refuse.
+      [nil, {}].each do |controllers|
+        bad = Marshal.load(Marshal.dump(artifact))
+        token = bad.fetch("units").find { _1.fetch("pass") == "sealed/token_tag" }
+        data = token.fetch("data")
+        controllers ? data["controllers"] = controllers : data.delete("controllers")
+        File.write(File.join(app, ".lowrail/manifest.json"), JSON.generate(bad))
+        declined = ruby_json(scenario, chdir: app, env: env.merge("RUBYOPT" => SETUP_OPT,
+          "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "1"))
+        assert_equal off.fetch("bodies"), declined.fetch("bodies")
+        assert_equal "refused", declined.fetch("admissions").first.last.fetch("state")
+        assert_equal 0, declined.fetch("hits").fetch(token.fetch("id").to_s, 0)
+        collection = bad.fetch("units").find { _1.fetch("pass") == "sealed/collection_render" }
+        assert_operator declined.fetch("hits").fetch(collection.fetch("id").to_s, 0), :>, 0
+      end
 
       # A custom token helper must remain live; unrelated collection admission
       # must not inherit its refusal or require a form-builder certificate.

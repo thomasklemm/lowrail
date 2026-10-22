@@ -15,10 +15,15 @@ Article/Comment/ArticlesController stopped four non-blog apps with the misleadin
 Token now records effective stock token/tag/tag_builder definitions and
 visibility per loaded named controller, auditing ActionView/ActiveSupport only.
 Admission reads already-cached view classes, never creates a view or receiver
-singleton class; unknown holders fall back. Collection audits ActionView and
+singleton class; unknown holders fall back without consuming the first
+certified controller witness (including an earlier mailer token call).
+Collection audits ActionView and
 treats the view as opaque, forwarding it unchanged to live Template#render.
-V1 artifacts keep their old scope. Both use the production mutation tripwire
-and remain subject to the [sealed contract](sealed.md).
+Each builder owns its audited roots and compile cache; subset audits cannot
+replace the form inventory's state. Token v2 requires its controller map;
+collection v2 has no view certificate. V1 artifacts keep their old scope.
+Both use the production mutation tripwire and remain subject to the
+[sealed contract](sealed.md).
 
 Form still requires its exact blog template, constructor/schema, FormBuilder,
 literal field/options/config and English translation facts. Deleting

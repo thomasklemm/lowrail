@@ -33,38 +33,51 @@ module Lowrail
       end
     end
 
-    def self.check(data, view)
+    def self.check(data, view, pass:)
       native = Lowrail.loaded_constant("Lowrail::Native")
       return "missing actual-holder primitive; keep original" unless native
       exact = native.method(:exact_class?)
       return "actual-holder primitive changed; rebuild" unless Sealed.signature(exact) == data.fetch("native_method")
       return "view context dispatch changed; rebuild" unless Sealed.view_context_fact == data.fetch("view_context")
-      binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
-      return "actual-holder binary not certified; rebuild" unless data.fetch("sources").key?(binary)
-      return "stale sources; rebuild" unless data.fetch("sources").all? { |file, sha| File.file?(file) && Manifest.sha256_file(file) == sha }
       mutation_holders = {native => [:exact_class?], BasicObject => [:instance_exec]}
       if data.fetch("version") == 1
         controller = Lowrail.loaded_constant("ArticlesController")
         view_class = controller && IVAR.bind_call(controller, :@view_context_class)
         return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
-      elsif !data.fetch("controllers").empty?
+      elsif pass == TokenTag::PASS
+        controllers = data.fetch("controllers")
+        return "no certified token controllers; rebuild" if controllers.empty?
         return "observer body changed; rebuild" unless
           Sealed.signature(TokenTag::Variant.instance_method(:token_tag)) == data.fetch("observer")
         # Read only view classes that Rails has already constructed. Never
         # call view_context_class (or singleton_class on a live receiver).
-        view_classes = data.fetch("controllers").filter_map do |name, methods|
+        known_view = false
+        view_classes = controllers.filter_map do |name, methods|
           controller = Lowrail.loaded_constant(name)
           type = controller && IVAR.bind_call(controller, :@view_context_class)
           next unless type
+          known_view ||= exact.call(view, type)
           next unless methods.all? do |method_name, expected|
             !method_refusal(type, method_name, expected, data.fetch("observer"))
           end
           mutation_holders[type] = methods.keys
           type
         end
+        # A mailer/API/unknown view stays original without consuming the
+        # first certified controller witness. A changed known holder refuses.
+        return nil unless known_view
         view_class = view_classes.find { exact.call(view, _1) }
         return "view holder/helpers not certified or naturally cached; keep original" unless view_class
+      elsif pass == CollectionRender::PASS
+        # Collection v2 has no view certificate: Template#render receives
+        # this opaque value unchanged. Token v2 must never take this branch.
+        return "unexpected collection view certificate; rebuild" if data.key?("controllers")
+      else
+        return "unknown render certificate; rebuild"
       end
+      binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
+      return "actual-holder binary not certified; rebuild" unless data.fetch("sources").key?(binary)
+      return "stale sources; rebuild" unless data.fetch("sources").all? { |file, sha| File.file?(file) && Manifest.sha256_file(file) == sha }
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("application_class")
       data.fetch("methods").each do |entry|
         type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))
@@ -126,10 +139,11 @@ module Lowrail
         return unless @pending && !@attempted && Ractor.current.equal?(Ractor.main) && @lock.try_lock
         begin
           return if @attempted || !@pending
+          started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          result = RenderUnits.check(@data, view, pass: @unit.fetch("pass"))
+          return unless result
           @attempted = true
           @admission = {state: "pending", attempts: 1}.freeze
-          started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-          result = RenderUnits.check(@data, view)
           return decline(result) if String === result
           mutation_holders = result.delete(:mutation_holders)
           result.each { |key, value| instance_variable_set(:"@#{key}", value) }

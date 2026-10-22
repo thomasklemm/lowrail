@@ -24,15 +24,14 @@ module Lowrail
     # constructor, route, form builder or template merely to use stock Rails.
     def source_inventory(gems: STOCK.keys)
       return "source inventory released; restart to recertify" if @released
-      @roots = gems.to_h { |name| [name, Gem.loaded_specs.fetch(name).full_gem_path] }
-      @compiled = {}
+      roots = gems.to_h { |name| [name, Gem.loaded_specs.fetch(name).full_gem_path] }
       gems.each do |name|
         expected = STOCK.fetch(name)
-        root = @roots.fetch(name)
+        root = roots.fetch(name)
         files = Dir[File.join(root, "lib/**/*.rb")].sort.to_h { [_1.delete_prefix(root + "/"), Manifest.sha256_file(_1)] }
         return "non-stock #{name} source inventory" unless Digest::SHA256.hexdigest(JSON.generate(files)) == expected
       end
-      nil
+      roots
     end
 
     def check(runtime: false, verification_test: false)
@@ -45,8 +44,9 @@ module Lowrail
         RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
       return "eager-loaded targets required; keep lazy applications original" unless (verification_test || Rails.application.config.eager_load) &&
         %w[Article Comment ArticlesController].all? { Lowrail.loaded_constant(_1) }
-      reason = source_inventory
-      return reason if reason
+      roots = source_inventory
+      return roots if String === roots
+      @roots, @compiled = roots, {}
       Article.define_attribute_methods
       Comment.define_attribute_methods
       require "objspace"
@@ -217,7 +217,7 @@ module Lowrail
       handler.call(template, template.send(:encode!))
     end
 
-    def stock_fact(method)
+    def stock_fact(method, roots: @roots, compiled: @compiled)
       return nil if @released
       path, line = method.source_location
       sequence = RubyVM::InstructionSequence.of(method)
@@ -230,7 +230,7 @@ module Lowrail
         # arity and all instructions, but not the process-local address.
         return runtime_fact(method)
       end
-      return nil unless @roots.values.any? { path.start_with?(_1 + "/lib/") }
+      return nil unless roots.values.any? { path.start_with?(_1 + "/lib/") }
       unless sequence
         # The only folded Ruby-source C accessors in this inventory.
         return Sealed.signature(method) if ["ActionView::Helpers::FormBuilder", "ActionView::Helpers::Tags::Base"].include?(method.owner.name) &&
@@ -241,7 +241,7 @@ module Lowrail
           %i[prefix suffix].include?(method.original_name) && line == 246
         return nil
       end
-      root = (@compiled[path] ||= RubyVM::InstructionSequence.compile_file(path))
+      root = (compiled[path] ||= RubyVM::InstructionSequence.compile_file(path))
       expected = find(root, sequence.label, line)
       expected_array = expected&.to_a
       if expected_array && method.original_name == :tag_builder && method.owner.equal?(ActionView::Helpers::TagHelper) && Sealed::ACTIVE[0]
