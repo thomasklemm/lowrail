@@ -62,11 +62,33 @@ module JitHooks
     invoke = -> { rack.get(path, headers).tap { raise "HTTP #{_1.status}" unless _1.status == 200 } }
     config.fetch("warmup", 1000).times { invoke.call }
     exact = nil
-    if phase == "exact"
+    if %w[exact census].include?(phase)
       policy = JSON.parse(File.read(config.fetch("policy")))
       control = BlogProduction::Entropy.validate(config.fetch("app"), policy: policy)
       raise control.fetch("reason") unless control.fetch("active")
       BlogProduction::Entropy.install(policy)
+    end
+    if phase == "census"
+      n = config.fetch("samples", 300)
+      windows = [0, 1].map do |seed|
+        responses = []
+        before = after = nil
+        _, evidence = BlogProduction::Entropy.with(seed, "GET #{path}", requests: n, wall_clock: true) do
+          before = snapshot
+          n.times { responses << invoke.call }
+          after = snapshot
+        end
+        raise "entropy errors: #{evidence.fetch('errors')}" unless evidence.fetch("errors").empty?
+        {seed: seed, requests: n,
+          response_sequence_sha256: Digest::SHA256.hexdigest(JSON.generate(responses.map { NativeBench.response_digest(_1) })),
+          jit_delta: after.to_h { |key, value| [key, value - before.fetch(key, 0)] }}
+      end
+      File.write(destination, JSON.pretty_generate(ruby: RUBY_DESCRIPTION, jit: mode,
+        binary_sha256: Digest::SHA256.file("/proc/self/exe").hexdigest,
+        workload: config.fetch("workload"), phase: phase, warmup: config.fetch("warmup", 1000), windows: windows))
+      return
+    end
+    if phase == "exact"
       exact = [0, 1].to_h do |seed|
         response, evidence = BlogProduction::Entropy.with(seed, "GET #{path}", wall_clock: true, &invoke)
         raise "entropy errors: #{evidence.fetch('errors')}" unless evidence.fetch("errors").empty?
@@ -144,7 +166,7 @@ module JitHooks
           end
           file = File.join(output, label + "-config.json")
           File.write(file, JSON.pretty_generate(candidate))
-          flags = candidate.fetch("flags") + (phase == "stats" ? candidate.fetch("stats_flags", []) : [])
+          flags = candidate.fetch("flags") + (%w[stats census].include?(phase) ? candidate.fetch("stats_flags", []) : [])
           destination = File.join(output, label + ".json")
           command = ["taskset", "-c", config.fetch("cpu", 2).to_s, candidate.fetch("ruby"), *flags,
             "-rbundler/setup", "-I#{ROOT}/gem/lib", SCRIPT, "worker", file, phase, destination]
@@ -158,6 +180,10 @@ module JitHooks
       end
       if phase == "exact"
         raise "exact response mismatch" unless rows.select { _1.fetch("phase") == "exact" }.map { _1.fetch("exact") }.uniq.size == 1
+      end
+      if phase == "census"
+        sequences = rows.select { _1.fetch("phase") == "census" }.map { |row| row.fetch("windows").map { _1.fetch("response_sequence_sha256") } }
+        raise "census response mismatch" unless sequences.uniq.size == 1
       end
     end
     walls = config.fetch("arms").keys.to_h { |arm|
@@ -198,19 +224,25 @@ module JitHooks
         ruby: RUBY_DESCRIPTION)
     RUBY
     rows = []
+    modes = config.fetch("modes", %w[interpreter zjit])
     10.times do |round|
-      %w[interpreter zjit].rotate(round).each do |mode|
+      modes.rotate(round).each do |mode|
         %w[off_a off_b on].rotate(round).each do |arm|
           ruby = config.fetch(arm == "on" ? "patched" : "base")
+          flags = case mode
+          when "zjit" then ["--disable-yjit", "--zjit"]
+          when "yjit" then ["--disable-zjit", "--yjit"]
+          when "interpreter" then ["--disable-yjit", "--disable-zjit"]
+          else raise "unknown micro mode: #{mode}"
+          end
           out, err, status = Open3.capture3({"RUBYOPT" => nil, "RUBY_YJIT_ENABLE" => nil, "RUBY_ZJIT_ENABLE" => nil},
-            "taskset", "-c", config.fetch("cpu", 2).to_s, ruby,
-            *(mode == "zjit" ? ["--zjit"] : ["--disable-yjit", "--disable-zjit"]), "-e", code, mode)
+            "taskset", "-c", config.fetch("cpu", 2).to_s, ruby, *flags, "-e", code, mode)
           raise "micro worker failed: #{err}" unless status.success?
           rows << JSON.parse(out).merge("arm" => arm, "mode" => mode, "round" => round)
         end
       end
     end
-    summary = %w[interpreter zjit].to_h do |mode|
+    summary = modes.to_h do |mode|
       walls = %w[off_a off_b on].to_h { |arm|
         [arm, rows.select { _1.fetch("mode") == mode && _1.fetch("arm") == arm }.map { _1.fetch("wall_seconds") }]
       }

@@ -1,0 +1,152 @@
+diff --git a/zjit/src/backend/lir.rs b/zjit/src/backend/lir.rs
+index d7ba3d5333..8dc7343572 100644
+--- a/zjit/src/backend/lir.rs
++++ b/zjit/src/backend/lir.rs
+@@ -3233,6 +3233,12 @@ impl Assembler
+                         asm_comment!(self, "increment a side exit counter");
+                         self.incr_counter(Opnd::const_ptr(exit_counter_ptr(reason)), 1.into());
+ 
++                        if get_option!(stats) {
++                            let Opnd::UImm(pc) = exit.pc else { panic!("unexpected exit PC") };
++                            let ptr = crate::stats::census_ptr("exit", side_exit_counter(reason).name(), exit.iseq, pc as *const VALUE, "");
++                            self.incr_counter(Opnd::const_ptr(ptr), 1.into());
++                        }
++
+                         if let SideExitReason::UnhandledYARVInsn(opcode) = reason {
+                             asm_comment!(self, "increment an unhandled YARV insn counter");
+                             self.incr_counter(Opnd::const_ptr(exit_counter_ptr_for_opcode(opcode)), 1.into());
+diff --git a/zjit/src/codegen.rs b/zjit/src/codegen.rs
+index bfdae89657..a5f24503ac 100644
+--- a/zjit/src/codegen.rs
++++ b/zjit/src/codegen.rs
+@@ -236,7 +236,7 @@ pub extern "C" fn rb_zjit_iseq_gen_entry_point(iseq: IseqPtr, ec: EcPtr, jit_exc
+ fn gen_iseq_entry_point(cb: &mut CodeBlock, iseq: IseqPtr, jit_exception: bool) -> Result<CodePtr, CompileError> {
+     // We don't support exception handlers yet
+     if jit_exception {
+-        return gen_exception_handler_counter(cb);
++        return gen_exception_handler_counter(cb, iseq);
+     }
+ 
+     let iseq_name = iseq_get_location(iseq, 0);
+@@ -1621,7 +1621,7 @@ fn gen_send(
+     state: &FrameState,
+     reason: SendFallbackReason,
+ ) -> lir::Opnd {
+-    gen_incr_send_fallback_counter(asm, reason);
++    gen_incr_send_fallback_counter(asm, reason, state, cd);
+     gen_trace_send_fallback(asm, &reason);
+ 
+     gen_prepare_fallback_call(jit, asm, function, state);
+@@ -1646,7 +1646,7 @@ fn gen_send_forward(
+     state: &FrameState,
+     reason: SendFallbackReason,
+ ) -> lir::Opnd {
+-    gen_incr_send_fallback_counter(asm, reason);
++    gen_incr_send_fallback_counter(asm, reason, state, cd);
+     gen_trace_send_fallback(asm, &reason);
+ 
+     gen_prepare_fallback_call(jit, asm, function, state);
+@@ -1671,7 +1671,7 @@ fn gen_send_without_block(
+     state: &FrameState,
+     reason: SendFallbackReason,
+ ) -> lir::Opnd {
+-    gen_incr_send_fallback_counter(asm, reason);
++    gen_incr_send_fallback_counter(asm, reason, state, cd);
+     gen_trace_send_fallback(asm, &reason);
+ 
+     gen_prepare_fallback_call(jit, asm, function, state);
+@@ -1999,7 +1999,7 @@ fn gen_invokeblock(
+     state: &FrameState,
+     reason: SendFallbackReason,
+ ) -> lir::Opnd {
+-    gen_incr_send_fallback_counter(asm, reason);
++    gen_incr_send_fallback_counter(asm, reason, state, cd);
+     gen_trace_send_fallback(asm, &reason);
+ 
+     gen_prepare_fallback_call(jit, asm, function, state);
+@@ -2167,7 +2167,7 @@ fn gen_invokesuper(
+     state: &FrameState,
+     reason: SendFallbackReason,
+ ) -> lir::Opnd {
+-    gen_incr_send_fallback_counter(asm, reason);
++    gen_incr_send_fallback_counter(asm, reason, state, cd);
+     gen_trace_send_fallback(asm, &reason);
+ 
+     gen_prepare_fallback_call(jit, asm, function, state);
+@@ -2192,7 +2192,7 @@ fn gen_invokesuperforward(
+     state: &FrameState,
+     reason: SendFallbackReason,
+ ) -> lir::Opnd {
+-    gen_incr_send_fallback_counter(asm, reason);
++    gen_incr_send_fallback_counter(asm, reason, state, cd);
+     gen_trace_send_fallback(asm, &reason);
+ 
+     gen_prepare_fallback_call(jit, asm, function, state);
+@@ -3375,7 +3375,11 @@ fn gen_incr_counter(asm: &mut Assembler, counter: Counter) {
+ 
+ /// Increment a counter for each DynamicSendReason. If the variant has
+ /// a counter prefix to break down the details, increment that as well.
+-fn gen_incr_send_fallback_counter(asm: &mut Assembler, reason: SendFallbackReason) {
++fn gen_incr_send_fallback_counter(asm: &mut Assembler, reason: SendFallbackReason, state: &FrameState, cd: *const rb_call_data) {
++    if get_option!(stats) {
++        let ptr = crate::stats::census_ptr("send", send_fallback_counter(reason).name(), state.iseq, state.pc, &ruby_call_method_name(cd));
++        gen_incr_counter_ptr(asm, ptr);
++    }
+     gen_incr_counter(asm, send_fallback_counter(reason));
+ 
+     use SendFallbackReason::*;
+@@ -4410,10 +4414,14 @@ fn gen_compile_error_counter(cb: &mut CodeBlock, compile_error: &CompileError) -
+ }
+ 
+ /// Generate a JIT entry that just increments exit_exception_handler and exits
+-fn gen_exception_handler_counter(cb: &mut CodeBlock) -> Result<CodePtr, CompileError> {
++fn gen_exception_handler_counter(cb: &mut CodeBlock, iseq: IseqPtr) -> Result<CodePtr, CompileError> {
+     let mut asm = Assembler::new();
+     asm.new_block_without_id("exception_handler_counter");
+     gen_incr_counter(&mut asm, Counter::exit_exception_handler);
++    if get_option!(stats) {
++        let ptr = crate::stats::census_ptr("exception_entry", "exit_exception_handler", iseq, unsafe { rb_iseq_pc_at_idx(iseq, 0) }, "");
++        gen_incr_counter_ptr(&mut asm, ptr);
++    }
+     asm.cret(Qundef.into());
+ 
+     asm.compile(cb).map(|(code_ptr, gc_offsets)| {
+diff --git a/zjit/src/hir.rs b/zjit/src/hir.rs
+index e80860883e..50fdf482d9 100644
+--- a/zjit/src/hir.rs
++++ b/zjit/src/hir.rs
+@@ -3100,6 +3100,15 @@ impl SendDirectFailure {
+     ) {
+         for &counter in &self.counters {
+             function.count(block, counter);
++            if get_option!(stats) {
++                let (cd, state) = match function.insns[send_insn] {
++                    Insn::Send { cd, state, .. } | Insn::InvokeSuper { cd, state, .. } => (cd, state),
++                    _ => unreachable!(),
++                };
++                let state = function.frame_state_ref(state);
++                let ptr = crate::stats::census_ptr("planner", counter.name(), state.iseq, state.pc, &ruby_call_method_name(cd));
++                function.push_insn(block, Insn::IncrCounterPtr { counter_ptr: ptr });
++            }
+         }
+         let context_counter = match context {
+             SendDirectFallbackContext::Send => Counter::send_direct_fallback_context_send,
+diff --git a/zjit/src/stats.rs b/zjit/src/stats.rs
+index e4bb03a1f8..23d1199645 100644
+--- a/zjit/src/stats.rs
++++ b/zjit/src/stats.rs
+@@ -11,6 +11,14 @@ mod jit;
+ 
+ use crate::{cast::IntoUsize as _, cruby::*, hir::ParseError, options::get_option, state::{increment_compile_time_ns, zjit_enabled_p, ZJITState}};
+ 
++// Z3 diagnostic only. Reuse the existing boxed, resettable dynamic-counter
++// storage. These extra increments must never be used for timing comparisons.
++pub fn census_ptr(kind: &str, reason: &str, iseq: IseqPtr, pc: *const VALUE, target: &str) -> *mut u64 {
++    let idx = unsafe { pc.offset_from(rb_iseq_pc_at_idx(iseq, 0)) } as u32;
++    let key = format!("Z3|{kind}|{reason}|{}|{idx}|{target}", iseq_get_location(iseq, idx));
++    &mut **ZJITState::get_iseq_calls_count_pointers().entry(key).or_insert_with(|| Box::new(0))
++}
++
+ macro_rules! make_counters {
+     (
+         default {
