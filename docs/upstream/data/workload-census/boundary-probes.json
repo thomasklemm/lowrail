@@ -1,0 +1,10 @@
+{
+  "mail_blank_subclass": {
+    "current": "overridden_operator",
+    "match_predicate_shortcut": false
+  },
+  "mail_dasherize": {
+    "independent_mutable_outputs": true,
+    "frozen_input_preserved": true
+  }
+}

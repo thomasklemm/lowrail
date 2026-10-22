@@ -1,0 +1,85 @@
+{
+  "checked_at": "2026-10-22",
+  "pull_requests": [
+    {
+      "base": "3a0b521d0031301daba73987993a66926bd834b4",
+      "head": "59a7187aa1c5ba94abb266a3b8f6f3d351a8c396",
+      "html_url": "https://github.com/rails/solid_cable/pull/86",
+      "merge_commit_sha": "10ab28a68822aa516f07ed277ca2633f033bd463",
+      "merged": true,
+      "merged_at": "2026-08-13T00:24:50Z",
+      "state": "closed",
+      "title": "Memoize cable configuration"
+    },
+    {
+      "base": "1e4217e51db6e116318804776d30c3f4c2b776a4",
+      "head": "7995ad429d348c92cb9884c3e336a7d32161ab50",
+      "html_url": "https://github.com/rails/solid_cable/pull/91",
+      "merge_commit_sha": null,
+      "merged": false,
+      "merged_at": null,
+      "state": "open",
+      "title": "Deliver messages that commit after a higher id"
+    },
+    {
+      "base": "1e4217e51db6e116318804776d30c3f4c2b776a4",
+      "head": "b125448d5a330c420b88e5f0b06212fdf8b70e68",
+      "html_url": "https://github.com/rails/solid_cable/pull/93",
+      "merge_commit_sha": "1df083a604f19c4c03628794b8312542424c70dc",
+      "merged": false,
+      "merged_at": null,
+      "state": "open",
+      "title": "Fall back when a cable duration setting cannot be parsed"
+    },
+    {
+      "base": "bd0442f84b10c44cbd915d919c74fcd698e02b11",
+      "head": "f25ec2382aa01b60b36eeba7a8f8520aea7bb0e2",
+      "html_url": "https://github.com/rails/solid_cable/pull/96",
+      "merge_commit_sha": "90b216ac2e105b3c327ec54b3a753fe1743499ed",
+      "merged": false,
+      "merged_at": null,
+      "state": "open",
+      "title": "Prevent listener failures from stopping delivery silently"
+    },
+    {
+      "base": "bd0442f84b10c44cbd915d919c74fcd698e02b11",
+      "head": "f42fc20bc89bd4fbd2e4e79c9ed269c96b7fe02a",
+      "html_url": "https://github.com/rails/solid_cable/pull/98",
+      "merge_commit_sha": "9d061308f547de7429c0afb22985b4704aa88c18",
+      "merged": false,
+      "merged_at": null,
+      "state": "open",
+      "title": "Allow opt-in synchronous broadcast writes"
+    },
+    {
+      "base": "d645d7b5b7d03218b0bc8971ef041c991a63f5f7",
+      "head": "e3fa1cdb03a260648694d20e3833b70c707fc8e7",
+      "html_url": "https://github.com/mikel/mail/pull/1693",
+      "merge_commit_sha": "b5b5fef0735bb86458b4c661f53f51a9773328e0",
+      "merged": false,
+      "merged_at": null,
+      "state": "open",
+      "title": "perf: Reduce allocations when encoding and finding attachments"
+    },
+    {
+      "base": "d645d7b5b7d03218b0bc8971ef041c991a63f5f7",
+      "head": "fe800ab504ec4e14c489c7914ea72791a9bafcbf",
+      "html_url": "https://github.com/mikel/mail/pull/1673",
+      "merge_commit_sha": "14791e4b5e759cdb098ff8ad27fc50a01b505487",
+      "merged": false,
+      "merged_at": null,
+      "state": "open",
+      "title": "Compile the MIME parameter matcher once per lookup"
+    },
+    {
+      "base": "d645d7b5b7d03218b0bc8971ef041c991a63f5f7",
+      "head": "39d52a29c1082027850627a4c02363d796aa08d5",
+      "html_url": "https://github.com/mikel/mail/pull/1676",
+      "merge_commit_sha": "70281a74eac86529b18a62c047b7b2ab2fae3c7a",
+      "merged": false,
+      "merged_at": null,
+      "state": "open",
+      "title": "Reuse group address serialization within each field rendering"
+    }
+  ]
+}

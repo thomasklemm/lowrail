@@ -1,0 +1,422 @@
+{
+  "public-pg-interpreter-base.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +PRISM [x86_64-linux]",
+    "pg": "1.6.3",
+    "source_sha256": "f1fef05ce9b14ac25b5ff9c7b7285eb867c7ac2e32a0c5afe861893d2f0a9a4e",
+    "yjit": false,
+    "zjit": false,
+    "scope": "allocations only; genuine PG results; no application data",
+    "measurements": [
+      {
+        "case": "no_columns_control",
+        "operations": 2000,
+        "objects_per_cast": 7.0005
+      },
+      {
+        "case": "zero_rows",
+        "operations": 2000,
+        "objects_per_cast": 11.0
+      },
+      {
+        "case": "one_column",
+        "operations": 2000,
+        "objects_per_cast": 10.0
+      },
+      {
+        "case": "wide_32_columns",
+        "operations": 2000,
+        "objects_per_cast": 72.0
+      },
+      {
+        "case": "unicode_binary_null",
+        "operations": 2000,
+        "objects_per_cast": 16.0
+      }
+    ]
+  },
+  "public-pg-interpreter-draft.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +PRISM [x86_64-linux]",
+    "pg": "1.6.3",
+    "source_sha256": "afa0c671a26b7cbb5bae84709a192f308736dccf8b168d3c75801a85eee8221c",
+    "yjit": false,
+    "zjit": false,
+    "scope": "allocations only; genuine PG results; no application data",
+    "measurements": [
+      {
+        "case": "no_columns_control",
+        "operations": 2000,
+        "objects_per_cast": 7.0005
+      },
+      {
+        "case": "zero_rows",
+        "operations": 2000,
+        "objects_per_cast": 10.0
+      },
+      {
+        "case": "one_column",
+        "operations": 2000,
+        "objects_per_cast": 9.0
+      },
+      {
+        "case": "wide_32_columns",
+        "operations": 2000,
+        "objects_per_cast": 71.0
+      },
+      {
+        "case": "unicode_binary_null",
+        "operations": 2000,
+        "objects_per_cast": 15.0
+      }
+    ]
+  },
+  "public-pg-yjit-base.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +YJIT +PRISM [x86_64-linux]",
+    "pg": "1.6.3",
+    "source_sha256": "f1fef05ce9b14ac25b5ff9c7b7285eb867c7ac2e32a0c5afe861893d2f0a9a4e",
+    "yjit": true,
+    "zjit": false,
+    "scope": "allocations only; genuine PG results; no application data",
+    "measurements": [
+      {
+        "case": "no_columns_control",
+        "operations": 2000,
+        "objects_per_cast": 7.0005
+      },
+      {
+        "case": "zero_rows",
+        "operations": 2000,
+        "objects_per_cast": 11.0
+      },
+      {
+        "case": "one_column",
+        "operations": 2000,
+        "objects_per_cast": 10.0
+      },
+      {
+        "case": "wide_32_columns",
+        "operations": 2000,
+        "objects_per_cast": 72.0
+      },
+      {
+        "case": "unicode_binary_null",
+        "operations": 2000,
+        "objects_per_cast": 16.0
+      }
+    ]
+  },
+  "public-pg-yjit-draft.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +YJIT +PRISM [x86_64-linux]",
+    "pg": "1.6.3",
+    "source_sha256": "afa0c671a26b7cbb5bae84709a192f308736dccf8b168d3c75801a85eee8221c",
+    "yjit": true,
+    "zjit": false,
+    "scope": "allocations only; genuine PG results; no application data",
+    "measurements": [
+      {
+        "case": "no_columns_control",
+        "operations": 2000,
+        "objects_per_cast": 7.0005
+      },
+      {
+        "case": "zero_rows",
+        "operations": 2000,
+        "objects_per_cast": 10.0
+      },
+      {
+        "case": "one_column",
+        "operations": 2000,
+        "objects_per_cast": 9.0
+      },
+      {
+        "case": "wide_32_columns",
+        "operations": 2000,
+        "objects_per_cast": 71.0
+      },
+      {
+        "case": "unicode_binary_null",
+        "operations": 2000,
+        "objects_per_cast": 15.0
+      }
+    ]
+  },
+  "public-pg-zjit-base.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +ZJIT +PRISM [x86_64-linux]",
+    "pg": "1.6.3",
+    "source_sha256": "f1fef05ce9b14ac25b5ff9c7b7285eb867c7ac2e32a0c5afe861893d2f0a9a4e",
+    "yjit": false,
+    "zjit": true,
+    "scope": "allocations only; genuine PG results; no application data",
+    "measurements": [
+      {
+        "case": "no_columns_control",
+        "operations": 2000,
+        "objects_per_cast": 7.0005
+      },
+      {
+        "case": "zero_rows",
+        "operations": 2000,
+        "objects_per_cast": 11.0
+      },
+      {
+        "case": "one_column",
+        "operations": 2000,
+        "objects_per_cast": 10.0
+      },
+      {
+        "case": "wide_32_columns",
+        "operations": 2000,
+        "objects_per_cast": 72.0
+      },
+      {
+        "case": "unicode_binary_null",
+        "operations": 2000,
+        "objects_per_cast": 16.0
+      }
+    ]
+  },
+  "public-pg-zjit-draft.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +ZJIT +PRISM [x86_64-linux]",
+    "pg": "1.6.3",
+    "source_sha256": "afa0c671a26b7cbb5bae84709a192f308736dccf8b168d3c75801a85eee8221c",
+    "yjit": false,
+    "zjit": true,
+    "scope": "allocations only; genuine PG results; no application data",
+    "measurements": [
+      {
+        "case": "no_columns_control",
+        "operations": 2000,
+        "objects_per_cast": 7.0005
+      },
+      {
+        "case": "zero_rows",
+        "operations": 2000,
+        "objects_per_cast": 10.0
+      },
+      {
+        "case": "one_column",
+        "operations": 2000,
+        "objects_per_cast": 9.0
+      },
+      {
+        "case": "wide_32_columns",
+        "operations": 2000,
+        "objects_per_cast": 71.0
+      },
+      {
+        "case": "unicode_binary_null",
+        "operations": 2000,
+        "objects_per_cast": 15.0
+      }
+    ]
+  },
+  "public-tz-interpreter-base.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +PRISM [x86_64-linux]",
+    "tzinfo": "2.0.6",
+    "source_sha256": "a818fbbf1085edb82db7687546dfc853602be803e1901a84a3c9765d225a1f30",
+    "yjit": false,
+    "zjit": false,
+    "scope": "allocations only; whole TZif read; synthetic public fixtures",
+    "measurements": [
+      {
+        "case": "format1_control",
+        "operations": 2000,
+        "objects_per_read": 37.0005
+      },
+      {
+        "case": "positive_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "negative_32",
+        "operations": 2000,
+        "objects_per_read": 288.0
+      },
+      {
+        "case": "signed_boundaries",
+        "operations": 2000,
+        "objects_per_read": 72.0
+      },
+      {
+        "case": "empty_control",
+        "operations": 2000,
+        "objects_per_read": 30.0
+      }
+    ]
+  },
+  "public-tz-interpreter-draft.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +PRISM [x86_64-linux]",
+    "tzinfo": "2.0.6",
+    "source_sha256": "665dc7295335d8cb84c7445891b314c45a6a0466a3f2b88d5c9f6f53b9474589",
+    "yjit": false,
+    "zjit": false,
+    "scope": "allocations only; whole TZif read; synthetic public fixtures",
+    "measurements": [
+      {
+        "case": "format1_control",
+        "operations": 2000,
+        "objects_per_read": 37.0005
+      },
+      {
+        "case": "positive_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "negative_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "signed_boundaries",
+        "operations": 2000,
+        "objects_per_read": 60.0
+      },
+      {
+        "case": "empty_control",
+        "operations": 2000,
+        "objects_per_read": 30.0
+      }
+    ]
+  },
+  "public-tz-yjit-base.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +YJIT +PRISM [x86_64-linux]",
+    "tzinfo": "2.0.6",
+    "source_sha256": "a818fbbf1085edb82db7687546dfc853602be803e1901a84a3c9765d225a1f30",
+    "yjit": true,
+    "zjit": false,
+    "scope": "allocations only; whole TZif read; synthetic public fixtures",
+    "measurements": [
+      {
+        "case": "format1_control",
+        "operations": 2000,
+        "objects_per_read": 37.0005
+      },
+      {
+        "case": "positive_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "negative_32",
+        "operations": 2000,
+        "objects_per_read": 288.0
+      },
+      {
+        "case": "signed_boundaries",
+        "operations": 2000,
+        "objects_per_read": 72.0
+      },
+      {
+        "case": "empty_control",
+        "operations": 2000,
+        "objects_per_read": 30.0
+      }
+    ]
+  },
+  "public-tz-yjit-draft.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +YJIT +PRISM [x86_64-linux]",
+    "tzinfo": "2.0.6",
+    "source_sha256": "665dc7295335d8cb84c7445891b314c45a6a0466a3f2b88d5c9f6f53b9474589",
+    "yjit": true,
+    "zjit": false,
+    "scope": "allocations only; whole TZif read; synthetic public fixtures",
+    "measurements": [
+      {
+        "case": "format1_control",
+        "operations": 2000,
+        "objects_per_read": 37.0005
+      },
+      {
+        "case": "positive_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "negative_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "signed_boundaries",
+        "operations": 2000,
+        "objects_per_read": 60.0
+      },
+      {
+        "case": "empty_control",
+        "operations": 2000,
+        "objects_per_read": 30.0
+      }
+    ]
+  },
+  "public-tz-zjit-base.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +ZJIT +PRISM [x86_64-linux]",
+    "tzinfo": "2.0.6",
+    "source_sha256": "a818fbbf1085edb82db7687546dfc853602be803e1901a84a3c9765d225a1f30",
+    "yjit": false,
+    "zjit": true,
+    "scope": "allocations only; whole TZif read; synthetic public fixtures",
+    "measurements": [
+      {
+        "case": "format1_control",
+        "operations": 2000,
+        "objects_per_read": 37.0005
+      },
+      {
+        "case": "positive_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "negative_32",
+        "operations": 2000,
+        "objects_per_read": 288.0
+      },
+      {
+        "case": "signed_boundaries",
+        "operations": 2000,
+        "objects_per_read": 72.0
+      },
+      {
+        "case": "empty_control",
+        "operations": 2000,
+        "objects_per_read": 30.0
+      }
+    ]
+  },
+  "public-tz-zjit-draft.json": {
+    "ruby": "ruby 4.1.0dev (2026-10-22T14:24:10Z HEAD 8ff4ae135d) +ZJIT +PRISM [x86_64-linux]",
+    "tzinfo": "2.0.6",
+    "source_sha256": "665dc7295335d8cb84c7445891b314c45a6a0466a3f2b88d5c9f6f53b9474589",
+    "yjit": false,
+    "zjit": true,
+    "scope": "allocations only; whole TZif read; synthetic public fixtures",
+    "measurements": [
+      {
+        "case": "format1_control",
+        "operations": 2000,
+        "objects_per_read": 37.0005
+      },
+      {
+        "case": "positive_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "negative_32",
+        "operations": 2000,
+        "objects_per_read": 160.0
+      },
+      {
+        "case": "signed_boundaries",
+        "operations": 2000,
+        "objects_per_read": 60.0
+      },
+      {
+        "case": "empty_control",
+        "operations": 2000,
+        "objects_per_read": 30.0
+      }
+    ]
+  }
+}

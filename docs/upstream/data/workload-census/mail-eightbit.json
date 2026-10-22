@@ -1,0 +1,82 @@
+{
+  "scope": "untimed source-attributed allocations, not proven removable allocations; no message contents",
+  "ranking": {
+    "owner": "gem",
+    "file": "GEM/mail-2.9.1/lib/mail/encodings/8bit.rb",
+    "line": 14,
+    "per_app": {
+      "casa": 36.0
+    },
+    "exposures": {
+      "casa:mailer/render+MIME-encode:interpreter": 108.0,
+      "casa:mailer/render+MIME-encode:yjit": 108.0
+    },
+    "score": 36.0,
+    "rank": 16
+  },
+  "profiles": [
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "yjit": false,
+      "public_source": "https://github.com/rubyforgood/casa@b584d2e6e6ebffe382f34c2ec202d20384d035ca:.",
+      "lock_sha256": "c1bc081e0e3a1be81a6910c321e09087128ae85026be5168a53debaa80051e7b",
+      "operation": "mailer/render+MIME-encode",
+      "trace_operations": 10,
+      "sites": [
+        {
+          "owner": "gem",
+          "file": "GEM/mail-2.9.1/lib/mail/encodings/8bit.rb",
+          "line": 14,
+          "class": "String",
+          "objects_per_operation": 104.0
+        },
+        {
+          "owner": "gem",
+          "file": "GEM/mail-2.9.1/lib/mail/encodings/8bit.rb",
+          "line": 14,
+          "class": "ActiveSupport::SafeBuffer",
+          "objects_per_operation": 2.0
+        },
+        {
+          "owner": "gem",
+          "file": "GEM/mail-2.9.1/lib/mail/encodings/8bit.rb",
+          "line": 14,
+          "class": "Array",
+          "objects_per_operation": 2.0
+        }
+      ]
+    },
+    {
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "yjit": true,
+      "public_source": "https://github.com/rubyforgood/casa@b584d2e6e6ebffe382f34c2ec202d20384d035ca:.",
+      "lock_sha256": "c1bc081e0e3a1be81a6910c321e09087128ae85026be5168a53debaa80051e7b",
+      "operation": "mailer/render+MIME-encode",
+      "trace_operations": 10,
+      "sites": [
+        {
+          "owner": "gem",
+          "file": "GEM/mail-2.9.1/lib/mail/encodings/8bit.rb",
+          "line": 14,
+          "class": "String",
+          "objects_per_operation": 104.0
+        },
+        {
+          "owner": "gem",
+          "file": "GEM/mail-2.9.1/lib/mail/encodings/8bit.rb",
+          "line": 14,
+          "class": "ActiveSupport::SafeBuffer",
+          "objects_per_operation": 2.0
+        },
+        {
+          "owner": "gem",
+          "file": "GEM/mail-2.9.1/lib/mail/encodings/8bit.rb",
+          "line": 14,
+          "class": "Array",
+          "objects_per_operation": 2.0
+        }
+      ]
+    }
+  ],
+  "duplicate": "https://github.com/mikel/mail/pull/1693"
+}

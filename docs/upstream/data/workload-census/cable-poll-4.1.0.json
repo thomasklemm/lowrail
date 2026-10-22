@@ -1,0 +1,55 @@
+{
+  "app": "blog",
+  "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+  "solid_cable": "4.1.0",
+  "operation": "direct synchronous persistence only; async writer excluded",
+  "calls_per_operation": [
+    {
+      "config_for": 0,
+      "yaml_parse": 0,
+      "operations": 50
+    }
+  ],
+  "call_paths": {},
+  "accessor_calls": {
+    "polling_interval": {
+      "config_for": 0,
+      "yaml_parse": 0
+    },
+    "silence_polling?": {
+      "config_for": 0,
+      "yaml_parse": 0
+    },
+    "message_retention": {
+      "config_for": 0,
+      "yaml_parse": 0
+    },
+    "autotrim?": {
+      "config_for": 0,
+      "yaml_parse": 0
+    },
+    "trim_batch_size": {
+      "config_for": 0,
+      "yaml_parse": 0
+    }
+  },
+  "real_listener_polls": [
+    {
+      "config_for": 0,
+      "yaml_parse": 0,
+      "iterations": 8
+    }
+  ],
+  "existing_cache_contracts": {
+    "cached_until_reset": true,
+    "reset_refreshes": true,
+    "database_override": true,
+    "programmatic_false": true,
+    "concurrent_read_values": 800,
+    "fork": {
+      "inherited": 0.75,
+      "child": 0.9
+    },
+    "parent_after_fork": 0.75
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-22",
+  "lowrail_base": "26f1b5fbaa3f1829f481c420f70bc3cdfeee4846",
+  "scope": "public corpus allocation evidence; no private app inputs or message contents; absolute orb paths normalized",
+  "public_repositories": [
+    "rubys/roundhouse",
+    "basecamp/once-campfire",
+    "basecamp/fizzy",
+    "rubyforgood/casa",
+    "codetriage/CodeTriage"
+  ],
+  "files": {
+    "bench/upstream/pg_fields_bench.rb": {
+      "bytes": 3343,
+      "sha256": "876497d3fd7357d5ba8e7373ec0b095bd59651d33c9d466ee28f49e5908df7a2"
+    },
+    "bench/upstream/tzinfo_signed_bench.rb": {
+      "bytes": 3830,
+      "sha256": "8afcaa70a3ec4f04b5853d6c39f8b60d9f7dd3141281601522c3cf1d1593fd8b"
+    },
+    "bench/upstream/workload_boot_census.rb": {
+      "bytes": 1809,
+      "sha256": "e1089e9e9b65cc077c94064d4773451a427297786c60c73027249066400b3046"
+    },
+    "bench/upstream/workload_cable_probe.rb": {
+      "bytes": 5372,
+      "sha256": "abdc28fc2fad805122aa5b0dadfafaa9fc67cf7a8f9d0449352102f6e1affcaf"
+    },
+    "bench/upstream/workload_census.rb": {
+      "bytes": 14545,
+      "sha256": "55beee226f6d29d27358b4ea57568676512294affb6702a603ab152ee527c043"
+    },
+    "bench/upstream/workload_census_rank.rb": {
+      "bytes": 2459,
+      "sha256": "2ea49a9f771c3b9134eb579e559b2b02fd26a18a95a836c359d3433c6a55e9cf"
+    },
+    "bench/upstream/workload_cohort.rb": {
+      "bytes": 5142,
+      "sha256": "26fd02fd8650abcf0f5d13e1007b517ac72bc38ce6d58ed471a5783459843ac7"
+    },
+    "bench/upstream/workload_pg.rb": {
+      "bytes": 6364,
+      "sha256": "6e79db4d07409398737f47783a7dfbaf8e18bfacf44b5c009e93ab294d1461e7"
+    },
+    "bench/upstream/workload_tzinfo.rb": {
+      "bytes": 5700,
+      "sha256": "67c6ae505c019a1cf3052ea72c192cfc906acacb2ee12788971c297db73128e1"
+    },
+    "docs/upstream/data/workload-census/boot-ranking.json.gz": {
+      "bytes": 3876549,
+      "sha256": "166f028f8e1984fcfab7cd915dd109dbd1b55f19bdd00b7e10b9246e99d63057"
+    },
+    "docs/upstream/data/workload-census/boot-ranking.tsv.gz": {
+      "bytes": 674224,
+      "sha256": "335cd8b71e72d50713905313faf58c271ba65108b7c4ff3ad184afdc735e5cb6"
+    },
+    "docs/upstream/data/workload-census/boundary-probes.json": {
+      "bytes": 214,
+      "sha256": "71a9b7c04a9852c0f0fb6819a544125e4be16f0e4fb44a4533256dba800b7623"
+    },
+    "docs/upstream/data/workload-census/cable-3.0.5.json": {
+      "bytes": 2749,
+      "sha256": "8fc3ec2fa0fd83482ffd32dffccc873b975338eae5acd7f20a009f9bed8a0b5b"
+    },
+    "docs/upstream/data/workload-census/cable-4.1.0.json": {
+      "bytes": 1035,
+      "sha256": "ce09c4c78b177cf4afed10f9b04e825ffba77ae175fc9839e75fcd7fafe44689"
+    },
+    "docs/upstream/data/workload-census/cable-poll-3.0.5.json": {
+      "bytes": 1963,
+      "sha256": "9bb9a81c7ebc116e61b9469b0a80d53b4d29b4528d881b2869513ee2a5aa98fd"
+    },
+    "docs/upstream/data/workload-census/cable-poll-4.1.0.json": {
+      "bytes": 1147,
+      "sha256": "b55bed72a0b0c239e40a38cae87a700f1d396640e1526ec29c281a2a6ade9b24"
+    },
+    "docs/upstream/data/workload-census/duplicate-checks.json": {
+      "bytes": 9310,
+      "sha256": "71a7da129c7425da2030e34ce053169c1002c1a38770a589dfc258ab4dda65f4"
+    },
+    "docs/upstream/data/workload-census/mail-eightbit.json": {
+      "bytes": 2585,
+      "sha256": "5cf13d6f4c3d10ecaf502f3413267dc43ea9793daf512f1340e2094690bb4dc7"
+    },
+    "docs/upstream/data/workload-census/pg-cohort.json.gz": {
+      "bytes": 47893,
+      "sha256": "a468a0c2c429dfec873d7bc5ec5eed89926f7a3762eec72c4deda1cac1c39908"
+    },
+    "docs/upstream/data/workload-census/pg-protocol.json": {
+      "bytes": 9261,
+      "sha256": "035b31f74b3bfd97aa16170eaab7645fbfb47782b3805188149e4f90cd4b8de4"
+    },
+    "docs/upstream/data/workload-census/pg-suite-outcomes.json.gz": {
+      "bytes": 122605,
+      "sha256": "97c7cbf9cca385dee8796afd4651fb69839cd8c55f0b43a78d4747c499a4b243"
+    },
+    "docs/upstream/data/workload-census/pg-summary.json": {
+      "bytes": 7678,
+      "sha256": "c8e0282723860b8a1597763d057d035d2f9e30f42cb93618eb8500ced49f055b"
+    },
+    "docs/upstream/data/workload-census/priority-duplicates.json": {
+      "bytes": 3256,
+      "sha256": "46eb120859f552f2aed96506476d6382226f6112da4a4467160c82db96b9d2ec"
+    },
+    "docs/upstream/data/workload-census/public-benchmarks.json": {
+      "bytes": 11354,
+      "sha256": "913fd5315f3c51aaebcff944043b391667fabcb89cb4d8020ecb5c3b70d0054c"
+    },
+    "docs/upstream/data/workload-census/ranking.json.gz": {
+      "bytes": 304778,
+      "sha256": "4f8aba95112fa0d2e533d0c13da727b2c0a82d2abf59f5416cd47de1d29d2694"
+    },
+    "docs/upstream/data/workload-census/ranking.tsv": {
+      "bytes": 260686,
+      "sha256": "11984488511f578d0b669fa14a7913e24730a07fe9d7b3fbfc63c90bf1a098df"
+    },
+    "docs/upstream/data/workload-census/tzinfo-cohort.json.gz": {
+      "bytes": 68406,
+      "sha256": "6ae378cdc3c27e68b5024879ba3f2c3b21e6a90a26e835d8d908bf0688eb7388"
+    },
+    "docs/upstream/data/workload-census/tzinfo-protocol.json": {
+      "bytes": 9258,
+      "sha256": "c397fa9460df0e855f99335c70853c14da370a64ccb65639aafbacea7d04dae4"
+    },
+    "docs/upstream/data/workload-census/tzinfo-suite-outcomes.json.gz": {
+      "bytes": 34404,
+      "sha256": "a7b19d1ecb1104a461515e713ed5ccf42b476454dd262661e242189859d87545"
+    },
+    "docs/upstream/data/workload-census/tzinfo-summary.json": {
+      "bytes": 7705,
+      "sha256": "8a66d5934276b6b5b25592425ed7310bb5c6085545f33ee6adcf1808ce1516a6"
+    },
+    "docs/upstream/workload-census.md": {
+      "bytes": 31614,
+      "sha256": "37b5d9b04be40a21853eac548f2bd3c98b846c27dcf4dd752d02ac7feb077538"
+    }
+  }
+}

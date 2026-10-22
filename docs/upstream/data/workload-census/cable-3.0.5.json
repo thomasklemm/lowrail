@@ -1,0 +1,54 @@
+{
+  "app": "fizzy",
+  "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+  "solid_cable": "3.0.5",
+  "operation": "full synchronous Cable broadcast",
+  "calls_per_operation": [
+    {
+      "config_for": 2,
+      "yaml_parse": 2,
+      "operations": 48
+    },
+    {
+      "config_for": 5,
+      "yaml_parse": 5,
+      "operations": 2
+    }
+  ],
+  "call_paths": {
+    "SolidCable.cable_config <- SolidCable.autotrim? <- ActionCable::SubscriptionAdapter::SolidCable#broadcast <- ActionCable::SubscriptionAdapter::ChannelPrefix#broadcast <- block in ActionCable::Server::Broadcasting::Broadcaster#broadcast": 50,
+    "SolidCable.cable_config <- SolidCable.trim_batch_size <- SolidCable::TrimJob#trim_batch_size <- SolidCable::TrimJob#trim? <- SolidCable::TrimJob#perform": 50,
+    "SolidCable.cable_config <- SolidCable.message_retention <- block in <class:Message> <- BasicObject#instance_exec <- block in ActiveRecord::Relation#_exec_scope": 2,
+    "SolidCable.cable_config <- SolidCable.use_skip_locked <- SolidCable::Record.non_blocking_lock <- Kernel#public_send <- block in ActiveRecord::Delegation::ClassSpecificRelation#method_missing": 1,
+    "SolidCable.cable_config <- SolidCable.trim_batch_size <- SolidCable::TrimJob#trim_batch_size <- block in SolidCable::TrimJob#perform <- block in ActiveRecord::ConnectionAdapters::TransactionManager#within_new_transaction": 2,
+    "SolidCable.cable_config <- SolidCable.use_skip_locked <- SolidCable::Record.non_blocking_lock <- block in SolidCable::Message::GeneratedRelationMethods#non_blocking_lock <- ActiveRecord::Relation#_scoping": 1,
+    "SolidCable.cable_config <- SolidCable.polling_interval <- Kernel#public_send <- block (2 levels) in <main> <- TracePoint#enable": 1,
+    "SolidCable.cable_config <- SolidCable.silence_polling? <- Kernel#public_send <- block (2 levels) in <main> <- TracePoint#enable": 1,
+    "SolidCable.cable_config <- SolidCable.message_retention <- Kernel#public_send <- block (2 levels) in <main> <- TracePoint#enable": 1,
+    "SolidCable.cable_config <- SolidCable.autotrim? <- Kernel#public_send <- block (2 levels) in <main> <- TracePoint#enable": 1,
+    "SolidCable.cable_config <- SolidCable.trim_batch_size <- Kernel#public_send <- block (2 levels) in <main> <- TracePoint#enable": 1
+  },
+  "accessor_calls": {
+    "polling_interval": {
+      "config_for": 1,
+      "yaml_parse": 1
+    },
+    "silence_polling?": {
+      "config_for": 1,
+      "yaml_parse": 1
+    },
+    "message_retention": {
+      "config_for": 1,
+      "yaml_parse": 1
+    },
+    "autotrim?": {
+      "config_for": 1,
+      "yaml_parse": 1
+    },
+    "trim_batch_size": {
+      "config_for": 1,
+      "yaml_parse": 1
+    }
+  },
+  "existing_cache_contracts": null
+}

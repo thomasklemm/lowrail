@@ -1,0 +1,320 @@
+{
+  "accepted": true,
+  "measurements": [
+    {
+      "mode": "interpreter",
+      "case": "format1_control",
+      "objects": {
+        "off_a": 37.0005,
+        "off_b": 37.0005,
+        "on": 37.0005
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -0.31673678572721187,
+      "cpu_95_percent": [
+        -1.6824146015233243,
+        3.1022211930698984
+      ],
+      "aa_change_percent": 0.12490590024626935,
+      "aa_95_percent": [
+        -1.1552889220190987,
+        1.6138068272231854
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "interpreter",
+      "case": "positive_32",
+      "objects": {
+        "off_a": 160.0,
+        "off_b": 160.0,
+        "on": 160.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -5.46513021856811,
+      "cpu_95_percent": [
+        -8.064617763670768,
+        -3.603350268637362
+      ],
+      "aa_change_percent": 1.8185597312263213,
+      "aa_95_percent": [
+        0.7520905868175554,
+        4.024275142452193
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "interpreter",
+      "case": "negative_32",
+      "objects": {
+        "off_a": 288.0,
+        "off_b": 288.0,
+        "on": 160.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -15.999625402358951,
+      "cpu_95_percent": [
+        -17.356636630730435,
+        -15.390908166162381
+      ],
+      "aa_change_percent": -1.459219549544749,
+      "aa_95_percent": [
+        -3.323687512360629,
+        1.3609026642720345
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "interpreter",
+      "case": "signed_boundaries",
+      "objects": {
+        "off_a": 72.0,
+        "off_b": 72.0,
+        "on": 60.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -5.480735209439851,
+      "cpu_95_percent": [
+        -7.499271552467257,
+        -2.920698604348865
+      ],
+      "aa_change_percent": 0.05605680990740658,
+      "aa_95_percent": [
+        -1.7115736933307646,
+        3.107160219609262
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "interpreter",
+      "case": "empty_control",
+      "objects": {
+        "off_a": 30.0,
+        "off_b": 30.0,
+        "on": 30.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -0.45231331690787635,
+      "cpu_95_percent": [
+        -3.844789079160021,
+        0.6375452244156699
+      ],
+      "aa_change_percent": -1.9115506791419323,
+      "aa_95_percent": [
+        -3.992398581224782,
+        0.25529019055664515
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "yjit",
+      "case": "format1_control",
+      "objects": {
+        "off_a": 37.0005,
+        "off_b": 37.0005,
+        "on": 37.0005
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": 1.4236619911805137,
+      "cpu_95_percent": [
+        -1.8171387023555474,
+        5.651420010477537
+      ],
+      "aa_change_percent": 1.4859398577945826,
+      "aa_95_percent": [
+        0.04528323542131729,
+        2.4621446888581033
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "yjit",
+      "case": "positive_32",
+      "objects": {
+        "off_a": 160.0,
+        "off_b": 160.0,
+        "on": 160.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -6.6266517987892515,
+      "cpu_95_percent": [
+        -7.99810141785875,
+        -4.738656314649081
+      ],
+      "aa_change_percent": 0.8755129996971811,
+      "aa_95_percent": [
+        -0.048723928633209734,
+        1.750934051047448
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "yjit",
+      "case": "negative_32",
+      "objects": {
+        "off_a": 288.0,
+        "off_b": 288.0,
+        "on": 160.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -14.021707583181612,
+      "cpu_95_percent": [
+        -16.097613855837956,
+        -12.248052378004632
+      ],
+      "aa_change_percent": 0.5870499465613022,
+      "aa_95_percent": [
+        -2.002321146585462,
+        1.96484353205022
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "yjit",
+      "case": "signed_boundaries",
+      "objects": {
+        "off_a": 72.0,
+        "off_b": 72.0,
+        "on": 60.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -6.420613769132327,
+      "cpu_95_percent": [
+        -9.338419697345895,
+        -5.053109250986321
+      ],
+      "aa_change_percent": 0.7208343383061533,
+      "aa_95_percent": [
+        -0.7136347257602094,
+        3.364432354575564
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "yjit",
+      "case": "empty_control",
+      "objects": {
+        "off_a": 30.0,
+        "off_b": 30.0,
+        "on": 30.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": 0.19008147185445856,
+      "cpu_95_percent": [
+        -1.217369383407002,
+        1.3387070903113085
+      ],
+      "aa_change_percent": 0.7564070870440864,
+      "aa_95_percent": [
+        -0.7360206646252032,
+        2.4298260943183103
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "zjit",
+      "case": "format1_control",
+      "objects": {
+        "off_a": 37.0005,
+        "off_b": 37.0005,
+        "on": 37.0005
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": 0.5353396779334774,
+      "cpu_95_percent": [
+        -0.7825167748021389,
+        3.4724233657616788
+      ],
+      "aa_change_percent": 0.3315458567536844,
+      "aa_95_percent": [
+        -1.2971027332262464,
+        1.0546977720644835
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "zjit",
+      "case": "positive_32",
+      "objects": {
+        "off_a": 160.0,
+        "off_b": 160.0,
+        "on": 160.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -6.078512775327871,
+      "cpu_95_percent": [
+        -7.312918585993216,
+        -4.465348685539084
+      ],
+      "aa_change_percent": 0.22072779857310043,
+      "aa_95_percent": [
+        -3.09564323433365,
+        1.3710463888303548
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "zjit",
+      "case": "negative_32",
+      "objects": {
+        "off_a": 288.0,
+        "off_b": 288.0,
+        "on": 160.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -11.73694649332544,
+      "cpu_95_percent": [
+        -12.106041606293687,
+        -11.455940920197506
+      ],
+      "aa_change_percent": -0.13749080002680714,
+      "aa_95_percent": [
+        -0.6885056761297637,
+        1.4672485685730985
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "zjit",
+      "case": "signed_boundaries",
+      "objects": {
+        "off_a": 72.0,
+        "off_b": 72.0,
+        "on": 60.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -5.647094169439532,
+      "cpu_95_percent": [
+        -6.317658662019976,
+        -4.833841050921106
+      ],
+      "aa_change_percent": -1.1115904631924856,
+      "aa_95_percent": [
+        -1.9507632529223218,
+        0.8815712968068157
+      ],
+      "resolved_cpu_regression": false
+    },
+    {
+      "mode": "zjit",
+      "case": "empty_control",
+      "objects": {
+        "off_a": 30.0,
+        "off_b": 30.0,
+        "on": 30.0
+      },
+      "allocation_gate": true,
+      "cpu_change_percent": -2.674078799524948,
+      "cpu_95_percent": [
+        -4.917395062836006,
+        -0.823436191510768
+      ],
+      "aa_change_percent": 0.6826064301834411,
+      "aa_95_percent": [
+        -2.4373564820021842,
+        1.9942239439434628
+      ],
+      "resolved_cpu_regression": false
+    }
+  ]
+}

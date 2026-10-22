@@ -1,0 +1,243 @@
+{
+  "rails-fields-duplicate-search.json": [
+    {
+      "number": 52015,
+      "title": "[FIX] Pluck columns should correctly casts types when using postgresql",
+      "state": "closed",
+      "html_url": "https://github.com/rails/rails/pull/52015",
+      "url": "https://api.github.com/repos/rails/rails/issues/52015",
+      "pull_request": {
+        "url": "https://api.github.com/repos/rails/rails/pulls/52015",
+        "html_url": "https://github.com/rails/rails/pull/52015",
+        "diff_url": "https://github.com/rails/rails/pull/52015.diff",
+        "patch_url": "https://github.com/rails/rails/pull/52015.patch",
+        "merged_at": "2024-06-04T15:55:29Z"
+      }
+    },
+    {
+      "number": 31435,
+      "title": "Suppress `warning: BigDecimal.new is deprecated` in activerecord",
+      "state": "closed",
+      "html_url": "https://github.com/rails/rails/pull/31435",
+      "url": "https://api.github.com/repos/rails/rails/issues/31435",
+      "pull_request": {
+        "url": "https://api.github.com/repos/rails/rails/pulls/31435",
+        "html_url": "https://github.com/rails/rails/pull/31435",
+        "diff_url": "https://github.com/rails/rails/pull/31435.diff",
+        "patch_url": "https://github.com/rails/rails/pull/31435.patch",
+        "merged_at": "2017-12-13T23:08:47Z"
+      }
+    },
+    {
+      "number": 23461,
+      "title": "Add prepared statements support for `Mysql2Adapter`",
+      "state": "closed",
+      "html_url": "https://github.com/rails/rails/pull/23461",
+      "url": "https://api.github.com/repos/rails/rails/issues/23461",
+      "pull_request": {
+        "url": "https://api.github.com/repos/rails/rails/pulls/23461",
+        "html_url": "https://github.com/rails/rails/pull/23461",
+        "diff_url": "https://github.com/rails/rails/pull/23461.diff",
+        "patch_url": "https://github.com/rails/rails/pull/23461.patch",
+        "merged_at": "2016-04-24T05:30:54Z"
+      }
+    },
+    {
+      "number": 17337,
+      "title": "Remove duplicate 'select' database statement",
+      "state": "closed",
+      "html_url": "https://github.com/rails/rails/pull/17337",
+      "url": "https://api.github.com/repos/rails/rails/issues/17337",
+      "pull_request": {
+        "url": "https://api.github.com/repos/rails/rails/pulls/17337",
+        "html_url": "https://github.com/rails/rails/pull/17337",
+        "diff_url": "https://github.com/rails/rails/pull/17337.diff",
+        "patch_url": "https://github.com/rails/rails/pull/17337.patch",
+        "merged_at": "2014-10-20T19:52:08Z"
+      }
+    },
+    {
+      "number": 11955,
+      "title": "Performance: result.fields allocates, cache the lookup",
+      "state": "closed",
+      "html_url": "https://github.com/rails/rails/pull/11955",
+      "url": "https://api.github.com/repos/rails/rails/issues/11955",
+      "pull_request": {
+        "url": "https://api.github.com/repos/rails/rails/pulls/11955",
+        "html_url": "https://github.com/rails/rails/pull/11955",
+        "diff_url": "https://github.com/rails/rails/pull/11955.diff",
+        "patch_url": "https://github.com/rails/rails/pull/11955.patch",
+        "merged_at": null
+      }
+    }
+  ],
+  "rails-cast-result-prs.json": [
+    {
+      "number": 57517,
+      "title": "Fixes #51780: prevent shared PostgreSQL queries from racing with reconnects",
+      "state": "open",
+      "url": "https://github.com/rails/rails/pull/57517"
+    },
+    {
+      "number": 58548,
+      "title": "`activerecord`: add an option to shuffle unordered `SELECT` results",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/58548"
+    },
+    {
+      "number": 58306,
+      "title": "Active Record Ractor-friendly connection handling",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/58306"
+    },
+    {
+      "number": 58275,
+      "title": "Don't swallow `::RangeError` on write queries",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/58275"
+    },
+    {
+      "number": 58217,
+      "title": "Remove unused Active Record internals",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/58217"
+    },
+    {
+      "number": 56366,
+      "title": "Fix QueryIntent RangeError handling breaking affected_rows",
+      "state": "closed",
+      "url": "https://github.com/rails/rails/pull/56366"
+    },
+    {
+      "number": 56267,
+      "title": "Move async execution into QueryIntent",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/56267"
+    },
+    {
+      "number": 55060,
+      "title": "Add `affected_rows` to `ActiveRecord::Result`",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/55060"
+    },
+    {
+      "number": 52461,
+      "title": "AbstractAdapter#cast_result should return a result with columns even if empty",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/52461"
+    },
+    {
+      "number": 52428,
+      "title": "Refactor Active Record adapters to have a similar internal interface",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/52428"
+    },
+    {
+      "number": 43945,
+      "title": "Add `ActiveRecord::Base::normalizes`",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/43945"
+    },
+    {
+      "number": 13195,
+      "title": "fix Mysql sum return integer instead of float",
+      "state": "closed",
+      "url": "https://github.com/rails/rails/pull/13195"
+    },
+    {
+      "number": 36532,
+      "title": "Empty array instead of nil for source_extract",
+      "state": "merged",
+      "url": "https://github.com/rails/rails/pull/36532"
+    }
+  ],
+  "tzinfo-performance-prs.json": [
+    {
+      "number": 129,
+      "title": "Implement TZInfo.eager_load!",
+      "state": "closed",
+      "html_url": "https://github.com/tzinfo/tzinfo/pull/129",
+      "url": "https://api.github.com/repos/tzinfo/tzinfo/issues/129",
+      "pull_request": {
+        "url": "https://api.github.com/repos/tzinfo/tzinfo/pulls/129",
+        "html_url": "https://github.com/tzinfo/tzinfo/pull/129",
+        "diff_url": "https://github.com/tzinfo/tzinfo/pull/129.diff",
+        "patch_url": "https://github.com/tzinfo/tzinfo/pull/129.patch",
+        "merged_at": null
+      }
+    },
+    {
+      "number": 80,
+      "title": "Fully initialize TZInfo::TimezoneTransitionDefinition object before freeze",
+      "state": "closed",
+      "html_url": "https://github.com/tzinfo/tzinfo/pull/80",
+      "url": "https://api.github.com/repos/tzinfo/tzinfo/issues/80",
+      "pull_request": {
+        "url": "https://api.github.com/repos/tzinfo/tzinfo/pulls/80",
+        "html_url": "https://github.com/tzinfo/tzinfo/pull/80",
+        "diff_url": "https://github.com/tzinfo/tzinfo/pull/80.diff",
+        "patch_url": "https://github.com/tzinfo/tzinfo/pull/80.patch",
+        "merged_at": null
+      }
+    },
+    {
+      "number": 33,
+      "title": "[TASK] Configure Travis for better build performance",
+      "state": "closed",
+      "html_url": "https://github.com/tzinfo/tzinfo/pull/33",
+      "url": "https://api.github.com/repos/tzinfo/tzinfo/issues/33",
+      "pull_request": {
+        "url": "https://api.github.com/repos/tzinfo/tzinfo/pulls/33",
+        "html_url": "https://github.com/tzinfo/tzinfo/pull/33",
+        "diff_url": "https://github.com/tzinfo/tzinfo/pull/33.diff",
+        "patch_url": "https://github.com/tzinfo/tzinfo/pull/33.patch",
+        "merged_at": null
+      }
+    }
+  ],
+  "tzinfo-unpack-prs.json": [],
+  "tzinfo-zoneinfo-prs.json": [
+    {
+      "number": 165,
+      "title": "Add support for loading zoneinfo from ENV['TZDIR']",
+      "state": "open",
+      "html_url": "https://github.com/tzinfo/tzinfo/pull/165",
+      "url": "https://api.github.com/repos/tzinfo/tzinfo/issues/165",
+      "pull_request": {
+        "url": "https://api.github.com/repos/tzinfo/tzinfo/pulls/165",
+        "html_url": "https://github.com/tzinfo/tzinfo/pull/165",
+        "diff_url": "https://github.com/tzinfo/tzinfo/pull/165.diff",
+        "patch_url": "https://github.com/tzinfo/tzinfo/pull/165.patch",
+        "merged_at": null
+      }
+    },
+    {
+      "number": 103,
+      "title": "Updated to tzdata version 2019c",
+      "state": "closed",
+      "html_url": "https://github.com/tzinfo/tzinfo/pull/103",
+      "url": "https://api.github.com/repos/tzinfo/tzinfo/issues/103",
+      "pull_request": {
+        "url": "https://api.github.com/repos/tzinfo/tzinfo/pulls/103",
+        "html_url": "https://github.com/tzinfo/tzinfo/pull/103",
+        "diff_url": "https://github.com/tzinfo/tzinfo/pull/103.diff",
+        "patch_url": "https://github.com/tzinfo/tzinfo/pull/103.patch",
+        "merged_at": null
+      }
+    },
+    {
+      "number": 52,
+      "title": "Implementing correct offsets for to_local",
+      "state": "closed",
+      "html_url": "https://github.com/tzinfo/tzinfo/pull/52",
+      "url": "https://api.github.com/repos/tzinfo/tzinfo/issues/52",
+      "pull_request": {
+        "url": "https://api.github.com/repos/tzinfo/tzinfo/pulls/52",
+        "html_url": "https://github.com/tzinfo/tzinfo/pull/52",
+        "diff_url": "https://github.com/tzinfo/tzinfo/pull/52.diff",
+        "patch_url": "https://github.com/tzinfo/tzinfo/pull/52.patch",
+        "merged_at": "2016-09-19T16:41:31Z"
+      }
+    }
+  ]
+}

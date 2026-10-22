@@ -1,0 +1,581 @@
+{
+  "scope": "allocation admission; CPU-time regression diagnostic only; no speed/Ir claim",
+  "rounds": 12,
+  "seed": 41231,
+  "warmup_per_case": 3000,
+  "allocation_operations": 2000,
+  "timed_operations": 10000,
+  "expected_objects_delta": {
+    "no_columns_control": 0,
+    "zero_rows": -1,
+    "one_column": -1,
+    "wide_32_columns": -1,
+    "unicode_binary_null": -1
+  },
+  "cpu": 0,
+  "ruby": "RUBY_MASTER/bin/ruby",
+  "worker_sha256": "6e79db4d07409398737f47783a7dfbaf8e18bfacf44b5c009e93ab294d1461e7",
+  "source_sha256": {
+    "base": "f1fef05ce9b14ac25b5ff9c7b7285eb867c7ac2e32a0c5afe861893d2f0a9a4e",
+    "draft": "afa0c671a26b7cbb5bae84709a192f308736dccf8b168d3c75801a85eee8221c"
+  },
+  "flags": {
+    "interpreter": [],
+    "yjit": [
+      "--yjit",
+      "--yjit-stats=quiet"
+    ],
+    "zjit": [
+      "--zjit",
+      "--zjit-stats-quiet"
+    ]
+  },
+  "jobs": [
+    {
+      "round": 0,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 0,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 0,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 0,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 0,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 0,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 0,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 0,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 0,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 1,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 1,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 1,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 1,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 1,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 1,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 1,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 1,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 1,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 2,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 2,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 2,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 2,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 2,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 2,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 2,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 2,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 2,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 3,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 3,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 3,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 3,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 3,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 3,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 3,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 3,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 3,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 4,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 4,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 4,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 4,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 4,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 4,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 4,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 4,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 4,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 5,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 5,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 5,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 5,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 5,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 5,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 5,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 5,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 5,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 6,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 6,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 6,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 6,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 6,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 6,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 6,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 6,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 6,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 7,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 7,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 7,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 7,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 7,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 7,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 7,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 7,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 7,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 8,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 8,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 8,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 8,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 8,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 8,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 8,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 8,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 8,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 9,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 9,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 9,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 9,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 9,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 9,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 9,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 9,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 9,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 10,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 10,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 10,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 10,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 10,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 10,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 10,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 10,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 10,
+      "mode": "yjit",
+      "arm": "on"
+    },
+    {
+      "round": 11,
+      "mode": "interpreter",
+      "arm": "on"
+    },
+    {
+      "round": 11,
+      "mode": "interpreter",
+      "arm": "off_b"
+    },
+    {
+      "round": 11,
+      "mode": "zjit",
+      "arm": "on"
+    },
+    {
+      "round": 11,
+      "mode": "yjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 11,
+      "mode": "yjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 11,
+      "mode": "zjit",
+      "arm": "off_a"
+    },
+    {
+      "round": 11,
+      "mode": "zjit",
+      "arm": "off_b"
+    },
+    {
+      "round": 11,
+      "mode": "interpreter",
+      "arm": "off_a"
+    },
+    {
+      "round": 11,
+      "mode": "yjit",
+      "arm": "on"
+    }
+  ],
+  "bootstrap": {
+    "resamples": 5000,
+    "interval": 0.95,
+    "seed": 1729
+  },
+  "acceptance": "expected allocation delta in every mode and round; reject any positive paired CPU-time interval; retain rejected cohorts"
+}
