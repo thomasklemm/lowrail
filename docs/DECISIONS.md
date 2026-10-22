@@ -4,6 +4,12 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet Y: non-creating guards pass the scoped throughput rule (2026-10-22)
+Fizzy singleton-send fallbacks 469→243/request; ~90 fewer objects than F; incremental interpreter Ir −0.622%, all controls pass.
+One real-Puma cohort: A/A [−1.632,+0.801]%; RPS +7.827% [+6.131,+9.839], zero errors; all 623,992 completions join native/wire records.
+Keep default off and the current result bench-only; the coordinator authorized ordered own-suite/DB/purity/lifecycle/fork/transport prerequisites, full gates and Thermos for an opt-in tier.
+Main integration and README changes are not authorized here; no SQL/whole-DB or ZJIT claim follows. [Protocol, limits and complete export](jit-guards.md).
+
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
 
 The all-sealed cold failure is a runtime defect, not witness noise. On the

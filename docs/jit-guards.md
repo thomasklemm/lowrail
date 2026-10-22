@@ -158,3 +158,115 @@ recorder CPU 7 shares the client set, never the server set.
 As in `44a33c4`, “A/A first” means adjudicate/report its band first within
 the rotated cohort, not run an extra timing cohort. The decision rule above
 is unchanged. A failed preflight or cohort is retained without a retry.
+
+## Single Puma cohort: accepted scoped throughput result
+
+Measured
+[`796fa58`](https://github.com/thomasklemm/lowrail/commit/796fa5893b4e117168340c229908f89b86fdaf41):
+Ruby 4.0.7, Rails 8.1.4, **Puma 6.5.0**, startup YJIT, four workers × one
+thread, c16, 20 rotated rounds, 5 s warmup / 20 s load. All 60 timed windows
+are retained, including the negative treatment round. No retry/exclusion.
+
+**A/A first:** paired mean −0.440081%, 95% [−1.632208%, +0.800804%]; maximum
+absolute single-round A/A spread 6.447765%. It contains zero. Treatment
+RPS is **+7.827430% [+6.130743%, +9.838538%]**: its lower bound exceeds the
+A/A upper bound, so the preregistered rule passes. This is new F versus
+Lowrail off, **not a head-to-head native price for the guard change** versus
+old F, and not a comparison obtained by subtracting two historical cohorts.
+
+| Median of window values | off-A | on | off-B |
+|---|---:|---:|---:|
+| RPS | 511.233 | 546.242 | 503.224 |
+| p50, ms | 7.687 | 7.194 | 7.763 |
+| p90, ms | 124.517 | 110.797 | 119.969 |
+| p99, ms | 265.474 | 246.536 | 268.017 |
+| Post-load sum of worker RSS, KiB | 916,908 | 905,118 | 904,300 |
+| Sum of worker GC-time deltas, ms | 3,554 | 3,636.5 | 3,590.5 |
+| Sum of worker collection deltas | 323 | 338.5 | 331.5 |
+| Process allocation deltas / completion | 9,066.219 | 8,398.372 | 9,066.256 |
+| Recorder CPU, s | 0.475 | 0.500 | 0.475 |
+| Native observer CPU, ms | 51.782 | 53.091 | 50.791 |
+
+Percent changes use the mean of paired-round ratios, not ratios of these
+medians. Latency values are medians of window percentiles, not a pooled
+histogram or proof of uniformly faster tails. Process deltas include the
+untimed metrics calls/background work; more completions occur in on windows.
+GC collections/time increase in absolute terms. These are not a fixed-heap
+memory/GC price or evidence that GC caused any tail. Observer CPU excludes
+Ruby wrapper overhead and kernel capture cost; no observer-off overhead
+ablation is claimed.
+
+Both seeds' natural login/GET cold and post-warmup status/body/all-Rack-header
+digests match across every arm/window. All 252 workers in the 63 fresh
+servers assert actual YJIT after fork; timed counters are off. Before the
+first load, all four on coverage workers have positive hits and strict
+shadows, zero fallback. Pre/post metrics show no worker replacement. All
+3,161 pinned inputs still match. There are **zero HTTP/transport errors**.
+
+The offline receipt audit independently reconciles every oha receipt hash,
+count/RPS/latency, schedule, paired bootstrap, worker mode and stable PID set.
+**623,992 / 623,992** timed completions join one-to-one with both native
+records and passive wire requests in all 60 windows. No join problems,
+sequence gaps/retransmissions, kernel/native drops or open GC intervals.
+Every one of the 72 interpreter dump totals separately equals its parsed
+native self-cost sum and its worker receipt. Raw captures and environment
+files stay private because they may contain disposable session credentials.
+
+The [durable machine-readable export](jit-guards.json) contains actual source
+and binary/input pins, all census counters (including pre-window totals),
+two-seed digests, every Ir window/dump hash, the rejected full-DB controls,
+all 60 RPS windows, all 252 worker-mode receipts, process metrics and the
+complete numeric GC/wire audit. `$REPO` and `$SCRATCH` are relocatable root
+labels, not a portable app/bundle. No credentials or raw cookie/packet data
+are exported. `window_ratio_in_yjit` is computed from instruction deltas;
+the arithmetic delta of a cumulative ratio is not that window ratio.
+
+## Reproduction and next admission boundary
+
+Reuse `script/corpus fizzy` and `script/corpus real-blog-r4`; prepare the
+committed `FizzyLinkFixture` and `BlogShowGetOnly` snapshots. Match artifacts
+to each actual stock/stats Ruby description, select the three blog units
+after resolving manifest paths, renumber IDs and regenerate relative-path
+metadata. Keep the existing entropy provider/site rules and update only
+source/lock pins for a freshly generated fixture. The export records every
+actual input hash. The stats Ruby recipe is:
+
+```sh
+./configure --prefix="$SCRATCH/ruby-stats" --enable-yjit=stats --disable-install-doc
+make -j4 && make install
+```
+
+Official 4.0.7 tar.xz SHA256:
+`47ef59413f7a4587ba6a6b78b14036eb5e36eec2ec0b90964801e88d56a3d375`.
+The executed stats binary SHA256 is in the export. Pin Bundler 4.0.20 and
+use the stock Ruby gem paths for the stats interpreter. Run each census in
+a fresh output directory, then the finite interpreter preflight/cohort:
+
+```sh
+mise exec ruby@4.0.7 -- ruby bench/experiments/jit_guards.rb run CONFIG NEW_OUTPUT
+PATH="$VALGRIND/bin:$PATH" CPATH="$VALGRIND/include" \
+  mise exec ruby@4.0.7 -- ruby bench/experiments/jit_guards_ir.rb none CONFIG NEW_OUTPUT
+PATH="$VALGRIND/bin:$PATH" CPATH="$VALGRIND/include" \
+  mise exec ruby@4.0.7 -- ruby bench/experiments/jit_guards_ir.rb cohort CONFIG NEW_OUTPUT
+```
+
+The Puma config additionally selects only `/buckets`, supplies pinned oha,
+the compiled shared `bench/rps_gc_tags.c`, `packet_capture_cpu: "7"`, and
+sets `puma_setup` to this branch's `jit_guards_rps.rb`. Keep all settings and
+the decision rule above; this completed attempt does **not** authorize a
+retry. Its entry point and offline parser are:
+
+```sh
+BUNDLER_VERSION=4.0.20 mise exec ruby@4.0.7 -- ruby \
+  bench/experiments/jit_guards_rps.rb "$HARNESS/script/rps" CONFIG NEW_OUTPUT
+python3 "$HARNESS/bench/rps_attribution.py" OUTPUT > PRIVATE_ATTRIBUTION.json
+```
+
+This result changes neither default delivery nor production admission.
+The coordinator has authorized taking F toward an **opt-in** tier here,
+in order: active DirectSite own-suite equivalence; declared and proved
+off/off DB-noise exclusions; purity/lifecycle/fork/concurrency certificates;
+a bounded transport-error review; full gates and Thermos. Those are new
+prerequisites, **not already satisfied by this throughput result**. Main
+integration belongs to the coordinator; README work follows integration.
+No ZJIT execution or speed claim is made.
