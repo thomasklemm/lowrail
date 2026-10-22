@@ -182,50 +182,9 @@ module ARCallsite
     end
   end
 
-  # Explicit pure call-site specimen. The caller, not a source analysis, asserts
-  # that invoking this block at boot is safe. Never installed in app requests.
-  # It prices removing chain spawning separately from final-query reuse.
-  class DirectSite
-    def initialize(model, arity:, &chain)
-      @model, @arity, @chain = model, arity, chain
-      @template = chain.call(*Array.new(arity) { ActiveRecord::StatementCache::Substitute.new })
-      raise Decline, "direct_site_shape" unless (@template.values.keys - ALLOWED).empty? && !@template.eager_loading?
-      model.with_connection do |connection|
-        raise Decline, "unprepared_connection" unless connection.prepared_statements
-        @connection, @visitor = connection, connection.visitor
-        @sql, binds, @preparable, @retryable = connection.send(:to_sql_and_binds, @template.arel)
-        @bind_map = ActiveRecord::StatementCache::BindMap.new(binds)
-      end
-      @defaults, @types = model.default_scopes.dup, model.attribute_types
-      @role, @shard = model.current_role, model.current_shard
-    end
-
-    def call(*values)
-      valid = ARCallsite.sql? && values.size == @arity && values.none? { ActiveRecord::StatementCache.unsupported_value?(_1) } &&
-        @model.default_scopes == @defaults && @model.attribute_types.equal?(@types) &&
-        @model.current_scope.nil? && @model.global_current_scope.nil? &&
-        @model.current_role == @role && @model.current_shard == @shard && ActiveRecord.query_transformers.empty?
-      @model.with_connection do |connection|
-        valid &&= connection.equal?(@connection) && connection.visitor.equal?(@visitor) && connection.prepared_statements
-      end
-      return @chain.call(*values).to_a unless valid
-      binds = @bind_map.bind(values)
-      return @chain.call(*values).to_a if binds.any? { _1.respond_to?(:unboundable?) && _1.unboundable? }
-      relation = @template.spawn
-      relation.instance_variable_set(:@ar_callsite_direct, [Plan.new(@sql, @preparable, @retryable), binds])
-      relation.to_a
-    end
-  end
-
   module QueryHook
     private
     def exec_main_query(async: false)
-      if (direct = @ar_callsite_direct) && ARCallsite.sql? && !async
-        plan, binds = direct
-        return skip_query_cache_if_necessary do
-          model.with_connection { model._query_by_sql(_1, plan.sql, binds, preparable: plan.preparable, allow_retry: plan.retryable) }
-        end
-      end
       return super unless ARCallsite.sql? && !async && !@none && !where_clause.contradiction?
       model.with_connection do |connection|
         planned = ARCallsite.query(self, connection)

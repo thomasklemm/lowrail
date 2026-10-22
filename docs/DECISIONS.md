@@ -16,6 +16,12 @@ Changing `Relation#_exec_scope` after authentication gives exact off/off but dif
 Keep production/default delivery unchanged: handwritten dependency lists and ancestry-changing template installation are not an opt-in compiler certificate.
 Retain the accepted historical throughput result, counterexample and remaining lifecycle/concurrency obligations separately. [Evidence](jit-guards.md#opt-in-prerequisite-3-refused-transitive-certificate).
 
+## Bet Y stays branch-only: closure invalidation is not a stock-Ruby certificate (2026-10-22)
+No clean near-zero-hot-cost design on Ruby 4.0.7: callback invalidation is suppressible, visibility lacks callbacks, and JIT CME assumptions do not cover erased sends.
+A closed, refusing compiler plus an unsuppressible VM dependency-group API could make structural checks constant-cost; neither exists here, and live data/reentry still need guards.
+Acceptance remains the two-seed `_exec_scope` mutation: exact responses/SQL, zero stale-plan hits, positive fallback, including after fork; no new timing was run.
+Keep Y/F bench-only, default off and opt-in integration paused; retain the scoped historical win. [Feasibility and cost estimate](jit-guards.md#closure-invalidation-feasibility-no-new-timing).
+
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
 
 The all-sealed cold failure is a runtime defect, not witness noise. On the

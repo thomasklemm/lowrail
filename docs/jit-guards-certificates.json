@@ -4,11 +4,13 @@
     "0": {
       "off_off_exact": true,
       "off_on_exact": false,
+      "stale_plan_refused": false,
       "passed": false
     },
     "1": {
       "off_off_exact": true,
       "off_on_exact": false,
+      "stale_plan_refused": false,
       "passed": false
     }
   },
@@ -18,6 +20,8 @@
       "yjit": true,
       "zjit": false,
       "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "forked": true,
+      "pid": 192718,
       "cases": {
         "0": {
           "response": {
@@ -51,15 +55,15 @@
             "sql_sha256": "761b2a71194f1ba8c5b62032eebb95f8dc281ce945d2a82fbfbde9c2c1a4611d"
           }
         }
-      },
-      "forked": true,
-      "pid": 181385
+      }
     },
     "off_b": {
       "arm": "off_b",
       "yjit": true,
       "zjit": false,
       "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "forked": true,
+      "pid": 192725,
       "cases": {
         "0": {
           "response": {
@@ -93,15 +97,15 @@
             "sql_sha256": "761b2a71194f1ba8c5b62032eebb95f8dc281ce945d2a82fbfbde9c2c1a4611d"
           }
         }
-      },
-      "forked": true,
-      "pid": 181416
+      }
     },
     "on": {
       "arm": "on",
       "yjit": true,
       "zjit": false,
       "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
+      "forked": true,
+      "pid": 192732,
       "cases": {
         "0": {
           "response": {
@@ -145,16 +149,19 @@
             "sql_sha256": "38d079471df119d8783c61d540e833a47d09cfc026ba5f3ac1c4e9f35bbe4bcc"
           }
         }
-      },
-      "forked": true,
-      "pid": 181448
+      }
     }
   },
   "scope": "transitive _exec_scope mutation after authentication; no app/config source patches; shadows off",
+  "replay_receipt_sha256": "3b8a92e4cc57fe7de4ed4c5dd4881ea468a0c864e0adb05a2e453e10601c109a",
+  "supersedes": {
+    "commit": "6d3b30aee03c14484c3a052cc450fb0ec284f591",
+    "path": "docs/jit-guards-certificates.json"
+  },
   "sources": {
-    "ar_request_sites_certificate.rb": "8367dc806b842073bdaed2dfced73da258aaa46f7a8dab448d0e96ab5f312163",
     "ar_request_sites.rb": "dab65d0ae5704b81683e3a0a28f1267f28c61932ee3c02bc1e481ef77b47dc28",
-    "ar_request_sites_check.rb": "d6eef53b6f363b19efbc1c7268f155f6794958debf48971e1a833b2003cda652",
-    "ar_callsite.rb": "37529c994b613e840caf25254d5ff0d852cb305fffb76608855ac3ae1bd52ca5"
+    "ar_request_sites_check.rb": "792aa36aab2684d04289a17d517d3fb775885643bd1fb00e49bc71d77aad7cc8",
+    "ar_request_sites_db.rb": "58277bb74a4f878c422ac87d3a2ca1c48d287b4acd2d9d630d47efb973918abb",
+    "ar_callsite.rb": "5be7551c4302aa80215a43d1b328de3fa4dab562890c615962cc9d36936b2b98"
   }
 }

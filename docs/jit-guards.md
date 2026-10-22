@@ -217,7 +217,12 @@ and binary/input pins, all census counters (including pre-window totals),
 two-seed digests, every Ir window/dump hash, the rejected full-DB controls,
 all 60 RPS windows, all 252 worker-mode receipts, process metrics and the
 complete numeric GC/wire audit. `$REPO` and `$SCRATCH` are relocatable root
-labels, not a portable app/bundle. No credentials or raw cookie/packet data
+labels, not a portable app/bundle. Format 2 replaces entropy traces and bulky
+workflow detail with hashes/counts, deduplicates DB inventories and summarizes
+generated-file pin catalogs. Every export names its immutable original commit,
+path and byte hash; `git show COMMIT:PATH` recovers those original details.
+Measurement commits and runtime pins describe the **historical measuring
+runtime**, not later branch HEAD. No credentials or raw cookie/packet data
 are exported. `window_ratio_in_yjit` is computed from instruction deltas;
 the arithmetic delta of a cumulative ratio is not that window ratio.
 
@@ -380,7 +385,10 @@ The single named internal key
 `__solid_cache_entry_size_moving_average_estimates` is decoded and retained
 separately, together with its row hash, presence and SQLite sequence hash.
 This is a **store-internal boundary, not noise** and not unrestricted
-full-cache determinism. With RNG seed 0 it is absent in all arms; with seed
+full-cache determinism: the split gate does not require equality of that
+internal row, its estimate or cache `sqlite_sequence`; it retains those as
+separate observations. The stricter declared-exclusion gate still compares
+them. With RNG seed 0 it is absent in all arms; with seed
 1 its raw ASCII payload decodes to **[189] in all arms**. Its own accounted
 row size is **192**, making current total size **381**, not 189: 49 key
 bytes + 3 payload bytes + SolidCache's 140-byte row overhead. The estimate
@@ -450,10 +458,81 @@ Reproduce the negative admission check, without a timing cohort:
 
 ```sh
 JIT_GUARDS_HARNESS="$HARNESS/script/native-bench" BUNDLER_VERSION=4.0.20 \
-  AR_GUARD_FORK=1 mise exec ruby@4.0.7 -- ruby \
-  bench/experiments/ar_request_sites_certificate.rb CONFIG NEW_OUTPUT
-# Expected current result: exit 2; both off_off_exact true / off_on_exact false.
+  AR_GUARD_FORK=1 AR_GUARD_TRANSITIVE=1 mise exec ruby@4.0.7 -- ruby \
+  bench/experiments/ar_request_sites_check.rb CONFIG NEW_OUTPUT
+# Expected current result: exit 2; response_equal/sql_equal/stale_plan_refused false.
+# Export independently confirms off/off exact at both seeds; DB clock stays separate.
 ```
+
+## Closure invalidation feasibility: no new timing
+
+**Verdict: not cleanly feasible at near-zero hot-path cost on stock Ruby
+4.0.7. Keep Y/F branch-only; no opt-in integration.** This is a bounded design
+assessment of the observed counterexample, not an implementation or new price.
+
+The missing certificate has two independent parts:
+
+1. **Derive the erased program, not just a list of scope names.** Starting
+   from each DirectSite chain, a compiler would need a worklist of effective
+   receiver/selector/visibility/lexical-lookup facts, including generated
+   delegates, `_exec_scope`, `super`, blocks, association construction,
+   predicate building, visitor/adapter code and all effects removed by SQL
+   reuse. An observed boot trace is not the closure: it misses alternate
+   values/branches. Ruby's dynamic sends, callbacks, eval, autoload and opaque
+   C calls require a closed modeled subset or refusal, not guessed edges.
+   Executing an arbitrary scope at boot to discover its closure is not a
+   purity proof and may advance effects or lazy loading. No such closed IR
+   and effect model exists for this specimen.
+2. **Revoke before the next affected use, independent of user callbacks.**
+   `method_added`/singleton and include/prepend callbacks can be suppressed;
+   own visibility changes have no corresponding callback. Lowrail's existing
+   [guard code](../gem/lib/lowrail/guard.rb) documents both holes, and the
+   [suppressed-hook audit](passes/suppressed-hooks.md) demonstrates stale
+   permission. JIT CME invalidation protects actual emitted sends, not a
+   cached plan that erased `_exec_scope`. Keeping that send live would retain
+   its normal invalidation, but would undo part of DirectSite's elimination.
+   The stock VM exposes no supported dependency-group subscription primitive
+   for Lowrail to reuse. A C extension wrapping Ruby callbacks does not make
+   them unsuppressible. Freezing the entire dependency graph instead changes
+   the application's mutation contract; it is not this guarded tier.
+
+**Cost estimate, structural rather than timing.** With \(M\) certified method
+lookups and \(E\) resolved call edges, worklist closure construction is
+\(O(M+E)\), plus parsing/effect analysis, and stores \(O(M+E)\) evidence.
+A reverse dependency index uses space proportional to total subscribed
+memberships. With a VM-owned group-valid bit, each structural mutation could
+revoke \(O(D)\) affected groups and each checkpoint could read one bit in
+\(O(1)\). That API does not exist here; publication, revocation-before-reentry,
+GC, reload, fork and thread/Ractor behavior would need their own certificates.
+No numerical memory/boot/write or near-zero latency estimate is justified.
+
+Existing **experimental patched-VM** individual method-token guards cost
+202 interpreter / 106 YJIT Ir per successful Ruby guard on their pinned
+master build ([evidence](upstream-drafts/ruby-method-token-description.md#costs-tests-and-patch)).
+Checking all \(M\) at \(C\) boundaries would scale as \(O(CM)\), roughly
+202\(CM\) / 106\(CM\) instructions before loop/receiver/data checks—not
+a stock-4.0.7 price or a demonstrated group primitive. A global epoch is not
+a scoped replacement: the existing Fizzy **`/bubbles`**, not `/buckets`,
+census sees 20 bumps/request; `/buckets` had zero in that census. Avoid
+extrapolating selected-token stability to a complete DirectSite closure.
+
+Even an ideal structural group does not cover mutable defaults/reflections,
+current scopes, role/shard/connection state, or an already-running fast region
+after arbitrary Ruby executes. Actual holder and data guards remain; every
+reentry needs a checkpoint and once-only local continuation or refusal.
+Adding `_exec_scope` alone to today's manual inventory would close one hole,
+not those obligations. No new hook, epoch or patched-Ruby dependency is added.
+
+**Acceptance test retained:** run the unified negative check above, with
+shadows off, both seeds and an actual-YJIT post-fork worker in every arm.
+Require off/off and off/on status/body/all-header/ordered-SQL equality,
+zero DirectSite hits and positive fallback after the `_exec_scope` mutation;
+an unmutated positive control must still hit. Keep raw DB-clock rejection
+separate from those response/SQL checks and the declared DB boundary.
+A future certificate must also handle suppressed callbacks, visibility,
+include/prepend/remove/undef/singleton changes and mutation inside argument
+evaluation without replay. The current replay still returns two stale-plan
+hits and zero fallback at both seeds. **This acceptance test remains red.**
 
 ## Bounded transport-error review
 
@@ -470,3 +549,30 @@ errors. All 623,992 timed completions reconcile against native and wire
 records. This meets the requested bounded nonrecurrence observation, **not
 a root-cause explanation or a general serving certificate**. No new load
 cohort or error exclusions were introduced for this review.
+
+## Thermos follow-up and gate attribution
+
+The original correctness/security and maintainability reviews requested
+changes; neither admitted production delivery. The follow-up removes the
+unused second DirectSite implementation and its dead query hook, folds the
+negative certificate into the existing worker/fork harness, and asserts both
+actual YJIT and disabled ZJIT in the child. Compacted exports preserve every
+counter/window/decision and explicitly distinguish measuring pins from HEAD;
+large original details remain recoverable by commit/path/hash.
+
+The suspected on-only cache-column hole does **not** reproduce: the complete
+canonical schema/header hash rejects it. The existing DB test now exercises
+that asymmetry, alongside changed primary rows and app cache values. The
+split store-internal-key boundary is coordinator-approved and explicitly
+separate from complete cache equivalence, not silently widened noise.
+
+The all-bench stale-artifact failure reproduced on the old branch base:
+the test demanded `stale build`, but the deliberate ancestry refusal ran
+first. Current main
+[`e05238f`](https://github.com/thomasklemm/lowrail/commit/e05238f2cdb45ea6b419966427e4dd20b6cd5a7d)
+passes the exact targeted test (1 run / 24 assertions); it already contains
+[`b8c8832`](https://github.com/thomasklemm/lowrail/commit/b8c8832dbc8c117c69a0b5b173843817a5f119e8),
+which keeps both refusal-order-independent rejection and an independent
+eligible-source staleness control. This is an **old-base test expectation**,
+not a newly fixed runtime defect in Y. Refresh by merging main, preserving
+published branch history; no rebase/force push or main write is needed.

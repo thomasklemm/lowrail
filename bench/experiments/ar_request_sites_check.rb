@@ -10,10 +10,11 @@ require_relative "ar_request_sites_db"
 load ENV.fetch("JIT_GUARDS_HARNESS")
 
 module ARSiteChecks
-  CASES = %w[baseline warm_baseline changed_scope added_default_scope current_scope global_scope
+  CASES = (ENV["AR_GUARD_TRANSITIVE"] == "1" ? %w[transitive_scope] :
+    %w[baseline warm_baseline changed_scope added_default_scope current_scope global_scope
     reflection_changed association_loaded unexpected_receiver model_method_private
     relation_method_changed owner_empty_singleton owner_private_singleton user_empty_singleton
-    user_singleton_reader owner_reader_private owner_reader_undefined source_pin_mismatch restored].freeze
+    user_singleton_reader owner_reader_private owner_reader_undefined source_pin_mismatch restored]).freeze
   class << self
     attr_accessor :current, :entered, :undo
 
@@ -64,6 +65,17 @@ module ARSiteChecks
         holder = Bubble.send(:relation_delegate_class, ActiveRecord::AssociationRelation)
         holder.send(:define_method, :limit) { |value| super(value) }
         self.undo = -> { holder.send(:remove_method, :limit) }
+      when "transitive_scope"
+        original = ActiveRecord::Relation.instance_method(:_exec_scope)
+        visibility = ActiveRecord::Relation.private_method_defined?(:_exec_scope) ? :private : :public
+        ActiveRecord::Relation.send(:define_method, :_exec_scope) do |*args, &block|
+          original.bind_call(self, *args, &block).where(id: -404)
+        end
+        ActiveRecord::Relation.send(visibility, :_exec_scope)
+        self.undo = -> {
+          ActiveRecord::Relation.send(:define_method, :_exec_scope, original)
+          ActiveRecord::Relation.send(visibility, :_exec_scope)
+        }
       when "owner_reader_private"
         inherited = Bucket.instance_method(:bubbles).owner != Bucket
         Bucket.send(:private, :bubbles)
@@ -82,6 +94,8 @@ module ARSiteChecks
       raise "actual YJIT required" unless RubyVM::YJIT.enabled? && !(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?)
       require config.fetch("exploration_setup")
       NativeBench::Exploration.install(config: config, state: state, arm: arm)
+      # A diagnostic shadow exception must not stand in for a runtime guard.
+      ARCallsite.shadow = false if CASES == %w[transitive_scope]
       require File.expand_path("../bench/experiments/fizzy_link_vector", File.dirname(config.fetch("harness")))
       return cases(config, state, arm) unless ENV["AR_GUARD_FORK"] == "1"
 
@@ -141,7 +155,7 @@ module ARSiteChecks
           expected_status = %w[model_method_private owner_private_singleton owner_reader_private owner_reader_undefined].include?(name) ? 500 : 200
           raise "unexpected status #{name}: #{response.status}" unless response.status == expected_status
           delta = ARRequestSites.counts.to_h { |key, value| [key, value - before.fetch(key, 0)] }
-          if arm == "on"
+          if arm == "on" && name != "transitive_scope"
             hits = delta.fetch("bucket:hit", 0)
             if %w[baseline warm_baseline restored].include?(name)
               raise "positive control has no hits #{name}" unless hits.positive?
@@ -168,6 +182,7 @@ module ARSiteChecks
       end
       raise "application source changed" unless BlogProduction::Entropy.source_pin(config.fetch("app")) == app_pin
       {"arm" => arm, "source_sha256" => app_pin, "yjit" => RubyVM::YJIT.enabled?,
+        "zjit" => !!(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?),
         "kernel_random_seed" => random_seed, "warm_entropy" => warm_evidence, "cases" => rows}
     end
   end
@@ -225,8 +240,11 @@ elsif $PROGRAM_NAME == __FILE__
       equality = fields.to_h { |field| [field, values.values.map { _1.fetch(field) }.uniq.size == 1] }
       sql = values.values.map { _1.fetch("evidence").fetch("sql_sha256") }.uniq.size == 1
       components = %w[primary cache queue cable].to_h { |db| [db, values.values.map { _1.fetch("db_components_sha256").fetch(db) }.uniq.size == 1] }
+      refused = name != "transitive_scope" || (values.fetch("on").fetch("counts_delta").fetch("bucket:hit", 0).zero? &&
+        values.fetch("on").fetch("counts_delta").fetch("bucket:fallback", 0).positive?)
       [seed, {"equal" => equality, "sql_equal" => sql, "database_equal" => components,
-        "response_equal" => equality.except("db_sha256").values.all?, "passed" => equality.values.all? && sql}]
+        "response_equal" => equality.except("db_sha256").values.all?,
+        "stale_plan_refused" => refused, "passed" => equality.values.all? && sql && refused}]
     end]
   end
   passed = checks.values.all? { _1.values.all? { |row| row.fetch("passed") } }
