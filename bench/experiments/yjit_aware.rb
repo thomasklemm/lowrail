@@ -42,14 +42,21 @@ module YjitAware
 
   def worker(config, state, arm, phase, destination)
     load config.fetch("harness")
+    require File.join(ROOT, "fixtures/corpus/blog_production")
     require File.join(config.fetch("app"), "config/environment")
     raise "wrong execution mode" unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4" &&
-      Rails.env.production? && RubyVM::YJIT.enabled? && !RubyVM::ZJIT.enabled?
+      Rails.env.production? && RubyVM::YJIT.enabled? && !(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?)
     require config.fetch("exploration_setup") if config["exploration_setup"]
     NativeBench::Exploration.install(config: config, state: state, arm: arm) if config["exploration_setup"]
     workload = NativeBench.routes(config, state, arm).values.fetch(0)
     invoke = -> { workload.call.tap { raise "HTTP #{_1.status}" unless _1.status == 200 } }
     config.fetch("warmup").times { invoke.call }
+    if arm == "on" && config.fetch("workload") == "blog"
+      %w[Lowrail::FormScaffold Lowrail::TokenTag Lowrail::CollectionRender].each do |name|
+        runtime = Lowrail.loaded_constant(name)
+        raise "inactive #{name}: #{runtime&.refusal}" unless runtime&.admitted?
+      end
+    end
     if phase == "coverage"
       unless config["exploration_setup"]
         policy = JSON.parse(File.read(config.fetch("entropy_policy")))
@@ -137,6 +144,23 @@ module YjitAware
           File.write(File.join(output, "workers.json"), JSON.pretty_generate(workers))
           FileUtils.remove_entry(state)
           warn "yjit-aware #{label}: complete"
+        end
+      end
+      if phase == "coverage"
+        coverage = workers.select { _1.fetch("phase") == "coverage" }
+        identities = coverage.map do |row|
+          row.fetch("exact").transform_values { _1.slice("status", "body_sha256", "headers_sha256") }
+        end
+        raise "response companions differ" unless identities.uniq.size == 1
+        on = coverage.find { _1.fetch("arm") == "on" }
+        before, after = on.fetch("counts_before"), on.fetch("counts_after")
+        if config.fetch("workload") == "blog"
+          hits = difference(before.fetch("hits"), after.fetch("hits"))
+          raise "blog hit/fallback gate" unless hits.values.sort == [10, 10, 40] && after.fetch("fallbacks").values.sum.zero?
+        else
+          delta = difference(before.fetch("direct_sites"), after.fetch("direct_sites"))
+          raise "Fizzy hit/shadow/fallback gate" unless delta.fetch("bucket:hit") == 20 &&
+            delta.fetch("bucket:shadow") == 20 && after.fetch("direct_sites").fetch("bucket:fallback", 0).zero?
         end
       end
     end
