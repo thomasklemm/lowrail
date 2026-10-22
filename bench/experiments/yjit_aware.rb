@@ -107,7 +107,8 @@ module YjitAware
     require File.join(ROOT, "fixtures/corpus/blog_production")
     paths = [SCRIPT, config.fetch("harness"), config.fetch("entropy_policy"),
       File.join(config.fetch("app"), "Gemfile.lock"), *config.fetch("extra_sources", []),
-      *Dir[File.join(ROOT, "gem/lib/**/*.{rb,so}")], *Dir[File.join(config.fetch("artifact"), "**/*")]].select { File.file?(_1) }
+      *Dir[File.join(ROOT, "gem/lib/**/*.{rb,so}")], *Dir[File.join(config.fetch("artifact"), "**/*")],
+      *Dir[File.join(config.fetch("stats_artifact"), "**/*")]].select { File.file?(_1) }
     pins = paths.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
     source = BlogProduction::Entropy.source_pin(config.fetch("app"))
     File.write(File.join(output, "protocol.json"), JSON.pretty_generate(config: config, pins: pins, app_source: source))
@@ -129,6 +130,7 @@ module YjitAware
           FileUtils.rm_rf(File.join(config.fetch("app"), "tmp"))
           env = NativeBench.environment(config, state).merge("LOWRAIL" => arm == "on" ? "1" : "0",
             "LOWRAIL_STATS" => phase == "coverage" ? "" : nil,
+            "LOWRAIL_DIR" => phase == "stats" ? config.fetch("stats_artifact") : config.fetch("artifact"),
             "RUBYOPT" => "-rbundler/setup -I#{ROOT}/gem/lib -rlowrail/setup")
           binary = phase == "stats" ? config.fetch("stats_ruby") : RbConfig.ruby
           flags = ["--yjit", "--disable-zjit"]
