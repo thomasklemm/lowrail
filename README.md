@@ -122,13 +122,19 @@ when scope or acceptance changes; retain superseded records as historical.
 - **Opt-in:** sealed production units require the [separate contract](docs/sealed.md)
   and exact passive admission. The two sealed production rows do not imply arbitrary
   endpoint coverage or config promotion. A separate
-  [verification-only AR test certificate](docs/test-certificate.md) exercises
-  naturally ready Article/Comment units, including true eager-load coverage;
-  it is not production admission or link/form/token/collection test coverage.
+  [verification-only test certificate](docs/test-certificate.md) exercises
+  naturally ready Article/Comment and passive token/collection units,
+  including true eager-load coverage; it is not production admission.
+  Link/form remain refused.
 - **Refused or quarantined:** the old source link/route passes remain
   quarantined, including old mixed artifacts; seven cached-fact passes are
-  sealed-only, not ordinary guarded opt-ins. Unsupported shapes, stale or
-  mode-mismatched artifacts, and the Bundlebun boundary stay original
+  sealed-only, not ordinary guarded opt-ins. Artifacts containing preload
+  plans, sealed link delivery or lowered templates now refuse as a whole:
+  their on-only framework ancestry is app-observable, even when sealed
+  ([boundary](docs/DECISIONS.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)).
+  The priced three-unit form/token/collection artifact is unaffected.
+  Unsupported shapes, stale or mode-mismatched artifacts, and the Bundlebun
+  boundary stay original
   ([pass ledger](docs/DECISIONS.md#passes), [loaders](docs/loaders.md)).
 
 ## How it works

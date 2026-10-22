@@ -53,7 +53,7 @@ class ManifestTest < Minitest::Test
       require "lowrail/manifest"
       data = {"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION, "compile_option" => "",
         "files" => {}, "tier" => "sealed-v1", "rails_env" => "production",
-        "units" => [{"id" => 0, "pass" => "sealed/link_to", "facts" => []}]}
+        "units" => [{"id" => 0, "pass" => "sealed/form_scaffold", "facts" => []}]}
       config = data.merge("units" => [{"id" => 0, "pass" => "inertia/config_bind", "facts" => []}])
       rows = [[nil, "production", data], ["1", "test", data], ["1", "production", data],
         ["1", "production", data.reject { _1 == "tier" }],
@@ -115,5 +115,50 @@ class ManifestTest < Minitest::Test
     RUBY
     assert_equal 33, result.size
     assert_equal [[false, true, false, false]], result.uniq
+
+    # Current-tier artifacts must also refuse the complete delivery before
+    # installers run, even when the unsafe unit is not selected.
+    result = ruby_json(<<~'RUBY', setup: false, env: {"RUBYOPT" => "-I#{GEM_LIB}"})
+      require "json"
+      require "tmpdir"
+      require "lowrail"
+      ENV["RAILS_ENV"], ENV["LOWRAIL_SEALED"] = "production", "1"
+      Dir.mktmpdir do |root|
+        Dir.mkdir(File.join(root, ".lowrail"))
+        unit = {"id" => 4, "pass" => "sealed/form_scaffold", "facts" => []}
+        base = {"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
+          "certification_jit" => Lowrail.jit_mode, "compile_option" => "", "files" => {},
+          "rails_env" => "production", "tier" => "sealed-v1", "units" => [unit]}
+        variants = %w[active_record/preload_plans sealed/link_to].flat_map do |pass|
+          unsafe = {"id" => 9, "pass" => pass, "facts" => []}
+          [base.merge("units" => [unsafe]), base.merge("units" => [unit, unsafe],
+            "files" => {"app.rb" => {"iseq" => "must-not-be-delivered.bin"}})]
+        end
+        variants << base.merge("templates" => {"index.html.erb" => {"code" => "raise 'must not run'"}})
+        variants << base.merge("units" => [], "templates" => {"empty.html.erb" => {}})
+        rows = variants.flat_map do |artifact|
+          File.write(File.join(root, ".lowrail/manifest.json"), JSON.generate(artifact))
+          %w[0 1].product([nil, "4"]).map do |enabled, selected|
+            ENV["LOWRAIL"], ENV["LOWRAIL_UNITS"] = enabled, selected
+            installed = Lowrail.setup(root: root)
+            {"installed" => installed, "reason" => Lowrail.refusal_reason,
+              "loaded" => %w[Lowrail::Guard Lowrail::Loader Lowrail::Templates Lowrail::PreloadPlans Lowrail::Sealed].map { !!Lowrail.loaded_constant(_1) },
+              "features" => $LOADED_FEATURES.grep(%r{/lowrail/(?:guard|loader|templates|preload_plans|sealed)\.rb\z}),
+              "object_chain" => Object.ancestors.map(&:name),
+              "module_chain" => Module.ancestors.map(&:name)}
+          end
+        end
+        puts JSON.generate(rows)
+      end
+    RUBY
+    assert_equal 24, result.size
+    result.each do |row|
+      refute row.fetch("installed")
+      assert_match(/app-visible ancestry delivery refused:/, row.fetch("reason"))
+      assert_equal [false] * 5, row.fetch("loaded")
+      assert_empty row.fetch("features")
+      refute row.fetch("object_chain").any? { _1&.start_with?("Lowrail::") }
+      refute row.fetch("module_chain").any? { _1&.start_with?("Lowrail::") }
+    end
   end
 end

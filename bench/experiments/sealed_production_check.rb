@@ -25,10 +25,19 @@ if ARGV.first == "worker"
   _, phase, destination, seed = ARGV
   BlogProduction.singleton_class.prepend(Module.new do
     def cold_features
+      # Observer only: enumerate existing framework holders without resolving
+      # an autoload or constructing a view. Compare the complete chains in
+      # both stages, not just the three historically named delivery holders.
+      framework = ObjectSpace.each_object(Module).filter_map do |holder|
+        name = Module.instance_method(:name).bind_call(holder)
+        next unless name&.match?(/\A(?:Action\w*|Active\w*|Rails|Rack|Zeitwerk)(?:::|\z)/)
+        [name, holder.ancestors.map(&:name)]
+      end.sort.to_h
       super.merge("production_seams" => %w[ActionView::Template ActionView::CollectionRenderer ActiveRecord::Associations::Preloader].to_h do |name|
         holder = Lowrail.loaded_constant(name)
         [name, holder&.ancestors&.map(&:name)]
-      end, "lowrail_features" => $LOADED_FEATURES.select { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) })
+      end, "framework_ancestry" => framework,
+        "lowrail_features" => $LOADED_FEATURES.select { _1.start_with?(File.join(ROOT, "gem/lib/lowrail")) })
     end
   end)
   BlogProduction.worker(phase, destination, seed, expected_jit: JitStability.mode)
@@ -86,6 +95,12 @@ companions = [0, 1].map do |seed|
   report = BlogProduction.compare(records)
   report["seed"] = seed
   report["cold_equal"] = records.all? { _1.fetch("cold_witness") == records.first.fetch("cold_witness") }
+  report["framework_holders_equal"] = %w[features after_requests].all? do |stage|
+    records.map { _1.fetch("cold_witness").fetch(stage).fetch("framework_ancestry") }.uniq.size == 1
+  end
+  report["framework_holder_counts"] = %w[features after_requests].to_h do |stage|
+    [stage, records.first.fetch("cold_witness").fetch(stage).fetch("framework_ancestry").size]
+  end
   report["forbidden_chains_absent"] = records.all? do |record|
     !JSON.generate(record.fetch("cold_witness")).match?(/Lowrail::Templates::CompiledSource|Lowrail::PreloadPlans::Hook/)
   end
@@ -95,7 +110,7 @@ companions = [0, 1].map do |seed|
   report["admissions"] = on.fetch("admissions")
   report["refusals"] = records.map { _1.fetch("production_refusals") }
   covered = PASSES.all? { |pass| on.fetch("scenarios").last.fetch("hits").fetch(ids.fetch(pass), 0).positive? }
-  report["status"] = "rejected_production_coverage" unless report.fetch("cold_equal") && report.fetch("forbidden_chains_absent") &&
+  report["status"] = "rejected_production_coverage" unless report.fetch("cold_equal") && report.fetch("framework_holders_equal") && report.fetch("forbidden_chains_absent") &&
     covered && on.fetch("admissions").values.all? { _1.fetch("state") == "active" } &&
     report.fetch("refusals").all? { _1.values.all?(&:nil?) }
   report

@@ -323,6 +323,8 @@ class PreloadPlansTest < Minitest::Test
     result["batch_change"] = $batch_calls
     result["build_wrapper_calls"] = $build_wrapper_calls if ENV["PRELOAD_PATCH"]
     result["hits"] = defined?(Lowrail::Stats) ? Lowrail::Stats.unit_hits : {}
+    result["refusal"] = Lowrail.refusal_reason
+    result["preloader_ancestry"] = ActiveRecord::Associations::Preloader.ancestors.map(&:name)
     puts JSON.generate(result)
   RUBY
 
@@ -355,12 +357,16 @@ class PreloadPlansTest < Minitest::Test
         JSON.parse(out.lines.last)
       end
       off, on, disabled, stale = runs
-      assert_operator on.delete("hits").fetch("8", 0), :>=, 6
-      assert_empty off.delete("hits")
-      assert_empty disabled.delete("hits")
-      assert_empty stale.delete("hits")
-      assert_equal 1, on.delete("habtm_fallbacks")
-      [off, disabled, stale].each { assert_equal 0, _1.delete("habtm_fallbacks") }
+      [on, stale].each do |result|
+        assert_match(/app-visible ancestry delivery refused: active_record\/preload_plans/, result.delete("refusal"))
+      end
+      assert_nil off.delete("refusal"), "this off control never requests manifest setup"
+      assert_nil disabled.delete("refusal")
+      runs.each do |result|
+        assert_empty result.delete("hits"), "ancestry-unsafe preload delivery stays original, even sealed"
+        assert_equal 0, result.delete("habtm_fallbacks")
+        refute_includes result.fetch("preloader_ancestry"), "Lowrail::PreloadPlans::Hook"
+      end
       assert_equal off, on
       assert_equal off, disabled
       assert_equal off, stale
@@ -419,6 +425,12 @@ class PreloadPlansTest < Minitest::Test
           JSON.parse(out.lines.last).tap do |result|
             assert_empty result.delete("hits")
             result.delete("habtm_fallbacks")
+            refusal = result.delete("refusal")
+            if patch == "association" && mode == "1"
+              assert_match(/app-visible ancestry delivery refused:/, refusal)
+            else
+              assert_nil refusal
+            end
           end
         end
         assert_equal runs.first, runs.last

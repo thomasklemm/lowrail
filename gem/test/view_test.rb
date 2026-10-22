@@ -30,11 +30,16 @@ class ViewTest < Minitest::Test
         template = ActionView::Template.new(File.read(file), file,
           ActionView::Template.handler_for_extension("erb"), locals: [], format: :html)
         puts JSON.generate(body: template.render(view, {}).to_s,
-          hits: Lowrail::Stats.unit_hits, reason: Lowrail.refusal_reason)
+          hits: Lowrail::Stats.unit_hits, reason: Lowrail.refusal_reason,
+          ancestry: ActionView::Template.ancestors.map(&:name),
+          templates_loaded: !!Lowrail.loaded_constant("Lowrail::Templates"))
       RUBY
       baseline = ruby_json(script, chdir: a, env: {"LOWRAIL_STATS" => ""})
-      assert_equal "fast", baseline.fetch("body")
-      assert_equal({"0" => 1}, baseline.fetch("hits"))
+      assert_equal "orig", baseline.fetch("body")
+      assert_empty baseline.fetch("hits")
+      assert_match(/app-visible ancestry delivery refused: template delivery/, baseline.fetch("reason"))
+      refute baseline.fetch("templates_loaded")
+      refute_includes baseline.fetch("ancestry"), "Lowrail::Templates::CompiledSource"
       FileUtils.cp_r(a, b)
       FileUtils.rm_rf(a)
       assert_equal baseline, ruby_json(script, chdir: b, env: {"LOWRAIL_STATS" => ""})
@@ -42,7 +47,7 @@ class ViewTest < Minitest::Test
       refused = ruby_json(script, chdir: b, env: {"LOWRAIL_STATS" => ""})
       assert_equal "changed", refused.fetch("body")
       assert_empty refused.fetch("hits")
-      assert_includes refused.fetch("reason"), "template source digest mismatch"
+      assert_equal baseline.fetch("reason"), refused.fetch("reason")
     end
   end
 

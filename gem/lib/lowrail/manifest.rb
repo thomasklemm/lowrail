@@ -145,6 +145,18 @@ module Lowrail
       unless unsafe.empty?
         @refusal_reason = "quarantined source passes: #{unsafe.join(', ')}; receiver certificates and post-argument/conversion continuations are incomplete; rebuild required"
       end
+      # These delivery seams prepend into app-visible framework holders and
+      # load certificate-named Lowrail holders on-only. Sealing forbids app
+      # mutation; it does not make ancestry, Module#=== or lookup unobservable.
+      # Refuse the WHOLE artifact before guards, file delivery or installers:
+      # dropping a unit alone could still deliver its lowered files/templates.
+      ancestry_seams = @units.filter_map do |unit|
+        unit["pass"] if %w[active_record/preload_plans sealed/link_to].include?(unit["pass"])
+      end.uniq
+      ancestry_seams << "template delivery" unless @templates.empty?
+      unless ancestry_seams.empty?
+        @refusal_reason ||= "app-visible ancestry delivery refused: #{ancestry_seams.join(', ')}; keep original; rebuild without these seams"
+      end
       # Symbol keys: the method_added hooks look up every defined name, and a
       # Symbol lookup does not allocate.
       by_method = Hash.new { |h, k| h[k] = [] }

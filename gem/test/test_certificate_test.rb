@@ -11,7 +11,7 @@ class TestCertificateTest < Minitest::Test
       require "lowrail"
       require "lowrail/manifest"
       data = {"format" => Lowrail::FORMAT, "ruby_description" => RUBY_DESCRIPTION,
-        "compile_option" => "", "files" => {}, "units" => [{"id" => 0, "pass" => "sealed/link_to", "facts" => []}]}
+        "compile_option" => "", "files" => {}, "units" => [{"id" => 0, "pass" => "active_record/instantiate", "facts" => []}]}
       production = data.merge("tier" => "sealed-v1", "rails_env" => "production")
       verification = data.merge("tier" => "sealed-test-v1", "rails_env" => "test",
         "verification_test" => {"version" => 1, "mode" => "verification-only"})
@@ -544,6 +544,7 @@ class TestCertificateTest < Minitest::Test
             Process.wait(pid)
             raise "child failed" unless $?.success?
             result = {before: before, child: child,
+              render_ids: %w[sealed/token_tag sealed/collection_render].map { ids.fetch(_1) },
               admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?]}
             exit
           end
@@ -561,6 +562,7 @@ class TestCertificateTest < Minitest::Test
           render_collection.call(true)
           result = {before: before, token: token_pair, collection: collection_pair,
             generation: generation, size_output: size_output,
+            render_ids: %w[sealed/token_tag sealed/collection_render].map { ids.fetch(_1) },
             admitted: [Lowrail::TokenTag.admitted?, Lowrail::CollectionRender.admitted?], stats: Lowrail::Stats.snapshot}
         RUBY
         if mutation == "fork"
@@ -571,7 +573,7 @@ class TestCertificateTest < Minitest::Test
           assert_equal [false, false], child.fetch("admitted")
           assert_equal ["", ["left/0/2", "right/1/2"]], child.fetch("outputs")
           assert_empty child.dig("stats", "unit_hits")
-          %w[4 5].each do |id|
+          result.fetch("render_ids").each do |id|
             assert_equal 1, child.dig("stats", "unit_deopts", id)
             assert_equal ["verification_unexpected_pid_original_only"], child.dig("stats", "unit_refusals", id)
           end
@@ -588,7 +590,7 @@ class TestCertificateTest < Minitest::Test
           expected = %w[dispatch tier opt_in].include?(mutation) ? [false, false] : %w[lexical size].include?(mutation) ? [true, false] : [false, true]
           assert_equal expected, result.fetch("admitted"), mutation
           expected.each_with_index do |active, index|
-            id = (4 + index).to_s
+            id = result.fetch("render_ids").fetch(index)
             assert_equal(active ? 0 : 1, result.dig("stats", "unit_deopts").fetch(id, 0), mutation)
             next if active
             prior = result.dig("before", "unit_hits", id)
@@ -660,8 +662,13 @@ class TestCertificateTest < Minitest::Test
       assert status.success?, "#{out}\n#{err}"
       FileUtils.cp_r(File.join(dir, ".lowrail/verification-test/.", "."), File.join(dir, ".lowrail"))
       manifest = JSON.parse(File.read(File.join(dir, ".lowrail/manifest.json")))
-      assert_equal %w[active_record/instantiate active_record/instantiate sealed/link_to sealed/form_scaffold
+      assert_equal %w[active_record/instantiate active_record/instantiate sealed/form_scaffold
         sealed/token_tag sealed/collection_render], manifest.fetch("units").map { _1.fetch("pass") }
+      assert_empty manifest.fetch("files"), "test discovery must not emit link's unsafe source/template delivery"
+      ledger = JSON.parse(File.read(File.join(dir, ".lowrail/ledger.json")))
+      link = ledger.select { _1.fetch("pass") == "sealed/link_to" }
+      assert_equal [["refused", "verification_literal_table_observer_unavailable"]],
+        link.map { _1.values_at("outcome", "reason") }, "link delivery must take the existing explicit refusal path"
       boot = <<~'RUBY'
         require "json"
         result = nil
