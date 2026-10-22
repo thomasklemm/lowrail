@@ -73,11 +73,31 @@ elsif gem_name == "importmap"
     "paths_8" => -> { view.javascript_module_preload_tag(*paths) },
     "empty_control" => -> { view.javascript_module_preload_tag }
   }
+elsif gem_name == "sqlite"
+  $LOAD_PATH.unshift(source)
+  require "sqlite3"
+  extension = $LOADED_FEATURES.find { _1.end_with?("sqlite3_native.so") }
+  raise "wrong native extension" unless File.realpath(extension).start_with?(File.realpath(source) + "/")
+  database = SQLite3::Database.new(":memory:")
+  database.execute("CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT)")
+  database.execute("WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<100) INSERT INTO items SELECT x, 'héllo' FROM n")
+  snapshot = database.execute("SELECT id, name FROM items ORDER BY id")
+  operations = {
+    "empty_select" => "SELECT id, name FROM items WHERE 0",
+    "one_row" => "SELECT id, name FROM items WHERE id = 31",
+    "hundred_rows" => "SELECT id, name FROM items ORDER BY id"
+  }.transform_values do |sql|
+    statement = database.prepare(sql)
+    -> { statement.reset!; statement.each { |_row| }; nil }
+  end
+  done = database.prepare("SELECT 1 WHERE 0")
+  done.step
+  operations["already_done_control"] = -> { done.step }
 else
   raise "unknown gem"
 end
 
-result = {ruby: RUBY_DESCRIPTION, gem: gem_name, source_sha256: Digest::SHA256.file(source).hexdigest,
+result = {ruby: RUBY_DESCRIPTION, gem: gem_name, source_sha256: Digest::SHA256.file(gem_name == "sqlite" ? extension : source).hexdigest,
   mode: JitStability.actual, snapshot: snapshot}
 unless command == "snapshot"
   result[:cases] = operations.to_h do |name, operation|

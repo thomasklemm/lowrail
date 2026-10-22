@@ -14,8 +14,16 @@ if ENV["GEM_SCREEN_CONFIG"]
   require_relative "../../fixtures/corpus/blog_entropy"
   ENV["SECRET_KEY_BASE"] = BlogProduction::Entropy::SECRET
   ScreenClock.install(policy.fetch("wall_clock").fetch("epoch"))
+  source = ENV.fetch("GEM_SCREEN_SOURCE")
+  if config["kind"] == "sqlite"
+    $LOAD_PATH.unshift(source)
+    require "sqlite3"
+    extension = $LOADED_FEATURES.find { _1.end_with?("sqlite3_native.so") }
+    raise "wrong native extension" unless File.realpath(extension).start_with?(File.realpath(source) + "/") &&
+      Digest::SHA256.file(extension).hexdigest == Digest::SHA256.file(File.join(source, "sqlite3/sqlite3_native.so")).hexdigest
+  end
   GemCensus.boot("blog")
-  load ENV.fetch("GEM_SCREEN_SOURCE")
+  load source unless config["kind"] == "sqlite"
   # WindowAudit uses only loaded_constant; do not call setup/initialize!.
   require_relative "../../gem/lib/lowrail"
   ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(WindowAudit::Reaper)
@@ -48,7 +56,8 @@ if ENV["GEM_SCREEN_CONFIG"]
   puts "LOWRAIL_BENCH #{JSON.generate(**JitStability.state, ruby: RUBY_DESCRIPTION, rails: Rails.version,
     windows: windows, heap_anchors: anchors, heap_page_targets: HeapWindows.page_targets, operations: true,
     jit_warmup: nil, exact: before, exact_after: after, refusal: nil,
-    source_sha256: Digest::SHA256.file(ENV.fetch("GEM_SCREEN_SOURCE")).hexdigest)}"
+    source_sha256: Digest::SHA256.file(extension || source).hexdigest,
+    sqlite: config["kind"] == "sqlite" ? {gem: SQLite3::VERSION, runtime: SQLite3::SQLITE_VERSION, extension: extension} : nil)}"
 else
   require_relative "../screen"
   input, output, option = ARGV
@@ -64,6 +73,9 @@ else
   files += Dir[File.join(__dir__, "*.rb"), File.expand_path("../*.rb", __dir__)]
   files += [config.fetch("before"), config.fetch("after"), config_file, RbConfig.ruby,
     File.join(config.fetch("app"), "Gemfile.lock"), File.join(GemCensus::ROOT, "fixtures/corpus/blog-entropy-controls.json")]
+  if config["kind"] == "sqlite"
+    files += %w[before after].flat_map { Dir[File.join(config.fetch(_1), "**/*")] }
+  end
   pins = files.select { File.file?(_1) }.uniq.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
   File.write(File.join(output, "protocol.json"), JSON.pretty_generate(config: config, pins: pins,
     rounds: 6, seed: 41231, requests: 10, warmup: 100, aa_tolerance_pct: 0.1,

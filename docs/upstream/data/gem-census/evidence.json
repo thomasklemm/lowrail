@@ -2143,5 +2143,64 @@
   "lowrail_validation": {
     "request_pairs": "Run options: --verbose --seed=1729\n\n# Running:\n\nRequestPairsTest#test_brk_overflow_rejects_the_cohort_in_preflight_or_a_successful_worker = 0.36 s = .\nRequestPairsTest#test_gc_exclusion_preserves_mutator_work_between_incremental_segments = 9.40 s = .\nRequestPairsTest#test_wide_control_is_not_equivalence = 0.20 s = .\nRequestPairsTest#test_jit_gate_requires_actual_mode_and_flat_warmup_and_measurement = 0.00 s = .\nRequestPairsTest#test_partial_zjit_flatness_never_substitutes_for_missing_invalidation_proof = 0.00 s = .\nRequestPairsTest#test_memory_attribution_deduplicates_containers_without_following_weak_references = 0.00 s = .\nRequestPairsTest#test_instruction_control_ignores_emulation_time = 0.04 s = .\nRequestPairsTest#test_operation_windows_sum_allocations_and_keep_zero_allocation_reports_finite = 14.28 s = .\nRequestPairsTest#test_comparisons_refuse_an_ar_build_that_would_silently_decline = 0.00 s = .\nRequestPairsTest#test_paired_bootstrap_removes_round_drift_but_not_a_real_effect = 0.65 s = .\nRequestPairsTest#test_native_no_app_harness_is_flat_and_keeps_its_explicit_pages = 2.38 s = .\nRequestPairsTest#test_repeated_blocks_do_not_hide_process_specific_bias = 0.05 s = .\nRequestPairsTest#test_worker_overlap_distinguishes_window_work_from_boot_and_unknown_migrations = 0.00 s = .\nRequestPairsTest#test_instruction_reader_uses_self_totals_not_wrapped_summary = 0.00 s = .\nRequestPairsTest#test_idle_clock_bound_and_companion_symmetry_are_independent = 0.00 s = .\nRequestPairsTest#test_jit_gate_rejects_wrong_modes_missing_counters_and_nonflat_windows = 0.00 s = .\nRequestPairsTest#test_quiet_warmup_does_not_stop_before_a_rare_block_and_reports_cap_exhaustion = 1.82 s = .\n\nFinished in 29.183474s, 0.5825 runs/s, 10.6910 assertions/s.\n\n17 runs, 312 assertions, 0 failures, 0 errors, 0 skips\n",
     "screen": "Run options: --verbose --seed=1729\n\n# Running:\n\nScreenTest#test_conflicting_companion_epoch_refuses_before_output_or_app_boot = 0.00 s = .\nScreenTest#test_actual_cache_events_detect_regeneration_and_same_size_byte_replacement = 0.12 s = .\nScreenTest#test_storage_seed_aliases_relatives_and_ancestors_cannot_erase_the_seed = 0.00 s = .\nScreenTest#test_clock_preserves_ttl_and_independent_graphs_across_real_elapsed_time = 0.30 s = .\nScreenTest#test_prospective_aa_rule_distinguishes_positive_negative_and_either_failed_metric = 1.73 s = .\n\nFinished in 2.156691s, 2.3184 runs/s, 44.0490 assertions/s.\n\n5 runs, 95 assertions, 0 failures, 0 errors, 0 skips\n"
+  },
+  "continued_triage": {
+    "scope": "Ranks 16–30 quick semantic triage only; no third qualified candidate",
+    "boundary_receipts": {
+      "bugsnag_setter": {
+        "returned": [
+          "retained"
+        ],
+        "next_return": [],
+        "separate": true,
+        "buffer": [
+          "old"
+        ],
+        "skipped_shift_candidate_return": null
+      },
+      "rack_path": {
+        "actual": "overridden-plus:/route",
+        "interpolation": "/prefix/route",
+        "version": "3.2.7"
+      }
+    },
+    "rack_open_2520": {
+      "body": "A few independent, behavior-preserving performance improvements, one commit each:\n\n- `Request#ssl?` called `#scheme`, which can parse the forwarded headers, up to twice. `#forwarded_scheme` also looked up the same header twice.\n- `Request::AUTHORITY` matched the host part lazily. The address character class does not include `:`, so a greedy match cannot consume the port separator and gives the same result, without backtracking at every character.\n- `CommonLogger` ran `gsub!(/[^[:print:]]/)` on every log line. It is now skipped when the line is ASCII-only and contains no `\\x00`-`\\x1f` or `\\x7f` (for ASCII, these are exactly the characters `[^[:print:]]` matches), which `String#ascii_only?` and `String#count` check much faster.\n- `Response` created a `method(:append)` object for every response. It now uses `nil` as the default writer and calls `#append` directly.\n- The multipart parser compiled its MIME head regexp, which does not depend on the boundary, for every request. It is now a constant, and the body regexps are built from a shared source string instead of interpolating one `Regexp` into another.\n\n### Measurements\n\nRuby 3.4.10 with YJIT, x86_64 Linux. Instructions are user-space instructions per call from `perf stat`, taking the difference between 2,000 and 12,000 iterations so startup is excluded. Allocations are from `GC.stat(:total_allocated_objects)`.\n\n| | instructions | allocations |\n|---|---|---|\n| `Request` accessors (`get?`, `path`, `fullpath`, `host`, `port`, `scheme`, `ssl?`, `url`, `ip`, `xhr?`, `content_type`, `media_type`) | 107.6k → 88.1k (−18%) | 55 → 40 |\n| GET through `MethodOverride`, `Runtime`, `CommonLogger`, `ShowExceptions`, `ContentLength`, `Head`, `ConditionalGet`, `ETag`, `TempfileReaper` | 130.0k → 99.5k (−23%) | 38 → 37 |\n| `Request#POST` with a 3-part multipart body (one 2 KB file) | 535.8k → 468.3k (−13%) | 215 → 193 |\n| `Response` with a cookie and two `write` calls, then `finish` and iterating the body | 32.1k → 30.0k (−7%) | 19 → 18 |\n\nHow much of this shows up end to end depends on the app. With puma (one thread) and `ab -k`, a plain Rack app using `CommonLogger` uses about 4% fewer instructions per GET request. For the Sinatra 4.2, Roda and Rails 8.1 apps I tested, which do not use `CommonLogger`, the difference was within 1%.\n\n### Equivalence\n\nIn addition to the test suite:\n\n- For 30,000 random environments (random `HTTP_HOST`/`SERVER_NAME` including IPv6, ports and invalid characters, `HTTPS`, `X-Forwarded-*` and `Forwarded` headers), the results of `scheme`, `ssl?`, `authority`, `host`, `hostname`, `port`, `host_with_port`, `base_url`, `url`, `forwarded_authority` and `forwarded_port`, or the raised exception classes, were identical to the current implementation.\n- For 5,000 random multipart bodies (random boundaries, nested names, file parts, embedded boundary-like data, truncated bodies and large parts), the parsed params, including file contents, or the raised exception classes, were identical.\n",
+      "files": [
+        {
+          "path": "CHANGELOG.md",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "lib/rack/common_logger.rb",
+          "additions": 3,
+          "deletions": 1,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "lib/rack/multipart/parser.rb",
+          "additions": 7,
+          "deletions": 4,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "lib/rack/request.rb",
+          "additions": 5,
+          "deletions": 4,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "lib/rack/response.rb",
+          "additions": 7,
+          "deletions": 3,
+          "changeType": "MODIFIED"
+        }
+      ],
+      "title": "Performance improvements in Request, CommonLogger, Response and the multipart parser",
+      "url": "https://github.com/rack/rack/pull/2520"
+    },
+    "rack_open_2520_patch": "diff --git a/CHANGELOG.md b/CHANGELOG.md\nindex 4a6d16d14..3e544488d 100644\n--- a/CHANGELOG.md\n+++ b/CHANGELOG.md\n@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file. For info on\n - The query parser now raises `Rack::QueryParser::IncompatibleEncodingError` if we try to parse params that are not ASCII compatible. ([#2416](https://github.com/rack/rack/pull/2416), [@bquorning](https://github.com/bquorning))\n - The mime type for `.pem` files has been changed from `application/x-x509-ca-cert` to `application/x-pem-file`. ([#2435](https://github.com/rack/rack/pull/2435), [@jeremyevans](https://github.com/jeremyevans))\n - Freeze `Rack::Auth::AbstractRequest::AUTHORIZATION_KEYS`, `Rack::Utils::STATUS_WITH_NO_ENTITY_BODY`, `Rack::Multipart::Parser::EMPTY`, `Rack::Utils.default_query_parser`, and internal constants in `Rack::Lint`. ([#2428](https://github.com/rack/rack/pull/2428), [@jhawthorn](https://github.com/jhawthorn))\n+- Improve the performance of `Rack::Request#ssl?`, host parsing, `Rack::CommonLogger`, `Rack::Response`, and multipart parser creation. ([#2520](https://github.com/rack/rack/pull/2520), [@linyiru](https://github.com/linyiru))\n \n ### Fixed\n \ndiff --git a/lib/rack/common_logger.rb b/lib/rack/common_logger.rb\nindex 940b8bead..53b5c252b 100644\n--- a/lib/rack/common_logger.rb\n+++ b/lib/rack/common_logger.rb\n@@ -66,7 +66,9 @@ def log(env, status, response_headers, began_at)\n         length,\n         Utils.clock_time - began_at)\n \n-      msg.gsub!(/[^[:print:]]/) { |c| sprintf(\"\\\\x%x\", c.ord) }\n+      unless msg.ascii_only? && msg.count(\"\\x00-\\x1f\\x7f\") == 0\n+        msg.gsub!(/[^[:print:]]/) { |c| sprintf(\"\\\\x%x\", c.ord) }\n+      end\n       msg[-1] = \"\\n\"\n \n       logger = @logger || request.get_header(RACK_ERRORS)\ndiff --git a/lib/rack/multipart/parser.rb b/lib/rack/multipart/parser.rb\nindex 6a8871ec5..ec5b1494f 100644\n--- a/lib/rack/multipart/parser.rb\n+++ b/lib/rack/multipart/parser.rb\n@@ -271,11 +271,11 @@ def initialize(boundary, tempfile, bufsize, query_parser)\n         @collector = Collector.new tempfile\n \n         @sbuf = StringScanner.new(\"\".b)\n-        @body_regex = /(?:#{EOL}|\\A)--#{Regexp.quote(boundary)}(?:#{EOL}|--)/m\n-        @body_regex_at_end = /#{@body_regex}\\z/m\n+        body_regex_source = \"(?:#{EOL}|\\\\A)--#{Regexp.quote(boundary)}(?:#{EOL}|--)\"\n+        @body_regex = Regexp.new(body_regex_source, Regexp::MULTILINE)\n+        @body_regex_at_end = Regexp.new(\"#{body_regex_source}\\\\z\", Regexp::MULTILINE)\n         @end_boundary_size = boundary.bytesize + 4 # (-- at start, -- at finish)\n         @rx_max_size = boundary.bytesize + 6 # (\\r\\n-- at start, either \\r\\n or -- at finish)\n-        @head_regex = /(.*?#{EOL})#{EOL}/m\n       end\n \n       def parse(io)\n@@ -376,8 +376,11 @@ def handle_consume_token\n       OBS_UNFOLD = /\\r\\n([ \\t])/\n       private_constant :OBS_UNFOLD\n \n+      HEAD_REGEX = /(.*?#{EOL})#{EOL}/m\n+      private_constant :HEAD_REGEX\n+\n       def handle_mime_head\n-        if @sbuf.scan_until(@head_regex)\n+        if @sbuf.scan_until(HEAD_REGEX)\n           head = @sbuf[1]\n           content_type = head[MULTIPART_CONTENT_TYPE, 1]\n           content_type.gsub!(OBS_UNFOLD, '\\1') if content_type\ndiff --git a/lib/rack/request.rb b/lib/rack/request.rb\nindex 71b175390..5a6f6cc72 100644\n--- a/lib/rack/request.rb\n+++ b/lib/rack/request.rb\n@@ -502,6 +502,7 @@ def forwarded_authority\n       end\n \n       def ssl?\n+        scheme = self.scheme\n         scheme == 'https' || scheme == 'wss'\n       end\n \n@@ -825,7 +826,7 @@ def split_header(value)\n           \\[(?<address>#{ipv6})\\]\n           |\n           # Match characters allowed by RFC 3986 Section 3.2.2\n-          (?<address>[-a-zA-Z0-9._~%!$&'()*+,;=]*?)\n+          (?<address>[-a-zA-Z0-9._~%!$&'()*+,;=]*)\n         )\n         (:(?<port>\\d+))?\n         \\z\n@@ -855,11 +856,11 @@ def forwarded_scheme\n             end\n           when :x_forwarded\n             x_forwarded_proto_priority.each do |x_type|\n-              if header = FORWARDED_SCHEME_HEADERS[x_type]\n-                if x_type == :ssl && get_header(header) == 'on'\n+              if (header = FORWARDED_SCHEME_HEADERS[x_type]) && (value = get_header(header))\n+                if x_type == :ssl && value == 'on'\n                   return 'https'\n                 else\n-                  split_header(get_header(header)).reverse_each do |scheme|\n+                  split_header(value).reverse_each do |scheme|\n                     if allowed_scheme(scheme)\n                       return scheme\n                     end\ndiff --git a/lib/rack/response.rb b/lib/rack/response.rb\nindex ece451db1..ba80a50ba 100644\n--- a/lib/rack/response.rb\n+++ b/lib/rack/response.rb\n@@ -64,7 +64,7 @@ def initialize(body = nil, status = 200, headers = {})\n         @headers[k] = v\n       end\n \n-      @writer = self.method(:append)\n+      @writer = nil\n \n       @block = nil\n \n@@ -146,7 +146,11 @@ def each(&callback)\n     def write(chunk)\n       buffered_body!\n \n-      @writer.call(chunk.to_s)\n+      if @writer\n+        @writer.call(chunk.to_s)\n+      else\n+        append(chunk.to_s)\n+      end\n     end\n \n     def close\n@@ -343,7 +347,7 @@ def buffered_body!\n             @buffered = true\n \n             body.each do |part|\n-              @writer.call(part.to_s)\n+              append(part.to_s)\n             end\n \n             body.close if body.respond_to?(:close)\n"
   }
 }
