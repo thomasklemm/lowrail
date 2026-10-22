@@ -130,6 +130,17 @@ lowrail types ROOT/fizzy/returns --rbs EXTERNAL_RBS_DIR
 rbs -I EXTERNAL_RBS_DIR validate
 ```
 
+The published ledger uses repo-relative `.corpus/...` paths in `detail`
+strings only. Reproduce this display-only normalization with:
+
+```sh
+jq -a 'walk(if type == "object" and (.detail? | type) == "string"
+  then .detail |= gsub("/home/user/workspace/repo/"; "")
+  else . end)' returns-ledger.json > docs/types-returns-coverage.json
+```
+
+Commands, raw/facts/output hashes, samples and all other fields stay unchanged.
+
 The return reducer checks fresh policy/root, matching argument observations,
 fixed slot universe, unchanged argument facts and known types, and zero
 unexplained conflicts. It never boots/patches an app or rewrites the raw file.

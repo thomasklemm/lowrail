@@ -150,9 +150,11 @@ when scope or acceptance changes; retain superseded records as historical.
   including true eager-load coverage; it is not production admission.
   Link/form remain refused.
 - **Refused or quarantined:** the old source link/route passes remain
-  quarantined, including old mixed artifacts; seven cached-fact passes are
-  sealed-only, not ordinary guarded opt-ins. Artifacts containing preload
-  plans, sealed link delivery or lowered templates now refuse as a whole:
+  quarantined, including old mixed artifacts; cached-fact passes are
+  sealed-only or quarantined, not ordinary guarded opt-ins. Preload and sealed
+  link builders now refuse **before emission**, even with `--sealed`;
+  template delivery remains quarantined. Old artifacts containing preload
+  plans, sealed link delivery or lowered templates still refuse as a whole:
   their on-only framework ancestry is app-observable, even when sealed
   ([boundary](docs/DECISIONS.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)).
   The priced three-unit form/token/collection artifact is unaffected.
@@ -169,16 +171,23 @@ when scope or acceptance changes; retain superseded records as historical.
   +442 static slots and +843 observed argument slots across the fixed six-app
   ledger; sampled types are not proofs or runtime specialization
   ([evidence and limits](docs/types-contracts.md)).
-- **Generic sealed token/collection inventory** ([6436f9c](https://github.com/thomasklemm/lowrail/commit/6436f9c6d7354dbe654b63458f151e67d16209fd)):
-  allocation screens preserve ≈377 objects/request **only for the isolated
-  blog form/token/collection artifact**, on show/show2; index is neutral.
-  Plain `build --sealed` currently refuses the combined artifact and saves
-  nothing: a preexisting all-sealed delivery gap, not a tripwire/generic-inventory
-  regression ([selection and known gap](docs/DECISIONS.md#isolated-blog-artifact-not-all-sealed-2026-10-22)).
-  Generic admission also saves ≈2–21 on five Fizzy routes. These are
-  allocation-only screens, not new instruction or throughput prices; form
-  stays narrow and link/template delivery stays quarantined
-  ([scope](docs/generic-sealed.md)).
+- **Plain sealed blog build** ([6fb2f14](https://github.com/thomasklemm/lowrail/commit/6fb2f149cd9ad81522694799eb188139e9e75459)):
+  `lowrail build APP --sealed --env production --jit interpreter` now delivers
+  **≈377 fewer objects/request on blog show/show2; index is neutral**, with
+  no denylist or manual isolated-artifact selection. The unsafe preload/link
+  builders ledger-refuse before emission; old combined artifacts still refuse
+  as a whole. Allocation evidence only, not a new Ir, timing or throughput
+  claim; form stays narrow and preload/link/template delivery stays quarantined
+  ([current scope and history](docs/DECISIONS.md#plain-sealed-blog-build-and-historical-isolation-gap-2026-10-22)).
+
+**Breadth is not savings:** Fizzy, Campfire, Writebook and CASA retain exact
+own-suite off/on outcomes but **no certified optimized suite hits**. Fizzy's
+suite has a compiler-certificate refusal (production queries separately fail
+query certification); Campfire/Writebook have Bootsnap `KeyError`, and CASA
+has unsupported RSpec certificate discovery at an older retained pin. Parity
+includes Fizzy's baseline errors and CASA's skips. **No savings claim for
+these plain sealed builds outside the blog**
+([pins and limits](docs/DECISIONS.md#own-suite-breadth-is-not-optimized-coverage)).
 
 ## How it works
 

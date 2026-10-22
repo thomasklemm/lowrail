@@ -25,58 +25,72 @@ Thermos follow-ups closed the harness/export findings, not the admission gap; [c
 ## Bet G: retain generic inventory, kill literal options (2026-10-22)
 
 Keep token/collection's boot-derived inventory separate from the blog form and its irrelevant I18n source pin.
-Only the isolated blog form/token/collection artifact retains ≈377 saved objects/request on show/show2 with options absent; index is neutral and the form stays narrow.
-Generic admission saves only ≈2–21 objects on five Fizzy routes; Campfire room and CASA sign-in are neutral.
+The historical isolated blog form/token/collection screen saves ≈377 objects/request on show/show2; plain sealed builds now retain this saving too, as recorded below. Index is neutral and the form stays narrow.
+Historical isolated generic-inventory screens save only ≈2–21 objects on five Fizzy routes; Campfire room and CASA sign-in are neutral. These are not savings claims for the new plain sealed builds outside the blog.
 Kill the literal-options prototype: Lobsters regresses, and its compiler delivery correctly invalidates the blog form.
 No certificate waiver, template seam, Ir run or promotion; [short census](generic-sealed.md), integration left to the coordinator.
 
-### Isolated blog artifact, not all-sealed (2026-10-22)
+### Plain sealed blog build and historical isolation gap (2026-10-22)
 
-**Known gap:** plain `lowrail build APP --sealed --env production` does not
-deliver the ≈377 saving. The combined artifact at
+**Current at [6fb2f14](https://github.com/thomasklemm/lowrail/commit/6fb2f149cd9ad81522694799eb188139e9e75459):**
+plain production `build --sealed`, with no denylist, emits 20 safe blog units:
+17 `active_record/instantiate` plus form/token/collection, with **no files or
+templates**. The preload and sealed-link builders each have one named
+pre-emission quarantine refusal in the ledger. Preload/link/template delivery
+remains quarantined until proven; old combined artifacts still fail Manifest
+admission as a whole. This excludes unsafe builders, not the safe build.
+
+The manual isolated-artifact denylist recipe is **no longer needed**. With a
+disposable retained blog and the [build prerequisites](development/testing.md):
+
+```sh
+lowrail build APP --sealed --env production --jit interpreter
+```
+
+The [exact-head verification](https://ampcode.com/threads/T-01a164e1-f985-70eb-bd17-535d6adfedc9)
+records ≈377 fewer objects/request on show/show2 and a neutral index. Its
+`script/screen --budget` response, entropy and background controls pass with
+the blog entropy policy and fixed time `1767312000`; sealed epoch stays 0→0
+and warm fallbacks are zero. These are allocation window means, not the
+original census's upper-middle medians or a new Ir, timing or throughput price.
+The same head's gates record gem **196 / 6,908** with one named
+`MaterializeCorpusTest#test_campfire` skip, seven benches **44 / 696** with no
+skips, and Rust **54 passed**. These are that head's receipts, not a new gate
+run for this documentation edit.
+
+**History, superseded for fresh builds:** the combined artifact at
 [b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c)
-prepends `Templates::CompiledSource` to `ActionView::Template` and
+prepended `Templates::CompiledSource` to `ActionView::Template` and
 `PreloadPlans::Hook` to `ActiveRecord::Associations::Preloader`. At
 [c4bf0cd](https://github.com/thomasklemm/lowrail/commit/c4bf0cde2d2b8d13f9847b2ed4b319a9a5e972c9)
 and [9afd2c0](https://github.com/thomasklemm/lowrail/commit/9afd2c0beec06fd07edcb39532757c91775c25df),
-the ancestry preflight instead refuses the whole artifact containing
-`active_record/preload_plans` and `sealed/link_to`, serves stock Rails and
-saves nothing. This is fail-closed handling of a preexisting delivery defect,
-not a regression from the tripwire (`ce47c62`) or generic inventory (`6436f9c`).
+the ancestry preflight instead refused the whole artifact containing
+`active_record/preload_plans` and `sealed/link_to`, served stock Rails and
+saved nothing; only manual isolation retained the allocation saving then.
+That was fail-closed handling of a preexisting delivery defect, not a
+regression from the tripwire (`ce47c62`) or generic inventory (`6436f9c`).
 
-To select the isolated artifact, use a **disposable retained blog copy** with
-the [build prerequisites](development/testing.md) prepared. Build once to
-inventory units, deny every other unit through the existing build denylist,
-then rebuild. Preserve prior denylist entries; do not filter a finished
-manifest or bypass ancestry preflight:
+#### Own-suite breadth is not optimized coverage
 
-```sh
-APP=/absolute/path/to/disposable/real-blog-r4
-lowrail build "$APP" --sealed --env production --jit interpreter
-ruby -rjson - "$APP/.lowrail" <<'RUBY'
-dir = ARGV.fetch(0)
-keep = %w[sealed/form_scaffold sealed/token_tag sealed/collection_render]
-manifest = JSON.parse(File.read(File.join(dir, "manifest.json")))
-path = File.join(dir, "denylist.json")
-denied = File.exist?(path) ? JSON.parse(File.read(path)) : []
-others = manifest.fetch("units").reject { keep.include?(_1.fetch("pass")) }
-denied.concat(others.map { _1.slice("kind", "pass", "file", "target") })
-File.write(path, JSON.pretty_generate(denied.uniq))
-RUBY
-lowrail build "$APP" --sealed --env production --jit interpreter
-```
+The same verification's four other apps retain exact off/on suite outcomes,
+but **no certified optimized suite hits**:
 
-Require exactly those three units, with **empty `files` and `templates`** in
-the rebuilt manifest, plus actual fast-path hits; otherwise the isolated
-claim does not apply. `--sealed` cannot be combined with `--passes`.
-The [scope verification](https://ampcode.com/threads/T-01a164e1-f985-70eb-bd17-535d6adfedc9)
-on `9afd2c0` confirms show/show2 savings with zero fallbacks and a neutral
-index under `script/screen --budget`, the blog entropy policy and epoch
-`1767312000`: response bytes are exact and background work is clean.
-Those window means are not the original census's upper-middle allocation
-medians or a new Ir/latency price. Raw entropy remains rejected.
+| App | Certificate boundary | Suite source and caveat |
+|---|---|---|
+| Fizzy | `verification_bootsnap_compiler_unknown` | `6fb2f14`; seven existing errors remain. Its separate production query ledger has `query_certificate` refusals, not the own-suite blocker. |
+| Campfire-r81 | Bootsnap `KeyError` (`key not found: "bootsnap"`) | `6fb2f14`; parity is unoptimized. |
+| Writebook | Bootsnap `KeyError` | `6fb2f14`; parity is unoptimized. |
+| CASA | RSpec certificate discovery unsupported | Retained [6436f9c](https://github.com/thomasklemm/lowrail/commit/6436f9c6d7354dbe654b63458f151e67d16209fd), **not** an exact-new-head rerun; 21 existing skips remain. |
+
+No plain-sealed-build savings claim follows outside the blog. Non-blog
+production entries in that ledger retain an older source pin and rejected
+controls (or a Lowrail-off boot blocker for Writebook), not new-head wins.
 
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
+
+Historical runtime-preflight evidence follows. Whole-artifact rejection still
+protects old unsafe artifacts; fresh builds now use the pre-emission refusals
+recorded above instead of emitting those seams.
 
 The all-sealed cold failure is a runtime defect, not witness noise. On the
 retained blog, `Template#compiled_source` changes owner from
@@ -1019,7 +1033,7 @@ retry or clean-arm salvage. [Experiment, ablations and controls](passes/sealed-r
 | `memo/uri_join` | **sealed-only**, guarded/opt-in refused | Suppress `URI.singleton_method_added` after two warm hits, replace `join`: original changes host/path, fast value stays stale, third hit and no fallback. SEAL001 required, not an exact guarded memo; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `digest/file_memo` | **sealed-only**, guarded/opt-in refused | Suppress `Digest::MD5.singleton_method_added` and replace `file`: bytes checks still pass but cannot certify the skipped digest method; third hit is stale. SEAL001 required. Private-page benefit is historical, not guarded safety evidence; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `active_record/instantiate` | **sealed-only**; performance still parked | Suppressed model singleton hook plus replaced `instantiate_instance_of` changes original row titles but not fast rows. AR epochs remain 52/55; cached guard remains true. SEAL001 required. Historical −38% alpha load-only gain disappeared upstream, blog stacked +0.59% remains a loss ([audit](passes/suppressed-hooks.md)) |
-| `active_record/preload_plans` | **sealed-only**, guarded/opt-in refused | Suppressed model singleton hook plus replaced `scope_for_association` filters original rows but not fast rows. AR epochs remain 52/55, so the epoch is not complete coverage of suppressed dependency mutation. SEAL001 required; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
+| `active_record/preload_plans` | **quarantined before emission**, including sealed builds | Delivery changes observable ancestry; [fresh builds omit the builder](#plain-sealed-blog-build-and-historical-isolation-gap-2026-10-22). Historical suppressed model singleton hook plus replaced `scope_for_association` filters original rows but not fast rows. AR epochs remain 52/55, so the epoch is not complete coverage of suppressed dependency mutation. Old/mixed artifacts still refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `active_record/ar_plans` | **sealed-only**, guarded/opt-in refused | Suppress the visitor owner's `method_added`, replace `visit_Arel_Nodes_SelectStatement` with an SQL-comment-producing body: original SQL changes, cached plan SQL does not. Same visitor identity and unchanged AR epochs 52/55 do not rescue the certificate. SEAL001 required; old/mixed artifacts refuse whole ([audit](passes/suppressed-hooks.md)) |
 | `inertia/config_bind` | **sealed-only**, promotion blocked | Warmed suppressed `Hash.method_added` defeats the guarded certificate. Pre-fix JSON interpreter −6.947%, HTML −0.275%; accepted YJIT **+16.339% / +16.459%** included sticky global tracing. Post-fix JSON interpreter **−10.156% accepted**; YJIT rejected A/A/flatness and a separate untimed probe has zero hits (JIT-mode fact mismatch). No accepted post-fix YJIT non-regression proof, no promotion. #437 open/unmerged; 3.23.0 lacks it; future fixed bodies refuse ([diagnosis](passes/yjit-regression.md), [old prices](passes/next-levers.md), [audit](passes/suppressed-hooks.md)) |
 | `inertia/props` | opt-in experiment; exact-guard ordinary-def alternative **stopped at price**; no promotion | Ordinary-Hash tuple iteration only; original prop body/lexical scope and fallback retained, actual iterator/visibility checked at every traversal after app code. Five-app 779 outcomes and own-thread SQL identical, nonzero hits in all three Inertia apps. Historical draft +0.873% interpreter / +0.976% YJIT cohorts stay rejected after safety fixes changed fingerprints ([retained evidence](passes/props.md)). Final-runtime brk512 request recheck: interpreter +4.364% [+4.292, +4.462] accepted; YJIT diagnostic +31.043% rejected (5/36 non-flat workers; [recheck](bench.md#decision-critical-512-mib-remeasurement-2026-10-20)). Separate corrected ordinary-def micro: +22.594% interpreter [22.496, 22.731], complete checks cost 6.857× the iteration saving; YJIT micro **cancelled**, invalid earlier fallback price retained ([stop and pins](passes/yjit-regression.md#corrected-interpreter-pricing-stop-at-price)). No credited gain or retry. |
