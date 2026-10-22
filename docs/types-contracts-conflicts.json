@@ -1,0 +1,257 @@
+{
+  "format": 1,
+  "scope": "All13 raw merger return flags retained; none merged into the argument-only derivative",
+  "classified_slots": 13,
+  "verified_normal_return_contradictions": 0,
+  "slots": [
+    {
+      "app": "campfire",
+      "count": 1,
+      "method": "Opengraph::Fetch#resolve_redirect",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "Array[untyped]",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "Opengraph::Fetch#resolve_redirect",
+          "result": "NilClass",
+          "pending_exception": "RestrictedHTTP::Violation",
+          "path": "app/models/opengraph/fetch.rb",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 16,
+      "method": "CasaOrg#casa_admins",
+      "observed_class": "CasaAdmin::ActiveRecord_Relation",
+      "slot": "return",
+      "static_type": "ActiveRecord::Relation[User]",
+      "classification": "compatible_relation_subtype",
+      "evidence": {
+        "target": "CasaOrg#casa_admins",
+        "class": "ActiveRecord::Relation",
+        "relation": true,
+        "element": "CasaAdmin",
+        "expected_element": "User",
+        "subtype": true
+      }
+    },
+    {
+      "app": "casa",
+      "count": 16,
+      "method": "CasaOrg#supervisors",
+      "observed_class": "Supervisor::ActiveRecord_Relation",
+      "slot": "return",
+      "static_type": "ActiveRecord::Relation[User]",
+      "classification": "compatible_relation_subtype",
+      "evidence": {
+        "target": "CasaOrg#supervisors",
+        "class": "ActiveRecord::Relation",
+        "relation": true,
+        "element": "Supervisor",
+        "expected_element": "User",
+        "subtype": true
+      }
+    },
+    {
+      "app": "casa",
+      "count": 16,
+      "method": "CasaOrg#volunteers",
+      "observed_class": "Volunteer::ActiveRecord_Relation",
+      "slot": "return",
+      "static_type": "ActiveRecord::Relation[User]",
+      "classification": "compatible_relation_subtype",
+      "evidence": {
+        "target": "CasaOrg#volunteers",
+        "class": "ActiveRecord::Relation",
+        "relation": true,
+        "element": "Volunteer",
+        "expected_element": "User",
+        "subtype": true
+      }
+    },
+    {
+      "app": "casa",
+      "count": 1,
+      "method": "ContactTypeGroupsController#new",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "ContactTypeGroup",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "ContactTypeGroupsController#new",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/contact_type_groups_controller.rb",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 1,
+      "method": "ContactTypesController#new",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "ContactType",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "ContactTypesController#new",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/contact_types_controller.rb",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 1,
+      "method": "CustomOrgLinksController#new",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "CustomOrgLink",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "CustomOrgLinksController#new",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/custom_org_links_controller.rb",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 1,
+      "method": "HearingTypesController#new",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "HearingType",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "HearingTypesController#new",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/hearing_types_controller.rb",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 1,
+      "method": "JudgesController#new",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "Judge",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "JudgesController#new",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/judges_controller.rb",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 1,
+      "method": "NotesController#edit",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "String",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "NotesController#edit",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/notes_controller.rb",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 2,
+      "method": "OtherDutiesController#new",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "OtherDuty",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "OtherDutiesController#new",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/other_duties_controller.rb",
+          "line": 41
+        },
+        {
+          "target": "OtherDutiesController#new",
+          "result": "NilClass",
+          "pending_exception": "Pundit::NotAuthorizedError",
+          "path": "app/controllers/other_duties_controller.rb",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "app": "casa",
+      "count": 16,
+      "method": "Volunteer#case_assignments_with_cases",
+      "observed_class": "CaseAssignment::ActiveRecord_AssociationRelation",
+      "slot": "return",
+      "static_type": "ActiveRecord::Relation[CaseAssignment]",
+      "classification": "compatible_relation_subtype",
+      "evidence": {
+        "target": "Volunteer#case_assignments_with_cases",
+        "class": "ActiveRecord::AssociationRelation",
+        "relation": true,
+        "element": "CaseAssignment",
+        "expected_element": "CaseAssignment",
+        "subtype": true
+      }
+    },
+    {
+      "app": "casa",
+      "count": 2,
+      "method": "VolunteersController#send_sms_to",
+      "observed_class": "NilClass",
+      "slot": "return",
+      "static_type": "String",
+      "classification": "exception_unwind_artifact_not_normal_return",
+      "evidence": [
+        {
+          "target": "VolunteersController#send_sms_to",
+          "result": "NilClass",
+          "pending_exception": "NoMethodError",
+          "path": "app/controllers/volunteers_controller.rb",
+          "line": 247
+        },
+        {
+          "target": "VolunteersController#send_sms_to",
+          "result": "NilClass",
+          "pending_exception": "NoMethodError",
+          "path": "app/controllers/volunteers_controller.rb",
+          "line": 247
+        }
+      ]
+    }
+  ],
+  "exit_probe_sha256": {
+    "campfire": "f70ae154e09c881d5ab0d0083918df17f5b8695b3cee8c36c74490831ff9bb53",
+    "casa": "25f0f1e49e0833ee654697a6e41bcd84fbaf307ded4d2153134d0e792341de6c"
+  },
+  "relation_probe_sha256": "9dccc2aeadec755a7310c08337236e22b5fef91fe8315776a2a383bc12988d95"
+}

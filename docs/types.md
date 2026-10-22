@@ -7,6 +7,11 @@ estimates](types-breadth.md), with a real source-checked Fizzy MCP session.
 It recovers 329 existing unknown slots as advisory static types; the blog stays
 2/99/7/188. This is not a whole-app typing or runtime-support claim.
 
+Next: [framework contracts and own-suite observed arguments](types-contracts.md)
+recover 442 static slots and sample 843 previously unknown argument slots across
+the same six workloads. The ledger separates static facts, partial failing-suite
+evidence, unknown container members and all 13 investigated return flags.
+
 ```sh
 script/corpus real-blog
 cargo run -- facts .corpus/real-blog
@@ -42,6 +47,11 @@ Counts, calls, cap/saturation and raw class names survive in `observation`;
 each typed slot also retains its class histogram in `samples`. Saturation
 means **recording stopped**, not exhaustive coverage. Exceptions, recursion,
 threads and uncalled methods can leave incomplete samples.
+
+In particular, Ruby emits a nil `:return` event during exception unwinding;
+the current recorder does not distinguish it from a normal nil return. Do not
+infer a nullable contract from that event. The six-app argument experiment
+therefore retains raw samples but merges an explicit argument-only derivative.
 
 Observations fill `untyped`, or annotate a static type without narrowing it.
 A contradicting sample creates a `conflicts` row with method, slot, static

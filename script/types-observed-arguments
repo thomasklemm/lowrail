@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+"""Measure argument-only observations against a frozen, external six-app census.
+
+ROOT/APP contains .lowrail/facts.json, static.json (before contracts), and
+contracts-static.json. Optional raw .lowrail/observed.json is never changed.
+All derived files stay in ROOT, which must be outside every application tree.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("root", type=Path)
+parser.add_argument("apps", nargs="+")
+parser.add_argument("--lowrail", default="target/debug/lowrail", type=Path)
+options = parser.parse_args()
+cli = options.lowrail.resolve()
+root = options.root.resolve()
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def slots(data):
+    result = {}
+    for target, signature in data["methods"].items():
+        result[(target, "return")] = signature["return_type"]
+        for index, p in enumerate(signature["parameters"]):
+            result[(target, f"arg:{index}:{p['name']}")] = p["ty"]
+    return result
+
+
+apps = {}
+for name in options.apps:
+    base = root / name
+    facts_path = base / ".lowrail/facts.json"
+    facts = read(facts_path)
+    anchor = Path(facts["app_root"])
+    if facts["format"] == 2:
+        # Match the CLI loader: relative anchors belong to the facts file,
+        # not the reducer's cwd. Pin that root before copying into the alias.
+        app_root = (facts_path.parent / anchor).resolve()
+    else:
+        assert anchor.is_absolute(), "format-1 facts must have an absolute app_root"
+        app_root = anchor.resolve()
+    assert not base.resolve().is_relative_to(app_root), "Lowrail outputs must be external"
+    before = read(base / "static.json")
+    contracts = read(base / "contracts-static.json")
+    original, static = slots(before), slots(contracts)
+    assert original.keys() == static.keys(), "contract slot universe changed"
+    raw_path = base / ".lowrail/observed.json"
+    observed = None
+    omitted = 0
+    if raw_path.exists():
+        observed = read(raw_path)
+        filtered = []
+        for sample in observed["types"]:
+            receiver = sample["module"]
+            if sample["singleton"] and receiver.startswith("#<Class:") and receiver.endswith(">"):
+                receiver = receiver[8:-1]
+            target = receiver + ("." if sample["singleton"] else "#") + sample["name"]
+            if target not in contracts["methods"]:
+                omitted += 1
+                continue
+            # Existing recorder: args at entry are useful even on a raised exit.
+            # Its return events include exception-unwind nils. Do not merge
+            # returns/ivars in this ARGUMENT measurement, or alter the raw file.
+            filtered.append(dict(sample, returns={}, ivars={}))
+        alias = base / "arguments/.lowrail"
+        alias.mkdir(parents=True, exist_ok=True)
+        if facts["format"] == 2:
+            (alias / "facts.json").write_text(json.dumps(dict(facts, app_root=str(app_root))))
+        else:
+            (alias / "facts.json").write_bytes(facts_path.read_bytes())
+        (alias / "observed.json").write_text(json.dumps(dict(observed, types=filtered)))
+        output = subprocess.check_output([str(cli), "types", str(alias.parent)], text=True)
+        (base / "arguments.json").write_text(output)
+        merged = json.loads(output)
+    else:
+        merged = contracts
+    final = slots(merged)
+    assert final.keys() == static.keys(), "argument comparison must hold denominator fixed"
+    assert not merged["conflicts"], "argument conflicts require classification before publication"
+    recovered = []
+    for identity, ty in final.items():
+        previous = static[identity]
+        if identity[1] == "return":
+            assert ty == previous, "argument measurement changed a return fact"
+        if previous["name"] != "untyped":
+            assert ty["name"] == previous["name"] and ty["evidence"] == previous["evidence"], "observation changed a static type"
+        if previous["name"] == "untyped" and ty["name"] != "untyped":
+            assert identity[1].startswith("arg:") and ty["evidence"] == "observed"
+            recovered.append({"target": identity[0], "slot": identity[1], "type": ty["name"],
+                              "evidence": ty["evidence"], "samples": ty["samples"], "provenance": ty["provenance"]})
+    static_recovered = [{"target": k[0], "slot": k[1], "type": ty["name"],
+                         "evidence": ty["evidence"], "provenance": ty["provenance"]}
+                        for k, ty in static.items()
+                        if original[k]["name"] == "untyped" and ty["name"] != "untyped"]
+    assert all(r["evidence"] == "static" for r in static_recovered), "catalog types are not proofs"
+    assert all(static[k]["name"] != "untyped" for k, ty in original.items() if ty["name"] != "untyped")
+    apps[name] = {"facts_sha256": digest(facts_path),
+        "before_sha256": digest(base / "static.json"),
+        "contracts_sha256": digest(base / "contracts-static.json"),
+        "arguments_sha256": digest(base / "arguments.json") if observed else None,
+        "before": before["coverage"], "contracts": contracts["coverage"], "arguments": merged["coverage"],
+        "static_recovered": static_recovered, "observed_arguments": recovered,
+        "unknown_arguments_before": sum(k[1].startswith("arg:") and t["name"] == "untyped" for k, t in static.items()),
+        "known_arguments_with_unknown_members": sum("untyped" in r["type"] for r in recovered),
+        "raw_observed_sha256": digest(raw_path) if observed else None,
+        "suite_exit_ok": observed["exit_ok"] if observed else None,
+        "suite_command": observed["command"] if observed else None,
+        "sample_cap_per_method_process": observed["samples_per_method"] if observed else None,
+        "runtime_methods_outside_fixed_universe": omitted,
+        "argument_conflicting_slots": len(merged["conflicts"])}
+
+print(json.dumps({"format": 1,
+    "scope": "fixed effective return/parameter slots; argument-only derivative; no return/ivar samples merged",
+    "apps": apps}, indent=2))

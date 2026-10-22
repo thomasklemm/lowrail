@@ -313,6 +313,87 @@ fn rails_catalog_propagates_calls_without_claiming_proof_or_ignoring_overrides()
 }
 
 #[test]
+fn view_contracts_keep_nullable_builder_and_unknown_input_boundaries() {
+    let dir = std::env::temp_dir().join(format!("lowrail-view-types-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("helpers.rb");
+    std::fs::write(&file, "def builder = tag\ndef maybe_builder = tag(nil)\ndef empty_capture = capture\n").unwrap();
+    let groups = [
+        ("TagHelper", "tag_helper", vec!["tag", "content_tag", "token_list", "class_names", "cdata_section", "escape_once", "tag_builder"]),
+        ("OutputSafetyHelper", "output_safety_helper", vec!["raw", "safe_join", "to_sentence"]),
+        ("CaptureHelper", "capture_helper", vec!["capture", "content_for", "provide", "content_for?"]),
+    ];
+    let mut modules = vec![json!({"name":"Example","kind":"class",
+        "ancestors":["Example","ActionView::Helpers::TagHelper","ActionView::Helpers::OutputSafetyHelper","ActionView::Helpers::CaptureHelper"],
+        "methods":[
+            {"name":"builder","source_location":format!("{}:1",file.display())},
+            {"name":"maybe_builder","source_location":format!("{}:2",file.display())},
+            {"name":"empty_capture","source_location":format!("{}:3",file.display())}
+        ]})];
+    for (owner, path, names) in &groups {
+        let owner = format!("ActionView::Helpers::{owner}");
+        let methods: Vec<_> = names.iter().map(|name| json!({"name":name,"owner":owner,
+            "parameters":[["opt","value"]],
+            "source_location":format!("/view/lib/action_view/helpers/{path}.rb:1")})).collect();
+        modules.push(json!({"name":owner,"methods":methods}));
+    }
+    let actions: Vec<_> = groups.iter().flat_map(|(_, _, names)| names.iter()).filter(|n| **n != "tag_builder").collect();
+    let mut facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "gems":[{"name":"actionview","version":"8.1.4","path":"/view"}],
+        "controllers":[{"name":"Example","actions":actions}],"modules":modules})).unwrap();
+    let model = TypeModel::from_facts(&facts).unwrap();
+    // Existing modeled calls propagate the whole-method contract, not an
+    // arity-selected overload; both builder forms must retain its builder arm.
+    for (name, expected) in [
+        ("tag", "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)"),
+        ("builder", "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)"),
+        ("maybe_builder", "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)"),
+        ("capture", "ActiveSupport::SafeBuffer?"), ("empty_capture", "ActiveSupport::SafeBuffer?"),
+        ("content_for", "ActiveSupport::SafeBuffer?"), ("provide", "nil"), ("content_for?", "bool"),
+        ("content_tag", "ActiveSupport::SafeBuffer"), ("class_names", "ActiveSupport::SafeBuffer"),
+        ("safe_join", "ActiveSupport::SafeBuffer"), ("to_sentence", "ActiveSupport::SafeBuffer"),
+    ] {
+        let ty = model.fact(&format!("Example#{name}"), "return").unwrap();
+        assert_eq!(ty.name, expected, "{name}");
+        assert_eq!(ty.proven_type(), None);
+        assert!(ty.provenance.iter().any(|p| p.source == Source::RailsApi && p.detail.contains("8.1.4")));
+    }
+    assert_eq!(model.fact("Example#tag", "arg:value").unwrap().name, "untyped");
+    model.write_rbs(&facts, &dir.join("sig")).unwrap();
+    if std::process::Command::new("rbs").arg("--version").output().is_ok() {
+        let check = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
+        assert!(check.status.success(), "{}{}", String::from_utf8_lossy(&check.stdout), String::from_utf8_lossy(&check.stderr));
+    }
+    // Included/prepended helpers shadow dependencies without changing the
+    // stock defining modules. Do not skip anonymous helpers to stock methods,
+    // even when the census holds them under synthetic rather than real names.
+    for (ancestor, holder) in [("CustomView", "CustomView"), ("#<Module:0x>", "Example.ancestors[1]")] {
+        facts.modules[0].ancestors.insert(1, ancestor.into());
+        facts.modules.push(serde_json::from_value(json!({"name":holder,"synthetic":true,
+            "methods":[{"name":"tag_builder","owner":ancestor,"source_location":"/custom.rb:1"},
+                       {"name":"safe_join","owner":ancestor,"source_location":"/custom.rb:2"}]})).unwrap());
+        let changed = TypeModel::from_facts(&facts).unwrap();
+        for name in ["tag", "content_tag", "token_list", "class_names", "to_sentence"] {
+            assert_eq!(changed.fact(&format!("Example#{name}"), "return").unwrap().name, "untyped", "{ancestor}: {name}");
+        }
+        facts.modules.pop();
+        if ancestor.starts_with('#') {
+            assert_eq!(TypeModel::from_facts(&facts).unwrap().fact("Example#tag", "return").unwrap().name, "untyped");
+        }
+        facts.modules[0].ancestors.remove(1);
+    }
+    // A replaced helper/callee or unsupported gem cannot supply the contract.
+    facts.modules[2].methods.iter_mut().find(|m| m.name == "safe_join").unwrap().source_location = Some("/app/custom.rb:1".into());
+    let changed = TypeModel::from_facts(&facts).unwrap();
+    for name in ["safe_join", "token_list", "class_names", "to_sentence"] {
+        assert_eq!(changed.fact(&format!("Example#{name}"), "return").unwrap().name, "untyped");
+    }
+    facts.gems[0].version = "9.0.0".into();
+    assert_eq!(TypeModel::from_facts(&facts).unwrap().fact("Example#provide", "return").unwrap().name, "untyped");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn template_source_locations_are_not_parsed_as_ruby() {
     let dir = std::env::temp_dir().join(format!("lowrail-template-types-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
@@ -465,8 +546,9 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
             "ivars":{"@articles":{"Article::ActiveRecord_Relation":3}}},
         {"module":"#<Class:Article>","singleton":true,"name":"list","calls":2,
             "returns":{"Article::ActiveRecord_Relation":2}},
-        {"module":"Outer::Item","name":"read","calls":4,
-            "returns":{"Outer::Parameters":1,"Set":1,"Thread::Queue":1,"Tempfile":1}}
+        {"module":"Outer::Item","name":"read","calls":7,
+            "returns":{"Outer::Parameters":1,"Set":1,"Thread::Queue":1,"Tempfile":1,
+                "DateTime":1,"Range":1,"NoMethodError":1}}
     ]});
     model.merge_observed(&facts, samples.to_string().as_bytes()).unwrap();
     let title = model.fact("Article#title", "return").unwrap();
@@ -488,7 +570,7 @@ fn observed_facts_preserve_static_types_counts_and_proof_boundary() {
     assert!(model.fact("Article#dynamic", "ivar:@articles").unwrap().proven_type().is_none());
     assert_eq!(model.fact("Article#caller", "return").unwrap().name, "Integer", "no inference from observations");
     assert_eq!(model.fact("Outer::Item#read", "return").unwrap().name,
-        "(Outer::Parameters | Set[untyped] | Tempfile | Thread::Queue[untyped])");
+        "(DateTime | NoMethodError[untyped] | Outer::Parameters | Range[untyped] | Set[untyped] | Tempfile | Thread::Queue[untyped])");
     let input = model.typed_facts();
     assert_eq!(input["format"], 1);
     assert_eq!(input["methods"]["Article#dynamic"]["return_type"]["evidence"], "observed");

@@ -33,7 +33,7 @@ fn parameter(sig: &mut Signature, kind: &str, name: &str, ty: &str) {
 fn source(facts: &Facts, method: &Method, gem: &str, file: &str) -> Option<String> {
     let spec = facts.gems.iter().find(|g| g.name == gem)?;
     let supported = match gem {
-        "activerecord" | "actionpack" => {
+        "activerecord" | "actionpack" | "actionview" => {
             spec.version.starts_with("8.0.") || spec.version.starts_with("8.1.")
         }
         "turbo-rails" => spec.version.starts_with("2.0."),
@@ -51,6 +51,24 @@ fn source(facts: &Facts, method: &Method, gem: &str, file: &str) -> Option<Strin
     };
     (Path::new(path) == Path::new(&spec.path).join(&file))
         .then(|| format!("{gem} {} {file}; boot owner {}", spec.version, method.owner))
+}
+
+// General body inference tolerates partial non-model ancestor facts. A view
+// contract cannot skip an anonymous helper that might shadow a return boundary.
+fn view_method<'a>(facts: &'a Facts, receiver: &str, name: &str, singleton: bool) -> Option<&'a Method> {
+    let (owner, method) = resolve(facts, receiver, name, singleton)?;
+    let module = facts.modules.iter().find(|m| m.name == receiver)?;
+    let ancestors = if singleton { &module.singleton_ancestors } else { &module.ancestors };
+    for ancestor in ancestors {
+        let named = if singleton {
+            ancestor.strip_prefix("#<Class:").and_then(|n| n.strip_suffix('>')).unwrap_or(ancestor)
+        } else { ancestor };
+        if named == owner.name { break; }
+        if ancestor.starts_with('#') && !facts.modules.iter().any(|m| m.name == named) {
+            return None;
+        }
+    }
+    Some(method)
 }
 
 /// Lookup may use a generic relation receiver, whose element type comes from
@@ -87,8 +105,36 @@ pub(super) fn lookup(
     }
     let record = element.unwrap_or(receiver);
     let relation = format!("ActiveRecord::Relation[{record}]");
+    // View inputs keep their booted shapes without guessing value types.
+    let boot_parameters: Vec<_> = method.parameters.iter().filter_map(|p| {
+        Some((p.first()?.as_str(), p.get(1).map(String::as_str).unwrap_or("arg"), "untyped"))
+    }).collect();
     let (gem, file, result, params): (&str, &str, String, &[(&str, &str, &str)]) =
         match (method.owner.as_str(), name) {
+            // Normal-return contracts, not proofs about arbitrary mutated
+            // buffers, conversion methods or blocks. tag(nil) is a builder;
+            // invalid names may raise rather than returning a safe string.
+            ("ActionView::Helpers::TagHelper", "tag") => (
+                "actionview", "action_view/helpers/tag_helper.rb",
+                match call_arguments {
+                    Some(false) => "ActionView::Helpers::TagHelper::TagBuilder",
+                    _ => "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)",
+                }.into(),
+                &boot_parameters,
+            ),
+            ("ActionView::Helpers::TagHelper", "content_tag" | "token_list" | "class_names" | "cdata_section" | "escape_once") => (
+                "actionview", "action_view/helpers/tag_helper.rb", "ActiveSupport::SafeBuffer".into(), &boot_parameters,
+            ),
+            ("ActionView::Helpers::OutputSafetyHelper", "raw" | "safe_join" | "to_sentence") => (
+                "actionview", "action_view/helpers/output_safety_helper.rb", "ActiveSupport::SafeBuffer".into(), &boot_parameters,
+            ),
+            ("ActionView::Helpers::CaptureHelper", "capture" | "content_for") => (
+                "actionview", "action_view/helpers/capture_helper.rb", "ActiveSupport::SafeBuffer?".into(), &boot_parameters,
+            ),
+            ("ActionView::Helpers::CaptureHelper", "provide" | "content_for?") => (
+                "actionview", "action_view/helpers/capture_helper.rb",
+                if name == "provide" { "nil" } else { "bool" }.into(), &boot_parameters,
+            ),
             ("ActiveRecord::Inheritance::ClassMethods", "new") => (
                 "activerecord",
                 "active_record/inheritance.rb",
@@ -236,6 +282,26 @@ pub(super) fn lookup(
             _ => return None,
         };
     let detail = source(facts, method, gem, file)?;
+    if gem == "actionview" {
+        view_method(facts, receiver, name, singleton)?;
+    }
+    // Resolve dependent return boundaries on the actual receiver, including
+    // included/prepended helpers, rather than on their defining Rails module.
+    let dependencies: &[(&str, &str, &str)] = match (gem, name) {
+        ("actionview", "tag" | "content_tag") => &[
+            ("tag_builder", "ActionView::Helpers::TagHelper", "action_view/helpers/tag_helper.rb"),
+        ],
+        ("actionview", "token_list" | "class_names" | "to_sentence") => &[
+            ("safe_join", "ActionView::Helpers::OutputSafetyHelper", "action_view/helpers/output_safety_helper.rb"),
+        ],
+        _ => &[],
+    };
+    for (dependency, expected_owner, expected_file) in dependencies {
+        let callee = view_method(facts, receiver, dependency, singleton)?;
+        if callee.owner != *expected_owner || source(facts, callee, gem, expected_file).is_none() {
+            return None;
+        }
+    }
     let mut sig = signature(
         receiver,
         name,
