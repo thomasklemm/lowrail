@@ -61,3 +61,100 @@ Runtime counters are window-wide, not per-guard attribution. Public Ruby APIs
 cannot assign every side exit, invalidation or ratio to an individual guard.
 The old/new F pair isolates its two holder-guard changes; unit ablations on
 blog can locate aggregate costs but do not make counters additive.
+
+## Completed admission screens
+
+Two-seed literal status/body/all-header digests match across all arms on both
+apps. Every coverage worker asserts actual YJIT; Fizzy old/new each complete
+20 hits and 20 strict SQL/bind shadows in ten requests, zero fallback. Blog
+form/token/collection/stack hit deltas are 10/40/10/(10+40+10), zero fallback.
+Stats workers use the independently built `--enable-yjit=stats` Ruby 4.0.7;
+stock workers use mise Ruby 4.0.7. Both use Bundler 4.0.20 before app boot.
+
+| Fizzy, per request | off-A | old F | new guard | off-B |
+|---|---:|---:|---:|---:|
+| Stock objects | 9084.796 | 8507.846 | **8417.880** | 9085.070 |
+| Singleton-send fallbacks | 243 | 469 | **243** | 243 |
+| Side exits | 42 | 38 | 38 | 42 |
+| Window ratio-in-YJIT, % | 99.763683 | 99.801331 | 99.795969 | 99.763683 |
+
+All four stats windows have zero invalidations/code GC and two newly compiled
+ISeqs. This is a clear singleton-send counter improvement, **not** a JIT-flat
+price or an across-the-board improvement: ratio-in-YJIT is slightly lower
+than old F. Stock objects fall by about 90 versus F and 667 versus off.
+
+| Blog, per request | off-A | form | token | collection | stack | off-B |
+|---|---:|---:|---:|---:|---:|---:|
+| Stock objects | 2286.326 | 1908.106 | 2286.272 | 2286.104 | 1908.438 | 2286.610 |
+| Singleton-send fallbacks | 106 | 106 | 106 | 106 | 106 | 106 |
+| Side exits | 11 | 12 | 15 | 11 | 16 | 11 |
+| Constant-cache exits | 0 | 1 | 4 | 0 | 5 | 0 |
+| Window ratio-in-YJIT, % | 99.742789 | 99.689520 | 99.727858 | 99.752880 | 99.658967 | 99.742789 |
+
+Every blog stats window also has zero invalidations/code GC and two new
+ISeqs. No blog runtime rewrite: the necessary implicit/private-dispatch
+blocks remain, with K's five CREF-sensitive constant-cache exits explicitly
+retained rather than rebranding K's rejected combined candidate.
+
+### Incremental interpreter gate: pass, one attempt
+
+Measured clean
+[`c968daa`](https://github.com/thomasklemm/lowrail/commit/c968daa6db34ee6b35362bef272862d963137011),
+old-on A / new-on / old-on B. These are **not new-versus-off prices** and must
+not be added to F's earlier, pre-worker-binding-fix price.
+
+| Metric | Old A / request | New / request | New/old paired change [95%], % | A/A [95%], % |
+|---|---:|---:|---:|---:|
+| Total Ir | 37,956,069.80 | 37,722,639.65 | **−0.621986 [−0.657997, −0.609650]** | [−0.017925, +0.034873] |
+| No-GC Ir | 37,957,220.95 | 37,725,681.45 | **−0.610000 [−0.654673, −0.582798]** | [−0.036947, +0.042471] |
+
+All 18 serial workers / 72 windows pass interpreter mode, source/tool/pin,
+exact-page and zero-new-page gates. Targets 2047/367/1128/148/199 pages;
+each full window completes 20 hits, zero fallback, shadows off. Four
+tool=none preflight workers / 16 windows pass too. Both A/A intervals lie
+wholly within the preregistered ±0.1%; both treatment upper bounds are ≤ 0.
+No measurement retry/exclusion. All automatic GC counts in these small
+fixed-heap windows are zero; the no-GC measurement is still separately kept.
+
+### Mutation/fork coverage and its limits
+
+Native primitive regression: `ruby -Igem/lib gem/test/native_test.rb` passes
+2 tests / 25 assertions / no skips. Three production/YJIT fork workers run
+19 controls × two seeds, preserving identical response status/body/headers.
+Baseline/restored controls hit; empty User/Bucket eigenclasses, singleton ID,
+private singleton/ordinary association readers and undefined readers refuse
+with positive fallback and no hit. Expected private/undefined reader errors
+remain HTTP 500 rather than silently using the cached query.
+
+The broader checker **exits 2**: SQL/whole-DB equality fails even off/off.
+Read-only SQLite comparison identifies session `created_at`/`updated_at` and
+SolidCache `created_at`/`value` differences in the completed databases; queue
+and cable match. No SQL or whole-DB certificate is credited or normalized.
+Premeasurement checker setup failures (optional ZJIT constant absent; an
+inherited-visibility mutation incompletely restored) are retained privately
+alongside the corrected controls. The initial native-test command lacked
+`-Igem/lib`; its load error is retained, not counted as a passing test.
+
+## Puma cohort admission
+
+The screens above admit exactly the one preregistered cohort. The unchanged
+shared scripts/runtime come from
+[`6510cd2`](https://github.com/thomasklemm/lowrail/commit/6510cd2f2cd4384fcf648c638f5f720d00c8d9c8),
+including the `b1e239f` RPS harness and `544ad8d` native-GC/passive-wire
+observers. Supply the existing native holder binary to that runtime. Use an
+unchanged disposable Fizzy copy under that harness's `.corpus/`, the same
+seed and entropy policy, and a relocated zero-unit artifact. No app source,
+Puma config or dependency changes beyond the committed corpus recipe.
+
+`jit_guards_rps.rb` adds only untimed admission: an external Puma setup hook
+asserts actual YJIT in each post-fork worker and writes PID-qualified mode
+receipts. Both seed workflows plus additional coverage GETs must reach all
+four workers with hits > 0 and fallback 0. Cold/warm checks also reconcile
+every running worker's mode receipt in all native servers. Public hit/shadow
+counters remain off during timed load. Native GC tags and tcpdump
+4.99.3/libpcap 1.10.3 are present identically from the first timed window;
+recorder CPU 7 shares the client set, never the server set.
+
+As in `44a33c4`, “A/A first” means adjudicate/report its band first within
+the rotated cohort, not run an extra timing cohort. The decision rule above
+is unchanged. A failed preflight or cohort is retained without a retry.
