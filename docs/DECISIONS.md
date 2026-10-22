@@ -4,6 +4,12 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet C2 cache breadth: stop at census (2026-10-22)
+Nineteen production routes: Fizzy/Campfire/blog/CASA have zero cached-Marshal objects; CodeTriage has only 7/3/6, all transient at public cache return (2/1/1 internal to individual loads).
+Fizzy/blog use SolidCache; Campfire uses Redis, CASA FileStore, CodeTriage MemCacheStore; none of these measured production boots uses MemoryStore.
+Writebook's Redis workload is unmeasured: unchanged production boot refuses the removed `sqlite3_production_warning=` API, not a measured zero.
+No useful breadth ceiling: no port, mutation variant, own-suite support claim or screen/Ir cohort; [census and unstarted main requirements](cache-breadth.md).
+
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
 
 The all-sealed cold failure is a runtime defect, not witness noise. On the
