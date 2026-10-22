@@ -6,6 +6,11 @@ setup described in the [Campfire M0](m0/campfire.md). Ruby 4.0+ is required;
 these runs use the repository's Ruby 4.0.7. **Callgrind instructions are the
 primary work metric; native YJIT CPU/wall time and allocations are secondary.**
 
+For a reusable off/off/on route screen with exact responses, allocations,
+paired total/no-GC Ir and per-window cache/background audits, see
+[`script/screen` (Bet P)](screen-platform.md). Its cheap tool=none budget
+precedes the finite ±0.1% A/A instruction protocol; no app patches are needed.
+
 ## Current accepted request results
 
 The [README table](../README.md#current-results-2026-10-21) is the current

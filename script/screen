@@ -1,0 +1,125 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+load File.expand_path("native-bench", __dir__)
+
+module NativeScreen
+  module_function
+
+  def instructions_probe
+    return {"available" => false, "reason" => "probe supports Linux x86_64 only"} unless RUBY_PLATFORM.include?("x86_64-linux")
+    require "fiddle"
+    call = Fiddle::Function.new(Fiddle::Handle::DEFAULT["syscall"],
+      [Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT, Fiddle::TYPE_INT, Fiddle::TYPE_INT, Fiddle::TYPE_LONG], Fiddle::TYPE_LONG)
+    # PERF_TYPE_HARDWARE / PERF_COUNT_HW_INSTRUCTIONS; disabled, user only.
+    attr = [0, 128, 1, 0, 0, 0, 97].pack("L<L<Q<Q<Q<Q<Q<").ljust(128, "\0")
+    fd = call.call(298, Fiddle::Pointer[attr], 0, -1, -1, 0)
+    if fd < 0
+      {"available" => false, "reason" => SystemCallError.new("perf_event_open", Fiddle.last_error).message,
+        "errno" => Fiddle.last_error, "perf_event_paranoid" => File.read("/proc/sys/kernel/perf_event_paranoid").strip}
+    else
+      IO.for_fd(fd).close
+      {"available" => true, "reason" => "counter available; this screen does not collect native instructions"}
+    end
+  rescue LoadError, SystemCallError => error
+    {"available" => false, "reason" => error.message}
+  end
+
+  def exact_checks(workers)
+    measured = workers.reject { _1.fetch("coverage") }
+    measured.first.fetch("exact").keys.to_h do |route|
+      [route, [0, 1].to_h do |seed|
+        rows = measured.map { _1.fetch("exact").fetch(route).fetch(seed.to_s) }
+        fields = %w[status body_sha256 headers_sha256]
+        controls_pass = rows.all? { _1.fetch("evidence").fetch("passed") == true }
+        pairs = measured.group_by { _1.fetch("round") }.values.map do |round|
+          arms = round.to_h { [_1.fetch("arm"), _1.fetch("exact").fetch(route).fetch(seed.to_s)] }
+          %w[off_b on].to_h { |arm| [arm, fields.to_h { |field| [field, arms.fetch("off_a").fetch(field) == arms.fetch(arm).fetch(field)] }] }
+        end
+        [seed.to_s, {"passed" => controls_pass && pairs.all? { _1.values.all? { |checks| checks.values.all? } },
+          "controls_pass" => controls_pass, "round_checks" => pairs}]
+      end]
+    end
+  end
+
+  def counter_delta(before, after)
+    return nil unless before && after
+    after.to_h do |key, value|
+      previous = before.fetch(key, value.is_a?(Hash) ? {} : 0)
+      [key, value.is_a?(Hash) ? counter_delta(previous, value) :
+        (value.is_a?(Numeric) ? value - previous : value)]
+    end
+  end
+
+  def run(config, output)
+    probe = instructions_probe
+    config = config.merge("screen" => true, "rounds" => 3)
+    config["exploration_sources"] = config.fetch("exploration_sources", []) + [File.expand_path(__FILE__)]
+    NativeBench.run(config, output)
+    result = JSON.parse(File.read(File.join(output, "result.json")))
+    exact = exact_checks(result.fetch("workers"))
+    measured = result.fetch("workers").reject { _1.fetch("coverage") }
+    report = {"scope" => "cheap exploration screen; no support or published price claim",
+      "native_instructions" => probe, "exact" => exact,
+      "passed_exact" => exact.values.all? { _1.values.all? { |row| row.fetch("passed") } }, "routes" => {}}
+    result.fetch("summary").each do |route, metrics|
+      wall = metrics.fetch("median_us")
+      aa_spread = wall.fetch("aa").fetch("round_deltas_pct").map(&:abs).max
+      floor = [aa_spread, wall.fetch("aa_noise_floor_pct")].max
+      allocations = NativeBench::ARMS.to_h do |arm|
+        values = measured.select { _1.fetch("arm") == arm }.flat_map { _1.fetch("routes").fetch(route).fetch("allocation_samples") }
+        [arm, {"median" => NativeBench.quantile(values, 0.5), "min" => values.min, "max" => values.max}]
+      end
+      coverage = result.fetch("workers").select { _1.fetch("coverage") }.to_h do |worker|
+        row = worker.fetch("routes").fetch(route)
+        [worker.fetch("arm"), {"requests" => row.fetch("requests"),
+          "delta" => counter_delta(row.fetch("counts_before"), row.fetch("counts_after"))}]
+      end
+      report.fetch("routes")[route] = {"wall_median_us" => wall, "aa_max_abs_round_spread_pct" => aa_spread,
+        "screen_noise_floor_pct" => floor, "allocation_samples" => allocations, "coverage" => coverage,
+        "other_metrics" => metrics.reject { |key, _| key == "median_us" },
+        "gc_counts" => NativeBench::ARMS.to_h { |arm| [arm, measured.select { _1.fetch("arm") == arm }.map { _1.fetch("routes").fetch(route).fetch("gc_count") }] },
+        "clear_wall_win" => report.fetch("passed_exact") && wall.fetch("on_off").fetch("ci95_pct").last < -3 * floor}
+      puts "\n#{route}: A/A max |round delta| #{format('%.3f', aa_spread)}%; noise floor #{format('%.3f', floor)}%"
+      puts "exact status/body/headers: #{exact.fetch(route).values.all? { _1.fetch('passed') } ? 'PASS' : 'FAIL (retained, no normalization)'}"
+      puts "wall medians us off-A/off-B/on: #{wall.fetch('arm_means').values.map { format('%.2f', _1) }.join(' / ')}; paired on/off #{format('%+.3f', wall.fetch('on_off').fetch('delta_pct'))}%"
+      puts "allocations/request median [min,max]: #{allocations.map { |arm, row| "#{arm}=#{row.fetch('median')} [#{row.fetch('min')},#{row.fetch('max')}]" }.join('; ')}"
+      puts "GC ms/request off-A/off-B/on: #{metrics.fetch('gc_ms_per_request').fetch('arm_means').values.map { format('%.4f', _1) }.join(' / ')}; RSS KiB: #{metrics.fetch('rss_kib').fetch('arm_means').values.map(&:round).join(' / ')}"
+      puts "coverage deltas (separate workers): #{JSON.generate(coverage)}"
+    end
+    report["elapsed_s"] = NativeBench.clock - config.fetch("screen_started")
+    File.write(File.join(output, "screen.json"), JSON.pretty_generate(report), perm: 0o600)
+    puts "native instructions: #{JSON.generate(probe)}; elapsed #{report.fetch('elapsed_s').round(2)}s"
+    report
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  require_relative "../bench/screen"
+  options = {"counter" => "callgrind"}
+  parser = OptionParser.new do |o|
+    o.banner = "usage: script/screen APP ROUTE... --artifact DIR --output NEW_DIRECTORY [--config FILE]"
+    %w[config output artifact exploration_setup entropy_policy storage_seed].each { |key| o.on("--#{key.tr('_', '-')} PATH") { options[key] = File.expand_path(_1) } }
+    %w[warmup samples cpu requests epoch].each { |key| o.on("--#{key} N", Integer) { options[key] = _1 } }
+    o.on("--counter MODE", %w[callgrind native]) { options["counter"] = _1 }
+    o.on("--budget", "Untimed tool=none heap/exactness preflight; no Ir") { options["budget"] = true }
+    o.on("--reset-cache", "Clear only this disposable app's cache before warmup") { options["reset_cache"] = true }
+    o.on("--exploration-only") { options["exploration_only"] = true }
+  end
+  parser.parse!
+  app, *paths = ARGV
+  abort parser.to_s unless app && !paths.empty? && options["output"]
+  config = {"workload" => "generic", "warmup" => 50, "requests" => 50}
+  config.merge!(JSON.parse(File.read(options.delete("config")))) if options["config"]
+  output = File.expand_path(options.delete("output"))
+  budget = options.delete("budget")
+  counter = options.delete("counter")
+  config.merge!(options).merge!("app" => File.realpath(app), "paths" => paths, "screen_started" => NativeBench.clock)
+  abort "--artifact required" unless config["artifact"]
+  if counter == "native"
+    config = {"samples" => 30}.merge(config)
+    exit(NativeScreen.run(config, output).fetch("passed_exact") ? 0 : 2)
+  end
+  exit(ScreenPlatform.run(config, output, budget: budget) ? 0 : 2)
+end

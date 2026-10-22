@@ -30,7 +30,7 @@ module RequestPairs
     { median: median(values), ci95: [draws[(bootstrap * 0.025).floor], draws[(bootstrap * 0.975).floor]] }
   end
 
-  def self.summarize(rounds, seed:, tolerance:, cohorts: nil, metrics: METRICS, controls: %w[cpu_us wall_us])
+  def self.summarize(rounds, seed:, tolerance:, cohorts: nil, metrics: METRICS, controls: %w[cpu_us wall_us], zero_containment: true)
     layers = rounds.first.keys
     result = layers.to_h do |layer|
       estimates = metrics.to_h do |metric|
@@ -52,7 +52,7 @@ module RequestPairs
     controls = controls.to_h do |metric|
       interval = result.fetch("off_b").fetch(metric).fetch(:delta_pct)&.fetch(:ci95)
       low, high = interval
-      [metric, !!(interval && low <= 0 && high >= 0 && low >= -tolerance && high <= tolerance)]
+      [metric, !!(interval && (!zero_containment || (low <= 0 && high >= 0)) && low >= -tolerance && high <= tolerance)]
     end
     { layers: result, aa: { pass: controls.values.all?, metrics: controls, tolerance_pct: tolerance } }
   end
@@ -364,7 +364,8 @@ module RequestPairs
   end
 
   def self.heap_instructions(environments, app, out, route, metadata, worker: "heap_requests.rb",
-    requests: Integer(ENV.fetch("BENCH_REQUESTS", "50")))
+    requests: Integer(ENV.fetch("BENCH_REQUESTS", "50")), aa_tolerance: Float(ENV.fetch("BENCH_AA_TOLERANCE", "0.5")),
+    aa_zero_containment: true)
     jobs = Integer(ENV.fetch("BENCH_JOBS", "4"))
     slots = HeapWindows.floors
     raise "positive requests/jobs required" unless requests.positive? && jobs.positive?
@@ -475,7 +476,7 @@ module RequestPairs
       end
       File.write(File.join(out, "samples.json"), JSON.pretty_generate(metadata.merge(samples: samples)))
     end
-    summary = summarize(samples, seed: metadata.fetch(:seed), tolerance: Float(ENV.fetch("BENCH_AA_TOLERANCE", "0.5")),
+    summary = summarize(samples, seed: metadata.fetch(:seed), tolerance: aa_tolerance, zero_containment: aa_zero_containment,
       metrics: %w[instructions_total instructions_no_gc allocations], controls: %w[instructions_total instructions_no_gc])
     if environments.key?("before")
       summary[:runtime_change_pct] = %w[instructions_total instructions_no_gc].to_h do |metric|
