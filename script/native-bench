@@ -1,0 +1,324 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Exploration only: native YJIT, serial in-process production Rack requests.
+# No Valgrind, app patches, GC disabling, cache-policy changes or JIT-flat gate.
+require File.expand_path("config/boot", Dir.pwd) if ARGV.first == "--worker"
+require "json"
+require "fileutils"
+require "digest"
+require "rbconfig"
+
+module NativeBench
+  ROOT = File.expand_path("..", __dir__)
+  SCRIPT = File.expand_path(__FILE__)
+  ARMS = %w[off_a off_b on].freeze
+  module_function
+
+  def clock = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  def quantile(values, p)
+    sorted = values.sort
+    index = (sorted.size - 1) * p
+    lo = index.floor
+    sorted.fetch(lo) + (sorted.fetch(index.ceil) - sorted.fetch(lo)) * (index - lo)
+  end
+
+  # Resample paired rounds, not individual correlated requests. Seeded and
+  # finite; retain every round even when the A/A interval is wide or biased.
+  def comparison(a, b, seed: 41231)
+    raise "paired nonempty rounds required" unless a.size == b.size && a.size >= 2
+    return {"status" => "zero_baseline", "absolute_round_deltas" => a.zip(b).map { |x, y| y - x }} if a.any?(&:zero?)
+    deltas = a.zip(b).map { |x, y| 100.0 * (y.fdiv(x) - 1) }
+    rng = Random.new(seed)
+    bootstrap = Array.new(5000) { Array.new(deltas.size) { deltas.fetch(rng.rand(deltas.size)) }.sum / deltas.size }
+    {"delta_pct" => deltas.sum / deltas.size, "ci95_pct" => [quantile(bootstrap, 0.025), quantile(bootstrap, 0.975)],
+      "round_deltas_pct" => deltas, "median_abs_round_delta_pct" => quantile(deltas.map(&:abs), 0.5)}
+  end
+
+  def rss
+    File.read("/proc/self/status").scan(/^(VmRSS|VmHWM):\s+(\d+) kB/).to_h.transform_values(&:to_i)
+  end
+
+  def jit
+    {"yjit" => RubyVM::YJIT.enabled?, "zjit" => defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?,
+      "counters" => RubyVM::YJIT.runtime_stats&.slice(:compiled_iseq_count, :compiled_block_count,
+        :invalidation_count, :code_gc_count, :compile_time_ns, :inline_code_size, :outlined_code_size)}
+  end
+
+  def environment(config, state)
+    app = config.fetch("app")
+    specific = case config.fetch("workload")
+    when "campfire"
+      raise "acknowledge dedicated disposable Redis with CAMPFIRE_DISPOSABLE_REDIS=1" unless ENV["CAMPFIRE_DISPOSABLE_REDIS"] == "1"
+      require_relative "../bench/experiments/campfire_scenario"
+      CampfireScenario.environment(app, state)
+    when "fizzy"
+      require_relative "../bench/experiments/fizzy_link_fixture"
+      FizzyLinkFixture.environment(app, state)
+    when "lobsters"
+      {} # Keep ruby-bench's :memory: database; the fixture setup restores it.
+    when "blog"
+      {"SECRET_KEY_BASE_DUMMY" => config["fixture_secret_key_base"] ? nil : "1",
+        "SECRET_KEY_BASE" => config["fixture_secret_key_base"], "RAILS_LOG_LEVEL" => "fatal"}
+    else raise "unknown workload"
+    end
+    # Clean inherited benchmark/activation state. Both off arms preload the
+    # same runtime; LOWRAIL=0 is the only activation difference for public units.
+    clean = ENV.keys.grep(/\A(?:LOWRAIL|RUBYOPT|RUBY_|BUNDLE_|RAILS_|RACK_ENV|DATABASE_URL|.*_DATABASE_URL)/).to_h { [_1, nil] }
+    clean.merge(specific).merge("RAILS_ENV" => "production", "RACK_ENV" => "production",
+      "BUNDLE_GEMFILE" => config.fetch("gemfile", File.join(app, "Gemfile")), "BUNDLE_FROZEN" => "true",
+      "RUBY_YJIT_ENABLE" => nil, "RUBY_ZJIT_ENABLE" => nil, "LOWRAIL_SEALED" => "1",
+      "LOWRAIL_ROOT" => app, "LOWRAIL_DIR" => config.fetch("artifact"),
+      "RUBYOPT" => "-rbundler/setup -I#{ROOT}/gem/lib -rlowrail/setup")
+  end
+
+  def routes(config, state, arm)
+    app = config.fetch("app")
+    case config.fetch("workload")
+    when "blog"
+      require "rack/mock"
+      rack = Rack::MockRequest.new(Rails.application)
+      headers = {"HTTP_HOST" => "localhost", "HTTPS" => "on"}.merge(config.fetch("headers", {}))
+      config.fetch("paths", ["/articles/1"]).to_h do |path|
+        ["GET #{path}", -> { rack.get(path, headers) }]
+      end
+    when "campfire"
+      require_relative "../bench/experiments/campfire_scenario"
+      driver = CampfireScenario::Driver.new(state, record: false, validate: false)
+      driver.login
+      driver.prepare_post
+      vector = JSON.parse(File.read(File.join(state, "scenario.json"))).fetch("vector")
+      config.fetch("paths", %w[room pagination sidebar search post]).to_h do |path|
+        route = vector.find { _1.fetch("id") == path || _1.fetch("path") == path } or raise "unknown Campfire route #{path}"
+        id = route.fetch("id")
+        [id, -> { driver.run(id) }]
+      end
+    when "fizzy"
+      require_relative "../bench/experiments/fizzy_link_vector"
+      driver = FizzyLinkVector::Driver.new(state, record: false)
+      driver.login
+      config.fetch("paths") { JSON.parse(File.read(File.join(state, "vector.json"))) }.to_h do |path|
+        ["GET #{path}", -> { driver.request("GET", path) }]
+      end
+    when "lobsters"
+      require "rack/mock"
+      rack = Rack::MockRequest.new(Rails.application)
+      headers = {"HTTP_HOST" => "localhost", "HTTPS" => "on"}.merge(config.fetch("headers", {}))
+      # Same shipped DB/dependency overlay as the hotspot study. Anonymous
+      # public story lists, not a claim to reproduce the login-heavy vector.
+      config.fetch("paths", %w[/newest /active /recent /hottest]).to_h do |path|
+        ["GET #{path}", -> { rack.get(path, headers) }]
+      end
+    end
+  end
+
+  def counts
+    if defined?(Exploration) && Exploration.respond_to?(:counts)
+      JSON.parse(JSON.generate(Exploration.counts))
+    elsif defined?(BlockLinkSpecimen) && BlockLinkSpecimen.counts
+      JSON.parse(JSON.generate(BlockLinkSpecimen.counts))
+    elsif defined?(Lowrail::Stats) && Lowrail::Stats.enabled?
+      {"hits" => Lowrail::Stats.unit_hits.dup, "fallbacks" => Lowrail::Stats.unit_fallbacks.dup}
+    end
+  end
+
+  def response_digest(response)
+    {"status" => response.status, "body_sha256" => Digest::SHA256.hexdigest(response.body),
+      "headers_sha256" => Digest::SHA256.hexdigest(JSON.generate(response.headers.to_h.sort.to_h))}
+  end
+
+  def worker(config, state, arm, destination, coverage)
+    started = Float(ENV.fetch("NATIVE_BENCH_STARTED"))
+    block_link = config.fetch("workload") == "fizzy" && !config.fetch("exploration_only", false)
+    if block_link
+      require_relative "../bench/experiments/fizzy_link_vector"
+      BlockLinkSpecimen.install(app: config.fetch("app"), artifact: config.fetch("artifact"),
+        contexts: JSON.parse(File.read(config.fetch("contexts"))), arm: arm == "on" ? "on" : "off")
+    end
+    require File.join(config.fetch("app"), "config/environment")
+    boot_ms = (clock - started) * 1000
+    BlockLinkSpecimen.dependencies! if block_link
+    raise "production Ruby 4.0.7 / Rails 8.1.4 / YJIT required" unless RUBY_VERSION == "4.0.7" &&
+      Rails.version == "8.1.4" && Rails.env.production? && RubyVM::YJIT.enabled? && !jit.fetch("zjit")
+    setup_started = clock
+    if config["exploration_setup"]
+      require config.fetch("exploration_setup")
+      Exploration.install(config: config, state: state, arm: arm)
+    end
+    setup_ms = (clock - setup_started) * 1000
+    workload = routes(config, state, arm)
+    invoke = ->(call) do
+      response = call.call
+      raise "HTTP #{response.status}" if response && response.status != 200
+      response
+    end
+    config.fetch("warmup").times { workload.each_value { invoke.call(_1) } }
+    if config["screen"]
+      exact = workload.to_h do |route, call|
+        [route, [0, 1].to_h do |seed|
+          response, evidence = if defined?(Exploration) && Exploration.respond_to?(:validation_request)
+            Exploration.validation_request(route: route, seed: seed, request: -> { invoke.call(call) })
+          else
+            [invoke.call(call), {"passed" => true, "control" => "raw; no entropy companion"}]
+          end
+          [seed.to_s, response_digest(response).merge("evidence" => evidence)]
+        end]
+      end
+    end
+    rows = workload.to_h do |name, call|
+      n = coverage ? 10 : config.fetch("samples")
+      samples = Array.new(n)
+      allocation_samples = Array.new(n) if config["screen"]
+      before_counts = counts
+      before_rss, before_jit = rss, jit
+      before_gc, before_alloc, before_gc_count = GC.total_time, GC.stat(:total_allocated_objects), GC.count
+      n.times do |i|
+        allocated = GC.stat(:total_allocated_objects) if allocation_samples
+        t = clock
+        invoke.call(call)
+        samples[i] = (clock - t) * 1_000_000
+        allocation_samples[i] = GC.stat(:total_allocated_objects) - allocated if allocation_samples
+      end
+      allocations, gc_ns, collections = GC.stat(:total_allocated_objects) - before_alloc, GC.total_time - before_gc, GC.count - before_gc_count
+      [name, {"samples_us" => coverage ? [] : samples, "requests" => n,
+        "median_us" => quantile(samples, 0.5), "p90_us" => quantile(samples, 0.9),
+        "throughput_rps" => n * 1_000_000.0 / samples.sum, "allocations_per_request" => allocations.fdiv(n),
+        "gc_ms_per_request" => gc_ns.fdiv(n * 1_000_000), "gc_count" => collections,
+        "rss_before_kib" => before_rss, "rss_after_kib" => rss,
+        "jit_before" => before_jit, "jit_after" => jit, "counts_before" => before_counts, "counts_after" => counts}]
+        .tap { |_, row| row["allocation_samples"] = allocation_samples if allocation_samples }
+    end
+    File.write(destination, JSON.pretty_generate({"arm" => arm, "coverage" => coverage,
+      "exact" => exact,
+      "boot_ms" => boot_ms, "exploration_setup_ms" => setup_ms, "ruby" => RUBY_DESCRIPTION, "rails" => Rails.version,
+      "affinity" => File.read("/proc/self/status")[/^Cpus_allowed_list:.*$/], "routes" => rows,
+      "refusal" => Lowrail.refusal_reason, "jit" => jit}), perm: 0o600)
+  end
+
+  def summarize(workers)
+    measured = workers.reject { _1.fetch("coverage") }
+    measured.first.fetch("routes").keys.to_h do |route|
+      rows = ARMS.to_h { |arm| [arm, measured.select { _1.fetch("arm") == arm }] }
+      metrics = %w[median_us p90_us throughput_rps allocations_per_request gc_ms_per_request boot_ms rss_kib]
+      [route, metrics.to_h do |metric|
+        values = rows.transform_values do |records|
+          records.map do |record|
+            case metric
+            when "boot_ms" then record.fetch("boot_ms")
+            when "rss_kib" then record.fetch("routes").fetch(route).fetch("rss_after_kib").fetch("VmRSS")
+            else record.fetch("routes").fetch(route).fetch(metric)
+            end
+          end
+        end
+        aa = comparison(values.fetch("off_a"), values.fetch("off_b"))
+        effect = comparison(values.fetch("off_a"), values.fetch("on"))
+        next [metric, {"arm_means" => values.transform_values { _1.sum.fdiv(_1.size) }, "aa" => aa,
+          "on_off" => effect, "direction" => "unresolved_zero_baseline"}] unless aa["ci95_pct"] && effect["ci95_pct"]
+        # The complete A/A envelope is an empirical noise floor, not a claim
+        # that a CI crossing zero proves equality. No filtered/clean reruns.
+        floor = aa.fetch("ci95_pct").map(&:abs).max
+        label = if effect.fetch("ci95_pct").last < -floor
+          "lower_than_noise_floor"
+        elsif effect.fetch("ci95_pct").first > floor
+          "higher_than_noise_floor"
+        else "unresolved_at_noise_floor"
+        end
+        [metric, {"arm_means" => values.transform_values { _1.sum.fdiv(_1.size) }, "aa" => aa,
+          "on_off" => effect, "aa_noise_floor_pct" => floor, "direction" => label}]
+      end]
+    end
+  end
+
+  def run(config, output)
+    raise "new output directory required" if File.exist?(output)
+    %w[app seed artifact].each { config[_1] = File.realpath(config.fetch(_1)) }
+    raise "dedicated disposable corpus app required" unless config.fetch("app").start_with?(File.join(ROOT, ".corpus/"))
+    raise "output must be outside app and seed" if [config.fetch("app"), config.fetch("seed")].any? { output.start_with?(_1 + "/") }
+    raise "acknowledge dedicated disposable Redis with CAMPFIRE_DISPOSABLE_REDIS=1" if config.fetch("workload") == "campfire" && ENV["CAMPFIRE_DISPOSABLE_REDIS"] != "1"
+    %w[contexts gemfile exploration_setup].each { config[_1] = File.realpath(config[_1]) if config[_1] }
+    config["exploration_sources"] = config.fetch("exploration_sources", []).map { File.realpath(_1) }
+    config = {"rounds" => 12, "warmup" => 200, "samples" => 300, "seed_number" => 41231, "cpu" => 2}.merge(config)
+    raise "at least two rounds and positive warmup/samples required" unless config.fetch("rounds") >= 2 &&
+      config.fetch("warmup").positive? && config.fetch("samples").positive?
+    manifest = File.join(config.fetch("artifact"), "manifest.json")
+    raise "matching-mode YJIT artifact required" unless JSON.parse(File.read(manifest)).fetch("certification_jit") == "yjit"
+    FileUtils.mkdir_p(output, mode: 0o700)
+    require_relative "../fixtures/corpus/blog_production"
+    sources = -> { BlogProduction::Entropy.source_pin(config.fetch("app")) }
+    pin = {"revision" => IO.popen(["git", "-C", ROOT, "rev-parse", "HEAD"], &:read).strip,
+      "source_sha256" => sources.call, "script_sha256" => Digest::SHA256.file(SCRIPT).hexdigest,
+      "manifest_sha256" => Digest::SHA256.file(manifest).hexdigest,
+      "lock_sha256" => Digest::SHA256.file(config.fetch("gemfile", File.join(config.fetch("app"), "Gemfile")) + ".lock").hexdigest,
+      "ruby_sha256" => Digest::SHA256.file(RbConfig.ruby).hexdigest,
+      "seed_sha256" => Dir[File.join(config.fetch("seed"), "**/*")].select { File.file?(_1) }.sort.to_h { [_1.delete_prefix(config.fetch("seed") + "/"), Digest::SHA256.file(_1).hexdigest] },
+      "artifact_sha256" => Dir[File.join(config.fetch("artifact"), "**/*")].select { File.file?(_1) }.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] },
+      "extra_files_sha256" => (%w[contexts gemfile exploration_setup].filter_map { config[_1] } +
+        [config.fetch("gemfile", File.join(config.fetch("app"), "Gemfile")) + ".lock"] + config.fetch("exploration_sources")).to_h { [_1, Digest::SHA256.file(_1).hexdigest] },
+      "files_sha256" => Dir[File.join(ROOT, "{gem/lib,bench}/**/*.{rb,so}")].sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }}
+    File.write(File.join(output, "config.json"), JSON.pretty_generate(config), perm: 0o600)
+    report = {"scope" => "exploratory native YJIT; not a published price or support certification",
+      "config" => config, "pins" => pin, "workers" => [],
+      "artifact_units" => JSON.parse(File.read(manifest)).fetch("units").map { _1.slice("id", "pass", "file") },
+      "host" => {"cpu" => File.read("/proc/cpuinfo")[/^model name.*$/], "uname" => IO.popen(["uname", "-a"], &:read).strip,
+        "frequency_control" => "not modified by harness", "aslr" => "unchanged",
+        "frequency_files" => Dir["/sys/devices/system/cpu/{cpu*/cpufreq/scaling_governor,intel_pstate/no_turbo,cpufreq/boost}"].to_h { [_1, File.read(_1).strip] }}}
+    rng = Random.new(config.fetch("seed_number"))
+    # Rotate all three arms; reverse every other round. Every arm occupies
+    # each position equally over a multiple of six rounds.
+    offset = rng.rand(3)
+    schedule = config.fetch("rounds").times.flat_map do |round|
+      order = config["screen"] ? %w[off_a on off_b] : ARMS.rotate((round + offset) % 3)
+      order = order.reverse if round.odd? && !config["screen"]
+      order.map { [round, _1, false] }
+    end
+    schedule = ARMS.map { ["coverage", _1, true] } + schedule
+    report["schedule"] = schedule
+    File.write(File.join(output, "protocol.json"), JSON.pretty_generate(report), perm: 0o600)
+    schedule.each do |round, arm, coverage|
+      label = "#{round}-#{arm}"
+      state = File.join(output, "#{label}-state")
+      FileUtils.cp_r(config.fetch("seed"), state)
+      if config.fetch("workload") == "blog"
+        # This app has literal storage paths. The app copy is dedicated to
+        # this serial run; only disposable DB/cache data are restored.
+        FileUtils.rm_rf(File.join(config.fetch("app"), "storage"))
+        FileUtils.cp_r(state, File.join(config.fetch("app"), "storage"))
+      end
+      FileUtils.rm_rf(File.join(config.fetch("app"), "tmp"))
+      if config.fetch("workload") == "campfire"
+        raise "disposable Redis reset failed" unless system("redis-cli", "-h", "127.0.0.1", "-p", "6379", "FLUSHDB", out: File::NULL)
+      end
+      env = environment(config, state).merge("LOWRAIL" => arm == "on" ? "1" : "0",
+        "LOWRAIL_STATS" => coverage ? "" : nil, "NATIVE_BENCH_STARTED" => clock.to_s)
+      destination = File.join(output, "#{label}.json")
+      command = [RbConfig.ruby, "--disable-zjit", "--yjit", SCRIPT, "--worker",
+        File.join(output, "config.json"), state, arm, destination, coverage.to_s]
+      command.unshift("taskset", "-c", config.fetch("cpu").to_s) if config["cpu"]
+      log = File.join(output, "#{label}.log")
+      ok = system(env, *command, chdir: config.fetch("app"), out: log, err: [:child, :out])
+      raise "worker #{label} failed; retained #{log}" unless ok
+      raise "app source or artifact changed" unless sources.call == pin.fetch("source_sha256") && Digest::SHA256.file(manifest).hexdigest == pin.fetch("manifest_sha256")
+      raise "harness or runtime changed" unless Digest::SHA256.file(SCRIPT).hexdigest == pin.fetch("script_sha256") &&
+        %w[files_sha256 artifact_sha256 extra_files_sha256].all? { |kind| pin.fetch(kind).all? { |path, sha| Digest::SHA256.file(path).hexdigest == sha } }
+      report.fetch("workers") << JSON.parse(File.read(destination)).merge("round" => round, "log_sha256" => Digest::SHA256.file(log).hexdigest)
+      File.write(File.join(output, "progress.json"), JSON.pretty_generate(report), perm: 0o600)
+      warn "native-bench #{label}: complete"
+      FileUtils.remove_entry(state)
+    end
+    report["summary"] = summarize(report.fetch("workers"))
+    File.write(File.join(output, "result.json"), JSON.pretty_generate(report), perm: 0o600)
+    puts JSON.pretty_generate(report.fetch("summary")) unless config["screen"]
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  command = ARGV.shift
+  if command == "--worker"
+    file, state, arm, destination, coverage = ARGV
+    NativeBench.worker(JSON.parse(File.read(file)), state, arm, destination, coverage == "true")
+  else
+    config, output = ARGV
+    abort "usage: mise exec ruby@4.0.7 -- script/native-bench run CONFIG.json NEW_OUTPUT_DIRECTORY" unless command == "run" && config && output && ARGV.size == 2
+    NativeBench.run(JSON.parse(File.read(config)), File.expand_path(output))
+  end
+end
