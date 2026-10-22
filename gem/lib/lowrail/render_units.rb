@@ -42,25 +42,48 @@ module Lowrail
       binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }
       return "actual-holder binary not certified; rebuild" unless data.fetch("sources").key?(binary)
       return "stale sources; rebuild" unless data.fetch("sources").all? { |file, sha| File.file?(file) && Manifest.sha256_file(file) == sha }
-      controller = Lowrail.loaded_constant("ArticlesController")
-      view_class = controller && IVAR.bind_call(controller, :@view_context_class)
-      return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
+      if data.fetch("version") == 1
+        controller = Lowrail.loaded_constant("ArticlesController")
+        view_class = controller && IVAR.bind_call(controller, :@view_context_class)
+        return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
+      elsif !data.fetch("controllers").empty?
+        return "observer body changed; rebuild" unless
+          Sealed.signature(TokenTag::Variant.instance_method(:token_tag)) == data.fetch("observer")
+        # Read only view classes that Rails has already constructed. Never
+        # call view_context_class (or singleton_class on a live receiver).
+        view_classes = data.fetch("controllers").filter_map do |name, methods|
+          controller = Lowrail.loaded_constant(name)
+          type = controller && IVAR.bind_call(controller, :@view_context_class)
+          next unless type
+          next unless methods.all? do |method_name, expected|
+            !method_refusal(type, method_name, expected, data.fetch("observer"))
+          end
+          type
+        end
+        view_class = view_classes.find { exact.call(view, _1) }
+        return "view holder/helpers not certified or naturally cached; keep original" unless view_class
+      end
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("application_class")
       data.fetch("methods").each do |entry|
         type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))
         return "dependency #{entry['holder']} not already loaded; keep original" unless type
-        method = entry["singleton"] ? type.method(entry.fetch("method")) : type.instance_method(entry.fetch("method"))
-        if [TokenTag::Variant, CollectionRender::Variant].include?(method.owner)
-          return "observer body changed; rebuild" unless Sealed.signature(method) == data.fetch("observer")
-          method = method.super_method
-        end
-        expected = entry.fetch("body")
-        return "method #{entry['holder']}##{entry['method']} changed; rebuild" unless
-          FormScaffoldInventory.runtime_fact(method) == expected.reject { |key, _| key == "visibility" }
-        return "visibility #{entry['holder']}##{entry['method']} changed; rebuild" if expected["visibility"] &&
-          Sealed.visibility(type, entry.fetch("method")) != expected.fetch("visibility")
+        reason = method_refusal(type, entry.fetch("method"), entry.fetch("body"), data.fetch("observer"), singleton: entry["singleton"])
+        return reason if reason
       end
-      {holder: exact, view_class: view_class}
+      {holder: exact, view_class: view_class, view_classes: view_classes || [view_class]}
+    end
+
+    def self.method_refusal(type, name, expected, observer, singleton: false)
+      method = singleton ? type.method(name) : type.instance_method(name)
+      if [TokenTag::Variant, CollectionRender::Variant].include?(method.owner)
+        return "observer body changed; rebuild" unless Sealed.signature(method) == observer
+        method = method.super_method
+      end
+      return "method #{type.name || 'view'}##{name} changed; rebuild" unless
+        FormScaffoldInventory.runtime_fact(method) == expected.reject { |key, _| key == "visibility" }
+      return "visibility #{type.name || 'view'}##{name} changed; rebuild" if expected["visibility"] &&
+        Sealed.visibility(type, name) != expected.fetch("visibility")
+      nil
     end
 
     module Admission
@@ -79,7 +102,7 @@ module Lowrail
       def activate
         return false if @attempted
         return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production"
-        return decline("unknown passive certificate; rebuild; keep original") unless @data.fetch("version") == 1
+        return decline("unknown passive certificate; rebuild; keep original") unless [1, 2].include?(@data.fetch("version"))
         @epoch = defined?(Lowrail::Seal) ? Lowrail::Seal::EPOCH : Sealed::EPOCH
         @pending = true
         @refusal = "pending first natural original operation"
@@ -168,7 +191,7 @@ module Lowrail
         return count(false, "explicit token or unknown options") unless token.nil? && @holder.call(options, Hash) &&
           options.size == 2 && options.key?(:action) && options.key?(:method)
         builder = RenderUnits::IVAR.bind_call(view, :@tag_builder)
-        return count(false, "unknown view/builder holder") unless @holder.call(view, @view_class) &&
+        return count(false, "unknown view/builder holder") unless (@holder.call(view, @view_class) || @view_classes.any? { @holder.call(view, _1) }) &&
           @holder.call(builder, @builder_class) && RenderUnits::IVAR.bind_call(builder, :@view_context).equal?(view)
         true
       end
@@ -251,7 +274,10 @@ module Lowrail
 
       def valid?(renderer, view, template, layout)
         return count(false, "seal epoch changed or foreign Ractor") unless Ractor.current.equal?(Ractor.main) && @epoch[0].zero?
-        count(template && !layout && @holder.call(renderer, @renderer_class) && @holder.call(view, @view_class),
+        # The view is opaque here: the original live Template#render receives
+        # it unchanged. No view helper/model/form facts are folded.
+        count(template && !layout && @holder.call(renderer, @renderer_class) &&
+          (@data.fetch("version") == 2 || @holder.call(view, @view_class)),
           "unknown renderer/view holder, missing template or layout")
       end
     end

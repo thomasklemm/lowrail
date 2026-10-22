@@ -20,6 +20,21 @@ module Lowrail
 
     module_function
 
+    # Shared build-only audit. Render units do not assume a model, locale,
+    # constructor, route, form builder or template merely to use stock Rails.
+    def source_inventory(gems: STOCK.keys)
+      return "source inventory released; restart to recertify" if @released
+      @roots = gems.to_h { |name| [name, Gem.loaded_specs.fetch(name).full_gem_path] }
+      @compiled = {}
+      gems.each do |name|
+        expected = STOCK.fetch(name)
+        root = @roots.fetch(name)
+        files = Dir[File.join(root, "lib/**/*.rb")].sort.to_h { [_1.delete_prefix(root + "/"), Manifest.sha256_file(_1)] }
+        return "non-stock #{name} source inventory" unless Digest::SHA256.hexdigest(JSON.generate(files)) == expected
+      end
+      nil
+    end
+
     def check(runtime: false, verification_test: false)
       # The current certificate has no read-only witness for these synthetic
       # probes. Do not try to produce one by executing them in the app. Until
@@ -30,13 +45,8 @@ module Lowrail
         RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
       return "eager-loaded targets required; keep lazy applications original" unless (verification_test || Rails.application.config.eager_load) &&
         %w[Article Comment ArticlesController].all? { Lowrail.loaded_constant(_1) }
-      @roots = STOCK.keys.to_h { |name| [name, Gem.loaded_specs.fetch(name).full_gem_path] }
-      @compiled = {}
-      STOCK.each do |name, expected|
-        root = @roots.fetch(name)
-        files = Dir[File.join(root, "lib/**/*.rb")].sort.to_h { [_1.delete_prefix(root + "/"), Manifest.sha256_file(_1)] }
-        return "non-stock #{name} source inventory" unless Digest::SHA256.hexdigest(JSON.generate(files)) == expected
-      end
+      reason = source_inventory
+      return reason if reason
       Article.define_attribute_methods
       Comment.define_attribute_methods
       require "objspace"
@@ -300,6 +310,7 @@ module Lowrail
       if method.owner.equal?(ActionView::Helpers::FormBuilder) && %w[text_field textarea].include?(name)
         return "def #{name}(method, options = {}); @template.#{name}(@object_name, method, objectify_options(options)); end"
       end
+      return unless Lowrail.loaded_constant("Comment")
       return unless method.owner.equal?(Comment.send(:generated_attribute_methods))
       field, suffix = name.match(/\A(commenter|body)(_before_type_cast|_came_from_user\?)?\z/)&.captures
       return unless field

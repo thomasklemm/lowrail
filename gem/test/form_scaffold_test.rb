@@ -5,6 +5,109 @@ require_relative "test_helper"
 class FormScaffoldTest < Minitest::Test
   include LowrailTest
 
+  def test_render_units_without_blog_models_templates_or_form_inventory
+    skip "sealed rendering fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
+    missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |app|
+      LowrailTest.write_rails_app(app,
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\ngem 'bootsnap'\n",
+        "Gemfile.lock" => "",
+        "config/environment.rb" => "require_relative 'application'\nRails.application.initialize!\n",
+        "config/application.rb" => <<~'RUBY',
+          require "bootsnap"
+          Bootsnap.setup(cache_dir: File.join(Dir.pwd, "tmp/cache"), development_mode: false,
+            load_path_cache: true, compile_cache_iseq: true, compile_cache_yaml: true, compile_cache_json: true)
+          require "rails"
+          require "active_record/railtie"
+          require "action_controller/railtie"
+          require "action_view/railtie"
+          class WidgetFixture < Rails::Application
+            config.root = File.expand_path("..", __dir__)
+            config.eager_load = true
+            config.yjit = false
+            config.logger = Logger.new(nil)
+            config.secret_key_base = "x" * 64
+            config.active_support.deprecation = :silence
+          end
+        RUBY
+        "config/database.yml" => "production:\n  adapter: sqlite3\n  database: database.sqlite3\n",
+        "app/models/widget.rb" => "class Widget < ApplicationRecord; end\n",
+        "app/controllers/widgets_controller.rb" => <<~'RUBY',
+          class WidgetsController < ApplicationController
+            def index; end
+            def form_authenticity_token(**) = 'live<&"'
+          end
+        RUBY
+        "app/controllers/custom_widgets_controller.rb" => <<~'RUBY',
+          class CustomWidgetsController < ApplicationController
+            helper do
+              def token_tag(*) = "controller-token".html_safe
+              private :token_tag
+            end
+            def index = render "widgets/index"
+          end
+        RUBY
+        "config/routes.rb" => "Rails.application.routes.draw { resources :widgets, only: :index; get '/custom_widgets', to: 'custom_widgets#index' }\n",
+        "app/views/widgets/index.html.erb" => '<%= content_tag :span, "prefix" %><%= button_to "Go", "/widgets" %><%= render partial: "widgets/row", collection: ["left<&", "right"], as: :widget %>',
+        "app/views/widgets/_row.html.erb" => '<p><%= widget %></p>')
+      FileUtils.mkdir_p(File.join(app, ".lowrail"))
+      denied = %w[memo/sha256 memo/uri_join digest/file_memo active_record/preload_plans active_record/ar_plans
+        inertia/config_bind sealed/link_to].map { {"pass" => _1} }
+      denied << {"pass" => "active_record/instantiate", "file" => "Widget"}
+      File.write(File.join(app, ".lowrail/denylist.json"), JSON.generate(denied))
+      env = CLEAN_ENV.merge("RAILS_ENV" => "production", "LOWRAIL_BUILD_JIT" => "0")
+      build = -> {
+        out, err, status = Open3.capture3(env, lowrail_cli, "build", app, "--env", "production", "--sealed")
+        assert status.success?, "#{out}\n#{err}"
+        JSON.parse(File.read(File.join(app, ".lowrail/manifest.json")))
+      }
+      artifact = build.call
+      assert_equal %w[sealed/token_tag sealed/collection_render], artifact.fetch("units").map { _1.fetch("pass") }
+      scenario = <<~'RUBY'
+        require "./config/environment"
+        require "rack/mock"
+        request = Rack::MockRequest.new(Rails.application)
+        bodies = 3.times.map do
+          response = request.get("/widgets", "HTTP_HOST" => "example.org")
+          raise "HTTP #{response.status}" unless response.status == 200
+          response.body
+        end
+        custom = request.get("/custom_widgets", "HTTP_HOST" => "example.org")
+        raise "custom HTTP #{custom.status}" unless custom.status == 200
+        puts JSON.generate(bodies: bodies, custom: custom.body, blog: %w[Article Comment ArticlesController].any? { Object.const_defined?(_1) },
+          hits: Lowrail::Stats.unit_hits, refusal: Lowrail.refusal_reason,
+          admissions: [Lowrail::TokenTag, Lowrail::CollectionRender].map { [_1.refusal, _1.admission] })
+      RUBY
+      off, on = %w[0 1].map do |mode|
+        ruby_json(scenario, chdir: app, env: env.merge("RUBYOPT" => SETUP_OPT,
+          "LOWRAIL" => mode, "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "1"))
+      end
+      refute on.fetch("blog")
+      assert_equal off.fetch("bodies"), on.fetch("bodies")
+      assert_includes on.fetch("bodies").last, "left&lt;&amp;"
+      assert_includes on.fetch("bodies").last, "live&lt;&amp;&quot;"
+      assert_equal off.fetch("custom"), on.fetch("custom")
+      assert_includes on.fetch("custom"), "controller-token"
+      artifact.fetch("units").each { assert_operator on.fetch("hits").fetch(_1.fetch("id").to_s, 0), :>, 0, on.inspect }
+
+      # A custom token helper must remain live; unrelated collection admission
+      # must not inherit its refusal or require a form-builder certificate.
+      FileUtils.mkdir_p(File.join(app, "config/initializers"))
+      File.write(File.join(app, "config/initializers/custom_token.rb"), <<~'RUBY')
+        ActiveSupport.on_load(:action_view) do
+          define_method(:token_tag) { |*args, **options| "custom-token".html_safe }
+          private :token_tag
+        end
+      RUBY
+      custom_artifact = build.call
+      assert_equal ["sealed/collection_render"], custom_artifact.fetch("units").map { _1.fetch("pass") }
+      custom = ruby_json(scenario, chdir: app, env: env.merge("RUBYOPT" => SETUP_OPT,
+        "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "1"))
+      assert_includes custom.fetch("bodies").last, "custom-token"
+      assert_operator custom.fetch("hits").fetch(custom_artifact.fetch("units").first.fetch("id").to_s, 0), :>, 0
+    end
+  end
+
   def test_passive_production_token_and_collection_public_artifact
     skip "sealed rendering fixture requires Ruby 4.0.7 (running #{RUBY_VERSION})" unless RUBY_VERSION == "4.0.7"
     corpus = File.join(CORPUS_ROOT, "real-blog-r4")
