@@ -25,10 +25,56 @@ Thermos follow-ups closed the harness/export findings, not the admission gap; [c
 ## Bet G: retain generic inventory, kill literal options (2026-10-22)
 
 Keep token/collection's boot-derived inventory separate from the blog form and its irrelevant I18n source pin.
-Blog form/token/collection retains ≈377 saved objects/request with options absent; the form itself stays narrow.
+Only the isolated blog form/token/collection artifact retains ≈377 saved objects/request on show/show2 with options absent; index is neutral and the form stays narrow.
 Generic admission saves only ≈2–21 objects on five Fizzy routes; Campfire room and CASA sign-in are neutral.
 Kill the literal-options prototype: Lobsters regresses, and its compiler delivery correctly invalidates the blog form.
 No certificate waiver, template seam, Ir run or promotion; [short census](generic-sealed.md), integration left to the coordinator.
+
+### Isolated blog artifact, not all-sealed (2026-10-22)
+
+**Known gap:** plain `lowrail build APP --sealed --env production` does not
+deliver the ≈377 saving. The combined artifact at
+[b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c)
+prepends `Templates::CompiledSource` to `ActionView::Template` and
+`PreloadPlans::Hook` to `ActiveRecord::Associations::Preloader`. At
+[c4bf0cd](https://github.com/thomasklemm/lowrail/commit/c4bf0cde2d2b8d13f9847b2ed4b319a9a5e972c9)
+and [9afd2c0](https://github.com/thomasklemm/lowrail/commit/9afd2c0beec06fd07edcb39532757c91775c25df),
+the ancestry preflight instead refuses the whole artifact containing
+`active_record/preload_plans` and `sealed/link_to`, serves stock Rails and
+saves nothing. This is fail-closed handling of a preexisting delivery defect,
+not a regression from the tripwire (`ce47c62`) or generic inventory (`6436f9c`).
+
+To select the isolated artifact, use a **disposable retained blog copy** with
+the [build prerequisites](development/testing.md) prepared. Build once to
+inventory units, deny every other unit through the existing build denylist,
+then rebuild. Preserve prior denylist entries; do not filter a finished
+manifest or bypass ancestry preflight:
+
+```sh
+APP=/absolute/path/to/disposable/real-blog-r4
+lowrail build "$APP" --sealed --env production --jit interpreter
+ruby -rjson - "$APP/.lowrail" <<'RUBY'
+dir = ARGV.fetch(0)
+keep = %w[sealed/form_scaffold sealed/token_tag sealed/collection_render]
+manifest = JSON.parse(File.read(File.join(dir, "manifest.json")))
+path = File.join(dir, "denylist.json")
+denied = File.exist?(path) ? JSON.parse(File.read(path)) : []
+others = manifest.fetch("units").reject { keep.include?(_1.fetch("pass")) }
+denied.concat(others.map { _1.slice("kind", "pass", "file", "target") })
+File.write(path, JSON.pretty_generate(denied.uniq))
+RUBY
+lowrail build "$APP" --sealed --env production --jit interpreter
+```
+
+Require exactly those three units, with **empty `files` and `templates`** in
+the rebuilt manifest, plus actual fast-path hits; otherwise the isolated
+claim does not apply. `--sealed` cannot be combined with `--passes`.
+The [scope verification](https://ampcode.com/threads/T-01a164e1-f985-70eb-bd17-535d6adfedc9)
+on `9afd2c0` confirms show/show2 savings with zero fallbacks and a neutral
+index under `script/screen --budget`, the blog entropy policy and epoch
+`1767312000`: response bytes are exact and background work is clean.
+Those window means are not the original census's upper-middle allocation
+medians or a new Ir/latency price. Raw entropy remains rejected.
 
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
 

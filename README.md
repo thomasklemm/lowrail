@@ -170,10 +170,15 @@ when scope or acceptance changes; retain superseded records as historical.
   ledger; sampled types are not proofs or runtime specialization
   ([evidence and limits](docs/types-contracts.md)).
 - **Generic sealed token/collection inventory** ([6436f9c](https://github.com/thomasklemm/lowrail/commit/6436f9c6d7354dbe654b63458f151e67d16209fd)):
-  allocation screens preserve the blog's ≈377 objects/request saving and save
-  ≈2–21 on five Fizzy routes. These are allocation-only screens, not new
-  instruction or throughput prices; form stays narrow and link/template
-  delivery stays quarantined ([scope](docs/generic-sealed.md)).
+  allocation screens preserve ≈377 objects/request **only for the isolated
+  blog form/token/collection artifact**, on show/show2; index is neutral.
+  Plain `build --sealed` currently refuses the combined artifact and saves
+  nothing: a preexisting all-sealed delivery gap, not a tripwire/generic-inventory
+  regression ([selection and known gap](docs/DECISIONS.md#isolated-blog-artifact-not-all-sealed-2026-10-22)).
+  Generic admission also saves ≈2–21 on five Fizzy routes. These are
+  allocation-only screens, not new instruction or throughput prices; form
+  stays narrow and link/template delivery stays quarantined
+  ([scope](docs/generic-sealed.md)).
 
 ## How it works
 
