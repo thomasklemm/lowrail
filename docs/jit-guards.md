@@ -629,3 +629,10 @@ only in the mutated case. Its committed public output regenerates byte-for-byte.
 The header-only regression fails against the previous comparator and passes
 now. No timing, new RPS cohort, app/configuration patch or production admission
 is part of these gates.
+
+Both independent Thermos follow-up reviews of `400fa41..2786f7f` are now
+complete. Correctness/security closed the prior findings with no new medium
+or high defect in that diff; maintainability closed its prior findings with
+no remaining follow-up. This closes the harness/export review requests,
+not production admission: the retained `_exec_scope` acceptance is still red,
+and Y/F remains branch-only. No code or receipt changed after those reviews.
