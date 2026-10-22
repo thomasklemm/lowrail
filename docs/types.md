@@ -2,6 +2,11 @@
 
 Target: Ruby 3.4+ (development pins 4.0.7), Rails 8.1+.
 
+Latest breadth check: [six-app slot ledger, ranked unknown causes and next-bet
+estimates](types-breadth.md), with a real source-checked Fizzy MCP session.
+It recovers 329 existing unknown slots as advisory static types; the blog stays
+2/99/7/188. This is not a whole-app typing or runtime-support claim.
+
 ```sh
 script/corpus real-blog
 cargo run -- facts .corpus/real-blog
@@ -95,8 +100,9 @@ type union and proof separate from precision.
   `String?`. The boot census's generated enum module also supplies predicates
   (`bool`), with actual prefix/suffix names, including non-identifier labels.
   Bang methods and enum-generated scopes/mappings are not newly inferred.
-  `where` and `unscoped` are not seeded: no-argument `where` returns a
-  WhereChain, and block-form `unscoped` returns the block's result.
+  Owner/source-matched `where` calls distinguish the zero-argument WhereChain
+  from a Relation with conditions; `exists?` returns bool. Block-form `unscoped`
+  is not seeded: it returns the block's result.
 - Controller actions and method-based `before_action` callbacks have roles
   in the model. Their returns remain `untyped` unless a simple body is known;
   an action is not assumed to return the HTTP response.
@@ -116,8 +122,12 @@ owner/source-matched Rails API signatures replace generic delegation shapes.
 Prism matches boot source locations and original method names, then propagates
 simple literals, attribute/association reads, ordinary calls and local/ivar
 assignments through up to eight synchronous return-inference rounds. Custom
-reader bodies take precedence over schema seeds. Unsupported control flow,
-blocks, safe navigation, splats, forwarding and recursive unknowns remain
+reader bodies take precedence over schema seeds. Bounded conditionals join
+both arms (including nil for a missing arm); containers keep unknown members
+untyped, and interpolation returns String on normal completion. These compound
+results are static, not proof. An unknown value need not hide a known sequence
+tail, but advisory predecessors withdraw the tail's body-proof label. Unknown
+control flow, blocks, safe navigation, splats, forwarding and recursive unknowns remain
 `untyped`. Argument values are not inferred; a bounded argument grammar rejects
 nested control flow, and argument-bearing calls discard local/ivar knowledge.
 This is not whole-program parameter inference, controller-to-view ivar flow,
@@ -131,6 +141,11 @@ the app declarations. The existing `lowrail types APP --rbs OUT_DIR` interface
 still writes separate `OUT_DIR/app.rbs` and `lowrail_support.rbs`, with the
 type model as JSON on stdout. Both use the same renderer as MCP `export_rbs`.
 Output is deterministic for the same facts, source and observation snapshots.
+
+For workloads that must not contain Lowrail output, collect facts externally
+and use `lowrail types APP --facts EXTERNAL_JSON --rbs EXTERNAL_DIR`. The facts
+loader still resolves paths from the facts file's recorded app root; no boot
+or app write is performed. Observations, if any, are read from APP as before.
 
 Each **slot**, not the whole signature, has a JSON RBS comment:
 
@@ -467,6 +482,8 @@ Tools:
 | Tool | Arguments | Result |
 |---|---|---|
 | `type_of` | `target`: `Article#title`, `Article.all` or `article_path`; optional `slot`: `return`, `arg:name`, `ivar:@name` | Signature/types, provenance, counts, evidence, conflicts; a slot query includes `proven_type` (name or null) |
+| `type_at_position` | `path` inside APP, `line`, `column`: one-based UTF-8 byte coordinates at a method-name token | Advisory def/call return, target/signature/evidence; dynamic receivers, ambiguous contexts and unsupported nodes explicitly unavailable, never guessed |
+| `find_definition` | `target`: `Class#method` or `Class.method` | Resolved boot source path/line and origin; generated methods report generator sites, native methods have no source location |
 | `export_rbs` | none | RBS files and the same per-slot proven/static/observed/unknown evidence as RBS comments, plus diagnostics/conflicts; no writes |
 | `method_facts` | `target`: `Class#method` or `Class.method` | Resolved boot method, owner/source/parameters/ISeq kind and existing origin classifier result |
 | `model` | `name`: model class | Raw columns, attributes, associations, callbacks; validations if recorded in the facts |
@@ -489,7 +506,9 @@ model is rebuilt on changes, even if mtime/size are unchanged. A malformed or
 missing facts replacement produces a tool error, never a stale successful answer;
 removing observations removes their types, and malformed observations error.
 Later requests retry reading the file. The ledger is read for every ledger
-request. Source-only edits require regenerated facts (or server restart).
+request. Changes to source files referenced by boot facts also refresh the type
+model. This is not live lookup/source certification: regenerate facts when
+definitions, owners or source locations change.
 Tool failures use MCP `isError`; protocol failures use JSON-RPC error codes.
 
 Method status matches an explicit method target, or source-file ledger sites

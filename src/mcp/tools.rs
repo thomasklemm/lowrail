@@ -1,12 +1,15 @@
 use crate::facts::{Classifier, Facts, Origin};
 use crate::types::{TypeModel, resolve};
 use serde_json::{Value, json};
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 pub(super) fn list() -> Vec<Value> {
     let string = json!({"type":"string"});
     [
         ("type_of", "Signature/provenance, or a typed fact at slot return, arg:name, ivar:@name", json!({"target":string,"slot":string}), vec!["target"]),
+        ("type_at_position", "Advisory method/call return at a method-name token; one-based UTF-8 byte coordinates. Dynamic receivers/blocks are not guessed", json!({"path":string,"line":{"type":"integer","minimum":1},"column":{"type":"integer","minimum":1}}), vec!["path","line","column"]),
+        ("find_definition", "Resolved boot source location and origin; generated locations are generator sites, not fabricated Ruby definitions", json!({"target":string}), vec!["target"]),
         ("export_rbs", "Read-only RBS files and per-slot proven/static/observed/unknown evidence from existing facts and samples; no whole-signature certification", json!({}), vec![]),
         ("method_facts", "Resolved boot method and its origin/generator", json!({"target":string}), vec!["target"]),
         ("model", "Model columns, associations, callbacks and available validations", json!({"name":string}), vec!["name"]),
@@ -34,6 +37,7 @@ pub(super) fn list() -> Vec<Value> {
 struct Snapshot {
     bytes: Vec<u8>,
     observed: Option<Vec<u8>>,
+    sources: BTreeMap<String, Option<Vec<u8>>>,
     facts: Facts,
     models: Vec<Value>,
     types: TypeModel,
@@ -57,7 +61,8 @@ impl Data {
         let path = self.app.join(".lowrail/facts.json");
         let bytes = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
         let observed = read_optional(&self.app.join(".lowrail/observed.json"))?;
-        if self.snapshot.as_ref().is_none_or(|s| s.bytes != bytes || s.observed != observed) {
+        if self.snapshot.as_ref().is_none_or(|s| s.bytes != bytes || s.observed != observed
+            || s.sources.iter().any(|(path, bytes)| std::fs::read(path).ok() != *bytes)) {
             let facts = crate::facts::load(&path)?;
             // Preserve optional fields (e.g. validations) not yet in Facts.
             #[derive(serde::Deserialize)]
@@ -69,9 +74,16 @@ impl Data {
             let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
             let mut types = TypeModel::from_facts(&facts)?;
             if let Some(bytes) = &observed { types.merge_observed(&facts, bytes)?; }
+            let sources = facts.modules.iter().flat_map(|module|
+                std::iter::once(module.const_source_location.as_deref())
+                    .chain(module.methods.iter().map(|m| m.source_location.as_deref())))
+                .flatten().filter_map(crate::facts::schema::split_location)
+                .filter(|(path, _)| facts.in_app(path))
+                .map(|(path, _)| (path.to_owned(), std::fs::read(path).ok())).collect();
             self.snapshot = Some(Snapshot {
                 bytes,
                 observed,
+                sources,
                 facts,
                 models: models.models,
                 types,
@@ -147,6 +159,9 @@ impl Data {
         let snapshot = self.refresh()?;
         match name {
             "export_rbs" => serde_json::to_value(snapshot.types.export_rbs(&snapshot.facts)).map_err(|e| e.to_string()),
+            "type_at_position" => snapshot.types.type_at_position(&snapshot.facts, required("path")?,
+                args.get("line").and_then(Value::as_u64).ok_or("line is required")?,
+                args.get("column").and_then(Value::as_u64).ok_or("column is required")?),
             "type_of" => {
                 let target = required("target")?;
                 let sig = snapshot
@@ -182,7 +197,7 @@ impl Data {
                 };
                 Ok(json!({"available":true,"target":target,"status":status,"sites":entries}))
             }
-            "method_facts" => {
+            "method_facts" | "find_definition" => {
                 let target = required("target")?;
                 let (receiver, method, singleton) = if let Some((c, m)) = target.rsplit_once('#') {
                     (c, m, false)
@@ -194,6 +209,13 @@ impl Data {
                 let (module, method) = resolve(&snapshot.facts, receiver, method, singleton)
                     .ok_or_else(|| format!("no boot method for {target}"))?;
                 let origin = Classifier::new(&snapshot.facts, &snapshot.parser).classify(module, method);
+                if name == "find_definition" {
+                    let location = method.source_location.as_deref().and_then(crate::facts::schema::split_location);
+                    return Ok(json!({"available":location.is_some(),"target":target,"owner":method.owner,
+                        "path":location.map(|(path, _)| path),"line":location.map(|(_, line)| line),
+                        "original_name":method.def_name(),"origin":origin_json(origin),
+                        "scope":"boot source/generator location; not live execution certification"}));
+                }
                 Ok(
                     json!({"target":target,"resolved_module":module.name,"method":method,"origin":origin_json(origin)}),
                 )

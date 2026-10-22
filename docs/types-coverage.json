@@ -1,0 +1,5143 @@
+{
+  "format": 1,
+  "scope": "advisory types; same frozen boot facts, source and observations; support members excluded",
+  "unknown_cause_policy": "coarse provenance-based families, not a claim of exhaustive AST diagnosis",
+  "apps": {
+    "real-blog-r4": {
+      "facts_sha256": "c0617c74335dadb37b720036f83d5130bd3cab5f9c65fd1e75bf9dc1fcdee123",
+      "rails": "8.1.4",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "facts_errors": 21,
+      "models": 2,
+      "facts_error_sites": {
+        "model ActionMailbox::InboundEmail": 1,
+        "model ActionText::EncryptedRichText": 1,
+        "model ActionText::RichText": 1,
+        "model ActiveStorage::Attachment": 1,
+        "model ActiveStorage::Blob": 1,
+        "model ActiveStorage::VariantRecord": 1,
+        "model SolidCable::Message": 1,
+        "model SolidCache::Entry": 1,
+        "model SolidQueue::Batch": 1,
+        "model SolidQueue::BatchExecution": 1,
+        "model SolidQueue::BlockedExecution": 1,
+        "model SolidQueue::ClaimedExecution": 1,
+        "model SolidQueue::FailedExecution": 1,
+        "model SolidQueue::Job": 1,
+        "model SolidQueue::Pause": 1,
+        "model SolidQueue::Process": 1,
+        "model SolidQueue::ReadyExecution": 1,
+        "model SolidQueue::RecurringExecution": 1,
+        "model SolidQueue::RecurringTask": 1,
+        "model SolidQueue::ScheduledExecution": 1,
+        "model SolidQueue::Semaphore": 1
+      },
+      "source_pin": "https://github.com/rubys/roundhouse@bb90df2514f80817f98d89848dd0a6baa8df20a9:fixtures/real-blog",
+      "before_json_sha256": "b6cbc32bf05d5bbe3e7f34fb869e319f6025016f49bd7e328be265399e461fa6",
+      "after_json_sha256": "7be2cb250d54786e00b99f2caab67c0ef139d16a0d2df6ec0e52f8f64ab24ee5",
+      "before": {
+        "coverage": {
+          "observed": 7,
+          "proven": 2,
+          "static": 99,
+          "unknown": 188
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "rest": 70,
+          "req": 17,
+          "key": 4,
+          "keyreq": 2,
+          "opt": 2,
+          "block": 2
+        },
+        "unknown_argument_families": {
+          "route": 60,
+          "constructor_or_query": 16,
+          "writer_name": 15,
+          "other": 6
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 18,
+          "ActionMailbox::BaseController": 9,
+          "ActionController::Live": 6,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::DiskController": 2,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 97,
+            "examples": [
+              {
+                "target": "ActiveStorage::Blobs::ProxyController#live_streaming_excluded_keys=",
+                "slot": "arg:val"
+              },
+              {
+                "target": "ActiveStorage::Blobs::ProxyController#send_stream",
+                "slot": "arg:filename"
+              },
+              {
+                "target": "ActiveStorage::Blobs::ProxyController#send_stream",
+                "slot": "arg:disposition"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 80,
+            "examples": [
+              {
+                "target": "ActionMailbox::BaseController#ensure_configured",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::Ingresses::Mailgun::InboundEmailsController#authenticate",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::Ingresses::Mailgun::InboundEmailsController#create",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 11,
+            "examples": [
+              {
+                "target": "Article#body=",
+                "slot": "return"
+              },
+              {
+                "target": "Article#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Article#id_value=",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "227dff84a6a0480ea9beeb68c6914c3ec169e07c18a0260d790e3280891a70bb",
+          "lowrail_support.rbs": "1d36dc6687492f5fe0e85e47ec8b4d1206111b9367e48ddb2ea5ba97ee13b639"
+        }
+      },
+      "after": {
+        "coverage": {
+          "observed": 7,
+          "proven": 2,
+          "static": 99,
+          "unknown": 188
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "rest": 70,
+          "req": 17,
+          "key": 4,
+          "keyreq": 2,
+          "opt": 2,
+          "block": 2
+        },
+        "unknown_argument_families": {
+          "route": 60,
+          "constructor_or_query": 16,
+          "writer_name": 15,
+          "other": 6
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 18,
+          "ActionMailbox::BaseController": 9,
+          "ActionController::Live": 6,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::DiskController": 2,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 97,
+            "examples": [
+              {
+                "target": "ActiveStorage::Blobs::ProxyController#live_streaming_excluded_keys=",
+                "slot": "arg:val"
+              },
+              {
+                "target": "ActiveStorage::Blobs::ProxyController#send_stream",
+                "slot": "arg:filename"
+              },
+              {
+                "target": "ActiveStorage::Blobs::ProxyController#send_stream",
+                "slot": "arg:disposition"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 80,
+            "examples": [
+              {
+                "target": "ActionMailbox::BaseController#ensure_configured",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::Ingresses::Mailgun::InboundEmailsController#authenticate",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::Ingresses::Mailgun::InboundEmailsController#create",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 11,
+            "examples": [
+              {
+                "target": "Article#body=",
+                "slot": "return"
+              },
+              {
+                "target": "Article#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Article#id_value=",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "57543e0c6eb9fe78b63ae685f4335730d44fcb4f100a7319b040b3680f1cb1d6",
+          "lowrail_support.rbs": "5c9d7b88c747246ade83c0f1dd036d589c8a2457a1282b0ef6048a715cb4e81a"
+        }
+      },
+      "recovered_slots": [],
+      "withdrawn_slots": [],
+      "changed_known_slots": [],
+      "diagnostics_before": [],
+      "diagnostics_after": []
+    },
+    "fizzy": {
+      "facts_sha256": "6acf9449112e1c61cdd6d491e8fc5975f5a5f7097abea0dc711d7d13767b60bb",
+      "rails": "8.1.4",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "facts_errors": 16,
+      "models": 32,
+      "facts_error_sites": {
+        "model ActionMailbox::InboundEmail": 1,
+        "model ActionText::EncryptedRichText": 1,
+        "model ActionText::RichText": 1,
+        "model SolidCable::Message": 1,
+        "model SolidCache::Entry": 1,
+        "model SolidQueue::BlockedExecution": 1,
+        "model SolidQueue::ClaimedExecution": 1,
+        "model SolidQueue::FailedExecution": 1,
+        "model SolidQueue::Job": 1,
+        "model SolidQueue::Pause": 1,
+        "model SolidQueue::Process": 1,
+        "model SolidQueue::ReadyExecution": 1,
+        "model SolidQueue::RecurringExecution": 1,
+        "model SolidQueue::RecurringTask": 1,
+        "model SolidQueue::ScheduledExecution": 1,
+        "model SolidQueue::Semaphore": 1
+      },
+      "source_pin": "https://github.com/basecamp/fizzy@6f1d200316ec3bae91d32c557d88647300807ee9:.",
+      "before_json_sha256": "b1a97bdfb89646deade1a2e9fe75da4de1a6c4d67402ed7c03f258afb8c90a5b",
+      "after_json_sha256": "de740f0482e71bd03cc70a4d74f039be1209663d3d02211e9531ca7af584dd6f",
+      "before": {
+        "coverage": {
+          "observed": 0,
+          "proven": 14,
+          "static": 936,
+          "unknown": 1677
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "rest": 460,
+          "req": 352,
+          "block": 44,
+          "opt": 34,
+          "keyrest": 31,
+          "key": 21,
+          "keyreq": 5
+        },
+        "unknown_argument_families": {
+          "route": 280,
+          "constructor_or_query": 256,
+          "other": 208,
+          "writer_name": 203
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 49,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 24,
+          "ActionMailbox::BaseController": 9,
+          "ActionController::Live": 9,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 947,
+            "examples": [
+              {
+                "target": "Access#bucket_id=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 410,
+            "examples": [
+              {
+                "target": "AccessesHelper#access_menu_tag",
+                "slot": "return"
+              },
+              {
+                "target": "AccessesHelper#access_toggles_for",
+                "slot": "return"
+              },
+              {
+                "target": "Account::Joinable#generate_join_code",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 175,
+            "examples": [
+              {
+                "target": "Access#bucket_id=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 138,
+            "examples": [
+              {
+                "target": "Access#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::JoinCodesController#verify_authenticity_token",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 5,
+            "examples": [
+              {
+                "target": "ActionText::Markdown#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              },
+              {
+                "target": "Message#messageable",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "schema_type_unmodeled",
+            "slots": 2,
+            "examples": [
+              {
+                "target": "Event#particulars",
+                "slot": "return"
+              },
+              {
+                "target": "Filter#fields",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "492636542a6a495308184253bfa199f7d7abde11b0f99c39d0c9c65825579873",
+          "lowrail_support.rbs": "551a9d337729d0f0ae85e85b92771003af75e303a0e09b17c83ebf0dfbc73eb4"
+        }
+      },
+      "after": {
+        "coverage": {
+          "observed": 0,
+          "proven": 14,
+          "static": 953,
+          "unknown": 1660
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "rest": 460,
+          "req": 352,
+          "block": 44,
+          "opt": 34,
+          "keyrest": 31,
+          "key": 21,
+          "keyreq": 5
+        },
+        "unknown_argument_families": {
+          "route": 280,
+          "constructor_or_query": 256,
+          "other": 208,
+          "writer_name": 203
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 49,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 24,
+          "ActionMailbox::BaseController": 9,
+          "ActionController::Live": 9,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 947,
+            "examples": [
+              {
+                "target": "Access#bucket_id=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 393,
+            "examples": [
+              {
+                "target": "AccessesHelper#access_menu_tag",
+                "slot": "return"
+              },
+              {
+                "target": "AccessesHelper#access_toggles_for",
+                "slot": "return"
+              },
+              {
+                "target": "Account::Joinable#generate_join_code",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 175,
+            "examples": [
+              {
+                "target": "Access#bucket_id=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 138,
+            "examples": [
+              {
+                "target": "Access#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::JoinCodesController#verify_authenticity_token",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 5,
+            "examples": [
+              {
+                "target": "ActionText::Markdown#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              },
+              {
+                "target": "Message#messageable",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "schema_type_unmodeled",
+            "slots": 2,
+            "examples": [
+              {
+                "target": "Event#particulars",
+                "slot": "return"
+              },
+              {
+                "target": "Filter#fields",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "8ac0564ae6f53a40267a87f46f395f404935d45381c5cbfe7ed2dd4c38a92d29",
+          "lowrail_support.rbs": "09b6316ed0701204c5c83650d912fdc469eebae2c923b2735c5264f7115e08b4"
+        }
+      },
+      "recovered_slots": [
+        {
+          "target": "Accounts::UsersController#ensure_permission_to_remove",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Authentication::SessionLookup#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Bubble::Messages#capture_draft_comment",
+          "slot": "return",
+          "type": "nil",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Bubble::Watchable#watchers_and_subscribers",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[User]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "BubblesController#deleted_notice",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "BubblesHelper#bubble_rotation",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Comment#bubble_comments",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[Comment]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CommentsController#require_own_comment",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CommentsController#set_comment",
+          "slot": "return",
+          "type": "(Comment | Array[Comment])",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "EventsController#user_events",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[Event]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Filter#cacheable?",
+          "slot": "return",
+          "type": "bool",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Filter::Fields::ClassMethods#default_values",
+          "slot": "return",
+          "type": "Hash[Symbol, String]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Filter::Summarized#assignee_summary",
+          "slot": "return",
+          "type": "((String | nil) | String)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Filter::Summarized#bucket_summary",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Filter::Summarized#creator_summary",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Filter::Summarized#stage_summary",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "MarkdownRenderer#autolink",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        }
+      ],
+      "withdrawn_slots": [],
+      "changed_known_slots": [],
+      "diagnostics_before": [],
+      "diagnostics_after": []
+    },
+    "campfire": {
+      "facts_sha256": "687e0d571de87b37d6d752af52a9b96d6940de5465056ed8c55f417bde872fa3",
+      "rails": "8.1.4",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "facts_errors": 1,
+      "models": 19,
+      "facts_error_sites": {
+        "model ActionMailbox::InboundEmail": 1
+      },
+      "source_pin": "https://github.com/basecamp/once-campfire@02023b0f0cafc4d66e06e43be072cf4d6ca328fa:.",
+      "before_json_sha256": "1879f521ff0bfea50859ef21f7950371e5f40a114a65bd81d2bd0372f0d2c6c8",
+      "after_json_sha256": "826e6c0fc1f218880858c0bf3f5e4262547d9b1e7f7a441876fa8a2908dccc4d",
+      "before": {
+        "coverage": {
+          "observed": 0,
+          "proven": 30,
+          "static": 622,
+          "unknown": 6071
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "rest": 1108,
+          "keyrest": 753,
+          "req": 735,
+          "opt": 483,
+          "key": 417,
+          "block": 168,
+          "keyreq": 127
+        },
+        "unknown_argument_families": {
+          "other": 3290,
+          "route": 202,
+          "constructor_or_query": 152,
+          "writer_name": 147
+        },
+        "unknown_effective_owners": {
+          "Turbo::Streams::Broadcasts": 693,
+          "ActionView::Helpers::TagHelper": 198,
+          "ActionView::Helpers::CaptureHelper": 165,
+          "ActionView::Helpers::OutputSafetyHelper": 99,
+          "Turbo::Streams::StreamName": 66,
+          "Turbo::Streams::ActionHelper": 66,
+          "ActionController::RequestForgeryProtection": 47,
+          "ActionView::Helpers::AssetUrlHelper": 32,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 19,
+          "ActionController::Live": 12,
+          "ActionMailbox::BaseController": 9,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 3791,
+            "examples": [
+              {
+                "target": "Account#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Account#custom_styles=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Account#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 1453,
+            "examples": [
+              {
+                "target": "Account#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::Bots::KeysController#broadcast_action_later_to",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::Bots::KeysController#broadcast_action_to",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 700,
+            "examples": [
+              {
+                "target": "Account::Joinable#generate_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Account::Joinable#reset_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::Bots::KeysController#deny_bots",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 124,
+            "examples": [
+              {
+                "target": "Account#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#custom_styles=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 3,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::RichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "9a87ffb1d149b7350bc1a6fe38c51ed0a10ef3ec0eb8e36d206c5a6130627ca7",
+          "lowrail_support.rbs": "8c041af6041cbc5c05ed0921a575278427da00a888c96c6134b628bc49758c77"
+        }
+      },
+      "after": {
+        "coverage": {
+          "observed": 0,
+          "proven": 30,
+          "static": 752,
+          "unknown": 5941
+        },
+        "known_slots_with_nested_untyped": 6,
+        "unknown_argument_shapes": {
+          "rest": 1108,
+          "keyrest": 753,
+          "req": 735,
+          "opt": 483,
+          "key": 417,
+          "block": 168,
+          "keyreq": 127
+        },
+        "unknown_argument_families": {
+          "other": 3290,
+          "route": 202,
+          "constructor_or_query": 152,
+          "writer_name": 147
+        },
+        "unknown_effective_owners": {
+          "Turbo::Streams::Broadcasts": 693,
+          "ActionView::Helpers::TagHelper": 198,
+          "ActionView::Helpers::CaptureHelper": 165,
+          "ActionView::Helpers::OutputSafetyHelper": 99,
+          "Turbo::Streams::StreamName": 66,
+          "Turbo::Streams::ActionHelper": 66,
+          "ActionController::RequestForgeryProtection": 47,
+          "ActionView::Helpers::AssetUrlHelper": 32,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 19,
+          "ActionController::Live": 12,
+          "ActionMailbox::BaseController": 9,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 3791,
+            "examples": [
+              {
+                "target": "Account#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Account#custom_styles=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Account#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 1453,
+            "examples": [
+              {
+                "target": "Account#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::Bots::KeysController#broadcast_action_later_to",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::Bots::KeysController#broadcast_action_to",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 570,
+            "examples": [
+              {
+                "target": "Account::Joinable#generate_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Account::Joinable#reset_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::Bots::KeysController#last_room_visited",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 124,
+            "examples": [
+              {
+                "target": "Account#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#custom_styles=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 3,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::RichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "b2fe4300d7b7ebd055d692ec2373026001337e24e3bdba35b9541d5764e9958d",
+          "lowrail_support.rbs": "d02eae98d83b1c4413aa91a0c3a2b349d77066d0dd9774d13b6f946c6a095201"
+        }
+      },
+      "recovered_slots": [
+        {
+          "target": "Accounts::Bots::KeysController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::Bots::KeysController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::Bots::KeysController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::Bots::KeysController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::BotsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::BotsController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::BotsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::BotsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::CustomStylesController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::CustomStylesController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::CustomStylesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::CustomStylesController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::JoinCodesController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::JoinCodesController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::JoinCodesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::JoinCodesController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::LogosController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::LogosController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::LogosController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::LogosController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::UsersController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::UsersController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::UsersController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::UsersController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "AccountsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "AccountsController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "AccountsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "AccountsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ActionText::Attachment::OpengraphEmbed.attributes_from_node",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "ApplicationController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ApplicationController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ApplicationController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Authentication::SessionLookup#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Autocompletable::UsersController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Autocompletable::UsersController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Autocompletable::UsersController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Ban.banned?",
+          "slot": "return",
+          "type": "bool",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ContentFilters::StyleUnfurledTwitterAvatars#opengraph_css_selector",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "FirstRunsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "FirstRunsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "FirstRunsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Message#to_key",
+          "slot": "return",
+          "type": "Array[String?]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "schema"
+          ]
+        },
+        {
+          "target": "Messages::BoostsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Messages::BoostsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Messages::BoostsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Messages::ByBotsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Messages::ByBotsController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Messages::ByBotsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Messages::ByBotsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MessagesController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MessagesController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MessagesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MessagesController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Opengraph::Fetch#resolve_redirect",
+          "slot": "return",
+          "type": "Array[untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "PwaController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "PwaController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "PwaController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "QrCodeController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "QrCodeController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "QrCodeController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Room::MessagePusher#build_direct_payload",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Room::MessagePusher#build_payload",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Room::MessagePusher#build_shared_payload",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Rooms::ClosedsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::ClosedsController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::ClosedsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::ClosedsController#grantees",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[User]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::ClosedsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::DirectsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::DirectsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::DirectsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::DirectsController#selected_users",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[User]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::InvolvementsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::InvolvementsController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::InvolvementsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::InvolvementsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::OpensController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::OpensController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::OpensController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::OpensController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::RefreshesController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::RefreshesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Rooms::RefreshesController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "RoomsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "RoomsController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "RoomsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "RoomsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "RoomsHelper#composer_data_options",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SearchesController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SearchesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SearchesController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Sessions::TransfersController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Sessions::TransfersController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Sessions::TransfersController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SessionsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SessionsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SessionsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UnfurlLinksController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UnfurlLinksController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UnfurlLinksController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "User::Bot#bot_key",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "User::Mentionable#attachable_plain_text_representation",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::AvatarsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::AvatarsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::AvatarsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::BansController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::BansController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::BansController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::BansController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::ProfilesController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::ProfilesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::ProfilesController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::ProfilesController#update_notice",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PushSubscriptions::TestNotificationsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::PushSubscriptions::TestNotificationsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::PushSubscriptions::TestNotificationsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::PushSubscriptionsController#create",
+          "slot": "return",
+          "type": "true",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::PushSubscriptionsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::PushSubscriptionsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::PushSubscriptionsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::SidebarsController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::SidebarsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::SidebarsController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UsersController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UsersController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UsersController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UsersController#verify_join_code",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "WelcomeController#deny_bots",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "WelcomeController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "WelcomeController#reject_banned_ip",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        }
+      ],
+      "withdrawn_slots": [],
+      "changed_known_slots": [],
+      "diagnostics_before": [],
+      "diagnostics_after": []
+    },
+    "casa": {
+      "facts_sha256": "5239be59d9802e744afcf6426eb6cf4fcd8189798bcbe4250f666a11890b3431",
+      "rails": "8.1.4",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "facts_errors": 1,
+      "models": 79,
+      "facts_error_sites": {
+        "model ActionMailbox::InboundEmail": 1
+      },
+      "source_pin": "https://github.com/rubyforgood/casa@b584d2e6e6ebffe382f34c2ec202d20384d035ca:.",
+      "before_json_sha256": "3b15f4178f7a5e81b4216dacebfba5e6e33615c4fab2fc266b9583b328371f6f",
+      "after_json_sha256": "3df7d5cad37e9f27bece1259f71394bf72367c86ff54f110fc6847166f38d1b5",
+      "before": {
+        "coverage": {
+          "observed": 0,
+          "proven": 40,
+          "static": 2424,
+          "unknown": 7410
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "req": 1726,
+          "rest": 981,
+          "opt": 248,
+          "block": 93,
+          "keyrest": 82,
+          "key": 58,
+          "keyreq": 35
+        },
+        "unknown_argument_families": {
+          "other": 1302,
+          "writer_name": 787,
+          "constructor_or_query": 632,
+          "route": 502
+        },
+        "unknown_effective_owners": {
+          "ApplicationController": 320,
+          "Draper::ViewContext": 108,
+          "ActionController::RequestForgeryProtection": 98,
+          "Devise::Controllers::Helpers": 79,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 62,
+          "DeviseController": 30,
+          "PgHero::HomeController": 29,
+          "Devise::InvitationsController": 20,
+          "Wicked::Controller::Concerns::Steps": 14,
+          "Devise::RegistrationsController": 14,
+          "Devise::PasswordsController": 13,
+          "Devise::SessionsController": 12,
+          "ActionView::Helpers::UrlHelper": 11,
+          "ActionController::Live": 10,
+          "ActionMailbox::BaseController": 9,
+          "Wicked::Controller::Concerns::Path": 8,
+          "Wicked::Controller::Concerns::RenderRedirect": 6,
+          "Devise::ConfirmationsController": 6,
+          "ActionView::Helpers::TagHelper": 6,
+          "ActiveStorage::SetBlob": 5,
+          "DeviseInvitable::Inviter": 5,
+          "ActionView::Helpers::CaptureHelper": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Wicked::Wizard": 4,
+          "Rails::ApplicationController": 4,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "Pagy::Frontend": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "DeviseInvitable::Controllers::Helpers": 3,
+          "Devise::UnlocksController": 3,
+          "ActionView::Helpers::ContentExfiltrationPreventionHelper": 3,
+          "ActionView::Helpers::OutputSafetyHelper": 3,
+          "Turbo::Native::NavigationController": 3,
+          "Pagy::BootstrapExtra": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Devise::OmniauthCallbacksController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "Pagy::UrlHelpers": 2,
+          "ViewComponent::PreviewActions": 2,
+          "ViewComponentsSystemTestController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "OtherDuty": 1,
+          "Pundit::Authorization": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1,
+          "Pagy::JSTools::FrontendAddOn": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 3223,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#body=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 2482,
+            "examples": [
+              {
+                "target": "Accessible#check_user",
+                "slot": "return"
+              },
+              {
+                "target": "AdditionalExpense#require_complete?",
+                "slot": "return"
+              },
+              {
+                "target": "AdditionalExpenseParamsService#calculate",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 948,
+            "examples": [
+              {
+                "target": "ActionMailbox::BaseController#activate_draper",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::BaseController#ensure_configured",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::Ingresses::Mailgun::InboundEmailsController#activate_draper",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 719,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#body=",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 27,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::RichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "schema_type_unmodeled",
+            "slots": 11,
+            "examples": [
+              {
+                "target": "BaseNotifier#params",
+                "slot": "return"
+              },
+              {
+                "target": "CaseContact#metadata",
+                "slot": "return"
+              },
+              {
+                "target": "EmancipationChecklistReminderNotifier#params",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 1,
+        "rbs_sha256": {
+          "app.rbs": "1d4d366be08e2fa7ef385d503eac179414bd96dbb630838c47a2e5f192aee6cc",
+          "lowrail_support.rbs": "a1183eb7f858f91d365f90c4a52af6f8c8dbd5241029defb2b826cb56097fbc9"
+        }
+      },
+      "after": {
+        "coverage": {
+          "observed": 0,
+          "proven": 40,
+          "static": 2548,
+          "unknown": 7286
+        },
+        "known_slots_with_nested_untyped": 9,
+        "unknown_argument_shapes": {
+          "req": 1726,
+          "rest": 981,
+          "opt": 248,
+          "block": 93,
+          "keyrest": 82,
+          "key": 58,
+          "keyreq": 35
+        },
+        "unknown_argument_families": {
+          "other": 1302,
+          "writer_name": 787,
+          "constructor_or_query": 632,
+          "route": 502
+        },
+        "unknown_effective_owners": {
+          "ApplicationController": 320,
+          "Draper::ViewContext": 108,
+          "ActionController::RequestForgeryProtection": 98,
+          "Devise::Controllers::Helpers": 79,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 62,
+          "DeviseController": 30,
+          "PgHero::HomeController": 29,
+          "Devise::InvitationsController": 20,
+          "Wicked::Controller::Concerns::Steps": 14,
+          "Devise::RegistrationsController": 14,
+          "Devise::PasswordsController": 13,
+          "Devise::SessionsController": 12,
+          "ActionView::Helpers::UrlHelper": 11,
+          "ActionController::Live": 10,
+          "ActionMailbox::BaseController": 9,
+          "Wicked::Controller::Concerns::Path": 8,
+          "Wicked::Controller::Concerns::RenderRedirect": 6,
+          "Devise::ConfirmationsController": 6,
+          "ActionView::Helpers::TagHelper": 6,
+          "ActiveStorage::SetBlob": 5,
+          "DeviseInvitable::Inviter": 5,
+          "ActionView::Helpers::CaptureHelper": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Wicked::Wizard": 4,
+          "Rails::ApplicationController": 4,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "Pagy::Frontend": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "DeviseInvitable::Controllers::Helpers": 3,
+          "Devise::UnlocksController": 3,
+          "ActionView::Helpers::ContentExfiltrationPreventionHelper": 3,
+          "ActionView::Helpers::OutputSafetyHelper": 3,
+          "Turbo::Native::NavigationController": 3,
+          "Pagy::BootstrapExtra": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Devise::OmniauthCallbacksController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "Pagy::UrlHelpers": 2,
+          "ViewComponent::PreviewActions": 2,
+          "ViewComponentsSystemTestController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "OtherDuty": 1,
+          "Pundit::Authorization": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1,
+          "Pagy::JSTools::FrontendAddOn": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 3223,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#body=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 2352,
+            "examples": [
+              {
+                "target": "Accessible#check_user",
+                "slot": "return"
+              },
+              {
+                "target": "AdditionalExpense#require_complete?",
+                "slot": "return"
+              },
+              {
+                "target": "AdditionalExpenseParamsService#calculate",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 948,
+            "examples": [
+              {
+                "target": "ActionMailbox::BaseController#activate_draper",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::BaseController#ensure_configured",
+                "slot": "return"
+              },
+              {
+                "target": "ActionMailbox::Ingresses::Mailgun::InboundEmailsController#activate_draper",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 725,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#body=",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::EncryptedRichText#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 27,
+            "examples": [
+              {
+                "target": "ActionText::EncryptedRichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActionText::RichText#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "schema_type_unmodeled",
+            "slots": 11,
+            "examples": [
+              {
+                "target": "BaseNotifier#params",
+                "slot": "return"
+              },
+              {
+                "target": "CaseContact#metadata",
+                "slot": "return"
+              },
+              {
+                "target": "EmancipationChecklistReminderNotifier#params",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "4a328a7163cd9622c60c774afc1fb3a6905c319f21ca81422c5c0db96090cfba",
+          "lowrail_support.rbs": "3be686c99e71a03a3bb43ff824e62eb37726df6639109c2fd98fb782ed7fb084"
+        }
+      },
+      "recovered_slots": [
+        {
+          "target": "AdditionalExpensesController#destroy",
+          "slot": "return",
+          "type": "true",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "AdminDashboard#stats",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        },
+        {
+          "target": "AllCasaAdminParameters#with_password",
+          "slot": "return",
+          "type": "AllCasaAdminParameters",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "AllCasaAdmins::PatchNotesController#patch_note_params",
+          "slot": "return",
+          "type": "ActionController::Parameters",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "AnalyticsController#chapter_kpis",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Api::V1::Users::SessionsController#user_params",
+          "slot": "return",
+          "type": "ActionController::Parameters",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ApiCredential#return_new_api_token!",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "ApiCredential#return_new_refresh_token!",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "ApplicationDatatable#as_json",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        },
+        {
+          "target": "ApplicationHelper#body_class",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "BadgeComponent#initialize",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "BannerHelper#banner_expiration_time_in_words",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "BannersController#banner_created_flash",
+          "slot": "return",
+          "type": "Hash[Symbol, String]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "BannersController#new",
+          "slot": "return",
+          "type": "Banner",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "BulkCourtDatesController#new",
+          "slot": "return",
+          "type": "CourtDate",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CasaAdminsController#case_contact_flagged_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CasaAdminsController#court_report_due_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CasaAdminsController#new",
+          "slot": "return",
+          "type": "CasaAdmin",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CasaAdminsController#no_contact_made_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CasaAdminsController#password_reset_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CasaCaseDecorator#emancipation_checklist_count",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CasaCaseDecorator#status",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CasaCasePolicy#case_court_orders_attributes",
+          "slot": "return",
+          "type": "Hash[Symbol, Array[Symbol]]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CasaOrg#contact_types",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[ContactType]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CasaOrg#followups",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[Followup]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CasaOrgController#set_contact_type_data",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[ContactType]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CaseAssignment.inactive_this_week",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[CaseAssignment]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CaseAssignmentsController#handle_failed_assignment",
+          "slot": "return",
+          "type": "Symbol",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseAssignmentsController#handle_successful_assignment",
+          "slot": "return",
+          "type": "Symbol",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContact#submitted_address_parts",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContact.sorted_by_params",
+          "slot": "return",
+          "type": "Hash[Symbol, String]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#contact_made",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#duration_minutes",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#form_title",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#form_updated_message",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#formatted_hours_and_minutes",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#miles_traveled",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#reimbursement_status_badge_type",
+          "slot": "return",
+          "type": "Symbol",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContactDecorator#reimbursement_status_text",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseContacts::FollowupsController#simple_followup_params",
+          "slot": "return",
+          "type": "ActionController::Parameters",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CaseContacts::FormController#get_contact_topics",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[ContactTopic]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CaseContactsDecorator#boolean_select_options",
+          "slot": "return",
+          "type": "Array[Array[(String | bool)]]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CaseCourtReportContext#filtered_interviewees",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[CaseContactContactType]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CaseCourtReportsController#date_range_params",
+          "slot": "return",
+          "type": "ActionController::Parameters",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ContactTopicAnswersController#destroy",
+          "slot": "return",
+          "type": "true",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ContactTypeDecorator#hash_for_multi_select_with_cases",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "ContactTypeGroupsController#new",
+          "slot": "return",
+          "type": "ContactTypeGroup",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ContactTypesController#new",
+          "slot": "return",
+          "type": "ContactType",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CourtDate#display_name",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CreateAllCasaAdminService#build",
+          "slot": "return",
+          "type": "AllCasaAdmin",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CreateCasaAdminService#build",
+          "slot": "return",
+          "type": "CasaAdmin",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "CustomOrgLinksController#new",
+          "slot": "return",
+          "type": "CustomOrgLink",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "DesignSystemHelper#field_error_id",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "DesignSystemHelper#name_link_class",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "DesignSystemHelper#record_link_class",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Dialog::GroupComponent#panel_classes",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Dialog::HeaderComponent#badge_classes",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationChecklistReminderNotifier#message",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationsHelper#emancipation_category_checkbox_checked",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationsHelper#emancipation_category_checkbox_checked_download",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationsHelper#emancipation_category_collapse_hidden",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationsHelper#emancipation_category_collapse_icon",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationsHelper#emancipation_option_checkbox_checked",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationsHelper#emancipation_option_checkbox_checked_download",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "EmancipationsHelper#emancipation_option_radio_checked_download",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "FailedImportCsvService#exists_warning",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "FailedImportCsvService#expired_warning",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "FileImporter#initialize",
+          "slot": "return",
+          "type": "Integer",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "FileImporter#status",
+          "slot": "return",
+          "type": "Symbol",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Followup.in_organization",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[Followup]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "FollowupResolvedNotifier#message",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "HearingTypesController#new",
+          "slot": "return",
+          "type": "HearingType",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ImportsController#header",
+          "slot": "return",
+          "type": "Hash[String, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "JudgesController#new",
+          "slot": "return",
+          "type": "Judge",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "LanguagesController#new",
+          "slot": "return",
+          "type": "Language",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "LearningHourTopicsController#new",
+          "slot": "return",
+          "type": "LearningHourTopic",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "LearningHourTypesController#new",
+          "slot": "return",
+          "type": "LearningHourType",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "LearningHoursHelper#format_time",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "LearningHoursReport#initialize",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[LearningHour]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MetricsReport#case_contacts",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[CaseContact]",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        },
+        {
+          "target": "MileageRatesController#index",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[MileageRate]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MileageReport#initialize",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[CaseContact]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MissingDataExportCsvService#get_status",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "MissingDataReport#initialize",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[CasaCase]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "NotesController#edit",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "NotificationsHelper#read_when_seen_notifications",
+          "slot": "return",
+          "type": "Array[String]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "OtherDutiesController#new",
+          "slot": "return",
+          "type": "OtherDuty",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ReportHelper#boolean_choices",
+          "slot": "return",
+          "type": "Array[(Array[(String | bool)] | Array[String])]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "ShortUrlService#initialize",
+          "slot": "return",
+          "type": "nil",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SmsBodyHelper#case_contact_flagged_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SmsBodyHelper#court_report_due_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SmsBodyHelper#no_contact_made_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SmsBodyHelper#password_reset_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "StaticController#index",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[CasaOrg]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SupervisorsController#case_contact_flagged_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SupervisorsController#court_report_due_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SupervisorsController#no_contact_made_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SupervisorsController#password_reset_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "SupervisorsController#supervisor_values",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "TemplateHelper#active_if",
+          "slot": "return",
+          "type": "(String | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "UserDecorator#email_confirmation_status",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "UserDecorator#status",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "UserParameters#with_organization",
+          "slot": "return",
+          "type": "UserParameters",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "UserParameters#with_password",
+          "slot": "return",
+          "type": "UserParameters",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "UserParameters#with_type",
+          "slot": "return",
+          "type": "UserParameters",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "UserParameters#without_active",
+          "slot": "return",
+          "type": "UserParameters",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "UserParameters#without_type",
+          "slot": "return",
+          "type": "UserParameters",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#body_class",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#case_contact_flagged_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#court_report_due_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#invalid_phone_number_error",
+          "slot": "return",
+          "type": "bool",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#no_contact_made_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#no_user_found_error",
+          "slot": "return",
+          "type": "bool",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#password_reset_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Users::PasswordsController#render_error",
+          "slot": "return",
+          "type": "bool",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteerBirthdayNotifier#message",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteerDashboard::Row#status",
+          "slot": "return",
+          "type": "Symbol",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteerDecorator#cc_reminder_text",
+          "slot": "return",
+          "type": "((String | nil) | String)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteersController#case_contact_flagged_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteersController#court_report_due_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteersController#no_contact_made_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteersController#password_reset_msg",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "VolunteersController#send_sms_to",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "YouthBirthdayNotifier#message",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        }
+      ],
+      "withdrawn_slots": [],
+      "changed_known_slots": [],
+      "diagnostics_before": [],
+      "diagnostics_after": []
+    },
+    "writebook": {
+      "facts_sha256": "cf7a5db1447dbb2c9ce81599096ff8931cac74873cca5c6fee746a9e074cba40",
+      "rails": "8.1.4",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "facts_errors": 3,
+      "models": 14,
+      "facts_error_sites": {
+        "model ActionMailbox::InboundEmail": 1,
+        "model ActionText::EncryptedRichText": 1,
+        "model ActionText::RichText": 1
+      },
+      "source_pin": "https://github.com/basecamp/writebook@be1f8fcf1b0fc8064011c2d29d75133885b182e2:.",
+      "before_json_sha256": "d5b2b65ecbd4e06b7a41a0f767cfdb1ec3ab7d8e9cf4b3aea0781fd49e0fce5e",
+      "after_json_sha256": "2661ba323512504f30e347cb262f0bc7c8aa19c03776d56b78a0361188ec0338",
+      "before": {
+        "coverage": {
+          "observed": 0,
+          "proven": 19,
+          "static": 462,
+          "unknown": 1062
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "rest": 228,
+          "req": 203,
+          "block": 27,
+          "key": 23,
+          "keyrest": 21,
+          "opt": 14,
+          "keyreq": 13
+        },
+        "unknown_argument_families": {
+          "other": 161,
+          "route": 148,
+          "constructor_or_query": 112,
+          "writer_name": 108
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 35,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 14,
+          "ActionMailbox::BaseController": 9,
+          "ActionController::Live": 6,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 529,
+            "examples": [
+              {
+                "target": "Access#book_id=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 326,
+            "examples": [
+              {
+                "target": "Account::Joinable#generate_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Account::Joinable#reset_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::CustomStylesController#account_params",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 111,
+            "examples": [
+              {
+                "target": "Access#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::CustomStylesController#verify_authenticity_token",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 92,
+            "examples": [
+              {
+                "target": "Access#book_id=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 4,
+            "examples": [
+              {
+                "target": "ActionText::Markdown#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              },
+              {
+                "target": "Edit#leafable",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "f4f67f740c8f7143f6badbb5281b91f6ba46fe9da969731bc31c02a6215906fc",
+          "lowrail_support.rbs": "0f2e0596f512848c961f5b7d3b7162dde136e45e698d3f29ae3eea2ab2b51697"
+        }
+      },
+      "after": {
+        "coverage": {
+          "observed": 0,
+          "proven": 19,
+          "static": 499,
+          "unknown": 1025
+        },
+        "known_slots_with_nested_untyped": 1,
+        "unknown_argument_shapes": {
+          "rest": 228,
+          "req": 203,
+          "block": 27,
+          "key": 23,
+          "keyrest": 21,
+          "opt": 14,
+          "keyreq": 13
+        },
+        "unknown_argument_families": {
+          "other": 161,
+          "route": 148,
+          "constructor_or_query": 112,
+          "writer_name": 108
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 35,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 14,
+          "ActionMailbox::BaseController": 9,
+          "ActionController::Live": 6,
+          "ActiveStorage::SetBlob": 5,
+          "Rails::Conductor::BaseController": 5,
+          "Rails::Conductor::ActionMailbox::InboundEmailsController": 4,
+          "ActionMailbox::Ingresses::Mandrill::InboundEmailsController": 3,
+          "ActiveStorage::Representations::BaseController": 3,
+          "Turbo::Native::NavigationController": 3,
+          "ActionMailbox::Ingresses::Mailgun::InboundEmailsController": 2,
+          "ActionMailbox::Ingresses::Relay::InboundEmailsController": 2,
+          "ActiveStorage::Blob": 2,
+          "ActiveStorage::DiskController": 2,
+          "Rails::ApplicationController": 2,
+          "Rails::Conductor::ActionMailbox::InboundEmails::SourcesController": 2,
+          "Rails::PwaController": 2,
+          "ActionMailbox::Ingresses::Postmark::InboundEmailsController": 1,
+          "ActionMailbox::Ingresses::Sendgrid::InboundEmailsController": 1,
+          "ActiveStorage::Blobs::ProxyController": 1,
+          "ActiveStorage::Blobs::RedirectController": 1,
+          "ActiveStorage::DirectUploadsController": 1,
+          "ActiveStorage::Representations::ProxyController": 1,
+          "ActiveStorage::Representations::RedirectController": 1,
+          "Rails::Conductor::ActionMailbox::IncineratesController": 1,
+          "Rails::Conductor::ActionMailbox::ReroutesController": 1,
+          "Rails::HealthController": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 529,
+            "examples": [
+              {
+                "target": "Access#book_id=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "arg:value"
+              },
+              {
+                "target": "Access#id=",
+                "slot": "arg:value"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 289,
+            "examples": [
+              {
+                "target": "Account::Joinable#generate_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Account::Joinable#reset_join_code",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::CustomStylesController#account_params",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 111,
+            "examples": [
+              {
+                "target": "Access#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Account#id=",
+                "slot": "return"
+              },
+              {
+                "target": "Accounts::CustomStylesController#verify_authenticity_token",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 92,
+            "examples": [
+              {
+                "target": "Access#book_id=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Access#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "association_target_unavailable",
+            "slots": 4,
+            "examples": [
+              {
+                "target": "ActionText::Markdown#record",
+                "slot": "return"
+              },
+              {
+                "target": "ActiveStorage::Attachment#record",
+                "slot": "return"
+              },
+              {
+                "target": "Edit#leafable",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "2eff40674878216b5397aa3d7465b4171470200df2fe0175a8b20212f9167a8f",
+          "lowrail_support.rbs": "1cb1fde17a5dced9e4350bbef5417b01ed2685f1fb5c5f0eea474e57103ef6df"
+        }
+      },
+      "recovered_slots": [
+        {
+          "target": "Accounts::CustomStylesController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::CustomStylesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::JoinCodesController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Accounts::JoinCodesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ActionText::Markdown::UploadsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "ApplicationController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Authentication::SessionLookup#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Books::BookmarksController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Books::Leaves::MovesController#ensure_editable",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Books::Leaves::MovesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Books::PublicationsController#ensure_editable",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Books::PublicationsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Books::SearchesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "BooksController#ensure_editable",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "BooksController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "BooksHelper#hotkey_data_attributes",
+          "slot": "return",
+          "type": "(Hash[Symbol, String] | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "FirstRunsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "LeafablesController#default_leaf_params",
+          "slot": "return",
+          "type": "Hash[Symbol, untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "LeafablesController#ensure_editable",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "LeafablesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "MarkdownRenderer#image",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Pages::EditsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "PagesController#default_leaf_params",
+          "slot": "return",
+          "type": "Hash[Symbol, String]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "PagesController#ensure_editable",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "PagesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "PicturesController#ensure_editable",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "PicturesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "QrCodeController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SectionsController#ensure_editable",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SectionsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Sessions::TransfersController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "SessionsController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::ProfilesController#ensure_current_user",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Users::ProfilesController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UsersController#ensure_can_administer",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UsersController#find_session_by_cookie",
+          "slot": "return",
+          "type": "(Session? | nil)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "UsersController#verify_join_code",
+          "slot": "return",
+          "type": "(nil | true)",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        }
+      ],
+      "withdrawn_slots": [],
+      "changed_known_slots": [],
+      "diagnostics_before": [],
+      "diagnostics_after": []
+    },
+    "lobsters": {
+      "facts_sha256": "fa63c03354151cb6f0afe9618467d5475b5702fc175d2aa93f129c73fba8fd5f",
+      "rails": "8.1.4",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "facts_errors": 0,
+      "models": 24,
+      "facts_error_sites": {},
+      "source_pin": null,
+      "before_json_sha256": "1cdbc06a3f269659b1a7797f112c6dd90fd6457d5a3e1c15a2df9d8edb652eaa",
+      "after_json_sha256": "8821aa379a22e19f8a73d486f0a1e5bbeb23c2b251ea0bd5a9a5e3965547c3b6",
+      "before": {
+        "coverage": {
+          "observed": 0,
+          "proven": 36,
+          "static": 858,
+          "unknown": 2227
+        },
+        "known_slots_with_nested_untyped": 0,
+        "unknown_argument_shapes": {
+          "req": 500,
+          "rest": 420,
+          "opt": 58,
+          "keyrest": 41,
+          "block": 29,
+          "key": 2
+        },
+        "unknown_argument_families": {
+          "other": 371,
+          "route": 258,
+          "writer_name": 229,
+          "constructor_or_query": 192
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 27,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 23,
+          "Rails::ApplicationController": 2,
+          "Rails::PwaController": 2,
+          "Rails::HealthController": 1,
+          "#<#<Class:0x>:0x>": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 1050,
+            "examples": [
+              {
+                "target": "AboutController#time_interval",
+                "slot": "arg:param"
+              },
+              {
+                "target": "ActiveRecord::Base#q",
+                "slot": "arg:str"
+              },
+              {
+                "target": "ActiveRecord::Base.q",
+                "slot": "arg:str"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 925,
+            "examples": [
+              {
+                "target": "AboutController#about",
+                "slot": "return"
+              },
+              {
+                "target": "AboutController#agent_is_spider?",
+                "slot": "return"
+              },
+              {
+                "target": "AboutController#authenticate_user",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 195,
+            "examples": [
+              {
+                "target": "Category#category=",
+                "slot": "return"
+              },
+              {
+                "target": "Category#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Category#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 56,
+            "examples": [
+              {
+                "target": "AboutController#verify_authenticity_token",
+                "slot": "return"
+              },
+              {
+                "target": "ApplicationController#verify_authenticity_token",
+                "slot": "return"
+              },
+              {
+                "target": "AvatarsController#verify_authenticity_token",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "schema_type_unmodeled",
+            "slots": 1,
+            "examples": [
+              {
+                "target": "ReplyingComment#is_unread",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "3d697d6bb9fa1665fc3c4d77081ab9976837df260de18470e3ccd79f96f61f28",
+          "lowrail_support.rbs": "8cca2a0c9f13a7720af28b39bf0bc9d7a53dc7f8b0c7ccfa40c69b283e97e32b"
+        }
+      },
+      "after": {
+        "coverage": {
+          "observed": 0,
+          "proven": 34,
+          "static": 881,
+          "unknown": 2206
+        },
+        "known_slots_with_nested_untyped": 2,
+        "unknown_argument_shapes": {
+          "req": 500,
+          "rest": 420,
+          "opt": 58,
+          "keyrest": 41,
+          "block": 29,
+          "key": 2
+        },
+        "unknown_argument_families": {
+          "other": 371,
+          "route": 258,
+          "writer_name": 229,
+          "constructor_or_query": 192
+        },
+        "unknown_effective_owners": {
+          "ActionController::RequestForgeryProtection": 27,
+          "ActiveRecord::AttributeMethods::PrimaryKey": 23,
+          "Rails::ApplicationController": 2,
+          "Rails::PwaController": 2,
+          "Rails::HealthController": 1,
+          "#<#<Class:0x>:0x>": 1
+        },
+        "unknown_causes": [
+          {
+            "cause": "argument_type_unavailable",
+            "slots": 1050,
+            "examples": [
+              {
+                "target": "AboutController#time_interval",
+                "slot": "arg:param"
+              },
+              {
+                "target": "ActiveRecord::Base#q",
+                "slot": "arg:str"
+              },
+              {
+                "target": "ActiveRecord::Base.q",
+                "slot": "arg:str"
+              }
+            ]
+          },
+          {
+            "cause": "source_body_unresolved",
+            "slots": 893,
+            "examples": [
+              {
+                "target": "AboutController#about",
+                "slot": "return"
+              },
+              {
+                "target": "AboutController#agent_is_spider?",
+                "slot": "return"
+              },
+              {
+                "target": "AboutController#authenticate_user",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "casting_writer_input",
+            "slots": 206,
+            "examples": [
+              {
+                "target": "Category#category=",
+                "slot": "return"
+              },
+              {
+                "target": "Category#created_at=",
+                "slot": "return"
+              },
+              {
+                "target": "Category#id_value=",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "effective_owner_contract_unavailable",
+            "slots": 56,
+            "examples": [
+              {
+                "target": "AboutController#verify_authenticity_token",
+                "slot": "return"
+              },
+              {
+                "target": "ApplicationController#verify_authenticity_token",
+                "slot": "return"
+              },
+              {
+                "target": "AvatarsController#verify_authenticity_token",
+                "slot": "return"
+              }
+            ]
+          },
+          {
+            "cause": "schema_type_unmodeled",
+            "slots": 1,
+            "examples": [
+              {
+                "target": "ReplyingComment#is_unread",
+                "slot": "return"
+              }
+            ]
+          }
+        ],
+        "rbs_validate_exit": 0,
+        "rbs_sha256": {
+          "app.rbs": "d1e619582c20fc1851c953f49630f512dc40167a48dbe37bfdd1803e570593bf",
+          "lowrail_support.rbs": "0e400768473ad821cfad6decac0355ac15d4db49583a1668fabe524f41bc7842"
+        }
+      },
+      "recovered_slots": [
+        {
+          "target": "CategoriesController#edit",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "CspController#violation_report",
+          "slot": "return",
+          "type": "true",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "DomainsController#caption_of_button",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Hat#to_txt",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "schema"
+          ]
+        },
+        {
+          "target": "ModController#default_periods",
+          "slot": "return",
+          "type": "Array[String]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "ModNotesController#default_periods",
+          "slot": "return",
+          "type": "Array[String]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Search#initialize",
+          "slot": "return",
+          "type": "Integer",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "StoriesPaginator#with_pagination_info",
+          "slot": "return",
+          "type": "Array[untyped]",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        },
+        {
+          "target": "Story#archiveorg_url",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Story#archivetoday_url",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Story#comments_path",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        },
+        {
+          "target": "Story#comments_url",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        },
+        {
+          "target": "Story#domain_search_url",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "boot_fact",
+            "inference"
+          ]
+        },
+        {
+          "target": "Story#ghost_url",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Story#mailing_list_message_id",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "schema"
+          ]
+        },
+        {
+          "target": "Story#merged_comments",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[Comment]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "Story#public_similar_stories",
+          "slot": "return",
+          "type": "Array[untyped]",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "StoryRepository#top",
+          "slot": "return",
+          "type": "ActiveRecord::Relation[Story]",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        },
+        {
+          "target": "TagsController#edit",
+          "slot": "return",
+          "type": "String",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "User#unban_by_user!",
+          "slot": "return",
+          "type": "bool",
+          "evidence": "static",
+          "sources": [
+            "inference"
+          ]
+        },
+        {
+          "target": "Vote#target",
+          "slot": "return",
+          "type": "((Comment | Array[Comment]) | (Story | Array[Story]))",
+          "evidence": "static",
+          "sources": [
+            "inference",
+            "rails_api"
+          ]
+        }
+      ],
+      "withdrawn_slots": [],
+      "changed_known_slots": [
+        {
+          "target": "CategoriesController#new",
+          "slot": "return",
+          "before": "String",
+          "after": "String",
+          "before_evidence": "proven_body",
+          "after_evidence": "static"
+        },
+        {
+          "target": "TagsController#new",
+          "slot": "return",
+          "before": "String",
+          "after": "String",
+          "before_evidence": "proven_body",
+          "after_evidence": "static"
+        }
+      ],
+      "diagnostics_before": [],
+      "diagnostics_after": []
+    }
+  }
+}

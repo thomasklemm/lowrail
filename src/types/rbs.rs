@@ -129,7 +129,11 @@ impl<'a> Declaration<'a> {
             } else {
                 node.kind
             };
-            let parent = node.superclass.as_deref().map(|s| format!(" < ::{s}")).unwrap_or_default();
+            // RBS core already declares Struct[E]. A Ruby subclass does not
+            // constrain the element type; do not redeclare it without E.
+            let parent = node.superclass.as_deref().map(|s|
+                format!(" < ::{s}{}", if s == "Struct" { "[untyped]" } else { "" }))
+                .unwrap_or_default();
             let _ = writeln!(out, "{indent}{kind} {name}{}{parent}", node.generics);
             for include in &node.includes { let _ = writeln!(out, "{indent}  include ::{include}"); }
             for sig in &node.methods {
@@ -205,7 +209,7 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
                     && observed::constant(parent) && !matches!(parent.as_str(), "Object" | "BasicObject")
                 {
                     node.superclass = Some(parent.clone());
-                    parents.push(parent.clone());
+                    if parent != "Struct" { parents.push(parent.clone()); }
                 }
             }
         }
@@ -236,6 +240,7 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
     proxy.kind = "class";
     proxy.generics = "[Elem]";
     proxy.superclass = Some("ActiveRecord::Relation[Elem]".into());
+    external.at("ActiveRecord::QueryMethods::WhereChain").kind = "class";
     for sig in model.methods.values() {
         for ty in std::iter::once(&sig.return_type).chain(sig.parameters.iter().map(|p| &p.ty)) {
             if !ty.provenance.iter().any(|p| matches!(p.source, Source::Observed | Source::SorbetSig)) { continue; }

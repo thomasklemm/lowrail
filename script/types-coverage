@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+"""Summarize frozen types JSON before/after; never boots or modifies an app."""
+import argparse
+from collections import Counter, defaultdict
+import hashlib
+import json
+from pathlib import Path
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--before", required=True, type=Path)
+parser.add_argument("--after", required=True, type=Path)
+parser.add_argument("apps", nargs="+", help="NAME=FACTS_JSON; snapshots are NAME-before/after.json")
+options = parser.parse_args()
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def slots(data):
+    result = {}
+    for target, signature in data["methods"].items():
+        result[(target, "return")] = signature["return_type"]
+        for parameter in signature["parameters"]:
+            result[(target, "arg:" + parameter["name"])] = parameter["ty"]
+    return result
+
+
+def cause(slot, fact):
+    if slot.startswith("arg:"):
+        return "argument_type_unavailable"
+    details = [p["detail"] for p in fact["provenance"]]
+    if "attribute writer returns input" in details:
+        return "casting_writer_input"
+    if any(p["source"] == "inference" for p in fact["provenance"]) or any(
+            d.startswith(("custom body of ", "body at ")) for d in details):
+        return "source_body_unresolved"
+    if any(d.startswith("unmodeled boot owner ") for d in details):
+        return "effective_owner_contract_unavailable"
+    if any(p["source"] == "schema" for p in fact["provenance"]):
+        return "schema_type_unmodeled"
+    if any(".belongs_to " in d or ".has_one " in d for d in details):
+        return "association_target_unavailable"
+    return "other_type_unavailable"
+
+
+def summarize(data):
+    causes = Counter()
+    examples = defaultdict(list)
+    counts = Counter()
+    owners = Counter()
+    argument_shapes = Counter()
+    argument_families = Counter()
+    nested_unknown = 0
+    for (target, slot), fact in slots(data).items():
+        status = "unknown" if fact["name"] == "untyped" else {
+            "proven_body": "proven", "static": "static", "observed": "observed"}[fact["evidence"]]
+        counts[status] += 1
+        nested_unknown += status != "unknown" and "untyped" in fact["name"]
+        if status == "unknown":
+            reason = cause(slot, fact)
+            causes[reason] += 1
+            if len(examples[reason]) < 3:
+                examples[reason].append({"target": target, "slot": slot})
+            signature = data["methods"][target]
+            if slot.startswith("arg:"):
+                parameter = next(p for p in signature["parameters"] if "arg:" + p["name"] == slot)
+                argument_shapes[parameter["kind"]] += 1
+                family = ("writer_name" if signature["method"].endswith("=") else
+                          "route" if signature["receiver"] == "Lowrail::RouteHelpers" else
+                          "constructor_or_query" if signature["singleton"] and signature["method"] in
+                          {"new", "find", "find_by", "find_by!", "where", "order", "includes", "joins", "limit", "none", "exists?"}
+                          else "other")
+                argument_families[family] += 1
+            if reason == "effective_owner_contract_unavailable":
+                detail = next(p["detail"] for p in fact["provenance"] if p["detail"].startswith("unmodeled boot owner "))
+                owners[detail.removeprefix("unmodeled boot owner ").split(" for ", 1)[0]] += 1
+    assert {key: counts[key] for key in data["coverage"]} == data["coverage"]
+    return {"coverage": data["coverage"], "known_slots_with_nested_untyped": nested_unknown,
+            "unknown_argument_shapes": dict(argument_shapes.most_common()),
+            "unknown_argument_families": dict(argument_families.most_common()),
+            "unknown_effective_owners": dict(owners.most_common()),
+            "unknown_causes": [{"cause": reason, "slots": count, "examples": examples[reason]}
+                               for reason, count in causes.most_common()]}
+
+
+apps = {}
+for item in options.apps:
+    name, facts_path = item.split("=", 1)
+    facts_path = Path(facts_path).resolve()
+    facts = json.loads(facts_path.read_bytes())
+    root = (facts_path.parent / facts["app_root"]).resolve()
+    before_path = options.before / (name + "-before.json")
+    after_path = options.after / (name + "-after.json")
+    before = json.loads(before_path.read_bytes())
+    after = json.loads(after_path.read_bytes())
+    old, new = slots(before), slots(after)
+    assert old.keys() == new.keys(), "slot universe changed; account for additions/removals explicitly"
+    recovered = []
+    withdrawn = []
+    changed = []
+    for (target, slot), fact in new.items():
+        previous = old[(target, slot)]
+        if previous["name"] == "untyped" and fact["name"] != "untyped":
+            assert fact["evidence"] != "proven_body", "a new inference is not a proof"
+            recovered.append({"target": target, "slot": slot, "type": fact["name"], "evidence": fact["evidence"],
+                              "sources": sorted({p["source"] for p in fact["provenance"]})})
+        elif previous["name"] != "untyped" and fact["name"] == "untyped":
+            withdrawn.append({"target": target, "slot": slot, "previous": previous["name"]})
+        elif previous["name"] != fact["name"] or previous["evidence"] != fact["evidence"]:
+            changed.append({"target": target, "slot": slot, "before": previous["name"], "after": fact["name"],
+                            "before_evidence": previous["evidence"], "after_evidence": fact["evidence"]})
+    source_pin = root / ".lowrail-corpus-source"
+    record = {"facts_sha256": digest(facts_path), "rails": facts["rails_version"], "ruby": facts["ruby_description"],
+              "facts_errors": len(facts["errors"]), "models": len(facts["models"]),
+              "facts_error_sites": dict(Counter(e.get("where", e.get("kind", "unknown")) for e in facts["errors"])),
+              "source_pin": source_pin.read_text().strip() if source_pin.exists() else None,
+              "before_json_sha256": digest(before_path), "after_json_sha256": digest(after_path),
+              "before": summarize(before), "after": summarize(after), "recovered_slots": recovered,
+              "withdrawn_slots": withdrawn, "changed_known_slots": changed,
+              "diagnostics_before": before["diagnostics"], "diagnostics_after": after["diagnostics"]}
+    for phase, directory in [("before", options.before), ("after", options.after)]:
+        status = directory / f"{name}-{phase}-validate.status"
+        record[phase]["rbs_validate_exit"] = int(status.read_text())
+        record[phase]["rbs_sha256"] = {p.name: digest(p) for p in sorted((directory / f"{name}-{phase}-rbs").glob("*.rbs"))}
+    apps[name] = record
+
+print(json.dumps({"format": 1, "scope": "advisory types; same frozen boot facts, source and observations; support members excluded",
+                  "unknown_cause_policy": "coarse provenance-based families, not a claim of exhaustive AST diagnosis",
+                  "apps": apps}, indent=2))
