@@ -47,6 +47,8 @@ module FactsFixture
 end
 
 class FactsTest < Minitest::Test
+  include LowrailTest
+
   def facts
     @facts ||= Lowrail::Facts.collect(app_root: __dir__)
   end
