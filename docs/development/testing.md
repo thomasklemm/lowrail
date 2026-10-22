@@ -101,12 +101,18 @@ bash script/corpus real-blog-r4
 
 This extracts `fixtures/corpus/real-blog-r4-retained.tgz`, installs the
 frozen bundle and prepares a disposable test database. The 50,425-byte
-archive is the previously certified source, not a newly approved baseline:
-SHA256 `b1dd980b6689bf2b3912691e527d74e0b7699fb32cb53169791c24879f0c0a99`,
-recovered from the [retained-fixture handoff](https://ampcode.com/threads/T-01a1601b-6c5e-77de-8689-b5d8f057ca42).
-It contains app/support source, the original lock and `runtime-pins.json`;
-no credentials, keys, `.kamal`, storage, databases, logs or caches. The helper
-extracts only the app. Production gates create their own schema/rows/seed.
+archive is a source-only repack of the previously certified specimen, not
+byte-identical to the original archive or a newly approved baseline. Its
+SHA256 is `b1dd980b6689bf2b3912691e527d74e0b7699fb32cb53169791c24879f0c0a99`;
+the [published original archive](../prism-2.md) has SHA256
+`56d74970a6531ff667e62a8a32c396c8cddb6e78991f5b2a7825c1dfcd7a180c`.
+The repack contains app/support source, the original lock and archive-level
+`runtime-pins.json` provenance metadata; no credentials, keys, `.kamal`,
+storage, databases, logs or caches. The helper extracts only the app,
+including its `.lowrail-corpus-source` marker; `runtime-pins.json` remains
+in the tracked archive, not in the app. The executable certificate remains
+`fixtures/corpus/blog-entropy-controls.json`. Production gates create their
+own schema/rows/seed.
 
 Source SHA256 remains
 `86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf`,
@@ -201,7 +207,7 @@ the normal/strict failure and optional-skip contracts in child suites.
 
 ## Main health check (2026-10-22)
 
-**The full primary gem gate is still red, not merely missing prerequisites.**
+**Main is NOT green: the full primary gem gate still has a real runtime defect.**
 With the retained fixture prepared, the all-sealed cold witness exposes
 `Templates::CompiledSource` on `ActionView::Template` and
 `PreloadPlans::Hook` on `ActiveRecord::Associations::Preloader` in the on arm
@@ -268,8 +274,8 @@ inferred from its totals:
 | Ordinary `LoaderTest` matrix with only Bootsnap 1.18.6 | 13 runs / 521 assertions / zero failures, errors or skips. Bet L's compiler-policy failures belong to `TestCertificateTest`, not this loader matrix. |
 
 No tests were removed, skipped, weakened, or changed to expect the known
-runtime mismatch. No entropy pin was refreshed. The retained archive is
-byte-identical to the earlier certified specimen, without a previously
-prepared database or storage snapshot.
+runtime mismatch. No entropy pin was refreshed. The retained source and lock
+match the published pins; the source-only archive repack has different bytes
+and includes no previously prepared database or storage snapshot.
 The setup helper rejects an already generated/wrong fixture and an edited
 retained source without overwriting either one; it validates frozen locks.
