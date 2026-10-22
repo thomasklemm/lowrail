@@ -38,9 +38,18 @@ gates. Each price applies only to its named endpoint/fixture and tier.
 | 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.16% [−10.22, −10.08]**; GC-excluded −10.16% [−10.25, −10.11] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
 | 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.40% [+0.39, +0.43]**; GC-excluded +0.40% [+0.38, +0.42] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
 | 2026-10-21 | [Fizzy (bet F), `GET /buckets`](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry) | 4.0.7 / 8.1.4 | Interpreter; Guarded DirectSite call-site query programs; branch prototype, bench-only, one route, not on main, not admission | **Total −5.49% [−5.58, −5.42]**; GC-excluded −5.50% [−5.55, −5.45] | [87c3c19](https://github.com/thomasklemm/lowrail/commit/87c3c1974c424eabef5178f518641d013dd601b3) / [f2e2e35](https://github.com/thomasklemm/lowrail/commit/f2e2e35b4d6372e8d67d285f329f0c93823ba259); runtime [addf55e](https://github.com/thomasklemm/lowrail/commit/addf55e00b080d2627503b7f10a74bbe68e17ed1); [JSON](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.json) |
+| 2026-10-22 | [Lobsters (bet M), `GET /`](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform.md#lobsters-m-accepted-scoped-interpreter-price-2026-10-22) | 4.0.7 / 8.1.4 | Interpreter; Cache-read copy plan; branch prototype, bench-only, unchanged app ([ruby-bench 351a39b workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716)), not on main, not production admission | **Total −5.18% [−5.20, −5.13]**; GC-excluded −5.38% [−5.41, −5.33] | [e84cf55](https://github.com/thomasklemm/lowrail/commit/e84cf55116600d676172a5531e78b6d08d28926c) / [94f3f32](https://github.com/thomasklemm/lowrail/commit/94f3f321c8c73a3814f3828bb299f26ba31e2ab0); runtime [42d3e5a](https://github.com/thomasklemm/lowrail/commit/42d3e5ade83922afc1ed39c632cc3c8ecee0dcd0); [JSON](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform-results.json) |
+| 2026-10-22 | [Lobsters (bet M), `GET /s/enr7ye`](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform.md#lobsters-m-accepted-scoped-interpreter-price-2026-10-22) | 4.0.7 / 8.1.4 | Interpreter; Cache-read copy plan; branch prototype, bench-only, unchanged app ([ruby-bench 351a39b workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716)), not on main, not production admission | **Total −1.64% [−1.67, −1.59]**; GC-excluded −1.65% [−1.67, −1.60] | [e84cf55](https://github.com/thomasklemm/lowrail/commit/e84cf55116600d676172a5531e78b6d08d28926c) / [94f3f32](https://github.com/thomasklemm/lowrail/commit/94f3f321c8c73a3814f3828bb299f26ba31e2ab0); runtime [42d3e5a](https://github.com/thomasklemm/lowrail/commit/42d3e5ade83922afc1ed39c632cc3c8ecee0dcd0); [JSON](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform-results.json) |
 <!-- current-results:end -->
 
 Displayed values are rounded; exact values are in the linked JSON exports.
+
+**Lobsters scope:** both endpoints' total and GC-excluded A/A intervals are
+wholly within ±0.1%. This is the unchanged
+[ruby-bench `351a39b` workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716),
+with a fixed clock, warm FileStore and pool reaping deferred outside the
+instrumented synchronous request price; not advancing-time or asynchronous
+maintenance performance.
 
 **Blog A/A rule change, 2026-10-21:** set prospectively before counting, both
 total and GC-excluded nominal 95% intervals must lie wholly within **±0.1%**;
@@ -100,6 +109,18 @@ This does not establish ±2% resolution or a latency gate.
 
 **Not uniformly faster: p99 increases despite lower p50/p90 and higher RPS. GC collections increase despite fewer allocations; the cause is not established.**
 Arm values are medians of windows; paired deltas are means of within-round ratios, not ratios of those medians. GC/allocations are load-bracketing four-process diagnostics including metrics/background work, not exclusive request counters.
+
+**2026-10-22 · [Fizzy (bet Y), `GET /buckets`](https://github.com/thomasklemm/lowrail/blob/dbe678a268828fda9ba1b324efc0648e2cbe3b4b/docs/jit-guards.md#single-puma-cohort-accepted-scoped-throughput-result) · Ruby / Rails 4.0.7 / 8.1.4 · Stock Ruby YJIT.**
+
+**Guarded DirectSite with JIT-friendly guards; branch prototype, bench-only, one route, not on main, not production admission.** Measured on [796fa58](https://github.com/thomasklemm/lowrail/commit/796fa5893b4e117168340c229908f89b86fdaf41); harness [6510cd2](https://github.com/thomasklemm/lowrail/commit/6510cd2f2cd4384fcf648c638f5f720d00c8d9c8); published [dbe678a](https://github.com/thomasklemm/lowrail/commit/dbe678a268828fda9ba1b324efc0648e2cbe3b4b); [exact JSON](https://github.com/thomasklemm/lowrail/blob/dbe678a268828fda9ba1b324efc0648e2cbe3b4b/docs/jit-guards.json).
+
+| RPS Δ vs no Lowrail [95% interval] | RPS A/A [95% interval] |
+|---|---|
+| **+7.83% [+6.13, +9.84]** | −0.44% [−1.63, +0.80] |
+
+The preregistered throughput rule passes: A/A contains zero and the on/off RPS lower bound exceeds the A/A upper bound.
+Median-window p99: **265.5 → 246.5 ms** (off-A → on), a window statistic only, **not a tail-latency claim** or a pooled histogram.
+This compares the new DirectSite prototype with Lowrail off, not old versus new guards; no whole-app, capacity or admission claim.
 <!-- throughput-results:end -->
 
 To update: publish the accepted export first, edit only the metadata/source
@@ -109,6 +130,8 @@ from the original exports, never copied into the index. Pinned exports use
 an explicit `source_commit` matching the full publication SHA; fetch bet F's
 branch with `git fetch origin thomasklemm/ar-callsite-compile` and bet A's with
 `git fetch origin thomasklemm/native-yjit-bench` before rendering.
+The new Lobsters and Fizzy guard records additionally require
+`git fetch origin thomasklemm/screen-platform thomasklemm/jit-guards`.
 They are read from that commit, never substituted from the main worktree.
 Refresh the short
 [status](docs/STATUS.md#at-a-glance-2026-10-21) and [benchmark summary](docs/bench.md#current-accepted-request-results)

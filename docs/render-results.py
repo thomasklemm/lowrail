@@ -41,6 +41,30 @@ def commit(sha):
 
 def throughput(entry, data, source_url):
     result = lookup(data, entry["result"])
+    if entry.get("window_statistics_only"):
+        summary = result["summary"]
+        p99 = [summary["median_latency_ms"][arm]["p99"] for arm in ("off_a", "on")]
+        p99 = [f"{n.quantize(Decimal('0.1'), rounding=ROUND_HALF_UP):f}" for n in p99]
+        return [
+            "",
+            f"**{entry['date']} · [{entry['app_endpoint']}]({entry['report']}) · "
+            f"Ruby / Rails {entry['ruby_rails']} · {entry['mode']}.**",
+            "",
+            f"**{entry['tier']}.** Measured on {commit(entry['revision'])}; "
+            f"harness {commit(result['harness_revision'])}; "
+            f"published {commit(entry['publication'])}; [exact JSON]({source_url}).",
+            "",
+            "| RPS Δ vs no Lowrail [95% interval] | RPS A/A [95% interval] |",
+            "|---|---|",
+            f"| **{interval(summary['on_off'])}** | {interval(summary['aa'])} |",
+            "",
+            "The preregistered throughput rule passes: A/A contains zero and the "
+            "on/off RPS lower bound exceeds the A/A upper bound.",
+            f"Median-window p99: **{p99[0]} → {p99[1]} ms** (off-A → on), "
+            "a window statistic only, **not a tail-latency claim** or a pooled histogram.",
+            "This compares the new DirectSite prototype with Lowrail off, not "
+            "old versus new guards; no whole-app, capacity or admission claim.",
+        ]
     config, summary = result["config"], result["summary"]
     rows = [
         f"**{entry['date']} · [{entry['app_endpoint']}]({entry['report']}) · "

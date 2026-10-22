@@ -97,5 +97,82 @@
     ],
     "revision_field": "rps_confirmatory_blog.base_main_revision",
     "result": "rps_confirmatory_blog"
+  },
+  {
+    "date": "2026-10-22",
+    "app_endpoint": "Lobsters (bet M), `GET /`",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Interpreter",
+    "tier": "Cache-read copy plan; branch prototype, bench-only, unchanged app ([ruby-bench 351a39b workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716)), not on main, not production admission",
+    "revision": "e84cf55116600d676172a5531e78b6d08d28926c",
+    "runtime_revision": "42d3e5ade83922afc1ed39c632cc3c8ecee0dcd0",
+    "publication": "94f3f321c8c73a3814f3828bb299f26ba31e2ab0",
+    "report": "https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform.md#lobsters-m-accepted-scoped-interpreter-price-2026-10-22",
+    "source": "docs/screen-platform-results.json",
+    "source_commit": "94f3f321c8c73a3814f3828bb299f26ba31e2ab0",
+    "accepted": "cohorts.lobsters-counted.result.accepted",
+    "required_gates": [
+      "calibration.accepted",
+      "cohorts.lobsters-counted.result.exact_pass",
+      "cohorts.lobsters-counted.result.source_unchanged",
+      "cohorts.lobsters-counted.result.controls.aa.pass",
+      "cohorts.lobsters-counted.result.per_route.GET /.aa.metrics.instructions_total",
+      "cohorts.lobsters-counted.result.per_route.GET /.aa.metrics.instructions_no_gc",
+      "cohorts.lobsters-counted.reconciliation.passed"
+    ],
+    "revision_field": "cohorts.lobsters-counted.provenance.revision",
+    "total": "cohorts.lobsters-counted.result.per_route.GET /.layers.on.instructions_total.delta_pct",
+    "no_gc": "cohorts.lobsters-counted.result.per_route.GET /.layers.on.instructions_no_gc.delta_pct"
+  },
+  {
+    "date": "2026-10-22",
+    "app_endpoint": "Lobsters (bet M), `GET /s/enr7ye`",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Interpreter",
+    "tier": "Cache-read copy plan; branch prototype, bench-only, unchanged app ([ruby-bench 351a39b workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716)), not on main, not production admission",
+    "revision": "e84cf55116600d676172a5531e78b6d08d28926c",
+    "runtime_revision": "42d3e5ade83922afc1ed39c632cc3c8ecee0dcd0",
+    "publication": "94f3f321c8c73a3814f3828bb299f26ba31e2ab0",
+    "report": "https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform.md#lobsters-m-accepted-scoped-interpreter-price-2026-10-22",
+    "source": "docs/screen-platform-results.json",
+    "source_commit": "94f3f321c8c73a3814f3828bb299f26ba31e2ab0",
+    "accepted": "cohorts.lobsters-counted.result.accepted",
+    "required_gates": [
+      "calibration.accepted",
+      "cohorts.lobsters-counted.result.exact_pass",
+      "cohorts.lobsters-counted.result.source_unchanged",
+      "cohorts.lobsters-counted.result.controls.aa.pass",
+      "cohorts.lobsters-counted.result.per_route.GET /s/enr7ye.aa.metrics.instructions_total",
+      "cohorts.lobsters-counted.result.per_route.GET /s/enr7ye.aa.metrics.instructions_no_gc",
+      "cohorts.lobsters-counted.reconciliation.passed"
+    ],
+    "revision_field": "cohorts.lobsters-counted.provenance.revision",
+    "total": "cohorts.lobsters-counted.result.per_route.GET /s/enr7ye.layers.on.instructions_total.delta_pct",
+    "no_gc": "cohorts.lobsters-counted.result.per_route.GET /s/enr7ye.layers.on.instructions_no_gc.delta_pct"
+  },
+  {
+    "kind": "throughput",
+    "window_statistics_only": true,
+    "date": "2026-10-22",
+    "app_endpoint": "Fizzy (bet Y), `GET /buckets`",
+    "ruby_rails": "4.0.7 / 8.1.4",
+    "mode": "Stock Ruby YJIT",
+    "tier": "Guarded DirectSite with JIT-friendly guards; branch prototype, bench-only, one route, not on main, not production admission",
+    "revision": "796fa5893b4e117168340c229908f89b86fdaf41",
+    "publication": "dbe678a268828fda9ba1b324efc0648e2cbe3b4b",
+    "report": "https://github.com/thomasklemm/lowrail/blob/dbe678a268828fda9ba1b324efc0648e2cbe3b4b/docs/jit-guards.md#single-puma-cohort-accepted-scoped-throughput-result",
+    "source": "docs/jit-guards.json",
+    "source_commit": "dbe678a268828fda9ba1b324efc0648e2cbe3b4b",
+    "accepted": "rps.decision.accepted",
+    "required_gates": [
+      "rps.decision.aa_pass",
+      "rps.decision.rps_win",
+      "rps.decision.operational_pass",
+      "rps.coverage_admission.passed",
+      "audit.passed_primary_audit",
+      "audit.no_worker_replacements"
+    ],
+    "revision_field": "rps.measured_source",
+    "result": "rps"
   }
 ]
