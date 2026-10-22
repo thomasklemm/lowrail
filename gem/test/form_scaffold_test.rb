@@ -283,6 +283,77 @@ class FormScaffoldTest < Minitest::Test
         assert_equal({"sealed/form_scaffold" => 1, "sealed/token_tag" => 4, "sealed/collection_render" => 1}, hot.fetch("hits"))
       end
 
+      # A transitive helper replacement used to leave the admitted token body
+      # live, silently omitting the new tag_option behavior. Exercise both
+      # callback and ancestor edits, before and after the natural admission.
+      %w[before after].product(%w[replace prepend]).each do |phase, change|
+        mutation = ruby_json(<<~'RUBY', chdir: app, env: boot_env.merge("MUTATION_PHASE" => phase, "MUTATION_KIND" => change))
+          require "./config/application"
+          Rails.application.config.yjit = false
+          require "./config/environment"
+          require "rack/mock"
+          view = nil
+          trace = TracePoint.new(:call) { |event| view = event.self }
+          warm = -> {
+            trace.enable(target: Lowrail::TokenTag::Variant.instance_method(:token_tag))
+            response = Rack::MockRequest.new(Rails.application).get("/articles/1", "HTTP_HOST" => "localhost", "HTTPS" => "on")
+            trace.disable
+            raise "HTTP #{response.status}" unless response.status == 200
+          }
+          phase = ENV.fetch("MUTATION_PHASE")
+          warm.call if phase == "after"
+          routes = []
+          if phase == "after"
+            request = Rack::MockRequest.new(Rails.application)
+            %w[/ /articles /articles/new /articles/1/edit /articles/2].each do |path|
+              response = request.get(path, "HTTP_HOST" => "localhost", "HTTPS" => "on")
+              routes << [path, response.status]
+            end
+            warm.call
+          end
+          admitted_before = Lowrail::TokenTag.admitted?
+          epoch_before = Lowrail::Sealed::EPOCH[0]
+          builder = ActionView::Helpers::TagHelper::TagBuilder
+          stock = builder.instance_method(:tag_option)
+          replacement = proc do |key, value, escape|
+            output = stock.bind_call(self, key, value, escape)
+            key.to_s == "value" ? output.sub('value="', 'value="MUTATED-') : output
+          end
+          if ENV.fetch("MUTATION_KIND") == "replace"
+            builder.define_method(:tag_option, &replacement)
+          else
+            builder.prepend(Module.new { define_method(:tag_option, &replacement) })
+          end
+          warm.call if phase == "before"
+          view.controller.define_singleton_method(:form_authenticity_token) { |**| 'live<&"' }
+          original = view.method(:token_tag).super_method
+          options = {action: "/articles/1/comments", method: "post"}
+          id = Lowrail.manifest.units.find { _1.fetch("pass") == "sealed/token_tag" }.fetch("id").to_s
+          before = [Lowrail::Stats.unit_hits.fetch(id, 0), Lowrail::Stats.unit_fallbacks.fetch(id, 0)]
+          off = original.call(nil, form_options: options)
+          on = view.send(:token_tag, nil, form_options: options)
+          puts JSON.generate(off: off, on: on, admitted_before: admitted_before,
+            routes: routes,
+            epoch_before: epoch_before, epoch_after: Lowrail::Sealed::EPOCH[0],
+            refusal: Lowrail::TokenTag.refusal, input_refusal: Lowrail::TokenTag.input_refusal,
+            hits: Lowrail::Stats.unit_hits.fetch(id, 0) - before[0],
+            fallbacks: Lowrail::Stats.unit_fallbacks.fetch(id, 0) - before[1])
+        RUBY
+        assert_equal mutation.fetch("off"), mutation.fetch("on"), "#{phase}/#{change}"
+        assert_includes mutation.fetch("on"), 'value="MUTATED-live&lt;&amp;&quot;"'
+        assert_equal 0, mutation.fetch("hits")
+        if phase == "after"
+          assert mutation.fetch("admitted_before")
+          assert_equal [200] * 5, mutation.fetch("routes").map(&:last)
+          assert_equal 0, mutation.fetch("epoch_before")
+          assert_operator mutation.fetch("epoch_after"), :>, 0
+          assert_equal 1, mutation.fetch("fallbacks")
+          assert_match(/seal epoch changed/, mutation.fetch("input_refusal"))
+        else
+          assert_match(/tag_option changed; rebuild; terminal admission/, mutation.fetch("refusal"))
+        end
+      end
+
       bad = Marshal.load(Marshal.dump(manifest))
       bad.fetch("units").reject { _1["pass"] == "sealed/form_scaffold" }.each { _1.fetch("data").fetch("observer")["iseq"] = "changed" }
       File.write(manifest_path, JSON.generate(bad))

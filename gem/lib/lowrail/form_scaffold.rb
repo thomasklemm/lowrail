@@ -89,6 +89,7 @@ module Lowrail
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = FormScaffoldAdmission.check(@data, view, block)
           return decline(result) if String === result
+          Sealed.watch(result.delete(:mutation_holders), @epoch)
           return decline("seal epoch changed during admission; keep original") unless @epoch[0].zero?
           # No app/view/model/template instance escapes the witness. Publish
           # only after every check; concurrent prepublication entries already

@@ -229,11 +229,14 @@ missing view/tag class. Anonymous ancestors retain their positions as null;
 this is a named-chain census, not a cross-process object-identity proof.
 
 The earlier narrower API/objspace/hook witness missed an on-only inherited
-`Lowrail::Guard::ObjectHooks`. Form/link units have no method-fact dependency
-on that hook. Hook admission now depends on selected facts; file delivery has
-an independent ModuleHooks/Bootsnap dependency. Required hooks are symmetric
-with explicit LOWRAIL=0, while that arm still delivers and activates nothing.
-Missing, incompatible, quarantined and empty builds remain no-ops.
+`Lowrail::Guard::ObjectHooks`. At that stage form/link units had no method-fact
+dependency on that hook: hook admission depended on selected facts, with a
+separate ModuleHooks/Bootsnap dependency for file delivery. The production
+[mutation tripwire](sealed.md#production-mutation-tripwire-not-enforcement)
+now also needs both chains under explicit `LOWRAIL_SEALED=1`, installed before
+boot equally off/on, even if the artifact later refuses. That arm still
+delivers and activates nothing. Without explicit sealed opt-in, missing,
+incompatible, quarantined and empty builds remain no-ops.
 
 **Open exactness failures, not normalized:** the all-sealed artifact still
 adds `Lowrail::Templates::CompiledSource` to `ActionView::Template` and
@@ -255,9 +258,10 @@ plus the hook fix, each with its own off/off/on seed-0 companion:
 | Default | 0 / 0 | **0 / 0** | Empty quarantined default, zero hits; unexercised, not support coverage |
 
 The form/default comparisons have zero off/off and off/on differences and
-zero capture errors, but are not renamed to coverage passes. Neither requires
-ObjectHooks; only link's file delivery requires ModuleHooks, identical in both
-arms. The all-sealed raw result remains `rejected_off_control`; its seed-0 and
+zero capture errors, but are not renamed to coverage passes. At this historical
+stage neither required ObjectHooks; only link's file delivery required
+ModuleHooks, identical in both arms. The all-sealed raw result remains
+`rejected_off_control`; its seed-0 and
 seed-1 companions both reject **only `cold_witness`** after the expanded
 census. The corresponding real cold test remains red, not normalized or
 marked skipped. Targeted guard/loader/admission checks pass on 4.0.7

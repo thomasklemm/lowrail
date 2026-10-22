@@ -50,7 +50,7 @@ module Lowrail
       return refusal.call("unknown compiled form site") unless calls.size == 1 && Prism::BlockNode === calls.first.block
       passive = passive_certificate(path, line)
       sources = [__FILE__, File.join(__dir__, "form_scaffold.rb"), File.join(__dir__, "form_scaffold_inventory.rb"),
-        File.join(__dir__, "form_scaffold_admission.rb"), File.join(__dir__, "setup.rb"),
+        File.join(__dir__, "form_scaffold_admission.rb"), File.join(__dir__, "setup.rb"), File.join(__dir__, "guard.rb"),
         File.join(__dir__, "render_units.rb"),
         File.join(__dir__, "sealed.rb"), File.join(__dir__, "templates.rb"), passive.delete("native_file"), path, Rails.root.join("Gemfile.lock").to_s,
         *Dir[Rails.root.join("{app,config,lib}/**/*.{rb,yml}")]].uniq
