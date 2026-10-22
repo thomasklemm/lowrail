@@ -377,6 +377,8 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
                 sig.return_type =
                     Type::new("untyped", Source::BootFact, format!("custom body of {id}"));
                 bodies.insert(id, body);
+            } else if let Some(catalog) = catalog {
+                sig.return_type = catalog.return_type;
             } else {
                 let generated = method.owner.ends_with("::GeneratedAttributeMethods")
                     || method.owner.ends_with("::GeneratedAssociationMethods");
@@ -386,7 +388,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
                     && sig.return_type.provenance.iter().any(|p| {
                         p.detail == format!("booted scope {}.{}", sig.receiver, sig.method)
                     });
-                if !generated && !query && !scope && catalog.is_none() {
+                if !generated && !query && !scope {
                     sig.return_type = Type::new(
                         "untyped",
                         Source::BootFact,

@@ -33,7 +33,7 @@ fn parameter(sig: &mut Signature, kind: &str, name: &str, ty: &str) {
 fn source(facts: &Facts, method: &Method, gem: &str, file: &str) -> Option<String> {
     let spec = facts.gems.iter().find(|g| g.name == gem)?;
     let supported = match gem {
-        "activerecord" | "actionpack" => {
+        "activerecord" | "actionpack" | "actionview" => {
             spec.version.starts_with("8.0.") || spec.version.starts_with("8.1.")
         }
         "turbo-rails" => spec.version.starts_with("2.0."),
@@ -75,6 +75,55 @@ pub(super) fn lookup(
         receiver
     };
     let (owner, method) = resolve(facts, boot_receiver, name, singleton)?;
+    // These are normal-return API contracts, not proofs about arbitrary view
+    // state or user blocks. Keep boot parameter shapes (and unknown inputs).
+    // In particular tag(nil) returns a builder, not a safe string. Invalid
+    // names can raise; these signatures describe normal returns only.
+    let view = match (method.owner.as_str(), name) {
+        ("ActionView::Helpers::TagHelper", "tag") => Some(("tag_helper", match call_arguments {
+            Some(false) => "ActionView::Helpers::TagHelper::TagBuilder",
+            _ => "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)",
+        })),
+        ("ActionView::Helpers::TagHelper", "content_tag" | "token_list" | "class_names" | "cdata_section" | "escape_once") =>
+            Some(("tag_helper", "ActiveSupport::SafeBuffer")),
+        ("ActionView::Helpers::OutputSafetyHelper", "raw" | "safe_join" | "to_sentence") =>
+            Some(("output_safety_helper", "ActiveSupport::SafeBuffer")),
+        ("ActionView::Helpers::CaptureHelper", "capture" | "content_for") =>
+            Some(("capture_helper", "ActiveSupport::SafeBuffer?")),
+        ("ActionView::Helpers::CaptureHelper", "provide") => Some(("capture_helper", "nil")),
+        ("ActionView::Helpers::CaptureHelper", "content_for?") => Some(("capture_helper", "bool")),
+        _ => None,
+    };
+    if let Some((file, result)) = view {
+        let file = format!("action_view/helpers/{file}.rb");
+        let detail = source(facts, method, "actionview", &file)?;
+        // A stock outer body must not hide an already-overridden return
+        // boundary. Internal conversion/buffer contracts remain advisory.
+        let dependencies: &[&str] = match name {
+            "tag" | "content_tag" => &["tag_builder"],
+            "token_list" | "class_names" | "to_sentence" => &["safe_join"],
+            _ => &[],
+        };
+        for dependency in dependencies {
+            let (_, callee) = resolve(facts, receiver, dependency, singleton)?;
+            let (expected_owner, expected_file) = if *dependency == "tag_builder" {
+                ("ActionView::Helpers::TagHelper", "tag_helper")
+            } else {
+                ("ActionView::Helpers::OutputSafetyHelper", "output_safety_helper")
+            };
+            if callee.owner != expected_owner || source(facts, callee, "actionview",
+                &format!("action_view/helpers/{expected_file}.rb")).is_none() {
+                return None;
+            }
+        }
+        let mut sig = signature(receiver, name, singleton, Type::new(result, Source::RailsApi, detail));
+        for p in &method.parameters {
+            if let Some(kind) = p.first() {
+                parameter(&mut sig, kind, p.get(1).map(String::as_str).unwrap_or("arg"), "untyped");
+            }
+        }
+        return Some(sig);
+    }
     if !singleton && name.ends_with('?') && owner.name == format!("{receiver}._enum_methods_module")
     {
         let detail = source(facts, method, "activerecord", "active_record/enum.rb")?;

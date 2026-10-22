@@ -222,10 +222,9 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
     root.render(&mut app, "");
     // Minimal declarations for standalone validation, not a replacement for
     // Rails signatures. Keep this separate when using a Rails RBS collection.
-    let mut support = String::from("# Bounded real-Rails API support; omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nclass Tempfile\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\n");
-    // Samples can introduce framework classes not used by the static catalog
-    // (e.g. strong parameters or safe strings). Emit name-only stubs, not
-    // invented signatures, for those namespaced external classes.
+    let mut support = String::from("# Bounded real-Rails API support; omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nclass DateTime < Date\nend\nclass Tempfile\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\n");
+    // Samples and catalog contracts can introduce external classes. Emit
+    // name-only stubs, not invented signatures, for those namespaced classes.
     let mut external = Declaration::default();
     let library = rails::support(facts);
     for sig in &library {
@@ -243,7 +242,7 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
     external.at("ActiveRecord::QueryMethods::WhereChain").kind = "class";
     for sig in model.methods.values() {
         for ty in std::iter::once(&sig.return_type).chain(sig.parameters.iter().map(|p| &p.ty)) {
-            if !ty.provenance.iter().any(|p| matches!(p.source, Source::Observed | Source::SorbetSig)) { continue; }
+            if !ty.provenance.iter().any(|p| matches!(p.source, Source::Observed | Source::SorbetSig | Source::RailsApi)) { continue; }
             for name in ty.name.split(|c: char| !c.is_ascii_alphanumeric() && c != '_' && c != ':') {
                 let name = name.trim_start_matches("::");
                 if !name.contains("::") || !observed::constant(name)
@@ -258,6 +257,9 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
         if let Some(node) = external.existing(&module.name) {
             node.kind = if module.kind == "class" { "class" } else { "module" };
         }
+    }
+    if let Some(node) = external.existing("ActiveSupport::SafeBuffer") {
+        node.superclass = Some("String".into());
     }
     external.render(&mut support, "");
     Export { format: 1, coverage, files: BTreeMap::from([("app.rbs".into(), app), ("lowrail_support.rbs".into(), support)]), signatures, diagnostics, conflicts: &model.conflicts }
