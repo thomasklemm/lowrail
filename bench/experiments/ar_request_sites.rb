@@ -158,13 +158,16 @@ module ARRequestSites
         association = owner.association(@association)
         valid &&= !association.loaded? && association.instance_variable_get(:@association_scope).nil? && association.singleton_methods.empty?
         @model.with_connection do |connection|
-          # Puma replaces pools after fork. Recompile once in the child, only
-          # after all model/scope/reflection/association facts still match.
-          # Never rebind a switched connection in the same process.
-          if valid && @process_id != Process.pid && connection.instance_of?(ActiveRecord::ConnectionAdapters::SQLite3Adapter) &&
+          # The same path covers Puma's post-fork pools and Rails' fixture
+          # connection replacement. Recompile only after every original fact
+          # passes, for the same database config, adapter and prepared mode.
+          forked = @process_id != Process.pid
+          changed = forked || !connection.equal?(@connection) || !connection.visitor.equal?(@visitor)
+          if valid && changed && connection.instance_of?(ActiveRecord::ConnectionAdapters::SQLite3Adapter) &&
               connection.prepared_statements && connection.pool.db_config.configuration_hash == @database_config
             bind_connection(connection)
-            ARRequestSites.count("#{@name}:worker_bind")
+            ARRequestSites.count("#{@name}:connection_bind")
+            ARRequestSites.count("#{@name}:worker_bind") if forked
           end
           valid &&= connection.equal?(@connection) && connection.visitor.equal?(@visitor) && connection.prepared_statements
         end

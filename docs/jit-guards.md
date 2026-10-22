@@ -270,3 +270,77 @@ a bounded transport-error review; full gates and Thermos. Those are new
 prerequisites, **not already satisfied by this throughput result**. Main
 integration belongs to the coordinator; README work follows integration.
 No ZJIT execution or speed claim is made.
+
+## Opt-in prerequisites, step 1: active own suite and shared rebinding
+
+The first unchanged-suite run was **coverage-invalid**: 124 identical outcomes
+and 5,324 identical ordered queries, but zero DirectSite hits / two fallback
+increments. The real `BucketsControllerTest#test_index` passed the holder,
+reader, scope, model and reflection checks; its connection and visitor were
+different from those captured after initialization. Rails' test-schema/fixture
+setup replaced the boot connection in the same process. This was correct
+refusal, not coverage. No test-only rebind or fixture-ready shortcut was added.
+
+The coordinator authorized generalizing the **same** `Site#eligible?` rebind
+trigger from PID change to PID **or connection/visitor identity change**.
+All original facts must still pass, and the current adapter must be exact
+SQLite with prepared statements and the identical captured database config.
+A mismatch still falls back. The historical `worker_bind` counter remains
+fork-only; `connection_bind` records either kind. This is a post-price runtime
+change: the accepted Puma cohort above still prices its earlier exact head.
+It does not yet certify concurrent publication or arbitrary mutable scopes.
+
+With startup YJIT asserted after initialization and again at exit in **both**
+workers, `lowrail verify` exits 0: **124 identical identities/outcomes, 117
+passes, 7 unchanged baseline errors, 458 assertions, 5,324 identical ordered
+queries**. The external adapter records **one DirectSite hit, one strict
+SQL/bind shadow, one same-process connection rebind and zero fallbacks**, all
+attributed to the actual `BucketsControllerTest#test_index`. No synthetic
+request contributes hits. App, configuration and test source trees are
+byte-identical to the committed corpus recipe. Single-worker test execution
+uses the app's normal `PARALLEL_WORKERS=1` option, not a source patch.
+
+All seven errors are `NoMethodError: undefined method 'reset_all' for an
+instance of Current`, with these exact identities in both arms:
+
+- `Bubble::AssignableTest#test_assigning_a_user_makes_them_watch_the_bubble`
+- `Bubble::CommentableTest#test_creating_a_comment_on_a_bubble_makes_the_creator_watch_the_bubble`
+- `Bubble::ScorableTest#test_a_bubble_has_a_score_that_increases_with_activity`
+- `Bubble::ScorableTest#test_commenting_on_a_bubble_boosts_its_score_more_than_boosting_it`
+- `Bubble::ScorableTest#test_recent_activity_counts_more_than_older_activity_in_the_ordering`
+- `CommentTest#test_first_by_author_on_bubble?`
+- `CommentTest#test_follows_comment_by_another_author?`
+
+The public zero-unit production artifact does not become a test certificate;
+its public unit counters remain zero. The independent, per-test counters above
+are for DirectSite itself. This is own-suite equivalence, **not a green Fizzy
+suite** and not public opt-in admission.
+
+An **untimed** real-Puma off-A/on/off-B replay uses the same production hook,
+four workers × one thread, startup-YJIT receipts for all 12 workers and the
+existing RPS boot/sample/cleanup functions. Both seeds' cold **and warm**
+status/body/all-header workflows match. All four on workers have positive
+hits/strict shadows (38/20/16/18), one connection/fork rebind each, zero
+fallbacks. Sixty ordinary warm GETs and the sampled workflows have no
+transport/non-200 errors; no oha or timing window runs.
+
+The first draft of this *new admission-only probe* rejected warm headers:
+on-only worker coverage logged in between the paired cold and warm samples,
+inserting an extra session (final off-A/on/off-B counts 7/9/7). The corrected
+probe defers worker fanout until **after** both paired samples, preserving
+identical request histories. It retains literal header comparisons and the
+failed probe evidence; nothing is normalized, excluded or re-priced.
+
+[Complete own-suite identities/SQL digests, per-test counts, worker receipts,
+source pins and failed-probe evidence](jit-guards-admission.json).
+The own-suite reproduction on a separate unchanged corpus copy is:
+
+```sh
+BUNDLER_VERSION=4.0.20 RUBY_YJIT_ENABLE=1 RAILS_ENV=test \
+  PARALLEL_WORKERS=1 SKIP_TELEMETRY=1 AR_DIRECT_SITE_RECEIPT="$PRIVATE/direct" \
+  RUBYOPT="-I$PWD/gem/lib -r$PWD/bench/experiments/ar_request_sites_suite.rb" \
+  mise exec ruby@4.0.7 -- target/release/lowrail verify .corpus/fizzy-suite \
+  -- bin/rails test --seed 731
+BUNDLER_VERSION=4.0.20 mise exec ruby@4.0.7 -- ruby \
+  bench/experiments/jit_guards_admission.rb "$HARNESS/script/rps" CONFIG NEW_OUTPUT
+```
