@@ -52,7 +52,7 @@ module DirectSiteDB
       {"estimates_bytes" => payload.split("|").map { Integer(_1) },
         "row_sha256" => digest(row), "byte_size" => row.fetch(names.index("byte_size")).fetch("value")}
     end
-    {"schema_sha256" => digest(database.fetch("schema")),
+    {"schema_sha256" => digest(database.fetch("schema")), "header_sha256" => digest(header),
       "app_key_values_sha256" => digest(app.map { [_1.fetch(key_index), _1.fetch(value_index)] }.sort_by { _1.first.fetch("base64") }),
       "app_entry_count" => app.size, "internal" => decoded,
       "metadata_sha256" => digest(tables.except("solid_cache_entries", "sqlite_sequence")),
@@ -78,7 +78,7 @@ module DirectSiteDB
           [database, snapshots.map { _1.fetch("raw_databases").fetch(database) }.uniq.one?]
         end
         cache = snapshots.map { _1.fetch("cache_boundary") }
-        cache_equal = cache.map { _1.slice("schema_sha256", "app_key_values_sha256", "app_entry_count", "metadata_sha256") }.uniq.one?
+        cache_equal = cache.map { _1.fetch_values("schema_sha256", "header_sha256", "app_key_values_sha256", "app_entry_count", "metadata_sha256") }.uniq.one?
         [seed, {"passed" => same && same_inventory && covered,
           "split_certificate" => {"passed" => complete_databases.values.all? && cache_equal,
             "complete_databases_no_exclusions" => complete_databases, "cache_app_keys_values_exact" => cache_equal},

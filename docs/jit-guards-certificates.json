@@ -1,167 +1,1630 @@
 {
   "passed": false,
+  "response_sql_certificate_passed": false,
   "checks": {
-    "0": {
-      "off_off_exact": true,
-      "off_on_exact": false,
-      "stale_plan_refused": false,
-      "passed": false
+    "baseline": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": true,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "stale_plan_refused": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": true,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "stale_plan_refused": true,
+        "passed": false
+      }
     },
-    "1": {
-      "off_off_exact": true,
-      "off_on_exact": false,
-      "stale_plan_refused": false,
-      "passed": false
+    "transitive_scope": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": false,
+          "headers_sha256": false,
+          "db_sha256": false
+        },
+        "sql_equal": false,
+        "database_equal": {
+          "primary": true,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": false,
+        "stale_plan_refused": false,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": false,
+          "headers_sha256": false,
+          "db_sha256": false
+        },
+        "sql_equal": false,
+        "database_equal": {
+          "primary": true,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": false,
+        "stale_plan_refused": false,
+        "passed": false
+      }
+    },
+    "restored": {
+      "0": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": true,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "stale_plan_refused": true,
+        "passed": false
+      },
+      "1": {
+        "equal": {
+          "status": true,
+          "body_sha256": true,
+          "headers_sha256": true,
+          "db_sha256": false
+        },
+        "sql_equal": true,
+        "database_equal": {
+          "primary": true,
+          "cache": false,
+          "queue": true,
+          "cable": true
+        },
+        "response_equal": true,
+        "stale_plan_refused": true,
+        "passed": false
+      }
+    }
+  },
+  "db_audit": {
+    "passed_with_declared_exclusions": true,
+    "split_certificate_passed": true,
+    "store_internal_boundary": "Only __solid_cache_entry_size_moving_average_estimates; raw decoded size estimates, row presence and SQLite sequence effects retained separately; not noise or deterministic full-cache equivalence",
+    "exclusions": {
+      "cache.solid_cache_entries.created_at": "SQLite STRFTIME(..., 'NOW') cache insertion timestamp; current off/off proof required"
+    },
+    "unused_candidates": [],
+    "checks": {
+      "baseline": {
+        "0": {
+          "passed": true,
+          "split_certificate": {
+            "passed": true,
+            "complete_databases_no_exclusions": {
+              "primary": true,
+              "queue": true,
+              "cable": true
+            },
+            "cache_app_keys_values_exact": true
+          },
+          "complete_inventory_equal": true,
+          "nonexcluded_state_equal": true,
+          "off_off_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "off_on_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "all_on_differences_also_off_off": true
+        },
+        "1": {
+          "passed": true,
+          "split_certificate": {
+            "passed": true,
+            "complete_databases_no_exclusions": {
+              "primary": true,
+              "queue": true,
+              "cable": true
+            },
+            "cache_app_keys_values_exact": true
+          },
+          "complete_inventory_equal": true,
+          "nonexcluded_state_equal": true,
+          "off_off_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "off_on_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "all_on_differences_also_off_off": true
+        }
+      },
+      "transitive_scope": {
+        "0": {
+          "passed": true,
+          "split_certificate": {
+            "passed": true,
+            "complete_databases_no_exclusions": {
+              "primary": true,
+              "queue": true,
+              "cable": true
+            },
+            "cache_app_keys_values_exact": true
+          },
+          "complete_inventory_equal": true,
+          "nonexcluded_state_equal": true,
+          "off_off_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "off_on_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "all_on_differences_also_off_off": true
+        },
+        "1": {
+          "passed": true,
+          "split_certificate": {
+            "passed": true,
+            "complete_databases_no_exclusions": {
+              "primary": true,
+              "queue": true,
+              "cable": true
+            },
+            "cache_app_keys_values_exact": true
+          },
+          "complete_inventory_equal": true,
+          "nonexcluded_state_equal": true,
+          "off_off_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "off_on_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "all_on_differences_also_off_off": true
+        }
+      },
+      "restored": {
+        "0": {
+          "passed": true,
+          "split_certificate": {
+            "passed": true,
+            "complete_databases_no_exclusions": {
+              "primary": true,
+              "queue": true,
+              "cable": true
+            },
+            "cache_app_keys_values_exact": true
+          },
+          "complete_inventory_equal": true,
+          "nonexcluded_state_equal": true,
+          "off_off_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "off_on_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "all_on_differences_also_off_off": true
+        },
+        "1": {
+          "passed": true,
+          "split_certificate": {
+            "passed": true,
+            "complete_databases_no_exclusions": {
+              "primary": true,
+              "queue": true,
+              "cable": true
+            },
+            "cache_app_keys_values_exact": true
+          },
+          "complete_inventory_equal": true,
+          "nonexcluded_state_equal": true,
+          "off_off_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "off_on_differing_columns": [
+            "cache.solid_cache_entries.created_at"
+          ],
+          "all_on_differences_also_off_off": true
+        }
+      }
     }
   },
   "workers": {
     "off_a": {
       "arm": "off_a",
+      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
       "yjit": true,
       "zjit": false,
-      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
-      "forked": true,
-      "pid": 192718,
+      "sql_shadow": false,
+      "kernel_random_seed": null,
+      "warm_entropy": null,
       "cases": {
-        "0": {
-          "response": {
+        "baseline": {
+          "0": {
             "status": 200,
-            "body_sha256": "4f88b952952f15f04722868923c8fe52782360e9c1342239a8124ff941bffb9f",
-            "headers_sha256": "b9d0ef9c3ea5f9c04a82922664f2d006a2fb087bc850833bf38c956beac03061"
+            "body_sha256": "2c116f10c56b8d429b39f52f2bdfc787933a7d32cdd672494b10ffc54677f890",
+            "headers_sha256": "9c9a031678d4bebd60646ce045820f24608ed55d481e02adb496db47f05c3b1b",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 194,
+                "sha256": "f0919cffe2774a3ad934d37887fafcdf0f38bd4c3309548f4486318dcaa143ed",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 6,
+                "sha256": "c9218e26d33db715da33fadab2626edf177842b77fb8176343ce3d354b33eeff",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 178,
+                "sha256": "a7618e632daf3c8deb8a14adbee42591017452f3211b12a486d45c83bf0e4dbe",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 86,
+              "sql_sha256": "710873a80f43cfc161343f6d3af94a3df101318c6aa9ce03b9dcfc74ad58bd68"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "47e61af06b9b59d675906889ff0fae999e666abff097042d246878e75d24d54d",
+              "comparison_sha256": "719dd66bd82d925fda1491c245f8b4ed69958112c28bcde1dabe266a9d71c615",
+              "raw_databases": {
+                "primary": "7b3db21e78567190ae64eb66c475d6f7541b6de1e303d47177cf2d11a204ca37",
+                "cache": "510032c6b1aa3f17991ab5bc56f6c008f8dad20886154adfcb639559528bc625",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "6a0d7cc0fa089286f0bdabc006823fa575700e80b300f8cbbfa81b65abdeea46",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "8058b6d31f5171af6bceba17952dc3e0954bb9090f71bab8a74eb45de9485031",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "f1b5e967964239119ea2fcea70dc06d782ac2cd18306fac3efcf2c644649c924"
+              },
+              "inventory_sha256": "f86f2f92952785d32e1f0c8c9225a707c8354a888da6190fc77b1f4bf9f16308"
+            },
+            "db_components_sha256": {
+              "primary": "7b3db21e78567190ae64eb66c475d6f7541b6de1e303d47177cf2d11a204ca37",
+              "cache": "510032c6b1aa3f17991ab5bc56f6c008f8dad20886154adfcb639559528bc625",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "47e61af06b9b59d675906889ff0fae999e666abff097042d246878e75d24d54d"
           },
-          "counts": {},
-          "evidence": {
-            "wall_clock": true,
-            "errors": [],
-            "passed": true,
-            "control": "source-pinned untimed entropy companion; timed entropy untouched",
-            "sql_events": 86,
-            "sql_sha256": "12cdcdd7594865392559fb586e2845bcf7c9a0560ee95519463ef76eb07c0475"
+          "1": {
+            "status": 200,
+            "body_sha256": "61cd1480084205c39cf1e858af416478425b35af6a21896435c97cfa98100737",
+            "headers_sha256": "21b52125247bc0b0ac7ff697661c3ed9c12e67c83cf731059c46ebbe8d85dc41",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 82,
+                "sha256": "f42b53081ee0606a4d4e5d135b0c3733d948eb2e67af77ea1fac8105a3e6800e",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 6,
+                "sha256": "ec471f12b7c528b0a72d66dafe6e0ad579e5460dad58ee203feaa570b7f7ddf2",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 66,
+                "sha256": "0150d4d203d18c2b16a2ff0662e71bc8c4389ab3a21e832ee8751ade49879959",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 30,
+              "sql_sha256": "476c784d9a4c7eb036f0d3038a62a33820d71af5a289cd7212a6d1c4e9e8f352"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "f1b5e967964239119ea2fcea70dc06d782ac2cd18306fac3efcf2c644649c924"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a"
           }
         },
-        "1": {
-          "response": {
+        "transitive_scope": {
+          "0": {
             "status": 200,
-            "body_sha256": "8e04cfe3de69c93b6452c75f4d5c003d053a3e98c909928948f17da03e0326d3",
-            "headers_sha256": "6f93dfa86a489f9a6e4b2d29c4e2e13156a4a227f0364c3bc34678f20584c2a9"
+            "body_sha256": "e4a0a3a3ebdaec65f575547e542cb9f7e5acb3fa1354ad5af25a8fc873a99a15",
+            "headers_sha256": "7e397aaec0c96d5b9678aebe40633a40d33f6698984da728fd8427c043565c9c",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "619f71fad99cabe61a6610344c6a2689e67c497c63ff69b79cb86ca00b290ae1",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "22da26492ad26ac1a786ecbf705c25f25b49bc7964bd73e6e29a7b70ef6d07ec",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "85378e1c462269754ef2c6deb01abc2353d9161c5d8db7900536b8bb860340c1",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "6a61d9c9b0af19035acf1d110f1004396b13329d2fcafef513261c0603fbd665"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "f1b5e967964239119ea2fcea70dc06d782ac2cd18306fac3efcf2c644649c924"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a"
           },
-          "counts": {},
-          "evidence": {
-            "wall_clock": true,
-            "errors": [],
-            "passed": true,
-            "control": "source-pinned untimed entropy companion; timed entropy untouched",
-            "sql_events": 30,
-            "sql_sha256": "761b2a71194f1ba8c5b62032eebb95f8dc281ce945d2a82fbfbde9c2c1a4611d"
+          "1": {
+            "status": 200,
+            "body_sha256": "0afe7f7d66489715a85a4b236e568486da5d7a3b0511d0ee0a4599957599e559",
+            "headers_sha256": "165db89365a13fc09b56f631567e56bb01f2fb10fe4112aa99bb4b2af964ebc4",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "8e2dd542c0c62f8b8c03b6d4f12e412266de24a6afe34f6439a43ce4d5c4b9f6",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "f2d75f0f76fc3bb2ef5b4e5420d6a09b1be6854ff12e9d7d875809fb97089ae0",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "05418d2c0e293a1cc04b0fa877865912797b07b7a318fa283b7e2ea2c5c2ee88",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "a6df83e73e68c26c2dacebe62e4c1966ebeae60852896aac721c680224b0b6c8"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "f1b5e967964239119ea2fcea70dc06d782ac2cd18306fac3efcf2c644649c924"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a"
+          }
+        },
+        "restored": {
+          "0": {
+            "status": 200,
+            "body_sha256": "b22199a258302e0ef741e164fb5efac47b006c0ac9cffccc5dc59acad8a3c1cb",
+            "headers_sha256": "33960eb06bbdce70f6de26d5515285525ea9b7159cab6a3af94f1c023944c894",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "619f71fad99cabe61a6610344c6a2689e67c497c63ff69b79cb86ca00b290ae1",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "edcbbd5c1a55ef4288bef7483c65949f5cd2c5cff03a324f460dcf2723e4b1a2",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "5e94e845e48f8cf944df0229c0a69f23375c68fda7148e6089f77eb7715d470c",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "588c51df2afb38193c9fd91ca7d8fee79eb8b5918d9318f3c000a47cd2903d0b"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "f1b5e967964239119ea2fcea70dc06d782ac2cd18306fac3efcf2c644649c924"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a"
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "6c551112b4696fab0530e584a659d9006395d7f45ef5d2a68919f3384256515a",
+            "headers_sha256": "93d3753ad205a95d6f0a666740975a734e4af51352a0ac124b20848af8b5a86b",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "8e2dd542c0c62f8b8c03b6d4f12e412266de24a6afe34f6439a43ce4d5c4b9f6",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "b504628c317e32a40ff183bddfcffb3c6c765aa853f3b1dee68617542237c39d",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "64f0e2304d7e04edff01c05d0b6d4aca02895bfde26670a743b005bf8c008912",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "f1b5e967964239119ea2fcea70dc06d782ac2cd18306fac3efcf2c644649c924"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "14637fb8d4e1e2ae91f4f899650905bdf4a8ae56b23d359f19ffe4e3f29421ac",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "acb30029c3fcf153825dc9c574be0b667b8c104349ebd3991b17705e4ee5ac2a"
           }
         }
-      }
+      },
+      "forked": true,
+      "pid": 246562
     },
     "off_b": {
       "arm": "off_b",
+      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
       "yjit": true,
       "zjit": false,
-      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
-      "forked": true,
-      "pid": 192725,
+      "sql_shadow": false,
+      "kernel_random_seed": null,
+      "warm_entropy": null,
       "cases": {
-        "0": {
-          "response": {
+        "baseline": {
+          "0": {
             "status": 200,
-            "body_sha256": "4f88b952952f15f04722868923c8fe52782360e9c1342239a8124ff941bffb9f",
-            "headers_sha256": "b9d0ef9c3ea5f9c04a82922664f2d006a2fb087bc850833bf38c956beac03061"
+            "body_sha256": "2c116f10c56b8d429b39f52f2bdfc787933a7d32cdd672494b10ffc54677f890",
+            "headers_sha256": "9c9a031678d4bebd60646ce045820f24608ed55d481e02adb496db47f05c3b1b",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 194,
+                "sha256": "f0919cffe2774a3ad934d37887fafcdf0f38bd4c3309548f4486318dcaa143ed",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 6,
+                "sha256": "9a9ec1ace6cbbcaf58fd6a46dc89033317ce41eb4baed26de3f00e3b64be0ee7",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 178,
+                "sha256": "9d0be758774fc9e4fc5d95ad4469fa13024bc574d02f339c51d9e5afd49fd5c9",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 86,
+              "sql_sha256": "710873a80f43cfc161343f6d3af94a3df101318c6aa9ce03b9dcfc74ad58bd68"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "741ecafcce888ffc55b3b4d905dcded8b407232ca7b854a12731eec0eef341f4",
+              "comparison_sha256": "719dd66bd82d925fda1491c245f8b4ed69958112c28bcde1dabe266a9d71c615",
+              "raw_databases": {
+                "primary": "7b3db21e78567190ae64eb66c475d6f7541b6de1e303d47177cf2d11a204ca37",
+                "cache": "dbfa41142edf8dd93c322ed9fe0aac610492a788a72e6c56f383c6d1a543f20f",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "6a0d7cc0fa089286f0bdabc006823fa575700e80b300f8cbbfa81b65abdeea46",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "8058b6d31f5171af6bceba17952dc3e0954bb9090f71bab8a74eb45de9485031",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "d2eb9e126543c5febfc0594780218e185906fa1eeb30b6a1e8e5fe866be8a1f8"
+              },
+              "inventory_sha256": "f86f2f92952785d32e1f0c8c9225a707c8354a888da6190fc77b1f4bf9f16308"
+            },
+            "db_components_sha256": {
+              "primary": "7b3db21e78567190ae64eb66c475d6f7541b6de1e303d47177cf2d11a204ca37",
+              "cache": "dbfa41142edf8dd93c322ed9fe0aac610492a788a72e6c56f383c6d1a543f20f",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "741ecafcce888ffc55b3b4d905dcded8b407232ca7b854a12731eec0eef341f4"
           },
-          "counts": {},
-          "evidence": {
-            "wall_clock": true,
-            "errors": [],
-            "passed": true,
-            "control": "source-pinned untimed entropy companion; timed entropy untouched",
-            "sql_events": 86,
-            "sql_sha256": "12cdcdd7594865392559fb586e2845bcf7c9a0560ee95519463ef76eb07c0475"
+          "1": {
+            "status": 200,
+            "body_sha256": "61cd1480084205c39cf1e858af416478425b35af6a21896435c97cfa98100737",
+            "headers_sha256": "21b52125247bc0b0ac7ff697661c3ed9c12e67c83cf731059c46ebbe8d85dc41",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 82,
+                "sha256": "f42b53081ee0606a4d4e5d135b0c3733d948eb2e67af77ea1fac8105a3e6800e",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 6,
+                "sha256": "42c49a29ca3b9e1cb5041cc4a4526d21a2690885ea1a65346ba43a4cbf13a612",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 66,
+                "sha256": "cedfb29c0c938b24accb95643b8807a8435ff6708ba6886f2f6be6e86b8cbb92",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 30,
+              "sql_sha256": "476c784d9a4c7eb036f0d3038a62a33820d71af5a289cd7212a6d1c4e9e8f352"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "d2eb9e126543c5febfc0594780218e185906fa1eeb30b6a1e8e5fe866be8a1f8"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260"
           }
         },
-        "1": {
-          "response": {
+        "transitive_scope": {
+          "0": {
             "status": 200,
-            "body_sha256": "8e04cfe3de69c93b6452c75f4d5c003d053a3e98c909928948f17da03e0326d3",
-            "headers_sha256": "6f93dfa86a489f9a6e4b2d29c4e2e13156a4a227f0364c3bc34678f20584c2a9"
+            "body_sha256": "e4a0a3a3ebdaec65f575547e542cb9f7e5acb3fa1354ad5af25a8fc873a99a15",
+            "headers_sha256": "7e397aaec0c96d5b9678aebe40633a40d33f6698984da728fd8427c043565c9c",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "619f71fad99cabe61a6610344c6a2689e67c497c63ff69b79cb86ca00b290ae1",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "6e424ce5b3990b7de528849a4a3eb6bf5bdfc32ae7da39cb77828775e87f6222",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "cdf10205d2ad95d5c2a45c96fa2b613f1d4b2d684fad389c5030d8033969f729",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "6a61d9c9b0af19035acf1d110f1004396b13329d2fcafef513261c0603fbd665"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "d2eb9e126543c5febfc0594780218e185906fa1eeb30b6a1e8e5fe866be8a1f8"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260"
           },
-          "counts": {},
-          "evidence": {
-            "wall_clock": true,
-            "errors": [],
-            "passed": true,
-            "control": "source-pinned untimed entropy companion; timed entropy untouched",
-            "sql_events": 30,
-            "sql_sha256": "761b2a71194f1ba8c5b62032eebb95f8dc281ce945d2a82fbfbde9c2c1a4611d"
+          "1": {
+            "status": 200,
+            "body_sha256": "0afe7f7d66489715a85a4b236e568486da5d7a3b0511d0ee0a4599957599e559",
+            "headers_sha256": "165db89365a13fc09b56f631567e56bb01f2fb10fe4112aa99bb4b2af964ebc4",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "8e2dd542c0c62f8b8c03b6d4f12e412266de24a6afe34f6439a43ce4d5c4b9f6",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "0ebf9eb152816c5e3c16b129b6ff2359b09dd436142a5708478d616c3b261b2b",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "4ec6c2821dac729fe595a62c613a61caccc11a43f5c5edcba83600ebafc45e26",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "a6df83e73e68c26c2dacebe62e4c1966ebeae60852896aac721c680224b0b6c8"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "d2eb9e126543c5febfc0594780218e185906fa1eeb30b6a1e8e5fe866be8a1f8"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260"
+          }
+        },
+        "restored": {
+          "0": {
+            "status": 200,
+            "body_sha256": "b22199a258302e0ef741e164fb5efac47b006c0ac9cffccc5dc59acad8a3c1cb",
+            "headers_sha256": "33960eb06bbdce70f6de26d5515285525ea9b7159cab6a3af94f1c023944c894",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "619f71fad99cabe61a6610344c6a2689e67c497c63ff69b79cb86ca00b290ae1",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "7a6fc495ce93f65ab200bcdacd56e031fcee66982924202f42a2277acb91bb48",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "48722a51782e39b7f49c5e0713da81db9652941cae1a21245f56f9693d455702",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "588c51df2afb38193c9fd91ca7d8fee79eb8b5918d9318f3c000a47cd2903d0b"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "d2eb9e126543c5febfc0594780218e185906fa1eeb30b6a1e8e5fe866be8a1f8"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260"
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "6c551112b4696fab0530e584a659d9006395d7f45ef5d2a68919f3384256515a",
+            "headers_sha256": "93d3753ad205a95d6f0a666740975a734e4af51352a0ac124b20848af8b5a86b",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "8e2dd542c0c62f8b8c03b6d4f12e412266de24a6afe34f6439a43ce4d5c4b9f6",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "1700653d9859204df29535d111499b81da711caf750712d74f881445c0e3dcd9",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "b0be1dd174e327ebd321a1ce96eb2abc27d2252cad8c44de875141b788ba32cb",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            },
+            "counts_delta": {},
+            "db_audit": {
+              "raw_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "d2eb9e126543c5febfc0594780218e185906fa1eeb30b6a1e8e5fe866be8a1f8"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "234a3c7c10dcd2d691d35f71e5d28581f3adbe725ff30ec3c96284a627902ed4",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "4e09c097e5f35b7d13efe676bc2d5936fcb33bf91c6fd606ee07e4a6fa6bf260"
           }
         }
-      }
+      },
+      "forked": true,
+      "pid": 246592
     },
     "on": {
       "arm": "on",
+      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
       "yjit": true,
       "zjit": false,
-      "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
-      "forked": true,
-      "pid": 192732,
+      "sql_shadow": false,
+      "kernel_random_seed": null,
+      "warm_entropy": null,
       "cases": {
-        "0": {
-          "response": {
+        "baseline": {
+          "0": {
             "status": 200,
-            "body_sha256": "a1fba8751a8093ce9ca265418cfb045c98b44fb67e02d31164e633baf1b99b0d",
-            "headers_sha256": "5f902aae39d429c304cb0a628dc233558f69bde4bf48957c0bd709f9490d910a"
+            "body_sha256": "2c116f10c56b8d429b39f52f2bdfc787933a7d32cdd672494b10ffc54677f890",
+            "headers_sha256": "9c9a031678d4bebd60646ce045820f24608ed55d481e02adb496db47f05c3b1b",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 194,
+                "sha256": "f0919cffe2774a3ad934d37887fafcdf0f38bd4c3309548f4486318dcaa143ed",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 6,
+                "sha256": "cf267e0b3817c55815a58545dbebf7613fd9dc4d1b136b068b73d3985f6ddf56",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 178,
+                "sha256": "e1ccbbc67d1e4a9a233edcb498427b14aa34d40f1b57e65df566ab53f5daac3d",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 86,
+              "sql_sha256": "710873a80f43cfc161343f6d3af94a3df101318c6aa9ce03b9dcfc74ad58bd68"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 1,
+              "bucket:connection_bind": 1,
+              "bucket:worker_bind": 1,
+              "bucket:hit": 2
+            },
+            "db_audit": {
+              "raw_sha256": "1a9b86de9b372e2410a729b61421ae358451baaffbea162d8d89789e5dbcce93",
+              "comparison_sha256": "719dd66bd82d925fda1491c245f8b4ed69958112c28bcde1dabe266a9d71c615",
+              "raw_databases": {
+                "primary": "7b3db21e78567190ae64eb66c475d6f7541b6de1e303d47177cf2d11a204ca37",
+                "cache": "3bd4d36da661cf1670db2d47e039e1aa84b0b73af96f1377be3a8bed9a5cb514",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "6a0d7cc0fa089286f0bdabc006823fa575700e80b300f8cbbfa81b65abdeea46",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "8058b6d31f5171af6bceba17952dc3e0954bb9090f71bab8a74eb45de9485031",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "72e5062984e4cd0b496807bacce46506e8d554e9bf474c702be2f818c6c4f4a2"
+              },
+              "inventory_sha256": "f86f2f92952785d32e1f0c8c9225a707c8354a888da6190fc77b1f4bf9f16308"
+            },
+            "db_components_sha256": {
+              "primary": "7b3db21e78567190ae64eb66c475d6f7541b6de1e303d47177cf2d11a204ca37",
+              "cache": "3bd4d36da661cf1670db2d47e039e1aa84b0b73af96f1377be3a8bed9a5cb514",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "1a9b86de9b372e2410a729b61421ae358451baaffbea162d8d89789e5dbcce93"
           },
-          "counts": {
-            "bucket:compiled_template": 1,
-            "bucket:connection_bind": 1,
-            "bucket:worker_bind": 1,
-            "bucket:hit": 2
-          },
-          "evidence": {
-            "wall_clock": true,
-            "errors": [],
-            "passed": true,
-            "control": "source-pinned untimed entropy companion; timed entropy untouched",
-            "sql_events": 86,
-            "sql_sha256": "f6113369391b2549e6faa3640a16c916a071d308fce59088333d130b1cab85fe"
+          "1": {
+            "status": 200,
+            "body_sha256": "61cd1480084205c39cf1e858af416478425b35af6a21896435c97cfa98100737",
+            "headers_sha256": "21b52125247bc0b0ac7ff697661c3ed9c12e67c83cf731059c46ebbe8d85dc41",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 82,
+                "sha256": "f42b53081ee0606a4d4e5d135b0c3733d948eb2e67af77ea1fac8105a3e6800e",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 6,
+                "sha256": "420220f544f112bc3f28ab2a78413d0ce557c7c2c8171fd9a73bd720433a6727",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 66,
+                "sha256": "b4e32717649677b8777f8b8679085373cca2524ae59e3ae1edfd62d31f3516c3",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 30,
+              "sql_sha256": "476c784d9a4c7eb036f0d3038a62a33820d71af5a289cd7212a6d1c4e9e8f352"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:connection_bind": 0,
+              "bucket:worker_bind": 0,
+              "bucket:hit": 2
+            },
+            "db_audit": {
+              "raw_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "72e5062984e4cd0b496807bacce46506e8d554e9bf474c702be2f818c6c4f4a2"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441"
           }
         },
-        "1": {
-          "response": {
+        "transitive_scope": {
+          "0": {
             "status": 200,
-            "body_sha256": "19dc7260c310335d851c2908604b0a7599cb7ffba85287425306aef6edbdbb06",
-            "headers_sha256": "64cb7e4f2a2cadebd4828ce65c3e383ff9967e8e726efbf512b83d5ab6c70614"
+            "body_sha256": "5040a088a1475b0abca81e2da084cdf013f30ad1efcf59de4cd209ef91992f4c",
+            "headers_sha256": "43d465a3f0c3e916297347ac07901943144d76d5951ade4944d473db5a010d34",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "619f71fad99cabe61a6610344c6a2689e67c497c63ff69b79cb86ca00b290ae1",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "d7942b07743927dcd2f304acac7f5ad9598fb64b8a55237b547350d9c477fb31",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "ff65c79ef789d62aa3c04e4d81e08c115f9aa55a54f3501f9af136ed901648ed",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "5ef86453fe2facb28cadc40dc89562813f6142620e5cb691903523080cf0dc88"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:connection_bind": 0,
+              "bucket:worker_bind": 0,
+              "bucket:hit": 2
+            },
+            "db_audit": {
+              "raw_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "72e5062984e4cd0b496807bacce46506e8d554e9bf474c702be2f818c6c4f4a2"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441"
           },
-          "counts": {
-            "bucket:compiled_template": 0,
-            "bucket:connection_bind": 0,
-            "bucket:worker_bind": 0,
-            "bucket:hit": 2
-          },
-          "evidence": {
-            "wall_clock": true,
-            "errors": [],
-            "passed": true,
-            "control": "source-pinned untimed entropy companion; timed entropy untouched",
-            "sql_events": 30,
-            "sql_sha256": "38d079471df119d8783c61d540e833a47d09cfc026ba5f3ac1c4e9f35bbe4bcc"
+          "1": {
+            "status": 200,
+            "body_sha256": "83cc66cdb26adfd3e10c63e803a9170a6033284efc92d0c206914b8fce869423",
+            "headers_sha256": "f10c7f725a77230773ddf95f030108505194cf87745fc43097d2c436487f01ba",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "8e2dd542c0c62f8b8c03b6d4f12e412266de24a6afe34f6439a43ce4d5c4b9f6",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "4953a21e687a6762e8444f559899dac3f5e2dcb8f79670b183e1c96c83f1d8f2",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "bccfb70667c948e6c43d415d8adee50578064f307abe9c91bda4abf3da777fcc",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "2c728e047c5f3c3c4e8a6df6b1d3f8252d96dd4f8ab39548fdb61776738d6e41"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:connection_bind": 0,
+              "bucket:worker_bind": 0,
+              "bucket:hit": 2
+            },
+            "db_audit": {
+              "raw_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "72e5062984e4cd0b496807bacce46506e8d554e9bf474c702be2f818c6c4f4a2"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441"
           }
+        },
+        "restored": {
+          "0": {
+            "status": 200,
+            "body_sha256": "b22199a258302e0ef741e164fb5efac47b006c0ac9cffccc5dc59acad8a3c1cb",
+            "headers_sha256": "33960eb06bbdce70f6de26d5515285525ea9b7159cab6a3af94f1c023944c894",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "619f71fad99cabe61a6610344c6a2689e67c497c63ff69b79cb86ca00b290ae1",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "430390ad1bda29e0293864cf13dafc5a53ec62bc54d7740d92d4f4303d928ec7",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "c4954ab2b1847f704cc12af9bf7a00e2934e6ee9dd62c30aae5bff714370a0e1",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "588c51df2afb38193c9fd91ca7d8fee79eb8b5918d9318f3c000a47cd2903d0b"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 1,
+              "bucket:connection_bind": 0,
+              "bucket:worker_bind": 0,
+              "bucket:hit": 2
+            },
+            "db_audit": {
+              "raw_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "72e5062984e4cd0b496807bacce46506e8d554e9bf474c702be2f818c6c4f4a2"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441"
+          },
+          "1": {
+            "status": 200,
+            "body_sha256": "6c551112b4696fab0530e584a659d9006395d7f45ef5d2a68919f3384256515a",
+            "headers_sha256": "93d3753ad205a95d6f0a666740975a734e4af51352a0ac124b20848af8b5a86b",
+            "evidence": {
+              "wall_clock": true,
+              "trace": {
+                "count": 48,
+                "sha256": "8e2dd542c0c62f8b8c03b6d4f12e412266de24a6afe34f6439a43ce4d5c4b9f6",
+                "omitted": "entropy trace; see original export"
+              },
+              "clock_reads": {
+                "count": 2,
+                "sha256": "74cae087949b4d16791c670cfbd8d55b50eb43e41beb5a0b393193029a06741b",
+                "omitted": "entropy trace; see original export"
+              },
+              "wall_clock_reads": {
+                "count": 42,
+                "sha256": "75f9bed5f0445b301cb472258f433f384aaf5070005eed501807a62151d6e2f2",
+                "omitted": "entropy trace; see original export"
+              },
+              "errors": [],
+              "passed": true,
+              "control": "source-pinned untimed entropy companion; timed entropy untouched",
+              "sql_events": 20,
+              "sql_sha256": "c88af9894ea78785c1fe37328b2b2072b0707a72c44f882677a4bc6d85bcc7be"
+            },
+            "counts_delta": {
+              "bucket:compiled_template": 0,
+              "bucket:connection_bind": 0,
+              "bucket:worker_bind": 0,
+              "bucket:hit": 2
+            },
+            "db_audit": {
+              "raw_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441",
+              "comparison_sha256": "4f6c8dce548e51954d6fdab45da0ac71a1133cad7e283ad1619ff5fd3dd6ce69",
+              "raw_databases": {
+                "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+                "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+                "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+                "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+              },
+              "cache_boundary": {
+                "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+                "header_sha256": "26c88d5506bf05399261565ba90f2bcc76db4cbf4f405767791d6c821ab7cf10",
+                "app_key_values_sha256": "0b3db0dddf6d922ff1b1bc78762323ba19f59388bc41911b4a6cd9af1b981239",
+                "app_entry_count": 1,
+                "internal": [],
+                "metadata_sha256": "2a41b5d2a30d915c96c20ae249362703ce5e93e195d24d9197e7fde6e1005def",
+                "sequence_sha256": "54831159ab62e03803a2063406cccaf459e6197cce996530b51bd2d530b9109a",
+                "current_total_byte_size": 189
+              },
+              "columns": {
+                "cache.solid_cache_entries.created_at": "72e5062984e4cd0b496807bacce46506e8d554e9bf474c702be2f818c6c4f4a2"
+              },
+              "inventory_sha256": "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974"
+            },
+            "db_components_sha256": {
+              "primary": "cf8d4cf41b2d33cf7fe54f48be9cba4b52f95afc6ed8d7cdf36200bd3f83ab2e",
+              "cache": "4203e52b1ed02d327ea63b1d281237ba28b40e2ab538fd54b7d0886c2b966a65",
+              "queue": "d3a37663bd74c1a234b21ae16b32760a583b2d8aa28fa08ebed3297c6343fa3e",
+              "cable": "5e3c6cf691277bef0117dcaffa8b429b44abb943563e0ce4a76c836793f46cee"
+            },
+            "db_sha256": "8e81e183d962953ac696bef2ae78ff26b1d65088ccfbdf1e97d55b1d841fc441"
+          }
+        }
+      },
+      "forked": true,
+      "pid": 246681
+    }
+  },
+  "sources": {
+    "ar_request_sites.rb": "dab65d0ae5704b81683e3a0a28f1267f28c61932ee3c02bc1e481ef77b47dc28",
+    "ar_request_sites_check.rb": "57a77c866087cfcfb37fc77d894052db9d191502f236ecdd92f2f25c5969b805",
+    "ar_request_sites_db.rb": "420bd3c2ff6dc06b22bbe0b66b6bb8bbff0be84ed43ddf1fd88e39ca5a625889",
+    "ar_callsite.rb": "5be7551c4302aa80215a43d1b328de3fa4dab562890c615962cc9d36936b2b98",
+    "jit_guards_export.rb": "739de0ebb3d9aad289a343a70b8533fbd54be37fda61849835003c0b8157b884"
+  },
+  "format": 2,
+  "inventories": {
+    "f86f2f92952785d32e1f0c8c9225a707c8354a888da6190fc77b1f4bf9f16308": {
+      "primary": {
+        "schema_sha256": "628a28ddda3ed188d39b9ccc61fc37c94d76469e24c4b7d836022cd05beb7f02",
+        "tables": {
+          "accesses": 4,
+          "accounts": 1,
+          "action_text_markdowns": 3,
+          "active_storage_attachments": 0,
+          "active_storage_blobs": 0,
+          "active_storage_variant_records": 0,
+          "ar_internal_metadata": 1,
+          "assignees_filters": 1,
+          "assigners_filters": 0,
+          "assignments": 3,
+          "bubbles": 4,
+          "bubbles_search_index": 0,
+          "bubbles_search_index_config": 1,
+          "bubbles_search_index_content": 0,
+          "bubbles_search_index_data": 2,
+          "bubbles_search_index_docsize": 0,
+          "bubbles_search_index_idx": 0,
+          "buckets": 2,
+          "buckets_filters": 0,
+          "comments": 3,
+          "comments_search_index": 0,
+          "comments_search_index_config": 1,
+          "comments_search_index_content": 0,
+          "comments_search_index_data": 2,
+          "comments_search_index_docsize": 0,
+          "comments_search_index_idx": 0,
+          "creators_filters": 0,
+          "event_summaries": 6,
+          "events": 14,
+          "filters": 1,
+          "filters_stages": 0,
+          "filters_tags": 1,
+          "messages": 9,
+          "notifications": 2,
+          "pops": 1,
+          "reactions": 2,
+          "schema_migrations": 1,
+          "sessions": 3,
+          "sqlite_sequence": 24,
+          "subscriptions": 1,
+          "taggings": 4,
+          "tags": 2,
+          "users": 3,
+          "watches": 11,
+          "workflow_stages": 3,
+          "workflows": 1
+        }
+      },
+      "cache": {
+        "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+        "tables": {
+          "ar_internal_metadata": 1,
+          "schema_migrations": 1,
+          "solid_cache_entries": 1,
+          "sqlite_sequence": 1
+        }
+      },
+      "queue": {
+        "schema_sha256": "9633567ce5f76ac7433155aa8ce5f09f60148c05a8ba4161f63f26722a9f34ca",
+        "tables": {
+          "ar_internal_metadata": 1,
+          "schema_migrations": 1,
+          "solid_queue_blocked_executions": 0,
+          "solid_queue_claimed_executions": 0,
+          "solid_queue_failed_executions": 0,
+          "solid_queue_jobs": 0,
+          "solid_queue_pauses": 0,
+          "solid_queue_processes": 0,
+          "solid_queue_ready_executions": 0,
+          "solid_queue_recurring_executions": 0,
+          "solid_queue_recurring_tasks": 0,
+          "solid_queue_scheduled_executions": 0,
+          "solid_queue_semaphores": 0,
+          "sqlite_sequence": 6
+        }
+      },
+      "cable": {
+        "schema_sha256": "c9b81ca68f09038e1a17ead4e768ad79f30452e05403d377855c991ab767dc0c",
+        "tables": {
+          "ar_internal_metadata": 1,
+          "schema_migrations": 1,
+          "solid_cable_messages": 0,
+          "sqlite_sequence": 0
+        }
+      }
+    },
+    "854927ebbd5c82ae962ccef347c3478eb532effbdcabc152201e72ad3a24b974": {
+      "primary": {
+        "schema_sha256": "628a28ddda3ed188d39b9ccc61fc37c94d76469e24c4b7d836022cd05beb7f02",
+        "tables": {
+          "accesses": 4,
+          "accounts": 1,
+          "action_text_markdowns": 3,
+          "active_storage_attachments": 0,
+          "active_storage_blobs": 0,
+          "active_storage_variant_records": 0,
+          "ar_internal_metadata": 1,
+          "assignees_filters": 1,
+          "assigners_filters": 0,
+          "assignments": 3,
+          "bubbles": 4,
+          "bubbles_search_index": 0,
+          "bubbles_search_index_config": 1,
+          "bubbles_search_index_content": 0,
+          "bubbles_search_index_data": 2,
+          "bubbles_search_index_docsize": 0,
+          "bubbles_search_index_idx": 0,
+          "buckets": 2,
+          "buckets_filters": 0,
+          "comments": 3,
+          "comments_search_index": 0,
+          "comments_search_index_config": 1,
+          "comments_search_index_content": 0,
+          "comments_search_index_data": 2,
+          "comments_search_index_docsize": 0,
+          "comments_search_index_idx": 0,
+          "creators_filters": 0,
+          "event_summaries": 6,
+          "events": 14,
+          "filters": 1,
+          "filters_stages": 0,
+          "filters_tags": 1,
+          "messages": 9,
+          "notifications": 2,
+          "pops": 1,
+          "reactions": 2,
+          "schema_migrations": 1,
+          "sessions": 4,
+          "sqlite_sequence": 24,
+          "subscriptions": 1,
+          "taggings": 4,
+          "tags": 2,
+          "users": 3,
+          "watches": 11,
+          "workflow_stages": 3,
+          "workflows": 1
+        }
+      },
+      "cache": {
+        "schema_sha256": "ba52d1e13398a600484739bbba09759d255968808ef8c5db04e9f78d2550b67d",
+        "tables": {
+          "ar_internal_metadata": 1,
+          "schema_migrations": 1,
+          "solid_cache_entries": 1,
+          "sqlite_sequence": 1
+        }
+      },
+      "queue": {
+        "schema_sha256": "9633567ce5f76ac7433155aa8ce5f09f60148c05a8ba4161f63f26722a9f34ca",
+        "tables": {
+          "ar_internal_metadata": 1,
+          "schema_migrations": 1,
+          "solid_queue_blocked_executions": 0,
+          "solid_queue_claimed_executions": 0,
+          "solid_queue_failed_executions": 0,
+          "solid_queue_jobs": 0,
+          "solid_queue_pauses": 0,
+          "solid_queue_processes": 0,
+          "solid_queue_ready_executions": 0,
+          "solid_queue_recurring_executions": 0,
+          "solid_queue_recurring_tasks": 0,
+          "solid_queue_scheduled_executions": 0,
+          "solid_queue_semaphores": 0,
+          "sqlite_sequence": 6
+        }
+      },
+      "cable": {
+        "schema_sha256": "c9b81ca68f09038e1a17ead4e768ad79f30452e05403d377855c991ab767dc0c",
+        "tables": {
+          "ar_internal_metadata": 1,
+          "schema_migrations": 1,
+          "solid_cable_messages": 0,
+          "sqlite_sequence": 0
         }
       }
     }
   },
-  "scope": "transitive _exec_scope mutation after authentication; no app/config source patches; shadows off",
-  "replay_receipt_sha256": "3b8a92e4cc57fe7de4ed4c5dd4881ea468a0c864e0adb05a2e453e10601c109a",
-  "supersedes": {
-    "commit": "6d3b30aee03c14484c3a052cc450fb0ec284f591",
-    "path": "docs/jit-guards-certificates.json"
-  },
-  "sources": {
-    "ar_request_sites.rb": "dab65d0ae5704b81683e3a0a28f1267f28c61932ee3c02bc1e481ef77b47dc28",
-    "ar_request_sites_check.rb": "792aa36aab2684d04289a17d517d3fb775885643bd1fb00e49bc71d77aad7cc8",
-    "ar_request_sites_db.rb": "58277bb74a4f878c422ac87d3a2ca1c48d287b4acd2d9d630d47efb973918abb",
-    "ar_callsite.rb": "5be7551c4302aa80215a43d1b328de3fa4dab562890c615962cc9d36936b2b98"
-  }
+  "scope": "public projection of unified collector; no timing; raw DB and response/SQL gates remain separate",
+  "replay_receipt_sha256": "9e975a2256dacdef2b3a374f110f59c5f289373ff495318753d69906e86cd4e3",
+  "raw_receipt_recovery": "private: contains SQL and bind values; public projection is the durable receipt",
+  "omitted_fields": [
+    "sql_trace",
+    "sql_capture",
+    "db_audit.columns except declared exclusion"
+  ]
 }
