@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tooling only: corpus downloads and disposable services remain opt-in.
+# Tooling and retained local gate prerequisites; service-backed apps stay opt-in.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 packages=(build-essential libclang-dev libyaml-dev libssl-dev libreadline-dev
@@ -33,10 +33,13 @@ Gem::Specification.load(ARGV.fetch(0)).development_dependencies.each do |depende
 end
 RUBY
 cargo fetch --locked --manifest-path "$root/Cargo.toml"
+# Retain physical Rack-3-only gems, both blogs and the Rails component bundle
+# in the orb snapshot. Warm runs use the package managers' own checks.
+ruby "$root/script/gate" --prepare
 # Amp and services start in new login shells, not this setup process.
 marker='# Lowrail orb toolchain'
 if ! grep -Fqx "$marker" "$HOME/.bash_profile" 2>/dev/null; then
   printf '\n%s\ncase "$PWD" in\n  %q|%q/*) export PATH=%q:"$HOME/.cargo/bin:$PATH" ;;\nesac\n' \
     "$marker" "$root" "$root" "$ruby_bin" >> "$HOME/.bash_profile"
 fi
-echo 'Lowrail tools ready; use script/corpus APP for app dependencies.'
+echo 'Lowrail gate prerequisites ready; use script/gate for the primary gates.'
