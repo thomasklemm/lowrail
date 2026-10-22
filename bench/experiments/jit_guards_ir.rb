@@ -28,7 +28,7 @@ module JitGuardsIR
     FizzyLinkFixture.environment(app, state).each { |key, value| value ? ENV[key] = value : ENV.delete(key) }
     FizzyLinkFixture.boot(app)
     JitStability.assert_mode!
-    raise "actual interpreter required" if RubyVM::YJIT.enabled? || RubyVM::ZJIT.enabled?
+    raise "actual interpreter required" if JitStability.enabled?
     treatment = ENV.fetch("JIT_GUARDS_TREATMENT")
     overlay = config.fetch("treatments").fetch(treatment).fetch("overlay")
     require overlay

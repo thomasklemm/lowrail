@@ -77,7 +77,7 @@ module ARSiteChecks
 
     def run(config, state, arm)
       require File.join(config.fetch("app"), "config/environment")
-      raise "actual YJIT required" unless RubyVM::YJIT.enabled? && !RubyVM::ZJIT.enabled?
+      raise "actual YJIT required" unless RubyVM::YJIT.enabled? && !(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?)
       require config.fetch("exploration_setup")
       NativeBench::Exploration.install(config: config, state: state, arm: arm)
       require File.expand_path("../bench/experiments/fizzy_link_vector", File.dirname(config.fetch("harness")))
@@ -103,7 +103,7 @@ module ARSiteChecks
     end
 
     def cases(config, state, arm)
-      raise "actual worker YJIT required" unless RubyVM::YJIT.enabled? && !RubyVM::ZJIT.enabled?
+      raise "actual worker YJIT required" unless RubyVM::YJIT.enabled? && !(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?)
       ActionView::Template.prepend(MidRequest)
       ActionView::Template::Handlers::ERB.prepend(SourceMismatch)
       app_pin = BlogProduction::Entropy.source_pin(config.fetch("app"))
