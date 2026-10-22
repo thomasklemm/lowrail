@@ -75,7 +75,7 @@ module HeapWindows
     GC.enable
   end
 
-  def self.run(windows, prepare: nil, observe: nil, settle: nil, warmup: nil, idle_connections: nil)
+  def self.run(windows, prepare: nil, observe: nil, settle: nil, warmup: nil, idle_connections: nil, audit: nil)
     anchors = prepare_heap
     observe_pools = ->(pools) { pools.each { |pool, stats| GC.stat_heap(pool, stats) } }
     clock = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) } if idle_connections
@@ -109,6 +109,7 @@ module HeapWindows
       collect
       window[:last_request_start_ns] = clock.call if clock
       settle&.call
+      audit&.before(window)
       if clock
         window[:last_request_end_ns] = clock.call
         window[:idle_connections] = idle_connections.call
@@ -131,6 +132,7 @@ module HeapWindows
       window[:jit_log_end_realtime_ns] = realtime.call if realtime
       window[:gc_segments] = segments
       window[:placement]["after"] = WorkerPlacement.snapshot
+      audit&.after(window)
     end
     anchors.size
   end

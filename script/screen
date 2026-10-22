@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require_relative "../bench/screen"
+
+if $PROGRAM_NAME == __FILE__
+  options = {}
+  parser = OptionParser.new do |o|
+    o.banner = "usage: script/screen APP ROUTE... --artifact DIR --output NEW_DIRECTORY [--config FILE]"
+    %w[config output artifact exploration_setup entropy_policy storage_seed].each { |key| o.on("--#{key.tr('_', '-')} PATH") { options[key] = File.expand_path(_1) } }
+    %w[warmup requests epoch].each { |key| o.on("--#{key} N", Integer) { options[key] = _1 } }
+    o.on("--budget", "Untimed tool=none heap/exactness preflight; no Ir") { options["budget"] = true }
+    o.on("--reset-cache", "Clear only this disposable app's cache before warmup") { options["reset_cache"] = true }
+  end
+  parser.parse!
+  app, *paths = ARGV
+  abort parser.to_s unless app && !paths.empty? && options["output"]
+  config = {"workload" => "generic", "warmup" => 50, "requests" => 50}
+  config.merge!(JSON.parse(File.read(options.delete("config")))) if options["config"]
+  output = File.expand_path(options.delete("output"))
+  budget = options.delete("budget")
+  config.merge!(options).merge!("app" => File.realpath(app), "paths" => paths, "screen_started" => ScreenPlatform.clock)
+  abort "--artifact required" unless config["artifact"]
+  exit(ScreenPlatform.run(config, output, budget: budget) ? 0 : 2)
+end

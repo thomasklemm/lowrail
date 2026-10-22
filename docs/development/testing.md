@@ -34,6 +34,28 @@ even with `LOWRAIL_STRICT_GATES=1`, so a skipped run is not the full gate.
 before probing or measuring; a different first refusal reason is not a
 successful measurement or a reason to bypass preflight.
 
+Assertion totals can depend on the live OS-thread census. With Ruby 4.0.7,
+Minitest 6.0.6 and the same Valgrind, the six original suites produce:
+
+| Suite | Runs | Assertions |
+|---|---:|---:|
+| `ar_diagnostics_test.rb` | 2 | 16 |
+| `callback_survey_test.rb` | 1 | 10 |
+| `pass_test.rb` | 17 | 243 |
+| `profile_summary_test.rb` | 1 | 9 |
+| `rails_drift_test.rb` | 1 | 11 |
+| `request_pairs_test.rb` | 17 | 312 or 352 |
+
+The last suite's
+`test_worker_overlap_distinguishes_window_work_from_boot_and_unknown_migrations`
+checks every available OS thread: eight fixed assertions plus five per thread
+(Minitest 6 counts `assert_operator` and `assert_match` as two each).
+A controlled run with `MT_CPU=8` observes 10 threads and makes 58 assertions
+in that test; `MT_CPU=16` observes 18 and makes 98. This reproduces the full
+**39/601 versus 39/641** difference with no skips or different counter path.
+Record the environment and named outcomes, not just an assertion total.
+The new `screen_test.rb` is an additional suite, not part of those six.
+
 From `gem/`, run both complete suites, without test filters:
 
 ```sh
@@ -47,6 +69,45 @@ failures with gate evidence. Rebase before publication and rerun affected
 gates on the rebased head; an older green summary is not current coverage.
 
 ## Preparing prerequisites
+
+### Isolate the unbundled Rails test gem home
+
+The strict gate needs a **Rack-3-only gem home for each Ruby**. A shared home
+containing Rack 2 / rack-session 1 for older corpus workloads can make
+unbundled fixture subprocesses activate those gems before Rails 8 requires
+Rack 3. This produces activation failures, not runtime regressions. Do not
+uninstall another workload's gems or weaken the fixtures to hide the conflict.
+Use a fresh per-Ruby home and install the prerequisites below into it, or
+make a disposable **physical copy** of an already prepared home:
+
+```sh
+# Run before exporting a custom GEM_HOME; source_gems must be this Ruby's home.
+source_gems=$(mise exec ruby@4.0.7 -- ruby -e 'print Gem.dir')
+gate_gems=$(mktemp -d "${TMPDIR:-/tmp}/lowrail-test-gems-4.0.7.XXXXXX")
+for component in gems specifications extensions; do
+  if test -d "$source_gems/$component"; then
+    cp -a --reflink=auto "$source_gems/$component" "$gate_gems/"
+  fi
+done
+# Remove legacy Rack candidates ONLY from this newly created disposable copy.
+rm -rf "$gate_gems"/gems/rack-2.* "$gate_gems"/gems/rack-session-1.*
+rm -f "$gate_gems"/specifications/rack-2.*.gemspec \
+  "$gate_gems"/specifications/rack-session-1.*.gemspec
+export GEM_HOME="$gate_gems" GEM_PATH="$gate_gems"
+mise exec ruby@4.0.7 -- ruby -e 'puts RUBY_DESCRIPTION; puts Gem.path; %w[rack rack-session].each { |n| puts Gem::Specification.find_all_by_name(n).map(&:full_name) }'
+```
+
+The copy command above uses GNU `cp` (Linux); on systems without reflinks,
+use a physical recursive copy. Do **not** symlink the gem directories:
+source-path certificates intentionally compare the actual installed source
+paths, and a symlinked home can correctly refuse an otherwise positive
+fixture. Native extensions and gem homes must not be reused across Ruby
+versions. For the Ruby 4.1 gate, prepare its own home from that Ruby's gems;
+do not leave the Ruby 4.0.7 exports active. Set **both** `GEM_HOME` and
+`GEM_PATH` for dependency installation, corpus preparation and the strict
+command, including its child processes. Keep the original home unchanged.
+
+### Install dependencies and prepare retained fixtures
 
 Install dependencies for **each** Ruby, not just the primary installation.
 The local integration tests require Rails/Active Record 8.1.4, sqlite3, bcrypt,
@@ -120,7 +181,13 @@ bash script/corpus real-blog-r4
 ```
 
 This extracts `fixtures/corpus/real-blog-r4-retained.tgz`, installs the
-frozen bundle and prepares a disposable test database. The 50,425-byte
+frozen bundle and prepares a disposable test database. Keep production
+screen copies separate: `storage_seed` replaces the entire disposable
+storage tree, including test databases. If that copy was used for a screen,
+rerun this preparation before Rust's generated-attribute facts gate; an
+empty test schema cannot materialize `Article#title`.
+
+The 50,425-byte
 archive is a source-only repack of the previously certified specimen, not
 byte-identical to the original archive or a newly approved baseline. Its
 SHA256 is `b1dd980b6689bf2b3912691e527d74e0b7699fb32cb53169791c24879f0c0a99`;
