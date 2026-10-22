@@ -1,0 +1,17 @@
+diff --git a/lib/time.rb b/lib/time.rb
+index 679cc82..74f419e 100644
+--- a/lib/time.rb
++++ b/lib/time.rb
+@@ -530,7 +530,9 @@ class Time
+         mon = MonthValue[$2.upcase]
+-        year = $3.to_i
+-        short_year_p = $3.length <= 3
++        year = $3
++        short_year_p = year.length <= 3
++        year = year.to_i
+         hour = $4.to_i
+         min = $5.to_i
+-        sec = $6 ? $6.to_i : 0
++        sec = $6
++        sec = sec ? sec.to_i : 0
+         zone = $7
