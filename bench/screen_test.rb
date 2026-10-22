@@ -18,6 +18,7 @@ class ScreenTest < Minitest::Test
         result = ScreenPlatform.summarize(rows)
         assert_equal delta.abs < 0.1, result.fetch(:aa).fetch(:pass), [delta, changed].inspect
         assert_in_delta(-10, result.fetch(:layers).fetch("on").fetch(changed).fetch(:delta_pct).fetch(:median), 1e-9)
+        assert_in_delta(-base.fetch(changed) / 10, result.fetch(:layers).fetch("on").fetch(changed).fetch(:delta).fetch(:median), 1e-9)
         refute RequestPairs.summarize(rows, seed: 41231, tolerance: 0.1,
           metrics: ScreenPlatform::METRICS, controls: ScreenPlatform::CONTROLS).fetch(:aa).fetch(:pass)
       end

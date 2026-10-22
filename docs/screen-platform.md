@@ -153,5 +153,98 @@ existing scenario adapters, not app edits. The command always requires an
 explicit new output directory; the frozen experiments above use warmup50
 and requests50 regardless of other workloads' budgets.
 
-Results will be appended here after the preregistered finite experiments;
-the preregistration and every failed budget remain in history/evidence.
+## First calibration: REJECTED, retained (2026-10-22)
+
+The first six-round cohort at
+[`2b41f39`](https://github.com/thomasklemm/lowrail/commit/2b41f395da6885f1760c9fd6a6e3df5dfa675b9f)
+completed all 18 workers / 72 windows in 372.86 seconds. Exact responses,
+source pins, five heaps/exact pages, brk and interpreter gates pass. Total
+A/A is [−0.029572,+0.032718]%, no-GC [−0.021656,+0.034918]%. No cache
+events, loads, reaper work or collections occurred in any window.
+
+Nevertheless it **fails calibration**: total −14.958363%
+[−15.000937,−14.916683]% does not include the −15.022961% reference. It also
+**fails background certification** because SolidCache had no raw-state
+adapter. The earlier budgets predated the final fail-closed unavailable-state
+predicate; their apparent background pass was insufficient. No old verdict
+is rescored or silently replaced. No Lobsters Ir was counted.
+
+### Untimed attribution and correction
+
+The entropy companion captured backtraces even when its request-thread
+context was nil. One raw-request ObjectSpace census attributes **119 objects**
+to two wrapper lines: 96 random-site backtrace locations, eight backtrace
+objects and eight arrays, two runtime-clock backtrace locations/objects/arrays,
+and one native random-result String. Early nil-context delegation removes
+**118 backtrace/array objects**. Ruby argument forwarding then avoids the
+eight splat-argument arrays allocated at callers; normal argument/error
+semantics and named seeded controls remain intact.
+
+The final raw census sees only the native random-result String, not an
+avoidable wrapper argument array. Uninstrumented/old/final companion native
+allocation probes with the same fixed request ID give approximately
+**2241.40 / 2367.07 / 2241.24 objects/request** over 200 requests. These are
+untimed attribution probes, not a second Ir price. The final wrapper adds
+no observed per-request objects above raw; its context checks and method
+dispatch still cost instructions, identically in all arms. Earlier nil-only
+intermediate probes retained eight extra arrays and are retained too.
+Thus the initial net ~96-object excess versus the historical cohort was
+not the full wrapper cost: other common request/boot/input differences also
+affect cross-cohort absolute object counts. Do not label that unexplained
+net residual as a particular allocation site.
+
+SolidCache snapshots now select raw serialized/encrypted table rows in each
+configured cache shard, outside endpoints, with query caching disabled and
+no model deserialization or cache-read side effects. Loaded constants only;
+unknown stores still refuse. A real-app scratch check verifies unchanged
+repeated snapshots/read values and detection of a same-size value replacement.
+The corrected three-arm budget reports identical empty cache rows, exact
+seeded responses, no background work and the expected 50/200/50 hits in each
+full window. The corrected Lobsters budget also passes with unchanged cache
+bytes and 50 copy-plan hits per full window.
+
+## Corrected calibration preregistration (before further counting)
+
+The coordinator explicitly authorized **one prospective corrected blog
+calibration**, with the first kept REJECTED, absolute saved work primary and
+percentage change secondary. This commit freezes that replacement protocol.
+There are **no further counted calibration retries**. If it fails any gate,
+stop and report; **do not run M**. No old cohort is pooled, filtered or used
+to adjust an estimate. This authorization does not authorize a second M run.
+
+Keep every other experiment setting and gate above unchanged: six serial
+off/off/on rounds, seed 41231, warmup50, N0/N50, original five floors,
+brk512 tool, same fixture/artifact, two-seed exact responses, raw cache state,
+background mix, unchanged sources and each total/no-GC A/A interval wholly
+inside ±0.1%. Before counting, both corrected tool=none budgets must pass.
+
+The public reference export supplies six independent paired samples.
+Compute each round's **on minus off-A Ir/request**, then its median and
+5,000-paired-round bootstrap interval using seed 41231, as for other effects.
+Do not subtract aggregate medians or use instruction percentages as work.
+
+| Metric | Reference paired median ΔIr/request | Preregistered absolute band |
+|---|---:|---:|
+| Total | −1,323,008.04 | [−1,336,238.1204, −1,309,777.9596] |
+| No-GC | −1,323,162.07 | [−1,336,393.6907, −1,309,930.4493] |
+
+**Primary acceptance:** each new absolute-change 95% interval must lie wholly
+inside its reference median ±**1% of absolute saved Ir** band above. This
+allows about 13.2k Ir/request, not 1% of the full 8.8M request; it bounds
+changes to the measured saving while accommodating independent cohorts and
+the retained reference uncertainty. Absolute `delta` intervals are now
+included in every route/layer/metric report, with existing relative estimates
+unchanged.
+
+**Secondary acceptance:** each new relative-effect 95% interval must lie
+wholly within **±0.20 percentage points** of the published reference: total
+−15.022961%, no-GC −15.021453%. The broader relative band allows common
+instrumentation/request-envelope work to move the denominator; it does not
+relax the primary saved-work band or the ±0.1% A/A gates. Report the actual
+relative intervals and whether they contain the historical point, even when
+the calibration otherwise passes. No native latency inference follows.
+
+Only after that calibration passes, run the **single previously declared
+Lobsters M cohort** using this corrected harness and the byte-identical
+`42d3e5a` copy plan. Its per-route ±0.1% controls and all other gates remain
+unchanged. The first failed blog and all untimed probes remain retained.

@@ -11,8 +11,14 @@ module ScreenPlatform
   module_function
 
   def summarize(rows)
-    RequestPairs.summarize(rows, seed: 41231, tolerance: 0.1,
+    result = RequestPairs.summarize(rows, seed: 41231, tolerance: 0.1,
       zero_containment: false, metrics: METRICS, controls: CONTROLS)
+    result.fetch(:layers).each do |arm, metrics|
+      metrics.each do |metric, estimates|
+        estimates[:delta] = RequestPairs.estimate(rows.map { _1.fetch(arm).fetch(metric) - _1.fetch("off_a").fetch(metric) }, seed: 41231)
+      end
+    end
+    result
   end
 
   def exact_report(workers)

@@ -80,6 +80,22 @@ class WindowAudit
       {"kind" => "file_bytes", "files" => files, "sha256" => Digest::SHA256.hexdigest(JSON.generate(files))}
     elsif @cache.class.name == "ActiveSupport::Cache::NullStore"
       {"kind" => "null_store"}
+    elsif @cache.class.name == "SolidCache::Store" && (entry = Lowrail.loaded_constant("SolidCache::Entry"))
+      connections = @cache.connections
+      shards = connections.names.to_h do |name|
+        state = connections.with(name) do
+          entry.uncached(dirties: false) do
+            entry.with_connection do |connection|
+              # Raw serialized/encrypted bytes, not decoded model attributes.
+              rows = connection.select_rows("SELECT * FROM #{connection.quote_table_name(entry.table_name)} ORDER BY id")
+              {"rows" => rows.size, "sha256" => Digest::SHA256.hexdigest(Marshal.dump(rows))}
+            end
+          end
+        end
+        [name.to_s, state]
+      end
+      {"kind" => "solid_cache_raw_rows", "shards" => shards,
+        "sha256" => Digest::SHA256.hexdigest(JSON.generate(shards))}
     else
       {"kind" => @cache.class.name, "unavailable" => "no byte-level snapshot adapter; event mix only"}
     end
