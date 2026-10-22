@@ -1,5 +1,10 @@
 # CRuby internals scout — bet R
 
+> **Later scope change (2026-10-22):** the owner subsequently authorized
+> small standalone Ruby C improvements, without requiring a large Lowrail
+> win. [Follow-up screens and owner-review drafts](upstream-drafts/ruby-small-c.md)
+> are separate from this original scout/kill decision and its measurements.
+
 **Answer: no measured small Ruby C change emerges as a large Lowrail lever.**
 The best Lowrail-specific opening is literal-derived tag/attribute work, but
 its remaining CPU budget is small and overlaps the existing sealed tier.

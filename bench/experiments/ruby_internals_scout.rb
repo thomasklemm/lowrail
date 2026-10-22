@@ -9,8 +9,8 @@ require "digest"
 require "objspace"
 
 app, mode, output = ARGV
-abort "usage: ruby_internals_scout.rb blog|fizzy|lobsters profile|census|regexp|capture|budget|wall OUTPUT" unless
-  %w[blog fizzy lobsters].include?(app) && %w[profile census regexp capture budget wall].include?(mode) && output
+abort "usage: ruby_internals_scout.rb blog|fizzy|lobsters profile|census|cgi|regexp|capture|budget|wall OUTPUT" unless
+  %w[blog fizzy lobsters].include?(app) && %w[profile census cgi regexp capture budget wall].include?(mode) && output
 
 require File.expand_path("config/application")
 Rails.application.config.yjit = false unless RubyVM::YJIT.enabled?
@@ -99,6 +99,35 @@ when "census"
     body_sha256: Digest::SHA256.hexdigest(response.body)}
   GC.enable
   ObjectSpace.trace_object_allocations_clear
+when "cgi"
+  # Untimed attribution, including aliases and instance/module uses. Never
+  # export input bytes: length/encoding/safe-byte status suffice for this screen.
+  require "cgi/escape"
+  sites = Hash.new(0)
+  wrapper = Module.new
+  %i[escapeHTML escape_html h].each do |name|
+    wrapper.define_method(name) do |value|
+      caller = caller_locations(1, 1).first
+      descriptor = String === value ? [value.bytesize, value.encoding.name,
+        !value.b.match?(/[<&'">]/)] : [value.class.name]
+      sites[[name, caller.path, caller.lineno, descriptor]] += 1
+      super(value)
+    end
+  end
+  CGI::EscapeExt.prepend(wrapper)
+  count = 0
+  trace = TracePoint.new(:c_call) do |event|
+    count += 1 if event.defined_class == CGI::EscapeExt && event.method_id == :escapeHTML
+  end
+  trace.enable { 10.times { request.call } }
+  result[:requests] = 10
+  result[:rack] = Rack.release
+  result[:cgi_c_calls] = count
+  result[:cgi_sites] = sites.to_a
+  count = 0
+  trace.enable { CGI.escapeHTML("a" * 200); CGI.escapeHTML("a" * 199 + "<") }
+  result[:positive_control_c_calls] = count
+  raise "missed CGI controls" unless count == 2
 when "regexp"
   # Untimed, disposable diagnostic worker only. c_call observes the actual
   # primitive and its Ruby callsite without wrapping backreference-sensitive
