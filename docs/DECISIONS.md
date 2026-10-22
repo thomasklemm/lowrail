@@ -10,6 +10,12 @@ One real-Puma cohort: A/A [−1.632,+0.801]%; RPS +7.827% [+6.131,+9.839], zero 
 Keep default off and the current result bench-only; the coordinator authorized ordered own-suite/DB/purity/lifecycle/fork/transport prerequisites, full gates and Thermos for an opt-in tier.
 Main integration and README changes are not authorized here; no SQL/whole-DB or ZJIT claim follows. [Protocol, limits and complete export](jit-guards.md).
 
+## F opt-in admission stops at the transitive certificate (2026-10-22)
+Own-suite coverage and the declared DB boundary pass; they do not certify erased scope machinery.
+Changing `Relation#_exec_scope` after authentication gives exact off/off but different on body/SQL at both seeds, with two stale-plan hits and zero fallbacks.
+Keep production/default delivery unchanged: handwritten dependency lists and ancestry-changing template installation are not an opt-in compiler certificate.
+Retain the accepted historical throughput result, counterexample and remaining lifecycle/concurrency obligations separately. [Evidence](jit-guards.md#opt-in-prerequisite-3-refused-transitive-certificate).
+
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
 
 The all-sealed cold failure is a runtime defect, not witness noise. On the

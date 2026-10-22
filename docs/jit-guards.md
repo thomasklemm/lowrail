@@ -410,3 +410,63 @@ mise exec ruby@4.0.7 -- ruby bench/experiments/ar_request_sites_db.rb \
   NEW_SEED_0/result.json NEW_SEED_1/result.json docs/jit-guards-db.json
 mise exec ruby@4.0.7 -- ruby bench/ar_request_sites_test.rb
 ```
+
+## Opt-in prerequisite 3: refused transitive certificate
+
+The own suite and 19 mutation controls are necessary but **not sufficient**.
+A new negative control changes `ActiveRecord::Relation#_exec_scope` in memory
+after authentication, on entry to the real bucket partial, to append
+`where(id: -404)` to the ordinary scope result. It does not edit any app or
+configuration file. Startup and child-worker YJIT are asserted; every arm
+gets an independent seed copy and the same mutation. Strict SQL shadowing
+is **off**, matching the normal runtime rather than turning a diagnostic
+exception into a production guard.
+
+At both response seeds, all arms return **HTTP 200**, and off-A/off-B have
+identical bodies, all headers and ordered SQL. On has a **different body,
+headers and SQL**, while recording **two DirectSite hits, zero fallbacks**.
+The forked on worker also successfully rebinds once. The collector exits 2.
+The overridden transitive scope method is absent from `Site`'s handwritten
+dependency inventory; the top-level named scope bodies remain unchanged.
+This is a demonstrated missing assumption, not cache-clock noise or a
+hypothetical concurrency concern. [Complete negative receipt](jit-guards-certificates.json).
+
+Adding only `_exec_scope` to the manual list would repair this one input,
+not establish the requested **compiler-owned** transitive/purity certificate.
+There is also no generated proof of argument evaluation order or prohibition
+on boot execution of arbitrary scopes. Concurrent first-bind publication,
+roles/shards/pools, reload and lazy-loading remain unclosed obligations;
+single-thread Puma and one same-process suite rebind do not certify them.
+
+Production integration also cannot reuse today's template seam unchanged.
+`Manifest#compatible?` deliberately refuses every nonempty template table
+before installation because `Templates.install` changes framework ancestry.
+F's external overlay similarly prepends a handler and a relation hook,
+symmetrically in its experimental arms; that does not prove equivalence to
+an uninstrumented app or authorize undoing main's refusal. No production
+pass/registry/manifest change is made. **Opt-in integration is not ready.**
+
+Reproduce the negative admission check, without a timing cohort:
+
+```sh
+JIT_GUARDS_HARNESS="$HARNESS/script/native-bench" BUNDLER_VERSION=4.0.20 \
+  AR_GUARD_FORK=1 mise exec ruby@4.0.7 -- ruby \
+  bench/experiments/ar_request_sites_certificate.rb CONFIG NEW_OUTPUT
+# Expected current result: exit 2; both off_off_exact true / off_on_exact false.
+```
+
+## Bounded transport-error review
+
+F's first rejected serving run reports four `connection closed before
+message completed` errors in its round-4 on window, with every worker
+terminated for missing a 60-second heartbeat. The reason for those missed
+heartbeats was not established; connection-identity fallback was separately
+proved and must not be relabeled their cause. F's later worker-local cohort
+already had zero errors, so nonrecurrence is not unique to the new guards.
+
+Under Y's new guards, all **60 timed load windows**, all warmups, and the
+later 12-worker untimed production-rebind replay have zero HTTP/transport
+errors. All 623,992 timed completions reconcile against native and wire
+records. This meets the requested bounded nonrecurrence observation, **not
+a root-cause explanation or a general serving certificate**. No new load
+cohort or error exclusions were introduced for this review.
