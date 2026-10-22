@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet G: retain generic inventory, kill literal options (2026-10-22)
+
+Keep token/collection's boot-derived inventory separate from the blog form and its irrelevant I18n source pin.
+Blog form/token/collection retains ≈377 saved objects/request with options absent; the form itself stays narrow.
+Generic admission saves only ≈2–21 objects on five Fizzy routes; Campfire room and CASA sign-in are neutral.
+Kill the literal-options prototype: Lobsters regresses, and its compiler delivery correctly invalidates the blog form.
+No certificate waiver, template seam, Ir run or promotion; [census and all labeled screens](generic-sealed.md), integration left to the coordinator.
+
 ## Ancestry-changing delivery refuses whole artifacts (2026-10-22)
 
 The all-sealed cold failure is a runtime defect, not witness noise. On the
