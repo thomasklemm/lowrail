@@ -51,6 +51,12 @@ module NativeRps
         snapshot = {"pid" => Process.pid, "gc" => stats.slice(:heap_live_slots, :old_objects,
           :malloc_increase_bytes, :count, :minor_gc_count, :major_gc_count, :total_allocated_objects,
           :time), "rss" => NativeBench.rss}
+        if @config["heap_observer"]
+          snapshot["gc"] = stats
+          snapshot["heaps"] = GC.stat_heap
+          snapshot["latest_gc"] = GC.latest_gc_info
+          snapshot["monotonic_s"] = NativeBench.clock
+        end
         snapshot["gc_tags"] = capture if capture
         return [200, {"content-type" => "application/json"}, [JSON.generate(snapshot)]]
       end
@@ -221,7 +227,20 @@ module NativeRps
           sleep 0.05
         end
       end
+      if config["heap_observer"] && File.basename(destination) == "timed.json"
+        boot = JSON.parse(File.read(File.join(File.dirname(destination), "boot.json")))
+        sampling_started = NativeBench.clock
+        sampler = Thread.new do
+          records = []
+          [0.25, duration / 2.0, duration - 0.5].each do |offset|
+            sleep [offset - (NativeBench.clock - sampling_started), 0].max
+            records << process_metrics(config, File.dirname(destination), boot)
+            write(destination + ".heaps.json", records)
+          end
+        end
+      end
       ok = system({"NO_COLOR" => "true"}, *command, out: destination, err: destination + ".stderr")
+      sampler&.value
       if service
         # Drain capture after oha has joined its outstanding requests. This is
         # outside the oha window; a zero-drop counter alone does not prove that
@@ -326,6 +345,7 @@ module NativeRps
     raise "unknown HTTP workload" unless %w[blog campfire fizzy lobsters].include?(config.fetch("workload"))
     raise "positive durations/concurrency and >=2 rounds required" unless config.fetch("rounds") >= 2 &&
       %w[duration warmup_seconds concurrency workers threads].all? { config.fetch(_1).positive? }
+    raise "heap sampling requires duration >=2 seconds" if config["heap_observer"] && config.fetch("duration") < 2
     policy = {"blog" => "blog-entropy-controls.json", "campfire" => "campfire-entropy-controls.json",
       "fizzy" => "fizzy-native-entropy.json", "lobsters" => "lobsters-rps-entropy.json"}.fetch(config.fetch("workload"))
     config["validation_policy"] ||= File.join(NativeBench::ROOT, "fixtures/corpus", policy)

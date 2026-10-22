@@ -113,5 +113,17 @@ class NativeBenchTest < Minitest::Test
       assert_kind_of Integer, snapshot.fetch("gc").fetch(field)
     end
     assert_operator snapshot.fetch("rss").fetch("VmRSS"), :>, 0
+    refute snapshot.key?("heaps"), "ordinary RPS diagnostics keep their existing cost"
+    wrapper = NativeRps::Samples.new(app, {"validation_key" => "test-key", "heap_observer" => true}, nil)
+    _, _, body = wrapper.call({"HTTP_X_LOWRAIL_METRICS" => "test-key"})
+    snapshot = JSON.parse(body.join)
+    assert_operator snapshot.fetch("gc").fetch("heap_available_slots"), :>, 0
+    assert_equal [40, 80, 160, 320, 640], snapshot.fetch("heaps").values.map { _1.fetch("slot_size") }
+    snapshot.fetch("heaps").each_value do |heap|
+      assert_equal heap.fetch("heap_eden_slots"),
+        heap.values_at("heap_live_slots", "heap_free_slots", "heap_final_slots").sum
+    end
+    assert snapshot.key?("latest_gc")
+    assert_operator snapshot.fetch("monotonic_s"), :>, 0
   end
 end
