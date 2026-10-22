@@ -42,7 +42,14 @@ for name in options.apps:
     base = root / name
     facts_path = base / ".lowrail/facts.json"
     facts = read(facts_path)
-    app_root = Path(facts["app_root"]).resolve()
+    anchor = Path(facts["app_root"])
+    if facts["format"] == 2:
+        # Match the CLI loader: relative anchors belong to the facts file,
+        # not the reducer's cwd. Pin that root before copying into the alias.
+        app_root = (facts_path.parent / anchor).resolve()
+    else:
+        assert anchor.is_absolute(), "format-1 facts must have an absolute app_root"
+        app_root = anchor.resolve()
     assert not base.resolve().is_relative_to(app_root), "Lowrail outputs must be external"
     before = read(base / "static.json")
     contracts = read(base / "contracts-static.json")
@@ -68,7 +75,10 @@ for name in options.apps:
             filtered.append(dict(sample, returns={}, ivars={}))
         alias = base / "arguments/.lowrail"
         alias.mkdir(parents=True, exist_ok=True)
-        (alias / "facts.json").write_bytes(facts_path.read_bytes())
+        if facts["format"] == 2:
+            (alias / "facts.json").write_text(json.dumps(dict(facts, app_root=str(app_root))))
+        else:
+            (alias / "facts.json").write_bytes(facts_path.read_bytes())
         (alias / "observed.json").write_text(json.dumps(dict(observed, types=filtered)))
         output = subprocess.check_output([str(cli), "types", str(alias.parent)], text=True)
         (base / "arguments.json").write_text(output)

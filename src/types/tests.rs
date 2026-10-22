@@ -364,6 +364,24 @@ fn view_contracts_keep_nullable_builder_and_unknown_input_boundaries() {
         let check = std::process::Command::new("rbs").arg("-I").arg(dir.join("sig")).arg("validate").output().unwrap();
         assert!(check.status.success(), "{}{}", String::from_utf8_lossy(&check.stdout), String::from_utf8_lossy(&check.stderr));
     }
+    // Included/prepended helpers shadow dependencies without changing the
+    // stock defining modules. Do not skip anonymous helpers to stock methods,
+    // even when the census holds them under synthetic rather than real names.
+    for (ancestor, holder) in [("CustomView", "CustomView"), ("#<Module:0x>", "Example.ancestors[1]")] {
+        facts.modules[0].ancestors.insert(1, ancestor.into());
+        facts.modules.push(serde_json::from_value(json!({"name":holder,"synthetic":true,
+            "methods":[{"name":"tag_builder","owner":ancestor,"source_location":"/custom.rb:1"},
+                       {"name":"safe_join","owner":ancestor,"source_location":"/custom.rb:2"}]})).unwrap());
+        let changed = TypeModel::from_facts(&facts).unwrap();
+        for name in ["tag", "content_tag", "token_list", "class_names", "to_sentence"] {
+            assert_eq!(changed.fact(&format!("Example#{name}"), "return").unwrap().name, "untyped", "{ancestor}: {name}");
+        }
+        facts.modules.pop();
+        if ancestor.starts_with('#') {
+            assert_eq!(TypeModel::from_facts(&facts).unwrap().fact("Example#tag", "return").unwrap().name, "untyped");
+        }
+        facts.modules[0].ancestors.remove(1);
+    }
     // A replaced helper/callee or unsupported gem cannot supply the contract.
     facts.modules[2].methods.iter_mut().find(|m| m.name == "safe_join").unwrap().source_location = Some("/app/custom.rb:1".into());
     let changed = TypeModel::from_facts(&facts).unwrap();

@@ -174,8 +174,30 @@ based on main's screen-platform commit 14d8cf0, passed:
   type-at-position, method signature, definition and dynamic-receiver refusal.
   The frozen per-slot ledger is identical after rebase.
 
-The final follow-up changes only this documentation, not checked gate inputs.
+The 6292640 follow-up changed only this documentation, not checked gate inputs.
 No new Steep, runtime-support or performance claim.
+
+### Thermos corrections
+
+The initial independent reviews identified an anonymous-helper lookup gap and
+a relative facts-path bug in the measurement reducer. Named dependency
+overrides already refused, but an anonymous ancestor could be skipped to a
+stock view method. The view catalog now refuses that incomplete lookup for
+both the outer method and its dependencies; the general body resolver is
+unchanged. A regression fails on the original candidate, and checks both
+named and anonymous shadowing without replacing the defining Rails module.
+
+The reducer now resolves format-2 `app_root` relative to the facts file, just
+like the CLI, refuses in-app output before writing, and pins the resolved root
+when copying facts into an external argument alias. Its integration control
+checks refusal, a successful external alias, and unchanged input facts.
+All retained workload outputs remain external, including Lobsters.
+
+View contracts now share the existing catalog signature builder, and required
+external RBS names, generics and superclasses share one declaration table.
+The nullable `capture` contract was not changed: `SafeBuffer?` already includes
+the nil values observed for nil/object block results. The frozen six-app
+static facts and argument ledger are unchanged by these corrections.
 
 A second Fizzy MCP session against the argument-only alias reports
 `AccessesHelper#access_menu_tag` as

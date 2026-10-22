@@ -14,6 +14,10 @@ mise exec -- cargo build --locked
 mise exec -- cargo test --locked
 ```
 
+Rust's types integration gate also needs Python 3.9+ to exercise the public
+argument-observation reducer, including refusal before any in-app output and
+external aliases with relative format-2 facts. It does not boot an app.
+
 The gem Rake task excludes `bench/`. Its benchmark-harness tests are a
 **separate required gate**, not optional coverage. From the repository root,
 run every top-level suite in its own process:

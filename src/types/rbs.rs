@@ -222,24 +222,32 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
     root.render(&mut app, "");
     // Minimal declarations for standalone validation, not a replacement for
     // Rails signatures. Keep this separate when using a Rails RBS collection.
-    let mut support = String::from("# Bounded real-Rails API support; omit when loading full Rails signatures.\nclass BigDecimal < Numeric\nend\nclass Date\nend\nclass DateTime < Date\nend\nclass Tempfile\nend\nmodule ActiveSupport\n  class TimeWithZone\n  end\nend\n");
+    let mut support = String::from("# Bounded real-Rails API support; omit when loading full Rails signatures.\n");
     // Samples and catalog contracts can introduce external classes. Emit
     // name-only stubs, not invented signatures, for those namespaced classes.
     let mut external = Declaration::default();
+    for (name, generics, superclass) in [
+        ("BigDecimal", "", Some("Numeric")),
+        ("Date", "", None),
+        ("DateTime", "", Some("Date")),
+        ("Tempfile", "", None),
+        ("ActiveSupport::TimeWithZone", "", None),
+        ("ActiveSupport::SafeBuffer", "", Some("String")),
+        ("ActiveRecord::Relation", "[Elem]", None),
+        ("ActiveRecord::Associations::CollectionProxy", "[Elem]", Some("ActiveRecord::Relation[Elem]")),
+        ("ActiveRecord::QueryMethods::WhereChain", "", None),
+    ] {
+        let node = external.at(name);
+        node.kind = "class";
+        node.generics = generics;
+        node.superclass = superclass.map(String::from);
+    }
     let library = rails::support(facts);
     for sig in &library {
         let receiver = sig.receiver.strip_suffix("[Elem]").unwrap_or(&sig.receiver);
         external.at(receiver).methods.push(sig);
         external.at(receiver).kind = "class";
     }
-    let relation = external.at("ActiveRecord::Relation");
-    relation.kind = "class";
-    relation.generics = "[Elem]";
-    let proxy = external.at("ActiveRecord::Associations::CollectionProxy");
-    proxy.kind = "class";
-    proxy.generics = "[Elem]";
-    proxy.superclass = Some("ActiveRecord::Relation[Elem]".into());
-    external.at("ActiveRecord::QueryMethods::WhereChain").kind = "class";
     for sig in model.methods.values() {
         for ty in std::iter::once(&sig.return_type).chain(sig.parameters.iter().map(|p| &p.ty)) {
             if !ty.provenance.iter().any(|p| matches!(p.source, Source::Observed | Source::SorbetSig | Source::RailsApi)) { continue; }
@@ -257,9 +265,6 @@ pub(super) fn export<'a>(model: &'a TypeModel, facts: &Facts) -> Export<'a> {
         if let Some(node) = external.existing(&module.name) {
             node.kind = if module.kind == "class" { "class" } else { "module" };
         }
-    }
-    if let Some(node) = external.existing("ActiveSupport::SafeBuffer") {
-        node.superclass = Some("String".into());
     }
     external.render(&mut support, "");
     Export { format: 1, coverage, files: BTreeMap::from([("app.rbs".into(), app), ("lowrail_support.rbs".into(), support)]), signatures, diagnostics, conflicts: &model.conflicts }

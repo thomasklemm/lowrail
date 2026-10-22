@@ -5,6 +5,42 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 #[test]
+fn argument_reducer_keeps_relative_facts_outputs_external() {
+    let dir = std::env::temp_dir().join(format!("lowrail-argument-paths-{}", std::process::id()));
+    let app = dir.join("app");
+    let external = dir.join("external/app");
+    let bin = env!("CARGO_BIN_EXE_lowrail");
+    let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("script/types-observed-arguments");
+    for (base, anchor, allowed) in [(&app, "..", false), (&external, "../../../app", true)] {
+        std::fs::create_dir_all(base.join(".lowrail")).unwrap();
+        let facts = json!({"format":2,"app_root":anchor,"ruby_description":"ruby 4.0.7",
+            "app_paths":{"values":[],"keys":[]}});
+        std::fs::write(base.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+        let static_output = Command::new(bin).arg("types").arg(base).output().unwrap();
+        assert!(static_output.status.success(), "{:?}", static_output);
+        for file in ["static.json", "contracts-static.json"] {
+            std::fs::write(base.join(file), &static_output.stdout).unwrap();
+        }
+        std::fs::write(base.join(".lowrail/observed.json"), json!({"format":1,"app_root":app,
+            "types":[],"exit_ok":true,"command":["unchanged-suite"],"samples_per_method":16}).to_string()).unwrap();
+        let output = Command::new("python3").arg(&script).arg(base.parent().unwrap()).arg("app")
+            .arg("--lowrail").arg(bin).output().unwrap();
+        assert_eq!(output.status.success(), allowed, "{:?}", output);
+        if allowed {
+            let copied: Value = serde_json::from_slice(&std::fs::read(base.join("arguments/.lowrail/facts.json")).unwrap()).unwrap();
+            assert_eq!(copied["app_root"], json!(app));
+            let ledger: Value = serde_json::from_slice(&output.stdout).unwrap();
+            assert_eq!(ledger["apps"]["app"]["argument_conflicting_slots"], 0);
+        } else {
+            assert!(String::from_utf8_lossy(&output.stderr).contains("Lowrail outputs must be external"));
+            assert!(!base.join("arguments").exists());
+        }
+        assert_eq!(std::fs::read_to_string(base.join(".lowrail/facts.json")).unwrap(), facts.to_string());
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn target_ruby_grammar_is_explicit_in_parse_types_and_mcp() {
     let dir = std::env::temp_dir().join(format!("lowrail-target-grammar-{}", std::process::id()));
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
