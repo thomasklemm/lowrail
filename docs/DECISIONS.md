@@ -4,6 +4,23 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet K: YJIT-aware emission screen (2026-10-22, before running)
+
+Screen blog `/articles/1` (current three passive production units) and Fizzy
+`/buckets` (bet F's separate DirectSite prototype), without app/config patches.
+One off-A/on/off-B stats screen each: 2,000 warm requests, 500 requests,
+Ruby 4.0.7 `--enable-yjit=stats`, sampled exit stacks (101), all counters retained.
+Separate stock-Ruby, stats-OFF wall screen: three rotated rounds, same counts,
+untimed two-seed response companions and positive-hit/zero-fallback coverage.
+Stats ratios use window retired YJIT / (retired YJIT + interpreter bytecodes),
+not differences of cumulative ratios. Compile fallbacks are not executed exits.
+Only a concrete lowering-attributed defect warrants one exact emission variant;
+stop if its allocation/counter screen is not better or wall improvement fails
+to clear three times the maximum absolute A/A interval bound. No retry-to-green.
+No RPS cohort without that clear screen win; if warranted, preregister exactly
+one using `script/rps` at 44a33c4/544ad8d, A/A first, retaining every window.
+ZJIT is a brief shape-parity note only; no default/admission/price promotion.
+
 ## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
 
 The token-only +32 objects/request is traced to per-hit view-context constant
