@@ -1,7 +1,11 @@
 # Bet Z3: remaining ZJIT send fallbacks on Rails requests
 
-2026-10-22. **One protected-send prototype is draft-eligible; fork only.**
-No upstream PR, issue or comment was posted. No whole-request speed claim.
+2026-10-22. **Z3 closed with two owner-admitted candidates.** This research
+thread posted no upstream PR, issue or comment. Dedicated owner-authorized
+PR threads subsequently opened [protected sends (#19483)](https://github.com/ruby/ruby/pull/19483)
+and [explicit block parameters (#19484)](https://github.com/ruby/ruby/pull/19484).
+Their current heads/reviews are owned by those threads, not certified by the
+historical measurements here. No whole-request speed claim.
 
 Follow-up: a second owner-admitted candidate removes **27 Fizzy / 0 blog
 final sends per request** by admitting guarded Proc sends to explicit block
@@ -33,6 +37,8 @@ estimated savings. Values agree across seeds unless a range is shown.
 Planner kwrest counts are a separate, overlapping diagnostic, not another
 send to add to this table. The top eligible **small** fix is rank 3, not the
 highest raw count.
+The original upstream assessments below precede the two PR handoffs linked
+above; the count baseline has not been regenerated after those handoffs.
 
 | Rank / reason | Blog | Fizzy | Fix sketch / upstream status / verdict |
 |---|---:|---:|---|
@@ -52,7 +58,7 @@ highest raw count.
 | 14. `super_from_block` | 10 | 12 | Recover lexical method and block environment correctly. **Defer.** |
 | 15. `super_call_with_block` | 2 | 5 | Preserve implicit/explicit block and callee frame semantics. **Defer.** |
 | 16. `super_polymorphic` | 2–2.017 | 3–3.017 | Mixed receiver/super lookup, including a small entropy-harness component. **Defer.** |
-| 17. `super_not_optimized_method_type` | 1 | 1 | Response-body setter super targets an attrset. Potential bounded specialization, but only one increment/request. **Lower priority; not prototyped.** |
+| 17. `super_not_optimized_method_type` | 1 | 1 | Response-body setter super targets an attrset. Reuse super-call guards and ivar-writing machinery, preserving arity/block/complex-argument refusals. Current master still refuses; open/closed super/attrset/attr_writer PR searches found no focused duplicate. **Investigated and declined: one call/request, a new guarded lowering rather than a stale refusal; not prototyped.** |
 
 Master was refreshed/checked at
 [`8ff4ae1`](https://github.com/ruby/ruby/commit/8ff4ae135d438314090f0dc23916601ef9c444d5).
@@ -68,6 +74,55 @@ returned seven results and no matching protected-dispatch improvement.
 PR template was present in the checked master tree. No AI/LLM-contribution
 ban was found in these contribution docs or `.github`; this is a scoped
 repository-policy check, not a claim about unpublished project policy.
+
+## Final disposition under the owner's value cutoff
+
+No third prototype or additional timing cohort was run. The accepted
+protected-send reduction is **86 blog / 344 Fizzy final sends per request**;
+the accepted explicit-block-parameter reduction is **0 / 27**. These are
+separate comparisons against the same pre-prototype control, **not a
+measured combined build**. The [follow-up evidence](zjit-block-param-send.md)
+corrects planner double-counting: the surviving nine add-bind-related
+fallbacks are SQLString yields, not unused-block warnings. A
+[dedicated stats PR thread](https://ampcode.com/threads/T-01a164eb-e13a-77e9-a92c-591a0d8f21c1)
+owns any optimizer-counter fix; none was made here.
+
+The final read-only inspection refreshed upstream `master` (still
+[`8ff4ae1`](https://github.com/ruby/ruby/commit/8ff4ae135d438314090f0dc23916601ef9c444d5))
+and RFC #19389, and searched
+open/closed PRs for ZJIT super, attrset and attr_writer. Both seeds locate
+the sole attrset-super fallback at `ActionController::Metal#response_body=`,
+`metal.rb:238`, bytecode offset 29: exactly **1 / 1** per request. Merged
+[#15993](https://github.com/ruby/ruby/pull/15993) explicitly left attrset
+targets after handling C-function super calls; current master still handles
+ISEQ/CFUNC targets only.
+
+An attrset implementation could reuse `emit_super_call_guards`, require one
+argument and emit `SetIvar` with the attr ID from the resolved method entry,
+returning the assigned value. A field-store fast path additionally needs
+receiver/shape guards and the existing frozen/complex-object fallbacks.
+This is a new guarded lowering, not another redundant refusal to remove;
+arity, block handling, alias/redefinition invalidation and exceptional
+behavior would need their own witnesses. At one call per request, this was
+declined rather than declared exact or measured profitable.
+
+The stopping decision is **not** a claim that all remaining counts above
+ten are covered upstream. Dynamic `send` remains **21 / 89** (61 Fizzy Arel
+visitor calls), and receiver-polymorphic fallback remains **64 / 398**.
+The former needs symbol-value profiling/guards, target lookup, permissions
+and call reshaping; the latter needs receiver-distribution/code-size
+decisions, not a blanket increase in specialization limits. Neither yielded
+another small, clearly exact admission. Method-missing sites must retain
+lookup/invalidation semantics. Super complex arguments are **27 / 38** in
+aggregate but no individual site exceeds six; super-from-block is **10 / 12**
+with no individual site above five and requires lexical environment/CME
+recovery.
+
+The leading yield/block/forwarding/exception areas overlap #19077, #19389,
+#18326, #18759 and #18244 as detailed in the ranking; overlap is not proven
+complete coverage. These larger projects and the unclaimed remaining gaps
+stay in the ledger. Under the requested small-change/value cutoff, Z3 ends
+with its two admitted candidates and no additional candidate handoff.
 
 ## Side exits and coverage limits
 
