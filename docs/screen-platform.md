@@ -248,3 +248,134 @@ Only after that calibration passes, run the **single previously declared
 Lobsters M cohort** using this corrected harness and the byte-identical
 `42d3e5a` copy plan. Its per-route ±0.1% controls and all other gates remain
 unchanged. The first failed blog and all untimed probes remain retained.
+
+## Corrected calibration: ACCEPTED (2026-10-22)
+
+The one authorized corrected cohort at
+[`e84cf55`](https://github.com/thomasklemm/lowrail/commit/e84cf55116600d676172a5531e78b6d08d28926c)
+passes the prospective **absolute saved-work** criterion and secondary
+percentage band. This does not reclassify the first rejected calibration.
+
+| Blog GET /articles/1 | Total Ir | No-GC Ir |
+|---|---:|---:|
+| Paired on minus off-A, Ir/request | −1,321,506.99 | −1,321,185.72 |
+| Absolute-change 95% interval | [−1,323,475.24, −1,320,106.79] | [−1,325,578.89, −1,318,351.35] |
+| Historical absolute median inside new interval | yes | yes |
+| Whole interval inside preregistered ±1% saving band | yes | yes |
+| Relative change | −15.054825% | −15.049772% |
+| Relative-change 95% interval | [−15.070921, −15.038712]% | [−15.098833, −15.022174]% |
+| Historical relative point inside new interval | **no** | **no** |
+| Whole interval inside preregistered ±0.20-point band | yes | yes |
+| A/A 95% interval | [−0.023582, +0.037459]% | [−0.032358, +0.068011]% |
+
+Off-A/off-B/on allocation medians are **2251.60 / 2250.91 / 1874.25**
+objects/request; the median of paired allocation differences is −377.17
+[−377.62, −377.10], not subtraction of aggregate medians. Common work and
+the denominator differ from the reference; **do not claim the original
+−15.022961% point was reproduced within the new relative interval**.
+
+All screen gates pass: pre/post two-seed exact status/body/all-header hashes,
+identical empty SolidCache raw-row state, no cache events/regeneration,
+lazy loads, collections or reaper work, both ±0.1% controls, all five heaps
+and exact pages, brk512, actual interpreter, unchanged input pins and no
+Lowrail refusal. Independent reconciliation verifies 72 dump totals against
+self-cost sums, 36 full-minus-empty subtractions and every paired estimate;
+no overlapping worker/window envelopes. Eighteen workers / six rounds took
+**370.90 seconds**, excluding tool/corpus/artifact construction. The final
+three-worker tool=none blog budget took about **44 seconds**; these observed
+costs are not performance promises for other apps.
+
+This pass permits the one previously preregistered M cohort. No further blog
+calibration, data pooling, round exclusion or tolerance adjustment occurred.
+
+## Lobsters M: ACCEPTED scoped interpreter price (2026-10-22)
+
+The single new-protocol cohort at the same `e84cf55` source completes all
+18 workers / six rounds, **144 windows**, in **1515.54 seconds** (25.26
+minutes). No retries, exclusions, route selection or pooling with the rejected
+historical M cohort. These are two synchronous warm-request bench specimens,
+not latency, whole-app support, production-cache admission or a default pass.
+
+| Paired metric | GET / | GET /s/enr7ye |
+|---|---:|---:|
+| Total Ir change | **−5.183274%** | **−1.637261%** |
+| Total change 95% interval | [−5.199424, −5.134288]% | [−1.665128, −1.591397]% |
+| No-GC Ir change | **−5.382614%** | **−1.647801%** |
+| No-GC change 95% interval | [−5.408094, −5.334706]% | [−1.665625, −1.604965]% |
+| Total ΔIr/request | −3,580,097.18 | −254,325.87 |
+| Total absolute-change 95% interval | [−3,590,926.70, −3,544,899.80] | [−258,678.41, −247,109.91] |
+| No-GC ΔIr/request | −3,623,141.30 | −255,979.24 |
+| No-GC absolute-change 95% interval | [−3,640,741.98, −3,590,091.62] | [−258,768.45, −249,237.77] |
+| Total A/A 95% interval | [−0.056867, +0.004564]% | [−0.044815, +0.016905]% |
+| No-GC A/A 95% interval | [−0.054387, −0.004275]% | [−0.052420, +0.005119]% |
+| Allocations/request off-A / off-B / on | 13828.24 / 13828.40 / 13461.40 | 3440.56 / 3441.15 / 3366.99 |
+| Paired allocation change | −366.89 [−367.31, −365.91] | −73.70 [−73.82, −73.37] |
+
+Both routes' total/no-GC A/A intervals lie wholly within **±0.1%**. The
+front-page no-GC interval does not contain zero; the prospectively declared
+rule deliberately does not require that. Allocations above are measured
+paired estimates, not a renewed claim of exact integer savings per request.
+
+Every screen gate passes. Status/body/all-header digests match at both seeds
+before and after windows. All **288 cache endpoints** have byte-state digest
+`ca773e468c52e43176c3138f26cd33316b5427c0e4cf670e6536957e613c33d0`.
+Each full window records exactly 50 cache reads/hits and 50 fetch-hit events;
+empty windows have none. No regeneration, cache mutation, lazy load, reap,
+flush, Marshal dump, deflate, binwrite, rename or require/load signature is
+observed. All 48 round/route/mode/size comparisons are comparable. Front-page
+full windows each have **two minor / zero major GCs** in every arm and mode;
+story and empty windows have zero. No-GC excludes GC instructions, not the
+collections themselves; these are separate executions, not a subtraction
+of GC savings. One pool's existing maintenance lock is held, explicitly
+deferring asynchronous reaping outside the synchronous request price.
+
+All five heap ranges/exact pages, brk512, observed interpreter, unchanged
+source/input pins and no-refusal gates pass. Independent reconciliation
+checks **144 dump totals/self-cost sums, 72 subtractions and every paired
+estimate**, with zero overlapping worker/window envelopes. The final
+three-worker tool=none M budget took about **112 seconds**. No Lobsters
+authored content, application/config patch or runtime/data publication is
+included; only Lowrail's harness and sanitized numeric/hash evidence are
+published. The unchanged copy-plan prototype is a branch-only specimen.
+
+## Validation and retained evidence
+
+`LOWRAIL_STRICT_GATES=1 mise exec ruby@4.0.7 -- ruby bench/screen_test.rb
+--seed=1729` passes **3 tests / 43 assertions**; the shared counter tests
+pass **17 / 312**, and the targeted entropy contracts pass **3 / 15**.
+The clock regression exercises a real FileStore beyond its wall-time TTL,
+independent mutable deserializations and timezone preservation. Cache
+regressions distinguish a hit, regeneration, same-size byte replacement,
+an unknown store and reaper contamination; A/A boundary tests exercise both
+signs and either failed metric while preserving historical caller policy.
+
+The unrelated stale-template expectation was reproduced once on a clean
+`origin/main` at
+[`f257ddd`](https://github.com/thomasklemm/lowrail/commit/f257ddd1d35284b1da4daad201852ab8cc2ee32e):
+`LOWRAIL_STRICT_GATES=1 mise exec ruby@4.0.7 -- ruby bench/pass_test.rb
+--verbose --seed=1729` reports **17 tests / 233 assertions / one failure** in
+`PassBenchTest#test_stale_manifest_is_a_rejected_measurement_not_a_silent_noop`.
+The ancestry-artifact refusal precedes the expected stale-build text.
+The first local observation used seed 53337. This is **bench/pass_test.rb,
+not the gem rake test suite**, so it does not contradict the recorded strict
+193 / 6,792 gem pass. No fix is included; the coordinator owns routing it.
+
+The shared counter suite requires the pinned tool's `bin` on `PATH` and its
+`include` on `CPATH`, as in the running instructions. An unconfigured final
+validation invocation failed to compile `valgrind/callgrind.h` (one failure,
+two skips); setting those prerequisite paths, without source changes, gives
+the 17 / 312 clean result above. This was not an app or counted-cohort retry.
+
+The [sanitized results export](screen-platform-results.json) retains all
+three counted cohorts, ten untimed budget attempts (including failures),
+allocation probes, per-window background/heap/placement observations, paired
+samples, dump/log hashes and independent reconciliations. The first blog
+verdict remains false; corrected blog and M are true. Complete file pins
+are deduplicated: a provenance `pins_ref` selects a `pin_sets` entry with
+either `files`, or `base` plus `overrides` and `removed` paths. Reconstruction
+was checked against every original protocol. `$REPO` replaces the workspace
+root; fixed public fixture secret values and detailed entropy trace payloads
+are omitted, retaining trace hashes/counts. No response/cache/database
+contents or Lobsters runtime files are published. Full private raw evidence
+is retained in this orb, not committed. README/results-index changes and
+any application/runtime promotion belong to the owner, not this screen.
