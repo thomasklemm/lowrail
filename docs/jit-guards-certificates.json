@@ -16,6 +16,7 @@
     "off_a": {
       "arm": "off_a",
       "yjit": true,
+      "zjit": false,
       "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
       "cases": {
         "0": {
@@ -52,11 +53,12 @@
         }
       },
       "forked": true,
-      "pid": 157556
+      "pid": 181385
     },
     "off_b": {
       "arm": "off_b",
       "yjit": true,
+      "zjit": false,
       "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
       "cases": {
         "0": {
@@ -93,11 +95,12 @@
         }
       },
       "forked": true,
-      "pid": 157563
+      "pid": 181416
     },
     "on": {
       "arm": "on",
       "yjit": true,
+      "zjit": false,
       "source_sha256": "acbd7b3fde88ddc316bedad6634f17a1085234d4ed73df39f18e094fd05de04b",
       "cases": {
         "0": {
@@ -117,8 +120,8 @@
             "errors": [],
             "passed": true,
             "control": "source-pinned untimed entropy companion; timed entropy untouched",
-            "sql_events": 91,
-            "sql_sha256": "b38ecffa2bcc5502d77d593fcb8f80949790b075a5bb62684d7453a2c197a3ef"
+            "sql_events": 86,
+            "sql_sha256": "f6113369391b2549e6faa3640a16c916a071d308fce59088333d130b1cab85fe"
           }
         },
         "1": {
@@ -144,12 +147,12 @@
         }
       },
       "forked": true,
-      "pid": 157570
+      "pid": 181448
     }
   },
   "scope": "transitive _exec_scope mutation after authentication; no app/config source patches; shadows off",
   "sources": {
-    "ar_request_sites_certificate.rb": "72c2f3340d631935eb5fdd873b2ab95359b9fe93e62ae32e2ec0e8603c1b78f2",
+    "ar_request_sites_certificate.rb": "8367dc806b842073bdaed2dfced73da258aaa46f7a8dab448d0e96ab5f312163",
     "ar_request_sites.rb": "dab65d0ae5704b81683e3a0a28f1267f28c61932ee3c02bc1e481ef77b47dc28",
     "ar_request_sites_check.rb": "d6eef53b6f363b19efbc1c7268f155f6794958debf48971e1a833b2003cda652",
     "ar_callsite.rb": "37529c994b613e840caf25254d5ff0d852cb305fffb76608855ac3ae1bd52ca5"

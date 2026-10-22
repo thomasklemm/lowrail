@@ -10,16 +10,21 @@ module ARSiteChecks
       self.entered += 1
       unless undo
         original = ActiveRecord::Relation.instance_method(:_exec_scope)
+        visibility = ActiveRecord::Relation.private_method_defined?(:_exec_scope) ? :private : :public
         ActiveRecord::Relation.send(:define_method, :_exec_scope) do |*args, &block|
           original.bind_call(self, *args, &block).where(id: -404)
         end
-        self.undo = -> { ActiveRecord::Relation.send(:define_method, :_exec_scope, original) }
+        ActiveRecord::Relation.send(visibility, :_exec_scope)
+        self.undo = -> {
+          ActiveRecord::Relation.send(:define_method, :_exec_scope, original)
+          ActiveRecord::Relation.send(visibility, :_exec_scope)
+        }
       end
       locals
     end
 
     def cases(config, state, arm)
-      raise "actual YJIT required" unless RubyVM::YJIT.enabled?
+      raise "actual YJIT required" unless RubyVM::YJIT.enabled? && !(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?)
       ActionView::Template.prepend(MidRequest)
       source = BlogProduction::Entropy.source_pin(config.fetch("app"))
       # Match production: SQL shadow is an untimed diagnostic, not a guard.
@@ -38,7 +43,8 @@ module ARSiteChecks
         self.undo = nil
       end
       raise "app source changed" unless BlogProduction::Entropy.source_pin(config.fetch("app")) == source
-      {"arm" => arm, "yjit" => RubyVM::YJIT.enabled?, "source_sha256" => source, "cases" => rows}
+      {"arm" => arm, "yjit" => RubyVM::YJIT.enabled?, "zjit" => !!(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?),
+        "source_sha256" => source, "cases" => rows}
     end
   end
 end
