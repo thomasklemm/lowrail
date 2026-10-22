@@ -38,20 +38,33 @@ lowrail observe APP --samples 16 --overhead # full definition/script census
 ```
 
 Verify records only its first **on** run, using targeted method TracePoints,
-not a global call hook. The lightweight mode omits script capture and the
-all-module definition census. The default cap is 16 returns per method per
+not a global call hook; a global **raise** hook tracks exception-tainted
+activations. The lightweight mode omits script capture and the all-module
+definition census. The default cap is 16 sampled entries per method per
 process (`LOWRAIL_OBSERVE_SAMPLES`); args are sampled at entry and receiver
-ivars at return. Missing ivars are not nil observations. Sampling never calls
+ivars at accepted return events. In-flight calls drain before a capped hook
+retires. Missing ivars are not nil observations. Sampling never calls
 the object's own reflection methods, enumerates a collection, or runs SQL.
 Counts, calls, cap/saturation and raw class names survive in `observation`;
 each typed slot also retains its class histogram in `samples`. Saturation
 means **recording stopped**, not exhaustive coverage. Exceptions, recursion,
 threads and uncalled methods can leave incomplete samples.
 
-In particular, Ruby emits a nil `:return` event during exception unwinding;
-the current recorder does not distinguish it from a normal nil return. Do not
-infer a nullable contract from that event. The six-app argument experiment
-therefore retains raw samples but merges an explicit argument-only derivative.
+Ruby emits nil `:return` events during exception unwinding, sometimes after
+`$!` has been cleared. The recorder taints active sampled frames when a raise
+occurs in their fiber, including raises in untraced callees. Tainted nil events
+are omitted, with an `exception_tainted_returns` counter; non-nil events and
+entry arguments remain usable. This conservatively loses some genuinely
+rescued normal nils. An ambient exception handled before a call does not
+taint that new activation. Non-exception `throw`/non-local exits remain a
+separate sampling limitation.
+
+Merged observations attest `return_sampling: exception_tainted_nil_omitted_v1`
+only when every process used that policy. Regenerate legacy observations;
+old or mixed files cannot be retrospectively cleaned. The historical
+[six-app argument experiment](types-contracts.md) remains argument-only.
+The fresh [five-app return experiment](types-returns.md) publishes 1,864
+observed return slots after classifying and withholding compatible raw flags.
 
 Observations fill `untyped`, or annotate a static type without narrowing it.
 A contradicting sample creates a `conflicts` row with method, slot, static

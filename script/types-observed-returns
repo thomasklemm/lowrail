@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+"""Measure return recovery after types-observed-arguments on an external census.
+
+ROOT/APP has static.json, arguments.json and fresh .lowrail/observed.json.
+Candidate conflicts halt publication unless individually classified compatible
+in --classifications. Those static return samples are retained in the ledger
+but withheld from the published alias; no static type is replaced or widened.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("root", type=Path)
+parser.add_argument("apps", nargs="+")
+parser.add_argument("--classifications", type=Path)
+parser.add_argument("--lowrail", default="target/debug/lowrail", type=Path)
+options = parser.parse_args()
+cli = options.lowrail.resolve()
+decisions = json.loads(options.classifications.read_text())["slots"] if options.classifications else []
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def slots(data):
+    result = {}
+    for target, signature in data["methods"].items():
+        result[(target, "return")] = signature["return_type"]
+        for i, parameter in enumerate(signature["parameters"]):
+            result[(target, f"arg:{i}:{parameter['name']}")] = parameter["ty"]
+    return result
+
+
+apps = {}
+for app in options.apps:
+    base = options.root.resolve() / app
+    facts = read(base / "arguments/.lowrail/facts.json")
+    app_root = Path(facts["app_root"])
+    assert app_root.is_absolute(), "prepare pinned external aliases with types-observed-arguments first"
+    for output in (base, base / "candidate", base / "returns", base / "candidate.json", base / "returns.json"):
+        assert not output.resolve().is_relative_to(app_root.resolve()), "Lowrail outputs must be external"
+    raw_path = base / ".lowrail/observed.json"
+    raw = read(raw_path)
+    assert raw.get("return_sampling") == "exception_tainted_nil_omitted_v1", "regenerate legacy/mixed observations"
+    assert raw["types"], "no called methods; check own-suite preparation before measuring"
+    assert raw["app_root"] == str(app_root), "observation root differs from pinned facts"
+    static = read(base / "static.json")
+    arguments = read(base / "arguments.json")
+    before = slots(arguments)
+    assert slots(static).keys() == before.keys(), "argument slot universe changed"
+    # Reuse the argument reducer's fixed universe and parameter shapes.
+    observed = read(base / "arguments/.lowrail/observed.json")
+    assert dict(observed, types=[]) == dict(raw, types=[]), "regenerate stale argument observations"
+    records = {(t["module"], t["name"], t["singleton"]): t for t in raw["types"]}
+    samples = []
+    for sample in observed["types"]:
+        original = records[(sample["module"], sample["name"], sample["singleton"])]
+        assert sample == dict(original, returns={}, ivars={}), "regenerate stale argument samples"
+        samples.append(dict(sample, returns=original["returns"]))
+
+    def analyze(variant, types):
+        alias = base / variant / ".lowrail"
+        assert not alias.resolve().is_relative_to(app_root.resolve()), "Lowrail outputs must be external"
+        alias.mkdir(parents=True, exist_ok=True)
+        (alias / "facts.json").write_text(json.dumps(facts))
+        (alias / "observed.json").write_text(json.dumps(dict(observed, types=types)))
+        output = subprocess.check_output([str(cli), "types", str(alias.parent)], text=True)
+        (base / f"{variant}.json").write_text(output)
+        return json.loads(output)
+
+    candidate = analyze("candidate", samples)
+    assert slots(candidate).keys() == before.keys(), "return slot universe changed"
+    classified = []
+    for conflict in candidate["conflicts"]:
+        decision = next((d for d in decisions if d["app"] == app
+                         and all(d[k] == conflict[k] for k in ("method", "slot", "static_type", "observed_class"))
+                         and d["classification"] == "compatible_relation_subtype" and d.get("evidence")), None)
+        assert decision is not None, f"unexplained conflict; no new publication: {app}: {conflict}"
+        assert conflict["slot"] == "return", "argument conflicts require a separate investigation"
+        classified.append(dict(conflict, classification=decision["classification"], evidence=decision["evidence"]))
+    blocked = {c["method"] for c in classified}
+    published = []
+    for sample in samples:
+        receiver = sample["module"]
+        if sample["singleton"] and receiver.startswith("#<Class:") and receiver.endswith(">"):
+            receiver = receiver[8:-1]
+        target = receiver + ("." if sample["singleton"] else "#") + sample["name"]
+        published.append(dict(sample, returns={} if target in blocked else sample["returns"]))
+    final = analyze("returns", published)
+    after = slots(final)
+    assert after.keys() == before.keys() and not final["conflicts"]
+    recovered = []
+    for identity, ty in after.items():
+        previous = before[identity]
+        if identity[1] != "return":
+            assert ty == previous, "return measurement changed an argument fact"
+        if previous["name"] != "untyped":
+            assert (ty["name"], ty["evidence"]) == (previous["name"], previous["evidence"]), "static fact changed"
+        if previous["name"] == "untyped" and ty["name"] != "untyped":
+            assert identity[1] == "return" and ty["evidence"] == "observed"
+            recovered.append(dict(target=identity[0], type=ty["name"], evidence=ty["evidence"],
+                                  samples=ty["samples"], provenance=ty["provenance"]))
+    apps[app] = dict(static=static["coverage"], arguments=arguments["coverage"], returns=final["coverage"],
+        slots=len(before), return_slots_recovered=recovered,
+        unknown_returns_before=sum(k[1] == "return" and t["name"] == "untyped" for k, t in before.items()),
+        recovered_with_unknown_members=sum("untyped" in r["type"] for r in recovered),
+        exception_tainted_returns=sum(t["exception_tainted_returns"] for t in raw["types"]),
+        classified_withheld_conflicts=classified, unexplained_conflicts=0,
+        suite_exit_ok=raw["exit_ok"], suite_command=raw["command"], samples_per_method=raw["samples_per_method"],
+        return_sampling=raw["return_sampling"], raw_sha256=digest(raw_path),
+        facts_sha256=digest(base / "arguments/.lowrail/facts.json"),
+        arguments_sha256=digest(base / "arguments.json"), returns_sha256=digest(base / "returns.json"))
+
+print(json.dumps(dict(format=1, scope="fixed return/parameter slots; fresh arguments vs fresh arguments+returns; no ivar samples", apps=apps), indent=2))

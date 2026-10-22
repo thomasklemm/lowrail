@@ -22,9 +22,12 @@
 # snapshot of every method there is the baseline for "defined after boot".
 #
 # Type sampling uses one TracePoint(:call, :return) per method, enabled with
-# `target:` so only that method's ISeq is instrumented; after N sampled
-# returns it disables itself, so the cost per method is bounded. App methods
-# are hooked at boot and as Zeitwerk loads app constants (on_load).
+# `target:` so only that method's ISeq is instrumented. Calls are capped;
+# hooks retire when in-flight calls drain. A global :raise hook taints active
+# sampled frames in that fiber: tainted nil return/ivar samples are omitted,
+# even if rescued, rather than mistaking an unwind for nil. Non-nil returns
+# cannot be exception-unwind events and remain usable.
+# App methods are hooked at boot and as Zeitwerk loads constants (on_load).
 #
 # Like lowrail/setup this file must not load default gems at require time
 # (json is required at exit).
@@ -47,6 +50,8 @@ module Lowrail
     KERNEL_IVAR_GET = Kernel.instance_method(:instance_variable_get)
     # Not app code for type sampling: vendored, generated and test code.
     SKIP_DIRS = %w[vendor node_modules tmp .lowrail test spec].freeze
+    RETURN_SAMPLING = "exception_tainted_nil_omitted_v1"
+    Frame = Struct.new(:record, :sampled, :tainted)
 
     class << self
       attr_reader :dir, :root, :samples
@@ -62,6 +67,7 @@ module Lowrail
         @extra = methods
         @hooked = {} # UnboundMethod equality survives fresh ISeq wrappers.
         @records = []
+        @active_frames = {}.compare_by_identity
         @t0 = clock
         @timings = {}
         ScriptCapture.start(phase: "boot") unless @types_only
@@ -90,6 +96,13 @@ module Lowrail
         @timings["snapshot_seconds"] = (clock - t).round(3)
         return unless @types
         t = clock
+        # A targeted TracePoint cannot see raises in untraced callees (and
+        # Ruby may clear $! before an unwinding :return). Those VM events
+        # carry nil, indistinguishable from some rescued normal returns.
+        @raise_trace = TracePoint.new(:raise) do
+          @active_frames[Fiber.current]&.each { |frame| frame.tainted = true }
+        end
+        @raise_trace.enable
         each_module { |mod| hook_module(mod) }
         @extra.each { |spec| hook_spec(spec) }
         if defined?(::Rails.autoloaders)
@@ -161,24 +174,41 @@ module Lowrail
         return if @hooked.key?(um)
         rec = {"module" => label(mod), "name" => um.name.to_s, "singleton" => MOD_SINGLETON_P.bind_call(mod),
                "source_location" => (loc = um.source_location) && "#{loc[0]}:#{loc[1]}",
-               "calls" => 0, "self" => Hash.new(0), "args" => {}, "ivars" => {}, "returns" => Hash.new(0), "saturated" => false}
+               "calls" => 0, "self" => Hash.new(0), "args" => {}, "ivars" => {}, "returns" => Hash.new(0),
+               "exception_tainted_returns" => 0, "saturated" => false}
         @hooked[um] = rec
         cap = @samples
+        pending = 0
         tp = TracePoint.new(:call, :return) do |t|
+          fiber = Fiber.current
           if t.event == :call
+            sampled = rec["calls"] < cap
+            (@active_frames[fiber] ||= []) << Frame.new(rec, sampled, false)
+            pending += 1
+            next unless sampled
             rec["calls"] += 1
+            rec["saturated"] = rec["calls"] >= cap
             rec["self"][class_label(t.self)] += 1
             sample_args(t, rec)
           else
-            rec["returns"][class_label(t.return_value)] += 1
-            KERNEL_IVARS.bind_call(t.self).each do |name|
-              value = KERNEL_IVAR_GET.bind_call(t.self, name)
-              (rec["ivars"][name.to_s] ||= Hash.new(0))[class_label(value)] += 1
+            frames = @active_frames[fiber]
+            index = frames&.rindex { |frame| frame.record.equal?(rec) }
+            next unless index # no entry witness for an already-running frame
+            frame = frames.delete_at(index)
+            @active_frames.delete(fiber) if frames.empty?
+            pending -= 1
+            if frame.sampled
+              if frame.tainted && KERNEL_IS_A.bind_call(t.return_value, NilClass)
+                rec["exception_tainted_returns"] += 1
+              else
+                rec["returns"][class_label(t.return_value)] += 1
+                KERNEL_IVARS.bind_call(t.self).each do |name|
+                  value = KERNEL_IVAR_GET.bind_call(t.self, name)
+                  (rec["ivars"][name.to_s] ||= Hash.new(0))[class_label(value)] += 1
+                end
+              end
             end
-            if rec["returns"].sum { _2 } >= cap
-              rec["saturated"] = true
-              t.disable
-            end
+            t.disable if rec["saturated"] && pending.zero?
           end
         rescue Exception # rubocop:disable Lint/RescueException
           nil
@@ -282,6 +312,7 @@ module Lowrail
           out["generated_stats"]["linking_decline"] = reason
         end
         out["samples_per_method"] = @samples
+        out["return_sampling"] = RETURN_SAMPLING
         out["types"] = (@records || []).select { |r| r["calls"] > 0 }.map { |r| finish(r) }
           .sort_by { |r| [r["module"], r["singleton"] ? 1 : 0, r["name"]] }
         out["hooked_methods"] = @records&.size || 0
@@ -311,7 +342,7 @@ module Lowrail
         FileUtils.mkdir_p(@dir)
         out = {"format" => 1, "pid" => Process.pid, "app_root" => @root.chomp("/"),
                "ruby_description" => RUBY_DESCRIPTION, "samples_per_method" => @samples,
-               "hooked_methods" => @records.size,
+               "hooked_methods" => @records.size, "return_sampling" => RETURN_SAMPLING,
                "types" => @records.select { |r| r["calls"] > 0 }.map { |r| finish(r) },
                "timings" => @timings.merge("process_seconds" => clock - @t0)}
         path = File.join(@dir, "observed-#{Process.pid}.json")

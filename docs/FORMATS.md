@@ -230,13 +230,14 @@ with summed `count`, types with summed counts).
   "generated_scripts": [{"...": "as in facts.json", "phase": "boot | test"}],
   "generated_stats": {"scripts": 2856, "compilations": 2900, "bytes": 1600000, "hook_seconds": 0.04},
   "samples_per_method": 16, "hooked_methods": 586,
+  "return_sampling": "exception_tainted_nil_omitted_v1",
   "types": [{
     "module": "#<Class:Room::MessagesCount>", "name": "ensure!", "singleton": true,
     "source_location": "/abs/app/models/room/messages_count.rb:12",
-    "calls": 16, "saturated": true,
+    "calls": 16, "saturated": true, "exception_tainted_returns": 2,
     "self": {"#<Class:Room::MessagesCount>": 16},
     "args": {"connection": {"ActiveRecord::ConnectionAdapters::SQLite3Adapter": 16}},
-    "returns": {"Array": 9, "NilClass": 7}
+    "returns": {"Array": 9, "NilClass": 5}
   }],
   "timings": {"59597": {"boot_seconds": 2.2, "snapshot_seconds": 0.07, "hook_install_seconds": 0.13,
                         "exit_seconds": 0.48, "process_seconds": 40.3}},
@@ -260,10 +261,24 @@ with summed `count`, types with summed counts).
   `vendor/`, `tmp/`, `test/`, `spec/`), hooked at boot and as Zeitwerk loads
   app constants, plus `--method` framework methods. Each method gets its
   own `TracePoint(:call, :return)` enabled with `target:`, which
-  instruments only that ISeq and disables itself after `samples_per_method`
-  returns (`saturated`); cfuncs and attr methods cannot be targeted.
+  instruments only that ISeq. At most `samples_per_method` entries are
+  sampled (`saturated`); the hook retires when in-flight calls drain.
+  All-raising methods exhaust the cap too. Cfuncs and attr methods cannot
+  be targeted.
   Classes are the shallow `obj.class` (core reflection, never the object's
   own methods); anonymous `*`/`**`/`&` parameters are not sampled.
+- **Exception-tainted returns**: one global `TracePoint(:raise)` taints
+  currently active sampled frames in that fiber, including raises from
+  untraced Ruby/C callees. An exception-unwind return carries nil; tainted
+  nil events contribute neither return nor ivar samples. Non-nil return
+  events remain usable. Some genuinely rescued normal nils are therefore
+  omitted too; `exception_tainted_returns` counts omissions, not proven
+  unwinds. Entry arguments are retained. Fiber/thread interleaving does not
+  taint another fiber's frames. This does not detect non-exception `throw`
+  or other non-local control flow.
+  `return_sampling` identifies this policy only if **every** merged process
+  supplied the same policy; old/mixed files do not acquire the attestation.
+  Legacy observations are readable but must be regenerated for this fix.
 - **comparison** (when facts.json exists): a method counts as in the facts
   by module and name, by the same generated script digest or the same name
   and generated `def` text (CodeGenerator's shared method caches), or, for

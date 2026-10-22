@@ -37,6 +37,85 @@ class ObserveTest < Minitest::Test
           Widget.create!(name: "b", password: "secret")
           assert_equal "b", Widget.named.cheapest.name
         end
+
+        def test_exception_samples
+          probe = ReturnProbe.new
+          6.times { assert_raises(RangeError) { probe.failing(:bad) } }
+          assert_raises(ArgumentError) { probe.indirect { Integer("bad") } }
+          assert_raises(RangeError) { probe.recursive(2, true) }
+          assert_equal "done", probe.recursive(0, false)
+          assert_instance_of ReturnProbe::Value, probe.rescued
+          assert_nil probe.rescued_nil
+          assert_equal :saved, probe.ensure_return
+          assert_raises(RangeError) { probe.ensured }
+          begin
+            raise "ambient, outside the sampled frames"
+          rescue
+            assert_nil probe.normal_nil
+            assert_equal "value", probe.normal_value
+          end
+          paused = Fiber.new { probe.interleaved(false) }
+          paused.resume
+          assert_raises(RangeError) { Fiber.new { probe.interleaved(true) }.resume }
+          assert_equal :safe, paused.resume
+          entered, leave = Queue.new, Queue.new
+          thread = Thread.new { probe.concurrent(entered, leave) }
+          entered.pop
+          assert_raises(ArgumentError) { probe.indirect { Integer("bad") } }
+          leave << true
+          assert_equal :safe, thread.value
+        end
+      end
+    RUBY
+    "app/models/return_probe.rb" => <<~'RUBY',
+      class ReturnProbe
+        class Value
+          def nil? = raise "the recorder must not call the returned object's methods"
+        end
+        def failing(value)
+          @partial = value
+          raise RangeError, "no normal return"
+        end
+        def indirect
+          yield
+        end
+        def recursive(depth, fail)
+          recursive(depth - 1, fail) if depth > 0
+          raise RangeError if fail
+          "done"
+        end
+        def rescued
+          raise RangeError
+        rescue
+          Value.new
+        end
+        def rescued_nil
+          raise RangeError
+        rescue
+          nil
+        end
+        def ensured
+          raise RangeError
+        ensure
+          @partial = :ensured
+        end
+        def ensure_return
+          raise RangeError
+        ensure
+          return :saved
+        end
+        def normal_nil = nil
+        def normal_value = "value"
+        def interleaved(fail)
+          Fiber.yield unless fail
+          raise RangeError if fail
+          :safe
+        end
+        def concurrent(entered, leave)
+          entered << true
+          leave.pop
+          :safe
+        end
       end
     RUBY
   }.freeze
@@ -74,7 +153,7 @@ class ObserveTest < Minitest::Test
   end
 
   def test_suite_passes_with_recorder
-    assert_match(/2 runs, \d+ assertions, 0 failures, 0 errors/, @log)
+    assert_match(/3 runs, \d+ assertions, 0 failures, 0 errors/, @log)
     assert_match(/cannot hook Nope#missing/, @log)
   end
 
@@ -121,10 +200,36 @@ class ObserveTest < Minitest::Test
     assert_nil types("WidgetTest", "test_label")
   end
 
+  def test_exception_unwinds_do_not_become_nil_return_samples
+    assert_equal "exception_tainted_nil_omitted_v1", @o["return_sampling"]
+    %w[failing indirect ensured rescued_nil].each do |name|
+      sample = types("ReturnProbe", name)
+      assert_equal({}, sample["returns"], name)
+      assert_equal({}, sample["ivars"], name)
+      assert_equal sample["calls"], sample["exception_tainted_returns"], name
+    end
+    assert_equal({"ReturnProbe::Value" => 1}, types("ReturnProbe", "rescued")["returns"])
+    # Some VM/compiler versions report nil for non-local ensure returns.
+    # Refusal is allowed; a fabricated nil observation is not.
+    assert_includes [{}, {"Symbol" => 1}], types("ReturnProbe", "ensure_return")["returns"]
+    failing = types("ReturnProbe", "failing")
+    assert_equal 4, failing["calls"]
+    assert failing["saturated"], "all-raising calls must still exhaust the sample cap"
+    assert_equal({"value" => {"Symbol" => 4}}, failing["args"])
+    recursive = types("ReturnProbe", "recursive")
+    assert_equal({"String" => 1}, recursive["returns"])
+    assert_equal 3, recursive["exception_tainted_returns"]
+    assert_equal({"NilClass" => 1}, types("ReturnProbe", "normal_nil")["returns"])
+    assert_equal({"String" => 1}, types("ReturnProbe", "normal_value")["returns"])
+    assert_equal({"Symbol" => 1}, types("ReturnProbe", "interleaved")["returns"])
+    assert_equal 1, types("ReturnProbe", "interleaved")["exception_tainted_returns"]
+    assert_equal({"Symbol" => 1}, types("ReturnProbe", "concurrent")["returns"])
+  end
+
   def test_lightweight_types_only_run_preserves_samples_and_outcomes
     _dir, data, log, status = self.class.observed_run(types_only: true)
     assert status.success?, log
-    assert_match(/2 runs, \d+ assertions, 0 failures, 0 errors/, log)
+    assert_match(/3 runs, \d+ assertions, 0 failures, 0 errors/, log)
     refute data.key?("generated_scripts")
     refute data.key?("defined_after_boot")
     assert_equal @o["types"].map { |t| t.slice("module", "name", "returns", "args", "ivars") },

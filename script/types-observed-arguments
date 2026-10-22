@@ -69,9 +69,9 @@ for name in options.apps:
             if target not in contracts["methods"]:
                 omitted += 1
                 continue
-            # Existing recorder: args at entry are useful even on a raised exit.
-            # Its return events include exception-unwind nils. Do not merge
-            # returns/ivars in this ARGUMENT measurement, or alter the raw file.
+            # Entry arguments remain useful even on a raised exit. Measure
+            # returns separately; do not merge them or ivars in this ARGUMENT
+            # comparison, and never alter the raw recorder file.
             filtered.append(dict(sample, returns={}, ivars={}))
         alias = base / "arguments/.lowrail"
         alias.mkdir(parents=True, exist_ok=True)

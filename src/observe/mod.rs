@@ -36,6 +36,9 @@ pub struct Observed {
     pub generated_stats: GeneratedStats,
     pub samples_per_method: usize,
     pub hooked_methods: usize,
+    /// Present only when every process used the same return-sampling policy.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub return_sampling: Option<String>,
     pub types: Vec<MethodTypes>,
     pub timings: BTreeMap<String, BTreeMap<String, f64>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,6 +59,7 @@ struct Partial {
     generated_stats: GeneratedStats,
     samples_per_method: usize,
     hooked_methods: usize,
+    return_sampling: Option<String>,
     types: Vec<MethodTypes>,
     timings: BTreeMap<String, f64>,
 }
@@ -87,8 +91,8 @@ pub struct MethodTypes {
     pub name: String,
     pub singleton: bool,
     pub source_location: Option<String>,
-    /// Sampled calls (the hook disables itself after `samples_per_method`
-    /// returns: `saturated`).
+    /// Sampled entries, capped at `samples_per_method` (`saturated`). Hooks
+    /// retire when in-flight calls drain, including exception-tainted exits.
     pub calls: u64,
     pub saturated: bool,
     #[serde(rename = "self")]
@@ -97,6 +101,9 @@ pub struct MethodTypes {
     /// Receiver ivars present at sampled returns; absence is not nil.
     pub ivars: BTreeMap<String, BTreeMap<String, u64>>,
     pub returns: BTreeMap<String, u64>,
+    /// Omitted nil events after a raise in the activation's fiber. These may
+    /// include rescued normal nils, not just actual exception unwinds.
+    pub exception_tainted_returns: u64,
 }
 
 /// Observed definitions against the boot facts.
@@ -280,6 +287,8 @@ pub fn merge(dir: &Path) -> Result<Observed, String> {
 fn merge_parts(parts: Vec<Partial>) -> Observed {
     let mut o = Observed {
         format: 1,
+        return_sampling: parts.first().and_then(|p| p.return_sampling.clone())
+            .filter(|policy| parts.iter().all(|p| p.return_sampling.as_ref() == Some(policy))),
         ..Default::default()
     };
     let mut defined: BTreeMap<(String, bool, String), ObservedMethod> = BTreeMap::new();
@@ -330,6 +339,7 @@ fn merge_parts(parts: Vec<Partial>) -> Observed {
             if e.calls > 0 {
                 add_counts(&mut e.self_, &t.self_);
                 add_counts(&mut e.returns, &t.returns);
+                e.exception_tainted_returns += t.exception_tainted_returns;
                 for (arg, c) in &t.args {
                     add_counts(e.args.entry(arg.clone()).or_default(), c);
                 }
@@ -634,6 +644,7 @@ mod tests {
             pid: 1,
             ruby_description: "ruby 4.0.7 (revision fixture)".into(),
             app_root: "/app".into(),
+            return_sampling: Some("exception_tainted_nil_omitted_v1".into()),
             defined_after_boot: vec![
                 om("Article", "title", Some("/gems/am/attr.rb:1"), None),
                 om("View", "_index_123", Some("/app/app/views/a/index.html.erb:0"), Some("t")),
@@ -643,8 +654,9 @@ mod tests {
             types: vec![MethodTypes {
                 module: "Article".into(),
                 name: "summary".into(),
-                calls: 2,
+                calls: 3,
                 returns: BTreeMap::from([("String".into(), 2)]),
+                exception_tainted_returns: 1,
                 ..Default::default()
             }],
             ..Default::default()
@@ -653,6 +665,7 @@ mod tests {
             pid: 2,
             ruby_description: "ruby 4.0.7 (revision fixture)".into(),
             app_root: "/app".into(),
+            return_sampling: p1.return_sampling.clone(),
             generated_stats: GeneratedStats {
                 linking_decline: Some("iseq_identity_unavailable: fresh wrappers".into()),
                 ..Default::default()
@@ -667,22 +680,27 @@ mod tests {
             types: vec![MethodTypes {
                 module: "Article".into(),
                 name: "summary".into(),
-                calls: 1,
+                calls: 2,
                 saturated: true,
                 returns: BTreeMap::from([("NilClass".into(), 1)]),
+                exception_tainted_returns: 1,
                 ..Default::default()
             }],
             ..Default::default()
         };
+        assert!(merge_parts(vec![p1.clone(), Partial::default()]).return_sampling.is_none(),
+                "legacy/mixed processes must not acquire the new sampling attestation");
         let mut o = merge_parts(vec![p1, p2]);
         assert_eq!(o.processes, vec![1, 2]);
+        assert_eq!(o.return_sampling.as_deref(), Some("exception_tainted_nil_omitted_v1"));
         assert_eq!(o.defined_after_boot.len(), 6);
         assert_eq!(o.generated_scripts.len(), 3);
         assert_eq!(o.generated_scripts.iter().find(|s| s.sha256 == "t").unwrap().count, 2);
         assert_eq!(serde_json::to_value(&o).unwrap()["generated_stats"]["linking_decline"],
                    "iseq_identity_unavailable: fresh wrappers");
         let t = &o.types[0];
-        assert_eq!((t.calls, t.saturated, t.returns.len()), (3, true, 2));
+        assert_eq!((t.calls, t.saturated, t.returns.len()), (5, true, 2));
+        assert_eq!(t.exception_tainted_returns, 2);
 
         let facts = Facts {
             ruby_description: "ruby 4.0.7 (revision fixture)".into(),

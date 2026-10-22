@@ -41,6 +41,57 @@ fn argument_reducer_keeps_relative_facts_outputs_external() {
 }
 
 #[test]
+fn return_reducer_refuses_unexplained_conflicts_before_publication() {
+    let dir = std::env::temp_dir().join(format!("lowrail-return-reducer-{}", std::process::id()));
+    let app = dir.join("source");
+    let external = dir.join("external/app");
+    std::fs::create_dir_all(&app).unwrap();
+    std::fs::create_dir_all(external.join(".lowrail")).unwrap();
+    let source = app.join("example.rb");
+    std::fs::write(&source, "class Example\n def unknown(value); value; end\n def fixed; 7; end\nend\n").unwrap();
+    let facts = json!({"format":1,"app_root":app,"ruby_description":"ruby 4.0.7",
+        "modules":[{"name":"Example","kind":"class","methods":[
+            {"name":"unknown","parameters":[["req","value"]],"source_location":format!("{}:2", source.display())},
+            {"name":"fixed","source_location":format!("{}:3", source.display())}]}]});
+    std::fs::write(external.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+    let bin = env!("CARGO_BIN_EXE_lowrail");
+    let output = Command::new(bin).arg("types").arg(&external).output().unwrap();
+    assert!(output.status.success(), "{:?}", output);
+    for file in ["static.json", "contracts-static.json"] {
+        std::fs::write(external.join(file), &output.stdout).unwrap();
+    }
+    let mut observed = json!({"format":1,"app_root":app,"exit_ok":true,"command":["unchanged-suite"],
+        "samples_per_method":16,"return_sampling":"exception_tainted_nil_omitted_v1","types":[
+            {"module":"Example","name":"unknown","singleton":false,"calls":1,"args":{"value":{"String":1}},"returns":{"String":1},"exception_tainted_returns":0},
+            {"module":"Example","name":"fixed","singleton":false,"calls":1,"returns":{"String":1},"exception_tainted_returns":0}]});
+    let scripts = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("script");
+    let run = |script: &str| Command::new("python3").arg(scripts.join(script))
+        .arg(external.parent().unwrap()).arg("app").arg("--lowrail").arg(bin).output().unwrap();
+    for conflict in [true, false] {
+        if !conflict { observed["types"][1]["returns"] = json!({}); }
+        std::fs::write(external.join(".lowrail/observed.json"), observed.to_string()).unwrap();
+        let arguments = run("types-observed-arguments");
+        assert!(arguments.status.success(), "{:?}", arguments);
+        let output = run("types-observed-returns");
+        assert_eq!(output.status.success(), !conflict, "{:?}", output);
+        if conflict {
+            assert!(String::from_utf8_lossy(&output.stderr).contains("unexplained conflict"));
+            assert!(!external.join("returns").exists());
+        } else {
+            let ledger: Value = serde_json::from_slice(&output.stdout).unwrap();
+            assert_eq!(ledger["apps"]["app"]["return_slots_recovered"][0]["type"], "String");
+            assert_eq!(ledger["apps"]["app"]["unexplained_conflicts"], 0);
+            let published: Value = serde_json::from_slice(&std::fs::read(external.join("returns.json")).unwrap()).unwrap();
+            assert_eq!(published["coverage"]["observed"], 2);
+            assert_eq!(published["methods"]["Example#fixed"]["return_type"]["name"], "Integer");
+            assert_eq!(published["methods"]["Example#unknown"]["return_type"]["evidence"], "observed");
+            assert!(!app.join(".lowrail").exists());
+        }
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn target_ruby_grammar_is_explicit_in_parse_types_and_mcp() {
     let dir = std::env::temp_dir().join(format!("lowrail-target-grammar-{}", std::process::id()));
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
