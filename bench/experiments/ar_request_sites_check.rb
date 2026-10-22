@@ -64,8 +64,9 @@ module ARSiteChecks
         holder.send(:define_method, :limit) { |value| super(value) }
         self.undo = -> { holder.send(:remove_method, :limit) }
       when "owner_reader_private"
+        inherited = Bucket.instance_method(:bubbles).owner != Bucket
         Bucket.send(:private, :bubbles)
-        self.undo = -> { Bucket.send(:public, :bubbles) }
+        self.undo = -> { inherited ? Bucket.send(:remove_method, :bubbles) : Bucket.send(:public, :bubbles) }
       when "owner_reader_undefined"
         original = Bucket.instance_method(:bubbles)
         raise "expected generated association reader" if original.owner == Bucket
