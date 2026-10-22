@@ -35,8 +35,38 @@ The Inertia matrix requires inertia_rails **3.21.2, 3.22.0 and 3.23.0**;
 the public analogues also need vite_ruby **3.11.1** and rails_vite **0.3.0**.
 The digest fixture pins **digest 3.2.1** for positive coverage: a newer,
 uncertified Digest implementation must still refuse, not lose its guard.
+Install **Prism 2.0.0** and **sorbet-runtime 0.5.12435** from the gemspec's
+development dependencies, plus **Prism 1.4.0** and **minitest 5.27.0** for
+the deliberately older locked-parser regression. `minitest-mock 5.27.0`
+is a different gem; it does not install Minitest 5. The main runner can use
+Minitest 6 (which resolves Prism 1.x); do not force Prism 2 into that runner.
+Unbundled test fixtures load their runner first so Rails cannot select an
+incompatible Prism independently of Minitest.
+
+The verification-test certificate's positive fixture requires **Bootsnap
+1.26.0**. Its compiler-policy certificate intentionally refuses the older
+1.18.6 API (`verification_bootsnap_compiler_unknown`); the ordinary loader
+matrix still exercises 1.18.6 when installed. Do not relax that certificate.
 The fixture Gemfile and individual scenarios are the version constraints.
 Tests never install gems or fetch apps automatically.
+
+For the primary Ruby, install the local prerequisites explicitly:
+
+```sh
+mise exec ruby@4.0.7 -- gem install rails -v 8.1.4 --no-document
+mise exec ruby@4.0.7 -- gem install sqlite3 bcrypt require-hooks freezolite rspec --no-document
+mise exec ruby@4.0.7 -- gem install bootsnap -v 1.26.0 --no-document
+mise exec ruby@4.0.7 -- gem install prism -v 2.0.0 --no-document
+mise exec ruby@4.0.7 -- gem install prism -v 1.4.0 --no-document
+mise exec ruby@4.0.7 -- gem install sorbet-runtime -v 0.5.12435 --no-document
+mise exec ruby@4.0.7 -- gem install minitest -v 5.27.0 --no-document
+mise exec ruby@4.0.7 -- gem install minitest-mock -v 5.27.0 --no-document
+for version in 3.21.2 3.22.0 3.23.0; do
+  mise exec ruby@4.0.7 -- gem install inertia_rails -v "$version" --no-document
+done
+mise exec ruby@4.0.7 -- gem install vite_ruby -v 3.11.1 --no-document
+mise exec ruby@4.0.7 -- gem install rails_vite -v 0.3.0 --no-document
+```
 
 Public build tests use `target/debug/lowrail`, not a separately built release
 binary. If it is absent, they run `cargo build --locked`; a failed build is
@@ -62,6 +92,34 @@ fail these strict gates; ordinary partial runs can still skip them by name.
 Install the generated bundle for each Ruby being tested, in a disposable
 copy if its platform lock needs adjustment.
 
+**Ruby 4.0.7 sealed/render-certificate gates also require the retained
+`real-blog-r4` specimen**, not a fresh generation under that dirname:
+
+```sh
+bash script/corpus real-blog-r4
+```
+
+This extracts `fixtures/corpus/real-blog-r4-retained.tgz`, installs the
+frozen bundle and prepares a disposable test database. The 50,425-byte
+archive is the previously certified source, not a newly approved baseline:
+SHA256 `b1dd980b6689bf2b3912691e527d74e0b7699fb32cb53169791c24879f0c0a99`,
+recovered from the [retained-fixture handoff](https://ampcode.com/threads/T-01a1601b-6c5e-77de-8689-b5d8f057ca42).
+It contains app/support source, the original lock and `runtime-pins.json`;
+no credentials, keys, `.kamal`, storage, databases, logs or caches. The helper
+extracts only the app. Production gates create their own schema/rows/seed.
+
+Source SHA256 remains
+`86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf`,
+and lock SHA256 remains
+`570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596`.
+The existing entropy validator checks these and every runtime/site pin
+unchanged. Fresh generation changes migration filenames/schema timestamps
+and app-name-bearing source; updating those pins would certify a different
+specimen. An existing mismatched directory is refused, never overwritten:
+preserve it and prepare a new DIRNAME, then use `LOWRAIL_TEST_CORPUS_ROOT`
+to select a corpus tree containing both required blogs. `--source-only`
+extracts/checks retained source and lock without installing the bundle.
+
 Other external apps/checkouts remain optional. Prepare them with
 `script/corpus` and `script/rails-suite` when their coverage is required. Use
 `LOWRAIL_TEST_CORPUS_ROOT` and `LOWRAIL_RAILS_CHECKOUT` for prepared copies.
@@ -86,11 +144,13 @@ mode. CLI prerequisites are built automatically as described above.
 | `ARInstantiateTest#test_real_loading_matches_rails_across_mutation_and_overrides`; `#test_early_setup_preserves_locale_and_lazy_model_loading` | Rails / sqlite3 / bcrypt |
 | `ARPlansTest#test_scoped_reader_preserves_rows_events_and_runtime_changes` | Rails / sqlite3 / bcrypt |
 | `CompilerTest#test_public_build_keeps_boot_output_out_of_oracle_protocol` | Debug CLI; Rails / sqlite3 / bcrypt |
+| `CompilerTest#test_sealed_build_respects_the_app_locked_prism_grammar` | Debug CLI; Rails / sqlite3 / bcrypt; Prism 1.4.0 and minitest 5.27.0 |
 | `DigestMemoTest#test_public_lazy_version_fixture_is_sealed_only_and_test_mode_stays_original` | Debug CLI; rails, rails_vite, inertia_rails or vite_ruby (names reported individually); other locked dependencies fail bundle preparation |
 | `E2ETest#test_late_rails_yjit_enable_reports_drift_and_keeps_fact_checks` | railties |
 | `E2ETest#test_fast_path_stub_and_restore` | minitest/mock (minitest-mock on Minitest 6) |
 | `E2ETest#test_real_blog_outcomes_identical_with_hooks` | `real-blog` source/bundle for the running Ruby; also fails strict mode if disabled with `LOWRAIL_REAL_BLOG=0` |
 | `FactsRealBlogTest#test_rails_sections`; `#test_templates`; `#test_app_methods` | `real-blog/Gemfile.lock` and working bundle (`bash script/corpus real-blog`) |
+| `FactsTest#test_sorbet_registry_does_not_execute_pending_sigs_or_app_methods` | sorbet-runtime 0.5.12435 |
 | `InertiaConfigTest#test_binding_contract_across_supported_gems` | inertia_rails 3.21.2 / 3.22.0 / 3.23.0; missing versions listed |
 | `InertiaConfigTest#test_plain_and_stale_build_controls`; `#test_private_binding_and_overridden_schema_are_not_installed` | inertia_rails 3.23.0 |
 | `InertiaPropsTest#test_public_contract_and_every_post_entry_dispatch_boundary`; `#test_each_mutation_private_visibility_and_stale_fallback`; `#test_nonmain_ractor_keeps_the_original_resolver` | inertia_rails 3.21.2 / 3.22.0 / 3.23.0; missing versions listed |
@@ -111,8 +171,11 @@ mode. CLI prerequisites are built automatically as described above.
 | `SealedLinkTest#test_cold_opt_in_delivery_preserves_response_effects_and_refuses_foreign_receivers` | On Ruby 4.0.7: debug CLI; Rails / sqlite3 / bcrypt |
 | `SqlTraceTest#test_trace_detects_changed_queries_not_bind_values`; `#test_full_trace_lines`; `#test_disabled` | Active Record 8.1.4 / sqlite3 |
 | `SuppressedHooksTest#test_old_guarded_artifacts_follow_suppressed_mutations_and_production_sealed_units_hit` | Rails / sqlite3 / bcrypt / inertia_rails 3.23.0 |
+| `TestCertificateTest#test_natural_generation_releases_pending_once_and_live_resets_do_not_retire`; `#test_real_config_builder_bootsnap_and_method_mutations_retire_stickily`; `#test_active_parent_forks_original_child_with_no_inherited_authority_or_counters`; `#test_actual_parallel_policy_mismatch_refuses_despite_workers1` | Rails / sqlite3 / bcrypt; Bootsnap 1.26.0 compiler API |
+| `TestCertificateTest#test_render_missing_or_mismatched_view_context_certificate_stays_original`; `#test_render_mutation_and_fork_authority_are_sticky_and_unit_local`; `#test_render_name_and_tag_dispatch_bypass_existing_view_reflection` | On Ruby 4.0.7: retained `real-blog-r4` source/bundle and debug CLI |
+| `BlogProductionTest#test_cold_sealed_admission_does_not_prepare_the_app`; `#test_terminal_completion_distinguishes_pending_jobs_from_drained_cable` | Retained `real-blog-r4` source/bundle and debug CLI; entropy companions require its unchanged source/lock/runtime pins |
 | `ViewTest#test_default_link_to_observes_a_suppressed_redefinition_after_warmup`; `#test_name_expression_can_change_the_actual_builder_before_link_to`; `#test_to_param_can_change_the_actual_route_formatter_without_replaying_conversion` | Debug CLI; Rails / sqlite3 / bcrypt |
-| `FormScaffoldTest#test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder` | On Ruby 4.0.7 with the optional blog source: debug CLI; production schema/rows prepared in the test copy |
+| `FormScaffoldTest#test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder`; `#test_passive_production_token_and_collection_public_artifact` | On Ruby 4.0.7: retained `real-blog-r4` source/bundle and debug CLI; production schema/rows prepared in the test copy |
 
 ## Inventory: intentional optional skips (also named in strict mode)
 
@@ -123,7 +186,11 @@ mode. CLI prerequisites are built automatically as described above.
 | `RailsSuiteReportTest#test_separate_build_does_not_change_view_primary_key_results` | Rails checkout `RAILS_VERSION` absent (`script/rails-suite`) |
 | `RailsSuiteReportTest#test_profiling_preserves_backtrace_cleaner_results` | Rails checkout or prepared `.lowrail/rails-suite/Gemfile` absent |
 | `SealedLinkTest#test_cold_opt_in_delivery_preserves_response_effects_and_refuses_foreign_receivers` | Fixture is certified only on Ruby 4.0.7; other Ruby version printed |
-| `FormScaffoldTest#test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder` | Same Ruby 4.0.7 boundary; or absent `real-blog-r4/config/environment.rb` |
+| `FormScaffoldTest#test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder`; `#test_passive_production_token_and_collection_public_artifact`; `BlogProductionTest#test_cold_sealed_admission_does_not_prepare_the_app` | Same Ruby 4.0.7 boundary |
+
+Although the two blog corpus observer tests can individually skip when
+`real-blog-r4` is absent, that absence does not exempt the required sealed
+gates above from strict-mode failure.
 
 Skips/pending examples inside the Minitest and RSpec reporter **fixture
 suites** intentionally test outcome reporting. They are not missing gem-test
