@@ -1,0 +1,133 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+if $PROGRAM_NAME == __FILE__
+  require "json"
+  require "fileutils"
+  require "optparse"
+  require "open3"
+  require "rbconfig"
+  require "shellwords"
+  require "tmpdir"
+  require "time"
+
+  root = File.expand_path("..", __dir__)
+  options = {}
+  OptionParser.new do |o|
+    o.banner = "Usage: mise exec ruby@4.0.7 -- script/gate [--prepare] [--output NEW_DIR]"
+    o.on("--prepare", "Prepare prerequisites only (also used by orb setup)") { options[:prepare] = true }
+    o.on("--output DIR", "Logs and JSON receipt; must not exist") { options[:output] = File.expand_path(_1) }
+  end.parse!
+  abort "unexpected arguments: #{ARGV.join(' ')}" unless ARGV.empty?
+  abort "gate requires Ruby 4.0.7; use mise exec ruby@4.0.7 -- script/gate" unless RUBY_VERSION == "4.0.7"
+  sha, status = Open3.capture2("git", "rev-parse", "HEAD", chdir: root)
+  abort "cannot identify checkout" unless status.success?
+  dirty, status = Open3.capture2("git", "status", "--porcelain", chdir: root)
+  abort "cannot identify worktree" unless status.success?
+  sha = sha.strip
+  out = options[:output] || "#{root}/.lowrail/gate/#{sha}-#{Time.now.utc.strftime('%Y%m%dT%H%M%S')}-#{Process.pid}"
+  abort "refusing to overwrite #{out}" if File.exist?(out)
+  FileUtils.mkdir_p(out)
+  receipt = { sha: sha, dirty: !dirty.empty?, ruby: RUBY_DESCRIPTION, mt_cpu: ENV.fetch("MT_CPU", "8"),
+    started_at: Time.now.utc.iso8601, prepare_only: !!options[:prepare], steps: [] }
+  env = { "MT_CPU" => receipt[:mt_cpu], "LOWRAIL_STRICT_GATES" => "1",
+    "RUBYOPT" => nil, "BUNDLE_GEMFILE" => nil, "RAILS_ENV" => nil, "RACK_ENV" => nil }
+  save = -> { File.write("#{out}/receipt.json", JSON.pretty_generate(receipt) + "\n") }
+  run = lambda do |name, command, directory = root, suite = false|
+    log = "#{out}/#{name}.log"
+    report = "#{out}/#{name}.json"
+    step = { name: name, command: command, directory: directory, log: log }
+    receipt[:steps] << step
+    puts "== #{name}: #{step[:command]} =="
+    $stdout.flush
+    child_env = env.merge(suite ? { "LOWRAIL_GATE_REPORT" => report, "RUBYOPT" => "-r#{__dir__}/gate_reporter.rb" } : {})
+    begin
+      File.open(log, "w") do |file|
+        Open3.popen2e(child_env, *command, chdir: directory) do |input, output, waiter|
+          input.close
+          output.each_line { file.write(_1); $stdout.write(_1) }
+          step[:exit] = waiter.value.exitstatus
+        end
+      end
+      step.merge!(JSON.parse(File.read(report))) if suite && File.file?(report)
+      if name == "rust"
+        counts = File.read(log).scan(/test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored;/).map { _1.map(&:to_i) }
+        step.merge!("tests" => counts.sum { _1.sum }, "failures" => counts.sum { _1[1] },
+          "skips" => counts.sum { _1[2] }, "assertions" => nil, "errors" => nil,
+          "named_skips" => File.readlines(log).filter_map { { test: _1.strip, reason: "Rust ignored test" } if _1.match?(/(?:\.\.\.|…) ignored/) })
+      end
+      step[:status] = step[:exit] == 0 && (!suite || step.fetch("tests", 0).positive?) ? "passed" : "failed"
+    rescue SystemCallError => error
+      step.merge!(status: "skipped", reason: "missing prerequisite: #{error.message}")
+    end
+    puts "#{name}: #{step[:status]} #{step.slice('tests', 'assertions', 'failures', 'errors', 'skips', 'observed_threads').to_json}"
+    Array(step["named_skips"]).each { puts "  SKIP #{_1.fetch('test')}: #{_1.fetch('reason')}" }
+    save.call
+    step[:status] == "passed"
+  end
+
+  # Physical, per-build copy: never remove Rack 2 from somebody else's home.
+  home = "#{root}/.lowrail/gate-gems/#{RUBY_VERSION}-#{RbConfig::CONFIG.fetch('arch')}-#{RUBY_REVISION}"
+  env.merge!("GEM_HOME" => home, "GEM_PATH" => home, "PATH" => "#{home}/bin:#{File.dirname(RbConfig.ruby)}:#{ENV.fetch('PATH')}")
+  receipt[:gem_home] = home
+  unless File.directory?(home)
+    FileUtils.mkdir_p(File.dirname(home))
+    Dir.mktmpdir("copy-", File.dirname(home)) do |copy|
+      staged = File.join(copy, "home")
+      FileUtils.mkdir_p(staged)
+      %w[gems specifications extensions bin cache].each do |component|
+        source = File.join(Gem.default_dir, component)
+        next unless File.directory?(source)
+        abort "gem home copy failed" unless system("cp", "-a", "--reflink=auto", source, staged)
+      end
+      File.rename(staged, home)
+    end
+  end
+  %w[gems specifications].each do |component|
+    Dir["#{home}/#{component}/rack-2.*", "#{home}/#{component}/rack-session-1.*"].each { FileUtils.rm_rf(_1) }
+  end
+  dependencies = <<~'RUBY'
+    require "rubygems/dependency_installer"
+    dependencies = {
+      "rails" => "8.1.4", "rake" => ">= 13", "minitest" => "6.0.6",
+      "sqlite3" => ">= 2.1", "bcrypt" => ">= 0", "require-hooks" => ">= 0",
+      "freezolite" => ">= 0", "rspec" => ">= 0", "stackprof" => "0.2.28",
+      "bootsnap" => "1.26.0", "sorbet-runtime" => "0.5.12435",
+      "minitest-mock" => "5.27.0", "vite_ruby" => "3.11.1", "rails_vite" => "0.3.0",
+      "digest" => "3.2.1"
+    }
+    pairs = dependencies.to_a + [["bootsnap", "1.18.6"], ["minitest", "5.27.0"]] +
+      %w[1.4.0 2.0.0].map { ["prism", _1] } +
+      %w[3.21.2 3.22.0 3.23.0].map { ["inertia_rails", _1] }
+    pairs.each do |name, version|
+      next if Gem::Specification.find_all_by_name(name, version).any?
+      puts "installing #{name} #{version}"
+      Gem::DependencyInstaller.new(document: []).install(name, version)
+    end
+    # A previous interrupted install can leave a spec without its executable.
+    Gem::Specification.each do |spec|
+      next if spec.default_gem?
+      next if spec.executables.all? { File.executable?(File.join(Gem.bindir, _1)) }
+      Gem::Installer.for_spec(spec, wrappers: true).generate_bin
+    end
+    abort "Rack 2 leaked into gate home" if Gem::Specification.find_all_by_name("rack", "< 3").any? ||
+      Gem::Specification.find_all_by_name("rack-session", "< 2").any?
+  RUBY
+  run.call("gems", [RbConfig.ruby, "-e", dependencies])
+  %w[real-blog real-blog-r4].each { run.call("prepare-#{_1}", ["bash", "script/corpus", _1]) }
+  run.call("prepare-rails", [RbConfig.ruby, "script/rails-suite", "--prepare"])
+  unless options[:prepare]
+    run.call("valgrind", ["valgrind", "--version"])
+    run.call("build", %w[cargo build --locked])
+    run.call("gem", [RbConfig.ruby, "-S", "rake", "test", "TESTOPTS=--verbose --seed=1729"], "#{root}/gem", true)
+    %w[ar_diagnostics callback_survey pass profile_summary rails_drift request_pairs screen].each do |name|
+      run.call("bench-#{name}", [RbConfig.ruby, "bench/#{name}_test.rb", "--verbose", "--seed=1729"], root, true)
+    end
+    run.call("rust", %w[cargo test --locked])
+  end
+  receipt[:finished_at] = Time.now.utc.iso8601
+  receipt[:passed] = receipt[:steps].all? { _1[:status] == "passed" }
+  save.call
+  puts "Receipt: #{out}/receipt.json (#{receipt[:passed] ? 'PASS' : 'FAIL'})"
+  exit(receipt[:passed] ? 0 : 1)
+end
