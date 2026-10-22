@@ -4,6 +4,7 @@
 # remains recoverable with git show; keep all decision/counter/window records.
 require "json"
 require "digest"
+require_relative "ar_request_sites_db"
 
 module JitGuardsExport
   module_function
@@ -59,10 +60,39 @@ module JitGuardsExport
     end
     File.write(path, JSON.pretty_generate(result) + "\n")
   end
+
+  # Preserve the collector schema; omit only private/verbose captures. The raw
+  # receipt is deliberately private because it contains SQL bind values.
+  def publish_control(input, output)
+    bytes = File.read(input)
+    report = JSON.parse(bytes)
+    report.fetch("workers").each_value do |worker|
+      worker.fetch("cases").each_value do |seeds|
+        seeds.each_value do |row|
+          row.delete("sql_trace")
+          row.delete("sql_capture")
+          row.fetch("db_audit").fetch("columns").select! { |column, _| DirectSiteDB::EXCLUSIONS.key?(column) }
+        end
+      end
+    end
+    inventories = {}
+    result = compact(report, inventories)
+    result.merge!("format" => 2, "inventories" => inventories,
+      "scope" => "public projection of unified collector; no timing; raw DB and response/SQL gates remain separate",
+      "replay_receipt_sha256" => Digest::SHA256.hexdigest(bytes),
+      "raw_receipt_recovery" => "private: contains SQL and bind values; public projection is the durable receipt",
+      "omitted_fields" => ["sql_trace", "sql_capture", "db_audit.columns except declared exclusion"])
+    File.write(output, JSON.pretty_generate(result) + "\n")
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
-  commit, *paths = ARGV
-  abort "usage: jit_guards_export.rb ORIGINAL_EXPORT_COMMIT EXPORT..." if paths.empty?
-  paths.each { JitGuardsExport.publish(_1, commit) }
+  if ARGV.first == "control"
+    abort "usage: jit_guards_export.rb control PRIVATE_RECEIPT PUBLIC_EXPORT" unless ARGV.size == 3
+    JitGuardsExport.publish_control(ARGV[1], ARGV[2])
+  else
+    commit, *paths = ARGV
+    abort "usage: jit_guards_export.rb ORIGINAL_EXPORT_COMMIT EXPORT..." if paths.empty?
+    paths.each { JitGuardsExport.publish(_1, commit) }
+  end
 end

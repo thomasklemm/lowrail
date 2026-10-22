@@ -219,7 +219,7 @@ all 60 RPS windows, all 252 worker-mode receipts, process metrics and the
 complete numeric GC/wire audit. `$REPO` and `$SCRATCH` are relocatable root
 labels, not a portable app/bundle. Format 2 replaces entropy traces and bulky
 workflow detail with hashes/counts, deduplicates DB inventories and summarizes
-generated-file pin catalogs. Every export names its immutable original commit,
+generated-file pin catalogs. Each compacted historical export names its original commit,
 path and byte hash; `git show COMMIT:PATH` recovers those original details.
 Measurement commits and runtime pins describe the **historical measuring
 runtime**, not later branch HEAD. No credentials or raw cookie/packet data
@@ -415,9 +415,13 @@ JIT_GUARDS_HARNESS="$HARNESS/script/native-bench" BUNDLER_VERSION=4.0.20 \
   mise exec ruby@4.0.7 -- ruby bench/experiments/ar_request_sites_check.rb CONFIG NEW_SEED_0
 # Repeat once with RNG seed 1 and a different output directory.
 mise exec ruby@4.0.7 -- ruby bench/experiments/ar_request_sites_db.rb \
-  NEW_SEED_0/result.json NEW_SEED_1/result.json docs/jit-guards-db.json
+  NEW_SEED_0/result.json NEW_SEED_1/result.json "$PRIVATE/new-db-export.json"
 mise exec ruby@4.0.7 -- ruby bench/ar_request_sites_test.rb
 ```
+
+The DB exporter emits format 1. The published format-2 file is a compacted
+immutable historical export; a new run must not overwrite it or borrow its
+measuring pins. Archive a new sanitized format-1 export before compacting it.
 
 ## Opt-in prerequisite 3: refused transitive certificate
 
@@ -433,11 +437,22 @@ exception into a production guard.
 At both response seeds, all arms return **HTTP 200**, and off-A/off-B have
 identical bodies, all headers and ordered SQL. On has a **different body,
 headers and SQL**, while recording **two DirectSite hits, zero fallbacks**.
-The forked on worker also successfully rebinds once. The collector exits 2.
+The forked on worker also successfully rebinds once. The original collector
+exited 2; the unified follow-up now distinguishes stale-plan exit **3** from
+raw-DB-only exit **2**. Neither is a passed admission gate.
 The overridden transitive scope method is absent from `Site`'s handwritten
 dependency inventory; the top-level named scope bodies remain unchanged.
 This is a demonstrated missing assumption, not cache-clock noise or a
 hypothetical concurrency concern. [Complete negative receipt](jit-guards-certificates.json).
+
+The final unified replay runs `baseline`, `transitive_scope`, then `restored`
+at both seeds **in the same forked worker**. Baseline/restored have exact
+responses and SQL plus two hits/zero fallback each. Only the mutated case
+diverges; it still records two stale hits/zero fallback. All three workers
+show actual YJIT, disabled ZJIT and disabled SQL shadow. The public receipt
+preserves the collector's case/seed/flat-response/`counts_delta`/DB schema,
+with only private SQL/binds removed, entropy traces summarized and inventories
+deduplicated. Its raw private receipt hash and source pins are retained.
 
 Adding only `_exec_scope` to the manual list would repair this one input,
 not establish the requested **compiler-owned** transitive/purity certificate.
@@ -460,9 +475,19 @@ Reproduce the negative admission check, without a timing cohort:
 JIT_GUARDS_HARNESS="$HARNESS/script/native-bench" BUNDLER_VERSION=4.0.20 \
   AR_GUARD_FORK=1 AR_GUARD_TRANSITIVE=1 mise exec ruby@4.0.7 -- ruby \
   bench/experiments/ar_request_sites_check.rb CONFIG NEW_OUTPUT
-# Expected current result: exit 2; response_equal/sql_equal/stale_plan_refused false.
-# Export independently confirms off/off exact at both seeds; DB clock stays separate.
+# Expected: exit 3, response_sql_certificate_passed false; baseline/restored hit.
+# Mutated response_equal/sql_equal/stale_plan_refused false; off/off remains exact.
+# Raw DB equality is reported separately: exit 2 only when the certificate passes.
+# The collector also writes NEW_OUTPUT/public.json, safe for publication.
 ```
+
+The committed negative receipt is the collector's `public.json` byte-for-byte,
+not a translation into the deleted checker's schema. Its raw receipt hash is
+an integrity reference, **not** a claim that private SQL/binds can be recovered
+from git. Regenerate the same public projection with
+`jit_guards_export.rb control PRIVATE_RECEIPT PUBLIC_EXPORT`. The earlier
+summary remains recoverable in
+[`6d3b30a`](https://github.com/thomasklemm/lowrail/commit/6d3b30aee03c14484c3a052cc450fb0ec284f591).
 
 ## Closure invalidation feasibility: no new timing
 
@@ -542,12 +567,19 @@ changes; neither admitted production delivery. The follow-up removes the
 unused second DirectSite implementation and its dead query hook, folds the
 negative certificate into the existing worker/fork harness, and asserts both
 actual YJIT and disabled ZJIT in the child. Compacted exports preserve every
-counter/window/decision and explicitly distinguish measuring pins from HEAD;
-large original details remain recoverable by commit/path/hash.
+numeric counter/window/decision outside the explicitly summarized workflows,
+and distinguish measuring pins from HEAD; original details remain recoverable
+by commit/path/hash. The follow-up export regression covers small and bulky
+workflows, both accepted/rejected windows, historical measuring commits and
+the retained/generated pin distinction.
 
-The suspected on-only cache-column hole does **not** reproduce: the complete
-canonical schema/header hash rejects it. The existing DB test now exercises
-that asymmetry, alongside changed primary rows and app cache values. The
+An actual SQLite column addition changes the captured schema and was already
+rejected. The follow-up nevertheless found that the separate split comparator
+could accept a header-only change with an unchanged schema string. It now
+requires an explicit header hash; the regression holds the schema string
+fixed and fails on the previous comparator. Current capture receipts require
+that field; the older DB export remains historical, not silently upgraded.
+Changed primary rows and app cache values remain rejected. The
 split store-internal-key boundary is coordinator-approved and explicitly
 separate from complete cache equivalence, not silently widened noise.
 
