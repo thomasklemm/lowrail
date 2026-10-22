@@ -12,6 +12,9 @@ class ObserveTest < Minitest::Test
   SUITE = {
     "test/test_helper.rb" => <<~'RUBY',
       ENV["RAILS_ENV"] ||= "test"
+      # Unlike a bundled app, this fixture has no dependency resolution step.
+      # Select Minitest's compatible Prism before Rails loads its ERB parser.
+      require "minitest/autorun"
       require_relative "../config/environment"
       require "rails/test_help"
     RUBY

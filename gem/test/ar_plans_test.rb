@@ -8,6 +8,8 @@ class ARPlansTest < Minitest::Test
   SCENARIO = <<~'RUBY'
     ENV["RAILS_ENV"] = "production"
     ENV["LOWRAIL_SEALED"] = "1"
+    # Resolve this unbundled fixture's Minitest/Prism pair before the builder.
+    require "minitest/test"
     gem "activerecord", "~> 8.1.4"
     require "active_record"
     require "lowrail"
@@ -57,7 +59,6 @@ class ARPlansTest < Minitest::Test
     # Test scaffolding may live in Arel's namespace without being part of SQL
     # planning. A namespace-wide inventory would incorrectly refuse the reader.
     File.write(File.join(dir, "arel_test.rb"), <<~'CODE')
-      require "minitest/test"
       require "lowrail/minitest"
       module Arel
         class ReaderTest < Minitest::Test

@@ -95,13 +95,14 @@ class E2ETest < Minitest::Test
         Rails.application.initialize!
       RUBY
       out, err, status = ruby("-e", <<~'RUBY', chdir: dir, env: {"RUBYOPT" => "--disable-yjit #{SETUP_OPT}", "RAILS_ENV" => "test", "LOWRAIL_STATS" => "", "LOWRAIL_DEBUG" => "1", "LOWRAIL_OUTCOMES" => File.join(dir, "outcomes")})
+        # Resolve this unbundled fixture's Minitest/Prism pair before Rails.
+        require "minitest/autorun"
         require_relative "config/environment"
         require_relative "app"
         require "json"
         Lowrail::Stats.reset_counts!
         puts JSON.generate(value: Calc.new.compute(7), stats: Lowrail::Stats.snapshot,
           admitted: !Lowrail.manifest.nil?, each_source: Array.instance_method(:each).source_location)
-        require "minitest/autorun"
         class DriftTest < Minitest::Test
           def test_original = assert_equal [:orig, 8], Calc.new.compute(7)
         end
