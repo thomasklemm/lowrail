@@ -258,7 +258,7 @@ module RequestPairs
   def self.compile_counter_extension(out)
     extension = File.join(out, "lowrail_callgrind.#{RbConfig::CONFIG.fetch("DLEXT")}")
     cc = RbConfig::CONFIG.fetch("LDSHARED").shellsplit
-    raise "could not compile Callgrind client requests" unless system(*cc, "-fPIC", "-O2",
+    raise "could not compile Callgrind client requests" unless Open3.system(RbConfig.ruby, "-e", "require 'rbconfig'; puts RbConfig::CONFIG['LDSHARED']", *cc, "-fPIC", "-O2",
       "-I#{RbConfig::CONFIG.fetch("rubyhdrdir")}", "-I#{RbConfig::CONFIG.fetch("rubyarchhdrdir")}",
       File.join(__dir__, "callgrind.c"), "-o", extension)
     extension
@@ -307,8 +307,8 @@ module RequestPairs
       puts HeapWindows.prepare_heap.size
     RUBY
     log = File.join(out, "preflight.valgrind.log")
-    ok = system(env.merge(floors).merge("RUBYOPT" => nil, "LOWRAIL" => "0"), executable, "--verbose", "--tool=none",
-      "--log-file=#{log}", RbConfig.ruby, *JitStability.flags("0"), "-e", program,
+    ok = Open3.system(env.merge(floors).merge("RUBYOPT" => nil, "LOWRAIL" => "0"), executable, "--verbose", "--tool=none",
+      "--log-file=#{log}", RbConfig.ruby, *JitStability.flags("0").shellsplit, "-e", program,
       rails_boot ? "rails" : "heap", File.expand_path("heap_windows.rb", __dir__),
       chdir: app,
       out: File.join(out, "preflight.log"), err: [:child, :out])
@@ -407,9 +407,9 @@ module RequestPairs
               "BENCH_PHASE_ORDER" => (round % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension,
               "BENCH_IDLE_CENSUS" => nil, "BENCH_YJIT_LOG_FILE" => jit_log)
             process_start = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
-            ok = system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
+            ok = Open3.system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
-              RbConfig.ruby, *worker_jit_flags, File.expand_path(worker, __dir__), route,
+              RbConfig.ruby, *worker_jit_flags.shellsplit, File.expand_path(worker, __dir__), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
             process_end = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
             check_valgrind_log!(out, label)
@@ -468,7 +468,7 @@ module RequestPairs
         env = environments.fetch(layer).merge(floors).merge("BENCH_REQUESTS" => requests.to_s,
           "BENCH_PHASE_ORDER" => (round.to_i % 2).to_s, "BENCH_CALLGRIND_EXTENSION" => extension,
           "BENCH_IDLE_CENSUS" => "1", "BENCH_YJIT_LOG_FILE" => nil)
-        ok = system(env, RbConfig.ruby, *jit_flags, File.expand_path(worker, __dir__), route,
+        ok = Open3.system(env, RbConfig.ruby, *jit_flags.shellsplit, File.expand_path(worker, __dir__), route,
           chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
         raise "Idle companion failed: #{name}; inspect #{log}" unless ok
         line = File.readlines(log).find { _1.start_with?("LOWRAIL_BENCH ") }
@@ -553,9 +553,9 @@ module RequestPairs
             label = "#{round}-#{layer}-#{n}"
             data = File.join(out, "#{label}.callgrind")
             env = environments.fetch(layer).merge("BENCH_COUNT_REQUESTS" => n.to_s, "BENCH_CALLGRIND_EXTENSION" => extension)
-            ok = system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
+            ok = Open3.system(env, "valgrind", "--verbose", "--tool=callgrind", "--instr-atstart=no", "--smc-check=all-non-file",
               "--callgrind-out-file=#{data}", "--log-file=#{File.join(out, "#{label}.valgrind.log")}",
-              RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "requests.rb"), route,
+              RbConfig.ruby, *(jit ? ["--yjit"] : ["--disable-yjit"]), File.join(__dir__, "requests.rb"), route,
               chdir: env.fetch("BENCH_WORKDIR", app), out: File.join(out, "#{label}.log"), err: [:child, :out])
             check_valgrind_log!(out, label)
             raise "Callgrind failed: #{label}; inspect logs" unless ok
@@ -603,7 +603,7 @@ module RequestPairs
           env["BENCH_HEAP_DUMP"] = File.join(out, "#{label}.heap.jsonl")
         end
         log = File.join(out, "#{label}.log")
-        ok = system(env, RbConfig.ruby, jit ? "--yjit" : "--disable-yjit", File.join(__dir__, "gc_requests.rb"),
+        ok = Open3.system(env, RbConfig.ruby, *(jit ? ["--yjit"] : ["--disable-yjit"]), File.join(__dir__, "gc_requests.rb"),
           route, chdir: env.fetch("BENCH_WORKDIR", app), out: log, err: [:child, :out])
         raise "GC diagnostic failed: #{label}; inspect logs" unless ok
         lines = File.readlines(log)

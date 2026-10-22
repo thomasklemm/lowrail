@@ -46,7 +46,7 @@ impl RubyOracle {
         let (parent, child_channel) = UnixStream::pair().map_err(|e| format!("oracle channel: {e}"))?;
         let mut command = Command::new("bundle");
         command.args(["exec", "ruby"]).arg(&script);
-        if let Some(jit) = jit { command.arg(jit); }
+        if let Some(jit) = jit { command.arg("--jit").arg(jit); }
         // Only the dedicated duplex channel crosses exec at fd 3. Do not
         // borrow stdin/stdout: an app may read or write them during boot/eval.
         // SAFETY: pre_exec performs only async-signal-safe fd operations. The
