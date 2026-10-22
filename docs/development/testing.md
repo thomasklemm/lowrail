@@ -117,7 +117,9 @@ unchanged. Fresh generation changes migration filenames/schema timestamps
 and app-name-bearing source; updating those pins would certify a different
 specimen. An existing mismatched directory is refused, never overwritten:
 preserve it and prepare a new DIRNAME, then use `LOWRAIL_TEST_CORPUS_ROOT`
-to select a corpus tree containing both required blogs. `--source-only`
+to select a corpus tree containing both required blogs (for example,
+DIRNAMEs `health-corpus/real-blog` and `health-corpus/real-blog-r4`, with
+`LOWRAIL_TEST_CORPUS_ROOT=/absolute/path/to/.corpus/health-corpus`). `--source-only`
 extracts/checks retained source and lock without installing the bundle.
 
 Other external apps/checkouts remain optional. Prepare them with
@@ -196,3 +198,78 @@ Skips/pending examples inside the Minitest and RSpec reporter **fixture
 suites** intentionally test outcome reporting. They are not missing gem-test
 prerequisites or exceptions to strict mode. `TestHelperTest` similarly proves
 the normal/strict failure and optional-skip contracts in child suites.
+
+## Main health check (2026-10-22)
+
+**The full primary gem gate is still red, not merely missing prerequisites.**
+With the retained fixture prepared, the all-sealed cold witness exposes
+`Templates::CompiledSource` on `ActionView::Template` and
+`PreloadPlans::Hook` on `ActiveRecord::Associations::Preloader` in the on arm
+only. The off/on holder ancestry and loaded-holder census differ. These are
+the [recorded open correctness failures](../DECISIONS.md#full-ancestry-is-observable),
+not entropy noise or permission to filter ancestors. Runtime/performance
+paths and the failing comparison are unchanged by this health-check work.
+
+The initial fresh-main run on `a9a71db` used Ruby 4.0.7, Minitest 6.0.6,
+Rails 8.1.4, both Bootsnap 1.18.6/1.26.0, the documented local gems, the
+generated `real-blog` plus a newly generated `real-blog-r4`, and the prepared
+Rails v8.1.4 component checkout/bundle. It produced **193 runs / 5,789
+assertions / 9 failures / 1 error / 1 skip**. The extra test in bet L's
+194-run branch is not on main; its 31 prerequisite/optional skips are not
+the skip count of this prepared main run.
+
+Both unfiltered primary runs use, from `gem/`:
+
+```sh
+LOWRAIL_STRICT_GATES=1 mise exec ruby@4.0.7 -- rake test TESTOPTS='--verbose --seed=1729'
+```
+
+The after-suite at
+[`2f7bd66`](https://github.com/thomasklemm/lowrail/commit/2f7bd6602f216d52113a2b8553efb2af929283f3)
+finishes in 1,074.60 seconds with **193 runs / 6,303 assertions / 1 failure /
+0 errors / 1 skip**. Both logs contain exactly the same 193 test identities.
+The sole remaining failure is `BlogProductionTest`'s complete cold-witness
+comparison at line 26; the sole skip remains optional Campfire materialization.
+Neither is counted as passing coverage.
+
+| Primary unfiltered gate | Runs | Assertions | Failures | Errors | Skips |
+|---|---:|---:|---:|---:|---:|
+| Fresh unchanged main, documented setup | 193 | 5,789 | 9 | 1 | 1 |
+| Fixed test fixtures and exact retained app | 193 | 6,303 | 1 | 0 | 1 |
+
+A separate detached, unchanged `a9a71db` worktree, with its own CLI/native
+build and the exact retained app, independently reproduces the same line-26
+failure: **1 run / 86 assertions / 1 failure / 0 errors / 0 skips**. Thus the
+remaining mismatch is not introduced by the fixture/setup fixes. No stale
+source, lock or entropy pins were found: it was the regenerated specimen,
+not its certificate, that was wrong. Rust `cargo build --locked` succeeds;
+`cargo test --locked` passes all **49 tests** (39 + 2 + 8).
+
+### Classification of every initial failure, error and skip
+
+| Test(s) | Initial result | Classification and disposition |
+|---|---|---|
+| `BlogProductionTest#test_cold_sealed_admission_does_not_prepare_the_app` | Error: inactive entropy policy has no `workers` | Undocumented prerequisite: a new generation is not the retained fixture. Restoring its exact bytes reaches the **real all-sealed ancestry defect** above; that failure remains red. |
+| `BlogProductionTest#test_terminal_completion_distinguishes_pending_jobs_from_drained_cable` | Failure: `app source pin mismatch` | Undocumented retained-fixture prerequisite; source, lock and all runtime entropy pins remain unchanged. |
+| `FormScaffoldTest#test_passive_production_token_and_collection_public_artifact` | Failure: `seed-0-off1` exits on the source pin | Same undocumented retained-fixture prerequisite. The real cold, 192+192-pair, native-hit, deopt and continuation gates run after restoring the original specimen. |
+| `CompilerTest#test_sealed_build_respects_the_app_locked_prism_grammar` | Failure: local lock cannot find minitest 5.27.0 | Undocumented prerequisite; install the actual Minitest 5 gem, not just minitest-mock. |
+| `ARPlansTest#test_scoped_reader_preserves_rows_events_and_runtime_changes` | Failure: cannot activate Minitest after Prism 2 | Real unbundled fixture dependency-order defect. Select the test runner/compatible Prism before build tooling, as a bundled app's resolver would. |
+| `ObserveTest#test_definitions_after_boot`; `#test_type_samples_are_bounded`; `#test_suite_passes_with_recorder`; `#test_lightweight_types_only_run_preserves_samples_and_outcomes` | Four failures: Minitest cannot activate; with 5 installed, plugins evaluate both 5 and 6 and crash | Real unbundled fixture dependency-order defect. Load the test runner before Rails chooses Prism. All recorder/type assertions remain intact. |
+| `E2ETest#test_late_rails_yjit_enable_reports_drift_and_keeps_fact_checks` | Failure: Minitest cannot activate; with 5 installed, recorded outcome is nil | Same fixture dependency-order defect, **not a JIT-mode defect**: the pre-fix subprocess already reports the correct interpreter→YJIT drift and fallback. |
+| `MaterializeCorpusTest#test_campfire` | Skip: optional Campfire corpus absent | Intentional optional skip, unchanged. No Campfire materialization coverage is claimed. |
+
+Additional failures from bet L were reproduced independently rather than
+inferred from its totals:
+
+| Test(s) / control | Classification and disposition |
+|---|---|
+| `FactsTest#test_sorbet_registry_does_not_execute_pending_sigs_or_app_methods` with Sorbet unavailable | Real test-helper defect: `FactsTest` did not include `LowrailTest`. Before: `NoMethodError`; after: named skip in a partial run, explicit prerequisite failure in strict mode. With the declared Sorbet gem installed, the registry test executes normally. |
+| `TestCertificateTest#test_natural_generation_releases_pending_once_and_live_resets_do_not_retire`; `#test_real_config_builder_bootsnap_and_method_mutations_retire_stickily`; `#test_active_parent_forks_original_child_with_no_inherited_authority_or_counters`; `#test_actual_parallel_policy_mismatch_refuses_despite_workers1` | Undocumented Bootsnap 1.26.0 prerequisite. Isolating installed gems to Bootsnap 1.18.6 reproduces all four `verification_bootsnap_compiler_unknown` failures. That version lacks the certified `DEFAULT` compiler API; do not widen the runtime certificate. |
+| Ordinary `LoaderTest` matrix with only Bootsnap 1.18.6 | 13 runs / 521 assertions / zero failures, errors or skips. Bet L's compiler-policy failures belong to `TestCertificateTest`, not this loader matrix. |
+
+No tests were removed, skipped, weakened, or changed to expect the known
+runtime mismatch. No entropy pin was refreshed. The retained archive is
+byte-identical to the earlier certified specimen, without a previously
+prepared database or storage snapshot.
+The setup helper rejects an already generated/wrong fixture and an edited
+retained source without overwriting either one; it validates frozen locks.

@@ -59,7 +59,7 @@ RUBY
         cd "$dest"
         BUNDLE_FROZEN=true bundle install --quiet
         RAILS_ENV=test BUNDLE_FROZEN=true bin/rails db:prepare
-        bundle exec ruby -r"$root/fixtures/corpus/blog_entropy" -e '
+        BUNDLE_FROZEN=true bundle exec ruby -r"$root/fixtures/corpus/blog_entropy" -e '
           control = BlogProduction::Entropy.validate(Dir.pwd)
           abort control.fetch("reason") unless control.fetch("active")
         '
