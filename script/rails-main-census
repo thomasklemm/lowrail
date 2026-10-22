@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Run with mise exec ruby@4.0.7 -- ruby script/rails-main-census prepare|profile.
+# prepare uses NEW disposable copies; profile refuses existing result files.
+require "fileutils"
+require "rbconfig"
+root = File.expand_path("..", __dir__)
+command = ARGV.fetch(0)
+raise "prepare|profile required" unless %w[prepare profile].include?(command)
+raise "unset database overrides before using disposable copies" if ENV.keys.any? { _1.end_with?("DATABASE_URL") }
+apps = { "blog" => "real-blog-r4", "campfire" => "campfire-r82", "fizzy" => "fizzy-r82", "writebook" => "writebook-r82" }
+output = ENV.fetch("CENSUS_OUTPUT", File.join(root, ".lowrail/private/rails-main-census"))
+FileUtils.mkdir_p(output)
+apps.each do |name, corpus|
+  app = File.join(root, ".corpus/census-#{name}")
+  env = { "BUNDLE_FROZEN" => "true", "RAILS_ENV" => "production", "RACK_ENV" => "production",
+    "SECRET_KEY_BASE_DUMMY" => "1", "RAILS_LOG_LEVEL" => "fatal", "DATABASE_ADAPTER" => "sqlite",
+    "SKIP_TELEMETRY" => "1", "APP_VERSION" => "census", "RUBYOPT" => nil,
+    "RUBY_YJIT_ENABLE" => "0", "RUBY_ZJIT_ENABLE" => "0" }
+  if command == "prepare"
+    raise "fresh copy required: #{app}" if File.exist?(app)
+    system(env, File.join(root, "script/corpus"), corpus, "census-#{name}", "--source-only", exception: true)
+    system("patch", "-p1", "-i", File.join(root, "fixtures/corpus/rails-main-census/#{name}.patch"), chdir: app, exception: true)
+    system(env, "bundle", "install", "--quiet", chdir: app, exception: true)
+    system(env, "bundle", "exec", "rails", "db:create", "db:schema:load", "assets:precompile", chdir: app, exception: true)
+    system(env, "bundle", "exec", RbConfig.ruby, File.join(root, "bench/upstream/rails_main_census.rb"), "prepare", name, chdir: app, exception: true)
+  else
+    %w[interpreter yjit].each do |mode|
+      flags = mode == "yjit" ? ["--yjit"] : []
+      system(env.merge("CENSUS_MODE" => mode, "RUBY_YJIT_ENABLE" => "0", "RUBY_ZJIT_ENABLE" => "0"),
+        "bundle", "exec", RbConfig.ruby, *flags, File.join(root, "bench/upstream/rails_main_census.rb"),
+        "profile", name, File.join(output, "#{name}-#{mode}.json"), chdir: app, exception: true)
+    end
+  end
+end

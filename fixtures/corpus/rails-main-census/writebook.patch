@@ -1,0 +1,24 @@
+--- a/Gemfile
++++ b/Gemfile
+@@ -2,7 +2,7 @@
+ 
+ ruby file: ".ruby-version"
+ 
+-gem "rails", github: "rails/rails", ref: "36e0f96b9d7a022755a53a2a9fb7a67ad4e3669e"
++gem "rails", github: "rails/rails", ref: "33748f4f60e68eeeed0d48ac566d345415dc78f4"
+ gem "benchmark" # Removed from Ruby 4's default gems; mini_magick requires it.
+ 
+ # Drivers
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -6,8 +6,8 @@
+ 
+ GIT
+   remote: https://github.com/rails/rails.git
+-  revision: 36e0f96b9d7a022755a53a2a9fb7a67ad4e3669e
+-  ref: 36e0f96b9d7a022755a53a2a9fb7a67ad4e3669e
++  revision: 33748f4f60e68eeeed0d48ac566d345415dc78f4
++  ref: 33748f4f60e68eeeed0d48ac566d345415dc78f4
+   specs:
+     actioncable (8.2.0.alpha)
+       actionpack (= 8.2.0.alpha)

@@ -4,6 +4,11 @@ Profiling findings that are best fixed in the gem that causes them, so every
 user of that gem benefits. Lowrail passes cover apps on older versions; the
 upstream fix removes the cause.
 
+**Rails-main census (bet U, 2026-10-22):** [four apps, 12 routes, 1,274 ranked
+allocation sites](upstream/rails-main-census.md), with a disposition for every
+top-15 site. The preload-buffer experiment saves allocations but is rejected
+for a resolved ZJIT regression; no qualifying draft or Rails fork push.
+
 | Finding | Measured | Gem / version | Proposed fix | Status |
 |---|---|---|---|---|
 | Cheap method-lookup assumption checks without suppressible Ruby hooks | Fizzy `/bubbles`: 20 global-epoch bumps/request, zero invalidations of 12 selected held tokens; reviewed token read/guard 184/202 interpreter, 103/106 YJIT Ir; C check 26 Ir | MRI master base `cfa50b0` | Experimental scoped method tokens; global epoch rejected for churn | Owner posted [Feature #22459](https://bugs.ruby-lang.org/issues/22459); mame asked for the concrete use case ([note 2](https://bugs.ruby-lang.org/issues/22459#note-2)), owner answered with the specializer/fallback example ([note 3](https://bugs.ruby-lang.org/issues/22459#note-3), memoization/DI motivation withdrawn); [review fix](https://github.com/thomasklemm/ruby/commit/a30db2f20843940c089bd8247135a7c7cd475ca5), 13 tests/97 assertions on interpreter and YJIT. [Evidence](upstream-drafts/ruby-method-token-evidence.md), unposted [replacement description](upstream-drafts/ruby-method-token-description.md) and [journal note](upstream-drafts/ruby-method-token-journal-note.md); detached pinned cohort passed A/A, heap and JIT gates; first post-fix attempt remains INVALID for harness drift. No upstream PR |
