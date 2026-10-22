@@ -7,6 +7,33 @@ Every run prints a **Lowrail gate summary** listing each skipped test's full
 class/method name and reason, even without `--verbose`, on Minitest 5 and 6.
 An optional skip is not coverage of that integration.
 
+## One-command primary gate
+
+```sh
+mise exec ruby@4.0.7 -- script/gate
+# Only populate reusable prerequisites (also called by .agents/setup):
+mise exec ruby@4.0.7 -- script/gate --prepare
+```
+
+The helper keeps a physical per-Ruby Rack-3-only home in `.lowrail/gate-gems`,
+installs the dependencies listed below, prepares both exact blog specimens
+with `script/corpus`, and runs `script/rails-suite --prepare`. Existing stale
+specimens are refused, never replaced. It then builds the debug CLI, runs the
+unfiltered strict gem suite and all six original bench suites plus screen
+(seed 1729), and runs `cargo test --locked`. It continues after failures so
+the receipt cannot silently omit later gates. Service-backed corpus apps and
+the Ruby 4.1 matrix remain separate; this is the primary Ruby 4.0.7 gate.
+
+Logs and a JSON receipt go to a new `.lowrail/gate/<SHA>-<run>/` directory;
+`--output NEW_DIR` overrides it. Receipts retain the exact SHA, dirty-tree
+flag, commands/exits, MT_CPU (default 8), maximum OS-thread census observed
+at test boundaries, and per-suite totals plus every named skip. Missing
+executables are named skipped steps and make the overall gate fail; strict
+test prerequisite failures remain failures. Optional named skips are still
+printed, not represented as exercised coverage. No app production database
+or other workload's gem home is modified. Setup caches these prerequisites
+in future orb snapshots once its changes reach the default branch.
+
 From the repository root, build the current CLI and run Rust tests first:
 
 ```sh
