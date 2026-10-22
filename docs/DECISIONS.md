@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet J heap shaping: KILLED after screen and bounded site diagnosis (2026-10-22)
+
+Three-round Puma screen does not confirm a smaller on heap: pool capacities are larger/overlapping, free slots phase-dependent.
+GC/1,000 medians off-A/on/off-B are 14.423/17.345/14.325; retain off-B's 22.946 window, not a resolved GC/p99 treatment effect.
+The 320-byte pool records 13 on-only forced-major increments; traced request allocations instead fall 32/30/32, with token Strings replacing stock ones.
+Warm post-full-GC 320-byte live slots are 966/1026/966; the extra 60 lack site coverage, and zero traced request 320-byte objects survive: no established pinning/buffer cause.
+Kill tuning and the RPS cohort; no justified lowering fix, runtime/app change or price. [Protocol, sites and complete evidence](gc-heap.md).
+
 ## Token allocation fix and one new-rule blog cohort: preregistered (2026-10-21)
 
 The token-only +32 objects/request is traced to per-hit view-context constant

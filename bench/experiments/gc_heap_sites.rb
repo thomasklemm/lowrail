@@ -73,7 +73,8 @@ module GcHeapSites
     ObjectSpace.trace_object_allocations_clear
     result = {"arm" => arm, "requests" => 20, "warmup" => 500,
       "ruby" => RUBY_DESCRIPTION, "rails" => Rails.version,
-      "refusal" => Lowrail.refusal_reason, "stats_enabled" => Lowrail::Stats.enabled?,
+      "refusal" => Lowrail.refusal_reason,
+      "stats_enabled" => !!(defined?(Lowrail::Stats) && Lowrail::Stats.enabled?),
       "admissions" => %w[FormScaffold TokenTag CollectionRender].to_h { |name|
         [name, Lowrail.const_get(name).admission] },
       "warm_pool_before_full_gc" => pre_gc, "warm_pool_after_full_gc" => post_gc,
