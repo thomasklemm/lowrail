@@ -1,6 +1,69 @@
 use super::*;
 
 #[test]
+fn callers_and_view_inputs_are_bounded_contextual_and_refresh_sources() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-useful-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
+    std::fs::create_dir_all(dir.join("app/controllers")).unwrap();
+    let source = dir.join("app/controllers/rooms_controller.rb");
+    let ruby = "class RoomsController\n def index; @value = 7; end\n def value = 7\n def caller = value\n def dynamic(obj) = obj.value\n def make = User.new\n def other = Other.new\nend\n";
+    std::fs::write(&source, ruby).unwrap();
+    std::fs::create_dir_all(dir.join("app/views/rooms")).unwrap();
+    for name in ["index", "_card"] {
+        std::fs::write(dir.join(format!("app/views/rooms/{name}.html.erb")), "template").unwrap();
+    }
+    use sha2::{Digest, Sha256};
+    let digest = format!("{:x}", Sha256::digest(b"template"));
+    let methods: Vec<_> = [("index",2), ("value",3), ("caller",4), ("dynamic",5), ("make",6), ("other",7)].into_iter()
+        .map(|(name,line)| json!({"name":name,"owner":"RoomsController","source_location":format!("{}:{line}",source.display())})).collect();
+    let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[{"name":"RoomsController","const_source_location":format!("{}:1",source.display()),"methods":methods},
+            {"name":"User","singleton_ancestors":["Class"]}, {"name":"Other","singleton_ancestors":["Class"]},
+            {"name":"Class","methods":[{"name":"new","owner":"Class","iseq_kind":"cfunc"}]},
+            {"name":"Array","methods":[{"name":"join","owner":"Array","iseq_kind":"cfunc"}]}],
+        "controllers":[{"name":"RoomsController","actions":["index"]}],
+        "routes":[{"controller":"rooms","action":"index"}],
+        "templates":[{"identifier":format!("{}/app/views/rooms/index.html.erb",dir.display()),"virtual_path":"rooms/index",
+            "source_sha256":digest,"code":"render 'card', value: @value, sampled: @sampled, joined: @sampled.join; render partial: 'card', collection: @sampled, as: :entry"},
+            {"identifier":format!("{}/app/views/rooms/_card.html.erb",dir.display()),"virtual_path":"rooms/_card","source_sha256":digest,"strict_locals":"value:, sampled:"}]});
+    std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+    std::fs::write(dir.join(".lowrail/observed.json"), json!({"format":1,"app_root":dir,"types":[
+        {"module":"RoomsController","name":"index","ivars":{"@sampled":{"Array":1}},
+            "collection_members":{"ivar:@sampled":{"Array.element":{"String":1}}}}]}).to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    let callers = data.call("callers", &json!({"target":"RoomsController#value"})).unwrap();
+    assert_eq!(callers["callers"].as_array().unwrap().len(), 1);
+    assert_eq!(callers["callers"][0]["caller"], "RoomsController#caller");
+    assert_eq!(callers["callers"][0]["line"], 4);
+    assert_eq!(callers["unresolved"][0]["line"], 5);
+    assert_eq!(callers["complete"], false);
+    let constructors = data.call("callers", &json!({"target":"User.new"})).unwrap();
+    assert_eq!(constructors["callers"].as_array().unwrap().len(), 1, "shared Class#new must not conflate concrete receivers");
+    assert_eq!(constructors["callers"][0]["caller"], "RoomsController#make");
+    let view = data.call("view_locals", &json!({"path":"rooms/_card"})).unwrap();
+    let incoming = &view["templates"][0]["incoming"][0];
+    assert_eq!(incoming["action"], "RoomsController#index");
+    assert_eq!(incoming["locals"]["value"]["name"], "Integer");
+    assert_eq!(incoming["locals"]["value"]["evidence"], "static");
+    assert_eq!(incoming["locals"]["sampled"]["name"], "Array[String]");
+    assert_eq!(incoming["locals"]["sampled"]["evidence"], "observed");
+    assert_eq!(incoming["locals"]["joined"]["name"], "String");
+    assert_eq!(incoming["locals"]["joined"]["evidence"], "observed", "receiver evidence must survive a call");
+    let collection = &view["templates"][0]["incoming"][1];
+    assert_eq!(collection["local_names"], json!(["entry", "entry_counter", "entry_iteration"]));
+    assert_eq!(collection["locals"]["entry"]["name"], "String");
+    assert_eq!(collection["locals"]["entry"]["evidence"], "observed");
+    assert_eq!(view["templates"][0]["strict_locals"], "value:, sampled:");
+    assert_eq!(view["complete"], false);
+    std::fs::write(&source, ruby.replace("def caller = value", "def caller = other")).unwrap();
+    assert_eq!(data.call("callers", &json!({"target":"RoomsController#value"})).unwrap()["callers"], json!([]));
+    assert_eq!(data.call("view_locals", &json!({"path":"unknown"})).unwrap()["available"], false);
+    std::fs::write(dir.join("app/views/rooms/_card.html.erb"), "changed").unwrap();
+    assert_eq!(data.call("view_locals", &json!({"path":"rooms/_card"})).unwrap()["available"], false);
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn protocol_errors_notifications_and_tool_discovery() {
     let input = b"not json\n[]\n\
         {\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}\n\
@@ -22,7 +85,7 @@ fn protocol_errors_notifications_and_tool_discovery() {
     assert_eq!(responses[2]["error"]["code"], -32000);
     assert_eq!(responses[3]["result"]["protocolVersion"], "2025-06-18");
     let tools = responses[4]["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 15);
+    assert_eq!(tools.len(), 17);
     assert!(tools.iter().any(|t| t["name"] == "type_of"));
     assert_eq!(responses[5]["error"]["code"], -32602);
     assert_eq!(responses[6]["result"], json!({}));

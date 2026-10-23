@@ -71,8 +71,33 @@ impl TypeModel {
                     }
                 }
                 ty.provenance.push(Provenance { source: Source::Observed, detail: detail.clone() });
+                if sample.collection_members.get(&slot).is_some_and(|roles| roles.values().any(|c| !c.is_empty())) {
+                    ty.provenance.push(Provenance { source: Source::Observed,
+                        detail: "collection member classes: at most 8 entries/value, depth 1; empty containers supply no element evidence; not exhaustive".into() });
+                    if let Some(roles) = sample.collection_members.get(&slot) {
+                        for (role, counts) in roles {
+                            if let Some(expected) = member_contract(&ty.name, role) {
+                                for (class, count) in counts {
+                                    if expected != "untyped" && !compatible(facts, expected, class) {
+                                        conflicts.push(Conflict { method: id.clone(), slot: format!("{slot}:{role}"),
+                                            static_type: ty.name.clone(), observed_class: class.clone(), count: *count });
+                                        ty.evidence = Evidence::Static;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 if ty.name == "untyped" {
-                    let arms: std::collections::BTreeSet<_> = counts.keys().map(|c| class_type(facts, c)).collect();
+                    let arms: std::collections::BTreeSet<_> = counts.keys().map(|c| {
+                        let members = sample.collection_members.get(&slot);
+                        match c.as_str() {
+                            "Array" => format!("Array[{}]", member_type(facts, members, "Array.element")),
+                            "Hash" => format!("Hash[{}, {}]", member_type(facts, members, "Hash.key"),
+                                member_type(facts, members, "Hash.value")),
+                            _ => class_type(facts, c),
+                        }
+                    }).collect();
                     ty.name = if arms.contains("untyped") { "untyped".into() }
                         else if arms.len() == 1 { arms.into_iter().next().unwrap() }
                         else { format!("({})", arms.into_iter().collect::<Vec<_>>().join(" | ")) };
@@ -83,6 +108,37 @@ impl TypeModel {
         }
         Ok(())
     }
+}
+
+// One-level histograms can contradict a direct container member contract, but
+// cannot distinguish correlated union arms or prove nested member contracts.
+fn member_contract<'a>(ty: &'a str, role: &str) -> Option<&'a str> {
+    if role == "Array.element" { return ty.strip_prefix("Array[")?.strip_suffix(']'); }
+    let inner = ty.strip_prefix("Hash[")?.strip_suffix(']')?;
+    let mut depth = 0;
+    for (index, c) in inner.char_indices() {
+        match c {
+            '[' | '(' => depth += 1,
+            ']' | ')' => depth -= 1,
+            ',' if depth == 0 => return match role {
+                "Hash.key" => Some(inner[..index].trim()),
+                "Hash.value" => Some(inner[index + 1..].trim()),
+                _ => None,
+            },
+            _ => {}
+        }
+    }
+    None
+}
+
+fn member_type(facts: &Facts, members: Option<&BTreeMap<String, BTreeMap<String, u64>>>, role: &str) -> String {
+    let Some(counts) = members.and_then(|m| m.get(role)).filter(|c| !c.is_empty()) else {
+        return "untyped".into();
+    };
+    let arms: std::collections::BTreeSet<_> = counts.keys().map(|c| class_type(facts, c)).collect();
+    if arms.contains("untyped") { "untyped".into() }
+    else if arms.len() == 1 { arms.into_iter().next().unwrap() }
+    else { format!("({})", arms.into_iter().collect::<Vec<_>>().join(" | ")) }
 }
 
 pub(super) fn constant(name: &str) -> bool {

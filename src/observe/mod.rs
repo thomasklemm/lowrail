@@ -101,6 +101,9 @@ pub struct MethodTypes {
     /// Receiver ivars present at sampled returns; absence is not nil.
     pub ivars: BTreeMap<String, BTreeMap<String, u64>>,
     pub returns: BTreeMap<String, u64>,
+    /// Slot -> built-in container role -> sampled member class histogram.
+    /// One level, at most eight entries per value; never enumerates relations.
+    pub collection_members: BTreeMap<String, BTreeMap<String, BTreeMap<String, u64>>>,
     /// Omitted nil events after a raise in the activation's fiber. These may
     /// include rescued normal nils, not just actual exception unwinds.
     pub exception_tainted_returns: u64,
@@ -345,6 +348,12 @@ fn merge_parts(parts: Vec<Partial>) -> Observed {
                 }
                 for (ivar, c) in &t.ivars {
                     add_counts(e.ivars.entry(ivar.clone()).or_default(), c);
+                }
+                for (slot, roles) in &t.collection_members {
+                    for (role, counts) in roles {
+                        add_counts(e.collection_members.entry(slot.clone()).or_default()
+                            .entry(role.clone()).or_default(), counts);
+                    }
                 }
             }
             e.calls += t.calls;

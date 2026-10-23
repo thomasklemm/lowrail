@@ -2,6 +2,66 @@ use super::*;
 use serde_json::json;
 
 #[test]
+fn relation_elements_propagate_through_app_returns_without_sampling() {
+    let dir = std::env::temp_dir().join(format!("lowrail-type-elements-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("room.rb");
+    std::fs::write(&file, "class Room\n def recent = messages.order(:created_at).to_a\n def first_message = messages.order(:created_at).first\n def limited = messages.order(:created_at).first(3)\n def forwarding = recent\n def recursive = recursive\n def first_title = first_message&.title\nend\n").unwrap();
+    let methods: Vec<_> = [("recent",2), ("first_message",3), ("limited",4), ("forwarding",5), ("recursive",6), ("first_title",7)]
+        .into_iter().map(|(name, line)| json!({"name":name,"owner":"Room","source_location":format!("{}:{line}",file.display())})).collect();
+    let mut facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "gems":[{"name":"activerecord","version":"8.1.4","path":"/rails"}],
+        "models":[{"name":"Room","associations":[{"name":"messages","macro":"has_many","class_name":"Message"}]},
+            {"name":"Message","columns":[{"name":"title","type":"string","null":true}]}],
+        "modules":[{"name":"Room","methods":methods},
+            {"name":"ActiveRecord::Associations::CollectionProxy","ancestors":["ActiveRecord::QueryMethods"]},
+            {"name":"ActiveRecord::Relation","ancestors":["ActiveRecord::Relation","ActiveRecord::FinderMethods"],
+                "methods":[{"name":"to_a","owner":"ActiveRecord::Relation","source_location":"/rails/lib/active_record/relation.rb:1"}]},
+            {"name":"ActiveRecord::QueryMethods","methods":[{"name":"order","owner":"ActiveRecord::QueryMethods","source_location":"/rails/lib/active_record/relation/query_methods.rb:1"}]},
+            {"name":"ActiveRecord::FinderMethods","methods":[{"name":"first","owner":"ActiveRecord::FinderMethods","source_location":"/rails/lib/active_record/relation/finder_methods.rb:1"}]}]})).unwrap();
+    let model = TypeModel::from_facts(&facts).unwrap();
+    for (method, expected) in [("recent","Array[Message]"), ("forwarding","Array[Message]"),
+        ("first_message","Message?"), ("limited","(Message? | Array[Message])"), ("recursive","untyped"), ("first_title","String?")] {
+        let ty = model.fact(&format!("Room#{method}"), "return").unwrap();
+        assert_eq!(ty.name, expected, "{method}");
+        assert_eq!(ty.evidence, Evidence::Static);
+    }
+    // An effective custom proxy implementation must not inherit the catalog.
+    facts.modules[1].ancestors.insert(0, "ProxyOverride".into());
+    facts.modules.push(serde_json::from_value(json!({"name":"ProxyOverride","methods":[
+        {"name":"order","owner":"ProxyOverride","source_location":"/custom/order.rb:1"}]})).unwrap());
+    let model = TypeModel::from_facts(&facts).unwrap();
+    assert_eq!(model.fact("Room#recent", "return").unwrap().name, "untyped");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn collection_members_remain_observed_and_never_feed_the_fixpoint() {
+    let dir = std::env::temp_dir().join(format!("lowrail-type-members-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("reader.rb");
+    std::fs::write(&file, "class Reader\n def values = external\n def caller = values\n def static = ['known']\nend\n").unwrap();
+    let methods: Vec<_> = [("values",2), ("caller",3), ("static",4)].into_iter()
+        .map(|(name,line)| json!({"name":name,"owner":"Reader","source_location":format!("{}:{line}",file.display())})).collect();
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[{"name":"Reader","methods":methods}]})).unwrap();
+    let mut model = TypeModel::from_facts(&facts).unwrap();
+    model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":[
+        {"module":"Reader","name":"values","returns":{"Array":2},"collection_members":{"return":{
+            "Array.element":{"String":3,"Integer":1,"Array":1}}}},
+        {"module":"Reader","name":"static","returns":{"Array":1},"collection_members":{"return":{"Array.element":{"Integer":1}}}}
+    ]}).to_string().as_bytes()).unwrap();
+    assert_eq!(model.fact("Reader#values", "return").unwrap().name, "Array[(Array[untyped] | Integer | String)]");
+    assert_eq!(model.fact("Reader#values", "return").unwrap().evidence, Evidence::Observed);
+    assert_eq!(model.fact("Reader#caller", "return").unwrap().name, "untyped");
+    assert_eq!(model.fact("Reader#static", "return").unwrap().name, "Array[String]");
+    assert_eq!(model.fact("Reader#static", "return").unwrap().evidence, Evidence::Static);
+    assert_eq!(model.conflicts.len(), 1, "sampled member contradictions must remain visible");
+    assert_eq!(model.conflicts[0].slot, "return:Array.element");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() {
     let dir = std::env::temp_dir().join(format!("lowrail-type-values-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
@@ -33,6 +93,14 @@ fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() 
         ("block", "external { return 7 }; 'tail'", "untyped"),
         ("stale_ivar", "@value = 7; external; @value", "untyped"),
         ("stale_local", "value = 7; external(binding); value", "untyped"),
+        ("final_return", "external; return 7", "Integer"),
+        ("early_return", "return 'early'; 7", "untyped"),
+        ("branch_return", "if external; return 'early'; end; 7", "untyped"),
+        ("nested_return", "return [external ? (return 7) : 'ok']", "untyped"),
+        ("joined", "['yes', 7].join", "String"),
+        ("keys", "{ name: [7] }.keys", "Array[Symbol]"),
+        ("values", "{ name: [7] }.values", "Array[Array[Integer]]"),
+        ("constructed", "Example.new", "Example"),
     ];
     let source = bodies.iter().map(|(name, body, _)| format!("def {name}; {body}; end\n")).collect::<String>();
     let parser = crate::parser::Parser::for_runtime("4.0.7").unwrap();
@@ -40,16 +108,22 @@ fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() 
     std::fs::write(&file, source).unwrap();
     let methods: Vec<_> = bodies.iter().enumerate().map(|(i, (name, _, _))|
         json!({"name":name,"source_location":format!("{}:{}",file.display(),i+1)})).collect();
-    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+    let mut facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
         "models":[{"name":"Example","columns":[{"name":"text","type":"string"},
             {"name":"created_at","type":"datetime"}]}],
-        "modules":[{"name":"Example","kind":"class","methods":methods}]})).unwrap();
+        "modules":[{"name":"Example","kind":"class","singleton_ancestors":["Class"],"methods":methods},
+            {"name":"Class","methods":[{"name":"new","owner":"Class","iseq_kind":"cfunc"}]},
+            {"name":"Array","methods":[{"name":"join","owner":"Array","iseq_kind":"cfunc"}]},
+            {"name":"Hash","methods":[{"name":"keys","owner":"Hash","iseq_kind":"cfunc"},
+                {"name":"values","owner":"Hash","iseq_kind":"cfunc"}]}]})).unwrap();
     let model = TypeModel::from_facts(&facts).unwrap();
     for (name, _, expected) in bodies {
         let ty = model.fact(&format!("Example#{name}"), "return").unwrap();
         assert_eq!(ty.name, expected, "{name}");
         assert_eq!(ty.proven_type(), None, "{name} is not a call/context proof");
     }
+    facts.modules[2].methods[0].source_location = Some("/custom/array.rb:1".into());
+    assert_eq!(TypeModel::from_facts(&facts).unwrap().fact("Example#joined", "return").unwrap().name, "untyped");
     std::fs::remove_dir_all(dir).unwrap();
 }
 
@@ -342,11 +416,11 @@ fn view_contracts_keep_nullable_builder_and_unknown_input_boundaries() {
         "gems":[{"name":"actionview","version":"8.1.4","path":"/view"}],
         "controllers":[{"name":"Example","actions":actions}],"modules":modules})).unwrap();
     let model = TypeModel::from_facts(&facts).unwrap();
-    // Existing modeled calls propagate the whole-method contract, not an
-    // arity-selected overload; both builder forms must retain its builder arm.
+    // A known zero-argument call selects the builder contract; the whole
+    // method and argument-taking form must still retain both result arms.
     for (name, expected) in [
         ("tag", "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)"),
-        ("builder", "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)"),
+        ("builder", "ActionView::Helpers::TagHelper::TagBuilder"),
         ("maybe_builder", "(ActiveSupport::SafeBuffer | ActionView::Helpers::TagHelper::TagBuilder)"),
         ("capture", "ActiveSupport::SafeBuffer?"), ("empty_capture", "ActiveSupport::SafeBuffer?"),
         ("content_for", "ActiveSupport::SafeBuffer?"), ("provide", "nil"), ("content_for?", "bool"),

@@ -10,6 +10,8 @@ pub(super) fn list() -> Vec<Value> {
         ("type_of", "Signature/provenance, or a typed fact at slot return, arg:name, ivar:@name", json!({"target":string,"slot":string}), vec!["target"]),
         ("type_at_position", "Advisory method/call return at a method-name token; one-based UTF-8 byte coordinates. Dynamic receivers/blocks are not guessed", json!({"path":string,"line":{"type":"integer","minimum":1},"column":{"type":"integer","minimum":1}}), vec!["path","line","column"]),
         ("find_definition", "Resolved boot source location and origin; generated locations are generator sites, not fabricated Ruby definitions", json!({"target":string}), vec!["target"]),
+        ("callers", "Bounded boot-resolved Ruby call sites, with unresolved candidates separate; never an exhaustive dynamic call graph", json!({"target":string}), vec!["target"]),
+        ("view_locals", "Explicit partial input bindings, strict locals and contextual controller exit ivars; not a callback/dominance guarantee", json!({"path":string}), vec!["path"]),
         ("export_rbs", "Read-only RBS files and per-slot proven/static/observed/unknown evidence from existing facts and samples; no whole-signature certification", json!({}), vec![]),
         ("method_facts", "Resolved boot method and its origin/generator", json!({"target":string}), vec!["target"]),
         ("model", "Model columns, associations, callbacks and available validations", json!({"name":string}), vec!["name"]),
@@ -158,6 +160,8 @@ impl Data {
         } else { None };
         let snapshot = self.refresh()?;
         match name {
+            "callers" => snapshot.types.callers(&snapshot.facts, required("target")?),
+            "view_locals" => snapshot.types.view_locals(&snapshot.facts, required("path")?),
             "export_rbs" => serde_json::to_value(snapshot.types.export_rbs(&snapshot.facts)).map_err(|e| e.to_string()),
             "type_at_position" => snapshot.types.type_at_position(&snapshot.facts, required("path")?,
                 args.get("line").and_then(Value::as_u64).ok_or("line is required")?,

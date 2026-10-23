@@ -12,6 +12,10 @@ recover 442 static slots and sample 843 previously unknown argument slots across
 the same six workloads. The ledger separates static facts, partial failing-suite
 evidence, unknown container members and all 13 investigated return flags.
 
+Current: [types usefulness](types-usefulness.md) keeps the five-app denominator
+fixed, samples bounded collection members, checks generated RBS with Steep,
+and replays 100 independently grounded questions against real stdio MCP.
+
 ```sh
 script/corpus real-blog
 cargo run -- facts .corpus/real-blog
@@ -44,7 +48,11 @@ definition census. The default cap is 16 sampled entries per method per
 process (`LOWRAIL_OBSERVE_SAMPLES`); args are sampled at entry and receiver
 ivars at accepted return events. In-flight calls drain before a capped hook
 retires. Missing ivars are not nil observations. Sampling never calls
-the object's own reflection methods, enumerates a collection, or runs SQL.
+the object's own reflection/enumeration methods or runs SQL. Exact built-in
+Arrays/Hashes supply at most eight entries per value, one level deep, using
+bound native methods; subclasses and relations are never enumerated. Empty
+containers give no member evidence. Member histograms remain observed and
+cannot narrow a static generic; sampled contradictions remain conflicts.
 Counts, calls, cap/saturation and raw class names survive in `observation`;
 each typed slot also retains its class histogram in `samples`. Saturation
 means **recording stopped**, not exhaustive coverage. Exceptions, recursion,
@@ -507,6 +515,8 @@ Tools:
 | `type_of` | `target`: `Article#title`, `Article.all` or `article_path`; optional `slot`: `return`, `arg:name`, `ivar:@name` | Signature/types, provenance, counts, evidence, conflicts; a slot query includes `proven_type` (name or null) |
 | `type_at_position` | `path` inside APP, `line`, `column`: one-based UTF-8 byte coordinates at a method-name token | Advisory def/call return, target/signature/evidence; dynamic receivers, ambiguous contexts and unsupported nodes explicitly unavailable, never guessed |
 | `find_definition` | `target`: `Class#method` or `Class.method` | Resolved boot source path/line and origin; generated methods report generator sites, native methods have no source location |
+| `callers` | `target`: `Class#method` or `Class.method` | Concrete boot-resolved constant/self call sites in indexed Ruby files; unresolved candidates separate, always incomplete |
+| `view_locals` | `path`: boot template identifier, app-relative path or virtual path | Literal partial-render local names/types, collection/object bindings, strict locals and controller exit-ivar context; changed/missing templates refuse; no callback/dominance guarantee |
 | `export_rbs` | none | RBS files and the same per-slot proven/static/observed/unknown evidence as RBS comments, plus diagnostics/conflicts; no writes |
 | `method_facts` | `target`: `Class#method` or `Class.method` | Resolved boot method, owner/source/parameters/ISeq kind and existing origin classifier result |
 | `model` | `name`: model class | Raw columns, attributes, associations, callbacks; validations if recorded in the facts |
