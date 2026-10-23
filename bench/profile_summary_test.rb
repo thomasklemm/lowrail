@@ -4,8 +4,21 @@ require "minitest/autorun"
 require "json"
 require "tempfile"
 require "open3"
+require_relative "profile_summary"
 
 class ProfileSummaryTest < Minitest::Test
+  def test_recursive_frames_in_one_file_count_inclusive_cost_once
+    profile = {"frames" => {
+      "1" => {"file" => "/app/outer.rb", "line" => 1},
+      "2" => {"file" => "/app/inner.rb", "line" => 2},
+      "3" => {"file" => "/app/inner.rb", "line" => 9}
+    }, "raw" => [4, 1, 2, 3, 2, 7, 1, 1, 3]}
+    counts = ProfileSummary.counts(profile, "/app/")
+    assert_equal 10, counts[:samples]
+    assert_equal({"/app/outer.rb" => 10, "/app/inner.rb" => 7}, counts[:inclusive_by_file])
+    assert_equal({"/app/outer.rb" => 3, "/app/inner.rb" => 7}, counts[:self_by_file])
+  end
+
   def test_git_rails_and_generated_templates_keep_their_own_areas
     profile = {
       frames: {

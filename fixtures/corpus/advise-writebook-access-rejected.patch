@@ -1,0 +1,16 @@
+diff --git a/app/models/book/accessable.rb b/app/models/book/accessable.rb
+index aa3dcf1..b87bdd9 100644
+--- a/app/models/book/accessable.rb
++++ b/app/models/book/accessable.rb
+@@ -25,7 +25,10 @@ module Book::Accessable
+   end
+ 
+   def editable?(user: Current.user)
+-    access_for(user: user)&.editor? || user&.administrator?
++    @_advice_editable ||= {}.compare_by_identity
++    return @_advice_editable[user] if @_advice_editable.key?(user)
++
++    @_advice_editable[user] = access_for(user: user)&.editor? || user&.administrator?
+   end
+ 
+   def access_for(user: Current.user)

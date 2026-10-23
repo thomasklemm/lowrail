@@ -141,8 +141,12 @@ module Lowrail
 
       # -- type sampling -----------------------------------------------------
 
+      def source_path?(path, root:)
+        path.start_with?(root) && SKIP_DIRS.none? { |d| path.start_with?("#{root}#{d}/") }
+      end
+
       def app_path?(path)
-        path.start_with?(@root) && SKIP_DIRS.none? { |d| path.start_with?("#{@root}#{d}/") }
+        source_path?(path, root: @root)
       end
 
       # Hooks every app-defined method of +mod+ and of its singleton class.

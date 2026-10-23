@@ -1,0 +1,46 @@
+diff --git a/app/helpers/arrangement_helper.rb b/app/helpers/arrangement_helper.rb
+index 6ab8dd3..8fdcfb5 100644
+--- a/app/helpers/arrangement_helper.rb
++++ b/app/helpers/arrangement_helper.rb
+@@ -14,25 +14,21 @@ module ArrangementHelper
+   end
+ 
+   def arrangement_actions
+-    actions = {
+-      "click": "click",
+-      "dragstart": "dragStart",
+-      "dragover": "dragOver:prevent",
+-      "dragend": "dragEnd",
+-      "drop": "drop",
+-      "keydown.up": "moveBefore",
+-      "keydown.right": "moveAfter",
+-      "keydown.down": "moveAfter",
+-      "keydown.left": "moveBefore",
+-      "keydown.shift+up": "moveBefore",
+-      "keydown.shift+right": "moveAfter",
+-      "keydown.shift+down": "moveAfter",
+-      "keydown.shift+left": "moveBefore",
+-      "keydown.space": "toggleMoveMode",
+-      "keydown.enter": "applyMoveMode",
+-      "keydown.esc": "cancelMoveMode"
+-    }
+-
+-    actions.map { |action, target| "#{action}->arrangement##{target}" }.join(" ")
++    "click->arrangement#click " \
++      "dragstart->arrangement#dragStart " \
++      "dragover->arrangement#dragOver:prevent " \
++      "dragend->arrangement#dragEnd " \
++      "drop->arrangement#drop " \
++      "keydown.up->arrangement#moveBefore " \
++      "keydown.right->arrangement#moveAfter " \
++      "keydown.down->arrangement#moveAfter " \
++      "keydown.left->arrangement#moveBefore " \
++      "keydown.shift+up->arrangement#moveBefore " \
++      "keydown.shift+right->arrangement#moveAfter " \
++      "keydown.shift+down->arrangement#moveAfter " \
++      "keydown.shift+left->arrangement#moveBefore " \
++      "keydown.space->arrangement#toggleMoveMode " \
++      "keydown.enter->arrangement#applyMoveMode " \
++      "keydown.esc->arrangement#cancelMoveMode"
+   end
+ end

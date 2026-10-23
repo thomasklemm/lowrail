@@ -47,16 +47,6 @@ end
 # ObjectSpace cannot enumerate VM-internal IMEMOs; the GC.stat residual is
 # explicit, not silently assigned to a user-visible class or callsite.
 n = Integer(ENV.fetch("ALLOC_REQUESTS", "20"))
-3.times { GC.start }
-ObjectSpace.trace_object_allocations_clear
-raise "GC was disabled" if GC.disable
-before = GC.stat(:total_allocated_objects)
-generation = GC.count
-ObjectSpace.trace_object_allocations_start
-n.times { request.call }
-ObjectSpace.trace_object_allocations_stop
-allocated = GC.stat(:total_allocated_objects) - before
-
 normalize = ->(file) {
   next "<no Ruby source>" unless file
   file.sub(Rails.root.to_s + "/", "APP/").
@@ -64,45 +54,12 @@ normalize = ->(file) {
     sub(RbConfig::CONFIG.fetch("rubylibdir") + "/", "RUBY/").
     sub(File.expand_path("../..", __dir__) + "/", "LOWRAIL/")
 }
-census = -> {
-  rows = Hash.new(0)
-  ObjectSpace.each_object do |object|
-    next unless ObjectSpace.allocation_generation(object) == generation
-    file = ObjectSpace.allocation_sourcefile(object)
-    type = case object
-    when String then "String"
-    when Hash then "Hash"
-    when Array then "Array"
-    when Proc then "Proc"
-    else "other"
-    end
-    # These three values describe allocation, not the object's current value.
-    rows[[normalize.call(file), ObjectSpace.allocation_sourceline(object), object.class&.name || "<anonymous/classless>", type]] += 1
-  end
-  rows
-}
-all = census.call
-# Keep FREEOBJ tracing active during collection: stopping it across GC leaves
-# stale address metadata that can mislabel newly reused slots as survivors.
-ObjectSpace.trace_object_allocations_start
-GC.enable
-3.times { GC.start }
-ObjectSpace.trace_object_allocations_stop
-retained = census.call
-raise "retained census changed identity" unless (retained.keys - all.keys).empty?
-ObjectSpace.trace_object_allocations_clear
-
-rows = all.sort_by { |key, count| [-count, key.to_s] }.map do |(file, line, klass, type), count|
-  { file: file, line: line, class: klass, type: type, allocated: count,
-    retained: retained.fetch([file, line, klass, type], 0) }
-end
-types = rows.group_by { _1[:type] }.
-  transform_values { |group| { allocated: group.sum { _1[:allocated] }, retained: group.sum { _1[:retained] } } }
+require_relative "../allocation_census"
+census = AllocationCensus.capture(n, normalize: normalize, &request)
 result = { ruby: RUBY_DESCRIPTION, yjit: !!RubyVM::YJIT.enabled?, rails: Rails.version,
   lowrail: ENV.fetch("LOWRAIL"), route: route, requests: n, warmup: Integer(ENV.fetch("BENCH_WARMUP", "400")),
   total_requests_per_block: Integer(ENV.fetch("ALLOC_TOTAL_REQUESTS", "100")), totals: totals,
-  trace_gc_allocations: allocated, enumerated: all.values.sum, retained: retained.values.sum,
-  unenumerated: allocated - all.values.sum, types: types, callsites: rows,
+  **census,
   lock_sha256: Digest::SHA256.file("Gemfile.lock").hexdigest,
   runtime_sha256: Dir[File.expand_path("../../gem/lib/**/*.rb", __dir__)].sort.to_h {
     [_1.split("/gem/lib/").last, Digest::SHA256.file(_1).hexdigest] },

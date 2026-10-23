@@ -1,6 +1,7 @@
 //! Lowrail CLI. See docs/PLAN.md for the pipeline and docs/FORMATS.md for
 //! the files each step reads and writes.
 
+mod advise;
 mod bench;
 mod build;
 mod explain;
@@ -23,6 +24,7 @@ const USAGE: &str = "usage: lowrail <command> [args]
   explain APP          explain current build units/sites, guards, refusals and recorded counters
   bench APP (--pass NAME | --passes SET --default-build DIR) [--path PATH]
                        controlled pass/request measurements; --budgets JSON for additivity
+  advise APP [OPTIONS]  rank source-level hotspots for requests or a Ruby workload
   types APP [--rbs DIR] derive types from boot facts, optionally write RBS
   types --rbs APP      export standalone RBS to stdout with per-slot evidence
   mcp APP              serve read-only type/fact tools over stdio
@@ -40,6 +42,7 @@ fn main() -> ExitCode {
             "build" => build::cli(rest),
             "explain" => explain::cli(rest),
             "bench" => bench::cli(rest),
+            "advise" => advise::cli(rest),
             "types" => types::cli(rest),
             "mcp" => mcp::cli(rest),
             "verify" => verify::cli(rest),

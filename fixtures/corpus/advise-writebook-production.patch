@@ -1,0 +1,13 @@
+diff --git a/config/environments/production.rb b/config/environments/production.rb
+index 9667513..0725bd6 100644
+--- a/config/environments/production.rb
++++ b/config/environments/production.rb
+@@ -62,8 +62,5 @@ Rails.application.configure do
+   # Do not dump schema after migrations.
+   config.active_record.dump_schema_after_migration = false
+ 
+-  # SQLite is good, actually
+-  config.active_record.sqlite3_production_warning = false
+-
+   config.active_job.queue_adapter = :resque
+ end

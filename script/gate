@@ -120,7 +120,7 @@ if $PROGRAM_NAME == __FILE__
     run.call("valgrind", ["valgrind", "--version"])
     run.call("build", %w[cargo build --locked])
     run.call("gem", [RbConfig.ruby, "-S", "rake", "test", "TESTOPTS=--verbose --seed=1729"], "#{root}/gem", true)
-    %w[ar_diagnostics callback_survey pass profile_summary rails_drift request_pairs screen].each do |name|
+    %w[advise ar_diagnostics callback_survey pass profile_summary rails_drift request_pairs screen].each do |name|
       run.call("bench-#{name}", [RbConfig.ruby, "bench/#{name}_test.rb", "--verbose", "--seed=1729"], root, true)
     end
     run.call("rust", %w[cargo test --locked])

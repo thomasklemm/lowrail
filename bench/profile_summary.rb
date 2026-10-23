@@ -7,60 +7,71 @@
 
 require "json"
 
-path, app_root, top = ARGV
-top = Integer(top || 25)
-prof = JSON.parse(File.read(path))
-frames = prof.fetch("frames")
-raw = prof.fetch("raw")
+module ProfileSummary
+  module_function
 
-def area(file, app_root)
-  return "erb(app)" if file.include?("/app/views/")
-  return "app" if app_root && file.start_with?(app_root) && !file.include?("/vendor/")
-  # Git-sourced Rails has one bundler checkout, not one gem path per component.
-  return Regexp.last_match(1) if file =~ %r{/rails-[^/]+/(action[a-z]+|active[a-z]+|railties)/lib/}
-  return Regexp.last_match(1) if file =~ %r{/gems/([a-z_\-]+?)-\d[^/]*/}
-  return "ruby-stdlib" if file.include?("/lib/ruby/4") || file.include?("/lib/ruby/3")
-  file.empty? ? "(native)" : "other"
+  def area(file, app_root)
+    return "erb(app)" if file.include?("/app/views/")
+    return "app" if app_root && file.start_with?(app_root) && !file.include?("/vendor/")
+    # Git-sourced Rails has one bundler checkout, not one path per component.
+    return Regexp.last_match(1) if file =~ %r{/rails-[^/]+/(action[a-z]+|active[a-z]+|railties)/lib/}
+    return Regexp.last_match(1) if file =~ %r{/gems/([a-z_\-]+?)-\d[^/]*/}
+    return "ruby-stdlib" if file.include?("/lib/ruby/4") || file.include?("/lib/ruby/3")
+    file.empty? ? "(native)" : "other"
+  end
+
+  def counts(prof, app_root)
+    frames = prof.fetch("frames")
+    raw = prof.fetch("raw", []) # StackProf omits raw when no samples landed.
+    result = { samples: 0, self: Hash.new(0), inclusive: Hash.new(0),
+      self_by_area: Hash.new(0), total_by_area: Hash.new(0),
+      self_by_file: Hash.new(0), inclusive_by_file: Hash.new(0) }
+    i = 0
+    while i < raw.length
+      len = raw[i]
+      stack = raw[i + 1, len]
+      count = raw[i + 1 + len]
+      i += len + 2
+      result[:samples] += count
+      next if stack.empty?
+      result[:self][stack.last] += count
+      result[:self_by_file][frames.fetch(stack.last.to_s)["file"].to_s] += count
+      stack.uniq.each { |id| result[:inclusive][id] += count }
+      entries = stack.map { frames.fetch(_1.to_s) }
+      entries.map { _1["file"].to_s }.uniq.each { result[:inclusive_by_file][_1] += count }
+      # Charge native self to its Ruby caller's area, retaining native frames.
+      ruby_entries = entries.select { _1["line"].to_i > 0 || _1["lines"]&.any? }
+      caller = ruby_entries.last
+      result[:self_by_area][caller ? area(caller["file"].to_s, app_root) : "(native)"] += count
+      ruby_entries.map { area(_1["file"].to_s, app_root) }.uniq.each { result[:total_by_area][_1] += count }
+    end
+    result
+  end
+
+  def print(prof, app_root, top)
+    frames = prof.fetch("frames")
+    result = counts(prof, app_root)
+    total = result.fetch(:samples)
+    pct = ->(n) { format("%5.1f%%", total.positive? ? 100.0 * n / total : 0) }
+    puts "samples: #{total}"
+    puts "\nby area (self / total):"
+    own, inclusive = result.values_at(:self_by_area, :total_by_area)
+    own.keys.union(inclusive.keys).sort_by { -own[_1] }.each do |a|
+      puts format("  %-28s %s  %s", a, pct.(own[a]), pct.(inclusive[a]))
+    end
+    label = lambda do |id|
+      frame = frames.fetch(id.to_s)
+      ruby = frame["line"].to_i > 0 || frame["lines"]&.any?
+      ruby ? "#{frame['name']} (#{area(frame['file'].to_s, app_root)}:#{frame['line'] || 'generated'})" : "#{frame['name']} (C)"
+    end
+    { self: "self", inclusive: "total" }.each do |key, title|
+      puts "\ntop #{top} frames by #{title}:"
+      result.fetch(key).sort_by { -_2 }.first(top).each { |id, n| puts "  #{pct.(n)}  #{label.(id)}" }
+    end
+  end
 end
 
-stacks = []
-i = 0
-while i < raw.length
-  len = raw[i]
-  stack = raw[i + 1, len]
-  count = raw[i + 1 + len]
-  stacks << [stack, count]
-  i += len + 2
+if $PROGRAM_NAME == __FILE__
+  path, app_root, top = ARGV
+  ProfileSummary.print(JSON.parse(File.read(path)), app_root, Integer(top || 25))
 end
-total = stacks.sum { _2 }
-
-self_by_frame = Hash.new(0)
-total_by_frame = Hash.new(0)
-self_by_area = Hash.new(0)
-total_by_area = Hash.new(0)
-# A C function has no line; charge its self time to the Ruby frame that
-# called it, so "Hash#fetch" inside ActionView counts as actionview.
-# Compiled ERB can have sampled lines without a method-definition line.
-ruby_frame = ->(f) { f["line"].to_i > 0 || f["lines"]&.any? }
-stacks.each do |stack, count|
-  self_by_frame[stack.last] += count
-  caller_id = stack.reverse.find { ruby_frame.(frames.fetch(_1.to_s)) }
-  self_by_area[caller_id ? area(frames.fetch(caller_id.to_s)["file"].to_s, app_root) : "(native)"] += count
-  stack.uniq.each { |f| total_by_frame[f] += count }
-  stack.select { ruby_frame.(frames.fetch(_1.to_s)) }.map { area(frames.fetch(_1.to_s)["file"].to_s, app_root) }.uniq.each { total_by_area[_1] += count }
-end
-
-pct = ->(n) { format("%5.1f%%", 100.0 * n / total) }
-puts "samples: #{total}"
-puts "\nby area (self / total):"
-self_by_area.keys.union(total_by_area.keys).sort_by { -self_by_area[_1] }.each do |a|
-  puts format("  %-28s %s  %s", a, pct.(self_by_area[a]), pct.(total_by_area[a]))
-end
-label = lambda do |id|
-  f = frames.fetch(id.to_s)
-  ruby_frame.(f) ? "#{f["name"]} (#{area(f["file"].to_s, app_root)}:#{f["line"] || "generated"})" : "#{f["name"]} (C)"
-end
-puts "\ntop #{top} frames by self:"
-self_by_frame.sort_by { -_2 }.first(top).each { |id, n| puts "  #{pct.(n)}  #{label.(id)}" }
-puts "\ntop #{top} frames by total:"
-total_by_frame.sort_by { -_2 }.first(top).each { |id, n| puts "  #{pct.(n)}  #{label.(id)}" }

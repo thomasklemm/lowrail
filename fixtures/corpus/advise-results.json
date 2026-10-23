@@ -1,0 +1,1076 @@
+{
+  "format": 1,
+  "date": "2026-10-23",
+  "scope": "Public fixture requests, not production traffic or representative data volumes. Profiles are discovery only; compilation during discovery is retained, not called a steady-state price.",
+  "first_candidate_gate": "Before investing, check current upstream main and record SHA plus code-path status. The earlier Writebook/CodeTriage attempts predate this rule and do not establish current upstream opportunities.",
+  "tally": {
+    "accepted": 0,
+    "rejected": 2,
+    "below_resolution": 3,
+    "already_fixed_upstream": 2,
+    "qualifying_native_cohorts": 0
+  },
+  "profiles": {
+    "writebook": {
+      "source": "https://github.com/basecamp/writebook@be1f8fcf1b0fc8064011c2d29d75133885b182e2:.",
+      "profile_sha256": "ac6473891ed8a1f6063112bfb6c9138cf09c8401053801e24bee723042c42d2e",
+      "source_snapshot_sha256": "d704367c176506422bb2f69c6367b1b808d46af65c64a72a86918439f7779aa3",
+      "workload": "GET book TOC (4 fixture leaves)",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "rails_env": "production",
+      "eager_load": true,
+      "caching": true,
+      "cache_store": "ActiveSupport::Cache::RedisCacheStore",
+      "yjit": true,
+      "lock_sha256": "e695442430b0d108433343b0706208dbabc9d9b333b38bc5cf7feb005a499ff9",
+      "warmup": 50,
+      "profile_operations": 200,
+      "census_operations": 5,
+      "samples": 255,
+      "profile_jit_flat": false,
+      "jit_before": {
+        "compiled_iseq_count": 1629,
+        "compiled_block_count": 22351,
+        "invalidation_count": 22
+      },
+      "jit_after": {
+        "compiled_iseq_count": 2503,
+        "compiled_block_count": 33975,
+        "invalidation_count": 22
+      },
+      "ranked_files": [
+        {
+          "file": "app/views/books/show.html.erb",
+          "self_samples": 2,
+          "inclusive_samples": 114,
+          "self_pct": 0.7843137254901961,
+          "inclusive_pct": 44.705882352941174,
+          "allocations_per_operation": 38.0,
+          "explanation": "Inspect :12 (String, 10 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_books_show_html_erb___1784807899217947748_16376",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/views/layouts/application.html.erb",
+          "self_samples": 1,
+          "inclusive_samples": 44,
+          "self_pct": 0.39215686274509803,
+          "inclusive_pct": 17.254901960784313,
+          "allocations_per_operation": 12.0,
+          "explanation": "Inspect :1 (String, 5 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_layouts_application_html_erb___1571948659225111978_16528",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/helpers/books_helper.rb",
+          "self_samples": 1,
+          "inclusive_samples": 24,
+          "self_pct": 0.39215686274509803,
+          "inclusive_pct": 9.411764705882353,
+          "allocations_per_operation": 17.0,
+          "explanation": "Inspect :29 (Hash, 15 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "BooksHelper#link_to_first_leafable",
+              "line": 25,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            },
+            {
+              "method": "BooksHelper#hotkey_data_attributes",
+              "line": 62,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        }
+      ]
+    },
+    "campfire": {
+      "source": "https://github.com/basecamp/once-campfire@02023b0f0cafc4d66e06e43be072cf4d6ca328fa:.",
+      "profile_sha256": "3e58704e7ce2e484f5ae039129c070c7cbc0decdca4f0ba8654e6de3191a67c4",
+      "source_snapshot_sha256": "1d69ff65fb02d595cff22ac81487a7467b5627ed2d43419d0f899b0b6fc740da",
+      "workload": "GET Campfire room (public fixtures)",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "rails_env": "production",
+      "eager_load": true,
+      "caching": true,
+      "cache_store": "ActiveSupport::Cache::RedisCacheStore",
+      "yjit": true,
+      "lock_sha256": "0429e4e3e73f5c49efad7c88014bea13e1461b3ca69af3b9900caaff749971f5",
+      "warmup": 50,
+      "profile_operations": 200,
+      "census_operations": 5,
+      "samples": 673,
+      "profile_jit_flat": false,
+      "jit_before": {
+        "compiled_iseq_count": 2476,
+        "compiled_block_count": 38461,
+        "invalidation_count": 46
+      },
+      "jit_after": {
+        "compiled_iseq_count": 3428,
+        "compiled_block_count": 51009,
+        "invalidation_count": 46
+      },
+      "ranked_files": [
+        {
+          "file": "app/views/rooms/show.html.erb",
+          "self_samples": 6,
+          "inclusive_samples": 224,
+          "self_pct": 0.8915304606240714,
+          "inclusive_pct": 33.283803863298665,
+          "allocations_per_operation": 14.0,
+          "explanation": "Inspect :1 (String, 5 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_rooms_show_html_erb___151281234059679386_20184",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/views/rooms/show/_composer.html.erb",
+          "self_samples": 4,
+          "inclusive_samples": 50,
+          "self_pct": 0.5943536404160475,
+          "inclusive_pct": 7.429420505200595,
+          "allocations_per_operation": 50.0,
+          "explanation": "Inspect :17 (String, 20 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_rooms_show__composer_html_erb__769280060268482399_20992",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/helpers/rooms_helper.rb",
+          "self_samples": 3,
+          "inclusive_samples": 58,
+          "self_pct": 0.4457652303120357,
+          "inclusive_pct": 8.618127786032689,
+          "allocations_per_operation": 32.0,
+          "explanation": "Inspect :12 (String, 10 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "RoomsHelper#room_display_name",
+              "line": 55,
+              "calls_per_operation": 2.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            },
+            {
+              "method": "RoomsHelper#link_to_edit_room",
+              "line": 8,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            },
+            {
+              "method": "RoomsHelper#button_to_jump_to_newest_message",
+              "line": 33,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        }
+      ]
+    },
+    "fizzy": {
+      "source": "https://github.com/basecamp/fizzy@6f1d200316ec3bae91d32c557d88647300807ee9:.",
+      "profile_sha256": "f2a63a65d59e46666b224699456dcdb4e2c342d03454c1e9a4b5b3f1b23c846d",
+      "source_snapshot_sha256": "855366e1e3b5231b0039f2d04da4a0091d88c7f9ea7c5f5cd518195e778d4810",
+      "workload": "GET Fizzy buckets (public fixtures)",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "rails_env": "production",
+      "eager_load": true,
+      "caching": true,
+      "cache_store": "SolidCache::Store",
+      "yjit": true,
+      "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212",
+      "warmup": 5000,
+      "profile_operations": 2000,
+      "census_operations": 5,
+      "samples": 3825,
+      "profile_jit_flat": false,
+      "jit_before": {
+        "compiled_iseq_count": 2746,
+        "compiled_block_count": 39628,
+        "invalidation_count": 58
+      },
+      "jit_after": {
+        "compiled_iseq_count": 2749,
+        "compiled_block_count": 41504,
+        "invalidation_count": 58
+      },
+      "ranked_files": [
+        {
+          "file": "app/views/filters/_filter.html.erb",
+          "self_samples": 7,
+          "inclusive_samples": 1596,
+          "self_pct": 0.1830065359477124,
+          "inclusive_pct": 41.72549019607843,
+          "allocations_per_operation": 25.0,
+          "explanation": "Inspect :18 (String, 15 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_filters__filter_html_erb___301458609002483612_30600",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/views/buckets/_bucket.html.erb",
+          "self_samples": 4,
+          "inclusive_samples": 373,
+          "self_pct": 0.10457516339869281,
+          "inclusive_pct": 9.751633986928105,
+          "allocations_per_operation": 26.0,
+          "explanation": "Inspect :5 (Array, 15 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_buckets__bucket_html_erb__1848395998797130302_30576",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/models/current.rb",
+          "self_samples": 4,
+          "inclusive_samples": 107,
+          "self_pct": 0.10457516339869281,
+          "inclusive_pct": 2.7973856209150325,
+          "allocations_per_operation": 0.0,
+          "explanation": "Inclusive cost includes callees: inspect the hottest method's callers for repeated/eager work, not removal of the whole file. No cheap scalar repetition evidence; effects and SQL remain live.",
+          "methods": [
+            {
+              "method": "Current#user",
+              "line": 4,
+              "calls_per_operation": 6.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        }
+      ]
+    },
+    "casa": {
+      "source": "https://github.com/rubyforgood/casa@b584d2e6e6ebffe382f34c2ec202d20384d035ca:.",
+      "profile_sha256": "c66cccf7f605d8ae2e39ef674182b2f543db5ea8b4ebd7f3229d1a257787d2a4",
+      "source_snapshot_sha256": "88808e960d38509b73ac0ca5266bf566fd694e15901864519bd6f5e0be3eb177",
+      "workload": "GET CASA cases (25 factory cases)",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "rails_env": "production",
+      "eager_load": true,
+      "caching": true,
+      "cache_store": "ActiveSupport::Cache::FileStore",
+      "yjit": true,
+      "lock_sha256": "c1bc081e0e3a1be81a6910c321e09087128ae85026be5168a53debaa80051e7b",
+      "warmup": 50,
+      "profile_operations": 200,
+      "census_operations": 5,
+      "samples": 576,
+      "profile_jit_flat": false,
+      "jit_before": {
+        "compiled_iseq_count": 2065,
+        "compiled_block_count": 30246,
+        "invalidation_count": 19
+      },
+      "jit_after": {
+        "compiled_iseq_count": 3324,
+        "compiled_block_count": 47116,
+        "invalidation_count": 19
+      },
+      "ranked_files": [
+        {
+          "file": "app/views/casa_cases/index.html.erb",
+          "self_samples": 9,
+          "inclusive_samples": 248,
+          "self_pct": 1.5625,
+          "inclusive_pct": 43.05555555555556,
+          "allocations_per_operation": 510.0,
+          "explanation": "Inspect :137 (String, 300 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_casa_cases_index_html_erb__774227393184557270_34024",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/views/layouts/casa_app.html.erb",
+          "self_samples": 3,
+          "inclusive_samples": 86,
+          "self_pct": 0.5208333333333334,
+          "inclusive_pct": 14.930555555555555,
+          "allocations_per_operation": 159.0,
+          "explanation": "Inspect :75 (Hash, 55 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_layouts_casa_app_html_erb__2539717697550216127_34304",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/views/casa_cases/_filter.html.erb",
+          "self_samples": 3,
+          "inclusive_samples": 10,
+          "self_pct": 0.5208333333333334,
+          "inclusive_pct": 1.7361111111111112,
+          "allocations_per_operation": 77.0,
+          "explanation": "Inspect :44 (String, 40 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_casa_cases__filter_html_erb__559945733528276462_34032",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        }
+      ]
+    },
+    "codetriage": {
+      "source": "https://github.com/codetriage/codetriage@d1868f8634e97a111a7fca49d58cc776d206007e:.",
+      "profile_sha256": "d7961109d60d211401033d680024361edcddd40a1b4ef0b119059fbdc7d7e58b",
+      "source_snapshot_sha256": "8703baaa9640f9b295d1e992b3ab90e520f03078f3c4a4f096e918211840ab6f",
+      "workload": "GET CodeTriage home (public fixtures)",
+      "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+      "rails": "8.1.4",
+      "rails_env": "production",
+      "eager_load": true,
+      "caching": true,
+      "cache_store": "ActiveSupport::Cache::MemCacheStore",
+      "yjit": true,
+      "lock_sha256": "1b4bb34ed036a27f5a71d7486be71f3b883f599fd8f6ba89787a9f0a1773da6d",
+      "warmup": 50,
+      "profile_operations": 200,
+      "census_operations": 5,
+      "samples": 282,
+      "profile_jit_flat": false,
+      "jit_before": {
+        "compiled_iseq_count": 1492,
+        "compiled_block_count": 21156,
+        "invalidation_count": 169
+      },
+      "jit_after": {
+        "compiled_iseq_count": 2485,
+        "compiled_block_count": 35183,
+        "invalidation_count": 1349
+      },
+      "ranked_files": [
+        {
+          "file": "app/views/pages/index.html.slim",
+          "self_samples": 2,
+          "inclusive_samples": 64,
+          "self_pct": 0.7092198581560284,
+          "inclusive_pct": 22.69503546099291,
+          "allocations_per_operation": 11.0,
+          "explanation": "Inspect :27 (String, 10 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_pages_index_html_slim__1345355987599139473_17096",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/controllers/pages_controller.rb",
+          "self_samples": 2,
+          "inclusive_samples": 49,
+          "self_pct": 0.7092198581560284,
+          "inclusive_pct": 17.375886524822697,
+          "allocations_per_operation": 9.0,
+          "explanation": "Inspect :64 (Array, 30 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "PagesController#valid_params",
+              "line": 63,
+              "calls_per_operation": 6.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            },
+            {
+              "method": "PagesController#get_covid_repos",
+              "line": 6,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            },
+            {
+              "method": "PagesController#index",
+              "line": 28,
+              "calls_per_operation": 1.0,
+              "comparable": 5,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        },
+        {
+          "file": "app/views/application/_footer.html.slim",
+          "self_samples": 2,
+          "inclusive_samples": 5,
+          "self_pct": 0.7092198581560284,
+          "inclusive_pct": 1.7730496453900708,
+          "allocations_per_operation": 29.0,
+          "explanation": "Inspect :13 (String, 15 allocations/census): move construction into the branch that consumes it, or reuse invariant intermediates outside the row/slot loop. Preserve fresh escaping values, evaluation order and SQL; this allocation may be necessary.",
+          "methods": [
+            {
+              "method": "#<Class < ActionView::Base>#_app_views_application__footer_html_slim___409769493580026718_17192",
+              "line": 0,
+              "calls_per_operation": 1.0,
+              "comparable": 0,
+              "repeated": 0,
+              "changed": 0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "candidates": [
+    {
+      "app": "writebook",
+      "patch": "advise-writebook-access-rejected.patch",
+      "decision": "rejected_correctness",
+      "upstream_gate": "unknown: rejected before upstream-first rule; no current-upstream claim",
+      "test_mode_calls_per_response": 18,
+      "scalar_observations": 32,
+      "repeated": 30,
+      "production_calls_per_response": 2,
+      "baseline_suite": {
+        "tests": 119,
+        "assertions": 381,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "failed_tests": []
+      },
+      "patch_suite": {
+        "tests": 119,
+        "assertions": 381,
+        "failures": 1,
+        "errors": 0,
+        "skips": 0,
+        "failed_tests": [
+          "Book::AccessableTest#test_update_access_updates_existing_access [test/models/book/accessable_test.rb:24]"
+        ]
+      },
+      "qualified_native_blocks": 0
+    },
+    {
+      "app": "writebook",
+      "patch": "advise-writebook-actions.patch",
+      "decision": "rejected_production_opportunity",
+      "upstream_gate": "unknown: rejected before upstream-first rule; no current-upstream claim",
+      "test_mode_objects_saved_per_response": 36,
+      "production_helper_calls": 0,
+      "production_sql_events": 7,
+      "ordinary_suite": {
+        "tests": 119,
+        "assertions": 381,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "failed_tests": []
+      },
+      "browser_suite": {
+        "tests": 2,
+        "assertions": 8,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "failed_tests": []
+      },
+      "qualified_native_blocks": 0,
+      "excluded_probe": "One earlier test-mode A/B/A block had non-flat warmup capped at 20000; the next worker refused. Not a qualifying cohort; no speed claim."
+    },
+    {
+      "app": "codetriage",
+      "patch": "advise-codetriage-params.patch",
+      "decision": "below_resolution",
+      "upstream_gate": "unknown: screened before upstream-first rule; no current-upstream claim",
+      "method": "PagesController#valid_params",
+      "inclusive_samples": 1,
+      "profile_samples": 282,
+      "estimated_inclusive_ceiling_pct": 0.3546099290780142,
+      "calls_per_response": 6,
+      "baseline_suite": {
+        "tests": 222,
+        "assertions": 483,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "failed_tests": []
+      },
+      "patch_suite": {
+        "tests": 222,
+        "assertions": 483,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "failed_tests": []
+      },
+      "vectors": {
+        "base": [
+          {
+            "status": 200,
+            "bytes": 7481,
+            "body_sha256": "85c5fdbfa5e90a3db6a705e6434aa591d6604598720ce184e22bfd4edbd59480",
+            "headers_sha256": "5fabeffce5fff91192565a2c00079f9b6257d1d785b7ffb096a11f9a68dd6233",
+            "controlled_body_sha256": "c286837462a3e12ae7394ac7cc8820efd1a8feb84e67be978b909233c74de635",
+            "controlled_headers_sha256": "b58b6d15eaa0a40e34dbcb8f0a4b1bed33793a9a8a85ed079751dfb29b40f52f",
+            "path": "/",
+            "sql_n": 1,
+            "sql_sha256": "36ca34ad65da387c89463488b57abaeaca8a57814a19ee0b6a6b18472622bcd9"
+          },
+          {
+            "status": 200,
+            "bytes": 6599,
+            "body_sha256": "134b0bc948913f20af318017f04835876e3cc22de86f21e18ac4241ca015de11",
+            "headers_sha256": "65d6f42797245838eb80e29f8b896324c5c9d58a4568e5653aca18cb3c4ac603",
+            "controlled_body_sha256": "9a6e9f3bf898ac3a93c18d8a50d3af4fbdbeb1a800f14bcb62788a2787a44b0b",
+            "controlled_headers_sha256": "b58b6d15eaa0a40e34dbcb8f0a4b1bed33793a9a8a85ed079751dfb29b40f52f",
+            "path": "/?language=Ruby&per_page=1&page=1&unpermitted=1",
+            "sql_n": 2,
+            "sql_sha256": "4d8ed31d8fb10d89708d1a2f08836a22cbfceb1c6dd7d03f484e562e1d7d13a9"
+          },
+          {
+            "status": 200,
+            "bytes": 5637,
+            "body_sha256": "9529be3e576139ff84107d16844305b3b9bb57af7b8f319b23c7fd889f8d1156",
+            "headers_sha256": "426ed86615b73415b8a8f061821d6c8c0bd9d0586878b4363df5153a0e8b0e31",
+            "controlled_body_sha256": "a882bc1c85d1cb6a3c9c45e3d5ed37e45cae2a85eacd7b3e53235ea02f7cdd1d",
+            "controlled_headers_sha256": "b58b6d15eaa0a40e34dbcb8f0a4b1bed33793a9a8a85ed079751dfb29b40f52f",
+            "path": "/?language=JavaScript&per_page=2&page=2",
+            "sql_n": 2,
+            "sql_sha256": "958f0aae97b5b91ceb68bfb5ebb93d4fc9c9197868bde718e93fdb84ccbbbec1"
+          }
+        ],
+        "params": [
+          {
+            "status": 200,
+            "bytes": 7481,
+            "body_sha256": "f7eaae7b381c2e93e60fafec181a56b530108887337f8bf6af2838ee0c61c81b",
+            "headers_sha256": "bb8d37cdcea3e89a8e0b1db44d7d1131edf5a8c6ec2b3e603d4264bc38c9ebb6",
+            "controlled_body_sha256": "c286837462a3e12ae7394ac7cc8820efd1a8feb84e67be978b909233c74de635",
+            "controlled_headers_sha256": "b58b6d15eaa0a40e34dbcb8f0a4b1bed33793a9a8a85ed079751dfb29b40f52f",
+            "path": "/",
+            "sql_n": 1,
+            "sql_sha256": "36ca34ad65da387c89463488b57abaeaca8a57814a19ee0b6a6b18472622bcd9"
+          },
+          {
+            "status": 200,
+            "bytes": 6599,
+            "body_sha256": "4548c4cb05e43eeab5fae377f5e88cff577631d898e7211d960d8bff04c45449",
+            "headers_sha256": "3b949cdba56b4ed80c50f1617a8f2679e4092390b98fbb497072dfa6268bba9b",
+            "controlled_body_sha256": "9a6e9f3bf898ac3a93c18d8a50d3af4fbdbeb1a800f14bcb62788a2787a44b0b",
+            "controlled_headers_sha256": "b58b6d15eaa0a40e34dbcb8f0a4b1bed33793a9a8a85ed079751dfb29b40f52f",
+            "path": "/?language=Ruby&per_page=1&page=1&unpermitted=1",
+            "sql_n": 2,
+            "sql_sha256": "4d8ed31d8fb10d89708d1a2f08836a22cbfceb1c6dd7d03f484e562e1d7d13a9"
+          },
+          {
+            "status": 200,
+            "bytes": 5637,
+            "body_sha256": "11901c4e63d06b6be9fe14dcf3f84e333dacf11ea81a7493b9023b7100c227f7",
+            "headers_sha256": "6d7c8b3359496828ca9c9ed2bb91c60e00c5bc944ca483d83a986acd63903486",
+            "controlled_body_sha256": "a882bc1c85d1cb6a3c9c45e3d5ed37e45cae2a85eacd7b3e53235ea02f7cdd1d",
+            "controlled_headers_sha256": "b58b6d15eaa0a40e34dbcb8f0a4b1bed33793a9a8a85ed079751dfb29b40f52f",
+            "path": "/?language=JavaScript&per_page=2&page=2",
+            "sql_n": 2,
+            "sql_sha256": "958f0aae97b5b91ceb68bfb5ebb93d4fc9c9197868bde718e93fdb84ccbbbec1"
+          }
+        ]
+      },
+      "entropy_policy": "advise-codetriage-entropy-controls.json",
+      "qualified_native_blocks": 0
+    },
+    {
+      "app": "fizzy",
+      "patch": "advise-fizzy-filter-url.patch",
+      "decision": "already_fixed_upstream",
+      "category": "amended duplicate-read SQL gate passes; CACHE-only stop, not a semantic rejection",
+      "upstream_gate": {
+        "repository": "https://github.com/basecamp/fizzy",
+        "main_sha": "13dc7702517250379e6aa0bdd013b0154ac2d99f",
+        "status": "fixed",
+        "evidence": "Filter::Params#as_params now uses @as_params ||=; Filter::Resources#boards (renamed from buckets) memoizes @boards; old _filter partial no longer exists"
+      },
+      "root_cause": {
+        "owner": "app",
+        "classification": "Repeated app calls build the same parameter hash and URL twice; no Filter record is constructed twice, and no url_for/to_param query was observed.",
+        "backtrace": [
+          "app/views/filters/_filter.html.erb:17",
+          "app/models/filter/params.rb:41 Filter::Params#as_params",
+          "app/models/filter/resources.rb:21 Filter::Resources#buckets -> super.ids",
+          "activerecord-8.1.4/lib/active_record/relation/calculations.rb:403 ActiveRecord::Calculations#ids",
+          "activerecord-8.1.4/lib/active_record/connection_adapters/abstract/query_cache.rb:318 QueryCache#cache_sql"
+        ],
+        "framework_version": "Active Record 8.1.4",
+        "framework_behavior": "Unloaded ids selects IDs without loading records; query cache emits sql.active_record with cached=true without calling the adapter on a hit. Expected behavior, not evidence of a Rails defect.",
+        "rails_main_sha": "a0fd31e1a4e96c80d3184998c956607004fb7f8c",
+        "rails_main_check": "Calculations#ids delegates to pluck, which still selects on unloaded relations; QueryCache#cache_sql still emits cached=true without adapter execution on hits. No general caching fix missing."
+      },
+      "method": "Filter::Params#as_params",
+      "inclusive_samples": 535,
+      "profile_samples": 3825,
+      "inclusive_pct": 13.986928104575163,
+      "calls_per_response": 2,
+      "suites": {
+        "base": {
+          "tests": 124,
+          "assertions": 458,
+          "failures": 0,
+          "errors": 7,
+          "skips": 0,
+          "failed_tests": [
+            "Bubble::AssignableTest#test_assigning_a_user_makes_them_watch_the_bubble",
+            "Bubble::CommentableTest#test_creating_a_comment_on_a_bubble_makes_the_creator_watch_the_bubble",
+            "Bubble::ScorableTest#test_a_bubble_has_a_score_that_increases_with_activity",
+            "Bubble::ScorableTest#test_commenting_on_a_bubble_boosts_its_score_more_than_boosting_it",
+            "Bubble::ScorableTest#test_recent_activity_counts_more_than_older_activity_in_the_ordering",
+            "CommentTest#test_first_by_author_on_bubble?",
+            "CommentTest#test_follows_comment_by_another_author?"
+          ]
+        },
+        "fork": {
+          "tests": 124,
+          "assertions": 458,
+          "failures": 0,
+          "errors": 7,
+          "skips": 0,
+          "failed_tests": [
+            "Bubble::AssignableTest#test_assigning_a_user_makes_them_watch_the_bubble",
+            "Bubble::CommentableTest#test_creating_a_comment_on_a_bubble_makes_the_creator_watch_the_bubble",
+            "Bubble::ScorableTest#test_a_bubble_has_a_score_that_increases_with_activity",
+            "Bubble::ScorableTest#test_commenting_on_a_bubble_boosts_its_score_more_than_boosting_it",
+            "Bubble::ScorableTest#test_recent_activity_counts_more_than_older_activity_in_the_ordering",
+            "CommentTest#test_first_by_author_on_bubble?",
+            "CommentTest#test_follows_comment_by_another_author?"
+          ]
+        }
+      },
+      "entropy_policy": "advise-fizzy-entropy-controls.json",
+      "screens": {
+        "base": {
+          "screen_only": true,
+          "requests": 1000,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+          "rails": "8.1.4",
+          "rails_env": "production",
+          "exact": [
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "80a34be35806b49a3165db69c0f31a38d41da39e7280c759537b0934eaa289f2",
+              "headers_sha256": "86eadcb18c9cb207e49420ab73abde149b5fe21701e95fd7a06191d553b2b28a",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 19,
+              "sql_sha256": "d8d7b992732fbd3f8b57f9171055f1118cc0a00b4642b4f84a596bbb8e86b61c"
+            },
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "669e27fd220e1a411a824627a5826b9459f4f08a7f917ce842a2ec1dff26841b",
+              "headers_sha256": "213b20c1dcb0ce542305ebb27410a15cf86789bbe8401cf9892f3103086cd49f",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 19,
+              "sql_sha256": "d8d7b992732fbd3f8b57f9171055f1118cc0a00b4642b4f84a596bbb8e86b61c"
+            },
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "a0a34a3210cbd1f1485e43bf3190ea9b5d1ff96c8ea7ccda94f8013133821c49",
+              "headers_sha256": "14af57cbffe1c6a7247feb65b1fbe97a8eea20dd1341e384761df16acc04b5d1",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 19,
+              "sql_sha256": "d8d7b992732fbd3f8b57f9171055f1118cc0a00b4642b4f84a596bbb8e86b61c"
+            }
+          ],
+          "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212"
+        },
+        "patch": {
+          "screen_only": true,
+          "requests": 1000,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+          "rails": "8.1.4",
+          "rails_env": "production",
+          "exact": [
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "2d0076136837cf575961b88014d2c56a586d791beee260a17942a3b8e8b6dae5",
+              "headers_sha256": "13c85bcb88584c7f2a870760bdf74960350d0e221f94d647112474282c6fce97",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 18,
+              "sql_sha256": "decb3d95a51a90602bd680ba9b134eca1e0c312cc7026c832ca43f1cc4343c38"
+            },
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "ea0e0affb58ee974ba61a41f6d953ae5c4516b2e4177c9092c1bc5013f23f445",
+              "headers_sha256": "b845d75acbd110f080307ccd19f46026795cf16955700542e4173045b3678f1a",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 18,
+              "sql_sha256": "decb3d95a51a90602bd680ba9b134eca1e0c312cc7026c832ca43f1cc4343c38"
+            },
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "73a79473e07d538f7c9645d7e482f111f7f1510245a576dade97e01a52a48645",
+              "headers_sha256": "bbe301f8d2b8fa8f491c97ec9598e65c38f938e1da99c826c0416b5c8d5518ae",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 18,
+              "sql_sha256": "decb3d95a51a90602bd680ba9b134eca1e0c312cc7026c832ca43f1cc4343c38"
+            }
+          ],
+          "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212"
+        },
+        "base2": {
+          "screen_only": true,
+          "requests": 1000,
+          "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]",
+          "rails": "8.1.4",
+          "rails_env": "production",
+          "exact": [
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "f0201e0ad40c35ade1c76bd5c6a805b256df057bb47cbef7f20c4e4f9c7388ba",
+              "headers_sha256": "db717a200408b92679a946efdb35a7a757b9b8df4fa8797af6f54ed90bf460c9",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 19,
+              "sql_sha256": "d8d7b992732fbd3f8b57f9171055f1118cc0a00b4642b4f84a596bbb8e86b61c"
+            },
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "60e235f0b67e0dfcad1c2af2cf672079daf84ae56dc9dcea1de9de8633b28984",
+              "headers_sha256": "beaf6f49dd64c833a951286505ff249be9cb37209ae2d0e00242ec1fb37d2811",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 19,
+              "sql_sha256": "d8d7b992732fbd3f8b57f9171055f1118cc0a00b4642b4f84a596bbb8e86b61c"
+            },
+            {
+              "status": 200,
+              "bytes": 18515,
+              "body_sha256": "7a958a1f39e6c78b5a412fa35fb89b00022e9bb294a35a34d9fb41e72e3f2d50",
+              "headers_sha256": "ae400d1ae0cea8323a62a50e2dc72664674a8afd497e1e1ba5e8970f64b58704",
+              "controlled_body_sha256": "1de980974c80a520f742e0e8f26612bba2c6e7c5c0d6446120d68df581241fb3",
+              "controlled_headers_sha256": "07bd5e58588e6fbd127d012d20cb1790210c9a7cdaa26b3a9016ec3b0b91caf0",
+              "sql_n": 19,
+              "sql_sha256": "d8d7b992732fbd3f8b57f9171055f1118cc0a00b4642b4f84a596bbb8e86b61c"
+            }
+          ],
+          "lock_sha256": "73c7a5a94a644adb57aee1306144406ab9ae99e2c14521cbd1d86c4ee716a212"
+        }
+      },
+      "dropped_sql": {
+        "statement": "SELECT \"buckets\".\"id\" FROM \"buckets\" INNER JOIN \"buckets_filters\" ON \"buckets\".\"id\" = \"buckets_filters\".\"bucket_id\" WHERE \"buckets_filters\".\"filter_id\" = ?",
+        "binds": [
+          [
+            "filter_id",
+            437785243
+          ]
+        ],
+        "cached": true,
+        "exact_duplicate_in_same_request": true,
+        "baseline_matching_events_1based": [
+          6,
+          8,
+          14,
+          18,
+          19
+        ],
+        "deleted_position_1based_confirmed_by_backtrace": 18,
+        "remaining_trace_exact": true,
+        "intervening_writes": false,
+        "real_database_round_trips_removed": 0,
+        "note": "The two final events have identical SQL/binds/cached flags, but stacks identify event 18 as the second as_params and event 19 as bucket_summary. Remaining 18 events identical in content/order.",
+        "final_amended_screen": "Three complete-event vectors per fresh A/B/A process pass controlled body/header/status, same lock and SQL gate: A=19/19/19, B=18/18/18, A=19/19/19. Includes exact name and row count. A greedy sequence match labels the indistinguishable final event 19; stacks establish physical call site 18. No native timing."
+      },
+      "native_pricing": "not run: CACHE-only stop and already fixed on current upstream main. No fork commit, PR draft or upstream PR warranted. Existing suite errors remain recorded, not suppressed.",
+      "sql_view": {
+        "operations": 2,
+        "buckets_ids_round_trips": 2,
+        "buckets_ids_cached_hits": 8,
+        "buckets_ids_duplicate_round_trips": 0,
+        "buckets_ids_duplicate_cached_hits": 8
+      },
+      "qualified_native_blocks": 0
+    },
+    {
+      "app": "campfire",
+      "method": "Message::Pagination last_page eager preloading",
+      "decision": "already_fixed_upstream",
+      "inclusive_samples": 96,
+      "profile_samples": 673,
+      "inclusive_pct": 14.264487369985142,
+      "upstream_gate": {
+        "repository": "https://github.com/basecamp/once-campfire",
+        "main_sha": "c8f74a0b0e1e93146c4d7c1d6ac80c9079682216",
+        "status": "fixed",
+        "evidence": "Message::Pagination::Page skips eager preloading, exposing preload_associations to collection caching for cache misses only; RoomsController uses with_presentation. No patch against obsolete eager last(PAGE_SIZE)."
+      },
+      "qualified_native_blocks": 0
+    },
+    {
+      "app": "casa",
+      "method": "CasaCase#in_transition_age? invariant duration construction",
+      "decision": "below_resolution",
+      "upstream_gate": {
+        "repository": "https://github.com/rubyforgood/casa",
+        "main_sha": "a242fe12239bed01be8204eb0c2c4aa23a66e368",
+        "status": "present",
+        "evidence": "Entire CasaCase model, decorator and cases index match current main byte-for-byte"
+      },
+      "inclusive_samples": 29,
+      "profile_samples": 576,
+      "inclusive_pct": 5.034722222222222,
+      "calls_per_response": 40,
+      "candidate": "Reuse only the invariant TRANSITION_AGE.years duration; still read the changing clock on each call",
+      "micro": {
+        "scope": "production Ruby 4.0.7/Rails 8.1.4 YJIT diagnostic only, 100000 calls/row; not independent request blocks or a speed claim",
+        "duration_us": [1.3292653800000043, 0.28954418000000537, 0.27798566000000413, 0.26794268999999815],
+        "method_us": [8.21128291, 8.37697361, 8.570060779999995, 8.895946670000008],
+        "jit_flat": [false, true, true, true],
+        "estimated_request_ceiling_pct": [0.8150348759468925, 0.17402161988679563, 0.1633104613595439, 0.15164400885791166],
+        "decision": "First nonflat row retained/excluded; flat estimates all below 2%. Even the excluded row estimates below 1%. No patch, suite or native cohort spent on this lead."
+      },
+      "qualified_native_blocks": 0
+    },
+    {
+      "app": "campfire",
+      "method": "RoomsHelper#composer_form_tag model construction",
+      "decision": "below_resolution",
+      "upstream_gate": {
+        "repository": "https://github.com/basecamp/once-campfire",
+        "main_sha": "c8f74a0b0e1e93146c4d7c1d6ac80c9079682216",
+        "status": "present",
+        "evidence": "composer_form_tag still constructs Message.new and passes it to form_with; source unchanged on main"
+      },
+      "inclusive_samples": 47,
+      "profile_samples": 673,
+      "inclusive_pct": 6.983655274888559,
+      "removable_model_construction_samples": 9,
+      "estimated_request_ceiling_pct": 1.337295690936107,
+      "decision_evidence": "Raw stack intersection of composer_form_tag with ActiveRecord::Core#initialize is 9/673; model construction including nested initialization cannot claim all captured form rendering. No patch, suite or cohort.",
+      "qualified_native_blocks": 0
+    }
+  ],
+  "fixture_overlays": [
+    "Existing corpus Ruby 4.0.7/Rails 8.1.4 dependency patches",
+    "advise-writebook-production.patch applied symmetrically, not a candidate",
+    "SKIP_TELEMETRY=1 for final Fizzy replay; fixed public fixture session prevents A/A SQL ID drift",
+    "CASA external temporary synthetic credentials and Warden fixture login; not an authentication certificate"
+  ],
+  "verification": {
+    "ruby": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+    "passed": true,
+    "steps": [
+      {
+        "name": "gems",
+        "status": "passed"
+      },
+      {
+        "name": "prepare-real-blog",
+        "status": "passed"
+      },
+      {
+        "name": "prepare-real-blog-r4",
+        "status": "passed"
+      },
+      {
+        "name": "prepare-rails",
+        "status": "passed"
+      },
+      {
+        "name": "valgrind",
+        "status": "passed"
+      },
+      {
+        "name": "build",
+        "status": "passed"
+      },
+      {
+        "name": "gem",
+        "status": "passed",
+        "tests": 196,
+        "assertions": 6908,
+        "failures": 0,
+        "errors": 0,
+        "skips": 1,
+        "named_skips": [
+          {
+            "test": "MaterializeCorpusTest#test_campfire",
+            "reason": "no /home/user/workspace/repo/.corpus/campfire (see script/corpus)"
+          }
+        ]
+      },
+      {
+        "name": "bench-advise",
+        "status": "passed",
+        "tests": 7,
+        "assertions": 59,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "bench-ar_diagnostics",
+        "status": "passed",
+        "tests": 2,
+        "assertions": 16,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "bench-callback_survey",
+        "status": "passed",
+        "tests": 1,
+        "assertions": 10,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "bench-pass",
+        "status": "passed",
+        "tests": 17,
+        "assertions": 243,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "bench-profile_summary",
+        "status": "passed",
+        "tests": 2,
+        "assertions": 12,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "bench-rails_drift",
+        "status": "passed",
+        "tests": 1,
+        "assertions": 11,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "bench-request_pairs",
+        "status": "passed",
+        "tests": 17,
+        "assertions": 312,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "bench-screen",
+        "status": "passed",
+        "tests": 5,
+        "assertions": 95,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "named_skips": []
+      },
+      {
+        "name": "rust",
+        "status": "passed",
+        "tests": 54,
+        "assertions": null,
+        "failures": 0,
+        "errors": null,
+        "skips": 0,
+        "named_skips": []
+      }
+    ],
+    "note": "Final full script/gate passed on Ruby 4.0.7: 196 gem tests/6908 assertions (one named absent-corpus skip), 52 bench tests/758 assertions, 54 Rust tests. Final production request/workload CLI smokes and explicit test-mode refusal pass; amended Fizzy complete-event screen passes without pricing."
+  }
+}

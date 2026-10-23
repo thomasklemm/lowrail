@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "scope": "CodeTriage anonymous GET /, disposable public fixtures, production YJIT. Declared before the patch cohort; no timestamp, SQL, HTML-structure or other-header exemptions.",
+  "body": [
+    {
+      "name": "one Rails CSRF meta token value",
+      "pattern": "(<meta name=\"csrf-token\" content=\")[A-Za-z0-9_-]{86}(\" />)",
+      "replacement": "\\1<csrf-token>\\2",
+      "count": 1
+    }
+  ],
+  "headers": {
+    "x-request-id": {
+      "name": "ActionDispatch generated request UUID",
+      "pattern": "\\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\z",
+      "replacement": "<request-id>",
+      "count": 1
+    },
+    "x-runtime": {
+      "name": "Rack request runtime",
+      "pattern": "\\A[0-9]+\\.[0-9]{6}\\z",
+      "replacement": "<runtime>",
+      "count": 1
+    },
+    "etag": {
+      "name": "Rack weak response ETag (body still compared except CSRF value)",
+      "pattern": "\\AW/\"[0-9a-f]{32}\"\\z",
+      "replacement": "<etag>",
+      "count": 1
+    },
+    "set-cookie": {
+      "name": "anonymous encrypted _code_triage_session value only (attributes retained)",
+      "pattern": "(\\A_code_triage_session=)[^;\\r\\n]+",
+      "replacement": "\\1<session>",
+      "count": 1
+    }
+  }
+}

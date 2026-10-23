@@ -1,0 +1,13 @@
+diff --git a/app/controllers/pages_controller.rb b/app/controllers/pages_controller.rb
+index 8a52dfa..1988c24 100644
+--- a/app/controllers/pages_controller.rb
++++ b/app/controllers/pages_controller.rb
+@@ -61,7 +61,7 @@ class PagesController < ApplicationController
+   end
+ 
+   private def valid_params
+-    params.permit(:language, :per_page, :page)
++    @valid_params ||= params.permit(:language, :per_page, :page)
+   end
+ 
+   private def set_cache_headers

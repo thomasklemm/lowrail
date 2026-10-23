@@ -324,7 +324,12 @@ lowrail mcp path/to/app        # read-only MCP server over stdio
 
 # 5. Measurements (see docs/bench.md before trusting a number)
 lowrail bench path/to/app --pass NAME
+lowrail advise path/to/app --request GET:/hot-screen --out /private/new-dir
 ```
+
+[`lowrail advise`](docs/advise.md) profiles production YJIT and ranks
+source-level opportunities with CPU, allocation and call-count evidence. It
+does not apply patches or turn a profile into a speedup claim.
 
 The runtime loads without app or Gemfile changes:
 
