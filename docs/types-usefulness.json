@@ -1,0 +1,781 @@
+{
+  "format": 1,
+  "scope": "advisory types, exact selected JSON facts, not runtime support or LLM tool selection",
+  "apps": [
+    {
+      "app": "A",
+      "slots": 296,
+      "before": {
+        "unknown": 188,
+        "static": 99,
+        "observed": 7,
+        "proven": 2
+      },
+      "after": {
+        "unknown": 188,
+        "static": 99,
+        "observed": 7,
+        "proven": 2
+      },
+      "conflicts": 0,
+      "changed_slots": 0,
+      "collection": {
+        "app": "A",
+        "augmented_slots": 0,
+        "original_generic_returns": 0,
+        "fully_resolved_returns": 0,
+        "improved_returns": 0,
+        "remaining_untyped_generic_returns": 0,
+        "observed_suite_ok": true,
+        "observed_methods": 13,
+        "conflicts": 0,
+        "coverage": {
+          "observed": 7,
+          "proven": 2,
+          "static": 99,
+          "unknown": 188
+        },
+        "frozen_facts_sha256": "4ef631a1c3272d713b7ba6ab00573737196ed626d28ac7cb8a3d687a2093d769",
+        "member_observations_sha256": "3347da08109f33c636e35ac3144d39e76b0dacce095bc099902dc6236ba0fae0"
+      },
+      "discovery_before": {
+        "tp": 17,
+        "fp": 0,
+        "fn": 6,
+        "correct": 17,
+        "wrong": 0,
+        "abstained": 3,
+        "precision": 1.0,
+        "recall": 0.7391304347826086
+      },
+      "discovery_after": {
+        "tp": 20,
+        "fp": 0,
+        "fn": 3,
+        "correct": 19,
+        "wrong": 0,
+        "abstained": 1,
+        "precision": 1.0,
+        "recall": 0.8695652173913043
+      },
+      "heldout": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 6,
+        "correct": 6,
+        "wrong": 1,
+        "abstained": 3,
+        "precision": 1.0,
+        "recall": 0.5384615384615384
+      },
+      "steep": {
+        "before": {
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 2
+          },
+          "summary": [
+            "Detected 2 problems from 1 file"
+          ]
+        },
+        "after_frozen": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 2
+          },
+          "summary": [
+            "Detected 2 problems from 1 file"
+          ]
+        },
+        "after_members": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 2
+          },
+          "summary": [
+            "Detected 2 problems from 1 file"
+          ]
+        }
+      },
+      "heldout_nonexact": [
+        {
+          "id": "h05",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 1
+        },
+        {
+          "id": "h08",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 3
+        },
+        {
+          "id": "h09",
+          "outcome": "wrong",
+          "tp_count": 1,
+          "fp_count": 0,
+          "fn_count": 1
+        },
+        {
+          "id": "h10",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 1
+        }
+      ]
+    },
+    {
+      "app": "B",
+      "slots": 2627,
+      "before": {
+        "static": 953,
+        "unknown": 1346,
+        "observed": 314,
+        "proven": 14
+      },
+      "after": {
+        "static": 955,
+        "unknown": 1346,
+        "observed": 312,
+        "proven": 14
+      },
+      "conflicts": 0,
+      "changed_slots": 2,
+      "collection": {
+        "app": "B",
+        "augmented_slots": 31,
+        "original_generic_returns": 21,
+        "fully_resolved_returns": 15,
+        "improved_returns": 19,
+        "remaining_untyped_generic_returns": 6,
+        "observed_suite_ok": false,
+        "observed_methods": 265,
+        "conflicts": 0,
+        "coverage": {
+          "observed": 312,
+          "proven": 14,
+          "static": 955,
+          "unknown": 1346
+        },
+        "frozen_facts_sha256": "fd3a6024529713aaf07f1c229a219d548f07f16b7b463248f5ef137966ac615b",
+        "member_observations_sha256": "209063f1788fa01da7f5563ac455596c0f75be226f3aa3bce531a01285eca93f"
+      },
+      "discovery_before": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 7,
+        "correct": 17,
+        "wrong": 0,
+        "abstained": 3,
+        "precision": 1.0,
+        "recall": 0.72
+      },
+      "discovery_after": {
+        "tp": 25,
+        "fp": 0,
+        "fn": 0,
+        "correct": 20,
+        "wrong": 0,
+        "abstained": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "heldout": {
+        "tp": 24,
+        "fp": 0,
+        "fn": 2,
+        "correct": 8,
+        "wrong": 0,
+        "abstained": 2,
+        "precision": 1.0,
+        "recall": 0.9230769230769231
+      },
+      "steep": {
+        "before": {
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::UnknownConstant": 76,
+            "Ruby::NoMethod": 696,
+            "Ruby::UnannotatedEmptyCollection": 9,
+            "Ruby::InsufficientPositionalArguments": 32,
+            "Ruby::UnexpectedBlockGiven": 32,
+            "Ruby::UndeclaredMethodDefinition": 22,
+            "Ruby::MethodBodyTypeMismatch": 12,
+            "Ruby::MethodArityMismatch": 2,
+            "Ruby::UnresolvedOverloading": 1,
+            "Ruby::UnexpectedPositionalArgument": 1,
+            "Ruby::UnexpectedKeywordArgument": 1,
+            "Ruby::ArgumentTypeMismatch": 1
+          },
+          "summary": [
+            "Detected 885 problems from 96 files"
+          ]
+        },
+        "after_frozen": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::UnknownConstant": 76,
+            "Ruby::NoMethod": 695,
+            "Ruby::UnannotatedEmptyCollection": 9,
+            "Ruby::InsufficientPositionalArguments": 32,
+            "Ruby::UnexpectedBlockGiven": 32,
+            "Ruby::UndeclaredMethodDefinition": 22,
+            "Ruby::MethodBodyTypeMismatch": 13,
+            "Ruby::MethodArityMismatch": 2,
+            "Ruby::UnresolvedOverloading": 1,
+            "Ruby::UnexpectedPositionalArgument": 1,
+            "Ruby::UnexpectedKeywordArgument": 1,
+            "Ruby::ArgumentTypeMismatch": 1
+          },
+          "summary": [
+            "Detected 885 problems from 96 files"
+          ]
+        },
+        "after_members": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::UnknownConstant": 76,
+            "Ruby::NoMethod": 696,
+            "Ruby::UnannotatedEmptyCollection": 9,
+            "Ruby::InsufficientPositionalArguments": 32,
+            "Ruby::UnexpectedBlockGiven": 32,
+            "Ruby::UndeclaredMethodDefinition": 22,
+            "Ruby::MethodBodyTypeMismatch": 13,
+            "Ruby::MethodArityMismatch": 2,
+            "Ruby::UnresolvedOverloading": 1,
+            "Ruby::UnexpectedPositionalArgument": 1,
+            "Ruby::UnexpectedKeywordArgument": 1,
+            "Ruby::ArgumentTypeMismatch": 1
+          },
+          "summary": [
+            "Detected 886 problems from 96 files"
+          ]
+        }
+      },
+      "heldout_nonexact": [
+        {
+          "id": "h04",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 1
+        },
+        {
+          "id": "h10",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 1
+        }
+      ]
+    },
+    {
+      "app": "C",
+      "slots": 6723,
+      "before": {
+        "static": 1181,
+        "unknown": 5017,
+        "observed": 495,
+        "proven": 30
+      },
+      "after": {
+        "static": 1187,
+        "unknown": 5017,
+        "observed": 489,
+        "proven": 30
+      },
+      "conflicts": 0,
+      "changed_slots": 6,
+      "collection": {
+        "app": "C",
+        "augmented_slots": 65,
+        "original_generic_returns": 46,
+        "fully_resolved_returns": 36,
+        "improved_returns": 38,
+        "remaining_untyped_generic_returns": 10,
+        "observed_suite_ok": true,
+        "observed_methods": 399,
+        "conflicts": 0,
+        "coverage": {
+          "observed": 489,
+          "proven": 30,
+          "static": 1187,
+          "unknown": 5017
+        },
+        "frozen_facts_sha256": "402ca2ace8f793addbd2556fae8d7b9854e737843ddadf4f85e47a5f0ae6db26",
+        "member_observations_sha256": "259be0ad2ce3b640f23ac0320b92c314e5dd1e0e143136197f9183d547c53710"
+      },
+      "discovery_before": {
+        "tp": 21,
+        "fp": 1,
+        "fn": 9,
+        "correct": 16,
+        "wrong": 1,
+        "abstained": 3,
+        "precision": 0.9545454545454546,
+        "recall": 0.7
+      },
+      "discovery_after": {
+        "tp": 30,
+        "fp": 0,
+        "fn": 0,
+        "correct": 20,
+        "wrong": 0,
+        "abstained": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "heldout": {
+        "tp": 11,
+        "fp": 0,
+        "fn": 6,
+        "correct": 8,
+        "wrong": 1,
+        "abstained": 1,
+        "precision": 1.0,
+        "recall": 0.6470588235294118
+      },
+      "steep": {
+        "before": {
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 686,
+            "Ruby::UnknownConstant": 154,
+            "Ruby::MethodBodyTypeMismatch": 15,
+            "Ruby::InsufficientPositionalArguments": 16,
+            "Ruby::UnexpectedBlockGiven": 21,
+            "Ruby::UndeclaredMethodDefinition": 12,
+            "Ruby::UnexpectedPositionalArgument": 6,
+            "Ruby::UnexpectedYield": 3,
+            "Ruby::ArgumentTypeMismatch": 8,
+            "Ruby::UnannotatedEmptyCollection": 3,
+            "Ruby::InsufficientKeywordArguments": 2
+          },
+          "summary": [
+            "Detected 926 problems from 102 files"
+          ]
+        },
+        "after_frozen": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 685,
+            "Ruby::UnknownConstant": 154,
+            "Ruby::MethodBodyTypeMismatch": 15,
+            "Ruby::InsufficientPositionalArguments": 16,
+            "Ruby::UnexpectedBlockGiven": 21,
+            "Ruby::UndeclaredMethodDefinition": 12,
+            "Ruby::UnexpectedPositionalArgument": 6,
+            "Ruby::UnexpectedYield": 3,
+            "Ruby::ArgumentTypeMismatch": 8,
+            "Ruby::UnannotatedEmptyCollection": 3,
+            "Ruby::InsufficientKeywordArguments": 2
+          },
+          "summary": [
+            "Detected 925 problems from 102 files"
+          ]
+        },
+        "after_members": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 685,
+            "Ruby::UnknownConstant": 154,
+            "Ruby::MethodBodyTypeMismatch": 15,
+            "Ruby::InsufficientPositionalArguments": 16,
+            "Ruby::UnexpectedBlockGiven": 21,
+            "Ruby::UndeclaredMethodDefinition": 12,
+            "Ruby::UnexpectedPositionalArgument": 6,
+            "Ruby::UnexpectedYield": 3,
+            "Ruby::ArgumentTypeMismatch": 12,
+            "Ruby::UnannotatedEmptyCollection": 2,
+            "Ruby::InsufficientKeywordArguments": 2
+          },
+          "summary": [
+            "Detected 928 problems from 102 files"
+          ]
+        }
+      },
+      "heldout_nonexact": [
+        {
+          "id": "h09",
+          "outcome": "wrong",
+          "tp_count": 1,
+          "fp_count": 0,
+          "fn_count": 5
+        },
+        {
+          "id": "h10",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 1
+        }
+      ]
+    },
+    {
+      "app": "D",
+      "slots": 9874,
+      "before": {
+        "observed": 1611,
+        "unknown": 5662,
+        "static": 2561,
+        "proven": 40
+      },
+      "after": {
+        "observed": 1599,
+        "unknown": 5661,
+        "static": 2574,
+        "proven": 40
+      },
+      "conflicts": 1,
+      "changed_slots": 13,
+      "collection": {
+        "app": "D",
+        "augmented_slots": 212,
+        "original_generic_returns": 149,
+        "fully_resolved_returns": 91,
+        "improved_returns": 124,
+        "remaining_untyped_generic_returns": 58,
+        "observed_suite_ok": false,
+        "observed_methods": 1265,
+        "conflicts": 1,
+        "coverage": {
+          "observed": 1599,
+          "proven": 40,
+          "static": 2574,
+          "unknown": 5661
+        },
+        "frozen_facts_sha256": "23d90d4c186893d2c960d5b406546d88791bd7c71f181b137ec8fcd888ae419b",
+        "member_observations_sha256": "7832b166b5f149ba38ca91497b4fa343e8f2cb0f6b6a8410cf186e35672daa1b"
+      },
+      "discovery_before": {
+        "tp": 19,
+        "fp": 1,
+        "fn": 6,
+        "correct": 16,
+        "wrong": 1,
+        "abstained": 3,
+        "precision": 0.95,
+        "recall": 0.76
+      },
+      "discovery_after": {
+        "tp": 25,
+        "fp": 0,
+        "fn": 0,
+        "correct": 20,
+        "wrong": 0,
+        "abstained": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "heldout": {
+        "tp": 8,
+        "fp": 2,
+        "fn": 3,
+        "correct": 7,
+        "wrong": 2,
+        "abstained": 1,
+        "precision": 0.8,
+        "recall": 0.7272727272727273
+      },
+      "steep": {
+        "before": {
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 1594,
+            "Ruby::UnknownConstant": 311,
+            "Ruby::MethodBodyTypeMismatch": 40,
+            "Ruby::UnannotatedEmptyCollection": 24,
+            "Ruby::ReturnTypeMismatch": 15,
+            "Ruby::ArgumentTypeMismatch": 18,
+            "Ruby::InsufficientPositionalArguments": 6,
+            "Ruby::UnexpectedBlockGiven": 12,
+            "Ruby::UnexpectedYield": 3,
+            "Ruby::UnexpectedPositionalArgument": 15,
+            "Ruby::UnresolvedOverloading": 4,
+            "Ruby::UndeclaredMethodDefinition": 8
+          },
+          "summary": [
+            "Detected 2050 problems from 180 files"
+          ]
+        },
+        "after_frozen": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 1592,
+            "Ruby::UnknownConstant": 311,
+            "Ruby::MethodBodyTypeMismatch": 37,
+            "Ruby::UnannotatedEmptyCollection": 24,
+            "Ruby::ReturnTypeMismatch": 15,
+            "Ruby::ArgumentTypeMismatch": 18,
+            "Ruby::InsufficientPositionalArguments": 6,
+            "Ruby::UnexpectedBlockGiven": 12,
+            "Ruby::UnexpectedYield": 3,
+            "Ruby::UnexpectedPositionalArgument": 15,
+            "Ruby::UnresolvedOverloading": 4,
+            "Ruby::UndeclaredMethodDefinition": 8
+          },
+          "summary": [
+            "Detected 2045 problems from 180 files"
+          ]
+        },
+        "after_members": {
+          "rbs_exit": 1,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 1588,
+            "Ruby::UnknownConstant": 305,
+            "Ruby::MethodBodyTypeMismatch": 37,
+            "Ruby::UnannotatedEmptyCollection": 22,
+            "Ruby::ReturnTypeMismatch": 15,
+            "Ruby::ArgumentTypeMismatch": 24,
+            "Ruby::InsufficientPositionalArguments": 6,
+            "Ruby::UnexpectedBlockGiven": 12,
+            "Ruby::UnexpectedYield": 3,
+            "Ruby::UnexpectedPositionalArgument": 15,
+            "Ruby::UnresolvedOverloading": 4,
+            "Ruby::BlockBodyTypeMismatch": 1,
+            "Ruby::BlockTypeMismatch": 7,
+            "Ruby::UndeclaredMethodDefinition": 8,
+            "RBS::UnknownTypeName": 2
+          },
+          "summary": [
+            "Detected 2049 problems from 181 files"
+          ]
+        }
+      },
+      "heldout_nonexact": [
+        {
+          "id": "h04",
+          "outcome": "wrong",
+          "tp_count": 0,
+          "fp_count": 1,
+          "fn_count": 1
+        },
+        {
+          "id": "h05",
+          "outcome": "wrong",
+          "tp_count": 0,
+          "fp_count": 1,
+          "fn_count": 1
+        },
+        {
+          "id": "h10",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 1
+        }
+      ]
+    },
+    {
+      "app": "E",
+      "slots": 1543,
+      "before": {
+        "static": 499,
+        "unknown": 745,
+        "observed": 280,
+        "proven": 19
+      },
+      "after": {
+        "static": 501,
+        "unknown": 745,
+        "observed": 278,
+        "proven": 19
+      },
+      "conflicts": 0,
+      "changed_slots": 2,
+      "collection": {
+        "app": "E",
+        "augmented_slots": 38,
+        "original_generic_returns": 15,
+        "fully_resolved_returns": 13,
+        "improved_returns": 13,
+        "remaining_untyped_generic_returns": 2,
+        "observed_suite_ok": true,
+        "observed_methods": 219,
+        "conflicts": 0,
+        "coverage": {
+          "observed": 278,
+          "proven": 19,
+          "static": 501,
+          "unknown": 745
+        },
+        "frozen_facts_sha256": "88894442927312fe76d3a3a5e4a083fd19efa318a9fd9cf8f4d1ec5652d31c3b",
+        "member_observations_sha256": "96181b69345998376b3484e2106d82272c17e8afb006a933c2b8a4a6dcb073cd"
+      },
+      "discovery_before": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 7,
+        "correct": 17,
+        "wrong": 0,
+        "abstained": 3,
+        "precision": 1.0,
+        "recall": 0.7586206896551724
+      },
+      "discovery_after": {
+        "tp": 29,
+        "fp": 0,
+        "fn": 0,
+        "correct": 20,
+        "wrong": 0,
+        "abstained": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "heldout": {
+        "tp": 16,
+        "fp": 0,
+        "fn": 1,
+        "correct": 9,
+        "wrong": 0,
+        "abstained": 1,
+        "precision": 1.0,
+        "recall": 0.9411764705882353
+      },
+      "steep": {
+        "before": {
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 391,
+            "Ruby::UnknownConstant": 54,
+            "Ruby::InsufficientPositionalArguments": 14,
+            "Ruby::UnexpectedBlockGiven": 16,
+            "Ruby::UndeclaredMethodDefinition": 12,
+            "Ruby::MethodBodyTypeMismatch": 12,
+            "Ruby::UnannotatedEmptyCollection": 8,
+            "Ruby::BlockTypeMismatch": 1,
+            "Ruby::UnexpectedYield": 2,
+            "Ruby::ArgumentTypeMismatch": 3,
+            "Ruby::UnexpectedPositionalArgument": 4,
+            "Ruby::UnexpectedKeywordArgument": 1
+          },
+          "summary": [
+            "Detected 518 problems from 58 files"
+          ]
+        },
+        "after_frozen": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 391,
+            "Ruby::UnknownConstant": 54,
+            "Ruby::InsufficientPositionalArguments": 14,
+            "Ruby::UnexpectedBlockGiven": 16,
+            "Ruby::UndeclaredMethodDefinition": 12,
+            "Ruby::MethodBodyTypeMismatch": 12,
+            "Ruby::UnannotatedEmptyCollection": 8,
+            "Ruby::BlockTypeMismatch": 1,
+            "Ruby::UnexpectedYield": 2,
+            "Ruby::ArgumentTypeMismatch": 3,
+            "Ruby::UnexpectedPositionalArgument": 4,
+            "Ruby::UnexpectedKeywordArgument": 1
+          },
+          "summary": [
+            "Detected 518 problems from 58 files"
+          ]
+        },
+        "after_members": {
+          "rbs_exit": 0,
+          "steep_exit": 1,
+          "diagnostics": {
+            "Ruby::NoMethod": 396,
+            "Ruby::UnknownConstant": 54,
+            "Ruby::InsufficientPositionalArguments": 14,
+            "Ruby::UnexpectedBlockGiven": 16,
+            "Ruby::UndeclaredMethodDefinition": 12,
+            "Ruby::MethodBodyTypeMismatch": 12,
+            "Ruby::UnannotatedEmptyCollection": 7,
+            "Ruby::BlockTypeMismatch": 1,
+            "Ruby::ArgumentTypeMismatch": 5,
+            "Ruby::UnexpectedYield": 2,
+            "Ruby::UnexpectedPositionalArgument": 4,
+            "Ruby::UnexpectedKeywordArgument": 1
+          },
+          "summary": [
+            "Detected 524 problems from 59 files"
+          ]
+        }
+      },
+      "heldout_nonexact": [
+        {
+          "id": "h10",
+          "outcome": "abstained",
+          "tp_count": 0,
+          "fp_count": 0,
+          "fn_count": 1
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "slots": 21063,
+    "before": {
+      "proven": 105,
+      "static": 5293,
+      "observed": 2707,
+      "unknown": 12958
+    },
+    "after": {
+      "proven": 105,
+      "static": 5316,
+      "observed": 2685,
+      "unknown": 12957
+    },
+    "independently_static_contracts": 23,
+    "conflict_rows": 1,
+    "generic_returns_before": 231,
+    "generic_returns_improved": 194,
+    "generic_returns_no_untyped_members": 155,
+    "generic_returns_still_incomplete": 76,
+    "generic_resolutions_evidence": "observed",
+    "discovery_before": {
+      "tp": 97,
+      "fp": 2,
+      "fn": 35,
+      "correct": 83,
+      "wrong": 2,
+      "abstained": 15,
+      "precision": 0.9797979797979798,
+      "recall": 0.7348484848484849
+    },
+    "discovery_after": {
+      "tp": 129,
+      "fp": 0,
+      "fn": 3,
+      "correct": 99,
+      "wrong": 0,
+      "abstained": 1,
+      "precision": 1.0,
+      "recall": 0.9772727272727273
+    },
+    "heldout": {
+      "tp": 66,
+      "fp": 2,
+      "fn": 18,
+      "correct": 38,
+      "wrong": 4,
+      "abstained": 8,
+      "precision": 0.9705882352941176,
+      "recall": 0.7857142857142857
+    }
+  },
+  "heldout_freeze": {
+    "questions_sha256": "ac8cbabe8148a673c18e37da127d9aaa13d36e280b4111be5e9e6fd5a54267cb",
+    "binary_sha256": "63f28c0cde70a8117780055770f86a9268cceb4101b3e927f4bf87f627543f12",
+    "implementation_manifest_sha256": "bcce445e8895c3c292a607920a18a770b3dc7271e3601b068c293a8b09f136d3",
+    "code_unchanged_after_run": true
+  },
+  "baseline_archive_sha256": "2fcc6d0ca0ecd97719437c380cbc3eb7ac9b89cb7984574800d7c4c3945a5343"
+}

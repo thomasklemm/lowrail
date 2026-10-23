@@ -48,6 +48,10 @@ module Lowrail
     KERNEL_SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
     KERNEL_IVARS = Kernel.instance_method(:instance_variables)
     KERNEL_IVAR_GET = Kernel.instance_method(:instance_variable_get)
+    ARRAY_LENGTH = Array.instance_method(:length)
+    ARRAY_GET = Array.instance_method(:[])
+    HASH_EACH = Hash.instance_method(:each_pair)
+    COLLECTION_LIMIT = 8
     # Not app code for type sampling: vendored, generated and test code.
     SKIP_DIRS = %w[vendor node_modules tmp .lowrail test spec].freeze
     RETURN_SAMPLING = "exception_tainted_nil_omitted_v1"
@@ -175,6 +179,7 @@ module Lowrail
         rec = {"module" => label(mod), "name" => um.name.to_s, "singleton" => MOD_SINGLETON_P.bind_call(mod),
                "source_location" => (loc = um.source_location) && "#{loc[0]}:#{loc[1]}",
                "calls" => 0, "self" => Hash.new(0), "args" => {}, "ivars" => {}, "returns" => Hash.new(0),
+               "collection_members" => {},
                "exception_tainted_returns" => 0, "saturated" => false}
         @hooked[um] = rec
         cap = @samples
@@ -203,9 +208,11 @@ module Lowrail
                 rec["exception_tainted_returns"] += 1
               else
                 rec["returns"][class_label(t.return_value)] += 1
+                sample_collection(t.return_value, rec, "return")
                 KERNEL_IVARS.bind_call(t.self).each do |name|
                   value = KERNEL_IVAR_GET.bind_call(t.self, name)
                   (rec["ivars"][name.to_s] ||= Hash.new(0))[class_label(value)] += 1
+                  sample_collection(value, rec, "ivar:#{name}")
                 end
               end
             end
@@ -227,6 +234,30 @@ module Lowrail
           next unless name && kind != :block
           v = b.local_variable_get(name)
           (rec["args"][name.to_s] ||= Hash.new(0))[class_label(v)] += 1
+          sample_collection(v, rec, "arg:#{name}")
+        end
+      end
+
+      # Never enumerate relations, call app reflection/enumeration methods, or
+      # recurse into members. Exact built-in containers only; at most eight
+      # entries per sampled value. Empty containers provide no element evidence.
+      def sample_collection(value, rec, slot)
+        klass = KERNEL_CLASS.bind_call(value)
+        return unless klass.equal?(Array) || klass.equal?(Hash)
+        members = (rec["collection_members"][slot] ||= {})
+        add = ->(role, item) { (members[role] ||= Hash.new(0))[class_label(item)] += 1 }
+        if klass.equal?(Array)
+          [ARRAY_LENGTH.bind_call(value), COLLECTION_LIMIT].min.times do |index|
+            add.call("Array.element", ARRAY_GET.bind_call(value, index))
+          end
+        else
+          count = 0
+          HASH_EACH.bind_call(value) do |key, item|
+            break if count >= COLLECTION_LIMIT
+            add.call("Hash.key", key)
+            add.call("Hash.value", item)
+            count += 1
+          end
         end
       end
 

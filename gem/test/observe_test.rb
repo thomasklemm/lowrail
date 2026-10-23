@@ -64,6 +64,14 @@ class ObserveTest < Minitest::Test
           assert_raises(ArgumentError) { probe.indirect { Integer("bad") } }
           leave << true
           assert_equal :safe, thread.value
+          array = ["x", 7, nil, [], true, false, :a, :b, 1.5]
+          def array.[](*) = raise "do not dispatch container methods"
+          hash = {"key" => 7, :other => "value"}
+          def hash.each_pair(*) = raise "do not dispatch container methods"
+          relation = Widget.all
+          [array, hash, [], relation].each { |value| assert_same value, probe.collection(value) }
+          refute relation.loaded?, "sampling must not load a relation"
+          assert_instance_of ReturnProbe::ArrayChild, probe.subclass(ReturnProbe::ArrayChild.new)
         end
       end
     RUBY
@@ -106,6 +114,11 @@ class ObserveTest < Minitest::Test
         end
         def normal_nil = nil
         def normal_value = "value"
+        def collection(value) = value
+        def subclass(value) = value
+        class ArrayChild < Array
+          def each(*) = raise "do not enumerate subclasses"
+        end
         def interleaved(fail)
           Fiber.yield unless fail
           raise RangeError if fail
@@ -198,6 +211,17 @@ class ObserveTest < Minitest::Test
     assert_equal({"String" => 1, "Integer" => 1}, greet["ivars"]["@sample"], "absence must not be recorded as nil")
     # Test methods are not sampled.
     assert_nil types("WidgetTest", "test_label")
+  end
+
+  def test_collection_members_are_bounded_shallow_and_do_not_dispatch_app_methods
+    sample = types("ReturnProbe", "collection")
+    assert_equal 4, sample["calls"]
+    expected = {"Array.element" => {"String" => 1, "Integer" => 1, "NilClass" => 1,
+      "Array" => 1, "TrueClass" => 1, "FalseClass" => 1, "Symbol" => 2},
+      "Hash.key" => {"String" => 1, "Symbol" => 1}, "Hash.value" => {"Integer" => 1, "String" => 1}}
+    assert_equal expected, sample["collection_members"]["return"]
+    assert_equal expected, sample["collection_members"]["arg:value"]
+    assert_equal({}, types("ReturnProbe", "subclass")["collection_members"])
   end
 
   def test_exception_unwinds_do_not_become_nil_return_samples
