@@ -7,10 +7,10 @@ use std::path::PathBuf;
 pub(super) fn list() -> Vec<Value> {
     let string = json!({"type":"string"});
     [
-        ("type_of", "Signature/provenance, or a typed fact at slot return, arg:name, ivar:@name", json!({"target":string,"slot":string}), vec!["target"]),
+        ("type_of", "Advisory signature/fact with provenance and nullability. Observed classes do not exclude nil. Slots: return, arg:name, ivar:@name", json!({"target":string,"slot":string}), vec!["target"]),
         ("type_at_position", "Advisory method/call return at a method-name token; one-based UTF-8 byte coordinates. Dynamic receivers/blocks are not guessed", json!({"path":string,"line":{"type":"integer","minimum":1},"column":{"type":"integer","minimum":1}}), vec!["path","line","column"]),
         ("find_definition", "Resolved boot source location and origin; generated locations are generator sites, not fabricated Ruby definitions", json!({"target":string}), vec!["target"]),
-        ("callers", "Bounded boot-resolved Ruby call sites, with unresolved candidates separate; never an exhaustive dynamic call graph", json!({"target":string}), vec!["target"]),
+        ("callers", "Partial boot-resolved calls/references, including callback/delegate/literal reflection and fresh templates; unresolved candidates separate; never a complete caller list", json!({"target":string}), vec!["target"]),
         ("view_locals", "Explicit partial input bindings, strict locals and contextual controller exit ivars; not a callback/dominance guarantee", json!({"path":string}), vec!["path"]),
         ("export_rbs", "Read-only RBS files and per-slot proven/static/observed/unknown evidence from existing facts and samples; no whole-signature certification", json!({}), vec![]),
         ("method_facts", "Resolved boot method and its origin/generator", json!({"target":string}), vec!["target"]),

@@ -1,6 +1,98 @@
 use super::*;
 
 #[test]
+fn return_nullability_never_treats_samples_as_exhaustive() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-nullability-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
+    let path = dir.join("record.rb");
+    let ruby = "class Record\n def conditional; external if predicate; end\n def early; return if predicate; external; end\n def safe = external&.strip\n def sampled = external\n def contradicted = 7\n def members = [nil]\n def column = title\n def block_return; items.each { return if predicate }; external; end\n def short_circuit = external && callback { external }\nend\n";
+    std::fs::write(&path, ruby).unwrap();
+    let methods: Vec<_> = [("conditional",2), ("early",3), ("safe",4), ("sampled",5),
+        ("contradicted",6), ("members",7), ("column",8), ("block_return",9), ("short_circuit",10)].into_iter()
+        .map(|(name,line)| json!({"name":name,"owner":"Record","source_location":format!("{}:{line}",path.display())})).collect();
+    let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "models":[{"name":"Record","columns":[{"name":"title","type":"string","null":true}]}],
+        "modules":[{"name":"Record","methods":methods}]});
+    std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+    let mut samples: Vec<_> = ["conditional", "early", "safe", "sampled", "block_return", "short_circuit"].into_iter()
+        .map(|name| json!({"module":"Record","name":name,"calls":4,"returns":{"String":4}})).collect();
+    samples.push(json!({"module":"Record","name":"contradicted","calls":2,"returns":{"Integer":1,"NilClass":1}}));
+    std::fs::write(dir.join(".lowrail/observed.json"), json!({"format":1,"app_root":dir,"types":samples}).to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    for name in ["conditional", "early", "safe", "block_return", "short_circuit"] {
+        let answer = data.call("type_of", &json!({"target":format!("Record#{name}"),"slot":"return"})).unwrap();
+        assert_eq!(answer["fact"]["nullability"], "nullable", "{name}");
+        assert_eq!(answer["fact"]["name"], "(String | nil)");
+        assert_eq!(answer["fact"]["evidence"], "observed", "a partial nil path is not a complete static contract");
+        assert!(answer["proven_type"].is_null());
+    }
+    let sampled = data.call("type_of", &json!({"target":"Record#sampled","slot":"return"})).unwrap();
+    assert_eq!(sampled["fact"]["nullability"], "observed_nil_not_excluded");
+    assert_eq!(sampled["fact"]["nullability_note"], "observed, nil not excluded");
+    let signature = data.call("type_of", &json!({"target":"Record#conditional"})).unwrap();
+    assert_eq!(signature["signature"], "() -> (String | nil)");
+    let contradicted = data.call("type_of", &json!({"target":"Record#contradicted","slot":"return"})).unwrap();
+    assert_eq!(contradicted["fact"]["name"], "(Integer | nil)");
+    assert_eq!(contradicted["conflicts"][0]["static_type"], "Integer");
+    assert_eq!(contradicted["conflicts"][0]["observed_class"], "NilClass");
+    for (name, expected) in [("members", "non_nil"), ("column", "nullable")] {
+        let answer = data.call("type_of", &json!({"target":format!("Record#{name}")})).unwrap();
+        assert_eq!(answer["type"]["return_type"]["nullability"], expected);
+    }
+    let position = data.call("type_at_position", &json!({"path":"record.rb","line":2,"column":7})).unwrap();
+    assert_eq!(position["fact"]["nullability"], "nullable");
+    assert_eq!(position["fact"]["name"], "(String | nil)");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn caller_references_include_macros_reflection_blocks_inheritance_and_templates() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-references-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
+    let path = dir.join("records.rb");
+    let ruby = "class Parent\n before_save :target\n def target = 7\n def wrapped; respond_to { target; public_send(:target) }; end\n def referenced = method(:target)\n def dynamic(name) = send(name)\n def rebound; other.instance_exec { target }; end\nend\nclass Child < Parent\n def own = target\nend\nclass Other < Parent\n def target = 9\nend\nclass Wrapper\n delegate :target, to: :record\n def callback; record.target; end\n after_save -> { record.target }\nend\n";
+    std::fs::write(&path, ruby).unwrap();
+    let methods = |owner: &str, entries: &[(&str,u32)]| entries.iter().map(|(name,line)|
+        json!({"name":name,"owner":owner,"source_location":format!("{}:{line}",path.display())})).collect::<Vec<_>>();
+    let view_path = dir.join("card.html.erb");
+    let view = "<p>Ignored Parent.new.target</p>\n<%= Parent.new.target %> <%= item.target %> <%= Child.new %>\n<%# Parent.new.target %>\n";
+    std::fs::write(&view_path, view).unwrap();
+    use sha2::{Digest, Sha256};
+    let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "models":[{"name":"Wrapper","associations":[{"name":"record","macro":"belongs_to","class_name":"Parent"}]}],
+        "modules":[
+            {"name":"Parent","kind":"class","ancestors":["Parent","Kernel"],"singleton_ancestors":["Class"],
+                "const_source_location":format!("{}:1",path.display()),"methods":methods("Parent", &[("target",3),("wrapped",4),("referenced",5),("dynamic",6),("rebound",7)])},
+            {"name":"Child","kind":"class","ancestors":["Child","Parent","Kernel"],"singleton_ancestors":["#<Class:Child>","#<Class:Parent>","Class"],"methods":methods("Child", &[("own",10)])},
+            {"name":"Other","kind":"class","ancestors":["Other","Parent","Kernel"],"methods":methods("Other", &[("target",13)])},
+            {"name":"Wrapper","kind":"class","methods":methods("Wrapper", &[("callback",17)])},
+            {"name":"Kernel","methods":[{"name":"send","owner":"Kernel","iseq_kind":"cfunc"},{"name":"public_send","owner":"Kernel","iseq_kind":"cfunc"},{"name":"method","owner":"Kernel","iseq_kind":"cfunc"}]},
+            {"name":"Class","methods":[{"name":"new","owner":"Class","iseq_kind":"cfunc"}]}],
+        "templates":[{"identifier":view_path,"source_sha256":format!("{:x}",Sha256::digest(view)),"virtual_path":"card"}]});
+    std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    let answer = data.call("callers", &json!({"target":"Parent#target"})).unwrap();
+    let sites = answer["callers"].as_array().unwrap();
+    for (file, line, kind) in [("records.rb",2,"callback_reference"),("records.rb",4,"call"),
+        ("records.rb",4,"literal_send"),("records.rb",5,"method_reference"),("records.rb",10,"call"),
+        ("records.rb",16,"delegate_reference"),("records.rb",17,"call"),("records.rb",18,"call"),("card.html.erb",2,"call")] {
+        assert!(sites.iter().any(|s| s["location"] == format!("{file}:{line}") && s["kind"] == kind), "{file}:{line} {kind}: {answer}");
+    }
+    assert_eq!(sites.len(), 9, "HTML/comments and rebinding/dynamic names must not become verified callers");
+    assert!(answer["unresolved"].as_array().unwrap().iter().any(|s| s["kind"] == "dynamic_reflection"));
+    assert_eq!(answer["complete"], false);
+    assert!(answer["summary"].as_str().unwrap().contains("not a complete caller list"));
+    let other = data.call("callers", &json!({"target":"Other#target"})).unwrap();
+    assert!(!other["callers"].as_array().unwrap().iter().any(|s| s["location"] == "records.rb:10"), "a sibling's inherited call is not this override's caller");
+    let constructor = data.call("callers", &json!({"target":"Parent.new"})).unwrap();
+    assert_eq!(constructor["callers"].as_array().unwrap().len(), 1, "Child.new is a different concrete constructor even with the same native owner");
+    std::fs::write(&view_path, "changed").unwrap();
+    let stale = data.call("callers", &json!({"target":"Parent#target"})).unwrap();
+    assert!(stale["unavailable_sources"].as_array().unwrap().contains(&json!(view_path)));
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn callers_and_view_inputs_are_bounded_contextual_and_refresh_sources() {
     let dir = std::env::temp_dir().join(format!("lowrail-mcp-useful-{}", std::process::id()));
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();

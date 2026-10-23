@@ -505,6 +505,7 @@ pub(super) fn seed(facts: &Facts, model: &mut TypeModel, parser: &crate::parser:
                     evidence: Evidence::Static,
                     provenance,
                     samples: BTreeMap::new(),
+                    possible_nil: false,
                 }
             };
             let parameters: Vec<_> = decl

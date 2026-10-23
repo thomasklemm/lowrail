@@ -97,7 +97,7 @@ pub(super) fn signature(sig: &Signature) -> String {
         } else {
             String::new()
         },
-        sig.return_type.name
+        sig.return_type.advisory_name()
     )
 }
 

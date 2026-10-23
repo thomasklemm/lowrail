@@ -76,11 +76,36 @@ observed return slots after classifying and withholding compatible raw flags.
 
 Observations fill `untyped`, or annotate a static type without narrowing it.
 A contradicting sample creates a `conflicts` row with method, slot, static
-type, class and count; the static name is preserved and body proof withdrawn.
+type, class and count; the original static contract is preserved in that row
+and body proof withdrawn, even when the displayed answer adds possible nil.
 `String?` plus String-only samples stays `String?`. Anonymous classes stay
 `untyped`; model-specific Rails relation class names are rendered as advisory
 `Relation[Model]`, not evidence about loaded elements. Regenerate facts and
 observations after source changes; no source-freshness certificate is implied.
+
+### Return nullability is separate from sampled classes
+
+Every serialized type also has `nullability` and a human-readable
+`nullability_note`, including `type_of` with/without a slot,
+`type_at_position`, typed-facts JSON and RBS evidence comments.
+
+| Nullability | Meaning |
+|---|---|
+| `nullable` | A static contract/possible return path allows nil, or nil was sampled at least once. A known candidate name is displayed with nil included. |
+| `non_nil` | Non-nil on normal completion **under the advisory static contract**, not a runtime certificate. |
+| `observed_nil_not_excluded` | **Observed, nil not excluded.** The name describes sampled classes, not an exhaustive non-nil return contract. Saturation never changes this. |
+| `unknown` | No complete contract; nil is not excluded. |
+
+A separate bounded may-nil walk retains missing `if`/`unless` branches,
+early returns (also inside unsupported blocks), safe navigation and
+short-circuit returns even when the full body cannot be typed. Nullable
+column/finder contracts remain nullable. This does **not** infer a complete
+return type, feed observations into inference, upgrade evidence, change
+slot identities/statuses, or suppress contradictions. Nil nested inside an
+Array/Hash is not confused with a nullable outer container. The Rust candidate
+and conflict contract remain unchanged; JSON and RBS signatures include any
+additional known nil possibility. Unmodeled bodies remain explicitly sampled
+or unknown, never silently non-nil.
 
 ## Typed-facts build API (format 1)
 
@@ -515,7 +540,7 @@ Tools:
 | `type_of` | `target`: `Article#title`, `Article.all` or `article_path`; optional `slot`: `return`, `arg:name`, `ivar:@name` | Signature/types, provenance, counts, evidence, conflicts; a slot query includes `proven_type` (name or null) |
 | `type_at_position` | `path` inside APP, `line`, `column`: one-based UTF-8 byte coordinates at a method-name token | Advisory def/call return, target/signature/evidence; dynamic receivers, ambiguous contexts and unsupported nodes explicitly unavailable, never guessed |
 | `find_definition` | `target`: `Class#method` or `Class.method` | Resolved boot source path/line and origin; generated methods report generator sites, native methods have no source location |
-| `callers` | `target`: `Class#method` or `Class.method` | Concrete boot-resolved constant/self call sites in indexed Ruby files; unresolved candidates separate, always incomplete |
+| `callers` | `target`: `Class#method` or `Class.method` | Boot-resolved calls/references in indexed Ruby and fresh templates; callback/delegate/literal reflection kinds, physical `location` and receiver `dispatches`; unresolved candidates separate, always incomplete |
 | `view_locals` | `path`: boot template identifier, app-relative path or virtual path | Literal partial-render local names/types, collection/object bindings, strict locals and controller exit-ivar context; changed/missing templates refuse; no callback/dominance guarantee |
 | `export_rbs` | none | RBS files and the same per-slot proven/static/observed/unknown evidence as RBS comments, plus diagnostics/conflicts; no writes |
 | `method_facts` | `target`: `Class#method` or `Class.method` | Resolved boot method, owner/source/parameters/ISeq kind and existing origin classifier result |
@@ -527,6 +552,19 @@ Tools:
 | `explain_site` | `location`: `path:line`; optional `dir`, `stats` | Exact ledger site(s), associated units, or explicit `left_original/not_recorded`; same typed `outputSchema` |
 | `verify_stats` | none | Last completed verify's pass/unit hits and fallbacks, command, equivalence result, recorder overhead and `matches_current_manifest` |
 | `diagnostics` | none | Source-read/parse diagnostics and static/observed type conflicts |
+
+`callers` is a **partial reference set**, not a complete caller list. Its
+`summary` says this explicitly. Named callback registrations and bodies,
+delegates to statically typed receivers or `class`, native literal-symbol
+`send`/`public_send` and method references, ordinary lexical blocks and boot
+inheritance are indexed. Constructors keep concrete receiver identity:
+`Child.new` is not a call of `Parent.new` merely because their native owner
+matches. ERB masks retain source coordinates; HTML/comments are not Ruby.
+Changed templates and unsupported handlers are unavailable, not stale answers.
+Untyped template locals/ivars and dynamic receiver/name candidates remain
+unresolved. Callback/delegate/method-reference edges indicate possible dispatch,
+not guaranteed execution. Custom block rebinding and unindexed/dynamic code
+can add callers; this is not a closed-world graph.
 
 For example, a tools/call request after initialization:
 

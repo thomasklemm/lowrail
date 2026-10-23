@@ -7,6 +7,8 @@ use std::collections::{BTreeMap, BTreeSet};
 #[derive(Clone, Debug)]
 enum Expr {
     Unknown,
+    Opaque(Vec<Expr>),
+    Return(Box<Expr>),
     Literal(&'static str),
     Self_,
     Constant(String),
@@ -18,6 +20,8 @@ enum Expr {
     Hash(Vec<(Expr, Expr)>),
     Interpolation(Vec<Expr>),
     Branch(Box<Expr>, Box<Expr>, Box<Expr>),
+    And(Box<Expr>, Box<Expr>),
+    Or(Box<Expr>, Box<Expr>),
 }
 
 fn expression(node: Node<'_>) -> Expr {
@@ -39,6 +43,10 @@ fn expression_ref(node: &Node<'_>) -> Expr {
         Expr::Literal("nil")
     } else if node.as_self_node().is_some() {
         Expr::Self_
+    } else if let Some(n) = node.as_return_node() {
+        Expr::Return(Box::new(n.arguments().and_then(|a| (a.arguments().len() == 1)
+            .then(|| expression(a.arguments().iter().next().unwrap())))
+            .unwrap_or_else(|| if n.arguments().is_none() { Expr::Literal("nil") } else { Expr::Unknown })))
     } else if node.as_constant_read_node().is_some() || node.as_constant_path_node().is_some() {
         Expr::Constant(
             String::from_utf8_lossy(node.location().as_slice())
@@ -55,6 +63,10 @@ fn expression_ref(node: &Node<'_>) -> Expr {
             Box::new(n.else_clause().map(|n| statements(n.statements())).unwrap_or(Expr::Literal("nil"))))
     } else if let Some(n) = node.as_else_node() {
         statements(n.statements())
+    } else if let Some(n) = node.as_and_node() {
+        Expr::And(Box::new(expression(n.left())), Box::new(expression(n.right())))
+    } else if let Some(n) = node.as_or_node() {
+        Expr::Or(Box::new(expression(n.left())), Box::new(expression(n.right())))
     } else if let Some(n) = node.as_interpolated_string_node() {
         Expr::Interpolation(n.parts().iter().map(expression).collect())
     } else if let Some(n) = node.as_embedded_statements_node() {
@@ -79,7 +91,7 @@ fn expression_ref(node: &Node<'_>) -> Expr {
         if n.elements().iter().all(argument) {
             Expr::Array(n.elements().iter().map(expression).collect())
         } else {
-            Expr::Unknown
+            opaque(node)
         }
     } else if let Some(n) = node.as_hash_node() {
         if n.elements().iter().all(|n| n.as_assoc_node().is_some_and(|a| argument(a.key()) && argument(a.value()))) {
@@ -88,7 +100,7 @@ fn expression_ref(node: &Node<'_>) -> Expr {
                 (expression(pair.key()), expression(pair.value()))
             }).collect())
         } else {
-            Expr::Unknown
+            opaque(node)
         }
     } else if let Some(n) = node.as_call_node() {
         if n.block().is_none()
@@ -101,12 +113,27 @@ fn expression_ref(node: &Node<'_>) -> Expr {
                 n.is_safe_navigation(),
             )
         } else {
-            Expr::Unknown
+            opaque(node)
         }
     } else {
         // Never infer just the tail of a body with unsupported control flow.
-        Expr::Unknown
+        opaque(node)
     }
+}
+
+fn opaque(node: &Node<'_>) -> Expr {
+    #[derive(Default)]
+    struct Returns(Vec<Expr>);
+    impl<'pr> Visit<'pr> for Returns {
+        fn visit_return_node(&mut self, n: &ruby_prism::ReturnNode<'pr>) {
+            self.0.push(expression(n.as_node()));
+        }
+        fn visit_def_node(&mut self, _: &ruby_prism::DefNode<'pr>) {}
+        fn visit_lambda_node(&mut self, _: &ruby_prism::LambdaNode<'pr>) {}
+    }
+    let mut returns = Returns::default();
+    returns.visit(node);
+    Expr::Opaque(returns.0)
 }
 
 fn statements(node: Option<ruby_prism::StatementsNode<'_>>) -> Expr {
@@ -461,6 +488,49 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
             sig.ivars = ivars;
         }
     }
+    // This is a separate may-nil analysis, NOT another return-type fixpoint.
+    // It cannot create a contract or improve a slot's evidence classification.
+    let hints: Vec<_> = bodies.iter().filter_map(|(id, (expr, _))| {
+        let sig = &model.methods[id];
+        may_nil(expr, facts, model, &sig.receiver, sig.singleton).then(|| id.clone())
+    }).collect();
+    for id in hints { model.methods.get_mut(&id).unwrap().return_type.possible_nil = true; }
+}
+
+fn may_nil(expr: &Expr, facts: &Facts, model: &TypeModel, receiver: &str, singleton: bool) -> bool {
+    let check = |expr| may_nil(expr, facts, model, receiver, singleton);
+    match expr {
+        Expr::Literal(name) => *name == "nil",
+        Expr::Return(value) => check(value) || evaluate(value, facts, model, receiver, singleton,
+            &mut BTreeMap::new()).is_none_or(|t| t.name == "untyped"),
+        Expr::Branch(predicate, yes, no) => escaping_nil(predicate, facts, model, receiver, singleton)
+            || check(yes) || check(no),
+        Expr::And(left, right) => check(left) || evaluate(left, facts, model, receiver, singleton,
+            &mut BTreeMap::new()).is_none_or(|t| t.name == "untyped") || check(right),
+        Expr::Or(left, right) => (check(left) || evaluate(left, facts, model, receiver, singleton,
+            &mut BTreeMap::new()).is_none_or(|t| t.name == "untyped"))
+            && (check(right) || evaluate(right, facts, model, receiver, singleton,
+                &mut BTreeMap::new()).is_none_or(|t| t.name == "untyped")),
+        Expr::Sequence(parts) => parts.iter().any(|e| escaping_nil(e, facts, model, receiver, singleton))
+            || parts.last().is_none_or(check),
+        Expr::Write(_, value) => check(value),
+        Expr::Opaque(returns) => returns.iter().any(check),
+        Expr::Call(_, _, _, true) => true,
+        _ => evaluate(expr, facts, model, receiver, singleton, &mut BTreeMap::new())
+            .is_some_and(|t| allows_nil(&t.name)),
+    }
+}
+
+fn escaping_nil(expr: &Expr, facts: &Facts, model: &TypeModel, receiver: &str, singleton: bool) -> bool {
+    let check = |expr| escaping_nil(expr, facts, model, receiver, singleton);
+    match expr {
+        Expr::Return(_) | Expr::Opaque(_) => may_nil(expr, facts, model, receiver, singleton),
+        Expr::Sequence(parts) | Expr::Interpolation(parts) | Expr::Array(parts) => parts.iter().any(check),
+        Expr::Branch(predicate, yes, no) => check(predicate) || check(yes) || check(no),
+        Expr::And(left, right) | Expr::Or(left, right) => check(left) || check(right),
+        Expr::Write(_, value) => check(value),
+        _ => false,
+    }
 }
 
 pub(super) fn value(node: &Node<'_>, facts: &Facts, model: &TypeModel, receiver: &str,
@@ -481,7 +551,7 @@ fn evaluate(
     locals: &mut BTreeMap<String, Type>,
 ) -> Option<Type> {
     match expr {
-        Expr::Unknown => None,
+        Expr::Unknown | Expr::Opaque(_) | Expr::Return(_) | Expr::And(_, _) | Expr::Or(_, _) => None,
         Expr::Literal(name) => {
             let mut ty = Type::new(*name, Source::Inference, "Ruby literal");
             ty.evidence = Evidence::ProvenBody;

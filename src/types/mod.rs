@@ -35,13 +35,35 @@ pub struct Provenance {
     pub detail: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Type {
     pub name: String,
     pub provenance: Vec<Provenance>,
     pub evidence: Evidence,
     /// Raw class histogram, never a confidence score or a proof.
     pub samples: BTreeMap<String, u64>,
+    // Independent of a complete return contract. Unsupported bodies can still
+    // contain a nil return path; this must not create a static/proven slot.
+    pub(super) possible_nil: bool,
+}
+
+impl Serialize for Type {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+        let mut out = serializer.serialize_struct("Type", 6)?;
+        out.serialize_field("name", &self.advisory_name())?;
+        out.serialize_field("provenance", &self.provenance)?;
+        out.serialize_field("evidence", &self.evidence)?;
+        out.serialize_field("samples", &self.samples)?;
+        out.serialize_field("nullability", self.nullability())?;
+        out.serialize_field("nullability_note", match self.nullability() {
+            "observed_nil_not_excluded" => "observed, nil not excluded",
+            "nullable" => "nil is allowed by a static return path/contract or was observed",
+            "non_nil" => "non-nil on normal completion under the advisory static contract",
+            _ => "nil not excluded; no complete contract",
+        })?;
+        out.end()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -64,7 +86,26 @@ impl Type {
             }],
             evidence: Evidence::Static,
             samples: BTreeMap::new(),
+            possible_nil: false,
         }
+    }
+
+    pub fn nullability(&self) -> &'static str {
+        if self.possible_nil || allows_nil(&self.name) || self.samples.get("NilClass").is_some_and(|n| *n > 0) {
+            "nullable"
+        } else if self.evidence == Evidence::Observed {
+            "observed_nil_not_excluded"
+        } else if self.name == "untyped" {
+            "unknown"
+        } else {
+            "non_nil"
+        }
+    }
+
+    fn advisory_name(&self) -> String {
+        if self.nullability() == "nullable" && self.name != "untyped" && !allows_nil(&self.name) {
+            format!("({} | nil)", self.name)
+        } else { self.name.clone() }
     }
 
     pub fn proven_type(&self) -> Option<&str> {
@@ -82,6 +123,25 @@ impl Type {
         }
         self
     }
+}
+
+// Only outer nil matters: Array[String?] and Hash[Symbol, nil] are not nil.
+fn allows_nil(name: &str) -> bool {
+    let name = name.trim().trim_start_matches("::");
+    if name.ends_with('?') || matches!(name, "nil" | "NilClass") { return true; }
+    if let Some(inner) = name.strip_prefix('(').and_then(|s| s.strip_suffix(')')) {
+        return allows_nil(inner);
+    }
+    let mut depth = 0;
+    for (i, c) in name.char_indices() {
+        match c {
+            '[' | '(' => depth += 1,
+            ']' | ')' => depth -= 1,
+            '|' if depth == 0 => return allows_nil(&name[..i]) || allows_nil(&name[i + 1..]),
+            _ => {}
+        }
+    }
+    false
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -398,7 +458,7 @@ impl TypeModel {
     }
 
     pub fn callers(&self, facts: &Facts, target: &str) -> Result<serde_json::Value, String> {
-        references::callers(facts, target)
+        references::callers(self, facts, target)
     }
 
     pub fn view_locals(&self, facts: &Facts, path: &str) -> Result<serde_json::Value, String> {
