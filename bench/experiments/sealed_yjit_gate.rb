@@ -187,7 +187,7 @@ module SealedYjitGate
         label = "#{block}-#{position}-#{arm}"
         destination = File.join(output, "#{label}.json")
         ok = system(env.merge("LOWRAIL" => arm == "on" ? "1" : "0"), "taskset", "-c", config.fetch("cpu").to_s,
-          RbConfig.ruby, "--yjit", "--disable-zjit", __FILE__, "worker", config_path, destination,
+          RbConfig.ruby, "--yjit", "--disable-zjit", File.expand_path(__FILE__), "worker", config_path, destination,
           chdir: app, out: File.join(output, "#{label}.log"), err: [:child, :out])
         raise "#{label} failed; retain partial cohort without retry" unless ok
         row = JSON.parse(File.read(destination)).merge("label" => label, "treatment" => arm)

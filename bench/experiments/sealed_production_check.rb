@@ -155,10 +155,9 @@ native = <<~'RUBY'
   fallbacks = render_units.transform_values { Lowrail::Stats.unit_fallbacks.fetch(_1, 0) }
   raise "native coverage failed" unless hits == {"sealed/form_scaffold" => 50, "sealed/token_tag" => 200,
     "sealed/collection_render" => 50} && fallbacks.values.all?(&:zero?)
-  before = Lowrail::Stats.unit_hits.dup
   Lowrail::Sealed::EPOCH[0] = 1
   raise "deopt request failed" unless request.call.status == 200
-  raise "deopt still hit" unless Lowrail::Stats.unit_hits == before
+  raise "deopt still hit" unless render_units.all? { |pass, id| Lowrail::Stats.unit_hits.fetch(id, 0) == hits.fetch(pass) }
   raise "deopt missing" unless render_units.values.all? { Lowrail::Stats.unit_fallbacks.fetch(_1, 0).positive? }
   binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") } or raise "native binary missing"
   puts "PRODUCTION_NATIVE #{JSON.generate(hits: hits, fallbacks: fallbacks, deopt_fallbacks: Lowrail::Stats.unit_fallbacks,

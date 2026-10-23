@@ -4,6 +4,32 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet S: runtime lowering parked (2026-10-23)
+
+**runtime lowering parked: interpreter-only gains do not count, YJIT is the reference**.
+If YJIT already removes work, Lowrail should not duplicate it. Existing
+interpreter evidence remains historical, not justification for continuing
+runtime lowering. No new interpreter pricing; the running blog counter was
+stopped and queued Fizzy instructions never started. Fizzy's one YJIT cohort
+had already completed and is retained only as a diagnostic data point.
+
+**NO-GO.** Four fresh alternating three-process blocks, ten warmups and ten
+requests per process: blog show **+10.724% wall time**, exploratory block
+t95 **[+7.158,+14.289]%**; Fizzy buckets **+7.207%
+[−7.527,+21.941]%**. The second app has the most units among successful
+primary-track production builds (47); unresolved builds are not counted as
+zero. Current plain artifacts have 20/47 units, not the historical isolated
+three-unit blog artifact.
+
+The blog's allocation saving survives, but compilation remains substantial
+and is larger on in these short YJIT windows. Fizzy removes little work and
+has unequal GC mix/large flank variation. Neither establishes saturated-YJIT
+performance or a per-component guard/delivery price; which semantic work YJIT
+eliminates is not isolated. Both also fail retained cold gates; Fizzy's lazy SQL capture and
+terminal-state controls remain incomplete/unequal. No exemptions or rescue
+cohorts. No Puma because the block condition fails; no pass, default,
+quarantine or support promotion. [Preregistration, numbers and diagnosis](passes/sealed-yjit-gate.md).
+
 ## Bet C2 cache breadth: stop at census (2026-10-22)
 Nineteen production routes: Fizzy/Campfire/blog/CASA have zero cached-Marshal objects; CodeTriage has only 7/3/6, all transient at public cache return (2/1/1 internal to individual loads).
 Fizzy/blog use SolidCache; Campfire uses Redis, CASA FileStore, CodeTriage MemCacheStore; none of these measured production boots uses MemoryStore.
