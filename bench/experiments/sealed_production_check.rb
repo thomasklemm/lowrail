@@ -55,7 +55,9 @@ BlogShowGetOnly.validate(seed_dir)
 manifest_file = File.join(app, ".lowrail/manifest.json")
 manifest = JSON.parse(File.read(manifest_file))
 jit = manifest.fetch("certification_jit")
-raise "isolated three-unit interpreter/YJIT artifact required" unless manifest.fetch("units").map { _1.fetch("pass") } == PASSES &&
+passes = manifest.fetch("units").map { _1.fetch("pass") }
+raise "form/token/collection with optional instantiate units required" unless
+  PASSES.all? { passes.count(_1) == 1 } && (passes - PASSES - ["active_record/instantiate"]).empty? &&
   manifest.fetch("files").empty? && manifest.fetch("templates", {}).empty? && %w[interpreter yjit].include?(jit)
 ids = manifest.fetch("units").to_h { [_1.fetch("pass"), _1.fetch("id").to_s] }
 FileUtils.mkdir_p(output, mode: 0o700)
@@ -148,17 +150,19 @@ native = <<~'RUBY'
   Lowrail::Stats.reset_counts!
   50.times { raise "request failed" unless request.call.status == 200 }
   units = Lowrail.manifest.units.to_h { [_1.fetch("pass"), _1.fetch("id").to_s] }
-  hits = units.transform_values { Lowrail::Stats.unit_hits.fetch(_1, 0) }
-  fallbacks = units.transform_values { Lowrail::Stats.unit_fallbacks.fetch(_1, 0) }
+  render_units = units.slice("sealed/form_scaffold", "sealed/token_tag", "sealed/collection_render")
+  hits = render_units.transform_values { Lowrail::Stats.unit_hits.fetch(_1, 0) }
+  fallbacks = render_units.transform_values { Lowrail::Stats.unit_fallbacks.fetch(_1, 0) }
   raise "native coverage failed" unless hits == {"sealed/form_scaffold" => 50, "sealed/token_tag" => 200,
     "sealed/collection_render" => 50} && fallbacks.values.all?(&:zero?)
   before = Lowrail::Stats.unit_hits.dup
   Lowrail::Sealed::EPOCH[0] = 1
   raise "deopt request failed" unless request.call.status == 200
   raise "deopt still hit" unless Lowrail::Stats.unit_hits == before
-  raise "deopt missing" unless units.values.all? { Lowrail::Stats.unit_fallbacks.fetch(_1, 0).positive? }
+  raise "deopt missing" unless render_units.values.all? { Lowrail::Stats.unit_fallbacks.fetch(_1, 0).positive? }
   binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") } or raise "native binary missing"
   puts "PRODUCTION_NATIVE #{JSON.generate(hits: hits, fallbacks: fallbacks, deopt_fallbacks: Lowrail::Stats.unit_fallbacks,
+    all_unit_hits: Lowrail::Stats.unit_hits, all_unit_fallbacks: Lowrail::Stats.unit_fallbacks,
     admissions: runtimes.to_h { [_1.name, _1.admission] }, jit: Lowrail.jit_status,
     native_binary: {binary => Digest::SHA256.file(binary).hexdigest})}"
 RUBY
