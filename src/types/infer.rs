@@ -10,7 +10,7 @@ enum Expr {
     Literal(&'static str),
     Self_,
     Constant(String),
-    Call(Option<Box<Expr>>, String, bool),
+    Call(Option<Box<Expr>>, String, bool, bool),
     Sequence(Vec<Expr>),
     Read(String),
     Write(String, Box<Expr>),
@@ -21,6 +21,10 @@ enum Expr {
 }
 
 fn expression(node: Node<'_>) -> Expr {
+    expression_ref(&node)
+}
+
+fn expression_ref(node: &Node<'_>) -> Expr {
     if node.as_string_node().is_some() {
         Expr::Literal("String")
     } else if node.as_symbol_node().is_some() {
@@ -78,7 +82,7 @@ fn expression(node: Node<'_>) -> Expr {
             Expr::Unknown
         }
     } else if let Some(n) = node.as_hash_node() {
-        if argument(node) {
+        if n.elements().iter().all(|n| n.as_assoc_node().is_some_and(|a| argument(a.key()) && argument(a.value()))) {
             Expr::Hash(n.elements().iter().map(|n| {
                 let pair = n.as_assoc_node().unwrap();
                 (expression(pair.key()), expression(pair.value()))
@@ -87,13 +91,14 @@ fn expression(node: Node<'_>) -> Expr {
             Expr::Unknown
         }
     } else if let Some(n) = node.as_call_node() {
-        if n.block().is_none() && !n.is_safe_navigation()
+        if n.block().is_none()
             && n.arguments().is_none_or(|a| a.arguments().iter().all(argument))
         {
             Expr::Call(
                 n.receiver().map(|r| Box::new(expression(r))),
                 String::from_utf8_lossy(n.name().as_slice()).into(),
                 n.arguments().is_some(),
+                n.is_safe_navigation(),
             )
         } else {
             Expr::Unknown
@@ -106,6 +111,24 @@ fn expression(node: Node<'_>) -> Expr {
 
 fn statements(node: Option<ruby_prism::StatementsNode<'_>>) -> Expr {
     node.map(|n| Expr::Sequence(n.body().iter().map(expression).collect())).unwrap_or(Expr::Literal("nil"))
+}
+
+fn method_body(node: Node<'_>) -> Expr {
+    let Some(body) = node.as_statements_node() else { return expression(node); };
+    let nodes: Vec<_> = body.body().iter().collect();
+    let length = nodes.len();
+    Expr::Sequence(nodes.into_iter().enumerate().map(|(index, node)| {
+        // Only the method's final top-level return is an implicit tail. Never
+        // accept a return in a branch, interpolation, argument or earlier row.
+        if index + 1 == length && let Some(ret) = node.as_return_node() {
+            return match ret.arguments() {
+                None => Expr::Literal("nil"),
+                Some(args) if args.arguments().len() == 1 => expression(args.arguments().iter().next().unwrap()),
+                _ => Expr::Unknown,
+            };
+        }
+        expression(node)
+    }).collect())
 }
 
 // Only accept arguments without unsupported control flow (including a return
@@ -174,7 +197,7 @@ impl<'pr> Visit<'pr> for Index {
             + 1;
         self.defs.insert(
             (line, String::from_utf8_lossy(n.name().as_slice()).into()),
-            n.body().map(expression).unwrap_or(Expr::Literal("nil")),
+            n.body().map(method_body).unwrap_or(Expr::Literal("nil")),
         );
         // Do not mistake macro calls inside method bodies for declarations.
     }
@@ -408,7 +431,8 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
         let mut changes = Vec::new();
         for (id, (expr, location)) in &bodies {
             let sig = &model.methods[id];
-            let mut locals = BTreeMap::new();
+            let mut locals: BTreeMap<_, _> = sig.parameters.iter()
+                .map(|p| (p.name.clone(), p.ty.clone())).collect();
             let ty = evaluate(
                 expr,
                 facts,
@@ -437,6 +461,15 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
             sig.ivars = ivars;
         }
     }
+}
+
+pub(super) fn value(node: &Node<'_>, facts: &Facts, model: &TypeModel, receiver: &str,
+    locals: &BTreeMap<String, Type>) -> Type {
+    let mut ty = evaluate(&expression_ref(node), facts, model, receiver, false, &mut locals.clone())
+        .unwrap_or_else(|| Type::new("untyped", Source::Inference, "unsupported view binding expression"));
+    ty.evidence = if ty.provenance.iter().any(|p| p.source == Source::Observed) { Evidence::Observed }
+        else { Evidence::Static };
+    ty
 }
 
 fn evaluate(
@@ -528,17 +561,19 @@ fn evaluate(
             locals.clear();
             Some(Type::new("untyped", Source::Inference, format!("constant value unavailable: {name}")))
         }
-        Expr::Call(target, name, arguments) => {
+        Expr::Call(target, name, arguments, safe_navigation) => {
+            let mut receiver_provenance = Vec::new();
             let (class, single) = match target.as_deref() {
                 None | Some(Expr::Self_) => (receiver.to_owned(), singleton),
                 Some(Expr::Constant(class)) => {
                     locals.clear(); // autoload/const_missing, even before a zero-argument call
                     (class.clone(), true)
                 }
-                Some(target) => (
-                    evaluate(target, facts, model, receiver, singleton, locals)?.name,
-                    false,
-                ),
+                Some(target) => {
+                    let ty = evaluate(target, facts, model, receiver, singleton, locals)?;
+                    receiver_provenance = ty.provenance;
+                    (ty.name, false)
+                }
             };
             // A call may mutate the receiver's ivars, even when its return
             // type is known. Never carry an exit-ivar proof across it.
@@ -549,13 +584,21 @@ fn evaluate(
             } else {
                 locals.retain(|name, _| !name.starts_with('@'));
             }
+            let nullable_receiver = *safe_navigation && class.ends_with('?');
+            let class = if nullable_receiver { class.trim_end_matches('?').to_owned() } else { class };
             let inherited = resolve(facts, &class, name, single)
                 .and_then(|(owner, method)| model.get(&owner.name, &method.name, method.singleton));
-            let mut ty = model.get(&class, name, single).or(inherited)
+            let mut ty = rails::lookup(facts, &class, name, single, Some(*arguments)).map(|s| s.return_type)
+                .or_else(|| builtins::lookup(facts, &class, name, single))
+                .or_else(|| model.get(&class, name, single).or(inherited)
                 .map(|s| s.return_type.clone())
-                .or_else(|| rails::lookup(facts, &class, name, single, Some(*arguments)).map(|s| s.return_type))
+                )
                 .unwrap_or_else(|| Type::new("untyped", Source::Inference,
                     format!("call contract unavailable: {}", key(&class, name, single))));
+            for p in receiver_provenance {
+                if !ty.provenance.contains(&p) { ty.provenance.push(p); }
+            }
+            if nullable_receiver { ty = union(vec![ty, Type::new("nil", Source::Inference, "safe navigation")]); }
             // Even a literal-returning callee can be replaced at runtime.
             // No call/lookup proof is supplied by this advisory walker.
             ty.evidence = Evidence::Static;

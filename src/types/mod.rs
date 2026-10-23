@@ -1,10 +1,13 @@
 //! Boot-first advisory types. These are not guards and never authorize lowering.
+mod builtins;
 mod infer;
 mod observed;
 mod position;
 mod rails;
+mod references;
 mod rbs;
 mod sorbet;
+mod views;
 #[cfg(test)]
 mod tests;
 
@@ -392,6 +395,14 @@ impl TypeModel {
 
     pub fn type_at_position(&self, facts: &Facts, path: &str, line: u64, column: u64) -> Result<serde_json::Value, String> {
         position::query(self, facts, path, line, column)
+    }
+
+    pub fn callers(&self, facts: &Facts, target: &str) -> Result<serde_json::Value, String> {
+        references::callers(facts, target)
+    }
+
+    pub fn view_locals(&self, facts: &Facts, path: &str) -> Result<serde_json::Value, String> {
+        views::query(self, facts, path)
     }
 
     pub fn export_rbs(&self, facts: &Facts) -> rbs::Export<'_> {

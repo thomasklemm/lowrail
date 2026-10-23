@@ -87,11 +87,14 @@ pub(super) fn lookup(
         .strip_prefix("ActiveRecord::Relation[")
         .or_else(|| receiver.strip_prefix("ActiveRecord::Associations::CollectionProxy["))
         .and_then(|s| s.strip_suffix(']'));
-    let boot_receiver = if element.is_some() {
-        "ActiveRecord::Relation"
-    } else {
-        receiver
-    };
+    let proxy = receiver.starts_with("ActiveRecord::Associations::CollectionProxy[");
+    let specific = element.map(|e| format!("{e}::{}", if proxy {
+        "ActiveRecord_Associations_CollectionProxy"
+    } else { "ActiveRecord_Relation" }));
+    let boot_receiver = specific.as_deref().filter(|name| facts.modules.iter().any(|m| m.name == *name))
+        .unwrap_or(if element.is_some() {
+            if proxy { "ActiveRecord::Associations::CollectionProxy" } else { "ActiveRecord::Relation" }
+        } else { receiver });
     let (owner, method) = resolve(facts, boot_receiver, name, singleton)?;
     if !singleton && name.ends_with('?') && owner.name == format!("{receiver}._enum_methods_module")
     {
@@ -105,6 +108,14 @@ pub(super) fn lookup(
     }
     let record = element.unwrap_or(receiver);
     let relation = format!("ActiveRecord::Relation[{record}]");
+    if proxy && method.owner == "ActiveRecord::Associations::CollectionProxy"
+        && matches!(name, "where" | "order" | "includes" | "joins" | "limit" | "none") {
+        let detail = source(facts, method, "activerecord", "active_record/associations/collection_proxy.rb")?;
+        let mut sig = lookup(facts, &relation, name, false, call_arguments)?;
+        sig.receiver = receiver.into();
+        sig.return_type.provenance.push(Provenance { source: Source::RailsApi, detail });
+        return Some(sig);
+    }
     // View inputs keep their booted shapes without guessing value types.
     let boot_parameters: Vec<_> = method.parameters.iter().filter_map(|p| {
         Some((p.first()?.as_str(), p.get(1).map(String::as_str).unwrap_or("arg"), "untyped"))
@@ -187,6 +198,18 @@ pub(super) fn lookup(
                     else { "active_record/relation/finder_methods.rb" },
                 "bool".into(),
                 &[("opt", "conditions", "untyped")],
+            ),
+            ("ActiveRecord::Relation", "to_a" | "to_ary" | "records") if element.is_some() => (
+                "activerecord", "active_record/relation.rb", format!("Array[{record}]"), &[],
+            ),
+            ("ActiveRecord::FinderMethods", "first" | "last" | "take") if element.is_some() => (
+                "activerecord", "active_record/relation/finder_methods.rb",
+                if call_arguments == Some(false) { nullable(record, true) }
+                    else { format!("({record}? | Array[{record}])") },
+                &[("opt", "limit", "untyped")],
+            ),
+            ("ActiveRecord::FinderMethods", "first!" | "last!" | "take!") if element.is_some() => (
+                "activerecord", "active_record/relation/finder_methods.rb", record.into(), &[],
             ),
             ("ActiveRecord::Querying", "order" | "includes" | "joins" | "limit" | "none")
             | ("ActiveRecord::QueryMethods", "order" | "includes" | "joins" | "limit" | "none") => {
@@ -414,6 +437,7 @@ pub(super) fn support(facts: &Facts) -> Vec<Signature> {
             false,
             &[
                 "order", "includes", "joins", "limit", "none", "find", "find_by", "find_by!", "where", "exists?",
+                "to_a", "to_ary", "records", "first", "last", "take", "first!", "last!", "take!",
             ][..],
         ),
         (

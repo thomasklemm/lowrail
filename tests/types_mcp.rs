@@ -306,7 +306,10 @@ fn real_blog_types_rbs_and_mcp_stdio_round_trip() {
         let response: Value = serde_json::from_str(&line).unwrap();
         assert_eq!(response["id"], id);
         if id == 2 {
-            assert_eq!(response["result"]["tools"].as_array().unwrap().len(), 15);
+            let tools = response["result"]["tools"].as_array().unwrap();
+            for name in ["type_of", "export_rbs", "callers", "view_locals"] {
+                assert!(tools.iter().any(|t| t["name"] == name), "missing {name}");
+            }
         } else if id == 4 {
             assert_eq!(response["result"]["isError"], false);
             let export = &response["result"]["structuredContent"];
