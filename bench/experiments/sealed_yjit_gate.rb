@@ -144,6 +144,11 @@ module SealedYjitGate
       arm: ENV.fetch("LOWRAIL"), requests_ns: samples, wall_ns_per_request: samples.sum.fdiv(10),
       jit_before: jit_before, jit_after: jit_after, gc_before: gc_before, gc_after: gc_after,
       hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks,
+      ar_installed: (Lowrail.manifest&.units || []).filter_map do |unit|
+        next unless unit["pass"] == "active_record/instantiate"
+        klass = Lowrail.loaded_constant(unit.fetch("ar_instantiate").fetch("model"))
+        unit.fetch("id") if klass&.instance_variable_defined?(:@_lowrail_instantiate)
+      end,
       admissions: admissions, refusal: Lowrail.refusal_reason,
       manifest_sha256: Digest::SHA256.file(File.join(config.fetch("artifact"), "manifest.json")).hexdigest}
     File.write(destination, JSON.pretty_generate(record), perm: 0o600)

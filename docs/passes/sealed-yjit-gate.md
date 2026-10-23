@@ -62,6 +62,33 @@ Time box: one working session, at most 90 minutes of setup/selection and
 measurement. Infrastructure failures and unfinished arms are recorded as
 unresolved NO-GO, not zero effect or evidence of no eligible corpus app.
 
+## Frozen selection — before native or instruction timing
+
+**Fizzy, GET /buckets**, is the second app: 47 units in its fresh plain
+production/YJIT build (45 AR instantiate, token, collection). Both render
+units admit and have nonzero hits in the untimed cold companion. Blog has
+20 units (17 AR instantiate, form, token, collection).
+
+The successful primary-track pinned production builds admit: Fizzy 47,
+Campfire 21, CodeTriage 13, Redprints 12, PingCRM 11, Starter 6,
+RubyToolbox 3, Fat Free CRM 1. CASA refuses a missing production master key;
+Writebook refuses the removed `sqlite3_production_warning=` API; Wikino
+requires production domain/AWS settings and PostgreSQL 18 schema support
+(the orb has PostgreSQL 15). These are unresolved builds, not zero units.
+The maximum is among successfully prepared primary-track builds; duplicate
+Rails 8.2-alpha fixture tracks were not surveyed. No app source was patched.
+
+YJIT manifest SHA-256, frozen before timing:
+
+- Blog: `171d9fcaa83510ab517132cae4cdd33131ec05f1ae39531d619181280ad6c5a7`.
+- Fizzy: `5032a2802ff6a1332ba31b0654f571c2c99be93a57139ab577cc6a76be5a8bdc`.
+
+Untimed correctness already rejects both current plain artifacts: on-only
+AR runtime feature loads differ from off; Fizzy also has off/off terminal
+effects differences and unavailable lazy SQL binds. No gates are waived.
+The single planned performance cohorts are retained as diagnostic evidence,
+not accepted speed claims, regardless of their sign.
+
 ## Results
 
 Not measured at preregistration.
