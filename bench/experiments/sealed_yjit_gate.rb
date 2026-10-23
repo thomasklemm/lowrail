@@ -26,6 +26,81 @@ module SealedYjitGate
     files.select { File.file?(_1) }.uniq.sort.to_h { [_1, Digest::SHA256.file(_1).hexdigest] }
   end
 
+  # Untimed, original public artifact only. Reuse the existing fixture's
+  # SQL/value, entropy, load and terminal-completion contracts, not its
+  # historical block-link specimen installer.
+  def cold_worker(config, destination, seed)
+    require File.join(config.fetch("app"), "config/boot")
+    require_relative "fizzy_link_vector"
+    require_relative "campfire_room_companion"
+    require File.join(ROOT, "gem/lib/lowrail/verify_loads")
+    policy = JSON.parse(File.read(config.fetch("entropy_policy")))
+    control = BlogProduction::Entropy.validate(config.fetch("app"), policy: policy)
+    raise control.fetch("reason") unless control.fetch("active")
+    unless seed == "raw"
+      BlogProduction::Entropy.install(policy)
+      SecureRandom.singleton_class.prepend(CampfireRoomCompanion::SessionRandom)
+    end
+    Lowrail::VerifyLoads.install
+    require File.join(config.fetch("app"), "config/application")
+    sql, errors = [], []
+    request_thread = Thread.current
+    ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      binds = payload[:type_casted_binds]
+      if Array === binds
+        sql << {sql: BlogProduction.value(payload[:sql]), binds: BlogProduction.value(binds),
+          name: BlogProduction.value(payload[:name]), cached: !!payload[:cached],
+          row_count: payload[:row_count], affected_rows: payload[:affected_rows],
+          database: payload[:connection]&.pool&.db_config&.name,
+          thread: Thread.current.equal?(request_thread) ? "request" : "other"}
+      else
+        errors << "adapter bind values unavailable (#{binds.class}); not evaluated"
+      end
+    end
+    events = BlogProduction::AppEvents.new
+    ActiveSupport::Notifications.subscribe(/\.(?:action_controller|action_view)\z/, events)
+    completion = FizzyLinkCompletion305.new(config.fetch("state"))
+    Rails.error.subscribe(completion)
+    require File.join(config.fetch("app"), "config/environment")
+    raise "production/YJIT required" unless Rails.env.production? && Lowrail.jit_mode == "yjit"
+    witness = -> {
+      names = %w[Object Kernel BasicObject ActionView::Base ActionView::Template ActionView::CollectionRenderer
+        ActiveRecord::Associations::Preloader ActionView::Helpers::FormHelper ActionView::Helpers::TagHelper]
+      {features: $LOADED_FEATURES.dup, ancestry: names.to_h do |name|
+        holder = Lowrail.loaded_constant(name)
+        [name, holder&.ancestors&.map(&:name)]
+      end}
+    }
+    before = witness.call
+    Lowrail::VerifyLoads.capture("cold_boot")
+    initial = FizzyLinkVector.effects(config.fetch("state"))
+    driver = FizzyLinkVector::Driver.new(config.fetch("state"))
+    events.thread = Thread.current
+    requests = -> {
+      driver.login
+      3.times do |index|
+        raise "GET failed" unless driver.request("GET", config.fetch("path")).status == 200
+        Lowrail::VerifyLoads.capture("request_#{index}")
+      end
+    }
+    _, entropy = seed == "raw" ? [requests.call, nil] : BlogProduction::Entropy.with(Integer(seed),
+      "sealed-yjit-fizzy-cold", requests: 5, wall_clock: true, &requests)
+    events.thread = nil
+    terminal = completion.finish
+    Lowrail::VerifyLoads.capture("completion")
+    runtimes = %w[TokenTag CollectionRender].to_h do |name|
+      runtime = Lowrail.loaded_constant("Lowrail::#{name}")
+      [name, {admission: runtime.admission, refusal: runtime.refusal}]
+    end
+    result = {initial_effects: initial, steps: driver.steps, sql: sql, events: events.events,
+      cold: before, after: witness.call, loads: Lowrail::VerifyLoads.snapshot.fetch("stages"),
+      completion: terminal, completed_effects: terminal.fetch("status") == "completed" ? FizzyLinkVector.effects(config.fetch("state")) : nil,
+      errors: errors, entropy_trace: entropy&.fetch("trace"), entropy_errors: entropy&.fetch("errors"),
+      hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks, runtimes: runtimes,
+      refusal: Lowrail.refusal_reason}
+    File.write(destination, JSON.pretty_generate(result), perm: 0o600)
+  end
+
   def worker(config, destination)
     require File.join(config.fetch("app"), "config/environment")
     require "rack/mock"
@@ -92,7 +167,7 @@ module SealedYjitGate
     env = clean.merge(config.fetch("env", {})).merge("RAILS_ENV" => "production", "RACK_ENV" => "production",
       "BUNDLE_GEMFILE" => File.join(app, "Gemfile"), "BUNDLE_FROZEN" => "true", "LOWRAIL_SEALED" => "1",
       "LOWRAIL_ROOT" => app, "LOWRAIL_DIR" => config.fetch("artifact"), "LOWRAIL_STATS" => nil,
-      "RUBYOPT" => "-I#{ROOT}/gem/lib -rlowrail/setup", "RAILS_LOG_LEVEL" => "fatal")
+      "RUBYOPT" => "-rbundler/setup -I#{ROOT}/gem/lib -rlowrail/setup", "RAILS_LOG_LEVEL" => "fatal")
     blocks = protocol.fetch(:order).map.with_index do |arms, block|
       arms.map.with_index do |arm, position|
         if config["storage_seed"]
@@ -137,6 +212,8 @@ end
 if $PROGRAM_NAME == __FILE__
   if ARGV.first == "worker"
     SealedYjitGate.worker(JSON.parse(File.read(ARGV.fetch(1))), ARGV.fetch(2))
+  elsif ARGV.first == "cold-worker"
+    SealedYjitGate.cold_worker(JSON.parse(File.read(ARGV.fetch(1))), ARGV.fetch(2), ARGV.fetch(3))
   else
     abort "usage: sealed_yjit_gate.rb CONFIG NEW_OUTPUT" unless ARGV.size == 2
     SealedYjitGate.run(JSON.parse(File.read(ARGV.fetch(0))), File.expand_path(ARGV.fetch(1)))
