@@ -28,7 +28,7 @@ Configuration, attaches this controller and shallow-copies **current** option
 values into a fresh mutable Hash. No values, controllers or proc results are
 cached. Values keep their identities, including mutable Strings and lambdas.
 Readers and their callable evaluation stay entirely in Inertia. This is why
-the [memo pass refused the method](memo.md#public-inertia-analogue-and-argos):
+the [memo pass refused the method](memo.md#public-inertia-analogue-and-private-rails-app-with-inertia-rails):
 caching its return would share mutable request-bound state.
 
 Build certificates pin the gem configuration file (audited **3.21.2, 3.22.0,

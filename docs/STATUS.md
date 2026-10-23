@@ -384,12 +384,14 @@ the separate contract; test processes refuse sealed artifacts. See the
   stream, reuse only after full byte equality; no stat-only shortcut or arbitrary
   Inertia-proc memo. RailsVite MD5 and vite_ruby SHA1 intrinsics retain original
   error/glob semantics. Public fixture: 7/7 identical, 65 reuses, no fallbacks.
-  Private-app gates: 10,816 unit/request + 552 system outcomes identical,
-  765/2,849 digest reuses, zero fallbacks. Five YJIT pairs: profile median −14.3%
-  with narrowly separated ranges; overview/list −6.1%/−13.1% remain within
+  [Private Rails app with Inertia Rails](m0/private-inertia-app.md): historical
+  unit/request and browser outcomes identical, nonzero digest reuses, zero
+  fallbacks. Five YJIT pairs: page C median −14.3%
+  with narrowly separated ranges; pages A/B −6.1%/−13.1% remain within
   overlapping noise. More allocations (+21/request), worse p95 tails, full file
   IO and guard limits remain. SQL-trace warnings also reproduce with every unit
   disabled; see the aggregate notes rather than assuming full SQL identity.
+  Guarded digest builds are now refused; this is not current admission.
 - **Runtime gem**: native translate / cache-output / ISeq eval seams, with
   no `load_iseq` definition (preserves Bootsnap and require-hooks/Freezolite
   method chains and adapter selection in every tested order), per-file compiler
@@ -479,11 +481,11 @@ the separate contract; test processes refuse sealed artifacts. See the
   `LOWRAIL=0` a second time and excludes tests whose traces already differ
   between the two off runs (inlined sequence ids, time, randomness). If
   differences remain, the on run is repeated too, so only differences that
-  reproduce in both on runs against two agreeing off runs gate. On a large
-  private app (10,816 tests, serial) the off-repeat-only check still left
-  21 differences with every unit disabled, i.e. rare flakiness; with the
-  symmetric check the same control passes: exit 0, 288 of 10,816 tests
-  excluded as unstable (2.7 %, not SQL-gated), 0 remaining differences,
+  reproduce in both on runs against two agreeing off runs gate. In
+  [Private Rails app with Inertia Rails](m0/private-inertia-app.md), the serial
+  off-repeat-only control still left rare flaky differences with every unit
+  disabled. With the symmetric check the same control passes: exit 0,
+  2.7% of tests excluded as unstable (not SQL-gated), zero remaining differences,
   identical outcomes in all four runs. Campfire: 634 tests, 15,103 queries,
   identical; real-blog: 21 tests, 125 queries, identical.
 - **Build surface** (PLAN 9.4): `lowrail facts` materializes lazy
@@ -503,7 +505,7 @@ the separate contract; test processes refuse sealed artifacts. See the
 |---|---|---|---|
 | real-blog (Rails 8.1.4) | 9/9 `link_to` sites, 10/10 route sites (1 in a controller), 12 units including preload plans | 21/21 identical, 116 fast-path hits across all 12 units (2 preload hits) | 4 HTML routes byte-identical on/off (CSRF masked); request time within noise, allocs −1 to −6 %; `edit_article_path` 2.7 → 1.4 µs |
 | Campfire (Rails 8.2 alpha) | 1/4 `link_to`, 108/162 route sites (51 `_url`) | 634/634 identical (2 skips both ways), 13238 hits across 52 units, 0 fallbacks; with `+preload_plans` 786 preload hits | M0 in `docs/m0/campfire.md`; preload results in [pass notes](passes/preload-plans.md) |
-| ARGOS (private, Rails 8.1.4) | 235/280 route sites + one opt-in digest site, 62 units; `link_to` 0/0 | 10,816 unit/request + 552 system outcomes identical; route 794/226 + digest 765/2,849 hits, zero fallbacks; SQL-trace caveat in notes | [Aggregate measurements](m0/argos.md): digest 298.40 → 129.81 µs; profile −14.3%, overview/list within noise; 14,734 type signatures, 3,053 non-untyped returns |
+| [Private Rails app with Inertia Rails](m0/private-inertia-app.md) | Historical route sites + one opt-in digest site; no eligible `link_to` sites | Unit/request and browser outcomes identical; route/digest hits, zero fallbacks; SQL-trace caveat in notes | Historical digest micro 298.40 → 129.81 µs; page C −14.3%, pages A/B within noise; about 20.7% non-untyped returns. Guarded digest now refused; not current admission |
 | PingCRM (Rails 8.1.4, Ruby 4.0.7) | 30/30 route sites, 4 route units + preload | 26/26 identical, 11 route + 7 preload hits | [Public Inertia M0](m0/inertia.md); seed 41231, browser suite included |
 | Redprints CFP (Rails 8.1.3, Ruby 4.0.7) | 25/27 route sites, 14 route units; 9 Ruby files compiled | 50/50 non-system + 12/12 browser outcomes identical; 25 + 19 fast-path hits, **zero fallbacks** in both runs | Freezolite delivery and dynamic mounted-engine script completion fixed ([loader survey](loaders.md)) |
 | React Starter Kit (Rails 8.1.4, Ruby 4.0.7) | 23/26 route sites, 8 route units + preload | 36/36 identical, 25 route hits across 7 units; no preload hits | [M0](m0/inertia.md) includes healthy SSR HTML and authenticated JSON |
@@ -511,7 +513,8 @@ the separate contract; test processes refuse sealed artifacts. See the
 Public Inertia builds and `observe` completed on all three. Lowrail-off
 production/YJIT baselines and StackProf area shares are in [the M0](m0/inertia.md),
 not speedup claims. All three version digests are eager boot Strings: **zero
-digest calls across 400 traced requests/app**, unlike ARGOS's version proc.
+digest calls across 400 traced requests/app**, unlike the version proc in
+Private Rails app with Inertia Rails.
 Configuration binding and serializer/prop descriptors are measured candidates;
 dynamic users, props, SQL and SSR output must remain per request.
 
@@ -850,4 +853,5 @@ Older follow-ups:
   resolve native YJIT boot/GC sensitivity before claiming request speedups.
 - Broader memo certificates for timeout-sensitive URI work; exact file-digest
   memo now works, but its byte-indexing/read cost remains measurable.
-- Active Record attribute/reflection dispatch (ARGOS, Campfire uncached).
+- Active Record attribute/reflection dispatch (Private Rails app with Inertia
+  Rails, Campfire uncached).

@@ -53,8 +53,9 @@ rendering**, i.e. helpers, partial lookup and HTML building inside Rails.
    per form) are a second tier; some are cacheable per request, not per
    build, and need care around security semantics.
 
-Caveat: real-blog is a scaffold. Campfire and ARGOS (Inertia: JSON props, no
-server-side ERB for pages) will shift the balance toward controllers,
+Caveat: real-blog is a scaffold. Campfire and
+[Private Rails app with Inertia Rails](private-inertia-app.md) (JSON props, no
+server-side ERB for pages in that study) will shift the balance toward controllers,
 serialization and Active Record; M0 is repeated there before choosing M4's
 order.
 

@@ -2,8 +2,9 @@
 
 Measured 2026-10-20 in a Debian 12 x86-64 orb, Ruby **4.0.7 +YJIT** for
 requests, production, **Lowrail off**. The public corpus now covers Vue +
-Jbuilder, React + Alba, and a React starter with SSR. No private ARGOS code,
-credentials or fixtures were used. **These are baselines, not speedups.**
+Jbuilder, React + Alba, and a React starter with SSR. No code, credentials or
+fixtures from [Private Rails app with Inertia Rails](private-inertia-app.md)
+were used. **These are baselines, not speedups.**
 
 Main findings:
 
@@ -13,7 +14,8 @@ Main findings:
 - Redprints runs unchanged on Ruby 4.0.7 despite its `ruby-3.4.3` version file.
   Its Freezolite/require-hooks integration leaves **zero fast-path hits**;
   equivalence proves safe fallback, not specialization coverage.
-- **None of these revisions repeats ARGOS's asset-version digest per request.**
+- **None of these revisions repeats the per-request asset-version digest
+  observed in Private Rails app with Inertia Rails.**
   They assign a digest String at boot, not a version proc. Positive-controlled
   traces of 400 requests per app recorded zero digest calls.
 - Inertia configuration binding/descriptor assembly is a more concrete small
@@ -71,8 +73,9 @@ The starter pin enables SSR (despite its README saying it ships disabled).
 its Puma SSR plugin, so run the renderer separately before preparing headers:
 
 ```sh
+# From the Lowrail repository root; expand the absolute path for the service.
 amp orb service start inertia-react-ssr --port 13714 \
-  --command 'node /home/user/workspace/repo/.corpus/react-starter-kit/ssr/inertia.js'
+  --command "node '$PWD/.corpus/react-starter-kit/ssr/inertia.js'"
 curl --fail http://localhost:13714/health  # status: OK
 ```
 
@@ -265,7 +268,8 @@ String, and each app's 400-request trace (100 HTML + 100 JSON on each route)
 had **zero** calls to those digest methods or `watched_files_digest`.
 The same trace explicitly called the digest once as a positive control and
 saw the expected 3 ViteRuby / 2 RailsVite method events. There is consequently
-no observed request-time asset digest share analogous to ARGOS's 12.8% self.
+no observed request-time asset digest share analogous to the 12.8% self in
+Private Rails app with Inertia Rails.
 
 The APIs differ: ViteRuby hashes watched source inputs, not its manifest.
 [3.10.2](https://github.com/ElMassimo/vite_ruby/blob/vite_ruby%403.10.2/vite_ruby/lib/vite_ruby/builder.rb)
@@ -308,7 +312,8 @@ JSON profiles; entries are **self / inclusive total %** for named Ruby frames
    `Resource#initialize` 0.01 / 0.20%, `transform_key` 0.06 / 0.37%, and
    `Alba.regularize_key` 0.31% self. A guarded serializer plan must preserve
    params, conditional blocks, collection behavior and mutable class metadata;
-   do not memoize user/CFP/proposal values. This is not ARGOS's missing digest.
+   do not memoize user/CFP/proposal values. This is not the repeated digest in
+   Private Rails app with Inertia Rails.
 4. **Database/framework dispatch remains larger.** PingCRM AR self 35.8%
    includes native PG work; authorization (CanCanCan 6.5% self), model
    instantiation/type handling and queries remain per request. Redprints AR

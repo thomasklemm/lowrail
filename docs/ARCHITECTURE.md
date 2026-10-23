@@ -43,7 +43,7 @@ The table and pain points record the pre-migration design.
 | `route/path` (+ `_url`) | source | Rust `src/lower/route.rs` + Ruby oracle | per call site, `Lowrail.ok?` + route facts | on | ~2× per call, request effect in noise |
 | `view/link_to` | source | Rust `src/lower/view.rs` | per call site | on | byte-identical HTML, request effect in noise |
 | `memo/sha256`, `memo/uri_join` | source | Rust `src/lower/memo.rs` + certificate | per call site + bounded cache | opt-in | no net win |
-| `digest/file_memo` | runtime | `exe/lowrail-digest-build` | method variant, byte compare | opt-in | −14 % on one ARGOS page |
+| `digest/file_memo` | runtime | `exe/lowrail-digest-build` | method variant, byte compare | opt-in | historical −14% on one page, [Private Rails app with Inertia Rails](m0/private-inertia-app.md); not current admission |
 | `active_record/preload_plans` | runtime | `exe/lowrail-preload-build` | method variant + structural plan | opt-in | slower uncached |
 | `active_record/instantiate` | runtime | `exe/lowrail-ar-instantiate-build` | per-model variant + AR epoch | opt-in | −38 % load-only on a Rails alpha already fixed upstream |
 | `active_record/ar_plans` | runtime | `exe/lowrail-ar-build` | final-relation plan + AR epoch | opt-in | <0.2 % expected |

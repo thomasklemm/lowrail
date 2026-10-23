@@ -1,134 +1,123 @@
-# Exaktes Memo für Datei-Digests
+# Exact file-digest memo
 
-**Aktueller Status: sealed-only.** Unterdrückte Methoden-Hooks umgehen das
-Digest-Zertifikat trotz unveränderter Dateibytes. Guarded `+digest_memo`
-und alte/gemischte Artefakte werden vollständig abgelehnt; siehe
-[Audit und aktuelle Gates](suppressed-hooks.md). Nur der separate
-[Sealed-Vertrag](../sealed.md) erlaubt Produktionsforschung, keinen Testmodus.
-Die folgenden Guarded-Messungen und Befehle sind historisch.
+**Current status: sealed-only.** Suppressed method hooks bypass the digest
+certificate even when file bytes are unchanged. Guarded `+digest_memo` and
+old/mixed artifacts are refused in full; see the
+[audit and current gates](suppressed-hooks.md). Only the separate
+[sealed contract](../sealed.md) permits production research, not test mode.
+The guarded measurements and commands below are historical.
 
-Stand: 2026-10-20. Passname `digest/file_memo`.
+As of 2026-10-20. Pass name: `digest/file_memo`.
 
-## Grenze und Auslieferung
+## Boundary and delivery
 
-Der Pass ersetzt ausschließlich die Intrinsics
-`Digest::MD5.file(path).hexdigest` und `Digest::SHA1.file(path).hexdigest`
-in `RailsVite::Manifest#digest`/`#watched_files_digest` beziehungsweise
-`ViteRuby::Builder#watched_files_digest`/`#file_digest`, soweit vorhanden.
-Gem-Code wird mit Prism zeilentreu verändert und über den bestehenden
-Compiler-/ISeq-Loader ausgeliefert. Methodennamen, Parameter, Sichtbarkeit,
-die umgebenden Rescues und der übrige Gem-Code bleiben erhalten. Der
-Helper erhält Algorithmus und Argument genau einmal, in Originalreihenfolge;
-bei ungültigem Guard ruft er `algorithm.file(name).hexdigest` auf.
+The pass replaces only `Digest::MD5.file(path).hexdigest` and
+`Digest::SHA1.file(path).hexdigest` intrinsics in
+`RailsVite::Manifest#digest`/`#watched_files_digest` and
+`ViteRuby::Builder#watched_files_digest`/`#file_digest`, where present.
+Prism rewrites gem code while preserving line numbers; the existing
+compiler/ISeq loader delivers it. Method names, parameters, visibility,
+surrounding rescues and remaining gem code are retained. The helper receives
+the algorithm and argument exactly once, in original order; an invalid
+guard calls `algorithm.file(name).hexdigest`.
 
-Es gibt **kein Memo für eine beliebige Inertia-Version-Proc**. Die Proc läuft
-weiter bei jedem ursprünglichen Aufruf. Gem-eigene Globs, Sortierung,
-Verzeichnisfilter, Zeitfenster und bestehende Dateistat-Caches bleiben
-unverändert. Insbesondere macht der Pass den bestehenden mtime/size-Cache
-von vite_ruby nicht strenger oder schwächer: Nur sein tatsächlich erreichter
-SHA1-Dateiaufruf wird spezialisiert.
+There is **no memo for an arbitrary Inertia version proc**. The proc still
+runs at every original call. Gem-owned globs, sorting, directory filters,
+time windows and existing file-stat caches are unchanged. In particular,
+the pass neither strengthens nor weakens vite_ruby's existing mtime/size
+cache: only its actually reached SHA1 file call is specialized.
 
-`gem/exe/lowrail-runtime-build` führt den Digest-Builder zusammen mit allen
-gewählten Runtime-Buildern in einem App-Boot aus. Rust schreibt das gemeinsame
-`units.json` vor dem normalen Compiler. Gem-Dateien bekommen eigene Units, Ledger-Einträge, Source-Hashes
-und Compiler-Fingerprints. Environment-Guard, `LOWRAIL=0`, `LOWRAIL_UNITS`,
-`verify --bisect` und die Bisection-Denylist gelten unverändert. Der eigene
-Install-Block folgt dem Memo-Block; Capture-/Observe-Hooks werden nicht
-verändert.
+`gem/exe/lowrail-runtime-build` runs the digest builder alongside the selected
+runtime builders in one app boot. Rust writes shared `units.json` before
+the normal compiler. Gem files get separate units, ledger entries, source
+hashes and compiler fingerprints. The environment guard, `LOWRAIL=0`,
+`LOWRAIL_UNITS`, `verify --bisect` and bisection denylist remain applicable.
+The digest install block follows the memo block; capture/observe hooks are
+unchanged.
 
-## Was ein Cache-Hit beweist
+## What a cache hit proves
 
-Jeder Aufruf öffnet die Datei erneut mit **`rb`** und liest wie
-`Digest::Instance#file` in **16.384-Byte-Blöcken mit wiederverwendetem
-Read-Buffer** bis EOF. Erst danach wird der vollständige gelesene Byte-String
-mit dem privaten Cache-Eintrag verglichen. Nur vollständige Gleichheit
-erlaubt die Wiederverwendung. Ein Ruby-String-Hash dient lediglich als Index;
-auch bei einer Kollision entscheidet der vollständige Byte-Vergleich.
-Dateiname, Stat-Tupel und ein verkürzter Hash sind **kein** Inhaltsbeweis.
+Every call reopens the file with **`rb`**, reading to EOF like
+`Digest::Instance#file` in **16,384-byte chunks with a reused read buffer**.
+Only then are all read bytes compared with the private cache entry.
+Complete equality is required for reuse. A Ruby String hash is only an
+index: full byte comparison still decides collisions. A filename, stat
+tuple or truncated hash is **not** content proof.
 
-Bei einem Miss wird genau dieser bereits gelesene Stream gehasht, nicht
-eine erneut geöffnete Datei. Cache-Schlüssel, gespeicherte Bytes und
-Hash-Ergebnis sind private Snapshots; das gespeicherte Ergebnis wird
-dupliziert und eingefroren, jeder Hit liefert eine neue veränderbare Kopie
-mit der ursprünglichen US-ASCII-Kodierung. Ein Thread-Wechsel zwischen
-Lesen und Einfügen kann deshalb keinen späteren Dateiinhalt mit einem alten
-Digest verknüpfen.
+A miss hashes that same already-read stream, not a reopened file. Cache
+keys, stored bytes and digest results are private snapshots. The stored
+result is duplicated/frozen; each hit returns a fresh mutable copy with
+the original US-ASCII encoding. A thread switch between reading and cache
+insertion therefore cannot associate later file contents with an old digest.
 
-Pro Unit werden höchstens 32 Einträge bis jeweils 1 MiB gehalten. Größere
-Streams wechseln nach Überschreiten der Grenze auf inkrementelles Hashen
-derselben geöffneten Datei und werden nicht gecacht. Diese Berechnungen,
-kalte Misses und fehlgeschlagene Dateioperationen zählen nicht als Hits.
-Hits zählen tatsächliche Digest-Wiederverwendung; Fallbacks zählen den
-Originalpfad bei Guard-/Eingabeablehnung.
+Each unit retains at most **32 entries of up to 1 MiB each**. Larger streams
+switch to incremental hashing of the same open file after crossing the
+limit and are not cached. These computations, cold misses and failed file
+operations do not count as hits. Hits count actual digest reuse; fallbacks
+count original-path execution on guard/input refusal.
 
-Es gibt **keinen stat-only Modus**, auch nicht implizit als schnelleres Memo.
+There is **no stat-only mode**, including as an implicit faster memo.
 
-## Dateirennen und Fehler
+## File races and errors
 
-Der Vertrag ist ein **Stream-Vertrag**, kein atomarer Dateisnapshot:
+The contract is a **stream contract**, not an atomic file snapshot:
 
-- Umbenennen/Ersetzen oder Entfernen des Pfads während des Lesens ändert
-  den schon geöffneten Deskriptor nicht. Der erste Digest gehört dessen
-  gelesenem Stream; der nächste Aufruf öffnet den dann aktuellen Pfad.
-- Eine In-place-Änderung zwischen zwei Reads kann einen gemischten Stream
-  aus altem Präfix und neuem Rest ergeben, genau wie im ursprünglichen
-  `Digest#file`. Der Cache speichert nur diesen tatsächlich gelesenen Stream;
-  beim nächsten Aufruf werden wieder alle Bytes gelesen und verglichen.
-- Ein zusätzlicher Kontroll-Read oder ein Neuöffnen nach dem Vergleich würde
-  ein anderes Rennen einführen und findet deshalb nicht statt.
-- `ENOENT`, `EACCES`, `EISDIR`, leere Dateien, binäre Inhalte und binär
-  kodierte Pfade laufen durch dieselben nativen Open-/Read-Operationen.
-  Fehlerklassen und Meldungen bleiben erhalten; der ursprüngliche
-  RailsVite-`ENOENT`-Rescue liefert weiter seinen Sentinel.
-- Integer-Dateideskriptoren brauchen keinen Pfad. Der Helper ruft deshalb
-  nicht zusätzlich `File#path` oder eine zweite Pfadkonvertierung auf.
+- Renaming/replacing or removing the path during reading does not change
+  the open descriptor. The first digest belongs to its read stream; the
+  next call opens the then-current path.
+- In-place modification between reads can produce an old prefix and new
+  remainder, just as with original `Digest#file`. The cache stores only
+  that actual stream; the next call rereads and compares every byte.
+- An extra control read or reopen after comparison would introduce a
+  different race and is not performed.
+- `ENOENT`, `EACCES`, `EISDIR`, empty files, binary contents and
+  binary-encoded paths use the same native open/read operations. Error
+  classes/messages remain intact; RailsVite's original `ENOENT` rescue
+  still returns its sentinel.
+- Integer descriptors need no path, so the helper does not additionally
+  call `File#path` or perform a second path conversion.
 
-Wie beim Original kann ein von außen gleichzeitig veränderter Stream von
-Lauf zu Lauf andere Bytes liefern. Es wird weder ein Snapshot versprochen
-noch nachträglich behauptet, das Ergebnis gehöre dem letzten `stat`.
+As in the original, an externally modified stream may yield different bytes
+between runs. No snapshot is promised, nor is the result retrospectively
+claimed to match the last `stat`.
 
-## Guards und Ablehnungen
+## Guards and refusals
 
-Der Build zertifiziert die Ruby-Bodies von `Digest::Class.file` und
-`Digest::Instance#file` anhand ihrer Tokens; ihre Implementierungsdatei wird
-zusammen mit den geladenen nativen Digest-Bibliotheken per SHA-256 gepinnt.
-Zunächst ist nur Digest 3.2.1 zertifiziert. Die übersprungenen Digest-Operationen
-(`new`, Initialisierung, `update`, `hexdigest`, Clone/Copy und `finish`),
-Open/Read, String-Operationen und die eingebaute Pathname-Konvertierung
-bekommen Methoden-Facts; native Digest-Owner müssen den Standard-Ownern
-entsprechen. Auch Array- und Algorithmus-Hash-/Equality-Dispatch des
-Cache-Schlüssels sind gepinnt. Native Aliasse werden über `original_name`
-geprüft: gleicher Owner und `source_location == nil` allein genügen nicht.
-Definition-/Modul-Hooks invalidieren die Unit und sie validiert erneut.
+The build certifies the Ruby bodies of `Digest::Class.file` and
+`Digest::Instance#file` by tokens, SHA-256-pinning their implementation file
+and loaded native digest libraries. Initially only Digest 3.2.1 is certified.
+Skipped digest operations (`new`, initialization, `update`, `hexdigest`,
+clone/copy and `finish`), open/read, String operations and built-in Pathname
+conversion get method facts; native digest owners must match stock owners.
+Array and algorithm hash/equality dispatch for cache keys are pinned too.
+Native aliases are checked through `original_name`: matching owner and
+`source_location == nil` alone are insufficient. Definition/module hooks
+invalidate the unit and trigger revalidation.
 
-Akzeptierte Pfade sind echte Strings, Integer-Deskriptoren und normale
-Pathnames mit einfachem String-Inhalt und zertifizierter Konvertierung.
-Eigene Pfadobjekte/Subklassen bleiben auf dem Originalpfad; deren
-`to_path` darf Effekte haben und wird nicht vorab aufgerufen. Ein abweichender
-lexikalischer Digest-Receiver und ein überschattetes `Digest::File` werden
-ebenfalls nicht umgangen. Der Originalaufruf behält seine Effekte/Fehler.
-Die zertifizierten Digest-Module werden erst nach der ersten erfolgreichen
-Validierung erfasst, nicht vor Bundler aktiviert. Ein späterer Wechsel der
-Namespace-Bindung geht ebenfalls auf den Originalpfad.
-Nicht-Haupt-Ractors verwenden den Originalpfad ohne Zugriff auf nicht
-teilbare Memo-/Stats-Zustände; deren Fallbacks werden nicht mitgezählt.
+Accepted paths are exact Strings, Integer descriptors and ordinary Pathnames
+with plain String contents and certified conversion. Custom path objects
+and subclasses stay original: their `to_path` can have effects and is not
+called early. A different lexical digest receiver or shadowed `Digest::File`
+is not bypassed. Original calls retain effects/errors. Certified digest
+modules are captured only after first successful validation, not activated
+before Bundler. Later namespace rebinding also falls back. Non-main Ractors
+use the original path without accessing unshareable memo/stats state; their
+fallbacks are not counted.
 
-Veränderte Ruby-Digest-Bodies, nicht-native/anders aliasierte Primitiven,
-angepasste Pfadkonvertierung, Refinements, mehrzeilige Intrinsics und
-denylistete Dateien werden konservativ abgelehnt. Unbekannte Ausdrucksformen
-werden nicht ersetzt. Die allgemeinen Guard-Grenzen bleiben bestehen:
-Definition-Hooks ohne `super`, reine Visibility-Änderungen, Refinements aus
-anderem Code, C-seitiges Metaprogramming und ISeq-/Stack-Inspektion werden
-nicht zu einem neuen Sicherheitsversprechen. Methoden müssen wie bei
-anderen Call-Site-Guards während eines einzelnen Intrinsics stabil bleiben;
-gleichzeitiges Monkeypatching mitten in einem IO-Read ist kein zertifiziertes
-Synchronisationsprotokoll.
+Changed Ruby digest bodies, non-native/differently aliased primitives,
+customized path conversion, refinements, multiline intrinsics and denylisted
+files are conservatively refused. Unknown expression shapes are not replaced.
+The general guard limitations remain: definition hooks without `super`,
+visibility-only changes, refinements from other code, C metaprogramming and
+ISeq/stack inspection do not acquire a new safety guarantee. As with other
+call-site guards, methods must stay stable during one intrinsic; monkeypatching
+concurrently inside an IO read is not a certified synchronization protocol.
 
-## Öffentliche Fixture und ausführbare Gates
+## Public fixture and executable gates
 
-`fixtures/digest-app` ist eine kleine Rails-App ohne Datenbank/JS-Build mit
-rails_vite 0.3.0, inertia_rails 3.22.0 und vite_ruby 3.11.1. Ihre Inertia-Version
-ist eine lazy Proc. Keine privaten Anwendungssourcen werden benötigt.
+`fixtures/digest-app` is a small public Rails app without a database/JS build,
+using rails_vite 0.3.0, inertia_rails 3.22.0 and vite_ruby 3.11.1. Its Inertia
+version is a lazy proc. No private application source is needed.
 
 ```sh
 cargo build --release
@@ -139,30 +128,27 @@ target/release/lowrail build fixtures/digest-app --passes default,+digest_memo
 target/release/lowrail verify fixtures/digest-app --bisect -- bin/rails test --seed 1729
 ```
 
-Die Fixture prüft Binärdaten und Ergebnis-Mutierbarkeit, gleiche Länge mit
-wiederhergestellter mtime, fehlende/wiederangelegte/leere/unlesbare Dateien,
-Verzeichnisfehler, Integer-Deskriptoren und Pfadkodierung. TracePoint-Proben
-ersetzen/überschreiben/entfernen eine Datei exakt nach dem ersten Read;
-eine andere Probe entfernt einen Treffer nach Glob-Expansion. Zeitreise
-prüft Globs samt Reihenfolge und bestehendem Zeitfenster. Die Inertia-Seite
-prüft neue Versionen und den 409-Location-Response für veraltete Clients.
-EACCES wird nur geprüft, wenn der laufende Nutzer tatsächlich keinen
-Lesezugriff hat; root kann Modus 0000 lesen.
+The fixture checks binary data/result mutability, equal length with restored
+mtime, missing/recreated/empty/unreadable files, directory errors, Integer
+descriptors and path encoding. TracePoint probes replace/overwrite/remove a
+file exactly after the first read; another removes a match after glob
+expansion. Time travel checks glob order and the existing time window. The
+Inertia page checks changed versions and the 409 Location response for stale
+clients. EACCES is checked only when the running user actually lacks read
+access; root can read mode 0000.
 
-Ergebnis: **7/7 identisch, 71 Assertions je Modus, 65 Hits** (52 MD5,
-13 SHA1), **0 Fallbacks**, keine Skips. Der Gem-Test prüft außerdem das
-Opt-in, absichtliche Clone-/Native-Alias-Overrides, eigene Pfadkonvertierung
-und lexikalisches Digest-Shadowing sowie einen Namespace-Wechsel. Ein eigener
-Algorithmus-`hash`, den der Originalaufruf nicht verwendet, darf ebenfalls nicht
-ausgeführt werden.
-Ohne dessen Methoden-Fact scheitert dieselbe öffentliche Probe mit einer
-zusätzlichen Exception; mit vollständigem Zertifikat liefert sie den
-Original-Digest. Dort sind die sechs gezählten Fallbacks gewollte
-Negativkontrollen; nach Wiederherstellung muss das Memo wieder treffen.
-Eine weitere Probe prüft den nativen Originalpfad in einem zweiten Ractor.
-Eine lexikalisch verfeinerte Methode wird am `using`-AST abgelehnt, auch wenn
-der Aufruf nach einem Semikolon steht; ihre abweichende Rückgabe bleibt erhalten.
+Result: **7/7 identical, 71 assertions/mode, 65 hits** (52 MD5, 13 SHA1),
+**zero fallbacks, no skips**. Gem tests also check opt-in, intentional
+clone/native-alias overrides, custom path conversion, lexical digest
+shadowing and namespace replacement. A custom algorithm `hash` that the
+original call does not use must not execute either. Without its method
+fact, the same public probe raises an extra exception; the complete
+certificate returns the original digest. Six counted fallbacks there are
+intentional negative controls; memo hits must resume after restoration.
+Another probe checks the native original path in a second Ractor. A
+lexically refined method is refused at its `using` AST even after a
+semicolon; its differing return is preserved.
 
-Aggregate Messungen der privaten Anwendung folgen in
-[M0 ARGOS](../m0/argos.md); nur aggregierte Zahlen, keine Anwendungssourcen,
-Klassen-, Datei- oder Testnamen.
+Aggregate historical measurements are in
+[Private Rails app with Inertia Rails](../m0/private-inertia-app.md); no application source,
+class/file/test names or dependency inventory is published there.

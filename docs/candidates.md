@@ -409,8 +409,9 @@ fully-literal price. This narrower census materially changes its priority.
   neither that draft nor its request deltas are a new exact Lowrail candidate.
 - **Asset digests:** all three public Inertia apps use eagerly computed String
   versions, **zero request-time digest calls in the existing 400-request
-  positive-controlled traces**. ARGOS's private −14% page is not an opportunity
-  measured in these five apps. Do not change their initializers to create one.
+  positive-controlled traces**. The historical −14% page in
+  [Private Rails app with Inertia Rails](m0/private-inertia-app.md) is not an
+  opportunity measured in these five apps. Do not change their initializers to create one.
 - **Preload/instantiate/attribute slots:** repeat the existing negative controls,
   not Roundhouse's older positive pin. Preload regressions are real; Rails 8.1
   already caches the builder that helped the 8.2 alpha load-only micro;

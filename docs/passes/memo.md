@@ -141,7 +141,7 @@ The targeted-tracing test failed before the tracing fix. The independent
 SHA-256 expected value is the published `abc` test vector, not a value
 computed by the memo under test.
 
-## Public Inertia analogue and ARGOS
+## Public Inertia analogue and Private Rails app with Inertia Rails
 
 The fixture `tests/fixtures/memo/inertia_version.rb` uses inertia_rails 3.23.0's
 lazy `config.version = -> { ViteRuby.digest }` with ViteRuby 3.11.1. Its real
@@ -157,8 +157,9 @@ and [Redprints CFP](https://github.com/evilmartians/redprints-cfp/blob/6080fc24f
 assign `ViteRuby.digest`; the
 [React Starter Kit](https://github.com/inertia-rails/react-starter-kit/blob/f8081935e9bda68f8ef1ec53dc7eed19c819ee68/config/initializers/inertia_rails.rb)
 assigns `RailsVite.digest`. These produce Strings at boot, not request-time
-lambdas, so those pins are **negative controls**, not evidence of ARGOS's
-12.8% request-time digest pattern. The separate
+lambdas, so those pins are **negative controls**, not evidence of the
+12.8% request-time digest pattern in
+[Private Rails app with Inertia Rails](../m0/private-inertia-app.md). The separate
 [public corpus investigation](../m0/inertia.md#version-digest-an-important-negative-control)
 reports **400 authenticated requests per app**, zero version-digest calls,
 and 2–3 expected trace events when explicitly invoking each digest as a positive
@@ -177,11 +178,12 @@ boot-fixed memo result; encountered calls are refused in the ledger. A guarded
 allocation/options-construction plan could be a separate optimization, not
 permission to cache controller-bound objects. No speedup is claimed for it.
 
-ARGOS is unavailable and was not built or verified. A future certificate for
-its actual manifest reader must establish file inputs/content identity,
+Private Rails app with Inertia Rails was unavailable to this memo-pass
+investigation and was not built or verified by it. A future certificate for
+the actual manifest reader must establish file inputs/content identity,
 reader/digest method owners, configuration and fresh-return semantics. An
 arbitrary Inertia version proc cannot qualify from its name or observed result.
-This pass does **not** yet replace file digest calls or specialize that private
+This pass does **not** yet replace file digest calls or specialize that
 method; implementation-file fingerprints are not data-file memo support.
 
 ## Request measurements

@@ -42,6 +42,17 @@ observer's recovery, not the ceiling of a wider sampler or caller analysis.
 and name, type, sample histogram, provenance, cap, facts/output hashes, suite
 exit status, and counts of runtime methods outside the fixed universe.
 
+Only display paths in `detail` strings are made repo-relative. Reproduce
+that publication step from the generated argument ledger with:
+
+```sh
+jq -a 'walk(if type == "object" and (.detail? | type) == "string"
+  then .detail |= gsub("/home/user/workspace/repo/"; "")
+  else . end)' arguments-ledger.json > docs/types-contracts-coverage.json
+```
+
+Recorded commands, hashes, samples and every other field remain unchanged.
+
 ## Generic contracts, not app-specific guesses
 
 The bounded catalog now describes ActionView's TagHelper, CaptureHelper and

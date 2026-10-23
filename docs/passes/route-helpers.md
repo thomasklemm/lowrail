@@ -280,8 +280,9 @@ helper overridden in that class, probe mismatch.
 ## Results (2026-10-20, Ruby 4.0.7)
 
 The real-blog/Campfire timings and hit counts below predate the dynamic finishing
-change. They are not a performance claim for the new implementation; the private
-app iteration and its new timings are recorded in [ARGOS M0](../m0/argos.md).
+change. They are not a performance claim for the new implementation; further
+historical timings are recorded in
+[Private Rails app with Inertia Rails](../m0/private-inertia-app.md).
 
 | App | Route sites lowered | Units | `lowrail verify` |
 |---|---|---|---|

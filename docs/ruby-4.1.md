@@ -255,7 +255,7 @@ change **only the disposable locks**, so do not compare them to unchanged
 
 ```sh
 # From gem/, with an absolute path to the prepared disposable corpus:
-export LOWRAIL_TEST_CORPUS_ROOT=/home/user/workspace/repo/.corpus/ruby41-source
+export LOWRAIL_TEST_CORPUS_ROOT="$(realpath ../.corpus/ruby41-source)"
 mise exec ruby@4.1.0-preview1 -- rake test
 # Back at the repository root, retaining the same environment:
 mise exec ruby@4.1.0-preview1 -- cargo test

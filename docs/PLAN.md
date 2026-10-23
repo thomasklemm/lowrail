@@ -260,7 +260,8 @@ are tracked over time.
 
 ## 9. Strategy after M0 (2026-10-20)
 
-Inputs: M0 on real-blog, Campfire and ARGOS (`docs/m0/`), and Roundhouse's
+Inputs: M0 on real-blog, Campfire and
+[Private Rails app with Inertia Rails](m0/private-inertia-app.md), and Roundhouse's
 `futamura` and `fractal` targets, which specialize Rails *inside* Rails:
 
 - In-Rails specialization has a ceiling. Futamura's query-chain
@@ -278,7 +279,8 @@ Decisions:
    replacement is an optional later mode for Ruby 4.1+, not the base design.
 2. **Passes are chosen by measured cost**, in this order:
    a. per-request work on boot-fixed inputs, memoized under a guard on its
-      inputs (ARGOS asset-version digest 12.8 % self; Campfire importmap/CSP
+      inputs (Private Rails app with Inertia Rails: asset-version digest
+      12.8% self; Campfire importmap/CSP
       URL work 34.8 % inclusive on cached pages);
    b. Active Record plans computed once (preload trees, association scopes,
       attribute/type dispatch), following futamura's measured preload win;

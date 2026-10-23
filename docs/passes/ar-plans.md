@@ -23,8 +23,9 @@ use SQLite. Campfire uses local Redis and `PARALLEL_WORKERS=1`.
 Production Rack requests, 200 warmups/route, four seconds/route for the
 baseline, then a **separate** StackProf wall profile at 100 µs. Campfire
 response caching is disabled with `CAMPFIRE_RESPONSE_CACHE_MB=0` throughout.
-The Inertia app is PingCRM, not the inaccessible private app mentioned in
-the original motivation.
+The Inertia app is PingCRM, not
+[Private Rails app with Inertia Rails](../m0/private-inertia-app.md), which
+was inaccessible to this investigation.
 
 Percent of all raw samples, not percent of AR time:
 
