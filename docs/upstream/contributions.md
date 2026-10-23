@@ -4,6 +4,7 @@ These are scoped upstream changes, not extra Lowrail request prices or whole-app
 
 **Checked on 2026-10-22:** every merged/open label below was verified with
 `gh pr view`, including the PR body and GitHub's merge commit when merged.
+Later checks are dated on the individual entries.
 Numbers summarize the linked PR's own evidence, not new measurements.
 Allocation reductions, instruction counts, fallback diagnostics and helper
 microbenchmarks are not interchangeable with request latency or throughput.
@@ -11,9 +12,10 @@ Where a PR reports no performance measurement, none is inferred here.
 
 Coverage: public PRs by `thomasklemm` opened October 19–22, plus the older
 Campfire work below. Roundhouse compiler work and a review of another
-author's Mail PR are listed separately. Closed superseded PRs are omitted.
+author's Mail PR are listed separately. Closed superseded PRs are omitted
+except for the consolidation note below.
 
-[Merged](#merged) · [Open](#open) · [Campfire maintenance](#campfire-maintenance) ·
+[Merged](#merged) · [Closed](#closed) · [Open](#open) · [Campfire maintenance](#campfire-maintenance) ·
 [Reviews](#reviews) · [Roundhouse](#roundhouse) ·
 [Investigated, not submitted](#investigated-not-submitted)
 
@@ -44,18 +46,22 @@ These performance-related PRs were opened before the October 19–22 census.
 - [#337](https://github.com/basecamp/once-campfire/pull/337), serve bot-page totals from SQLite-maintained `rooms.messages_count`, including bulk/foreign writers — removes the per-page messages `COUNT(*)`; **no measured speedup in the PR body**. This is the trigger-based revision, not the superseded callback counter cache. [Merge fd49099](https://github.com/basecamp/once-campfire/commit/fd490997290b930585b54aa87bde2a7ce1c69204).
 - [#339](https://github.com/basecamp/once-campfire/pull/339), move SQLite WAL checkpoints off the request thread to an elected writer with a dedicated connection — **250 ms** PASSIVE loop, unchanged journal mode/`synchronous=NORMAL`; configuration/design evidence, **no benchmark number in the PR body**. [Merge e55b6dc](https://github.com/basecamp/once-campfire/commit/e55b6dc3e534e6dd884eb74eac387fd576c3e6a9).
 
+## Closed
+
+- **Closed unmerged; checked on 2026-10-23:** [ruby/ruby#19478](https://github.com/ruby/ruby/pull/19478), ZJIT empty keyword-rest direct sends, closed in favor of [#19488](https://github.com/ruby/ruby/pull/19488), which carries both commits, at [k0kubun's suggestion](https://github.com/ruby/ruby/pull/19478#issuecomment-6353913049). This is consolidation, not a merge; the historical microbenchmark remains in the closed PR.
+
 ## Open
 
-All entries in this section are **open, not merged; checked on 2026-10-22**.
+All entries in this section are **open, not merged; checked on 2026-10-22**
+unless a later check is noted inline.
 
 ### Ruby — ruby/ruby
 
-- [#19478](https://github.com/ruby/ruby/pull/19478), ZJIT direct sends with empty keyword rest — warmed **2M-call micro 109.75 → 29.42 ms (−73.2%)**, kwrest fallbacks **2,000,000 → 0**, allocations unchanged at **2,000,007**, A/A elapsed **+0.9%**; fallback counts are separate untimed runs, not application speed evidence.
 - [#19483](https://github.com/ruby/ruby/pull/19483), guard ZJIT protected sends with runtime caller `self` — earlier stacked prototype permission fallbacks/request **87 → 1** blog, **353 → 9** Fizzy; inherited-options micro ZJIT **−36.45% [−38.75, −34.95]**, but YJIT **+3.61% [+1.26, +6.80]**. Not measurements of this independently master-based PR binary; no master-alone or whole-app speed claim.
 - [#19484](https://github.com/ruby/ruby/pull/19484), allow Proc arguments for explicit block parameters in ZJIT — **27 final send fallbacks/request removed in Fizzy, none in the blog**; earlier Arel-style forwarding micro ZJIT **−61.41% [−63.78, −59.53]**, interpreter **+1.75% [+0.03, +3.67]**, YJIT unresolved. Nine unrelated yield fallbacks remain; no request-throughput claim.
 - [#19485](https://github.com/ruby/ruby/pull/19485), prevent ZJIT send counters accumulating across specialization retries — repro counters **[18, 18, 9] → [9, 9, 9]**, deeper inlining **[27, 27, 9] → [9, 9, 9]**; diagnostics fix, not fewer executed sends. Without stats, normalized HIR/main-path disassembly is unchanged; no performance claim.
 - [#19487](https://github.com/ruby/ruby/pull/19487), compile YJIT `super` on Class/Module receivers — untimed singleton-super fallbacks/request **141 → 13** blog, **300 → 16** Fizzy; dynamic dispatch attempts **616 → 488 / 1,304 → 1,020**. Escaping micro: **352 fewer Ir/call (32.20% of marginal work)** and **23.12% less YJIT time [−29.82, −17.35]%**, not whole-request speed. Class/module graph retention remains; ordinary singleton receivers stay refused.
-- [#19488](https://github.com/ruby/ruby/pull/19488), literal keyword-rest direct sends in ZJIT, dependent on #19478 — **2M-call mean 266.28 → 134.88 ms**, kwrest fallbacks **2,000,000 → 0**, allocations unchanged; paired **−48.85% [−52.28, −46.00]**, with ZJIT A/A drift **−5.18% [−10.49, −0.84]** and interpreter elapsed **+3.95% [+0.36, +7.63]**. Diagnostic request counter increments **62 → 31** blog, **343 → 88** Fizzy, not unique calls or whole-app speed; measured windows each compiled two ISeqs.
+- [#19488](https://github.com/ruby/ruby/pull/19488), ZJIT empty/literal keyword-rest direct sends, carrying both commits after #19478 closed — **open; checked on 2026-10-23**. Earlier literal-kwrest **2M-call mean 266.28 → 134.88 ms**, kwrest fallbacks **2,000,000 → 0**, allocations unchanged; paired **−48.85% [−52.28, −46.00]**, with ZJIT A/A drift **−5.18% [−10.49, −0.84]** and interpreter elapsed **+3.95% [+0.36, +7.63]**. These wall-time results predate the assertion-only amendment and were not repeated. Diagnostic request counter increments **62 → 31** blog, **343 → 88** Fizzy, not unique calls or whole-app speed; measured windows each compiled two ISeqs. The [headline benchmark reply](https://github.com/ruby/ruby/pull/19478#issuecomment-6354265907) covers all **16 ruby-bench headline workloads** in the #19478 empty-kwrest-only comparison: removed fallbacks **263 → 0** Lobsters, **1,987 → 0** Railsbench, **504 → 0** RuboCop, **320 → 0** Shipit, for one measured iteration after five warmups. Every measured empty/literal kwrest category is **below 0.02% of base JIT sends**; **no headline timing was run and no headline speedup is claimed**. These are not new combined-PR measurements.
 - [#19492](https://github.com/ruby/ruby/pull/19492), count YJIT dynamic sends before dispatch — for **1,000** raising, throwing or block-break sends, counter **0 → 1,000**; normal-return control **1,000 → 1,000** and results unchanged. Corrects attempt diagnostics only; **no performance claim**.
 
 ### Importmap — rails/importmap-rails
