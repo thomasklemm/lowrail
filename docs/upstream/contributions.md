@@ -215,6 +215,8 @@ on main.
 
 - **JIT differential run (2026-11-02):** Rails 8.1.4 and Rails main component suites, plus the Campfire, Writebook and Fizzy suites, ran on ruby/ruby master `e83592ba14` under the interpreter and 17 ZJIT/YJIT modes (low thresholds, inline 0/500, small code memory, auto-compaction), with per-test outcomes compared. There were 503 runs. Only one new divergence was found: YJIT raises `Ractor::IsolationError` while compiling a singleton-class guard from a non-main Ractor (fork branch `thomasklemm/ruby:yjit-attached-object-ractor`). Two known divergences were not resubmitted: Shopify/ruby#976 (fixed by open ruby/ruby#18960, verified) and Bug #22419 (an interpreter crash too). Active Storage needs service credentials and was not run, and Railties was not attempted.
 
+- **YJIT/ZJIT empty anonymous rest (2026-11-02), held:** the interpreter passes a shared frozen empty Array to an anonymous `*` that receives nothing (43683e1e9d); YJIT `gen_send_iseq` and ZJIT master `plan_send_direct_rest_parameter` allocate a new one per call. This explains the YJIT-only Arrays at `Relation.create(model, ...)`, `SQLString#initialize(*)` and `capture(*, **, &block)`. Fork branch `thomasklemm/ruby:jit-anon-rest-empty-frozen` (`f224bff8f8`, YJIT + ZJIT commits with tests, mirroring merged #9972). ruby-bench allocations: YJIT shipit −1.10%, lobsters −0.56%, railsbench −0.12%; timing within A/A on 16 headline workloads, GC count unchanged, estimated shipit effect ≈0.02%. Below the 0.1% bar as a performance PR; only a parity submission is possible. Separate lead: `where!(opts, *rest)` called with a splat allocates 2 Arrays under YJIT vs 1 in the interpreter.
+
 ## Updating this ledger
 
 Read the current body and state, not only a search result or an old receipt:
