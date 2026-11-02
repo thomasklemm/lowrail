@@ -1,0 +1,416 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Rails allocation census: one entry point for every round. See docs/upstream/census.md.
+#   script/census setup    --rails SPEC [--ruby R] [--apps LIST]
+#   script/census run      --label L [--rails SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST]
+#   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2]
+#   script/census compare  --base L [--aa L0] [--detail] [--markdown] LABEL...
+#   script/census controls --script FILE [--app blog] [--modes ...] BASE LABEL...
+#   script/census prs      --label L [--mode interp] [--top N] [--refresh]
+#   script/census list     [--apps LIST] [--ruby R]
+# SPEC is [OWNER/REPO@|/local/rails/repo@]REF (default repo rails/rails), REF a
+# branch, tag or commit. R is a mise Ruby version or a path to a ruby binary or
+# its bin directory. Common options: --corpus NAME (app copies in
+# .corpus/NAME-APP, default census), --out DIR (default .lowrail/private/census).
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "socket"
+require "time"
+require_relative "../bench/upstream/census/rank"
+require_relative "../bench/upstream/census/compare"
+
+module Census
+  ROOT = File.expand_path("..", __dir__)
+  HARNESS = File.join(ROOT, "bench/upstream/census/harness.rb")
+  OVERLAYS = File.join(ROOT, "fixtures/corpus/rails-main-census-4")
+  MODES = { "interp" => "interpreter", "interpreter" => "interpreter", "yjit" => "yjit", "zjit" => "zjit" }.freeze
+  FLAGS = { "interpreter" => [], "yjit" => ["--yjit"], "zjit" => ["--zjit"] }.freeze
+  PG = { "DATABASE_ADAPTER" => "postgresql" }.freeze
+
+  # Census 4's nine apps (fizzy runs on two adapters). source: script/corpus name;
+  # bare: fetch without script/corpus's own overlay, because the census overlay
+  # applies to the pristine pin. Only blog and campfire were re-run through this
+  # command; the others carry census 4/5's recorded setup.
+  APPS = {
+    "blog" => { source: "real-blog-r4" },
+    "campfire" => { source: "campfire", services: %w[redis] },
+    "writebook" => { source: "writebook-r82", bare: true, services: %w[redis] },
+    "fizzy" => { source: "fizzy-r82", bare: true },
+    "fizzy-mysql" => { source: "fizzy-r82", bare: true, overlay: "fizzy", services: %w[mysql],
+      env: { "DATABASE_ADAPTER" => "mysql", "MYSQL_USER" => "root", "MYSQL_HOST" => "127.0.0.1", "MYSQL_PORT" => "3307" } },
+    "codetriage" => { source: "codetriage", services: %w[postgresql memcached redis], env: PG,
+      database_yml: "config/database.example.yml" },
+    "pingcrm" => { source: "pingcrm", services: %w[postgresql], env: PG, build: [%w[bun install --frozen-lockfile]] },
+    "redprints-cfp" => { source: "redprints-cfp", build: [%w[bun install --frozen-lockfile]] },
+    "react-starter-kit" => { source: "react-starter-kit", build: [%w[npm ci --no-audit --no-fund]],
+      after_assets: [%w[npx vite build --ssr]] },
+    "lobsters" => { source: "lobsters", database_yml: "config/database.yml.sample" },
+  }.freeze
+  SERVICES = { "redis" => 6379, "memcached" => 11211, "mysql" => 3307 }.freeze
+
+  module_function
+
+  def sh(env, *cmd, chdir: ROOT, log: nil)
+    puts "+ #{cmd.join(" ")}#{" (in #{chdir.delete_prefix(ROOT + "/")})" if chdir != ROOT}"
+    opts = { chdir: chdir, exception: true }
+    opts.merge!(out: log, err: %i[child out]) if log
+    system(env, *cmd, **opts)
+  end
+
+  def capture(*cmd, **opts)
+    out, status = Open3.capture2(*cmd, **opts)
+    raise "#{cmd.join(" ")} failed" unless status.success?
+    out.strip
+  end
+
+  def mise = ENV.fetch("MISE", File.executable?(File.expand_path("~/.local/bin/mise")) ? File.expand_path("~/.local/bin/mise") : "mise")
+
+  # Ruby: a bin directory, a ruby executable, or a mise version (installed on demand).
+  def ruby_bin(spec)
+    return spec if File.executable?(File.join(spec, "ruby"))
+    return File.join(spec, "bin") if File.executable?(File.join(spec, "bin/ruby"))
+    return File.dirname(File.expand_path(spec)) if File.file?(spec) && File.executable?(spec)
+    system(mise, "install", "ruby@#{spec}", exception: true)
+    File.join(capture(mise, "where", "ruby@#{spec}"), "bin")
+  end
+
+  def ruby_description(bin) = capture(File.join(bin, "ruby"), "-e", "print RUBY_DESCRIPTION")
+
+  # [OWNER/REPO@|/path@]REF -> source, ref and commit.
+  def resolve_rails(spec)
+    repo, ref = spec.include?("@") ? spec.split("@", 2) : ["rails/rails", spec]
+    if repo.start_with?("/")
+      sha = capture("git", "-C", repo, "rev-parse", "--verify", "#{ref}^{commit}")
+      return { "spec" => spec, "source" => %(git: "#{repo}"), "ref" => ref, "sha" => sha }
+    end
+    sha = ref if ref.match?(/\A\h{40}\z/)
+    sha ||= capture("git", "ls-remote", "https://github.com/#{repo}.git", "refs/heads/#{ref}", "refs/tags/#{ref}", ref)
+      .lines.first&.split&.first
+    raise "cannot resolve #{spec}" unless sha
+    { "spec" => spec, "source" => %(github: "#{repo}"), "ref" => ref, "sha" => sha }
+  end
+
+  def app_dir(corpus, app) = File.join(ROOT, ".corpus", "#{corpus}-#{app}")
+
+  def state(corpus, app)
+    path = File.join(app_dir(corpus, app), ".census.json")
+    raise "#{app}: no census copy; run script/census setup first" unless File.exist?(path)
+    JSON.parse(File.read(path))
+  end
+
+  def env_for(app, bin, rails, gemfile, frozen: true)
+    raise "unset database overrides before using disposable copies" if ENV.keys.any? { _1.end_with?("DATABASE_URL") }
+    { "PATH" => "#{bin}:#{ENV.fetch("PATH")}", "BUNDLE_GEMFILE" => gemfile, "BUNDLE_FROZEN" => frozen.to_s,
+      "RAILS_ENV" => "production", "RACK_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1",
+      "RAILS_LOG_LEVEL" => "fatal", "SKIP_TELEMETRY" => "1", "APP_VERSION" => "census", "APP_HOST" => "localhost",
+      "RUBYOPT" => nil, "RUBY_YJIT_ENABLE" => "0", "RUBY_ZJIT_ENABLE" => "0", "GEM_HOME" => nil, "GEM_PATH" => nil,
+      "CENSUS_RAILS_SHA" => rails.fetch("sha"), "DISABLE_DATABASE_ENVIRONMENT_CHECK" => "1" }
+      .merge(APPS.fetch(app).fetch(:env, {}))
+  end
+
+  # The app's census Gemfile with Rails at this commit (and no ruby pin, so the
+  # Ruby is a parameter), bundled for this Ruby. Identical commits share one.
+  def variant(corpus, app, rails, bin)
+    dir = app_dir(corpus, app)
+    gemfile = File.join(dir, "Gemfile.census-#{rails.fetch("sha")[0, 12]}")
+    unless File.exist?(gemfile)
+      lines = File.readlines(File.join(dir, "Gemfile"))
+      pins = lines.each_index.select { lines[_1].match?(/\A\s*gem "rails",/) }
+      raise "#{app}: expected one gem \"rails\" line, found #{pins.size}" unless pins.one?
+      lines[pins.first] = %(gem "rails", #{rails.fetch("source")}, ref: "#{rails.fetch("sha")}"\n)
+      File.write(gemfile, lines.grep_v(/\Aruby\b/).join)
+      FileUtils.cp(File.join(dir, "Gemfile.lock"), gemfile + ".lock")
+    end
+    env = env_for(app, bin, rails, gemfile, frozen: false)
+    system(env, "bundle", "check", chdir: dir, out: File::NULL, err: File::NULL) ||
+      sh(env, "bundle", "install", "--quiet", chdir: dir)
+    gemfile
+  end
+
+  # Dependency control: a variant's lock may differ from the base lock only in
+  # the Rails source block and the Ruby version.
+  def lock_outside_rails(path)
+    File.read(path).split(/\n{2,}/).reject { _1.start_with?("RUBY VERSION") || (_1.start_with?("GIT") && _1.match?(/^    rails \(/)) }
+  end
+
+  def check_services(apps)
+    apps.flat_map { APPS.fetch(_1).fetch(:services, []) }.uniq.each do |service|
+      ok = if service == "postgresql"
+        system("pg_isready", "-q")
+      else
+        begin
+          Socket.tcp("127.0.0.1", SERVICES.fetch(service), connect_timeout: 1).close
+          true
+        rescue SystemCallError, IOError
+          false
+        end
+      end
+      raise "#{service} is not reachable; start a disposable local #{service} (see docs/upstream/census.md)" unless ok
+    end
+  end
+
+  def apps_option(value) = value == "all" ? APPS.keys : value.split(",").each { |app| APPS.fetch(app) { raise "unknown app #{app}" } }
+
+  def setup(opts)
+    rails = resolve_rails(opts.fetch(:rails))
+    bin = ruby_bin(opts[:ruby])
+    check_services(opts[:apps])
+    opts[:apps].each do |app|
+      conf = APPS.fetch(app)
+      dir = app_dir(opts[:corpus], app)
+      raise "fresh copy required: #{dir}" if File.exist?(dir)
+      sh({}, File.join(ROOT, "script/corpus"), conf.fetch(:source), File.basename(dir), "--source-only",
+        *("--no-overlay" if conf[:bare]))
+      overlay = File.join(opts[:overlays], "#{conf.fetch(:overlay, app)}.patch")
+      sh({}, "patch", "-p1", "--forward", "--silent", "-i", overlay, chdir: dir)
+      FileUtils.cp(File.join(dir, conf[:database_yml]), File.join(dir, "config/database.yml")) if conf[:database_yml] && !File.exist?(File.join(dir, "config/database.yml"))
+      File.write(File.join(dir, ".census.json"), JSON.pretty_generate("app" => app, "base" => rails,
+        "overlay" => overlay.delete_prefix(ROOT + "/"), "created" => Time.now.utc.iso8601) + "\n")
+      gemfile = variant(opts[:corpus], app, rails, bin)
+      env = env_for(app, bin, rails, gemfile)
+      sh(env, "bundle", "exec", "rails", "db:create", "db:schema:load", chdir: dir)
+      conf.fetch(:build, []).each { sh(env, *_1, chdir: dir) }
+      sh(env, "bundle", "exec", "rails", "assets:precompile", chdir: dir)
+      conf.fetch(:after_assets, []).each { sh(env, *_1, chdir: dir) }
+      sh(env.merge("CENSUS_MODE" => "interpreter"), "bundle", "exec", "ruby", HARNESS, "prepare", app, chdir: dir)
+      sh(env.merge("CENSUS_MODE" => "interpreter"), "bundle", "exec", "ruby", HARNESS, "list", app, chdir: dir)
+    end
+  end
+
+  def list(opts)
+    bin = ruby_bin(opts[:ruby])
+    check_services(opts[:apps])
+    opts[:apps].each do |app|
+      rails = state(opts[:corpus], app).fetch("base")
+      gemfile = variant(opts[:corpus], app, rails, bin)
+      sh(env_for(app, bin, rails, gemfile).merge("CENSUS_MODE" => "interpreter"), "bundle", "exec", "ruby", HARNESS,
+        "list", app, chdir: app_dir(opts[:corpus], app))
+    end
+  end
+
+  def run(opts)
+    labels = opts[:aa] ? [opts.fetch(:label), "#{opts[:label]}2"] : [opts.fetch(:label)]
+    bin = ruby_bin(opts[:ruby])
+    ruby = ruby_description(bin)
+    check_services(opts[:apps])
+    bases = opts[:apps].map { state(opts[:corpus], _1).fetch("base") }.uniq
+    raise "apps were set up on different Rails bases" unless bases.one?
+    rails = opts[:rails] ? resolve_rails(opts[:rails]) : bases.first
+    # Bundle everything before measuring; no bundle command runs during a run.
+    gemfiles = opts[:apps].to_h { [_1, variant(opts[:corpus], _1, rails, bin)] }
+    locks = opts[:apps].to_h do |app|
+      base_lock = File.join(app_dir(opts[:corpus], app), "Gemfile.census-#{bases.first.fetch("sha")[0, 12]}.lock")
+      variant(opts[:corpus], app, bases.first, bin) unless File.exist?(base_lock)
+      [app, lock_outside_rails(gemfiles[app] + ".lock") == lock_outside_rails(base_lock)]
+    end
+    locks.each { |app, same| warn "#{app}: dependencies outside Rails differ from the base lock" unless same }
+    labels.product(opts[:modes], opts[:apps]).each do |label, mode, app|
+      json = File.join(opts[:out], label, "#{app}-#{mode}.json")
+      raise "fresh output required: #{json}" if File.exist?(json)
+    end
+    labels.each do |label|
+      out = File.join(opts[:out], label)
+      FileUtils.mkdir_p(out)
+      meta_path = File.join(out, "meta.json")
+      meta = File.exist?(meta_path) ? JSON.parse(File.read(meta_path)) : { "label" => label, "rails" => rails, "ruby" => ruby, "runs" => [] }
+      raise "#{label} was run with #{meta["rails"]["sha"]} / #{meta["ruby"]}" unless meta["rails"]["sha"] == rails["sha"] && meta["ruby"] == ruby
+      opts[:modes].each do |mode|
+        queue = Queue.new
+        opts[:apps].each { queue << _1 }
+        Array.new([opts[:jobs], opts[:apps].size].min) do
+          Thread.new do
+            while (app = (queue.pop(true) rescue nil))
+              json = File.join(out, "#{app}-#{mode}.json")
+              env = env_for(app, bin, rails, gemfiles[app]).merge("CENSUS_MODE" => mode, "CENSUS_ONLY" => opts[:only])
+              sh(env, "bundle", "exec", "ruby", *FLAGS.fetch(mode), HARNESS, "profile", app, json,
+                chdir: app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
+            end
+          end
+        end.each(&:join)
+      end
+      meta["runs"] << { "apps" => opts[:apps], "modes" => opts[:modes], "only" => opts[:only], "dependencies_outside_rails_match_base" => locks,
+        "finished" => Time.now.utc.iso8601 }
+      File.write(meta_path, JSON.pretty_generate(meta) + "\n")
+      puts "#{label}: #{opts[:modes].size * opts[:apps].size} runs in #{out.delete_prefix(ROOT + "/")}"
+    end
+  end
+
+  def ranked(opts)
+    runs = CensusRank.load_runs(File.join(opts[:out], opts.fetch(:label)), opts[:mode])
+    raise "no #{opts[:mode]} runs for #{opts[:label]} in #{opts[:out]}" if runs.empty?
+    [runs, CensusRank.rows(runs, tiers: opts[:tiers])]
+  end
+
+  def rank(opts)
+    runs, rows = ranked(opts)
+    tsv = File.join(opts[:out], "rank-#{opts[:label]}-#{opts[:mode]}.tsv")
+    File.write(tsv, CensusRank.tsv(rows))
+    print opts[:tsv] ? CensusRank.tsv(rows) : CensusRank.text(runs, rows, opts[:mode], opts[:limit])
+    warn "full ranking: #{tsv.delete_prefix(ROOT + "/")}"
+  end
+
+  def describe(out, label)
+    meta = File.join(out, label.split(":").first, "meta.json")
+    return "#{label}: (no meta.json)" unless File.exist?(meta)
+    m = JSON.parse(File.read(meta))
+    "#{label}: Rails #{m["rails"]["spec"]} #{m["rails"]["sha"][0, 10]}, #{m["ruby"]}"
+  end
+
+  def compare(opts, labels)
+    base = opts.fetch(:base)
+    raise "compare needs at least one LABEL or --aa L0" if labels.empty? && !opts[:aa].is_a?(String)
+    puts([base, opts[:aa], *labels].compact.map { describe(opts[:out], _1) })
+    if opts[:markdown]
+      columns = (opts[:aa] ? [[opts[:aa], base]] : []) + labels.map { [base, _1] }
+      print CensusCompare.markdown(opts[:out], columns, (opts[:aa] ? ["A/A"] : []) + labels, opts[:modes])
+      return
+    end
+    if opts[:aa]
+      puts "-- A/A control (#{base} - #{opts[:aa]}): the noise floor for every comparison below"
+      print CensusCompare.report(opts[:out], opts[:aa], [base], detail: opts[:detail])
+    end
+    print CensusCompare.report(opts[:out], base, labels, detail: opts[:detail]) unless labels.empty?
+  end
+
+  # Runs a controls script (SQL/result snapshots, e.g. census_5_controls.rb)
+  # under each label's Rails in one SQLite app's bundle; every output must
+  # equal the first label's.
+  def controls(opts, labels)
+    raise "controls needs BASE and at least one LABEL" if labels.size < 2
+    script = File.expand_path(opts.fetch(:script))
+    app = opts[:app]
+    bin = ruby_bin(opts[:ruby])
+    dir = File.join(opts[:out], "controls")
+    FileUtils.mkdir_p(dir)
+    outputs = labels.to_h do |label|
+      rails = JSON.parse(File.read(File.join(opts[:out], label, "meta.json"))).fetch("rails")
+      gemfile = variant(opts[:corpus], app, rails, bin)
+      [label, opts[:modes].to_h do |mode|
+        out = capture(env_for(app, bin, rails, gemfile), "bundle", "exec", "ruby", *FLAGS.fetch(mode), script,
+          chdir: app_dir(opts[:corpus], app))
+        File.write(File.join(dir, "#{File.basename(script, ".rb")}-#{label}-#{mode}.txt"), out + "\n")
+        [mode, out]
+      end]
+    end
+    base = labels.first
+    failed = false
+    labels.drop(1).each do |label|
+      opts[:modes].each do |mode|
+        a = outputs[base][mode].lines
+        b = outputs[label][mode].lines
+        diff = a.zip(b).each_with_index.reject { |(x, y), _| x == y }
+        diff << [[nil, nil], a.size] if a.size != b.size
+        failed ||= diff.any?
+        puts format("%-24s %-11s %s", label, mode, diff.empty? ? "identical to #{base} (#{a.size} lines)" : "DIFFERS from #{base} at #{diff.size} lines")
+        diff.first(5).each { |(x, y), i| puts "  #{i + 1}: #{base}: #{x&.chomp}\n  #{i + 1}: #{label}: #{y&.chomp}" }
+      end
+    end
+    exit 1 if failed
+  end
+
+  OPEN_PRS = <<~GRAPHQL
+    query($endCursor: String) {
+      repository(owner: "rails", name: "rails") {
+        pullRequests(states: OPEN, first: 50, after: $endCursor) {
+          nodes { number title url isDraft author { login } files(first: 100) { nodes { path } } }
+          pageInfo { hasNextPage endCursor }
+        }
+      }
+    }
+  GRAPHQL
+
+  def open_prs(cache, refresh)
+    if refresh || !File.exist?(cache)
+      jq = ".data.repository.pullRequests.nodes[] | {number, title, url, draft: .isDraft, author: .author.login, files: [.files.nodes[].path]}"
+      lines = capture("gh", "api", "graphql", "--paginate", "-f", "query=#{OPEN_PRS}", "--jq", jq)
+      FileUtils.mkdir_p(File.dirname(cache))
+      File.write(cache, JSON.pretty_generate("fetched" => Time.now.utc.iso8601, "prs" => lines.lines.map { JSON.parse(_1) }) + "\n")
+    end
+    data = JSON.parse(File.read(cache))
+    warn "open rails/rails PRs fetched #{data["fetched"]} (#{data["prs"].size}); --refresh to refetch"
+    data
+  end
+
+  # Old-side hunk ranges per file, fetched once per PR and kept in the cache.
+  def hunks(pr)
+    pr["hunks"] ||= capture("gh", "api", "--paginate", "repos/rails/rails/pulls/#{pr["number"]}/files", "--jq", ".[] | {filename, patch}")
+      .lines.map { JSON.parse(_1) }
+      .to_h { |f| [f["filename"], (f["patch"] || "").scan(/^@@ -(\d+)(?:,(\d+))?/).map { |a, b| [Integer(a), Integer(b || 1)] }] }
+  end
+
+  # Open PRs whose diff covers a top-ranked line (hunk ranges on the PR's own
+  # base, so approximate), and how many more only touch the same file.
+  def prs(opts)
+    _, rows = ranked(opts)
+    top = rows.first(opts[:top]).each_with_index.map { |r, i| [i + 1, r] }
+    cache = File.join(opts[:out], "open-rails-prs.json")
+    data = open_prs(cache, opts[:refresh])
+    by_file = Hash.new { |h, k| h[k] = [] }
+    data["prs"].each { |pr| pr["files"].each { by_file[_1] << pr } }
+    on_line = {}
+    on_file = {}
+    top.each do |rank, r|
+      file, line = r[:site].split(/:(?=\d+\z)/)
+      prs = by_file[file].sort_by { _1["number"] }
+      hit, rest = prs.partition { |pr| hunks(pr).fetch(file, []).any? { |start, len| Integer(line).between?(start, start + len - 1) } }
+      hit.each { on_line[_1["number"]] = true }
+      rest.each { on_file[_1["number"]] = true }
+      next if prs.empty?
+      puts format("%3d %-70s apps %d mean %6.2f", rank, r[:site][0, 70], r[:apps], r[:mean])
+      hit.each { puts "      line: ##{_1["number"]} #{_1["title"][0, 80]} (#{_1["author"]}#{", draft" if _1["draft"]})" }
+      puts "      file: #{rest.size} more (#{rest.first(8).map { "##{_1["number"]}" }.join(" ")}#{" ..." if rest.size > 8})" if rest.any?
+    end
+    File.write(cache, JSON.pretty_generate(data) + "\n")
+    puts "#{on_line.size} open PRs change a top-#{top.size} #{opts[:label]} #{opts[:mode]} line; " \
+      "#{(on_file.keys - on_line.keys).size} more only touch the same files"
+  end
+
+  def main(argv)
+    command = argv.shift
+    opts = { corpus: "census", out: File.join(ROOT, ".lowrail/private/census"), ruby: "4.0.7", apps: APPS.keys,
+      modes: %w[interpreter yjit], mode: "interpreter", limit: 60, tiers: CensusRank::TIERS, top: 40, jobs: 1,
+      app: "blog", overlays: OVERLAYS }
+    parser = OptionParser.new do |o|
+      o.banner = File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.map { _1.delete_prefix("# ").delete_prefix("#") }.join
+      o.on("--rails SPEC") { opts[:rails] = _1 }
+      o.on("--ruby R") { opts[:ruby] = _1 }
+      o.on("--apps LIST", "comma-separated, or all (default)") { opts[:apps] = apps_option(_1) }
+      o.on("--app APP", "controls: SQLite app whose bundle runs the script (default blog)") { opts[:app] = _1 }
+      o.on("--corpus NAME") { opts[:corpus] = _1 }
+      o.on("--overlays DIR", "setup: dependency overlays (default fixtures/corpus/rails-main-census-4)") { opts[:overlays] = File.expand_path(_1) }
+      o.on("--out DIR") { opts[:out] = File.expand_path(_1) }
+      o.on("--label L") { opts[:label] = _1 }
+      o.on("--aa [L0]", "run: also run L2, the A/A twin; compare: the A/A twin of --base") { opts[:aa] = _1 || true }
+      o.on("--modes LIST", "interp,yjit,zjit") { |v| opts[:modes] = v.split(",").map { MODES.fetch(_1) } }
+      o.on("--mode M") { opts[:mode] = MODES.fetch(_1) }
+      o.on("--only WORKLOADS", "run: comma-separated workload names") { opts[:only] = _1 }
+      o.on("--jobs N", Integer, "run: apps measured in parallel per mode (default 1)") { opts[:jobs] = _1 }
+      o.on("--limit N", Integer) { opts[:limit] = _1 }
+      o.on("--tiers LIST", "rank: app-count tier floors (default 7,5,3,2)") { |v| opts[:tiers] = v.split(",").map { Integer(_1) } }
+      o.on("--tsv") { opts[:tsv] = true }
+      o.on("--base L") { opts[:base] = _1 }
+      o.on("--detail") { opts[:detail] = true }
+      o.on("--markdown") { opts[:markdown] = true }
+      o.on("--script FILE") { opts[:script] = _1 }
+      o.on("--top N", Integer) { opts[:top] = _1 }
+      o.on("--refresh") { opts[:refresh] = true }
+    end
+    rest = parser.parse(argv)
+    case command
+    when "setup" then setup(opts)
+    when "run" then run(opts)
+    when "list" then list(opts)
+    when "rank" then rank(opts)
+    when "compare" then compare(opts, rest)
+    when "controls" then controls(opts, rest)
+    when "prs" then prs(opts)
+    else abort parser.help
+    end
+  end
+end
+
+Census.main(ARGV.dup) if $PROGRAM_NAME == __FILE__
