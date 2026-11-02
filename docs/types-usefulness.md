@@ -296,3 +296,10 @@ no boot method (2), `ClassMethods` concern targets and instance-method callers
 through dynamic receivers (4), a block-only caller (1), a scoped relation
 assigned in a controller (`render @books`), a `render layout:` partial, and
 two return/nil-ability questions without evidence.
+
+**After v2 (in-sample, not held-out):** `callers` now answers named-route
+helpers (`*_path`/`*_url` of a booted named route on a class that includes
+`ActionDispatch::Routing::UrlFor`), which boot facts cannot see because they
+live in an anonymous module. Rerunning v2 fixes c14 (strict 85.37% / 63.64%),
+while w14 stays an abstention: `book_slug_url` comes from `direct`, not the
+route table. v2 is no longer a held-out measure for this change.

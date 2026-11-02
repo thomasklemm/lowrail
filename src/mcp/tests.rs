@@ -8,7 +8,7 @@ fn callers_follow_respond_to_blocks_and_includers_and_views_follow_record_render
     std::fs::create_dir_all(dir.join("app/controllers")).unwrap();
     let controller = dir.join("app/controllers/cards_controller.rb");
     let concern = dir.join("app/stamped.rb");
-    std::fs::write(&controller, "class CardsController\n def index\n  respond_to do |format|\n   format.html { finish }\n   format.json do |variant|\n    variant.phone { finish }\n   end\n  end\n  other_block { finish }\n end\n def finish = 1\nend\n").unwrap();
+    std::fs::write(&controller, "class CardsController\n def index\n  respond_to do |format|\n   format.html { finish; card_path }\n   format.json do |variant|\n    variant.phone { finish }\n   end\n  end\n  other_block { finish }\n end\n def finish = 1\nend\n").unwrap();
     std::fs::write(&concern, "module Stamped\n def stamp = finish\nend\n").unwrap();
     use sha2::{Digest, Sha256};
     let digest = format!("{:x}", Sha256::digest(b"template"));
@@ -18,7 +18,7 @@ fn callers_follow_respond_to_blocks_and_includers_and_views_follow_record_render
     let at = |file: &std::path::Path, line: u32| format!("{}:{line}", file.display());
     let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
         "modules":[
-            {"name":"CardsController","kind":"class","ancestors":["CardsController","Stamped","ActionController::MimeResponds"],
+            {"name":"CardsController","kind":"class","ancestors":["CardsController","Stamped","ActionController::MimeResponds","ActionDispatch::Routing::UrlFor"],
              "const_source_location":at(&controller,1),"methods":[
                 {"name":"index","owner":"CardsController","source_location":at(&controller,2)},
                 {"name":"finish","owner":"CardsController","source_location":at(&controller,11)}]},
@@ -32,7 +32,7 @@ fn callers_follow_respond_to_blocks_and_includers_and_views_follow_record_render
             {"name":"Gadget","kind":"class","ancestors":["Gadget","Widget"]}],
         "models":[{"name":"Card","partial_path":"cards/card"},{"name":"Widget","partial_path":"cards/widget"}],
         "controllers":[{"name":"CardsController","actions":["index"]}],
-        "routes":[{"controller":"cards","action":"index"}],
+        "routes":[{"controller":"cards","action":"index"},{"name":"card","controller":"cards","action":"show"}],
         "templates":[{"identifier":format!("{}/app/views/cards/index.html.erb",dir.display()),"virtual_path":"cards/index",
             "source_sha256":digest,"code":"render @cards; render @card; render @widgets; render @unknown"},
             {"identifier":format!("{}/app/views/cards/_card.html.erb",dir.display()),"virtual_path":"cards/_card","source_sha256":digest},
@@ -51,6 +51,11 @@ fn callers_follow_respond_to_blocks_and_includers_and_views_follow_record_render
     assert_eq!(callers["unresolved"][0]["line"], 9);
     // Other also includes Stamped but does not define finish: no caller for it.
     assert_eq!(data.call("callers", &json!({"target":"CardsController#stamp"})).unwrap()["callers"], json!([]));
+    let route = data.call("callers", &json!({"target":"CardsController#card_path"})).unwrap();
+    assert_eq!(route["callers"].as_array().unwrap().len(), 1);
+    assert_eq!((route["callers"][0]["line"].clone(), route["callers"][0]["route_helper"].clone()), (json!(4), json!(true)));
+    assert!(data.call("callers", &json!({"target":"Other#card_path"})).is_err(), "no UrlFor, no route helper");
+    assert!(data.call("callers", &json!({"target":"CardsController#cards_path"})).is_err(), "unnamed route");
     let card = data.call("view_locals", &json!({"path":"cards/_card"})).unwrap();
     let incoming = card["templates"][0]["incoming"].as_array().unwrap();
     assert_eq!(incoming.len(), 2);

@@ -5,11 +5,27 @@ use ruby_prism::Visit;
 use serde_json::{Value, json};
 use std::collections::BTreeSet;
 
+const ROUTE_HELPERS: &str = "Lowrail::RouteHelpers";
+
+/// Named-route helpers live in an anonymous module ahead of Rails' UrlFor, so
+/// boot facts carry no method for them; the route table does.
+fn route_helper(facts: &Facts, receiver: &str, name: &str) -> bool {
+    let Some(route) = name.strip_suffix("_path").or_else(|| name.strip_suffix("_url")) else { return false; };
+    facts.routes.iter().any(|r| r.name.as_deref() == Some(route))
+        && facts.modules.iter().any(|m| m.name == receiver
+            && m.ancestors.iter().any(|a| a == "ActionDispatch::Routing::UrlFor"))
+}
+
 pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
     let (receiver, name, singleton) = target.rsplit_once('#').map(|(c, m)| (c, m, false))
         .or_else(|| target.rsplit_once('.').map(|(c, m)| (c, m, true)))
         .ok_or("expected Class#method or Class.method")?;
-    let (_, wanted) = resolve(facts, receiver, name, singleton).ok_or("no boot method for target")?;
+    let route = Method { name: name.to_owned(), owner: ROUTE_HELPERS.into(), ..Default::default() };
+    let wanted = match resolve(facts, receiver, name, singleton) {
+        Some((_, method)) => method,
+        None if !singleton && route_helper(facts, receiver, name) => &route,
+        None => return Err("no boot method for target".into()),
+    };
     let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
     let paths: BTreeSet<_> = facts.modules.iter().flat_map(|m| &m.methods)
         .filter_map(|m| m.source_location.as_deref().and_then(split_location))
@@ -87,7 +103,14 @@ impl<'pr> Visit<'pr> for Calls<'_> {
                 .map_or(loc.start() as usize + 1, |p| loc.start() as usize - p);
             let site = json!({"path":self.path,"line":line,"column":column,
                 "caller":self.context.as_ref().map(|(r, m, s)| key(r, m, *s))});
-            if let Some(via) = via {
+            let route = resolved.is_none() && self.wanted.owner == ROUTE_HELPERS
+                && node.receiver().is_none_or(|n| n.as_self_node().is_some())
+                && receiver.as_ref().is_some_and(|(r, s)| !*s && r == self.wanted_receiver);
+            if route {
+                let mut site = site;
+                site["route_helper"] = json!(true);
+                self.found.push(site);
+            } else if let Some(via) = via {
                 let mut site = site;
                 site["via"] = json!(via);
                 self.found.push(site);
