@@ -247,3 +247,52 @@ errors or skips**; `git diff --check` clean. Tests exercise override refusal,
 safe-navigation boundaries, hostile singleton container methods, unloaded
 relations, caps/nesting, member conflicts, stale templates, constructor receiver
 identity, view evidence preservation and real MCP stdio discovery/exports.
+
+## Held-out v2 on public apps (2026-11-02)
+
+The private apps and question sets above are not available in this orb, so
+their cohorts were **not** rerun. Instead, a separate agent wrote 40 new
+questions (20 each for Campfire `af4dd9f` and Writebook `be1f8fc`) with
+source-derived ground truth and froze them before any `types`/`mcp` call
+(SHA-256 `d03454cd44d5fa1b1860b860d22cdfb6c57462ef296f3a684c9b68e2a961b05c`;
+seed `20261102`; per app 9 `type_of`, 5 `callers`, 3 `view_locals`,
+2 `model`, 1 `routes`). Two strata were redefined before evaluation because
+neither app calls an app method inside `respond_to`: those questions ask for
+route-helper callers instead. Inputs and results stay outside Git.
+
+The changes measured here: callers keep the controller as `self` in Rails
+`respond_to`/`format`/variant blocks and resolve module methods through the
+queried including class (`via`); `view_locals` follows `render @record(s)`
+when the model has stock `to_partial_path` (new boot fact `partial_path`) and
+no subclasses; sampled returns keep a `nil` arm when the source can return nil
+(bare/`nil` return, missing `else`, safe navigation). These were written from
+the gaps listed above, **before** the v2 questions existed; nothing changed
+after the first v2 run.
+
+Same questions, same observations (`LOWRAIL_OBSERVE_TYPES_ONLY=1 lowrail
+observe … --samples 16`, Campfire 634 runs / Writebook 119 runs, no
+failures). Each binary used facts from the same dumper; the question writer's
+facts already came from the working tree that contained the `partial_path`
+change, which the older binary ignores.
+
+| Run | Precision | Recall | TP/FP/FN | exact / wrong / abstained |
+|---|---:|---:|---|---|
+| before, no observations | 100% | 45.45% | 25/0/30 | 15 / 0 / 25 |
+| after, no observations | 100% | 50.91% | 28/0/27 | 16 / 0 / 24 |
+| before, observed | 83.78% | 56.36% | 31/6/24 | 21 / 6 / 13 |
+| **after, observed** | **85.00%** | **61.82%** | **34/6/21** | **22 / 6 / 12** |
+
+Strict string scoring. Treating `(T | nil)` and `T?` as the same spelling
+(declared in the question file before evaluation) gives 86.49% / 58.18%
+before and 90.00% / 65.45% after; report it beside, not instead of, the
+strict score. This cohort is harder than the first held-out set (different
+apps, more parameter and callback questions) and is not comparable with its
+78.57% recall.
+
+Remaining wrong answers: three sampled **parameter** types miss a nil the
+callers can pass (the nil-path rule covers returns only), one `around_create`
+callback return misses `false`. Abstentions: route-helper targets resolve to
+no boot method (2), `ClassMethods` concern targets and instance-method callers
+through dynamic receivers (4), a block-only caller (1), a scoped relation
+assigned in a controller (`render @books`), a `render layout:` partial, and
+two return/nil-ability questions without evidence.
