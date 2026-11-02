@@ -85,6 +85,14 @@ Measurements are the PRs' own, from their original dates.
 - [#19620](https://github.com/ruby/ruby/pull/19620), backport of merged #19554 to `ruby_3_4`, requested in review — correctness fix, no measurement.
 - [#19492](https://github.com/ruby/ruby/pull/19492), count YJIT dynamic sends before dispatch — for **1,000** raising, throwing or block-break sends, counter **0 → 1,000**; normal-return control **1,000 → 1,000** and results unchanged. Corrects attempt diagnostics only; **no performance claim**.
 
+### Rails — rails/rails
+
+Opened 2026-11-02 from [census 3](rails-main-census-3.md); allocation counts only, no timing claim.
+
+- [#59533](https://github.com/rails/rails/pull/59533), build `WhereClause#ast` predicates in one pass — one Array per compiled where clause; Fizzy board/cards/notifications **−103/−26/−10** objects/request, Writebook **−4…−16**, interpreter and YJIT alike.
+- [#59534](https://github.com/rails/rails/pull/59534), map Arel `project`/`order`/`Window` rest arguments in place — Fizzy **−126/−39/−13**, Writebook **−6…−21**, blog index **−4**, both modes.
+- Held back: shared frozen empty `collect_warnings` result (Fizzy −60/−22/−13). It is the only candidate with an observable boundary (a third-party override appending to `super` would raise), so it waits until the two above are reviewed.
+
 ### Importmap — rails/importmap-rails
 
 - [#336](https://github.com/rails/importmap-rails/pull/336), construct modulepreload tags without per-module tuples/options — **2 objects/module** saved on Ruby 4.0.7 (**3** on tested master 4.1), empty control **6 → 6**; seven-package blog `GET /articles` **15.75 fewer objects/request [13.90, 16.20]**, interpreter total Ir **−0.0997% [−0.127, −0.080]**, no-GC **−0.0728%**. Instruction A/A is within ±0.1%, but native CPU A/A failed: **no CPU or JIT speed claim**.
