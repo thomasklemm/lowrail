@@ -1,0 +1,153 @@
+# frozen_string_literal: true
+
+# Census harness, run by script/census inside a disposable census app copy:
+#   bundle exec ruby [--yjit|--zjit] SCRIPT prepare|profile|list APP [NEW_JSON]
+# Reuses census 4's request client, measurement windows and workload set
+# (../rails_main_census_4.rb, ../census_4_workloads.rb) unchanged. Only the
+# round-specific parts are generalized here: which Rails checkout is expected
+# (CENSUS_RAILS_SHA), the execution mode (CENSUS_MODE interpreter|yjit|zjit),
+# fixture preparation for every corpus app, and a per-workload SQL control.
+require_relative "../rails_main_census_4"
+
+module RailsCensus
+  # Workloads build c::Op and c::Client; measure and the job/mail helpers come
+  # from census 4 and run with self = RailsCensus, so site_key below applies.
+  include RailsMainCensus4
+  extend RailsMainCensus4
+
+  ROOT = File.expand_path("../../..", __dir__)
+  MODES = %w[interpreter yjit zjit].freeze
+
+  class << self
+    public(*RailsMainCensus4.private_instance_methods(false))
+    attr_reader :rails_dir
+
+    def rails_sha = ENV.fetch("CENSUS_RAILS_SHA")
+    def mode = ENV.fetch("CENSUS_MODE", "interpreter")
+
+    def boot(name)
+      raise "disposable census copy required" unless Dir.pwd.match?(%r{\A#{Regexp.escape(ROOT)}/\.corpus/census[\w.-]*-#{Regexp.escape(name)}\z})
+      raise "no Lowrail preload" if defined?(Lowrail)
+      raise "unknown mode #{mode}" unless MODES.include?(mode)
+      ENV.update("RAILS_ENV" => "production", "RACK_ENV" => "production", "LOWRAIL" => "0",
+        "SECRET_KEY_BASE_DUMMY" => "1", "SKIP_TELEMETRY" => "1", "RAILS_LOG_LEVEL" => "fatal",
+        "APP_VERSION" => "census", "GIT_REVISION" => "census")
+      ENV["DATABASE_ADAPTER"] ||= "sqlite"
+      require File.expand_path("config/application")
+      Rails.application.config.yjit = mode == "yjit"
+      # Writebook enables YJIT itself; hide only that entry point in other modes.
+      manual_enable = RubyVM::YJIT.method(:enable) if name == "writebook" && mode != "yjit"
+      RubyVM::YJIT.singleton_class.undef_method(:enable) if manual_enable
+      begin
+        require File.expand_path("config/environment")
+      ensure
+        RubyVM::YJIT.define_singleton_method(:enable, manual_enable) if manual_enable
+      end
+      @rails_dir = File.dirname(Gem.loaded_specs.fetch("railties").full_gem_path)
+      raise "wrong Rails revision: #{@rails_dir}" unless File.basename(@rails_dir).end_with?("-#{rails_sha[0, 12]}")
+      raise "wrong YJIT mode" unless RubyVM::YJIT.enabled? == (mode == "yjit")
+      raise "wrong ZJIT mode" unless !!(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?) == (mode == "zjit")
+      Rails.logger.level = :fatal
+      ActiveRecord::Base.logger = nil
+      # External measurement controls, the same for every app (as in census 4).
+      ActiveJob::Base.queue_adapter = :test
+      if defined?(ActionMailer)
+        ActionMailer::Base.delivery_method = :test
+        ActionMailer::Base.perform_deliveries = true
+        ActionMailer::Base.default_url_options = { host: "localhost", protocol: "https" }.merge(ActionMailer::Base.default_url_options)
+      end
+      Rails.application.routes.default_url_options = { host: "localhost", protocol: "https" }.merge(Rails.application.routes.default_url_options)
+      Rails.application.config.hosts.clear if Rails.application.config.respond_to?(:hosts)
+    end
+
+    def prepare(name)
+      marker = "tmp/census-fixtures.json"
+      raise "fixtures already prepared" if File.exist?(marker)
+      require "active_record/fixtures"
+      case name
+      when "blog", "redprints-cfp", "react-starter-kit"
+        load "db/seeds.rb"
+      when "pingcrm"
+        Faker::Config.random = Random.new(42)
+        load "db/seeds.rb"
+      when "lobsters"
+        load "db/seeds.rb"
+        Rails.application.load_tasks # defines FakeDataGenerator
+        BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
+        srand(42)
+        ActiveRecord::Base.transaction(requires_new: false) { FakeDataGenerator.new.generate }
+      when "fizzy", "fizzy-mysql"
+        helper = File.read("test/test_helper.rb").split("module FixturesTestHelper\n", 2).fetch(1)
+        eval("module FixturesTestHelper\n" + helper, TOPLEVEL_BINDING, "test/test_helper.rb")
+        load_fixtures
+      when "campfire", "writebook", "codetriage"
+        load_fixtures
+      else
+        raise "no preparation known for #{name}"
+      end
+      FileUtils.mkdir_p("tmp")
+      File.write(marker, JSON.generate(name: name, rails: rails_sha, lock: Digest::SHA256.file(ENV.fetch("BUNDLE_GEMFILE") + ".lock").hexdigest))
+    end
+
+    def site_key(file)
+      if file.nil?
+        "<no Ruby source>"
+      elsif file.start_with?(Rails.root.to_s + "/")
+        file.sub(Rails.root.to_s + "/", "APP/")
+      elsif file.start_with?(rails_dir + "/")
+        "RAILS/" + file.delete_prefix(rails_dir + "/")
+      elsif file.include?("/gems/")
+        "GEM/" + file.split("/gems/", 2).last
+      elsif file.start_with?(RbConfig::CONFIG.fetch("rubylibdir") + "/")
+        file.sub(RbConfig::CONFIG.fetch("rubylibdir") + "/", "RUBY/")
+      else
+        file.sub(ROOT + "/", "LOWRAIL/")
+      end
+    end
+
+    # Behavior control, after every measurement: the SQL each workload runs
+    # (literals and numbers masked), two operations each. A patch that keeps
+    # behavior keeps the digest; the A/A pair shows which workloads drift anyway.
+    def sql_shape(op)
+      statements = []
+      thread = Thread.current
+      subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+        next if payload[:name] == "SCHEMA" || !Thread.current.equal?(thread)
+        sql = payload[:sql].to_s.gsub(/'(?:[^']|'')*'/, "?").gsub(/\b\d+(?:\.\d+)?\b/, "?")
+        statements << (payload[:cached] ? "CACHE #{sql}" : sql)
+      end
+      begin
+        2.times { op.call.call; reset_side_effects }
+      ensure
+        ActiveSupport::Notifications.unsubscribe(subscriber)
+      end
+      { queries_per_op: statements.size / 2.0, digest: Digest::SHA256.hexdigest(statements.join("\n"))[0, 16] }
+    end
+
+    def profile(name, output)
+      raise "fresh output required" if File.exist?(output)
+      ops = workloads(name)
+      only = ENV["CENSUS_ONLY"]&.split(",")
+      ops = ops.select { only.include?(_1.name) } if only
+      raise "no workloads selected" if ops.empty?
+      results = ops.map { |op| measure(op) }
+      ops.zip(results) { |op, result| result[:sql] = sql_shape(op) }
+      result = { app: name, ruby: RUBY_DESCRIPTION, mode: mode, yjit: RubyVM::YJIT.enabled?, rails: rails_sha,
+        rails_dir: File.basename(rails_dir), adapter: ActiveRecord::Base.connection_db_config.adapter,
+        lock_sha256: Digest::SHA256.file(ENV.fetch("BUNDLE_GEMFILE") + ".lock").hexdigest, workloads: results }
+      File.write(output, JSON.pretty_generate(result) + "\n")
+      puts JSON.generate(result.except(:workloads).merge(workloads: results.map { _1.except(:sites) }))
+    end
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  command, name, output = ARGV
+  RailsCensus.boot(name)
+  case command
+  when "prepare" then RailsCensus.prepare(name)
+  when "profile" then RailsCensus.profile(name, output)
+  when "list" then RailsCensus.list(name)
+  else abort "usage: harness.rb prepare|profile|list APP [NEW_JSON]"
+  end
+end

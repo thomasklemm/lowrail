@@ -2,7 +2,8 @@
 # Fetch a pinned corpus app into .corpus/<name> (not checked in) and install
 # its bundle. Usage: script/corpus APP [DIRNAME] [--source-only|--casa-production-boot-fixture]
 # --source-only fetches the exact source and dependency overlay, without
-# installing its bundle, preparing databases or building assets. The generated
+# installing its bundle, preparing databases or building assets. --no-overlay
+# skips fixtures/corpus/APP.patch (script/census applies its own). The generated
 # blog must already exist: its ordinary generator itself prepares a database.
 # --casa-production-boot-fixture uses external throwaway credentials and loads
 # only the schema into an explicitly supplied empty local disposable database.
@@ -14,10 +15,12 @@ shift
 dirname=$name
 source_only=false
 casa_boot_fixture=false
+overlay=true
 for arg in "$@"; do
   case "$arg" in
     --source-only) source_only=true ;;
     --casa-production-boot-fixture) casa_boot_fixture=true ;;
+    --no-overlay) overlay=false ;;
     --*) echo "unknown option: $arg" >&2; exit 2 ;;
     *) dirname=$arg ;;
   esac
@@ -130,6 +133,11 @@ RUBY
     rev=d1868f8634e97a111a7fca49d58cc776d206007e
     repo=https://github.com/codetriage/codetriage
     sub=. ;;
+  lobsters)
+    # main on 2026-11-01 (census 4); script/census copies database.yml.sample.
+    rev=366e21167521eccd4c10a125cff45142c237275d
+    repo=https://github.com/lobsters/lobsters
+    sub=. ;;
   wikino)
     # Rails app lives in rails/; dependency-only wrapper in fixtures/corpus.
     rev=25255d2d6c808df6672e293661ea797a76c6d2a9
@@ -167,7 +175,7 @@ if [ "$name" != real-blog ]; then
   (
     cd "$dest"
     patch="$root/fixtures/corpus/$name.patch"
-    if [ -f "$patch" ]; then
+    if "$overlay" && [ -f "$patch" ]; then
       if git apply --check "$patch" 2>/dev/null; then
         git apply "$patch"
       elif ! git apply --reverse --check "$patch" 2>/dev/null; then
