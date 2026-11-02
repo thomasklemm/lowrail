@@ -98,6 +98,11 @@ Opened 2026-11-02 from [census 3/3b](rails-main-census-3.md); allocation counts 
 - [#59538](https://github.com/rails/rails/pull/59538), frozen empty defaults when loading a relation — every query-running `Relation#load` −1, association load −2 (`post.author` **231 → 229**). Boundary: with `prepared_statements: false`, `sql.active_record` `binds` is that frozen Array.
 - [#59539](https://github.com/rails/rails/pull/59539), `drop(index)` for the join chain tail — one object per joined reflection in `joins`/`left_joins`/`eager_load`.
 - All four opened 2026-11-02 in parallel after Codex Thermos reviews (GPT-6.1 Sol) approved both rubrics for each; Buildkite green on all four.
+- From [census 4](rails-main-census-4.md) (nine apps, SQLite/PostgreSQL/MySQL, 97 request/job/mailer workloads per mode), opened 2026-11-02 after Codex Thermos (GPT-6.1 Sol) approved both rubrics for each:
+  - [#59541](https://github.com/rails/rails/pull/59541), skip unneeded Arrays when merging into an empty `WhereClause` — every association read and `Relation#merge` (`post.author` **235 → 228**); 82/97 workloads, median **−19**.
+  - [#59542](https://github.com/rails/rails/pull/59542), skip finalizing intents on checkin when none are pending — every connection checkin (`Post.first` **118 → 117**); 82/97, median **−7**.
+  - [#59543](https://github.com/rails/rails/pull/59543), `except`/`only` read `@values` without the `values` dup — `exists?`, scoped `count`, association scopes; 62/97. Boundary: a subclass overriding `values`.
+  - [#59544](https://github.com/rails/rails/pull/59544), extract Ranges in `ArrayHandler` only when present — every `where(col: array)` and preload `IN`; 60/97.
 
 ### Importmap — rails/importmap-rails
 
