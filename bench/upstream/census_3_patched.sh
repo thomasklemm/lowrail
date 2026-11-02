@@ -6,9 +6,9 @@ set -e
 label=$1; shift
 B=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-e77813d4e8d7
 out=/home/user/workspace/repo/.lowrail/private/rails-main-census-3/after-$label
-rm -rf $out; mkdir -p $out
+mkdir -p $out; for n in ${APPS:-blog campfire fizzy writebook}; do rm -f $out/$n-*.json; done
 for p in "$@"; do patch -s -p1 -d $B -i $p; done
 trap 'rm -rf $B && cp -a /tmp/w/rails-bundled-orig $B' EXIT
-for n in blog campfire fizzy writebook; do for m in interpreter yjit; do $(dirname $0)/census_3_profile.sh $n $m $out > /tmp/w/after-$label-$n-$m.log 2>&1 & done; done
+for n in ${APPS:-blog campfire fizzy writebook}; do for m in interpreter yjit; do $(dirname $0)/census_3_profile.sh $n $m $out > /tmp/w/after-$label-$n-$m.log 2>&1 & done; done
 wait
 diff -r /tmp/w/rails-bundled-orig $B > /dev/null && echo "UNEXPECTED: patch not applied" || echo "patched run complete"

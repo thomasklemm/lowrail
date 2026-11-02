@@ -61,7 +61,7 @@ module RailsMainCensus
 
   def workload(name)
     require "rack/mock"
-    require "action_dispatch/testing/test_request" unless name == "blog"
+    require "action_dispatch/testing/test_request" unless %w[blog codetriage].include?(name)
     headers = { "HTTP_HOST" => "localhost", "HTTPS" => "on", "HTTP_ACCEPT" => "text/html",
       "HTTP_USER_AGENT" => "Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0" }
     routes = case name
@@ -88,6 +88,10 @@ module RailsMainCensus
       prefix = "/#{account.external_account_id}"
       board = account.boards.find_by!(name: "Writebook")
       ["#{prefix}/boards/#{board.id}", "#{prefix}/cards", "#{prefix}/notifications"]
+    when "codetriage"
+      # PostgreSQL app; anonymous pages only, so no session is needed.
+      repo = Repo.find_by!(full_name: "schneems/get_process_mem")
+      ["/", "/#{repo.full_name}", "/rails/rails/subscribers"]
     else
       raise "unknown app"
     end

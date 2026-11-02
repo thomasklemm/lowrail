@@ -231,13 +231,15 @@ These are short, following the merged PRs. The scripts are linked above. The dra
 
 ### 3 — Share an empty warnings Array when a query has none
 
-> The abstract adapter returned a new `[]` from `collect_warnings` for every query. PostgreSQL swapped
-> in a new Array even when no notice had arrived. Return a frozen empty Array in those cases.
+> Every query Active Record executes collects database warnings afterwards. On SQLite, PostgreSQL with no pending notice,
+> and MySQL with no warnings or warnings disabled, that meant a new empty `[]` per query, including `find`,
+> `pluck`, `insert`, `update` and association loads. Return a frozen empty Array in those cases.
 > Collected warnings are handed over and reset as before.
 >
-> One Array fewer per query on SQLite and PostgreSQL, and on MySQL when no warnings are pending or
-> warnings are disabled. Fizzy: 60/22/13 fewer objects per request. Blog: 2 fewer. The interpreter and
-> YJIT agree. No timing claim.
+> Per call: one object fewer per executed query (`Post.find(1)` 62 → 61, `select_all` 38 → 37).
+> Across the corpus: about 2 fewer objects per request (Blog), 3–16 (Writebook), 13–61 (Fizzy), 1–3 (CodeTriage on PostgreSQL). No timing claim.
+>
+Not a PR line. The branch is held back because of the FrozenError boundary: a caller that mutates the returned warnings Array would now raise.
 
 ## Blockers and limits
 
@@ -248,3 +250,245 @@ These are short, following the merged PRs. The scripts are linked above. The dra
   open will have to be manual.
 * The YJIT-only `...` forwarding Array (rank 107) is a lead for ruby/ruby and needs its own ruby-bench evidence
   under DECISIONS' submission bar.
+
+## Follow-up 3b: untried pool and a PostgreSQL app (2026-11-02)
+
+This follow-up screens rank 123/257 and the previously unscreened ranks 130–300, and adds CodeTriage on
+PostgreSQL to price the PG type map. **Four more exact candidates qualify.** Each is one commit on its own branch
+in the fork. No PR is open.
+
+* Rails base: the fork commits sit on canonical main
+  [`b5be03636e`](https://github.com/rails/rails/commit/b5be03636e0ac5c3d763411b8be9300e589a0953), which is
+  `e77813d4e8` plus merged #59533. The request reruns patch the bundled `e77813d4e8` checkout. None of the four
+  changed files differs between the two pins.
+* Same method as above: every patch gets a full rerun of all apps × interpreter/YJIT. A fresh A/A rerun
+  (`base3`) moves by at most ±1.7 objects per route, except one Campfire YJIT room cell at +4.3. That cell
+  appears in the A/A rerun and in three patched reruns that never reach Campfire's code paths, so it is noise.
+* CodeTriage [`d1868f8`](https://github.com/codetriage/codetriage/commit/d1868f8634e97a111a7fca49d58cc776d206007e)
+  runs on PostgreSQL 15 and memcached. The dependency overlay is
+  [codetriage.patch](../../fixtures/corpus/rails-main-census-3/codetriage.patch), made with
+  `bundle update rails --conservative`. `config/database.yml` is the app's own `database.example.yml`, and
+  fixtures are loaded with the census `prepare` step. The routes are anonymous `/`, `/schneems/get_process_mem`
+  and `/rails/rails/subscribers`. Each returns 200 with a non-empty body. Base objects per request:
+  interpreter 3,107.8 / 3,149.8 / 2,621.4, YJIT about 3,121 / 3,164.6 / 2,632.2.
+
+### Candidates
+
+Deltas are objects per request (GC-enabled median, after − before) for the routes in the order of the first
+table. CodeTriage reaches none of these four paths: all its cells stay within its ±1.2 A/A.
+
+| Patch | Mode | Blog | Campfire | Fizzy | Writebook |
+| --- | --- | ---: | ---: | ---: | ---: |
+| A/A control | interpreter | −0.1 / +0.4 / −0.7 | +0.0 / +0.0 / +0.0 | −0.6 / +0.0 / +0.0 | +0.9 / +0.6 / +0.0 |
+| A/A control | YJIT | +1.7 / −0.2 / −0.8 | +4.3 / +0.1 / −0.0 | −1.1 / +0.0 / +0.0 | −0.1 / +0.2 / −0.4 |
+| 4 tag_string order | interpreter | −4.5 / −3.9 / −2.8 | +0.7 / +0.8 / +0.0 | **−183.6 / −131.0 / −27.0** | −2.7 / −8.4 / −9.0 |
+| 4 tag_string order | YJIT | −3.9 / −4.0 / −1.4 | +0.0 / +0.0 / +1.0 | **−184.1 / −131.0 / −27.0** | −2.6 / −9.6 / −8.7 |
+| 5 HWIA#fetch | interpreter | +0.4 / −0.2 / −0.2 | +0.7 / +0.0 / +0.0 | **−69.6 / −22.0 / −6.0** | +0.5 / −5.4 / −15.7 |
+| 5 HWIA#fetch | YJIT | +1.2 / +0.4 / −0.2 | +4.4 / +0.2 / −0.0 | **−70.1 / −22.0 / −6.0** | +0.1 / −5.6 / −17.0 |
+| 6 frozen load defaults | interpreter | −1.7 / −0.4 / −0.4 | +0.0 / +0.0 / +0.0 | **−60.1 / −22.0 / −9.0** | −3.2 / −14.4 / −23.0 |
+| 6 frozen load defaults | YJIT | −0.2 / −0.9 / +0.0 | −0.4 / +0.1 / −0.0 | **−60.1 / −22.0 / −9.0** | −3.6 / −15.1 / −22.3 |
+| 7 join chain `drop` | interpreter | +1.5 / −0.5 / −0.2 | +0.7 / +0.0 / +0.0 | **−47.6 / −10.0 / +0.0** | +1.2 / −0.1 / +0.3 |
+| 7 join chain `drop` | YJIT | +1.5 / +1.0 / −0.9 | +4.3 / +0.0 / +0.6 | **−48.1 / −10.0 / +0.0** | +0.7 / +0.4 / +0.3 |
+
+A first full rerun of the same four patches, made before the CodeTriage receipts existed, gave the same Fizzy
+values within 2.0 objects; it was overwritten by the second rerun. In CodeTriage, branch 6 saves 1–4 objects
+per request. Branch 3 (empty warnings) saves 0.6–3.4 on PostgreSQL routes and branch 2 (Arel) saves 0.4–2.5.
+Those are small but consistent with the per-query sites.
+
+Micro ([`census_3b_allocs.rb`](../../bench/upstream/census_3b_allocs.rb), objects per warmed operation,
+interpreter / YJIT where they differ):
+
+| Operation | Clean | 4 | 5 | 6 | 7 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `tag.span("x", class: "a")` | 5 | 4 | 5 | 5 | 5 |
+| `tag.my_widget("x")` (method_missing) | 9 | 6 | 9 | 9 | 9 |
+| `HWIA#fetch(:a)` / `fetch(:z, 0)` | 1 / 1 | 1 / 1 | 0 / 0 | 1 / 1 | 1 / 1 |
+| enum `serialize("live")` | 2 | 2 | 1 | 2 | 2 |
+| `Post.where(author_id:).load` | 90 / 93 | 90 / 93 | 90 / 93 | 89 / 92 | 90 / 93 |
+| `Post.joins(:author).load` | 153 / 155 | 153 / 155 | 153 / 155 | 152 / 154 | 152 / 154 |
+
+| # | Branch | Commit | Change |
+| --- | --- | --- | --- |
+| 4 | [`thomasklemm/tag-string-trailing-content`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-string-trailing-content) | [`df8bb7f451`](https://github.com/thomasklemm/rails/commit/df8bb7f45159896870b4633b99da9cb157e0d41e) | Private `TagBuilder#tag_string(name, content = nil, options, …)` becomes `(name, options, content = nil, …)`, and its three callers are reordered. |
+| 5 | [`thomasklemm/indifferent-fetch-without-rest`](https://github.com/thomasklemm/rails/tree/thomasklemm/indifferent-fetch-without-rest) | [`6a9c90662a`](https://github.com/thomasklemm/rails/commit/6a9c90662a2b19555d2ee876a6d821d5464d146f) | `HashWithIndifferentAccess#fetch(key, *extras)` becomes `fetch(key, default = (no_default = true; nil))`. Amended after review with boundary tests (was `bf0b203829`). |
+| 6 | [`thomasklemm/relation-load-frozen-empty-defaults`](https://github.com/thomasklemm/rails/tree/thomasklemm/relation-load-frozen-empty-defaults) | [`c11df3143f`](https://github.com/thomasklemm/rails/commit/c11df3143f14e559007fd4bf3cd566b81cc525cb) | `exec_main_query` passes `FROZEN_EMPTY_ARRAY` as binds to `_query_by_sql`. The `alias_tracker` default `joins = []` becomes `FROZEN_EMPTY_ARRAY`. |
+| 7 | [`thomasklemm/join-chain-drop`](https://github.com/thomasklemm/rails/tree/thomasklemm/join-chain-drop) | [`a70709e899`](https://github.com/thomasklemm/rails/commit/a70709e8991d998e6048191c4bbc2a2d65e055e0) | `JoinAssociation#join_constraints` uses `reflection_chain.drop(index)` instead of `reflection_chain[index..]`. |
+
+Author and committer are Thomas Klemm `<github@tklemm.eu>`, with no trailers.
+
+### Why each one is exact, and its boundaries
+
+4. **Rank 123/257 isolated.** The Array attributed to the generated `define_element` lines (1484 `span`, 1454 `li`)
+   is the argument shuffle Ruby performs because `tag_string` has an optional parameter before a required one. A
+   standalone reproduction shows 4 → 3 objects per call when the optional parameter moves to the end, in both modes.
+   The same shuffle explains part of rank 132 (`method_missing`, line 1676). Output, escaping, blocks and self-closing
+   behavior are unchanged. For `tag.foo("a", "b")` and `tag.span("a", "b")` the ArgumentError messages are identical
+   ("given 4, expected 2..3" / "given 2, expected 0..1"). **Boundary:** `tag_string` is private on a `:nodoc:`
+   class, so a third-party subclass that overrides or calls it with the old order breaks. A GitHub code search
+   found only vendored copies of Rails and unrelated `tag_string` implementations (hanami-view, derails). #50737
+   last reshaped this method's arguments to cut Hash splats. Open #54042 touches `tag_string`'s body, not its
+   signature, and would need a trivial rebase.
+5. **HWIA `fetch`.** Missing keys (KeyError key/receiver), defaults including explicit `nil`, blocks, block
+   precedence and the "block supersedes default value argument" warning all match. The block form now matches
+   `Hash#fetch` directly. **Disclosed difference:** calling `fetch()` with no arguments now says
+   "expected 1..2" instead of "expected 1+". This is now Hash#fetch's own message. Enum `serialize` and
+   `serializable?` call `mapping.fetch(value, value)` on an HWIA, which is where most of the request saving comes from.
+   No overlapping PR was found (#46942 is `fetch_values`). The merged #59293 and #59294 by sampokuokkanen removed
+   the neighboring rest Arrays the same way.
+6. **Frozen load defaults.** Neither Array is read for content or mutated: the arel path replaces binds in
+   `compile_arel!`, and `AliasTracker.create` only checks `joins.empty?`. **Disclosed boundary (observable):** with
+   `prepared_statements: false` (the default for MySQL), `sql.active_record` `payload[:binds]` for relation loads
+   is now the shared frozen empty Array instead of a fresh empty one. This was verified directly: `[false, false]`
+   becomes `[true, true]`. A subscriber that appends to `payload[:binds]` would raise. Rails' own subscribers only
+   read it. If the binds half is unwanted, the `alias_tracker` half stands alone.
+7. **Join chain `drop`.** `index` is always less than the chain size inside `each_with_index`, so `[index..]` never
+   returns nil, and both forms return a new Array of the same elements. This saves one endless Range per chain element
+   when building joins (rank 142).
+
+### Behavior controls and suites
+
+[`census_3b_controls.rb`](../../bench/upstream/census_3b_controls.rb) records 34 snapshots: tag builder content,
+blocks, nil, escaping, void, SVG self-closing and content forms, custom tags with 0, 1 and 2 arguments, and
+`content_tag`; HWIA fetch shapes and errors; through and nested joins, `left_joins`, `eager_load`, through readers,
+enum queries; and the size and class of `sql.active_record` binds. The snapshots are identical between clean main and
+every branch in the interpreter and YJIT.
+
+Local suites (Ruby 4.0.7, seed 41231, serial):
+
+* **Action View, full:** clean `b5be036` and branch 4 each give 2,913 / 6,939; 251 / 342; 177 / 344, with 0 failures,
+  errors or skips.
+* **Active Support, full:** clean and branch 5 each give 6,865 runs / 29,875 assertions / 0 failures / 0 errors /
+  60 skips. A first parallel attempt failed 30 and 25 `MemCacheStoreTest` cases on clean and branch alike,
+  because both runs shared one memcached server. That attempt was discarded and both were rerun serially.
+  After the Thermos review nit, branch 5 was amended (`6a9c90662a`) with three tests in
+  `hash_with_indifferent_access_test.rb`: `nil`/`false` defaults, KeyError `key`/`receiver` for a missing key,
+  and block-only and block-plus-default (block wins, "block supersedes default value argument" warning). They pass
+  on the branch and on clean main. They catch a mutant that treats falsy defaults as "no default"
+  (1 error). Full Active Support on the amended commit: 6,868 runs / 29,885 assertions / 0 failures /
+  0 errors / 60 skips. RuboCop: no offenses.
+* **Active Record SQLite, full:** branches 5, 6 and 7 each give 10,247 runs, 0 failures, 0 errors, 52 skips,
+  the same as clean main above.
+* **Branch 6 on other adapters:** PostgreSQL adapter tests plus `relations`, `finder` and `associations/join_model`
+  give 1,678 / 5,180 / 0 / 0 / 15 skips, identical to clean main. (The socket symlink now makes postgres_fdw work,
+  so the earlier 4 ForeignTable errors are gone on both trees.) MariaDB trilogy gives 888 / 2,574 / 0 / 0 and mysql2
+  869 / 2,531 / 0 / 0, identical to clean main. Both use `prepared_statements: false`, which is the frozen-binds path.
+* **RuboCop:** six files (four framework sources and two scripts), no offenses.
+
+### PostgreSQL pools (CodeTriage)
+
+[`census_3b_pg_sites.rb`](../../bench/upstream/census_3b_pg_sites.rb) lists PG-specific sites. Values are objects
+per request averaged over three routes and both modes:
+
+| Site | Objects/request | Disposition |
+| --- | ---: | --- |
+| `postgresql_adapter.rb:1047`, `type_map.fetch(oid, fmod, sql_type)` → `HashLookupTypeMap#fetch(lookup_key, *args)` | **25.3** (≈0.8% of request objects) | **Priced. Rejected as a small exact change.** One `[fmod, sql_type]` Array per column per result. That Array *is* the `Concurrent::Map` key (`@cache[oid].fetch_or_store(args)`), so the hit probe needs an equal key. Removing it means a nested per-fmod/per-sql_type cache, a different key encoding, or a specialized two-argument path. That is a cache restructure: `register_type`/`alias_type`/`clear` invalidation and third-party `register_type` blocks receiving `*args` would all need preserving. A design proposal at best, not an elision. |
+| `postgresql/database_statements.rb:228`, `result.fields` | 25.3 | Field-name Strings created by the pg gem, used as the Result's columns. Required. #59278 already reuses this Array. |
+| `postgresql/database_statements.rb:258`, `result.values` / Result | 10.7 + 5.0 + 4.0 + 1.3 | Row values (Strings and Time casts), the Result object and its rows. Required data. |
+| `postgresql/database_statements.rb:231–233` | 1.3 each | `types`, `field_types` and `missing_oids` per result. Each is required or escapes, except `missing_oids`, an always-new Array that is usually empty. 1.3 objects per request is below the bar. Not submitted. |
+| `postgresql/database_statements.rb:276`, warnings swap | 1.3 | Covered by held-back branch 3: CodeTriage −0.6…−3.4. |
+| `postgresql_adapter.rb:1124`, `"#{schema_search_path}-#{sql}"` | 1.0 | Statement-pool key. Required. |
+
+No other PG-only pool reaches 1 object per request. CodeTriage's largest framework sites (SafeBuffer, template paths,
+structured-event root stripping, fanout) match the SQLite apps and keep the dispositions recorded above.
+
+### Ranks 130–300: dispositions
+
+The ranks named below correspond to the earlier table and [sites.tsv](data/rails-main-census-3/sites.tsv).
+"Rejected" means the obvious small change is rejected, not every possible algorithm.
+
+| Ranks | Sites | Disposition |
+| --- | --- | --- |
+| 123, 132, 257 | AV `tag_helper.rb:1484/1676/1454` | **Candidate 4.** |
+| 131, 212 | AV `tag_helper.rb:1598` capture, `output_safety_helper.rb:41` `safe_join` | `capture(self, &block)` forwards with `yield(*, **)`. Covered by the deferred `capture` row above. `safe_join`'s `flatten` and `map!` are its output path. |
+| 133–136, 207, 114 | AR collectors and `to_sql.rb:793` | One collector per compile. Required. |
+| 137, 198, 215, 222, 231, 234, 265, 277, 281, 300, 301, 307–309 | AR preloader branch/batch | `flat_map`/`reject`/`partition`/`group_by` results escape into the next iteration of the preloading loop. No exact elision without restructuring the loop. Untried beyond that. |
+| 138 | AS `erb/util.rb:16` | Escaped output String. Required. |
+| 139 | AR `persistence.rb:278` (records) | Model instances. Required data. |
+| 140, 217, 238, 296 | AP CSP header, `request_forgery_protection.rb:582–584` | Header output, or work already shortened by merged #59375 and #59500 (open). Not reopened. |
+| 141, 147, 169, 173–175, 247, 276, 299, 318 | AV renderer objects | Per-render state. #59258, #59265 and #59290 are merged nearby. |
+| **142** | AR `join_association.rb:30` | **Candidate 7** (Range half). The Array half is the yielded chain tail. Required. |
+| 143, 178, 182, 223–230, 241, 250 | AR join dependency nodes and buckets | Per-query Arel AST and join state. |
+| 145, 148, 190, 210, 272–275, 285–287, 291–293, 310, 316, 322 | AR query_methods rest/flat_map Arrays | Rest arguments of public query methods (`where`, `order`, …) and their per-call results. Changing public signatures is out. `flattened_args` (145) builds the result it returns. |
+| 146, 149, 150, 209, 244 | AM attribute / IndexedRow / binary Data | Per-record attribute state. |
+| 151–154, 163, 164, 166, 211, 263, 329 | AP URL/route building, AV template paths, AS thread_mattr keys | Fresh output Strings or Hashes; `script_name.to_s.chomp` and Journey buffers are covered in U2. The `thread_mattr` key String (`"attr_#{sym}_#{object_id}"`) could be cached per class, but that adds a memo on a generated accessor. Refused. |
+| 155, 181, 303 | AR `where_clause.rb:184/22` | `except_predicates` and `-` results are the new clause's predicates. Required. |
+| 156, 200, 242, 249, 252, 261, 267, 270, 282, 288, 289 | AS/AR String results (`String#at`, `cache_key`, `upcase`, `downcase`, key generator join, `StringInquirer`) | Fresh return values. Earlier "fresh result" rejections apply. |
+| 157, 194 | AR `querying.rb:83/84` | **Candidate 6** for the binds default (83). The `"#{name} Load"` String (84) is the notification name. Caching it per model would be a memo of `name`. Refused. |
+| 158–162, 251 | AR/AS structured event subscriber, `deep_dup`, fanout | Overlaps open #58957. `deep_dup` copies are its contract. |
+| 165, 253, 254 | AR association scope/extensions | `merge!` rest and `|` results. `|` returns a new Array by contract. Related #57246 decision. |
+| 167 | Arel `select_manager.rb:148` | Candidate 2 (#59534). |
+| 170, 171, 177, 204, 232, 233 | AR predicate builder dup, merger `public_send` rest, `values.except`, reflection scope building | Per-query state. 171's `*value` splat into `#{name}!` uses the bang methods' public rest signatures. |
+| 176, 239, 240 | AR `@association_cache`, CollectionAssociation target/Set | Per-record or per-association state. |
+| 179, 196, 269, 313, 314 | AV form tag sanitize/options | Fresh id Strings and option Hashes. #59269 merged nearby. |
+| 183, 188, 189, 206, 218–220, 279 | AR reflection scope/chain Arrays, `AssociationScope#get_chain` | Covered by the reflection-chain row above. |
+| 184, 186, 187 | AR `Result#column_types` Hash, `_load_from_sql` reject and payload | Per-result Hash. A `reject` on an empty Hash still returns a new Hash; skipping it when `attribute_types` covers everything would change identity only for a local. Small (26/request). Untried. |
+| 185, 195, 221 | AR AliasTracker | **Candidate 6** for the `joins = []` default (221). AliasTracker and its Hash are required state. |
+| **205, 237** | AR `enum.rb:231/227` `mapping.fetch(value, value)` | **Candidate 5.** The Array was HWIA's `*extras`. |
+| 193 | AM `type/string.rb:40` | Defensive copy of a mutable String. Required. |
+| 197, 260 | AR `references_values |=`, predicate_builder references | New Arrays by `|` contract and per-query state. |
+| 199 | AS `inflector/methods.rb:163` (`humanize`) | Overlaps open #58752. |
+| 201, 208, 266 | Arel Limit/And/Count nodes | Per-query AST. |
+| 202 | AR `quoting.rb:219` `binds.map` | `type_casted_binds` result. Required. |
+| 203, 324 | AS MessageVerifier / CSRF HMAC `dup` | Fresh HMAC state per digest. #59430 merged nearby. |
+| 213 | AM `attribute_registration.rb:125` `name.to_s` | The #59357/#59366 Symbol#name series covers sibling sites. This one converts String-or-Symbol to a new String the caller keeps. Not proven disposable. Untried. |
+| 214 | AR preloader `scope.where(key => keys)` | Public `where` with a Hash argument. Required. |
+| 216, 283, 304 | AS time calculations, `TimeWithZone.new` | Rational/Time results. #59397 and #59402 merged nearby. |
+| 235, 271, 280 | AR `references_eager_loaded_tables?` | `build_joins([])` plus the `map!`/`-` chain. The `[]` literal argument is a new Array passed into `build_joins`, which may use it as an accumulator. Not proven disposable. Untried. |
+| 245, 255, 256 | AS `inquiry`, AR `default_scopes` `[]`, `compact_blank` | 255's `return []` escapes to `default_extensions` callers and is unioned with `|`; returning a frozen Array would be exact for Rails' callers, but it is ≤16/request on one app. Below the bar. |
+| 248 | AV `navigation_helper.rb:311` Proc | `&block` capture. Required. |
+| 258, 306, 315, 317, 319–321, 323, 325, 328, 330 | Remaining (≤16/request) | Below the bar for this screen. Untried. |
+
+Ranks 301–330 appear only where a row above names them. Everything below rank 300 that isn't named stays untried.
+
+### PR description drafts (not published)
+
+Rewritten after the Thermos reviews (2026-11-02) to lead with the common Rails pattern that reaches each path and the
+cost per call. App numbers stay as one supporting line. Per-call counts come from standalone micros on the fork
+branches (SQLite in memory, Ruby 4.0.7, identical in the interpreter and YJIT unless noted).
+
+**4 — Take tag_string options before the optional content**
+
+> Every `tag.div`, `tag.span`, `tag.li`… call goes through the private `TagBuilder#tag_string(name, content = nil, options, …)`.
+> It has an optional parameter before a required one, so Ruby allocates an Array on each call to shuffle the arguments.
+> Custom elements through `method_missing` (`tag.my_widget`) pay this three times. Reorder the private method's
+> parameters and its three callers. Output, escaping, blocks and arity errors are unchanged.
+>
+> Per call: `tag.span("x", class: "a")` 5 → 4 objects, `tag.my_widget("x")` 9 → 6.
+> Across corpus pages that use `tag.*`: 1–5 fewer objects per request (Blog), 3–10 (Writebook), 27–184 (Fizzy). Allocation counts only; no timing claim.
+
+**5 — Avoid a rest Array in HashWithIndifferentAccess#fetch**
+
+> `HashWithIndifferentAccess#fetch(key, *extras)` allocated an Array on every call, including `fetch(key)` with no default.
+> HWIA backs `params`, so `params.fetch(:user)` and `params.fetch(:page, nil)` pay for it. So do enum casts: every enum
+> value in a `where`, an assignment or a validation goes through `mapping.fetch(value, value)`. Take the default as an
+> optional positional parameter instead. Missing keys (KeyError key and receiver), `nil`/`false` defaults, blocks, and
+> "block supersedes default value argument" behave as before. New tests cover these cases.
+> The only visible difference is the arity message for `fetch()` with no arguments, which now matches `Hash#fetch` ("1..2" instead of "1+").
+>
+> Per call: `params.fetch(:q)` 3 → 2 objects, `hwia.fetch(:a)` 1 → 0, `Post.where(status: :live).to_a` 77 → 74.
+> Across the corpus: 5–17 fewer objects per request (Writebook), 6–70 (Fizzy). No timing claim.
+
+**6 — Pass frozen empty defaults when loading a relation**
+
+> Every `Relation#load` that runs a query (`to_a`, `each`, `first`, association readers…) allocated an empty binds Array
+> in `exec_main_query`. Every association scope (`post.author`, `author.posts`) allocated another for `alias_tracker`'s
+> default `joins`. Neither Array is read for content or mutated, so pass the existing `FROZEN_EMPTY_ARRAY`.
+> With `prepared_statements: false` (the MySQL default), the `sql.active_record` payload's `binds` for these loads is now that frozen Array.
+>
+> Per call: 1 object fewer per relation load, 2 per association load (`post.author` 231 → 229).
+> Across the corpus: 3–23 fewer objects per request (Writebook), 9–60 (Fizzy), 1–4 (CodeTriage on PostgreSQL). No timing claim.
+
+**7 — Use drop instead of an endless Range for the join chain tail**
+
+> Building SQL for `joins`, `left_joins` or `eager_load` (including `includes` that turns into a JOIN) walks each
+> association's reflection chain. It allocated an endless Range per chain element for `reflection_chain[index..]`.
+> `drop(index)` returns the same new Array without the Range.
+>
+> Per call: one object fewer per joined reflection (`Post.joins(:author).load` 153 → 152, through associations more).
+> Across the corpus: 10–48 fewer objects per request on Fizzy's joined pages; the other apps' routes are within noise. No timing claim.
+
+### Ranking and limits
+
+By breadth of the pattern: 6 and 3 (every relation load or executed query), 5 (every HWIA/`params` `fetch` and enum cast), 4 (every `tag.*` element), 7 (joined queries only). Candidates 4 and 6 carry the disclosed boundaries above. 5 and 7 have only the error-message difference
+(5) or no observable difference found (7). Local suites only, no hosted CI. The two-open-PR limit means at most
+these two can follow once #59533 and #59534 resolve.
