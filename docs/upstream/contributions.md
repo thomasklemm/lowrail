@@ -104,6 +104,11 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
   - [#59542](https://github.com/rails/rails/pull/59542), skip finalizing intents on checkin when none are pending — every connection checkin (`Post.first` **118 → 117**); 82/97, median **−7**. **Merged 2026-11-02** ([ee16712](https://github.com/rails/rails/commit/ee16712354)).
   - [#59543](https://github.com/rails/rails/pull/59543), `except`/`only` read `@values` without the `values` dup — `exists?`, scoped `count`, association scopes; 62/97. Boundary: a subclass overriding `values`. **Merged 2026-11-02** ([f861e1e](https://github.com/rails/rails/commit/f861e1e0ce)).
   - [#59544](https://github.com/rails/rails/pull/59544), extract Ranges in `ArrayHandler` only when present — every `where(col: array)` and preload `IN`; 60/97. **Merged 2026-11-02** ([5810776](https://github.com/rails/rails/commit/5810776eec)).
+- From [census 5](rails-main-census-5.md) (same nine apps on main 5810776 after the merges), Codex Thermos (GPT-6.1 Sol) approve on both rubrics for each; opened 2026-11-02:
+  - [#59551](https://github.com/rails/rails/pull/59551), skip `extending!` in `Relation#merge` when there are no extensions — every merge −1 (`author.posts.count` **100 → 98**); 76/97, median **−5.8**; 63/97 still move with open #59212.
+  - [#59552](https://github.com/rails/rails/pull/59552), a direct association reflection's `constraints` returns `scopes` — −2 per direct reflection (`post.comments.size` **249 → 246**); 74/97, median **−7.3**. Boundary: a subclass overriding `chain`.
+  - [#59553](https://github.com/rails/rails/pull/59553), frozen empty `default_extensions` without a default scope — −1 per association proxy; 58/97, median **−1.6**. Boundary: a caller mutating the result.
+  - Held: `merger-bang-method-names` (40be14c), most of its gain overlaps #59212's removed `limit(1)` merge.
 
 ### Importmap — rails/importmap-rails
 
