@@ -49,6 +49,12 @@ Where they disagree with this section, this section wins.
    output and explicit eval preserve existing load hooks and adapter selection.
    Bundlebun's order-sensitive integration loading requires a targeted no-op;
    Redprints loses its fast-path hits ([loaders.md](loaders.md)).
+7. **Discovery first, lowering parked (2026-11-02).** Runtime lowering failed
+   the YJIT gate and stays parked. Lowrail's measurements are now used to fix
+   avoidable work upstream (Rails, gems, YJIT/ZJIT, apps), where maintainers
+   have merged a series of such changes, and to power advisory types/MCP that
+   need no lowering. Contract §1 still binds the runtime gem; it just gains no
+   new passes for now. [Decision and stop list](DECISIONS.md#lowrail-reoriented-toward-upstream-fixes-and-advisory-types-2026-11-02).
 
 ## 1. Contract
 

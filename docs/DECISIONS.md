@@ -4,6 +4,38 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Lowrail reoriented toward upstream fixes and advisory types (2026-11-02)
+
+Lowrail's boot facts, allocation censuses and JIT fallback counts found work
+that maintainers accepted: seven Rails PRs, sqlite3-ruby #758, Prism #4298,
+three Campfire PRs and five ruby/ruby JIT fixes are merged
+([ledger](upstream/contributions.md)). Lowrail's own runtime lowering did not
+survive the YJIT gate (Bet S below), and the default build lowers nothing.
+
+The rejections point the same way. Feature #22459 (method tokens for a
+specializer) was declined in substance: tenderlovemaking called it the JIT's
+responsibility and suggested fixing such code in the framework; alanwu saw no
+reason to ship an experimental primitive. ruby/ruby#19488 was closed because
+its gain (≈0.07% of railsbench sends) did not justify the complexity.
+
+**Decision.** Lowrail is first a discovery tool: measure real apps, locate
+avoidable work, and fix it where it lives (Rails, the gem, YJIT/ZJIT, the
+app). Second, it ships advisory types and MCP that need no lowering. The
+runtime gem, guards and sealed tier stay in the tree as research, unchanged
+and not promoted.
+
+1. **Pursue, in order:** keep open upstream PRs current or close them
+   deliberately; turn Lowrail's JIT fallback counts into YJIT/ZJIT fixes only
+   when ruby-bench headline workloads show the effect; rerun the allocation
+   census against current Rails main to find what remains after the merges;
+   close the held-out types/MCP gaps ([types-usefulness](types-usefulness.md)).
+2. **Submission bar:** exact, small, live-dispatch-preserving changes with
+   short PR bodies and the maintainers' own benchmark (ruby-bench for Ruby).
+   Micro effects below about 0.1% of headline work are not submitted.
+3. **Stop:** new interpreter-Ir pricing, sealed-tier breadth, guarded
+   endpoints, Rails 8.2 sealed re-certification before a beta, and further
+   promotion of #22459 or its drafts.
+
 ## Bet S: runtime lowering parked (2026-10-23)
 
 **runtime lowering parked: interpreter-only gains do not count, YJIT is the reference**.

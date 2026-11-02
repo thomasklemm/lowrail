@@ -10,10 +10,14 @@ Allocation reductions, instruction counts, fallback diagnostics and helper
 microbenchmarks are not interchangeable with request latency or throughput.
 Where a PR reports no performance measurement, none is inferred here.
 
-Coverage: public PRs by `thomasklemm` opened October 19–22, plus the older
-Campfire work below. Roundhouse compiler work and a review of another
-author's Mail PR are listed separately. Closed superseded PRs are omitted
-except for the consolidation note below.
+**Rechecked on 2026-11-02:** every PR state below was read again with
+`gh pr view`; PRs opened October 23 – November 2 were added from
+`gh search prs --author thomasklemm --created 2026-10-23..2026-11-02`.
+
+Coverage: public PRs by `thomasklemm` opened October 19 – November 2 that
+relate to Lowrail, plus the older Campfire work below. Roundhouse compiler work
+and a review of another author's Mail PR are listed separately. Closed
+superseded PRs are omitted except for the notes under [Closed](#closed).
 
 [Merged](#merged) · [Closed](#closed) · [Open](#open) · [Campfire maintenance](#campfire-maintenance) ·
 [Reviews](#reviews) · [Roundhouse](#roundhouse) ·
@@ -21,7 +25,7 @@ except for the consolidation note below.
 
 ## Merged
 
-All entries in this section are **merged; checked on 2026-10-22**.
+All entries in this section are **merged; rechecked on 2026-11-02**.
 The merge links use GitHub's `mergeCommit`, not the contributor's pre-merge commit.
 
 ### Rails — rails/rails
@@ -33,6 +37,20 @@ The merge links use GitHub's `mergeCommit`, not the contributor's pre-merge comm
 - [#59270](https://github.com/rails/rails/pull/59270), reuse delegated-type helper names — **2 → 1 allocations/call** in interpreter/YJIT/ZJIT; median million helper calls/s **0.977 → 1.181 / 1.358 → 1.594 / 1.371 → 1.748**, respectively. Helper microbenchmarks only, not application-level speedups. [Merge ab5a78a](https://github.com/rails/rails/commit/ab5a78a7c221915cbf09c2824068c4479d144f91).
 - [#59274](https://github.com/rails/rails/pull/59274), reuse unique asset-tag source arrays — **one Array/helper call** saved in all nine cases and interpreter/YJIT/ZJIT (default **29 → 28**, three stylesheets **64 → 63**, preload-disabled/deferred **22 → 21**). Allocation-only: two ZJIT A/A timing controls exclude parity; no speedup/application saving claimed. [Merge e4fd6cb](https://github.com/rails/rails/commit/e4fd6cb9678755b209de3fbb79ccb36f4311e4dc).
 - [#59278](https://github.com/rails/rails/pull/59278), reuse PostgreSQL result fields while casting — **one Array per column-bearing result**, including zero rows: **11 → 10 / 10 → 9 / 72 → 71 / 16 → 15** objects/cast across the four fixtures; zero-column control unchanged. All 108 preregistered interpreter/YJIT/ZJIT workers retain the delta; noisy CPU intervals support **no speed or Ir claim**. [Merge fb7501a](https://github.com/rails/rails/commit/fb7501ad2d7f77713a7de4ed20db1d1d5b5f1c02).
+
+### Ruby — ruby/ruby
+
+**Merged; checked on 2026-11-02.** JIT correctness and diagnostics fixes; none claims a speedup.
+
+- [#19485](https://github.com/ruby/ruby/pull/19485), stop ZJIT send counters accumulating across specialization retries — repro counters **[18, 18, 9] → [9, 9, 9]**; railsbench's first two counters **749,107 → 250,038**, control unchanged. Counter-correctness fix; three stats-off chunky-png comparisons ran 2.3–5.7% longer with identical HIR, cause unexplained, **no performance claim**. [Merge 8258233](https://github.com/ruby/ruby/commit/8258233785195eb92e05e7bd964d0b00d94ed824).
+- [#19538](https://github.com/ruby/ruby/pull/19538), exit with the original send's stack on ZJIT stack overflow — master crashed or returned wrong arguments for default-filled/reordered keywords, rest and `&nil` sends at all 12 tested VM stack sizes; the PR passes all of them. Correctness fix, normal path unchanged. [Merge 461085c](https://github.com/ruby/ruby/commit/461085c2c7c23a0c3393223d603d4254f30f6f7c).
+- [#19554](https://github.com/ruby/ruby/pull/19554), YJIT falls back for explicit keywords in IFUNC block calls — `enum_for` with `yield [], key: 1` returned `[[[], 1]]` instead of the interpreter's `[[[], {key: 1}]]`. Correctness fix. [Merge 54d0988](https://github.com/ruby/ruby/commit/54d098816777fd29e716746c2adcb3bbe4f88710).
+- [#19586](https://github.com/ruby/ruby/pull/19586), ZJIT guards the lookup CME when resolving aliases — re-aliasing a module method could keep calling the old target; regressions for sends and `super` fail without the fix. [Merge 1654a6a](https://github.com/ruby/ruby/commit/1654a6a0fd71ef962635d1322a37cc50f908d91a).
+- [#19619](https://github.com/ruby/ruby/pull/19619), backport of #19554 to `ruby_4_0`, requested in review. [Merge 9bebcb4](https://github.com/ruby/ruby/commit/9bebcb455f0f9ddbd4af1d3e5dcf2a96b508a455).
+
+### SQLite — sparklemotion/sqlite3-ruby
+
+- [#758](https://github.com/sparklemotion/sqlite3-ruby/pull/758), avoid a row Array on statement completion — **one Array/completed statement, not per row**: empty SELECT **2 → 1**, one-row SELECT **4 → 3**, empty UPDATE **2 → 1** objects; repeated DONE stays zero. Allocation-only; no speed, latency or CPU no-regression claim. **Merged; checked on 2026-11-02.** [Merge 526d4e1](https://github.com/sparklemotion/sqlite3-ruby/commit/526d4e1d8aea588950850d4a204f298616d95b81).
 
 ### Prism — ruby/prism
 
@@ -49,19 +67,22 @@ These performance-related PRs were opened before the October 19–22 census.
 ## Closed
 
 - **Closed unmerged; checked on 2026-10-23:** [ruby/ruby#19478](https://github.com/ruby/ruby/pull/19478), ZJIT empty keyword-rest direct sends, closed in favor of [#19488](https://github.com/ruby/ruby/pull/19488), which carries both commits, at [k0kubun's suggestion](https://github.com/ruby/ruby/pull/19478#issuecomment-6353913049). This is consolidation, not a merge; the historical microbenchmark remains in the closed PR.
+- **Closed unmerged by the author; checked on 2026-11-02:** [ruby/ruby#19488](https://github.com/ruby/ruby/pull/19488), the consolidated ZJIT empty/literal keyword-rest PR, closed 2026-10-26 following k0kubun's complexity concern ([closing comment](https://github.com/ruby/ruby/pull/19488#issuecomment-6423531796)): on ruby-bench the removed literal-keyword fallbacks are about **0.07%** of sends on railsbench and **0.03%** on shipit, the hottest affected callees save roughly 40 ns/call, and headline timings stay within A/A noise for ZJIT and YJIT. Its earlier fallback counts, micros and headline-fallback reply remain in the closed PR; they are not merged work.
+- **Closed unmerged; checked on 2026-11-02:** [ruby/ruby#19555](https://github.com/ruby/ruby/pull/19555), recompile once when a PatchPoint invalidates a ZJIT final version, closed in favor of another author's [#19617](https://github.com/ruby/ruby/pull/19617), which handles the same case.
 
 ## Open
 
-All entries in this section are **open, not merged; checked on 2026-10-22**
-unless a later check is noted inline.
+All entries in this section are **open, not merged; checked on 2026-11-02**.
+Measurements are the PRs' own, from their original dates.
 
 ### Ruby — ruby/ruby
 
 - [#19483](https://github.com/ruby/ruby/pull/19483), guard ZJIT protected sends with runtime caller `self` — earlier stacked prototype permission fallbacks/request **87 → 1** blog, **353 → 9** Fizzy; inherited-options micro ZJIT **−36.45% [−38.75, −34.95]**, but YJIT **+3.61% [+1.26, +6.80]**. Not measurements of this independently master-based PR binary; no master-alone or whole-app speed claim.
 - [#19484](https://github.com/ruby/ruby/pull/19484), allow Proc arguments for explicit block parameters in ZJIT — **27 final send fallbacks/request removed in Fizzy, none in the blog**; earlier Arel-style forwarding micro ZJIT **−61.41% [−63.78, −59.53]**, interpreter **+1.75% [+0.03, +3.67]**, YJIT unresolved. Nine unrelated yield fallbacks remain; no request-throughput claim.
-- [#19485](https://github.com/ruby/ruby/pull/19485), prevent ZJIT send counters accumulating across specialization retries — repro counters **[18, 18, 9] → [9, 9, 9]**, deeper inlining **[27, 27, 9] → [9, 9, 9]**; diagnostics fix, not fewer executed sends. Without stats, normalized HIR/main-path disassembly is unchanged; no performance claim.
 - [#19487](https://github.com/ruby/ruby/pull/19487), compile YJIT `super` on Class/Module receivers — untimed singleton-super fallbacks/request **141 → 13** blog, **300 → 16** Fizzy; dynamic dispatch attempts **616 → 488 / 1,304 → 1,020**. Escaping micro: **352 fewer Ir/call (32.20% of marginal work)** and **23.12% less YJIT time [−29.82, −17.35]%**, not whole-request speed. Class/module graph retention remains; ordinary singleton receivers stay refused.
-- [#19488](https://github.com/ruby/ruby/pull/19488), ZJIT empty/literal keyword-rest direct sends, carrying both commits after #19478 closed — **open; checked on 2026-10-23**. Earlier literal-kwrest **2M-call mean 266.28 → 134.88 ms**, kwrest fallbacks **2,000,000 → 0**, allocations unchanged; paired **−48.85% [−52.28, −46.00]**, with ZJIT A/A drift **−5.18% [−10.49, −0.84]** and interpreter elapsed **+3.95% [+0.36, +7.63]**. These wall-time results predate the assertion-only amendment and were not repeated. Diagnostic request counter increments **62 → 31** blog, **343 → 88** Fizzy, not unique calls or whole-app speed; measured windows each compiled two ISeqs. The [headline benchmark reply](https://github.com/ruby/ruby/pull/19478#issuecomment-6354265907) covers all **16 ruby-bench headline workloads** in the #19478 empty-kwrest-only comparison: removed fallbacks **263 → 0** Lobsters, **1,987 → 0** Railsbench, **504 → 0** RuboCop, **320 → 0** Shipit, for one measured iteration after five warmups. Every measured empty/literal kwrest category is **below 0.02% of base JIT sends**; **no headline timing was run and no headline speedup is claimed**. These are not new combined-PR measurements.
+- [#19558](https://github.com/ruby/ruby/pull/19558), ZJIT reprofiles shape-polymorphic send misses — across 16 headline workloads, polymorphic fallbacks **20,763,714 → 16,787,818** and dynamic sends **87,940,035 → 84,116,799** (erubi-rails **12,222,068 → 8,921,915**); megamorphic fallbacks rise **8,175,838 → 8,317,469**. Three interleaved headline runs: geomean PR/base **0.986 / 1.006 / 0.997** versus A/A **1.006 / 0.997 / 0.996**, so **no measurable timing effect**.
+- [#19620](https://github.com/ruby/ruby/pull/19620), backport of merged #19554 to `ruby_3_4`, requested in review — correctness fix, no measurement.
+- [#19625](https://github.com/ruby/ruby/pull/19625), ZJIT Ruby fast path for `Integer#step` with a block (resolves Shopify/ruby#1090) — `yield` can become a direct JIT block call when the block's parameter count matches; all other shapes use the C implementation. Also fixes `1.step(by: 2, to: 3).with_index` raising under the JITs. Correctness evidence covers ~50 hand cases and ~13k generated argument combinations; like `times`/`downto`, redefining `Integer#+`/`<=`/`>=` changes the result.
 - [#19492](https://github.com/ruby/ruby/pull/19492), count YJIT dynamic sends before dispatch — for **1,000** raising, throwing or block-break sends, counter **0 → 1,000**; normal-return control **1,000 → 1,000** and results unchanged. Corrects attempt diagnostics only; **no performance claim**.
 
 ### Importmap — rails/importmap-rails
@@ -70,7 +91,6 @@ unless a later check is noted inline.
 
 ### SQLite — sparklemotion/sqlite3-ruby
 
-- [#758](https://github.com/sparklemotion/sqlite3-ruby/pull/758), avoid a row Array on statement completion — **one Array/completed statement, not per row**: empty SELECT **2 → 1**, one-row SELECT **4 → 3**, empty UPDATE **2 → 1** objects; repeated DONE stays zero. Allocation-only; no speed, latency or CPU no-regression claim.
 
 ### Time zones — tzinfo/tzinfo
 
@@ -112,18 +132,19 @@ unless a later check is noted inline.
 
 ## Campfire maintenance
 
-**Checked on 2026-10-22:** merged [#341](https://github.com/basecamp/once-campfire/pull/341) (libvips blocking test), [#342](https://github.com/basecamp/once-campfire/pull/342) (RuboCop), [#343](https://github.com/basecamp/once-campfire/pull/343) (Puma 8), [#344](https://github.com/basecamp/once-campfire/pull/344) (Ruby 4.0.7); open [#345](https://github.com/basecamp/once-campfire/pull/345) (Solid Cache), [#346](https://github.com/basecamp/once-campfire/pull/346) (Solid Queue), [#347](https://github.com/basecamp/once-campfire/pull/347) (Solid Cable, dependent on #345/#346). Maintenance/operational work, not performance claims; #343's local HTTP benchmark was unavailable, and the store/queue cutovers have explicit migration/deployment limits.
+**Checked on 2026-11-02:** merged [#341](https://github.com/basecamp/once-campfire/pull/341) (libvips blocking test), [#342](https://github.com/basecamp/once-campfire/pull/342) (RuboCop), [#343](https://github.com/basecamp/once-campfire/pull/343) (Puma 8), [#344](https://github.com/basecamp/once-campfire/pull/344) (Ruby 4.0.7); open [#345](https://github.com/basecamp/once-campfire/pull/345) (Solid Cache), [#346](https://github.com/basecamp/once-campfire/pull/346) (Solid Queue), [#347](https://github.com/basecamp/once-campfire/pull/347) (Solid Cable, dependent on #345/#346). Maintenance/operational work, not performance claims; #343's local HTTP benchmark was unavailable, and the store/queue cutovers have explicit migration/deployment limits.
 
 ## Reviews
 
-- **Open; checked on 2026-10-22:** [mikel/mail#1693](https://github.com/mikel/mail/pull/1693), another author's MIME/attachment allocation PR, was [validated rather than duplicated](https://github.com/mikel/mail/pull/1693#pullrequestreview-5620401003). Our Ruby 4.0.8 review measures body-check **201 → 0 objects/call**, missing-header filename **30 → 18**, present-header control **34 → 34**; it finds an **invalid-UTF-8 `IndexError` regression** after a newline, plus a `$/ = nil` compatibility edge. Synthetic in-memory message flows are not SMTP delivery; A/A outliers of **18%/26%** preclude a firm delivery-speed claim. The census's **108 attributed objects/operation** are not 108 proven removable allocations.
+- **Open; checked on 2026-11-02:** [mikel/mail#1693](https://github.com/mikel/mail/pull/1693), another author's MIME/attachment allocation PR, was [validated rather than duplicated](https://github.com/mikel/mail/pull/1693#pullrequestreview-5620401003). Our Ruby 4.0.8 review measures body-check **201 → 0 objects/call**, missing-header filename **30 → 18**, present-header control **34 → 34**; it finds an **invalid-UTF-8 `IndexError` regression** after a newline, plus a `$/ = nil` compatibility edge. Synthetic in-memory message flows are not SMTP delivery; A/A outliers of **18%/26%** preclude a firm delivery-speed claim. The census's **108 attributed objects/operation** are not 108 proven removable allocations.
 
 ## Roundhouse
 
-Compiler/runtime/CI work in `rubys/roundhouse`, not additional performance
-PR measurements. Titles and states only; all **checked on 2026-10-22** via
-individual `gh pr view` calls. Includes merged/open PRs created since
-2026-10-19, not closed superseded work.
+Compiler/runtime/CI work in Roundhouse, not additional performance
+PR measurements. The repository moved from `rubys/roundhouse` to
+`roundhouse-rb/roundhouse`; old links redirect. Titles and states only; all
+**checked on 2026-11-02** via individual `gh pr view` calls. Includes
+merged/open PRs created since 2026-10-19, not closed superseded work.
 
 ### Merged
 
@@ -155,11 +176,18 @@ individual `gh pr view` calls. Includes merged/open PRs created since
 - [#1194](https://github.com/rubys/roundhouse/pull/1194) — Bump ruby-prism to 2.0.0 and rubydex to v0.4.2 — merged.
 - [#1206](https://github.com/rubys/roundhouse/pull/1206) — Use Prism 2 line_offsets, sharper recovery diagnostics, StringQuery audit — merged.
 - [#1212](https://github.com/rubys/roundhouse/pull/1212) — Escape control characters in Prism recovery previews — merged.
+- [#1231](https://github.com/roundhouse-rb/roundhouse/pull/1231) — Test ownership of emitted truncate results — merged.
+- [#1233](https://github.com/roundhouse-rb/roundhouse/pull/1233) — Respect app helper return types in ActionView analysis — merged.
+- [#1275](https://github.com/roundhouse-rb/roundhouse/pull/1275) — lower: association-build temps skip a leading underscore — merged.
+- [#1438](https://github.com/roundhouse-rb/roundhouse/pull/1438) — ingest: Mentions word index stays single-map when serial — merged.
+- [#1442](https://github.com/roundhouse-rb/roundhouse/pull/1442) — ingest: refuse unsafe file-level constant hoists — merged.
+- [#1443](https://github.com/roundhouse-rb/roundhouse/pull/1443) — lower: warn on eager find under an aggregate on untyped subclasses — merged.
+- [#1444](https://github.com/roundhouse-rb/roundhouse/pull/1444) — lower: quiet non-loading in_batches; keep where.find.count warned — merged.
+- [#1451](https://github.com/roundhouse-rb/roundhouse/pull/1451) — ingest: use crate::det hash maps in file_constant_hoist — merged.
 
 ### Open
 
-- [#1231](https://github.com/rubys/roundhouse/pull/1231) — Test ownership of emitted truncate results — open.
-- [#1233](https://github.com/rubys/roundhouse/pull/1233) — Respect app helper return types in ActionView analysis — open.
+None.
 
 ## Investigated, not submitted
 
@@ -177,7 +205,7 @@ Read the current body and state, not only a search result or an old receipt:
 
 ```sh
 gh pr view NUMBER --repo OWNER/REPO --json title,url,state,mergedAt,mergeCommit,body
-gh search prs --author thomasklemm --repo rubys/roundhouse --created '>=2026-10-19' --limit 100
+gh search prs --author thomasklemm --repo roundhouse-rb/roundhouse --created '>=2026-10-19' --limit 100
 ```
 
 Move entries when state changes, refresh the checked-on date, and preserve
