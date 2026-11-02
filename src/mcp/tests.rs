@@ -1,6 +1,68 @@
 use super::*;
 
 #[test]
+fn callers_follow_respond_to_blocks_and_includers_and_views_follow_record_renders() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-dispatch-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
+    std::fs::create_dir_all(dir.join("app/views/cards")).unwrap();
+    std::fs::create_dir_all(dir.join("app/controllers")).unwrap();
+    let controller = dir.join("app/controllers/cards_controller.rb");
+    let concern = dir.join("app/stamped.rb");
+    std::fs::write(&controller, "class CardsController\n def index\n  respond_to do |format|\n   format.html { finish }\n   format.json do |variant|\n    variant.phone { finish }\n   end\n  end\n  other_block { finish }\n end\n def finish = 1\nend\n").unwrap();
+    std::fs::write(&concern, "module Stamped\n def stamp = finish\nend\n").unwrap();
+    use sha2::{Digest, Sha256};
+    let digest = format!("{:x}", Sha256::digest(b"template"));
+    for name in ["index", "_card", "_widget"] {
+        std::fs::write(dir.join(format!("app/views/cards/{name}.html.erb")), "template").unwrap();
+    }
+    let at = |file: &std::path::Path, line: u32| format!("{}:{line}", file.display());
+    let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[
+            {"name":"CardsController","kind":"class","ancestors":["CardsController","Stamped","ActionController::MimeResponds"],
+             "const_source_location":at(&controller,1),"methods":[
+                {"name":"index","owner":"CardsController","source_location":at(&controller,2)},
+                {"name":"finish","owner":"CardsController","source_location":at(&controller,11)}]},
+            {"name":"Stamped","kind":"module","ancestors":["Stamped"],"const_source_location":at(&concern,1),
+             "methods":[{"name":"stamp","owner":"Stamped","source_location":at(&concern,2)}]},
+            {"name":"Other","kind":"class","ancestors":["Other","Stamped"]},
+            {"name":"ActionController::MimeResponds","kind":"module",
+             "methods":[{"name":"respond_to","owner":"ActionController::MimeResponds","iseq_kind":"method"}]},
+            {"name":"Card","kind":"class","ancestors":["Card"]},
+            {"name":"Widget","kind":"class","ancestors":["Widget"]},
+            {"name":"Gadget","kind":"class","ancestors":["Gadget","Widget"]}],
+        "models":[{"name":"Card","partial_path":"cards/card"},{"name":"Widget","partial_path":"cards/widget"}],
+        "controllers":[{"name":"CardsController","actions":["index"]}],
+        "routes":[{"controller":"cards","action":"index"}],
+        "templates":[{"identifier":format!("{}/app/views/cards/index.html.erb",dir.display()),"virtual_path":"cards/index",
+            "source_sha256":digest,"code":"render @cards; render @card; render @widgets; render @unknown"},
+            {"identifier":format!("{}/app/views/cards/_card.html.erb",dir.display()),"virtual_path":"cards/_card","source_sha256":digest},
+            {"identifier":format!("{}/app/views/cards/_widget.html.erb",dir.display()),"virtual_path":"cards/_widget","source_sha256":digest}]});
+    std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+    std::fs::write(dir.join(".lowrail/observed.json"), json!({"format":1,"app_root":dir,"types":[
+        {"module":"CardsController","name":"index","ivars":{"@cards":{"Array":1},"@card":{"Card":1},"@widgets":{"Array":1}},
+            "collection_members":{"ivar:@cards":{"Array.element":{"Card":2}},"ivar:@widgets":{"Array.element":{"Widget":1}}}}]}).to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    let callers = data.call("callers", &json!({"target":"CardsController#finish"})).unwrap();
+    let lines: Vec<_> = callers["callers"].as_array().unwrap().iter().map(|c| (c["line"].clone(), c["caller"].clone())).collect();
+    assert_eq!(lines, vec![(json!(4), json!("CardsController#index")), (json!(6), json!("CardsController#index")),
+        (json!(2), json!("Stamped#stamp"))], "respond_to/format/variant blocks keep self; the includer resolves the mixin call");
+    assert_eq!(callers["callers"][2]["via"], "CardsController");
+    assert_eq!(callers["unresolved"].as_array().unwrap().len(), 1, "an arbitrary block may rebind self");
+    assert_eq!(callers["unresolved"][0]["line"], 9);
+    // Other also includes Stamped but does not define finish: no caller for it.
+    assert_eq!(data.call("callers", &json!({"target":"CardsController#stamp"})).unwrap()["callers"], json!([]));
+    let card = data.call("view_locals", &json!({"path":"cards/_card"})).unwrap();
+    let incoming = card["templates"][0]["incoming"].as_array().unwrap();
+    assert_eq!(incoming.len(), 2);
+    assert_eq!(incoming[0]["local_names"], json!(["card", "card_counter", "card_iteration"]));
+    assert_eq!(incoming[0]["locals"]["card"]["name"], "Card");
+    assert_eq!(incoming[1]["local_names"], json!(["card"]), "a single record has no counter");
+    let widget = data.call("view_locals", &json!({"path":"cards/_widget"})).unwrap();
+    assert_eq!(widget["templates"][0]["incoming"], json!([]), "a subclass may render another partial");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn callers_and_view_inputs_are_bounded_contextual_and_refresh_sources() {
     let dir = std::env::temp_dir().join(format!("lowrail-mcp-useful-{}", std::process::id()));
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();

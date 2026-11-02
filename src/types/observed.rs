@@ -98,6 +98,11 @@ impl TypeModel {
                             _ => class_type(facts, c),
                         }
                     }).collect();
+                    let mut arms = arms;
+                    // Samples are not exhaustive: keep a nil the source can return.
+                    if slot == "return" && ty.provenance.iter().any(|p| p.detail.starts_with(super::infer::NIL_PATH)) {
+                        arms.insert("nil".into());
+                    }
                     ty.name = if arms.contains("untyped") { "untyped".into() }
                         else if arms.len() == 1 { arms.into_iter().next().unwrap() }
                         else { format!("({})", arms.into_iter().collect::<Vec<_>>().join(" | ")) };

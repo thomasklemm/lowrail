@@ -42,7 +42,8 @@ Prism can look at the source span.
     "attribute_aliases": {"id_value": "id"},
     "associations": [{"macro": "has_many", "name": "comments", "class_name": "Comment",
                       "foreign_key": "article_id", "options": {"dependent": "destroy"}}],
-    "callbacks": {"save": [{"kind": "before", "filter": "normalize", "filter_type": "method", "conditions": false}]}
+    "callbacks": {"save": [{"kind": "before", "filter": "normalize", "filter_type": "method", "conditions": false}]},
+    "partial_path": "articles/article" // implicit `render record` partial; null unless to_partial_path is stock
   }],
   "controllers": [{"name": "ArticlesController", "abstract": false, "actions": ["index"],
                    "callbacks": [{"kind": "before", "filter": "set_article", "filter_type": "method", "conditions": true}]}],

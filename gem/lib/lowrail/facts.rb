@@ -418,6 +418,12 @@ module Lowrail
           "attribute_aliases" => json_safe(model.attribute_aliases),
           "associations" => model.reflect_on_all_associations.map { |r| association_entry(name, r) }.compact,
           "callbacks" => callbacks(model, "model #{name}"),
+          # Implicit `render record` partial, only with stock to_partial_path.
+          "partial_path" => guard("model #{name} partial path") do
+            stock = model.instance_method(:to_partial_path).owner == ActiveModel::Conversion &&
+              model.singleton_class.instance_method(:_to_partial_path).owner == ActiveModel::Conversion::ClassMethods
+            "#{model.model_name.collection}/#{model.model_name.element}" if stock
+          end,
         }
       end
 

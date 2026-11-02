@@ -195,6 +195,8 @@ pub struct Model {
     pub attribute_aliases: BTreeMap<String, String>,
     pub associations: Vec<Association>,
     pub callbacks: BTreeMap<String, Vec<Callback>>,
+    /// `"#{collection}/#{element}"` when `to_partial_path` is Rails' own.
+    pub partial_path: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

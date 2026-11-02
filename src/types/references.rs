@@ -22,11 +22,12 @@ pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
         let parsed = parser.parse(&source);
         if parsed.errors().next().is_some() { unavailable.push(path); continue; }
         Calls { facts, path, source: &source, wanted, wanted_receiver: receiver, name, context: None,
+            preserving: Vec::new(), collectors: Vec::new(),
             found: &mut found, unresolved: &mut unresolved }.visit(&parsed.node());
     }
     Ok(json!({"available":true,"target":target,"callers":found,"unresolved":unresolved,
         "unavailable_sources":unavailable,
-        "complete":false,"scope":"boot-indexed Ruby files; implicit/self/constant receivers outside blocks only; dynamic dispatch, templates and unindexed files are not exhaustive"}))
+        "complete":false,"scope":"boot-indexed Ruby files; implicit/self/constant receivers outside blocks, plus Rails respond_to/format blocks and module methods resolved through booted includers; dynamic dispatch, other blocks, templates and unindexed files are not exhaustive"}))
 }
 
 struct Calls<'a> {
@@ -37,6 +38,10 @@ struct Calls<'a> {
     wanted_receiver: &'a str,
     name: &'a str,
     context: Option<(String, String, bool)>,
+    /// Per enclosing call: whether its block runs with the caller's self.
+    preserving: Vec<bool>,
+    /// Block parameters bound to Rails' respond_to collectors.
+    collectors: Vec<Vec<u8>>,
     found: &'a mut Vec<Value>,
     unresolved: &'a mut Vec<Value>,
 }
@@ -72,12 +77,21 @@ impl<'pr> Visit<'pr> for Calls<'_> {
                 _ => None,
             };
             let resolved = receiver.as_ref().and_then(|(r, s)| resolve(self.facts, r, self.name, *s));
+            // A module method's implicit self is any booted class that includes
+            // it. Report the site only for the queried class, with that class.
+            let via = (resolved.is_none() && !receiver.as_ref().is_some_and(|(_, s)| *s)
+                && node.receiver().is_none_or(|n| n.as_self_node().is_some()))
+                .then(|| self.includer()).flatten();
             let line = self.source[..loc.start() as usize].iter().filter(|&&b| b == b'\n').count() + 1;
             let column = self.source[..loc.start() as usize].iter().rposition(|&b| b == b'\n')
                 .map_or(loc.start() as usize + 1, |p| loc.start() as usize - p);
             let site = json!({"path":self.path,"line":line,"column":column,
                 "caller":self.context.as_ref().map(|(r, m, s)| key(r, m, *s))});
-            if let Some((_, method)) = resolved {
+            if let Some(via) = via {
+                let mut site = site;
+                site["via"] = json!(via);
+                self.found.push(site);
+            } else if let Some((_, method)) = resolved {
                 if receiver.as_ref().is_some_and(|(r, _)| r == self.wanted_receiver)
                     && method.owner == self.wanted.owner && method.name == self.wanted.name
                     && method.singleton == self.wanted.singleton {
@@ -87,12 +101,53 @@ impl<'pr> Visit<'pr> for Calls<'_> {
                 self.unresolved.push(site);
             }
         }
+        self.preserving.push(self.preserves_self(node));
         ruby_prism::visit_call_node(self, node);
+        self.preserving.pop();
     }
 
     fn visit_block_node(&mut self, node: &ruby_prism::BlockNode<'pr>) {
+        if self.preserving.last() == Some(&true) {
+            // Rails stores these blocks and later calls them with `call`, so
+            // their self is still the enclosing method's receiver.
+            let parameter = node.parameters().and_then(|p| p.as_block_parameters_node())
+                .and_then(|p| p.parameters()).and_then(|p| p.requireds().iter().next())
+                .and_then(|p| p.as_required_parameter_node()).map(|p| p.name().as_slice().to_vec());
+            let pushed = parameter.map(|p| self.collectors.push(p)).is_some();
+            ruby_prism::visit_block_node(self, node);
+            if pushed { self.collectors.pop(); }
+            return;
+        }
         let previous = self.context.take();
+        let collectors = std::mem::take(&mut self.collectors);
         ruby_prism::visit_block_node(self, node);
         self.context = previous;
+        self.collectors = collectors;
+    }
+}
+
+impl Calls<'_> {
+    fn preserves_self(&self, node: &ruby_prism::CallNode<'_>) -> bool {
+        match node.receiver() {
+            None => node.name().as_slice() == b"respond_to" && self.context.as_ref().is_some_and(|(r, _, s)|
+                !*s && resolve(self.facts, r, "respond_to", false)
+                    .is_some_and(|(_, m)| m.owner == "ActionController::MimeResponds")),
+            Some(receiver) => receiver.as_local_variable_read_node()
+                .is_some_and(|n| self.collectors.iter().any(|c| c.as_slice() == n.name().as_slice())),
+        }
+    }
+
+    /// The queried class, when the current context is an instance method of a
+    /// module that this class includes and the name resolves to the target there.
+    fn includer(&self) -> Option<String> {
+        let (module, _, false) = self.context.as_ref()? else { return None; };
+        if self.wanted.singleton || !self.facts.modules.iter().any(|m| &m.name == module && m.kind == "module") {
+            return None;
+        }
+        let class = self.facts.modules.iter().find(|m| m.name == self.wanted_receiver)?;
+        if !class.ancestors.iter().any(|a| a == module) { return None; }
+        let (_, method) = resolve(self.facts, &class.name, self.name, false)?;
+        (method.owner == self.wanted.owner && method.name == self.wanted.name && !method.singleton)
+            .then(|| class.name.clone())
     }
 }

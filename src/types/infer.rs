@@ -168,6 +168,8 @@ pub(super) fn argument(node: Node<'_>) -> bool {
 #[derive(Default)]
 struct Index {
     defs: BTreeMap<(u32, String), Expr>,
+    /// Bodies with a syntactic nil-returning path, even when inference fails.
+    nil_paths: BTreeSet<(u32, String)>,
     scopes: BTreeSet<(String, String)>,
     enums: BTreeSet<(String, String)>,
     source: Vec<u8>,
@@ -195,10 +197,12 @@ impl<'pr> Visit<'pr> for Index {
             .filter(|b| **b == b'\n')
             .count() as u32
             + 1;
-        self.defs.insert(
-            (line, String::from_utf8_lossy(n.name().as_slice()).into()),
-            n.body().map(method_body).unwrap_or(Expr::Literal("nil")),
-        );
+        let body = n.body().map(method_body).unwrap_or(Expr::Literal("nil"));
+        let name: String = String::from_utf8_lossy(n.name().as_slice()).into();
+        let mut returns = NilReturns(false);
+        if let Some(node) = n.body() { returns.visit(&node); }
+        if returns.0 || nil_tail(&body) { self.nil_paths.insert((line, name.clone())); }
+        self.defs.insert((line, name), body);
         // Do not mistake macro calls inside method bodies for declarations.
     }
 
@@ -225,6 +229,38 @@ impl<'pr> Visit<'pr> for Index {
         }
         ruby_prism::visit_call_node(self, n);
     }
+}
+
+/// Marker provenance: the source can return nil, so a sampled return type
+/// must keep a nil arm even when no sample saw one.
+pub(super) const NIL_PATH: &str = "source has a nil-returning path";
+
+fn nil_tail(expr: &Expr) -> bool {
+    match expr {
+        Expr::Literal(name) => *name == "nil",
+        Expr::Branch(_, yes, no) => nil_tail(yes) || nil_tail(no),
+        Expr::Sequence(body) => body.last().is_none_or(nil_tail),
+        Expr::Call(_, _, _, safe_navigation) => *safe_navigation,
+        _ => false,
+    }
+}
+
+/// Finds `return` / `return nil` that leave this method, including from
+/// blocks; lambdas and nested defs return from themselves instead.
+struct NilReturns(bool);
+
+impl<'pr> Visit<'pr> for NilReturns {
+    fn visit_return_node(&mut self, n: &ruby_prism::ReturnNode<'pr>) {
+        match n.arguments() {
+            None => self.0 = true,
+            Some(args) if args.arguments().len() == 1
+                && args.arguments().iter().next().unwrap().as_nil_node().is_some() => self.0 = true,
+            _ => {}
+        }
+        ruby_prism::visit_return_node(self, n);
+    }
+    fn visit_lambda_node(&mut self, _: &ruby_prism::LambdaNode<'pr>) {}
+    fn visit_def_node(&mut self, _: &ruby_prism::DefNode<'pr>) {}
 }
 
 impl Index {
@@ -308,7 +344,8 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
                     Source::BootFact,
                     format!("body at {path}:{line}"),
                 );
-                bodies.insert(id, (body.clone(), format!("{path}:{line}")));
+                let nil_path = index.nil_paths.contains(&(line, method.def_name().to_owned()));
+                bodies.insert(id, (body.clone(), format!("{path}:{line}"), nil_path));
             }
         }
     }
@@ -429,7 +466,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
     }
     for _ in 0..8 {
         let mut changes = Vec::new();
-        for (id, (expr, location)) in &bodies {
+        for (id, (expr, location, _)) in &bodies {
             let sig = &model.methods[id];
             let mut locals: BTreeMap<_, _> = sig.parameters.iter()
                 .map(|p| (p.name.clone(), p.ty.clone())).collect();
@@ -459,6 +496,12 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
             let sig = model.methods.get_mut(&id).unwrap();
             sig.return_type = ty;
             sig.ivars = ivars;
+        }
+    }
+    for (id, (_, location, nil_path)) in &bodies {
+        let ty = &mut model.methods.get_mut(id).unwrap().return_type;
+        if *nil_path && ty.name == "untyped" {
+            ty.provenance.push(Provenance { source: Source::Inference, detail: format!("{NIL_PATH} at {location}") });
         }
     }
 }
