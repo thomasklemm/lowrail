@@ -92,12 +92,12 @@ Measurements are the PRs' own, from their original dates.
 Opened 2026-11-02 from [census 3/3b](rails-main-census-3.md); allocation counts only, no timing claim. Held candidates 3, 4, 6 and 7 are listed there.
 
 - [#59534](https://github.com/rails/rails/pull/59534), map Arel `project`/`order`/`Window` rest arguments in place — Fizzy **−126/−39/−13**, Writebook **−6…−21**, blog index **−4**, both modes.
-- [#59535](https://github.com/rails/rails/pull/59535), avoid a rest Array in `HashWithIndifferentAccess#fetch` — every `params.fetch` and enum value cast: `params.fetch(:q)` **3 → 2** objects, `Post.where(status: :live).to_a` **77 → 74**; new boundary tests; Codex Thermos (GPT-6.1 Sol) approve on both rubrics. Opened 2026-11-02.
+- [#59535](https://github.com/rails/rails/pull/59535), avoid a rest Array in `HashWithIndifferentAccess#fetch` — every `params.fetch` and enum value cast: `params.fetch(:q)` **3 → 2** objects, `Post.where(status: :live).to_a` **77 → 74**; boundary tests for missing keys, falsy defaults and a present key with a block (head `fee8edf`; the block-plus-default warning test was dropped because Rails' strict-warnings CI turns that Ruby warning into an error); Codex Thermos (GPT-6.1 Sol) approve on both rubrics for the final head. Opened 2026-11-02; Buildkite green.
 - [#59536](https://github.com/rails/rails/pull/59536), share one frozen empty `collect_warnings` Array when a query has none — every executed query on SQLite, PostgreSQL without notices and MySQL without warnings (`Post.find(1)` **62 → 61**). Boundary: a third-party override appending to `super` would raise `FrozenError`.
 - [#59537](https://github.com/rails/rails/pull/59537), take `tag_string` options before the optional content — every `tag.*` call (`tag.span` **5 → 4**, custom `tag.my_widget` **9 → 6**). Boundary: private `:nodoc:` signature.
 - [#59538](https://github.com/rails/rails/pull/59538), frozen empty defaults when loading a relation — every query-running `Relation#load` −1, association load −2 (`post.author` **231 → 229**). Boundary: with `prepared_statements: false`, `sql.active_record` `binds` is that frozen Array.
 - [#59539](https://github.com/rails/rails/pull/59539), `drop(index)` for the join chain tail — one object per joined reflection in `joins`/`left_joins`/`eager_load`.
-- All four opened 2026-11-02 in parallel after Codex Thermos reviews (GPT-6.1 Sol) approved both rubrics for each.
+- All four opened 2026-11-02 in parallel after Codex Thermos reviews (GPT-6.1 Sol) approved both rubrics for each; Buildkite green on all four.
 
 ### Importmap — rails/importmap-rails
 
