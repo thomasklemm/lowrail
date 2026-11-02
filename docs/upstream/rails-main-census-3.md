@@ -231,13 +231,15 @@ These are short, following the merged PRs. The scripts are linked above. The dra
 
 ### 3 — Share an empty warnings Array when a query has none
 
-> The abstract adapter returned a new `[]` from `collect_warnings` for every query. PostgreSQL swapped
-> in a new Array even when no notice had arrived. Return a frozen empty Array in those cases.
+> Every query Active Record executes collects database warnings afterwards. On SQLite, PostgreSQL with no pending notice,
+> and MySQL with no warnings or warnings disabled, that meant a new empty `[]` per query, including `find`,
+> `pluck`, `insert`, `update` and association loads. Return a frozen empty Array in those cases.
 > Collected warnings are handed over and reset as before.
 >
-> One Array fewer per query on SQLite and PostgreSQL, and on MySQL when no warnings are pending or
-> warnings are disabled. Fizzy: 60/22/13 fewer objects per request. Blog: 2 fewer. The interpreter and
-> YJIT agree. No timing claim.
+> Per call: one object fewer per executed query (`Post.find(1)` 62 → 61, `select_all` 38 → 37).
+> Across the corpus: about 2 fewer objects per request (Blog), 3–16 (Writebook), 13–61 (Fizzy), 1–3 (CodeTriage on PostgreSQL). No timing claim.
+>
+Not a PR line. The branch is held back because of the FrozenError boundary: a caller that mutates the returned warnings Array would now raise.
 
 ## Blockers and limits
 
@@ -308,7 +310,7 @@ interpreter / YJIT where they differ):
 | # | Branch | Commit | Change |
 | --- | --- | --- | --- |
 | 4 | [`thomasklemm/tag-string-trailing-content`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-string-trailing-content) | [`df8bb7f451`](https://github.com/thomasklemm/rails/commit/df8bb7f45159896870b4633b99da9cb157e0d41e) | Private `TagBuilder#tag_string(name, content = nil, options, …)` becomes `(name, options, content = nil, …)`, and its three callers are reordered. |
-| 5 | [`thomasklemm/indifferent-fetch-without-rest`](https://github.com/thomasklemm/rails/tree/thomasklemm/indifferent-fetch-without-rest) | [`bf0b203829`](https://github.com/thomasklemm/rails/commit/bf0b2038294e671b468dfdf78c6551f6590fae07) | `HashWithIndifferentAccess#fetch(key, *extras)` becomes `fetch(key, default = (no_default = true; nil))`. |
+| 5 | [`thomasklemm/indifferent-fetch-without-rest`](https://github.com/thomasklemm/rails/tree/thomasklemm/indifferent-fetch-without-rest) | [`6a9c90662a`](https://github.com/thomasklemm/rails/commit/6a9c90662a2b19555d2ee876a6d821d5464d146f) | `HashWithIndifferentAccess#fetch(key, *extras)` becomes `fetch(key, default = (no_default = true; nil))`. Amended after review with boundary tests (was `bf0b203829`). |
 | 6 | [`thomasklemm/relation-load-frozen-empty-defaults`](https://github.com/thomasklemm/rails/tree/thomasklemm/relation-load-frozen-empty-defaults) | [`c11df3143f`](https://github.com/thomasklemm/rails/commit/c11df3143f14e559007fd4bf3cd566b81cc525cb) | `exec_main_query` passes `FROZEN_EMPTY_ARRAY` as binds to `_query_by_sql`. The `alias_tracker` default `joins = []` becomes `FROZEN_EMPTY_ARRAY`. |
 | 7 | [`thomasklemm/join-chain-drop`](https://github.com/thomasklemm/rails/tree/thomasklemm/join-chain-drop) | [`a70709e899`](https://github.com/thomasklemm/rails/commit/a70709e8991d998e6048191c4bbc2a2d65e055e0) | `JoinAssociation#join_constraints` uses `reflection_chain.drop(index)` instead of `reflection_chain[index..]`. |
 
@@ -358,6 +360,12 @@ Local suites (Ruby 4.0.7, seed 41231, serial):
 * **Active Support, full:** clean and branch 5 each give 6,865 runs / 29,875 assertions / 0 failures / 0 errors /
   60 skips. A first parallel attempt failed 30 and 25 `MemCacheStoreTest` cases on clean and branch alike,
   because both runs shared one memcached server. That attempt was discarded and both were rerun serially.
+  After the Thermos review nit, branch 5 was amended (`6a9c90662a`) with three tests in
+  `hash_with_indifferent_access_test.rb`: `nil`/`false` defaults, KeyError `key`/`receiver` for a missing key,
+  and block-only and block-plus-default (block wins, "block supersedes default value argument" warning). They pass
+  on the branch and on clean main. They catch a mutant that treats falsy defaults as "no default"
+  (1 error). Full Active Support on the amended commit: 6,868 runs / 29,885 assertions / 0 failures /
+  0 errors / 60 skips. RuboCop: no offenses.
 * **Active Record SQLite, full:** branches 5, 6 and 7 each give 10,247 runs, 0 failures, 0 errors, 52 skips,
   the same as clean main above.
 * **Branch 6 on other adapters:** PostgreSQL adapter tests plus `relations`, `finder` and `associations/join_model`
@@ -434,41 +442,53 @@ Ranks 301–330 appear only where a row above names them. Everything below rank 
 
 ### PR description drafts (not published)
 
+Rewritten after the Thermos reviews (2026-11-02) to lead with the common Rails pattern that reaches each path and the
+cost per call. App numbers stay as one supporting line. Per-call counts come from standalone micros on the fork
+branches (SQLite in memory, Ruby 4.0.7, identical in the interpreter and YJIT unless noted).
+
 **4 — Take tag_string options before the optional content**
 
-> `tag_string(name, content = nil, options, …)` has an optional parameter before a required one, so every
-> `tag.span`/`tag.div` call (and `tag.<custom>` via `method_missing`) allocates an Array to shuffle its arguments.
-> Reorder this private method's parameters and its three callers.
+> Every `tag.div`, `tag.span`, `tag.li`… call goes through the private `TagBuilder#tag_string(name, content = nil, options, …)`.
+> It has an optional parameter before a required one, so Ruby allocates an Array on each call to shuffle the arguments.
+> Custom elements through `method_missing` (`tag.my_widget`) pay this three times. Reorder the private method's
+> parameters and its three callers. Output, escaping, blocks and arity errors are unchanged.
 >
-> One Array fewer per TagBuilder element (three fewer through `method_missing`). On Rails main with Ruby 4.0.7,
-> Fizzy's board/cards/notifications pages allocate 184/131/27 fewer objects per request, and Writebook 3–10 fewer.
-> The counts match in the interpreter and YJIT. Allocation counts only; no timing claim.
+> Per call: `tag.span("x", class: "a")` 5 → 4 objects, `tag.my_widget("x")` 9 → 6.
+> Across corpus pages that use `tag.*`: 1–5 fewer objects per request (Blog), 3–10 (Writebook), 27–184 (Fizzy). Allocation counts only; no timing claim.
 
 **5 — Avoid a rest Array in HashWithIndifferentAccess#fetch**
 
-> Take the default as an optional positional parameter instead of `*extras`. `fetch(key)` and
-> `fetch(key, default)` no longer allocate an Array; missing keys, defaults, blocks and the
-> block-supersedes warning behave as before. Enum `serialize` goes through this on every query
-> (`mapping.fetch(value, value)`).
+> `HashWithIndifferentAccess#fetch(key, *extras)` allocated an Array on every call, including `fetch(key)` with no default.
+> HWIA backs `params`, so `params.fetch(:user)` and `params.fetch(:page, nil)` pay for it. So do enum casts: every enum
+> value in a `where`, an assignment or a validation goes through `mapping.fetch(value, value)`. Take the default as an
+> optional positional parameter instead. Missing keys (KeyError key and receiver), `nil`/`false` defaults, blocks, and
+> "block supersedes default value argument" behave as before. New tests cover these cases.
+> The only visible difference is the arity message for `fetch()` with no arguments, which now matches `Hash#fetch` ("1..2" instead of "1+").
 >
-> Fizzy: 70/22/6 fewer objects per request. Writebook: 5–17 fewer. No timing claim.
+> Per call: `params.fetch(:q)` 3 → 2 objects, `hwia.fetch(:a)` 1 → 0, `Post.where(status: :live).to_a` 77 → 74.
+> Across the corpus: 5–17 fewer objects per request (Writebook), 6–70 (Fizzy). No timing claim.
 
 **6 — Pass frozen empty defaults when loading a relation**
 
-> `exec_main_query` and `alias_tracker` allocated a new empty Array for binds and joins that are never
-> read or mutated. Pass the existing `FROZEN_EMPTY_ARRAY`. With `prepared_statements: false`, the
-> `sql.active_record` payload's `binds` is now that frozen Array.
+> Every `Relation#load` that runs a query (`to_a`, `each`, `first`, association readers…) allocated an empty binds Array
+> in `exec_main_query`. Every association scope (`post.author`, `author.posts`) allocated another for `alias_tracker`'s
+> default `joins`. Neither Array is read for content or mutated, so pass the existing `FROZEN_EMPTY_ARRAY`.
+> With `prepared_statements: false` (the MySQL default), the `sql.active_record` payload's `binds` for these loads is now that frozen Array.
 >
-> Fizzy: 60/22/9 fewer objects per request. Writebook: 3–23 fewer. CodeTriage on PostgreSQL: 1–4 fewer. No timing claim.
+> Per call: 1 object fewer per relation load, 2 per association load (`post.author` 231 → 229).
+> Across the corpus: 3–23 fewer objects per request (Writebook), 9–60 (Fizzy), 1–4 (CodeTriage on PostgreSQL). No timing claim.
 
 **7 — Use drop instead of an endless Range for the join chain tail**
 
-> `reflection_chain[index..]` allocates a Range per chain element; `drop(index)` returns the same new
-> Array without it. Fizzy board/cards: 48/10 fewer objects per request. No timing claim.
+> Building SQL for `joins`, `left_joins` or `eager_load` (including `includes` that turns into a JOIN) walks each
+> association's reflection chain. It allocated an endless Range per chain element for `reflection_chain[index..]`.
+> `drop(index)` returns the same new Array without the Range.
+>
+> Per call: one object fewer per joined reflection (`Post.joins(:author).load` 153 → 152, through associations more).
+> Across the corpus: 10–48 fewer objects per request on Fizzy's joined pages; the other apps' routes are within noise. No timing claim.
 
 ### Ranking and limits
 
-By request savings: 4 (−184 on the Fizzy board), 5 (−70), 6 (−60), 7 (−48). For comparison, #59533 was −103 and
-#59534 −126. Candidates 4 and 6 carry the disclosed boundaries above. 5 and 7 have only the error-message difference
+By breadth of the pattern: 6 and 3 (every relation load or executed query), 5 (every HWIA/`params` `fetch` and enum cast), 4 (every `tag.*` element), 7 (joined queries only). Candidates 4 and 6 carry the disclosed boundaries above. 5 and 7 have only the error-message difference
 (5) or no observable difference found (7). Local suites only, no hosted CI. The two-open-PR limit means at most
 these two can follow once #59533 and #59534 resolve.
