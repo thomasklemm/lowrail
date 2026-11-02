@@ -59,7 +59,7 @@ module RailsMainCensus4
   module_function
 
   def boot(name)
-    raise "disposable census copy required" unless Dir.pwd.start_with?(ROOT + "/.corpus/census4-")
+    raise "disposable census copy required" unless Dir.pwd.match?(%r{\A#{Regexp.escape(ROOT)}/\.corpus/census[45]-})
     raise "no Lowrail preload" if defined?(Lowrail)
     ENV.update("RAILS_ENV" => "production", "RACK_ENV" => "production", "LOWRAIL" => "0",
       "SECRET_KEY_BASE_DUMMY" => "1", "SKIP_TELEMETRY" => "1", "RAILS_LOG_LEVEL" => "fatal",
