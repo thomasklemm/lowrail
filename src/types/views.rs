@@ -22,8 +22,9 @@ pub(super) fn query(model: &TypeModel, facts: &Facts, path: &str) -> Result<Valu
     let mut results = Vec::new();
     for template in templates {
         let mut incoming = Vec::new();
-        // Explicit partial-name edges only. Object/collection dispatch and
-        // dynamically selected templates stay unavailable rather than guessed.
+        // Explicit partial names, and `render record(s)` when the inferred
+        // model has stock partial paths and no subclasses; other dynamically
+        // selected templates stay unavailable rather than guessed.
         for parent in &facts.templates {
             if !fresh(parent) { continue; }
             let parsed = parser.parse(parent.code.as_bytes());
@@ -41,7 +42,7 @@ pub(super) fn query(model: &TypeModel, facts: &Facts, path: &str) -> Result<Valu
             "incoming":incoming}));
     }
     Ok(json!({"available":true,"templates":results,"complete":false,
-        "scope":"explicit literal partial renders in boot handler output; controller exit ivars are contextual hints only, not availability at render; callback, template effects and dynamic render dispatch are not modeled"}))
+        "scope":"explicit literal partial renders and stock-path record renders in boot handler output; controller exit ivars are contextual hints only, not availability at render; callback, template effects and dynamic render dispatch are not modeled"}))
 }
 
 fn contexts(model: &TypeModel, facts: &Facts, template: &Template) -> Vec<(String, BTreeMap<String, Type>)> {
@@ -92,6 +93,37 @@ fn pairs<'pr>(node: &Node<'pr>) -> Vec<(String, Node<'pr>)> {
     }).collect()
 }
 
+impl Renders<'_> {
+    /// `render @article` / `render @articles`: Rails asks each record for
+    /// its partial path, so require one booted model class without subclasses.
+    fn implicit(&mut self, value: &Node<'_>) {
+        let receiver = self.action.rsplit_once('#').map(|(r, _)| r).unwrap_or("");
+        let ty = infer::value(value, self.facts, self.model, receiver, self.ivars);
+        let collection = ["Array[", "ActiveRecord::Relation[", "ActiveRecord::Associations::CollectionProxy["]
+            .iter().find_map(|prefix| ty.name.strip_prefix(prefix).and_then(|s| s.strip_suffix(']')));
+        let class = collection.unwrap_or(ty.name.trim_end_matches('?'));
+        let Some(path) = self.facts.models.iter().find(|m| m.name == class).and_then(|m| m.partial_path.as_deref())
+            else { return; };
+        if self.facts.modules.iter().any(|m| m.kind == "class" && m.name != class && m.ancestors.iter().any(|a| a == class)) {
+            return;
+        }
+        let Some((dir, base)) = path.rsplit_once('/') else { return; };
+        if self.target.virtual_path.as_deref() != Some(&format!("{dir}/_{base}")) { return; }
+        let mut element = ty.clone();
+        element.name = class.to_owned();
+        let mut locals = BTreeMap::new();
+        if collection.is_some() {
+            locals.insert(format!("{base}_counter"), Type::new("Integer", Source::RailsApi, "partial collection counter"));
+            locals.insert(format!("{base}_iteration"), Type::new("untyped", Source::RailsApi, "partial iteration object; methods not modeled"));
+        }
+        locals.insert(base.to_owned(), element);
+        let local_names: Vec<_> = locals.keys().collect();
+        self.incoming.push(json!({"from":self.parent.identifier,"action":self.action,
+            "locals":locals,"local_names":local_names,"implicit_partial":path,
+            "location_scope":"boot handler output, not original template line numbers"}));
+    }
+}
+
 impl<'pr> Visit<'pr> for Renders<'_> {
     fn visit_call_node(&mut self, node: &ruby_prism::CallNode<'pr>) {
         if node.name().as_slice() == b"render" && node.receiver().is_none()
@@ -101,6 +133,10 @@ impl<'pr> Visit<'pr> for Renders<'_> {
             let shorthand = args.first().and_then(literal);
             let partial = shorthand.clone()
                 .or_else(|| options.iter().find(|(k, _)| k == "partial").and_then(|(_, n)| literal(n)));
+            if partial.is_none() && let Some(first) = args.first()
+                && first.as_keyword_hash_node().is_none() && first.as_hash_node().is_none() {
+                self.implicit(first);
+            }
             if let Some(partial) = partial {
                 let parent_dir = self.parent.virtual_path.as_deref().and_then(|p| p.rsplit_once('/')).map(|(p, _)| p).unwrap_or("");
                 let partial = if partial.contains('/') { partial } else { format!("{parent_dir}/{partial}") };

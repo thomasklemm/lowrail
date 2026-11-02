@@ -62,6 +62,27 @@ fn collection_members_remain_observed_and_never_feed_the_fixpoint() {
 }
 
 #[test]
+fn sampled_returns_keep_a_nil_the_source_can_return() {
+    let dir = std::env::temp_dir().join(format!("lowrail-type-nil-paths-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("reader.rb");
+    std::fs::write(&file, "class Reader\n def guarded\n  return if external\n  external.name\n end\n def tail\n  external if external\n end\n def plain = external.name\n def lambda_only\n  -> { return }.call\n  external.name\n end\nend\n").unwrap();
+    let methods: Vec<_> = [("guarded",2), ("tail",6), ("plain",9), ("lambda_only",10)].into_iter()
+        .map(|(name,line)| json!({"name":name,"owner":"Reader","source_location":format!("{}:{line}",file.display())})).collect();
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[{"name":"Reader","methods":methods}]})).unwrap();
+    let mut model = TypeModel::from_facts(&facts).unwrap();
+    model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":(["guarded","tail","plain","lambda_only"].map(|name|
+        json!({"module":"Reader","name":name,"returns":{"String":4}})))}).to_string().as_bytes()).unwrap();
+    for (name, expected) in [("guarded", "(String | nil)"), ("tail", "(String | nil)"), ("plain", "String"), ("lambda_only", "String")] {
+        let ty = model.fact(&format!("Reader#{name}"), "return").unwrap();
+        assert_eq!((name, ty.name.as_str()), (name, expected));
+        assert_eq!(ty.evidence, Evidence::Observed);
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() {
     let dir = std::env::temp_dir().join(format!("lowrail-type-values-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
