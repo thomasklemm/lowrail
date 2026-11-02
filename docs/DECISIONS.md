@@ -32,6 +32,11 @@ and not promoted.
 2. **Submission bar:** exact, small, live-dispatch-preserving changes with
    short PR bodies and the maintainers' own benchmark (ruby-bench for Ruby).
    Micro effects below about 0.1% of headline work are not submitted.
+   Prefer broad, idiomatic Rails/Ruby patterns (code every app runs:
+   `where`, SELECT compilation, `tag.*`, params/enum `fetch`, block
+   forwarding) over single-app hotspots; app numbers are supporting evidence
+   across several apps, not the headline. Every PR gets an independent
+   Thermos review (Codex: GPT-6 Astra for Ruby, GPT-6.1 Sol for Rails) first.
 3. **Stop:** new interpreter-Ir pricing, sealed-tier breadth, guarded
    endpoints, Rails 8.2 sealed re-certification before a beta, and further
    promotion of #22459 or its drafts.
