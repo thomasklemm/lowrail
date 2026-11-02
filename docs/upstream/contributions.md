@@ -207,6 +207,8 @@ on main.
 - **Cache payload Range removal:** saves one object per signed load but is [rejected for resolved ZJIT regressions](https://github.com/thomasklemm/lowrail/blob/367ab4e8f09f7da3424b584859916f717c21af20/docs/upstream/rails-main-census-2.md#cache-payload-slice--rejected-do-not-submit) in binary-version/compressed cases. No qualifying draft or upstream PR; allocation saving alone does not qualify it.
 - **Empty finalization queue shortcut:** returning the empty adapter-owned Array aliases live state; the [executed ownership counterexample](https://github.com/thomasklemm/lowrail/blob/367ab4e8f09f7da3424b584859916f717c21af20/docs/upstream/rails-main-census-2.md#rank-51s-return-ownership-counterexample) makes a later call raise. No timing cohort or fork commit.
 
+- **JIT differential run (2026-11-02):** Rails 8.1.4 and Rails main component suites, plus the Campfire, Writebook and Fizzy suites, ran on ruby/ruby master `e83592ba14` under the interpreter and 17 ZJIT/YJIT modes (low thresholds, inline 0/500, small code memory, auto-compaction), with per-test outcomes compared. There were 503 runs. Only one new divergence was found: YJIT raises `Ractor::IsolationError` while compiling a singleton-class guard from a non-main Ractor (fork branch `thomasklemm/ruby:yjit-attached-object-ractor`). Two known divergences were not resubmitted: Shopify/ruby#976 (fixed by open ruby/ruby#18960, verified) and Bug #22419 (an interpreter crash too). Active Storage needs service credentials and was not run, and Railties was not attempted.
+
 ## Updating this ledger
 
 Read the current body and state, not only a search result or an old receipt:
