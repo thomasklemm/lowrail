@@ -1,0 +1,318 @@
+diff --git a/.ruby-version b/.ruby-version
+index 753ec9c..43beb40 100644
+--- a/.ruby-version
++++ b/.ruby-version
+@@ -1 +1 @@
+-ruby-3.4.3
++4.0.7
+diff --git a/Gemfile b/Gemfile
+index d935524..e65e647 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -1,7 +1,7 @@
+ source "https://rubygems.org"
+ 
+ # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+-gem "rails", "~> 8.1.0"
++gem "rails", github: "rails/rails", ref: "b5be03636e0ac5c3d763411b8be9300e589a0953"
+ # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
+ gem "propshaft"
+ # Use sqlite3 as the database for Active Record
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 77715fa..c52b18f 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -1,75 +1,69 @@
+-GEM
+-  remote: https://rubygems.org/
++GIT
++  remote: https://github.com/rails/rails.git
++  revision: b5be03636e0ac5c3d763411b8be9300e589a0953
++  ref: b5be03636e0ac5c3d763411b8be9300e589a0953
+   specs:
+-    action_text-trix (2.1.19)
+-      railties
+-    actioncable (8.1.3)
+-      actionpack (= 8.1.3)
+-      activesupport (= 8.1.3)
++    actioncable (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nio4r (~> 2.0)
+       websocket-driver (>= 0.6.1)
+       zeitwerk (~> 2.6)
+-    actionmailbox (8.1.3)
+-      actionpack (= 8.1.3)
+-      activejob (= 8.1.3)
+-      activerecord (= 8.1.3)
+-      activestorage (= 8.1.3)
+-      activesupport (= 8.1.3)
++    actionmailbox (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+-    actionmailer (8.1.3)
+-      actionpack (= 8.1.3)
+-      actionview (= 8.1.3)
+-      activejob (= 8.1.3)
+-      activesupport (= 8.1.3)
++    actionmailer (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+       rails-dom-testing (~> 2.2)
+-    actionpack (8.1.3)
+-      actionview (= 8.1.3)
+-      activesupport (= 8.1.3)
++    actionpack (8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nokogiri (>= 1.8.5)
+       rack (>= 2.2.4)
+       rack-session (>= 1.0.1)
+       rack-test (>= 0.6.3)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
++      rails-html-sanitizer (~> 1.7)
+       useragent (~> 0.16)
+-    actiontext (8.1.3)
+-      action_text-trix (~> 2.1.15)
+-      actionpack (= 8.1.3)
+-      activerecord (= 8.1.3)
+-      activestorage (= 8.1.3)
+-      activesupport (= 8.1.3)
++    actiontext (8.2.0.alpha)
++      action_text-trix (~> 2.1.16)
++      actionpack (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       globalid (>= 0.6.0)
+       nokogiri (>= 1.8.5)
+-    actionview (8.1.3)
+-      activesupport (= 8.1.3)
++    actionview (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       builder (~> 3.1)
+       erubi (~> 1.11)
++      herb (>= 0.10)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
+-    active_delivery (1.2.0)
+-      ruby-next-core (~> 1.0)
+-    active_link_to (1.0.5)
+-      actionpack
+-      addressable
+-    active_record-associated_object (1.0.0)
+-      activerecord (>= 6.1)
+-    activejob (8.1.3)
+-      activesupport (= 8.1.3)
+-      globalid (>= 0.3.6)
+-    activemodel (8.1.3)
+-      activesupport (= 8.1.3)
+-    activerecord (8.1.3)
+-      activemodel (= 8.1.3)
+-      activesupport (= 8.1.3)
++      rails-html-sanitizer (~> 1.7)
++    activejob (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      globalid (>= 1.4.0)
++    activemodel (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++    activerecord (8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       timeout (>= 0.4.0)
+-    activestorage (8.1.3)
+-      actionpack (= 8.1.3)
+-      activejob (= 8.1.3)
+-      activerecord (= 8.1.3)
+-      activesupport (= 8.1.3)
+-      marcel (~> 1.0)
+-    activesupport (8.1.3)
++    activestorage (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      marcel (~> 2.0)
++    activesupport (8.2.0.alpha)
+       base64
+       bigdecimal
+       concurrent-ruby (~> 1.0, >= 1.3.1)
+@@ -79,9 +73,47 @@ GEM
+       json
+       logger (>= 1.4.2)
+       minitest (>= 5.1)
++      psych (>= 4)
++      ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+       tzinfo (~> 2.0, >= 2.0.5)
+       uri (>= 0.13.1)
++    rails (8.2.0.alpha)
++      actioncable (= 8.2.0.alpha)
++      actionmailbox (= 8.2.0.alpha)
++      actionmailer (= 8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actiontext (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      bundler (>= 1.15.0)
++      railties (= 8.2.0.alpha)
++    railties (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      irb (~> 1.13)
++      rackup (>= 1.0.0)
++      rake (>= 12.2)
++      thor (~> 1.0, >= 1.2.2)
++      tsort (>= 0.2)
++      zeitwerk (~> 2.6)
++
++GEM
++  remote: https://rubygems.org/
++  specs:
++    action_text-trix (2.1.19)
++      railties
++    active_delivery (1.2.0)
++      ruby-next-core (~> 1.0)
++    active_link_to (1.0.5)
++      actionpack
++      addressable
++    active_record-associated_object (1.0.0)
++      activerecord (>= 6.1)
+     addressable (2.9.0)
+       public_suffix (>= 2.0.2, < 8.0)
+     after_commit_everywhere (1.6.0)
+@@ -198,6 +230,9 @@ GEM
+       activesupport (>= 6.1)
+     hashie (5.1.0)
+       logger
++    herb (0.11.1-aarch64-linux-gnu)
++    herb (0.11.1-arm64-darwin)
++    herb (0.11.1-x86_64-linux-gnu)
+     htmlbeautifier (1.4.3)
+     htmlentities (4.3.4)
+     i18n (1.15.2)
+@@ -265,15 +300,15 @@ GEM
+     loofah (2.25.1)
+       crass (~> 1.0.2)
+       nokogiri (>= 1.12.0)
+-    lookbook (2.3.14)
++    lookbook (2.3.15)
+       activemodel
+       css_parser
+       htmlbeautifier (~> 1.3)
+-      htmlentities (~> 4.3.4)
+-      marcel (~> 1.0)
++      htmlentities (~> 4.3)
++      marcel (>= 1.0)
+       railties (>= 5.0)
+       redcarpet (~> 3.5)
+-      rouge (>= 3.26, < 5.0)
++      rouge (>= 3.26, < 6.0)
+       view_component (>= 2.0)
+       yard (~> 0.9)
+       zeitwerk (~> 2.5)
+@@ -283,7 +318,7 @@ GEM
+       net-imap
+       net-pop
+       net-smtp
+-    marcel (1.2.1)
++    marcel (2.1.0)
+     matrix (0.4.3)
+     meta-tags (2.23.0)
+       actionpack (>= 6.0.0)
+@@ -374,6 +409,9 @@ GEM
+       actionpack (>= 7.0.0)
+       activesupport (>= 7.0.0)
+       rack
++    psych (5.5.0)
++      date
++      stringio
+     public_suffix (7.0.5)
+     puma (8.0.2)
+       nio4r (~> 2.0)
+@@ -393,20 +431,7 @@ GEM
+       rack (>= 1.3)
+     rackup (2.3.1)
+       rack (>= 3)
+-    rails (8.1.3)
+-      actioncable (= 8.1.3)
+-      actionmailbox (= 8.1.3)
+-      actionmailer (= 8.1.3)
+-      actionpack (= 8.1.3)
+-      actiontext (= 8.1.3)
+-      actionview (= 8.1.3)
+-      activejob (= 8.1.3)
+-      activemodel (= 8.1.3)
+-      activerecord (= 8.1.3)
+-      activestorage (= 8.1.3)
+-      activesupport (= 8.1.3)
+-      bundler (>= 1.15.0)
+-      railties (= 8.1.3)
++    ractor-dispatch (0.3.0)
+     rails-dom-testing (2.3.0)
+       activesupport (>= 5.0.0)
+       minitest
+@@ -414,15 +439,6 @@ GEM
+     rails-html-sanitizer (1.7.0)
+       loofah (~> 2.25)
+       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
+-    railties (8.1.3)
+-      actionpack (= 8.1.3)
+-      activesupport (= 8.1.3)
+-      irb (~> 1.13)
+-      rackup (>= 1.0.0)
+-      rake (>= 12.2)
+-      thor (~> 1.0, >= 1.2.2)
+-      tsort (>= 0.2)
+-      zeitwerk (~> 2.6)
+     rainbow (3.1.1)
+     rake (13.4.2)
+     rb-fsevent (0.11.2)
+@@ -547,6 +563,7 @@ GEM
+       railties (>= 6.0.0)
+     store_model (4.6.0)
+       activerecord (>= 7.0)
++    stringio (3.2.0)
+     test-prof (1.6.1)
+     thor (1.5.0)
+     timeout (0.6.1)
+@@ -567,10 +584,10 @@ GEM
+     uri (1.1.1)
+     useragent (0.16.11)
+     version_gem (1.1.13)
+-    view_component (4.12.0)
++    view_component (4.20.0)
+       actionview (>= 7.1.0)
+       activesupport (>= 7.1.0)
+-      concurrent-ruby (~> 1)
++      prism (>= 1.0)
+     view_component-contrib (0.2.5)
+       ruby-next-core (>= 0.15.0)
+       view_component
+@@ -633,7 +650,7 @@ DEPENDENCIES
+   overmind
+   propshaft
+   puma (>= 5.0)
+-  rails (~> 8.1.0)
++  rails!
+   rspec-rails
+   rubocop-rspec
+   ruby-lsp-rails
+@@ -652,4 +669,4 @@ DEPENDENCIES
+   vite_rails
+ 
+ BUNDLED WITH
+-   2.6.8
++  4.0.20
