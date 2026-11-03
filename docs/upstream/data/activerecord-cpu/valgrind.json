@@ -1,0 +1,10 @@
+{
+  "version": "3.19.0",
+  "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+  "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+  "brk_reservation_mib": 512,
+  "tool": "libexec/valgrind/callgrind-amd64-linux",
+  "tool_sha256": "bead1326a6ae5ec1ce61f0ac49b20fe7befd516088715f3c342eb763fccd515b",
+  "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+  "libc": "glibc 2.36"
+}

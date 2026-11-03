@@ -17,8 +17,9 @@ Active Record SQLite and PostgreSQL suites with `RAILS_STRICT_WARNINGS=1`, plus 
 
 Instruction counts are Callgrind's, one measured iteration after warmup with GC off in the window (see
 [Method](#method)); A/A (same tree twice) is −0.002% / +0.021% / −0.151% in the interpreter and +0.056% / +0.043% / −0.045% under YJIT; C2 and C3 together are −0.93% / −6.75% / −1.08% (interpreter), additive. Interpreter / YJIT for the census columns.
-Wall time on ruby-bench in this orb could not resolve effects of this size (A/A spread up to 4%; see
-[Wall time](#wall-time)), so instruction counts are the primary evidence here and wall time is reported as a check.
+Wall time on ruby-bench in this orb could not resolve effects of this size (A/A spread −4.0% to +1.5%; see
+[Wall time](#wall-time)), so instruction counts are the primary evidence and **no wall-time speedup is claimed**.
+All instruction counts: [instructions.txt](data/activerecord-cpu/instructions.txt).
 
 Neither candidate has been opened as a PR. Drafts in the [DECISIONS](../DECISIONS.md) short form are at the end.
 
@@ -119,7 +120,10 @@ Per call (12-column model, SQLite in memory, Ruby 4.0.7; [micro.rb](../../bench/
 | `_load_from_sql`, 1 row | 142,722 → 113,503 (−20.5%) | 83,835 → 75,485 (−10.0%) |
 | `_load_from_sql`, 10 rows | 311,067 → 281,215 (−9.6%) | |
 
-MICRO_C3_TIME
+Time per call, interpreter (6 interleaved processes, median; A/A is base against itself): `find` 109.8 → 104.5 µs
+(−4.8%, A/A −1.0%), `where(...).limit(5).to_a` 219.3 → 209.3 µs (−4.6%, A/A −1.7%), one-row load 17.5 → 14.0 µs
+(−20.3%, A/A +1.6%). YJIT process CPU time: `find` 43.7 → 42.4 µs (−3.1%, A/A +2.1%), `where…to_a` 77.4 → 76.1 µs
+(−1.6%, A/A +0.7%); YJIT per-call timing is within its A/A, the instruction counts are not.
 
 ruby-bench instructions per iteration (interpreter): railsbench 5.1168 → 5.0634 G (−1.04%), shipit 6.1304 → 5.8778 G
 (−4.12%), lobsters 4.1731 → 4.1301 G (−1.03%); A/A −0.002% / +0.021% / −0.151%. YJIT: railsbench 2.8055 → 2.7864 G (−0.68%), shipit 3.2078 → 3.0381 G (−5.29%), lobsters 2.8890 → 2.8716 G (−0.60%); A/A +0.056% / +0.043% / −0.045%. Census
@@ -150,7 +154,9 @@ Per call (same micro; each `fresh_*` case instantiates a new `Post` first):
 | `post.comments.where(body: "c").to_a` | 1,049,464 → 1,004,384 (−4.3%) | 429,728 → 417,466 (−2.9%) | 1,050,056 → 1,003,365 (−4.4%) |
 | `association(:comments).scope`, rebuilt | 241,736 → 196,720 (−18.6%) | | 242,237 → 196,798 (−18.6%) |
 
-MICRO_C2_TIME
+Time per call, interpreter (6 interleaved processes, median): `post.author` 223.7 → 207.3 µs (−7.3%, A/A −1.9%),
+`post.comments.to_a` 283.4 → 266.9 µs (−5.8%, A/A −2.0%), `post.comments.where(…).to_a` 354.2 → 345.1 µs (−2.6%,
+A/A 0.0%); 2 objects fewer in each.
 
 ruby-bench instructions (interpreter): railsbench −0.09%, shipit −2.64%, lobsters −0.28% (A/A as above). Census
 allocations: −2 objects per direct association scope (the tracker and its Hash); 36 / 42 of 56 workloads moved
@@ -196,7 +202,26 @@ shipit under YJIT) and #59518 with merged #59505 is the query-cache-key lead; bo
 
 ## Wall time
 
-WALL_SECTION
+Two interleaved cohorts on ruby-bench (railsbench, lobsters, shipit; interpreter and YJIT; 4 rounds, variant order
+rotated, one process per run; interpreter 3 warmup + 15 timed iterations, YJIT 10 + 15). Batch 2 also recorded
+process CPU time, which in this orb equals wall time to within 0.1% (gVisor accounting), so it adds no resolution.
+Ratio of medians of per-process means against `A`; `B` is the same tree as `A`
+([walltime-batch1.txt](data/activerecord-cpu/walltime-batch1.txt), [walltime-batch2.txt](data/activerecord-cpu/walltime-batch2.txt)):
+
+| | railsbench interp / YJIT | lobsters interp / YJIT | shipit interp / YJIT |
+| --- | --- | --- | --- |
+| A/A (B), batch 1 | 1.0036 / 1.0153 | 0.9886 / 0.9598 | 0.9862 / 1.0143 |
+| A/A (B), batch 2 | 0.9910 / 1.0038 | 1.0069 / 0.9807 | 0.9728 / 1.0111 |
+| C3, batch 1 | 1.0291 / 0.9941 | 0.9606 / 0.9882 | 1.0174 / 1.0133 |
+| C3, batch 2 | 0.9781 / 1.0510 | 1.0004 / 0.9898 | 0.9838 / 0.9922 |
+| C2, batch 1 | 1.0179 / 1.0131 | 0.9373 / 0.9640 | 0.9871 / 0.9873 |
+| C2, batch 2 | 0.9916 / 1.0552 | 1.0526 / 0.9704 | 0.9423 / 0.9994 |
+
+The A/A spreads from −4.0% to +1.5%, wider than either candidate's instruction-count effect except C3 on shipit, and
+individual cells flip sign between batches (railsbench YJIT: C3 0.994 then 1.051). **No wall-time claim** is made
+for either candidate from this orb; the shipit cells lean the expected way (C3 0.984 / 0.992 in batch 2, C2 0.942),
+but not beyond the A/A. A quieter machine with more rounds is needed for a wall-time number. The instruction counts
+are deterministic (A/A ≤ 0.16%) and agree with the per-call timings.
 
 ## Method
 
