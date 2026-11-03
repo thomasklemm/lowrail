@@ -9,7 +9,7 @@ apps, and builds exact candidates on forks. Nothing is opened or posted; the dra
 19.6% of all objects; **i18n is the largest and broadest: 248 objects per workload, 2.45% of all allocations, in
 19 of 20 apps**, almost all of it in `Backend::Fallbacks`, which every app with `config.i18n.fallbacks` runs (the
 `production.rb` that `rails new` generates sets it). Two exact i18n candidates come out of that: **I1** removes **0.40%** of all
-allocations (−40 objects per workload, 14 apps) and **I2** **0.32%** (−33, 17 apps), against an A/A of +0.3 on the
+allocations (−40 objects per workload, 14 apps) and **I2** **0.32%** (−32, 9 apps), against an A/A of +0.3 on the
 same lines; both are the same in the interpreter and YJIT, and Sure (a finance app with 1,322 translations per
 dashboard request) carries most of the mean. **C1** in connection_pool removes four Hashes per `#with`: −4.6 objects per workload (0.06% of all) on the 18 configurations that lock
 connection_pool 3.x, in 6 apps (Mastodon −27.6).
@@ -19,7 +19,7 @@ or a lead. Allocation counts only; no timing is claimed.
 | # | Repo, branch | Per call | Census (interpreter / YJIT) |
 | --- | --- | --- | --- |
 | I1 | [thomasklemm/i18n `thomasklemm/fallback-locale-identity`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-locale-identity) [`405f196476`](https://github.com/thomasklemm/i18n/commit/405f19647685c9be74637f7157806a4862a6f4d6) | −2 objects per translation that hits the requested locale (`I18n.t(:hello)` 13 → 11) | −40.3 / −40.4 objects per workload, 0.40% of all; 14 apps |
-| I2 | [thomasklemm/i18n `thomasklemm/fallback-defaults-without-wrapper`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-defaults-without-wrapper) [`1d8c5793d2`](https://github.com/thomasklemm/i18n/commit/1d8c5793d23c77a719b66039f525ca4773f4e222) | −2 or −3 objects per translation with a `default:` (Array default 21 → 18) | −32.7 / −32.9 objects per workload, 0.32% of all; 17 apps |
+| I2 | [thomasklemm/i18n `thomasklemm/fallback-defaults-without-wrapper`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-defaults-without-wrapper) [`7d205cd675`](https://github.com/thomasklemm/i18n/commit/7d205cd675347da8c966158e552ed1782088b160) | −2 objects per translation with a non-Array `default:` (`default: 3` 14 → 12) | −32.2 / −32.3 objects per workload, 0.32% of all; 9 apps |
 | C1 | [thomasklemm/connection_pool `thomasklemm/frozen-interrupt-masks`](https://github.com/thomasklemm/connection_pool/tree/thomasklemm/frozen-interrupt-masks) [`1533388d07`](https://github.com/thomasklemm/connection_pool/commit/1533388d0749bbc30d76021a47d95e4e2a6941de), open as [connection_pool#225](https://github.com/mperham/connection_pool/pull/225) | −4 objects per `#with` (14 → 10) | −4.6 / −4.6 objects per workload, 0.06% of all; 6 apps |
 
 ## Pins and method
@@ -54,7 +54,8 @@ or a lead. Allocation counts only; no timing is claimed.
   gem's lib directory on the load path.
 * **Receipts:** [`data/gem-census/receipts.tar.xz`](data/gem-census/receipts.tar.xz): the run summaries, rankings and
   delta tables; [`data/gem-census/receipts-rerun.tar.xz`](data/gem-census/receipts-rerun.tar.xz): the `i1b` and
-  `i2b` reruns of the amended i18n commits, their delta tables and the I2 differential.
+  `i2b` reruns of the amended i18n commits, their delta tables and the I2 differential; [`data/gem-census/receipts-i2c.tar.xz`](data/gem-census/receipts-i2c.tar.xz): the `i2c` rerun
+  of `7d205cd675` and the 36-case differential.
 
 ## Per gem
 
@@ -139,7 +140,8 @@ were checked: none touches `fallbacks.rb`; #758 (Utils.except) and #759 (localiz
 
 All three are one commit on the gem's current main, pushed to `thomasklemm` forks, with the gem's own suite passing.
 After Sol review, I1 and I2 were amended to be exact (first versions `a9de2f7071` and `568d730577`; see each section)
-and rerun in the census as `i1b` and `i2b`.
+and rerun in the census as `i1b` and `i2b`; a second round of review made I2 exact for nil/false and Array defaults
+(`7d205cd675`, rerun `i2c`).
 The census rows below are i18n's (or connection_pool's) own lines: mean objects per workload, interpreter / YJIT.
 
 ### I1: compare fallback locales before converting them to Strings
@@ -208,40 +210,63 @@ elements) compares return value, identity, the options left behind, exceptions a
   defaults (−64.2 and −16.7 objects per workload). Micro: `I18n.t(key, default: 3)` 14 → 12 (hit), 21 → 19 (miss).
   Lock control clean in all 23 apps.
 
+Second review round (Sol and Astra on `1d8c5793d2`), two more fixes, now in `7d205cd675`:
+
+* **nil and false:** the old code left `options[:default]` alone (its `detect` returns the falsy default, so nothing
+  is assigned); `1d8c5793d2` set it to `[]` and raised `FrozenError` on frozen options. They are now returned with
+  the options untouched. `translate` only calls the method when the default is truthy, so this is reachable only
+  from subclasses that call it directly.
+* **Array defaults:** flattening the caller's Array directly reads its elements in a different order than
+  flattening the wrapper, so a `to_ary` hook that changes an earlier element gave `"changed"` instead of
+  `"original"`; a global `Array.prepend` of `flatten` was also bypassed. Every Array default (`Array === default`)
+  now takes the old `[default].flatten`; the fast paths are for non-Array defaults only.
+* **Accepted, no change:** a global `Array#flatten` redefinition is no longer called on the non-Array paths (the
+  wrapper is what called it). With a prepended `flatten` that only logs, results match the old code in every case;
+  only the call is skipped.
+
+The differential now has 36 cases (adding nil, false, a default overriding `!`, and Arrays whose element `to_ary`
+mutates, clears or extends them), run plain, with frozen options and with a prepended `flatten`: `7d205cd675` matches
+master in all of them (with the prepend, apart from the skipped call); `1d8c5793d2` differs in three (nil, false, the
+earlier-element mutation). The two new tests fail on `1d8c5793d2` and pass on master and `7d205cd675`; suite 1,613
+runs, 0 failures. Micro: Array defaults no longer save (21 → 21, 36 → 36); String 23 → 21, Symbol 29 → 27, Hash
+22 → 20, Integer 14 → 12. Census rerun `i2c`: −32.2 / −32.3 objects per workload, 0.32% of all allocations; 9 apps
+(10 configurations) save at least 0.5 per workload. Sure (−722), Docuseal (−64), Lobsters (−24) and Discourse
+(−17) keep their saving; Blog loses its −6 (Array defaults) and Casa drops from −8.1 to −7.2. Lock control clean.
+
 ### Census, I1 and I2
 
 i18n's own lines, objects per workload, interpreter / YJIT. Lago and `lago-nops` do not translate.
 
 | App | Workloads | i18n objects/op | I1 | I2 | A/A | All objects/op |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| blog | 10 | 160.3 | −2.8 / −2.8 | −6.0 / −6.0 | +0.0 / +0.0 | 1519 |
+| blog | 10 | 160.3 | −2.8 / −2.8 | +0.0 / +0.0 | +0.0 / +0.0 | 1519 |
 | campfire | 9 | 1.1 | −0.2 / −0.2 | −0.2 / −0.2 | +0.0 / +0.0 | 5672 |
-| casa | 10 | 248.9 | −33.2 / −33.2 | −8.1 / −8.1 | +0.0 / +0.0 | 12590 |
+| casa | 10 | 248.9 | −33.2 / −33.2 | −7.2 / −7.2 | +0.0 / +0.0 | 12590 |
 | chatwoot | 14 | 1.1 | −0.1 / −0.1 | +0.0 / +0.0 | +0.0 / +0.0 | 15404 |
-| codetriage | 7 | 28.6 | −0.3 / −0.3 | −2.6 / −2.6 | +0.0 / +0.0 | 2554 |
+| codetriage | 7 | 28.6 | −0.3 / −0.3 | −1.7 / −1.7 | +0.0 / +0.0 | 2554 |
 | discourse | 14 | 321.5 | −45.0 / −45.0 | −16.7 / −16.7 | +0.0 / +0.0 | 11717 |
 | docuseal | 13 | 497.7 | −65.5 / −65.5 | −64.2 / −64.2 | +0.0 / +0.0 | 7131 |
-| fizzy | 14 | 10.6 | −1.0 / −1.0 | −0.7 / −0.7 | +0.0 / +0.0 | 9184 |
-| fizzy-mysql | 14 | 10.6 | −1.0 / −1.0 | −0.7 / −0.7 | +0.0 / +0.0 | 9053 |
-| flow | 10 | 27.8 | −0.4 / −0.4 | −1.2 / −1.2 | +0.0 / +0.0 | 9740 |
-| hackatime | 12 | 42.2 | −2.0 / −2.0 | −1.5 / −1.5 | +0.0 / +0.0 | 7344 |
+| fizzy | 14 | 10.6 | −1.0 / −1.0 | −0.4 / −0.4 | +0.0 / +0.0 | 9184 |
+| fizzy-mysql | 14 | 10.6 | −1.0 / −1.0 | −0.4 / −0.4 | +0.0 / +0.0 | 9053 |
+| flow | 10 | 27.8 | −0.4 / −0.4 | −0.2 / −0.2 | +0.0 / +0.0 | 9740 |
+| hackatime | 12 | 42.2 | −2.0 / −2.0 | −0.2 / −0.2 | +0.0 / +0.0 | 7344 |
 | lobsters | 11 | 122.9 | −23.6 / −23.6 | −23.6 / −23.6 | +0.0 / +0.0 | 10429 |
 | loomio | 15 | 54.2 | −10.9 / −10.9 | −3.1 / −3.1 | +0.0 / +0.0 | 9083 |
 | mastodon | 14 | 19.3 | −3.4 / −3.4 | −3.0 / −3.0 | +0.0 / +0.0 | 15743 |
 | mastodon-nops | 14 | 19.3 | −3.4 / −3.4 | −3.0 / −3.0 | +0.0 / +0.0 | 15697 |
-| pingcrm | 8 | 27.2 | −0.5 / −0.5 | −1.0 / −1.0 | +0.0 / +0.0 | 2689 |
-| react-starter-kit | 8 | 13.6 | −0.2 / −0.2 | −0.5 / −0.5 | +0.0 / +0.0 | 1789 |
-| redprints-cfp | 8 | 79.4 | −1.2 / −1.2 | −1.9 / −1.9 | +0.0 / +0.0 | 1872 |
-| sure | 9 | 4655.6 | −849.4 / −854.4 | −722.4 / −727.4 | +7.0 / +0.0 | 52306 |
-| thinkroom | 9 | 37.7 | −1.3 / −1.3 | −1.8 / −1.8 | +0.0 / +0.0 | 5215 |
+| pingcrm | 8 | 27.2 | −0.5 / −0.5 | +0.0 / +0.0 | +0.0 / +0.0 | 2689 |
+| react-starter-kit | 8 | 13.6 | −0.2 / −0.2 | +0.0 / +0.0 | +0.0 / +0.0 | 1789 |
+| redprints-cfp | 8 | 79.4 | −1.2 / −1.2 | +0.0 / +0.0 | +0.0 / +0.0 | 1872 |
+| sure | 9 | 4655.6 | −849.4 / −854.4 | −722.3 / −727.3 | +7.0 / +0.0 | 52306 |
+| thinkroom | 9 | 37.7 | −1.3 / −1.3 | −0.4 / −0.4 | +0.0 / +0.0 | 5215 |
 | writebook | 8 | 3.8 | −0.8 / −0.8 | −0.8 / −0.8 | +0.0 / +0.0 | 4895 |
-| **All (23 configurations)** | 251 | 248.2 | −40.3 / −40.4 | −32.7 / −32.9 | +0.3 / +0.0 | 10150 |
+| **All (23 configurations)** | 251 | 248.2 | −40.3 / −40.4 | −32.2 / −32.3 | +0.3 / +0.0 | 10150 |
 
-Rows are the reruns `i1b` and `i2b` of the amended commits. Sure dominates both means: without it, I1 removes about
-10 objects per workload and I2 about 7. I1's apps are the ones that translate on most requests (Docuseal, Discourse,
+Rows are the reruns `i1b` and `i2c` of the amended commits. Sure dominates both means: without it, I1 removes about
+10 objects per workload and I2 about 6.5. I1's apps are the ones that translate on most requests (Docuseal, Discourse,
 Casa, Lobsters, Loomio); I2's are the ones that pass `default:` (Sure, Docuseal and Discourse with Integer defaults,
-Lobsters, Casa, Blog). The change in all allocations agrees within the A/A noise: I1 −36.4 / −38.2 and I2 −30.0 /
-−29.1 objects per workload, A/A −23.1 / −2.5 (the interpreter A/A is mostly Thinkroom, −535 per workload between
+Lobsters, Casa). The change in all allocations agrees within the A/A noise: I1 −36.4 / −38.2 and I2 −22.3 /
+−26.6 objects per workload, A/A −23.1 / −2.5 (the interpreter A/A is mostly Thinkroom, −535 per workload between
 identical runs).
 
 ### C1: reuse constant interrupt masks in `ConnectionPool#with`
@@ -316,7 +341,7 @@ Across 20 open-source Rails apps (251 request, job and mailer workloads), this r
 
 Added a test with a locale whose `==` matches the fallback but whose String does not; `on_fallback` is still called for it. The test suite passes (1,608 runs).
 
-### I2 (ruby-i18n/i18n, from `thomasklemm/fallback-defaults-without-wrapper` `1d8c5793d2`)
+### I2 (ruby-i18n/i18n, from `thomasklemm/fallback-defaults-without-wrapper` `7d205cd675`)
 
 **Title:** Avoid wrapping the default in an Array in Fallbacks#extract_non_symbol_default!
 
@@ -324,7 +349,7 @@ Added a test with a locale whose `==` matches the fallback but whose String does
 
 `Backend::Fallbacks#translate` calls `extract_non_symbol_default!` for every translation that has a `default`. It starts with `[options[:default]].flatten`, which allocates a wrapper Array and a flattened copy even when the default is a single Symbol, String, Hash or Integer.
 
-Flattening a one-element wrapper converts the element with `Array.try_convert` and flattens the result with `Array#flatten`. This does those two steps without the wrapper: `Array.try_convert(default)`, then `Array.instance_method(:flatten).bind_call` on the result, so `to_ary` conversions (including through `method_missing`) work as before and an Array subclass's own `flatten` is still not called. A default that does not convert is returned as the non-Symbol default with `options[:default] = []`, as before, and a Symbol default returns early.
+Flattening a one-element wrapper converts the element with `Array.try_convert` and flattens the result with `Array#flatten`. For a default that is not an Array, this does those two steps without the wrapper: a default that converts through `to_ary` (including through `method_missing`) is flattened as before, a Symbol default returns early, a nil or false default is returned with the options untouched, and any other default is returned as the non-Symbol default with `options[:default] = []`, as before. Array defaults keep `[default].flatten` unchanged.
 
 #### Benchmark
 
@@ -332,19 +357,18 @@ Ruby 4.0.7, objects allocated per call with `I18n::Backend::Fallbacks` included 
 
 ```
                                  before   after
-Array default (hit)                21  ->  18
-Array default (miss)               36  ->  33
+Array default                      21  ->  21
 String default                     23  ->  21
 Symbol default                     29  ->  27
 Hash default                       22  ->  20
 Integer default                    14  ->  12
 ```
 
-Across 20 open-source Rails apps (251 request, job and mailer workloads), this removes 0.3% of all allocated objects, in 17 of the apps.
+Across 20 open-source Rails apps (251 request, job and mailer workloads), this removes 0.3% of all allocated objects; most of it is in apps that pass Integer defaults or translate heavily on one dashboard.
 
 #### Testing
 
-Added tests that a nested Array default is not mutated, that a default (including a String) responding to `to_ary` still flattens, and that an Array subclass's `flatten` is not called. The test suite passes (1,611 runs).
+Added tests that a nested Array default is not mutated, that a default (including a String) responding to `to_ary` still flattens, that an Array subclass's `flatten` is not called, that an Array default is flattened as given when an element's `to_ary` changes it, and that a nil or false default leaves the options untouched. The test suite passes (1,613 runs).
 
 ### C1 (mperham/connection_pool, from `thomasklemm/frozen-interrupt-masks`)
 
