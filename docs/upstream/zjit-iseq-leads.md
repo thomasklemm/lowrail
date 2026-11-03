@@ -315,6 +315,27 @@ An inlined ISEQ call costs 21–22 Ir in `PushInlineFrame` + `PopInlineFrame`: 9
 is not a gap against YJIT, where a full call costs about 19 Ir plus `leave`. Taken: Shopify/ruby#1023 (nirvdrum,
 Virtual Inline Frames); see also Shopify/ruby#1008 and #1070.
 
+### 20. Over-broad method-entry invalidation: parked
+
+Found in the `Kernel#dup` work ([zjit-cfunc-paths](zjit-cfunc-paths.md#why-an-unrelated-include-invalidates-hashs-patch-point)).
+
+* **Mechanism:** an `include`, `extend` or `def` clears the method cache for each method name at the changed class's
+  superclass. If that lookup reaches a method inherited from a module, such as `Kernel#initialize_dup` or
+  `Kernel#respond_to?`, CRuby invalidates the one method entry that every inheriting class shares. ZJIT keys its
+  `MethodRedefined` patch points by that entry, so it patches all of them, even on receiver classes whose lookup
+  did not change. Once a site has used its 4 versions, the final version exits on every call.
+* **Size:** 95–97% of the invalidated patch points guard a class that could not see the change (railsbench 397 of
+  411, lobsters 575 of 593, shipit 698 of 734). On master this costs lobsters 382 exits per iteration and no
+  measurable Ir. With a Ruby-level `dup` it costs 3.6k–3.8k exits per iteration, and an unsound oracle that keeps
+  the unaffected patch points saves 0.31% (lobsters) and 1.35% (shipit) Ir.
+* **Exact fix:** CRuby would tell the JITs which class changed, or call a hook once the change is complete. ZJIT and
+  YJIT would then re-resolve each kept patch point's method, keep it only if the definition and defined class are
+  unchanged, and re-key it to the new entry. That is a cross-cutting change to CRuby's method cache.
+* **Status:** parked (Thomas, 2026-11-03): no new ruby/ruby PRs, and this is a CRuby method-cache change we can't
+  stand behind yet. Unowned. The closest work treats the symptom: ruby/ruby#19617 (k0kubun, open) lets invalidated
+  final versions recompile, and row 19 of Shopify/ruby#1039 ("Let invalidated ISEQs recompile instead of exiting
+  forever") has no assignee.
+
 ## New leads from Rails PR work (2026-11-03)
 
 Found while measuring open Rails PRs ([rails-open-evidence.md](rails-open-evidence.md)), Ruby master `9aa0898240`
