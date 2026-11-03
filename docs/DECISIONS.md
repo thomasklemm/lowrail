@@ -119,6 +119,9 @@ not ask anyone to merge.
 
 **Parallel orbs:** at most 8 working orbs at once (Thomas, 2026-11-03). The orbs already running finish their
 current work; new work is started only when the count is below 8.
+**Orb size:** the project default is enough for builds, ruby-bench, Callgrind and the census. A larger orb (for
+example `a1.xxlarge`) may be used for long parallel runs such as a full census matrix, to finish sooner (Thomas,
+2026-11-03). It doesn't reduce wall-time noise from shared hosts; Callgrind stays the primary measure.
 
 ## Priorities after the merge wave (2026-11-03)
 
