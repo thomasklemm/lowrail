@@ -4,6 +4,21 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Priorities after the merge wave (2026-11-03)
+
+20 of 25 Rails PRs from this cycle are merged, and the combined effect is −1.66% / −1.64% of allocations over 206
+workloads ([combined-effect](upstream/combined-effect.md)). Thomas: focus on Rails and ZJIT. In order:
+
+1. **Z1, ZJIT gap census** (J1): fallbacks, exits and parity allocations on current master; only gaps nobody owns.
+2. **Z2, ZJIT differential correctness** (U1): Rails and app suites, interpreter vs ZJIT modes, on current master.
+3. **Rails CPU deep dives** (V1 Action View: C1 in review; A1 Active Record): running.
+4. **G1, gem census** (R5): broad allocation sites in rack, i18n, turbo-rails, devise and others; spreads review load.
+5. **R6, the two largest Rails leads** (R2): relation delegators forwarding `...` from a block (14 apps), and
+   `default_scope` owner checks (16 apps).
+
+Next, when a slot frees up: a census 7 after the next merge wave, and a serialization CPU dive (`as_json`, `render
+json:`). Parked: types/MCP gaps, YJIT ([yjit-leads](upstream/yjit-leads.md)), ruby/uri and the Campfire lead.
+
 ## JIT performance work targets ZJIT (2026-11-03)
 
 k0kubun on [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897): the team wants ZJIT
