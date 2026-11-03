@@ -286,6 +286,16 @@ merged/open PRs created since 2026-10-19, not closed superseded work.
 
 None.
 
+## Held
+
+- **B1-1, route source locations (2026-11-03):** exact, development-only. It computes `route_source_location`'s
+  Action Dispatch directory once instead of per route. Per call: 4.4 → 1.9 µs interpreter, 3.8 → 1.7 µs YJIT,
+  2.7 → 1.5 µs master ZJIT. That is 4–5% of a development route redraw and about 1–2% of a dev reload request.
+  Branch [`thomasklemm/route-source-location-dir`](https://github.com/thomasklemm/rails/tree/thomasklemm/route-source-location-dir)
+  ([`a9c03b098e`](https://github.com/thomasklemm/rails/commit/a9c03b098e76861d8b9d4d2ed51a27fbd95570b2)), with a draft
+  in [rails-boot.md](rails-boot.md#b1-1-compute-the-action-dispatch-directory-once-for-route-source-locations).
+  Held until the "is it worth it?" discussion on [#59577](https://github.com/rails/rails/pull/59577) is settled.
+
 ## Drafted, not opened
 
 - **Gem census (2026-11-03):** two i18n candidates and one connection_pool candidate on `thomasklemm` forks, with
