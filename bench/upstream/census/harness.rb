@@ -25,8 +25,12 @@ module RailsCensus
     def rails_sha = ENV.fetch("CENSUS_RAILS_SHA")
     def mode = ENV.fetch("CENSUS_MODE", "interpreter")
 
+    # APP-nops runs APP's copy and workloads with prepared statements off
+    # (CENSUS_PREPARED_STATEMENTS=false), as behind PgBouncer.
+    def copy_of(name) = name.delete_suffix("-nops")
+
     def boot(name)
-      raise "disposable census copy required" unless Dir.pwd.match?(%r{\A#{Regexp.escape(ROOT)}/\.corpus/census[\w.-]*-#{Regexp.escape(name)}\z})
+      raise "disposable census copy required" unless Dir.pwd.match?(%r{\A#{Regexp.escape(ROOT)}/\.corpus/census[\w.-]*-#{Regexp.escape(copy_of(name))}\z})
       raise "no Lowrail preload" if defined?(Lowrail)
       raise "unknown mode #{mode}" unless MODES.include?(mode)
       ENV.update("RAILS_ENV" => "production", "RACK_ENV" => "production", "LOWRAIL" => "0",
@@ -35,8 +39,8 @@ module RailsCensus
       ENV["DATABASE_ADAPTER"] ||= "sqlite"
       require File.expand_path("config/application")
       Rails.application.config.yjit = mode == "yjit"
-      # Writebook enables YJIT itself; hide only that entry point in other modes.
-      manual_enable = RubyVM::YJIT.method(:enable) if name == "writebook" && mode != "yjit"
+      # Writebook and Sure enable YJIT themselves; hide only that entry point in other modes.
+      manual_enable = RubyVM::YJIT.method(:enable) if %w[writebook sure].include?(name) && mode != "yjit"
       RubyVM::YJIT.singleton_class.undef_method(:enable) if manual_enable
       begin
         require File.expand_path("config/environment")
@@ -58,6 +62,49 @@ module RailsCensus
       end
       Rails.application.routes.default_url_options = { host: "localhost", protocol: "https" }.merge(Rails.application.routes.default_url_options)
       Rails.application.config.hosts.clear if Rails.application.config.respond_to?(:hosts)
+      # CENSUS_DEBUG=1 (list only): print every exception raised in app code,
+      # since apps often rescue them into a bare 500 body.
+      if ENV["CENSUS_DEBUG"] == "1"
+        TracePoint.new(:raise) do |tp|
+          trace = tp.raised_exception.backtrace || []
+          frame = trace.find { _1.start_with?(Rails.root.to_s) } || trace.first
+          warn "DEBUG #{tp.raised_exception.class}: #{tp.raised_exception.message[0, 300]} at #{frame}"
+        end.enable
+      end
+      # Apps that push native Sidekiq jobs (not Active Job) get the same control:
+      # pushes are captured in memory and performed as their own workloads.
+      if ENV["CENSUS_SIDEKIQ_FAKE"] == "1"
+        require "sidekiq/testing"
+        Sidekiq::Testing.fake!
+      end
+      if (expected = ENV["CENSUS_PREPARED_STATEMENTS"])
+        actual = ActiveRecord::Base.with_connection(&:prepared_statements)
+        raise "prepared_statements is #{actual}, expected #{expected}" unless actual.to_s == expected
+      end
+    end
+
+    def reset_side_effects
+      super
+      Sidekiq::Job.clear_all if ENV["CENSUS_SIDEKIQ_FAKE"] == "1"
+    end
+
+    # Native Sidekiq jobs a block pushes, as [class, args] payloads.
+    def sidekiq_jobs_from
+      reset_side_effects
+      yield
+      Sidekiq::Job.jobs.map { _1.slice("class", "args") }
+    ensure
+      reset_side_effects
+    end
+
+    def sidekiq_job_op(name, payload)
+      Op.new(name, :job, -> { payload["class"].constantize.new.perform(*payload["args"].deep_dup) })
+    end
+
+    def workloads(name)
+      load File.join(__dir__, "../census_4_workloads.rb")
+      load File.join(__dir__, "pg_workloads.rb")
+      Census4Workloads.public_send(copy_of(name).tr("-", "_"), self)
     end
 
     def prepare(name)
@@ -92,6 +139,23 @@ module RailsCensus
         load_fixtures
       when "campfire", "writebook", "codetriage"
         load_fixtures
+      when "casa"
+        # CASA's own seeds (DbPopulator); the preset is chosen by APP_ENVIRONMENT.
+        ENV["APP_ENVIRONMENT"] = "development"
+        ENV["DB_SEEDS_RANDOM_SEED"] = "42"
+        load "db/seeds.rb"
+      when "lago"
+        srand(42)
+        load "db/seeds.rb"
+      when "sure"
+        Rails.application.load_tasks
+        ENV["SEED"] = "42"
+        Rake::Task["demo_data:default"].invoke
+      when "docuseal", "mastodon", "discourse", "loomio"
+        # The app's own seeds where it has them, then a seed script that
+        # writes through the app's own services (fixtures/corpus/pg-census/seeds).
+        load "db/seeds.rb" if name == "mastodon"
+        load File.join(ROOT, "fixtures/corpus/pg-census/seeds/#{name}.rb")
       else
         raise "no preparation known for #{name}"
       end

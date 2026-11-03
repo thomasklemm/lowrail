@@ -27,6 +27,11 @@ module Census
   ROOT = File.expand_path("..", __dir__)
   HARNESS = File.join(ROOT, "bench/upstream/census/harness.rb")
   OVERLAYS = File.join(ROOT, "fixtures/corpus/rails-main-census-4")
+  PG_OVERLAYS = File.join(ROOT, "fixtures/corpus/pg-census")
+  # Gems the Rails ref swap pins: the rails gem, or the components an app
+  # lists instead (Discourse).
+  RAILS_GEMS = %w[rails railties actioncable actionmailbox actionmailer actionpack actiontext actionview activejob
+    activemodel activerecord activestorage activesupport].freeze
   MODES = { "interp" => "interpreter", "interpreter" => "interpreter", "yjit" => "yjit", "zjit" => "zjit" }.freeze
   FLAGS = { "interpreter" => [], "yjit" => ["--yjit"], "zjit" => ["--zjit"] }.freeze
   PG = { "DATABASE_ADAPTER" => "postgresql" }.freeze
@@ -49,7 +54,61 @@ module Census
     "react-starter-kit" => { source: "react-starter-kit", build: [%w[npm ci --no-audit --no-fund]],
       after_assets: [%w[npx vite build --ssr]] },
     "lobsters" => { source: "lobsters", database_yml: "config/database.yml.sample" },
-  }.freeze
+  }.merge(
+    # PostgreSQL census apps (docs/upstream/pg-census.md). Each takes its
+    # overlay from fixtures/corpus/pg-census; the env is throwaway local config.
+    # APP-nops reruns APP's copy with prepared statements off (as behind PgBouncer).
+    "docuseal" => { source: "docuseal", overlay: PG_OVERLAYS + "/docuseal.patch", services: %w[postgresql redis],
+      env: { "DATABASE_URL" => "postgres:///census_docuseal", "SECRET_KEY_BASE" => "census" * 16,
+        "REDIS_URL" => "redis://localhost:6379/3", "CENSUS_SIDEKIQ_FAKE" => "1" },
+      build: [%w[npx --yes yarn@1.22.22 install --frozen-lockfile --network-timeout 1000000]] },
+    "mastodon" => { source: "mastodon", overlay: PG_OVERLAYS + "/mastodon.patch", services: %w[postgresql redis],
+      env: { "LOCAL_DOMAIN" => "localhost", "DB_HOST" => "/var/run/postgresql", "DB_NAME" => "census_mastodon", "DB_USER" => ENV.fetch("USER"),
+        "REDIS_URL" => "redis://localhost:6379/4", "ES_ENABLED" => "false", "S3_ENABLED" => "false",
+        "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY" => "census" * 6, "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT" => "salt" * 8,
+        "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY" => "primary" * 5, "CENSUS_SIDEKIQ_FAKE" => "1" },
+      build: [["sh", "-c", "mkdir -p tmp/corepack && corepack enable --install-directory tmp/corepack && PATH=$PWD/tmp/corepack:$PATH " \
+        "COREPACK_ENABLE_DOWNLOAD_PROMPT=0 sh -c 'yarn install --immutable && bundle exec rails assets:precompile'"]] },
+    "lago" => { source: "lago", overlay: PG_OVERLAYS + "/lago.patch", services: %w[postgresql redis],
+      env: { "DATABASE_URL" => "postgres:///census_lago", "LAGO_REDIS_CACHE_URL" => "redis://localhost:6379/1",
+        "REDIS_URL" => "redis://localhost:6379/2", "LAGO_API_URL" => "https://localhost", "LAGO_FRONT_URL" => "https://localhost",
+        "LAGO_DISABLE_SEGMENT" => "true", "LAGO_ENCRYPTION_PRIMARY_KEY" => "primary" * 5,
+        "LAGO_ENCRYPTION_DETERMINISTIC_KEY" => "census" * 6, "LAGO_ENCRYPTION_KEY_DERIVATION_SALT" => "salt" * 8 },
+      # A throwaway RSA key, which config/initializers/rsa_keys.rb reads before boot.
+      # API only: no assets to build.
+      pre_db: [["sh", "-c", "mkdir -p config/keys && openssl genrsa -out config/keys/private.pem 2048"]], assets: false },
+    "discourse" => { source: "discourse", overlay: PG_OVERLAYS + "/discourse.patch", services: %w[postgresql redis],
+      env: { "DISCOURSE_DB_NAME" => "census_discourse", "DISCOURSE_DB_HOST" => "", "DISCOURSE_DB_SOCKET" => "/var/run/postgresql",
+        "DISCOURSE_DB_USERNAME" => ENV.fetch("USER"),
+        "DISCOURSE_HOSTNAME" => "localhost", "DISCOURSE_REDIS_HOST" => "localhost", "DISCOURSE_REDIS_DB" => "5",
+        "DISCOURSE_DEVELOPER_EMAILS" => "census0@census.test", "LOAD_PLUGINS" => "0", "DISCOURSE_DISABLE_ANON_CACHE" => "1",
+        "DISCOURSE_MAX_REQS_PER_IP_MODE" => "none", "CENSUS_SIDEKIQ_FAKE" => "1" },
+      # Discourse's db:migrate loads structure.sql (it needs pgvector); the
+      # measured pages are crawler HTML and JSON, so the Ember build is skipped.
+      pre_db: [%w[npx --yes pnpm@12.11.2 install --frozen-lockfile]], db: %w[db:create db:migrate], assets: false },
+    "loomio" => { source: "loomio", overlay: PG_OVERLAYS + "/loomio.patch", services: %w[postgresql redis],
+      env: { "DATABASE_URL" => "postgres:///census_loomio", "CANONICAL_HOST" => "localhost", "REDIS_URL" => "redis://localhost:6379/7" },
+      build: [["sh", "-c", "npm install --prefix tmp/npm --no-audit --no-fund npm@11.16.0 && cd vue && " \
+        "../tmp/npm/node_modules/.bin/npm ci --no-audit --no-fund && ../tmp/npm/node_modules/.bin/npm run build"]] },
+    "sure" => { source: "sure", overlay: PG_OVERLAYS + "/sure.patch", services: %w[postgresql redis],
+      env: { "DB_HOST" => "/var/run/postgresql", "POSTGRES_DB" => "census_sure", "REDIS_URL" => "redis://localhost:6379/8",
+        "SELF_HOSTED" => "true" } },
+    "casa" => { source: "casa", bare: true, overlay: PG_OVERLAYS + "/casa.patch", services: %w[postgresql],
+      env: { "DATABASE_URL" => "postgres:///census_casa", "POSTGRES_USER" => ENV.fetch("USER"), "APP_ENVIRONMENT" => "census",
+        "SCOUT_MONITOR" => "false", "ACTIVE_STORAGE_SERVICE" => "local" },
+      pre_db: [["bundle", "exec", "ruby", PG_OVERLAYS + "/casa_credentials.rb"]],
+      # package.json requires Node 24 (script/corpus's CASA pin).
+      # cssbundling's precompile runs npm too, so Node 24 stays on PATH for it.
+      build: [["sh", "-c", "mise install node@24.22.0 && PATH=$(mise where node@24.22.0)/bin:$PATH && " \
+        "npm ci --no-audit --no-fund && bundle exec rails assets:precompile"]], assets: false },
+  ).then do |apps|
+    apps.merge(
+      "mastodon-nops" => apps["mastodon"].merge(copy: "mastodon", env: apps["mastodon"][:env].merge(
+        "PREPARED_STATEMENTS" => "false", "CENSUS_PREPARED_STATEMENTS" => "false")),
+      "lago-nops" => apps["lago"].merge(copy: "lago", env: apps["lago"][:env].merge(
+        "DATABASE_PREPARED_STATEMENTS" => "false", "CENSUS_PREPARED_STATEMENTS" => "false")),
+    )
+  end.freeze
   SERVICES = { "redis" => 6379, "memcached" => 11211, "mysql" => 3307 }.freeze
 
   module_function
@@ -94,7 +153,7 @@ module Census
     { "spec" => spec, "source" => %(github: "#{repo}"), "ref" => ref, "sha" => sha }
   end
 
-  def app_dir(corpus, app) = File.join(ROOT, ".corpus", "#{corpus}-#{app}")
+  def app_dir(corpus, app) = File.join(ROOT, ".corpus", "#{corpus}-#{APPS.fetch(app).fetch(:copy, app)}")
 
   def state(corpus, app)
     path = File.join(app_dir(corpus, app), ".census.json")
@@ -119,11 +178,13 @@ module Census
     gemfile = File.join(dir, "Gemfile.census-#{rails.fetch("sha")[0, 12]}")
     unless File.exist?(gemfile)
       lines = File.readlines(File.join(dir, "Gemfile"))
-      pins = lines.each_index.select { lines[_1].match?(/\A\s*gem "rails",/) }
-      raise "#{app}: expected one gem \"rails\" line, found #{pins.size}" unless pins.one?
-      lines[pins.first] = %(gem "rails", #{rails.fetch("source")}, ref: "#{rails.fetch("sha")}"\n)
+      pins = lines.each_index.filter_map { |i| [i, $1] if lines[i] =~ /\A\s*gem ["'](#{RAILS_GEMS.join("|")})["'],/ }
+      raise "#{app}: expected a gem \"rails\" line (or its components), found none" if pins.empty?
+      pins.each { |i, gem| lines[i] = %(gem "#{gem}", #{rails.fetch("source")}, ref: "#{rails.fetch("sha")}"\n) }
       File.write(gemfile, lines.grep_v(/\Aruby\b/).join)
-      FileUtils.cp(File.join(dir, "Gemfile.lock"), gemfile + ".lock")
+      # The variant drops the ruby pin, so its lock drops RUBY VERSION too
+      # (frozen Bundler otherwise refuses to unlock it).
+      File.write(gemfile + ".lock", File.read(File.join(dir, "Gemfile.lock")).sub(/^RUBY VERSION\n.*?\n\n/m, ""))
     end
     env = env_for(app, bin, rails, gemfile, frozen: false)
     system(env, "bundle", "check", chdir: dir, out: File::NULL, err: File::NULL) ||
@@ -134,7 +195,7 @@ module Census
   # Dependency control: a variant's lock may differ from the base lock only in
   # the Rails source block and the Ruby version.
   def lock_outside_rails(path)
-    File.read(path).split(/\n{2,}/).reject { _1.start_with?("RUBY VERSION") || (_1.start_with?("GIT") && _1.match?(/^    rails \(/)) }
+    File.read(path).split(/\n{2,}/).reject { _1.start_with?("RUBY VERSION") || (_1.start_with?("GIT") && _1.match?(/^    (rails|railties) \(/)) }
   end
 
   def check_services(apps)
@@ -161,11 +222,13 @@ module Census
     check_services(opts[:apps])
     opts[:apps].each do |app|
       conf = APPS.fetch(app)
+      next puts("#{app}: runs #{conf[:copy]}'s copy") if conf[:copy]
       dir = app_dir(opts[:corpus], app)
       raise "fresh copy required: #{dir}" if File.exist?(dir)
       sh({}, File.join(ROOT, "script/corpus"), conf.fetch(:source), File.basename(dir), "--source-only",
         *("--no-overlay" if conf[:bare]))
-      overlay = File.join(opts[:overlays], "#{conf.fetch(:overlay, app)}.patch")
+      overlay = conf.fetch(:overlay, app)
+      overlay = File.join(opts[:overlays], "#{overlay}.patch") unless overlay.include?("/")
       sh({}, "patch", "-p1", "--forward", "--silent", "-i", overlay, chdir: dir)
       FileUtils.cp(File.join(dir, conf[:database_yml]), File.join(dir, "config/database.yml")) if conf[:database_yml] && !File.exist?(File.join(dir, "config/database.yml"))
       # Git does not keep empty directories; Lobsters' production log opens log/rails.log at boot.
@@ -174,10 +237,12 @@ module Census
         "overlay" => overlay.delete_prefix(ROOT + "/"), "created" => Time.now.utc.iso8601) + "\n")
       gemfile = variant(opts[:corpus], app, rails, bin)
       env = env_for(app, bin, rails, gemfile)
+      conf.fetch(:pre_db, []).each { sh(env, *_1, chdir: dir) }
+      db_tasks = conf.fetch(:db, %w[db:create db:schema:load])
       # Server databases are named by the app's own config, not by the copy, so
       # another copy of the same app (another --corpus, an earlier round) uses
       # the same ones. Refuse instead of loading the schema over its data.
-      if conf.fetch(:services, []).intersect?(%w[postgresql mysql])
+      if conf.fetch(:services, []).intersect?(%w[postgresql mysql]) && db_tasks.first == "db:create"
         puts "+ bundle exec rails db:create (in #{dir.delete_prefix(ROOT + "/")})"
         out, status = Open3.capture2e(env, "bundle", "exec", "rails", "db:create", chdir: dir)
         print out
@@ -186,12 +251,12 @@ module Census
           raise "#{app}: #{existing.join(", ")} already exist on the shared server, so another copy may use them. " \
             "Drop them first if they are disposable."
         end
-        sh(env, "bundle", "exec", "rails", "db:schema:load", chdir: dir)
+        sh(env, "bundle", "exec", "rails", *db_tasks.drop(1), chdir: dir)
       else
-        sh(env, "bundle", "exec", "rails", "db:create", "db:schema:load", chdir: dir)
+        sh(env, "bundle", "exec", "rails", *db_tasks, chdir: dir)
       end
       conf.fetch(:build, []).each { sh(env, *_1, chdir: dir) }
-      sh(env, "bundle", "exec", "rails", "assets:precompile", chdir: dir)
+      sh(env, "bundle", "exec", "rails", "assets:precompile", chdir: dir) unless conf[:assets] == false
       conf.fetch(:after_assets, []).each { sh(env, *_1, chdir: dir) }
       sh(env.merge("CENSUS_MODE" => "interpreter"), "bundle", "exec", "ruby", HARNESS, "prepare", app, chdir: dir)
       sh(env.merge("CENSUS_MODE" => "interpreter"), "bundle", "exec", "ruby", HARNESS, "list", app, chdir: dir)
@@ -235,19 +300,31 @@ module Census
       meta_path = File.join(out, "meta.json")
       meta = File.exist?(meta_path) ? JSON.parse(File.read(meta_path)) : { "label" => label, "rails" => rails, "ruby" => ruby, "runs" => [] }
       raise "#{label} was run with #{meta["rails"]["sha"]} / #{meta["ruby"]}" unless meta["rails"]["sha"] == rails["sha"] && meta["ruby"] == ruby
+      # Configurations that share a copy (APP-nops) share its database, so
+      # they never run at the same time.
+      copy_locks = opts[:apps].to_h { [app_dir(opts[:corpus], _1), Mutex.new] }
       opts[:modes].each do |mode|
         queue = Queue.new
         opts[:apps].each { queue << _1 }
+        failed = Queue.new
         Array.new([opts[:jobs], opts[:apps].size].min) do
           Thread.new do
             while (app = (queue.pop(true) rescue nil))
               json = File.join(out, "#{app}-#{mode}.json")
               env = env_for(app, bin, rails, gemfiles[app]).merge("CENSUS_MODE" => mode, "CENSUS_ONLY" => opts[:only])
-              sh(env, "bundle", "exec", "ruby", *FLAGS.fetch(mode), HARNESS, "profile", app, json,
-                chdir: app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
+              begin
+                copy_locks[app_dir(opts[:corpus], app)].synchronize do
+                  sh(env, "bundle", "exec", "ruby", *FLAGS.fetch(mode), HARNESS, "profile", app, json,
+                    chdir: app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
+                end
+              rescue RuntimeError
+                failed << app # one app's failure does not stop the others in this mode
+              end
             end
           end
         end.each(&:join)
+        failures = Array.new(failed.size) { failed.pop }
+        raise "#{label} #{mode}: #{failures.sort.join(", ")} failed; see their .log files" if failures.any?
       end
       meta["runs"] << { "apps" => opts[:apps], "modes" => opts[:modes], "only" => opts[:only], "dependencies_outside_rails_match_base" => locks,
         "finished" => Time.now.utc.iso8601 }

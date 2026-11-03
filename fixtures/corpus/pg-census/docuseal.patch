@@ -1,0 +1,348 @@
+diff --git a/Gemfile b/Gemfile
+index 86f3c08..496a4da 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -2,7 +2,7 @@
+ 
+ source 'https://rubygems.org'
+ 
+-ruby '4.0.9'
++ruby '4.0.7'
+ 
+ gem 'addressable'
+ gem 'arabic-letter-connector', require: false
+@@ -30,7 +30,7 @@ gem 'pg', require: false
+ gem 'pretender'
+ gem 'puma', require: false
+ gem 'rack'
+-gem 'rails'
++gem 'rails', github: 'rails/rails', ref: '5810776eecc5b2e50b58e81ee0c26c02c718fdf0'
+ gem 'rails-i18n'
+ gem 'rotp'
+ gem 'rouge', require: false
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 6b12f2e..c9aada5 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -1,68 +1,69 @@
+-GEM
+-  remote: https://rubygems.org/
++GIT
++  remote: https://github.com/rails/rails.git
++  revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
++  ref: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+   specs:
+-    action_text-trix (2.1.19)
+-      railties
+-    actioncable (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actioncable (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nio4r (~> 2.0)
+       websocket-driver (>= 0.6.1)
+       zeitwerk (~> 2.6)
+-    actionmailbox (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailbox (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+-    actionmailer (8.1.4)
+-      actionpack (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailer (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+       rails-dom-testing (~> 2.2)
+-    actionpack (8.1.4)
+-      actionview (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionpack (8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nokogiri (>= 1.8.5)
+       rack (>= 2.2.4)
+       rack-session (>= 1.0.1)
+       rack-test (>= 0.6.3)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
++      rails-html-sanitizer (~> 1.7)
+       useragent (~> 0.16)
+-    actiontext (8.1.4)
+-      action_text-trix (~> 2.1.15)
+-      actionpack (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actiontext (8.2.0.alpha)
++      action_text-trix (~> 2.1.16)
++      actionpack (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       globalid (>= 0.6.0)
+       nokogiri (>= 1.8.5)
+-    actionview (8.1.4)
+-      activesupport (= 8.1.4)
++    actionview (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       builder (~> 3.1)
+       erubi (~> 1.11)
++      herb (>= 0.10)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
+-    activejob (8.1.4)
+-      activesupport (= 8.1.4)
+-      globalid (>= 0.3.6)
+-    activemodel (8.1.4)
+-      activesupport (= 8.1.4)
+-    activerecord (8.1.4)
+-      activemodel (= 8.1.4)
+-      activesupport (= 8.1.4)
++      rails-html-sanitizer (~> 1.7)
++    activejob (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      globalid (>= 1.4.0)
++    activemodel (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++    activerecord (8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       timeout (>= 0.4.0)
+-    activestorage (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      marcel (~> 1.0)
+-    activesupport (8.1.4)
++    activestorage (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      marcel (~> 2.0)
++    activesupport (8.2.0.alpha)
+       base64
+       bigdecimal
+       concurrent-ruby (~> 1.0, >= 1.3.1)
+@@ -72,9 +73,40 @@ GEM
+       json
+       logger (>= 1.4.2)
+       minitest (>= 5.1)
++      psych (>= 4)
++      ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+       tzinfo (~> 2.0, >= 2.0.5)
+       uri (>= 0.13.1)
++    rails (8.2.0.alpha)
++      actioncable (= 8.2.0.alpha)
++      actionmailbox (= 8.2.0.alpha)
++      actionmailer (= 8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actiontext (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      bundler (>= 1.15.0)
++      railties (= 8.2.0.alpha)
++    railties (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      irb (~> 1.13)
++      rackup (>= 1.0.0)
++      rake (>= 12.2)
++      thor (~> 1.0, >= 1.2.2)
++      tsort (>= 0.2)
++      zeitwerk (~> 2.6)
++
++GEM
++  remote: https://rubygems.org/
++  specs:
++    action_text-trix (2.1.19)
++      railties
+     addressable (2.9.0)
+       public_suffix (>= 2.0.2, < 8.0)
+     annotaterb (4.22.0)
+@@ -257,6 +289,11 @@ GEM
+       os (>= 0.9, < 2.0)
+       signet (>= 0.16, < 2.a)
+     hashdiff (1.2.1)
++    herb (0.11.1-aarch64-linux-gnu)
++    herb (0.11.1-aarch64-linux-musl)
++    herb (0.11.1-arm64-darwin)
++    herb (0.11.1-x86_64-linux-gnu)
++    herb (0.11.1-x86_64-linux-musl)
+     hexapdf (1.7.0)
+       cmdparse (~> 3.0, >= 3.0.3)
+       geom2d (~> 0.4, >= 0.4.1)
+@@ -293,16 +330,16 @@ GEM
+       activesupport (>= 4)
+       railties (>= 4)
+       request_store (~> 1.0)
+-    loofah (2.25.2)
++    loofah (2.25.3)
+       crass (~> 1.0.2)
+-      nokogiri (>= 1.12.0)
++      nokogiri (>= 1.19.5)
+     mail (2.9.1)
+       logger
+       mini_mime (>= 0.1.1)
+       net-imap
+       net-pop
+       net-smtp
+-    marcel (1.2.1)
++    marcel (2.1.0)
+     matrix (0.4.3)
+     method_source (1.1.0)
+     mini_mime (1.1.5)
+@@ -323,15 +360,15 @@ GEM
+     net-smtp (0.5.2)
+       net-protocol
+     nio4r (2.7.5)
+-    nokogiri (1.19.4-aarch64-linux-gnu)
++    nokogiri (1.19.7-aarch64-linux-gnu)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-aarch64-linux-musl)
++    nokogiri (1.19.7-aarch64-linux-musl)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-arm64-darwin)
++    nokogiri (1.19.7-arm64-darwin)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-gnu)
++    nokogiri (1.19.7-x86_64-linux-gnu)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-musl)
++    nokogiri (1.19.7-x86_64-linux-musl)
+       racc (~> 1.4)
+     numo-narray-alt (0.10.3)
+     onnxruntime (0.10.1-aarch64-linux)
+@@ -369,11 +406,14 @@ GEM
+       reline (>= 0.6.0)
+     pry-rails (0.3.11)
+       pry (>= 0.13.0)
++    psych (5.5.0)
++      date
++      stringio
+     public_suffix (7.0.5)
+     puma (8.0.2)
+       nio4r (~> 2.0)
+     racc (1.8.1)
+-    rack (3.2.7)
++    rack (3.2.8)
+     rack-proxy (0.7.7)
+       rack
+     rack-session (2.1.2)
+@@ -383,39 +423,17 @@ GEM
+       rack (>= 1.3)
+     rackup (2.3.1)
+       rack (>= 3)
+-    rails (8.1.4)
+-      actioncable (= 8.1.4)
+-      actionmailbox (= 8.1.4)
+-      actionmailer (= 8.1.4)
+-      actionpack (= 8.1.4)
+-      actiontext (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activemodel (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      bundler (>= 1.15.0)
+-      railties (= 8.1.4)
++    ractor-dispatch (0.3.0)
+     rails-dom-testing (2.3.0)
+       activesupport (>= 5.0.0)
+       minitest
+       nokogiri (>= 1.6)
+-    rails-html-sanitizer (1.7.1)
+-      loofah (~> 2.25, >= 2.25.2)
++    rails-html-sanitizer (1.7.2)
++      loofah (~> 2.25, >= 2.25.3)
+       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
+     rails-i18n (8.1.0)
+       i18n (>= 0.7, < 2)
+       railties (>= 8.0.0, < 9)
+-    railties (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      irb (~> 1.13)
+-      rackup (>= 1.0.0)
+-      rake (>= 12.2)
+-      thor (~> 1.0, >= 1.2.2)
+-      tsort (>= 0.2)
+-      zeitwerk (~> 2.6)
+     rainbow (3.1.1)
+     rake (13.4.2)
+     rbs (4.2.0)
+@@ -529,6 +547,7 @@ GEM
+     sqlite3 (2.9.6-arm64-darwin)
+     sqlite3 (2.9.6-x86_64-linux-gnu)
+     sqlite3 (2.9.6-x86_64-linux-musl)
++    stringio (3.2.0)
+     strip_attributes (2.0.1)
+       activemodel (>= 3.0, < 9.0)
+     strscan (3.1.8)
+@@ -637,7 +656,7 @@ DEPENDENCIES
+   pry-rails
+   puma
+   rack
+-  rails
++  rails!
+   rails-i18n
+   rotp
+   rouge
+@@ -664,7 +683,7 @@ DEPENDENCIES
+   xlsxtream
+ 
+ RUBY VERSION
+-  ruby 4.0.9
++  ruby 4.0.7
+ 
+ BUNDLED WITH
+-  4.0.3
++  4.0.20
+diff --git a/config/initializers/active_storage.rb b/config/initializers/active_storage.rb
+index be1236a..b346f67 100644
+--- a/config/initializers/active_storage.rb
++++ b/config/initializers/active_storage.rb
+@@ -60,7 +60,7 @@ ActiveSupport.on_load(:active_storage_blob) do
+   end
+ end
+ 
+-ActiveStorage::LogSubscriber.detach_from(:active_storage) if Rails.env.production?
++ActiveStorage::LogSubscriber.detach_from(:active_storage) if Rails.env.production? && ActiveStorage::LogSubscriber.respond_to?(:detach_from)
+ 
+ Rails.configuration.to_prepare do
+   ActiveStorage::DiskController.after_action do
+diff --git a/lib/webhook_urls.rb b/lib/webhook_urls.rb
+index 5544499..11d2d0f 100644
+--- a/lib/webhook_urls.rb
++++ b/lib/webhook_urls.rb
+@@ -28,7 +28,7 @@ module WebhookUrls
+ 
+     rel = WebhookUrl.where(account_id:)
+ 
+-    event_arel = events.map { |event| Arel::Table.new(:webhook_urls)[:events].matches("%\"#{event}\"%") }.reduce(:or)
++    event_arel = events.map { |event| Arel::Table.new(name: :webhook_urls)[:events].matches("%\"#{event}\"%") }.reduce(:or)
+ 
+     if Docuseal.multitenant? || account_id == 1
+       rel.where(event_arel)

@@ -1,0 +1,309 @@
+diff --git a/.ruby-version b/.ruby-version
+index 7919852..43beb40 100644
+--- a/.ruby-version
++++ b/.ruby-version
+@@ -1 +1 @@
+-4.0.9
++4.0.7
+diff --git a/Gemfile b/Gemfile
+index 4e75b18..e559b0e 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -5,7 +5,7 @@ ruby file: '.ruby-version'
+ 
+ gem 'propshaft'
+ gem 'puma'
+-gem 'rails', '~> 8.1.0'
++gem 'rails', github: 'rails/rails', ref: '5810776eecc5b2e50b58e81ee0c26c02c718fdf0'
+ gem 'thor', '~> 1.2'
+ 
+ gem 'dotenv'
+diff --git a/Gemfile.lock b/Gemfile.lock
+index ee09d0b..9ff8a14 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -7,76 +7,72 @@ GIT
+       hkdf (~> 0.2)
+       jwt (~> 2.0)
+ 
+-GEM
+-  remote: https://rubygems.org/
++GIT
++  remote: https://github.com/rails/rails.git
++  revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
++  ref: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+   specs:
+-    action_text-trix (2.1.19)
+-      railties
+-    actioncable (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actioncable (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nio4r (~> 2.0)
+       websocket-driver (>= 0.6.1)
+       zeitwerk (~> 2.6)
+-    actionmailbox (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailbox (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+-    actionmailer (8.1.4)
+-      actionpack (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailer (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+       rails-dom-testing (~> 2.2)
+-    actionpack (8.1.4)
+-      actionview (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionpack (8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nokogiri (>= 1.8.5)
+       rack (>= 2.2.4)
+       rack-session (>= 1.0.1)
+       rack-test (>= 0.6.3)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
++      rails-html-sanitizer (~> 1.7)
+       useragent (~> 0.16)
+-    actiontext (8.1.4)
+-      action_text-trix (~> 2.1.15)
+-      actionpack (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actiontext (8.2.0.alpha)
++      action_text-trix (~> 2.1.16)
++      actionpack (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       globalid (>= 0.6.0)
+       nokogiri (>= 1.8.5)
+-    actionview (8.1.4)
+-      activesupport (= 8.1.4)
++    actionview (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       builder (~> 3.1)
+       erubi (~> 1.11)
++      herb (>= 0.10)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
+-    active_model_serializers (0.10.16)
+-      actionpack (>= 4.1)
+-      activemodel (>= 4.1)
+-      case_transform (>= 0.2)
+-      jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
+-    activejob (8.1.4)
+-      activesupport (= 8.1.4)
+-      globalid (>= 0.3.6)
+-    activemodel (8.1.4)
+-      activesupport (= 8.1.4)
+-    activerecord (8.1.4)
+-      activemodel (= 8.1.4)
+-      activesupport (= 8.1.4)
++      rails-html-sanitizer (~> 1.7)
++    activejob (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      globalid (>= 1.4.0)
++    activemodel (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++    activerecord (8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       timeout (>= 0.4.0)
+-    activestorage (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      marcel (~> 1.0)
+-    activesupport (8.1.4)
++    activestorage (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      marcel (~> 2.0)
++    activesupport (8.2.0.alpha)
+       base64
+       bigdecimal
+       concurrent-ruby (~> 1.0, >= 1.3.1)
+@@ -86,9 +82,45 @@ GEM
+       json
+       logger (>= 1.4.2)
+       minitest (>= 5.1)
++      psych (>= 4)
++      ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+       tzinfo (~> 2.0, >= 2.0.5)
+       uri (>= 0.13.1)
++    rails (8.2.0.alpha)
++      actioncable (= 8.2.0.alpha)
++      actionmailbox (= 8.2.0.alpha)
++      actionmailer (= 8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actiontext (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      bundler (>= 1.15.0)
++      railties (= 8.2.0.alpha)
++    railties (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      irb (~> 1.13)
++      rackup (>= 1.0.0)
++      rake (>= 12.2)
++      thor (~> 1.0, >= 1.2.2)
++      tsort (>= 0.2)
++      zeitwerk (~> 2.6)
++
++GEM
++  remote: https://rubygems.org/
++  specs:
++    action_text-trix (2.1.19)
++      railties
++    active_model_serializers (0.10.16)
++      actionpack (>= 4.1)
++      activemodel (>= 4.1)
++      case_transform (>= 0.2)
++      jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
+     addressable (2.9.2)
+       public_suffix (>= 2.0.2, < 8.0)
+     aes_key_wrap (1.1.0)
+@@ -305,6 +337,7 @@ GEM
+       logger
+     hcaptcha (7.1.0)
+       json
++    herb (0.11.1)
+     highline (3.1.2)
+       reline
+     hiredis-client (0.31.0)
+@@ -439,7 +472,7 @@ GEM
+       net-imap
+       net-pop
+       net-smtp
+-    marcel (1.2.1)
++    marcel (2.1.0)
+     mario-redis-lock (1.2.1)
+       redis (>= 3.0.5)
+     matrix (0.4.3)
+@@ -471,7 +504,7 @@ GEM
+     net-smtp (0.5.2)
+       net-protocol
+     nio4r (2.7.5)
+-    nokogiri (1.19.6)
++    nokogiri (1.19.7)
+       mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+     omniauth (2.3.1)
+@@ -631,6 +664,9 @@ GEM
+       actionpack (>= 7.0.0)
+       activesupport (>= 7.0.0)
+       rack
++    psych (5.5.0)
++      date
++      stringio
+     public_suffix (7.0.5)
+     puma (8.0.2)
+       nio4r (~> 2.0)
+@@ -664,20 +700,7 @@ GEM
+       rack (>= 1.3)
+     rackup (2.3.1)
+       rack (>= 3)
+-    rails (8.1.4)
+-      actioncable (= 8.1.4)
+-      actionmailbox (= 8.1.4)
+-      actionmailer (= 8.1.4)
+-      actionpack (= 8.1.4)
+-      actiontext (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activemodel (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      bundler (>= 1.15.0)
+-      railties (= 8.1.4)
++    ractor-dispatch (0.3.0)
+     rails-dom-testing (2.3.0)
+       activesupport (>= 5.0.0)
+       minitest
+@@ -688,15 +711,6 @@ GEM
+     rails-i18n (8.1.0)
+       i18n (>= 0.7, < 2)
+       railties (>= 8.0.0, < 9)
+-    railties (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      irb (~> 1.13)
+-      rackup (>= 1.0.0)
+-      rake (>= 12.2)
+-      thor (~> 1.0, >= 1.2.2)
+-      tsort (>= 0.2)
+-      zeitwerk (~> 2.6)
+     rainbow (3.1.1)
+     rake (13.4.2)
+     rbs (4.2.0)
+@@ -863,6 +877,7 @@ GEM
+     stoplight (5.8.3)
+       concurrent-ruby
+       zeitwerk
++    stringio (3.2.0)
+     strong_migrations (2.8.0)
+       activerecord (>= 7.2)
+     strscan (3.1.8)
+@@ -1056,7 +1071,7 @@ DEPENDENCIES
+   rack-cors
+   rack-proxy
+   rack-test (~> 2.1)
+-  rails (~> 8.1.0)
++  rails!
+   rails-i18n (~> 8.0)
+   rdf-normalize (~> 0.5)
+   redcarpet (~> 3.6)
+@@ -1102,7 +1117,7 @@ DEPENDENCIES
+   xorcist (~> 1.1)
+ 
+ RUBY VERSION
+-  ruby 4.0.9
++  ruby 4.0.7
+ 
+ BUNDLED WITH
+-  4.0.23
++  4.0.20
+diff --git a/lib/action_dispatch/remote_ip_extensions.rb b/lib/action_dispatch/remote_ip_extensions.rb
+index bf78c69..4fbc15f 100644
+--- a/lib/action_dispatch/remote_ip_extensions.rb
++++ b/lib/action_dispatch/remote_ip_extensions.rb
+@@ -61,7 +61,8 @@ module ActionDispatch
+ 
+         # If every single IP option is in the trusted list, return the IP that's
+         # furthest away
+-        filter_proxies([remote_addr] + ips).first || ips.last || remote_addr
++        # Lowrail census compat: Rails main 752cc3915d replaced filter_proxies(...).first with first_non_proxy.
++        first_non_proxy([remote_addr] + ips) || ips.last || remote_addr
+       end
+     end
+   end
