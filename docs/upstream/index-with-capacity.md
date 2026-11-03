@@ -4,7 +4,7 @@
 hash built with `Hash.new(capacity: size)`, or `{}` when the array has two elements or fewer. It is the same embedded hash
 `Array#to_h` makes, without a pair Array per element. Ruby 4.0 and older, and Array subclasses, keep `to_h` unchanged. It is one commit on
 [`thomasklemm/index-with-capacity`](https://github.com/thomasklemm/rails/tree/thomasklemm/index-with-capacity),
-[`412a33b`](https://github.com/thomasklemm/rails/commit/412a33b0c9b2dade53d3bb5162f9b2be94d51cd6), stacked on
+[`d98b002`](https://github.com/thomasklemm/rails/commit/d98b002da5874da43f588c209fd4bb33d5b76dc9), stacked on
 [`6235de2`](https://github.com/thomasklemm/rails/commit/6235de2236077aafd67d4991cab172715054ebd0) (rails/rails#59555,
 the `Hash#index_with` fix, which adds the `Array#index_with` this change extends), on canonical main
 [`5810776eec`](https://github.com/rails/rails/commit/5810776eec). No PR is open for it.
@@ -12,9 +12,19 @@ the `Hash#index_with` fix, which adds the `Array#index_with` this change extends
 **Review round 1** (Codex Thermos, gpt-6.1-sol) on the first version, `c1da731`, requested two changes, both made.
 (1) The 4.1 path used `size` and `each`, which an Array subclass can override, where `Array#to_h` reads the storage
 directly. The fast path is now taken only when `instance_of?(Array)`; subclasses keep `to_h`. (2) The gate
-`RUBY_VERSION >= "4.1"` compared strings (`"10.0" < "4.1"`). It is now `Gem::Version`, evaluated once at load time.
+`RUBY_VERSION >= "4.1"` compared strings (`"10.0" < "4.1"`). It became `Gem::Version` (replaced in round 2).
 Per-call allocations and memsizes are unchanged from `c1da731` at every size on 4.1 (interpreter and YJIT) and 4.0.7,
 so the heap-harness, census and wall-time numbers below, measured on the `c1da731` method, still apply.
+
+**Review round 2** on `412a33b` requested two more changes. (1) `Gem::Version` made the file depend on RubyGems at
+load (`ruby --disable-gems -ractive_support/core_ext/enumerable` raised NameError). The gate is now
+`(RUBY_VERSION.split(".").map(&:to_i) <=> [4, 1]) >= 0`, still evaluated once at load, and the file loads with
+`--disable-gems` on 4.0.7 and 4.1.0dev. (2) Plain Arrays with a singleton or global `each`/`size` override still reach
+the loop. Iterating through `Array.instance_method(:each)`/`(:length)` with `bind_call`, captured at load, was
+measured and rejected: on 4.1 it adds 2 objects per call in the default form and 4 with a block (interpreter and YJIT),
+and per-call time is 2–3× (e.g. 6 elements, interpreter: 652→881 ns default, 796→1198 ns block; YJIT 529→958 ns,
+560→1246 ns). Because it already fails the zero-object bar, no wall-time round was run for it. The overrides are
+documented as a boundary instead, with a test.
 
 | | main (`to_h`) | candidate on 4.1 |
 | --- | --- | --- |
@@ -456,7 +466,8 @@ class Array # :nodoc:
   # same way, without Array#to_h's pair array per element. An empty hash already
   # has room for two entries. Subclasses keep Array#to_h, which reads the
   # elements directly rather than through an overridden #each or #size.
-  if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.1")
+  # Compared as integers, without RubyGems, when this file loads.
+  if (RUBY_VERSION.split(".").map(&:to_i) <=> [4, 1]) >= 0
     def index_with(default = (no_default = true))
       if no_default && !block_given?
         to_enum(:index_with) { size }
@@ -496,10 +507,14 @@ end
 * **Array subclasses keep `to_h`.** `Array#to_h` walks the storage in C and ignores an overridden `each` or `size`.
   The fast path calls both, so it runs only for `instance_of?(Array)`; a subclass gets exactly main's result, on
   every Ruby. The `instance_of?` check allocates nothing.
+* **Boundary: singleton or global overrides of `Array#each`/`#size`.** A plain Array with `def values.each`, or a
+  reopened `class Array; def each`, is filled through the override on 4.1, as Rails 8.1 and #59108 did, where
+  `Array#to_h` reads the storage. `test_index_with_array_with_singleton_each` pins that behavior per Ruby version.
 * **Boundary: Ruby 4.1.0dev builds between ruby/ruby#18345 and #19537** take the capacity path without #19537's
   presizing, so they spill as #59108 did. Released 4.1 will include #19537.
-* **Version gate:** `Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.1")`, evaluated once when the file loads,
-  so it orders `10.0` after `4.1` and costs nothing per call. `Hash.new(capacity:)` does not exist before 3.4;
+* **Version gate:** `(RUBY_VERSION.split(".").map(&:to_i) <=> [4, 1]) >= 0`, evaluated once when the file loads, so
+  it orders `10.0` after `4.1`, needs no RubyGems (checked with `ruby --disable-gems -Iactivesupport/lib
+  -ractive_support/core_ext/enumerable` on 4.0.7 and 4.1.0dev), and costs nothing per call. `Hash.new(capacity:)` does not exist before 3.4;
   3.3.5 never reaches it.
 
 ### Tests and suites
@@ -513,7 +528,7 @@ end
 * On 4.1, `test_index_with_array` fails each of six wrong implementations: a positional `Hash.new(size)`, keeping the first value,
   `reverse_each` in either form, an unsized enumerator, and `default.dup`. It passes on unchanged main, so it
   pins current behavior rather than the implementation.
-* **ActiveSupport suite, `RAILS_STRICT_WARNINGS=1`, on `412a33b`:** Ruby 4.0.7, 6871 runs, 0 failures, 0 errors,
+* **ActiveSupport suite, `RAILS_STRICT_WARNINGS=1`, on `d98b002`:** Ruby 4.0.7, 6871 runs, 0 failures, 0 errors,
   1766 skips. Ruby 4.1.0dev, 6871 runs, 0 failures and 1 error:
   `NotificationSubscriptionTest#test_record_and_set_subscriptions_when_using_a_regexp`, a
   `Ractor::Error: can not copy ActiveSupport::Notifications::Fanout::Registry` that occurs the same way on
@@ -542,7 +557,10 @@ end
 > On Ruby 4.1, `Array#index_with` fills `Hash.new(capacity: size)`, or `{}` for two elements or fewer since that already
 > fits them. Ruby 4.0 and older keep `to_h`, because there `Hash.new(capacity:)` spills even small hashes. Array
 > subclasses keep `to_h` too, since it reads the elements directly rather than through an overridden `each` or `size`.
-> The version check uses `Gem::Version` once at load time. The result is the same hash, with the same order, duplicate-key handling,
+> The version check compares integers once at load time, without RubyGems.
+>
+> Boundary: a plain Array whose `each` or `size` is overridden on the singleton or on `Array` itself is filled through
+> the override on 4.1, as Rails 8.1 and #59108 did, where `Array#to_h` reads the storage. A test documents it. The result is the same hash, with the same order, duplicate-key handling,
 > default object and sized enumerator. Its memsize is identical to `to_h`'s at every size from 0 to 50.
 >
 > ### Additional information
