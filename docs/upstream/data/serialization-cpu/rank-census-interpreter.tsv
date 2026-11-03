@@ -1,0 +1,108 @@
+	mean	blog-i	campfire-i	chatwoot-i	codetriage-i	discourse-i	fizzy-i	lago-i	lobsters-i	mastodon-i	pingcrm-i	redprints-cfp-i
+samples		16195	35443	131385	8153	83358	28099	59682	16281	142814	30942	8071
+GC %		2.9	4.8	1.3	2.3	2.0	1.6	1.5	1.0	3.5	3.4	2.5
+
+## Self time by area (% of all samples)
+Active Record (queries, associations, other)	37.3	25.8	22.2	51.0	33.7	41.9	49.6	50.3	49.4	34.1	30.6	22.1
+other gems	13.7	11.2	30.6	14.9	22.3	11.3	7.7	15.5	4.3	10.2	13.2	9.6
+Active Support (other)	12.2	17.2	15.4	6.6	14.2	4.9	14.5	6.3	9.6	10.6	11.7	23.0
+Action Pack, Rack	9.5	21.5	6.9	2.1	12.2	2.7	4.4	2.7	11.5	5.5	13.7	21.3
+attribute reads	6.3	6.2	4.8	7.4	2.8	7.8	5.8	5.9	8.9	10.9	5.5	3.8
+database driver (pg, sqlite3)	6.2	2.7	1.9	8.2	7.4	7.0	6.7	11.8	6.8	0.7	10.6	3.8
+app code	2.9	0.6	2.0	1.9	0.4	11.4	3.5	2.4	2.9	5.9	0.5	0.9
+Action View	1.9	6.2	6.5	1.5	1.2	0.5	1.7	0.2	0.3	1.2	0.8	0.8
+active_model_serializers	1.7	0.0	0.0	0.0	0.0	5.3	0.0	0.0	0.0	13.4	0.0	0.0
+other	1.4	1.3	1.5	1.2	2.0	1.1	1.7	1.4	1.6	0.8	1.6	1.2
+Ruby stdlib	1.0	0.9	0.7	1.6	0.7	2.0	0.9	0.9	1.0	0.2	1.4	1.1
+inertia_rails	0.8	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.5	5.0
+jbuilder	0.6	1.8	2.0	0.9	0.0	0.0	0.5	0.0	0.0	0.0	1.4	0.0
+JSON escape (gsub!/tr!)	0.4	0.2	0.2	0.1	0.3	0.6	0.1	0.0	0.5	0.8	0.6	0.8
+index_with	0.4	0.2	0.2	0.6	0.2	0.3	0.2	0.3	0.4	0.9	0.4	0.2
+json gem generator (C)	0.3	0.2	0.1	0.2	0.0	0.0	0.2	0.2	0.6	0.3	0.4	0.7
+Time/Date/BigDecimal as_json	0.2	0.4	0.1	0.1	0.1	0.2	0.3	0.2	0.6	0.3	0.0	0.4
+Active Model (other)	0.2	0.5	0.2	0.3	0.1	0.2	0.3	0.3	0.2	0.2	0.1	0.1
+alba / other serializer gems	0.2	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.4
+AS JSON encoder (encode, Coder proc)	0.1	0.2	0.0	0.0	0.0	0.0	0.1	0.0	0.2	0.0	0.1	0.3
+Active Model serialization	0.1	0.0	0.0	0.0	0.0	0.1	0.0	0.0	0.0	0.3	0.5	0.0
+Oj	0.1	0.0	0.0	0.0	0.0	0.6	0.0	0.0	0.0	0.0	0.0	0.0
+AS as_json (Hash/Array/Object)	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0
+
+## Inclusive (% of all samples with a frame of the area on the stack)
+inside json renderer (render json:)	35.7	33.3	71.3	67.9	0.4	0.1	41.5	32.1	30.6	64.3	15.8	35.3
+jbuilder	20.1	27.5	65.8	67.4	0.0	0.0	40.4	0.0	0.0	0.0	20.0	0.0
+inertia_rails	15.4	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	91.1	77.8
+inside as_json/serializable_hash	15.3	0.3	0.0	0.0	0.0	42.7	0.0	0.0	32.4	63.5	9.5	19.2
+inside to_json/AS::JSON.encode	15.1	0.8	0.4	0.3	0.1	16.7	0.3	31.9	30.5	63.8	0.6	20.4
+AS JSON encoder (encode, Coder proc)	12.2	0.8	0.4	0.2	0.1	16.7	0.3	0.2	30.4	63.8	0.6	20.3
+AS as_json (Hash/Array/Object)	12.1	0.8	0.3	0.2	0.1	16.7	0.2	0.3	30.4	63.8	0.6	20.1
+attribute reads	11.3	13.1	17.0	11.9	6.1	11.5	16.4	10.5	11.4	14.1	7.0	5.4
+active_model_serializers	9.7	0.0	0.0	0.0	0.0	42.9	0.0	0.0	0.0	64.3	0.0	0.0
+json gem generator (C)	4.9	0.6	0.3	0.4	0.0	0.0	0.3	0.4	30.1	0.3	0.6	20.6
+alba / other serializer gems	1.7	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	19.2
+Active Model serialization	1.7	0.0	0.0	0.0	0.0	1.2	0.0	0.0	0.0	8.0	9.5	0.0
+Oj	1.5	0.0	0.0	0.0	0.0	17.0	0.0	0.0	0.0	0.0	0.0	0.0
+index_with	0.7	0.2	0.2	1.3	0.2	0.9	0.3	0.5	0.5	2.3	0.8	0.3
+Time/Date/BigDecimal as_json	0.5	0.4	0.2	0.1	1.5	0.3	0.5	0.2	1.7	0.5	0.0	0.4
+JSON escape (gsub!/tr!)	0.4	0.2	0.2	0.1	0.3	0.6	0.1	0.0	0.5	1.0	0.6	0.8
+
+## Top frames by self time
+ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#perform_query (active_rec	1.77	0.0	0.0	2.2	3.7	4.2	0.0	2.3	0.0	4.2	2.9	0.0
+PG::Connection#get_result (GEM/pg-1.7.0-x86_64-linux/lib/pg/connection.rb)	1.48	0.0	0.0	0.0	0.0	5.0	0.0	0.0	0.0	0.7	10.6	0.0
+PG::Connection#get_result (GEM/pg-1.5.9/lib/pg/connection.rb)	1.08	0.0	0.0	0.0	0.0	0.0	0.0	11.8	0.0	0.0	0.0	0.0
+PG::Connection#get_result (GEM/pg-1.5.3/lib/pg/connection.rb)	0.75	0.0	0.0	8.2	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+PG::Connection#get_result (GEM/pg-1.6.3-x86_64-linux/lib/pg/connection.rb)	0.68	0.0	0.0	0.0	7.4	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+ActiveModel::LazyAttributeSet#fetch_value! (active_model/attribute_set.rb)	0.66	0.5	0.5	0.7	0.1	1.1	0.3	0.4	1.6	1.1	0.7	0.3
+ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#cast_result (active_recor	0.56	0.0	0.0	0.5	1.7	1.1	0.0	0.8	0.0	0.9	1.2	0.0
+Concurrent::Collection::NonConcurrentMapBackend#get_or_default (GEM/concurrent-ruby-1.3.8/	0.48	0.9	0.5	0.4	1.5	0.4	0.2	0.4	0.2	0.3	0.4	0.0
+ActiveRecord::Querying#_load_from_sql (active_record/querying.rb)	0.47	0.3	0.1	1.2	0.2	0.4	0.3	0.6	0.7	0.3	0.5	0.5
+ActiveSupport::IsolatedExecutionState.[] (active_support/isolated_execution_state.rb)	0.45	0.7	0.4	0.5	0.5	0.3	0.6	0.4	0.4	0.3	0.5	0.5
+ActiveRecord::ConnectionAdapters::SQLite3::DatabaseStatements#perform_query (active_record	0.45	1.5	0.5	0.0	0.0	0.0	1.4	0.0	1.0	0.0	0.0	0.7
+SQLite3::Statement#each (GEM/sqlite3-2.9.6-x86_64-linux-gnu/lib/sqlite3/statement.rb)	0.44	0.0	0.9	0.0	0.0	0.0	4.0	0.0	0.0	0.0	0.0	0.0
+ActiveRecord::ConnectionAdapters::QueryCache::Store#compute_if_absent (active_record/conne	0.42	0.3	0.2	0.9	0.5	0.1	0.6	0.6	0.2	0.4	0.4	0.5
+Arel::Visitors::Visitor#visit (arel/visitors/visitor.rb)	0.40	0.2	0.2	0.6	0.5	0.5	0.4	0.7	0.5	0.2	0.4	0.2
+ActiveRecord::Result#column_types (active_record/result.rb)	0.40	0.3	0.0	1.0	0.2	0.4	0.3	0.7	0.6	0.3	0.4	0.2
+ActiveRecord::QueryMethods#build_arel (active_record/relation/query_methods.rb)	0.38	0.2	0.1	0.5	0.4	0.4	0.5	0.5	0.6	0.2	0.4	0.2
+ActiveRecord::QueryMethods#build_where_clause (active_record/relation/query_methods.rb)	0.37	0.1	0.2	0.6	0.4	0.4	0.5	0.6	0.3	0.3	0.3	0.3
+ActiveModel::IndexedRow::Mutable#fetch (active_model/indexed_row.rb)	0.37	0.2	0.2	0.5	0.0	0.8	0.2	0.2	0.8	0.6	0.3	0.1
+ActiveRecord::Associations#association (active_record/associations.rb)	0.37	0.2	0.3	0.5	0.0	0.5	0.3	0.3	0.9	0.6	0.1	0.1
+ActiveSupport::Inflector#apply_inflections (active_support/inflector/methods.rb)	0.36	0.0	0.0	0.1	0.0	0.0	0.0	0.1	0.0	2.2	1.6	0.0
+ActiveSupport::WeakKeyMap#fetch_or_store (active_support/weak_key_map.rb)	0.34	0.4	0.4	0.5	0.2	0.2	0.5	0.4	0.4	0.2	0.2	0.4
+ActiveSupport::Notifications::Fanout#groups_for (active_support/notifications/fanout.rb)	0.34	0.6	0.4	0.3	0.6	0.1	0.6	0.2	0.3	0.1	0.2	0.4
+String#gsub! (<cfunc>)	0.33	0.1	0.2	0.1	0.2	0.6	0.1	0.0	0.5	0.7	0.5	0.6
+ActiveSupport::Notifications::Fanout#build_handle (active_support/notifications/fanout.rb)	0.33	0.5	0.3	0.3	0.8	0.0	0.4	0.3	0.3	0.1	0.2	0.3
+RedisClient::RubyConnection::BufferedIO#fill_buffer (GEM/redis-client-0.30.1/lib/redis_cli	0.32	0.0	0.0	1.9	0.0	0.9	0.0	0.6	0.0	0.0	0.0	0.0
+ActiveRecord::Delegation::ClassMethods#create (active_record/relation/delegation.rb)	0.31	0.1	0.1	0.5	0.3	0.3	0.5	0.6	0.4	0.3	0.1	0.2
+Array#index_with (active_support/core_ext/enumerable.rb)	0.30	0.1	0.1	0.6	0.1	0.2	0.2	0.3	0.3	0.9	0.4	0.2
+Hash#extract! (active_support/core_ext/hash/slice.rb)	0.30	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	2.5
+SQLite3::Statement#each (GEM/sqlite3-2.9.5-x86_64-linux-gnu/lib/sqlite3/statement.rb)	0.30	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.3
+ActiveRecord::ConnectionHandling#connection_specification_name (active_record/connection_h	0.30	0.3	0.3	0.5	0.2	0.2	0.5	0.1	0.4	0.2	0.3	0.2
+Arel::Table#[] (arel/table.rb)	0.29	0.1	0.1	0.4	0.3	0.4	0.3	0.8	0.3	0.2	0.2	0.2
+Arel::Collectors::PlainString#<< (arel/collectors/plain_string.rb)	0.29	0.2	0.1	0.4	0.4	0.4	0.2	0.8	0.3	0.2	0.2	0.1
+ActiveRecord::Scoping::Default::ClassMethods#build_default_scope (active_record/scoping/de	0.29	0.1	0.1	0.5	0.2	0.4	0.3	0.7	0.4	0.2	0.2	0.0
+ActiveRecord::PredicateBuilder#expand_from_hash (active_record/relation/predicate_builder.	0.29	0.1	0.1	0.4	0.4	0.3	0.3	0.4	0.4	0.2	0.2	0.2
+ActiveRecord::Relation::Merger#merge (active_record/relation/merger.rb)	0.28	0.0	0.1	0.7	0.4	0.2	0.5	0.4	0.2	0.2	0.1	0.2
+SQLite3::Statement#initialize (GEM/sqlite3-2.9.6/lib/sqlite3/statement.rb)	0.26	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.8	0.0	0.0	0.0
+Concurrent::Collection::NonConcurrentMapBackend#[] (GEM/concurrent-ruby-1.3.8/lib/concurre	0.25	0.3	0.4	0.3	0.5	0.3	0.2	0.4	0.1	0.2	0.1	0.0
+ActiveRecord::ConnectionAdapters::DatabaseStatements#to_sql_and_binds (active_record/conne	0.24	0.3	0.1	0.3	0.3	0.2	0.4	0.3	0.3	0.2	0.3	0.2
+BasicSocket#write_nonblock (RUBY/socket.rb)	0.24	0.0	0.1	1.0	0.0	1.2	0.0	0.3	0.0	0.0	0.0	0.0
+ActiveRecord::PredicateBuilder#handler_for (active_record/relation/predicate_builder.rb)	0.24	0.1	0.1	0.4	0.5	0.2	0.3	0.4	0.2	0.2	0.2	0.1
+SQLite3::Statement#each (GEM/sqlite3-2.9.6/lib/sqlite3/statement.rb)	0.24	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.6	0.0	0.0	0.0
+ActiveRecord::Reflection::AssociationReflection#association_route (active_record/reflectio	0.23	0.2	0.2	0.4	0.1	0.2	0.3	0.2	0.4	0.2	0.1	0.1
+ActiveRecord::ConnectionAdapters::DatabaseStatements#start_intent_log (active_record/conne	0.23	0.4	0.1	0.2	0.1	0.2	0.3	0.2	0.3	0.1	0.3	0.2
+Kernel#clone (<internal:kernel>)	0.23	0.1	0.1	0.3	0.3	0.2	0.2	0.4	0.3	0.1	0.3	0.1
+JSON::Ext::Generator::State#generate (<cfunc>)	0.23	0.2	0.1	0.2	0.0	0.0	0.1	0.2	0.5	0.2	0.4	0.6
+SQLite3::Statement#initialize (GEM/sqlite3-2.9.6-x86_64-linux-gnu/lib/sqlite3/statement.rb	0.22	0.0	0.6	0.0	0.0	0.0	1.9	0.0	0.0	0.0	0.0	0.0
+ActiveRecord::Relation#initialize (active_record/relation.rb)	0.22	0.1	0.1	0.3	0.1	0.2	0.4	0.4	0.4	0.2	0.1	0.1
+ActiveRecord::Reflection::ClassMethods#_reflect_on_association (active_record/reflection.r	0.22	0.1	0.1	0.3	0.1	0.3	0.3	0.3	0.4	0.2	0.1	0.2
+ActiveModel::LazyAttributeSet#keys (active_model/attribute_set.rb)	0.22	0.2	0.0	0.2	0.0	0.1	0.1	0.2	0.0	1.4	0.2	0.0
+ActiveRecord::Associations::Preloader::Batch#call (active_record/associations/preloader/ba	0.20	0.3	0.1	0.2	0.0	0.2	0.3	0.3	0.5	0.1	0.1	0.0
+ActionController::RequestForgeryProtection#csrf_token_hmac (action_controller/metal/reques	0.20	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	1.4
+ActiveRecord::ConnectionHandling#connection_pool (active_record/connection_handling.rb)	0.20	0.1	0.3	0.3	0.1	0.2	0.2	0.2	0.2	0.2	0.2	0.1
+ActiveRecord::Scoping::ScopeRegistry#value_for (active_record/scoping.rb)	0.19	0.1	0.1	0.3	0.1	0.2	0.3	0.4	0.2	0.1	0.1	0.1
+ActiveRecord::Associations::Preloader::Branch#preloaders_for_reflection (active_record/ass	0.19	0.2	0.1	0.1	0.0	0.3	0.3	0.2	0.6	0.1	0.1	0.0
+ActiveRecord::PredicateBuilder#build (active_record/relation/predicate_builder.rb)	0.19	0.1	0.1	0.3	0.3	0.2	0.2	0.3	0.2	0.2	0.2	0.1
+ActiveRecord::Scoping::Default::ClassMethods#has_default_scope? (active_record/scoping/def	0.19	0.1	0.0	0.3	0.1	0.2	0.2	0.1	0.3	0.3	0.0	0.3
+URI::RFC3986_Parser#split (GEM/uri-1.1.2/lib/uri/rfc3986_parser.rb)	0.18	0.0	1.1	0.0	0.0	0.1	0.0	0.0	0.0	0.8	0.0	0.0
+Concurrent::Collection::MriMapBackend#compute_if_absent (GEM/concurrent-ruby-1.3.8/lib/con	0.18	0.5	0.1	0.3	0.2	0.1	0.2	0.1	0.1	0.1	0.2	0.0
+Psych::Parser#parse (GEM/psych-5.5.0/lib/psych/parser.rb)	0.18	0.0	0.0	2.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+ActiveRecord::ConnectionAdapters::QueryCache#cache_sql (active_record/connection_adapters/	0.17	0.1	0.1	0.3	0.1	0.2	0.2	0.2	0.2	0.2	0.1	0.2
