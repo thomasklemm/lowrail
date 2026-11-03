@@ -217,21 +217,27 @@ impl Calls<'_> {
                 .is_some_and(|n| self.collectors.iter().any(|c| c.as_slice() == n.name().as_slice())),
         };
         if collects { Block::Collects }
-        else if node.receiver().is_some_and(|r| self.core_iterator(&r, &String::from_utf8_lossy(node.name().as_slice()))) { Block::Keeps }
+        else if node.receiver().is_some_and(|r| self.core_iterator(&r, &String::from_utf8_lossy(node.name().as_slice()), node.is_safe_navigation())) { Block::Keeps }
         else { Block::Rebinds }
     }
 
-    fn core_iterator(&self, receiver: &ruby_prism::Node<'_>, name: &str) -> bool {
+    fn core_iterator(&self, receiver: &ruby_prism::Node<'_>, name: &str, safe_navigation: bool) -> bool {
         const CORE: &[&str] = &["Array", "Hash", "Enumerable", "String", "Integer", "Range"];
         if !YIELDING.contains(&name) || receiver.as_self_node().is_some() { return false; }
         let context = self.context.as_ref().filter(|(_, _, s)| !*s).map_or("", |(r, _, _)| r.as_str());
         let ty = super::infer::value(receiver, self.facts, self.model, context, &BTreeMap::new());
         // Callers are static answers: a sampled receiver class is not proof.
         if ty.evidence == Evidence::Observed || ty.name == "untyped" { return false; }
-        // A nil receiver raises before any block runs.
-        super::infer::arms(&ty.name).iter().filter(|arm| *arm != "nil").all(|arm| {
+        // nil is an ordinary NilClass receiver (NilClass may be reopened);
+        // only safe navigation skips the call, and its block, on nil.
+        let mut classes = BTreeSet::new();
+        for arm in super::infer::arms(&ty.name) {
+            let nullable = arm == "nil" || arm.ends_with('?');
             let arm = arm.trim_end_matches('?');
-            let class = arm.split('[').next().unwrap_or(arm);
+            if arm != "nil" { classes.insert(arm.split('[').next().unwrap_or(arm).to_owned()); }
+            if nullable && !safe_navigation { classes.insert("NilClass".to_owned()); }
+        }
+        !classes.is_empty() && classes.iter().all(|class| {
             resolve(self.facts, class, name, false).is_some_and(|(_, method)| {
                 let core = if matches!(name, "tap" | "then" | "yield_self") { method.owner == "Kernel" }
                     else { CORE.contains(&method.owner.as_str()) };
@@ -253,7 +259,9 @@ impl Calls<'_> {
     /// name. A scope whose table is unknown refuses.
     fn unambiguous(&self, name: &str) -> bool {
         let first = name.split("::").next().unwrap_or(name);
-        let lacks = |module: &Module| module.constants.as_ref().is_some_and(|c| !c.iter().any(|c| c == first));
+        // Both tables are required: `constants` omits private constants.
+        let lacks = |module: &Module| [&module.constants, &module.private_constants].iter()
+            .all(|table| table.as_ref().is_some_and(|c| !c.iter().any(|c| c == first)));
         let mut scopes: BTreeSet<String> = BTreeSet::new();
         for scope in self.nesting.iter().chain(self.lexical.iter().map(|(r, _, _)| r)) {
             let mut prefix = scope.as_str();
@@ -265,8 +273,11 @@ impl Calls<'_> {
         }
         let Some(inner) = self.nesting.last().or(self.lexical.as_ref().map(|(r, _, _)| r))
             .and_then(|inner| self.facts.modules.iter().find(|m| &m.name == inner)) else { return false; };
+        // Unnamed ancestors' tables include private names only in dumps that
+        // also carry `private_constants`, which `lacks(inner)` requires below.
         if !inner.anonymous_ancestor_constants.as_ref().is_some_and(|c| !c.iter().any(|c| c == first)) { return false; }
         scopes.extend(inner.ancestors.iter().filter(|a| !a.starts_with('#')).cloned());
+        scopes.insert(inner.name.clone());
         scopes.remove("Object");
         scopes.iter().all(|scope| self.facts.modules.iter().find(|m| &m.name == scope).is_some_and(lacks))
     }

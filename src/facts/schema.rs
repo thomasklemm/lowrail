@@ -136,8 +136,13 @@ pub struct Module {
     pub const_source_location: Option<String>,
     /// Own constant names, autoloads included; None when not dumped.
     pub constants: Option<Vec<String>>,
-    /// Own constants of unnamed ancestors, which have no entry of their own.
+    /// Own private constants among top-level names (Ruby cannot list them).
+    pub private_constants: Option<Vec<String>>,
+    /// Own constants of unnamed ancestors (private ones among top-level
+    /// names), which have no entry of their own.
     pub anonymous_ancestor_constants: Option<Vec<String>>,
+    /// Own instance method names of unnamed ancestors.
+    pub anonymous_ancestor_methods: Option<Vec<String>>,
     pub methods: Vec<Method>,
     /// An anonymous module dumped under a descriptive name (compiled
     /// template container, route helper modules).

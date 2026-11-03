@@ -250,14 +250,13 @@ pub(super) fn helper_argument_sites(model: &TypeModel, facts: &Facts, wanted: &B
     -> BTreeMap<String, Vec<(usize, Type, String)>> {
     let mut out: BTreeMap<String, Vec<(usize, Type, String)>> = BTreeMap::new();
     let Ok(parser) = crate::parser::Parser::for_runtime(&facts.ruby_description) else { return out; };
-    let view = "ActionView::LookupContext.view_context_class";
+    // The one owner the name has in every view that defines it at all.
     let owner = |name: &str| -> Option<String> {
-        let mut owners = facts.modules.iter().filter(|m| (m.name.ends_with("Helper") || m.name.ends_with("Helpers"))
-            && m.methods.iter().any(|d| d.name == name && !d.singleton));
-        let module = owners.next()?;
-        (owners.next().is_none() && module.kind == "module"
-            && module.const_source_location.as_deref().is_some_and(|l| l.starts_with("app/helpers/") || l.contains("/app/helpers/"))
-            && resolve(facts, view, name, false).is_none()).then(|| module.name.clone())
+        let mut owners = BTreeSet::new();
+        for owner in view_owners(facts, name)? {
+            match owner { Lookup::Owner(o) => { owners.insert(o); } Lookup::Undefined => {} Lookup::Unknown => return None }
+        }
+        (owners.len() == 1).then(|| owners.into_iter().next().unwrap())
     };
     for template in &facts.templates {
         if !fresh(template) || !wanted.iter().any(|name| template.code.contains(name.as_str())) { continue; }
@@ -302,13 +301,54 @@ struct HelperCalls<'a> {
 }
 
 impl HelperCalls<'_> {
+    /// Every view that defines the name resolves it to a Rails or Turbo
+    /// helper, so the block runs through `capture` with the view as self.
     fn captures(&self, node: &ruby_prism::CallNode<'_>) -> bool {
         if node.receiver().is_some() { return false; }
-        let name = String::from_utf8_lossy(node.name().as_slice());
-        let mut owners = self.facts.modules.iter().filter(|m| (m.name.ends_with("Helper") || m.name.ends_with("Helpers"))
-            && m.methods.iter().any(|d| d.name == name && !d.singleton)).peekable();
-        owners.peek().is_some() && owners.all(|m| m.name.starts_with("ActionView::Helpers::") || m.name == "Turbo::FramesHelper")
+        let Some(owners) = view_owners(self.facts, &String::from_utf8_lossy(node.name().as_slice())) else { return false; };
+        owners.iter().any(|o| matches!(o, Lookup::Owner(_))) && owners.iter().all(|o| match o {
+            Lookup::Owner(o) => o.starts_with("ActionView::Helpers::") || o == "Turbo::FramesHelper",
+            Lookup::Undefined => true,
+            Lookup::Unknown => false,
+        })
     }
+}
+
+enum Lookup {
+    Owner(String),
+    Undefined,
+    /// An ancestor without facts, or an unnamed one defining the name.
+    Unknown,
+}
+
+/// The owner of an instance method name along a module's booted ancestors.
+fn lookup(facts: &Facts, module: &crate::facts::schema::Module, name: &str) -> Lookup {
+    if module.anonymous_ancestor_methods.as_ref().is_none_or(|m| m.iter().any(|m| m == name)) { return Lookup::Unknown; }
+    for ancestor in module.ancestors.iter().filter(|a| !a.starts_with('#')) {
+        let Some(found) = facts.modules.iter().find(|m| &m.name == ancestor) else { return Lookup::Unknown; };
+        if found.methods.iter().any(|m| m.name == name && !m.singleton) { return Lookup::Owner(found.name.clone()); }
+    }
+    Lookup::Undefined
+}
+
+/// The name's owner in each controller or mailer view: Rails builds each view
+/// class from the base view class, the route helpers and the class's helper
+/// module (`X::HelperMethods`), which wins. None when no view is booted.
+fn view_owners(facts: &Facts, name: &str) -> Option<Vec<Lookup>> {
+    let base = facts.modules.iter().find(|m| m.name == "ActionView::LookupContext.view_context_class")?;
+    let routes = ["Rails.application.routes.named_routes.url_helpers_module",
+        "Rails.application.routes.named_routes.path_helpers_module"];
+    let helpers: Vec<_> = facts.modules.iter().filter(|m| m.name.strip_suffix("::HelperMethods").is_some_and(|owner|
+        facts.modules.iter().any(|c| c.name == owner && c.ancestors.iter().any(|a| a == "AbstractController::Helpers")))).collect();
+    if helpers.is_empty() { return None; }
+    Some(helpers.into_iter().map(|helper| match lookup(facts, helper, name) {
+        Lookup::Undefined => match facts.modules.iter().find(|m| routes.contains(&m.name.as_str())
+            && m.methods.iter().any(|m| m.name == name && !m.singleton)) {
+            Some(route) => Lookup::Owner(route.name.clone()),
+            None => lookup(facts, base, name),
+        },
+        found => found,
+    }).collect())
 }
 
 impl<'pr> Visit<'pr> for HelperCalls<'_> {

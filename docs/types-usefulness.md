@@ -503,3 +503,54 @@ above `206a2fc` on both sets.
 Verification: `cargo test --locked`, 49 + 4 + 8 passed. `git diff --check`
 is clean. `gem/test/facts_test.rb` has the same three real-blog failures
 with and without this change.
+
+### Second review and a third v3 measurement (2026-11-03)
+
+A re-review of `4fe284a` found three more ways to report a false fact where
+abstaining is required. Each is fixed, with a regression assertion that
+fails on `4fe284a`:
+
+1. **Private constants.** `Module#constants(false)` omits them, so its
+   table cannot prove that a name is absent. The dumper now also records
+   `private_constants`: every top-level constant name for which
+   `const_defined?(name, false)` is true but which `constants` omits. That
+   probe sees private constants and registered autoloads without loading
+   them. The tables of unnamed ancestors include the same probe. A
+   relative constant resolves only when both tables of every scope are
+   present and lack the name. Facts without the new field refuse.
+2. **nil receivers.** A `nil` arm is checked as `NilClass`, which may be
+   reopened, like any other receiver. Only safe navigation (`&.`) skips the
+   call and its block on nil.
+3. **View helper overrides.** A template block is certified by the method's
+   effective owner along each controller view's real ancestry: its
+   `X::HelperMethods` module (which includes the app's helpers and any other
+   included module), then the route helper modules, then the base view
+   class. The dumper records the method names of unnamed ancestors, so an
+   override in a generated module is visible too. The block counts only
+   when every view that defines the name resolves it to a Rails
+   `ActionView::Helpers::*` or `Turbo::FramesHelper` method. An unknown
+   ancestor, or an unnamed one defining the name, refuses. The owner of a
+   called app helper is resolved the same way, and it must be unique.
+
+Facts were regenerated with this dumper; dump errors per app are unchanged.
+This is the **third measurement of v3**, on the same frozen file, prompted
+by review rather than by v3 results; the first measurement remains the
+held-out result. Binary `36dafa97…`. Every answer on v2 and v3, with and
+without observations, is identical to the second measurement:
+
+| v3 run | Precision | Recall | TP/FP/FN | exact / wrong / abstained |
+|---|---:|---:|---|---|
+| `206a2fc`, observed | 96.08% | 73.13% | 49/2/18 | 27 / 4 / 9 |
+| `e39898b`, observed (first) | 96.43% | 80.60% | 54/2/13 | 30 / 3 / 7 |
+| `4fe284a`, observed (second) | 96.30% | 77.61% | 52/2/15 | 28 / 4 / 8 |
+| **fixed, observed (third)** | **96.30%** | **77.61%** | **52/2/15** | **28 / 4 / 8** |
+| fixed, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+
+| v2 run (in-sample) | Strict P / R | TP/FP/FN | `T?` equivalence |
+|---|---|---|---|
+| `206a2fc`, observed | 85.37 / 63.64 | 35/6/20 | 90.24 / 67.27 |
+| **fixed, observed** | **87.50 / 76.36** | **42/6/13** | **95.83 / 83.64** |
+| fixed, no observations | 100 / 60.00 | 33/0/22 | 100 / 60.00 |
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed; `git diff --check`
+is clean.
