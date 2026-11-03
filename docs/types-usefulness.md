@@ -607,3 +607,34 @@ identical to the second and third measurements:
 Verification: `cargo test --locked` passes 49 + 4 + 8;
 `gem/test/facts_test.rb -n /private_constants/` passes. `git diff --check`
 is clean.
+
+### Fourth review: Unicode constants and `capture` (2026-11-03)
+
+A fourth review of `01e12c5` found two narrow gaps, both fixed without new
+machinery. Each has a regression test that fails on `01e12c5`:
+
+1. **Unicode constant names.** The dumper no longer filters probe names
+   with an ASCII pattern. The names come from Ruby's own constant tables
+   and module names, so a private `Shop::Café` shadow is recorded. A name
+   that `const_defined?` rejects as invalid cannot be written as a
+   constant in source, so it is skipped.
+2. **`capture` overrides.** Rails runs a helper's block through `capture`
+   and `with_output_buffer`. A template block now counts only when every
+   definer of the helper is gem-defined, and every definer of `capture` and
+   of `with_output_buffer` is either the gem's `ActionView::Helpers` method
+   or a class outside the view hierarchy, which no view includes. Any
+   module definer refuses, such as an app `ApplicationHelper#capture` or a
+   concern. This refuses template blocks in Fizzy and Lobsters, where a
+   model concern and Parslet define `capture` in modules.
+
+**Fifth measurement of v3**, on the same frozen file with facts
+regenerated, prompted by review. Binary `bc27c3fe…`. Every answer on v2
+and v3, with and without observations, is identical to the fourth
+measurement:
+- **v3, observed:** 96.30% / 77.61%, 52/2/15.
+- **v3, no observations:** 100% / 58.21%.
+- **v2, observed:** strict 87.50% / 76.36%, equivalence 95.83% / 83.64%.
+- **v2, no observations:** 100% / 60.00%.
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed;
+`gem/test/facts_test.rb -n /private_constants/` passes.

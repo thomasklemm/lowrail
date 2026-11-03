@@ -13,10 +13,13 @@ require "lowrail/facts"
 # appears in Module#constants.
 class LowrailPrivateTop; end
 Object.send(:private_constant, :LowrailPrivateTop)
+class LowrailCafé; end
 
 module FactsFixture
   class LowrailPrivateTop; end
   private_constant :LowrailPrivateTop
+  class LowrailCafé; end
+  private_constant :LowrailCafé
   class Plain
     attr_reader :r
     attr_writer :w
@@ -85,6 +88,7 @@ class FactsTest < Minitest::Test
     shop = mod("FactsFixture")
     refute_includes shop["constants"], "LowrailPrivateTop"
     assert_includes shop["private_constants"], "LowrailPrivateTop"
+    assert_includes shop["private_constants"], "LowrailCafé", "Unicode constant names are probed too"
     # A top-level name defined after a dump is probed by the next dump.
     Object.const_set(:LowrailLaterTop, Class.new)
     FactsFixture.const_set(:LowrailLaterTop, Class.new)

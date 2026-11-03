@@ -307,11 +307,19 @@ impl HelperCalls<'_> {
         if node.receiver().is_some() { return false; }
         let name = String::from_utf8_lossy(node.name().as_slice());
         let Some(modules) = definers(self.facts, &name) else { return false; };
-        !modules.is_empty() && modules.iter().all(|m| m.methods.iter().filter(|d| d.name == name && !d.singleton).all(|d| {
+        let gem = |m: &crate::facts::schema::Module, name: &str| m.methods.iter().filter(|d| d.name == name && !d.singleton).all(|d| {
             let at = d.source_location.as_deref().unwrap_or("");
             (m.name.starts_with("ActionView::Helpers::") && at.contains("/lib/action_view/helpers/"))
                 || (m.name == "Turbo::FramesHelper" && at.contains("/app/helpers/turbo/frames_helper.rb"))
-        }))
+        });
+        // Rails runs the block through `capture` (and `with_output_buffer`).
+        // Their other definers may only be classes outside the view
+        // hierarchy, which no view includes; any module refuses.
+        let runner_safe = |runner: &str| definers(self.facts, runner).is_some_and(|modules| modules.iter().all(|m| gem(m, runner)
+            || (m.kind == "class" && !matches!(m.name.as_str(), "Object" | "BasicObject")
+                && !m.ancestors.iter().any(|a| a == "ActionView::Base"))));
+        !modules.is_empty() && modules.iter().all(|m| gem(m, &name))
+            && runner_safe("capture") && runner_safe("with_output_buffer")
     }
 }
 

@@ -99,7 +99,7 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
     let mut helpers: Vec<_> = [("label",2), ("count",3), ("title",4), ("heading",5), ("caption",7), ("banner",8), ("notice",9)].into_iter()
         .map(|(name,line)| json!({"name":name,"owner":"ViewHelper","source_location":format!("{}:{line}",helper.display()),"parameters":[["req","text"]]})).collect();
     helpers.push(json!({"name":"consume","owner":"ViewHelper","source_location":format!("{}:6",helper.display()),"parameters":[["req","first"],["req","text"]]}));
-    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+    let facts_json = json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
         "modules":[{"name":"ViewHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ViewHelper"],"const_source_location":format!("{}:1",helper.display()),"methods":helpers},
             {"name":"Page","kind":"class","anonymous_ancestor_methods":[],"ancestors":["Page","ViewHelper"],"const_source_location":format!("{}:1",page.display()),"methods":[
                 {"name":"maybe","owner":"Page","source_location":format!("{}:2",page.display())},
@@ -110,6 +110,11 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
                 {"name":"link_to","owner":"ActionView::Helpers::UrlHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/url_helper.rb:197"},
                 {"name":"button_to","owner":"ActionView::Helpers::UrlHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/url_helper.rb:333"},
                 {"name":"mail_to","owner":"ActionView::Helpers::UrlHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/url_helper.rb:484"}]},
+            {"name":"ActionView::Helpers::CaptureHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ActionView::Helpers::CaptureHelper"],"methods":[
+                {"name":"capture","owner":"ActionView::Helpers::CaptureHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb:47"},
+                {"name":"with_output_buffer","owner":"ActionView::Helpers::CaptureHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb:221"}]},
+            // Unrelated classes outside the view hierarchy may define capture.
+            {"name":"ActiveStorage::Previewer","kind":"class","anonymous_ancestor_methods":[],"ancestors":["ActiveStorage::Previewer"],"methods":[{"name":"capture","owner":"ActiveStorage::Previewer"}]},
             {"name":"ActionView::Helpers::TagHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ActionView::Helpers::TagHelper"],
              "methods":[{"name":"content_tag","owner":"ActionView::Helpers::TagHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/tag_helper.rb:516"}]},
             // Overrides that a reconstructed view ancestry missed: a module not named *Helper,
@@ -128,10 +133,11 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
         // Rails' link_to captures its block with the view as self; instance_eval and any
         // overridden helper may rebind it. No view class is dumped under either spelling.
         "templates":[template("pages/index", "render 'row', note: nil, other: 'set'"),
-            template("pages/_row", "link_to('x') { title(note) }; count(other); Other.new.instance_eval { heading(nil) }; content_tag(:p) { caption(note) }; button_to('x') { banner(note) }; mail_to('x') { notice(note) }")]})).unwrap();
+            template("pages/_row", "link_to('x') { title(note) }; count(other); Other.new.instance_eval { heading(nil) }; content_tag(:p) { caption(note) }; button_to('x') { banner(note) }; mail_to('x') { notice(note) }")]});
+    let facts: Facts = serde_json::from_value(facts_json.clone()).unwrap();
     let mut model = TypeModel::from_facts(&facts).unwrap();
     let text = || json!({"text":{"String":3}});
-    model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":[
+    let observed = json!({"format":1,"app_root":dir,"types":[
         {"module":"Page","name":"maybe","returns":{"String":2}},
         {"module":"ViewHelper","name":"label","args":text()},
         {"module":"ViewHelper","name":"count","args":text()},
@@ -140,7 +146,8 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
         {"module":"ViewHelper","name":"caption","args":text()},
         {"module":"ViewHelper","name":"banner","args":text()},
         {"module":"ViewHelper","name":"notice","args":text()},
-        {"module":"ViewHelper","name":"consume","args":{"first":{"String":1},"text":{"String":1}}}]}).to_string().as_bytes()).unwrap();
+        {"module":"ViewHelper","name":"consume","args":{"first":{"String":1},"text":{"String":1}}}]}).to_string();
+    model.merge_observed(&facts, observed.as_bytes()).unwrap();
     let label = model.fact("ViewHelper#label", "arg:text").unwrap();
     assert_eq!(label.name, "(String | nil)", "Page#show passes a value whose source can be nil");
     assert!(label.provenance.iter().any(|p| p.detail.contains("Page#show")));
@@ -154,6 +161,14 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
     assert_eq!(model.fact("ViewHelper#notice", "arg:text").unwrap().name, "String", "a helper outside any HelperMethods name overrides mail_to");
     assert_eq!(model.fact("ViewHelper#consume", "arg:text").unwrap().name, "String",
         "the earlier argument's call may reassign @value before it is read");
+    // An app override of `capture`, which runs link_to's block, may rebind self.
+    let mut overridden = facts_json;
+    overridden["modules"].as_array_mut().unwrap().push(json!({"name":"ApplicationHelper","kind":"module",
+        "anonymous_ancestor_methods":[],"ancestors":["ApplicationHelper"],"methods":[{"name":"capture","owner":"ApplicationHelper"}]}));
+    let facts: Facts = serde_json::from_value(overridden).unwrap();
+    let mut model = TypeModel::from_facts(&facts).unwrap();
+    model.merge_observed(&facts, observed.as_bytes()).unwrap();
+    assert_eq!(model.fact("ViewHelper#title", "arg:text").unwrap().name, "String", "capture is overridden");
     std::fs::remove_dir_all(dir).unwrap();
 }
 

@@ -137,7 +137,7 @@ module Lowrail
         # which includes private top-level constants. Recomputed per dump.
         @probe_names = (MOD_CONSTANTS.bind_call(Object, false).map { |c| c.to_s } +
           snapshot.filter_map { |m| n = MOD_NAME.bind_call(m); n.split("::").first if n.is_a?(String) && !n.include?("#<") })
-          .uniq.select { |n| n.match?(/\A[A-Z]\w*\z/) }
+          .uniq
         snapshot.each do |mod|
           if MOD_SINGLETON_P.bind_call(mod)
             stats["singleton_classes"] += 1
@@ -267,7 +267,13 @@ module Lowrail
       # autoloads without loading them.
       def private_top_level_names(mod)
         public = MOD_CONSTANTS.bind_call(mod, false).map { |c| c.to_s }
-        (@probe_names - public).select { |c| MOD_CONST_DEFINED.bind_call(mod, c, false) }.map { |c| c.to_s }.sort
+        # Names come from Ruby's own tables, Unicode ones included. A name that
+        # is not a valid constant cannot be written as one in source.
+        (@probe_names - public).select do |c|
+          MOD_CONST_DEFINED.bind_call(mod, c, false)
+        rescue NameError
+          false
+        end.sort
       end
 
       def own_methods(mod, mod_name, singleton)
