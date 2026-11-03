@@ -138,6 +138,8 @@ pub struct TypeModel {
     pub methods: BTreeMap<String, Signature>,
     pub diagnostics: Vec<String>,
     pub conflicts: Vec<Conflict>,
+    #[serde(skip)]
+    bodies: infer::Bodies,
 }
 
 pub fn key(receiver: &str, method: &str, singleton: bool) -> String {

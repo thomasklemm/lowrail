@@ -83,6 +83,44 @@ fn sampled_returns_keep_a_nil_the_source_can_return() {
 }
 
 #[test]
+fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
+    let dir = std::env::temp_dir().join(format!("lowrail-type-caller-nils-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join("app/helpers")).unwrap();
+    std::fs::create_dir_all(dir.join("app/views/pages")).unwrap();
+    let helper = dir.join("app/helpers/view_helper.rb");
+    let page = dir.join("page.rb");
+    std::fs::write(&helper, "module ViewHelper\n def label(text) = text\n def count(text) = text\n def title(text) = text\nend\n").unwrap();
+    std::fs::write(&page, "class Page\n def maybe\n  return if external\n  'x'\n end\n def show\n  value = maybe\n  label(value)\n  count('fixed')\n end\nend\n").unwrap();
+    use sha2::{Digest, Sha256};
+    let digest = format!("{:x}", Sha256::digest(b"template"));
+    for name in ["index", "_row"] { std::fs::write(dir.join(format!("app/views/pages/{name}.html.erb")), "template").unwrap(); }
+    let template = |path: &str, code: &str| json!({"identifier":format!("{}/app/views/{path}.html.erb",dir.display()),
+        "virtual_path":path,"source_sha256":digest,"code":code});
+    let helpers: Vec<_> = [("label",2), ("count",3), ("title",4)].into_iter()
+        .map(|(name,line)| json!({"name":name,"owner":"ViewHelper","source_location":format!("{}:{line}",helper.display()),"parameters":[["req","text"]]})).collect();
+    let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[{"name":"ViewHelper","kind":"module","ancestors":["ViewHelper"],"const_source_location":format!("{}:1",helper.display()),"methods":helpers},
+            {"name":"Page","kind":"class","ancestors":["Page","ViewHelper"],"const_source_location":format!("{}:1",page.display()),"methods":[
+                {"name":"maybe","owner":"Page","source_location":format!("{}:2",page.display())},
+                {"name":"show","owner":"Page","source_location":format!("{}:6",page.display())}]}],
+        "templates":[template("pages/index", "render 'row', note: nil, other: 'set'"), template("pages/_row", "title(note); count(other)")]})).unwrap();
+    let mut model = TypeModel::from_facts(&facts).unwrap();
+    let text = || json!({"text":{"String":3}});
+    model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":[
+        {"module":"Page","name":"maybe","returns":{"String":2}},
+        {"module":"ViewHelper","name":"label","args":text()},
+        {"module":"ViewHelper","name":"count","args":text()},
+        {"module":"ViewHelper","name":"title","args":text()}]}).to_string().as_bytes()).unwrap();
+    let label = model.fact("ViewHelper#label", "arg:text").unwrap();
+    assert_eq!(label.name, "(String | nil)", "Page#show passes a value whose source can be nil");
+    assert!(label.provenance.iter().any(|p| p.detail.contains("Page#show")));
+    assert_eq!(label.evidence, Evidence::Observed);
+    assert_eq!(model.fact("ViewHelper#count", "arg:text").unwrap().name, "String", "no caller passes nil");
+    assert_eq!(model.fact("ViewHelper#title", "arg:text").unwrap().name, "(String | nil)", "a template local bound to nil");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn unknown_values_do_not_hide_a_known_tail_or_container_but_control_flow_does() {
     let dir = std::env::temp_dir().join(format!("lowrail-type-values-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();

@@ -111,7 +111,45 @@ impl TypeModel {
             }
             self.conflicts.extend(conflicts);
         }
+        self.caller_nils(facts);
         Ok(())
+    }
+
+    /// Samples cannot show a nil that no test passed. Add a nil arm to a
+    /// sampled positional parameter only where a resolved call site in app
+    /// code passes a value whose type has a nil arm; never as a blanket rule.
+    fn caller_nils(&mut self, facts: &Facts) {
+        let mut wanted = Vec::new();
+        for (id, sig) in &self.methods {
+            if sig.observation.is_none() { continue; }
+            // Ruby fills post-required parameters before optional ones, and a
+            // rest parameter absorbs extras; only map plain req*/opt* lists.
+            let kinds: Vec<_> = sig.parameters.iter().map(|p| p.kind.as_str())
+                .filter(|k| !matches!(*k, "key" | "keyreq" | "keyrest" | "block")).collect();
+            if kinds.iter().any(|k| !matches!(*k, "req" | "opt"))
+                || kinds.windows(2).any(|w| w == ["opt", "req"]) { continue; }
+            let Some((owner, method)) = resolve(facts, &sig.receiver, &sig.method, sig.singleton) else { continue; };
+            let callee = key(&owner.name, &method.name, method.singleton);
+            for (index, p) in sig.parameters.iter().filter(|p| matches!(p.kind.as_str(), "req" | "opt")).enumerate() {
+                if p.ty.evidence == Evidence::Observed && p.ty.name != "untyped" && !super::infer::has_nil(&p.ty.name) {
+                    wanted.push((id.clone(), p.name.clone(), index, callee.clone(), sig.method.clone()));
+                }
+            }
+        }
+        if wanted.is_empty() { return; }
+        let mut sites = super::infer::argument_sites(facts, self);
+        let names = wanted.iter().map(|(.., name)| name.clone()).collect();
+        for (callee, found) in super::views::helper_argument_sites(self, facts, &names) {
+            sites.entry(callee).or_default().extend(found);
+        }
+        for (id, name, index, callee, _) in wanted {
+            let Some((_, ty, location)) = sites.get(&callee).into_iter().flatten()
+                .find(|(i, ty, _)| *i == index && super::infer::has_nil(&ty.name)) else { continue; };
+            let detail = format!("caller can pass nil: {location} passes {}", ty.name);
+            let p = self.methods.get_mut(&id).unwrap().parameters.iter_mut().find(|p| p.name == name).unwrap();
+            p.ty.name = super::infer::with_nil(&p.ty.name);
+            p.ty.provenance.push(Provenance { source: Source::Inference, detail });
+        }
     }
 }
 

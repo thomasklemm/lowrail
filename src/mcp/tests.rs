@@ -68,6 +68,72 @@ fn callers_follow_respond_to_blocks_and_includers_and_views_follow_record_render
 }
 
 #[test]
+fn callers_follow_extenders_lexical_constants_core_iterators_and_views_follow_layouts() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-lexical-{}", std::process::id()));
+    for sub in [".lowrail", "app/controllers/shop", "app/controllers/admin", "app/models/shop", "app/views/shop/orders", "app/views/cards"] {
+        std::fs::create_dir_all(dir.join(sub)).unwrap();
+    }
+    let orders = dir.join("app/controllers/shop/orders_controller.rb");
+    let items = dir.join("app/controllers/admin/items_controller.rb");
+    std::fs::write(&orders, "class Shop::OrdersController\n def create\n  wrap do\n   Card.build\n  end\n  Widget.build\n end\n def list(items)\n  items.each { finish }\n  each { finish }\n  shop_url\n end\n def finish = 1\n def index = 1\nend\n").unwrap();
+    std::fs::write(&items, "class Admin::ItemsController\n def make = Card.build\nend\n").unwrap();
+    // Not loaded at boot, but Zeitwerk would autoload Shop::Widget first.
+    std::fs::write(dir.join("app/models/shop/widget.rb"), "class Shop::Widget; end\n").unwrap();
+    use sha2::{Digest, Sha256};
+    let digest = format!("{:x}", Sha256::digest(b"template"));
+    for name in ["shop/orders/index", "shop/orders/_frame", "cards/_card"] {
+        std::fs::write(dir.join(format!("app/views/{name}.html.erb")), "template").unwrap();
+    }
+    let at = |file: &std::path::Path, line: u32| format!("{}:{line}", file.display());
+    let template = |path: &str, code: &str| json!({"identifier":format!("{}/app/views/{path}.html.erb",dir.display()),
+        "virtual_path":path,"source_sha256":digest,"code":code});
+    let methods: Vec<_> = [("create",2), ("list",8), ("finish",13), ("index",14)].into_iter()
+        .map(|(name,line)| json!({"name":name,"owner":"Shop::OrdersController","source_location":at(&orders,line)})).collect();
+    let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[
+            {"name":"Shop::OrdersController","kind":"class","ancestors":["Shop::OrdersController","ActionDispatch::Routing::UrlFor"],
+             "const_source_location":at(&orders,1),"methods":methods},
+            {"name":"Admin::ItemsController","kind":"class","ancestors":["Admin::ItemsController"],"const_source_location":at(&items,1),
+             "methods":[{"name":"make","owner":"Admin::ItemsController","source_location":at(&items,2)}]},
+            {"name":"Builder::ClassMethods","kind":"module","ancestors":["Builder::ClassMethods"],
+             "methods":[{"name":"build","owner":"Builder::ClassMethods"}]},
+            {"name":"Card","kind":"class","ancestors":["Card"],"singleton_ancestors":["#<Class:Card>","Builder::ClassMethods"]},
+            {"name":"Widget","kind":"class","ancestors":["Widget"],"singleton_ancestors":["#<Class:Widget>","Builder::ClassMethods"]},
+            {"name":"Admin","kind":"module"},
+            {"name":"Admin::Card","kind":"class","ancestors":["Admin::Card"]},
+            {"name":"Rails.application.routes.named_routes.url_helpers_module","kind":"module",
+             "methods":[{"name":"shop_url","owner":"Rails.application.routes.named_routes.url_helpers_module"}]}],
+        "models":[{"name":"Card","partial_path":"cards/card"}],
+        "controllers":[{"name":"Shop::OrdersController","actions":["index"]}],
+        "routes":[{"controller":"shop/orders","action":"index"}],
+        "templates":[template("shop/orders/index", "render layout: 'frame', locals: { order: @order } do; end; render @cards"),
+            template("shop/orders/_frame", ""), template("cards/_card", "")]});
+    std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+    std::fs::write(dir.join(".lowrail/observed.json"), json!({"format":1,"app_root":dir,"types":[
+        {"module":"Shop::OrdersController","name":"index",
+         "ivars":{"@cards":{"Card::ActiveRecord_Relation":1,"Card::ActiveRecord_AssociationRelation":1}}}]}).to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    let build = data.call("callers", &json!({"target":"Builder::ClassMethods#build"})).unwrap();
+    assert_eq!(build["callers"], json!([{"path":orders,"line":4,"column":9,"caller":"Shop::OrdersController#create","via":"Card."}]),
+        "a block keeps lexical constant lookup and the enclosing def; the extended module is called through Card");
+    let refused: Vec<_> = build["unresolved"].as_array().unwrap().iter().map(|c| c["line"].clone()).collect();
+    assert_eq!(refused, vec![json!(2), json!(6)], "Shop::Widget is autoloadable and Admin::Card is booted: both shadow the top level");
+    let finish = data.call("callers", &json!({"target":"Shop::OrdersController#finish"})).unwrap();
+    assert_eq!((finish["callers"].as_array().unwrap().len(), finish["callers"][0]["line"].clone()), (1, json!(9)),
+        "a core iterator on another receiver keeps self");
+    assert_eq!(finish["unresolved"][0]["line"], 10, "an implicit-self each may be the app's own DSL");
+    let direct = data.call("callers", &json!({"target":"Shop::OrdersController#shop_url"})).unwrap();
+    assert_eq!((direct["callers"][0]["line"].clone(), direct["callers"][0]["route_helper"].clone()), (json!(11), json!(true)),
+        "a `direct` helper has no route, only a booted helper method");
+    let frame = data.call("view_locals", &json!({"path":"shop/orders/_frame"})).unwrap();
+    assert_eq!(frame["templates"][0]["incoming"][0]["local_names"], json!(["order"]));
+    let card = data.call("view_locals", &json!({"path":"cards/_card"})).unwrap();
+    assert_eq!(card["templates"][0]["incoming"][0]["local_names"], json!(["card", "card_counter", "card_iteration"]),
+        "sampled relation classes of one model are a collection of it");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn callers_and_view_inputs_are_bounded_contextual_and_refresh_sources() {
     let dir = std::env::temp_dir().join(format!("lowrail-mcp-useful-{}", std::process::id()));
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();

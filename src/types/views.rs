@@ -3,6 +3,7 @@ use super::*;
 use crate::facts::schema::Template;
 use ruby_prism::{Node, Visit};
 use serde_json::{Value, json};
+use std::collections::BTreeSet;
 use sha2::{Digest, Sha256};
 
 fn fresh(template: &Template) -> bool {
@@ -21,20 +22,7 @@ pub(super) fn query(model: &TypeModel, facts: &Facts, path: &str) -> Result<Valu
     let parser = crate::parser::Parser::for_runtime(&facts.ruby_description)?;
     let mut results = Vec::new();
     for template in templates {
-        let mut incoming = Vec::new();
-        // Explicit partial names, and `render record(s)` when the inferred
-        // model has stock partial paths and no subclasses; other dynamically
-        // selected templates stay unavailable rather than guessed.
-        for parent in &facts.templates {
-            if !fresh(parent) { continue; }
-            let parsed = parser.parse(parent.code.as_bytes());
-            if parsed.errors().next().is_some() { continue; }
-            let contexts = contexts(model, facts, parent);
-            for (action, ivars) in &contexts {
-                Renders { model, facts, parent, target: template, action,
-                    ivars, incoming: &mut incoming }.visit(&parsed.node());
-            }
-        }
+        let (incoming, _) = incoming(model, facts, &parser, template);
         results.push(json!({"path":template.identifier,"virtual_path":template.virtual_path,
             "strict_locals":template.strict_locals,
             "controller_contexts":contexts(model, facts, template).into_iter()
@@ -43,6 +31,26 @@ pub(super) fn query(model: &TypeModel, facts: &Facts, path: &str) -> Result<Valu
     }
     Ok(json!({"available":true,"templates":results,"complete":false,
         "scope":"explicit literal partial renders and stock-path record renders in boot handler output; controller exit ivars are contextual hints only, not availability at render; callback, template effects and dynamic render dispatch are not modeled"}))
+}
+
+/// Explicit partial names, and `render record(s)` when the inferred model has
+/// stock partial paths and no subclasses; other dynamically selected
+/// templates stay unavailable rather than guessed. Returns each incoming
+/// render as JSON and its typed locals.
+fn incoming(model: &TypeModel, facts: &Facts, parser: &crate::parser::Parser, template: &Template)
+    -> (Vec<Value>, Vec<BTreeMap<String, Type>>) {
+    let (mut incoming, mut typed) = (Vec::new(), Vec::new());
+    for parent in &facts.templates {
+        if !fresh(parent) { continue; }
+        let parsed = parser.parse(parent.code.as_bytes());
+        if parsed.errors().next().is_some() { continue; }
+        let contexts = contexts(model, facts, parent);
+        for (action, ivars) in &contexts {
+            Renders { model, facts, parent, target: template, action,
+                ivars, incoming: &mut incoming, typed: &mut typed }.visit(&parsed.node());
+        }
+    }
+    (incoming, typed)
 }
 
 fn contexts(model: &TypeModel, facts: &Facts, template: &Template) -> Vec<(String, BTreeMap<String, Type>)> {
@@ -69,6 +77,9 @@ fn contexts(model: &TypeModel, facts: &Facts, template: &Template) -> Vec<(Strin
     out
 }
 
+/// `render` options that are not shorthand locals.
+const RESERVED: &[&str] = &["partial", "collection", "object", "as", "layout", "formats", "variants", "status"];
+
 struct Renders<'a> {
     model: &'a TypeModel,
     facts: &'a Facts,
@@ -77,6 +88,7 @@ struct Renders<'a> {
     action: &'a str,
     ivars: &'a BTreeMap<String, Type>,
     incoming: &'a mut Vec<Value>,
+    typed: &'a mut Vec<BTreeMap<String, Type>>,
 }
 
 fn literal(node: &Node<'_>) -> Option<String> {
@@ -94,14 +106,23 @@ fn pairs<'pr>(node: &Node<'pr>) -> Vec<(String, Node<'pr>)> {
 }
 
 impl Renders<'_> {
+    /// Directory, base name and `dir/_base` virtual path of a partial name,
+    /// relative to the rendering template's directory when it has no slash.
+    fn partial(&self, partial: &str) -> (String, String, String) {
+        let parent_dir = self.parent.virtual_path.as_deref().and_then(|p| p.rsplit_once('/')).map(|(p, _)| p).unwrap_or("");
+        let partial = if partial.contains('/') { partial.to_owned() } else { format!("{parent_dir}/{partial}") };
+        let (dir, base) = partial.rsplit_once('/').unwrap_or(("", &partial));
+        let base = base.trim_start_matches('_');
+        (dir.to_owned(), base.to_owned(), format!("{dir}/_{base}"))
+    }
+
     /// `render @article` / `render @articles`: Rails asks each record for
     /// its partial path, so require one booted model class without subclasses.
     fn implicit(&mut self, value: &Node<'_>) {
         let receiver = self.action.rsplit_once('#').map(|(r, _)| r).unwrap_or("");
         let ty = infer::value(value, self.facts, self.model, receiver, self.ivars);
-        let collection = ["Array[", "ActiveRecord::Relation[", "ActiveRecord::Associations::CollectionProxy["]
-            .iter().find_map(|prefix| ty.name.strip_prefix(prefix).and_then(|s| s.strip_suffix(']')));
-        let class = collection.unwrap_or(ty.name.trim_end_matches('?'));
+        let collection = element_of(&ty.name);
+        let class = collection.as_deref().unwrap_or(ty.name.trim_end_matches('?'));
         let Some(path) = self.facts.models.iter().find(|m| m.name == class).and_then(|m| m.partial_path.as_deref())
             else { return; };
         if self.facts.modules.iter().any(|m| m.kind == "class" && m.name != class && m.ancestors.iter().any(|a| a == class)) {
@@ -118,10 +139,30 @@ impl Renders<'_> {
         }
         locals.insert(base.to_owned(), element);
         let local_names: Vec<_> = locals.keys().collect();
+        self.typed.push(locals.clone());
         self.incoming.push(json!({"from":self.parent.identifier,"action":self.action,
             "locals":locals,"local_names":local_names,"implicit_partial":path,
             "location_scope":"boot handler output, not original template line numbers"}));
     }
+}
+
+/// The model of a collection type, also when sampled arms name the same
+/// model's relation classes (`M::ActiveRecord_AssociationRelation`, ...).
+fn element_of(name: &str) -> Option<String> {
+    let arms: Vec<&str> = match name.strip_prefix('(').and_then(|s| s.strip_suffix(')')) {
+        // Generic arguments are model names here; a nested union refuses.
+        Some(inner) if !inner.contains('(') => inner.split(" | ").collect(),
+        Some(_) => return None,
+        None => vec![name],
+    };
+    let mut models = arms.iter().map(|arm| {
+        ["Array[", "ActiveRecord::Relation[", "ActiveRecord::Associations::CollectionProxy["].iter()
+            .find_map(|prefix| arm.strip_prefix(prefix).and_then(|s| s.strip_suffix(']')))
+            .or_else(|| ["::ActiveRecord_Relation", "::ActiveRecord_AssociationRelation", "::ActiveRecord_Associations_CollectionProxy"]
+                .iter().find_map(|suffix| arm.strip_suffix(suffix)))
+    });
+    let first = models.next()??;
+    models.all(|m| m == Some(first)).then(|| first.to_owned())
 }
 
 impl<'pr> Visit<'pr> for Renders<'_> {
@@ -137,11 +178,24 @@ impl<'pr> Visit<'pr> for Renders<'_> {
                 && first.as_keyword_hash_node().is_none() && first.as_hash_node().is_none() {
                 self.implicit(first);
             }
+            // A partial layout (`render layout: "x", locals: {...} do`, or
+            // beside a partial) is itself a partial and receives `locals:`.
+            if let Some(layout) = options.iter().find(|(k, _)| k == "layout").and_then(|(_, n)| literal(n))
+                && self.target.virtual_path.as_deref() == Some(&self.partial(&layout).2) {
+                let receiver = self.action.rsplit_once('#').map(|(r, _)| r).unwrap_or("");
+                let value = |node: &Node<'_>| infer::value(node, self.facts, self.model, receiver, self.ivars);
+                let locals: BTreeMap<_, _> = options.iter().flat_map(|(k, v)| if k == "locals" {
+                        pairs(v).iter().map(|(name, node)| (name.clone(), value(node))).collect()
+                    } else if shorthand.is_some() && !RESERVED.contains(&k.as_str()) { vec![(k.clone(), value(v))] }
+                    else { vec![] }).collect();
+                let local_names: Vec<_> = locals.keys().collect();
+                self.typed.push(locals.clone());
+        self.incoming.push(json!({"from":self.parent.identifier,"action":self.action,
+                    "locals":locals,"local_names":local_names,"partial_layout":layout,
+                    "location_scope":"boot handler output, not original template line numbers"}));
+            }
             if let Some(partial) = partial {
-                let parent_dir = self.parent.virtual_path.as_deref().and_then(|p| p.rsplit_once('/')).map(|(p, _)| p).unwrap_or("");
-                let partial = if partial.contains('/') { partial } else { format!("{parent_dir}/{partial}") };
-                let (dir, base) = partial.rsplit_once('/').unwrap_or(("", &partial));
-                let target = format!("{dir}/_{}", base.trim_start_matches('_'));
+                let (_, base, target) = self.partial(&partial);
                 if self.target.virtual_path.as_deref() == Some(&target) {
                     let receiver = self.action.rsplit_once('#').map(|(r, _)| r).unwrap_or("");
                     let mut locals = BTreeMap::new();
@@ -150,7 +204,7 @@ impl<'pr> Visit<'pr> for Renders<'_> {
                             for (name, value) in pairs(value) {
                                 locals.insert(name, infer::value(&value, self.facts, self.model, receiver, self.ivars));
                             }
-                        } else if shorthand.is_some() && !["partial", "collection", "object", "as", "layout", "formats", "variants", "status"].contains(&name.as_str()) {
+                        } else if shorthand.is_some() && !RESERVED.contains(&name.as_str()) {
                             locals.insert(name.clone(), infer::value(value, self.facts, self.model, receiver, self.ivars));
                         }
                     }
@@ -173,7 +227,8 @@ impl<'pr> Visit<'pr> for Renders<'_> {
                         locals.insert(name, element);
                     }
                     let local_names: Vec<_> = locals.keys().collect();
-                    self.incoming.push(json!({"from":self.parent.identifier,"action":self.action,
+                    self.typed.push(locals.clone());
+        self.incoming.push(json!({"from":self.parent.identifier,"action":self.action,
                         "locals":locals,"local_names":local_names,
                         "collection_unmodeled":collection.is_some_and(|_| options.iter().any(|(k, _)| k == "object")),
                         "location_scope":"boot handler output, not original template line numbers"}));
@@ -181,5 +236,82 @@ impl<'pr> Visit<'pr> for Renders<'_> {
             }
         }
         ruby_prism::visit_call_node(self, node);
+    }
+}
+
+/// Argument types that templates pass to app helper methods named in
+/// `wanted`, with each incoming render's locals. A view's implicit self
+/// includes the app helpers, so a call resolves to the one helper module
+/// defining that name; any other module named *Helper(s) defining it, or the
+/// base view class itself, makes the call ambiguous and it is skipped.
+/// Locals the template assigns or binds as block parameters are dropped.
+pub(super) fn helper_argument_sites(model: &TypeModel, facts: &Facts, wanted: &BTreeSet<String>)
+    -> BTreeMap<String, Vec<(usize, Type, String)>> {
+    let mut out: BTreeMap<String, Vec<(usize, Type, String)>> = BTreeMap::new();
+    let Ok(parser) = crate::parser::Parser::for_runtime(&facts.ruby_description) else { return out; };
+    let view = "ActionView::LookupContext.view_context_class";
+    let owner = |name: &str| -> Option<String> {
+        let mut owners = facts.modules.iter().filter(|m| (m.name.ends_with("Helper") || m.name.ends_with("Helpers"))
+            && m.methods.iter().any(|d| d.name == name && !d.singleton));
+        let module = owners.next()?;
+        (owners.next().is_none() && module.kind == "module"
+            && module.const_source_location.as_deref().is_some_and(|l| l.starts_with("app/helpers/") || l.contains("/app/helpers/"))
+            && resolve(facts, view, name, false).is_none()).then(|| module.name.clone())
+    };
+    for template in &facts.templates {
+        if !fresh(template) || !wanted.iter().any(|name| template.code.contains(name.as_str())) { continue; }
+        let parsed = parser.parse(template.code.as_bytes());
+        if parsed.errors().next().is_some() { continue; }
+        let mut calls = HelperCalls { wanted, calls: Vec::new(), bound: BTreeSet::new() };
+        calls.visit(&parsed.node());
+        if calls.calls.is_empty() { continue; }
+        let (_, contexts) = incoming(model, facts, &parser, template);
+        let contexts = if contexts.is_empty() { vec![BTreeMap::new()] } else { contexts };
+        for (name, arguments) in &calls.calls {
+            let Some(module) = owner(name) else { continue; };
+            for locals in &contexts {
+                let locals: BTreeMap<_, _> = locals.iter().filter(|(n, _)| !calls.bound.contains(*n))
+                    .map(|(n, t)| (n.clone(), t.clone())).collect();
+                for (index, argument) in arguments.iter().enumerate() {
+                    let parsed = parser.parse(argument.as_bytes());
+                    let Some(node) = parsed.node().as_program_node().and_then(|p| p.statements().body().iter().next()) else { continue; };
+                    let ty = infer::value(&node, facts, model, "", &locals);
+                    out.entry(key(&module, name, false)).or_default()
+                        .push((index, ty, format!("template {}", template.identifier)));
+                }
+            }
+        }
+    }
+    out
+}
+
+/// Implicit-self calls of wanted names with only positional, non-block
+/// arguments (kept as source text), and every name the template binds.
+struct HelperCalls<'a> {
+    wanted: &'a BTreeSet<String>,
+    calls: Vec<(String, Vec<String>)>,
+    bound: BTreeSet<String>,
+}
+
+impl<'pr> Visit<'pr> for HelperCalls<'_> {
+    fn visit_call_node(&mut self, node: &ruby_prism::CallNode<'pr>) {
+        let name = String::from_utf8_lossy(node.name().as_slice()).into_owned();
+        if node.receiver().is_none() && self.wanted.contains(&name) && let Some(args) = node.arguments() {
+            let arguments: Vec<_> = args.arguments().iter().filter(|a| a.as_keyword_hash_node().is_none())
+                .map(|a| String::from_utf8_lossy(a.location().as_slice()).into_owned()).collect();
+            if args.arguments().iter().all(|a| infer::argument(a)) {
+                self.calls.push((name, arguments));
+            }
+        }
+        ruby_prism::visit_call_node(self, node);
+    }
+
+    fn visit_local_variable_write_node(&mut self, node: &ruby_prism::LocalVariableWriteNode<'pr>) {
+        self.bound.insert(String::from_utf8_lossy(node.name().as_slice()).into_owned());
+        ruby_prism::visit_local_variable_write_node(self, node);
+    }
+
+    fn visit_required_parameter_node(&mut self, node: &ruby_prism::RequiredParameterNode<'pr>) {
+        self.bound.insert(String::from_utf8_lossy(node.name().as_slice()).into_owned());
     }
 }
