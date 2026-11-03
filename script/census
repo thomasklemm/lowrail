@@ -3,7 +3,7 @@
 
 # Rails allocation census: one entry point for every round. See docs/upstream/census.md.
 #   script/census setup    --rails SPEC [--ruby R] [--apps LIST]
-#   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST]
+#   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST] [--stats[=FLAGS]]
 #   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2] [--gem NAME]
 #   script/census compare  --base L [--aa L0] [--detail] [--markdown] LABEL...
 #   script/census controls --script FILE [--app blog] [--modes ...] BASE LABEL...
@@ -39,6 +39,7 @@ module Census
     activemodel activerecord activestorage activesupport].freeze
   MODES = { "interp" => "interpreter", "interpreter" => "interpreter", "yjit" => "yjit", "zjit" => "zjit" }.freeze
   FLAGS = { "interpreter" => [], "yjit" => ["--yjit"], "zjit" => ["--zjit"] }.freeze
+  STATS_FLAGS = { "yjit" => ["--yjit-stats=quiet"], "zjit" => ["--zjit-stats-quiet"] }.freeze
   PG = { "DATABASE_ADAPTER" => "postgresql" }.freeze
 
   # Census 4's nine apps (fizzy runs on two adapters). source: script/corpus name;
@@ -382,7 +383,8 @@ module Census
               env = env_for(app, bin, rails, gemfiles[app]).merge("CENSUS_MODE" => mode, "CENSUS_ONLY" => opts[:only])
               begin
                 copy_locks[app_dir(opts[:corpus], app)].synchronize do
-                  sh(env, "bundle", "exec", "ruby", *FLAGS.fetch(mode), HARNESS, "profile", app, json,
+                  command, flags = opts[:stats] ? ["stats", (ENV["CENSUS_DEFAULT_COUNTERS"] == "1" ? [] : STATS_FLAGS.fetch(mode)) + opts[:stats].split] : ["profile", []]
+                  sh(env, "bundle", "exec", "ruby", *FLAGS.fetch(mode), *flags, HARNESS, command, app, json,
                     chdir: app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
                 end
               rescue RuntimeError
@@ -870,6 +872,8 @@ module Census
       o.on("--modes LIST", "interp,yjit,zjit") { |v| opts[:modes] = v.split(",").map { MODES.fetch(_1) } }
       o.on("--mode M") { opts[:mode] = MODES.fetch(_1) }
       o.on("--only WORKLOADS", "run: comma-separated workload names") { opts[:only] = _1 }
+      o.on("--stats [FLAGS]", "run: JIT counters per operation instead of allocations, with extra ruby FLAGS " \
+        "(e.g. --zjit-trace-exits-sample-rate=20); a ZJIT trace lands in /tmp/perfetto-PID.fxt") { opts[:stats] = _1.to_s }
       o.on("--jobs N", Integer, "run: apps measured in parallel per mode (default 1)") { opts[:jobs] = _1 }
       o.on("--limit N", Integer) { opts[:limit] = _1 }
       o.on("--tiers LIST", "rank: app-count tier floors (default 7,5,3,2)") { |v| opts[:tiers] = v.split(",").map { Integer(_1) } }
