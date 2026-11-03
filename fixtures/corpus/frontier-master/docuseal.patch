@@ -1,0 +1,134 @@
+diff --git a/Gemfile b/Gemfile
+index 496a4da..d53fdbe 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -26,7 +26,7 @@ gem 'lograge'
+ gem 'numo-narray-alt', require: false
+ gem 'onnxruntime', require: false
+ gem 'pagy'
+-gem 'pg', require: false
++gem 'pg', require: false, force_ruby_platform: true
+ gem 'pretender'
+ gem 'puma', require: false
+ gem 'rack'
+@@ -39,7 +39,7 @@ gem 'ruby-vips'
+ gem 'rubyzip', require: false
+ gem 'shakapacker'
+ gem 'sidekiq'
+-gem 'sqlite3', require: false
++gem 'sqlite3', require: false, force_ruby_platform: true
+ gem 'strip_attributes'
+ gem 'trilogy', require: false
+ gem 'turbo-rails'
+@@ -77,3 +77,9 @@ group :test do
+   gem 'cuprite'
+   gem 'webmock'
+ end
++
++gem "ffi", "= 1.17.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "nokogiri", "= 1.19.7", force_ruby_platform: true # ruby41-watch: no 4.1 binary
+diff --git a/Gemfile.lock b/Gemfile.lock
+index c9aada5..93102fa 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -241,11 +241,7 @@ GEM
+       concurrent-ruby (~> 1.1)
+       webrick (~> 1.7)
+       websocket-driver (~> 0.7)
+-    ffi (1.17.4-aarch64-linux-gnu)
+-    ffi (1.17.4-aarch64-linux-musl)
+-    ffi (1.17.4-arm64-darwin)
+-    ffi (1.17.4-x86_64-linux-gnu)
+-    ffi (1.17.4-x86_64-linux-musl)
++    ffi (1.17.4)
+     foreman (0.90.0)
+       thor (~> 1.4)
+     geom2d (0.4.1)
+@@ -289,11 +285,7 @@ GEM
+       os (>= 0.9, < 2.0)
+       signet (>= 0.16, < 2.a)
+     hashdiff (1.2.1)
+-    herb (0.11.1-aarch64-linux-gnu)
+-    herb (0.11.1-aarch64-linux-musl)
+-    herb (0.11.1-arm64-darwin)
+-    herb (0.11.1-x86_64-linux-gnu)
+-    herb (0.11.1-x86_64-linux-musl)
++    herb (0.11.1)
+     hexapdf (1.7.0)
+       cmdparse (~> 3.0, >= 3.0.3)
+       geom2d (~> 0.4, >= 0.4.1)
+@@ -343,6 +335,7 @@ GEM
+     matrix (0.4.3)
+     method_source (1.1.0)
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -360,17 +353,10 @@ GEM
+     net-smtp (0.5.2)
+       net-protocol
+     nio4r (2.7.5)
+-    nokogiri (1.19.7-aarch64-linux-gnu)
++    nokogiri (1.19.7)
++      mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+-    nokogiri (1.19.7-aarch64-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-musl)
+-      racc (~> 1.4)
+-    numo-narray-alt (0.10.3)
++    numo-narray-alt (0.10.7)
+     onnxruntime (0.10.1-aarch64-linux)
+       ffi
+     onnxruntime (0.10.1-arm64-darwin)
+@@ -389,11 +375,7 @@ GEM
+     parser (3.3.11.1)
+       ast (~> 2.4.1)
+       racc
+-    pg (1.6.3-aarch64-linux)
+-    pg (1.6.3-aarch64-linux-musl)
+-    pg (1.6.3-arm64-darwin)
+-    pg (1.6.3-x86_64-linux)
+-    pg (1.6.3-x86_64-linux-musl)
++    pg (1.6.3)
+     pp (0.6.4)
+       prettyprint
+     pretender (1.0.0)
+@@ -542,11 +524,8 @@ GEM
+     simplecov-html (0.13.2)
+     simplecov_json_formatter (0.1.4)
+     smart_properties (1.17.0)
+-    sqlite3 (2.9.6-aarch64-linux-gnu)
+-    sqlite3 (2.9.6-aarch64-linux-musl)
+-    sqlite3 (2.9.6-arm64-darwin)
+-    sqlite3 (2.9.6-x86_64-linux-gnu)
+-    sqlite3 (2.9.6-x86_64-linux-musl)
++    sqlite3 (2.9.6)
++      mini_portile2 (~> 2.8.0)
+     stringio (3.2.0)
+     strip_attributes (2.0.1)
+       activemodel (>= 3.0, < 9.0)
+@@ -642,12 +621,15 @@ DEPENDENCIES
+   faker
+   faraday
+   faraday-follow_redirects
++  ffi (= 1.17.4)
+   foreman
+   google-cloud-storage
++  herb (= 0.11.1)
+   hexapdf
+   jwt
+   letter_opener_web
+   lograge
++  nokogiri (= 1.19.7)
+   numo-narray-alt
+   onnxruntime
+   pagy

@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Rails allocation census: one entry point for every round. See docs/upstream/census.md.
-#   script/census setup    --rails SPEC [--ruby R] [--apps LIST]
+#   script/census setup    --rails SPEC [--ruby R] [--ruby-overlays DIR] [--apps LIST]
 #   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST] [--stats[=FLAGS]]
 #   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2] [--gem NAME|all]
 #   script/census compare  --base L [--aa L0] [--detail] [--markdown] LABEL...
@@ -305,16 +305,25 @@ module Census
       next puts("#{app}: runs #{conf[:copy]}'s copy") if conf[:copy]
       dir = app_dir(opts[:corpus], app)
       raise "fresh copy required: #{dir}" if File.exist?(dir)
-      sh({}, File.join(ROOT, "script/corpus"), conf.fetch(:source), File.basename(dir), "--source-only",
+      sh({ "CORPUS_RUBY_BIN" => bin }, File.join(ROOT, "script/corpus"), conf.fetch(:source), File.basename(dir), "--source-only",
         *("--no-overlay" if conf[:bare]))
       overlay = conf.fetch(:overlay, app)
       overlay = File.join(opts[:overlays], "#{overlay}.patch") unless overlay.include?("/")
       sh({}, "patch", "-p1", "--forward", "--silent", "-i", overlay, chdir: dir)
+      # A Ruby overlay (for example the master one) applies on top: only the gem
+      # changes that Ruby needs, so the Rails-side overlay stays shared.
+      ruby_overlay = opts[:ruby_overlays] && File.join(opts[:ruby_overlays], File.basename(overlay))
+      ruby_overlay = nil unless ruby_overlay && File.exist?(ruby_overlay)
+      sh({}, "patch", "-p1", "--forward", "--silent", "-i", ruby_overlay, chdir: dir) if ruby_overlay
+      # APP.sh next to it vendors a patched path gem (Bundler does not compile
+      # path gems, so the script builds its extension with this Ruby).
+      vendor = ruby_overlay&.sub(/\.patch\z/, ".sh")
+      sh({ "PATH" => "#{bin}:#{ENV.fetch("PATH")}", "RUBYOPT" => nil }, "bash", vendor, chdir: dir) if vendor && File.exist?(vendor)
       FileUtils.cp(File.join(dir, conf[:database_yml]), File.join(dir, "config/database.yml")) if conf[:database_yml] && !File.exist?(File.join(dir, "config/database.yml"))
       # Git does not keep empty directories; Lobsters' production log opens log/rails.log at boot.
       FileUtils.mkdir_p(%w[log tmp storage].map { File.join(dir, _1) })
       File.write(File.join(dir, ".census.json"), JSON.pretty_generate("app" => app, "base" => rails,
-        "overlay" => overlay.delete_prefix(ROOT + "/"), "created" => Time.now.utc.iso8601) + "\n")
+        "overlay" => overlay.delete_prefix(ROOT + "/"), "ruby_overlay" => ruby_overlay&.delete_prefix(ROOT + "/"), "created" => Time.now.utc.iso8601) + "\n")
       gemfile = variant(opts[:corpus], app, rails, bin)
       env = env_for(app, bin, rails, gemfile)
       conf.fetch(:pre_db, []).each { sh(env, *_1, chdir: dir) }
@@ -882,6 +891,7 @@ module Census
       o.on("--app APP", "controls: SQLite app whose bundle runs the script (default blog)") { opts[:app] = _1 }
       o.on("--corpus NAME") { opts[:corpus] = _1 }
       o.on("--overlays DIR", "setup: dependency overlays (default fixtures/corpus/rails-main-census-4)") { opts[:overlays] = File.expand_path(_1) }
+      o.on("--ruby-overlays DIR", "setup: per-app gem overlays for --ruby, applied after --overlays (e.g. fixtures/corpus/frontier-master)") { opts[:ruby_overlays] = File.expand_path(_1) }
       o.on("--out DIR") { opts[:out] = File.expand_path(_1) }
       o.on("--label L") { opts[:label] = _1 }
       o.on("--aa [L0]", "run: also run L2, the A/A twin; compare: the A/A twin of --base") { opts[:aa] = _1 || true }

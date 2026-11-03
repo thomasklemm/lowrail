@@ -1,0 +1,115 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index aa3f19c..8f9128d 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -33,16 +33,14 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
+ 
+ [[package]]
+ name = "bindgen"
+-version = "0.69.5"
++version = "0.72.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "271383c67ccabffb7381723dea0672a673f292304fcb45c01cc648c7a8d58088"
++checksum = "993776b509cfb49c750f11b8f07a46fa23e0a1386ffc01fb1e7d343efc387895"
+ dependencies = [
+  "bitflags",
+  "cexpr",
+  "clang-sys",
+  "itertools 0.12.1",
+- "lazy_static",
+- "lazycell",
+  "proc-macro2",
+  "quote",
+  "regex",
+@@ -339,12 +337,6 @@ version = "1.5.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
+ 
+-[[package]]
+-name = "lazycell"
+-version = "1.3.0"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
+-
+ [[package]]
+ name = "libc"
+ version = "0.2.172"
+@@ -385,9 +377,9 @@ checksum = "b8dd856d451cc0da70e2ef2ce95a18e39a93b7558bedf10201ad28503f918568"
+ 
+ [[package]]
+ name = "magnus"
+-version = "0.8.2"
++version = "0.8.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "3b36a5b126bbe97eb0d02d07acfeb327036c6319fd816139a49824a83b7f9012"
++checksum = "e76237a607e1dea288dd0ef0c6c8f49037df2152d14bb52b3542c46522d9e6fc"
+ dependencies = [
+  "magnus-macros",
+  "rb-sys",
+@@ -590,18 +582,18 @@ dependencies = [
+ 
+ [[package]]
+ name = "rb-sys"
+-version = "0.9.124"
++version = "0.9.130"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "c85c4188462601e2aa1469def389c17228566f82ea72f137ed096f21591bc489"
++checksum = "02faf625bb10ba893e3ae620f19c9fb1b5f8fcae0fe4eb86bb3f2230fad75edb"
+ dependencies = [
+  "rb-sys-build",
+ ]
+ 
+ [[package]]
+ name = "rb-sys-build"
+-version = "0.9.124"
++version = "0.9.130"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "568068db4102230882e6d4ae8de6632e224ca75fe5970f6e026a04e91ed635d3"
++checksum = "05be6f9c86fe5482808162826f6c047d093b3670582296c770de1d94f8066694"
+ dependencies = [
+  "bindgen",
+  "lazy_static",
+@@ -614,9 +606,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "rb-sys-env"
+-version = "0.2.2"
++version = "0.2.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "08f8d2924cf136a1315e2b4c7460a39f62ef11ee5d522df9b2750fab55b868b6"
++checksum = "cca7ad6a7e21e72151d56fe2495a259b5670e204c3adac41ee7ef676ea08117a"
+ 
+ [[package]]
+ name = "regex"
+@@ -649,9 +641,9 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
+ 
+ [[package]]
+ name = "rustc-hash"
+-version = "1.1.0"
++version = "2.1.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
++checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
+ 
+ [[package]]
+ name = "rustversion"
+@@ -817,6 +809,7 @@ dependencies = [
+  "ahash",
+  "magnus",
+  "onig",
++ "rb-sys",
+  "serde",
+  "tokenizers",
+ ]
+diff --git a/ext/tokenizers/Cargo.toml b/ext/tokenizers/Cargo.toml
+index 25b3156..050c073 100644
+--- a/ext/tokenizers/Cargo.toml
++++ b/ext/tokenizers/Cargo.toml
+@@ -14,6 +14,7 @@ crate-type = ["cdylib"]
+ [dependencies]
+ ahash = { version = "0.8.11", features = ["serde"] }
+ magnus = "0.8"
++rb-sys = { version = "0.9", default-features = false, features = ["stable-api-compiled-fallback"] }
+ onig = { version = "6", default-features = false }
+ serde = { version = "1", features = ["rc", "derive"] }
+ 

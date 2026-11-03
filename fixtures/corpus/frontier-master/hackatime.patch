@@ -1,0 +1,122 @@
+diff --git a/Gemfile b/Gemfile
+index 9505f86..493677a 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -6,7 +6,7 @@ gem "rails", github: "rails/rails", ref: "5810776eecc5b2e50b58e81ee0c26c02c718fd
+ # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
+ gem "propshaft"
+ # Use PostgreSQL as the database for Wakatime
+-gem "pg"
++gem "pg", force_ruby_platform: true
+ # Use the Puma web server [https://github.com/puma/puma]
+ gem "puma", ">= 5.0"
+ # Build JSON APIs with ease [https://github.com/rails/jbuilder]
+@@ -162,3 +162,9 @@ gem "vite_rails", "~> 3.11"
+ gem "rubyzip", "~> 3.3", require: false # only used by HeartbeatExportJob
+ 
+ gem "mailkick"
++
++gem "ffi", "= 1.17.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "nokogiri", "= 1.19.7", force_ruby_platform: true # ruby41-watch: no 4.1 binary
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 8c7f854..fdeed9b 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -221,13 +221,7 @@ GEM
+       railties (>= 6.1.0)
+     faker (3.8.0)
+       i18n (>= 1.8.11, < 2)
+-    ffi (1.17.4-aarch64-linux-gnu)
+-    ffi (1.17.4-aarch64-linux-musl)
+-    ffi (1.17.4-arm-linux-gnu)
+-    ffi (1.17.4-arm-linux-musl)
+-    ffi (1.17.4-arm64-darwin)
+-    ffi (1.17.4-x86_64-linux-gnu)
+-    ffi (1.17.4-x86_64-linux-musl)
++    ffi (1.17.4)
+     fiddle (1.1.8)
+     flamegraph (0.9.5)
+     flipper (1.4.2)
+@@ -258,13 +252,7 @@ GEM
+       railties (>= 6.1.0)
+       thor (>= 1.0.0)
+     hashdiff (1.2.1)
+-    herb (0.11.1-aarch64-linux-gnu)
+-    herb (0.11.1-aarch64-linux-musl)
+-    herb (0.11.1-arm-linux-gnu)
+-    herb (0.11.1-arm-linux-musl)
+-    herb (0.11.1-arm64-darwin)
+-    herb (0.11.1-x86_64-linux-gnu)
+-    herb (0.11.1-x86_64-linux-musl)
++    herb (0.11.1)
+     htmlentities (4.4.2)
+     http (6.0.4)
+       http-cookie (~> 1.0)
+@@ -338,6 +326,7 @@ GEM
+       mime-types-data (~> 3.2025, >= 3.2025.0507)
+     mime-types-data (3.2026.0701)
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -353,19 +342,8 @@ GEM
+     net-smtp (0.5.2)
+       net-protocol
+     nio4r (2.7.5)
+-    nokogiri (1.19.7-aarch64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-aarch64-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-musl)
++    nokogiri (1.19.7)
++      mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+     oj (3.17.6)
+       bigdecimal (>= 3.0)
+@@ -379,11 +357,6 @@ GEM
+       ast (~> 2.4.1)
+       racc
+     pg (1.6.3)
+-    pg (1.6.3-aarch64-linux)
+-    pg (1.6.3-aarch64-linux-musl)
+-    pg (1.6.3-arm64-darwin)
+-    pg (1.6.3-x86_64-linux)
+-    pg (1.6.3-x86_64-linux-musl)
+     playwright-ruby-client (1.62.0)
+       base64
+       concurrent-ruby (>= 1.1.6)
+@@ -618,12 +591,14 @@ DEPENDENCIES
+   erb_lint
+   factory_bot_rails
+   faker
++  ffi (= 1.17.4)
+   flamegraph
+   flipper
+   flipper-active_record
+   flipper-ui
+   geocoder
+   good_job
++  herb (= 0.11.1)
+   http
+   image_processing (~> 2.0)
+   inertia_rails (~> 3.21)
+@@ -637,6 +612,7 @@ DEPENDENCIES
+   mailkick
+   maxminddb
+   memory_profiler
++  nokogiri (= 1.19.7)
+   oj
+   paper_trail
+   pg

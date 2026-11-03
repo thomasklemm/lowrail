@@ -143,6 +143,14 @@ sqlite3, pg, herb) to their source builds there, and that must not change the re
 needs a Ruby built with ZJIT. The mise build of 4.0.9 here has none (built without rustc); use a ZJIT build such
 as Ruby master.
 
+**Gems on Ruby master.** Master needs gem changes the release overlays do not have. Set a master corpus up with
+`setup --ruby ~/rubies/master --ruby-overlays fixtures/corpus/frontier-master` ([README](../../fixtures/corpus/frontier-master/README.md)):
+`setup` applies `DIR/<overlay basename>` after the base overlay, runs `DIR/<app>.sh` if present (it vendors a
+patched path gem), and records `ruby_overlay` in `.census.json`. The overlays change only Gemfile and Gemfile.lock
+(Thinkroom also drops a `.bundle/config` that holds only `---`). With them, 21 of 23 configurations install on
+master `9aa0898240`. [gems-on-master](gems-on-master.md) has, per gem, what fixed it and what still blocks
+Chatwoot and Flow.
+
 ## Services and apps
 
 | App | Source (script/corpus) | Overlay | Needs |

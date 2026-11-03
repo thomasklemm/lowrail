@@ -1,0 +1,183 @@
+diff --git a/Gemfile b/Gemfile
+index 0398771..7f93c91 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -1,6 +1,6 @@
+ source "https://rubygems.org"
+ 
+-ruby file: ".ruby-version"
++# ruby file: ".ruby-version" # ruby41-watch: one bundle for 4.0.7 and master
+ 
+ # Rails
+ gem 'rails', github: 'rails/rails', ref: '5810776eecc5b2e50b58e81ee0c26c02c718fdf0'
+@@ -153,3 +153,13 @@ group :test do
+   gem "climate_control"
+   gem "simplecov", require: false
+ end
++
++gem "cbor", github: "nobu/cbor-ruby", ref: "08f34f5b9af330e9add9400716c253cb96f02de6", require: false # master: cabo/cbor-ruby#31 (TypedData), unreleased
++
++gem "ffi", "= 1.17.2", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "google-protobuf", "= 4.36.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "nokogiri", "= 1.19.7", force_ruby_platform: true # ruby41-watch: no 4.1 binary
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 78c8dc9..8929450 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -1,3 +1,10 @@
++GIT
++  remote: https://github.com/nobu/cbor-ruby.git
++  revision: 08f34f5b9af330e9add9400716c253cb96f02de6
++  ref: 08f34f5b9af330e9add9400716c253cb96f02de6
++  specs:
++    cbor (0.5.10.2)
++
+ GIT
+   remote: https://github.com/rails/rails.git
+   revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+@@ -181,7 +188,6 @@ GEM
+       rack-test (>= 0.6.3)
+       regexp_parser (>= 1.5, < 3.0)
+       xpath (~> 3.2)
+-    cbor (0.5.10.2)
+     cgi (0.5.1)
+     childprocess (5.1.0)
+       logger (~> 1.5)
+@@ -269,14 +275,6 @@ GEM
+     faraday-retry (2.4.0)
+       faraday (~> 2.0)
+     ffi (1.17.2)
+-    ffi (1.17.2-aarch64-linux-gnu)
+-    ffi (1.17.2-aarch64-linux-musl)
+-    ffi (1.17.2-arm-linux-gnu)
+-    ffi (1.17.2-arm-linux-musl)
+-    ffi (1.17.2-arm64-darwin)
+-    ffi (1.17.2-x86_64-darwin)
+-    ffi (1.17.2-x86_64-linux-gnu)
+-    ffi (1.17.2-x86_64-linux-musl)
+     foreman (0.88.1)
+     fugit (1.11.1)
+       et-orbi (~> 1, >= 1.2.11)
+@@ -318,24 +316,6 @@ GEM
+     google-protobuf (4.36.1)
+       bigdecimal
+       rake (~> 13.3)
+-    google-protobuf (4.36.1-aarch64-linux-gnu)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.36.1-aarch64-linux-musl)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.36.1-arm64-darwin)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.36.1-x86_64-darwin)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.36.1-x86_64-linux-gnu)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.36.1-x86_64-linux-musl)
+-      bigdecimal
+-      rake (~> 13.3)
+     googleapis-common-protos-types (1.23.0)
+       google-protobuf (~> 4.26)
+     googleauth (1.16.2)
+@@ -352,14 +332,7 @@ GEM
+       logger
+     heapy (0.2.0)
+       thor
+-    herb (0.11.1-aarch64-linux-gnu)
+-    herb (0.11.1-aarch64-linux-musl)
+-    herb (0.11.1-arm-linux-gnu)
+-    herb (0.11.1-arm-linux-musl)
+-    herb (0.11.1-arm64-darwin)
+-    herb (0.11.1-x86_64-darwin)
+-    herb (0.11.1-x86_64-linux-gnu)
+-    herb (0.11.1-x86_64-linux-musl)
++    herb (0.11.1)
+     highline (3.1.2)
+       reline
+     hotwire-livereload (2.0.0)
+@@ -479,6 +452,7 @@ GEM
+       benchmark
+       logger
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -504,21 +478,8 @@ GEM
+     net-smtp (0.5.2)
+       net-protocol
+     nio4r (2.7.5)
+-    nokogiri (1.19.7-aarch64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-aarch64-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-musl)
++    nokogiri (1.19.7)
++      mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+     oauth2 (2.0.22)
+       auth-sanitizer (~> 0.2, >= 0.2.1)
+@@ -839,14 +800,14 @@ GEM
+       simplecov_json_formatter (~> 0.1)
+     simplecov-html (0.13.1)
+     simplecov_json_formatter (0.1.4)
+-    skylight (6.0.4)
+-      activesupport (>= 5.2.0)
++    skylight (7.0.0)
++      activesupport (>= 7.1.0)
+     smart_properties (1.17.0)
+     snaky_hash (2.0.7)
+       hashie (>= 0.1.0, < 6)
+       version_gem (~> 1.1, >= 1.1.14)
+     ssrf_filter (1.6.0)
+-    stackprof (0.2.27)
++    stackprof (0.2.28)
+     standardwebhooks (1.1.0)
+     stimulus-rails (1.3.4)
+       railties (>= 6.0.0)
+@@ -958,6 +919,7 @@ DEPENDENCIES
+   bootsnap
+   brakeman
+   capybara
++  cbor!
+   climate_control
+   connection_pool (~> 2.5)
+   countries
+@@ -971,8 +933,11 @@ DEPENDENCIES
+   faraday
+   faraday-multipart
+   faraday-retry
++  ffi (= 1.17.2)
+   foreman
+   google-cloud-storage (~> 1.59)
++  google-protobuf (= 4.36.1)
++  herb (= 0.11.1)
+   hotwire-livereload
+   hotwire_combobox
+   httparty
+@@ -987,6 +952,7 @@ DEPENDENCIES
+   lookbook (>= 2.3.15)
+   lucide-rails
+   mocha
++  nokogiri (= 1.19.7)
+   octokit
+   omniauth (~> 2.1)
+   omniauth-github

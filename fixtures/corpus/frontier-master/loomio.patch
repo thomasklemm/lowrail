@@ -1,0 +1,255 @@
+diff --git a/Gemfile b/Gemfile
+index 9bb45aa..4684186 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -6,7 +6,7 @@ gem 'rails', github: 'rails/rails', ref: '5810776eecc5b2e50b58e81ee0c26c02c718fd
+ gem 'json', '< 3'
+ gem 'uri', '1.1.2'
+ gem 'rake'
+-gem 'pg'
++gem 'pg', force_ruby_platform: true
+ gem 'phlex-rails'
+ gem 'bcrypt'
+ gem 'pwned'
+@@ -15,7 +15,7 @@ gem 'actionpack-action_caching'
+ gem 'actionpack-page_caching'
+ gem 'cancancan'
+ gem 'gravtastic'
+-gem 'nokogiri'
++gem 'nokogiri', force_ruby_platform: true
+ gem 'redcarpet', '~> 3.6.1'
+ gem 'paper_trail', '~> 17.0.0'
+ gem 'solid_queue'
+@@ -94,3 +94,15 @@ end
+ if Dir.exist?('engines/loomio_subs')
+   gem 'loomio_subs', path: 'engines/loomio_subs'
+ end
++
++gem "cbor", github: "nobu/cbor-ruby", ref: "08f34f5b9af330e9add9400716c253cb96f02de6", require: false # master: cabo/cbor-ruby#31 (TypedData), unreleased
++
++gem "prism", path: "vendor/f1/prism", require: false # frontier-master: patched gem (released 1.9.0, not master's bundled copy)
++
++gem "ffi", "= 1.17.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "google-protobuf", "= 4.35.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "grpc", "= 1.83.0", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
+diff --git a/Gemfile.lock b/Gemfile.lock
+index a032861..3c49127 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -6,6 +6,13 @@ GIT
+     active_model_serializers (0.8.4)
+       activemodel (>= 3.0)
+ 
++GIT
++  remote: https://github.com/nobu/cbor-ruby.git
++  revision: 08f34f5b9af330e9add9400716c253cb96f02de6
++  ref: 08f34f5b9af330e9add9400716c253cb96f02de6
++  specs:
++    cbor (0.5.10.2)
++
+ GIT
+   remote: https://github.com/rails/rails.git
+   revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+@@ -110,6 +117,11 @@ GIT
+       tsort (>= 0.2)
+       zeitwerk (~> 2.6)
+ 
++PATH
++  remote: vendor/f1/prism
++  specs:
++    prism (1.9.0)
++
+ GEM
+   remote: https://rubygems.org/
+   specs:
+@@ -168,7 +180,6 @@ GEM
+     byebug (13.0.0)
+       reline (>= 0.6.0)
+     cancancan (3.7.0)
+-    cbor (0.5.10.3)
+     cld (0.13.0)
+       ffi
+     concurrent-ruby (1.3.8)
+@@ -222,14 +233,7 @@ GEM
+       net-http (~> 0.5)
+     faraday-retry (2.4.0)
+       faraday (~> 2.0)
+-    ffi (1.17.4-aarch64-linux-gnu)
+-    ffi (1.17.4-aarch64-linux-musl)
+-    ffi (1.17.4-arm-linux-gnu)
+-    ffi (1.17.4-arm-linux-musl)
+-    ffi (1.17.4-arm64-darwin)
+-    ffi (1.17.4-x86_64-darwin)
+-    ffi (1.17.4-x86_64-linux-gnu)
+-    ffi (1.17.4-x86_64-linux-musl)
++    ffi (1.17.4)
+     friendly_id (5.7.0)
+       activerecord (>= 4.0.0)
+     fugit (1.13.0)
+@@ -302,24 +306,6 @@ GEM
+     google-protobuf (4.35.1)
+       bigdecimal
+       rake (~> 13.3)
+-    google-protobuf (4.35.1-aarch64-linux-gnu)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.35.1-aarch64-linux-musl)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.35.1-arm64-darwin)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.35.1-x86_64-darwin)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.35.1-x86_64-linux-gnu)
+-      bigdecimal
+-      rake (~> 13.3)
+-    google-protobuf (4.35.1-x86_64-linux-musl)
+-      bigdecimal
+-      rake (~> 13.3)
+     googleapis-common-protos (1.9.0)
+       google-protobuf (~> 4.26)
+       googleapis-common-protos-types (~> 1.21)
+@@ -338,37 +324,12 @@ GEM
+     grpc (1.83.0)
+       google-protobuf (>= 3.25, < 5.0)
+       googleapis-common-protos-types (~> 1.0)
+-    grpc (1.83.0-aarch64-linux-gnu)
+-      google-protobuf (>= 3.25, < 5.0)
+-      googleapis-common-protos-types (~> 1.0)
+-    grpc (1.83.0-aarch64-linux-musl)
+-      google-protobuf (>= 3.25, < 5.0)
+-      googleapis-common-protos-types (~> 1.0)
+-    grpc (1.83.0-arm64-darwin)
+-      google-protobuf (>= 3.25, < 5.0)
+-      googleapis-common-protos-types (~> 1.0)
+-    grpc (1.83.0-x86_64-darwin)
+-      google-protobuf (>= 3.25, < 5.0)
+-      googleapis-common-protos-types (~> 1.0)
+-    grpc (1.83.0-x86_64-linux-gnu)
+-      google-protobuf (>= 3.25, < 5.0)
+-      googleapis-common-protos-types (~> 1.0)
+-    grpc (1.83.0-x86_64-linux-musl)
+-      google-protobuf (>= 3.25, < 5.0)
+-      googleapis-common-protos-types (~> 1.0)
+     grpc-google-iam-v1 (1.12.0)
+       google-protobuf (>= 3.18, < 5.a)
+       googleapis-common-protos (~> 1.9.0)
+       grpc (~> 1.41)
+     hashdiff (1.2.1)
+-    herb (0.11.1-aarch64-linux-gnu)
+-    herb (0.11.1-aarch64-linux-musl)
+-    herb (0.11.1-arm-linux-gnu)
+-    herb (0.11.1-arm-linux-musl)
+-    herb (0.11.1-arm64-darwin)
+-    herb (0.11.1-x86_64-darwin)
+-    herb (0.11.1-x86_64-linux-gnu)
+-    herb (0.11.1-x86_64-linux-musl)
++    herb (0.11.1)
+     htmlentities (4.3.4)
+     http_accept_language (2.1.1)
+     i18n (1.15.2)
+@@ -417,6 +378,7 @@ GEM
+     mini_magick (5.4.0)
+       logger
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -448,25 +410,12 @@ GEM
+       net-protocol
+     net_http_timeout_errors (1.0.0)
+     nio4r (2.7.5)
+-    nokogiri (1.19.7-aarch64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-aarch64-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm64-darwin)
++    nokogiri (1.19.7)
++      mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-musl)
+-      racc (~> 1.4)
+-    oga (3.4)
++    oga (3.5)
+       ast
+-      ruby-ll (~> 2.1)
++      ruby-ll (~> 2.2)
+     openssl (4.0.2)
+     openssl-signature_algorithm (1.3.0)
+       openssl (> 2.0)
+@@ -479,12 +428,6 @@ GEM
+       ast (~> 2.4.1)
+       racc
+     pg (1.7.0)
+-    pg (1.7.0-aarch64-linux)
+-    pg (1.7.0-aarch64-linux-musl)
+-    pg (1.7.0-arm64-darwin)
+-    pg (1.7.0-x86_64-darwin)
+-    pg (1.7.0-x86_64-linux)
+-    pg (1.7.0-x86_64-linux-musl)
+     pg_search (2.4.0)
+       activerecord (>= 8.0)
+       activesupport (>= 8.0)
+@@ -506,7 +449,6 @@ GEM
+       net-smtp
+       premailer (~> 1.7, >= 1.7.9)
+     prettyprint (0.2.1)
+-    prism (1.9.0)
+     propshaft (1.3.2)
+       actionpack (>= 7.0.0)
+       activesupport (>= 7.0.0)
+@@ -607,7 +549,7 @@ GEM
+       rubocop (>= 1.72)
+       rubocop-performance (>= 1.24)
+       rubocop-rails (>= 2.30)
+-    ruby-ll (2.1.3)
++    ruby-ll (2.2.0)
+       ansi
+       ast
+     ruby-openai (8.3.0)
+@@ -742,6 +684,7 @@ DEPENDENCIES
+   bundler-audit
+   byebug
+   cancancan
++  cbor!
+   cld
+   csv
+   discard (~> 2.0)
+@@ -752,10 +695,14 @@ DEPENDENCIES
+   faker
+   faraday (~> 2.15)
+   faraday-follow_redirects (~> 0.5)
++  ffi (= 1.17.4)
+   friendly_id (~> 5.7.0)
+   google-cloud-storage (~> 1.62)
+   google-cloud-translate
++  google-protobuf (= 4.35.1)
+   gravtastic
++  grpc (= 1.83.0)
++  herb (= 0.11.1)
+   http_accept_language
+   i18n-timezones
+   icalendar
+@@ -772,6 +719,7 @@ DEPENDENCIES
+   pg_search
+   phlex-rails
+   premailer-rails
++  prism!
+   propshaft (~> 1.3)
+   puma
+   pwned
