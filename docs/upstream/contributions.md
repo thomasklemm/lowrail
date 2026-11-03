@@ -110,7 +110,7 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
   - [#59551](https://github.com/rails/rails/pull/59551), skip `extending!` in `Relation#merge` when there are no extensions — every merge −1 (`author.posts.count` **100 → 98**); 76/97, median **−5.8**; 63/97 still move with open #59212.
   - [#59552](https://github.com/rails/rails/pull/59552), a direct association reflection's `constraints` returns `scopes` — −2 per direct reflection (`post.comments.size` **249 → 246**); 74/97, median **−7.3**. Boundary: a subclass overriding `chain`.
   - [#59553](https://github.com/rails/rails/pull/59553), frozen empty `default_extensions` without a default scope — −1 per association proxy; 58/97, median **−1.6**. Boundary: a caller mutating the result.
-  - Held: `merger-bang-method-names` (40be14c), most of its gain overlaps #59212's removed `limit(1)` merge.
+  - [#59554](https://github.com/rails/rails/pull/59554), precomputed bang method names in `Merger#merge` — −1 String per merged value (`post.author` **223 → 222**); 66/97, median **−3.0**. Overlaps open #59212 (with it: 51/97 interpreter, median −1; YJIT within noise), stated in the PR. Sol approve on both rubrics; opened 2026-11-03. On #59212 itself (Sol static review: no findings) we posted the nine-app breadth numbers: 75/74 of 97 workloads, median −46/−49.
 
 ### Importmap — rails/importmap-rails
 
