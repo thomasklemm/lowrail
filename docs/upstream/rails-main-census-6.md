@@ -186,7 +186,10 @@ instance-dependent, `includes` + `references`, STI and already-loaded preloads: 
 `#test_preload_can_group_multi_level_ping_pong_through`.
 
 **Suites.** Active Record `rake test:sqlite3` with `RAILS_STRICT_WARNINGS=1`, `SEED=41231`: main `3bdc579090`
-10,247 runs, 36,561 assertions, 0 failures, 0 errors, 52 skips; branch identical. RuboCop on both files: no offenses.
+10,247 runs, 0 failures, 0 errors, 52 skips; branch identical. (The suite's assertion total varies between runs on
+main itself, 36,561 to 36,591; per-test assertion counts were identical between main and the branches.) After the PR
+was opened (#59564), `rake test:postgresql` on `2b53fa5cbe`: 11,166 runs, 0 failures, 0 errors, 31 skips. RuboCop on
+both files: no offenses.
 
 **Overlap.** No open PR changes these lines' allocations. Open #42010 (`batched_method`, 2021) edits
 `Branch#runnable_loaders`'s line for a feature; open #58120 and #53454/#53548 touch nearby preloader lines for
@@ -230,7 +233,7 @@ behavior. Merged history of these files has no allocation work.
   overridden `Relation#scoping`. Not exact as is; also a VM question (block-captured `...`).
 * **Lead: `has_default_scope?`/`build_default_scope`** `method(:default_scope).owner` (16 apps, 39 / op combined):
   unchanged from census 5.
-* **Not yet measured:** L6's four apps (above).
+* **L6's four apps:** measured in the [addendum](#addendum-l6s-four-apps).
 
 ## Limits
 
@@ -242,3 +245,71 @@ behavior. Merged history of these files has no allocation work.
 * Receipts: [data/rails-main-census-6/receipts.tar.gz](data/rails-main-census-6/receipts.tar.gz) holds both rankings,
   the label metadata, the A/A, merge-wave and candidate comparisons (`--detail`), the open-PR map, the micro, control
   and suite outputs.
+
+## Addendum: L6's four apps
+
+L6's Chatwoot, Flow, Hackatime and Thinkroom ([inertia-chatwoot-census.md](inertia-chatwoot-census.md), Lowrail main
+`301bdfc`) were set up on the same pin (`script/census setup --rails 3bdc579090… --apps thinkroom,hackatime,flow,chatwoot`;
+Chatwoot compiles `grpc` from source) and measured under the same labels (`c6`, `c62`, `preload`), without `--gem`
+pins (each app's locked inertia-rails). The corpus is now **23 configurations, 20 apps, 251 workloads**. A/A on
+all of them: median +0.0 / +0.0, 43 / 53 moved ≤ −1, 55 / 40 moved ≥ +1.
+
+**C6-1 on the new apps:** Flow −22.5 / −27.5 (9–10 of 10 workloads), Chatwoot, Hackatime and Thinkroom within the
+A/A. Over 251 workloads C6-1 moves 121 / 119 (A/A 43 / 53); the 113 workloads that preload (17 apps) move a median
+−53 / −54.
+
+**Ranking changes.** No previously unranked site reaches the top tier except these, all from apps that eager-load or
+preload more:
+
+| Rank | Site | Apps / share | Objects/op | Disposition |
+| ---: | --- | --- | ---: | --- |
+| 45 | AR `arel/alias_predication.rb:8` `As` + SqlLiteral | 9 / 18% | 20.8 | AST nodes for `select(... .as(...))`. Required. |
+| 56 (YJIT 34) | AR `join_dependency.rb:188` `"t#{i}_r#{j}"` | 7 / 9% | 17.7 (26.9) | Eager-load column aliases, memoized per join dependency. Sharing them across queries needs a global table of frozen names (anti-Ractor-shareable). Lead. |
+| **84, 92, 132, 138, 139** | AR `preloader/branch.rb:49/33/55/35/47` | 7–15 / 15–39% | 8.9–14.5 | **C6-2** (below) for `:33/:35/:47/:49`; `:55` is `likely_reflections`' result (required). |
+| 124 | AS `subscriber.rb:142` | 20 / 92% | 9.6 | Covered by our open #59562. |
+| 133, 141, 147, 149, 150 | AR `query_methods.rb:2460`, `alias_tracker.rb:12/24`, `reflection.rb:223/276` | 19–20 / 73–88% | 8.4–9.0 | Join/alias bookkeeping and chain scopes; ranked in since the tier grew. Required (`reflection.rb:223/276` after #59552). |
+
+### C6-2: build the preloader branch's class lists in place
+
+[`wip/preloader-branch-class-lists`](https://github.com/thomasklemm/rails/tree/wip/preloader-branch-class-lists)
+[`faa73be940`](https://github.com/thomasklemm/rails/commit/faa73be940fbd713e601671c6b2a4fe2baa0cb29), one commit **on
+top of C6-1** (#59564). `Branch#immediate_future_classes` and `#target_classes` built a fresh `reject`, `flat_map`
+or `map` result and copied it again with `uniq`; they now filter and deduplicate those Arrays in place
+(`delete_if`, `map!`, `tap(&:uniq!)`). `likely_reflections` returns a fresh `filter_map` result; `preloaded_records`
+is memoized but only mapped, never mutated. Same elements, same order.
+
+| Per call, objects | main | C6-1 | C6-1 + C6-2 (interp / YJIT) |
+| --- | ---: | ---: | ---: |
+| `Post.preload(:author)` | 287 | 278 | 277 / 284 |
+| `Author.preload(posts: :comments)` | 577 | 555 | 550 / 562 |
+| `Post.preload(:author, :tags, comments: :author)` | 1,029 | 989 | 982 / 1,004 |
+
+The micro's shapes exercise few parent-not-done branches; the apps do. **Census** (`preload2`): against C6-1,
+131 / 126 of 251 workloads moved ≤ −1 (A/A 43 / 53) and the 113 workloads that preload move a median **−11 / −14**;
+against main, 136 / 129 moved with Sure −200 / −193, Docuseal −27 / −29, Flow −28 / −33, Discourse −24 / −10, Lago
+−21 / −20, Loomio −19 / −11, CASA −8 / −11, PingCRM −5 / −4. **SQL:** `preload2` showed changed digests on Discourse,
+Fizzy, Lobsters, Mastodon-nops and Sure pages that matched in `c62`/`c6`/`preload`; it ran last, after more POST
+workloads. Rerun back to back on the current databases, main, C6-1 and C6-2 give identical digests for Fizzy
+`GET board`/`GET cards`, Sure `GET account` and Discourse `latest.json`/`categories.json`/`search.json` (and main's
+Discourse digest now equals `preload2`'s earlier one): database drift between runs, not the change. Control script
+identical; `associations_test.rb`, `eager_test.rb` and `nested_through_associations_test.rb` 418 runs, 0 failures;
+Active Record `test:sqlite3` 10,247 runs, 0 failures, 0 errors, 52 skips (per-test assertion counts identical to
+main); RuboCop clean.
+
+**Delivery.** C6-2 touches the same file as #59564, so it is either folded into #59564 or opened after #59564 merges
+(no stacked PRs). Draft for the separate PR:
+
+> **Build the preloader branch's class lists in place**
+>
+> While a preload batch runs, `Preloader::Branch#target_classes` and `#immediate_future_classes` are asked again on
+> every pass, for every branch, to decide which loaders can run. Each builds a fresh Array with `reject`,
+> `flat_map` or `map` and then copies it with `uniq`.
+>
+> The first Array is never shared, so this filters and deduplicates it in place (`delete_if`, `map!`, `uniq!`). The
+> classes and their order are unchanged.
+>
+> Across 17 open-source apps on Rails main, requests and jobs that preload allocate a median 11 fewer objects on top
+> of #59564.
+
+Receipts: [data/rails-main-census-6/receipts-addendum.tar.gz](data/rails-main-census-6/receipts-addendum.tar.gz)
+(both rankings on 251 workloads, label metadata, `--detail` comparisons, the back-to-back SQL drift check).
