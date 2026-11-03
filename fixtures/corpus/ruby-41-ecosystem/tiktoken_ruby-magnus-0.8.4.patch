@@ -1,0 +1,44 @@
+From daa0b75293feefb1cc2a79750f55bdd3570deeb9 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Tue, 3 Nov 2026 14:45:49 +0000
+Subject: [PATCH] Bump magnus from 0.8.2 to 0.8.4
+
+magnus 0.8.2 does not compile against Ruby 4.1 (ruby-head), whose
+rb_data_type_t gained handle_weak_references.  magnus 0.8.3 and later
+cope with it; the update also takes rb-sys-env 0.2.3, which knows
+Ruby 4.1.  Cargo.lock only; tests pass on Ruby 4.0.7 and 4.1.0dev.
+---
+ Cargo.lock | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 9df3ca4..15fe913 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -155,9 +155,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "magnus"
+-version = "0.8.2"
++version = "0.8.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "3b36a5b126bbe97eb0d02d07acfeb327036c6319fd816139a49824a83b7f9012"
++checksum = "e76237a607e1dea288dd0ef0c6c8f49037df2152d14bb52b3542c46522d9e6fc"
+ dependencies = [
+  "magnus-macros",
+  "rb-sys",
+@@ -242,9 +242,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "rb-sys-env"
+-version = "0.2.2"
++version = "0.2.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "08f8d2924cf136a1315e2b4c7460a39f62ef11ee5d522df9b2750fab55b868b6"
++checksum = "cca7ad6a7e21e72151d56fe2495a259b5670e204c3adac41ee7ef676ea08117a"
+ 
+ [[package]]
+ name = "regex"
+-- 
+2.55.0
+
