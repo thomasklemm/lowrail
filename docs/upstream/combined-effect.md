@@ -11,6 +11,10 @@ tree's A/A pair stays within ±0.12% overall. Wall time on ruby-bench's railsben
 iterations allocate 0.4% and 1.3% fewer objects, GC runs per iteration do not change, and every timing ratio is
 inside its A/A spread. These are allocation savings, not a measured speedup.
 
+**Under ZJIT** (bet F2, [below](#zjit-bet-f2)), on Ruby master and the 22 PRs merged by 2026-11-03 10:43 UTC, the
+savings carry over unchanged: −3.21% of allocations under ZJIT and −3.27% interpreted on census 4's nine apps. ZJIT
+Ir on ruby-bench falls 0.5%, and no PR adds net ZJIT fallbacks or exits in three or more apps.
+
 ## Pins and method
 
 * **Rails, with the PRs:** canonical `rails/rails` main
@@ -129,3 +133,161 @@ Receipts: [`data/combined-effect/receipts.tar.xz`](data/combined-effect/receipts
 JSON, log and `meta.json` for `with`, `with2`, `without` and `without2`.
 [`data/combined-effect/walltime.tar.xz`](data/combined-effect/walltime.tar.xz) holds every wall-time process
 JSON and log, including the discarded round 1.
+
+## ZJIT (bet F2)
+
+**Result.** On Ruby master with ZJIT, our 22 merged Rails PRs save the same allocations as in the interpreter:
+**−3.21% of all allocations under ZJIT and −3.27% interpreted** (−203 / −206 objects per workload) across census 4's
+nine apps (10 configurations, 97 workloads). Every workload moves, and none allocates more. Each tree's A/A pair stays
+within ±0.06% overall. They also lower ZJIT's work: dynamic sends fall in every app (−1% to −10% per operation), send
+and ivar fallbacks fall in nine of ten (the Blog's +0.2% is inside its A/A), and Callgrind Ir per iteration on
+ruby-bench under ZJIT drops **0.54% (railsbench) and 0.49% (lobsters)**, well outside the A/A. Three PRs each raise one ZJIT counter, and each
+does so by turning other ZJIT work into it: **#59541** adds `SendForward: not yet specialized` fallbacks (4 apps)
+through a `delegate`d `empty?`, **#59537** replaces `concatarray` side exits with splat-argument fallbacks (3 apps),
+and **#59568** adds class-guard side exits in Writebook (+36 per operation) while removing 1,274 dynamic sends there.
+
+### Pins and method
+
+* **Ruby:** ruby/ruby master [`9aa0898240`](https://github.com/ruby/ruby/commit/9aa089824003b9fde7ff2de6953d282def364edb)
+  (2026-11-03 12:42 UTC), `./configure --enable-yjit --enable-zjit --disable-install-doc`, Rust 1.99.1, release
+  build. ZJIT defaults (`--zjit-mem-size` 128 MiB, call threshold 30); the stats runs pass `--zjit-mem-size=128`
+  explicitly. The F1 thread was told the pin.
+* **Rails, with:** canonical `rails/rails` main
+  [`c042aee23a`](https://github.com/rails/rails/commit/c042aee23a56205c43c9a60219cd1c4d7f7576a8) (merge of #59575,
+  2026-11-03 10:43 UTC).
+* **Rails, without:** the same commit with 23 merges reverted (`git revert -m 1`, newest first), local commit
+  `14ac835463` (not pushed). Our 22 merged PRs: #59533–#59539, #59541–#59544, #59551–#59556, #59558, #59560, #59561,
+  #59563, #59568. **Confound: kamipo's #59572** ("Skip merging a relation's values into themselves", merge
+  `b084108cf3`) is reverted too. It builds on #59556 (`values_for_merge`), so #59556's revert conflicted in
+  `merger.rb` and `merging_test.rb` until #59572 was reverted first. No conflict was resolved by hand; after the
+  reverts `merger.rb` is identical to pre-wave `e77813d4e8`. #59572 skips self-merges, which these workloads rarely
+  do, but its effect is inside these numbers.
+* **Not included:** our October PRs (#59235–#59278, #59316, #59329) are in both trees, as in the 4.0.7 measurement
+  above. #59571 and #59576 merged after the pin (13:59 and 14:19 UTC) and are in neither.
+* **Apps:** census 4's nine apps (Fizzy on SQLite and MySQL), set up fresh as corpus `censusf2` on the master pin
+  with the [JIT parity](jit-parity-census.md) overlays (`fixtures/corpus/jit-parity-census`; CodeTriage, PingCRM,
+  redprints-cfp and react-starter-kit with census 4's, since the parity CodeTriage patch no longer applies to the
+  census source). `run`'s dependency control: every lock outside Rails matches in all runs.
+* **Allocations:** `script/census run --modes interp,zjit`, warmup 200 operations (`CENSUS_WARMUP=200`, recorded per
+  workload), ABBA (`zw`, `zwo`, `zwo2`, `zw2`):
+  [`census_abba.sh`](../../bench/upstream/zjit_combined/census_abba.sh), table
+  [`census_table.rb`](../../bench/upstream/zjit_combined/census_table.rb).
+* **ZJIT stats:** separate processes, `--stats="--zjit-mem-size=128"` (`--zjit-stats-quiet`), 200 warmup and 20
+  measured operations per workload, twice per tree (`zsw`, `zswo`, `zswo2`, `zsw2`). Tables:
+  [`stats_compact.rb`](../../bench/upstream/zjit_combined/stats_compact.rb) and
+  [`stats_table.rb`](../../bench/upstream/zjit_combined/stats_table.rb), which lists every fallback, exit and
+  argument-passing counter the PRs raise by more than 2× its A/A, 5% and 0.05 per operation. Sites: one traced run per
+  tree and app (`--zjit-trace-exits-sample-rate=20 --zjit-trace-fallbacks-sample-rate=20`), diffed with
+  [`trace_diff.rb`](../../bench/upstream/zjit_combined/trace_diff.rb). Attribution: main with a single PR reverted,
+  stats twice.
+* **Callgrind:** ruby-bench railsbench and lobsters (byroot/ruby-bench `bf1afb2` with the
+  [index_with patch](../../bench/upstream/index_with_ruby_bench/ruby-bench.patch); two checkouts differing only in
+  the Rails path), `--zjit`, Valgrind 3.19.0 built by `script/bench-valgrind` (stock Valgrind hit `brk segment
+  overflow`, which [bench.md](../bench.md) treats as invalid; no run reports it). Per process 15 warmup iterations,
+  then an empty and a 3-iteration window with GC excluded
+  ([`harness.rb`](../../bench/upstream/zjit_combined/harness.rb)); three rounds of with-A, without-A, without-B,
+  with-B in rotated order, sequential ([`callgrind.sh`](../../bench/upstream/zjit_combined/callgrind.sh),
+  [`callgrind_summary.rb`](../../bench/upstream/zjit_combined/callgrind_summary.rb)).
+* **Warmup gate:** after 200 warmups, compiled ISEQs per operation are 0.00–0.35 in seven apps but 1.5 in Campfire
+  and 2.1 in CodeTriage, the same in both trees and both runs (±0.04). Those two keep compiling new ISEQs in steady
+  state (the gate fails there for both trees alike), so their counters include compilation; the A/A shows it does not
+  differ between runs. Fizzy and Fizzy-MySQL reach the 128 MiB limit (`compile_error_out_of_memory`); their
+  `exit_compile_error` swings by up to ±165 per operation between runs of the same tree, so side exits below exclude it.
+
+### Allocations
+
+Interpreter / ZJIT in every cell, as in [Allocations](#allocations).
+
+| App | Workloads | Objects/workload without → with | Δ objects/workload | Share | A/A with, without | Workloads moved ≤ −1 (A/A) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| blog | 10 | 1710 → 1671 / 1705 → 1668 | −38.4 / −37.2 | −2.24% / −2.18% | −0.14%, +1.00% / −0.02%, +0.13% | 10 (3) / 10 (1) |
+| campfire | 9 | 6357 → 6240 / 6498 → 6382 | −116.8 / −116.1 | −1.84% / −1.79% | +0.00%, +0.00% / −0.00%, −0.01% | 9 (0) / 9 (0) |
+| fizzy | 14 | 10517 → 10058 / 10532 → 10076 | −458.5 / −455.9 | −4.36% / −4.33% | +0.00%, +0.06% / +0.00%, −0.16% | 14 (2) / 14 (1) |
+| fizzy-mysql | 14 | 10271 → 9819 / 10275 → 9839 | −451.2 / −436.5 | −4.39% / −4.25% | −0.00%, −0.10% / +0.00%, −0.10% | 14 (2) / 14 (2) |
+| lobsters | 11 | 11534 → 11306 / 11518 → 11290 | −228.2 / −228.4 | −1.98% / −1.98% | −0.03%, +0.01% / −0.00%, −0.00% | 11 (4) / 11 (4) |
+| react-starter-kit | 8 | 1950 → 1921 / 1951 → 1922 | −29.6 / −28.3 | −1.52% / −1.45% | +0.01%, +0.04% / −0.03%, +0.02% | 8 (2) / 8 (4) |
+| redprints-cfp | 8 | 2089 → 2044 / 2091 → 2046 | −45.1 / −44.9 | −2.16% / −2.15% | +0.00%, −0.05% / −0.01%, −0.03% | 8 (3) / 8 (3) |
+| writebook | 8 | 5464 → 5284 / 5536 → 5357 | −180.1 / −178.7 | −3.30% / −3.23% | +0.01%, −0.01% / +0.03%, +0.00% | 8 (1) / 8 (1) |
+| codetriage | 7 | 2828 → 2731 / 2839 → 2742 | −96.6 / −96.1 | −3.42% / −3.39% | +0.04%, −0.03% / −0.06%, +0.04% | 7 (1) / 7 (5) |
+| pingcrm | 8 | 2953 → 2881 / 2952 → 2881 | −72.1 / −70.9 | −2.44% / −2.40% | +0.01%, +0.20% / −0.01%, −0.10% | 8 (1) / 8 (2) |
+
+| Scope | Workloads | Objects/workload without → with | Δ | Share | A/A with, without | Moved (A/A) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Census 4's nine apps (10 configurations) | 97 | 6,306 → 6,100 / 6,326 → 6,123 | −205.9 / −202.8 | **−3.27% / −3.21%** | −0.01%, +0.03% / −0.00%, −0.06% | 97 (19) / 97 (23) |
+
+* **ZJIT keeps the saving.** Per app, ZJIT and the interpreter agree to within 0.15 points (Fizzy-MySQL −4.39% /
+  −4.25%). No workload allocates more in either mode.
+* **Larger than on 4.0.7** (−2.00% / −2.00% for these apps above): the tree now reverts 22 PRs instead of 11, and the
+  master pin is a different Ruby. The two are not comparable as a Ruby 4.0.7 → master change.
+* **A/A:** every app is within ±0.20%, except the Blog's reverted pair in the interpreter (+1.00%), which is one
+  stateful job (`Turbo::Streams::ActionBroadcastJob`, 618 → 796 objects between runs).
+
+### ZJIT counters
+
+Per operation, mean of each tree's two runs; Δ against the reverted tree, A/A the larger of the two trees' run-to-run
+changes, on the same scale. Fallbacks are send, invokeblock, getivar and setivar fallbacks; side exits exclude
+compile-error exits (see the warmup gate).
+
+| App | Dynamic sends without → with (Δ; A/A) | Fallbacks without → with (Δ; A/A) | Side exits without → with (Δ; A/A) |
+| --- | ---: | ---: | ---: |
+| blog | 1723 → 1706 (−1.0%; ±1.2%) | 3195 → 3202 (+0.2%; ±1.4%) | 32.0 → 31.5 (−1.5%; ±0.3%) |
+| campfire | 7827 → 7568 (−3.3%; ±0.0%) | 12544 → 12155 (−3.1%; ±0.0%) | 208 → 207 (−0.3%; ±0.3%) |
+| codetriage | 3246 → 3177 (−2.1%; ±0.0%) | 4970 → 4820 (−3.0%; ±0.0%) | 130 → 130 (−0.0%; ±0.0%) |
+| fizzy | 16832 → 16074 (−4.5%; ±0.5%) | 26963 → 26093 (−3.2%; ±0.4%) | 620 → 617 (−0.5%; ±0.2%) |
+| fizzy-mysql | 16361 → 15766 (−3.6%; ±0.5%) | 25230 → 24643 (−2.3%; ±0.3%) | 596 → 606 (+1.7%; ±2.8%) |
+| lobsters | 16374 → 15702 (−4.1%; ±0.0%) | 26552 → 25424 (−4.2%; ±0.2%) | 571 → 568 (−0.6%; ±0.0%) |
+| pingcrm | 2376 → 2272 (−4.4%; ±0.0%) | 3190 → 3086 (−3.3%; ±0.0%) | 26.4 → 26.8 (+1.5%; ±0.2%) |
+| react-starter-kit | 1028 → 997 (−2.9%; ±0.0%) | 1307 → 1277 (−2.3%; ±0.0%) | 23.8 → 23.8 (+0.0%; ±0.0%) |
+| redprints-cfp | 1610 → 1527 (−5.2%; ±0.0%) | 2314 → 2224 (−3.9%; ±0.1%) | 40.3 → 40.3 (+0.0%; ±0.0%) |
+| writebook | 25587 → 23117 (−9.7%; ±0.0%) | 44398 → 40369 (−9.1%; ±0.0%) | 1248 → 1285 (+2.9%; ±0.0%) |
+
+**Counters raised by a PR.** `stats_table.rb` lists 16 (app, counter) pairs. Accepting only reasons that reach ≥ 3 apps
+with stable runs leaves two, and both trace to single PRs, confirmed by trees that revert just that PR:
+
+| Counter | Apps | PR | without → with | single revert | What changed |
+| --- | --- | --- | --- | --- | --- |
+| `send_fallback_sendforward_not_specialized` | Writebook, Campfire, redprints-cfp, react-starter-kit | **#59541** | Writebook 768 → 920, Campfire 284 → 307, redprints-cfp 113 → 119, rsk 56 → 60 | Writebook 768, Campfire 284 (`42cb27e233`, twice) | `WhereClause#merge` now asks `empty?` first, and `WhereClause#empty?` is `delegate :empty?, to: :predicates`, a `(...)` forwarder ZJIT does not specialize. It replaces the getivar fallbacks of `except_predicates`/`each_attributes` it skips; Writebook's fallbacks still fall 9.1% overall. With #59541 alone reverted, Writebook's dynamic sends are 23,086 against 23,117 with it: +31 per operation (+0.13%). Campfire −1. |
+| `complex_arg_pass_caller_splat` | Fizzy, Fizzy-MySQL, Writebook | **#59537** | Fizzy 17.6 → 21.4, Fizzy-MySQL 16.9 → 21.0, Writebook 15.5 → 16.4 | Fizzy 18.0, Writebook 15.5 (`d58e0dddd4`, twice) | `TagBuilder#method_missing` called `tag_string(name, *args, options, …)`, which compiles to `concatarray`, an instruction ZJIT side-exits on (`exit_unhandled_yarv_insn` 3.4 per operation in Fizzy). With `options, *args` it is an ordinary splat send that ZJIT compiles and counts as a fallback. `exit_unhandled_yarv_insn` drops to 0 in all five apps that had it; complex-argument fallbacks as a whole fall (Fizzy 812 → 801). |
+
+Below the three-app bar:
+
+* **Writebook `exit_guard_type_failure` 326 → 362, #59568.** With #59568 alone reverted (`7e6308f9cc`, twice) it is
+  326.3 again. `_load_from_sql` now reads `self.attribute_types` once in the method body, where ZJIT guards the
+  receiver's class and Writebook's many model classes fail the guard, instead of in the `reject` block, where the
+  same call was a send fallback. The same PR removes 1,274 dynamic sends per operation in Writebook (24,391
+  without it, 23,117 with). No other app's guard failures move (largest change −3.5, Lobsters).
+* **`send_fallback_send_megamorphic` (Fizzy +305, Lobsters +75)** is a reclassification: `schema_context` and
+  `Merger` sends that were polymorphic fallbacks now count as megamorphic. Polymorphic and megamorphic send fallbacks
+  together fall in every app (Fizzy 9,998 → 9,841, Lobsters 8,523 → 8,041, Writebook 15,192 → 13,917).
+* **PingCRM `exit_unhandled_block_arg` 3.0 → 3.4** is a new site at `HashWithIndifferentAccess#fetch` <
+  `ActionController::Parameters#fetch`, which #59535 rewrote (traced site only; no single-PR tree). The old
+  `super(convert_key(key), *extras)` was a `super` complex-argument fallback; the new plain `super` side-exits
+  when a block is passed. Elsewhere the same change removes those `super` fallbacks (Fizzy: 1,813 trace samples,
+  none left).
+* **The Blog's getivar/setivar fallbacks** (+15.6 and +4.9) are single-app, and its total fallbacks stay inside its
+  A/A. Codetriage's `getivar_fallback_megamorphic` +0.1 and
+  Campfire's `complex_arg_pass_caller_blockarg` +0.9 are below one per operation.
+
+No PR raises a fallback or exit reason in ≥ 3 apps in a way that adds net work: in both cases the new counter replaces
+an equal or larger one at the same call.
+
+### Callgrind under ZJIT
+
+| App | Rounds | Ir/iteration without → with | with / without: mean (range over rounds) | A/A with, without: mean (largest) | GC runs per 3-iteration window | Objects/iteration without → with |
+| --- | ---: | ---: | --- | --- | --- | --- |
+| railsbench | 3 | 2.969 G → 2.953 G | **−0.54%** (−0.62% … −0.41%) | −0.03% (−0.09%), −0.13% (−0.18%) | 12–14 in both trees | 959,488 → 943,430 (−1.67%) |
+| lobsters | 3 | 3.053 G → 3.038 G | **−0.49%** (−0.51% … −0.46%) | +0.02% (+0.04%), −0.06% (−0.10%) | 1–2 in both trees | 549,267 → 539,681 (−1.75%) |
+
+* **Outside the A/A.** Every round's with/without ratio is lower than −0.4%, and no A/A ratio of either tree
+  exceeds 0.18% in any round. Ir excludes GC (`CG_NO_GC=1`), so this is mutator work: fewer allocations and fewer
+  dynamic sends, not fewer collections.
+* **CPU is an observation, not a speed claim.** Per [bench.md](../bench.md) the primary evidence is interpreter
+  instruction counts with fixed heap; these are ZJIT instruction counts on two benchmarks, without a JIT-flat gate
+  or wall time. They say the PRs do not cost ZJIT CPU on these benchmarks, and likely save about half a percent.
+* **GC:** objects per iteration fall 1.7% in both benchmarks, but GC runs in the 3-iteration window do not change
+  (railsbench 12–14, lobsters 1–2 in both trees).
+
+Receipts: [`data/combined-effect/zjit.tar.xz`](data/combined-effect/zjit.tar.xz) holds the run JSONs, logs and
+`meta.json` of every census label (`zw`, `zw2`, `zwo`, `zwo2`, the stats labels `zsw`, `zsw2`, `zswo`, `zswo2`, the
+single-revert labels `zs1`/`zs1b` for #59541, `zs37`/`zs37b` for #59537 and `zs68`/`zs68b` for #59568), the summarized
+fallback and exit traces per app and tree, and the Callgrind logs and totals.
