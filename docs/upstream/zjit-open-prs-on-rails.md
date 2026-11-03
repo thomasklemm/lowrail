@@ -43,8 +43,9 @@ breaks `HashWithIndifferentAccess#merge(...) = dup.update(...)` when called as `
 `query_value(...) = single_value_from_rows(query_rows(...))`.
 
 Two master bugs turned up on the way. Neither involves any of the PRs (see [Master bugs](#master-bugs)):
-a ZJIT miscompile at `--zjit-call-threshold=1` (a local reads `nil` after an inlined call with a block),
-and an interpreter `[BUG]` when a Ractor reads a frozen `Set` class ivar.
+a ZJIT miscompile at `--zjit-call-threshold=1` (a local reads `nil` after an inlined call with a block,
+fixed by open #18960), and an interpreter `[BUG]` when a Ractor reads a frozen `Set` class ivar (Bug #22419,
+from #19145, draft fix #19447).
 
 ## Builds
 
@@ -184,7 +185,8 @@ specialization that is not yet correct.
 
 ## Master bugs
 
-Neither involves the three PRs. Both reproduce on master `90dbced795`, which `d4b4ad206f` does not change.
+Neither involves the three PRs. Both reproduce on master `90dbced795`. Both are already known and have open fixes,
+so nothing new is filed.
 
 **ZJIT: local reads `nil` after an inlined call with a block that writes it** (`--zjit-call-threshold=1` only):
 
@@ -208,6 +210,13 @@ never stores `x = 1` to the frame, and then reloads `x` from the frame (`LoadFie
 block may write it, so it reads a stale `nil`. That is Rails' `ObjectTryTest#test_try_only_block_nil`
 (`NilClass#try(*, &)`). Thresholds 2 and default are correct.
 
+This is the known [Shopify/ruby#976](https://github.com/Shopify/ruby/issues/976). Open
+[ruby/ruby#18960](https://github.com/ruby/ruby/pull/18960) ("ZJIT: Locals in stack map; HIR local spills;
+always locals in exits", head `0564799aa1`) fixes it. Merged onto master (only `zjit/src/hir/opt_tests.rs`
+conflicts, master's version kept), the repro gives `{1 => 100}` at thresholds 1 and 2 and default, and a
+32-case matrix (8 block-parameter signatures × receivers `nil`, `true`, `1`, `Object.new`) has 0 divergences,
+against 15 on master.
+
 **Interpreter: `[BUG]` when a Ractor reads a frozen `Set` class ivar** (no JIT):
 
 ```ruby
@@ -217,9 +226,18 @@ p Ractor.new { C.s }.value
 ```
 
 This aborts Rails' Action Pack suite at `ControllerInstanceTests#test_action_methods_is_ractor_safe_by_default`
-(`AbstractController::Base.action_methods` memoizes a frozen `Set`). The message comes from `gc.c`. The likely
-origin is [`f0439cdfa7`](https://github.com/ruby/ruby/commit/f0439cdfa7) "Remove VM lock from
-Ractor.make_shareable()" (2026-10-06); not bisected.
+(`AbstractController::Base.action_methods` memoizes a frozen `Set`).
+
+Bisected with `miniruby`: [`e8964f3aa3`](https://github.com/ruby/ruby/commit/e8964f3aa3) is good and its child
+[`f0439cdfa7`](https://github.com/ruby/ruby/commit/f0439cdfa7) "Remove VM lock from Ractor.make_shareable()"
+([ruby/ruby#19145](https://github.com/ruby/ruby/pull/19145), merged 2026-10-06) is the first bad commit. Master
+`0c404b09a0` (2026-11-03) still crashes. It is already reported as
+[Bug #22419](https://bugs.ruby-lang.org/issues/22419) (yahonda, 2026-10-08, from Rails nightly CI, same
+bisect, assigned to the ractor group; #22497 was closed as its duplicate). ko1's draft fix
+[ruby/ruby#19447](https://github.com/ruby/ruby/pull/19447) "Only the owner Ractor makes its objects shareable"
+(head `8ef1b2c0e5`, two open review comments from jhawthorn) merges cleanly onto master. With it, both repros
+pass, the Rails test passes, the full Action Pack suite with its Ractor tests passes (4,745 runs, 0 failures,
+0 errors), and `test/ruby/test_ractor.rb` passes (86 tests).
 
 ## Draft comments
 
