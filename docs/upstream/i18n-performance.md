@@ -21,10 +21,10 @@ together: 1,628 runs.
 
 | # | Branch @ SHA | Per call | Census (10 apps, interpreter / YJIT) |
 | --- | --- | --- | --- |
-| **C1** | [`thomasklemm/fallback-options-without-merge-kwargs`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-options-without-merge-kwargs) [`38dc6cff84`](https://github.com/thomasklemm/i18n/commit/38dc6cff841b81be46d6b4ccf29a25c7fc3b0824) | −1 object per translation (`t(:hello)` 13 → 12); −4.3% instructions | **−47.3 / −47.3 objects per workload, 0.38% of all allocations, 10 of 10 apps**; A/A −0.5 / +0.0 |
+| **C1** | [`thomasklemm/fallback-options-without-merge-kwargs`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-options-without-merge-kwargs) [`0ff39e7cbf`](https://github.com/thomasklemm/i18n/commit/0ff39e7cbfccdf4b4cdaa65aabdfaa6527836ae6) | −1 object per translation (`t(:hello)` 13 → 12); −3.7% instructions | **−47.3 / −47.3 objects per workload, 0.38% of all allocations, 10 of 10 apps**; A/A −0.5 / +0.0 |
 | C2 | [`thomasklemm/resolve-symbols-without-merge`](https://github.com/thomasklemm/i18n/tree/thomasklemm/resolve-symbols-without-merge) [`3bef11d6e3`](https://github.com/thomasklemm/i18n/commit/3bef11d6e3d174a1666fa5c73ed57b6159c08e25) | −2 per Symbol default, −5 per Symbol link; `full_messages` (2 errors) 527 → 499 | −2.5 / −2.0, 4 / 3 apps (Blog −17.2) |
 | C3 | [`thomasklemm/lookup-symbol-miss`](https://github.com/thomasklemm/i18n/tree/thomasklemm/lookup-symbol-miss) [`b82af9eeae`](https://github.com/thomasklemm/i18n/commit/b82af9eeae49d8fd0d018c3494fca37fa5229bc7) | −1 String per missing key segment; `full_messages` 527 → 509 | −2.3 / −1.7, 5 apps (Blog −13.2) |
-| **C4** | [`thomasklemm/fiber-storage-check-once`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fiber-storage-check-once) [`dd3d1e05f6`](https://github.com/thomasklemm/i18n/commit/dd3d1e05f6f32fa29555881cd93c579e0bdab203) | CPU only: −4.1% instructions per `t(:hello)`, −2.9% to −3.6% on the other cases | no allocation change, as expected (i18n lines −0.5 / +0.0, the same as the A/A) |
+| **C4** | [`thomasklemm/fiber-storage-check-once`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fiber-storage-check-once) [`0b55237840`](https://github.com/thomasklemm/i18n/commit/0b552378da4401908539c28ddffdd832a6d22944) | CPU only: −3.3% instructions per `t(:hello)`, −2.3% to −2.8% on the other cases | no allocation change, as expected (i18n lines −0.5 / +0.0, the same as the A/A) |
 
 C1 is the census lead `fallbacks.rb:54`, the largest gem site. C4 is the largest CPU item that can be made exact
 cheaply. C2 and C3 are exact, but they only matter on paths that miss or resolve Symbols, such as validation messages,
@@ -66,11 +66,15 @@ With #763 and #764 open, the three-PR limit leaves one slot, so **C1 is next**.
 
 | Case | master | A/A | C1 | C2 | C3 | C4 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `t(:hello)` | 53,783 | 53,828 | 51,489 (−4.3%) | 53,819 | 53,848 | 51,569 (−4.1%) |
-| `t(:greet, name:)` | 81,020 | 81,112 | 79,779 (−1.5%) | 81,121 | 81,004 | 78,529 (−3.1%) |
-| `human_attribute_name` miss | 135,755 | 135,925 | 134,953 (−0.6%) | 134,678 (−0.8%) | 135,123 (−0.5%) | 131,746 (−3.0%) |
-| `t(:link)` (Symbol link) | 111,562 | 111,628 | 109,069 (−2.2%) | 107,478 (−3.7%) | 111,706 | 107,522 (−3.6%) |
-| String default, missing key | 73,731 | 73,796 | 72,676 (−1.4%) | 73,680 | 72,751 (−1.3%) | 71,595 (−2.9%) |
+| `t(:hello)` | 53,783 | 53,828 | 51,794 (−3.7%) | 53,819 | 53,848 | 52,016 (−3.3%) |
+| `t(:greet, name:)` | 81,020 | 81,112 | 80,054 (−1.2%) | 81,121 | 81,004 | 78,874 (−2.7%) |
+| `human_attribute_name` miss | 135,755 | 135,925 | 135,600 (−0.1%) | 134,678 (−0.8%) | 135,123 (−0.5%) | 132,267 (−2.6%) |
+| `t(:link)` (Symbol link) | 111,562 | 111,628 | 109,635 (−1.7%) | 107,478 (−3.7%) | 111,706 | 108,454 (−2.8%) |
+| String default, missing key | 73,731 | 73,796 | 72,839 (−1.3%) | 73,680 | 72,751 (−1.3%) | 72,075 (−2.3%) |
+
+C1 and C4 are at the reworked SHAs (`0ff39e7cbf`, `0b55237840`), measured in a later batch against master again
+(53,811 / 81,039 / 135,751 / 111,570 / 73,772, A/A within 0.4%); the percentages are against that batch. The combined
+row and the wall times below are from the first SHAs.
 
 All four candidates together with I1, I2 and #758: `t(:hello)` 53,783 → 47,436 instructions (−11.8%) and
 `t(:greet, name:)` 81,020 → 74,494 (−8.1%).
@@ -163,21 +167,31 @@ Each is one keyword Hash per hop, required by the keyword signatures.
 
 `Fallbacks#translate` copies the options with `options.merge(:fallback_in_progress => true, fallback_original_locale:
 locale)`. The two keywords become a Hash, and `merge` copies the options into a second Hash. The candidate copies with
-`options.merge` (no arguments) and then stores the two keys.
+`options.merge` (no arguments) and then stores the two keys. It does that only for a plain Hash
+(`options.instance_of?(Hash)`, which is what `I18n.t` passes); Hash subclasses keep the original `merge` with keywords.
 
 **Exactness.** I compared the old and new form on plain, frozen, empty, defaulted, `default_proc`, `compare_by_identity`,
 instance-variable and subclass Hashes, and on Hashes that already have `false` flags. Class, contents, key order,
 default, default proc, identity and frozenness are all the same. `options.dup` would also save the object, but it calls
 `initialize_copy` on Hash subclasses, which `merge` does not. That is why the candidate uses `merge`.
 
+The review of the first version (`38dc6cff84`) found three subclass differences, all reproduced on Ruby 4.0.7: a
+subclass's own `[]=` was now called, a one-parameter `merge(other)` override raised ArgumentError, and a zero-argument
+`merge` returning `self` mutated the caller's options. The `instance_of?(Hash)` guard sends every subclass through the
+old call, so all three behave as on master. Accepted: a prepend or redefinition on `Hash` itself (core method
+redefinition, as for #764).
+
 **Test.** A recording module sits between `Fallbacks` and `Simple`. It checks four things: the first fallback receives
 `{…, fallback_original_locale:, fallback_in_progress: true}` in the old key order, every fallback sees the requested
-locale, and frozen caller options stay unchanged. The test is a guard, so it also passes on master.
+locale, and frozen caller options stay unchanged. The test is a guard, so it also passes on master. A second test
+passes a Hash subclass that records `[]=`: no key is stored through it and the caller's options stay unchanged. It fails
+on `38dc6cff84` and passes on master.
 
-Suite: 1,608 runs, 0 failures.
+Suite: 1,609 runs, 0 failures.
 
 **Numbers.** −1 object on every translation that goes through Fallbacks, and −2 on `l`, which translates twice.
-Instructions: −4.3% on `t(:hello)`. Census:
+Instructions: −3.7% on `t(:hello)` (the guard costs about 300). Census, rerun at `0ff39e7cbf` (`c1b`, identical per app
+to the first run):
 
 | App | i18n objects/op | C1 | A/A |
 | --- | ---: | ---: | ---: |
@@ -233,23 +247,29 @@ retry is the same key, and `to_s` allocates a String. The candidate returns `nil
 **Numbers.** −1 per missing segment: the fallback miss 21 → 20, String default 23 → 22, `full_messages` 527 → 509,
 `errors.add` 181 → 174. Instructions: −1.3% on a String default miss. Census: −2.3 / −1.7 objects per workload in 5 apps (Blog −13.2, PingCRM −2.5, Casa −2.3, CodeTriage −0.9; Sure −7.8 in the interpreter is within its A/A of −6.7), against an A/A of −0.5 / +0.0.
 
-### C4: check for Fiber storage once on Rubies that have it
+### C4: check for Fiber storage once in `I18n.config` on Rubies that have it
 
 Since #731 and #739, `I18n.config`, `writable_config`, `config=`, `I18n.fallbacks`, `fallbacks=` and the middleware
 check `Fiber.respond_to?(:[])` on every call. That check keeps 1.15.2 working on Ruby 3.1 and JRuby 9.4, which lack
 `Fiber[]`. A translation reads `config` about five times and `fallbacks` once. The candidate records `FIBER_STORAGE =
-Fiber.respond_to?(:[])` when i18n loads, as a private constant, and tests `FIBER_STORAGE || Fiber.respond_to?(:[])`.
+Fiber.respond_to?(:[])` when i18n loads, as a private constant, and tests `FIBER_STORAGE || Fiber.respond_to?(:[])` in
+`config`, `writable_config` and `config=`. `fallbacks.rb` and `middleware.rb` keep their own dynamic check: the first
+version (`dd3d1e05f6`) used the constant there too, and a process that requires `i18n/backend/fallbacks` without `i18n`
+raised `NameError: uninitialized constant FIBER_STORAGE` from `I18n.fallbacks=` (review P3, reproduced).
 
 **Exactness.** On Ruby 3.2+, `Fiber[]` is core and stays defined. On Rubies without it, every call still checks, so a
 `Fiber[]` that something defines later is used as before (for example the `fiber-storage` gem, if it is loaded after
-i18n). The only difference would come from removing `Fiber.[]` at runtime on 3.2+.
+i18n). Accepted, as core method removal or redefinition: removing `Fiber.[]` or making it private after load, or
+overriding `Fiber.respond_to?` (per thread).
 
 **Test.** The test stubs `FIBER_STORAGE` to `false` on a Ruby with `Fiber[]` and checks that `I18n.locale=` still writes
-to Fiber storage. It fails on the constant-only variant. Suite: 1,608 runs, 0 failures.
+to Fiber storage. It fails on the constant-only variant. A fresh-process test requires only `i18n/backend/fallbacks`
+and sets `I18n.fallbacks`; it fails on `dd3d1e05f6` with the NameError. Suite: 1,609 runs, 0 failures.
 
-**Numbers.** No allocation change. Instructions: −4.1% on `t(:hello)`, −3.1% on interpolation, and −2.9% to −3.6% on
-the default, link and miss cases, against an A/A of ≤0.3%. The census measures allocations only, so it can't show C4.
-Its census run confirms that the allocations don't change: i18n's own lines move −0.5 / +0.0, the same as the A/A.
+**Numbers.** No allocation change. Instructions: −3.3% on `t(:hello)`, −2.7% on interpolation, and −2.3% to −2.8% on
+the default, link and miss cases (the first version, which also covered `I18n.fallbacks`, was −4.1%), against an A/A of ≤0.3%. The census measures allocations only, so it can't show C4.
+Its census runs (`c4`, and `c4b` at `0b55237840`) confirm that the allocations don't change: i18n's own lines move
+−0.5 / +0.0 in both, the same as the A/A.
 The total over all lines moves +14.6 / +26.6, which is the apps' own run-to-run swing (mostly Loomio, which also moves
 +54 to +80 in C2 and C3).
 
@@ -303,9 +323,10 @@ The total over all lines moves +14.6 / +26.6, which is the apps' own run-to-run 
 `options.merge(:fallback_in_progress => true, fallback_original_locale: locale)`. The two keywords are collected into a
 Hash first, so every translation through Fallbacks allocates two Hashes here.
 
-This copies the options with `options.merge` and stores the two keys. The copy is the same Hash as before: same class,
-default, `compare_by_identity` and key order. It is one allocation less per translation (`dup` would call
-`initialize_copy` on Hash subclasses, which `merge` does not).
+For a plain Hash, which is what `I18n.t` passes, this copies the options with `options.merge` and stores the two keys.
+The copy is the same Hash as before: same class, default, `compare_by_identity` and key order. It is one allocation
+less per translation. Hash subclasses keep the merge with keywords, so their own `merge` and `[]=` are called exactly
+as before.
 
 #### Benchmark
 
@@ -318,26 +339,28 @@ I18n.t(:greet, name:)              21  ->  20
 I18n.l(time)                       52  ->  49
 ```
 
-Instructions per `I18n.t(:hello)` (Callgrind): 53,783 → 51,489 (−4.3%; master against itself differs by under 0.3%).
+Instructions per `I18n.t(:hello)` (Callgrind): 53,811 → 51,794 (−3.7%; master against itself differs by under 0.4%).
 Across 10 open-source Rails apps (111 request, job and mailer workloads), this removes 0.38% of all allocated objects,
 and every app that translates gains.
 
 #### Testing
 
 Added a test that the fallback lookups receive the options with both keys, in the same order, without changing the
-caller's options. The test suite passes (1,608 runs).
+caller's options, and one that a Hash subclass's own `[]=` is not called. The test suite passes (1,609 runs).
 
 ### C4
 
 #### Summary
 
-Since #731/#739, `I18n.config` and `I18n.fallbacks` check `Fiber.respond_to?(:[])` on every call, so that Rubies
-without Fiber storage (3.1, JRuby 9.4) keep using thread variables. A translation reads the config about five times,
-so this check is about 4% of the instructions of a simple `I18n.t`.
+Since #731/#739, `I18n.config` checks `Fiber.respond_to?(:[])` on every call, so that Rubies without Fiber storage
+(3.1, JRuby 9.4) keep using thread variables. A translation reads the config about five times, so this check is about
+3% of the instructions of a simple `I18n.t`.
 
-This records whether `Fiber[]` existed when i18n loaded and only checks again when it didn't. `Fiber[]` is core from
+This records in `I18n.config` whether `Fiber[]` existed when i18n loaded and only checks again when it didn't. `Fiber[]` is core from
 Ruby 3.2 and can't go away there. On Rubies without it, every call still checks, so a `Fiber[]` defined later (for
-example by the fiber-storage gem) is still picked up.
+example by the fiber-storage gem) is still picked up. Only removing or redefining `Fiber.[]` or `Fiber.respond_to?`
+after load would behave differently. `I18n.fallbacks` and the middleware keep their own check, so
+`require "i18n/backend/fallbacks"` still works on its own.
 
 #### Benchmark
 
@@ -345,15 +368,15 @@ Ruby 4.0.7, instructions per call (Callgrind, `I18n::Backend::Fallbacks` include
 
 ```
                                 before     after
-I18n.t(:hello)                  53,783    51,569   (-4.1%)
-I18n.t(:greet, name:)           81,020    78,529   (-3.1%)
-I18n.t(:missing, default: "x")  73,731    71,595   (-2.9%)
+I18n.t(:hello)                  53,811    52,016   (-3.3%)
+I18n.t(:greet, name:)           81,039    78,874   (-2.7%)
+I18n.t(:missing, default: "x")  73,772    72,075   (-2.3%)
 ```
 
 #### Testing
 
-Added a test that Fiber storage is still used when it becomes available after i18n is loaded. The test suite passes
-(1,608 runs).
+Added a test that Fiber storage is still used when it becomes available after i18n is loaded, and one that
+`I18n.fallbacks=` works when only the fallbacks backend is required. The test suite passes (1,609 runs).
 
 ### C2
 
