@@ -13,6 +13,92 @@ Results are allocation counts only. No timing is inferred from them. Speed claim
 `script/census watch` reruns the census daily at current rails/rails `main` against the last recorded `main`. It
 attributes new allocations and SQL or behavior-control diffs to commits: [rails-main-watch](rails-main-watch/README.md).
 
+## Run it on your own app
+
+The census runs only apps registered in this repository: each has a pinned source, a dependency overlay, an entry
+in `script/census`, a data preparation step and a workload list. There is no option that points it at an app
+directory outside the repo. Running your app therefore means adding it in a local checkout, as below. Start with
+the Blog to check the setup.
+
+**Requirements.** Git, network access, [mise](https://mise.jdx.dev) with Ruby 4.0.7 (`mise.toml`; the script runs
+under `mise exec --` or any Ruby on `PATH`, and `--ruby` picks the Ruby that measures), the app's own build tools
+(bun, npm, yarn, pnpm), and its services as local disposable instances (see [Services and apps](#services-and-apps)).
+`gh` is needed only for `prs`. Unset every `*DATABASE_URL` variable first; `script/census` refuses to run with one.
+A `--corpus` name must start with `census`, because the harness only boots copies under `.corpus/census*-APP`.
+
+**Try it on the Blog** (SQLite, no services; setup takes a few minutes, a run under a minute):
+
+```sh
+mise exec -- script/census setup --rails main --apps blog
+mise exec -- script/census run --label base --aa --apps blog --modes interp,yjit
+mise exec -- script/census rank --label base2
+mise exec -- script/census compare --base base2 --aa base
+```
+
+`setup` fetches the app into `.corpus/census-blog`, applies its overlay, moves Rails to the resolved commit,
+creates and seeds the database, builds assets and finishes with `list`, which runs every workload three times:
+
+```text
+html     GET articles                             ok (25 ms for 3)
+...
+job      perform Turbo::Streams::ActionBroadcastJob ok (5 ms for 3)
+```
+
+`run --aa` measures the same tree twice, as labels `base` and `base2`, writing `LABEL/APP-MODE.json` under
+`.lowrail/private/census` (see [Outputs](#outputs)). For each workload, `gc_enabled_objects_per_op` holds the three
+measured windows (the median is the census value) and `sites` lists the objects allocated per operation by file and
+line (`RAILS/…`, `APP/…`, `GEM/…`, `RUBY/…`).
+
+`rank` lists Rails lines, one per row: rank, file and line, the number of apps that reach the line, the share of
+workloads it reaches, the mean objects per operation over every workload, the kinds of workload it runs in and its
+main classes ([How ranking works](#how-ranking-works)). The full ranking goes to `rank-LABEL-MODE.tsv`. With one app
+every line is in the same tier, so the order is by mean objects.
+
+`compare` prints the A/A pair first. This output is from Rails main `1105756f42` on 2026-11-03:
+
+```text
+-- A/A control (base2 - base): the noise floor for every comparison below
+== base2 vs base
+blog-interpreter               moved  4/10 median   +0.0 min  -190.0 |
+blog-yjit                      moved  1/10 median   +0.0 min    -3.2 |
+ALL interpreter workloads  10  median  +0.0  moved<=-1:   4  moved>=+1:   1
+ALL yjit        workloads  10  median  +0.0  moved<=-1:   1  moved>=+1:   2
+SQL interpreter workloads  10  changed SQL:   0
+SQL yjit        workloads  10  changed SQL:   0
+```
+
+`moved` counts workloads whose median objects per operation fell by at least one, `median` and `min` are the
+per-workload deltas, and `SQL` counts workloads whose masked SQL digest changed. Two runs of the same tree are not
+identical: here one Blog write workload moved by −190 objects. A change is judged against these A/A counts, never by
+a single workload ([the A/A rule](#comparing-branches-and-the-aa-rule)). To measure a Rails branch, run it under a
+new label and compare it against `base2`:
+
+```sh
+mise exec -- script/census run --label mine --apps blog --rails OWNER/rails@BRANCH
+mise exec -- script/census compare --base base2 --aa base mine
+```
+
+**Adding an app.** Five pieces, each following an existing app. [Thinkroom](https://github.com/kieranklaassen/thinkroom)
+(SQLite, one overlay, a short seed script) is the smallest example.
+
+1. **Source:** a `case` entry in [`script/corpus`](../../script/corpus) with the repository and a pinned commit.
+2. **Overlay:** a patch applied to that commit, for example in
+   [fixtures/corpus/inertia-chatwoot-census](../../fixtures/corpus/inertia-chatwoot-census). It moves the Gemfile
+   and lock to Rails main and `.ruby-version` to 4.0.7, plus any compatibility edit Rails main needs. The Gemfile
+   must keep a `gem "rails", …` line (or its components): that line is what `setup` and `run` swap to another commit.
+3. **Configuration:** an entry in `APPS` in [`script/census`](../../script/census): `source`, `overlay`,
+   `services`, throwaway `env`, and optional `build`, `pre_db`, `db` and `assets: false`.
+4. **Data:** a `prepare` case in [harness.rb](../../bench/upstream/census/harness.rb) that seeds the database
+   deterministically (fixed `srand` and Faker seeds), with the app's own seeds or a seed script.
+5. **Workloads:** a method named after the app (`-` becomes `_`) in `Census4Workloads`, for example in
+   [inertia_chatwoot_workloads.rb](../../bench/upstream/census/inertia_chatwoot_workloads.rb). It returns the
+   operations to measure: requests through the census client, and the jobs and mails they enqueue. Each operation
+   must raise unless it succeeded. Writes must not accumulate state from run to run (the Blog deletes its census
+   comments first and flips an article title between two values), or the A/A pair drifts.
+
+Then `script/census setup --rails main --apps APP` builds the copy and runs `list`. `CENSUS_DEBUG=1` with
+`script/census list --apps APP` prints the exceptions behind a bare 500.
+
 ## Run a round
 
 ```sh
@@ -30,7 +116,7 @@ script/census compare --base base2 --aa base extending              # add --mark
 script/census controls --script bench/upstream/census_5_controls.rb base2 extending
 ```
 
-Common options: `--apps blog,campfire` (default: all ten configurations), `--ruby 4.0.7` (a mise version, installed
+Common options: `--apps blog,campfire` (default: all 23 configurations), `--ruby 4.0.7` (a mise version, installed
 on demand, or a path to a `ruby` binary or its `bin` directory), `--corpus NAME` (copies in `.corpus/NAME-APP`, so
 several bases can coexist), `--out DIR` (default `.lowrail/private/census`), `--jobs N` (apps measured in parallel
 within one mode; counts are per process and unaffected). `script/census list` replays every workload three times
