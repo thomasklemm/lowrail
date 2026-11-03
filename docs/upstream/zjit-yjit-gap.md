@@ -41,7 +41,7 @@ Ranked by size, the leads are (M Ir per iteration, railsbench / lobsters / shipi
 | 14 | `&block` passed to a C method (`Rack::Request#fetch_header`) and other `complex_arg_pass` | 6.8 / 1.8 / 5.3 | 4% / 1% / 1% | in part: `**rest` callees free (#1039 rows 36/43), `&block` parts wait for row 7 ([Lead 14](#lead-14-what-one_or_more_complex_arg_pass-really-costs)) |
 | 4 | protected calls | 14.9 / 4.4 / 10.6 | 8% / 2% / 2% | taken (ours, ruby/ruby#19483) |
 | 5 | `Kernel#send` | 11.3 / 4.7 / 14.3 | 6% / 3% / 2% | taken (tekknolagi, ruby/ruby#19583) |
-| 15 | getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`) | 3.9 / 7.8 / 24.0 | 2% / 4% / 4% | **free** (Shopify/ruby#1099 pattern 3) |
+| 15 | getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`) | ~5.5 / ~6.3 / ~22.8 | 3% / 4% / 4% | in part: attr_reader in final versions free (15a); singleton objects need k0kubun's agreement (15b); stale final-version shapes taken (15c) ([Lead 15](#lead-15-ivar-reads-in-final-versions-and-on-singleton-objects)) |
 | 17 | `throw` from blocks and exception handlers unwind by longjmp and materialize frames | 15.6+ / 5.3+ / 13.2+ | 8% / 3% / 2% | taken (Shopify/ruby#1093, ruby/ruby#18759, ruby/ruby#18244) |
 | 16 | PatchPoint nop padding executed inline | 31.7 / 14.0 / 27.9 | Ir only, not cycles | free, low priority |
 
@@ -717,6 +717,142 @@ series that includes:
 
 The commit messages describe the same mechanism this page measured. Lead 12 is taken. The first check searched
 for CCall and frame terms and missed #1030, because the series is linked by benchmark name.
+
+## Lead 15: ivar reads in final versions and on singleton objects
+
+Follow-up of 2026-11-03, ruby/ruby master `a8b095a07e`, investigation only: nothing was built for upstream and
+nothing was posted. Scratch files are in `~/w/l15` on the orb.
+
+**What a "final version" is.** ZJIT may compile a method several times. When a compiled version is thrown away
+(invalidated) and the method has used up its `--zjit-max-versions` (4), the next version is the last one. ZJIT
+compiles it with a "no side exits" policy: wherever an earlier version would have left JIT code to learn more
+(and recompile), the last one calls a generic C function instead. The counter `getivar_fallback_no_side_exits`
+counts the instance-variable reads that take such a generic call.
+
+**There are two kinds of reads behind the counter, and the stats split them exactly.** Every dynamic ivar read is
+either `rb_ivar_get` or `rb_vm_getinstancevariable`, and `no_side_exits` = (`rb_ivar_get` calls not explained by
+other counters) + (`rb_vm_getinstancevariable` calls). Per iteration, railsbench / lobsters / shipit:
+
+| kind | reads | what ZJIT does | cost per read |
+|---|---:|---|---:|
+| an `attr_reader` call in a final version (`reflection`, `values`, `type_caster`) | 8.0k / 28.6k / 163.0k | Gives up specializing the reader and calls `rb_ivar_get`, which walks the shape tree, even when the object has exactly the shape seen before. | about 105–130 Ir |
+| an `@ivar` read in a final version | 65.9k / 125.0k / 247.7k | Keeps one branch per shape it saw when it profiled; any other shape calls `rb_vm_getinstancevariable`. | about 75 Ir |
+
+YJIT reads the same ivars inline after a shape check, at about 5–10 Ir. At most of these sites it makes no generic
+call; the exceptions include `attribute_types` on model classes (120k on shipit) and `association_instance_get`.
+
+**Why methods end up in their final version.**
+
+1. **Singleton objects.** Since ruby/ruby#19540 (k0kubun, a memory-leak fix), the profiler records an object
+   whose class is its own singleton class (any object that was `extend`ed, for example) as "other". It does not
+   keep its class or shape. Rails' logger is such an object. An `@level` read on it therefore never gets a
+   profiled shape. Each compiled version puts a "no profile, recompile" exit there, the exit fires, and the
+   method soon uses up its versions. The final version then makes a generic call on every read. The repro in
+   Shopify/ruby#1099 shows 9,970 such reads out of 10,000. Measured with `Lg.new.extend(Module.new)`, Ir per
+   call:
+
+   | | ZJIT | YJIT |
+   |---|---:|---:|
+   | send + `@level` read, singleton object | 402 | 313 |
+   | the same object without `extend` | ≈ 0 extra over an empty loop | 45 extra |
+
+   On the singleton object, ZJIT's read alone costs 73 Ir in `rb_vm_getinstancevariable`. YJIT also calls the
+   method generically there, but reads the ivar inline.
+
+   Sites: Logger `level` and `level_override` (26.0k each on railsbench, 2.9k / 5.1k on lobsters / shipit),
+   TaggedLogging `tag_stack` (12.0k on railsbench) and `Logger#add`.
+2. **Everything else** reaches its final version by ordinary invalidations during warm-up, such as shape guards
+   that miss or constants redefined at boot. In the final version, the shapes seen at the first profile are all
+   ZJIT knows, and nothing refreshes them. Sites:
+   * attr_reader calls: `block in fetch_value` (`values`, `types`, `additional_types`), 74.3k on shipit;
+     `BelongsToAssociation#stale_state` (`reflection`), 32.8k / 17.0k; `Arel::Table#type_for_attribute`
+     (`type_caster`) and `TypeCaster::Map#type_for_attribute` (`klass`), 8.3k each; `TableMetadata#type`
+     (`arel_table`), 8.3k.
+   * `@ivar` reads: `assert_modifiable!` (`@loaded || @arel`), 10.3k; `Reflection#klass` (`@klass ||=`), 8.3k;
+     lobsters' comment and layout templates, 15.4k and 5.6k.
+
+**k0kubun's ruby/ruby#19617 does not change this.** That PR lets a final version that a constant change
+invalidated compile again. I applied it on the same master (without its test files) and reran the stats with 512
+/ 1024 MiB (0 out-of-memory errors, 10 measured iterations):
+
+| per iteration | railsbench | lobsters | shipit |
+|---|---|---|---|
+| `getivar_fallback_no_side_exits`, master → #19617 | 73.9k → 73.9k | 153.7k → 153.7k | 410.8k → 423.5k |
+| side exits, master → #19617 | 23.7k → 23.7k | 12.7k → 12.3k | 49.6k → 11.7k |
+
+**Size against YJIT**, counting only reads where YJIT makes no generic call (M Ir per iteration):
+
+| part | railsbench | lobsters | shipit |
+|---|---:|---:|---:|
+| 15a `attr_reader` in a final version | 0.9 | 3.1 | 17.9 |
+| 15b `@ivar` on a singleton object | 4.6 | 0.4 | 0.7 |
+| 15c other `@ivar` reads in a final version | ~0 | ~2.8 | ~4.2 |
+| lead 15 | **~5.5** | **~6.3** | **~22.8** |
+
+The first estimate was 3.9 / 7.8 / 24.0. 15a and 15b are upper bounds: they assume every read would hit a known
+shape. Shopify/ruby#1099 measured that four shapes cover 69% (lobsters) and 87% (shipit) of these reads, and one
+shape covers 100% on railsbench.
+
+**Fixes, smallest first:**
+
+* **15a, attr_reader in a final version.**
+  * **The fix:** in `try_emit_optimized_getivar`, the final-version case returns early and leaves a plain
+    `rb_ivar_get` call. Instead, emit the same shape branch that an `@ivar` read already gets in a final version:
+    compare the object's shape with each profiled shape and load the slot directly, otherwise call
+    `rb_ivar_get` as today.
+  * **Why it is exact:** a shape fixes where each ivar lives, and a miss takes today's path. It has no exit, so
+    it fits the final-version policy.
+  * **Effort:** small, because `dispatch_getivar` already builds this branch.
+  * **Status:** free by our rule. Shopify/ruby#1039 row 78 (`4857dd0ef5`, no assignee) includes it as a ported
+    piece ("Branch on the ivar shape in an attr_reader's final version"). The rest of row 78 is the
+    polymorphic-arm work that lead 11 found taken (tekknolagi's ruby/ruby#18616), so a fix must take only the
+    final-version piece.
+* **15b, singleton objects.**
+  * **The fix:** for ivar instructions, record the shape of a singleton object without keeping its singleton
+    class alive. Ivar reads only need the shape, and a shape id holds no reference to the object.
+  * **Why it is exact:** the read is still guarded by the shape.
+  * **The catch:** it changes the profiling policy of k0kubun's ruby/ruby#19540, and the self profile at these
+    instructions is also used to type `self`. Every consumer of that profile would have to ignore the class of
+    such an entry.
+  * **Effort:** medium.
+  * **Status:** free by our rule (Shopify/ruby#1099 pattern 3, no assignee), but it reverses part of a
+    deliberate design, so it needs k0kubun's agreement first. It is worth 4.6 M on railsbench (about 0.1%).
+* **15c, a stale shape list in a final version.** Let the final version learn new shapes from its slow path, or
+  back the slow path with a per-name shape table. This is version policy and shape-chain-miss work that is already
+  owned:
+  * k0kubun's Shopify/ruby#1031 "Adaptive Compilation" (assigned) asks what policy each version should use;
+  * Shopify/ruby#1039 row 6 (`db956701f2`, assigned to tekknolagi) puts a per-name shape table behind shape-chain
+    misses;
+  * rows 9, 10 and 52 (`8d954d394d`, `77b12926a3`, `47ca4e3255`, no assignee) let a final version earn back
+    missing shapes.
+
+  Treat 15c as taken.
+
+**Ownership check (2026-11-03).**
+
+* **Shopify/ruby issues:** all 126 open issues. I read the assignee of each and searched the bodies for ivar,
+  final version, singleton and `no_side_exits`. That includes the issues that link patch series by benchmark
+  name:
+  * Shopify/ruby#1030, whose ruby-bench items contain no ivar work;
+  * Shopify/ruby#1039, rows 5, 6, 9, 10, 16, 50, 52–54 and 78, of which only rows 5 and 6 have an assignee
+    (tekknolagi);
+  * Shopify/ruby#1093;
+  * the assigned version-policy issues Shopify/ruby#930 and #1031 (k0kubun).
+* **Open ruby/ruby PRs with "ZJIT" in the title (68):**
+  * ivar or shape work: tekknolagi's #19443, #18616 (draft), #18249 "Deduplicate ivar branches" (draft) and
+    #17865 (draft), and our #19558 (sends);
+  * k0kubun's #19617 (final versions after PatchPoint invalidation, measured above);
+  * none of them branches on shapes for an attr_reader in a final version or profiles singleton objects for ivars.
+* **Shopify/ruby#1099** is ours and has no comments.
+
+**Recommendation:**
+
+* **15a** is the one fix worth building: small, exact, and 17.9 M (about 0.45%) on shipit.
+* **15b** needs k0kubun to agree to the profiling change, and under the new rule we don't ask in issues, so park
+  it.
+* **15c** is taken.
+
+No crash, wrong result or divergence turned up.
 
 ## Caveats
 
