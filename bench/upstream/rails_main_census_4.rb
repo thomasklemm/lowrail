@@ -68,8 +68,8 @@ module RailsMainCensus4
     require File.expand_path("config/application")
     mode = ENV.fetch("CENSUS_MODE", "interpreter")
     Rails.application.config.yjit = mode == "yjit"
-    # Writebook enables YJIT itself; hide only that entry point in interpreter mode.
-    manual_enable = RubyVM::YJIT.method(:enable) if name == "writebook" && mode == "interpreter"
+    # Writebook enables YJIT itself; hide only that entry point outside YJIT mode.
+    manual_enable = RubyVM::YJIT.method(:enable) if name == "writebook" && mode != "yjit"
     RubyVM::YJIT.singleton_class.undef_method(:enable) if manual_enable
     begin
       require File.expand_path("config/environment")
@@ -78,7 +78,7 @@ module RailsMainCensus4
     end
     raise "wrong Rails revision" unless Gem.loaded_specs.fetch("railties").full_gem_path.include?(RAILS_PIN[0, 12])
     raise "wrong YJIT mode" unless RubyVM::YJIT.enabled? == (mode == "yjit")
-    raise "unexpected ZJIT" if defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+    raise "wrong ZJIT mode" unless (defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?) == (mode == "zjit")
     Rails.logger.level = :fatal
     ActiveRecord::Base.logger = nil
     # External measurement controls, the same for every app: jobs are captured
@@ -223,11 +223,27 @@ module RailsMainCensus4
     only = ENV["CENSUS_ONLY"]&.split(",")
     ops = ops.select { only.include?(_1.name) } if only
     results = ops.map { |op| measure(op) }
-    result = { app: name, ruby: RUBY_DESCRIPTION, yjit: RubyVM::YJIT.enabled?, rails: RAILS_PIN,
+    result = { app: name, ruby: RUBY_DESCRIPTION, yjit: RubyVM::YJIT.enabled?,
+      zjit: defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?, rails: RAILS_PIN,
       adapter: ActiveRecord::Base.connection_db_config.adapter,
       lock_sha256: Digest::SHA256.file("Gemfile.lock").hexdigest, workloads: results }
     File.write(output, JSON.pretty_generate(result) + "\n")
     puts JSON.generate(result.except(:workloads).merge(workloads: results.map { _1.except(:sites) }))
+  end
+
+  # JIT counters for steady-state workloads (run with --yjit-stats or
+  # --zjit-stats): warm every workload, reset, then run each 20 times.
+  def stats(name, output)
+    raise "fresh output required" if File.exist?(output)
+    jit = RubyVM::YJIT.enabled? ? RubyVM::YJIT : RubyVM::ZJIT
+    raise "run with --yjit-stats or --zjit-stats" unless jit.stats_enabled?
+    ops = workloads(name)
+    ops.each { |op| Integer(ENV.fetch("CENSUS_WARMUP", "50")).times { op.call.call; reset_side_effects } }
+    jit.reset_stats!
+    ops.each { |op| 20.times { op.call.call; reset_side_effects } }
+    stats = jit == RubyVM::YJIT ? jit.runtime_stats : jit.stats
+    File.write(output, JSON.pretty_generate(app: name, ruby: RUBY_DESCRIPTION, jit: jit.name, ops: ops.size * 20,
+      stats: stats.select { |_, v| v.is_a?(Numeric) && v != 0 }) + "\n")
   end
 
   def list(name)
@@ -246,6 +262,7 @@ if $PROGRAM_NAME == __FILE__
   when "prepare" then RailsMainCensus4.prepare(name)
   when "profile" then RailsMainCensus4.profile(name, output)
   when "list" then RailsMainCensus4.list(name)
-  else abort "usage: rails_main_census_4.rb prepare|profile|list APP [NEW_JSON]"
+  when "stats" then RailsMainCensus4.stats(name, output)
+  else abort "usage: rails_main_census_4.rb prepare|profile|stats|list APP [NEW_JSON]"
   end
 end

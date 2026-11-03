@@ -1,0 +1,298 @@
+diff --git a/.ruby-version b/.ruby-version
+index 90cdbdc..ee74734 100644
+--- a/.ruby-version
++++ b/.ruby-version
+@@ -1 +1 @@
+-ruby-4.0.1
++4.1.0
+diff --git a/Gemfile b/Gemfile
+index 7ece949..52ceacc 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -1,7 +1,7 @@
+ source "https://rubygems.org"
+ 
+ # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+-gem "rails", "~> 8.1.4"
++gem "rails", github: "rails/rails", ref: "5810776eecc5b2e50b58e81ee0c26c02c718fdf0"
+ # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
+ gem "propshaft"
+ # Use sqlite3 as the database for Active Record
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 728a7b8..5c63144 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -1,68 +1,69 @@
+-GEM
+-  remote: https://rubygems.org/
++GIT
++  remote: https://github.com/rails/rails.git
++  revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
++  ref: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+   specs:
+-    action_text-trix (2.1.19)
+-      railties
+-    actioncable (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actioncable (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nio4r (~> 2.0)
+       websocket-driver (>= 0.6.1)
+       zeitwerk (~> 2.6)
+-    actionmailbox (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailbox (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+-    actionmailer (8.1.4)
+-      actionpack (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailer (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+       rails-dom-testing (~> 2.2)
+-    actionpack (8.1.4)
+-      actionview (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionpack (8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nokogiri (>= 1.8.5)
+       rack (>= 2.2.4)
+       rack-session (>= 1.0.1)
+       rack-test (>= 0.6.3)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
++      rails-html-sanitizer (~> 1.7)
+       useragent (~> 0.16)
+-    actiontext (8.1.4)
+-      action_text-trix (~> 2.1.15)
+-      actionpack (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actiontext (8.2.0.alpha)
++      action_text-trix (~> 2.1.16)
++      actionpack (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       globalid (>= 0.6.0)
+       nokogiri (>= 1.8.5)
+-    actionview (8.1.4)
+-      activesupport (= 8.1.4)
++    actionview (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       builder (~> 3.1)
+       erubi (~> 1.11)
++      herb (>= 0.10)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
+-    activejob (8.1.4)
+-      activesupport (= 8.1.4)
+-      globalid (>= 0.3.6)
+-    activemodel (8.1.4)
+-      activesupport (= 8.1.4)
+-    activerecord (8.1.4)
+-      activemodel (= 8.1.4)
+-      activesupport (= 8.1.4)
++      rails-html-sanitizer (~> 1.7)
++    activejob (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      globalid (>= 1.4.0)
++    activemodel (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++    activerecord (8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       timeout (>= 0.4.0)
+-    activestorage (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      marcel (~> 1.0)
+-    activesupport (8.1.4)
++    activestorage (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      marcel (~> 2.0)
++    activesupport (8.2.0.alpha)
+       base64
+       bigdecimal
+       concurrent-ruby (~> 1.0, >= 1.3.1)
+@@ -72,9 +73,40 @@ GEM
+       json
+       logger (>= 1.4.2)
+       minitest (>= 5.1)
++      psych (>= 4)
++      ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+       tzinfo (~> 2.0, >= 2.0.5)
+       uri (>= 0.13.1)
++    rails (8.2.0.alpha)
++      actioncable (= 8.2.0.alpha)
++      actionmailbox (= 8.2.0.alpha)
++      actionmailer (= 8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actiontext (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      bundler (>= 1.15.0)
++      railties (= 8.2.0.alpha)
++    railties (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      irb (~> 1.13)
++      rackup (>= 1.0.0)
++      rake (>= 12.2)
++      thor (~> 1.0, >= 1.2.2)
++      tsort (>= 0.2)
++      zeitwerk (~> 2.6)
++
++GEM
++  remote: https://rubygems.org/
++  specs:
++    action_text-trix (2.1.19)
++      railties
+     addressable (2.9.0)
+       public_suffix (>= 2.0.2, < 8.0)
+     ast (2.4.3)
+@@ -127,6 +159,14 @@ GEM
+       raabro (~> 1.4)
+     globalid (1.4.0)
+       activesupport (>= 6.1)
++    herb (0.11.1)
++    herb (0.11.1-aarch64-linux-gnu)
++    herb (0.11.1-aarch64-linux-musl)
++    herb (0.11.1-arm-linux-gnu)
++    herb (0.11.1-arm-linux-musl)
++    herb (0.11.1-arm64-darwin)
++    herb (0.11.1-x86_64-linux-gnu)
++    herb (0.11.1-x86_64-linux-musl)
+     i18n (1.15.2)
+       concurrent-ruby (~> 1.0)
+     inertia_rails (3.22.0)
+@@ -170,9 +210,10 @@ GEM
+       net-imap
+       net-pop
+       net-smtp
+-    marcel (1.2.1)
++    marcel (2.1.0)
+     matrix (0.4.3)
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -192,6 +233,9 @@ GEM
+       net-protocol
+     net-ssh (7.3.3)
+     nio4r (2.7.5)
++    nokogiri (1.19.4)
++      mini_portile2 (~> 2.8.2)
++      racc (~> 1.4)
+     nokogiri (1.19.4-aarch64-linux-gnu)
+       racc (~> 1.4)
+     nokogiri (1.19.4-aarch64-linux-musl)
+@@ -219,6 +263,9 @@ GEM
+       actionpack (>= 7.0.0)
+       activesupport (>= 7.0.0)
+       rack
++    psych (5.5.0)
++      date
++      stringio
+     public_suffix (7.0.5)
+     puma (8.0.2)
+       nio4r (~> 2.0)
+@@ -232,20 +279,7 @@ GEM
+       rack (>= 1.3)
+     rackup (2.3.1)
+       rack (>= 3)
+-    rails (8.1.4)
+-      actioncable (= 8.1.4)
+-      actionmailbox (= 8.1.4)
+-      actionmailer (= 8.1.4)
+-      actionpack (= 8.1.4)
+-      actiontext (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activemodel (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      bundler (>= 1.15.0)
+-      railties (= 8.1.4)
++    ractor-dispatch (0.3.0)
+     rails-dom-testing (2.3.0)
+       activesupport (>= 5.0.0)
+       minitest
+@@ -255,15 +289,6 @@ GEM
+       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
+     rails_vite (0.2.3)
+       railties (>= 7.0)
+-    railties (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      irb (~> 1.13)
+-      rackup (>= 1.0.0)
+-      rake (>= 12.2)
+-      thor (~> 1.0, >= 1.2.2)
+-      tsort (>= 0.2)
+-      zeitwerk (~> 2.6)
+     rainbow (3.1.1)
+     rake (13.4.2)
+     rbs (4.2.0)
+@@ -349,6 +374,8 @@ GEM
+       fugit (~> 1.11)
+       railties (>= 7.1)
+       thor (>= 1.3.1)
++    sqlite3 (2.9.6)
++      mini_portile2 (~> 2.8.0)
+     sqlite3 (2.9.6-aarch64-linux-gnu)
+     sqlite3 (2.9.6-aarch64-linux-musl)
+     sqlite3 (2.9.6-arm-linux-gnu)
+@@ -363,6 +390,7 @@ GEM
+       net-sftp (>= 2.1.2)
+       net-ssh (>= 2.8.0)
+       ostruct
++    stringio (3.2.0)
+     thor (1.5.0)
+     thruster (0.1.26)
+     thruster (0.1.26-aarch64-linux)
+@@ -419,7 +447,7 @@ DEPENDENCIES
+   letter_opener
+   propshaft
+   puma (>= 5.0)
+-  rails (~> 8.1.4)
++  rails!
+   rails_vite
+   rspec-rails (~> 8.0)
+   rubocop-rails-omakase
+@@ -434,4 +462,4 @@ DEPENDENCIES
+   web-console
+ 
+ BUNDLED WITH
+-  4.0.3
++  4.1.0.beta3
