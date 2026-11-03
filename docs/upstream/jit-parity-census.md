@@ -7,13 +7,15 @@ interpreter) were attributed to source lines and ranked by apps and workloads re
 **On master, YJIT allocates 15 to 17 more objects than the interpreter in the median workload, and ZJIT 6 to 7
 more.** Four exact changes account for all of YJIT's Rails-side difference. Together they leave the median YJIT
 workload one object *below* the interpreter. One is the already-open #19655; three are new YJIT fixes, each one
-commit on master in the fork. No PR is open for the three new ones.
+commit on master in the fork. After Codex Astra reviews, A is open as
+[#19664](https://github.com/ruby/ruby/pull/19664) and B as [#19665](https://github.com/ruby/ruby/pull/19665)
+(2026-11-03); C is reviewed and waiting to be opened. See [Review rounds](#review-rounds).
 
 | # | Branch | Commit | Pattern (Rails site) | YJIT per call, interp / master / fix | ruby-bench YJIT allocations |
 | --- | --- | --- | --- | --- | --- |
-| A | [`thomasklemm/yjit-splat-rest-subseq`](https://github.com/thomasklemm/ruby/tree/thomasklemm/yjit-splat-rest-subseq) | [`d531b19421`](https://github.com/thomasklemm/ruby/commit/d531b19421621777ef3a4767917771439903c28f) | splat into lead + rest: every `where(...)` → `where!(opts, *rest)` (`query_methods.rb:1284`) | `where(h)` 2 / 3 / 2 | railsbench −0.07%, lobsters −0.10%, shipit −0.13% |
-| B | [`thomasklemm/yjit-objtostring-fixnum-module`](https://github.com/thomasklemm/ruby/tree/thomasklemm/yjit-objtostring-fixnum-module) | [`623e39a1f7`](https://github.com/thomasklemm/ruby/commit/623e39a1f7b5f357126f7c2c65ce35f8459f8cd0) | interpolating an Integer or Module: `"#{self} Update"`/`"#{self} Create"` (`persistence.rb:236/229`), `"t#{i}_r#{j}"` (`join_dependency.rb:188`) | `"t#{i}_r#{j}"` 1 / 3 / 1, `"#{klass} Update"` 1 / 2 / 1 | shipit −0.21%, lobsters −0.03%, railsbench 0.00% |
-| C | [`thomasklemm/yjit-splat-rest-reuse`](https://github.com/thomasklemm/ruby/tree/thomasklemm/yjit-splat-rest-reuse) | [`e999828fc6`](https://github.com/thomasklemm/ruby/commit/e999828fc684c90761bba478eb70513d57593a96) | splat the rest parameter can own: `def process_action(*) = super` chain (`params_wrapper.rb:264`, `instrumentation.rb:74`), `touch_later(*)` (`optimistic.rb:72`), `f(*a, b)` | controller `process_action` chain 2 / 5 / 3 (2 with #19655) | railsbench −0.23%, lobsters −0.03%, shipit −0.01% |
+| A | [`thomasklemm/yjit-splat-rest-subseq`](https://github.com/thomasklemm/ruby/tree/thomasklemm/yjit-splat-rest-subseq) | [`d531b19421`](https://github.com/thomasklemm/ruby/commit/d531b19421621777ef3a4767917771439903c28f), [#19664](https://github.com/ruby/ruby/pull/19664) | splat into lead + rest: every `where(...)` → `where!(opts, *rest)` (`query_methods.rb:1284`) | `where(h)` 2 / 3 / 2 | railsbench −0.07%, lobsters −0.10%, shipit −0.13% |
+| B | [`thomasklemm/yjit-objtostring-fixnum-module`](https://github.com/thomasklemm/ruby/tree/thomasklemm/yjit-objtostring-fixnum-module) | [`89472a2a77`](https://github.com/thomasklemm/ruby/commit/89472a2a771790112feef19127862e714b4b769c), [#19665](https://github.com/ruby/ruby/pull/19665) | interpolating an Integer or Module: `"#{self} Update"`/`"#{self} Create"` (`persistence.rb:236/229`), `"t#{i}_r#{j}"` (`join_dependency.rb:188`) | `"t#{i}_r#{j}"` 1 / 3 / 1, `"#{klass} Update"` 1 / 2 / 1 | shipit −0.21%, lobsters −0.03%, railsbench 0.00% |
+| C | [`thomasklemm/yjit-splat-rest-reuse`](https://github.com/thomasklemm/ruby/tree/thomasklemm/yjit-splat-rest-reuse) | [`70b8e23a8f`](https://github.com/thomasklemm/ruby/commit/70b8e23a8f64e4c435874584d12136308df07519) | splat the rest parameter can own: `def process_action(*) = super` chain (`params_wrapper.rb:264`, `instrumentation.rb:74`), `touch_later(*)` (`optimistic.rb:72`), `f(*a, b)` | controller `process_action` chain 2 / 5 / 3 (2 with #19655) | railsbench −0.23%, lobsters −0.03%, shipit −0.01% |
 | — | open [#19655](https://github.com/ruby/ruby/pull/19655) | `3db46445ca` | empty anonymous rest: `Relation.create(model, ...)` (`core.rb:481`), `SQLString#initialize(*)` (Arel collectors, `abstract_adapter.rb:1426/1432`), `capture(*, **, &)` | `Post.connection.send(:collector)` lead | railsbench −0.12%, lobsters −0.55%, shipit −1.10% |
 
 All four stacked: railsbench **−0.42%**, lobsters **−0.71%**, shipit **−1.45%** objects per iteration, against an
@@ -167,18 +169,34 @@ mutation of the rest not reaching the caller's array, and a 20-element heap arra
 in two cases. In the first, the caller built the array for this call (`VM_CALL_ARGS_SPLAT_MUT`, as in
 `f(*a, b)`). In the second, an anonymous rest parameter receives exactly the splat elements, with no optional or
 post parameters, no keywords and no `ruby2_keywords`, and can only pass them on as a splat. YJIT duplicated in
-both cases. The fix mirrors the same conditions; the keyword cases are already refused before this point.
+both cases. The fix mirrors the same conditions. A kwsplat reaching this point is always `**nil` (YJIT exits on
+any other), so `f(*a, **nil)` reuses the array too, as vm_args.c does. A `**nil` method called without a kwsplat
+still copies, like the interpreter.
 
 Rails' controller stack forwards every action through `def process_action(*) = super`
 (ParamsWrapper → Instrumentation, with `super` inside the instrumentation block → Rescue → Rendering →
 `AbstractController::Base#process_action(...)`). Without Rails, that chain allocates 2 objects in the interpreter,
 5 in YJIT, 3 with C, 4 with #19655, and 2 with both.
 
-Tests: `test_splat_to_rest_without_dup`: allocations for an anonymous rest receiving a splat (0), a fresh
-`f(*a, 3)` array (1), `forward(*a)` from an anonymous into a named rest (1) and a plain named-rest splat (1).
-Ownership checks: a callee appending to its rest does not change the caller's array, including the prepend and
-`SPLAT_MUT` paths, and a `SubArray` forwarded through an anonymous rest arrives as an `Array` in a named rest. It
-fails on master with `[1, 2, 2, 1]`.
+Tests, split after the second review:
+
+* `test_splat_to_rest_without_dup` requires compiled calls: no side exits and `no_send_fallbacks`. That way a
+  case cannot pass by falling back to the interpreter, which also allocates 0. It reads the allocation counter in
+  a straight line, because one `yield` site would go megamorphic. Allocations:
+  * an anonymous rest receiving a plain, frozen or `**nil` splat: 0;
+  * a `**nil` method called with `**nil`: 0;
+  * `f(*a, 3)`, an anonymous rest forwarded into a named rest, and a leading parameter: 1;
+  * copies kept like the interpreter: a `**nil` method called without a kwsplat 1, an optional parameter 2,
+    `ruby2_keywords` 2.
+
+  It also checks results: callee mutation doesn't reach the caller's array (prepend and `SPLAT_MUT` paths), frozen
+  splats, a `SubArray` that arrives as an `Array`, and a ruby2_keywords hash that stays the same object. Expected
+  `[0,0,0,0,1,1,1,1,2,2]`. Master gives `[1,1,1,1,2,2,2,1,2,2]`. The pre-review head `e999828fc6`'s codegen gives
+  `[0,0,1,1,…]`.
+* `test_splat_to_rest_with_block_or_flagged_hash` keeps `exits: :any` and checks results and allocations only.
+  It covers the cases YJIT doesn't compile here: block forwarding (`&block`, `yield(*)`) and an incoming
+  ruby2_keywords-flagged hash at the end of the splat (it side-exits in `opt_send_without_block` on master and
+  on C). Passes on both.
 
 The two overlap in one `if` in `gen_send_iseq` and with #19655's `rb_get_iseq_flags_anon_rest` accessor (C adds
 the same function, so whichever lands second drops that hunk). Resolving the overlap is mechanical: the local stack
@@ -189,15 +207,23 @@ uses `reuse_array || non_rest_arg_count < required_num + opt_num`.
 `vm_objtostring` interpolates a Fixnum with `rb_fix_to_s`, which returns a shared frozen String for 0..9, and a
 Module with `rb_mod_name`, when the resolved `to_s` is the original `Integer#to_s`/`Module#to_s`. YJIT specialized
 only Strings and Symbols, so everything else went through `gen_send_general` to a `to_s` that allocates a new
-mutable String. The fix adds a branch guarded like the Symbol case: `jit_guard_known_klass` plus
-`assume_method_basic_definition(class_of(recv), :to_s)`. It calls `rb_fix_to_s` as a leaf call that may allocate,
-or a new `rb_yjit_mod_objtostring` helper (`rb_mod_name`, else `rb_mod_to_s`) as a non-leaf call, since a singleton
-class's `to_s` may call `#inspect`.
+mutable String. The fix adds a branch with `jit_guard_known_klass` plus `assume_expected_cfunc` that `to_s` resolves
+to `rb_int_to_s` (Fixnum) or `rb_mod_to_s` (Module). That is `vm_objtostring`'s `check_cfunc`. The first version
+used `assume_method_basic_definition`, which accepts refined entries because `make_method_entry_refined` keeps
+the basic flag, so `using R` with a refined `Integer#to_s` was skipped (review P1). It calls `rb_fix_to_s` as a
+leaf call that may allocate, or a new `rb_yjit_mod_objtostring` helper (`rb_mod_name`, else `rb_mod_to_s`) as a
+non-leaf call, since a singleton class's `to_s` may call `#inspect`.
 
 Tests: `test_string_interpolation_integer_and_module`: allocations for `"t#{3}_r#{4}"` (1), `"t#{12}_r#{4}"` (2),
 a named class (1) and a module (1). Results for negative and large Integers, an overridden singleton `to_s`, an
 anonymous class and a singleton class, and `Integer#to_s` redefined after compilation. It fails on master with
-`[3, 3, 2, 2]`.
+`[3, 3, 2, 2]`. `test_string_interpolation_refined_to_s` refines `Integer#to_s` and `Module#to_s` and expects
+`["int!","mod!","mod!","7","M"]`. It fails on the pre-review head `623e39a1f7` (`["7","M","#<Class…>","7","M"]`)
+and passes on master and on the branch.
+
+The Symbol branch has the same refinement gap, but it doesn't diverge: `vm_objtostring` also checks Symbol with
+`check_method_basic_definition`, so with a refined `Symbol#to_s` the interpreter, YJIT and ZJIT all print `"a"`.
+That is pre-existing interpreter behaviour and is not changed here.
 
 ### Verification (each branch)
 
@@ -205,6 +231,8 @@ anonymous class and a singleton class, and `Integer#to_s` redefined after compil
   file to show that.
 * `make btest RUN_OPTS=--yjit-call-threshold=1`: PASS all 2,138 tests on A, B and C.
 * `test/ruby/test_yjit.rb`: 151 tests, 0 failures, 1 skip on each branch. YJIT `cargo test --release`: 372 passed.
+  The review heads were rechecked: B `89472a2a77` btest 2,138 PASS, test_yjit 152 tests, 0 failures, cargo 372; C
+  `70b8e23a8f` btest 2,138 PASS, test_yjit 152 tests, 0 failures, 1 skip.
 * The stack (master + #19655 + A + B + C) passes `test/ruby/test_yjit.rb` (154 tests) and runs the whole
   `test/ruby` with `--yjit-call-threshold=1` (11,515 tests). The only failures are
   `TestThread#test_handle_interrupt_masks_sigint`, `TestIO#test_seek` and `#test_seek_symwhence`, which fail the
@@ -247,6 +275,9 @@ Two interleaved rounds, mean per build; master is the mean of `base` and `base2`
 > `#to_s` otherwise, which allocates: `"t#{i}_r#{j}"` allocated three strings instead of one and
 > `"#{klass} Update"` two instead of one.
 >
+> Like `vm_objtostring()`'s `check_cfunc()`, the new branch guards that `#to_s` resolves to `rb_int_to_s()` or
+> `rb_mod_to_s()` with `assume_expected_cfunc`, so a refined or redefined `#to_s` still goes through the send path.
+>
 > Rails interpolates the model class into the name of every insert and update (`"#{self} Update"`) and small
 > integers into join aliases. YJIT objects per iteration: shipit −0.21%, lobsters −0.03%, railsbench unchanged.
 
@@ -255,11 +286,35 @@ Two interleaved rounds, mean per build; master is the mean of `base` and `base2`
 > Like `rest_dupped` in vm_args.c, the interpreter uses a splat array as the rest parameter without a copy when
 > nothing else can reference it: the caller built it for this call (`VM_CALL_ARGS_SPLAT_MUT`, as in
 > `f(*a, b)`), or an anonymous rest parameter receives exactly the splat elements (`def f(*) = g(*)`). YJIT
-> always duplicated the array.
+> always duplicated the array. It now reuses it in the same cases, including `f(*a, **nil)`. It still copies for
+> optional or post parameters, `ruby2_keywords` methods, and `**nil` methods called without a kwsplat; calls that
+> splat with a block argument still use the existing fallback.
 >
 > Rails forwards every controller action through a chain of `def process_action(*) = super`; that chain
 > allocates 5 objects under YJIT and 2 in the interpreter (3 with this change, 2 together with #19655). YJIT
 > objects per iteration: railsbench −0.23%, lobsters −0.03%, shipit −0.01%.
+>
+> This touches the same `if` in `gen_send_iseq` as #19664; whichever lands second resolves it as
+> `reuse_array || non_rest_arg_count < required_num + opt_num`. Independent of #19655.
+
+### Review rounds
+
+Codex Astra reviewed each branch on a correctness and a quality rubric (2026-11-03).
+
+| # | Round 1 | Fix | Round 2 | State |
+| --- | --- | --- | --- | --- |
+| A | approve, approve | — | — | open as [#19664](https://github.com/ruby/ruby/pull/19664), head `d531b19421` |
+| B | request changes (P1, refined `to_s` skipped) | `assume_expected_cfunc` and a refinement test, `623e39a1f7` → `89472a2a77` | approve, approve | open as [#19665](https://github.com/ruby/ruby/pull/19665), head `89472a2a77` |
+| C | approve with nits (test gaps, `**nil`) | tests added, `**nil` reuse, `e999828fc6` → `cbc29b57be` | approve; quality P3: the reuse cases could pass via the interpreter | split into a strict and a permissive test, `70b8e23a8f`; not opened yet |
+
+CI on ruby/ruby, last read 2026-11-03:
+* #19664: two jobs fail. Both are pre-existing on master and unrelated:
+  * SHSTK AMD64 `make check`: 4 `JSONGeneratorTest#test_rfc8785_*` failures, also failing on master run 41522893499.
+  * ModGC mmtk `make check`: "failed to re-disable GC after GC", also failing on master run 41522777008.
+* #19665: no failures so far.
+
+Master moved to `13c3f56bb8` (ZJIT GH-19484) after these heads. That commit doesn't touch `yjit/` or
+`test_yjit.rb`, and A, B and C each merge into it without conflicts.
 
 ## ZJIT remaining
 
