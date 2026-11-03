@@ -53,21 +53,24 @@ Allocation counts only; no timing is inferred ([DECISIONS](../../DECISIONS.md)).
 ## Validation (2026-11-03)
 
 [`validation/58663.md`](validation/58663.md): the watch over the six merges around #58663, from `c1aac32006` to
-`91ea391a11`, as if run on 2026-09-15. Ruby 4.0.7, ten configurations, both modes; 10 minutes once both pairs were
-measured.
+`91ea391a11`, as if run on 2026-09-15. Ruby 4.0.7, ten configurations, both modes; 23 minutes, both pairs and the
+bisections included.
 
 * **Behavior:** `watch_controls.rb` differs on 36 `Enumerable#index_with` lines, 12 each for Hash,
   HashWithIndifferentAccess and Struct receivers (`{a: 1}.index_with { |k, v| … }` now indexes `:a` with `v = nil`). Bisection
   over the merges and then inside the branch names 2b88dc1995 itself, the regression rails/rails#59555 fixed (merged 2026-11-03). The
   census 4 and 5 controls stay identical.
-* **Allocations:** 172 of 194 workload×mode cells moved beyond A/A, 162 attributed to 2b88dc1995 and the rest to
-  other #58663 commits (1fbedade58, 3be318dff8). The largest is +445 objects/op on Lobsters `GET story.json`, mostly
-  `enumerable.rb:88` (the pair array per `index_with` element, +387). That line is still on main at
-  `5810776eec`: #59203 reverted the each-loop version for Ruby 4.1 hash embedding, and rails/rails#59557 (open) removes
+* **Allocations:** 163 of 194 workload×mode cells moved beyond A/A, 155 attributed to 2b88dc1995 and the rest to
+  other #58663 commits (1fbedade58, 3be318dff8). The largest is +444 objects/op on Lobsters `GET story.json`, mostly
+  `enumerable.rb:88` (the pair array per `index_with` element, +387). The pair array is still on main
+  (`Array#index_with` since #59555): #59203 reverted the each-loop version for Ruby 4.1 hash embedding, and rails/rails#59557 (open) removes
   the pair arrays on Ruby 4.1 ([index-with-capacity](../index-with-capacity.md)).
-* **Noise:** one fizzy-mysql YJIT workload changed its SQL digest in the full run with both pairs stable, and the
-  one-workload process did not reproduce it. It is listed and not counted as a move. The first pass, before
-  requiring that reproduction, bisected the same kind of flip to an unrelated commit.
+* **Noise:** no SQL diff and no unstable SQL workload. Two rules came from earlier passes: a moved workload's traced
+  count must agree (on this range a Fizzy YJIT `POST comment.json` rose +160 by its census value while its traced
+  count fell), and the floor covers both modes (on main, Blog's broadcast job had a YJIT A/A of 0 and an
+  interpreter A/A of 65).
+  Masking the sign of numbers in the SQL control removed SolidCache `key_hash` flips, which had made 12 to 17
+  workloads unstable and one look like a real diff.
 
 ## Daily run
 
