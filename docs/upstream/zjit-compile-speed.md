@@ -67,7 +67,7 @@ sites in `x86_64/mod.rs` and `arm64/mod.rs`, which neither candidate touches. Is
 Both candidates are pure compiler-speed changes: each computes the same values as before, faster.
 
 * **c1, #1064**: [`thomasklemm/zjit-cache-may-write-block-code`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-cache-may-write-block-code),
-  `2fbdceeda7` + test `63483773c1`. Caches the bytecode scan as `may_write_block_code: Option<bool>` on
+  `4819e46698` (fix and test, squashed). Caches the bytecode scan as `may_write_block_code: Option<bool>` on
   `IseqPayload`. Diff: codegen.rs +9/−1, payload.rs +3, and a 15-line test.
 * **c2, #1065 stopgap**: [`thomasklemm/zjit-caller-saved-regs-stopgap`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-caller-saved-regs-stopgap),
   `f7fc82f964`. Before the block loop, collects the sorted CCall positions once. Each register interval's
@@ -174,6 +174,21 @@ write every live local. Code size then grows quadratically, and at N=500 the met
   is the natural third.
 * **Emit and scratch_split.** These are large (24% and 18% of backend Ir) but have no hotspot that a small
   change would remove.
+
+## Leads (recorded, not built)
+
+* **Side exits that write every live local make code size quadratic.** Take a method of N
+  `vI = o.hash` statements whose results all stay live until a final `s ^= vI` chain. Each call's side exit
+  writes every local that is live there, so code size grows as N². At N=250 the method compiles to 4.2 MB of
+  code (1,316 side exits). At N=500 it fails with `out_of_memory` after 0.7 s of compiling, and at N=1000 after
+  3.1 s (16% of that in side-exit compile). Callgrind at N=500 puts 48% of the compile in `x86_emit`/`mov`.
+  This is a generated-code change: shared exit code, or materializing locals from the frame instead of
+  per-exit stores. It belongs to whoever owns side exits and stack maps (#1021). We have not checked
+  whether any Rails method is large enough to hit it.
+* **FxHash for the side-exit dedup map (#1049).** On railsbench it costs up to 0.29G Ir, 4% of compile Ir,
+  inside `compile_exits`. Exit order is already `RandomState`-random from run to run, so a fixed hasher
+  would not make generated code less exact; it would make LIR dumps reproducible. Measure it with the
+  same A/A rounds as c1/c2 before proposing it.
 
 ## 5. Issue comment drafts (not posted)
 
