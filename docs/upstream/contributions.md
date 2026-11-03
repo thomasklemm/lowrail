@@ -312,7 +312,7 @@ None.
 
 ## Investigated, not submitted
 
-- **R7-2, `Symbol#name` for `Hash#as_json` keys (2026-11-03): not opened.** On 4.0.9 a direct `as_json` with 4 Symbol keys runs −15.9% / −30.9% Ir (interpreter / YJIT), but on Ruby master `Symbol#to_s` already costs what `Symbol#name` does, so the added type check is pure overhead: +12.5% interpreter, +3.2% ZJIT (A/A ≤ 0.12%). Every exact spelling loses on the master interpreter. It would trade a 4.0 gain for a permanent 4.1 loss, and ruby-bench never reaches it. Branch `thomasklemm/hash-as-json-symbol-names` kept ([opening pass](rails-r7-queue.md#opening-pass)).
+- **R7-2, `Symbol#name` for `Hash#as_json` keys (2026-11-03): not opened.** On 4.0.9 a direct `as_json` with 4 Symbol keys runs −15.9% / −30.9% Ir (interpreter / YJIT), but on Ruby master `Symbol#to_s` already costs what `Symbol#name` does, so the added type check is pure overhead: +12.5% interpreter, +3.2% ZJIT (A/A ≤ 0.12%). Every exact spelling loses on the master interpreter. It would trade a 4.0 gain for a permanent 4.1 loss, and ruby-bench never reaches it. Branch `thomasklemm/hash-as-json-symbol-names` kept ([opening pass](rails-r7-queue.md#opening-pass-2026-11-03-neither-r7-2-nor-r7-1-opens)).
 - **R7-1, nested tag values without intermediate Arrays (2026-11-03): not opened.** L2 (two new helpers, one needing a comment) with no measurable app or ruby-bench effect: `build_tag_values` runs 0 times per request in railsbench and lobsters and 1.32 in shipit (~0.001% of a request). Branch `thomasklemm/tag-values-without-copies` kept.
 
 These dispositions are already public Lowrail evidence, not new candidate
