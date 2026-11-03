@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# ZJIT polymorphism probe (docs/upstream/zjit-polymorphism.md). Needs a build of
+# thomasklemm/ruby wip/zjit-poly-probe in $PROBE_PREFIX and the census-4 apps.
+#   script/zjit-poly-probe apps interp|jit         # nine census apps
+#   script/zjit-poly-probe bench interp|jit B...   # ruby-bench (railsbench lobsters shipit)
+#   ruby bench/upstream/zjit_poly_rank.rb DIR/interp DIR/jit > report.md
+set -uo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+probe=${PROBE_PREFIX:-$HOME/w/rprobe}
+gems=$(echo "${GEM_PREFIX:-$HOME/w/rm}"/lib/ruby/gems/*)
+out_root="$root/.lowrail/private/zjit-poly"
+what=${1:?apps|bench}; mode=${2:?interp|jit}; shift 2
+flags=(--zjit --zjit-stats-quiet)
+[ "$mode" = interp ] && flags+=(--zjit-call-threshold=4000000000)
+case $what in
+  apps)
+    out="$out_root/$mode"; mkdir -p "$out"
+    for n in ${APPS:-blog campfire writebook fizzy codetriage pingcrm redprints-cfp react-starter-kit lobsters}; do
+      ZJIT_POLYPROBE=$mode:$out/$n.tsv RUBY_PREFIX=$probe GEM_PREFIX=${GEM_PREFIX:-$HOME/w/rm} \
+        "$root/script/jit-parity-census" stats-one "$n" zjit "$out/$n.json" "${flags[@]:1}" > "$out/$n.log" 2>&1 &
+    done
+    wait ;;
+  bench)
+    out="$out_root/rb$mode"; mkdir -p "$out"
+    cp "$root/bench/upstream/zjit_poly_harness.rb" "${RUBY_BENCH_DIR:-$HOME/w/ruby-bench}/harness/polyprobe.rb"
+    cd "${RUBY_BENCH_DIR:-$HOME/w/ruby-bench}" || exit 1
+    unset RUBYOPT; export PATH="$probe/bin:$PATH" GEM_HOME=$gems GEM_PATH=$gems WARMUP_ITRS=${WARMUP_ITRS:-10} MIN_BENCH_ITRS=${MIN_BENCH_ITRS:-10}
+    for b in "$@"; do
+      ZJIT_POLYPROBE=$mode:$out/$b.tsv ruby "${flags[@]}" -r ./harness/polyprobe.rb "benchmarks/$b/benchmark.rb" > "$out/$b.log" 2>&1 &
+      echo "{\"ops\":$MIN_BENCH_ITRS}" > "$out/$b.json"
+    done
+    wait ;;
+  *) echo "usage: $0 apps|bench interp|jit [BENCH...]" >&2; exit 2 ;;
+esac

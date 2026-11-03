@@ -54,6 +54,9 @@ case ${1:?profile|stats|trace} in
       for n in $apps; do run_app "$n" "$m" stats "$out/$n-$m.json" "$flag" > "$out/$n-$m.log" 2>&1 & done
       wait
     done ;;
+  stats-one) # APP MODE OUT [ruby flags...]
+    shift; n=$1 m=$2 o=$3; shift 3
+    run_app "$n" "$m" stats "$o" "$@" ;;
   trace)
     out="$out_root/trace"; mkdir -p "$out"; rate=${2:-20}
     for n in $apps; do
