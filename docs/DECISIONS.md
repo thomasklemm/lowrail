@@ -41,9 +41,16 @@ and not promoted.
    review faster, even on approved PRs; many ruby/ruby contributors work
    without agents and set their own pace. Comment only with new substance
    (a fix, a review answer, evidence that a red job is unrelated when asked).
-   **PR descriptions:** ruby/ruby stays short. rails/rails may be somewhat
-   fuller: motivation, the change, a compact table (per-call and app
-   numbers, before/after) and boundaries; no padding, no full receipts.
+   **PR descriptions (revised 2026-11-03):** make review as easy as
+   possible; less text is better. A reviewer should see in 30 seconds what
+   is wasted, where it runs, what changes and why it is safe. rails/rails:
+   keep the template headings, 2–3 sentences of motivation, 2–3 sentences
+   of change (including the one boundary a reviewer would ask about), then
+   at most one small before/after table (per call) and one sentence of app
+   breadth; about 150 words outside the checklist. No per-app tables,
+   review history, method notes or receipts; those stay in Lowrail docs.
+   ruby/ruby: shorter still, about 100 words plus one micro table, and a
+   line naming the PR it is stacked on.
 3. **Stop:** new interpreter-Ir pricing, sealed-tier breadth, guarded
    endpoints, Rails 8.2 sealed re-certification before a beta, and further
    promotion of #22459 or its drafts.
