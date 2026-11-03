@@ -151,7 +151,7 @@ maintenance performance.
 **Blog A/A rule change, 2026-10-21:** set prospectively before counting, both
 total and GC-excluded nominal 95% intervals must lie wholly within **±0.1%**;
 zero containment is no longer required
-([preregistration](https://github.com/thomasklemm/lowrail/blob/b059fc9fbcdbc4cff6a7bc523defb01e7783385c/docs/DECISIONS.md#token-allocation-fix-and-one-new-rule-blog-cohort-preregistered-2026-10-21)).
+([preregistration](https://github.com/thomasklemm/lowrail/blob/b059fc9fbcdbc4cff6a7bc523defb01e7783385c/docs/decisions-prototype.md#token-allocation-fix-and-one-new-rule-blog-cohort-preregistered-2026-10-21)).
 
 Bet F's per-metric A/A gates both pass within ±0.1%. The linked branch JSON
 documents a cosmetic `project_aa` field overwrite; the table uses the per-metric
@@ -253,11 +253,11 @@ when scope or acceptance changes; retain superseded records as historical.
   template delivery remains quarantined. Old artifacts containing preload
   plans, sealed link delivery or lowered templates still refuse as a whole:
   their on-only framework ancestry is app-observable, even when sealed
-  ([boundary](docs/DECISIONS.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)).
+  ([boundary](docs/decisions-prototype.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)).
   The priced three-unit form/token/collection artifact is unaffected.
   Unsupported shapes, stale or mode-mismatched artifacts, and the Bundlebun
   boundary stay original
-  ([pass ledger](docs/DECISIONS.md#passes), [loaders](docs/loaders.md)).
+  ([pass ledger](docs/decisions-prototype.md#passes), [loaders](docs/loaders.md)).
 
 #### Also on main (2026-10-22)
 
@@ -275,7 +275,7 @@ when scope or acceptance changes; retain superseded records as historical.
   builders ledger-refuse before emission; old combined artifacts still refuse
   as a whole. Allocation evidence only, not a new Ir, timing or throughput
   claim; form stays narrow and preload/link/template delivery stays quarantined
-  ([current scope and history](docs/DECISIONS.md#plain-sealed-blog-build-and-historical-isolation-gap-2026-10-22)).
+  ([current scope and history](docs/decisions-prototype.md#plain-sealed-blog-build-and-historical-isolation-gap-2026-10-22)).
 
 **Breadth is not savings:** Fizzy, Campfire, Writebook and CASA retain exact
 own-suite off/on outcomes but **no certified optimized suite hits**. Fizzy's
@@ -284,7 +284,7 @@ query certification); Campfire/Writebook have Bootsnap `KeyError`, and CASA
 has unsupported RSpec certificate discovery at an older retained pin. Parity
 includes Fizzy's baseline errors and CASA's skips. **No savings claim for
 these plain sealed builds outside the blog**
-([pins and limits](docs/DECISIONS.md#own-suite-breadth-is-not-optimized-coverage)).
+([pins and limits](docs/decisions-prototype.md#own-suite-breadth-is-not-optimized-coverage)).
 
 ### How it works
 
@@ -354,7 +354,7 @@ or incompatible build is a silent no-op. More options are in the
   comparisons are not a universal support claim.
 - **The default build lowers nothing.** Every guarded specialization tried so
   far was either unsafe under mid-request mutation or its guard cost more than
-  it saved ([DECISIONS](docs/DECISIONS.md)).
+  it saved ([decisions-prototype](docs/decisions-prototype.md)).
 - **The sealed tier has scoped interpreter results**, shown in
   [Historical results](#historical-results-2026-10-21). Passive production form,
   token and collection admission is implemented; the separate test certificate
@@ -371,7 +371,7 @@ or incompatible build is a silent no-op. More options are in the
   unknown), refusal reasons and recorded hits ([types.md](docs/types.md)).
 
 Every pursued, parked and rejected idea is in
-[docs/DECISIONS.md](docs/DECISIONS.md). Dated evidence is in
+[docs/decisions-prototype.md](docs/decisions-prototype.md). Dated evidence is in
 [docs/STATUS.md](docs/STATUS.md).
 
 ### Direction
@@ -382,7 +382,7 @@ further:
 | Tier | Who | Promise | State |
 |---|---|---|---|
 | **guarded** (default) | any Rails app, any gem | identical test outcomes; specializations guarded and refused when not exact | works; currently lowers nothing by default |
-| **sealed** (opt-in) | apps that accept a contract: no code, subscriber, config or route mutation after boot, among others | compile endpoints ahead of time without per-call checks; `lowrail seal-check` runs the app's suite and lists every violation with `file:line` and the code change that fixes it | opt-in research: measured interpreter wins; admission must be passive ([sealed.md](docs/sealed.md), [decision](docs/DECISIONS.md#architecture)) |
+| **sealed** (opt-in) | apps that accept a contract: no code, subscriber, config or route mutation after boot, among others | compile endpoints ahead of time without per-call checks; `lowrail seal-check` runs the app's suite and lists every violation with `file:line` and the code change that fixes it | opt-in research: measured interpreter wins; admission must be passive ([sealed.md](docs/sealed.md), [decision](docs/decisions-prototype.md#architecture)) |
 
 Apps that do not meet the sealed contract still run in the guarded tier. The
 tooling explains why and what to change.
@@ -511,7 +511,7 @@ decision, and Lowrail works next to them:
 | [upstream/contributions.md](docs/upstream/contributions.md) | upstream PRs, their results and caveats |
 | [PLAN.md](docs/PLAN.md) | goals, contract, why this design |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | pipeline, pass contract, registry |
-| [DECISIONS.md](docs/DECISIONS.md) | what is pursued, parked or rejected, plus the stacking backlog |
+| [DECISIONS.md](docs/DECISIONS.md) · [decisions-prototype.md](docs/decisions-prototype.md) | current rules and decisions; the parked prototype's decisions and stacking backlog |
 | [STATUS.md](docs/STATUS.md) | dated evidence log |
 | [compat.md](docs/compat.md) | pinned real apps, gem breadth, baseline failures, load-order findings and verify results |
 | [bench.md](docs/bench.md) | measurement protocol and results |

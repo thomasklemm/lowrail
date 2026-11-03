@@ -269,7 +269,7 @@ round, not differences of displayed medians. **A/H/J/B** mean both A/A gates,
 all five heap checks, actual JIT/warmup/window checks, and preflight plus every
 worker's brk-log check, respectively. Historical acceptance never implies
 the old brk gate passed. Decisions are assessed in
-[DECISIONS.md](DECISIONS.md#512-mib-decision-recheck-2026-10-20).
+[DECISIONS.md](decisions-prototype.md#512-mib-decision-recheck-2026-10-20).
 
 | Comparison | Historical stock-tool result [95% CI] | 512 MiB-tool result [95% CI] | New controls / verdict | Decision |
 |---|---|---|---|---|

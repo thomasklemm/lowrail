@@ -364,7 +364,7 @@ These are **investigation recommendations, not removable percentages or pass
 promotions**. The same source-owned bucket can contain necessary data/crypto
 work, dispatch and descendants. The existing safety refusals and parked
 decisions still apply. The named overlaps below refer to rows in
-[DECISIONS.md](../DECISIONS.md), including its allocation follow-ups; their
+[decisions-prototype.md](../decisions-prototype.md), including its allocation follow-ups; their
 conditional pools must not be added to this map or to each other.
 
 | Hotspot family | Best-fit lever | Boundary and existing decision rows |

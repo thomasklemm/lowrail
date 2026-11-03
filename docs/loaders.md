@@ -197,7 +197,7 @@ the eligible **14 `inertia/props` hits**, identical outcomes/SQL, unchanged
 hook detection and zero stable load differences. That gate is **not
 satisfied**. No sealed-only pass is re-enabled to recover the old total.
 This is a targeted no-op, not full active support. See
-[compatibility results](compat.md) and [DECISIONS](DECISIONS.md).
+[compatibility results](compat.md) and [decisions-prototype](decisions-prototype.md).
 
 #### Bounded follow-up: delivery timing cannot certify this bundle
 

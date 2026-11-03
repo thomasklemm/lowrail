@@ -779,7 +779,7 @@ than hidden in ordinary verify overhead.
   not `bin/rails test`. Its latest documented entropy-companion gates still
   reject SQL/load differences. `fixtures/corpus/breadth_production_spec.rb`
   likewise supplies narrow production probes, not full-suite coverage.
-  [DECISIONS](DECISIONS.md#sealed-verification-external-production-scenarios-first-slice-rejected-2026-10-21)
+  [DECISIONS](decisions-prototype.md#sealed-verification-external-production-scenarios-first-slice-rejected-2026-10-21)
   keeps wider production replay/test seams open. There was **no active sealed
   whole-own-suite gate** for blog or Fizzy, and this check does not create one.
 

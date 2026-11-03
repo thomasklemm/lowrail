@@ -16,7 +16,7 @@ attribute the difference from an earlier cohort solely to the token split.
 ## Prospective rule, not a rescue of rejected data
 
 The owner authorized one new cohort and published its rule in
-[`b059fc9` DECISIONS](../DECISIONS.md#token-allocation-fix-and-one-new-rule-blog-cohort-preregistered-2026-10-21)
+[`b059fc9` DECISIONS](../decisions-prototype.md#token-allocation-fix-and-one-new-rule-blog-cohort-preregistered-2026-10-21)
 **before counting**. Both total and no-GC A/A nominal 95% intervals must lie
 wholly within **±0.1%**; zero containment is not required. The rationale:
 the previous [+0.009283,+0.062511]% interval is immaterial relative to the

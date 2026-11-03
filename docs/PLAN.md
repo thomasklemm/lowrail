@@ -34,7 +34,7 @@ Where they disagree with this section, this section wins.
    component replacements mostly measure or estimate below 1 % of real
    requests. The exceptions are app-specific: `inertia/config_bind` is
    estimated at 0.5–2.8 % on JSON routes, and digest memo helped one private
-   page ([DECISIONS](DECISIONS.md)). Whole-endpoint lowering of the render path is
+   page ([decisions-prototype](decisions-prototype.md)). Whole-endpoint lowering of the render path is
    the only measured large lever (−26 %/−37 % handwritten, events kept, upper
    bounds). Certifying it from the call site costs more than it saves.
 4. **Two tiers.** *Guarded* (default, any app, unchanged contract) and

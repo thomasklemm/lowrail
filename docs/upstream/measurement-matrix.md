@@ -1,4 +1,4 @@
-# Measurement matrix: Rails main, Ruby 4.0.7 and master, interpreter, YJIT and ZJIT
+# Measurement matrix: Rails main, Ruby 4.0.9 and master, interpreter, YJIT and ZJIT
 
 Thomas (2026-11-03) asked two questions. Should every Rails measurement also run ZJIT, so the 20 census apps turn up
 ZJIT work and show how our own fixes behave there? And do the apps run against the frontier, meaning Rails main and
@@ -29,7 +29,7 @@ Ruby master (4.1dev)? This page records the answer and the matrix we use from no
   slow. Apps find the sites, ruby-bench prices them, as [bench.md](../bench.md) requires.
 * **Rails changes made only "for ZJIT"** (less polymorphism, avoiding `send` or `...`) are a trap. The JIT should
   handle idiomatic code, such changes go stale as ZJIT improves, and Z3 found that the largest fallback bucket is
-  profile loss at monomorphic sites, which is a ZJIT problem. A Rails change counts only if it also wins on Ruby 4.0.7
+  profile loss at monomorphic sites, which is a ZJIT problem. A Rails change counts only if it also wins on the Ruby pin (4.0.9)
   (allocations or interpreter instructions). A ZJIT gain is then one supporting line.
 
 ## The matrix

@@ -307,4 +307,4 @@ duplicates and oracle-reviewing the text:
 uses `PM_OPTIONS_VERSION_CRUBY_4_0` and accepts `"4.0"`. Suggested a consistent
 `CRuby4_0` name while retaining deprecated compatibility; **no behavior bug
 claimed and no PR opened**. The naming persisted from the reverse-sync
-rename through v2.0.0/master. See [decision register](DECISIONS.md#prism-2-adoption-and-target-grammar-2026-10-21).
+rename through v2.0.0/master. See [decision register](decisions-prototype.md#prism-2-adoption-and-target-grammar-2026-10-21).

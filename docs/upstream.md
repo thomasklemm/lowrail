@@ -19,7 +19,7 @@ Compared the [hotspot map](passes/hotspots.md), [allocation census](passes/alloc
 [tag component](passes/tag-options.md), [source sites](passes/tag-options-sites.md),
 [blank audit](passes/string-blank.md), [lookup survey](passes/template-lookup.md),
 [sealed form/token/collection prices](passes/sealed-form.md), and both backlog
-tables in [DECISIONS.md](DECISIONS.md) with canonical Rails main
+tables in [decisions-prototype.md](decisions-prototype.md) with canonical Rails main
 [`6e8d3903f8`](https://github.com/rails/rails/commit/6e8d3903f85dd948d726bee9495ea77bc8e50aaa).
 GitHub searches covered open, closed and merged PRs; the important overlapping
 patches were read, not inferred from their titles. Negative search results are

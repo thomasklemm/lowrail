@@ -158,7 +158,7 @@ The conditional micro's 74 → 61 objects and 5,894 YJIT Ir/call saving exclude
 this full receiver certificate. The guarded draft instead allocates more at
 request level; no tuple-pool ceiling is credited as a net saving. The pass
 remains opt-in for experimentation and is recorded in the
-[Stacking backlog](../DECISIONS.md#stacking-backlog), with no promotion or
+[Stacking backlog](../decisions-prototype.md#stacking-backlog), with no promotion or
 assumed additive benefit. Any later guard-cost change requires new exactness
 gates and a newly declared finite measurement, not selection from these rounds.
 

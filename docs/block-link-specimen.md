@@ -864,4 +864,4 @@ The prototype remains only on local branch `thomasklemm/block-link-request-scan`
 neither it nor bet D's unfinished detector is imported into main. Per the
 correctness-first stop rule, no allocation/native-YJIT screen or new cohort
 runs. Keep the stock fallback and stop block-link work; the five-line kill
-note is in [DECISIONS](DECISIONS.md#fizzy-block-links-n50-invalid-n10-scoped-warm-bench-price-2026-10-21).
+note is in [DECISIONS](decisions-prototype.md#fizzy-block-links-n50-invalid-n10-scoped-warm-bench-price-2026-10-21).

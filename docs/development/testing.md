@@ -334,7 +334,7 @@ With the retained fixture prepared, the all-sealed cold witness exposes
 `Templates::CompiledSource` on `ActionView::Template` and
 `PreloadPlans::Hook` on `ActiveRecord::Associations::Preloader` in the on arm
 only. The off/on holder ancestry and loaded-holder census differ. These are
-the [recorded open correctness failures](../DECISIONS.md#full-ancestry-is-observable),
+the [recorded open correctness failures](../decisions-prototype.md#full-ancestry-is-observable-2026-10-21),
 not entropy noise or permission to filter ancestors. Runtime/performance
 paths and the failing comparison are unchanged by this health-check work.
 
@@ -404,7 +404,7 @@ retained source without overwriting either one; it validates frozen locks.
 
 ## Sealed-ancestry runtime refusal (2026-10-22)
 
-The [runtime fix](../DECISIONS.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)
+The [runtime fix](../decisions-prototype.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)
 keeps the complete cold-witness comparison, all original 193 test identities
 (compared against `8009c3b`), and every response/SQL/effect/metadata assertion.
 Unsafe-delivery activation assertions now demand explicit whole-artifact

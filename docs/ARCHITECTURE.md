@@ -196,7 +196,7 @@ across requests; refusal reasons are recorded, never silent.
 ### Proposed: component passes (not yet implemented)
 
 Per-site surveys keep ending below 0.5 % per route (template lookup, routes,
-callbacks; see [DECISIONS.md](DECISIONS.md)) because each site needs its own
+callbacks; see [decisions-prototype.md](decisions-prototype.md)) because each site needs its own
 certificate. A `component` pass instead replaces one framework subsystem
 (e.g. `TagBuilder`/`FormBuilder`, Journey formatting, AR attribute storage)
 with a faster implementation of the same observable behavior, keeping the
