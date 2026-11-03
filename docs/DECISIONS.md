@@ -4,6 +4,18 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bet V1: Action View CPU time, one escape candidate (2026-11-03)
+
+Sampling profiles of five census apps and ruby-bench's erubi-rails and railsbench (Ruby 4.0.7 and 4.1dev,
+interpreter and YJIT) put no single Action View frame above 1.8% of an app page; the largest shared cost is the
+escape path behind `<%= %>` ([actionview-cpu](upstream/actionview-cpu.md)). **C1** (`OutputBuffer#<<` calls
+`ERB::Escape.html_escape` directly) cuts erubi-rails instructions by 9.9% interpreter / 5.0% YJIT (A/A ≤ 0.4%)
+with an unchanged census. **C2** (the same for every `unwrapped_html_escape`) is held: it removes the `super`
+that #46573 chose for prepend-friendliness. Submitting C1 needs Thomas's call on that boundary. Rejected with
+numbers: `xml_name_escape`, `ensure_valid_html5_tag_name`, `_all_renderers`; `prepend_formats` stays a lead. App
+pages cannot be priced by instruction counts (A/A up to ±7%). YJIT's `invokesuper_singleton_class` fallback is a
+separate Ruby lead.
+
 ## Lowrail reoriented toward upstream fixes and advisory types (2026-11-02)
 
 Lowrail's boot facts, allocation censuses and JIT fallback counts found work
