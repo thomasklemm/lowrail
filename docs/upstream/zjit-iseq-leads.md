@@ -160,6 +160,17 @@ Found while measuring open Rails PRs ([rails-open-evidence.md](rails-open-eviden
 Checked and not a ZJIT lead: a 2-local partial render allocates 35 objects on master in both the interpreter and
 ZJIT, against 33 on 4.0.7, so the extra 2 come from master, not ZJIT.
 
+## New leads from the lead 7 build (2026-11-03)
+
+Found while building lead 7 (thomasklemm/ruby `thomasklemm/zjit-forward-block-param` @ `bde4e2acc6`, on master
+`a8b095a07e`). ruby-bench per iteration, 15 warmup + 10 measured, 0 `compile_error_out_of_memory`. Nothing posted.
+
+| lead | fallback / exit | repro or site | counts | status |
+|---|---|---|---|---|
+| 7b `&block` forwarding at sites that see both nil and the proxy | `send_fallback_send_block_arg_not_nil` | `_read_attribute(name, &block)` (activerecord 8.1.1 read.rb:39), called with and without a block; `def ra(n, &b) = inner(n, &b)` called both ways | after lead 7: lobsters 72.6k, shipit 95.0k per itr left (railsbench 50.9k, sites not traced). Rails main removed this block, so app counts are smaller | Patch shape: branch on nil vs. proxy instead of a guard (`split_nil_block_arg` in k0kubun's `93e4e7d69c`, Shopify/ruby#1039 row 7, **assigned to k0kubun**). Taken in that sense; ask first |
+| 7c recompiling guards on skewed profiles keep exiting | side exits of a `recompile` guard after the version budget is spent | First draft of lead 7 guarded the proxy also on `SkewedPolymorphic` profiles: lobsters 8,902 and shipit 7,859 `exit_block_arg_not_block_param_proxy` per itr, all in `_read_attribute` (traced) | the shipped version guards only monomorphic profiles: 0 / 77 per itr | Free, **unmeasured** in general: whether other skewed `GuardType`/`GuardBitEquals ... recompile` sites behave the same on the apps. Related to ruby/ruby#19617 (k0kubun, PatchPoint only) |
+| 7d inline callees that receive the forwarded block handler | none (missed inlining, not a fallback) | `SendDirect ..., &vN` with `BlockParamProxy` is not inlined; `mon_synchronize(&b)` → `Monitor#synchronize` | **unmeasured** | Free: Shopify/ruby#1039 row 44 (`e89844f878`, unassigned) |
+
 ## Lead 10: the receiver class
 
 The fallback is the `UNSET.equal?(value)` send. The lobsters HIR dump shows
