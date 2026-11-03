@@ -246,9 +246,11 @@ with 12 of 14 workloads moving.
   10, including two objects of its own), so #441 says 8.
 * **No stacked PRs** ([DECISIONS](../DECISIONS.md)), so IR-1, IR-4 and IR-2 go as one PR, in that order and one commit
   each, on [`thomasklemm/props-resolver-plain-values`](https://github.com/thomasklemm/inertia-rails/tree/thomasklemm/props-resolver-plain-values)
-  [`56739a92b3`](https://github.com/thomasklemm/inertia-rails/commit/56739a92b3456794fc4024415ef412a7a3738f98) on
-  master `3e1330a33d`. The IR-2/IR-4 line is resolved once (the resolver is byte-identical to `wip/inertia-combined`'s),
-  and the PR has a single CHANGELOG entry. rspec 1077 examples, 0 failures; rake test 61 runs, 0 failures; rubocop
+  [`3886d49e82`](https://github.com/thomasklemm/inertia-rails/commit/3886d49e824dd0b134fdef62d9d07799d590d1f3) on
+  master `3e1330a33d` (census `ipr` measured `56739a92b3`, which differs only in the spec). After Sol's P3, the IR-1
+  spec also covers a partial reload (`only`) and a DevTools recorder. Reverting any one of the three `BaseProp`
+  guards now fails at least one of its two examples, and both examples fail on master. The IR-2/IR-4 line is resolved once (the resolver is byte-identical to `wip/inertia-combined`'s),
+  and the PR has a single CHANGELOG entry. rspec 1078 examples, 0 failures; rake test 61 runs, 0 failures; rubocop
   197 files clean. The 3,000-tree differential digest is identical on master and the branch. Micro (23-value page):
   165 → 40 objects, 73 → 38 µs interpreter, 24.7 → 14.6 µs YJIT. Census `ipr` against `ic2`: median −75.3 / −74.6
   objects per workload (−1.8% / −1.9%), 41 / 41 of 55 workloads moved (A/A 17 / 22). Hackatime's Inertia XHR dashboard
