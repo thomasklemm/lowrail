@@ -81,10 +81,11 @@ These performance-related PRs were opened before the October 19–22 census.
 
 ## Queue
 
-Finished, reviewed candidates waiting for room (empty after #59568–#59570 opened) (rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)).
+Finished, reviewed candidates waiting for room (rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)).
 
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
+| i18n C4: check for Fiber storage once in `I18n.config` | ruby-i18n/i18n | `thomasklemm/fiber-storage-check-once` @ `0b55237` | CPU only: `I18n.t(:hello)` −3.3% instructions, −2.3% to −2.8% elsewhere | Sol approve (both), adversarial Astra approve; waits for an i18n slot (3 open). Draft in [i18n-performance.md](i18n-performance.md#c4) |
 
 ## Open
 
