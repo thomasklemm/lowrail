@@ -74,9 +74,15 @@ Database URLs in the environment are refused.
 Setup per app: `db:create db:schema:load` in production, the app's JS build where it has one, `assets:precompile`,
 then the harness `prepare` step. That step loads the Blog's seeds; test fixtures for Campfire, Writebook, Fizzy (with
 its UUID fixture helper) and CodeTriage; PingCRM's seeds with `Faker::Config.random = Random.new(42)`; Redprints' and
-the starter kit's seeds; Lobsters' seeds and `FakeDataGenerator` with `srand(42)`. Last comes `list`. **Only blog and
-campfire have been set up and run through this command so far.** The other eight rows encode census 4's and 5's
-recorded setup ([census 5, Apps](rails-main-census-5.md#apps)) and may need fixes the first time they run.
+the starter kit's seeds; Lobsters' seeds and `FakeDataGenerator` with `srand(42)` and
+`Faker::Config.random = Random.new(42)`, under the app's own queue adapter (solid_queue). Last comes `list`. All ten
+configurations have been set up and run through this command ([Validation](#validation-nine-apps-2026-11-03)).
+
+PostgreSQL and MySQL databases are named by the app's config, not by the copy, so every copy of an app shares them.
+For those apps `setup` runs `db:create` on its own and stops if it reports `Database '…' already exists`, rather
+than loading the schema over another copy's data. Drop the databases first when they are disposable (for example
+`dropdb pingcrm_production`, or `DROP DATABASE fizzy_production…` on port 3307). `setup` also creates `log`, `tmp` and
+`storage`, which Git does not keep and Lobsters' production boot needs.
 
 ## What a run measures
 
@@ -183,6 +189,45 @@ Blog and Campfire on Rails main `5810776eec` (census 5's pin), Ruby 4.0.7, inter
   makes `controls` exit 1.
 * A first pass recorded SQL from every thread. It showed 1–2 workloads drifting in the A/A pair. Recording only
   the measuring thread removed that drift.
+
+## Validation, nine apps (2026-11-03)
+
+All ten configurations on census 5's pin (Rails main `5810776eec`, Ruby 4.0.7), set up from scratch with
+`script/census setup` and run with `run --label base --aa --modes interp,yjit --jobs 10`. Every copy passed `list`, with
+97 workloads in total (blog 10, campfire 9, writebook 8, fizzy 14, fizzy-mysql 14, codetriage 7, pingcrm 8,
+redprints-cfp 8, react-starter-kit 8, lobsters 11), the same names as census 5's receipts. Three fixes to the command
+came out of the first full pass:
+
+* **Server databases.** fizzy-mysql's `db:schema:load` failed on a foreign key because census 5's copies had left
+  `fizzy_production*` on the shared MySQL server. `setup` now refuses when `db:create` reports an existing database
+  (see [Services and apps](#services-and-apps)). It also creates `log`, `tmp` and `storage`; Lobsters' production
+  boot opens `log/rails.log`. PingCRM's `prepare` requires `faker`, which its Gemfile marks `require: false`.
+* **Lobsters data.** The first runs differed from census 5 on GET story (−3,282 objects) and GET tag (−936). Census
+  5's recorded recipe (`db:prepare`, then `rails runner` with `srand(42)` and `Faker::Config.random =
+  Random.new(42)`) reproduces census 5's stories exactly. The harness had omitted the Faker seed, and it generated
+  under boot's `:test` queue adapter. Replaying census 5's recipe with only `queue_adapter = :test` added reproduces
+  the harness's stories, so the generator's draws depend on the adapter. `prepare` now seeds Faker and generates under
+  the app's adapter, and its stories match census 5's row for row. Two fresh setups give identical stories, users,
+  tags and comments.
+* **Job workloads.** fizzy-mysql under YJIT enumerated a 15th workload, `perform Turbo::Streams::BroadcastStreamJob`,
+  in both A/A runs. Fizzy's `broadcasts_refreshes` enqueues that job from Turbo's debounce timer thread 0.5 s later,
+  so census 4's `jobs_from` caught it only when the timer fired inside the capture. Census 5 never caught it. The
+  harness now drops jobs enqueued on other threads. Only Fizzy uses refresh broadcasts; `list` still passes all 14
+  Fizzy workloads.
+
+Results, with the Lobsters and fizzy-mysql runs redone after the fixes:
+
+* A/A (`base2 − base`): median +0.0 in both modes. 24 / 23 workloads moved ≤ −1 and 16 / 15 moved ≥ +1
+  (interpreter / YJIT); census 5's A/A moved 17 / 18 and 24 / 23. SQL changed for 8 / 6 workloads. PingCRM moved 8
+  of 8 interpreter workloads by a median −3.0, a uniform shift from one process to the next.
+* Against census 5's `base2`: median 0.0 in both modes. Per-app medians are within ±2.2 objects, except PingCRM
+  interpreter at −5.4, within its own A/A shift. Six workloads move more than 20 objects, all comment or message
+  writes. Fizzy comment POST.json moves +81 (interpreter, A/A 35), −67 / −68 on MySQL (A/A 19 / 67), and Fizzy
+  PATCH comment moves −82 under YJIT (A/A 81). The Blog's comment POST moves −60 under YJIT (A/A 59). Campfire's PATCH
+  message moves −37 under YJIT, where both rounds' A/A is flat, and is flat in the interpreter; neither that nor
+  fizzy-mysql's interpreter −67 is explained.
+* `rank` on `base2`: the interpreter top 40 is identical to census 5's (same sites, ranks and app counts). YJIT
+  shares 39 of 40 sites; `fanout.rb:263` (40th, now 41st) and `date_and_time/zones.rb:38` swap at the boundary.
 
 ## Older census scripts
 

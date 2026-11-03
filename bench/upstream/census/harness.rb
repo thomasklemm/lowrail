@@ -68,6 +68,7 @@ module RailsCensus
       when "blog", "redprints-cfp", "react-starter-kit"
         load "db/seeds.rb"
       when "pingcrm"
+        require "faker" # require: false in PingCRM's Gemfile
         Faker::Config.random = Random.new(42)
         load "db/seeds.rb"
       when "lobsters"
@@ -75,7 +76,16 @@ module RailsCensus
         Rails.application.load_tasks # defines FakeDataGenerator
         BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
         srand(42)
-        ActiveRecord::Base.transaction(requires_new: false) { FakeDataGenerator.new.generate }
+        Faker::Config.random = Random.new(42) # as census 5: Faker draws from its own generator
+        # Census 5 generated under the app's own queue adapter (solid_queue), not
+        # boot's :test one; the generated stories differ between the two.
+        measured_adapter = ActiveJob::Base.queue_adapter
+        ActiveJob::Base.queue_adapter = Rails.application.config.active_job.queue_adapter
+        begin
+          ActiveRecord::Base.transaction(requires_new: false) { FakeDataGenerator.new.generate }
+        ensure
+          ActiveJob::Base.queue_adapter = measured_adapter
+        end
       when "fizzy", "fizzy-mysql"
         helper = File.read("test/test_helper.rb").split("module FixturesTestHelper\n", 2).fetch(1)
         eval("module FixturesTestHelper\n" + helper, TOPLEVEL_BINDING, "test/test_helper.rb")
@@ -87,6 +97,22 @@ module RailsCensus
       end
       FileUtils.mkdir_p("tmp")
       File.write(marker, JSON.generate(name: name, rails: rails_sha, lock: Digest::SHA256.file(ENV.fetch("BUNDLE_GEMFILE") + ".lock").hexdigest))
+    end
+
+    # Jobs the request itself enqueues. Debounced Turbo refreshes
+    # (broadcasts_refreshes) enqueue from a timer thread 0.5 s later, so census
+    # 4's capture saw them only when that timer happened to fire inside the
+    # window; they are left out, as in census 5's receipts.
+    def jobs_from(&block)
+      thread = Thread.current
+      other_threads = []
+      subscriber = ActiveSupport::Notifications.subscribe("enqueue.active_job") do |*, payload|
+        other_threads << payload[:job].job_id unless Thread.current.equal?(thread)
+      end
+      jobs = super(&block)
+      jobs.reject { other_threads.include?(_1["job_id"]) }
+    ensure
+      ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber
     end
 
     def site_key(file)
