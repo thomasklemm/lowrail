@@ -21,7 +21,14 @@ call that removes the slow-path lookup entirely, and per-call counts return to t
 | AT1 | [`thomasklemm/time-zone-converter-shareable`](https://github.com/thomasklemm/rails/tree/thomasklemm/time-zone-converter-shareable) | [`9ac3833d1c`](https://github.com/thomasklemm/rails/commit/9ac3833d1c) | Freeze `TimeZoneConverter` when its subtype is frozen | `attribute_types` −40% / −45%; `Post.new` −8.6% / −14%; loading 10 rows −4.2% / −5.7% | −0.10% / −0.16% / −0.15% (A/A −0.04% / +0.01% / −0.02%) | within A/A, no SQL changes |
 | AT2 | [`thomasklemm/enum-type-shareable`](https://github.com/thomasklemm/rails/tree/thomasklemm/enum-type-shareable) | [`363fee003d`](https://github.com/thomasklemm/rails/commit/363fee003d) | Freeze `EnumType` when its mapping and subtype are frozen | model with an enum, on top of AT1: `attribute_types` −40% / −45%; `Post.new` −8.6% / −14%; 10 rows −4.1% / −4.9%; nothing without AT1 | within A/A alone; AT1+AT2 −0.13% / −0.15% / −0.23% | within A/A, no SQL changes |
 
-Not opened. Drafts in the short form are at the end.
+**Combined for submission (2026-11-03):** AT1 and AT2 read as one change ("freeze the wrapper type when what it
+wraps is frozen"), so they go out as one PR:
+[`thomasklemm/shareable-attribute-types`](https://github.com/thomasklemm/rails/tree/thomasklemm/shareable-attribute-types)
+at [`b0e77d009a`](https://github.com/thomasklemm/rails/commit/b0e77d009aa89fb94523e2817f3f8ed9ccb5cd98), one commit
+on `c042aee23a`, without the code comments (the reasoning is in the commit message and the body). AR sqlite3 with
+`RAILS_STRICT_WARNINGS=1`: 10,267 runs, 0 failures, 0 errors; RuboCop clean. Readability **L1**: two one-line
+conditional freezes, and why the converter isn't frozen unconditionally (a Delegator freezes what it wraps) lives in
+the commit message, not the code. The ZJIT loss below is accepted as explained. Not opened; the PR body is at the end.
 
 **ruby-bench** (Callgrind, one measured iteration after warmup; A/A = same commit in a second worktree):
 
@@ -165,40 +172,23 @@ makes that possible for most models without moving any cast.
 * **Suites.** Each branch: `rake test:sqlite3` in `activerecord` with `RAILS_STRICT_WARNINGS=1` (AT1 10,266 runs,
   AT2 10,265 runs, 0 failures, 0 errors), RuboCop on the changed files. Each new test fails on main.
 
-## Drafts
+## PR body (AT1+AT2)
 
-### AT1: Freeze TimeZoneConverter when its subtype is frozen
+**Freeze TimeZoneConverter and EnumType when what they wrap is frozen**
 
-> A model's default attributes are shared through its schema context only when they're Ractor-shareable;
-> otherwise every `attribute_types`, `attributes_builder` and `_default_attributes` read looks them up in
-> Ractor-local storage. Time zone aware attributes wrap their column type in a `TimeZoneConverter` that is never
-> frozen, so every model with a datetime column takes that path under `time_zone_aware_attributes`, which apps
-> enable by default.
->
-> This freezes the converter when the type it wraps is already frozen. An unfrozen subtype stays as it is, since
-> freezing a Delegator also freezes the object it wraps.
->
-> | Per call, interpreter / YJIT | Before | After |
-> | --- | ---: | ---: |
-> | `Post.attribute_types` | 2,790 / 1,412 instructions | 1,672 / 781 (−40% / −45%) |
-> | `Post.new` | 25,992 / 8,935 | 23,762 / 7,675 (−8.6% / −14%) |
-> | loading 10 rows | 293,673 / 131,856 | 281,238 / 124,385 (−4.2% / −5.7%) |
->
-> In eleven apps, 176 of 312 models move to the shared path; ruby-bench runs 0.10% to 0.16% fewer instructions.
+A model's default attributes are shared through its schema context only when they're Ractor-shareable; otherwise every `attribute_types`, `attributes_builder` and `_default_attributes` read looks them up in Ractor-local storage. `TimeZoneConverter`, which wraps every datetime column under `time_zone_aware_attributes` (on by default), and `EnumType` are never frozen, so almost every model takes that path.
 
-### AT2: Freeze EnumType when its mapping and subtype are frozen
+This freezes the converter when its subtype is already frozen, and the `EnumType` when its mapping and subtype are. An unfrozen subtype stays as it is, since freezing a Delegator also freezes the object it wraps.
 
-> Like time zone aware attributes, enum attributes are typed with an `EnumType` that is never frozen, so a
-> model with an enum reads its default attributes from Ractor-local storage on every `attribute_types`,
-> `attributes_builder` and `_default_attributes` call instead of from its schema context.
->
-> This freezes the `EnumType` when its mapping and the type it wraps are already frozen, which they are once `enum`
-> has returned.
->
-> | Per call, model with an enum and timestamps, with AT1, interpreter / YJIT | Before | After |
-> | --- | ---: | ---: |
-> | `Post.attribute_types` | 2,790 / 1,411 instructions | 1,672 / 781 (−40% / −45%) |
-> | `Post.new` | 25,905 / 8,936 | 23,679 / 7,688 (−8.6% / −14%) |
-> | loading 10 rows | 298,083 / 135,396 | 285,985 / 128,709 (−4.1% / −4.9%) |
->
-> With the change to `TimeZoneConverter`, 47 more of 312 models in eleven apps move to the shared path.
+| Per call, model with timestamps and an enum, Ruby 4.0.7 | Interpreter | YJIT |
+| --- | ---: | ---: |
+| `Post.attribute_types` | 2,790 → 1,672 instructions (−40%), 295 → 144 ns | 1,411 → 781 (−45%), 128 → 94 ns |
+| `Post.new` | 25,905 → 23,679 (−8.6%), 3,737 → 3,348 ns | 8,950 → 7,688 (−14%), 1,319 → 1,319 ns |
+| loading 10 rows | 298,287 → 285,985 (−4.1%), 42.0 → 38.7 µs | 135,330 → 128,709 (−4.9%), 20.5 → 19.0 µs |
+
+Instructions are Callgrind's with GC off (A/A within 0.4%); ns are medians of 7 rounds and as noisy as wall time on a shared machine (A/A up to 9% under YJIT), so the instructions carry the comparison. On ruby-bench this is 0.13% to 0.23% fewer instructions in the interpreter (A/A within 0.04%) and on railsbench and shipit under YJIT, and within noise on lobsters under YJIT. Under ZJIT (Ruby master) the per-call counts drop 7% to 10%, and lobsters runs 0.20% fewer instructions (A/A +0.11%); a model left on the slow path in an app where others moved off it is up to 4.6% slower per read, because ZJIT then compiles that branch without a profile, but both ZJIT apps are net lower. I found the site by counting schema-context reads in eleven open-source apps, where 294 of 312 models took the Ractor-local path and this moves 223 of them: https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/schema-context.md (benchmark: https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/schema_context/micro.rb).
+
+ns per call for the body (`micro.rb`, `TZA=1 ENUM=1`, median of 7 rounds of 20,000, wall time, noisy):
+interpreter `at-base` / `at-base2` / PR: `attribute_types` 294.9 / 304.9 / 144.1 ns, `new` 3,736.5 / 3,840.5 /
+3,348.0 ns, 10 rows 41,986.7 / 41,627.3 / 38,706.4 ns; YJIT 128.2 / 116.1 / 93.8 ns, 1,318.7 / 1,395.6 / 1,319.1 ns,
+20,546.3 / 21,205.1 / 18,981.2 ns.
