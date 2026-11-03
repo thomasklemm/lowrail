@@ -95,6 +95,7 @@ Measurements are the PRs' own, from their original dates.
 ### Gems
 
 - [mperham/connection_pool#225](https://github.com/mperham/connection_pool/pull/225), `#with` passes frozen constant interrupt masks to `Thread.handle_interrupt` instead of Hash literals — `pool.with {}` **14 → 10** objects; −4.6 objects per workload on the 18 census configurations that lock 3.x (Mastodon −27.6). From the [gem census](gem-census.md) (bet G1). Sol approve on both rubrics; adversarial Astra: three low items accepted (wrappers of `handle_interrupt` taking `**mask` or mutating the mask, constant-redefinition warnings on reload); a `Fiber#raise` scheduler leak exists in base too. Opened 2026-11-03.
+- [ruby-i18n/i18n#763](https://github.com/ruby-i18n/i18n/pull/763), `Backend::Fallbacks#translate` skips the String comparison when the fallback is the requested locale object (`equal?`) — `I18n.t(:hello)` **13 → 11** objects; −40.3 objects per workload, 0.40% of all allocations in 14 apps (most of it Sure's dashboard; about −10 without it). From the [gem census](gem-census.md) (bet G1). Sol: request-changes twice (custom `==`, then overridden `equal?`); the second accepted, since Ruby documents that `equal?` should not be overridden. Opened 2026-11-03.
 
 ### Ruby — ruby/ruby
 
