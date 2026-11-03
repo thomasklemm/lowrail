@@ -145,6 +145,25 @@ ruby-bench is per iteration (railsbench / lobsters / shipit).
 | 4 | 1 polymorphic yield in `Array#each`/`map`/`find` | 10 | 1,397 | 242k / 136k / 361k | Biggest volume overall, but the largest change. Block inlining is k0kubun's (Shopify/ruby#1093, assigned). Run-time block-ISEQ dispatch (Shopify/ruby#1039 row 55) is free but sits right next to that work, so collision risk is high. |
 | 5 | 2 `BasicObject#!=` (polymorphic inner `==`) | 10 | 277 | 0 / 3.8k / 0 | A polymorphic dispatch inside a builtin. Little ruby-bench effect, and it would ride on any general polymorphic-send work rather than stand alone. |
 
+**Added by Z12, unranked** ([zjit-warmup.md](zjit-warmup.md), master `9aa0898240`, Rails `c042aee23a`). The
+sampled counts come from `--zjit-trace-exits --zjit-trace-exits-sample-rate=50` runs (first ~100 ops plus the stats
+window) that hit `compile_error_out_of_memory`, so they rank sites but are **unmeasured** per op until the rerun
+at `--zjit-exec-mem-size=512 --zjit-mem-size=1024` lands.
+
+| lead | exit or fallback | app and site | counts | status |
+|---|---|---|---|---|
+| Z12-a: Mastodon fills the default 64 MiB code region | `compile_error_out_of_memory`, then `rb_zjit_compiling_p = false` (codegen.rs:209), no code GC | Mastodon, default options: region full at op 887, about 110 ISEQs (0.8%) never compiled; needs about 65 MiB | measured (default counters, 3,000 ops); no throughput change measured | free as such (Shopify/ruby#686 closed, made the size configurable but hidden); held until Mastodon is run on ruby/ruby#18960 (XrXr, open), which shrinks code 14–20% |
+| Z12-b: `def env.x` on the Rack env Hash every request | `exit_patchpoint_no_singleton_class` (`NoSingletonClass(Hash)`) | Mastodon via http_accept_language `middleware.rb:10`; exits in `AttributeSet#[]` (attribute_set.rb:92), `LazyAttributeSet#fetch_value!` (:249), `Associations#association_instance_get` (associations.rb:98), `HashLookupTypeMap#key?`, `Arel::Table#[]` | ~18,000 exits/op steady (YJIT: 59), stats pass with OOM; per-op recount pending | taken: ruby/ruby#19658 (linyiru, open) |
+| Z12-c: `NoSingletonClass` on Nokogiri node sets | `exit_patchpoint_no_singleton_class` (`NoSingletonClass(Nokogiri::XML::NodeSet)`) | Writebook, `Nokogiri::XML::Searchable#xpath_query_from_css_rule` (searchable.rb:240); singletons come from `Document#decorate` → `extend` (xml/document.rb:416) | 315 sampled; unmeasured | taken: same mechanism as ruby/ruby#19658 |
+| Z12-d: `class_attribute` owner methods keep exiting | `PatchPoint(MethodRedefined(Class, __class_attr_<name>_owner))` side exit | Mastodon, `ActiveRecord::Base.attribute_aliases` (activemodel attribute_methods.rb:64, from `Arel::Table#[]`); AMS `Serializer.config` (serializer.rb:16) | 2,215 and 1,484 sampled; unmeasured | probably the final-version mechanism of ruby/ruby#19617 (k0kubun, open), with `MethodRedefined` instead of lead 9's `StableConstantNames`; not verified on #19617's head |
+| Z12-e: block argument exit in a mapped block | `BlockArgNotNil` side exit | Mastodon, `ActiveRecord::Querying#_load_from_sql` (querying.rb:114) inside `Array#map` | 1,427 sampled; unmeasured | free as far as checked; may be a lead 7 (Shopify/ruby#1014) relative |
+| Z12-f: nil option values in tag helpers | `GuardType(NilClass)` side exit | Writebook, `TagBuilder#tag_options` (tag_helper.rb:1551) via `Hash#each_pair` | 440 sampled; unmeasured | free; likely a value-type mix rather than a JIT gap |
+
+Note for lead 9: across the 8 Z12 apps, every "Constant state changed" invalidation happened during boot or the
+first request (Concern `include` in concern.rb:147); none after op 100. So the `StableConstantNames(EMPTY)` exits
+in Writebook (where_clause.rb:99, from_clause.rb:22) come from versions spent at boot, not from per-request
+constant redefinition. That fits ruby/ruby#19617.
+
 Not built yet; the ruby/ruby PR cap (15) applies before any of these can open.
 
 ## Lead 10: the receiver class
