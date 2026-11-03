@@ -9,8 +9,8 @@ docs; this page only records the decision and why.
 k0kubun on [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897): the team wants ZJIT
 faster than YJIT in Ruby 4.1 and lacks bandwidth for a stream of YJIT performance PRs. Thomas
 answered "Sure, makes sense, will focus on ZJIT". From now on, new JIT performance and allocation
-parity work targets ZJIT only. YJIT gets correctness fixes only. YJIT leads (such as invokesuper on
-singleton-class receivers) are recorded, not built. Open YJIT PRs #19664, #19665, #19666 and #19671
+parity work targets ZJIT only. YJIT gets correctness fixes only. YJIT findings are tracked in
+[upstream/yjit-leads.md](upstream/yjit-leads.md), not built. Open YJIT PRs #19664, #19665, #19666 and #19671
 stay as they are until Thomas decides; send no new ones and keep the ruby/ruby PR rate low.
 
 ## Bet V1: Action View CPU time, one escape candidate (2026-11-03)
