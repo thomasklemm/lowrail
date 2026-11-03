@@ -104,6 +104,13 @@ interpreter + ZJIT allocations. ZJIT speed claims stay on ruby-bench with A/A. R
 a 4.0.7 win of their own. Every Rails candidate report also gives its micro on Ruby master × ZJIT (pinned build, A/A),
 unless its code path doesn't run on 4.1; then it says so. A ZJIT loss blocks the candidate until explained. New bets: F1 frontier census (20 apps on master), F2 our merged Rails PRs under ZJIT.
 
+## One JIT per ruby/ruby PR (2026-11-03)
+
+tekknolagi on [ruby#19661](https://github.com/ruby/ruby/pull/19661#issuecomment-6607345199): "Please don't mix YJIT
+and ZJIT PRs like this." A ruby/ruby PR touches the VM, YJIT or ZJIT, never two JITs, and is not stacked on another
+open PR. VM changes that need JIT follow-ups land first on their own; the ZJIT follow-up comes after. The Hash.new
+stack (#19660–#19663) and #19655 get split accordingly.
+
 ## YJIT is in maintenance mode (2026-11-03)
 
 XrXr on [ruby#19664](https://github.com/ruby/ruby/pull/19664#pullrequestreview-5752852916): "YJIT is mainly in
