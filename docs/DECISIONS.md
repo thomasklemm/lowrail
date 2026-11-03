@@ -82,6 +82,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   * lead with the answer to the question asked; prefer three short paragraphs to a dense table with footnotes;
   * before posting, a separate Sol pass checks the facts against our doc and reads it as an outsider would. A text
     that fails is rewritten, not trimmed.
+    Rewrites of already posted bodies that add no new claims may use any separate reviewer (2026-11-03: no codex
+    in the rewrite orb); edit a body only when the old one is hard to read.
   We don't add an AI disclaimer to every PR; where it matters (as on #1058) we say so plainly.
 * **One concern per PR.** A ruby/ruby PR touches the VM, YJIT or ZJIT, never two of them (tekknolagi on
   [ruby#19661](https://github.com/ruby/ruby/pull/19661#issuecomment-6607345199)). Dependent changes go into one PR
