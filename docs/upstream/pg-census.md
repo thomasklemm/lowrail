@@ -16,7 +16,7 @@ PostgreSQL result. No open PR covers either.
 
 | # | Branch | Per call | Workloads moved (of 124; A/A 22 / 27) | Median per workload |
 | --- | --- | ---: | ---: | ---: |
-| 16 | [`thomasklemm/pg-result-type-args`](https://github.com/thomasklemm/rails/tree/thomasklemm/pg-result-type-args) | −1 Array per result column | 121 / 122 | −198 / −211 (−2.4% / −2.5%) |
+| 16 | [`thomasklemm/pg-result-type-args`](https://github.com/thomasklemm/rails/tree/thomasklemm/pg-result-type-args) | −1 Array per result column | 120 / 122 | −171 / −211 (−2.4% / −2.5%) |
 | 17 | [`thomasklemm/pg-cast-result-scratch`](https://github.com/thomasklemm/rails/tree/thomasklemm/pg-cast-result-scratch) | −2 Arrays per query | 121 / 121 | −22.5 / −23.8 |
 
 Interpreter / YJIT. Both save the same with prepared statements on or off. Seven apps were added (Docuseal,
@@ -46,7 +46,7 @@ on Ruby 4. Booting the apps on main also turned up two Rails-main breaks worth r
   and Mastodon's Redis cache makes `mastodon-nops` query counts depend on run order (`GET profile` 6 vs 17 queries).
 * **Allocation counts only.** No timing is inferred.
 * **Receipts:** [data/pg-census/receipts.tar.gz](data/pg-census/receipts.tar.gz) holds every run JSON and log for
-  `base`, `base2`, `typeargs` and `scratch`, plus the full `rank-base2-interpreter.tsv`.
+  `base`, `base2`, `typeargs3` (candidate 16 at `408e6a3e29`) and `scratch`, plus the full `rank-base2-interpreter.tsv`.
 
 ## Apps
 
@@ -141,7 +141,7 @@ Numbering continues from census 5 (12–15). Each candidate is one commit on its
 
 | # | Branch | Commit | Pattern | Per call | Workloads moved (A/A 22 / 27 of 124) | Median per workload | Median % |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
-| 16 | [`thomasklemm/pg-result-type-args`](https://github.com/thomasklemm/rails/tree/thomasklemm/pg-result-type-args) | [`e25d80d6af`](https://github.com/thomasklemm/rails/commit/e25d80d6afd80959aaa6ebe08bca906316cf039c) | every query result on PostgreSQL: each column's type lookup | −1 per result column (10-column `cast_result` 27 → 17) | 121 / 122 | −198 / −211 | −2.4% / −2.5% |
+| 16 | [`thomasklemm/pg-result-type-args`](https://github.com/thomasklemm/rails/tree/thomasklemm/pg-result-type-args) | [`408e6a3e29`](https://github.com/thomasklemm/rails/commit/408e6a3e29d6a7ebc212c352eeac094c053598d6) | every query result on PostgreSQL: each column's type lookup | −1 per result column (10-column `cast_result` 27 → 17) | 120 / 122 | −171 / −211 | −2.4% / −2.5% |
 | 17 | [`thomasklemm/pg-cast-result-scratch`](https://github.com/thomasklemm/rails/tree/thomasklemm/pg-cast-result-scratch) | [`0afbc4b871`](https://github.com/thomasklemm/rails/commit/0afbc4b871488eb35c0914daf111629f64c7fa21) | every query result on PostgreSQL | −2 per query (27 → 25) | 121 / 121 | −22.5 / −23.8 | −0.4% / −0.4% |
 
 Interpreter / YJIT. The two branches touch different methods, so their savings should add up (not measured together).
@@ -150,15 +150,15 @@ Interpreter / YJIT. The two branches touch different methods, so their savings s
 
 | App | Workloads | 16: type-map keys | 17: scratch Arrays |
 | --- | ---: | ---: | ---: |
-| Sure | 9 | −396 / −398 | −51 / −80 |
+| Sure | 9 | −402 / −397 | −51 / −80 |
 | Mastodon (and `-nops`) | 14 | −279 / −279 | −30 / −30 |
-| Lago (and `-nops`) | 10 | −258 / −258 | −28 / −27 |
-| Loomio | 15 | −172 / −169 | −16 / −16 |
-| CASA | 10 | −144 / −152 | −30 / −25 |
-| Discourse | 14 | −132 / −289 | −18 / −18 |
-| Docuseal | 13 | −117 / −118 | −21 / −19 |
-| CodeTriage | 7 | −50 / −49 | −2.9 / −2.8 |
-| PingCRM | 8 | −27 / −25 | −4.6 / −6.7 |
+| Lago (and `-nops`) | 10 | −257 / −257 | −28 / −27 |
+| Loomio | 15 | −164 / −164 | −16 / −16 |
+| CASA | 10 | −147 / −148 | −30 / −25 |
+| Discourse | 14 | −133 / −293 | −18 / −18 |
+| Docuseal | 13 | −119 / −117 | −21 / −19 |
+| CodeTriage | 7 | −51 / −51 | −2.9 / −2.8 |
+| PingCRM | 8 | −28 / −29 | −4.6 / −6.7 |
 
 Every workload of every app moves, except 2–3 that grow for reasons outside Rails. Discourse's `GET topic.json`
 and `GET latest.json` grow in rack-mini-profiler lines (which Discourse samples in production), while their Rails
@@ -176,19 +176,29 @@ Candidate 16 removes 0.7–3.6% of each app's objects per workload (median).
 
 The key has to be an equal Array, but it doesn't have to be a new one. Result columns always look up with
 `sql_type = ""`, so their key is `[fmod, ""]`. A frozen `[fmod, ""]` per type modifier (a handful per app: −1, varchar
-lengths, numeric precisions) is the same key the cache already stores, and a new `HashLookupTypeMap#fetch_with_args`
-lets the adapter pass it in. `fetch` delegates to it. Nothing about the cache changes: key encoding, `register_type`
-and `alias_type` blocks (which still receive `*args`), `clear`, and lookups with a SQL type (schema columns, which
-still build their key).
+lengths, numeric precisions) is the same key the cache already stores. `HashLookupTypeMap#fetch_result_type` keeps
+it on the type map next to the cached types it indexes, and only once a type was cached under it: `register_type` and
+`clear` (so `reload_type_map`) drop it with them, a discarded type map takes it along, and a lookup whose block
+raises retains nothing. Nothing about the cache changes: key encoding, `register_type` and `alias_type` blocks
+(which still receive `*args`), and lookups with a SQL type (schema columns, which still use `fetch`).
+
+Review history: the first version (`e25d80d6af`) kept the keys in a process-global map that survived
+`reload_type_map` and grew with every distinct modifier. The second (`895b983e73`) moved them onto the type map but
+stored a key before its lookup succeeded, so failing lookups grew the key map until `clear`. `408e6a3e29` fixes both;
+census numbers are identical across the three (median +0.0 between them).
 
 ### Why each one is exact
 
 * **16:** the cache key passed to `fetch_or_store` is equal (`[fmod, ""].eql?([fmod, ""])`, same `hash`).
   `Concurrent::Map` looks keys up by `hash`/`eql?`, so a reused frozen key finds the same entry; on a miss it stores
   that frozen Array, which nothing mutates (before, it stored the caller's fresh rest Array). `perform_fetch`
-  receives the same splatted arguments, so registered blocks see the same values. The per-fmod key table only grows
-  with distinct type modifiers in result columns, which is bounded by the schemas queried. Third-party callers of
-  `fetch`/`lookup` are unchanged.
+  receives the same splatted arguments, so registered blocks see the same values (a block that mutates its rest
+  args mutates a copy). The key table holds at most one key per modifier with a cached type, and is cleared with
+  that cache; the type cache itself already grows the same way on main. A `clear` racing an in-flight lookup can
+  leave that one lookup's key behind, harmlessly (it is equal to the key it replaces). Third-party callers of
+  `fetch`/`lookup` are unchanged. Tests cover a hit through both paths, invalidation by `register_type`, `clear` and
+  `reload_type_map`, the keys belonging to the type map, failed lookups retaining nothing, and blocks mutating
+  their arguments.
 * **17:** `PG::Result#ftype` returns an Integer without allocating, so reading it again in each of the three passes
   replaces `field_types`. `missing_oids` is built only when an OID is missing, which is the only time it was read.
   The passes, their order, `load_additional_types` and `register_unknown_oid_type` calls are unchanged.
@@ -204,11 +214,12 @@ still build their key).
 * The census SQL control: no workload changed SQL beyond the A/A's own changes (Discourse `GET topic.json` text,
   `mastodon-nops` cache-order counts under YJIT).
 * Local suites, Ruby 4.0.7, `RAILS_STRICT_WARNINGS=1`, no warnings printed:
-  * **Active Record PostgreSQL 15, full:** both branches 11,166 runs, 0 failures, 0 errors, 31 skips (the census-5 count).
-  * **Active Record SQLite, full:** both branches 10,247 runs, 0 failures, 0 errors, 52 skips. Branch 16's first run
-    had 4 errors in `sqlite_rake_test.rb` because the orb lacked the `sqlite3` CLI; after installing it, 0.
+  * **Active Record PostgreSQL 15, full:** 17: 11,166 runs; 16 (`408e6a3e29`, with its 6 new tests): 11,172 runs.
+    Both 0 failures, 0 errors, 31 skips.
+  * **Active Record SQLite, full:** 17: 10,247 runs; 16: 10,252 runs. Both 0 failures, 0 errors, 52 skips. A first
+    run had 4 errors in `sqlite_rake_test.rb` because the orb lacked the `sqlite3` CLI; after installing it, 0.
   * **RuboCop:** each branch's changed files, no offenses.
-* **Open PRs:** none changes `get_oid_type` or `HashLookupTypeMap#fetch`. #44478 and #46409 (2022/2024) move the type
+* **Open PRs:** none changes `get_oid_type` or `HashLookupTypeMap`. #44478 and #46409 (2022/2024) move the type
   map into the schema cache and touch `get_oid_type`'s surroundings, not the key. #57785 adds a `get_oid_type` call
   in quoting, compatible. #57517 (oneearedrabbit) wraps `cast_result` in `@lock.synchronize` and reindents it, so it
   conflicts textually with 17 (not semantically); 17 rebases onto it in one hunk.
@@ -221,13 +232,14 @@ still build their key).
 > `*args` Array is the type map's cache key, so even when the type is cached, every column of every query allocates
 > one Array.
 >
-> Result columns have no SQL type, so their key is always `[fmod, ""]`. Keep one frozen key per type modifier and
-> pass it to a new `HashLookupTypeMap#fetch_with_args`, which `fetch` now calls. Keys, registered type blocks and
-> resolved types are unchanged; lookups with a SQL type still build their key.
+> Result columns have no SQL type, so their key is always `[fmod, ""]`. `HashLookupTypeMap#fetch_result_type` keeps
+> that key on the type map once a type was cached under it, next to the cached types it indexes: `register_type` and
+> `clear` (so `reload_type_map`) drop it with them, failed lookups retain nothing, and nothing is process-global.
+> Cache keys, registered type blocks and resolved types are unchanged; lookups with a SQL type still use `fetch`.
 >
 > One Array fewer per result column (a 10-column `select_all`: 27 → 17 objects in `cast_result`). Across nine
-> open-source apps on PostgreSQL (Mastodon, Discourse, Lago, Loomio, Docuseal, Sure, CASA, CodeTriage, PingCRM), 121 of
-> 124 request, job and mailer workloads allocate fewer objects, median −198 per workload (−2.4%), with or without
+> open-source apps on PostgreSQL (Mastodon, Discourse, Lago, Loomio, Docuseal, Sure, CASA, CodeTriage, PingCRM), 120 of
+> 124 request, job and mailer workloads allocate fewer objects, median −171 per workload (−2.4%), with or without
 > prepared statements. Allocation counts only; no timing claim.
 
 **17 — Avoid scratch Arrays when casting PostgreSQL results**
