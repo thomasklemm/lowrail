@@ -147,6 +147,19 @@ ruby-bench is per iteration (railsbench / lobsters / shipit).
 
 Not built yet; the ruby/ruby PR cap (15) applies before any of these can open.
 
+## New leads from Rails PR work (2026-11-03)
+
+Found while measuring open Rails PRs ([rails-open-evidence.md](rails-open-evidence.md)), Ruby master `9aa0898240`
+`--zjit`, Callgrind Ir per call with an A/A. Not from `--zjit-stats-iseq`; nothing posted.
+
+| lead | fallback / exit | repro or site | counts | status |
+|---|---|---|---|---|
+| A `Hash.new(capacity:)` | `opt_new` is not specialized for `Hash` under ZJIT, so ruby/ruby#19537's capacity fast path is skipped and the call allocates 2 transient Hashes | `Hash.new(capacity: 6)`: 3 objects per call under `--zjit`, 1 in the interpreter. Site: rails/rails#59557 `Array#index_with` | `index_with`, 3 Strings: +45.8% Ir against `to_h` (A/A 0.07%); `serializable_hash` with 4 attributes +11.3%; 8 Strings +16.1% | Taken: ruby/ruby#19662 (ours, open). Remeasure #59557 once it lands |
+| B direct association scope build | unknown: not measured with stats | `post.association(:comments).scope` after `reset_scope` ([`cpu_open.rb`](../../bench/upstream/rails-open/cpu_open.rb) `scope_hm`). rails/rails#59569 skips building the `AliasTracker` there | saves 8.3% Ir in the 4.0.7 interpreter and 6.1% under YJIT, +0.1% under ZJIT (that mode's A/A is 1.31%); ZJIT wall time −10% | Free, **unmeasured**: the ZJIT Ir may simply be noisy here, or the tracker path is already cheap or not compiled. Next step: `--zjit-stats-iseq` on `scope_hm` |
+
+Checked and not a ZJIT lead: a 2-local partial render allocates 35 objects on master in both the interpreter and
+ZJIT, against 33 on 4.0.7, so the extra 2 come from master, not ZJIT.
+
 ## Lead 10: the receiver class
 
 The fallback is the `UNSET.equal?(value)` send. The lobsters HIR dump shows
