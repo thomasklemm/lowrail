@@ -86,9 +86,11 @@ Every finished candidate (review gates passed, body drafted) goes into the **Que
 has room. Open the strongest first. A candidate made moot upstream leaves the queue with a note.
 
 * **rails/rails:** at most 20 of our PRs open (Thomas). Keep each PR small.
-* **ruby/ruby:** at most 15 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas). At 15 or
-  more, open nothing new until merges or closes bring the count below 15, and let the maintainers merge. New PRs
-  are VM or ZJIT, at most one new PR per day. Slots above the cap (Thomas): Shopify/ruby#1100's fix, which k0kubun
+* **ruby/ruby:** at most 20 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas; 15 earlier on
+  2026-11-03, back to 20 the same evening). At 20 or more, open nothing new until merges or closes bring the count
+  below 20, and let the maintainers merge. New PRs
+  are VM or ZJIT, at most one new PR per day. Slots above the cap are decided by the agent (Thomas, 2026-11-03), recorded here. Current ones: the 4.1 GC
+  pool-budget regression fix (Thomas approved); Shopify/ruby#1100's fix (ruby/ruby#19682), which k0kubun
   cleared on that issue; the top free lead from Z13's ranking (this slot was lead 7's, which turned out to be taken), and lead 3, class-level methods on
   many model classes (Shopify/ruby#1099 item 2), from the
   [lead queue](upstream/zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03). The green-lit Shopify/ruby#1064,
