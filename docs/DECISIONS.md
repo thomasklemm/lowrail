@@ -4,6 +4,17 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Rails PR evidence: CPU and provenance, not only objects (2026-11-03)
+
+fatkodima on [rails#59577](https://github.com/rails/rails/pull/59577#issuecomment-6606427493) asked how we choose
+what to optimize, what the real-world impact is and where the benchmark is, and called the code more complex for
+questionable benefit. Thomas agreed to this response: every new rails/rails PR gives CPU per call (ns and Ir,
+interpreter and YJIT on 4.0.7, A/A) next to objects, a one-line ruby-bench placement (or "within noise"), and one
+sentence on how the site was found, linking the census doc in the public Lowrail repo. Lowrail is named as our
+research project; Roundhouse is not mentioned. A candidate whose CPU gain is within noise and whose diff adds real
+complexity is not opened. Replies to "is this worth it" questions are drafted, reviewed twice (facts, then tone)
+and shown to Thomas before posting.
+
 ## Finding ZJIT leads in real Rails apps is a goal of its own (2026-11-03)
 
 Thomas: a main goal is to find new ZJIT leads in the census apps and take them on as issues or PRs, with targeted
