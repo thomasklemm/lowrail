@@ -118,11 +118,12 @@ question first. Leads 1–3 are #1099. Lead 10 is the general #19658/#19669 prob
 
 ## Queue: which leads are free (2026-11-03)
 
-Rule (DECISIONS, after k0kubun on [Shopify/ruby#1100](https://github.com/Shopify/ruby/issues/1100)): an idea is
-taken only when its own issue has an assignee or an open PR exists; burndown rows such as Shopify/ruby#1039's
-count as free. I checked assignees and all 67 open ruby/ruby PRs with "ZJIT" in the title on 2026-11-03. Numbers
-below come from runs with 0 `compile_error_out_of_memory` (the three apps that hit the 64 MiB code region were
-rerun with `--zjit-exec-mem-size=512 --zjit-mem-size=1024`). "Per op" is the mean over the apps reached;
+Rule (DECISIONS 2fa718c, after k0kubun on [Shopify/ruby#1100](https://github.com/Shopify/ruby/issues/1100)): an idea is
+taken when its own issue has an assignee, an open PR exists, or a tracker table names an assignee for it (such as
+the Assignee column of Shopify/ruby#1039); an unassigned tracker row is free. On 2026-11-03 I checked issue
+assignees, all open ruby/ruby PRs with "ZJIT" in the title, and all 83 rows of Shopify/ruby#1039 (body as of
+16:56Z), the only open Shopify/ruby tracker with an assignee column. Numbers below come from runs with 0
+`compile_error_out_of_memory` (the three apps that hit the 64 MiB code region were rerun with `--zjit-exec-mem-size=512 --zjit-mem-size=1024`). "Per op" is the mean over the apps reached;
 ruby-bench is per iteration (railsbench / lobsters / shipit).
 
 **Taken**
@@ -140,11 +141,14 @@ ruby-bench is per iteration (railsbench / lobsters / shipit).
 
 | rank | lead | apps | per op | ruby-bench | why this rank |
 |---|---|---|---|---|---|
-| — | 7 `&block` forwarding | | | | **Taken** (see above): k0kubun is the assignee of Shopify/ruby#1039 row 7. Rows 41/44/49 build on it. |
-| 2 | 10 `singleton_class_seen` for module receivers (`IndexedRow::Mutable#fetch` → `UNSET.equal?`) | 6 | 431 | 0 / 1.2k / 0.2k | Small: guard the receiver's class instead of a dynamic send. A standalone repro exists. It's free because ruby/ruby#19669 was closed by its author (linyiru, no comment). It builds on linyiru's open ruby/ruby#19658, so it should wait for or sit on top of that PR. Matters mostly on Rails main. |
-| 3 | 3 class-level methods on many model classes (`_reflections`, `attribute_aliases`, `schema_context`) | 10 | 325 | 0 / 10.5k / 16.2k | Shopify/ruby#1099 item 2: 7–36 receiver classes, but one method entry. Needs a method-entry-keyed guard (cf. Shopify/ruby#1039 rows 24/25/27, unassigned). Design-heavy. |
-| 4 | 1 polymorphic yield in `Array#each`/`map`/`find` | 10 | 1,397 | 242k / 136k / 361k | Biggest volume overall, but the largest change. Block inlining is k0kubun's (Shopify/ruby#1093, assigned). Run-time block-ISEQ dispatch (Shopify/ruby#1039 row 55) is free but sits right next to that work, so collision risk is high. |
-| 5 | 2 `BasicObject#!=` (polymorphic inner `==`) | 10 | 277 | 0 / 3.8k / 0 | A polymorphic dispatch inside a builtin. Little ruby-bench effect, and it would ride on any general polymorphic-send work rather than stand alone. |
+| 1 | 10 `singleton_class_seen` for module receivers (`IndexedRow::Mutable#fetch` → `UNSET.equal?`) | 6 | 431 | 0 / 1.2k / 0.2k | Small: guard the receiver's class instead of a dynamic send. A standalone repro exists. It's free because ruby/ruby#19669 was closed by its author (linyiru, no comment). It builds on linyiru's open ruby/ruby#19658, so it should wait for or sit on top of that PR. Matters mostly on Rails main. |
+| 2 | 3 class-level methods on many model classes (`_reflections`, `attribute_aliases`, `schema_context`) | 10 | 325 | 0 / 10.5k / 16.2k | Shopify/ruby#1099 item 2: 7–36 receiver classes, but one method entry. Needs a method-entry-keyed guard (cf. Shopify/ruby#1039 rows 24/25/27, still unassigned). Design-heavy. |
+| 3 | 1 polymorphic yield in `Array#each`/`map`/`find` | 10 | 1,397 | 242k / 136k / 361k | Biggest volume overall, but the largest change. Block inlining is k0kubun's (Shopify/ruby#1093, assigned). Run-time block-ISEQ dispatch (Shopify/ruby#1039 row 55) is free but sits right next to that work, so collision risk is high. |
+| 4 | 2 `BasicObject#!=` (polymorphic inner `==`) | 10 | 277 | 0 / 3.8k / 0 | A polymorphic dispatch inside a builtin. Little ruby-bench effect, and it would ride on any general polymorphic-send work rather than stand alone. |
+
+Shopify/ruby#1039 rows per lead (2026-11-03): 10 and 2 have no row; 3 is near rows 24/25/27 and 1 near row 55,
+all unassigned; 7b is row 7's `split_nil_block_arg` (k0kubun, taken); 7c has no row (rows 19 and 45 are other
+mechanisms, unassigned); 7d is row 44 (unassigned).
 
 Not built yet; the ruby/ruby PR cap (15) applies before any of these can open.
 
