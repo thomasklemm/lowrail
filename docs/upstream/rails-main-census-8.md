@@ -278,6 +278,52 @@ threads. Its checks:
 * The commit message is accurate, and no CHANGELOG entry is needed.
 * Optional: a test covering the line-start and `cid:`/`data:` cases, if maintainers ask.
 
+### Rebased with time (2026-11-03)
+
+Thomas approved opening C8-1 and asked for time next to instructions first. The branch is rebased onto rails/rails
+main [`d795dac950`](https://github.com/rails/rails/commit/d795dac950) as one commit,
+[`8d9d843428`](https://github.com/thomasklemm/rails/commit/8d9d843428e1ad9c243064d15439cd8591a8fb1a) (Thomas as author
+and committer), and force-pushed to the fork with a lease from `84b0a308dc`.
+
+* **Suites** (`RAILS_STRICT_WARNINGS=1`, `SEED=41231`, Ruby 4.0.9, base `d795dac950` and C8-1): Action View
+  `rake test` 2,913 + 251 + 177 runs, 0 failures, 0 errors, 0 skips, exit 0 on both. The same two capybara 3.40.0
+  warnings appear on both. RuboCop on `asset_url_helper.rb`: no offenses.
+* **Objects per call** (interpreter and YJIT, base and C8-1): `asset_path("application.css")` 5,
+  `stylesheet_link_tag("application")` 24, `asset_path("https://cdn.example.com/x.js")` 1. No change.
+* **Time** ([ns.sh](../../bench/upstream/census8/ns.sh), [ns_best.rb](../../bench/upstream/census8/ns_best.rb), the
+  `ns` mode of [micro.rb](../../bench/upstream/census8/micro.rb)): wall ns per call over 200,000 calls with GC
+  enabled, one process per run pinned to one CPU, best of 7 rounds, main / main again / C8-1 interleaved in a
+  rotating order. **Ir:** [ir.sh](../../bench/upstream/census8/ir.sh) at N = 20,000. At N = 3,000 the URL case under YJIT
+  showed +130 Ir per call for C8-1. The gap was +20 at N = 20,000 and +4 at N = 60,000, which points to a fixed
+  ~0.4M Ir of YJIT compile work landing inside the window, not a per-call cost. The regexp alone costs 2,163 Ir
+  (interpreter) and 2,020 / 2,021 (YJIT) per `match?` on the URL in both forms. Raw runs are in
+  [data/rails-main-census-8/c8-1-pr](data/rails-main-census-8/c8-1-pr/).
+
+| Call | Mode | ns main | ns A/A | ns C8-1 | Ir main | Ir A/A | Ir C8-1 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `asset_path("application.css")` | interp | 2,621 | −1.1% | **2,296 (−12.4%)** | 34,778 | +0.04% | **31,134 (−10.5%)** |
+| | YJIT | 1,883 | −0.9% | **1,608 (−14.6%)** | 25,927 | +0.01% | **22,306 (−14.0%)** |
+| `stylesheet_link_tag("application")` | interp | 7,932 | +1.9% | 7,829 (−1.3%) | 88,765 | +0.20% | **85,475 (−3.7%)** |
+| | YJIT | 4,760 | −1.0% | 4,655 (−2.2%) | 56,968 | +0.26% | **53,798 (−5.6%)** |
+| `asset_path("https://cdn.example.com/x.js")` | interp | 216 | +1.0% | 224 (+3.8%) | 3,561 | 0.00% | 3,525 (−1.0%) |
+| | YJIT | 168 | −4.7% | 168 (−0.2%) | 2,270 | +0.22% | 2,292 (+1.0%) |
+
+The time saving clears the A/A only for `asset_path` with a relative source. For `stylesheet_link_tag` the time
+differences (−1.3% / −2.2%) are about the size of the A/A (+1.9% / −1.0%), although the Ir drop is clear. For the absolute URL, a repeat session gave interp
++2.6% against an A/A of −4.0% and YJIT +0.4% against +0.3%. The regexp cost is identical, so the +3.8% in the first
+session is read as noise, and the body says so.
+
+The full PR body, after a separate reviewer checked it against this doc and the raw runs (8 findings, all
+applied: the scripts link needs this branch on main, the YJIT time wording, the URL Ir explanation, the census
+scope), is [pr-body.md](data/rails-main-census-8/c8-1-pr/pr-body.md). Not posted yet: the Rails PR template asks
+contributors not to open draft PRs, and Thomas asked for a draft, so that waits for his choice.
+
+**Overlap search (again, 2026-11-03):** `gh search prs --repo rails/rails` for `URI_REGEXP`, `asset_path regexp`,
+`asset_url_helper` (open), `asset_path` (by update), `regexp anchor alternation`, `anchor regexp alternatives`,
+`asset_path faster`, `remote_url? regexp`, `compute_asset_host regexp` and `URI regexp asset`. The only PR naming
+`URI_REGEXP` is #10969 (2013). [#58270](https://github.com/rails/rails/pull/58270) (merged 2026-08) changed
+another part of `asset_path` and is in the base. #59511 (merged) changes preload Link headers. No overlap.
+
 ### PR draft (short form, not published)
 
 **Anchor `URI_REGEXP` once instead of per alternative**

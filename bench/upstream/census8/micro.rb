@@ -4,6 +4,7 @@
 #   RAILS=DIR ruby [--yjit|--zjit] micro.rb CASE N ir     N calls inside Array#cycle (GC off), for
 #                                                         Callgrind --toggle-collect=rb_ary_cycle (ir.sh)
 #   RAILS=DIR ruby [--yjit|--zjit] micro.rb CASE N stats  objects per call
+#   RAILS=DIR ruby [--yjit|--zjit] micro.rb CASE N ns     wall ns per call over N calls, GC on (ns.sh)
 # Loads Rails from the checkout's lib directories, so a Ruby without a bundle (master) runs it too.
 rails = ENV.fetch("RAILS")
 %w[activesupport activemodel activerecord actionview].each { |c| $LOAD_PATH.unshift(File.join(rails, c, "lib")) }
@@ -60,4 +61,11 @@ when "stats"
   before = GC.stat(:total_allocated_objects)
   1000.times { fn.() }
   puts "#{name} #{RUBY_DESCRIPTION[/\A\S+ \S+/]} #{(GC.stat(:total_allocated_objects) - before) / 1000.0} objects"
+when "ns"
+  GC.enable
+  20_000.times { fn.() }
+  GC.start
+  t = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
+  n.times { fn.() }
+  puts format("%.1f", (Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) - t).fdiv(n))
 end
