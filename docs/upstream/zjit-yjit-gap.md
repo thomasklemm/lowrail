@@ -31,7 +31,7 @@ Ranked by size, the leads are (M Ir per iteration, railsbench / lobsters / shipi
 
 | # | lead | M Ir | share of gap | status |
 |---|---|---|---|---|
-| 11 | attr_reader/getivar on shape-polymorphic receivers without a shape profile (`getivar_fallback_no_profile_missing_ic`) | 12.4 / 30.8 / 83.9 | 7% / 17% / 14% | **free** (Shopify/ruby#1099 pattern 1, unassigned) |
+| 11 | attr_reader/getivar on shape-polymorphic receivers without a shape profile (`getivar_fallback_no_profile_missing_ic`) | 12.4 / 30.8 / 83.9 | 7% / 17% / 14% | taken (tekknolagi: ruby/ruby#19443 open, ruby/ruby#18616 draft; see [Lead 11](#lead-11-why-there-is-no-profile)) |
 | 3 | class-polymorphic sends to one method entry (`send_polymorphic_fallback`) | 7.2 / 42.1 / 180.1 | 4% / 24% / 29% | **free** (Shopify/ruby#1099 pattern 2; slot granted) |
 | 1 | polymorphic or unspecialized yields in `Array#each`/`#map` | 70.4 / 27.2 / 60.9 | 38% / 15% / 10% | taken (k0kubun, Shopify/ruby#1093) |
 | 12 | cfunc calls with a frame: ~40 Ir of JIT code against YJIT's ~18 | 48 / 22 / 35 | 26% / 12% / 6% | **free**, mechanism not confirmed |
@@ -44,9 +44,9 @@ Ranked by size, the leads are (M Ir per iteration, railsbench / lobsters / shipi
 | 17 | `throw` from blocks and exception handlers unwind by longjmp and materialize frames | 15.6+ / 5.3+ / 13.2+ | 8% / 3% / 2% | taken (Shopify/ruby#1093, ruby/ruby#18759, ruby/ruby#18244) |
 | 16 | PatchPoint nop padding executed inline | 31.7 / 14.0 / 27.9 | Ir only, not cycles | free, low priority |
 
-Lead 11 and lead 3 are the largest free leads on lobsters and shipit, and lead 12 is the largest free lead on
-railsbench. The full list with sites is in [Leads](#leads). No crash, wrong result or divergence turned up. The
-only failed run was a lobsters 500 caused by two processes sharing one `tmp/cache`, not by a JIT. After that,
+Lead 3 is the largest free lead on lobsters and shipit, and lead 12 is the largest free lead on railsbench.
+Lead 11 turned out to be taken ([Lead 11](#lead-11-why-there-is-no-profile)). The full list with sites is in
+[Leads](#leads). No crash, wrong result or divergence turned up. The only failed run was a lobsters 500 caused by two processes sharing one `tmp/cache`, not by a JIT. After that,
 every run used its own copy of ruby-bench.
 
 ## Pins and method
@@ -189,7 +189,7 @@ estimated M Ir in brackets):
 
 | reason | railsbench | lobsters | shipit | lead / owner |
 |---|---:|---:|---:|---|
-| `getivar_fallback_no_profile_missing_ic` | 218k (12.4) | 303k (30.8) | 706k (83.9) | 11, free |
+| `getivar_fallback_no_profile_missing_ic` | 218k (12.4) | 303k (30.8) | 706k (83.9) | 11, taken |
 | `send_fallback_send_polymorphic_fallback` | 26.5k (7.2) | 148k (42.1) | 515k (180.1) | 3, free |
 | `send_fallback_invokeblock_polymorphic_miss` | 154k (41.8) | 42k (11.9) | 161k (56.2) | 1, taken (Shopify/ruby#1093) |
 | `send_fallback_invokeblock_not_specialized` | 105k (28.6) | 54k (15.3) | 13.5k (4.7) | 1, taken (Shopify/ruby#1093; ours ruby/ruby#19659) |
@@ -335,13 +335,122 @@ The lead numbers continue [zjit-iseq-leads](zjit-iseq-leads.md#new-leads-from-th
 queue has the ranked list with free/taken status, checked on 2026-11-03 against assignees, all 67 open ruby/ruby
 PRs with "ZJIT" in the title, and keyword searches of Shopify/ruby issues and ruby/ruby PRs.
 
-* **Free and new:** 11 (attr_reader/getivar on shape-polymorphic receivers), 12 (cfunc frame cost in JIT code),
+* **Free and new:** 12 (cfunc frame cost in JIT code),
   13 (JITFrame root marking), 14 (`&block` to C methods / `complex_arg_pass`), 15 (getivar on final versions and
   singleton objects), 16 (PatchPoint nops), and 18 (`with_vm_lock` `gc_rest`, wall time only).
 * **Existing, now sized:** 3 (class-polymorphic sends, the largest on shipit), 7 (`&block` forwarding), and 1, 4,
   5, 6, 9 (taken).
-* **Taken, new:** 17 (`throw` unwinding and materialization, Shopify/ruby#1093 / ruby/ruby#18244 / #18759) and 19
-  (`PushInlineFrame`, Shopify/ruby#1023).
+* **Taken, new:** 11 (attr_reader/getivar on shape-polymorphic receivers; tekknolagi's ruby/ruby#19443 and draft
+  ruby/ruby#18616, see [Lead 11](#lead-11-why-there-is-no-profile)), 17 (`throw` unwinding and materialization,
+  Shopify/ruby#1093 / ruby/ruby#18244 / #18759) and 19 (`PushInlineFrame`, Shopify/ruby#1023).
+
+## Lead 11: why there is no profile
+
+Follow-up of 2026-11-03 on lead 11, ruby/ruby master `a8b095a07e`. This was an investigation only: nothing was
+built for upstream and nothing was posted. Repro scripts and dumps are in `~/w/l11` on the orb and were not
+committed.
+
+**Cause: the profile exists, but a polymorphic dispatch arm drops it.** Neither of the other suspected causes holds:
+attr_reader dispatch does profile, and the profile slot is filled. The sites are not megamorphic either: 71–77% of
+these sites see a single (class, shape) and two entries cover 88–96%. The loss happens in three steps (HIR dumps
+with `--zjit-dump-hir`):
+
+1. In `iseq_to_hir`, `opt_send_without_block` with a polymorphic receiver profile emits one `CondBranchHasType` arm
+   per distinct class. Each arm takes a fresh Snapshot with `profiles.copy_entries_except(exit_id, snapshot,
+   recv)`, which drops the receiver's profile entry. The arm's receiver is then only `StaticallyKnown` from the
+   class refinement.
+2. In `type_specialize`, the attr_reader (`VM_METHOD_TYPE_IVAR`) branch finds `profiled_type = None`. It emits
+   `GetIvar` with `ic: null` and counts `getivar_fallback_no_profile_missing_ic`.
+3. Codegen calls `rb_ivar_get`, a full shape-tree walk (`rb_ivar_lookup` + `rb_shape_get_iv_index`) of about
+   130 Ir per call inclusive.
+
+The same happens to an implicit-self reader inside a method that is inlined into such an arm: `PushInlineFrame :get`
+is followed by `GetIvar v18, :@v` with no IC.
+
+**Repro** (`r.rb`, 300 warmup calls, then 10,000 calls; fallbacks counted over the 10,000):
+
+| case | master | with ruby/ruby#19443 |
+|---|---|---|
+| `box`: one class, two shapes, `o.v` (Shopify/ruby#1099 pattern 1) | 10,000 | 10,000 |
+| `selfshape`: one class, two shapes, `def get = v` | 10,000 | 10,000 |
+| `selfmono`: one class, one shape | 0 | 0 |
+| `selfclasses`: two subclasses, reader in the base class (`Type::Value#hash`-like) | 10,000 | 0 |
+| `selfmanyclasses`: six subclasses | 8,334 getivar + 3,332 `send_polymorphic_fallback` | 0 getivar + 3,332 `send_polymorphic_fallback` |
+
+Callgrind micro-benchmark (ZJIT, per call, GC excluded):
+
+| case | Ir per call |
+|---|---|
+| empty loop | 33 |
+| attr_reader, one shape | 67 |
+| attr_reader, two shapes | 181 |
+| `@v` read, two shapes | 97 |
+
+A two-shape attr_reader costs about 114 Ir more than a one-shape one; `rb_ivar_get` alone is 104 Ir.
+
+**What ruby/ruby#19443 changes** (tekknolagi, "ZJIT: Specialize polymorphic class + monomorphic shape", open, approved by jacob-shops and k0kubun). It gives an
+arm a monomorphic profile when exactly one bucket names the arm's class. That handles different classes with one
+shape each, but not several shapes of one class. Its diff carries the TODO "Specialize for polymorphic shape within
+a type". The hir.rs and distribution.rs parts were applied on `a8b095a07e`; opt_tests.rs was left out because of a
+conflict. The runs used 512/1024 MiB with 0 `compile_error_out_of_memory`.
+
+| per iteration | railsbench | lobsters | shipit |
+|---|---|---|---|
+| `getivar_fallback_no_profile_missing_ic`, master → #19443 (stats) | 221k → 197k (−11%) | 320k → 246k (−23%) | 837k → 587k (−30%) |
+| `rb_ivar_get` calls, master → #19443 (Callgrind) | 243k → 219k | 354k → 306k | 1,001k → 785k |
+| `rb_ivar_get` inclusive Ir, master → #19443 | 31.5 → 28.7 M | 48.7 → 41.7 M | 131.5 → 100.9 M |
+| total Ir, master a / c → #19443 a / c | 4,943 / 4,946 → 4,935 / 4,941 M | 3,274 / 3,303 → 3,267 / 3,266 M | 3,972 / 3,972 → 3,936 / 3,935 M |
+
+Shipit drops 0.9%, against an A/A of 0.03%. Railsbench and lobsters move less than their A/A spread in total Ir,
+but the drop in `rb_ivar_get` is deterministic. `getivar_fallback_no_side_exits` rises on lobsters (154k → 178k)
+and shipit (411k → 437k). That is lead 15's bucket, now reached by readers whose arm has a shape but whose final
+version has no side exits.
+
+Callgrind setup: 10 warmup and 3 measured iterations in two runs (a, c). Both runs of a build share the `a` perf
+map, which only affects the per-symbol split, not totals or C functions.
+
+**Remaining after #19443: 70–89% of the lead.** These are arms whose class was profiled with two or more shapes:
+`Arel::Collectors::Composite#<<`, `ActiveModel::Attribute#hash`/`#==` and `Association#klass` all see
+attribute-dependent shapes per class. The remaining gap against YJIT is about **11 / 24 / 59 M Ir per iteration**,
+the old size scaled by the remaining count.
+
+**Smallest exact fix.** Give each arm every profiled shape of its class, not only the shape when exactly one
+exists. Then `GetIvar` in the arm becomes a shape-compare chain: compare the shape, load the field, and otherwise
+fall through to `rb_ivar_get`, the generic helper. A miss must not side-exit, because the arm never promised a
+shape, and must not re-profile, because that would discard the type profile the arms came from. This is exact: a
+shape determines the ivar's index, and a miss goes through the same helper as today. An IC on the attr_reader's
+`GetIvar` would be smaller, but `rb_vm_getinstancevariable`'s one-entry IC thrashes on these alternating shapes.
+Implicit-self readers inlined into an arm need the same handoff, through the `self` of the inline frame.
+
+**Ir estimate.** A shape compare plus a load is about 5–10 Ir against about 130. With up to two shapes per arm
+covering about 90% of reads, the fix saves about **21 / 27 / 63 M Ir per iteration (0.4% / 0.8% / 1.6% of ZJIT's
+total)** over #19443. That is more than the gap to YJIT above, because YJIT also pays `rb_ivar_get_at_no_ractor_check`
+at some of these sites.
+
+**Ownership: taken.**
+
+* **ruby/ruby#18616** (tekknolagi, open draft, "ZJIT: Seed polymorphic type branches with shape data too", updated
+  2026-09-04, no reviews). It does exactly this. In `specialize_polymorphic_send`, it groups the profile buckets of
+  each class and emits a `LoadShape` + `IsBitEqual` + `CondBranch` chain over the arm's shapes "to optimize
+  polymorphic attr_reader to field loads instead of generic getivar". Under the queue rule, an open PR makes the
+  lead taken. The draft was missed in the first status check.
+* **ruby/ruby#19443** (tekknolagi, open, approved) is the one-shape half of the lead, and its TODO is the
+  multi-shape half.
+* **Shopify/ruby#1039, rows 77 and 78** (k0kubun's lobsters branch, rows with no assignee): `a96d35362b` "Keep the
+  profiled shape reachable through guards and dispatch arms" and `4857dd0ef5` "Branch on the ivar shape for
+  attr_accessor sends in polymorphic arms".
+  * They port upstream `zjit/all` commits `af5bc8f19d`, `98f1b7adbd`, `2f92871390`, `afe2f672d9` and `7ce7db7820`
+    to this mechanism, including the inlined-callee leak and the no-reprofile miss path.
+  * Row 77's message measures `zjit/all` at 338,599 `getivar_fallback_no_profile_missing_ic` against 5,204,190 on
+    its base (whole lobsters run).
+  * On lobsters, row 77 measures −0.69% and row 78 +0.00%, which is within the issue's ±0.5% noise.
+* **Shopify/ruby#1099** has no assignee; lead 11 is its pattern 1. Our ruby/ruby#19558 covers sends, not getivar.
+
+Recommendation: take lead 11 off the free list. Don't build it. The data above (per-site counts, the five-case
+repro, and the measured #19443 effect) could later help tekknolagi's draft or rows 77/78, once posting is open
+again.
+
+No crash, wrong result or divergence turned up in this follow-up.
 
 ## Caveats
 
