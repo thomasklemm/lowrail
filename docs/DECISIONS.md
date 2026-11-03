@@ -10,11 +10,12 @@ Sampling profiles of five census apps and ruby-bench's erubi-rails and railsbenc
 interpreter and YJIT) put no single Action View frame above 1.8% of an app page; the largest shared cost is the
 escape path behind `<%= %>` ([actionview-cpu](upstream/actionview-cpu.md)). **C1** (`OutputBuffer#<<` calls
 `ERB::Escape.html_escape` directly for plain Strings; amended after Sol's review to keep String subclasses on
-the old path) cuts erubi-rails instructions by 6.9% interpreter / 5–10% YJIT (A/A ≤ 0.4%) with an unchanged census. **C2** (the same for every `unwrapped_html_escape`) is held: it removes the `super`
-that #46573 chose for prepend-friendliness. Submitting C1 needs Thomas's call on that boundary. Rejected with
+the old path, then after a second review to inline `unwrapped_html_escape`'s own `to_s` and `html_safe?` steps) cuts
+erubi-rails instructions by 5.8% interpreter / 5–6% YJIT (6–9% on Ruby master; A/A ≤ 0.5%) with an unchanged census. **C2** (the same for every `unwrapped_html_escape`) is held: it removes the `super`
+that #46573 chose for prepend-friendliness. Thomas decided to submit C1 and leave that boundary to the reviewer; the draft states it. Rejected with
 numbers: `xml_name_escape`, `ensure_valid_html5_tag_name`, `_all_renderers`; `prepend_formats` stays a lead. App
-pages cannot be priced by instruction counts (A/A up to ±7%). YJIT's `invokesuper_singleton_class` fallback is a
-separate Ruby lead.
+pages cannot be priced by instruction counts (A/A up to ±7%). YJIT's `invokesuper_singleton_class` fallback is recorded as a YJIT lead only (JIT work goes
+mainly to ZJIT, ruby#19671); ZJIT has no such check by source reading, unmeasured.
 
 ## Lowrail reoriented toward upstream fixes and advisory types (2026-11-02)
 
