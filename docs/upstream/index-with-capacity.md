@@ -2,10 +2,19 @@
 
 **Result: one variant beats `to_h` on Ruby 4.1 without changing Ruby 4.0.** On Ruby 4.1, `Array#index_with` fills a
 hash built with `Hash.new(capacity: size)`, or `{}` when the array has two elements or fewer. It is the same embedded hash
-`Array#to_h` makes, without a pair Array per element. Ruby 4.0 and older keep `to_h` unchanged. It is one commit on
+`Array#to_h` makes, without a pair Array per element. Ruby 4.0 and older, and Array subclasses, keep `to_h` unchanged. It is one commit on
 [`thomasklemm/index-with-capacity`](https://github.com/thomasklemm/rails/tree/thomasklemm/index-with-capacity),
-[`c1da731`](https://github.com/thomasklemm/rails/commit/c1da73121f543f16c1ac61ddf65b431731b86061), based on canonical
-main [`5810776eec`](https://github.com/rails/rails/commit/5810776eec). No PR is open.
+[`412a33b`](https://github.com/thomasklemm/rails/commit/412a33b0c9b2dade53d3bb5162f9b2be94d51cd6), stacked on
+[`6235de2`](https://github.com/thomasklemm/rails/commit/6235de2236077aafd67d4991cab172715054ebd0) (rails/rails#59555,
+the `Hash#index_with` fix, which adds the `Array#index_with` this change extends), on canonical main
+[`5810776eec`](https://github.com/rails/rails/commit/5810776eec). No PR is open for it.
+
+**Review round 1** (Codex Thermos, gpt-6.1-sol) on the first version, `c1da731`, requested two changes, both made.
+(1) The 4.1 path used `size` and `each`, which an Array subclass can override, where `Array#to_h` reads the storage
+directly. The fast path is now taken only when `instance_of?(Array)`; subclasses keep `to_h`. (2) The gate
+`RUBY_VERSION >= "4.1"` compared strings (`"10.0" < "4.1"`). It is now `Gem::Version`, evaluated once at load time.
+Per-call allocations and memsizes are unchanged from `c1da731` at every size on 4.1 (interpreter and YJIT) and 4.0.7,
+so the heap-harness, census and wall-time numbers below, measured on the `c1da731` method, still apply.
 
 | | main (`to_h`) | candidate on 4.1 |
 | --- | --- | --- |
@@ -439,24 +448,34 @@ Every variant/main ratio sits inside the spread of its A/A control or the 4.0 se
 
 ```ruby
 class Array # :nodoc:
-  if RUBY_VERSION >= "4.1"
-    # Same as Enumerable#index_with, without a pair array per element. An empty
-    # hash has room for two entries; for more, Hash.new(capacity:) sizes the
-    # hash before allocating it (ruby/ruby#19537), so it is embedded for up to
-    # 8 entries, as Array#to_h would make it.
+  # Array#to_h sizes the hash for the array up front, so it stays embedded up
+  # to 8 entries, where Enumerable#index_with's growing hash would move to the
+  # C heap.
+  #
+  # Since Ruby 4.1 (ruby/ruby#19537), Hash.new(capacity:) sizes the hash the
+  # same way, without Array#to_h's pair array per element. An empty hash already
+  # has room for two entries. Subclasses keep Array#to_h, which reads the
+  # elements directly rather than through an overridden #each or #size.
+  if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.1")
     def index_with(default = (no_default = true))
-      if block_given?
-        result = size > 2 ? Hash.new(capacity: size) : {}
-        each { |elem| result[elem] = yield(elem) }
-        result
-      elsif no_default
+      if no_default && !block_given?
         to_enum(:index_with) { size }
-      else
+      elsif instance_of?(Array)
         result = size > 2 ? Hash.new(capacity: size) : {}
-        each { |elem| result[elem] = default }
+        if block_given?
+          each { |elem| result[elem] = yield(elem) }
+        else
+          each { |elem| result[elem] = default }
+        end
         result
+      elsif block_given?
+        to_h { |elem| [elem, yield(elem)] } # rubocop:disable Rails/IndexWith
+      else
+        to_h { |elem| [elem, default] } # rubocop:disable Rails/IndexWith
       end
     end
+  else
+    # The #59555 method, unchanged.
   end
 end
 ```
@@ -474,23 +493,28 @@ end
   deliberate. A generic `respond_to?(:size)` path would call `Relation#size`, which can run a `COUNT` query, and
   `Enumerator#size`, which can be nil or computed lazily. Hash receivers are a separate question: main
   regressed them, which is fixed on its own branch (see [Other findings](#other-findings)).
-* **Boundary: Array subclasses that override `each`.** Main's `to_h` is `Array#to_h`, which walks the array in C and
-  ignores an overridden `each`; the candidate calls `each`. That is what Rails 8.1 and #59108 did. No Rails class
-  does this, but a subclass whose `each` yields something other than its elements would now index those.
+* **Array subclasses keep `to_h`.** `Array#to_h` walks the storage in C and ignores an overridden `each` or `size`.
+  The fast path calls both, so it runs only for `instance_of?(Array)`; a subclass gets exactly main's result, on
+  every Ruby. The `instance_of?` check allocates nothing.
 * **Boundary: Ruby 4.1.0dev builds between ruby/ruby#18345 and #19537** take the capacity path without #19537's
   presizing, so they spill as #59108 did. Released 4.1 will include #19537.
-* **Ruby 3.3:** `Hash.new(capacity:)` does not exist before 3.4. The gate is `>= "4.1"`, so 3.3.5 never reaches it.
+* **Version gate:** `Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.1")`, evaluated once when the file loads,
+  so it orders `10.0` after `4.1` and costs nothing per call. `Hash.new(capacity:)` does not exist before 3.4;
+  3.3.5 never reaches it.
 
 ### Tests and suites
 
 * New `test_index_with_array` in `activesupport/test/core_ext/enumerable_test.rb`. It checks 12 elements with the
   block and default forms against expectations built with `zip`, that the result has no default, the empty array,
   that the default object is shared, duplicate keys (order and last value), and the enumerator's size and `each`.
-* On 4.1, it fails each of six wrong implementations: a positional `Hash.new(size)`, keeping the first value,
+* New `test_index_with_array_subclass_overriding_each_and_size`: an Array subclass whose `each` is `reverse_each`
+  and whose `size` raises, in the block and default forms, must give main's order. It errors on `c1da731` under 4.1
+  and passes on 4.0.7 and on this commit.
+* On 4.1, `test_index_with_array` fails each of six wrong implementations: a positional `Hash.new(size)`, keeping the first value,
   `reverse_each` in either form, an unsized enumerator, and `default.dup`. It passes on unchanged main, so it
   pins current behavior rather than the implementation.
-* **ActiveSupport suite, `RAILS_STRICT_WARNINGS=1`:** Ruby 4.0.7, 6869 runs, 29,892 assertions, 0 failures, 0 errors,
-  60 skips. Ruby 4.1.0dev, 6869 runs, 0 failures and 1 error:
+* **ActiveSupport suite, `RAILS_STRICT_WARNINGS=1`, on `412a33b`:** Ruby 4.0.7, 6871 runs, 0 failures, 0 errors,
+  1766 skips. Ruby 4.1.0dev, 6871 runs, 0 failures and 1 error:
   `NotificationSubscriptionTest#test_record_and_set_subscriptions_when_using_a_regexp`, a
   `Ractor::Error: can not copy ActiveSupport::Notifications::Fanout::Registry` that occurs the same way on
   unchanged main under Ruby master (not related to this change). RuboCop: no offenses.
@@ -498,6 +522,8 @@ end
 ### PR description draft (not published)
 
 > **Build `Array#index_with` without pair arrays on Ruby 4.1**
+>
+> Depends on #59555, which adds the `Array#index_with` this extends; only the last commit is new here.
 >
 > ### Motivation / Background
 >
@@ -514,15 +540,16 @@ end
 > ### Detail
 >
 > On Ruby 4.1, `Array#index_with` fills `Hash.new(capacity: size)`, or `{}` for two elements or fewer since that already
-> fits them. Ruby 4.0 and older keep `to_h`, because there `Hash.new(capacity:)` spills even small hashes. Other
-> enumerables keep `Enumerable#index_with`. The result is the same hash, with the same order, duplicate-key handling,
+> fits them. Ruby 4.0 and older keep `to_h`, because there `Hash.new(capacity:)` spills even small hashes. Array
+> subclasses keep `to_h` too, since it reads the elements directly rather than through an overridden `each` or `size`.
+> The version check uses `Gem::Version` once at load time. The result is the same hash, with the same order, duplicate-key handling,
 > default object and sized enumerator. Its memsize is identical to `to_h`'s at every size from 0 to 50.
 >
 > ### Additional information
 >
 > Per call on Ruby 4.1.0dev (7142a3d): n + 1 objects become 1 in the interpreter. Under YJIT it is 3 for more than two
-> elements, because YJIT and ZJIT don't yet take #19537's `opt_new` fast path. Those two extra objects go away with the
-> pending YJIT/ZJIT `Hash.new(capacity:)` work.
+> elements, because YJIT and ZJIT don't yet take #19537's `opt_new` fast path. Those two extra objects go away with
+> ruby/ruby#19662 and #19663.
 >
 > byroot's heap-report harness, one iteration, Rails main against this change:
 >
@@ -559,8 +586,8 @@ end
 
 * **YJIT/ZJIT: `opt_new` has no `Hash` `capacity:` branch.** Interpreted, `Hash.new(capacity: n)` allocates 1 object
   after #19537. Under `--yjit` or `--zjit` it allocates 3: the result plus two transient Hashes, at any n. The
-  YJIT and ZJIT parts of #19537 only regenerated bindings. **Already in progress:** U1's `yjit-hash-new` and
-  `zjit-hash-new` branches on thomasklemm/ruby, stacked on ruby/ruby#19660 and the Hash-subclass fix. Once they land,
+  YJIT and ZJIT parts of #19537 only regenerated bindings. **Already in progress:** ruby/ruby#19662 and #19663
+  (U1's `yjit-hash-new` and `zjit-hash-new`), stacked on ruby/ruby#19660 and the Hash-subclass fix. Once they land,
   the candidate costs 1 object under YJIT too, and its `> 2` split stays harmless.
 * **`Enumerable#to_h` does not presize from `size`.** `Set#index_with` (and any `Enumerable#to_h` with a block on a
   sized collection) spills at 3 entries on 4.1: 160 B against 80 B presized.
@@ -579,7 +606,7 @@ end
     `{[:a, 1] => "a1"}` on 8.1. HashWithIndifferentAccess is affected the same way.
   * `Struct#to_h` yields members, so a struct indexes `:x, :y` instead of its values.
   * Every Rails caller passes an Array, so Rails itself is unaffected.
-  * The fix is [`thomasklemm/hash-index-with-pairs`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-index-with-pairs),
+  * The fix is rails/rails#59555, [`thomasklemm/hash-index-with-pairs`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-index-with-pairs),
     [`6235de2`](https://github.com/thomasklemm/rails/commit/6235de2236077aafd67d4991cab172715054ebd0), on canonical main
     `5810776eec`. `Enumerable#index_with` goes back to 8.1's `each` loop, and a new `Array#index_with` keeps `to_h`,
     so arrays stay byte-identical to main and keep #59203's no-spill result. For Sets and other enumerables the
@@ -589,8 +616,6 @@ end
     and Struct (`each`), with `each_pair` as the contrast. It fails on main and passes on the branch.
   * AS suite with `RAILS_STRICT_WARNINGS=1`: 4.0.7 6869 runs, 0 failures, 0 errors; 4.1.0dev only the same
     pre-existing Ractor error. RuboCop is clean.
-  * **Overlap:** both this branch and `index-with-capacity` add `Array#index_with` to the same spot in
-    `enumerable.rb`. Whichever lands second needs a small rebase: the capacity branch's gated method then replaces the
-    `to_h` body on Ruby 4.1.
+  * `index-with-capacity` is stacked on it, so both changes define `Array#index_with` in one place.
 * **Rails main on Ruby master:** the AS Ractor error above, Herb rejecting templates in two ruby-bench apps, and
   shipit-engine reopening the now-frozen `model_name` are all independent of `index_with`.
