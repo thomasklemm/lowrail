@@ -445,17 +445,30 @@ descriptions may be somewhat fuller than ruby/ruby's).
 
 ## Leads
 
-* **Generated URL path copy** (`url.rb:169` + `visitors.rb:38`, 9 apps, 10.9/op each): the route's buffer is copied
-  into `path_for`'s String. Removing the copy needs an internal path that may take ownership of `options[:path]`;
-  `ActionDispatch::Http::URL.path_for` is public.
-* **Config reads through `method_missing`** (39 calls/op): `asset_path` reads `config.relative_url_root` and
-  `config.asset_host` behind `defined?`, the CSRF settings delegate to `config`. A real reader on the config object
-  would keep `respond_to?` semantics; needs a design that keeps arbitrary `config` objects working.
-* **`BroadcastLogger#method_missing`** for `push_tags`/`pop_tags`/`flush` (3 calls and 3 Arrays per request, 8 apps):
-  avoid the `select` Array when one broadcast responds, keeping `respond_to?`.
-* **`view_assigns`** (`instance_variables - _protected_ivars`, 2 objects per render).
-* **Active Record, for an AR round:** `ActiveSupport::Ractors.[]` 147 calls/op from the schema context and
-  reflections.
+Second pass (after #59561 and #59562 were opened), against the same bar: at least 7 apps, exact, a census delta
+against the A/A, no overlap with open PRs. **None clears it.**
+
+* **`view_assigns`** (`instance_variables - _protected_ivars`, 9 apps): tried as
+  [`wip/view-assigns-without-subtraction`](https://github.com/thomasklemm/rails/tree/wip/view-assigns-without-subtraction)
+  ([`aa4c92d413`](https://github.com/thomasklemm/rails/commit/aa4c92d41310a6d03962229293501d2ff5399d76)): skip
+  protected names with `include?` while building the assigns instead of subtracting first. Exact (same keys, order
+  and values; Symbol `==` and `eql?` agree). Census label `viewassigns`: 60 / 51 of 97 workloads moved ≤ −1 (A/A
+  26 / 27), median −2.0 / −1.0; controls identical in both modes; Action Pack 4,472, Action Mailer 286, Action View
+  2,913 + 251 + 177 runs, 0 F / 0 E (as main); RuboCop clean. **Rejected:** with a realistic controller (22 ivars,
+  24 protected names; [`micro_view_assigns.rb`](../../bench/upstream/framework_census/micro_view_assigns.rb)) it
+  saves 2 objects (10 → 8) but costs about 1 µs per render: 4,853 → 5,891 ns (interp), 4,266 → 4,975 ns (YJIT),
+  because each ivar scans the protected Array. #38769 (merged 2020) chose the subtraction for exactly that speed;
+  making the lookup cheap needs a Set or Hash of protected names, which changes the overridable `_protected_ivars`.
+* **Generated URL path copy** (`url.rb:169` + `visitors.rb:38`, 9 apps, 10.9/op each): `path_for` must return a
+  String distinct from `options[:path]`, so any saving needs the route set to signal that it owns the buffer (an
+  internal option or a second `path_for`/`url_for` chain); `ActionDispatch::Http::URL.path_for` and `url_for` are
+  public. Not exact without that design change. Not pursued; a maintainer question rather than a PR.
+* **`BroadcastLogger#method_missing`** (8 apps, 3 Arrays per request): overlaps open #56650, which rewrites
+  `method_missing` (block dispatch), and #53105 (tagged logging on `BroadcastLogger`). Excluded.
+* **Config reads through `method_missing`** (39 calls/op, ~5–9 µs per page): `config[:key]` or a real reader is not
+  exact for `config` objects that are not `OrderedOptions`. Rejected as before.
+* **`ActiveSupport::Ractors.[]`** (147 calls/op): a one-line delegation to `Ractor.current[key]` with no allocation;
+  removing the indirection would bypass the non-Ractor fallback the module exists for, for ~30 ns a call. Rejected.
 * **R2-4** after ruby/ruby#19655.
 
 ## Limits
