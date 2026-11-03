@@ -75,6 +75,10 @@ needs a Ruby built with ZJIT. The local 4.0.7 is not, so ZJIT has not been run t
 | sure | `sure` (`8d0d84d`) | `pg-census/sure.patch` | PostgreSQL, Redis |
 | casa | `casa` (`b584d2e`, without its census-era overlay) | `pg-census/casa.patch` | PostgreSQL, Node 24 (mise) |
 | mastodon-nops, lago-nops | mastodon's and lago's copies | | as above; `prepared_statements: false` |
+| chatwoot | `chatwoot` (`ae66c97`, plus commonmarker 0.23.12 built as a path gem) | `inertia-chatwoot-census/chatwoot.patch` | PostgreSQL with pgvector, Redis, Node 24 and pnpm 10 |
+| hackatime | `hackatime` (`74deec4`) | `inertia-chatwoot-census/hackatime.patch` | PostgreSQL (two databases), bun |
+| flow | `flow` (`6a8b5fd`) | `inertia-chatwoot-census/flow.patch` | PostgreSQL, Redis, Node 24 with corepack yarn |
+| thinkroom | `thinkroom` (`f7865d0`) | `inertia-chatwoot-census/thinkroom.patch` | Node 24 |
 
 Overlays default to [fixtures/corpus/rails-main-census-4](../../fixtures/corpus/rails-main-census-4) (`--overlays`
 picks another round's). They are dependency-only (Gemfile, lock, `.ruby-version`); setup then moves Rails to the
@@ -106,6 +110,13 @@ local `env`. `prepare` seeds them with the app's own generator where it has one 
 script in `fixtures/corpus/pg-census/seeds` that writes through the app's own services. A row with `copy: APP`
 (`mastodon-nops`, `lago-nops`) runs APP's copy and database with different settings; `run` never measures two
 configurations of one copy at the same time.
+
+Chatwoot and three more Inertia apps ([Inertia and Chatwoot census](inertia-chatwoot-census.md)) follow the same
+pattern, with overlays and seeds in [fixtures/corpus/inertia-chatwoot-census](../../fixtures/corpus/inertia-chatwoot-census).
+`run --gem NAME=SPEC` (repeatable) also pins a gem to a git ref, `OWNER/REPO@REF`, in every app whose Gemfile lists
+it. The variant Gemfile is `Gemfile.census-RAILS12-NAME-GEM12`, and the dependency control ignores that gem's own
+lock lines. `rank --gem NAME` ranks the gem's lines instead of Rails', keyed by their path inside the gem, so apps on
+different releases or git checkouts of it share one key.
 
 ## What a run measures
 

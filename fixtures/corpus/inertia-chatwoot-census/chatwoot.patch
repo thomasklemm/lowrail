@@ -1,0 +1,1123 @@
+diff --git a/.ruby-version b/.ruby-version
+index f989260..43beb40 100644
+--- a/.ruby-version
++++ b/.ruby-version
+@@ -1 +1 @@
+-3.4.4
++4.0.7
+diff --git a/Gemfile b/Gemfile
+index bc381ee..1acfd4b 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -1,11 +1,14 @@
+ source 'https://rubygems.org'
+ 
+-ruby '3.4.4'
++ruby '4.0.7'
+ 
+ ##-- base gems for rails --##
+ 
+ gem 'rack-cors', '2.0.0', require: 'rack/cors'
+-gem 'rails', '7.2.3.1'
++gem 'rails', github: 'rails/rails', ref: '5810776eecc5b2e50b58e81ee0c26c02c718fdf0'
++gem 'benchmark' # Ruby 4.0: a bundled gem, still required by mini_magick 4.12
++gem 'readline' # Ruby 4.0: no longer shipped; lib/tasks/captain_chat.rake requires it
++gem 'sprockets-rails' # the rails gem stopped depending on it in 8.0
+ 
+ # Reduces boot times through caching; required in config/boot.rb
+ gem 'bootsnap', require: false
+@@ -33,7 +36,7 @@ gem 'haikunator'
+ # Template parsing safely
+ gem 'liquid'
+ # Parse Markdown to HTML
+-gem 'commonmarker'
++gem 'commonmarker', path: 'vendor/commonmarker' # census: 0.23.12 declares ruby < 4.0; its tag, with only that cap lifted (script/corpus)
+ # Validate Data against JSON Schema
+ gem 'json_schemer'
+ # used in swagger build
+@@ -86,7 +89,7 @@ gem 'devise', '>= 4.9.4'
+ # 2.2.3 requires Devise 5; Chatwoot remains on Devise 4 for this upgrade stack.
+ gem 'devise-secure_password', '2.2.1'
+ gem 'devise_token_auth', '>= 1.2.3'
+-gem 'rails-i18n', '~> 7.0'
++gem 'rails-i18n', '~> 8.0'
+ # two-factor authentication
+ gem 'devise-two-factor', '>= 5.0.0'
+ # authorization
+@@ -96,7 +99,6 @@ gem 'pundit'
+ # super admin
+ gem 'administrate', '>= 0.20.1'
+ gem 'administrate-field-active_storage', '>= 1.0.3'
+-gem 'administrate-field-belongs_to_search', '>= 0.10.0'
+ 
+ ##--- gems for pubsub service ---##
+ # https://karolgalanciak.com/blog/2019/11/30/from-activerecord-callbacks-to-publish-slash-subscribe-pattern-and-event-driven-design/
+@@ -134,7 +136,7 @@ gem 'sentry-ruby', require: false
+ gem 'sentry-sidekiq', '>= 5.19.0', require: false
+ 
+ ##-- background job processing --##
+-gem 'sidekiq', '~> 7.3.10'
++gem 'sidekiq', '~> 7.3.10', require: ['sidekiq', 'active_job/queue_adapters/sidekiq_adapter'] # census: Rails main removed its SidekiqAdapter (10c24f2481); 7.3 defines it only in an on_load hook that runs after Active Job resolves :sidekiq
+ # We want cron jobs
+ gem 'sidekiq-cron', '>= 2.4.0'
+ # for sidekiq healthcheck
+@@ -204,7 +206,6 @@ gem 'ai-agents', '~> 0.13.0'
+ 
+ gem 'ruby_llm', '~> 2.0.0'
+ 
+-gem 'cld3', '~> 3.7'
+ 
+ # OpenTelemetry for LLM observability
+ gem 'opentelemetry-sdk'
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 1375900..3860284 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -1,103 +1,134 @@
+-GEM
+-  remote: https://rubygems.org/
++GIT
++  remote: https://github.com/rails/rails.git
++  revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
++  ref: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+   specs:
+-    actioncable (7.2.3.1)
+-      actionpack (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
++    actioncable (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nio4r (~> 2.0)
+       websocket-driver (>= 0.6.1)
+       zeitwerk (~> 2.6)
+-    actionmailbox (7.2.3.1)
+-      actionpack (= 7.2.3.1)
+-      activejob (= 7.2.3.1)
+-      activerecord (= 7.2.3.1)
+-      activestorage (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
++    actionmailbox (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+-    actionmailer (7.2.3.1)
+-      actionpack (= 7.2.3.1)
+-      actionview (= 7.2.3.1)
+-      activejob (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
++    actionmailer (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+       rails-dom-testing (~> 2.2)
+-    actionpack (7.2.3.1)
+-      actionview (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
+-      cgi
++    actionpack (8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nokogiri (>= 1.8.5)
+-      racc
+-      rack (>= 2.2.4, < 3.3)
++      rack (>= 2.2.4)
+       rack-session (>= 1.0.1)
+       rack-test (>= 0.6.3)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
++      rails-html-sanitizer (~> 1.7)
+       useragent (~> 0.16)
+-    actiontext (7.2.3.1)
+-      actionpack (= 7.2.3.1)
+-      activerecord (= 7.2.3.1)
+-      activestorage (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
++    actiontext (8.2.0.alpha)
++      action_text-trix (~> 2.1.16)
++      actionpack (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       globalid (>= 0.6.0)
+       nokogiri (>= 1.8.5)
+-    actionview (7.2.3.1)
+-      activesupport (= 7.2.3.1)
++    actionview (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       builder (~> 3.1)
+-      cgi
+       erubi (~> 1.11)
++      herb (>= 0.10)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
+-    active_record_query_trace (1.8)
+-    activejob (7.2.3.1)
+-      activesupport (= 7.2.3.1)
+-      globalid (>= 0.3.6)
+-    activemodel (7.2.3.1)
+-      activesupport (= 7.2.3.1)
+-    activerecord (7.2.3.1)
+-      activemodel (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
++      rails-html-sanitizer (~> 1.7)
++    activejob (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      globalid (>= 1.4.0)
++    activemodel (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++    activerecord (8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       timeout (>= 0.4.0)
+-    activerecord-import (2.1.0)
+-      activerecord (>= 4.2)
+-    activestorage (7.2.3.1)
+-      actionpack (= 7.2.3.1)
+-      activejob (= 7.2.3.1)
+-      activerecord (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
+-      marcel (~> 1.0)
+-    activesupport (7.2.3.1)
++    activestorage (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      marcel (~> 2.0)
++    activesupport (8.2.0.alpha)
+       base64
+-      benchmark (>= 0.3)
+       bigdecimal
+       concurrent-ruby (~> 1.0, >= 1.3.1)
+       connection_pool (>= 2.2.5)
+       drb
+       i18n (>= 1.6, < 2)
++      json
+       logger (>= 1.4.2)
+-      minitest (>= 5.1, < 6)
++      minitest (>= 5.1)
++      psych (>= 4)
++      ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+       tzinfo (~> 2.0, >= 2.0.5)
+-    acts-as-taggable-on (12.0.0)
+-      activerecord (>= 7.1, < 8.1)
++      uri (>= 0.13.1)
++    rails (8.2.0.alpha)
++      actioncable (= 8.2.0.alpha)
++      actionmailbox (= 8.2.0.alpha)
++      actionmailer (= 8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actiontext (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      bundler (>= 1.15.0)
++      railties (= 8.2.0.alpha)
++    railties (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      irb (~> 1.13)
++      rackup (>= 1.0.0)
++      rake (>= 12.2)
++      thor (~> 1.0, >= 1.2.2)
++      tsort (>= 0.2)
++      zeitwerk (~> 2.6)
++
++PATH
++  remote: vendor/commonmarker
++  specs:
++    commonmarker (0.23.12)
++
++GEM
++  remote: https://rubygems.org/
++  specs:
++    action_text-trix (2.1.19)
++      railties
++    active_record_query_trace (1.9)
++      activerecord (>= 6.0.0)
++    activerecord-import (2.1.0)
++      activerecord (>= 4.2)
++    acts-as-taggable-on (13.0.0)
++      activerecord (>= 7.1, < 8.2)
+       zeitwerk (>= 2.4, < 3.0)
+     addressable (2.9.0)
+       public_suffix (>= 2.0.2, < 8.0)
+-    administrate (0.20.1)
+-      actionpack (>= 6.0, < 8.0)
+-      actionview (>= 6.0, < 8.0)
+-      activerecord (>= 6.0, < 8.0)
+-      jquery-rails (~> 4.6.0)
++    administrate (1.0.0)
++      actionpack (>= 6.0, < 9.0)
++      actionview (>= 6.0, < 9.0)
++      activerecord (>= 6.0, < 9.0)
+       kaminari (~> 1.2.2)
+-      sassc-rails (~> 2.1)
+-      selectize-rails (~> 0.6)
+     administrate-field-active_storage (1.0.3)
+       administrate (>= 0.2.2)
+       rails (>= 7.0)
+-    administrate-field-belongs_to_search (0.10.0)
+-      administrate (>= 0.3, < 1.0)
+-      jbuilder (~> 2)
+-      rails (>= 4.2, < 8.0)
+-      selectize-rails (~> 0.6)
+     ai-agents (0.13.0)
+       ruby_llm (~> 2.0.0)
+     annotaterb (4.20.0)
+@@ -109,9 +140,9 @@ GEM
+       net-http2 (>= 0.18.3, < 2)
+     ast (2.4.3)
+     attr_extras (7.1.0)
+-    audited (5.4.1)
+-      activerecord (>= 5.0, < 7.7)
+-      activesupport (>= 5.0, < 7.7)
++    audited (5.8.0)
++      activerecord (>= 5.2, < 8.2)
++      activesupport (>= 5.2, < 8.2)
+     auth-sanitizer (0.2.1)
+       version_gem (~> 1.1, >= 1.1.10)
+     aws-actionmailbox-ses (0.1.0)
+@@ -168,17 +199,15 @@ GEM
+       uniform_notifier (~> 1.11)
+     bundle-audit (0.1.0)
+       bundler-audit
+-    bundler-audit (0.9.1)
+-      bundler (>= 1.2.0, < 3)
++    bundler-audit (0.9.3)
++      bundler (>= 1.2.0)
+       thor (~> 1.0)
+     byebug (11.1.3)
+     cgi (0.5.2)
+     childprocess (5.1.0)
+       logger (~> 1.5)
+-    cld3 (3.7.0)
+     climate_control (1.2.0)
+     coderay (1.1.3)
+-    commonmarker (0.23.12)
+     concurrent-ruby (1.3.8)
+     connection_pool (2.5.5)
+     crack (1.0.0)
+@@ -219,15 +248,15 @@ GEM
+     devise-secure_password (2.2.1)
+       devise (>= 4.0.0, < 5.0.0)
+       railties (>= 5.0.0, < 9.0.0)
+-    devise-two-factor (6.1.0)
+-      activesupport (>= 7.0, < 8.1)
+-      devise (~> 4.0)
+-      railties (>= 7.0, < 8.1)
++    devise-two-factor (6.4.1)
++      activesupport (>= 7.2, < 8.2)
++      devise (>= 4.0, < 6.0)
++      railties (>= 7.2, < 8.2)
+       rotp (~> 6.0)
+-    devise_token_auth (1.2.5)
++    devise_token_auth (1.3.0)
+       bcrypt (~> 3.0)
+-      devise (> 3.5.2, < 5)
+-      rails (>= 4.2.0, < 8.1)
++      devise (> 3.5.2, < 6)
++      rails (>= 4.2.0, < 8.3)
+     diff-lcs (1.5.1)
+     digest-crc (0.6.5)
+       rake (>= 12.0.0, < 14.0.0)
+@@ -271,8 +300,6 @@ GEM
+       dry-inflector (~> 1.0)
+       dry-logic (~> 1.4)
+       zeitwerk (~> 2.6)
+-    ecma-re-validator (0.4.0)
+-      regexp_parser (~> 2.2)
+     elastic-apm (4.6.2)
+       concurrent-ruby (~> 1.0)
+       http (>= 3.0)
+@@ -299,7 +326,7 @@ GEM
+       faraday-net_http (>= 2.0, < 3.5)
+       json
+       logger
+-    faraday-mashify (1.0.0)
++    faraday-mashify (1.0.3)
+       faraday (~> 2.0)
+       hashie
+     faraday-multipart (1.2.0)
+@@ -346,7 +373,7 @@ GEM
+     geocoder (1.8.1)
+     gli (2.22.2)
+       ostruct
+-    globalid (1.2.1)
++    globalid (1.4.0)
+       activesupport (>= 6.1)
+     gmail_xoauth (0.4.3)
+       oauth (>= 0.3.6)
+@@ -426,6 +453,10 @@ GEM
+     hashdiff (1.1.0)
+     hashie (5.1.0)
+       logger
++    herb (0.11.1)
++    herb (0.11.1-arm64-darwin)
++    herb (0.11.1-x86_64-darwin)
++    herb (0.11.1-x86_64-linux-gnu)
+     html2text (0.4.0)
+       nokogiri (>= 1.0, < 2.0)
+     http-2 (1.2.3)
+@@ -460,18 +491,14 @@ GEM
+       actionview (>= 7.0.0)
+       activesupport (>= 7.0.0)
+     jmespath (1.6.2)
+-    jquery-rails (4.6.0)
+-      rails-dom-testing (>= 1, < 3)
+-      railties (>= 4.2.0)
+-      thor (>= 0.14, < 2.0)
+     json (2.21.2)
+     json_refs (0.1.8)
+       hana
+-    json_schemer (0.2.24)
+-      ecma-re-validator (~> 0.3)
++    json_schemer (2.5.0)
++      bigdecimal
+       hana (~> 1.3)
+       regexp_parser (~> 2.0)
+-      uri_template (~> 0.7)
++      simpleidn (~> 0.2)
+     json_skooma (0.2.5)
+       bigdecimal
+       hana (~> 1.3)
+@@ -544,7 +571,7 @@ GEM
+       net-imap
+       net-pop
+       net-smtp
+-    marcel (1.2.1)
++    marcel (2.1.0)
+     maxminddb (0.1.22)
+     meta_request (0.8.5)
+       rack-contrib (>= 1.1, < 3)
+@@ -555,7 +582,6 @@ GEM
+     mime-types-data (3.2023.0218.1)
+     mini_magick (4.12.0)
+     mini_mime (1.1.5)
+-    mini_portile2 (2.8.9)
+     minitest (5.27.0)
+     mock_redis (0.36.0)
+       ruby2_keywords
+@@ -587,9 +613,6 @@ GEM
+     newrelic_rpm (9.6.0)
+       base64
+     nio4r (2.7.5)
+-    nokogiri (1.19.4)
+-      mini_portile2 (~> 2.8.2)
+-      racc (~> 1.4)
+     nokogiri (1.19.4-arm64-darwin)
+       racc (~> 1.4)
+     nokogiri (1.19.4-x86_64-darwin)
+@@ -684,6 +707,9 @@ GEM
+       method_source (~> 1.0)
+     pry-rails (0.3.9)
+       pry (>= 0.10.4)
++    psych (5.5.0)
++      date
++      stringio
+     public_suffix (7.0.5)
+     puma (7.2.1)
+       nio4r (~> 2.0)
+@@ -714,20 +740,7 @@ GEM
+     rack-timeout (0.6.3)
+     rackup (2.2.1)
+       rack (>= 3)
+-    rails (7.2.3.1)
+-      actioncable (= 7.2.3.1)
+-      actionmailbox (= 7.2.3.1)
+-      actionmailer (= 7.2.3.1)
+-      actionpack (= 7.2.3.1)
+-      actiontext (= 7.2.3.1)
+-      actionview (= 7.2.3.1)
+-      activejob (= 7.2.3.1)
+-      activemodel (= 7.2.3.1)
+-      activerecord (= 7.2.3.1)
+-      activestorage (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
+-      bundler (>= 1.15.0)
+-      railties (= 7.2.3.1)
++    ractor-dispatch (0.3.0)
+     rails-dom-testing (2.3.0)
+       activesupport (>= 5.0.0)
+       minitest
+@@ -735,19 +748,9 @@ GEM
+     rails-html-sanitizer (1.7.1)
+       loofah (~> 2.25, >= 2.25.2)
+       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
+-    rails-i18n (7.0.10)
++    rails-i18n (8.1.0)
+       i18n (>= 0.7, < 2)
+-      railties (>= 6.0.0, < 8)
+-    railties (7.2.3.1)
+-      actionpack (= 7.2.3.1)
+-      activesupport (= 7.2.3.1)
+-      cgi
+-      irb (~> 1.13)
+-      rackup (>= 1.0.0)
+-      rake (>= 12.2)
+-      thor (~> 1.0, >= 1.2.2)
+-      tsort (>= 0.2)
+-      zeitwerk (~> 2.6)
++      railties (>= 8.0.0, < 9)
+     rainbow (3.1.1)
+     rake (13.2.1)
+     rb-fsevent (0.11.2)
+@@ -762,9 +765,11 @@ GEM
+       prism (>= 1.6.0)
+       rbs (>= 4.0.0)
+       tsort
++    readline (0.0.4)
++      reline
+     redis (5.0.6)
+       redis-client (>= 0.9.0)
+-    redis-client (0.26.4)
++    redis-client (0.30.1)
+       connection_pool
+     redis-namespace (1.10.0)
+       redis (>= 4)
+@@ -847,8 +852,9 @@ GEM
+     ruby-saml (1.18.1)
+       nokogiri (>= 1.13.10)
+       rexml
+-    ruby-vips (2.1.4)
++    ruby-vips (2.3.0)
+       ffi (~> 1.12)
++      logger
+     ruby2_keywords (0.0.5)
+     ruby2ruby (2.5.0)
+       ruby_parser (~> 3.1)
+@@ -872,14 +878,6 @@ GEM
+     sass-listen (4.0.0)
+       rb-fsevent (~> 0.9, >= 0.9.4)
+       rb-inotify (~> 0.9, >= 0.9.7)
+-    sassc (2.4.0)
+-      ffi (~> 1.9)
+-    sassc-rails (2.1.2)
+-      railties (>= 4.0.0)
+-      sassc (>= 2.0)
+-      sprockets (> 3.0)
+-      sprockets-rails
+-      tilt
+     schematist (1.1.0)
+     scout_apm (5.3.3)
+       parser
+@@ -892,7 +890,6 @@ GEM
+     seed_dump (3.3.1)
+       activerecord (>= 4)
+       activesupport (>= 4)
+-    selectize-rails (0.12.6)
+     sentry-rails (5.19.0)
+       railties (>= 5.0)
+       sentry-ruby (~> 5.19.0)
+@@ -902,7 +899,7 @@ GEM
+     sentry-sidekiq (5.19.0)
+       sentry-ruby (~> 5.19.0)
+       sidekiq (>= 3.0)
+-    sexp_processor (4.17.0)
++    sexp_processor (4.17.6)
+     shopify_api (14.8.0)
+       activesupport
+       concurrent-ruby
+@@ -941,6 +938,7 @@ GEM
+       simplecov_json_formatter (~> 0.1)
+     simplecov-html (0.13.2)
+     simplecov_json_formatter (0.1.4)
++    simpleidn (0.3.0)
+     skooma (0.3.7)
+       json_skooma (~> 0.2.5)
+       zeitwerk (~> 2.6)
+@@ -960,14 +958,15 @@ GEM
+     sprockets (4.2.1)
+       concurrent-ruby (~> 1.0)
+       rack (>= 2.2.4, < 4)
+-    sprockets-rails (3.4.2)
+-      actionpack (>= 5.2)
+-      activesupport (>= 5.2)
++    sprockets-rails (3.5.2)
++      actionpack (>= 6.1)
++      activesupport (>= 6.1)
+       sprockets (>= 3.0.0)
+     squasher (0.7.2)
+     ssrf_filter (1.5.0)
+     stackprof (0.2.25)
+     statsd-ruby (1.5.0)
++    stringio (3.2.0)
+     stripe (18.0.1)
+     telephone_number (1.4.20)
+     test-prof (1.6.3)
+@@ -977,7 +976,6 @@ GEM
+       fast-mcp (~> 1.5.0)
+       rack (>= 2.0)
+       rails (>= 7.1.0)
+-    tilt (2.3.0)
+     timeout (0.6.1)
+     trailblazer-option (0.1.2)
+     tsort (0.2.0)
+@@ -1000,11 +998,10 @@ GEM
+     unicode (0.4.4.5)
+     unicode-display_width (3.1.4)
+       unicode-emoji (~> 4.0, >= 4.0.4)
+-    unicode-emoji (4.0.4)
++    unicode-emoji (4.3.0)
+     uniform_notifier (1.17.0)
+     uri (1.1.1)
+     uri-idna (0.3.1)
+-    uri_template (0.7.0)
+     useragent (0.16.11)
+     valid_email2 (5.2.6)
+       activemodel (>= 3.2)
+@@ -1047,7 +1044,6 @@ PLATFORMS
+   arm64-darwin-20
+   arm64-darwin-21
+   arm64-darwin-22
+-  ruby
+   x86_64-darwin-18
+   x86_64-darwin-20
+   x86_64-darwin-21
+@@ -1060,7 +1056,6 @@ DEPENDENCIES
+   acts-as-taggable-on
+   administrate (>= 0.20.1)
+   administrate-field-active_storage (>= 1.0.3)
+-  administrate-field-belongs_to_search (>= 0.10.0)
+   ai-agents (~> 0.13.0)
+   annotaterb
+   apnotic (~> 1.8)
+@@ -1071,15 +1066,15 @@ DEPENDENCIES
+   aws-sdk-sesv2
+   azure-blob
+   barnes
++  benchmark
+   bootsnap
+   brakeman
+   browser
+   bullet
+   bundle-audit
+   byebug
+-  cld3 (~> 3.7)
+   climate_control
+-  commonmarker
++  commonmarker!
+   csv-safe
+   database_cleaner
+   datadog (~> 2.0)
+@@ -1153,8 +1148,9 @@ DEPENDENCIES
+   rack-cors (= 2.0.0)
+   rack-mini-profiler (>= 3.2.0)
+   rack-timeout
+-  rails (= 7.2.3.1)
+-  rails-i18n (~> 7.0)
++  rails!
++  rails-i18n (~> 8.0)
++  readline
+   redis
+   redis-namespace
+   responders (>= 3.1.1)
+@@ -1186,6 +1182,7 @@ DEPENDENCIES
+   skooma
+   slack-ruby-client (~> 2.7.0)
+   speedshop-cloudwatch (~> 0.2.1)
++  sprockets-rails
+   squasher
+   ssrf_filter (~> 1.5)
+   stackprof
+@@ -1206,7 +1203,7 @@ DEPENDENCIES
+   working_hours
+ 
+ RUBY VERSION
+-   ruby 3.4.4p34
++  ruby 4.0.7
+ 
+ BUNDLED WITH
+-   2.5.16
++  4.0.20
+diff --git a/app/assets/stylesheets/administrate/application.scss b/app/assets/stylesheets/administrate/application.scss
+deleted file mode 100644
+index 4e90a18..0000000
+--- a/app/assets/stylesheets/administrate/application.scss
++++ /dev/null
+@@ -1,5 +0,0 @@
+-@charset 'utf-8';
+-
+-// The super admin is styled by app/javascript/entrypoints/superadmin.scss.
+-// Sprockets only serves the selectize base styles its pickers need.
+-@import 'selectize';
+diff --git a/app/dashboards/account_user_dashboard.rb b/app/dashboards/account_user_dashboard.rb
+index 9e8b2c4..7a5ce01 100644
+--- a/app/dashboards/account_user_dashboard.rb
++++ b/app/dashboards/account_user_dashboard.rb
+@@ -8,9 +8,9 @@ class AccountUserDashboard < Administrate::BaseDashboard
+   # which determines how the attribute is displayed
+   # on pages throughout the dashboard.
+   ATTRIBUTE_TYPES = {
+-    account: Field::BelongsToSearch.with_options(class_name: 'Account', searchable: true, searchable_field: [:name, :id], order: 'id DESC'),
+-    user: Field::BelongsToSearch.with_options(class_name: 'User', searchable: true, searchable_field: [:name, :email, :id], order: 'id DESC'),
+-    inviter: Field::BelongsToSearch.with_options(class_name: 'User', searchable: true, searchable_field: [:name, :email, :id], order: 'id DESC'),
++    account: Field::BelongsTo.with_options(class_name: 'Account', searchable: true, searchable_field: [:name, :id], order: 'id DESC'),
++    user: Field::BelongsTo.with_options(class_name: 'User', searchable: true, searchable_field: [:name, :email, :id], order: 'id DESC'),
++    inviter: Field::BelongsTo.with_options(class_name: 'User', searchable: true, searchable_field: [:name, :email, :id], order: 'id DESC'),
+     id: Field::Number,
+     role: Field::Select.with_options(collection: AccountUser.roles.keys),
+     created_at: Field::DateTime,
+diff --git a/app/models/account_user.rb b/app/models/account_user.rb
+index 1d76257..182caa6 100644
+--- a/app/models/account_user.rb
++++ b/app/models/account_user.rb
+@@ -33,8 +33,8 @@ class AccountUser < ApplicationRecord
+   belongs_to :user
+   belongs_to :inviter, class_name: 'User', optional: true
+ 
+-  enum role: { agent: 0, administrator: 1 }
+-  enum availability: { online: 0, offline: 1, busy: 2 }
++  enum :role, { agent: 0, administrator: 1 }
++  enum :availability, { online: 0, offline: 1, busy: 2 }
+ 
+   accepts_nested_attributes_for :account
+ 
+diff --git a/app/models/agent_bot.rb b/app/models/agent_bot.rb
+index ae6de39..aaed35d 100644
+--- a/app/models/agent_bot.rb
++++ b/app/models/agent_bot.rb
+@@ -39,7 +39,7 @@ class AgentBot < ApplicationRecord
+                                     as: :ai_assignee,
+                                     inverse_of: :ai_assignee
+   belongs_to :account, optional: true
+-  enum bot_type: { webhook: 0 }
++  enum :bot_type, { webhook: 0 }
+ 
+   validates :outgoing_url, length: { maximum: Limits::URL_LENGTH_LIMIT }
+ 
+diff --git a/app/models/agent_bot_inbox.rb b/app/models/agent_bot_inbox.rb
+index 82c69b9..0ea9693 100644
+--- a/app/models/agent_bot_inbox.rb
++++ b/app/models/agent_bot_inbox.rb
+@@ -20,7 +20,7 @@ class AgentBotInbox < ApplicationRecord
+   belongs_to :inbox
+   belongs_to :agent_bot
+   belongs_to :account
+-  enum status: { active: 0, inactive: 1 }
++  enum :status, { active: 0, inactive: 1 }
+ 
+   private
+ 
+diff --git a/app/models/article.rb b/app/models/article.rb
+index 0578503..b67dc27 100644
+--- a/app/models/article.rb
++++ b/app/models/article.rb
+@@ -74,7 +74,7 @@ class Article < ApplicationRecord
+   before_create :add_position_to_article
+   after_save :category_id_changed_action, if: :saved_change_to_category_id?
+ 
+-  enum status: { draft: 0, published: 1, archived: 2 }
++  enum :status, { draft: 0, published: 1, archived: 2 }
+ 
+   scope :search_by_category_slug, ->(category_slug) { where(categories: { slug: category_slug }) if category_slug.present? }
+   scope :search_by_category_locale, ->(locale) { where(categories: { locale: locale }) if locale.present? }
+diff --git a/app/models/assignment_policy.rb b/app/models/assignment_policy.rb
+index 12c46aa..200576e 100644
+--- a/app/models/assignment_policy.rb
++++ b/app/models/assignment_policy.rb
+@@ -33,9 +33,9 @@ class AssignmentPolicy < ApplicationRecord
+   validates :fair_distribution_window, numericality: { greater_than: 0 }
+   validates :exclude_older_than_hours, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+ 
+-  enum conversation_priority: { earliest_created: 0, longest_waiting: 1 }
++  enum :conversation_priority, { earliest_created: 0, longest_waiting: 1 }
+ 
+-  enum assignment_order: { round_robin: 0 } unless ChatwootApp.enterprise?
++  enum :assignment_order, { round_robin: 0 } unless ChatwootApp.enterprise?
+ end
+ 
+ AssignmentPolicy.include_mod_with('Concerns::AssignmentPolicy')
+diff --git a/app/models/attachment.rb b/app/models/attachment.rb
+index b03adad..11d3422 100644
+--- a/app/models/attachment.rb
++++ b/app/models/attachment.rb
+@@ -44,7 +44,7 @@ class Attachment < ApplicationRecord
+   before_save :set_extension
+   validate :acceptable_file
+   validates :external_url, length: { maximum: Limits::URL_LENGTH_LIMIT }
+-  enum file_type: { :image => 0, :audio => 1, :video => 2, :file => 3, :location => 4, :fallback => 5, :share => 6, :story_mention => 7,
++  enum :file_type, { :image => 0, :audio => 1, :video => 2, :file => 3, :location => 4, :fallback => 5, :share => 6, :story_mention => 7,
+                     :contact => 8, :ig_reel => 9, :ig_post => 10, :ig_story => 11, :embed => 12 }
+ 
+   def push_event_data
+diff --git a/app/models/automation_rule_pending_execution.rb b/app/models/automation_rule_pending_execution.rb
+index 264a5b5..d481efd 100644
+--- a/app/models/automation_rule_pending_execution.rb
++++ b/app/models/automation_rule_pending_execution.rb
+@@ -39,7 +39,7 @@ class AutomationRulePendingExecution < ApplicationRecord
+   # `processing` is claimed but not yet acting, so it is safe to reclaim and retry. `executing`
+   # means the actions are running: a row that dies there is never replayed, because the actions
+   # are customer-facing (messages, emails, webhooks) and repeating them is worse than dropping them.
+-  enum status: { pending: 0, processing: 1, executed: 2, skipped: 3, executing: 4 }
++  enum :status, { pending: 0, processing: 1, executed: 2, skipped: 3, executing: 4 }
+ 
+   # Processing rows whose worker died: the claim renews updated_at, so a lock past the timeout is abandoned.
+   scope :stale_processing, -> { processing.where(updated_at: ...STALE_PROCESSING_TIMEOUT.ago) }
+diff --git a/app/models/campaign.rb b/app/models/campaign.rb
+index a151864..ed25075 100644
+--- a/app/models/campaign.rb
++++ b/app/models/campaign.rb
+@@ -47,9 +47,9 @@ class Campaign < ApplicationRecord
+   belongs_to :inbox
+   belongs_to :sender, class_name: 'User', optional: true
+ 
+-  enum campaign_type: { ongoing: 0, one_off: 1 }
++  enum :campaign_type, { ongoing: 0, one_off: 1 }
+   # TODO : enabled attribute is unneccessary . lets move that to the campaign status with additional statuses like draft, disabled etc.
+-  enum campaign_status: { active: 0, completed: 1, processing: 2 }
++  enum :campaign_status, { active: 0, completed: 1, processing: 2 }
+ 
+   has_many :conversations, dependent: :nullify, autosave: true
+ 
+diff --git a/app/models/channel/twilio_sms.rb b/app/models/channel/twilio_sms.rb
+index 880ce0c..1fd9c5e 100644
+--- a/app/models/channel/twilio_sms.rb
++++ b/app/models/channel/twilio_sms.rb
+@@ -49,7 +49,7 @@ class Channel::TwilioSms < ApplicationRecord
+   validates :phone_number, absence: true, if: :messaging_service_sid?
+   validates :phone_number, uniqueness: true, allow_nil: true
+ 
+-  enum medium: { sms: 0, whatsapp: 1 }
++  enum :medium, { sms: 0, whatsapp: 1 }
+ 
+   def name
+     medium == 'sms' ? 'Twilio SMS' : 'Whatsapp'
+diff --git a/app/models/channel/web_widget.rb b/app/models/channel/web_widget.rb
+index d977efa..54f342a 100644
+--- a/app/models/channel/web_widget.rb
++++ b/app/models/channel/web_widget.rb
+@@ -55,7 +55,7 @@ class Channel::WebWidget < ApplicationRecord
+             :column => 'feature_flags',
+             :check_for_column => false
+ 
+-  enum reply_time: { in_a_few_minutes: 0, in_a_few_hours: 1, in_a_day: 2 }
++  enum :reply_time, { in_a_few_minutes: 0, in_a_few_hours: 1, in_a_day: 2 }
+ 
+   def name
+     'Website'
+diff --git a/app/models/contact.rb b/app/models/contact.rb
+index 9e3bd92..f86f6ef 100644
+--- a/app/models/contact.rb
++++ b/app/models/contact.rb
+@@ -69,7 +69,7 @@ class Contact < ApplicationRecord
+   before_save :sync_contact_attributes
+   include ContactCompanyAssociation
+ 
+-  enum contact_type: { visitor: 0, lead: 1, customer: 2 }
++  enum :contact_type, { visitor: 0, lead: 1, customer: 2 }
+ 
+   scope :order_on_last_activity_at, lambda { |direction|
+     order(
+diff --git a/app/models/conversation.rb b/app/models/conversation.rb
+index 2193967..cca94be 100644
+--- a/app/models/conversation.rb
++++ b/app/models/conversation.rb
+@@ -83,8 +83,8 @@ class Conversation < ApplicationRecord
+   validates :uuid, uniqueness: true
+   validate :validate_referer_url
+ 
+-  enum status: { open: 0, resolved: 1, pending: 2, snoozed: 3 }
+-  enum priority: { low: 0, medium: 1, high: 2, urgent: 3 }
++  enum :status, { open: 0, resolved: 1, pending: 2, snoozed: 3 }
++  enum :priority, { low: 0, medium: 1, high: 2, urgent: 3 }
+ 
+   scope :unassigned, -> { where(assignee_id: nil, assignee_agent_bot_id: nil) }
+   scope :assigned, -> { where.not(assignee_id: nil).or(where.not(assignee_agent_bot_id: nil)) }
+diff --git a/app/models/custom_attribute_definition.rb b/app/models/custom_attribute_definition.rb
+index a6fd580..8a9818b 100644
+--- a/app/models/custom_attribute_definition.rb
++++ b/app/models/custom_attribute_definition.rb
+@@ -45,8 +45,8 @@ class CustomAttributeDefinition < ApplicationRecord
+   validates :attribute_model, presence: true
+   validate :attribute_must_not_conflict, on: :create
+ 
+-  enum attribute_model: { conversation_attribute: 0, contact_attribute: 1, company_attribute: 2 }
+-  enum attribute_display_type: { text: 0, number: 1, currency: 2, percent: 3, link: 4, date: 5, list: 6, checkbox: 7 }
++  enum :attribute_model, { conversation_attribute: 0, contact_attribute: 1, company_attribute: 2 }
++  enum :attribute_display_type, { text: 0, number: 1, currency: 2, percent: 3, link: 4, date: 5, list: 6, checkbox: 7 }
+ 
+   belongs_to :account
+   after_update :update_widget_pre_chat_custom_fields, unless: :company_attribute?
+diff --git a/app/models/custom_filter.rb b/app/models/custom_filter.rb
+index 6e2461a..ebac2e7 100644
+--- a/app/models/custom_filter.rb
++++ b/app/models/custom_filter.rb
+@@ -20,7 +20,7 @@ class CustomFilter < ApplicationRecord
+   belongs_to :user
+   belongs_to :account
+ 
+-  enum filter_type: { conversation: 0, contact: 1, report: 2 }
++  enum :filter_type, { conversation: 0, contact: 1, report: 2 }
+   validate :validate_number_of_filters
+   after_create_commit :invalidate_filtered_unread_count_create
+   after_update_commit :invalidate_filtered_unread_count_update
+diff --git a/app/models/data_import.rb b/app/models/data_import.rb
+index 53a3f84..a6549ac 100644
+--- a/app/models/data_import.rb
++++ b/app/models/data_import.rb
+@@ -54,7 +54,7 @@ class DataImport < ApplicationRecord
+   validate :validate_import_types
+   validate :validate_integration_provider
+ 
+-  enum status: { pending: 0, processing: 1, completed: 2, failed: 3, completed_with_errors: 6, abandoned: 7 }
++  enum :status, { pending: 0, processing: 1, completed: 2, failed: 3, completed_with_errors: 6, abandoned: 7 }
+ 
+   scope :active_intercom, -> { where(data_type: 'intercom', source_provider: 'intercom', status: [:pending, :processing]) }
+   scope :active_integrations, lambda {
+diff --git a/app/models/data_import_item.rb b/app/models/data_import_item.rb
+index 1ac9c28..4108669 100644
+--- a/app/models/data_import_item.rb
++++ b/app/models/data_import_item.rb
+@@ -31,5 +31,5 @@ class DataImportItem < ApplicationRecord
+   validates :source_provider, :source_object_type, :source_object_id, presence: true
+   validates :source_object_id, uniqueness: { scope: [:data_import_id, :source_object_type] }
+ 
+-  enum status: { pending: 0, processing: 1, imported: 2, skipped: 3, failed: 4 }
++  enum :status, { pending: 0, processing: 1, imported: 2, skipped: 3, failed: 4 }
+ end
+diff --git a/app/models/inbox.rb b/app/models/inbox.rb
+index cb98705..1cb1d9a 100644
+--- a/app/models/inbox.rb
++++ b/app/models/inbox.rb
+@@ -78,7 +78,7 @@ class Inbox < ApplicationRecord
+   has_many :webhooks, dependent: :destroy_async
+   has_many :hooks, dependent: :destroy_async, class_name: 'Integrations::Hook'
+ 
+-  enum sender_name_type: { friendly: 0, professional: 1 }
++  enum :sender_name_type, { friendly: 0, professional: 1 }
+ 
+   before_destroy :capture_filtered_unread_count_user_ids, prepend: true
+   after_destroy :delete_round_robin_agents
+diff --git a/app/models/integrations/hook.rb b/app/models/integrations/hook.rb
+index 8aeae39..beda52d 100644
+--- a/app/models/integrations/hook.rb
++++ b/app/models/integrations/hook.rb
+@@ -43,13 +43,13 @@ class Integrations::Hook < ApplicationRecord
+ 
+   # TODO: This seems to be only used for slack at the moment
+   # We can add a validator when storing the integration settings and toggle this in future
+-  enum status: { disabled: 0, enabled: 1 }
++  enum :status, { disabled: 0, enabled: 1 }
+ 
+   belongs_to :account
+   belongs_to :inbox, optional: true
+   has_secure_token :access_token
+ 
+-  enum hook_type: { account: 0, inbox: 1 }
++  enum :hook_type, { account: 0, inbox: 1 }
+ 
+   def shopify_custom_app
+     account.shopify_custom_app if app_id == 'shopify' && settings['custom_app_id'].present?
+diff --git a/app/models/macro.rb b/app/models/macro.rb
+index fc25bee..30a9d7a 100644
+--- a/app/models/macro.rb
++++ b/app/models/macro.rb
+@@ -26,7 +26,7 @@ class Macro < ApplicationRecord
+              class_name: :User, optional: true
+   has_many_attached :files
+ 
+-  enum visibility: { personal: 0, global: 1 }
++  enum :visibility, { personal: 0, global: 1 }
+ 
+   validate :json_actions_format
+ 
+diff --git a/app/models/message.rb b/app/models/message.rb
+index 5ebd7bc..301e581 100644
+--- a/app/models/message.rb
++++ b/app/models/message.rb
+@@ -85,8 +85,8 @@ class Message < ApplicationRecord
+   # Transient flag used to skip waiting_since clearing for specific bot/system messages.
+   attr_accessor :preserve_waiting_since
+ 
+-  enum message_type: { incoming: 0, outgoing: 1, activity: 2, template: 3 }
+-  enum content_type: {
++  enum :message_type, { incoming: 0, outgoing: 1, activity: 2, template: 3 }
++  enum :content_type, {
+     text: 0,
+     input_text: 1,
+     input_textarea: 2,
+@@ -101,7 +101,7 @@ class Message < ApplicationRecord
+     sticker: 11,
+     voice_call: 12
+   }
+-  enum status: { sent: 0, delivered: 1, read: 2, failed: 3 }
++  enum :status, { sent: 0, delivered: 1, read: 2, failed: 3 }
+   # [:submitted_email, :items, :submitted_values] : Used for bot message types
+   # [:email] : Used by conversation_continuity incoming email messages
+   # [:in_reply_to] : Used to reply to a particular tweet in threads
+diff --git a/app/models/notification.rb b/app/models/notification.rb
+index c1e746f..f3e36e8 100644
+--- a/app/models/notification.rb
++++ b/app/models/notification.rb
+@@ -47,7 +47,7 @@ class Notification < ApplicationRecord
+     voice_call_missed: 9
+   }.freeze
+ 
+-  enum notification_type: NOTIFICATION_TYPES
++  enum :notification_type, NOTIFICATION_TYPES
+ 
+   before_create :set_last_activity_at
+   after_create_commit :process_notification_delivery, :dispatch_create_event
+diff --git a/app/models/notification_subscription.rb b/app/models/notification_subscription.rb
+index 7658131..d978f6a 100644
+--- a/app/models/notification_subscription.rb
++++ b/app/models/notification_subscription.rb
+@@ -26,5 +26,5 @@ class NotificationSubscription < ApplicationRecord
+     apns_voip: 3
+   }.freeze
+ 
+-  enum subscription_type: SUBSCRIPTION_TYPES
++  enum :subscription_type, SUBSCRIPTION_TYPES
+ end
+diff --git a/app/models/webhook.rb b/app/models/webhook.rb
+index 9ee62f1..0723b05 100644
+--- a/app/models/webhook.rb
++++ b/app/models/webhook.rb
+@@ -27,7 +27,7 @@ class Webhook < ApplicationRecord
+   validates :account_id, presence: true
+   validates :url, uniqueness: { scope: [:account_id] }, format: URI::DEFAULT_PARSER.make_regexp(%w[http https])
+   validate :validate_webhook_subscriptions
+-  enum webhook_type: { account_type: 0, inbox_type: 1 }
++  enum :webhook_type, { account_type: 0, inbox_type: 1 }
+ 
+   ALLOWED_WEBHOOK_EVENTS = %w[conversation_status_changed conversation_updated conversation_created contact_created contact_updated
+                               message_created message_updated webwidget_triggered inbox_created inbox_updated
+diff --git a/config/routes.rb b/config/routes.rb
+index 1c8e39e..dc6985f 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -712,7 +712,7 @@ Rails.application.routes.draw do
+ 
+   # ----------------------------------------------------------------------
+   # Used in mailer templates
+-  resource :app, only: [:index] do
++  resource :app, only: [] do # census: Rails 8 rejects :index on a singular resource; it never generated a route
+     resources :accounts do
+       resources :conversations, only: [:show]
+     end
+diff --git a/enterprise/app/models/applied_sla.rb b/enterprise/app/models/applied_sla.rb
+index 25bd0f8..040cf42 100644
+--- a/enterprise/app/models/applied_sla.rb
++++ b/enterprise/app/models/applied_sla.rb
+@@ -28,7 +28,7 @@ class AppliedSla < ApplicationRecord
+   validates :account_id, uniqueness: { scope: %i[sla_policy_id conversation_id] }
+   before_validation :ensure_account_id
+ 
+-  enum sla_status: { active: 0, hit: 1, missed: 2, active_with_misses: 3 }
++  enum :sla_status, { active: 0, hit: 1, missed: 2, active_with_misses: 3 }
+ 
+   scope :filter_by_date_range, ->(range) { where(created_at: range) if range.present? }
+   scope :filter_by_inbox_id, ->(inbox_id) { joins(:conversation).where(conversations: { inbox_id: inbox_id }) if inbox_id.present? }
+diff --git a/enterprise/app/models/campaign_recipient.rb b/enterprise/app/models/campaign_recipient.rb
+index 5589aaf..11c4ede 100644
+--- a/enterprise/app/models/campaign_recipient.rb
++++ b/enterprise/app/models/campaign_recipient.rb
+@@ -5,7 +5,7 @@ class CampaignRecipient < ApplicationRecord
+   belongs_to :inbox
+   belongs_to :contact_inbox, optional: true
+ 
+-  enum status: {
++  enum :status, {
+     queued: 0,
+     skipped: 1,
+     sent: 2,
+diff --git a/enterprise/app/models/captain/assistant_response.rb b/enterprise/app/models/captain/assistant_response.rb
+index 0635ff4..481d37f 100644
+--- a/enterprise/app/models/captain/assistant_response.rb
++++ b/enterprise/app/models/captain/assistant_response.rb
+@@ -45,7 +45,7 @@ class Captain::AssistantResponse < ApplicationRecord
+   scope :by_assistant, ->(assistant_id) { where(assistant_id: assistant_id) }
+   scope :with_document, ->(document_id) { where(document_id: document_id) }
+ 
+-  enum status: { approved: 1 }
++  enum :status, { approved: 1 }
+ 
+   def self.search(query, account_id: nil)
+     embedding = Captain::Llm::EmbeddingService.new(account_id: account_id).get_embedding(query)
+diff --git a/enterprise/app/models/captain/document.rb b/enterprise/app/models/captain/document.rb
+index 929c202..a2b80c9 100644
+--- a/enterprise/app/models/captain/document.rb
++++ b/enterprise/app/models/captain/document.rb
+@@ -50,7 +50,7 @@ class Captain::Document < ApplicationRecord
+   before_validation :set_external_link_for_pdf
+   before_validation :normalize_external_link
+ 
+-  enum status: {
++  enum :status, {
+     in_progress: 0,
+     available: 1
+   }
+diff --git a/enterprise/app/models/captain/faq_observation.rb b/enterprise/app/models/captain/faq_observation.rb
+index 15c5e12..768c4b9 100644
+--- a/enterprise/app/models/captain/faq_observation.rb
++++ b/enterprise/app/models/captain/faq_observation.rb
+@@ -20,7 +20,7 @@ class Captain::FaqObservation < ApplicationRecord
+   belongs_to :conversation, class_name: '::Conversation'
+   belongs_to :faq_suggestion, class_name: 'Captain::FaqSuggestion', optional: true, inverse_of: :observations
+ 
+-  enum status: { attached: 0, discarded: 1 }
++  enum :status, { attached: 0, discarded: 1 }
+ 
+   validates :generated_question, :generated_answer, :language, presence: true
+   validates :faq_suggestion, presence: true, if: :attached?
+diff --git a/enterprise/app/models/captain/faq_suggestion.rb b/enterprise/app/models/captain/faq_suggestion.rb
+index 047d5e1..12cf174 100644
+--- a/enterprise/app/models/captain/faq_suggestion.rb
++++ b/enterprise/app/models/captain/faq_suggestion.rb
+@@ -25,7 +25,7 @@ class Captain::FaqSuggestion < ApplicationRecord
+            inverse_of: :faq_suggestion
+   has_neighbors :embedding, normalize: true
+ 
+-  enum status: { open: 0, approved: 1, dismissed: 2 }
++  enum :status, { open: 0, approved: 1, dismissed: 2 }
+ 
+   validates :question, :answer, :language, presence: true
+ 
+diff --git a/enterprise/app/models/copilot_message.rb b/enterprise/app/models/copilot_message.rb
+index 9a8200d..72a619f 100644
+--- a/enterprise/app/models/copilot_message.rb
++++ b/enterprise/app/models/copilot_message.rb
+@@ -20,7 +20,7 @@ class CopilotMessage < ApplicationRecord
+   belongs_to :account
+   has_one :copilot_run, class_name: 'CopilotRun::Turn', dependent: :destroy
+ 
+-  enum message_type: { user: 0, assistant: 1, assistant_thinking: 2, assistant_approval: 3, assistant_progress: 4 }
++  enum :message_type, { user: 0, assistant: 1, assistant_thinking: 2, assistant_approval: 3, assistant_progress: 4 }
+ 
+   validates :message_type, presence: true
+   validates :message, presence: true
+diff --git a/enterprise/app/models/enterprise/concerns/assignment_policy.rb b/enterprise/app/models/enterprise/concerns/assignment_policy.rb
+index bddcc5e..05ace5d 100644
+--- a/enterprise/app/models/enterprise/concerns/assignment_policy.rb
++++ b/enterprise/app/models/enterprise/concerns/assignment_policy.rb
+@@ -2,6 +2,6 @@ module Enterprise::Concerns::AssignmentPolicy
+   extend ActiveSupport::Concern
+ 
+   included do
+-    enum assignment_order: { round_robin: 0, balanced: 1 } if ChatwootApp.enterprise?
++    enum :assignment_order, { round_robin: 0, balanced: 1 } if ChatwootApp.enterprise?
+   end
+ end
+diff --git a/enterprise/app/models/sla_event.rb b/enterprise/app/models/sla_event.rb
+index 1ba18f0..871c9e2 100644
+--- a/enterprise/app/models/sla_event.rb
++++ b/enterprise/app/models/sla_event.rb
+@@ -28,7 +28,7 @@ class SlaEvent < ApplicationRecord
+   belongs_to :sla_policy
+   belongs_to :applied_sla
+ 
+-  enum event_type: { frt: 0, nrt: 1, rt: 2 }
++  enum :event_type, { frt: 0, nrt: 1, rt: 2 }
+ 
+   before_validation :ensure_applied_sla_id, :ensure_account_id, :ensure_inbox_id, :ensure_sla_policy_id
+   after_create_commit :create_notifications

@@ -3,15 +3,17 @@
 
 # Rails allocation census: one entry point for every round. See docs/upstream/census.md.
 #   script/census setup    --rails SPEC [--ruby R] [--apps LIST]
-#   script/census run      --label L [--rails SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST]
-#   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2]
+#   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST]
+#   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2] [--gem NAME]
 #   script/census compare  --base L [--aa L0] [--detail] [--markdown] LABEL...
 #   script/census controls --script FILE [--app blog] [--modes ...] BASE LABEL...
 #   script/census prs      --label L [--mode interp] [--top N] [--refresh]
 #   script/census list     [--apps LIST] [--ruby R]
 #   script/census watch    [--base SHA] [--head SHA] [--bisect N] [--watch-dir DIR] [--jobs N]
 # SPEC is [OWNER/REPO@|/local/rails/repo@]REF (default repo rails/rails), REF a
-# branch, tag or commit. R is a mise Ruby version or a path to a ruby binary or
+# branch, tag or commit. --gem NAME=SPEC (repeatable) also pins gem NAME to a
+# git ref in every app whose Gemfile lists it (rank --gem NAME ranks its lines).
+# R is a mise Ruby version or a path to a ruby binary or
 # its bin directory. Common options: --corpus NAME (app copies in
 # .corpus/NAME-APP, default census), --out DIR (default .lowrail/private/census).
 require "digest"
@@ -30,6 +32,7 @@ module Census
   HARNESS = File.join(ROOT, "bench/upstream/census/harness.rb")
   OVERLAYS = File.join(ROOT, "fixtures/corpus/rails-main-census-4")
   PG_OVERLAYS = File.join(ROOT, "fixtures/corpus/pg-census")
+  IC_OVERLAYS = File.join(ROOT, "fixtures/corpus/inertia-chatwoot-census")
   # Gems the Rails ref swap pins: the rails gem, or the components an app
   # lists instead (Discourse).
   RAILS_GEMS = %w[rails railties actioncable actionmailbox actionmailer actionpack actiontext actionview activejob
@@ -103,6 +106,44 @@ module Census
       # cssbundling's precompile runs npm too, so Node 24 stays on PATH for it.
       build: [["sh", "-c", "mise install node@24.22.0 && PATH=$(mise where node@24.22.0)/bin:$PATH && " \
         "npm ci --no-audit --no-fund && bundle exec rails assets:precompile"]], assets: false },
+  ).merge(
+    # Chatwoot and Inertia census apps (docs/upstream/inertia-chatwoot-census.md),
+    # overlays in fixtures/corpus/inertia-chatwoot-census.
+    # Chatwoot's schema needs pgvector; its Vite build needs Node 24 and pnpm 10,
+    # which vite_rails runs inside assets:precompile.
+    "chatwoot" => { source: "chatwoot", overlay: IC_OVERLAYS + "/chatwoot.patch", services: %w[postgresql redis],
+      env: { "POSTGRES_HOST" => "/var/run/postgresql", "POSTGRES_USERNAME" => ENV.fetch("USER"), "POSTGRES_PASSWORD" => "",
+        "POSTGRES_DATABASE" => "census_chatwoot", "REDIS_URL" => "redis://localhost:6379/9", "FRONTEND_URL" => "https://localhost",
+        "SECRET_KEY_BASE" => "census" * 16, "ACTIVE_STORAGE_SERVICE" => "local", "ENABLE_ACCOUNT_SIGNUP" => "false" },
+      build: [["sh", "-c", "mise install node@24.22.0 && PATH=$(mise where node@24.22.0)/bin:$PATH && " \
+        "npx --yes pnpm@10.2.0 install --frozen-lockfile && bundle exec rails assets:precompile"]], assets: false },
+    # Flow runs as a self-hosted install (its SaaS mode adds billing and legal
+    # gates); S3 and the secrets its boot requires are throwaway values.
+    "flow" => { source: "flow", overlay: IC_OVERLAYS + "/flow.patch", services: %w[postgresql redis],
+      env: { "DB_NAME" => "census_flow", "DB_HOST" => "/var/run/postgresql", "DB_USERNAME" => ENV.fetch("USER"), "DB_PASSWORD" => "",
+        "REDIS_URL" => "redis://localhost:6379/10", "RAILS_SECRET_KEY_BASE" => "census" * 16, "SECRET_KEY_BASE" => "census" * 16,
+        "CREDENTIALS_SECRET_KEY" => "census-credentials-key-0123456789ab", "CONFIG_ITEMS_SECRET_KEY" => "census-config-items-key-0123456789",
+        "INTEGRATIONS_SECRET_KEY" => "census-integrations-key-012345678", "OAUTH_SECRET_KEY" => "census-oauth-secret-key-0123456789ab",
+        "AWS_S3_BUCKET" => "census-local", "AWS_ACCESS_KEY_ID" => "census", "AWS_SECRET_ACCESS_KEY" => "census",
+        "AWS_DEFAULT_REGION" => "us-east-1", "DOMAIN" => "localhost", "PROTOCOL" => "https", "DEPLOYMENT_MODE" => "self_hosted",
+        "ADMIN_PASSWORD" => "Census-password-1!" },
+      build: [["sh", "-c", "mise install node@24.22.0 && PATH=$(mise where node@24.22.0)/bin:$PATH && mkdir -p tmp/corepack && " \
+        "corepack enable --install-directory tmp/corepack && PATH=$PWD/tmp/corepack:$PATH COREPACK_ENABLE_DOWNLOAD_PROMPT=0 " \
+        "sh -c 'yarn install --immutable && bundle exec rails assets:precompile'"]], assets: false },
+    # Hackatime: a primary and a Solid Cache database. Its Svelte pages import
+    # route helpers that js_from_routes generates before the Vite build (as in
+    # its Dockerfile). S3 is the production Active Storage service; never called.
+    "hackatime" => { source: "hackatime", overlay: IC_OVERLAYS + "/hackatime.patch", services: %w[postgresql],
+      env: { "POOL_DATABASE_URL" => "postgres:///census_hackatime", "DATABASE_URL" => "postgres:///census_hackatime_cache",
+        "APP_HOST" => "localhost", "ENCRYPTION_PRIMARY_KEY" => "censusprimarykeycensusprimarykey",
+        "ENCRYPTION_DETERMINISTIC_KEY" => "censusdeterministiccensusdetermi", "ENCRYPTION_KEY_DERIVATION_SALT" => "censussaltcensussaltcensussalt12",
+        "S3_ACCESS_KEY_ID" => "census", "S3_SECRET_ACCESS_KEY" => "census", "S3_BUCKET" => "census", "S3_ENDPOINT" => "http://127.0.0.1:9",
+        "AWS_EC2_METADATA_DISABLED" => "true" },
+      build: [%w[bun install --frozen-lockfile], ["sh", "-c", "JS_FROM_ROUTES_FORCE=true bin/rake js_from_routes:generate"]] },
+    # Thinkroom: SQLite (storage/production*.sqlite3), React with Vite.
+    "thinkroom" => { source: "thinkroom", overlay: IC_OVERLAYS + "/thinkroom.patch",
+      build: [["sh", "-c", "mise install node@24.22.0 && PATH=$(mise where node@24.22.0)/bin:$PATH && npm ci --no-audit --no-fund && " \
+        "bundle exec rails assets:precompile"]], assets: false },
   ).then do |apps|
     apps.merge(
       "mastodon-nops" => apps["mastodon"].merge(copy: "mastodon", env: apps["mastodon"][:env].merge(
@@ -142,8 +183,8 @@ module Census
   def ruby_description(bin) = capture(File.join(bin, "ruby"), "-e", "print RUBY_DESCRIPTION")
 
   # [OWNER/REPO@|/path@]REF -> source, ref and commit.
-  def resolve_rails(spec)
-    repo, ref = spec.include?("@") ? spec.split("@", 2) : ["rails/rails", spec]
+  def resolve_rails(spec, default_repo = "rails/rails")
+    repo, ref = spec.include?("@") ? spec.split("@", 2) : [default_repo, spec]
     if repo.start_with?("/")
       sha = capture("git", "-C", repo, "rev-parse", "--verify", "#{ref}^{commit}")
       return { "spec" => spec, "source" => %(git: "#{repo}"), "ref" => ref, "sha" => sha }
@@ -175,14 +216,26 @@ module Census
 
   # The app's census Gemfile with Rails at this commit (and no ruby pin, so the
   # Ruby is a parameter), bundled for this Ruby. Identical commits share one.
-  def variant(corpus, app, rails, bin)
+  # Gem pins (--gem) apply only to apps whose Gemfile lists the gem.
+  def gem_pins(corpus, app, gems)
+    gemfile = File.read(File.join(app_dir(corpus, app), "Gemfile"))
+    gems.select { |name, _| gemfile.match?(/^\s*gem ["']#{Regexp.escape(name)}["']/) }
+  end
+
+  def variant(corpus, app, rails, bin, gems = {})
     dir = app_dir(corpus, app)
-    gemfile = File.join(dir, "Gemfile.census-#{rails.fetch("sha")[0, 12]}")
+    gems = gem_pins(corpus, app, gems)
+    suffix = gems.map { |name, g| "-#{name}-#{g.fetch("sha")[0, 12]}" }.join
+    gemfile = File.join(dir, "Gemfile.census-#{rails.fetch("sha")[0, 12]}#{suffix}")
     unless File.exist?(gemfile)
       lines = File.readlines(File.join(dir, "Gemfile"))
       pins = lines.each_index.filter_map { |i| [i, $1] if lines[i] =~ /\A\s*gem ["'](#{RAILS_GEMS.join("|")})["'],/ }
       raise "#{app}: expected a gem \"rails\" line (or its components), found none" if pins.empty?
       pins.each { |i, gem| lines[i] = %(gem "#{gem}", #{rails.fetch("source")}, ref: "#{rails.fetch("sha")}"\n) }
+      gems.each do |name, g|
+        i = lines.index { _1.match?(/\A\s*gem ["']#{Regexp.escape(name)}["']/) }
+        lines[i] = %(gem "#{name}", #{g.fetch("source")}, ref: "#{g.fetch("sha")}"\n)
+      end
       File.write(gemfile, lines.grep_v(/\Aruby\b/).join)
       # The variant drops the ruby pin, so its lock drops RUBY VERSION too
       # (frozen Bundler otherwise refuses to unlock it).
@@ -196,8 +249,13 @@ module Census
 
   # Dependency control: a variant's lock may differ from the base lock only in
   # the Rails source block and the Ruby version.
-  def lock_outside_rails(path)
-    File.read(path).split(/\n{2,}/).reject { _1.start_with?("RUBY VERSION") || (_1.start_with?("GIT") && _1.match?(/^    (rails|railties) \(/)) }
+  def lock_outside_rails(path, gems = [])
+    names = Regexp.union(%w[rails railties] + gems)
+    pinned = Regexp.union(gems)
+    blocks = File.read(path).split(/\n{2,}/).reject { _1.start_with?("RUBY VERSION") || (_1.start_with?("GIT") && _1.match?(/^    #{names} \(/)) }
+    return blocks if gems.empty?
+    # A pinned gem's own spec (and its dependency lines) and its DEPENDENCIES entry move with the pin.
+    blocks.map { _1.gsub(/^    #{pinned} \(.*\n(?:      .*\n?)*/, "").gsub(/^  #{pinned}(?:!| \(.*)?$\n?/, "") }
   end
 
   def check_services(apps)
@@ -281,15 +339,16 @@ module Census
     bin = ruby_bin(opts[:ruby])
     ruby = ruby_description(bin)
     check_services(opts[:apps])
-    bases = opts[:apps].map { state(opts[:corpus], _1).fetch("base") }.uniq
+    bases = opts[:apps].map { state(opts[:corpus], _1).fetch("base") }.uniq { _1.fetch("sha") }
     raise "apps were set up on different Rails bases" unless bases.one?
     rails = opts[:rails] ? resolve_rails(opts[:rails]) : bases.first
+    gems = opts[:gems].transform_values { |spec| resolve_rails(spec, nil) }
     # Bundle everything before measuring; no bundle command runs during a run.
-    gemfiles = opts[:apps].to_h { [_1, variant(opts[:corpus], _1, rails, bin)] }
+    gemfiles = opts[:apps].to_h { [_1, variant(opts[:corpus], _1, rails, bin, gems)] }
     locks = opts[:apps].to_h do |app|
       base_lock = File.join(app_dir(opts[:corpus], app), "Gemfile.census-#{bases.first.fetch("sha")[0, 12]}.lock")
       variant(opts[:corpus], app, bases.first, bin) unless File.exist?(base_lock)
-      [app, lock_outside_rails(gemfiles[app] + ".lock") == lock_outside_rails(base_lock)]
+      [app, lock_outside_rails(gemfiles[app] + ".lock", gems.keys) == lock_outside_rails(base_lock, gems.keys)]
     end
     locks.each { |app, same| warn "#{app}: dependencies outside Rails differ from the base lock" unless same }
     labels.product(opts[:modes], opts[:apps]).each do |label, mode, app|
@@ -300,8 +359,9 @@ module Census
       out = File.join(opts[:out], label)
       FileUtils.mkdir_p(out)
       meta_path = File.join(out, "meta.json")
-      meta = File.exist?(meta_path) ? JSON.parse(File.read(meta_path)) : { "label" => label, "rails" => rails, "ruby" => ruby, "runs" => [] }
+      meta = File.exist?(meta_path) ? JSON.parse(File.read(meta_path)) : { "label" => label, "rails" => rails, "gems" => gems, "ruby" => ruby, "runs" => [] }
       raise "#{label} was run with #{meta["rails"]["sha"]} / #{meta["ruby"]}" unless meta["rails"]["sha"] == rails["sha"] && meta["ruby"] == ruby
+      raise "#{label} was run with gems #{meta["gems"]}" unless meta.fetch("gems", {}).transform_values { _1["sha"] } == gems.transform_values { _1["sha"] }
       # Configurations that share a copy (APP-nops) share its database, so
       # they never run at the same time.
       copy_locks = opts[:apps].to_h { [app_dir(opts[:corpus], _1), Mutex.new] }
@@ -338,12 +398,13 @@ module Census
   def ranked(opts)
     runs = CensusRank.load_runs(File.join(opts[:out], opts.fetch(:label)), opts[:mode])
     raise "no #{opts[:mode]} runs for #{opts[:label]} in #{opts[:out]}" if runs.empty?
-    [runs, CensusRank.rows(runs, tiers: opts[:tiers])]
+    site = opts[:gem] && CensusRank.gem_site(opts[:gem])
+    [runs, CensusRank.rows(runs, tiers: opts[:tiers], **(site ? { site: site } : {}))]
   end
 
   def rank(opts)
     runs, rows = ranked(opts)
-    tsv = File.join(opts[:out], "rank-#{opts[:label]}-#{opts[:mode]}.tsv")
+    tsv = File.join(opts[:out], "rank-#{opts[:label]}-#{opts[:mode]}#{"-#{opts[:gem]}" if opts[:gem]}.tsv")
     File.write(tsv, CensusRank.tsv(rows))
     print opts[:tsv] ? CensusRank.tsv(rows) : CensusRank.text(runs, rows, opts[:mode], opts[:limit])
     warn "full ranking: #{tsv.delete_prefix(ROOT + "/")}"
@@ -353,7 +414,8 @@ module Census
     meta = File.join(out, label.split(":").first, "meta.json")
     return "#{label}: (no meta.json)" unless File.exist?(meta)
     m = JSON.parse(File.read(meta))
-    "#{label}: Rails #{m["rails"]["spec"]} #{m["rails"]["sha"][0, 10]}, #{m["ruby"]}"
+    gems = m.fetch("gems", {}).map { |name, g| ", #{name} #{g["spec"]} #{g["sha"][0, 10]}" }.join
+    "#{label}: Rails #{m["rails"]["spec"]} #{m["rails"]["sha"][0, 10]}#{gems}, #{m["ruby"]}"
   end
 
   def compare(opts, labels)
@@ -783,11 +845,15 @@ module Census
     command = argv.shift
     opts = { corpus: "census", out: File.join(ROOT, ".lowrail/private/census"), ruby: "4.0.7", apps: APPS.keys,
       modes: %w[interpreter yjit], mode: "interpreter", limit: 60, tiers: CensusRank::TIERS, top: 40, jobs: 1,
-      app: "blog", overlays: OVERLAYS, bisect: 20, watch_dir: File.join(ROOT, "docs/upstream/rails-main-watch") }
+      app: "blog", overlays: OVERLAYS, bisect: 20, watch_dir: File.join(ROOT, "docs/upstream/rails-main-watch"), gems: {} }
     parser = OptionParser.new do |o|
       o.banner = File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.map { _1.delete_prefix("# ").delete_prefix("#") }.join
       o.on("--rails SPEC") { opts[:rails] = _1 }
       o.on("--ruby R") { opts[:ruby] = _1 }
+      o.on("--gem NAME[=SPEC]", "run: pin gem NAME to OWNER/REPO@REF; rank: rank NAME's lines") do |v|
+        name, spec = v.split("=", 2)
+        spec ? opts[:gems][name] = spec : opts[:gem] = name
+      end
       o.on("--apps LIST", "comma-separated, or all (default)") { opts[:apps] = apps_option(_1); opts[:apps_given] = true }
       o.on("--app APP", "controls: SQLite app whose bundle runs the script (default blog)") { opts[:app] = _1 }
       o.on("--corpus NAME") { opts[:corpus] = _1 }
