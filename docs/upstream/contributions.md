@@ -261,6 +261,12 @@ merged/open PRs created since 2026-10-19, not closed superseded work.
 
 None.
 
+## Drafted, not opened
+
+- **Gem census (2026-11-03):** two i18n candidates and one connection_pool candidate on `thomasklemm` forks, with
+  drafts, in [gem-census.md](gem-census.md#candidates): I1 −0.40% and I2 −0.20% of all census allocations, C1 −4
+  objects per `ConnectionPool#with`. Not opened.
+
 ## Investigated, not submitted
 
 These dispositions are already public Lowrail evidence, not new candidate

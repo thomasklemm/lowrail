@@ -1,0 +1,327 @@
+# Gem census: allocation sites outside Rails, by breadth
+
+Lowrail bet G1. Our Rails PRs are mostly merged; the next broad source of avoidable allocations is the gems nearly
+every Rails app runs. This census ranks every allocation site outside Rails and Ruby's standard library over census
+6's corpus by breadth (apps reached) and objects per operation, classifies the top sites that reach at least five
+apps, and builds exact candidates on forks. Nothing is opened or posted; the drafts are below.
+
+**Result.** Over 23 configurations (20 apps, 251 workloads), the 162 gems outside Rails and the standard library allocate
+19.6% of all objects; **i18n is the largest and broadest: 248 objects per workload, 2.45% of all allocations, in
+19 of 20 apps**, almost all of it in `Backend::Fallbacks`, which every app with `config.i18n.fallbacks` runs (the
+`production.rb` that `rails new` generates sets it). Two exact i18n candidates come out of that: **I1** removes **0.40%** of all
+allocations (−40 objects per workload, 14 apps) and **I2** **0.20%** (−20, 14 apps), against an A/A of +0.3 on the
+same lines; both are the same in the interpreter and YJIT, and Sure (a finance app with 1,322 translations per
+dashboard request) carries most of the mean. **C1** in connection_pool removes four Hashes per `#with`: −4.6 objects per workload (0.06% of all) on the 18 configurations that lock
+connection_pool 3.x, in 6 apps (Mastodon −27.6).
+Every other top site is required work, already covered by an open PR (i18n#758, rack#2519, rack#2520, mail#1693),
+or a lead. Allocation counts only; no timing is claimed.
+
+| # | Repo, branch | Per call | Census (interpreter / YJIT) |
+| --- | --- | --- | --- |
+| I1 | [thomasklemm/i18n `thomasklemm/fallback-locale-identity`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-locale-identity) [`a9de2f7071`](https://github.com/thomasklemm/i18n/commit/a9de2f70715591b68ee1dba6d79abe049ab93820) | −2 objects per translation that hits the requested locale (`I18n.t(:hello)` 13 → 11) | −40.3 / −40.4 objects per workload, 0.40% of all; 14 apps |
+| I2 | [thomasklemm/i18n `thomasklemm/fallback-defaults-without-wrapper`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-defaults-without-wrapper) [`568d730577`](https://github.com/thomasklemm/i18n/commit/568d730577748f4d1210ac13c5fe7fc167005f59) | −2 or −3 objects per translation with a `default:` (Array default 21 → 18) | −19.8 / −19.9 objects per workload, 0.20% of all; 14 apps |
+| C1 | [thomasklemm/connection_pool `thomasklemm/frozen-interrupt-masks`](https://github.com/thomasklemm/connection_pool/tree/thomasklemm/frozen-interrupt-masks) [`1533388d07`](https://github.com/thomasklemm/connection_pool/commit/1533388d0749bbc30d76021a47d95e4e2a6941de) | −4 objects per `#with` (14 → 10) | −4.6 / −4.6 objects per workload, 0.06% of all; 6 apps |
+
+## Pins and method
+
+* **Rails:** canonical `rails/rails` main
+  [`3bdc579090`](https://github.com/rails/rails/commit/3bdc57909066eb17dee70fea0b6266edaffa9ffc), census 6's pin.
+* **Ruby 4.0.7**, interpreter and `--yjit`; production; services as disposable orb services (Redis, memcached,
+  MySQL 8.4 on 3307, PostgreSQL 15 on the local socket).
+* **Corpus:** census 6's 19 configurations (census 5's nine apps with Fizzy on SQLite and MySQL, the PG census's
+  seven apps plus `mastodon-nops` and `lago-nops`) and the four L6 apps (Thinkroom, Hackatime, Flow, Chatwoot): 23
+  configurations, 20 apps, 251 workloads per mode. Census 6's copies were set up on `5810776eec` and run at the pin;
+  the L6 copies were set up on the pin.
+* **Runs**, in this order, each in both modes: `g`, `g2` (the A/A pair), `i1`, `i2` on all 23 configurations, then
+  `cpbase` and `cp` on the 18 configurations that lock connection_pool 3.x (Chatwoot, Discourse, Lago, `lago-nops` and
+  Sure lock 2.5.5). [`runs.sh`](../../bench/upstream/gem_census/runs.sh) has the exact commands. A candidate run pins
+  one gem to a git commit with `script/census run --gem NAME=OWNER/REPO@SHA`; the run's dependency control
+  (`dependencies_outside_rails_match_base` in each run's `meta.json`) found no lock difference outside Rails and
+  the pinned gem in any app.
+* **Ranking:** `script/census rank --label g2 --gem all` (new): every site in a gem's files, keyed by gem, path and
+  the line's source text, so different versions of a gem rank as one site. Excluded: Rails, Ruby's default and
+  bundled gems except json, the census harness and its rack-test, and rack's `MockRequest`/`MockResponse`, which only
+  the harness calls. [`site_callers.rb`](../../bench/upstream/gem_census/site_callers.rb) traced who calls a site, to
+  tell harness work from app work. Per-gem totals:
+  [`gem_summary.rb`](../../bench/upstream/gem_census/gem_summary.rb).
+* **Candidate deltas:** [`gem_delta.rb`](../../bench/upstream/gem_census/gem_delta.rb): per app, the mean over
+  workloads of the objects per operation in the candidate gem's own lines, before (`g2`), after, and the same for the
+  A/A (`g` against `g2`). Restricting to the gem's lines removes the apps' own noise (single workloads in Sure,
+  Thinkroom and Discourse move by hundreds of objects between identical runs); the change in all allocations is in the
+  receipts and agrees within that noise. The share is the change over all allocations of all workloads.
+* **Micros:** [`i18n_micro.rb`](../../bench/upstream/gem_census/i18n_micro.rb) and
+  [`connection_pool_micro.rb`](../../bench/upstream/gem_census/connection_pool_micro.rb), objects per call with each
+  gem's lib directory on the load path.
+* **Receipts:** [`data/gem-census/receipts.tar.xz`](data/gem-census/receipts.tar.xz): the run summaries, rankings and
+  delta tables.
+
+## Per gem
+
+Interpreter; every gem's YJIT share is within 0.13 percentage points of it. Apps: apps with at least 0.5 objects per operation
+in the gem's lines in some workload, of 20.
+
+| Gem | Apps | Objects/workload | Share of all | Largest line (objects/workload) |
+| --- | ---: | ---: | ---: | --- |
+| i18n | 19 | 248.2 | 2.45% | `backend/fallbacks.rb:54` (42.6) |
+| rack | 20 | 95.4 | 0.94% | `query_parser.rb:245` (11.3) |
+| nokogiri | 12 | 88.8 | 0.87% | `xml/searchable.rb:270` (7.5) |
+| mail | 5 | 74.5 | 0.73% | `encodings/8bit.rb:14` (12.4) |
+| sqlite3 | 8 | 69.0 | 0.68% | `statement.rb:125` (41.4) |
+| tzinfo | 20 | 66.8 | 0.66% | `timestamp.rb:208` (28.1) |
+| json | 19 | 40.5 | 0.40% | `common.rb:364` (20.5) |
+| useragent | 7 | 38.6 | 0.38% | `user_agent/version.rb:27` (7.4) |
+| importmap-rails | 6 | 27.9 | 0.27% | `importmap_tags_helper.rb:34` (9.3) |
+| redis-client | 10 | 24.4 | 0.24% | `ruby_connection/resp3.rb:54` (5.0) |
+| jbuilder | 6 | 20.3 | 0.20% | `jbuilder.rb:314` (5.1) |
+| globalid | 11 | 15.7 | 0.15% | `uri/gid.rb:159` (3.7) |
+| pg | 12 | 15.5 | 0.15% | `connection.rb:403` (5.4) |
+| connection_pool | 11 | 13.5 | 0.13% | `connection_pool.rb:110` (2.1) |
+| propshaft | 12 | 12.3 | 0.12% | `resolver/static.rb:11` (5.9) |
+| turbo-rails | 10 | 11.0 | 0.11% | `frames_helper.rb:42` (2.3) |
+| warden | 6 | 10.5 | 0.10% | `proxy.rb:334` (1.8) |
+| base64 | 17 | 5.8 | 0.06% | `base64.rb:283` (5.4) |
+| devise | 6 | 4.4 | 0.04% | `controllers/helpers.rb:128` (1.0) |
+| pagy | 5 | 1.5 | 0.01% | `shared_methods.rb:12` (0.1) |
+| sidekiq | 3 | 1.9 | 0.02% | `sidekiq.rb:54` (0.4) |
+
+All sites together: 10,150 objects per workload (interpreter), 10,232 (YJIT); 162 gems allocate 19.6% of them.
+Kaminari (under 0.01%) and sprockets-rails (0.02%) are smaller still; turbo-rails, devise, warden, pagy and sidekiq
+have no line above 2.3 objects per workload.
+
+## Ranking
+
+The top sites that reach at least five apps, by objects per workload (interpreter; YJIT ranks the same sites in nearly
+the same order). Required: the object is the result or is needed by the caller. Covered: an open PR removes it. Lead:
+avoidable, but not exact, small and broad together.
+# is the site's rank in the full ranking; the missing ranks are further lines of a row's site and nokogiri
+serialization (required).
+
+| # | Site | Apps | Objects/workload | Disposition |
+| --- | --- | ---: | ---: | --- |
+| 1 | i18n `backend/fallbacks.rb:54` `options.merge(fallback_in_progress: true, …)` | 19 | 42.6 | Lead: the merged Hash is what `super` receives; avoiding it changes how the flag reaches the backend |
+| 2 | sqlite3 `statement.rb:125` `step` | 8 | 41.9 | Required: the row values |
+| 3 | i18n `backend/fallbacks.rb:60` `locale.to_s != fallback.to_s` | 19 | 41.0 | **I1** |
+| 4 | i18n `backend/fallbacks.rb:98` `[options[:default]].flatten` | 18 | 33.5 | **I2** |
+| 5 | tzinfo `timestamp.rb:208` `time.subsec` | 20 | 28.1 | Required: `Timestamp` keeps the sub-second as a Rational (public API); reached from Active Support's `TimeZone#utc_to_local` |
+| 6 | i18n `utils.rb:8` `hash.except(*keys)` | 19 | 22.3 | Required: the interpolation values |
+| 7 | i18n `i18n.rb:396` `normalize_keys` | 19 | 22.3 | Lead: the key Array is returned to callers |
+| 8 | i18n `backend/base.rb:58` `Utils.except(options, *RESERVED_KEYS)` rest Array | 19 | 21.3 | Covered: open [i18n#758](https://github.com/ruby-i18n/i18n/pull/758) |
+| 9 | json `common.rb:364` `Parser.parse` | 13 | 21.1 | Required: the parsed document |
+| 10 | i18n `backend/fallbacks.rb:101` `defaults[0, index]` | 18 | 16.6 | **I2** (for Hash and String defaults) |
+| 11 | tzinfo `timestamp.rb:193` `allocate` | 20 | 15.2 | Required: the Timestamp |
+| 12 | pg `connection.rb:410` `sync_get_result` | 12 | 12.2 | Required: the result |
+| 13 | i18n `backend/base.rb:49` `entry.dup` | 17 | 11.4 | Required: callers get their own String |
+| 14 | rack `query_parser.rb:245` and `:229` | 18 | 21.2 | Mostly the harness (rack-test's cookie jar); the app part is covered by open [rack#2519](https://github.com/rack/rack/pull/2519) |
+| 16 | useragent `browsers/base.rb:120` `product.to_s.downcase` | 7 | 8.7 | Lead: reached through Rails' `allow_browser`; `casecmp?` folds case differently from `downcase ==` outside ASCII |
+| 17 | i18n `interpolate/ruby.rb:33` `gsub` | 17 | 7.6 | Required: the interpolated String |
+| 18 | nokogiri `xml/searchable.rb:270` `evaluate` | 9 | 7.5 | Required: the node set (sanitizer paths) |
+| 19 | useragent `version.rb:27` `scan` | 7 | 7.4 | Lead (as 16) |
+| 20 | rack `request.rb:595` `base_url` | 9 | 7.2 | Lead: the String is returned |
+| 21 | rack `utils.rb:693` `clean_path_info` `split` | 16 | 6.6 | Lead; open [rack#2302](https://github.com/rack/rack/pull/2302) changes the separator, not the allocation |
+| 22 | propshaft `resolver/static.rb:11` `File.join` | 9 | 6.0 | Required: the asset path; unchanged on propshaft main `e7530a0` |
+| 23 | redis-client `ruby_connection/resp3.rb:39`, `:67` | 8 | 11.1 | Required: the command buffer (the `capacity:` keyword Hash is a lead) |
+| 25 | base64 `base64.rb:283` `pack` | 17 | 5.4 | Required: the output |
+| 26 | json `common.rb:860` `generate` | 18 | 5.1 | Required: the output |
+| 27 | rack `request.rb:607` `script_name + path_info` | 20 | 4.9 | Lead: the String is returned |
+| 30 | rack `utils.rb:331`, `:333`, `:408` (cookies) | 18 | 11.1 | Required: cookie parsing and the `Set-Cookie` value |
+| 31 | connection_pool `connection_pool.rb:64`, `:67` `handle_interrupt(Exception => …)` | 11 | 7.7 | **C1** (3.x; 2.5.5 has the same lines) |
+| 33 | globalid `uri/gid.rb:159` `split` | 11 | 3.8 | Required: the parsed parts |
+| 35 | rack `body_proxy.rb:12` `@block = block` | 20 | 3.4 | Required: the Proc |
+| – | rack `response.rb:67` `method(:append)` | 20 | 1.5 | Covered: open [rack#2520](https://github.com/rack/rack/pull/2520) |
+| – | mail `encodings/8bit.rb:14` `str.lines.find` | 5 | 12.4 | Covered: open [mail#1693](https://github.com/mikel/mail/pull/1693) |
+| – | importmap-rails `importmap_tags_helper.rb:34` | 3 | 9.3 | Below five apps; our [importmap-rails#336](https://github.com/rails/importmap-rails/pull/336) is still open |
+
+i18n main (`a0a416e570`) has only CI changes since 1.15.2, so none of the i18n sites is an upgrade note. Its open PRs
+were checked: none touches `fallbacks.rb`; #758 (Utils.except) and #759 (localize formats) are the allocation ones.
+
+## Candidates
+
+All three are one commit on the gem's current main, pushed to `thomasklemm` forks, with the gem's own suite passing.
+The census rows below are i18n's (or connection_pool's) own lines: mean objects per workload, interpreter / YJIT.
+
+### I1: compare fallback locales before converting them to Strings
+
+`Backend::Fallbacks#translate` calls `on_fallback` only when the translation came from another locale, and checks
+that with `locale.to_s != fallback.to_s`. The first fallback is the requested locale itself, so every translation
+found there converted two Symbols to Strings. I1 adds `locale != fallback &&` in front: the same object always
+gives the same String, so the result is unchanged, and different objects still go through the String comparison (a
+String locale with its Symbol fallback still does not count as a fallback).
+
+* Micro, objects per call, interpreter and YJIT: `I18n.t(:hello)` 13 → 11, `I18n.t(:greet, name:)` 21 → 19,
+  `human_attribute_name` (hit) 21 → 19.
+* Suite: 1,607 runs, 0 failures (`bundle exec rake test`).
+
+### I2: extract fallback defaults without a wrapper Array
+
+`extract_non_symbol_default!` runs for every translation with a `default:`. It started with
+`[options[:default]].flatten`: a wrapper Array and its flattened copy, even for a single Symbol. I2 returns early for
+a Symbol, flattens an Array directly, and returns a plain Hash or String itself with `options[:default] = []`, which
+is what the old code computed. Anything else keeps `[default].flatten`, because `flatten` converts elements with
+`to_ary` (including through `method_missing`), so only `instance_of?(Hash)` and `instance_of?(String)` skip it.
+
+* Micro, objects per call: Array default 21 → 18, Array default that misses 36 → 33, String 23 → 21, Symbol 29 → 27,
+  Hash 22 → 20.
+* Tests added: a nested Array default is not mutated; a default that responds to `to_ary` still flattens. Suite:
+  1,609 runs, 0 failures.
+
+### Census, I1 and I2
+
+i18n's own lines, objects per workload, interpreter / YJIT. Lago and `lago-nops` do not translate.
+
+| App | Workloads | i18n objects/op | I1 | I2 | A/A | All objects/op |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| blog | 10 | 160.3 | −2.8 / −2.8 | −6.0 / −6.0 | +0.0 / +0.0 | 1519 |
+| campfire | 9 | 1.1 | −0.2 / −0.2 | −0.2 / −0.2 | +0.0 / +0.0 | 5672 |
+| casa | 10 | 248.9 | −33.2 / −33.2 | −8.1 / −8.1 | +0.0 / +0.0 | 12590 |
+| chatwoot | 14 | 1.1 | −0.1 / −0.1 | +0.0 / +0.0 | +0.0 / +0.0 | 15404 |
+| codetriage | 7 | 28.6 | −0.3 / −0.3 | −0.9 / −0.9 | +0.0 / +0.0 | 2554 |
+| discourse | 14 | 321.5 | −45.0 / −45.0 | +0.0 / +0.0 | +0.0 / +0.0 | 11717 |
+| docuseal | 13 | 497.7 | −65.5 / −65.5 | +0.0 / +0.0 | +0.0 / +0.0 | 7131 |
+| fizzy | 14 | 10.6 | −1.0 / −1.0 | −0.7 / −0.7 | +0.0 / +0.0 | 9184 |
+| fizzy-mysql | 14 | 10.6 | −1.0 / −1.0 | −0.7 / −0.7 | +0.0 / +0.0 | 9053 |
+| flow | 10 | 27.8 | −0.4 / −0.4 | −1.2 / −1.2 | +0.0 / +0.0 | 9740 |
+| hackatime | 12 | 42.2 | −2.0 / −2.0 | −1.5 / −1.5 | +0.0 / +0.0 | 7344 |
+| lobsters | 11 | 122.9 | −23.6 / −23.6 | −23.6 / −23.6 | +0.0 / +0.0 | 10429 |
+| loomio | 15 | 54.2 | −10.9 / −10.9 | +0.0 / +0.0 | +0.0 / +0.0 | 9083 |
+| mastodon | 14 | 19.3 | −3.4 / −3.4 | −2.6 / −2.6 | +0.0 / +0.0 | 15743 |
+| mastodon-nops | 14 | 19.3 | −3.4 / −3.4 | −2.6 / −2.6 | +0.0 / +0.0 | 15697 |
+| pingcrm | 8 | 27.2 | −0.5 / −0.5 | −1.0 / −1.0 | +0.0 / +0.0 | 2689 |
+| react-starter-kit | 8 | 13.6 | −0.2 / −0.2 | −0.5 / −0.5 | +0.0 / +0.0 | 1789 |
+| redprints-cfp | 8 | 79.4 | −1.2 / −1.2 | −1.9 / −1.9 | +0.0 / +0.0 | 1872 |
+| sure | 9 | 4655.6 | −849.4 / −854.4 | −486.9 / −491.9 | +7.0 / +0.0 | 52306 |
+| thinkroom | 9 | 37.7 | −1.3 / −1.3 | −1.8 / −1.8 | +0.0 / +0.0 | 5215 |
+| writebook | 8 | 3.8 | −0.8 / −0.8 | −0.8 / −0.8 | +0.0 / +0.0 | 4895 |
+| **All (23 configurations)** | 251 | 248.2 | −40.3 / −40.4 | −19.8 / −19.9 | +0.3 / +0.0 | 10150 |
+
+Sure dominates both means: without it, I1 removes about 10 objects per workload and I2 about 2.4. I1's apps are the
+ones that translate on most requests (Docuseal, Discourse, Casa, Lobsters, Loomio); I2's are the ones that pass
+`default:` (Sure, Lobsters, Casa, Blog). The change in all allocations agrees within
+the A/A noise: I1 −27.6 / −39.0 and I2 −14.1 / −18.5 objects per workload, A/A −23.1 / −2.5 (the interpreter A/A is
+mostly Thinkroom, −535 per workload between identical runs).
+
+### C1: reuse constant interrupt masks in `ConnectionPool#with`
+
+`#with` calls `Thread.handle_interrupt(Exception => :never)` and `(Exception => :immediate)`. A Hash literal passed as
+keywords costs two objects per call: the Hash and the positional copy `handle_interrupt` receives. C1 passes two
+frozen private constants instead. `handle_interrupt` reads the mask and keeps no reference to it.
+
+* Micro: `pool.with {}` 14 → 10 objects, interpreter and YJIT.
+* Suite: 87 runs, 0 failures; `standardrb` clean.
+
+Census, against connection_pool main (`cpbase`, `mperham/connection_pool@5a3d762481`), on the 18 configurations
+that lock 3.x; the A/A is `g`/`g2`, on the released 3.0.2. Configurations whose workloads never check out are left
+out.
+
+| App | Workloads | connection_pool objects/op, 3.0.2 → main | C1 | A/A (3.0.2) |
+| --- | ---: | ---: | ---: | ---: |
+| campfire | 9 | 4.7 → 8.0 | −2.7 / −2.7 | +0.0 / +0.0 |
+| writebook | 8 | 4.4 → 7.5 | −2.5 / −2.5 | +0.0 / +0.0 |
+| codetriage | 7 | 7.0 → 12.0 | −4.0 / −4.0 | +0.0 / +0.0 |
+| docuseal | 13 | 1.6 → 2.8 | −0.9 / −0.9 | +0.0 / +0.0 |
+| mastodon | 14 | 48.4 → 83.2 | −27.6 / −27.6 | +0.0 / +0.0 |
+| mastodon-nops | 14 | 48.4 → 83.2 | −27.6 / −27.6 | +0.0 / +0.0 |
+| loomio | 15 | 0.5 → 0.8 | −0.3 / −0.3 | +0.0 / +0.0 |
+| flow | 10 | 6.3 → 10.9 | −3.7 / −3.4 | +0.0 / +0.0 |
+| **All (18 configurations)** | 194 | 8.1 → 13.9 | −4.6 / −4.6 | +0.0 / +0.0 |
+
+Mastodon checks out about seven times per workload, so C1 saves 4 per checkout there as in the micro.
+
+**Upgrade note:** connection_pool main allocates more than 3.0.2 (8.1 → 13.9 objects per workload on the same apps,
+about five more per checkout). Main forwards `**kwargs` through more methods than 3.0.2 (`checkout` → `pop` →
+`try_fetch_connection` → `connection_stored?`/`fetch_connection`, and since #223 `push`/`store_connection` on checkin),
+and each hop builds an empty keyword Hash. C1 does not touch that; it is a lead (below), worth raising before main is
+released.
+
+## Drafts
+
+Short, in each gem's PR style (i18n#758: Summary / Benchmark / Testing; connection_pool#223: Summary /
+Verification). Allocation counts only.
+
+### I1 (ruby-i18n/i18n, from `thomasklemm/fallback-locale-identity`)
+
+**Title:** Skip the String comparison when a fallback hits the requested locale
+
+#### Summary
+
+`Backend::Fallbacks#translate` calls `on_fallback` only when the translation came from a different locale, and checks that with `locale.to_s != fallback.to_s`. Most lookups hit the first fallback, which is the requested locale itself, so every such translation converts both Symbols to new Strings just to find they are equal.
+
+This compares the locales directly first and only falls back to the String comparison when they differ, so a String and a Symbol for the same locale still count as the same locale. `on_fallback` is called in exactly the same cases as before.
+
+#### Benchmark
+
+Ruby 4.0.7, objects allocated per call with `I18n::Backend::Fallbacks` included (same with and without YJIT):
+
+```
+                                 before   after
+I18n.t(:hello)                     13  ->  11
+I18n.t(:greet, name:)              21  ->  19
+human_attribute_name (hit)         21  ->  19
+```
+
+Across 20 open-source Rails apps (251 request, job and mailer workloads), this removes 0.4% of all allocated objects; 14 of the apps translate through this path.
+
+#### Testing
+
+The test suite passes (1,607 runs).
+
+### I2 (ruby-i18n/i18n, from `thomasklemm/fallback-defaults-without-wrapper`)
+
+**Title:** Avoid wrapping the default in an Array in Fallbacks#extract_non_symbol_default!
+
+#### Summary
+
+`Backend::Fallbacks#translate` calls `extract_non_symbol_default!` for every translation that has a `default`. It starts with `[options[:default]].flatten`, which allocates a wrapper Array and a flattened copy even when the default is a single Symbol, String or Hash.
+
+This handles the common shapes directly: a Symbol default returns early (it stays in the options, as before), an Array is flattened once without the wrapper, and a plain Hash or String is returned as the non-Symbol default with `options[:default] = []`, which is what the old code computed. Any other object still goes through `[default].flatten`, so defaults that respond to `to_ary` keep flattening the same way.
+
+#### Benchmark
+
+Ruby 4.0.7, objects allocated per call with `I18n::Backend::Fallbacks` included (same with and without YJIT):
+
+```
+                                 before   after
+Array default (hit)                21  ->  18
+Array default (miss)               36  ->  33
+String default                     23  ->  21
+Symbol default                     29  ->  27
+Hash default                       22  ->  20
+```
+
+Across 20 open-source Rails apps (251 request, job and mailer workloads), this removes 0.2% of all allocated objects, in 14 of the apps.
+
+#### Testing
+
+Added tests that a nested Array default is not mutated and that a default responding to `to_ary` still flattens. The test suite passes (1,609 runs).
+
+### C1 (mperham/connection_pool, from `thomasklemm/frozen-interrupt-masks`)
+
+**Title:** Reuse frozen interrupt masks in ConnectionPool#with
+
+#### Summary
+
+- `#with` passes `Exception => :never` and `Exception => :immediate` to `Thread.handle_interrupt` as Hash literals, which build a new Hash (and its keyword copy) on every checkout
+- keep both masks as frozen private constants and pass them positionally
+- behavior is unchanged: `Thread.handle_interrupt` reads the mask and does not keep or mutate it
+
+#### Verification
+
+- `pool.with {}` allocates 14 objects before, 10 after (Ruby 4.0.7, with and without YJIT)
+- across the 16 open-source Rails apps in our census that lock connection_pool 3.x, 4 objects fewer per checkout in every app that checks out (Mastodon: 28 fewer per request or job)
+- full suite: 87 runs, 0 failures
+- `standardrb lib/connection_pool.rb`
+
+## Leads
+
+* **i18n `fallback_options = options.merge(…)`** (19 apps, 42.6): the largest gem site. Passing the in-progress flag
+  another way (a thread-local, or a keyword the backend strips) would remove a Hash per fallback step, but it changes
+  what custom backends receive.
+* **tzinfo `Timestamp.for_time`** (20 apps, 43 together): a Timestamp and a Rational per Active Support time-zone
+  conversion. The Rational is part of tzinfo's API; avoiding it belongs in Active Support (caching the period) rather
+  than tzinfo.
+* **useragent** (7 apps, 38.6): parsing the User-Agent on every request through Rails' `allow_browser`. Caching the
+  parsed agent per request string, in Rails, would remove almost all of it.
+* **connection_pool main's keyword forwarding** (see the upgrade note under C1): about five keyword Hashes per
+  checkout that 3.0.2 does not allocate. Forwarding keywords only when some were given might avoid it; not built or measured, and it touches
+  #223's code, so it needs its author's view first.
+* **connection_pool 2.5.5**: Chatwoot, Discourse, Lago and Sure lock 2.5.5, which has the same `handle_interrupt`
+  lines; C1 reaches them only once they upgrade.

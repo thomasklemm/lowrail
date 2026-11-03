@@ -113,10 +113,12 @@ configurations of one copy at the same time.
 
 Chatwoot and three more Inertia apps ([Inertia and Chatwoot census](inertia-chatwoot-census.md)) follow the same
 pattern, with overlays and seeds in [fixtures/corpus/inertia-chatwoot-census](../../fixtures/corpus/inertia-chatwoot-census).
-`run --gem NAME=SPEC` (repeatable) also pins a gem to a git ref, `OWNER/REPO@REF`, in every app whose Gemfile lists
-it. The variant Gemfile is `Gemfile.census-RAILS12-NAME-GEM12`, and the dependency control ignores that gem's own
+`run --gem NAME=SPEC` (repeatable) also pins a gem to a git ref, `OWNER/REPO@REF`, in every app whose Gemfile or
+Gemfile.lock lists it (a gem only in the lock is added with `require: false`). The variant Gemfile is `Gemfile.census-RAILS12-NAME-GEM12`, and the dependency control ignores that gem's own
 lock lines. `rank --gem NAME` ranks the gem's lines instead of Rails', keyed by their path inside the gem, so apps on
-different releases or git checkouts of it share one key.
+different releases or git checkouts of it share one key. `rank --gem all` ranks every gem outside Rails, Ruby's
+default gems (json excepted) and the harness, keyed by gem, path and the line's source text
+([gem census](gem-census.md)).
 
 ## What a run measures
 
