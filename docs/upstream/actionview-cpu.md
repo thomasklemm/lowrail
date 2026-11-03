@@ -13,17 +13,18 @@ alias dispatch and a `super` lookup per call in the interpreter. Under YJIT it i
 
 | # | Branch | Commit | Change | Per `<%= %>` (ns, main → branch) | ruby-bench Ir per iteration (A/A) |
 | --- | --- | --- | --- | --- | --- |
-| C1 | [`thomasklemm/output-buffer-escape`](https://github.com/thomasklemm/rails/tree/thomasklemm/output-buffer-escape) | [`a1c7466a1e`](https://github.com/thomasklemm/rails/commit/a1c7466a1e238dea119499460254e2d60b1793c9) | `OutputBuffer#<<` calls `ERB::Escape.html_escape` when the converted value is a plain unsafe String | interp 147 → **104**, YJIT 70 → **53** | erubi-rails interp **−6.9%** (+0.2%), YJIT **−5.1% / −10.6%** (−0.1%); 4.1dev **−7.8%** (−0.2%) / **−7.0% / −6.8%** (−0.4% / +0.2%) |
+| C1 | [`thomasklemm/output-buffer-escape`](https://github.com/thomasklemm/rails/tree/thomasklemm/output-buffer-escape) | [`a2a3bf0075`](https://github.com/thomasklemm/rails/commit/a2a3bf00753bda9d10527b5bb1d89558dadbf244) | `OutputBuffer#<<` runs `unwrapped_html_escape`'s steps inline (`to_s`, `html_safe?`, `ERB::Escape.html_escape`) instead of the alias and `super` | interp 141 → **110**, YJIT 68 → **52** | erubi-rails interp **−5.8%** (−0.3%), YJIT **−5.3% / −6.1%** (+0.5% / −0.2%); 4.1dev **−6.3%** (−0.1%) / **−8.9% / −5.8%** (−0.2% / +0.4%) |
 | C2 (held) | [`thomasklemm/erb-util-escape-direct`](https://github.com/thomasklemm/rails/tree/thomasklemm/erb-util-escape-direct) | [`157be38ca0`](https://github.com/thomasklemm/rails/commit/157be38ca0acb901bbfa86acfe8588ee68c5496f) | `unwrapped_html_escape` calls `ERB::Escape.html_escape` instead of `super` | `unwrapped_html_escape` of an unsafe String: interp 78 → **71**, YJIT 55 → **43** | erubi-rails interp **−5.2%**, YJIT **−4.8%**; 4.1dev **−1.4%** / **−6.5%**; railsbench interp **−0.8%** |
 
 Ir = instructions counted by Valgrind (pinned `script/bench-valgrind` build). Wall time on this orb has A/A swings
 of up to ±30% per run, so instruction counts are the primary evidence; wall time is reported alongside.
 
-**Decision needed (C1 and C2):** both bypass `super`, which #46573 (k0kubun) chose deliberately so that escaping stays
+**Boundary (C1 and C2):** both bypass `super`, which #46573 (k0kubun) chose deliberately so that escaping stays
 "permissive about other monkey patches using `Module#prepend`". A module prepended to `ERB::Util` *before* Active
 Support loads would no longer see the bypassed calls (C1: template appends only; C2: every escape). Modules prepended
-after Active Support never saw them. C1 is the narrow form and is recommended; C2 is held because it reverses that
-design for all escapes.
+after Active Support never saw them. **Thomas decided (2026-11-03): submit C1 and let the reviewer decide the
+boundary**; the draft states it so a reviewer can judge it alone. C2 stays held because it reverses that design for
+all escapes.
 
 ## Pins and method
 
@@ -238,12 +239,12 @@ operations). `ERBUtil#html_escape` counts every `unwrapped_html_escape`/`html_es
          value = value.to_s
          @raw_buffer << if value.html_safe?
            value
-+        elsif value.instance_of?(String)
-+          # A plain String's to_s and html_safe? can't change the result, so
-+          # escape it directly instead of repeating them in unwrapped_html_escape.
-+          ERB::Escape.html_escape(value)
          else
-           ERB::Util.unwrapped_html_escape(value)
+-          ERB::Util.unwrapped_html_escape(value)
++          # The steps of ERB::Util.unwrapped_html_escape, without its alias
++          # and super dispatch to the same ERB::Escape.html_escape.
++          value = value.to_s
++          value.html_safe? ? value : ERB::Escape.html_escape(value)
          end
        end
        self
@@ -398,25 +399,75 @@ The `instance_of?` check costs ~15 ns per append in the interpreter and nothing 
 of C1 vary between processes more than the A/A does (also before the amendment: −0.9 … −6.1%), so the YJIT claim is
 "5–10%". The other C1 measurements in this section are for `3fdf00ef79`.
 
-**Draft PR description:**
+### Second review (`a2a3bf0075`)
 
-> Every `<%= %>` appends through `ActionView::OutputBuffer#<<`. For a value that isn't html_safe it already calls
-> `to_s` and `html_safe?`, then calls `ERB::Util.unwrapped_html_escape`, which repeats both checks and reaches
-> `ERB::Escape.html_escape` through an alias and `super`. YJIT can't specialize that `super` (it is defined on a
-> singleton class), so each append is a dynamic send.
+Sol's second round on `a1c7466a1e` (both rubrics request changes, same P2) found that `instance_of?(String)` still
+lets through a plain String whose `to_s` differs: a singleton `to_s`, or a redefined `String#to_s`. Main calls that
+`to_s` again inside `unwrapped_html_escape`; the guard skipped it:
+
+```ruby
+string = String.new("<original>")
+string.define_singleton_method(:to_s) { "<replacement>" }
+value = Object.new
+value.define_singleton_method(:to_s) { string }
+buffer = ActionView::OutputBuffer.new
+buffer << value
+buffer.to_s # main "&lt;replacement&gt;", a1c7466a1e "&lt;original&gt;"
+```
+
+`a2a3bf0075` drops the guard and inlines exactly what `unwrapped_html_escape` does after `<<` has converted the
+value: `value = value.to_s`, then `value.html_safe? ? value : ERB::Escape.html_escape(value)` (diff above). Every
+`to_s` and `html_safe?` call main makes stays; only the alias and the `super` dispatch are skipped, which leaves the
+prepend boundary as the one difference. The repro is a third test in `buffers_test.rb`; it fails on `a1c7466a1e`
+(expected `"&lt;replacement&gt;"`, actual `"&lt;original&gt;"`) and passes, with the two subclass tests, on main and
+`a2a3bf0075`. Action View suite 3,355 runs, 0 failures, 0 errors, `RAILS_STRICT_WARNINGS=1`, Ruby 4.0.7; RuboCop
+clean on both files.
+
+**Per call, `a2a3bf0075`** (same micro, best of 7 × 1,000,000 appends, ns, main → C1):
+
+| `buf.append = value` | 4.0.7 interp | 4.0.7 YJIT | 4.1dev interp | 4.1dev YJIT |
+| --- | ---: | ---: | ---: | ---: |
+| unsafe String, nothing to escape | 141 → **110** | 68 → **52** | 147 → **116** | 75 → **56** |
+| unsafe String with `<&` | 197 → **167** | 149 → **98** | 207 → **174** | 131 → **102** |
+| Integer | 177 → **142** | 113 → **84** | 175 → **137** | 106 → **87** |
+| SafeBuffer, `nil` (controls) | flat | flat | flat | flat |
+
+**The three versions of C1** (erubi-rails Ir per iteration; YJIT rows are two samples, each a fresh pair of
+processes per variant; A/A for `a2a3bf0075` in the last column):
+
+| Measure | 3fdf00ef79 (direct) | a1c7466a1e (guard) | a2a3bf0075 (inline) | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| unsafe String append, interp 4.0.7 (ns) | 146 → 89 | 147 → 104 | 141 → **110** | |
+| unsafe String append, YJIT 4.0.7 (ns) | 66 → 51 | 70 → 53 | 68 → **52** | |
+| interp 4.0.7 | −9.9% | −6.9% | **−5.8%** | −0.3% |
+| YJIT 4.0.7 | −5.0% (median of 4) | −5.1%, −10.6% | **−5.3%, −6.1%** | +0.5%, −0.2% |
+| interp 4.1dev | −10.0% | −7.8% | **−6.3%** | −0.1% |
+| YJIT 4.1dev | −7.8% (median of 4) | −7.0%, −6.8% | **−8.9%, −5.8%** | −0.2%, +0.4% |
+
+The inline `to_s` and `html_safe?` cost about 5 ns per append over the guard in the interpreter (one more method
+call, `Object#html_safe?` is Ruby) and nothing measurable under YJIT. Census and app runs were not repeated: the
+change only adds back two calls main already makes.
+
+**Draft PR description** (boundary per Thomas's decision: submit, and let the reviewer decide):
+
+> Every `<%= %>` appends through `ActionView::OutputBuffer#<<`. For a value that isn't html_safe it calls `to_s` and
+> `html_safe?`, then `ERB::Util.unwrapped_html_escape`, which reaches `ERB::Escape.html_escape` through an alias and
+> a `super` on `ERB::Util`'s singleton class. YJIT can't specialize that `super`, so each append is a dynamic send.
 >
-> When the converted value is a plain String, this calls `ERB::Escape.html_escape` directly, which is the method
-> `super` reaches, so the output is the same; anything else (a String subclass with its own `to_s`) takes the old path.
-> The one boundary: a module prepended to `ERB::Util` before Active Support loads no longer sees these appends;
-> modules prepended after it never did.
+> This runs the same steps inline: `to_s` on the converted value, `html_safe?` again, then `ERB::Escape.html_escape`,
+> the method `super` reaches. Every `to_s` and `html_safe?` call stays. The one difference: a module prepended to
+> `ERB::Util`'s singleton class before Active Support loads no longer sees template appends. Every other
+> `html_escape` caller still goes through `super`, and modules prepended after Active Support never saw these
+> appends. `unwrapped_html_escape` is private and `:nodoc:`. #46573 chose `super` on purpose so other prepends keep
+> working; this keeps it everywhere except this internal path.
 >
 > | `<%= %>` of an unsafe String | main | this PR |
 > | --- | ---: | ---: |
-> | interpreter | 147 ns | 104 ns |
-> | YJIT | 70 ns | 53 ns |
+> | interpreter | 141 ns | 110 ns |
+> | YJIT | 68 ns | 52 ns |
 >
-> On ruby-bench's erubi-rails this runs 6.9% fewer instructions per iteration in the interpreter and 5–10% fewer with
-> YJIT (7% on Ruby master); a page in Fizzy or Lobsters makes 130–920 such appends.
+> On ruby-bench's erubi-rails this runs 5.8% fewer instructions per iteration in the interpreter and 5–6% fewer
+> with YJIT (6–9% on Ruby master); a page in Fizzy or Lobsters makes 130–920 such appends.
 
 ## C2 (held): `unwrapped_html_escape` without `super`
 
@@ -460,7 +511,7 @@ failures, 0 errors, 403 skips (cache stores without their services); Action View
 **Why held.** C2 is exact for Rails and erb, but it removes the `super` that #46573 introduced on purpose, so a
 module prepended to `ERB::Util` (or its singleton class) before Active Support loads no longer sees *any* escape.
 That is a design question for the maintainers, not a review nit. C1 keeps `super` for every caller except template
-appends. Most of C2's gain is under YJIT; a YJIT fix (see [Leads outside Rails](#leads-outside-rails)) would recover that
+appends. Most of C2's gain is under YJIT; a YJIT change (a lead only, see [Leads outside Rails](#leads-outside-rails)) would recover that
 part without touching Rails or its `super`.
 
 ## Rejected and leads
@@ -486,7 +537,12 @@ part without touching Rails or its `super`.
   class (Rails prepends to it), so every escape's `super` is a dynamic send: 7.2 M fallbacks over 6 erubi-rails
   iterations on 4.0.7, 97% of all `super` calls there. A receiver that is a Class or Module lives as long as its
   constant, so specializing on it would retain nothing new; that would recover C2's YJIT part for every
-  `singleton_class.prepend` pattern without changing Rails. Needs its own ruby-bench evidence (DECISIONS).
+  `singleton_class.prepend` pattern without changing Rails. **Recorded as a YJIT lead only, not to be built:**
+  JIT performance work goes mainly to ZJIT (k0kubun on ruby#19671; Thomas agreed).
+* **ZJIT:** not the same gap, by source reading only. On master `64d821e685`, `zjit/src/hir.rs` specializes
+  `InvokeSuper` by guarding the method entry and calling an ISEQ or fixed-arity cfunc target; it has no
+  singleton-class rejection. Not measured: the orb's master build has no ZJIT. Check with ZJIT's send-fallback
+  stats on erubi-rails before recording a ZJIT lead.
 
 ## Process notes
 
