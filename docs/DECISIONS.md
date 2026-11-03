@@ -39,6 +39,8 @@ in its report which items it checked:
 6. Mutation during conversion or iteration (live Hash iteration vs a snapshot), and fibers suspended there.
 7. Frozen receivers, arguments and results; exception class and message.
 8. Load order and standalone `require`; configuration read before vs after the work, as in base.
+9. Prior work: search open and closed PRs as well as issues in the target repo before building (cbor-ruby#43
+   duplicated nobu's open #31, found only after the maintainer asked).
 
 Accepted without a fix, unless the change is escaping or SQL safety: global redefinition of core methods,
 overrides of private (nodoc) methods, and reaching internal Arrays through ObjectSpace.
