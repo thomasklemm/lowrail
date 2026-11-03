@@ -369,6 +369,51 @@ Lobsters runs must not share a checkout concurrently: two parallel runs raced on
 `test/ruby/test_zjit.rb` no longer exists on master (ported to `zjit/src/codegen_tests.rs`; the rest is
 `test_zjit_cli.rb`). Only the three updated HIR snapshots fail without the change.
 
+## Lead 3: our build and its numbers (2026-11-03)
+
+thomasklemm/ruby [`thomasklemm/zjit-method-entry-dispatch`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-method-entry-dispatch)
+@ `2c26d6e653`, one commit on master `a8b095a07e`, 5 files, +219/−33 (production code +63). Not opened; in review.
+
+**What it does.** When every profiled receiver class of a polymorphic send resolves the same ISEQ method entry, a new
+arm before the fallback checks `rb_callable_method_entry(CLASS_OF(recv), mid) == cme` (`IsMethodCme`) and calls the
+entry directly, with the same `MethodRedefined` patch point as the profiled arms. A run-time check rather than an
+ancestor guard plus a new "no override" invariant (Shopify/ruby#1039 row 25).
+
+**Fallbacks**, ruby-bench per iteration (railsbench / lobsters / shipit), 0 `compile_error_out_of_memory`:
+`send_polymorphic_fallback` 26,500 / 248,651 / 641,506 → 26,500 / 117,672 / 230,604; `dynamic_send_count`
+1,065,952 / 745,792 / 1,695,215 → 1,089,874 / 623,677 / 1,252,556. Census apps were not rerun in this orb.
+
+**Callgrind** (Ir per iteration in millions, GC excluded, 15 warmup + 3 measured, 4 runs each):
+
+| | master `a8b095a07e` | branch | Δ |
+|---|---|---|---:|
+| railsbench | 4688.4 / 4694.3 / 4681.2 / 4687.4 (range 0.28%) | 4703.1 / 4698.9 / 4708.1 / 4708.6 | **+0.36%** |
+| lobsters | 3205.5 / 3207.8 / 3207.1 / 3205.2 (range 0.08%) | 3195.3 / 3195.2 / 3192.8 / 3196.5 | −0.36% |
+| shipit | 3667.7 / 3665.7 / 3669.3 / 3670.0 (range 0.12%) | 3621.9 / 3624.3 / 3621.7 / 3624.2 | −1.23% |
+
+The railsbench loss is lead 3b: by function, `vm_search_super_method`, `rb_vm_invokesuper` and the cfunc frames
+behind them add about 6M Ir per iteration; the check itself costs 0.2M. `--zjit-stats-iseq` puts all 23,922 extra
+dynamic supers in `OrderedOptions#[]`, which the new arm inlines into `method_missing`. With inlining off, both
+builds call the same methods the same number of times.
+
+**Per call:** 36 subclasses 565.6 → 290.9 Ir; class method calling a class method 987.4 → 474.2; monomorphic 132.0
+unchanged; worst case (profile shares one method, run-time receivers override it) 632.0 → 774.0.
+
+**Checks:** `make zjit-test` 1941/1942 (the miss is `test_profile_frames_during_direct_jit_to_jit_entry`, load-sensitive,
+5/5 alone); btest at threshold 1 2141/2141; test-all at threshold 1 (method, module, class, refinement, super, alias,
+object, call, eval, zjit_cli, settracefunc, keyword, iterator) 1073 tests, 0 failures; a 14-scenario differential
+script (redefinition, singleton methods, prepend/extend/include, new subclasses, undef/private with
+`method_missing`, refinements of a subclass and of the owner, remove, instances with blocks, compaction) matches the
+interpreter at four threshold/profile settings. Railsbench responses are identical (body digests).
+
+## New leads from the lead 3 build (2026-11-03)
+
+| lead | fallback / exit | repro or site | counts | status |
+|---|---|---|---|---|
+| 3b `super` after a method-entry copy | `send_fallback_super_polymorphic` | Repro in the lead 3 PR draft: profile `super` in `OO#[]`, then `Sub.class_eval { def [](k) = super }` with `SubSub < Sub` copies `OO#[]`'s entry; the super profile then holds two entries for one method and never specializes (0 → 10,000 per 10,000 calls on master). Site: `ActiveSupport::OrderedOptions#[]` (ordered_options.rb:42) | railsbench 4,013 per itr on master; 27,935 with lead 3, which inlines `#[]` at one more site and costs railsbench about +0.3% Ir | Free: next to Shopify/ruby#1039 rows 45/46 (unassigned). Small fix candidate: pick the one valid entry when all profiled entries share a definition |
+| 3c failed method-entry check | none (extra C call before a fallback) | lead 3 when run-time receivers resolve another entry than the profile's shared one | +142 Ir per call in the worst-case micro; **unmeasured** on apps | Ours, part of lead 3 |
+| 3d megamorphic sites with one method entry | `send_fallback_send_megamorphic` | lead 3 only covers polymorphic summaries; `connection_specification_name` (`superclass`/`==`, 34 singleton classes, 1 method) | 27 per op in 6 apps (zjit-polymorphism.md) | Free: Shopify/ruby#1039 rows 24/25/27 (unassigned) |
+
 ## Lead 10: the receiver class
 
 The fallback is the `UNSET.equal?(value)` send. The lobsters HIR dump shows
