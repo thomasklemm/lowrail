@@ -189,6 +189,12 @@ lead. States change often; each bet's doc is the source of truth.
 | V1, A1, S1 | Action View, Active Record and JSON serialization CPU | [actionview-cpu](upstream/actionview-cpu.md) · [activerecord-cpu](upstream/activerecord-cpu.md) · [serialization-cpu](upstream/serialization-cpu.md) |
 | G1, I18N | gem census; i18n deep dive | [gem-census](upstream/gem-census.md) · [i18n-performance](upstream/i18n-performance.md) |
 | R6 | relation delegators `...`, `default_scope` owner checks | [rails-r6-leads](upstream/rails-r6-leads.md) |
+| E2 | make the 13 census configurations that fail on Ruby master install, via gem fixes upstream; doubles the corpus every ZJIT pass sees | census docs |
+| Z13 | where ZJIT spends more Ir than YJIT on railsbench, lobsters and shipit, classified into buckets that become leads | zjit-yjit-gap (planned) |
+
+Chosen 2026-11-03 for reach. E2 unblocks ZJIT measurement on Mastodon, Discourse, Chatwoot, Lobsters and Loomio, and
+the gem fixes are needed for 4.1 anyway. Z13 measures the gap to YJIT directly instead of inferring it from fallback
+counts. One orb slot stays reserved for Rails candidates from C8's CPU census; the Rails queue is otherwise empty.
 
 ## Learnings from 2026-11-03
 
