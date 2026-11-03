@@ -176,6 +176,9 @@ today the only way to see it is a trace or a custom probe.
   against the global counter. The sum check also catches a future double count.
 * **Size estimate:** about 150 lines across `stats.rs`, `state.rs`, `codegen.rs`, `hir.rs` and `options.rs`.
 
+**Built (Z10, 2026-11-03):** `thomasklemm/zjit-stats-iseq` @ `508f80e462`. The results on the apps are in
+[zjit-iseq-leads.md](zjit-iseq-leads.md).
+
 ### Draft comment for Shopify/ruby#746 (not posted)
 
 > Some data for this from Rails. Per-ISEQ counts are what we've been missing in the Rails work. The fallbacks
