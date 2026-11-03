@@ -238,6 +238,46 @@ with 12 of 14 workloads moving.
 * Branch interactions: IR-4 conflicts textually with IR-2 in `deep_transform_props` (one line), and every branch
   adds a CHANGELOG line. Whichever lands second needs a trivial rebase. `wip/inertia-combined` shows the resolution.
 
+### Submission (2026-11-03)
+
+* **R-1** opened as [rails/rails#59563](https://github.com/rails/rails/pull/59563) and **IR-3** as
+  [inertiajs/inertia-rails#441](https://github.com/inertiajs/inertia-rails/pull/441). Thomas opened both after Sol
+  approved each on both rubrics. Sol counted 8 → 0 objects for IR-3's eight header reads (the micro above counts
+  10, including two objects of its own), so #441 says 8.
+* **No stacked PRs** ([DECISIONS](../DECISIONS.md)), so IR-1, IR-4 and IR-2 go as one PR, in that order and one commit
+  each, on [`thomasklemm/props-resolver-plain-values`](https://github.com/thomasklemm/inertia-rails/tree/thomasklemm/props-resolver-plain-values)
+  [`3886d49e82`](https://github.com/thomasklemm/inertia-rails/commit/3886d49e824dd0b134fdef62d9d07799d590d1f3) on
+  master `3e1330a33d` (census `ipr` measured `56739a92b3`, which differs only in the spec). After Sol's P3, the IR-1
+  spec also covers a partial reload (`only`) and a DevTools recorder. Reverting any one of the three `BaseProp`
+  guards now fails at least one of its two examples, and both examples fail on master. The IR-2/IR-4 line is resolved once (the resolver is byte-identical to `wip/inertia-combined`'s),
+  and the PR has a single CHANGELOG entry. rspec 1078 examples, 0 failures; rake test 61 runs, 0 failures; rubocop
+  197 files clean. The 3,000-tree differential digest is identical on master and the branch. Micro (23-value page):
+  165 → 40 objects, 73 → 38 µs interpreter, 24.7 → 14.6 µs YJIT. Census `ipr` against `ic2`: median −75.3 / −74.6
+  objects per workload (−1.8% / −1.9%), 41 / 41 of 55 workloads moved (A/A 17 / 22). Hackatime's Inertia XHR dashboard
+  is −14.2% (13,114 → 11,258).
+* Flow's Rack::Attack `login/combo` throttle (10 logins per hour) began returning 429 for the `ipr` run. Flow's setup
+  now calls `Rack::Attack.reset!`, which clears the counters but keeps Rack::Attack in every measured request.
+
+**Combined draft — Treat plain prop values as data in the props resolver**
+
+> The props resolver asks every resolved value whether it is deferred, once or rescued, through `Object#try`. A plain
+> value that answers one of those predicates is treated as a prop type. A record with a `deferred` column is dropped
+> from the first load, and one with a `once` column raises `NoMethodError` (`once_key`). This PR asks only prop types;
+> the added spec fails on master.
+>
+> The plain-data path also gets cheaper. The first commit skips the three `try` calls per value (each allocates an
+> args Array and a kwargs Hash). The second walks props hashes with `Hash#each` instead of `each_with_object` pairs.
+> The third copies plain values as is when no partial reload or DevTools recording needs their paths, as `7915f3b`
+> did for plain arrays.
+>
+> | Resolving a page with 23 plain values | Before | After |
+> | --- | ---: | ---: |
+> | objects | 165 | 40 |
+> | µs, interpreter / YJIT | 73 / 24.7 | 38 / 14.6 |
+>
+> Across six open-source Inertia apps (PingCRM, Hackatime, Flow, Thinkroom, Redprints CFP, the React starter kit),
+> 41 of 55 requests allocate fewer objects, median −1.8%, with no change in the resolved props.
+
 ### PR description drafts (not published)
 
 **IR-1 — Treat plain prop values as data in the props resolver**
@@ -317,7 +357,7 @@ with 12 of 14 workloads moving.
 * **Rails `Relation::Merger` splats** (Chatwoot rank 4/5): not small; lead.
 * **Rails `IndifferentCoder#load`**, **`to_datetime`**, **STI instantiation:** required.
 * **The `verify_authenticity_token` deprecation per request:** intentional (4f2ee07b8e); the fix is in the app.
-* **Rails-main breaks found** (no PR proposed): `parameter_parsers` frozen (ac98c112f4) breaks scimitar 2.15;
+* **Rails-main breaks found** (notes only; they belong to the gems and apps, not to a Lowrail PR): `parameter_parsers` frozen (ac98c112f4) breaks scimitar 2.15;
   `TableMetadata` frozen (3ba8970f4a) breaks blind_index 2.8.1; new `default_order` query method clashes with an app
   scope of that name. The first two are worth a CHANGELOG note upstream if a maintainer agrees.
 

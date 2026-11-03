@@ -71,6 +71,9 @@ module Census4Workloads
     task = board.board_tasks.find_by!(title: ["Set up project workflows", "Set up project workflows (census)"])
     task.update_columns(title: "Set up project workflows")
     Project.where(name: "Census project").delete_all
+    # Rack::Attack allows 10 logins per hour per IP and email (login/combo), one
+    # per run process; clear its counters, but keep it measured on every request.
+    Rack::Attack.reset!
     client = c::Client.new
     token = xsrf_cookie(client.get("/login"))
     client.post("/login", params: { user: { email: "john@example.com", password: ENV.fetch("ADMIN_PASSWORD") } },
