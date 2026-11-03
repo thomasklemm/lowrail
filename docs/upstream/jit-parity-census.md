@@ -368,7 +368,7 @@ sites in parentheses are where ZJIT's trace shows the same pattern.
 | `send_megamorphic` | 1,209 | `attribute_aliases`, `connection_specification_name`, `association_instance_get` |
 | `sendforward_not_specialized` | 312 | `delegate`-generated `(...)` methods: `WhereClause#empty?`, `current_transaction`, `ScopeRegistry.current_scope` (9). Open #18326 specializes monomorphic `sendforward`. |
 | `send_block_arg_not_nil` | 331 | `MonitorMixin#mon_synchronize`, notification `Fanout`, pool `Queue#synchronize` (9). Open #19484 / Shopify/ruby#1014. |
-| `send_not_optimized_method_type_optimized` (`Kernel#send`) | 183 | Arel `Visitor#visit` (one `send` per SQL node), TZInfo `Timestamp.new!`, Journey visitors (9). No issue or PR found; YJIT specializes `send`. |
+| `send_not_optimized_method_type_optimized` (`Kernel#send`) | 183 | Arel `Visitor#visit` (one `send` per SQL node), TZInfo `Timestamp.new!`, Journey visitors (9). Open draft #19583 covers constant names; Arel and Journey use non-constant names ([zjit-send](zjit-send.md)). |
 | `send_not_optimized_need_permission` | 186 | `InheritableOptions#initialize` (protected `@parent._get`), `WhereClause#merge` (protected `other.extract_attributes`) (9). Open #19483 covers protected sends. |
 | super complex args / from block | 36 / 22 | `SQLString#initialize(*)`, `touch_later(*)`; `QueryCache#select_all` |
 
