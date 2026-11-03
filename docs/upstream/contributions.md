@@ -102,8 +102,8 @@ Measurements are the PRs' own, from their original dates.
 
 ### Gems
 
-- [getlago/lago-expression#91](https://github.com/getlago/lago-expression/pull/91), Ruby 4.1 compatibility: `required_ruby_version` `~> 4.0.2` → `>= 4.0.2`, and rb-sys `stable-api-compiled-fallback` (rb-sys 0.9.130 has no 4.1 stable API). Lago installs it from git. 20 specs on 4.0.7 and master; patch from the F1 frontier census. Bet E1; opened 2026-11-03.
-- Issue [ruby/rubygems#10017](https://github.com/ruby/rubygems/issues/10017): Bundler 4.0.x (through 4.0.23) fails on Ruby 4.1 when `.bundle/config` is `---`, a file Bundler writes itself; asks whether 368fc29ce1 (from #9379, unlabeled so not backported) can go into the next 4.0.x, and notes it cherry-picks cleanly onto `4.0`. Bet E1; filed 2026-11-03.
+- [getlago/lago-expression#91](https://github.com/getlago/lago-expression/pull/91), Ruby 4.1 compatibility: `required_ruby_version` `~> 4.0.2` → `>= 4.0.2`, and rb-sys `stable-api-compiled-fallback` (rb-sys 0.9.130 has no 4.1 stable API). Lago installs it from git. 20 specs on 4.0.7 and master; patch from the F1 frontier census. Bet E1; opened 2026-11-03. The census master overlay installs Lago from this branch (`d23823a03e`), so Lago and Lago-nops run on master ([gems-on-master](gems-on-master.md)); open, no review on 2026-11-03.
+- Issue [ruby/rubygems#10017](https://github.com/ruby/rubygems/issues/10017): Bundler 4.0.x (through 4.0.23) fails on Ruby 4.1 when `.bundle/config` is `---`, a file Bundler writes itself; asks whether 368fc29ce1 (from #9379, unlabeled so not backported) can go into the next 4.0.x, and notes it cherry-picks cleanly onto `4.0`. Bet E1; filed 2026-11-03. Until a fix ships, Thinkroom's census master overlay deletes its committed `.bundle/config`, which holds only `---` ([gems-on-master](gems-on-master.md)); no reply on 2026-11-03.
 - [ruby-i18n/i18n#763](https://github.com/ruby-i18n/i18n/pull/763), `Backend::Fallbacks#translate` skips the String comparison when the fallback is the requested locale object (`equal?`) — `I18n.t(:hello)` **13 → 11** objects; −40.3 objects per workload, 0.40% of all allocations in 14 apps (most of it Sure's dashboard; about −10 without it). From the [gem census](gem-census.md) (bet G1). Sol: request-changes twice (custom `==`, then overridden `equal?`); the second accepted, since Ruby documents that `equal?` should not be overridden. Opened 2026-11-03.
 - [ruby-i18n/i18n#764](https://github.com/ruby-i18n/i18n/pull/764), `extract_non_symbol_default!` skips the wrapper Array for scalar defaults (Symbol, String, Hash, Integer) — 2 objects fewer per call; −32.2 objects per workload, 0.32% of all allocations (Sure −722, Docuseal −64 and Discourse −17 via Integer defaults). Four review rounds (Sol and adversarial Astra): to_ary coercion, flatten dispatch, nil/false, Array mutation and `!` dispatch all fixed; accepted: a global redefinition of `Array#flatten` sees a different call order for `to_ary`-convertible defaults. Head `6a57b94`. Opened 2026-11-03.
 - [ruby-i18n/i18n#765](https://github.com/ruby-i18n/i18n/pull/765), `Backend::Fallbacks#translate` copies plain-Hash options with `merge` and sets the two fallback keys, instead of collecting them into a keyword Hash — `I18n.t(:hello)` 13 → 12 objects, −3.7% instructions; −47.3 objects per workload, 0.38% of all allocations, 10 of 10 translating apps. From the [i18n evaluation](i18n-performance.md) (C1). Sol and adversarial Astra: Hash-subclass `[]=`/`merge` overrides fixed (subclasses keep the old merge); accepted: a singleton `merge` on a plain options Hash, which `I18n.t` cannot pass because `**options` always builds a fresh Hash. Head `0ff39e7`. Opened 2026-11-03.
@@ -313,6 +313,18 @@ None.
 These dispositions are already public Lowrail evidence, not new candidate
 claims. Branch-only documents are pinned explicitly because they are not
 on main.
+
+- **Census gems on Ruby master (2026-11-03, bet E2):** 11 of the 13 configurations that did not bundle on master
+  `9aa0898240` now install and pass `list` through dependency-only master overlays, so 21 of 23 can run on master.
+  Released bumps (redcarpet 3.6.1, commonmarker 2.10.1, stackprof 0.2.28, numo-narray-alt 0.10.7, datadog 2.45.0,
+  haml 7.5.2, oga 3.5/ruby-ll 2.2.0, skylight 7.0.0) and git sources at existing fixes: nobu's
+  [cabo/cbor-ruby#31](https://github.com/cabo/cbor-ruby/pull/31), our getlago/lago-expression#91,
+  [vmg/rinku#97](https://github.com/vmg/rinku/pull/97), and IAPark/tiktoken_ruby main. tokenizers 0.6.4 stays
+  vendored (fixed only on ankane/tokenizers-ruby master, outside discourse_ai-tokenizers' `~> 0.6.3`). No PR or
+  comment was needed, and nothing was posted. Still blocked: Chatwoot, because gjtorikian declined the commonmarker
+  0.x port (gjtorikian/commonmarker#424, #430), and Flow, because temporalio has no 4.1 build and its source gem
+  cannot build (temporalio/sdk-ruby#218). C8's "msgpack" failure for Lago was cbor's msgpack-derived type names;
+  msgpack builds. Details in [gems-on-master.md](gems-on-master.md).
 
 - **Solid Cable YAML rereads:** already fixed by merged [rails/solid_cable#86](https://github.com/rails/solid_cable/pull/86). The [published workload census](https://github.com/thomasklemm/lowrail/blob/0636db9979d847b47697823e90a0066c6b2f48c6/docs/upstream/workload-census.md#priority-lead-solid-cable-yaml-rereads) confirms repeated 3.0.5 config reads versus zero YAML parses in tested 4.1.0 paths; architecture changed too, so this is not an isolated patch benchmark. No duplicate memoization patch.
 - **Cache payload Range removal:** saves one object per signed load but is [rejected for resolved ZJIT regressions](https://github.com/thomasklemm/lowrail/blob/367ab4e8f09f7da3424b584859916f717c21af20/docs/upstream/rails-main-census-2.md#cache-payload-slice--rejected-do-not-submit) in binary-version/compressed cases. No qualifying draft or upstream PR; allocation saving alone does not qualify it.

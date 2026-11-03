@@ -38,8 +38,14 @@ mkdir -p "$root/.corpus"
 ruby_version=${LOWRAIL_CORPUS_RUBY:-4.0.9}
 mise=$(command -v mise || true)
 mise=${mise:-$HOME/.local/bin/mise}
-"$mise" install "ruby@$ruby_version"
-export PATH="$("$mise" where "ruby@$ruby_version")/bin:$PATH"
+if [ -n "${CORPUS_RUBY_BIN:-}" ]; then
+  # script/census setup --ruby: build source-time extensions (Chatwoot's
+  # vendored commonmarker) with the Ruby the copy will run on.
+  export PATH="$CORPUS_RUBY_BIN:$PATH"
+else
+  "$mise" install "ruby@$ruby_version"
+  export PATH="$("$mise" where "ruby@$ruby_version")/bin:$PATH"
+fi
 case "$name" in
   real-blog-r4)
     # The entropy certificate names retained bytes, not a new rails generator

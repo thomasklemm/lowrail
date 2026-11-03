@@ -1,0 +1,53 @@
+diff --git a/Gemfile b/Gemfile
+index e559b0e..1a3dbcf 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -235,3 +235,5 @@ gem 'mail', '~> 2.8'
+ gem 'base58', '~> 0.2.3'
+ 
+ gem 'bloom_fit', '~> 1.2'
++
++gem "cbor", github: "nobu/cbor-ruby", ref: "08f34f5b9af330e9add9400716c253cb96f02de6", require: false # master: cabo/cbor-ruby#31 (TypedData), unreleased
+diff --git a/Gemfile.lock b/Gemfile.lock
+index eb8d038..ffd4876 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -7,6 +7,13 @@ GIT
+       hkdf (~> 0.2)
+       jwt (~> 2.0)
+ 
++GIT
++  remote: https://github.com/nobu/cbor-ruby.git
++  revision: 08f34f5b9af330e9add9400716c253cb96f02de6
++  ref: 08f34f5b9af330e9add9400716c253cb96f02de6
++  specs:
++    cbor (0.5.10.2)
++
+ GIT
+   remote: https://github.com/rails/rails.git
+   revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+@@ -192,7 +199,6 @@ GEM
+       playwright-ruby-client (>= 1.16.0)
+     case_transform (0.2)
+       activesupport
+-    cbor (0.5.10.3)
+     cgi (0.5.2)
+     charlock_holmes (0.7.9)
+     chewy (8.4.1)
+@@ -316,7 +322,7 @@ GEM
+       rake (~> 13.3)
+     googleapis-common-protos-types (1.24.0)
+       google-protobuf (~> 4.26)
+-    haml (7.5.1)
++    haml (7.5.2)
+       prism (>= 1.1.0)
+       temple (>= 0.8.2)
+       thor
+@@ -976,6 +982,7 @@ DEPENDENCIES
+   bundler-audit (~> 0.9)
+   capybara (~> 3.39)
+   capybara-playwright-driver
++  cbor!
+   charlock_holmes (~> 0.7.7)
+   chewy
+   climate_control

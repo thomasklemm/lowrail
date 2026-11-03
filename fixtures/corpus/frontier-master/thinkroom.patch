@@ -1,0 +1,292 @@
+diff --git a/.bundle/config b/.bundle/config
+deleted file mode 100644
+index ed97d53..0000000
+--- a/.bundle/config
++++ /dev/null
+@@ -1 +0,0 @@
+----
+diff --git a/Gemfile b/Gemfile
+index 0f7693c..ff6aa15 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -5,7 +5,7 @@ gem "rails", github: "rails/rails", ref: "5810776eecc5b2e50b58e81ee0c26c02c718fd
+ # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
+ gem "propshaft"
+ # Use sqlite3 as the database for Active Record
+-gem "sqlite3", ">= 2.1"
++gem "sqlite3", ">= 2.1", force_ruby_platform: true
+ # Use the Puma web server [https://github.com/puma/puma]
+ gem "puma", ">= 5.0"
+ # Use Redis adapter to run Action Cable in production
+@@ -71,12 +71,12 @@ gem "flipper-ui", "~> 1.3"
+ 
+ gem "vite_rails", "~> 3.11"
+ 
+-gem "y-rb", "~> 0.7.0"
++gem "y-rb", "~> 0.7.0", force_ruby_platform: true
+ 
+ gem "y-rb_actioncable", "~> 0.1.7"
+ 
+ # Render source documents to plain text for format-neutral agent context.
+-gem "commonmarker", "~> 2.10"
++gem "commonmarker", "2.10.1"
+ 
+ # Decode and re-encode public image uploads before Active Storage persistence.
+ gem "ruby-vips", "~> 2.3"
+@@ -86,3 +86,9 @@ gem "omniauth-google-oauth2", "~> 1.2"
+ gem "omniauth-rails_csrf_protection", "~> 2.0"
+ 
+ gem "ruby_native", "~> 0.15"
++
++gem "ffi", "= 1.17.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "nokogiri", "= 1.19.7", force_ruby_platform: true # ruby41-watch: no 4.1 binary
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 5f3bee9..010b710 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -126,15 +126,7 @@ GEM
+       bundler (>= 1.2.0)
+       thor (~> 1.0)
+     chunky_png (1.4.0)
+-    commonmarker (2.10.0)
+-      rb_sys (~> 0.9)
+-    commonmarker (2.10.0-aarch64-linux)
+-    commonmarker (2.10.0-aarch64-linux-musl)
+-    commonmarker (2.10.0-arm-linux-gnu)
+-    commonmarker (2.10.0-arm64-darwin)
+-    commonmarker (2.10.0-x86_64-darwin)
+-    commonmarker (2.10.0-x86_64-linux)
+-    commonmarker (2.10.0-x86_64-linux-musl)
++    commonmarker (2.10.1)
+     concurrent-ruby (1.3.8)
+     connection_pool (3.0.2)
+     crass (1.0.8)
+@@ -159,14 +151,7 @@ GEM
+       net-http (~> 0.5)
+     faraday-retry (2.4.0)
+       faraday (~> 2.0)
+-    ffi (1.17.4-aarch64-linux-gnu)
+-    ffi (1.17.4-aarch64-linux-musl)
+-    ffi (1.17.4-arm-linux-gnu)
+-    ffi (1.17.4-arm-linux-musl)
+-    ffi (1.17.4-arm64-darwin)
+-    ffi (1.17.4-x86_64-darwin)
+-    ffi (1.17.4-x86_64-linux-gnu)
+-    ffi (1.17.4-x86_64-linux-musl)
++    ffi (1.17.4)
+     flipper (1.4.2)
+       concurrent-ruby (< 2)
+     flipper-active_record (1.4.2)
+@@ -183,14 +168,7 @@ GEM
+       activesupport (>= 6.1)
+     hashie (5.1.0)
+       logger
+-    herb (0.11.1-aarch64-linux-gnu)
+-    herb (0.11.1-aarch64-linux-musl)
+-    herb (0.11.1-arm-linux-gnu)
+-    herb (0.11.1-arm-linux-musl)
+-    herb (0.11.1-arm64-darwin)
+-    herb (0.11.1-x86_64-darwin)
+-    herb (0.11.1-x86_64-linux-gnu)
+-    herb (0.11.1-x86_64-linux-musl)
++    herb (0.11.1)
+     i18n (1.15.2)
+       concurrent-ruby (~> 1.0)
+     inertia_rails (3.22.0)
+@@ -229,6 +207,7 @@ GEM
+       net-smtp
+     marcel (2.1.0)
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -254,21 +233,8 @@ GEM
+       net-protocol
+     net-ssh (7.3.2)
+     nio4r (2.7.5)
+-    nokogiri (1.19.7-aarch64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-aarch64-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-arm64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.7-x86_64-linux-musl)
++    nokogiri (1.19.7)
++      mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+     oauth2 (2.0.24)
+       anonymous_loader (~> 0.1, >= 0.1.1)
+@@ -422,14 +388,8 @@ GEM
+       activejob (>= 7.2)
+       activerecord (>= 7.2)
+       railties (>= 7.2)
+-    sqlite3 (2.9.6-aarch64-linux-gnu)
+-    sqlite3 (2.9.6-aarch64-linux-musl)
+-    sqlite3 (2.9.6-arm-linux-gnu)
+-    sqlite3 (2.9.6-arm-linux-musl)
+-    sqlite3 (2.9.6-arm64-darwin)
+-    sqlite3 (2.9.6-x86_64-darwin)
+-    sqlite3 (2.9.6-x86_64-linux-gnu)
+-    sqlite3 (2.9.6-x86_64-linux-musl)
++    sqlite3 (2.9.6)
++      mini_portile2 (~> 2.8.0)
+     sshkit (1.25.0)
+       base64
+       logger
+@@ -474,24 +434,6 @@ GEM
+     y-rb (0.7.0)
+       rake (~> 13.2)
+       rb_sys (~> 0.9.110)
+-    y-rb (0.7.0-aarch64-linux-gnu)
+-      rake (~> 13.2)
+-      rb_sys (~> 0.9.110)
+-    y-rb (0.7.0-aarch64-linux-musl)
+-      rake (~> 13.2)
+-      rb_sys (~> 0.9.110)
+-    y-rb (0.7.0-arm64-darwin)
+-      rake (~> 13.2)
+-      rb_sys (~> 0.9.110)
+-    y-rb (0.7.0-x86_64-darwin)
+-      rake (~> 13.2)
+-      rb_sys (~> 0.9.110)
+-    y-rb (0.7.0-x86_64-linux-gnu)
+-      rake (~> 13.2)
+-      rb_sys (~> 0.9.110)
+-    y-rb (0.7.0-x86_64-linux-musl)
+-      rake (~> 13.2)
+-      rb_sys (~> 0.9.110)
+     y-rb_actioncable (0.1.7)
+       rails (>= 7.0.4)
+       y-rb (>= 0.4.5)
+@@ -514,13 +456,16 @@ DEPENDENCIES
+   bootsnap
+   brakeman
+   bundler-audit
+-  commonmarker (~> 2.10)
++  commonmarker (= 2.10.1)
+   debug
++  ffi (= 1.17.4)
+   flipper (~> 1.3)
+   flipper-active_record (~> 1.3)
+   flipper-ui (~> 1.3)
++  herb (= 0.11.1)
+   inertia_rails (~> 3.22)
+   kamal (~> 2.12.0)
++  nokogiri (= 1.19.7)
+   omniauth-google-oauth2 (~> 1.2)
+   omniauth-rails_csrf_protection (~> 2.0)
+   propshaft
+@@ -565,16 +510,10 @@ CHECKSUMS
+   bootsnap (1.25.0) sha256=41059e7d0f9cb4023a33465d095f64b913fc9d1b808d6524c307da945fbcffcf
+   brakeman (8.0.6) sha256=759cc69341115e6c2dcd47b6fd8649a0b9bd540e3585ac8a0a94e31c66fee386
+   builder (3.3.0) sha256=497918d2f9dca528fdca4b88d84e4ef4387256d984b8154e9d5d3fe5a9c8835f
++  bundler (4.0.20) sha256=7978a8ac648767f5e635bc522445b79e80a52b907a39a36c2d8085ed6bc762ae
+   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
+   chunky_png (1.4.0) sha256=89d5b31b55c0cf4da3cf89a2b4ebc3178d8abe8cbaf116a1dba95668502fdcfe
+-  commonmarker (2.10.0) sha256=1884529957bf59bcd4f19fcc29e931f2042760ced273353e8010a20fe4ae68cb
+-  commonmarker (2.10.0-aarch64-linux) sha256=eeb167dea203dee066eb0dd99b3fd2deb526c8b5e7297ad385f7a5d60f869478
+-  commonmarker (2.10.0-aarch64-linux-musl) sha256=e95d9e87ea6306e21ffa11855a7bb55518538143b23a227fe3bb00b41873ce25
+-  commonmarker (2.10.0-arm-linux-gnu) sha256=2165642969df6816625c5fa4470a8959345d715daf96dd063fc56913fdbb1b90
+-  commonmarker (2.10.0-arm64-darwin) sha256=39ecc891d1e4308b5233cc28b40383de854a2bfbefe17d68e49174347a8aa79e
+-  commonmarker (2.10.0-x86_64-darwin) sha256=01e0830ed0319825ecdc16411c90acd3f661d1568dfc178731b3f64d0ce2363d
+-  commonmarker (2.10.0-x86_64-linux) sha256=945c510c0bfca9022245928e2248468fe3ddad58c939be0c37b20082cc392880
+-  commonmarker (2.10.0-x86_64-linux-musl) sha256=288cd4fb9f17eed2ffa73551ef241dcf594e0f484b2aee2a0999540333c0618e
++  commonmarker (2.10.1) sha256=924a972223dab8701cd01ed66bb5fda208ad17a4a566c0b7cdc4a78772e9f845
+   concurrent-ruby (1.3.8) sha256=b2f1be836e968ccc78ccfce277ea79c72a88633f22306782c16ff23fb415d1e1
+   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
+   crass (1.0.8) sha256=7a0145c7a2c59f8e7923b3a69ce819c444823a00a5127d805298fea13be24efe
+@@ -591,27 +530,13 @@ CHECKSUMS
+   faraday-multipart (1.2.0) sha256=7d89a949693714176f612323ca13746a2ded204031a6ba528adee788694ef757
+   faraday-net_http (3.4.4) sha256=0e78af151747ed1b00f33e25973b4bc220d7f16c00c39676817c8b12331eb588
+   faraday-retry (2.4.0) sha256=7b79c48fb7e56526faf247b12d94a680071ff40c9fda7cf1ec1549439ad11ebe
+-  ffi (1.17.4-aarch64-linux-gnu) sha256=b208f06f91ffd8f5e1193da3cae3d2ccfc27fc36fba577baf698d26d91c080df
+-  ffi (1.17.4-aarch64-linux-musl) sha256=9286b7a615f2676245283aef0a0a3b475ae3aae2bb5448baace630bb77b91f39
+-  ffi (1.17.4-arm-linux-gnu) sha256=d6dbddf7cb77bf955411af5f187a65b8cd378cb003c15c05697f5feee1cb1564
+-  ffi (1.17.4-arm-linux-musl) sha256=9d4838ded0465bef6e2426935f6bcc93134b6616785a84ffd2a3d82bc3cf6f95
+-  ffi (1.17.4-arm64-darwin) sha256=19071aaf1419251b0a46852abf960e77330a3b334d13a4ab51d58b31a937001b
+-  ffi (1.17.4-x86_64-darwin) sha256=aa70390523cf3235096cf64962b709b4cfbd5c082a2cb2ae714eb0fe2ccda496
+-  ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
+-  ffi (1.17.4-x86_64-linux-musl) sha256=3fdf9888483de005f8ef8d1cf2d3b20d86626af206cbf780f6a6a12439a9c49e
++  ffi (1.17.4) sha256=bcd1642e06f0d16fc9e09ac6d49c3a7298b9789bcb58127302f934e437d60acf
+   flipper (1.4.2) sha256=dca7d65b5ec660b525b6c599e727219ac4994073c855b41b6656b2d91a9cb304
+   flipper-active_record (1.4.2) sha256=ab70aeb78a44d59c690b5538fc269b08d1c2918abb720fe82832ac77fb1dfcd1
+   flipper-ui (1.4.2) sha256=d7b2fd886e922ba5e0c8240cbabd27163125b011a6c42e6dba509a1715540dee
+   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
+   hashie (5.1.0) sha256=c266471896f323c446ea8207f8ffac985d2718df0a0ba98651a3057096ca3870
+-  herb (0.11.1-aarch64-linux-gnu) sha256=5484e0fc0bd5d040380cbbf503e86dccf3fc1d33428b7ad02715ee7dcaa018f9
+-  herb (0.11.1-aarch64-linux-musl) sha256=1113663d5e7832dad601547edb4606557ac84def516479ee5136fc7072747a58
+-  herb (0.11.1-arm-linux-gnu) sha256=849d49d6ec27aaf5a9ea07e66434fbb16a8c599b287e8f24f7478d6b358666da
+-  herb (0.11.1-arm-linux-musl) sha256=de283c299df16c089e209dbc461fe003d4b3fbf100168637c8f983cc97186b5e
+-  herb (0.11.1-arm64-darwin) sha256=c5d3c1d5f88a504bcfa6a4bb52f56650dc40345e23cdf051b02f3390cf184d9e
+-  herb (0.11.1-x86_64-darwin) sha256=f73cad010299bf998bd4ead676b80ae2c1f0ff5487a2ef852e8d83652f74ced0
+-  herb (0.11.1-x86_64-linux-gnu) sha256=e3104c5dab07300a2ea6fc3898014cf57db978fbf09f5554a2a6ef6c46f973f8
+-  herb (0.11.1-x86_64-linux-musl) sha256=0c687b667b612e7cc2403e9991ee7c8e8d10cfef026cf41165f9d99284630b09
++  herb (0.11.1) sha256=7a5a74c4931b341a2b7b7f5a530616801f5721a633d2655f002156ff553cd2d7
+   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
+   inertia_rails (3.22.0) sha256=39c20120de472015d2831fa461f8a09672c68e91c41d3d660e0b1d16b787b7b1
+   io-console (0.9.5) sha256=83dd9bbf4c4680416629245b39cd4212eb5f4d9a4ea91804870c1f6b846414d5
+@@ -626,6 +551,7 @@ CHECKSUMS
+   mail (2.9.1) sha256=06574eca475253d6c18145dd70af80d0eb970182d55053497c5f4d797ea160e8
+   marcel (2.1.0) sha256=f8b0327111dc7e516331eeefe052e981ce50e2bd826c1042a53cdf047fcc3512
+   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
++  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
+   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
+   msgpack (1.8.4) sha256=4411c22d350dd1c20250f7eada3cca2695438c2f769cf0782f0cd065d90a3e7b
+   multi_xml (0.9.1) sha256=7ce766b59c17241ed62976caeae1fae9b2431b263398c35396239a68c4a64e57
+@@ -640,14 +566,7 @@ CHECKSUMS
+   net-smtp (0.5.2) sha256=35103cc04d6b2d94632f9928ede07483c24b70b9c0db1f231fea43909b678f3c
+   net-ssh (7.3.2) sha256=65029e213c380e20e5fd92ece663934ab0a0fe888e0cd7cc6a5b664074362dd4
+   nio4r (2.7.5) sha256=6c90168e48fb5f8e768419c93abb94ba2b892a1d0602cb06eef16d8b7df1dca1
+-  nokogiri (1.19.7-aarch64-linux-gnu) sha256=8f5e15d299602456406e1f03a9f3456cceb33a0722811e818d2ee2214eb4c84a
+-  nokogiri (1.19.7-aarch64-linux-musl) sha256=efe0c3602e6e54521bc21c681930ce5568e2d11203de17400710b2b3ca2e4cb4
+-  nokogiri (1.19.7-arm-linux-gnu) sha256=7fd1907125691aa89e838cc91161761c758b4e17bb32f0dd9b5515a82cc759af
+-  nokogiri (1.19.7-arm-linux-musl) sha256=28d0ff0c87b6bb2e56580323a6fb049d5d4a02b94f0958fdd47e9ac146991c77
+-  nokogiri (1.19.7-arm64-darwin) sha256=f27d7f25f4873fbc3aa35a2cc2fb680c98555fec1925348da439d0869d541142
+-  nokogiri (1.19.7-x86_64-darwin) sha256=508e81e8c5f84aaa240dce981bf1c43faae60808726f0ce7024ee92effc5cafe
+-  nokogiri (1.19.7-x86_64-linux-gnu) sha256=25865ccb462f714e712fdf8906fde07849cb6704a808e3d629d75baa5af5dd3b
+-  nokogiri (1.19.7-x86_64-linux-musl) sha256=464d1f3dfb0d53cf54c0c6a7e23e8e91cf68ec3cafc2b27dc4a7682f2d9bf546
++  nokogiri (1.19.7) sha256=abe94507c54cb18f872777b16bdca4aad32b1abdc4c52fe843f1c80fbdf992b8
+   oauth2 (2.0.24) sha256=3d4864983ab9fb7d3c836bca9635ef7b347631918fa890fcd9793d40ec82c186
+   omniauth (2.1.4) sha256=42a05b0496f0d22e1dd85d42aaf602f064e36bb47a6826a27ab55e5ba608763c
+   omniauth-google-oauth2 (1.2.2) sha256=74c3f3d0221c048f938846092fb15a1f15237526f50a7c93d9793f9a4ff1be11
+@@ -700,14 +619,7 @@ CHECKSUMS
+   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
+   snaky_hash (2.0.6) sha256=3663cae48cdef582b517025cf8a39d8789996eaf0b4ed89e2f0624836505654a
+   solid_cable (4.0.2) sha256=084636a67679ad00d23088b33c84047e614bcf41ee559db24b414d83cdc42d03
+-  sqlite3 (2.9.6-aarch64-linux-gnu) sha256=d8b1f7d23efd7abac285775a9566562fc7debfef79d594e3a20354406fb7907c
+-  sqlite3 (2.9.6-aarch64-linux-musl) sha256=3579e1c98cdc7ff5c3722847bb63ed4e1efb7ff675cb5e1e48ef2d4da5fb3bc9
+-  sqlite3 (2.9.6-arm-linux-gnu) sha256=33541500e3615da02afe54a9cc38b17a6985d3cf9d8b76d6d0a83002f114e7ec
+-  sqlite3 (2.9.6-arm-linux-musl) sha256=c5490af48bb228fefa54314e9541375c3907e70f8109f3881b5ff97e1c93ae33
+-  sqlite3 (2.9.6-arm64-darwin) sha256=849b5d7f795e60fe25076d62c72dd722beb45b3850b516ad978d60ee848ec15b
+-  sqlite3 (2.9.6-x86_64-darwin) sha256=b5842fea77781c14da03fa7bc0feb82db03a69e135affcb6f5399cbd2797a5f3
+-  sqlite3 (2.9.6-x86_64-linux-gnu) sha256=613188ce02f614126ddbc38c5e217ccffd6306d0dcd9adca9764547aa890a634
+-  sqlite3 (2.9.6-x86_64-linux-musl) sha256=d493b11818a3573387a1d56e1ee8fa00da23a683a7a1cc063e7a0feeed843abf
++  sqlite3 (2.9.6) sha256=956fe606956420d04ac7157d3ace620c8caba2135b2e05c76e483493da24d08e
+   sshkit (1.25.0) sha256=c8c6543cdb60f91f1d277306d585dd11b6a064cb44eab0972827e4311ff96744
+   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
+   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
+@@ -730,12 +642,6 @@ CHECKSUMS
+   websocket-driver (0.8.2) sha256=97c556b019bf3410b4961002ac501621e9322d3f8a7bc02161a09301cc4c4146
+   websocket-extensions (0.1.5) sha256=1c6ba63092cda343eb53fc657110c71c754c56484aad42578495227d717a8241
+   y-rb (0.7.0) sha256=533c83d0e295c44f3a06b2abdd37139246967848aba2fad96e78c8f9c6d5a068
+-  y-rb (0.7.0-aarch64-linux-gnu) sha256=30f16f46aafe8e0e399e42504794256fba49e413dbaf57969eb43568f1192a87
+-  y-rb (0.7.0-aarch64-linux-musl) sha256=5d00a946c0d3ee371a6a8b4e38c5665feea080fe816431e848fa1479af7ab392
+-  y-rb (0.7.0-arm64-darwin) sha256=42d75cdd38e06ff2cc15628d78adca97f9f9ddd674b2a9521d2b911e240d18be
+-  y-rb (0.7.0-x86_64-darwin) sha256=1b87473f37dfdbeb5e94147e185bb6d7059bf9e9694af2ce704f4688d3fa8c25
+-  y-rb (0.7.0-x86_64-linux-gnu) sha256=198391d0c7d483718bad8c0ffe87fe0f9d8f668f60b7704996ab1f634d87f290
+-  y-rb (0.7.0-x86_64-linux-musl) sha256=e4dbb005e1651aa816be51ac645412b94768b0a683ce7826fe686ee7658e53e6
+   y-rb_actioncable (0.1.7) sha256=89cf4aa6c044d32fc59b8ee4e262b0ab8362b40265e2f8fc2bab5a7c6cde41af
+   zeitwerk (2.8.3) sha256=2c85125a8467ce069e20123d1e709a08955c9d29c118c25b46b7b7fafdbb92e5
+ 
