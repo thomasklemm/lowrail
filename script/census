@@ -9,6 +9,7 @@
 #   script/census controls --script FILE [--app blog] [--modes ...] BASE LABEL...
 #   script/census prs      --label L [--mode interp] [--top N] [--refresh]
 #   script/census list     [--apps LIST] [--ruby R]
+#   script/census watch    [--base SHA] [--head SHA] [--bisect N] [--watch-dir DIR] [--jobs N]
 # SPEC is [OWNER/REPO@|/local/rails/repo@]REF (default repo rails/rails), REF a
 # branch, tag or commit. R is a mise Ruby version or a path to a ruby binary or
 # its bin directory. Common options: --corpus NAME (app copies in
@@ -22,6 +23,7 @@ require "socket"
 require "time"
 require_relative "../bench/upstream/census/rank"
 require_relative "../bench/upstream/census/compare"
+require_relative "../bench/upstream/census/watch"
 
 module Census
   ROOT = File.expand_path("..", __dir__)
@@ -406,6 +408,320 @@ module Census
     exit 1 if failed
   end
 
+  # -- Rails main watch (docs/upstream/rails-main-watch/README.md) ------------
+
+  # The census's ten configurations; the PG census apps are not part of the watch.
+  WATCH_APPS = %w[blog campfire writebook fizzy fizzy-mysql codetriage pingcrm redprints-cfp react-starter-kit lobsters].freeze
+  WATCH_CONTROLS = %w[bench/upstream/census/watch_controls.rb bench/upstream/census_5_controls.rb
+    bench/upstream/census_4_controls.rb].freeze
+
+  def watch_repo
+    dir = File.join(ROOT, ".corpus/rails-watch.git")
+    system("git", "clone", "--quiet", "--bare", "https://github.com/rails/rails.git", dir, exception: true) unless File.exist?(dir)
+    system("git", "-C", dir, "fetch", "--quiet", "origin", "+refs/heads/main:refs/heads/main", exception: true)
+    CensusWatch::Repo.new(dir)
+  end
+
+  def watch_labels(sha) = ["w-#{sha[0, 12]}", "w-#{sha[0, 12]}2"]
+
+  def watch_rails(sha) = { "spec" => "rails/rails@#{sha}", "source" => %(github: "rails/rails"), "ref" => sha, "sha" => sha }
+
+  # The A/A pair at SHA, trimmed, run now unless both labels are complete
+  # (an orb that lost them re-measures the baseline commit).
+  def watch_pair(opts, sha)
+    labels = watch_labels(sha)
+    files = labels.product(opts[:modes], opts[:apps]).map { |l, m, a| File.join(opts[:out], l, "#{a}-#{m}.json") }
+    run(opts.merge(label: labels.first, aa: true, rails: "rails/rails@#{sha}")) unless files.all? { File.exist?(_1) }
+    meta = JSON.parse(File.read(File.join(opts[:out], labels.first, "meta.json")))
+    { "rails" => sha, "ruby" => meta["ruby"], "apps" => opts[:apps], "modes" => opts[:modes],
+      "runs" => labels.map do |l|
+        opts[:modes].to_h { |m| [m, opts[:apps].to_h { |a| [a, CensusWatch.trim(JSON.parse(File.read(File.join(opts[:out], l, "#{a}-#{m}.json"))))] }] }
+      end }
+  end
+
+  # Drops what this run measured, except head and the copies' own base: the
+  # previous base's labels, bisect receipts, and the variant Gemfiles and Rails
+  # checkouts of base and bisect commits (64 MB each).
+  def watch_prune(opts, base, head)
+    keep = [head, state(opts[:corpus], opts[:apps].first).dig("base", "sha")].map { _1[0, 12] }
+    measured = [base[0, 12], *Dir[File.join(opts[:out], "watch-bisect", "*")].map { File.basename(_1) },
+      *Dir[File.join(opts[:out], "watch-controls", "*.txt")].map { File.basename(_1)[0, 12] }].uniq - keep
+    FileUtils.rm_rf(watch_labels(base).map { File.join(opts[:out], _1) }) unless base == head
+    FileUtils.rm_rf(File.join(opts[:out], "watch-bisect"))
+    FileUtils.rm_f(Dir[File.join(opts[:out], "watch-controls", "*.txt")].reject { keep.include?(File.basename(_1)[0, 12]) })
+    gems = capture(File.join(ruby_bin(opts[:ruby]), "ruby"), "-e", "print Gem.dir")
+    measured.each do |sha12|
+      FileUtils.rm_f(Dir[File.join(ROOT, ".corpus", "#{opts[:corpus]}-*", "Gemfile.census-#{sha12}{,.lock}")])
+      FileUtils.rm_rf(File.join(gems, "bundler/gems/rails-#{sha12}"))
+    end
+  end
+
+  # One workload at SHA in its own process (bisect steps), trimmed and cached.
+  def watch_measure(opts, sha, app, mode, workload)
+    dir = File.join(opts[:out], "watch-bisect", sha[0, 12])
+    json = File.join(dir, "#{app}-#{mode}-#{Digest::SHA256.hexdigest(workload)[0, 12]}.json")
+    unless File.exist?(json)
+      FileUtils.mkdir_p(dir)
+      rails = watch_rails(sha)
+      bin = ruby_bin(opts[:ruby])
+      env = env_for(app, bin, rails, variant(opts[:corpus], app, rails, bin)).merge("CENSUS_MODE" => mode, "CENSUS_ONLY" => workload)
+      sh(env, "bundle", "exec", "ruby", *FLAGS.fetch(mode), HARNESS, "profile", app, json,
+        chdir: app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
+    end
+    CensusWatch.trim(JSON.parse(File.read(json))).fetch(workload)
+  end
+
+  # Output of a controls script at SHA (interpreter, blog's bundle), cached per run number.
+  def watch_control(opts, sha, script, n = 1)
+    path = File.join(opts[:out], "watch-controls", "#{sha[0, 12]}-#{File.basename(script, ".rb")}-#{n}.txt")
+    return File.read(path) if File.exist?(path)
+    rails = watch_rails(sha)
+    bin = ruby_bin(opts[:ruby])
+    out = capture(env_for(opts[:app], bin, rails, variant(opts[:corpus], opts[:app], rails, bin)), "bundle", "exec", "ruby",
+      File.join(ROOT, script), chdir: app_dir(opts[:corpus], opts[:app])) + "\n"
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, out)
+    out
+  end
+
+  # First commit in COMMITS (oldest first; the last satisfies test) for which test holds.
+  def watch_bisect(commits, test)
+    lo, hi = -1, commits.size - 1
+    while hi - lo > 1
+      mid = (lo + hi) / 2
+      test.(commits[mid]) ? hi = mid : lo = mid
+    end
+    commits[hi]
+  end
+
+  # The first-parent commit (merge) that flips test, then the commit inside it.
+  def watch_attribute(repo, fps, test)
+    merge = watch_bisect(fps, test)
+    parents = repo.parents(merge)
+    inner = parents.size == 2 ? repo.git("rev-list", "--reverse", "--first-parent", parents[1], "^#{parents[0]}").split : []
+    commit = if inner.one? then inner.first
+    elsif inner.size > 1 && test.(inner.last) then watch_bisect(inner, test)
+    else merge
+    end
+    { merge:, commit:, by: "bisect" }
+  end
+
+  # A range of one commit, or one merge of a one-commit branch, needs no bisection.
+  def watch_only(repo, fps)
+    return nil unless fps.one?
+    parents = repo.parents(fps.first)
+    inner = parents.size == 2 ? repo.git("rev-list", "--first-parent", parents[1], "^#{parents[0]}").split : [fps.first]
+    { merge: fps.first, commit: inner.first, by: "only commit in range" } if inner.one?
+  end
+
+  # Isolated value of METRIC (a lambda over the trimmed workload) at base and
+  # head; test(c) is whether c is past the midpoint. nil when the move does not
+  # reproduce in a one-workload process.
+  def watch_metric_test(opts, row, base, head, metric)
+    value = ->(sha) { metric.(watch_measure(opts, sha, row[:app], row[:mode], row[:workload])) }
+    vb, vh = value.(base), value.(head)
+    return nil if (vh - vb).abs < [1.0, row[:delta].abs / 2].max || (vh - vb).positive? != row[:delta].positive?
+    ->(sha) { ((value.(sha) - vb) * (vh <=> vb)) > (vh - vb).abs / 2 }
+  end
+
+  def watch_sha_link(sha) = "[`#{sha[0, 10]}`](https://github.com/rails/rails/commit/#{sha})"
+
+  def watch_attribution(repo, a)
+    return "not reproduced in a one-workload process" if a.nil?
+    return a if a.is_a?(String)
+    pr = repo.pr(a[:merge])
+    commit = a[:commit] == a[:merge] ? "" : " #{watch_sha_link(a[:commit])} “#{repo.subject(a[:commit])[0, 70]}”"
+    "#{pr ? "[##{pr}](https://github.com/rails/rails/pull/#{pr})" : watch_sha_link(a[:merge])}#{commit} (#{a[:by]})"
+  end
+
+  def watch(opts)
+    opts = opts.merge(apps: WATCH_APPS) unless opts[:apps_given]
+    dir = opts[:watch_dir]
+    data = File.join(dir, "data")
+    FileUtils.mkdir_p(data)
+    baseline_path = File.join(dir, "baseline.json")
+    baseline = File.exist?(baseline_path) ? JSON.parse(File.read(baseline_path)) : {}
+    repo = watch_repo
+    head = repo.git("rev-parse", opts[:head] || "main").strip
+    base = repo.git("rev-parse", opts[:base] || baseline["rails"] || raise("no baseline; pass --base SHA")).strip
+    if base == head && baseline["rails"] == base
+      puts "WATCH: rails/rails main unchanged at #{base[0, 10]}; nothing to measure"
+      return
+    end
+    check_services(opts[:apps])
+    b = watch_pair(opts, base)
+    h = watch_pair(opts, head)
+    floors_path = File.join(data, "floors.json")
+    floors = File.exist?(floors_path) ? JSON.parse(File.read(floors_path)) : {}
+    result = CensusWatch.compare(repo, b, h, floors)
+    fps = repo.first_parents(base, head)
+
+    # Behavior controls: two runs at each end; lines that differ within a pair are dropped.
+    controls = WATCH_CONTROLS.to_h do |script|
+      outs = [[base, 1], [base, 2], [head, 1], [head, 2]].map { |sha, n| watch_control(opts, sha, script, n) }
+      [script, CensusWatch.control_diff(*outs)]
+    end
+
+    # Attribution: blame for lines added in the range; bisect over main's first
+    # parents (then inside the merged branch) for everything else.
+    budget = opts[:bisect]
+    grown = CensusWatch.site_rows(result[:sites], grown: true)
+    shrunk = CensusWatch.site_rows(result[:sites], grown: false)
+    only = watch_only(repo, fps)
+    attributed = {}
+    (grown + shrunk).each do |row|
+      if only
+        attributed[row[:key]] = only
+      elsif row[:new]
+        file, line = row[:head_key].delete_prefix("RAILS/").split(/:(?=\d+\z)/)
+        commit = repo.blame(head, file, Integer(line))
+        attributed[row[:key]] = { merge: repo.landed_by(fps, commit) || commit, commit:, by: "blame" }
+      elsif !row[:net]
+        attributed[row[:key]] = "moved within its file"
+      elsif budget.positive?
+        budget -= 1
+        r = row[:max]
+        file = CensusWatch.file_of(row[:key])
+        test = watch_metric_test(opts, r, base, head, ->(w) { w["sites"].sum { |k, v| k.start_with?(file + ":") ? v : 0 } })
+        attributed[row[:key]] = test && watch_attribute(repo, fps, test)
+      else
+        attributed[row[:key]] = "not bisected (--bisect budget)"
+      end
+    end
+    result[:workloads].sort_by { -_1[:delta].abs }.each do |r|
+      sites = result[:sites].select { |s| s.values_at(:mode, :app, :workload) == r.values_at(:mode, :app, :workload) && s[:key].start_with?("RAILS/") }
+      # The largest line that moved the same way and is already attributed.
+      if (s = sites.select { (_1[:delta] > 0) == (r[:delta] > 0) && attributed[_1[:key]].is_a?(Hash) }.max_by { _1[:delta].abs })
+        r[:attribution] = attributed[s[:key]].merge(by: "via #{s[:head_key] || s[:key]}")
+      elsif only
+        r[:attribution] = only
+      elsif budget.positive?
+        budget -= 1
+        test = watch_metric_test(opts, r, base, head, ->(w) { w["traced"] })
+        r[:attribution] = test && watch_attribute(repo, fps, test)
+      else
+        r[:attribution] = "not bisected (--bisect budget)"
+      end
+    end
+    result[:sql].each do |r|
+      digest = ->(sha) { watch_measure(opts, sha, r[:app], r[:mode], r[:workload]).dig("sql", "digest") }
+      # Bisect only when a one-workload process reproduces both ends' digests.
+      r[:attribution] = if digest.(head) != r[:head]["digest"] || digest.(base) != r[:base]["digest"] then nil
+      elsif only then only
+      elsif budget.positive?
+        budget -= 1
+        watch_attribute(repo, fps, ->(sha) { digest.(sha) != digest.(base) })
+      else "not bisected (--bisect budget)"
+      end
+    end
+    controls.each do |script, diff|
+      keys = diff[:changed].map { |pair| pair.compact.first[/\A(.*?) => /, 1] }
+      lines = ->(sha) { watch_control(opts, sha, script).lines.map(&:chomp) }
+      base_lines = lines.(base)
+      diff[:attribution] = if keys.empty? then nil
+      elsif only then only
+      else
+        watch_attribute(repo, fps, ->(sha) { (lines.(sha) - base_lines).any? { |l| keys.include?(l[/\A(.*?) => /, 1]) } })
+      end
+    end
+
+    # Records: the report, its trimmed receipts, floors and the new baseline.
+    date = Time.now.utc.strftime("%Y-%m-%d")
+    name = File.exist?(File.join(dir, "#{date}.md")) ? "#{date}-#{head[0, 10]}" : date
+    path = File.join(dir, "#{name}.md")
+    receipts = File.join(data, "#{name}.json.gz")
+    CensusWatch.write_receipts(receipts, CensusWatch.receipts(b, h, result, attributed, controls))
+    File.write(floors_path, JSON.pretty_generate(floors.merge(result[:floors]) { |_, x, y| [x, y].max }.sort.to_h) + "\n")
+    report = watch_report(repo, b, h, fps, result, grown, shrunk, attributed, controls, receipts.delete_prefix(dir + "/"))
+    File.write(path, report)
+    File.write(baseline_path, JSON.pretty_generate("rails" => head, "ruby" => h["ruby"], "report" => File.basename(path),
+      "recorded" => Time.now.utc.iso8601) + "\n")
+    watch_prune(opts, base, head)
+    # An SQL diff counts when a one-workload process reproduces it or both modes show it.
+    sql_real = result[:sql].select { |r| r[:attribution].is_a?(Hash) || result[:sql].count { _1.values_at(:app, :workload) == r.values_at(:app, :workload) } > 1 }
+    moved = result[:workloads].any? || grown.any? { _1[:net] } || sql_real.any? || controls.values.any? { _1[:changed].any? }
+    puts report
+    puts "WATCH: #{moved ? "MOVED" : "quiet"} #{base[0, 10]}..#{head[0, 10]} (#{path.delete_prefix(ROOT + "/")})"
+  end
+
+  def watch_report(repo, b, h, fps, result, grown, shrunk, attributed, controls, receipts)
+    base, head = b["rails"], h["rails"]
+    fmt = ->(v) { format("%+.1f", v).sub("-", "−") }
+    head_link = ->(key) { file, line = key.delete_prefix("RAILS/").split(/:(?=\d+\z)/); "[`#{file.sub(%r{\A\w+/lib/}, "")}:#{line}`](https://github.com/rails/rails/blob/#{head}/#{file}#L#{line})" }
+    base_link = ->(key) { file, line = key.delete_prefix("RAILS/").split(/:(?=\d+\z)/); "[`#{file.sub(%r{\A\w+/lib/}, "")}:#{line}`](https://github.com/rails/rails/blob/#{base}/#{file}#L#{line})" }
+    real_grown = grown.select { _1[:net] }
+    o = []
+    o << "# Rails main watch, #{Time.now.utc.strftime("%Y-%m-%d")}" << ""
+    o << "Range: [`#{base[0, 10]}...#{head[0, 10]}`](https://github.com/rails/rails/compare/#{base}...#{head}), " \
+      "#{fps.size} first-parent commits on main (#{fps.count { repo.pr(_1) }} PRs). #{h["ruby"].split(" ").first(2).join(" ")}, " \
+      "#{h["apps"].size} configurations, #{h["modes"].join(" and ")}, each end measured twice (A/A)."
+    o << "" << "**#{[
+      "#{result[:workloads].size} workloads moved beyond A/A",
+      "#{real_grown.size} Rails lines grew (#{grown.size - real_grown.size} more moved within their file)",
+      "#{shrunk.count { _1[:net] }} shrank (#{shrunk.count { !_1[:net] }} more moved)",
+      "#{result[:sql].size} SQL diffs",
+      "#{controls.values.sum { _1[:changed].size }} behavior-control diffs",
+    ].join("; ")}.**"
+    if result[:workloads].any?
+      o << "" << "## Workloads moved beyond A/A" << ""
+      o << "Grouped by attribution; every workload is in the receipts." << ""
+      o << "| Attributed to | Workloads (interp / YJIT) | Apps | Median Δ | Largest |" << "| --- | ---: | ---: | ---: | --- |"
+      result[:workloads].group_by { watch_attribution(repo, _1[:attribution]).sub(/ \([^()]*\)\z/, "") }
+        .sort_by { |_, rows| -rows.size }.each do |label, rows|
+        counts = %w[interpreter yjit].map { |m| rows.count { _1[:mode] == m } }.join(" / ")
+        top = rows.max_by { _1[:delta].abs }
+        o << "| #{label} | #{counts} | #{rows.map { _1[:app].sub(/-mysql\z/, "") }.uniq.size} | " \
+          "#{fmt.(CensusWatch.median(rows.map { _1[:delta] }))} | #{fmt.(top[:delta])} #{top[:app]} #{top[:mode]} #{top[:workload]} (floor #{top[:floor]}) |"
+      end
+    end
+    if grown.any?
+      o << "" << "## Rails lines that grew" << ""
+      o << "Per traced operation; *net file* is the line's file over the same workload, so a line whose allocation only " \
+        "moved within its file shows a net of about zero." << ""
+      o << "| Line at head | Apps | Workloads | Max Δ (workload) | Net file Δ | Attributed to |" << "| --- | ---: | ---: | --- | ---: | --- |"
+      grown.first(15).each do |row|
+        m = row[:max]
+        line = row[:head_key] ? head_link.(row[:head_key]) : base_link.(row[:key])
+        o << "| #{line}#{" (new)" if row[:new]} | #{row[:apps].size} | #{row[:rows].size} | #{fmt.(m[:delta])} (#{m[:app]} #{m[:mode]} #{m[:workload]}) | " \
+          "#{fmt.(m[:file_delta])} | #{watch_attribution(repo, attributed[row[:key]])} |"
+      end
+      o << "" << "(#{grown.size - 15} more in the receipts.)" if grown.size > 15
+    end
+    if shrunk.any?
+      o << "" << "## Rails lines that shrank" << ""
+      shrunk.first(10).each do |row|
+        m = row[:max]
+        o << "* #{base_link.(row[:key].sub(":+", ":"))}: #{row[:apps].size} apps, #{row[:rows].size} workloads, up to #{fmt.(m[:delta])} " \
+          "(#{m[:app]} #{m[:mode]} #{m[:workload]}, net file #{fmt.(m[:file_delta])}); #{watch_attribution(repo, attributed[row[:key]])}"
+      end
+    end
+    o << "" << "## Behavior controls" << ""
+    o << "SQL: #{result[:sql].size} workloads changed their masked SQL digest with both A/A pairs stable; " \
+      "#{result[:sql_unstable].size} differ within an A/A pair and are not judged."
+    result[:sql].each do |r|
+      o << "* SQL #{r[:mode]} #{r[:app]} #{r[:workload]}: #{r[:base]["queries_per_op"]} → #{r[:head]["queries_per_op"]} queries/op, " \
+        "#{watch_attribution(repo, r[:attribution] || "differs only in the full run")}"
+    end
+    controls.each do |script, d|
+      o << "* `#{File.basename(script)}`: #{d[:changed].size} of #{d[:lines]} lines differ (#{d[:noisy]} unstable within a pair, ignored)" \
+        "#{d[:changed].any? ? "; #{watch_attribution(repo, d[:attribution])}" : ""}"
+      d[:changed].first(8).each { |x, y| o << "  * `#{x || "(absent)"}` → `#{(y || "(absent)").sub(/\A.*? => /, "")}`" }
+    end
+    o << "" << "## A/A floor" << ""
+    o << "| Mode | Workloads | Base A/A ≤ −1 / ≥ +1 | Head A/A ≤ −1 / ≥ +1 |" << "| --- | ---: | ---: | ---: |"
+    result[:aa].each { |mode, (n, b1, b2, h1, h2)| o << "| #{mode} | #{n} | #{b1} / #{b2} | #{h1} / #{h2} |" }
+    o << "" << "A workload or line counts as moved only when all four base×head deltas clear the floor in the same direction: " \
+      "the largest A/A difference of that workload in either pair or any earlier watch run (`data/floors.json`), and at least one object."
+    if fps.any?
+      o << "" << "<details><summary>Commits in range</summary>" << ""
+      fps.reverse.each { |c| o << "* #{watch_sha_link(c)} #{repo.subject(c)[0, 100]}" }
+      o << "" << "</details>"
+    end
+    o << "" << "Receipts: [`#{receipts}`](#{receipts}) (trimmed: every workload's census value, traced objects and SQL digest in " \
+      "all four runs, every moved line, control diffs and attributions). Command: `script/census watch`."
+    o.join("\n") + "\n"
+  end
+
   OPEN_PRS = <<~GRAPHQL
     query($endCursor: String) {
       repository(owner: "rails", name: "rails") {
@@ -467,12 +783,12 @@ module Census
     command = argv.shift
     opts = { corpus: "census", out: File.join(ROOT, ".lowrail/private/census"), ruby: "4.0.7", apps: APPS.keys,
       modes: %w[interpreter yjit], mode: "interpreter", limit: 60, tiers: CensusRank::TIERS, top: 40, jobs: 1,
-      app: "blog", overlays: OVERLAYS }
+      app: "blog", overlays: OVERLAYS, bisect: 20, watch_dir: File.join(ROOT, "docs/upstream/rails-main-watch") }
     parser = OptionParser.new do |o|
       o.banner = File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.map { _1.delete_prefix("# ").delete_prefix("#") }.join
       o.on("--rails SPEC") { opts[:rails] = _1 }
       o.on("--ruby R") { opts[:ruby] = _1 }
-      o.on("--apps LIST", "comma-separated, or all (default)") { opts[:apps] = apps_option(_1) }
+      o.on("--apps LIST", "comma-separated, or all (default)") { opts[:apps] = apps_option(_1); opts[:apps_given] = true }
       o.on("--app APP", "controls: SQLite app whose bundle runs the script (default blog)") { opts[:app] = _1 }
       o.on("--corpus NAME") { opts[:corpus] = _1 }
       o.on("--overlays DIR", "setup: dependency overlays (default fixtures/corpus/rails-main-census-4)") { opts[:overlays] = File.expand_path(_1) }
@@ -486,12 +802,15 @@ module Census
       o.on("--limit N", Integer) { opts[:limit] = _1 }
       o.on("--tiers LIST", "rank: app-count tier floors (default 7,5,3,2)") { |v| opts[:tiers] = v.split(",").map { Integer(_1) } }
       o.on("--tsv") { opts[:tsv] = true }
-      o.on("--base L") { opts[:base] = _1 }
+      o.on("--base L", "compare: base label; watch: Rails commit to compare against (default: the recorded baseline)") { opts[:base] = _1 }
       o.on("--detail") { opts[:detail] = true }
       o.on("--markdown") { opts[:markdown] = true }
       o.on("--script FILE") { opts[:script] = _1 }
       o.on("--top N", Integer) { opts[:top] = _1 }
       o.on("--refresh") { opts[:refresh] = true }
+      o.on("--head SHA", "watch: Rails commit to measure (default: rails/rails main)") { opts[:head] = _1 }
+      o.on("--bisect N", Integer, "watch: most bisections per run (default 20)") { opts[:bisect] = _1 }
+      o.on("--watch-dir DIR", "watch: reports and receipts (default docs/upstream/rails-main-watch)") { opts[:watch_dir] = File.expand_path(_1) }
     end
     rest = parser.parse(argv)
     case command
@@ -502,6 +821,7 @@ module Census
     when "compare" then compare(opts, rest)
     when "controls" then controls(opts, rest)
     when "prs" then prs(opts)
+    when "watch" then watch(opts)
     else abort parser.help
     end
   end
