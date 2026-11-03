@@ -1,0 +1,2 @@
+## lobsters reload request: 151 ms sampled; routes 43 (28%), autoload 33 (22%), gc 27 (18%), executor 24 (16%), schema_load 8 (5%), unload_and_setup 7 (5%), reloader_callbacks 6 (4%), template_compile 3 (2%), other 2 (1%)
+## mastodon reload request: 1171 ms sampled; routes 498 (42%), executor 227 (19%), gc 149 (13%), autoload 140 (12%), unload_and_setup 43 (4%), reloader_callbacks 40 (3%), template_compile 36 (3%), schema_load 29 (2%), other 10 (1%)
