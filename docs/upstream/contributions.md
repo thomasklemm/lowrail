@@ -116,6 +116,7 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
   - [#59553](https://github.com/rails/rails/pull/59553), frozen empty `default_extensions` without a default scope — −1 per association proxy; 58/97, median **−1.6**. Boundary: a caller mutating the result.
   - [#59554](https://github.com/rails/rails/pull/59554), precomputed bang method names in `Merger#merge` — −1 String per merged value (`post.author` **223 → 222**); 66/97, median **−3.0**. Overlaps open #59212 (with it: 51/97 interpreter, median −1; YJIT within noise), stated in the PR. Sol approve on both rubrics; opened 2026-11-03. On #59212 itself (Sol static review: no findings) we posted the nine-app breadth numbers: 75/74 of 97 workloads, median −46/−49.
   - [#59555](https://github.com/rails/rails/pull/59555), `Enumerable#index_with` yields what `each` yields again — fixes an unreleased regression from 2b88dc1995 where Hash/HWIA receivers got only keys and Struct got member names; `Array#index_with` keeps `to_h`. Sol approve on both rubrics; opened 2026-11-03.
+  - [#59556](https://github.com/rails/rails/pull/59556), `Merger` reads the other relation's values without a dup (new `:nodoc:` `values_for_merge`; copies only when the values Hash is the receiver's own) — every merge and association read −1…−3 (`post.author` **223 → 221**); 80/97, median **−6.8**. Sol: first round request-changes (CollectionProxy self-merge dropped `limit`), fixed and approved on both rubrics; opened 2026-11-03.
 
 ### Importmap — rails/importmap-rails
 
