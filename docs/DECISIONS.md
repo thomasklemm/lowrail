@@ -114,7 +114,10 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
   build, a side exit seen in passing. Add it to the
   [lead queue](upstream/zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03) with the fallback reason or exit,
   a repro or the app and site, counts per op and on ruby-bench where known, and whether it is free or taken. An
-  unmeasured lead goes in too, marked unmeasured. Nothing is posted upstream for it.
+  unmeasured lead goes in too, marked unmeasured. Nothing is posted upstream for it. A lead goes upstream as a PR
+  when we can build it. An issue is opened only for a correctness bug (crash, wrong result, interpreter/JIT
+  divergence) with a minimal repro, which we file even if we also fix it (like Shopify/ruby#1101). Performance
+  leads never become issues on their own.
 * **Where claims come from.** Callgrind instruction counts with fixed heap and A/A are primary
   ([bench.md](bench.md)). App pages find sites but can't price them (A/A up to ±7%). ZJIT speed claims come from
   ruby-bench with A/A.
