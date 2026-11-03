@@ -24,7 +24,7 @@ call that removes the slow-path lookup entirely, and per-call counts return to t
 **Combined for submission (2026-11-03):** AT1 and AT2 read as one change ("freeze the wrapper type when what it
 wraps is frozen"), so they go out as one PR:
 [`thomasklemm/shareable-attribute-types`](https://github.com/thomasklemm/rails/tree/thomasklemm/shareable-attribute-types)
-at [`b0e77d009a`](https://github.com/thomasklemm/rails/commit/b0e77d009aa89fb94523e2817f3f8ed9ccb5cd98), one commit
+at [`2236cd5626`](https://github.com/thomasklemm/rails/commit/2236cd56260ba02697c0af73deb1406595f7e4ee), one commit
 on `c042aee23a`, without the code comments (the reasoning is in the commit message and the body). AR sqlite3 with
 `RAILS_STRICT_WARNINGS=1`: 10,267 runs, 0 failures, 0 errors; RuboCop clean. Readability **L1**: two one-line
 conditional freezes, and why the converter isn't frozen unconditionally (a Delegator freezes what it wraps) lives in
@@ -172,13 +172,35 @@ makes that possible for most models without moving any cast.
 * **Suites.** Each branch: `rake test:sqlite3` in `activerecord` with `RAILS_STRICT_WARNINGS=1` (AT1 10,266 runs,
   AT2 10,265 runs, 0 failures, 0 errors), RuboCop on the changed files. Each new test fails on main.
 
+## Review round (2026-11-03)
+
+On `b0e77d009a` all three reviews requested changes. Fixed in `2236cd5626`:
+
+1. **Subclasses.** The inherited `.new` froze user subclasses of `TimeZoneConverter`, so a subclass with its own
+   state raised `FrozenError` (Sol). The converter is now frozen only when it's an instance of `TimeZoneConverter`
+   itself; `test_subclass_with_its_own_state_stays_unfrozen` fails on `b0e77d009a`. `EnumType` gets no such check:
+   `_enum` builds it with the literal `EnumType.new`, so no subclass reaches the freeze.
+2. **Double freeze (open, needs a decision).** `Delegator#freeze` calls `freeze` on the already frozen subtype
+   again, so a subtype whose `freeze` hook sets state raises `FrozenError` (Astra). Freezing the wrapper alone
+   needs `::Kernel.instance_method(:freeze).bind_call(converter)` (checked: it works on a `DelegateClass` instance
+   and leaves the subtype alone). That's the bind_call form held for a decision; not built.
+3. **Frozen types in general.** Prepends or `decorate_attributes` blocks that set ivars, and `clone` plus
+   mutation, now raise. Precedent: tenderlove's [#54228](https://github.com/rails/rails/pull/54228) ("Freeze
+   database conversion types", `76448a0166`, Jan 2025, for `_default_attributes` shareability) and
+   [#55606](https://github.com/rails/rails/pull/55606) ("Freeze database types", `d2da81670c`) freeze every type the
+   adapters' type maps return. Checked on main: every column type of a SQLite model is frozen; types declared with
+   `attribute :a, :string` are not. Both wrappers are frozen only around frozen types, so this brings them in line
+   with what they wrap; accepted, and one sentence in the body.
+
+AR sqlite3 with `RAILS_STRICT_WARNINGS=1`: 10,268 runs, 0 failures, 0 errors; RuboCop clean.
+
 ## PR body (AT1+AT2)
 
 **Freeze TimeZoneConverter and EnumType when what they wrap is frozen**
 
 A model's default attributes are shared through its schema context only when they're Ractor-shareable; otherwise every `attribute_types`, `attributes_builder` and `_default_attributes` read looks them up in Ractor-local storage. `TimeZoneConverter`, which wraps every datetime column under `time_zone_aware_attributes` (on by default), and `EnumType` are never frozen, so almost every model takes that path.
 
-This freezes the converter when its subtype is already frozen, and the `EnumType` when its mapping and subtype are. An unfrozen subtype stays as it is, since freezing a Delegator also freezes the object it wraps.
+This freezes the converter when its subtype is already frozen, and the `EnumType` when its mapping and subtype are. An unfrozen subtype stays as it is, since freezing a Delegator also freezes the object it wraps. Subclasses of the converter stay unfrozen, since they may keep state of their own. Rails already freezes the column types its type maps return (#54228, #55606), so this brings the two wrappers around them in line.
 
 | Per call, model with timestamps and an enum, Ruby 4.0.7 | Interpreter | YJIT |
 | --- | ---: | ---: |
