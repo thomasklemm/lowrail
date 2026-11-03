@@ -110,6 +110,11 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
   routine cell moves to 4.1. Cells and cadence: [measurement-matrix](upstream/measurement-matrix.md).
 * **Every census adds a ZJIT stats pass on master.** ZJIT stats on apps need `--zjit-exec-mem-size=512
   --zjit-mem-size=1024`, and `compile_error_out_of_memory` must be 0 in every run before a counter is reported.
+* **Every new ZJIT lead is written down** (Thomas, 2026-11-03), wherever it turns up: a census, a review, a PR
+  build, a side exit seen in passing. Add it to the
+  [lead queue](upstream/zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03) with the fallback reason or exit,
+  a repro or the app and site, counts per op and on ruby-bench where known, and whether it is free or taken. An
+  unmeasured lead goes in too, marked unmeasured. Nothing is posted upstream for it.
 * **Where claims come from.** Callgrind instruction counts with fixed heap and A/A are primary
   ([bench.md](bench.md)). App pages find sites but can't price them (A/A up to ±7%). ZJIT speed claims come from
   ruby-bench with A/A.
