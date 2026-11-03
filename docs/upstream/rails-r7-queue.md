@@ -22,6 +22,60 @@ opened. R7-4 is out of the queue (Sure only). R7-5 replaces it and is marked "do
 The first pass recommended R7-1, R7-2, R7-3, R7-4. The value ranking below replaces it: R7-3, then R7-2 (Ruby 4.0
 only, Thomas decides), then R7-1. R7-5 is "don't open".
 
+## Opening pass (2026-11-03): neither R7-2 nor R7-1 opens
+
+Thomas cleared R7-2 to open, on the premise that it is a no-op on Ruby master, and R7-1 subject to the L0–L3 gate.
+Both branches rebase cleanly onto rails/rails main
+[`1105756f42`](https://github.com/rails/rails/commit/1105756f42) (R7-2 → `0f375b5bed`, R7-1 → `1d25fe3689`, local
+only; the fork keeps `a97a37b603` and `d18c315d20`). No open PR or main commit since `1597d576bd` touches
+`core_ext/object/json.rb` or `tag_helper.rb`, and 10 of our 20 rails/rails slots are in use.
+
+**R7-2 is blocked: it is a regression on Ruby 4.1, not a no-op.** On master, objects don't change (5/8/10 → 1/5/5 on
+4.0.9; 1/5/5 on master before and after). Instructions do change. Master's `Symbol#to_s` already costs what
+`Symbol#name` costs, so the added `Symbol === k` is pure overhead there. The Rails micro
+([`ir_run_409.sh`](../../bench/upstream/r7/open/ir_run_409.sh), [`ir_run_i41.sh`](../../bench/upstream/r7/open/ir_run_i41.sh),
+`cpu_r7.rb` as above; i49/y49 = 4.0.9 interpreter/YJIT, i41/z41 = master `9aa0898240` interpreter/ZJIT):
+
+| Operation | Mode | main Ir | A/A | candidate Ir | Δ | Δ % |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `{ 4 Symbol keys }.as_json` | i49 | 11,203 | +0.12% | 9,423 | −1,779 | −15.88% |
+| | y49 | 8,775 | +0.01% | 6,067 | −2,708 | −30.86% |
+| | i41 | 9,715 | −0.02% | 10,927 | +1,212 | **+12.48%** |
+| | z41 | 7,433 | −0.07% | 7,673 | +240 | **+3.23%** |
+| `to_json(except: :created_at)` | i49 | 24,638 | +0.05% | 23,244 | −1,394 | −5.66% |
+| | y49 | 18,577 | −0.02% | 16,534 | −2,043 | −11.00% |
+| | i41 | 24,939 | +0.07% | 25,979 | +1,040 | **+4.17%** |
+| | z41 | 19,085 | +0.42% | 19,263 | +177 | +0.93% |
+| `ActiveSupport::JSON.encode(hash)` | i49 / y49 / i41 / z41 | 8,728 / 6,535 / 9,582 / 7,726 | ≤ 1.11% | 8,728 / 6,535 / 9,634 / 7,728 | 0 / 0 / +52 / +2 | 0 / 0 / +0.54 / +0.03 |
+
+The explanation, from standalone loops ([`key_variants.rb`](../../bench/upstream/r7/open/key_variants.rb),
+[`key_calls.rb`](../../bench/upstream/r7/open/key_calls.rb), Ir per call over a bare `k` reference): one `Symbol === k`
+costs about 264 Ir in both interpreters. `k.to_s` costs 435 on 4.0.9 against 170 for `k.name`, plus the allocation
+and the fstring lookup in `Hash#[]=`. On master `to_s` and `name` cost the same (141). The other exact spellings
+don't help the interpreter: in the as_json-shaped loop on master, `Symbol ===` is +14.8%, `is_a?(Symbol)` +15.4% and
+`case k when Symbol` +15.5% against plain `to_s`. Only `is_a?` is flat under ZJIT (0.0% against +3.2%). A
+Ruby-version branch would avoid the cost and is L3. Ruby 4.1.0 ships in December 2026, when the routine cell moves to
+4.1 ([measurement-matrix](measurement-matrix.md)), so the change would trade a 4.0 gain for a permanent 4.1
+interpreter loss. Per DECISIONS (a ZJIT loss blocks until explained), R7-2 doesn't open. It goes back to Thomas
+with this explanation.
+
+ruby-bench doesn't reach it: per request, railsbench and shipit make 0 `Hash#as_json` calls, and lobsters 0.44 with
+no Symbol keys ([`lowrail_asjson.rb`](../../bench/upstream/r7/open/lowrail_asjson.rb)). Suites on 4.0.9
+(`RAILS_STRICT_WARNINGS=1`, `SEED=41231`): Active Support 6,894 runs, 0 failures, 0 errors (`PARALLEL_WORKERS=1`,
+memcached as an orb service); Action Pack 4,472 runs, 0 failures; Active Record `test:sqlite3` 10,270 runs, 0
+failures, 4 errors, all four `SqliteStructureDump/LoadTest` failing because this orb has no `sqlite3` CLI. RuboCop
+is clean.
+
+**R7-1 is L2 and has no measurable app or ruby-bench effect, so it doesn't open.** Gate rating: two new module
+helpers (`append_tag_value`, `append_tag_values`) replace one recursive method, and one of them needs a comment
+explaining why nested Arrays are still splatted. That is L2 ("a new helper"), close to L3. L2 needs an effect
+measurable in an app or on ruby-bench. ruby-bench: `build_tag_values` runs 0 times per request in railsbench and
+lobsters, and 1.32 times in shipit ([`lowrail_tagcount.rb`](../../bench/upstream/r7/open/lowrail_tagcount.rb)).
+At about 105 ns per call (`tag.div(class: [..])`, 4.0.7 interpreter) that is about 140 ns of a 17 ms shipit request
+(1,992 ms per 114-request iteration), about 0.001%. In apps the largest site is Sure's account pages (679 fewer
+objects, so a few hundred calls), still a small fraction of a percent of a page whose A/A moves by up to ±7%, so app pages
+can't price it. The branch stays on the fork; nothing was rerun on 4.0.9.
+
 ## Pins and method
 
 * **Rails:** canonical `rails/rails` main `1597d576bd` (merge of our #59576), fetched 2026-11-03 14:20 UTC. The
