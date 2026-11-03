@@ -16,14 +16,25 @@ without arguments (micro: `def m(*args, **kwargs)` and the `define_method` equiv
 so eliding them needs escape analysis, and block parameters cannot be anonymous-forwarded (`proc { |*| m(*) }` is a
 SyntaxError). Nothing to file.
 
-**Candidate R6-1** `thomasklemm/scope-zero-arity-no-splat` @ `abd19e812b0ac5bedce2fc8cc0899a234c1e63dc`
-(thomasklemm/rails, on 3bdc579090): when the scope body is a lambda with arity 0, define the scope method without
+**Candidate R6-1** `thomasklemm/scope-zero-arity-no-splat` @ `8e4bb3afce6fd8a98e46e765ca1020f81f592fce`
+(thomasklemm/rails, on 3bdc579090): when the scope body is a lambda without parameters (`lambda? && parameters.empty?`), define the scope method without
 parameters. Such a lambda raises `ArgumentError` for any argument, so callers see the same error and message;
 procs, lambdas with parameters and other callables keep the generic method. `Relation#scoping` and the delegator are
 untouched, so overrides keep working.
 
 Observable differences: `Model.method(:scope).arity`/`parameters` become `0`/`[]` instead of `-1`/`[[:rest, :args],
 [:keyrest, :kwargs]]`, and the ArgumentError's backtrace starts at the scope method instead of inside the lambda.
+
+Ordering: before, `all` (and with it any default scope) ran before the lambda rejected bad arguments; now the
+ArgumentError comes first, so an invalid call such as `klass.strict(1)` no longer evaluates a raising or
+side-effecting default scope. Only programmer-error calls see this; accepted for the commit and left out of the PR
+body.
+
+Review round 1 (Sol, on `abd19e812b`): the first version checked `arity == 0`, which also matched `->(**nil)`
+(arity 0, parameters `[[:nokey]]`), turning base's "no keywords accepted" into "wrong number of arguments (given 1,
+expected 0)" for `Post.x(k: 1)` and `Post.all.x(k: 1)`. Fixed in `8e4bb3afce` by requiring `parameters.empty?`; the
+test now asserts both messages, and its `**nil` assertion fails on `abd19e812b`. The check uses the converted
+`scope_body` Proc rather than `body`, because a `to_proc`-able body such as a Method does not respond to `lambda?`.
 
 Per call ([micro_scope.rb](../../bench/upstream/r6/micro_scope.rb), objects):
 
@@ -52,6 +63,8 @@ Suites (RAILS_STRICT_WARNINGS=1, SEED=41231): AR `test:sqlite3` 10248 runs, 0 fa
 warnings; AR `test:postgresql` 11167 runs, 0 failures, 0 errors, 31 skips. RuboCop: no offenses. The new test
 `test_scope_arguments_follow_the_scope_body` passes on base and head and fails on a mutant that drops the `lambda?`
 check (a proc body would then reject arguments).
+After round 1 (`8e4bb3afce`): sqlite3 10248 runs, postgresql 11167 runs, both 0 failures and 0 errors; RuboCop
+clean; per-call micro unchanged from the table above.
 
 Overlap: `gh search prs` on rails/rails (open) for "scope kwargs", "named scope allocation", "scope_method proc",
 "_exec_scope", "scope arity": nothing on this code. Origin of the signature: #58238 (kamipo, `ruby2_keywords`
