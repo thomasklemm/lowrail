@@ -127,6 +127,11 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
   - [#59560](https://github.com/rails/rails/pull/59560), reuse frozen `[fmod, ""]` type-map keys for PostgreSQL result columns, kept per type map and dropped with its cache — −1 Array per result column (10-column `cast_result` **27 → 17**); 120/124 PG workloads, median **−171** (−2.4%). Head `408e6a3` after two Sol request-changes rounds (process-global keys, then keys retained by failed lookups); Sol approve on both rubrics. Opened 2026-11-03.
   - [#59561](https://github.com/rails/rails/pull/59561), `thread_mattr_accessor` uses a frozen literal key for the defining module (subclasses still build theirs) — reader/writer **2 → 0** objects, reader 364 → 198 ns interpreter / 299 → 109 ns YJIT; 83/97 workloads, median **−10.8** (Lobsters −41 via query log tags). From the [framework census](rails-framework-census.md) (bet R2). Sol approve on both rubrics; opened 2026-11-03.
   - [#59562](https://github.com/rails/rails/pull/59562), `ActiveSupport::Subscriber` records each String pattern's handler in an ivar at `attach_to`, so `#call` no longer slices the event name — **1 → 0** objects per call (424 → 217 ns interpreter, 242 → 87 ns YJIT); 75/97 workloads, median **−3.3** (Fizzy −23 to −29). Complements open #58957. Head `963c79f` after two Sol request-changes rounds (public accessor collided with handler names and dotted names changed dispatch; then Regexp `prepare_pattern` broke `attach_to`); Sol approve on both rubrics. Opened 2026-11-03.
+  - [#59563](https://github.com/rails/rails/pull/59563), Active Job `serialize_hash` walks the Hash with `each` instead of `each_with_object` pairs — typical kwargs **13 → 6** objects per serialize, Chatwoot status toggle −238 (−1.3%). From the [Inertia/Chatwoot census](inertia-chatwoot-census.md) (bet L6). Sol approve on both rubrics; opened 2026-11-03.
+
+### Inertia — inertiajs/inertia-rails
+
+- [#441](https://github.com/inertiajs/inertia-rails/pull/441), the renderer reads `X-Inertia-*` headers by Rack env key like the middleware — 8 header-key Strings per render → 0; 42/55 workloads across six Inertia apps. Sol approve on both rubrics; opened 2026-11-03.
 
 ### Importmap — rails/importmap-rails
 
