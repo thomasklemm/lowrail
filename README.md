@@ -111,7 +111,12 @@ for the other projects we learned from.
 > **Research prototype.** Lowrail is not published as a gem and gives no
 > production speedup by default today. Use it on a copy of your app or in CI.
 
-### Current results (2026-10-21)
+### Historical results (2026-10-21)
+
+> **Historical.** These are the prototype's last measured results, on Ruby 4.0.7
+> and Rails 8.1.4 at the linked commits. They have not been re-measured since.
+> The upstream work measures on Ruby 4.0.9 and Rails main; see
+> [Combined effect](#combined-effect).
 
 #### Warm-request instruction counts
 
@@ -312,7 +317,8 @@ the runtime that boots the app, certifies facts and installs lowered code.
 
 ### Quick start
 
-Requirements: a Rust toolchain, Ruby 4.0.7 (pinned in `mise.toml`), and a
+Requirements: a Rust toolchain, Ruby 4.0.7 (the prototype's pin,
+`mise exec ruby@4.0.7`), and a
 Rails 8.1 app whose test suite passes.
 
 ```sh
@@ -350,7 +356,7 @@ or incompatible build is a silent no-op. More options are in the
   far was either unsafe under mid-request mutation or its guard cost more than
   it saved ([DECISIONS](docs/DECISIONS.md)).
 - **The sealed tier has scoped interpreter results**, shown in
-  [Current results](#current-results-2026-10-21). Passive production form,
+  [Historical results](#historical-results-2026-10-21). Passive production form,
   token and collection admission is implemented; the separate test certificate
   remains AR-only ([production](docs/passes/sealed-production.md),
   [test coverage](docs/test-certificate.md)).
@@ -386,7 +392,7 @@ tooling explains why and what to change.
 | Axis | Primary | Secondary / diagnostic |
 |---|---|---|
 | Rails | 8.1.4 | 8.2 alpha (Campfire's pin) |
-| Ruby (minimum 4.0) | 4.0.7 (`mise.toml`) | 4.1 preview ([separate compatibility matrix](docs/ruby-4.1.md)) |
+| Ruby (minimum 4.0) | 4.0.7 (the prototype's pin) | 4.1 preview ([separate compatibility matrix](docs/ruby-4.1.md)) |
 | Execution | interpreter instruction counts (Callgrind, fixed heap, A/A controls) | YJIT under a strict JIT-flat gate; ZJIT being added, diagnostic only |
 
 How to read and reproduce measurements: [docs/bench.md](docs/bench.md).

@@ -13,8 +13,8 @@ precedes the finite ±0.1% A/A instruction protocol; no app patches are needed.
 
 ## Current accepted request results
 
-The [README table](../README.md#current-results-2026-10-21) is the current
-results index: rounded deltas/intervals (exact values in linked JSON), dates,
+The [README table](../README.md#historical-results-2026-10-21) is the
+prototype's results index, historical since 2026-11-03 (Ruby 4.0.7, not re-measured): rounded deltas/intervals (exact values in linked JSON), dates,
 endpoints, Ruby/Rails versions,
 mode, tier, measured commits and publication links. Its numbers render
 directly from accepted JSON exports via [results.json](results.json) and

@@ -51,7 +51,7 @@ ruby/ruby#18326 for sendforward). This replaces the shortlist rule "don't take #
 fatkodima on [rails#59577](https://github.com/rails/rails/pull/59577#issuecomment-6606427493) asked how we choose
 what to optimize, what the real-world impact is and where the benchmark is, and called the code more complex for
 questionable benefit. Thomas agreed to this response: every new rails/rails PR gives CPU per call (ns and Ir,
-interpreter and YJIT on 4.0.7, A/A) next to objects, a one-line ruby-bench placement (or "within noise"), and one
+interpreter and YJIT on the Ruby pin, 4.0.9 since 2026-11-03, A/A) next to objects, a one-line ruby-bench placement (or "within noise"), and one
 sentence on how the site was found, linking the census doc in the public Lowrail repo. Lowrail is named as our
 research project; Roundhouse is not mentioned. A candidate whose CPU gain is within noise and whose diff adds real
 complexity is not opened. Replies to "is this worth it" questions are drafted, reviewed twice (facts, then tone)
@@ -157,11 +157,21 @@ workloads ([combined-effect](upstream/combined-effect.md)). Thomas: focus on Rai
 Next, when a slot frees up: a census 7 after the next merge wave, and a serialization CPU dive (`as_json`, `render
 json:`). Parked: types/MCP gaps, YJIT ([yjit-leads](upstream/yjit-leads.md)), ruby/uri and the Campfire lead.
 
+## Ruby pin 4.0.9 and a 4.1.0-preview1 column (2026-11-03)
+
+Thomas agreed: census and Rails PR evidence move from Ruby 4.0.7 to 4.0.9. 4.0.8 is bugfixes only (use-after-free
+fixes, a ZJIT keyword-order fix) and 4.0.9 fixes the Onigmo Regexp CVEs; neither targets performance. Results across
+pins are never compared; every A/A and every main-versus-branch pair runs on one pin. Open PR bodies with 4.0.7 numbers
+stay as they are, because they name their Ruby. Census 8 (C8) restarts its runs on 4.0.9 under new labels. Each census
+adds Ruby 4.1.0-preview1 (interpreter and YJIT allocations, A/A), the release apps will test against, next to the
+ZJIT pass on master. The lowering prototype keeps its 4.0.7 gates (`script/gate`, token Ruby, certificates); its README
+results are labeled historical and are not re-measured.
+
 ## Measurement matrix: ZJIT and Ruby master on the census apps (2026-11-03)
 
 Thomas: measure ZJIT on the Rails apps as well, and measure at the frontier (Rails main, Ruby master). Decided in
 [upstream/measurement-matrix.md](upstream/measurement-matrix.md): Rails PR evidence stays on Rails main × Ruby
-4.0.7 (interpreter, YJIT). Every census adds a ZJIT stats pass on Ruby master, and each weekly Ruby pin adds
+4.0.7 (interpreter, YJIT); 4.0.9 from 2026-11-03, see above. Every census adds a ZJIT stats pass on Ruby master, and each weekly Ruby pin adds
 interpreter + ZJIT allocations. ZJIT speed claims stay on ruby-bench with A/A. Rails changes made only for ZJIT need
 a 4.0.7 win of their own. Every Rails candidate report also gives its micro on Ruby master × ZJIT (pinned build, A/A),
 unless its code path doesn't run on 4.1; then it says so. A ZJIT loss blocks the candidate until explained. New bets: F1 frontier census (20 apps on master), F2 our merged Rails PRs under ZJIT.
