@@ -621,11 +621,17 @@ machinery. Each has a regression test that fails on `01e12c5`:
 2. **`capture` overrides.** Rails runs a helper's block through `capture`
    and `with_output_buffer`. A template block now counts only when every
    definer of the helper is gem-defined, and every definer of `capture` and
-   of `with_output_buffer` is either the gem's `ActionView::Helpers` method
-   or a class outside the view hierarchy, which no view includes. Any
-   module definer refuses, such as an app `ApplicationHelper#capture` or a
-   concern. This refuses template blocks in Fizzy and Lobsters, where a
-   model concern and Parslet define `capture` in modules.
+   of `with_output_buffer` is ActionView's own `CaptureHelper` method. Any
+   other definer refuses: a module may be included, and a class may be
+   inherited by a custom view class (a fifth review executed such a case).
+   Every corpus app has other definers (`ActiveStorage::Previewer`,
+   `ActionView::OutputBuffer`, ...), so template blocks now refuse in all of
+   them. This changes one v2 answer, contrary to an earlier estimate:
+   c07's helper call sits inside a `turbo_frame_tag` block in Campfire's
+   `_membership` partial, so c07 answers `String` again, as on `206a2fc`.
+   Strict v2 stays 87.50% / 76.36% (42/6/13); the equivalence drops from
+   95.83% / 83.64% to 93.75% / 81.82%. v3 and v2 without observations are
+   unchanged.
 
 **Fifth measurement of v3**, on the same frozen file with facts
 regenerated, prompted by review. Binary `bc27c3fe…`. Every answer on v2

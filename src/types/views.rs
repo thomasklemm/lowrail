@@ -313,11 +313,10 @@ impl HelperCalls<'_> {
                 || (m.name == "Turbo::FramesHelper" && at.contains("/app/helpers/turbo/frames_helper.rb"))
         });
         // Rails runs the block through `capture` (and `with_output_buffer`).
-        // Their other definers may only be classes outside the view
-        // hierarchy, which no view includes; any module refuses.
-        let runner_safe = |runner: &str| definers(self.facts, runner).is_some_and(|modules| modules.iter().all(|m| gem(m, runner)
-            || (m.kind == "class" && !matches!(m.name.as_str(), "Object" | "BasicObject")
-                && !m.ancestors.iter().any(|a| a == "ActionView::Base"))));
+        // Any definer other than ActionView's own refuses: a module may be
+        // included and a class inherited by a custom view class.
+        let runner_safe = |runner: &str| definers(self.facts, runner).is_some_and(|modules| modules.iter().all(|m|
+            m.name == "ActionView::Helpers::CaptureHelper" && gem(m, runner)));
         !modules.is_empty() && modules.iter().all(|m| gem(m, &name))
             && runner_safe("capture") && runner_safe("with_output_buffer")
     }

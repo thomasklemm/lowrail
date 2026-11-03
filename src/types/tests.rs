@@ -113,8 +113,6 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
             {"name":"ActionView::Helpers::CaptureHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ActionView::Helpers::CaptureHelper"],"methods":[
                 {"name":"capture","owner":"ActionView::Helpers::CaptureHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb:47"},
                 {"name":"with_output_buffer","owner":"ActionView::Helpers::CaptureHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/capture_helper.rb:221"}]},
-            // Unrelated classes outside the view hierarchy may define capture.
-            {"name":"ActiveStorage::Previewer","kind":"class","anonymous_ancestor_methods":[],"ancestors":["ActiveStorage::Previewer"],"methods":[{"name":"capture","owner":"ActiveStorage::Previewer"}]},
             {"name":"ActionView::Helpers::TagHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ActionView::Helpers::TagHelper"],
              "methods":[{"name":"content_tag","owner":"ActionView::Helpers::TagHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/tag_helper.rb:516"}]},
             // Overrides that a reconstructed view ancestry missed: a module not named *Helper,
@@ -161,14 +159,17 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
     assert_eq!(model.fact("ViewHelper#notice", "arg:text").unwrap().name, "String", "a helper outside any HelperMethods name overrides mail_to");
     assert_eq!(model.fact("ViewHelper#consume", "arg:text").unwrap().name, "String",
         "the earlier argument's call may reassign @value before it is read");
-    // An app override of `capture`, which runs link_to's block, may rebind self.
-    let mut overridden = facts_json;
-    overridden["modules"].as_array_mut().unwrap().push(json!({"name":"ApplicationHelper","kind":"module",
-        "anonymous_ancestor_methods":[],"ancestors":["ApplicationHelper"],"methods":[{"name":"capture","owner":"ApplicationHelper"}]}));
-    let facts: Facts = serde_json::from_value(overridden).unwrap();
-    let mut model = TypeModel::from_facts(&facts).unwrap();
-    model.merge_observed(&facts, observed.as_bytes()).unwrap();
-    assert_eq!(model.fact("ViewHelper#title", "arg:text").unwrap().name, "String", "capture is overridden");
+    // Any other definer of `capture`, which runs link_to's block, may rebind
+    // self: a helper module, or a class a custom view class inherits from.
+    for (name, kind) in [("ApplicationHelper", "module"), ("Runner", "class")] {
+        let mut overridden = facts_json.clone();
+        overridden["modules"].as_array_mut().unwrap().push(json!({"name":name,"kind":kind,
+            "anonymous_ancestor_methods":[],"ancestors":[name],"methods":[{"name":"capture","owner":name}]}));
+        let facts: Facts = serde_json::from_value(overridden).unwrap();
+        let mut model = TypeModel::from_facts(&facts).unwrap();
+        model.merge_observed(&facts, observed.as_bytes()).unwrap();
+        assert_eq!(model.fact("ViewHelper#title", "arg:text").unwrap().name, "String", "{name}#capture overrides");
+    }
     std::fs::remove_dir_all(dir).unwrap();
 }
 
