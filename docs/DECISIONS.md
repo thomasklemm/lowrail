@@ -194,6 +194,11 @@ and not promoted.
    review faster, even on approved PRs; many ruby/ruby contributors work
    without agents and set their own pace. Comment only with new substance
    (a fix, a review answer, evidence that a red job is unrelated when asked).
+   **Collaborative, not credit (Thomas, 2026-11-03):** treat upstream work as
+   shared. Don't post comments that point out overlap with our PRs, ask who
+   lands what, or offer to close "ours" in favor of "theirs"; we don't need
+   acknowledgement. Post data or code that helps, and let maintainers combine
+   it however they like.
    **PR descriptions (revised 2026-11-03):** make review as easy as
    possible; less text is better. A reviewer should see in 30 seconds what
    is wasted, where it runs, what changes and why it is safe. rails/rails:
