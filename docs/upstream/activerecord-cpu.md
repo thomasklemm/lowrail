@@ -135,6 +135,13 @@ shipit gain as a one-line change, and becomes moot if #59141 merges. A variant t
 (`c3b`: iterate `result_set.columns`) saves more per call (one-row load −32% vs −23% in time) but changes the
 contents of the additional-types Hash and overlaps #59141 further; not pursued. On ruby-bench `c3b` is −1.27% / −5.19% / −1.24% (interpreter) against C3's −1.04% / −4.12% / −1.03%.
 
+**Reviews.** Opened as [rails/rails#59568](https://github.com/rails/rails/pull/59568) (`2fd04c4`). Sol: correctness
+approve; quality P2, an `attribute_types` override that returns a different Hash on each call would now be read only
+once per result. No Rails path does that and correctness rejected it as unsubstantiated, so it is outside the
+contract; no change. Adversarial Astra round: P3 only, accepted. A schema change injected in the middle of the
+filter (with TracePoint) keeps the types read before it, where main would switch to the new ones for the remaining
+keys.
+
 ### C2: build the association alias tracker only for through chains
 
 `AssociationScope#scope` passes `scope.alias_tracker` to `get_chain`. `Relation#alias_tracker` resolves the model's
@@ -168,6 +175,12 @@ so on top of it C2 only applies where a scope is still built: association relati
 −0.78%, railsbench −0.01%, lobsters +0.07% (within lobsters' A/A), and shipit −1.09% under YJIT; per call `post.comments.where(…).to_a` −4.4% and
 `association(:comments).scope` −18.6% are unchanged by #59212. The two touch different files and are independent.
 
+**Reviews.** Opened as [rails/rails#59569](https://github.com/rails/rails/pull/59569) (`fcfadc0`). Sol: approve on
+both rubrics; the boundary both name is that building a direct scope no longer checks out a connection, so a missing
+connection raises only when the query runs (already stated in the PR). Adversarial Astra round: P3 only, accepted.
+A prepend of the private `AssociationScope#get_chain` now receives the Relation instead of the `AliasTracker` as
+its third argument.
+
 ## Overlaps measured, not duplicated
 
 Same instruction-count method, each PR merged onto the same main (interpreter):
@@ -179,7 +192,7 @@ Same instruction-count method, each PR merged onto the same main (interpreter):
 | #59413 | czj | look up the raw-SQL matcher in `order` only when needed | +0.03% | −0.90% | −0.24% |
 | #59518 | sampokuokkanen | memoize `QueryAttribute#hash` (query cache key) | −0.16% | −0.36% | −0.28% |
 
-¹ With #59141 (head `6df1ebd`) lobsters fails at boot: `User has no attribute 'prefers_color_scheme' to define a reader for` (`ArgumentError` from `define_method_attribute`), raised when activerecord-typedstore 1.6.0 calls `define_attribute_method` for a typed-store key that is not a column. Recorded here only; nothing was posted.
+¹ With #59141 (head `6df1ebd`) lobsters fails at boot: `User has no attribute 'prefers_color_scheme' to define a reader for` (`ArgumentError` from `define_method_attribute`), raised when activerecord-typedstore 1.6.0 calls `define_attribute_method` for a typed-store key that is not a column. Minimal repro without the gem: `store :settings, accessors: [:theme]` plus `define_attribute_method(:theme)` passes on main and raises on 6df1ebd. Known to the author (comment 2026-10-26: he hit an activerecord-typedstore problem in their CI and sent the gem a patch); not posted.
 
 #59413 is exactly the `preprocess_order_args` lead found here (eager `model.adapter_class` per `order`, 0.77% of
 shipit under YJIT) and #59518 with merged #59505 is the query-cache-key lead; both were found by their authors first.
@@ -260,7 +273,7 @@ are deterministic (A/A ≤ 0.16%) and agree with the per-call timings.
 ## Drafts
 
 Short form from [DECISIONS](../DECISIONS.md): two paragraphs, one per-call table, one sentence of breadth.
-Not opened; each needs its Thermos review (Codex, GPT-6.1 Sol) first.
+Opened as #59568 (C3) and #59569 (C2) after Sol and Astra reviews (see each candidate's Reviews).
 
 ### C3: Read attribute_types once when loading records
 
