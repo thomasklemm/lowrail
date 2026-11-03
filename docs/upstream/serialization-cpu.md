@@ -88,6 +88,26 @@ Instructions per call (interpreter, 100 calls after warmup, GC off; A/A within 0
 20 records `as_json` 2.30 M, `to_json` 4.07 M; `render json:` 20 records 2.85 M; jbuilder 5.14 M.
 `time.as_json` is 5,627, of which `Time#xmlschema` is 1,494.
 
+**Submitted form (2026-11-03): the minimal variant.** After fatkodima's objection to #59577 and the readability
+gate in [DECISIONS](../DECISIONS.md#learnings-from-2026-11-03), S1 goes out as the coder-only variant:
+[`thomasklemm/json-escape-coder-only`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-coder-only)
+at [`f3a074279b`](https://github.com/thomasklemm/rails/commit/f3a074279ba1dc0c6d82d54b444ae116e7e73c7b), one commit
+on `b084108cf3`. Only `JSONGemCoderEncoder#escape!` changes (two frozen Hash constants, two `each_key` loops with
+plain `include?`/`gsub!`, settings read first), with no code comment and no bound-method constants. Its String
+comes straight from `JSON::Coder#dump`, so no custom `stringify` can reach it, and every finding of review rounds 2
+to 6, including the pre-4.0 Ractor IsolationError, came through that hook; `JSONGemEncoder` keeps main's code. All
+eleven census apps lock json 2.20 to 3.1, so all use the coder encoder. Checks: Active Support with
+`RAILS_STRICT_WARNINGS=1` 5,482 runs, 0 failures (Redis store tests excluded, no Redis gem in this bundle);
+RuboCop clean; `escape_fuzz.rb` 0 of 16,000 and `escape_fuzz_custom.rb` 0 of 80,001 differ from main; encoding
+from a non-main Ractor works. Ruby 4.1 (master `9aa0898240`) takes the `tr!` branch and never calls this method,
+so no ZJIT number applies. Readability **L1**: the per-character loop is slightly unusual next to a single
+`gsub!`, but clear at once, and the gain is outside the A/A per call and on railsbench under YJIT.
+
+ruby-bench on the minimal variant (Callgrind, one measured iteration after warmup, A/A = `b084108cf3` in a
+second worktree): interpreter railsbench −0.037% (A/A +0.014%), lobsters +0.046% (−0.000%), shipit +0.039%
+(+0.004%); YJIT railsbench **−0.764%** (A/A +0.038%) and, rerun, **−0.282%** (A/A −0.078%), lobsters +0.021%
+(−0.023%), shipit −0.040% (+0.019%). The PR body is at the end.
+
 ## Candidate
 
 ### S1: escape JSON by searching for each character instead of a Regexp
@@ -344,3 +364,18 @@ Instructions per call (Callgrind, Ruby 4.0.7, 20 records of 11 columns):
 This path runs for every `to_json` and jbuilder template, and for `render json:` before 8.1 defaults; on six apps,
 30 of 56 workloads allocate at least one object fewer (16 in an A/A run). A single small record is within about ±1%
 (+0.5% interpreter, −1.0% YJIT).
+
+## PR body (minimal variant)
+
+**Escape JSON from JSON::Coder by searching for each character**
+
+Before Ruby 4.1, `JSONGemCoderEncoder`, the default encoder with json 2.15.2 or later, escapes `<`, `>`, `&`, U+2028 and U+2029 with one `gsub!` over a Regexp union, which runs the regexp engine over the whole document even when nothing needs escaping. Its String comes straight from `JSON::Coder#dump`, so this searches it for each character with `include?` and replaces only the ones that occur. The replacements contain none of the five characters, and the search still runs on the binary String, so the output is the same, including invalid UTF-8 from `JSON::Fragment`; both settings are read before anything is replaced. `JSONGemEncoder` (older json, custom encoders) keeps the single `gsub!`, and Ruby 4.1 keeps using `tr!`.
+
+| Per call, Ruby 4.0.7, 20 records of 11 columns | Interpreter | YJIT |
+| --- | ---: | ---: |
+| `posts.to_json` | 2,576k → 2,459k instructions (−4.5%), 359 → 342 µs | 2,223k → 2,088k (−6.1%), 291 → 280 µs |
+| jbuilder index | 3,651k → 3,547k (−2.9%), 799 → 813 µs | 1,862k → 1,749k (−6.1%), 382 → 361 µs |
+| `render json: posts` before `load_defaults 8.1` | 3,204k → 3,012k (−6.0%), 583 → 558 µs | 2,633k → 2,449k (−7.0%), 398 → 361 µs |
+| `posts.to_json`, text with `<b>` and `&` | 4,073k → 3,500k (−14.1%), 524 → 446 µs | 3,703k → 3,132k (−15.4%), 464 → 379 µs |
+
+Instructions are Callgrind's with GC off (A/A within 0.2%, `render json:` under YJIT 1.8%); µs are medians of 8 interleaved rounds and as noisy as wall time on a shared machine (A/A up to 5%), so the instructions carry the comparison. A single small record gains too (−2.8% / −4.4% instructions). Plain documents allocate one object fewer; a document with `<`, `>` and `&` allocates 7 more. On ruby-bench, railsbench under YJIT runs 0.28% and 0.76% fewer instructions in two runs (A/A −0.08% and +0.04%); lobsters, shipit and the interpreter are within noise. I found the site by profiling the JSON endpoints of eleven open-source apps, where escaping was 0.4% (interpreter) to 0.6% (YJIT) of samples: https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/serialization-cpu.md (benchmark: https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/serialization_cpu/micro.rb).

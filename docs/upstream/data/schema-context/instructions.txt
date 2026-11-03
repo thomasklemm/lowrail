@@ -1,0 +1,141 @@
+# Instructions per call (Callgrind, Ruby 4.0.7, Rails c042aee23a). base / aa (A/A) / at1 / at12 (AT1+AT2).
+
+## ir-path
+== TZA=0
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 1672
+columns_hash: base 1452
+has_attribute: base 3767
+type_for_attribute: base 5252
+new: base 23764
+instantiate: base 17076
+load_from_sql_10: base 281188
+find: base 413501
+find_by: base 427773
+where_to_a: base 718144
+== TZA=1
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 2790
+columns_hash: base 1452
+has_attribute: base 4881
+type_for_attribute: base 6369
+new: base 25992
+instantiate: base 18188
+load_from_sql_10: base 293346
+find: base 418876
+find_by: base 430175
+where_to_a: base 726915
+
+## ir-at1
+== TZA=1 interpreter
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 2790 | aa 2790 (+0.0%) | at1 1672 (-40.1%)
+has_attribute: base 4885 | aa 4894 (+0.2%) | at1 3768 (-22.9%)
+type_for_attribute: base 6369 | aa 6365 (-0.1%) | at1 5251 (-17.6%)
+new: base 25992 | aa 25990 (-0.0%) | at1 23762 (-8.6%)
+instantiate: base 18188 | aa 18191 (+0.0%) | at1 17078 (-6.1%)
+load_from_sql_10: base 293673 | aa 293564 (-0.0%) | at1 281238 (-4.2%)
+find: base 416301 | aa 415848 (-0.1%) | at1 413936 (-0.6%)
+find_by: base 430159 | aa 431211 (+0.2%) | at1 427908 (-0.5%)
+where_to_a: base 727415 | aa 726936 (-0.1%) | at1 718656 (-1.2%)
+includes: base 2968455 | aa 2969205 (+0.0%) | at1 2940204 (-1.0%)
+== TZA=1 YJIT
+YJIT: instructions per call (200 calls, GC off)
+attribute_types: base 1412 | aa 1411 (-0.1%) | at1 781 (-44.7%)
+has_attribute: base 2378 | aa 2379 (+0.1%) | at1 1749 (-26.4%)
+type_for_attribute: base 3954 | aa 3958 (+0.1%) | at1 3327 (-15.9%)
+new: base 8935 | aa 8950 (+0.2%) | at1 7675 (-14.1%)
+instantiate: base 4893 | aa 4947 (+1.1%) | at1 4262 (-12.9%)
+load_from_sql_10: base 135512 | aa 130971 (-3.4%) | at1 124196 (-8.4%)
+find: base 214853 | aa 214689 (-0.1%) | at1 213654 (-0.6%)
+find_by: base 225087 | aa 227179 (+0.9%) | at1 225946 (+0.4%)
+where_to_a: base 355711 | aa 348080 (-2.1%) | at1 351405 (-1.2%)
+includes: base 1279095 | aa 1280450 (+0.1%) | at1 1244444 (-2.7%)
+
+## ir-enum
+== TZA=1 ENUM=1 interpreter
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 2790 | aa 2790 (-0.0%) | at1 2790 (-0.0%) | at12 1672 (-40.1%)
+new: base 25905 | aa 25905 (+0.0%) | at1 25905 (+0.0%) | at12 23679 (-8.6%)
+load_from_sql_10: base 298287 | aa 298152 (-0.0%) | at1 298083 (-0.1%) | at12 285985 (-4.1%)
+where_to_a: base 737833 | aa 737599 (-0.0%) | at1 737724 (-0.0%) | at12 728658 (-1.2%)
+== TZA=1 ENUM=1 YJIT
+YJIT: instructions per call (200 calls, GC off)
+attribute_types: base 1411 | aa 1411 (+0.0%) | at1 1414 (+0.2%) | at12 781 (-44.7%)
+new: base 8950 | aa 8949 (-0.0%) | at1 8936 (-0.2%) | at12 7688 (-14.1%)
+load_from_sql_10: base 135330 | aa 135876 (+0.4%) | at1 135396 (+0.0%) | at12 128709 (-4.9%)
+where_to_a: base 365507 | aa 364965 (-0.1%) | at1 364983 (-0.1%) | at12 358772 (-1.8%)
+== TZA=1 YJIT rerun
+YJIT: instructions per call (1000 calls, GC off)
+load_from_sql_10: base 131856 | aa 131440 (-0.3%) | at1 124385 (-5.7%)
+where_to_a: base 357451 | aa 351049 (-1.8%) | at1 352197 (-1.5%)
+
+## ir-hoist
+== TZA=1 interpreter
+interpreter: instructions per call (200 calls, GC off)
+load_from_sql_1: at1 113610 | at1b 113709 (+0.1%) | at1h 113057 (-0.5%)
+load_from_sql_10: at1 281189 | at1b 281412 (+0.1%) | at1h 265037 (-5.7%)
+where_to_a: at1 718433 | at1b 719245 (+0.1%) | at1h 711421 (-1.0%)
+includes: at1 2939993 | at1b 2940618 (+0.0%) | at1h 2907061 (-1.1%)
+== TZA=1 YJIT
+YJIT: instructions per call (200 calls, GC off)
+load_from_sql_1: at1 75686 | at1b 75410 (-0.4%) | at1h 75368 (-0.4%)
+load_from_sql_10: at1 123863 | at1b 123882 (+0.0%) | at1h 120287 (-2.9%)
+where_to_a: at1 351021 | at1b 351191 (+0.0%) | at1h 349551 (-0.4%)
+includes: at1 1245127 | at1b 1263823 (+1.5%) | at1h 1256428 (+0.9%)
+
+## ZJIT micro (Ruby master 9aa0898240)
+== TZA=1 ZJIT master
+attribute_types: base 3335 | aa 3334 (-0.0%) | at1 3043 (-8.7%) | at12 3042 (-8.8%)
+has_attribute: base 4434 | aa 4427 (-0.2%) | at1 4010 (-9.6%) | at12 4009 (-9.6%)
+new: base 9420 | aa 9390 (-0.3%) | at1 8701 (-7.6%) | at12 8705 (-7.6%)
+instantiate: base 5417 | aa 5422 (+0.1%) | at1 5010 (-7.5%) | at12 5151 (-4.9%)
+load_from_sql_10: base 125625 | aa 125788 (+0.1%) | at1 122969 (-2.1%) | at12 122974 (-2.1%)
+where_to_a: base 357600 | aa 358390 (+0.2%) | at1 355314 (-0.6%) | at12 359721 (+0.6%)
+== TZA=1 ENUM=1 ZJIT master
+attribute_types: base 3375 | aa 3375 (+0.0%) | at1 3448 (+2.2%) | at12 3055 (-9.5%)
+new: base 9504 | aa 9505 (+0.0%) | at1 9779 (+2.9%) | at12 8873 (-6.6%)
+load_from_sql_10: base 130674 | aa 131114 (+0.3%) | at1 132052 (+1.1%) | at12 127838 (-2.2%)
+where_to_a: base 359609 | aa 359978 (+0.1%) | at1 358702 (-0.3%) | at12 358995 (-0.2%)
+instantiate: base 3885 | aa 3917 (+0.8%) | at1 3619 (-6.8%) | at12 3616 (-6.9%)
+load_from_sql_10: base 127008 | aa 126706 (-0.2%) | at1 124043 (-2.3%) | at12 123945 (-2.4%)
+
+## ruby-bench interpreter
+lobsters: atbase 4.1299 G (+0.000%) | atbase2 4.1284 G (-0.035%) | at1 4.1256 G (-0.104%) | at2 4.1344 G (+0.111%) | at12 4.1243 G (-0.134%)
+railsbench: atbase 5.0566 G (+0.000%) | atbase2 5.0572 G (+0.012%) | at1 5.0487 G (-0.157%) | at2 5.0588 G (+0.043%) | at12 5.0490 G (-0.152%)
+shipit: atbase 5.8746 G (+0.000%) | atbase2 5.8736 G (-0.018%) | at1 5.8661 G (-0.146%) | at2 5.8749 G (+0.005%) | at12 5.8609 G (-0.233%)
+
+## ruby-bench YJIT
+lobsters yjit: atbase 2.8679 G (+0.000%) | atbase2 2.8797 G (+0.413%) | at1 2.8713 G (+0.120%) | at2 2.8727 G (+0.168%) | at12 2.8677 G (-0.006%)
+railsbench yjit: atbase 2.7816 G (+0.000%) | atbase2 2.7846 G (+0.106%) | at1 2.7743 G (-0.263%) | at2 2.7760 G (-0.203%) | at12 2.7781 G (-0.126%)
+shipit yjit: atbase 3.0273 G (+0.000%) | atbase2 3.0247 G (-0.088%) | at1 3.0215 G (-0.192%) | at2 3.0281 G (+0.027%) | at12 3.0202 G (-0.234%)
+
+## ruby-bench ZJIT (master)
+lobsters zjit: atbase 3.0986 G (+0.000%) | atbase2 3.1020 G (+0.109%) | at1 3.0945 G (-0.133%) | at12 3.0924 G (-0.200%)
+railsbench zjit: atbase 2.9643 G (+0.000%) | atbase2 2.9634 G (-0.030%) | at1 2.9600 G (-0.145%) | at12 2.9621 G (-0.072%)
+
+## ns per call (micro.rb, TZA=1, median of 7 rounds of 20,000; wall time, noisy)
+== interp at-base
+attribute_types        276.5 ns  (min 274.6)     0.0 obj
+new                   3765.4 ns  (min 3710.8)     5.0 obj
+load_from_sql_10     40226.9 ns  (min 38096.1)    81.0 obj
+== interp at-base2
+attribute_types        300.2 ns  (min 298.1)     0.0 obj
+new                   4151.7 ns  (min 3805.6)     5.0 obj
+load_from_sql_10     40488.3 ns  (min 38991.3)    81.0 obj
+== interp at1
+attribute_types        151.1 ns  (min 149.6)     0.0 obj
+new                   3640.3 ns  (min 3536.9)     5.0 obj
+load_from_sql_10     39285.9 ns  (min 37334.1)    81.0 obj
+== --yjit at-base
+attribute_types        109.4 ns  (min 104.5)     0.0 obj
+new                   1425.8 ns  (min 1409.3)     5.0 obj
+load_from_sql_10     19470.3 ns  (min 19021.2)    81.0 obj
+== --yjit at-base2
+attribute_types        108.9 ns  (min 105.6)     0.0 obj
+new                   1352.8 ns  (min 1314.8)     5.0 obj
+load_from_sql_10     20696.1 ns  (min 18015.4)    81.0 obj
+== --yjit at1
+attribute_types         55.6 ns  (min 53.9)     0.0 obj
+new                   1206.1 ns  (min 1165.9)     5.0 obj
+load_from_sql_10     19982.5 ns  (min 18385.8)    81.0 obj
