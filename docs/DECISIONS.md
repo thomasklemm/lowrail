@@ -73,7 +73,7 @@ candidate (Thermos approve on both rubrics, draft in the short form) goes into t
 [upstream/contributions.md](upstream/contributions.md), ranked by effect and breadth. It is opened from there only
 when the repository has room:
 
-* **rails/rails:** up to 25 of our PRs open at once (Thomas, 2026-11-03; raised from 10–15 the same day). Reviewer load still counts: open strongest first and keep each PR small.
+* **rails/rails:** up to 20 of our PRs open at once (Thomas, 2026-11-03; lowered from 25 the same day). Reviewer load still counts: open strongest first and keep each PR small.
 * **ruby/ruby:** at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
   Exception (Thomas, 2026-11-03): the three tracker items tekknolagi green-lit (Shopify/ruby#1064, #1065, #1091)
   may be open at the same time, i.e. up to 3; `Kernel#dup` (#1058) waits for a slot.
@@ -81,6 +81,9 @@ when the repository has room:
 
 Prefer the strongest candidate, not the oldest. A candidate that an upstream change makes moot leaves the queue
 with a note.
+
+**Parallel orbs:** at most 8 working orbs at once (Thomas, 2026-11-03). The orbs already running finish their
+current work; new work is started only when the count is below 8.
 
 ## Priorities after the merge wave (2026-11-03)
 
