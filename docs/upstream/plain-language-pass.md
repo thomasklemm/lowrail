@@ -18,5 +18,10 @@ ruby/ruby#19483, #19558, #19680 and #19681 are rewritten by the thread that is r
 | 2026-11-03 | [ruby/ruby#19492](https://github.com/ruby/ruby/pull/19492) | Answer first; ratio directions stated; the stats table became one sentence. |
 | 2026-11-03 | [ruby/ruby#19648](https://github.com/ruby/ruby/pull/19648) | Answer first; corrected the new function's name to `rb_yjit_class_attached_object()`. |
 | 2026-11-03 | [ruby/ruby#19661](https://github.com/ruby/ruby/pull/19661) | Labels and tables became sentences; names #19663 and #19662 as the JIT follow-ups. |
+| 2026-11-03 | [ruby/ruby#19663](https://github.com/ruby/ruby/pull/19663) | Problem/Fix labels became sentences; the ns table says which run is which. |
+| 2026-11-03 | [ruby/ruby#19664](https://github.com/ruby/ruby/pull/19664) | Allocation numbers became one sentence with master as the baseline. |
+| 2026-11-03 | [ruby/ruby#19665](https://github.com/ruby/ruby/pull/19665) | Corrected "both tests fail on master": only the allocation test does; baseline named. |
+| 2026-11-03 | [ruby/ruby#19666](https://github.com/ruby/ruby/pull/19666) | Corrected the ruby2_keywords case (methods marked with it, not flagged hashes); dropped the stale "2 together with #19655". |
+| 2026-11-03 | [ruby/ruby#19670](https://github.com/ruby/ruby/pull/19670) | Answer first; the three-number table became one sentence; "embedded table" is now "AR table". |
 
-Left unchanged: [ruby/ruby#19620](https://github.com/ruby/ruby/pull/19620), already plain.
+Left unchanged: [ruby/ruby#19620](https://github.com/ruby/ruby/pull/19620), already plain. The ruby/ruby part stopped after these, because the open ruby/ruby PRs are being reviewed with Thomas.
