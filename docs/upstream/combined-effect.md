@@ -142,7 +142,7 @@ nine apps (10 configurations, 97 workloads). Every workload moves, and none allo
 within ±0.06% overall. They also lower ZJIT's work: dynamic sends fall in every app (−1% to −10% per operation), send
 and ivar fallbacks fall in nine of ten (the Blog's +0.2% is inside its A/A), and Callgrind Ir per iteration on
 ruby-bench under ZJIT drops **0.54% (railsbench) and 0.49% (lobsters)**, well outside the A/A. Three PRs each raise one ZJIT counter, and each
-does so by turning other ZJIT work into it: **#59541** adds `SendForward: not yet specialized` fallbacks (4 apps)
+does so by turning other ZJIT work into it: **#59541** adds `SendForward: not yet specialized` fallbacks (five apps, six configurations)
 through a `delegate`d `empty?`, **#59537** replaces `concatarray` side exits with splat-argument fallbacks (3 apps),
 and **#59568** adds class-guard side exits in Writebook (+36 per operation) while removing 1,274 dynamic sends there.
 
@@ -150,8 +150,10 @@ and **#59568** adds class-guard side exits in Writebook (+36 per operation) whil
 
 * **Ruby:** ruby/ruby master [`9aa0898240`](https://github.com/ruby/ruby/commit/9aa089824003b9fde7ff2de6953d282def364edb)
   (2026-11-03 12:42 UTC), `./configure --enable-yjit --enable-zjit --disable-install-doc`, Rust 1.99.1, release
-  build. ZJIT defaults (`--zjit-mem-size` 128 MiB, call threshold 30); the stats runs pass `--zjit-mem-size=128`
-  explicitly. The F1 thread was told the pin.
+  build. ZJIT defaults (`--zjit-mem-size` 128 MiB, of which `--zjit-exec-mem-size` 64 MiB of executable code,
+  call threshold 30) for the allocation and Callgrind runs. The stats runs used `--zjit-mem-size=128`; Fizzy,
+  Fizzy-MySQL and Lobsters were rerun at `--zjit-exec-mem-size=512 --zjit-mem-size=1024` (see the warmup gate). The
+  F1 thread was told the pin.
 * **Rails, with:** canonical `rails/rails` main
   [`c042aee23a`](https://github.com/rails/rails/commit/c042aee23a56205c43c9a60219cd1c4d7f7576a8) (merge of #59575,
   2026-11-03 10:43 UTC).
@@ -172,7 +174,8 @@ and **#59568** adds class-guard side exits in Writebook (+36 per operation) whil
   workload), ABBA (`zw`, `zwo`, `zwo2`, `zw2`):
   [`census_abba.sh`](../../bench/upstream/zjit_combined/census_abba.sh), table
   [`census_table.rb`](../../bench/upstream/zjit_combined/census_table.rb).
-* **ZJIT stats:** separate processes, `--stats="--zjit-mem-size=128"` (`--zjit-stats-quiet`), 200 warmup and 20
+* **ZJIT stats:** separate processes, `--stats="--zjit-mem-size=128"` (`--zjit-stats-quiet`; `census_abba.sh` now
+  defaults to `--zjit-exec-mem-size=512 --zjit-mem-size=1024`), 200 warmup and 20
   measured operations per workload, twice per tree (`zsw`, `zswo`, `zswo2`, `zsw2`). Tables:
   [`stats_compact.rb`](../../bench/upstream/zjit_combined/stats_compact.rb) and
   [`stats_table.rb`](../../bench/upstream/zjit_combined/stats_table.rb), which lists every fallback, exit and
@@ -191,8 +194,17 @@ and **#59568** adds class-guard side exits in Writebook (+36 per operation) whil
 * **Warmup gate:** after 200 warmups, compiled ISEQs per operation are 0.00–0.35 in seven apps but 1.5 in Campfire
   and 2.1 in CodeTriage, the same in both trees and both runs (±0.04). Those two keep compiling new ISEQs in steady
   state (the gate fails there for both trees alike), so their counters include compilation; the A/A shows it does not
-  differ between runs. Fizzy and Fizzy-MySQL reach the 128 MiB limit (`compile_error_out_of_memory`); their
-  `exit_compile_error` swings by up to ±165 per operation between runs of the same tree, so side exits below exclude it.
+  differ between runs.
+* **Code memory.** At the default limits, Fizzy and Fizzy-MySQL fill the 64 MiB executable region in every stats
+  run: `compile_error_out_of_memory` 388–552 (Fizzy) and 298–453 (Fizzy-MySQL) per operation, unequal between runs
+  of the same tree, so their counters at 128 MiB were not comparable. The other eight configurations report 0 in all
+  runs and both single-revert trees, with Lobsters closest to the limit (63.2 MiB). Fizzy, Fizzy-MySQL and Lobsters
+  were rerun in ABBA order at `--zjit-exec-mem-size=512 --zjit-mem-size=1024` (`zmw`, `zmwo`, `zmwo2`, `zmw2`), as F1
+  does, with the #59541 and #59537 single-revert trees on both Fizzy configurations (`zm41`/`zm41b`,
+  `zm37`/`zm37b`): 0 out-of-memory errors in every run; Fizzy's code region then grows to 80 MiB, Lobsters' stays
+  at 63 MiB. The table below uses those reruns for the three apps. ruby-bench never comes close: under plain `--zjit`
+  with the Callgrind harness's 15 + 3 iterations, the code region is 7.8 MiB (railsbench) and 28.4 MiB (lobsters) in
+  both trees, and a `--zjit-stats` pass of the same reports 0 out-of-memory errors, so the Callgrind numbers stand.
 
 ### Allocations
 
@@ -226,28 +238,28 @@ Interpreter / ZJIT in every cell, as in [Allocations](#allocations).
 
 Per operation, mean of each tree's two runs; Δ against the reverted tree, A/A the larger of the two trees' run-to-run
 changes, on the same scale. Fallbacks are send, invokeblock, getivar and setivar fallbacks; side exits exclude
-compile-error exits (see the warmup gate).
+compile-error exits (see the warmup gate). Fizzy, Fizzy-MySQL and Lobsters are the 1024 MiB reruns.
 
 | App | Dynamic sends without → with (Δ; A/A) | Fallbacks without → with (Δ; A/A) | Side exits without → with (Δ; A/A) |
 | --- | ---: | ---: | ---: |
 | blog | 1723 → 1706 (−1.0%; ±1.2%) | 3195 → 3202 (+0.2%; ±1.4%) | 32.0 → 31.5 (−1.5%; ±0.3%) |
 | campfire | 7827 → 7568 (−3.3%; ±0.0%) | 12544 → 12155 (−3.1%; ±0.0%) | 208 → 207 (−0.3%; ±0.3%) |
 | codetriage | 3246 → 3177 (−2.1%; ±0.0%) | 4970 → 4820 (−3.0%; ±0.0%) | 130 → 130 (−0.0%; ±0.0%) |
-| fizzy | 16832 → 16074 (−4.5%; ±0.5%) | 26963 → 26093 (−3.2%; ±0.4%) | 620 → 617 (−0.5%; ±0.2%) |
-| fizzy-mysql | 16361 → 15766 (−3.6%; ±0.5%) | 25230 → 24643 (−2.3%; ±0.3%) | 596 → 606 (+1.7%; ±2.8%) |
-| lobsters | 16374 → 15702 (−4.1%; ±0.0%) | 26552 → 25424 (−4.2%; ±0.2%) | 571 → 568 (−0.6%; ±0.0%) |
+| fizzy | 17630 → 16937 (−3.9%; ±0.1%) | 28175 → 27348 (−2.9%; ±0.1%) | 626 → 623 (−0.6%; ±0.2%) |
+| fizzy-mysql | 16801 → 16278 (−3.1%; ±0.3%) | 26036 → 25513 (−2.0%; ±0.3%) | 612 → 615 (+0.4%; ±2.9%) |
+| lobsters | 16385 → 15708 (−4.1%; ±0.0%) | 26583 → 25454 (−4.2%; ±0.1%) | 572 → 568 (−0.7%; ±0.0%) |
 | pingcrm | 2376 → 2272 (−4.4%; ±0.0%) | 3190 → 3086 (−3.3%; ±0.0%) | 26.4 → 26.8 (+1.5%; ±0.2%) |
 | react-starter-kit | 1028 → 997 (−2.9%; ±0.0%) | 1307 → 1277 (−2.3%; ±0.0%) | 23.8 → 23.8 (+0.0%; ±0.0%) |
 | redprints-cfp | 1610 → 1527 (−5.2%; ±0.0%) | 2314 → 2224 (−3.9%; ±0.1%) | 40.3 → 40.3 (+0.0%; ±0.0%) |
 | writebook | 25587 → 23117 (−9.7%; ±0.0%) | 44398 → 40369 (−9.1%; ±0.0%) | 1248 → 1285 (+2.9%; ±0.0%) |
 
-**Counters raised by a PR.** `stats_table.rb` lists 16 (app, counter) pairs. Accepting only reasons that reach ≥ 3 apps
+**Counters raised by a PR.** `stats_table.rb` lists 17 (app, counter) pairs. Accepting only reasons that reach ≥ 3 apps
 with stable runs leaves two, and both trace to single PRs, confirmed by trees that revert just that PR:
 
 | Counter | Apps | PR | without → with | single revert | What changed |
 | --- | --- | --- | --- | --- | --- |
-| `send_fallback_sendforward_not_specialized` | Writebook, Campfire, redprints-cfp, react-starter-kit | **#59541** | Writebook 768 → 920, Campfire 284 → 307, redprints-cfp 113 → 119, rsk 56 → 60 | Writebook 768, Campfire 284 (`42cb27e233`, twice) | `WhereClause#merge` now asks `empty?` first, and `WhereClause#empty?` is `delegate :empty?, to: :predicates`, a `(...)` forwarder ZJIT does not specialize. It replaces the getivar fallbacks of `except_predicates`/`each_attributes` it skips; Writebook's fallbacks still fall 9.1% overall. With #59541 alone reverted, Writebook's dynamic sends are 23,086 against 23,117 with it: +31 per operation (+0.13%). Campfire −1. |
-| `complex_arg_pass_caller_splat` | Fizzy, Fizzy-MySQL, Writebook | **#59537** | Fizzy 17.6 → 21.4, Fizzy-MySQL 16.9 → 21.0, Writebook 15.5 → 16.4 | Fizzy 18.0, Writebook 15.5 (`d58e0dddd4`, twice) | `TagBuilder#method_missing` called `tag_string(name, *args, options, …)`, which compiles to `concatarray`, an instruction ZJIT side-exits on (`exit_unhandled_yarv_insn` 3.4 per operation in Fizzy). With `options, *args` it is an ordinary splat send that ZJIT compiles and counts as a fallback. `exit_unhandled_yarv_insn` drops to 0 in all five apps that had it; complex-argument fallbacks as a whole fall (Fizzy 812 → 801). |
+| `send_fallback_sendforward_not_specialized` | Writebook, Fizzy, Fizzy-MySQL, Campfire, redprints-cfp, react-starter-kit | **#59541** | Writebook 768 → 920, Fizzy 705 → 779, Fizzy-MySQL 705 → 779, Campfire 284 → 307, redprints-cfp 113 → 119, rsk 56 → 60 | Writebook 768, Campfire 284, Fizzy 705, Fizzy-MySQL 705 (`42cb27e233`, twice) | `WhereClause#merge` now asks `empty?` first, and `WhereClause#empty?` is `delegate :empty?, to: :predicates`, a `(...)` forwarder ZJIT does not specialize. It replaces the getivar fallbacks of `except_predicates`/`each_attributes` it skips; Writebook's fallbacks still fall 9.1% overall. With #59541 alone reverted, Writebook's dynamic sends are 23,086 against 23,117 with it: +31 per operation (+0.13%); Fizzy +52 (+0.3%), Fizzy-MySQL +26 (+0.2%), Campfire −1. At 128 MiB the Fizzy rise was hidden by the full code region. |
+| `complex_arg_pass_caller_splat` | Fizzy, Fizzy-MySQL, Writebook | **#59537** | Fizzy 19.4 → 23.5, Fizzy-MySQL 18.7 → 22.8, Writebook 15.5 → 16.4 | Fizzy 20.1, Fizzy-MySQL 19.4, Writebook 15.5 (`d58e0dddd4`, twice): #59537 is 3.4 of the Fizzy rise of 4.1 | `TagBuilder#method_missing` called `tag_string(name, *args, options, …)`, which compiles to `concatarray`, an instruction ZJIT side-exits on (`exit_unhandled_yarv_insn` 3.4 per operation in Fizzy). With `options, *args` it is an ordinary splat send that ZJIT compiles and counts as a fallback. `exit_unhandled_yarv_insn` drops to 0 in all five apps that had it; complex-argument fallbacks as a whole fall (Fizzy 851 → 841). |
 
 Below the three-app bar:
 
@@ -256,9 +268,11 @@ Below the three-app bar:
   receiver's class and Writebook's many model classes fail the guard, instead of in the `reject` block, where the
   same call was a send fallback. The same PR removes 1,274 dynamic sends per operation in Writebook (24,391
   without it, 23,117 with). No other app's guard failures move (largest change −3.5, Lobsters).
-* **`send_fallback_send_megamorphic` (Fizzy +305, Lobsters +75)** is a reclassification: `schema_context` and
-  `Merger` sends that were polymorphic fallbacks now count as megamorphic. Polymorphic and megamorphic send fallbacks
-  together fall in every app (Fizzy 9,998 → 9,841, Lobsters 8,523 → 8,041, Writebook 15,192 → 13,917).
+* **`send_fallback_send_megamorphic`** rises in Lobsters (+75, A/A 0) and Fizzy (+241, inside twice its A/A of 126
+  at 1024 MiB; the +305 at 128 MiB was measured with a full code region). It is a reclassification: `schema_context`
+  and `Merger` sends that were polymorphic fallbacks now count as megamorphic. Polymorphic and megamorphic send
+  fallbacks together fall in Fizzy (10,532 → 10,419), Lobsters (8,534 → 8,047), Writebook (15,192 → 13,917) and the
+  other apps, except Fizzy-MySQL: 10,006 → 10,071 (+0.6%, A/A ±0.4%), while its total fallbacks fall 2.0%.
 * **PingCRM `exit_unhandled_block_arg` 3.0 → 3.4** is a new site at `HashWithIndifferentAccess#fetch` <
   `ActionController::Parameters#fetch`, which #59535 rewrote (traced site only; no single-PR tree). The old
   `super(convert_key(key), *extras)` was a `super` complex-argument fallback; the new plain `super` side-exits
@@ -289,5 +303,6 @@ an equal or larger one at the same call.
 
 Receipts: [`data/combined-effect/zjit.tar.xz`](data/combined-effect/zjit.tar.xz) holds the run JSONs, logs and
 `meta.json` of every census label (`zw`, `zw2`, `zwo`, `zwo2`, the stats labels `zsw`, `zsw2`, `zswo`, `zswo2`, the
-single-revert labels `zs1`/`zs1b` for #59541, `zs37`/`zs37b` for #59537 and `zs68`/`zs68b` for #59568), the summarized
-fallback and exit traces per app and tree, and the Callgrind logs and totals.
+single-revert labels `zs1`/`zs1b` for #59541, `zs37`/`zs37b` for #59537 and `zs68`/`zs68b` for #59568, and the
+1024 MiB reruns `zmw`, `zmw2`, `zmwo`, `zmwo2`, `zm41`, `zm41b`, `zm37`, `zm37b`), the summarized
+fallback and exit traces per app and tree, the Callgrind logs and totals, and the ruby-bench code-memory check (`oomcheck.txt`).
