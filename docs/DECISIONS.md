@@ -50,8 +50,12 @@ and not promoted.
    (2–3 sentences). Then at most one small before/after table (per call)
    and one sentence of app breadth; about 150 words. No per-app tables,
    review history, method notes or receipts; those stay in Lowrail docs.
-   ruby/ruby: shorter still, about 100 words plus one micro table, and a
-   line naming the PR it is stacked on.
+   ruby/ruby: shorter still, about 100 words plus one micro table.
+   **No stacked PRs (2026-11-03):** changes that depend on each other go
+   into one PR (separate commits are fine); open a follow-up only after its
+   base has merged. Existing stacks (#19662/#19663 on #19660/#19661) stay.
+   **Closing comments:** thank, accept the point, and leave a neutral
+   fact for the record; don't belittle our own result.
 3. **Stop:** new interpreter-Ir pricing, sealed-tier breadth, guarded
    endpoints, Rails 8.2 sealed re-certification before a beta, and further
    promotion of #22459 or its drafts.
