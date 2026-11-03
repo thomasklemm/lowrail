@@ -116,6 +116,37 @@ Lead 8 is the only one without an issue. It's small: give the block-handler guar
 implicit block pass through `super`. It's also in the area of k0kubun's super rows, so it needs an ownership
 question first. Leads 1–3 are #1099. Lead 10 is the general #19658/#19669 problem with `Module` as the class, so it belongs with linyiru's PRs.
 
+## Queue: which leads are free (2026-11-03)
+
+Rule (DECISIONS, after k0kubun on [Shopify/ruby#1100](https://github.com/Shopify/ruby/issues/1100)): an idea is
+taken only when its own issue has an assignee or an open PR exists; burndown rows such as Shopify/ruby#1039's
+count as free. I checked assignees and all 67 open ruby/ruby PRs with "ZJIT" in the title on 2026-11-03. Numbers
+below come from runs with 0 `compile_error_out_of_memory` (the three apps that hit the 64 MiB code region were
+rerun with `--zjit-exec-mem-size=512 --zjit-mem-size=1024`). "Per op" is the mean over the apps reached;
+ruby-bench is per iteration (railsbench / lobsters / shipit).
+
+**Taken**
+
+| lead | taken by |
+|---|---|
+| 4 protected calls | ours, ruby/ruby#19483 (open) |
+| 5 `Kernel#send` | tekknolagi, ruby/ruby#19583 "Support .send(:symbol)" (open) |
+| 6 `def m(...)` forwarding | nozomemein, ruby/ruby#18326 "Specialize monomorphic sendforward calls" (open) |
+| 8 `super` with a block | cleared by k0kubun on Shopify/ruby#1100; U3 builds the fix |
+| 9 invalidated constant patch points | k0kubun, ruby/ruby#19617 "Recompile final versions invalidated by PatchPoint" (open) |
+
+**Free, ranked**
+
+| rank | lead | apps | per op | ruby-bench | why this rank |
+|---|---|---|---|---|---|
+| 1 | 7 `&block` forwarding (`mon_synchronize(&b)`, Notifications fanout, `ConnectionPool::Queue#synchronize`, `with_connection`) | 10 | 345 | 120k / 95k / 201k | Largest concrete volume in both data sets. It has its own issue, [Shopify/ruby#1014](https://github.com/Shopify/ruby/issues/1014), with no assignee and no open PR. The patch shape is known from Shopify/ruby#1039 rows 41/44/49 (unassigned). Medium size. |
+| 2 | 10 `singleton_class_seen` for module receivers (`IndexedRow::Mutable#fetch` → `UNSET.equal?`) | 6 | 431 | 0 / 1.2k / 0.2k | Small: guard the receiver's class instead of a dynamic send. A standalone repro exists. It's free because ruby/ruby#19669 was closed by its author (linyiru, no comment). It builds on linyiru's open ruby/ruby#19658, so it should wait for or sit on top of that PR. Matters mostly on Rails main. |
+| 3 | 3 class-level methods on many model classes (`_reflections`, `attribute_aliases`, `schema_context`) | 10 | 325 | 0 / 10.5k / 16.2k | Shopify/ruby#1099 item 2: 7–36 receiver classes, but one method entry. Needs a method-entry-keyed guard (cf. Shopify/ruby#1039 rows 24/25/27, unassigned). Design-heavy. |
+| 4 | 1 polymorphic yield in `Array#each`/`map`/`find` | 10 | 1,397 | 242k / 136k / 361k | Biggest volume overall, but the largest change. Block inlining is k0kubun's (Shopify/ruby#1093, assigned). Run-time block-ISEQ dispatch (Shopify/ruby#1039 row 55) is free but sits right next to that work, so collision risk is high. |
+| 5 | 2 `BasicObject#!=` (polymorphic inner `==`) | 10 | 277 | 0 / 3.8k / 0 | A polymorphic dispatch inside a builtin. Little ruby-bench effect, and it would ride on any general polymorphic-send work rather than stand alone. |
+
+Not built yet; the ruby/ruby PR cap (15) applies before any of these can open.
+
 ## Lead 10: the receiver class
 
 The fallback is the `UNSET.equal?(value)` send. The lobsters HIR dump shows
