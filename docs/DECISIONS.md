@@ -32,7 +32,7 @@ candidate (Thermos approve on both rubrics, draft in the short form) goes into t
 [upstream/contributions.md](upstream/contributions.md), ranked by effect and breadth. It is opened from there only
 when the repository has room:
 
-* **rails/rails:** up to 10 of our PRs open at once, 15 when merges keep pace (Thomas, 2026-11-03).
+* **rails/rails:** up to 25 of our PRs open at once (Thomas, 2026-11-03; raised from 10–15 the same day). Reviewer load still counts: open strongest first and keep each PR small.
 * **ruby/ruby:** at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
 * **gems:** at most 1 open PR per gem; i18n up to 3 (Thomas, 2026-11-03).
 
