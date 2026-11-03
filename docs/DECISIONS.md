@@ -85,6 +85,11 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
     Rewrites of already posted bodies that add no new claims may use any separate reviewer (2026-11-03: no codex
     in the rewrite orb); edit a body only when the old one is hard to read.
   We don't add an AI disclaimer to every PR; where it matters (as on #1058) we say so plainly.
+* **Thomas can explain it first** (Thomas, 2026-11-03). Before a ruby/ruby PR or any issue opens, Thomas can say
+  in two or three sentences of his own what is wrong, what changes and why that is safe. I give him a short
+  explanation with a minimal example; the PR opens only when he can retell it. The agentic work (builds, numbers,
+  reviews) comes after that, not instead of it. New ZJIT PRs pause until the open ones are reviewed with him; open
+  PRs and issues he can't stand behind are closed with one neutral line.
 * **One concern per PR.** A ruby/ruby PR touches the VM, YJIT or ZJIT, never two of them (tekknolagi on
   [ruby#19661](https://github.com/ruby/ruby/pull/19661#issuecomment-6607345199)). Dependent changes go into one PR
   as separate commits; open a follow-up only after its base has merged. Never stack on an open PR.
