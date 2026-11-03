@@ -8,6 +8,10 @@ docs; this page only records the decision and why.
 
 Rules that came out of one day's feedback. Most of them are about maintainers' time.
 
+* **Decide, then document** (Thomas). Within the standing rules, go with the recommendation you think is right and
+  record it here with its reason, instead of asking first. Ask only for actions outside the standing authorization
+  (destructive or irreversible ones, releases, visibility changes).
+
 * **Don't post data nobody asked for.** Comment on an issue or PR only to answer a question asked there, to report
   a bug or a verified fix that bears on it, or with a change the thread is waiting for. Benchmarks of someone
   else's PR, "breadth in case it helps", and pointers to overlap with our PRs stay in our docs. Two #1039
@@ -161,14 +165,15 @@ workloads ([combined-effect](upstream/combined-effect.md)). Thomas: focus on Rai
 Next, when a slot frees up: a census 7 after the next merge wave, and a serialization CPU dive (`as_json`, `render
 json:`). Parked: types/MCP gaps, YJIT ([yjit-leads](upstream/yjit-leads.md)), ruby/uri and the Campfire lead.
 
-## Ruby pin 4.0.9 and a 4.1.0-preview1 column (2026-11-03)
+## Ruby pin 4.0.9; 4.1 measured on pinned master (2026-11-03)
 
 Thomas agreed: census and Rails PR evidence move from Ruby 4.0.7 to 4.0.9. 4.0.8 is bugfixes only (use-after-free
 fixes, a ZJIT keyword-order fix) and 4.0.9 fixes the Onigmo Regexp CVEs; neither targets performance. Results across
 pins are never compared; every A/A and every main-versus-branch pair runs on one pin. Open PR bodies with 4.0.7 numbers
-stay as they are, because they name their Ruby. Census 8 (C8) restarts its runs on 4.0.9 under new labels. Each census
-adds Ruby 4.1.0-preview1 (interpreter and YJIT allocations, A/A), the release apps will test against, next to the
-ZJIT pass on master. The lowering prototype keeps its 4.0.7 gates (`script/gate`, token Ruby, certificates); its README
+stay as they are, because they name their Ruby. Census 8 (C8) restarts its runs on 4.0.9 under new labels. For 4.1, each census
+measures pinned Ruby master, with the SHA recorded: boot, interpreter, YJIT and ZJIT allocations with an A/A, on the
+same build as the ZJIT pass. 4.1.0-preview1 (2026-10-12) was considered and dropped. It predates our merged Ruby PRs,
+a regression found there may already be fixed on master, and ruby/ruby fixes land against master. The lowering prototype keeps its 4.0.7 gates (`script/gate`, token Ruby, certificates); its README
 results are labeled historical and are not re-measured.
 
 ## Measurement matrix: ZJIT and Ruby master on the census apps (2026-11-03)

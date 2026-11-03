@@ -37,10 +37,9 @@ Ruby master (4.1dev)? This page records the answer and the matrix we use from no
 | Cell (Rails × Ruby × mode → measurement) | Cadence | Evidence for |
 | --- | --- | --- |
 | main × 4.0.9 × interp + YJIT → allocations, SQL, A/A | every census and the daily watch (4.0.7 until 2026-11-03) | **Rails PRs**: maintainers and most apps run released Ruby |
-| main × 4.1.0-preview1 × interp + YJIT → boot, allocations, A/A | every census until 4.1.0 ships | regressions apps will hit when they try the preview |
 | main × master × ZJIT → stats counters, exit and fallback traces (sample rate 20) | every census | **choosing ZJIT issues and PRs** |
 | main × master × interp + ZJIT → allocations, A/A | per Ruby pin (weekly) | ZJIT parity sites; Rails PRs that need 4.1 (e.g. #59557) |
-| main × master × interp + YJIT → allocations, GC | per Ruby pin | the 4.1 regression watch (L3 found 3 regressions) |
+| main × master × interp + YJIT → boot, allocations, GC, A/A | every census, same pinned SHA as the ZJIT pass (recorded) | the 4.1 regression watch (L3 found 3 regressions); replaces a 4.1.0-preview1 column |
 | ruby-bench × master × ZJIT → Callgrind Ir with A/A | per candidate | **the speed claim of a ZJIT PR** |
 | our merged Rails PRs, revert tree × master × interp + ZJIT | once now, then per merge wave | do our savings carry over to ZJIT, and does any PR add ZJIT fallbacks |
 | boot to warm, compile time, 3 large apps (Discourse, Mastodon, Chatwoot) | once per compile-speed bet | ZJIT compile-speed issues (Z6 had to use ruby-bench instead) |
