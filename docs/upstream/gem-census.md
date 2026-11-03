@@ -19,7 +19,7 @@ or a lead. Allocation counts only; no timing is claimed.
 | # | Repo, branch | Per call | Census (interpreter / YJIT) |
 | --- | --- | --- | --- |
 | I1 | [thomasklemm/i18n `thomasklemm/fallback-locale-identity`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-locale-identity) [`405f196476`](https://github.com/thomasklemm/i18n/commit/405f19647685c9be74637f7157806a4862a6f4d6) | −2 objects per translation that hits the requested locale (`I18n.t(:hello)` 13 → 11) | −40.3 / −40.4 objects per workload, 0.40% of all; 14 apps |
-| I2 | [thomasklemm/i18n `thomasklemm/fallback-defaults-without-wrapper`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-defaults-without-wrapper) [`7d205cd675`](https://github.com/thomasklemm/i18n/commit/7d205cd675347da8c966158e552ed1782088b160) | −2 objects per translation with a non-Array `default:` (`default: 3` 14 → 12) | −32.2 / −32.3 objects per workload, 0.32% of all; 9 apps |
+| I2 | [thomasklemm/i18n `thomasklemm/fallback-defaults-without-wrapper`](https://github.com/thomasklemm/i18n/tree/thomasklemm/fallback-defaults-without-wrapper) [`6a57b94bc1`](https://github.com/thomasklemm/i18n/commit/6a57b94bc1e854ab2d00cd16737c6b58ca37851c) (ruby-i18n/i18n#764) | −2 objects per translation with a non-Array `default:` (`default: 3` 14 → 12) | −32.2 / −32.3 objects per workload, 0.32% of all; 9 apps |
 | C1 | [thomasklemm/connection_pool `thomasklemm/frozen-interrupt-masks`](https://github.com/thomasklemm/connection_pool/tree/thomasklemm/frozen-interrupt-masks) [`1533388d07`](https://github.com/thomasklemm/connection_pool/commit/1533388d0749bbc30d76021a47d95e4e2a6941de), open as [connection_pool#225](https://github.com/mperham/connection_pool/pull/225) | −4 objects per `#with` (14 → 10) | −4.6 / −4.6 objects per workload, 0.06% of all; 6 apps |
 
 ## Pins and method
@@ -173,15 +173,20 @@ one-element wrapper does exactly two things to the element (`flatten` in `array.
 `Array#flatten`'s own C code, never the element's `flatten`. I2 does those two steps directly:
 
 ```ruby
-if (defaults = Array.try_convert(default))
-  defaults = FLATTEN.bind_call(defaults)   # FLATTEN = Array.instance_method(:flatten)
-elsif default.is_a?(Symbol)
-  return
+if Array === default
+  defaults = [default].flatten
+elsif (converted = Array.try_convert(default))
+  defaults = [converted].flatten
 else
-  options[:default] = []
-  return default
+  if !default.is_a?(Symbol)
+    options[:default] = [] if default
+    return default
+  end
+  return
 end
 ```
+
+(Code as of `6a57b94bc1`, opened as ruby-i18n/i18n#764; the history of the versions follows.)
 
 A default that does not convert is the wrapper's only element, so the old code returned it with
 `options[:default] = []` unless it was a Symbol (the old `detect` uses the same `is_a?(Symbol)` call).
@@ -232,6 +237,17 @@ runs, 0 failures. Micro: Array defaults no longer save (21 → 21, 36 → 36); S
 22 → 20, Integer 14 → 12. Census rerun `i2c`: −32.2 / −32.3 objects per workload, 0.32% of all allocations; 9 apps
 (10 configurations) save at least 0.5 per workload. Sure (−722), Docuseal (−64), Lobsters (−24) and Discourse
 (−17) keep their saving; Blog loses its −6 (Array defaults) and Casa drops from −8.1 to −7.2. Lock control clean.
+
+Third review round (Sol and Astra on `7d205cd675`), now in `6a57b94bc1`: flattening a `to_ary`-converted default
+directly copied the prefix at a different point than the wrapper walk (a hook setting `ary[0]` gave `"Changed"`
+instead of `"Original"`), and branching on `is_a?(Symbol)` skipped the old `!` call on its result. A converted
+default now takes `[converted].flatten`, which walks it as the wrapper did, so the `FLATTEN` constant and its
+`bind_call` (and their reload warning) are gone; the scalar path evaluates `!default.is_a?(Symbol)` and assigns
+`options[:default] = []` only for a truthy default, as `detect` with `if first_non_symbol_default` did. The two repros
+are tests that fail on `7d205cd675`; suite 1,615 runs, 0 failures. Census and micro unchanged (−32.2 / −32.3 objects
+per workload, 0.32%; the Integer, String, Hash and Symbol paths are the same). A fourth round found only a call
+order for converted defaults under a globally prepended or redefined `Array#flatten`, which is the
+core-method-redefinition class accepted above. Opened as ruby-i18n/i18n#764.
 
 ### Census, I1 and I2
 
@@ -341,7 +357,7 @@ Across 20 open-source Rails apps (251 request, job and mailer workloads), this r
 
 Added a test with a locale whose `==` matches the fallback but whose String does not; `on_fallback` is still called for it. The test suite passes (1,608 runs).
 
-### I2 (ruby-i18n/i18n, from `thomasklemm/fallback-defaults-without-wrapper` `7d205cd675`)
+### I2 (ruby-i18n/i18n#764, from `thomasklemm/fallback-defaults-without-wrapper` `6a57b94bc1`)
 
 **Title:** Avoid wrapping the default in an Array in Fallbacks#extract_non_symbol_default!
 
