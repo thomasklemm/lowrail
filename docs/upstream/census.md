@@ -311,6 +311,33 @@ lines total each mode across apps. `SQL` lines count the workloads whose SQL dig
   bundle (`--app`, default blog), for every mode. Every label's output must equal the first label's, otherwise the
   command exits 1.
 
+## CPU census: `script/cpu-census`
+
+[`script/cpu-census`](../../script/cpu-census) ranks the same corpus by instructions instead of objects (census 8,
+[rails-main-census-8](rails-main-census-8.md)). It reuses `script/census`'s copies, bundles and workloads (set up
+with `script/census setup`, same `--corpus`), and runs each app and mode once under a Callgrind with a sampling
+request:
+
+```sh
+mise exec -- script/cpu-census build                    # patched Valgrind 3.19.0 into /opt/c8-valgrind (VALGRIND_PREFIX)
+mise exec -- script/cpu-census run --label cpu --aa --modes interp,yjit --jobs 8
+mise exec -- script/cpu-census rank --label cpu --mode interp --by line --objects ALLOC_LABEL
+mise exec -- script/cpu-census compare --base cpu2 --aa cpu
+mise exec -- script/cpu-census prs --label cpu
+```
+
+Per workload it reports the exact instructions per operation of the measuring thread, the share sampled inside GC
+(apart, charged to no line), objects per operation, and sampled Ruby stacks with lines; a sample's instructions go to
+its nearest Ruby frame, so C functions count for the Ruby line that called them. `rank --by method` ranks by self
+instructions. `--objects` adds the objects column from a `script/census` label on the same pin. Under YJIT only
+JIT-flat workloads are ranked (the gate is in the [census 8 method](rails-main-census-8.md#pins-and-method)).
+Instruction counts follow invariant 4: a CPU ranking points at candidates, and a candidate's own claim is its
+per-call Callgrind micro ([micro.rb](../../bench/upstream/census8/micro.rb), [ir.sh](../../bench/upstream/census8/ir.sh))
+against an A/A.
+
+Two runs must not use the same app copy at once: the workloads write to its database. Split `--apps` between
+concurrent runs (`-nops` configurations share their app's copy).
+
 ## Validation (2026-11-02)
 
 Blog and Campfire on Rails main `5810776eec` (census 5's pin), Ruby 4.0.7, interpreter and YJIT. The A/A pair

@@ -131,6 +131,7 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
+| Census 8 C8-1: anchor `URI_REGEXP` once | rails/rails | [`thomasklemm/uri-regexp-anchor`](https://github.com/thomasklemm/rails/tree/thomasklemm/uri-regexp-anchor) @ `84b0a308dc` on main `1105756f42` | `asset_path("application.css")` 34,688 → 31,053 Ir interpreted, 26,024 → 22,421 YJIT, 24,668 → 20,715 ZJIT; the line −35% to −47% in 8 apps, requests within the A/A. L0 ([census 8](rails-main-census-8.md#c8-1-anchor-uri_regexp-once)) | Waits for the primary review. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
 
 ## Open
@@ -339,6 +340,12 @@ None.
 These dispositions are already public Lowrail evidence, not new candidate
 claims. Branch-only documents are pinned explicitly because they are not
 on main.
+
+- **Rails-main CPU census 8 (2026-11-03):** ranked by instructions, 22 of the CPU top 30 lines allocate nothing and only 5 are in
+  census 7's allocation top 30 ([rails-main-census-8](rails-main-census-8.md)). Not built: `apply_inflections` (CPU rank 1; a
+  cache is memoization, a combined regexp was #35459), `IsolatedExecutionState.[]` (call overhead), `handler_for` (L2).
+  Rejected after measuring: C8-2, a constant default for the generated `where_clause`/`having_clause` readers (interpreter
+  −195 Ir per call, but YJIT +121 and ZJIT +57), and ivar reads in `Arel::Collectors::Composite#<<` (YJIT −3 Ir).
 
 - **Census gems on Ruby master (2026-11-03, bet E2):** 11 of the 13 configurations that did not bundle on master
   `9aa0898240` now install and pass `list` through dependency-only master overlays, so 21 of 23 can run on master.

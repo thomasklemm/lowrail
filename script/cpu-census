@@ -1,0 +1,176 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Rails CPU census (census 8): the census corpus under an instruction-sampling
+# Callgrind. See docs/upstream/rails-main-census-8.md.
+#   script/cpu-census build  [--prefix DIR]
+#   script/cpu-census run    --label L [--aa] [--modes interp,yjit] [--apps LIST] [--jobs N] [--only W]
+#   script/cpu-census rank   --label L [--mode interp] [--objects LABEL] [--by line|method] [--limit N]
+#   script/cpu-census compare --base L --aa L0 [LABEL...]
+#   script/cpu-census prs    --label L [--mode interp] [--limit N] [--refresh]
+# Copies, Rails base and Ruby come from script/census setup (same --corpus).
+# Valgrind: VALGRIND_PREFIX (default /opt/c8-valgrind), built by `build`.
+require "etc"
+require "tmpdir"
+load File.expand_path("census", __dir__)
+require_relative "../bench/upstream/census8/cpu_rank"
+
+module CpuCensus
+  ROOT = Census::ROOT
+  HARNESS = File.join(ROOT, "bench/upstream/census8/cpu_harness.rb")
+  EXT = File.join(ROOT, "bench/upstream/census8/cpu_sampler.c")
+  PATCH = File.join(ROOT, "bench/upstream/census8/cpu-valgrind.patch")
+  VALGRIND_SHA256 = "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02"
+
+  module_function
+
+  def prefix = ENV.fetch("VALGRIND_PREFIX", "/opt/c8-valgrind")
+
+  # Valgrind 3.19.0 with the sampler request (as script/bench-valgrind's archive).
+  def build(opts)
+    dir = Dir.mktmpdir("cpu-census-valgrind")
+    Census.sh({}, "curl", "-fsSL", "https://sourceware.org/pub/valgrind/valgrind-3.19.0.tar.bz2", "-o", "#{dir}/v.tar.bz2")
+    Census.sh({}, "sh", "-c", "echo '#{VALGRIND_SHA256}  #{dir}/v.tar.bz2' | sha256sum -c -")
+    Census.sh({}, "tar", "-xjf", "#{dir}/v.tar.bz2", "-C", dir)
+    src = File.join(dir, "valgrind-3.19.0")
+    Census.sh({}, "patch", "-p1", "-i", PATCH, chdir: src)
+    Census.sh({}, "./configure", "--enable-only64bit", "--prefix=#{opts[:prefix] || prefix}", chdir: src)
+    Census.sh({}, "make", "-j#{Etc.nprocessors}", chdir: src)
+    Census.sh({}, "make", "install", chdir: src)
+  end
+
+  # One build per sampler source and Ruby; a running census keeps its own file.
+  def extension(bin, out)
+    key = Digest::SHA256.hexdigest(File.read(EXT) + Census.ruby_description(bin))[0, 12]
+    so = File.join(out, "sampler-#{key}", "census_cpu_sampler.so")
+    return so if File.exist?(so)
+    FileUtils.mkdir_p(File.dirname(so))
+    rb = File.join(bin, "ruby")
+    hdr, arch, ldshared = %w[rubyhdrdir rubyarchhdrdir LDSHARED].map { Census.capture(rb, "-e", "print RbConfig::CONFIG['#{_1}']") }
+    Census.sh({}, *ldshared.split, "-fPIC", "-O2", "-Wall", "-I#{hdr}", "-I#{arch}", "-I#{prefix}/include", EXT, "-o", "#{so}.tmp")
+    File.rename("#{so}.tmp", so)
+    so
+  end
+
+  def run(opts)
+    labels = opts[:aa] ? [opts.fetch(:label), "#{opts[:label]}2"] : [opts.fetch(:label)]
+    bin = Census.ruby_bin(opts[:ruby])
+    ruby = Census.ruby_description(bin)
+    Census.check_services(opts[:apps])
+    bases = opts[:apps].map { Census.state(opts[:corpus], _1).fetch("base") }.uniq { _1.fetch("sha") }
+    raise "apps were set up on different Rails bases" unless bases.one?
+    rails = opts[:rails] ? Census.resolve_rails(opts[:rails]) : bases.first
+    gemfiles = opts[:apps].to_h { [_1, Census.variant(opts[:corpus], _1, rails, bin)] }
+    tool = File.join(prefix, "bin/valgrind")
+    raise "patched Valgrind missing: #{tool} (script/cpu-census build)" unless File.executable?(tool)
+    FileUtils.mkdir_p(opts[:out])
+    ext = extension(bin, opts[:out])
+    copy_locks = opts[:apps].to_h { [Census.app_dir(opts[:corpus], _1), Mutex.new] }
+    labels.each do |label|
+      out = File.join(opts[:out], label)
+      FileUtils.mkdir_p(out)
+      meta_path = File.join(out, "meta.json")
+      meta = File.exist?(meta_path) ? JSON.parse(File.read(meta_path)) : { "label" => label, "rails" => rails, "ruby" => ruby,
+        "valgrind" => Census.capture(tool, "--version"), "patch_sha256" => Digest::SHA256.file(PATCH).hexdigest, "runs" => [] }
+      raise "#{label} was run with #{meta["rails"]["sha"]} / #{meta["ruby"]}" unless meta["rails"]["sha"] == rails["sha"] && meta["ruby"] == ruby
+      jobs = opts[:modes].product(opts[:apps]).reject { |mode, app| File.exist?(File.join(out, "#{app}-#{mode}.json")) }
+      queue = Queue.new
+      jobs.each { queue << _1 }
+      failed = Queue.new
+      Array.new([opts[:jobs], jobs.size].min) do
+        Thread.new do
+          while (job = (queue.pop(true) rescue nil))
+            mode, app = job
+            json = File.join(out, "#{app}-#{mode}.json")
+            env = Census.env_for(app, bin, rails, gemfiles[app]).merge("CENSUS_MODE" => mode, "CENSUS_ONLY" => opts[:only],
+              "CENSUS_CPU_EXT" => ext)
+            # Chatwoot refuses a conversation's 201st message within a minute;
+            # 200 warmup ops cross it; census 7's allocation runs stay under it.
+            env["CONVERSATION_MESSAGE_PER_MINUTE_LIMIT"] = "1000000" if app == "chatwoot"
+            cmd = [tool, "--tool=callgrind", "--instr-atstart=no", "--collect-atstart=yes", "--max-threads=2000",
+              "--callgrind-out-file=#{Dir.tmpdir}/cpu-census-%p.out", File.join(bin, "ruby"), "-rbundler/setup",
+              *Census::FLAGS.fetch(mode), *("--yjit-log=quiet" if mode == "yjit" && ENV["CENSUS_CPU_DIAG"]), HARNESS, "profile", app, json]
+            begin
+              copy_locks[Census.app_dir(opts[:corpus], app)].synchronize do
+                Census.sh(env, "sh", "-c", 'ulimit -d unlimited; exec "$@"', "sh", *cmd,
+                  chdir: Census.app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
+              end
+            rescue RuntimeError
+              failed << "#{app}-#{mode}"
+            end
+          end
+        end
+      end.each(&:join)
+      FileUtils.rm_f(Dir[File.join(Dir.tmpdir, "cpu-census-*.out")])
+      failures = Array.new(failed.size) { failed.pop }
+      # Two runs may share a label (disjoint --apps), so the record is appended under a lock.
+      File.open(meta_path + ".lock", File::CREAT | File::RDWR) do |lock|
+        lock.flock(File::LOCK_EX)
+        meta = JSON.parse(File.read(meta_path)) if File.exist?(meta_path)
+        meta["runs"] << { "apps" => opts[:apps], "modes" => opts[:modes], "only" => opts[:only], "failed" => failures.sort,
+          "sampler" => File.basename(File.dirname(ext)), "harness_sha256" => Digest::SHA256.file(HARNESS).hexdigest,
+          "finished" => Time.now.utc.iso8601 }
+        File.write(meta_path, JSON.pretty_generate(meta) + "\n")
+      end
+      warn "#{label}: #{failures.sort.join(", ")} failed; see their .log files" if failures.any?
+    end
+  end
+
+  # Open rails/rails PRs whose hunks cover a top CPU line (script/census prs's cache and matching).
+  def prs(opts)
+    runs = CpuRank.load_runs(File.join(opts[:out], opts.fetch(:label)), opts[:mode])
+    rows = CpuRank.rows(runs, tiers: opts[:tiers]).first(opts[:limit])
+    cache = File.join(opts[:census_out] || File.join(ROOT, ".lowrail/private/census"), "open-rails-prs.json")
+    data = Census.open_prs(cache, opts[:refresh])
+    by_file = Hash.new { |h, k| h[k] = [] }
+    data["prs"].each { |pr| pr["files"].each { by_file[_1] << pr } }
+    rows.each_with_index do |r, i|
+      file, line = r[:site].split(/:(?=\d+\z)/)
+      prs = by_file[file].sort_by { _1["number"] }
+      hit, rest = prs.partition { |pr| Census.hunks(pr).fetch(file, []).any? { |start, len| Integer(line).between?(start, start + len - 1) } }
+      next if prs.empty?
+      puts format("%3d %-70s apps %2d Ir/op %8.0f", i + 1, r[:site][0, 70], r[:apps], r[:mean])
+      hit.each { puts "      line: ##{_1["number"]} #{_1["title"][0, 80]} (#{_1["author"]}#{", draft" if _1["draft"]})" }
+      puts "      file: #{rest.size} more (#{rest.first(8).map { "##{_1["number"]}" }.join(" ")}#{" ..." if rest.size > 8})" if rest.any?
+    end
+    File.write(cache, JSON.pretty_generate(data) + "\n")
+  end
+
+  def main(argv)
+    command = argv.shift
+    opts = { corpus: "census", out: File.join(ROOT, ".lowrail/private/cpu-census"), ruby: "4.0.9", apps: Census::APPS.keys,
+      modes: %w[interpreter yjit], mode: "interpreter", jobs: 1, limit: 60, by: "line", tiers: CpuRank::TIERS }
+    rest = OptionParser.new do |o|
+      o.banner = File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.map { _1.delete_prefix("# ").delete_prefix("#") }.join
+      o.on("--label L") { opts[:label] = _1 }
+      o.on("--aa [L0]", "run: also run L2, the A/A twin; compare: the A/A twin of --base") { opts[:aa] = _1 || true }
+      o.on("--rails SPEC") { opts[:rails] = _1 }
+      o.on("--ruby R") { opts[:ruby] = _1 }
+      o.on("--apps LIST") { opts[:apps] = Census.apps_option(_1) }
+      o.on("--modes LIST") { |v| opts[:modes] = v.split(",").map { Census::MODES.fetch(_1) } }
+      o.on("--mode M") { opts[:mode] = Census::MODES.fetch(_1) }
+      o.on("--jobs N", Integer) { opts[:jobs] = _1 }
+      o.on("--only W") { opts[:only] = _1 }
+      o.on("--corpus NAME") { opts[:corpus] = _1 }
+      o.on("--out DIR") { opts[:out] = File.expand_path(_1) }
+      o.on("--prefix DIR") { opts[:prefix] = _1 }
+      o.on("--objects LABEL", "rank: script/census label whose allocations fill the objects column") { opts[:objects] = _1 }
+      o.on("--census-out DIR", "rank: script/census output (default .lowrail/private/census)") { opts[:census_out] = File.expand_path(_1) }
+      o.on("--by KIND", "rank: line or method") { opts[:by] = _1 }
+      o.on("--limit N", Integer) { opts[:limit] = _1 }
+      o.on("--tiers LIST") { |v| opts[:tiers] = v.split(",").map { Integer(_1) } }
+      o.on("--base L") { opts[:base] = _1 }
+      o.on("--refresh", "prs: refetch the open rails/rails PRs") { opts[:refresh] = true }
+    end.parse(argv)
+    case command
+    when "build" then build(opts)
+    when "run" then run(opts)
+    when "rank" then CpuRank.command(opts)
+    when "compare" then CpuRank.compare(opts, rest)
+    when "prs" then prs(opts)
+    else abort "usage: see the header of #{__FILE__}"
+    end
+  end
+end
+
+CpuCensus.main(ARGV.dup) if $PROGRAM_NAME == __FILE__
