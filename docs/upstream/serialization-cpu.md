@@ -16,7 +16,7 @@ behind `to_json`, about 4% of it. One exact candidate came out of it:
 
 | # | Branch | Commit | What | Per call, interpreter / YJIT | ruby-bench | Census (56 workloads) |
 | --- | --- | --- | --- | --- | --- | --- |
-| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`60d70808d9`](https://github.com/thomasklemm/rails/commit/60d70808d9) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
+| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`f883f67d87`](https://github.com/thomasklemm/rails/commit/f883f67d87d44a85591a77f2063748008c85d2e8) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
 
 Not opened. Escaping is a critical change under [DECISIONS](../DECISIONS.md#extra-adversarial-astra-round-for-critical-changes-2026-11-03),
 so it needs Sol and the adversarial Astra round before it can enter the queue. Draft in the short form at the end.
@@ -138,6 +138,32 @@ subclass or a SafeBuffer, comparing bytes, encoding, class and `html_safe?`
 `include?`/`gsub!` shows both settings on main and on the fix, only the HTML setting on `72d0a204cc`. The guard
 costs 0.1 to 0.3 points per call; the numbers below are the fix's.
 
+**Review round 3 (2026-11-03).** Sol and Astra (176k probes on Ruby 4.0.7) found one remaining difference in
+`60d70808d9`: `instance_of?(String)` is also true for a plain String with singleton methods, so a custom encoder
+returning `super.tap { |s| def s.include?(*) = false }` left all five characters literal (P2). Fixed in
+[`f883f67d87`](https://github.com/thomasklemm/rails/commit/f883f67d87d44a85591a77f2063748008c85d2e8) with option
+(a): the guard is `String#to_s` called through a bound core method (it returns the receiver only for an instance of
+String itself), and the search and replacement call `String#include?` and `String#gsub!` through bound core
+methods, so no method defined on the String itself is consulted. Subclasses keep main's single dispatched `gsub!`.
+Variants measured and rejected: `Kernel#instance_of?` via `bind_call` (+2 objects per call); also routing a
+singleton `gsub!` override to main's path by checking `method(:gsub!).owner` (V2, +3 objects per call, `to_json`
++1.1% vs main); a `String#count` prefilter (V3) and a `Regexp#match?` prefilter (V5), both of which give back the
+plain-text saving. The one remaining difference from main is a singleton `gsub!` override on a plain String: main
+calls it, the fix does not. That difference can only escape more, never less: a no-op `gsub!` override makes main
+emit `<>&` and U+2028/9 literally (4,499 of 6,000 cases), while the fix's output equals `JSONGemEncoder`'s in
+6,000 of 6,000 ([escape_noop_gsub.rb](../../bench/upstream/serialization_cpu/escape_noop_gsub.rb)). A pass-through override matches main exactly. New test
+`test_escape_string_with_singleton_methods_from_custom_encoder` fails on `60d70808d9` and passes on main and the fix.
+Fuzz ([escape_fuzz_custom.rb](../../bench/upstream/serialization_cpu/escape_fuzz_custom.rb), extended with
+singleton `include?`, `include?` that raises, `instance_of?`, `to_s`/`equal?`/`class`, `equal?` plus `include?`,
+a SafeBuffer lying about `to_s`/`equal?`/`instance_of?`, a subclass doing the same, and pass-through and no-op
+`gsub!`): main vs the fix differs in 3,248 of 52,001 cases, all in the no-op `gsub!` encoder; main vs `60d70808d9`
+differs in 10,472 (singleton `include?`, raising `include?`, lying SafeBuffer, `equal?` plus `include?`). Allocations
+per call unchanged from `60d70808d9` (25 / 481 / 527 for `to_json` / 20 posts / jbuilder, main 26 / 482 / 528).
+Active Support with `RAILS_STRICT_WARNINGS=1`: 5,488 runs, 0 failures; RuboCop clean. The bound calls cost about
+1.5 points on a single small record (`post.to_json` plain −1.1% interpreter, −2.6% YJIT, against −2.5% / −4.3% for
+`60d70808d9`); the multi-record and jbuilder cases are within 0.7 points of `60d70808d9`. All runs in
+[instructions.txt](data/serialization-cpu/instructions.txt).
+
 **Checks.** All Active Support test files except the Redis cache store (the `redis` gem is outside the bundle
 groups installed here) with `RAILS_STRICT_WARNINGS=1`: 5,486 runs, 0 failures; RuboCop clean. The census was not
 rerun for the fix: the default encoders return plain Strings, which take the same path as in `72d0a204cc`.
@@ -239,18 +265,19 @@ and S1 removes most of it on plain text.
 Before Ruby 4.1, `ActiveSupport::JSON.encode` escapes `<`, `>`, `&`, U+2028 and U+2029 with one `gsub!` over a
 Regexp union, which runs the regexp engine over the whole document even when nothing needs escaping. This searches
 for each character with `include?` and replaces only the ones that occur, still on the binary String, so the
-output is unchanged, including invalid UTF-8 from `JSON::Fragment`. String subclasses, such as a SafeBuffer from a
+output is unchanged, including invalid UTF-8 from `JSON::Fragment`. It calls the core String methods directly, so
+singleton methods on the generated String can't skip escaping, and String subclasses, such as a SafeBuffer from a
 custom encoder, keep the single `gsub!`. Ruby 4.1 keeps using `tr!`.
 
 Instructions per call (Callgrind, Ruby 4.0.7, 20 records of 11 columns):
 
 | | interpreter | YJIT |
 | --- | ---: | ---: |
-| `post.to_json` | −2.7% | −4.2% |
-| `posts.to_json` | −4.6% | −5.6% |
+| `post.to_json` | −1.1% | −2.6% |
+| `posts.to_json` | −4.6% | −5.5% |
 | jbuilder index | −3.1% | −6.2% |
-| `render json: posts` (before `load_defaults 8.1`) | −5.8% | −7.1% |
-| `posts.to_json`, text with `<b>` and `&` | −14.1% | −15.8% |
+| `render json: posts` (before `load_defaults 8.1`) | −5.8% | −6.6% |
+| `posts.to_json`, text with `<b>` and `&` | −13.6% | −15.1% |
 
 This path runs for every `to_json` and jbuilder template, and for `render json:` before 8.1 defaults; on six apps,
 30 of 56 workloads allocate at least one object fewer (16 in an A/A run).

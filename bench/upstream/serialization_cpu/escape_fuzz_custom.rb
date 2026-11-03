@@ -1,5 +1,7 @@
-# ruby fuzz2.rb BASE_RAILS HEAD_RAILS: compare escape results (bytes, encoding, class, html_safe?) across
-# the default encoder and custom JSONGemEncoders whose stringify returns a String subclass or a SafeBuffer.
+# ruby escape_fuzz_custom.rb BASE_RAILS HEAD_RAILS: compare escape results (bytes, encoding, class,
+# html_safe?) across the default encoder and custom JSONGemEncoders whose stringify returns a String subclass,
+# a SafeBuffer, or a plain String with singleton methods (include?, instance_of?, to_s/equal?/class, gsub!).
+# Prints the differing cases per encoder.
 outs = ARGV.first(2).map do |dir|
   r, w = IO.pipe
   pid = fork do
@@ -12,6 +14,15 @@ outs = ARGV.first(2).map do |dir|
       "gem" => ActiveSupport::JSON::Encoding::JSONGemEncoder,
       "subclass" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { define_method(:stringify) { |j| sub.new(super(j)) } },
       "safe_buffer" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.html_safe },
+      "singleton_include" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.include?(*) = false } },
+      "singleton_instance_of" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.instance_of?(*) = false } },
+      "singleton_include_raises" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.include?(*) = raise("include?") } },
+      "singleton_gsub_passthrough" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.gsub!(*a, **k, &b) = super } },
+      "singleton_to_s_equal_class" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.to_s = "x"; def s.equal?(*) = false; def s.class = Integer } },
+      "safe_buffer_lying" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.html_safe.tap { |s| def s.to_s = self; def s.equal?(*) = true; def s.instance_of?(*) = true } },
+      "singleton_equal_true_include_false" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.equal?(*) = true; def s.include?(*) = false } },
+      "subclass_equal_true_include_false" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = Class.new(String) { def equal?(*) = true; def include?(*) = false; def to_s = self }.new(super) },
+      "singleton_gsub_noop" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.gsub!(*) = nil } },
     }
     rng = Random.new(7)
     alpha = ["<", ">", "&", "\u2028", "\u2029", "a", "é", "\"", "\\", " ", "\u2027", "<b>", "x"]
@@ -57,4 +68,4 @@ diff = outs[0].zip(outs[1]).select { _1 != _2 }
 puts "cases #{outs[0].size}, differing #{diff.size}"
 outs[0][0...-1].group_by(&:first).each { |e, rows| puts "#{e}: #{rows.size} cases, invalid-encoding outputs #{rows.count { |_, v| v.size > 1 && !v[0].dup.force_encoding('UTF-8').valid_encoding? }}, html_safe true #{rows.count { |_, v| v.each_slice(4).any? { _1[3] == true } }}, errors #{rows.count { |_, v| v.size == 1 }}" }
 puts "trace base: #{outs[0].last.inspect}  head: #{outs[1].last.inspect}"
-diff.first(3).each { p _1 }
+puts "differing by encoder: #{diff.map { _1[0][0] }.tally}"
