@@ -1,0 +1,25 @@
+frame	lobsters-interp	lobsters-yjit	railsbench-interp	railsbench-yjit	shipit-interp	shipit-yjit
+Relation#exec_queries	19.94	20.89	0.95	0.92	23.61	23.20
+_load_from_sql (instantiate)	4.11	3.16	3.68	2.74	11.59	11.94
+Result#column_types	0.44	0.71	0.41	0.60	1.36	2.72
+build_arel	2.45	2.12	0.07	0.03	2.15	1.91
+arel to_sql (Visitor#accept/compile)	2.61	2.11	0.05	0.03	3.02	2.56
+to_sql_and_binds	3.13	2.38	0.27	0.24	3.79	3.08
+where/rewhere/build_where_clause	4.27	3.82	0.00	0.00	5.58	4.84
+PredicateBuilder	2.97	2.55	0.00	0.00	4.58	4.06
+Merger#merge / Relation#merge	0.80	0.73	0.00	0.00	5.03	4.26
+Relation spawn/new (Delegation.create, Relation#initialize/_copy)	2.28	2.78	0.01	0.01	4.73	5.04
+default scope (build_default_scope, has_default_scope?)	0.54	0.73	0.32	0.61	1.00	1.18
+Relation#scoping/_scoping	7.07	7.19	0.00	0.00	12.33	12.54
+Association#scope / AssociationScope	3.14	2.63	0.00	0.00	19.70	15.81
+StatementCache#execute	4.16	4.32	14.20	14.91	14.38	14.63
+StatementCache::BindMap#bind	0.13	0.08	0.32	0.38	0.44	0.30
+connection_pool lookup (ConnectionHandling#connection_pool)	1.25	1.00	0.91	0.52	3.24	2.41
+with_connection/checkout/checkin	1.45	0.91	1.76	0.98	4.82	2.60
+SQLite3 Statement step/prepare/bind (driver C)	6.24	10.58	3.22	6.41	3.82	6.95
+perform_query (adapter, incl. driver)	7.39	11.50	4.43	7.22	5.18	8.20
+type casting binds (type_casted_binds)	1.50	1.15	0.39	0.16	0.63	0.34
+Preloader#call	10.66	10.50	0.00	0.00	2.20	2.31
+LazyAttributeSet#fetch_value(!)	6.48	5.76	2.49	2.30	3.78	3.06
+Core#init_with_attributes	1.87	0.92	0.66	0.17	5.49	3.09
+ActiveSupport::Notifications (any)	90.04	88.83	63.41	58.26	94.16	89.12

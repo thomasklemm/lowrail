@@ -1,5 +1,8 @@
 {
   "servicePorts": {
-    "campfire-redis": 31925
+    "campfire-redis": 31925,
+    "census-pg": 32706,
+    "census-redis": 31694,
+    "census-memcached": 31122
   }
 }
