@@ -32,11 +32,11 @@ byebug 11.1.3 → 13.0.0, numo-narray-alt 0.10.3 → 0.10.7, oga 3.4 → 3.5 wit
 * **Lockfiles:** each app's upstream `Gemfile.lock` at its `script/corpus` pin (19 apps), plus Blog's census 4 copy.
   1,787 gem versions, 1,011 names; 66 more come from git or path sources. Upstream lockfiles, not the master overlays,
   so the sweep shows what the apps lock today.
-* **Build:** every locked gem whose gemspec declares extensions and the latest release of each such gem (86 gems, 208 versions;
-  203 of them, all but the four gems skipped below) was built with `gem install --local --ignore-dependencies` on master and on 4.0.7. A gem
+* **Build:** every locked gem whose gemspec declares extensions and the latest release of each such gem (86 gems, 198 versions;
+  193 of them, all but the four gems skipped below) was built with `gem install --local --ignore-dependencies` on master and on 4.0.7. A gem
   counts as broken by 4.1 only when it builds on 4.0.7 and fails on master. libv8-node, mini_racer, grpc and
   sass-embedded were not built: they vendor toolchains, and a grep finds the removed API only in a grpc comment.
-* **Link check:** each `.so` built on master (406 files, counting the gem-dir and extension-dir copies) was checked with `nm` for imported `rb_*`/`ruby_*`
+* **Link check:** each `.so` built on master was checked with `nm` for imported `rb_*`/`ruby_*`
   symbols that master's `ruby` does not export. None were missing, so every extension that compiled also links.
 * **Receipts:** [`fixtures/corpus/ruby-41-ecosystem/`](../../fixtures/corpus/ruby-41-ecosystem):
   `sweep.sh` (lockfiles → downloads → builds → link check → header diff), `build-results.tsv` (exit status per gem

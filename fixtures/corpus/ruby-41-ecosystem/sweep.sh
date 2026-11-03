@@ -18,7 +18,7 @@ cd "$work"
 # 1. Lockfiles at the pins in script/corpus (blog: its census 4 copy).
 awk '/^  [a-z0-9-]+\)$/{n=$1;sub(/\)/,"",n)} /rev=/{r=$1;sub(/rev=/,"",r)}
      /repo=/{u=$1;sub(/repo=/,"",u); print n, r, u}' "$here/script/corpus" |
-  grep -vE '^(real-blog|campfire-r8|fizzy-r82|writebook-r82|wikino) ' > locks/apps.txt
+  grep -vE '^(real-blog|campfire-r81|campfire-r82|fizzy-r82|writebook-r82|wikino) ' > locks/apps.txt
 while read -r n r u; do
   curl -sfL "https://raw.githubusercontent.com/${u#https://github.com/}/$r/Gemfile.lock" -o "locks/$n.lock"
 done < locks/apps.txt
@@ -35,15 +35,15 @@ touch locks/Gemfile
   File.write("apps_by_gem.tsv", all.map { |(n, v), a| [n, v, a.join(",")].join("\t") }.join("\n") + "\n")')
 
 # 2. Source gems, extension gems, their latest releases.
-cut -f1,2 locks/apps_by_gem.tsv | tr '\t' - | sort -u |
-  xargs -P24 -I{} sh -c 'test -s gems/{}.gem || curl -sfL -o gems/{}.gem https://rubygems.org/downloads/{}.gem || echo "missing {}"'
-for g in gems/*.gem; do
-  b=$(basename "$g" .gem)
-  tar -xOf "$g" metadata.gz | gunzip | grep -q '^extensions: *$' && echo "$b"
-done > ext/with-ext.txt || true
+cut -f1,2 locks/apps_by_gem.tsv | tr '\t' - | sort -u > ext/locked.txt
+xargs -P24 -I{} sh -c 'test -s gems/{}.gem || curl -sfL -o gems/{}.gem https://rubygems.org/downloads/{}.gem || echo "missing {}"' < ext/locked.txt
+while read -r b; do
+  [ -s "gems/$b.gem" ] && tar -xOf "gems/$b.gem" metadata.gz | gunzip | grep -q '^extensions: *$' && echo "$b"
+done < ext/locked.txt > ext/with-ext.txt || true
 sed -E 's/-[0-9][^-]*$//' ext/with-ext.txt | sort -u | while read -r n; do
   v=$(curl -sf "https://rubygems.org/api/v1/versions/$n/latest.json" | jq -r .version)
-  [ -s "gems/$n-$v.gem" ] || { curl -sfL -o "gems/$n-$v.gem" "https://rubygems.org/downloads/$n-$v.gem" && echo "$n-$v" >> ext/with-ext.txt; }
+  [ -s "gems/$n-$v.gem" ] || curl -sfL -o "gems/$n-$v.gem" "https://rubygems.org/downloads/$n-$v.gem"
+  echo "$n-$v" >> ext/with-ext.txt
 done
 # libv8-node, mini_racer, grpc and sass-embedded are skipped: vendored
 # toolchains, no C API use beyond comments (checked by grep).
@@ -76,8 +76,7 @@ ids() { grep -rhoE '\b(rb|ruby|RB|RUBY|R[A-Z]+|Data|DATA|OBJ|rb_[a-z])[A-Za-z0-9
 comm -23 <(ids inc-v4.0.7) <(ids "inc-$("$rmas" -e 'print RUBY_REVISION[0,10]')") > ext/removed.txt
 
 printf 'gem\tversion\tmaster\tr407\n' > ext/results.tsv
-for f in build/master/logs/*.rc; do
-  b=$(basename "$f" .rc)
-  printf '%s\t%s\t%s\t%s\n' "${b%-*}" "${b##*-}" "$(cat "$f")" "$(cat "build/r407/logs/$b.rc" 2>/dev/null || echo -)"
-done >> ext/results.tsv
+while read -r b; do
+  printf '%s\t%s\t%s\t%s\n' "${b%-*}" "${b##*-}" "$(cat "build/master/logs/$b.rc")" "$(cat "build/r407/logs/$b.rc" 2>/dev/null || echo -)"
+done < ext/buildlist.txt >> ext/results.tsv
 awk -F'\t' 'NR > 1 && $3 != 0' ext/results.tsv
