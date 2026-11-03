@@ -153,7 +153,7 @@ average price per call, so they are estimates.
 
 | rank | lead | gap (M Ir) | apps (census, per op) | why this rank |
 |---|---|---|---|---|
-| 1 | 3 class-polymorphic sends to one method entry: class-level methods on model classes (`attribute_types` in `_load_from_sql`, `current_shard`/`current_role`, `_reflections`) and instance-level `self` attr_readers shared by many subclasses (`Type::Value#hash`/`#cast`, `association`) | 7.2 / 42.1 / 180.1 (4% / 24% / 29%) | 10, 325 | Largest free item on lobsters and shipit. Shopify/ruby#1099 item 2, no assignee; slot granted. Includes lead 2's 6.6 M on shipit. Design-heavy (method-entry-keyed guard; YJIT handles these sites with its class-guard chain). |
+| 1 | 3 class-polymorphic sends to one method entry: class-level methods on model classes (`attribute_types` in `_load_from_sql`, `current_shard`/`current_role`, `_reflections`) and instance-level `self` attr_readers shared by many subclasses (`Type::Value#hash`/`#cast`, `association`) | 7.2 / 42.1 / 180.1 (4% / 24% / 29%) | 10, 325 | Largest free item on lobsters and shipit. Shopify/ruby#1099 item 2, no assignee. Includes lead 2's 6.6 M on shipit. **Built, candidate only, not to be opened** (no new ruby/ruby PRs for now): two commits at `23273fd8ec`, see [Lead 3](#lead-3-our-build-and-its-numbers-2026-11-03). |
 | 2 | 13 `rb_zjit_root_mark` marks every JITFrame's ISEQ on every GC | 25.4 / 6.7 / 37.1 (14% / 4% / 6%) | unmeasured | No issue or PR. Small, self-contained. Scales with GC count and JITFrames (38k / 150k / 119k). |
 | 3 | 15 getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`: `block in fetch_value`, `Logger#level`/`level_override`, `stale_state`) | 3.9 / 7.8 / 24.0 (2% / 4% / 4%) | 10, 1,662 | Shopify/ruby#1099 pattern 3 (receivers recorded as "other" since ruby/ruby#19540), no assignee. |
 | 4 | 14c ISEQ callees with `**rest`, including `def m(a, ...)` (`Relation.create(self)` → `def create(model, ...)`, `AssociationRelation#initialize(klass, association, **)`) | 0.7 / 1.0 / 5.1 | –, 21.5k `complex_arg_pass_param_kwrest` per shipit iteration | Measured +314 to +405 Ir per call against YJIT. Shopify/ruby#1039 rows 36 (`2ac995c680`) and 43 (`29903d645e`) have no assignee, and there is no PR or issue. Medium: keyword planning plus the callee's hidden `kw_bits` argument. See [Lead 14](zjit-yjit-gap.md#lead-14-what-one_or_more_complex_arg_pass-really-costs). |
@@ -389,46 +389,74 @@ Lobsters runs must not share a checkout concurrently: two parallel runs raced on
 
 ## Lead 3: our build and its numbers (2026-11-03)
 
-thomasklemm/ruby [`thomasklemm/zjit-method-entry-dispatch`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-method-entry-dispatch)
-@ `2c26d6e653`, one commit on master `a8b095a07e`, 5 files, +219/−33 (production code +63). Not opened; in review.
+**Candidate only, not to be opened** (DECISIONS 10cef95: no new ruby/ruby PRs for now). thomasklemm/ruby
+[`thomasklemm/zjit-method-entry-dispatch-v3`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-method-entry-dispatch-v3)
+@ `23273fd8ec`, two commits on master `9b30fd207f`:
+
+1. `59b5ddc22a` ZJIT: Recompile a super call that has no profile yet (lead 3e below). Stands alone.
+2. `23273fd8ec` ZJIT: Call the shared method directly for receivers outside a polymorphic profile (lead 3).
+
+The first review head `2c26d6e653` (one commit) stays on `thomasklemm/zjit-method-entry-dispatch`. Lead 3b is no longer
+in the PR: it did not change railsbench (the same +23,922 dynamic supers with and without it), and Shopify/ruby#1039
+row 46 covers the same profile shape. It is kept locally as `thomasklemm/zjit-super-profile-copy` (`24c306b98e`).
 
 **What it does.** When every profiled receiver class of a polymorphic send resolves the same ISEQ method entry, a new
-arm before the fallback checks `rb_callable_method_entry(CLASS_OF(recv), mid) == cme` (`IsMethodCme`) and calls the
-entry directly, with the same `MethodRedefined` patch point as the profiled arms. A run-time check rather than an
-ancestor guard plus a new "no override" invariant (Shopify/ruby#1039 row 25).
+branch before the generic send checks `rb_callable_method_entry(CLASS_OF(recv), mid) == cme` and calls the entry
+directly. Since the review, the branch is dropped again when its direct call can't be specialized (a `**kw` splat, for
+example), and the resolved method entry is carried with the branch instead of being looked up again.
 
-**Fallbacks**, ruby-bench per iteration (railsbench / lobsters / shipit), 0 `compile_error_out_of_memory`:
-`send_polymorphic_fallback` 26,500 / 248,651 / 641,506 → 26,500 / 117,672 / 230,604; `dynamic_send_count`
-1,065,952 / 745,792 / 1,695,215 → 1,089,874 / 623,677 / 1,252,556. Census apps were not rerun in this orb.
+**Generic calls per iteration**, ruby-bench, master → branch, 0 `compile_error_out_of_memory`:
 
-**Callgrind** (Ir per iteration in millions, GC excluded, 15 warmup + 3 measured, 4 runs each):
+| | railsbench | lobsters | shipit |
+|---|---:|---:|---:|
+| `send_fallback_send_polymorphic_fallback` | 26,500 → 26,500 | 246,906 → 128,767 | 681,999 → 263,907 |
+| `send_fallback_super_polymorphic` | 4,013 → 0 | 2,738 → 2,338 | 1,682 → 1,439 |
+| `dynamic_send_count` | 1,065,952 → 1,061,939 | 750,522 → 631,545 | 1,709,365 → 1,269,447 |
+| `exit_unhandled_block_arg` | 2,052 → 6,052 | 341 → 591 | 57 → 171 |
 
-| | master `a8b095a07e` | branch | Δ |
+**Callgrind** (Ir per iteration in millions, GC excluded, 15 warmup + 3 measured, 4 runs each, master `9b30fd207f`):
+
+| | master `9b30fd207f` | branch `23273fd8ec` | Δ |
 |---|---|---|---:|
-| railsbench | 4688.4 / 4694.3 / 4681.2 / 4687.4 (range 0.28%) | 4703.1 / 4698.9 / 4708.1 / 4708.6 | **+0.36%** |
-| lobsters | 3205.5 / 3207.8 / 3207.1 / 3205.2 (range 0.08%) | 3195.3 / 3195.2 / 3192.8 / 3196.5 | −0.36% |
-| shipit | 3667.7 / 3665.7 / 3669.3 / 3670.0 (range 0.12%) | 3621.9 / 3624.3 / 3621.7 / 3624.2 | −1.23% |
+| railsbench | 4691.4 / 4690.6 / 4693.7 / 4686.0 (A/A range 0.16%) | 4697.3 / 4700.6 / 4697.4 / 4695.4 | **+0.15%** |
+| lobsters | 3205.6 / 3206.3 / 3204.7 / 3204.0 (A/A range 0.07%) | 3195.1 / 3195.5 / 3194.2 / 3197.2 | −0.30% |
+| shipit | 3668.5 / 3667.7 / 3670.5 / 3668.1 (A/A range 0.08%) | 3623.9 / 3627.3 / 3624.8 / 3622.9 | −1.20% |
 
-The railsbench loss is lead 3b: by function, `vm_search_super_method`, `rb_vm_invokesuper` and the cfunc frames
-behind them add about 6M Ir per iteration; the check itself costs 0.2M. `--zjit-stats-iseq` puts all 23,922 extra
-dynamic supers in `OrderedOptions#[]`, which the new arm inlines into `method_missing`. With inlining off, both
-builds call the same methods the same number of times.
+Railsbench misses the bar (at or below master, or inside the A/A): the lowest branch run is 1.7M above the highest
+master run.
 
-**Per call:** 36 subclasses 565.6 → 290.9 Ir; class method calling a class method 987.4 → 474.2; monomorphic 132.0
-unchanged; worst case (profile shares one method, run-time receivers override it) 632.0 → 774.0.
+**Railsbench.** The cost is one site: `self[name]` in `ActiveSupport::OrderedOptions#method_missing`
+(ordered_options.rb:50). On master its receiver profile holds the hot `InheritableOptions` class and `#[]` is inlined.
+On the branch the profile taken after a recompile holds two other option classes, so 23,922 calls per iteration take
+the new check (about 117 Ir) and a direct call that is not inlined (`inline_iseq_optimized_send_count` −21,108,
+`iseq_optimized_send_count` +21,120). A same-binary toggle (arm off/on in one build, 4 runs each) gives +9.8M (+0.21%)
+in total; +6.8M of that is heap page initialization (`heap_page_allocate_and_initialize` and its `memset`), which
+varies with GC timing under Valgrind (outside Valgrind both modes allocate about two pages per iteration for the same
+1.73M objects). Without heap page initialization the toggle difference is +2.6M (+0.06%), inside the A/A range.
 
-**Checks:** `make zjit-test` 1941/1942 (the miss is `test_profile_frames_during_direct_jit_to_jit_entry`, load-sensitive,
-5/5 alone); btest at threshold 1 2141/2141; test-all at threshold 1 (method, module, class, refinement, super, alias,
-object, call, eval, zjit_cli, settracefunc, keyword, iterator) 1073 tests, 0 failures; a 14-scenario differential
-script (redefinition, singleton methods, prepend/extend/include, new subclasses, undef/private with
-`method_missing`, refinements of a subclass and of the owner, remove, instances with blocks, compaction) matches the
-interpreter at four threshold/profile settings. Railsbench responses are identical (body digests).
+**Per call** (Ir): 36 subclasses 565.6 → 290.9; class method calling a class method 987.4 → 474.2; monomorphic
+132.0 unchanged; `super` that first runs after profiling 614.0 → 173.0; `**kw` splat (no branch) 1,303.4 → 1,303.4;
+worst case (profile shares one method, run-time receivers override it) 632.0 → 774.0.
+
+**Checks:** `make zjit-test` 1945/1946 (the miss is `test_profile_frames_during_direct_jit_to_jit_entry`, which fails
+only under load and passes 3/3 alone); btest at threshold 1 2141/2141; test-all at threshold 1 (method, module,
+class, refinement, super, alias, object, call, eval, zjit_cli, settracefunc, keyword, iterator, gc_compact) 1104
+tests, 0 failures; the 14-scenario differential and a `super` differential (redefined target, prepend, implicit block,
+module includer) match the interpreter at four threshold/profile settings; railsbench responses are identical.
+New tests fail without the change where a wrong variant is observable: the `**kw` HIR snapshot, the shared-entry
+snapshot and counter tests, and the late `super` test (polymorphic super fallbacks 20 → 21). Two wrong variants could
+not be made to fail: dropping the branch's `MethodRedefined` patch point (a visibility change keeps the method entry
+but the method cache clear copies it, so the run-time check already fails), and embedding the method entry untracked
+by GC (compaction did not move it in the test).
 
 ## New leads from the lead 3 build (2026-11-03)
 
 | lead | fallback / exit | repro or site | counts | status |
 |---|---|---|---|---|
-| 3b `super` after a method-entry copy | `send_fallback_super_polymorphic` | Repro in the lead 3 PR draft: profile `super` in `OO#[]`, then `Sub.class_eval { def [](k) = super }` with `SubSub < Sub` copies `OO#[]`'s entry; the super profile then holds two entries for one method and never specializes (0 → 10,000 per 10,000 calls on master). Site: `ActiveSupport::OrderedOptions#[]` (ordered_options.rb:42) | railsbench 4,013 per itr on master; 27,935 with lead 3, which inlines `#[]` at one more site and costs railsbench about +0.3% Ir | Free: next to Shopify/ruby#1039 rows 45/46 (unassigned). Small fix candidate: pick the one valid entry when all profiled entries share a definition |
+| 3b `super` after a method-entry copy | `send_fallback_super_polymorphic` | Profile `super` in `OO#[]`, then `Sub.class_eval { def [](k) = super }` with `SubSub < Sub` copies `OO#[]`'s entry; the super profile then holds two entries for one method and never specializes (0 → 10,000 per 10,000 calls on master) | not the railsbench cause after all (3e is); app counts **unmeasured** | Overlaps Shopify/ruby#1039 row 46 (`6f1119a5f1`, unassigned; dispatches polymorphic `super` on the frame's method entry). Our fix kept locally as `thomasklemm/zjit-super-profile-copy` (`24c306b98e`), not in the lead 3 candidate |
+| 3e `super` without a profile | `send_fallback_super_polymorphic` (mislabeled; the profile is empty) | A `super` that does not run while its method is profiled, or sits in a method inlined before it was profiled: `def get(k, flag) = flag ? super(k) : k`, profile with `flag = false`, then call with `true` (10,000 of 10,000 calls dynamic on master). Sites: `OrderedOptions#[]` (ordered_options.rb:42) inlined into `method_missing`, actionview `PreloadCollectionIterator#each_with_info` (collection_renderer.rb:92) | railsbench 4,013 → 0, lobsters 2,738 → 2,338, shipit 1,682 → 1,439 per itr; 614 → 173 Ir per call | Ours: first commit of the lead 3 candidate. Not on k0kubun's `zjit-lobsters7` branch; no #1039 row |
+| 3f `super` that forwards a block | `exit_unhandled_block_arg` (side exit on every call, no recompile) | A specialized `super` guards that the caller passed no block; a method always called with a block exits on every call. Site: actionview `PreloadCollectionIterator#each_with_info` `super` (collection_renderer.rb:92), which 3e now specializes | railsbench 2,052 per itr on master, 6,052 with 3e; Ir **unmeasured** | Overlaps Shopify/ruby#1039 row 45 (`7b373cdb14`, unassigned; recompiles on this guard and then dispatches dynamically) |
+| 3g profile timing at a shared-entry site | none (direct call instead of an inlined profiled branch) | `self[name]` in `OrderedOptions#method_missing` (ordered_options.rb:50): the profile taken after a recompile misses the hot `InheritableOptions`, so lead 3's check plus a non-inlined direct call replaces master's inlined branch | 23,922 calls per railsbench itr, about +0.06% to +0.16% Ir | Ours, part of lead 3; a fix would inline the shared-entry call or re-profile the site |
 | 3c failed method-entry check | none (extra C call before a fallback) | lead 3 when run-time receivers resolve another entry than the profile's shared one | +142 Ir per call in the worst-case micro; **unmeasured** on apps | Ours, part of lead 3 |
 | 3d megamorphic sites with one method entry | `send_fallback_send_megamorphic` | lead 3 only covers polymorphic summaries; `connection_specification_name` (`superclass`/`==`, 34 singleton classes, 1 method) | 27 per op in 6 apps (zjit-polymorphism.md) | Free: Shopify/ruby#1039 rows 24/25/27 (unassigned) |
 
