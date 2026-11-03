@@ -16,7 +16,7 @@ behind `to_json`, about 4% of it. One exact candidate came out of it:
 
 | # | Branch | Commit | What | Per call, interpreter / YJIT | ruby-bench | Census (56 workloads) |
 | --- | --- | --- | --- | --- | --- | --- |
-| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`4e73141327`](https://github.com/thomasklemm/rails/commit/4e73141327d9c6a5a68af085659f6256a9f9bc52) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
+| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`7f88aeab6d`](https://github.com/thomasklemm/rails/commit/7f88aeab6ddca2eb3c930fb2a5a088931a918317) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
 
 Not opened. Escaping is a critical change under [DECISIONS](../DECISIONS.md#extra-adversarial-astra-round-for-critical-changes-2026-11-03),
 so it needs Sol and the adversarial Astra round before it can enter the queue. Draft in the short form at the end.
@@ -177,6 +177,38 @@ Support with `RAILS_STRICT_WARNINGS=1`: 5,488 runs, 0 failures; RuboCop clean. T
 points on a single small record (plain `post.to_json` −0.5% interpreter, −1.6% YJIT); the other cases are within
 0.3 points of `f883f67d87`. All runs in [instructions.txt](data/serialization-cpu/instructions.txt).
 
+**Review round 5 (2026-11-03).** Sol (correctness) and Astra found two cases with one cause: the fast path assumed
+the dispatched `json.force_encoding(::Encoding::BINARY)` had made the String binary. With a singleton
+`force_encoding` that returns `self`, invalid UTF-8 made main's Regexp `gsub!` raise `ArgumentError` while head
+returned invalid JSON; on a frozen String, main's `gsub!` raised `FrozenError` while head returned the String. Fixed
+in [`7f88aeab6d`](https://github.com/thomasklemm/rails/commit/7f88aeab6ddca2eb3c930fb2a5a088931a918317): the fast
+path also requires `String#+@` (bound) to return the receiver, which is true only for an unfrozen String, and the
+encoding read through a bound `String#encoding` to be `Encoding::BINARY`; anything else takes main's `gsub!`. A bound
+`Kernel#frozen?` was measured and rejected: `bind_call` on a Kernel method allocates 2 objects per call. Fully bound
+`EQUAL.bind_call(::Encoding::BINARY, …)` cost 0.4 points more than `::Encoding::BINARY.equal?(…)`, so the latter is
+used; it dispatches on the frozen, shareable `Encoding::BINARY` (a singleton method on it raises `FrozenError`).
+New test `test_escape_string_that_force_encoding_does_not_convert_from_custom_encoder` (both repros) fails on
+`4e73141327` and passes on main and the fix. Fuzz encoders added: no-op `force_encoding`, the same frozen, a binary
+frozen String lying about `frozen?`, and a chilled literal; main vs the fix differs in 3,217 of 72,001 cases, all in
+the accepted no-op `gsub!` encoder (main vs `4e73141327`: 6,083, including 2,866 in the three `force_encoding`
+encoders). A chilled String warns identically on main and the fix. Allocations unchanged (25 / 481 / 527). Active
+Support with `RAILS_STRICT_WARNINGS=1`: 5,490 runs, 0 failures; RuboCop clean. Cost against `4e73141327`: about
+0.9 points on a single small record (plain `post.to_json` +0.5% interpreter, −1.0% YJIT vs main), nothing on
+`posts.to_json` (−4.5% / −5.3%).
+
+**Audit of the remaining dispatched calls on the String** (`escape!` and `escape_binary!`, both encoders):
+
+* `json.force_encoding(::Encoding::BINARY)` before escaping: the same call, arguments and position as main. Whatever
+  it does, head now checks the result with bound core methods and otherwise takes main's path.
+* `json.force_encoding(::Encoding::UTF_8)` after escaping: identical to main, and its return value is `escape!`'s in
+  both.
+* `json.gsub!(regexp, ESCAPED_CHARS)` on the fallback path: identical to main.
+* Fast path: `to_s`, `+@`, `encoding`, `include?`, `gsub!` and `equal?` are all bound core calls; nothing is
+  dispatched on the String.
+* `::Encoding::BINARY.equal?` dispatches on the Encoding, not the String; only a global redefinition of
+  `BasicObject#equal?` (or `Encoding#equal?`) could change it, which Ruby documents should not be done.
+* Ruby 4.1's `tr!` path is unchanged from main.
+
 **Checks.** All Active Support test files except the Redis cache store (the `redis` gem is outside the bundle
 groups installed here) with `RAILS_STRICT_WARNINGS=1`: 5,486 runs, 0 failures; RuboCop clean. The census was not
 rerun for the fix: the default encoders return plain Strings, which take the same path as in `72d0a204cc`.
@@ -286,11 +318,11 @@ Instructions per call (Callgrind, Ruby 4.0.7, 20 records of 11 columns):
 
 | | interpreter | YJIT |
 | --- | ---: | ---: |
-| `post.to_json` | −0.5% | −1.6% |
-| `posts.to_json` | −4.4% | −5.6% |
-| jbuilder index | −3.1% | −6.3% |
+| `post.to_json` | +0.5% | −1.0% |
+| `posts.to_json` | −4.5% | −5.3% |
+| jbuilder index | −3.0% | −6.2% |
 | `render json: posts` (before `load_defaults 8.1`) | −5.8% | −7.4% |
-| `posts.to_json`, text with `<b>` and `&` | −13.4% | −15.0% |
+| `posts.to_json`, text with `<b>` and `&` | −13.5% | −15.1% |
 
 This path runs for every `to_json` and jbuilder template, and for `render json:` before 8.1 defaults; on six apps,
 30 of 56 workloads allocate at least one object fewer (16 in an A/A run).
