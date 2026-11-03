@@ -1,13 +1,14 @@
 # ruby escape_fuzz_custom.rb BASE_RAILS HEAD_RAILS: compare escape results (bytes, encoding, class,
 # html_safe?) across the default encoder and custom JSONGemEncoders whose stringify returns a String subclass,
-# a SafeBuffer, or a plain String with singleton methods (include?, instance_of?, equal?, to_s/equal?/class, force_encoding, gsub!).
+# a SafeBuffer, or a plain String with singleton methods (include?, instance_of?, equal?, to_s/equal?/class, force_encoding, gsub!),
+# or a proxy (SimpleDelegator, BasicObject with method_missing).
 # Prints the differing cases per encoder.
 outs = ARGV.first(2).map do |dir|
   r, w = IO.pipe
   pid = fork do
     r.close
     $LOAD_PATH.unshift(File.join(dir, "activesupport/lib"))
-    require "active_support"; require "active_support/json"; require "active_support/core_ext/string/output_safety"
+    require "active_support"; require "delegate"; require "active_support/json"; require "active_support/core_ext/string/output_safety"
     sub = Class.new(String) { def include?(*) = false }
     encoders = {
       "default" => ActiveSupport::JSON::Encoding.json_encoder,
@@ -27,6 +28,8 @@ outs = ARGV.first(2).map do |dir|
       "frozen_force_encoding_noop" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.force_encoding(*) = self }.freeze },
       "binary_frozen_force_encoding_noop" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.b.tap { |s| def s.force_encoding(*) = self; def s.frozen? = false }.freeze },
       "chilled_force_encoding_noop" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = eval(super.b.dump).tap { |s| def s.force_encoding(*) = self } },
+      "simple_delegator" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = SimpleDelegator.new(super) },
+      "basic_object_proxy" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = Class.new(BasicObject) { def initialize(t) = @t = t; def method_missing(...) = @t.__send__(...); def respond_to_missing?(...) = @t.respond_to?(...) }.new(super) },
       "singleton_gsub_noop" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.gsub!(*) = nil } },
     }
     rng = Random.new(7)
