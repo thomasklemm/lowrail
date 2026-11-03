@@ -60,7 +60,10 @@ module Census
     # APP-nops reruns APP's copy with prepared statements off (as behind PgBouncer).
     "docuseal" => { source: "docuseal", overlay: PG_OVERLAYS + "/docuseal.patch", services: %w[postgresql redis],
       env: { "DATABASE_URL" => "postgres:///census_docuseal", "SECRET_KEY_BASE" => "census" * 16,
-        "REDIS_URL" => "redis://localhost:6379/3", "CENSUS_SIDEKIQ_FAKE" => "1" },
+        "REDIS_URL" => "redis://localhost:6379/3", "CENSUS_SIDEKIQ_FAKE" => "1",
+        # config/initializers/migrate.rb migrates at boot in production, which
+        # creates the database before setup's db:create; setup loads the schema.
+        "RUN_MIGRATIONS" => "false" },
       build: [%w[npx --yes yarn@1.22.22 install --frozen-lockfile --network-timeout 1000000]] },
     "mastodon" => { source: "mastodon", overlay: PG_OVERLAYS + "/mastodon.patch", services: %w[postgresql redis],
       env: { "LOCAL_DOMAIN" => "localhost", "DB_HOST" => "/var/run/postgresql", "DB_NAME" => "census_mastodon", "DB_USER" => ENV.fetch("USER"),
