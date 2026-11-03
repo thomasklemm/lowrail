@@ -258,7 +258,8 @@ index 4c5578d..2460a14 100644
    rubocop-capybara
    rubocop-factory_bot
 @@ -394,4 +412,4 @@ RUBY VERSION
-   ruby 4.0.7
+-  ruby 4.0.7
++  ruby 4.0.9
  
  BUNDLED WITH
 -  4.0.21

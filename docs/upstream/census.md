@@ -4,7 +4,7 @@ One command runs the census of censuses 4 and 5: real apps on Rails main (SQLite
 request, job and mailer workloads, interpreter and JIT modes, an A/A baseline, allocation sites attributed by file
 and line, a breadth-first ranking, comparisons of patched Rails branches against the base with behavior controls,
 and the open rails/rails PRs that touch the ranked lines. Rails ref, Ruby and mode are parameters. The same steps
-therefore serve a Rails-main round, a Ruby 4.0.7 vs ruby-master comparison (`--ruby`) and a JIT vs interpreter
+therefore serve a Rails-main round, a Ruby 4.0.9 vs ruby-master comparison (`--ruby`) and a JIT vs interpreter
 comparison (`--modes`, `LABEL:MODE`).
 
 Results are allocation counts only. No timing is inferred from them. Speed claims need `lowrail bench`
@@ -20,8 +20,8 @@ in `script/census`, a data preparation step and a workload list. There is no opt
 directory outside the repo. Running your app therefore means adding it in a local checkout, as below. Start with
 the Blog to check the setup.
 
-**Requirements.** Git, network access, [mise](https://mise.jdx.dev) with Ruby 4.0.7 (`mise.toml`; the script runs
-under `mise exec --` or any Ruby on `PATH`, and `--ruby` picks the Ruby that measures), the app's own build tools
+**Requirements.** Git, network access, [mise](https://mise.jdx.dev) (the script runs under `mise exec --` or any Ruby on `PATH`;
+it measures on Ruby 4.0.9 by default, installed on demand, and `--ruby` picks another), the app's own build tools
 (bun, npm, yarn, pnpm), and its services as local disposable instances (see [Services and apps](#services-and-apps)).
 `gh` is needed only for `prs`. Unset every `*DATABASE_URL` variable first; `script/census` refuses to run with one.
 A `--corpus` name must start with `census`, because the harness only boots copies under `.corpus/census*-APP`.
@@ -84,7 +84,7 @@ mise exec -- script/census compare --base base2 --aa base mine
 1. **Source:** a `case` entry in [`script/corpus`](../../script/corpus) with the repository and a pinned commit.
 2. **Overlay:** a patch applied to that commit, for example in
    [fixtures/corpus/inertia-chatwoot-census](../../fixtures/corpus/inertia-chatwoot-census). It moves the Gemfile
-   and lock to Rails main and `.ruby-version` to 4.0.7, plus any compatibility edit Rails main needs. The Gemfile
+   and lock to Rails main and `.ruby-version` to 4.0.9, plus any compatibility edit Rails main needs. The Gemfile
    must keep a `gem "rails", …` line (or its components): that line is what `setup` and `run` swap to another commit.
 3. **Configuration:** an entry in `APPS` in [`script/census`](../../script/census): `source`, `overlay`,
    `services`, throwaway `env`, and optional `build`, `pre_db`, `db` and `assets: false`.
@@ -116,7 +116,7 @@ script/census compare --base base2 --aa base extending              # add --mark
 script/census controls --script bench/upstream/census_5_controls.rb base2 extending
 ```
 
-Common options: `--apps blog,campfire` (default: all 23 configurations), `--ruby 4.0.7` (a mise version, installed
+Common options: `--apps blog,campfire` (default: all 23 configurations), `--ruby 4.0.9` (the default; a mise version, installed
 on demand, or a path to a `ruby` binary or its `bin` directory), `--corpus NAME` (copies in `.corpus/NAME-APP`, so
 several bases can coexist), `--out DIR` (default `.lowrail/private/census`), `--jobs N` (apps measured in parallel
 within one mode; counts are per process and unaffected). `script/census list` replays every workload three times
@@ -131,13 +131,17 @@ lock, differs in exactly one line: `gem "rails", github: "OWNER/REPO", ref: "SHA
 repository). The `ruby` pin is dropped, so the Ruby is a parameter. Every bundle is installed before measuring. No
 `bundle` command runs during a run, and no shared gem checkout is patched in place (censuses 3 and 5 did patch it).
 As a dependency control, `run` compares the variant lock with the base lock outside the Rails `GIT` block and
-`RUBY VERSION`. It records the result in `meta.json` and warns when they differ.
+`RUBY VERSION`. It records the result in `meta.json` and warns when they differ. A dev build (Ruby master) gets its
+own variant, `Gemfile.census-SHA12-ruby-REV10`: Bundler resolves gems whose binaries exclude 4.1 (ffi, nokogiri,
+sqlite3, pg, herb) to their source builds there, and that must not change the release pin's lock.
 
 **Ruby comparisons.** Give each Ruby its own labels and its own A/A pair, for example
-`run --label m407 --aa --ruby 4.0.7` and `run --label master --aa --ruby ~/rubies/master`. Then run
-`compare --base m4072 --aa m407 master`. `compare` prints each label's Rails commit and `RUBY_DESCRIPTION` first.
+`run --label m409 --aa --ruby 4.0.9` and `run --label master --aa --ruby ~/rubies/master`. Then run
+`compare --base m4092 --aa m409 master`. Labels never mix Ruby pins: census 8 moved from 4.0.7 to 4.0.9
+([decision](../DECISIONS.md#ruby-pin-409-41-measured-on-pinned-master-2026-11-03)), and 4.0.7 receipts are not compared with 4.0.9 runs. `compare` prints each label's Rails commit and `RUBY_DESCRIPTION` first.
 **JIT comparisons:** `compare --base base2:interpreter base2:yjit` pairs the same app across modes. `--modes zjit`
-needs a Ruby built with ZJIT. The local 4.0.7 is not, so ZJIT has not been run through this command yet.
+needs a Ruby built with ZJIT. The mise build of 4.0.9 here has none (built without rustc); use a ZJIT build such
+as Ruby master.
 
 ## Services and apps
 

@@ -464,7 +464,8 @@ index 5462e798..0ce10161 100644
    strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
    syntax_tree (6.3.0) sha256=56e25a9692c798ec94c5442fe94c5e94af76bef91edc8bb02052cbdecf35f13d
 @@ -1342,4 +1370,4 @@ RUBY VERSION
-   ruby 4.0.7
+-  ruby 4.0.7
++  ruby 4.0.9
  
  BUNDLED WITH
 -  4.0.23

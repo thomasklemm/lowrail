@@ -114,7 +114,7 @@ if $PROGRAM_NAME == __FILE__
       Gem::Specification.find_all_by_name("rack-session", "< 2").any?
   RUBY
   run.call("gems", [RbConfig.ruby, "-e", dependencies])
-  %w[real-blog real-blog-r4].each { run.call("prepare-#{_1}", ["bash", "script/corpus", _1]) }
+  %w[real-blog real-blog-r4].each { run.call("prepare-#{_1}", ["env", "LOWRAIL_CORPUS_RUBY=4.0.7", "bash", "script/corpus", _1]) }
   run.call("prepare-rails", [RbConfig.ruby, "script/rails-suite", "--prepare"])
   unless options[:prepare]
     run.call("valgrind", ["valgrind", "--version"])

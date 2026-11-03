@@ -7,7 +7,7 @@ index 86f3c08..496a4da 100644
  source 'https://rubygems.org'
  
 -ruby '4.0.9'
-+ruby '4.0.7'
++ruby '4.0.9'
  
  gem 'addressable'
  gem 'arabic-letter-connector', require: false
@@ -315,7 +315,7 @@ index 6b12f2e..c9aada5 100644
  
  RUBY VERSION
 -  ruby 4.0.9
-+  ruby 4.0.7
++  ruby 4.0.9
  
  BUNDLED WITH
 -  4.0.3
