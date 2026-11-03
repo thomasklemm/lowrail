@@ -1,0 +1,302 @@
+## Rails frames by total (inclusive) time: apps ≥ 0.5%, mean %, per app
+  Rails::Application#initialize!                                         5  52.1  chatwoot 46.7, discourse 54.5, lobsters 56.5, mastodon 49.3, sure 53.5
+  Rails::Initializable#run_initializers                                  5  52.1  chatwoot 46.7, discourse 54.5, lobsters 56.5, mastodon 49.3, sure 53.5
+  Rails::Initializable::Collection#each                                  5  52.0  chatwoot 46.6, discourse 54.5, lobsters 56.3, mastodon 49.2, sure 53.5
+  Rails::Initializable::Initializer#run                                  5  51.9  chatwoot 46.6, discourse 54.4, lobsters 56.2, mastodon 49.1, sure 53.4
+  block in <module:Finisher>                                             5  48.8  chatwoot 45.1, discourse 50.4, lobsters 49.2, mastodon 47.5, sure 51.9
+  ActiveSupport::Callbacks#run_callbacks                                 5   9.5  chatwoot 3.7, discourse 23.1, lobsters 6.7, mastodon 8.7, sure 5.5
+  Rails::Application::RoutesReloader#reload!                             5   8.4  chatwoot 11.8, discourse 10.8, lobsters 2.1, mastodon 12.6, sure 5.0
+  Rails::Application::RoutesReloader#execute_unless_loaded               5   7.5  chatwoot 7.0, discourse 10.8, lobsters 2.1, mastodon 12.6, sure 5.0
+  Rails::Application::RoutesReloader#execute                             5   7.5  chatwoot 7.0, discourse 10.8, lobsters 2.1, mastodon 12.6, sure 5.0
+  Rails::Application::RoutesReloader#updater                             5   7.5  chatwoot 7.0, discourse 10.8, lobsters 2.1, mastodon 12.6, sure 5.0
+  ActiveSupport::FileUpdateChecker#execute                               5   7.5  chatwoot 7.0, discourse 10.8, lobsters 2.1, mastodon 12.6, sure 5.0
+  ActiveSupport::Notifications.instrument                                5   6.2  chatwoot 1.7, discourse 9.0, lobsters 8.3, mastodon 3.3, sure 8.7
+  Rails::Application::RoutesReloader#load_paths                          5   6.0  chatwoot 9.2, discourse 5.8, lobsters 1.3, mastodon 10.5, sure 3.3
+  ActionDispatch::Routing::RouteSet#eval_block                           5   6.0  chatwoot 9.2, discourse 5.7, lobsters 1.3, mastodon 10.4, sure 3.3
+  ActionDispatch::Routing::RouteSet#draw                                 5   6.0  chatwoot 9.1, discourse 5.7, lobsters 1.3, mastodon 10.4, sure 3.3
+  ActiveSupport::Concern#append_features                                 5   5.6  chatwoot 8.8, discourse 3.2, lobsters 3.8, mastodon 8.0, sure 4.2
+  ActionDispatch::Routing::Mapper::Resources#match                       5   5.1  chatwoot 7.0, discourse 5.4, lobsters 1.1, mastodon 9.3, sure 3.0
+  ActionDispatch::Routing::Mapper::Resources#map_match                   5   5.1  chatwoot 6.9, discourse 5.2, lobsters 1.1, mastodon 9.2, sure 2.9
+  ActionDispatch::Routing::Mapper::Resources#decomposed_match            5   5.0  chatwoot 6.8, discourse 5.1, lobsters 1.1, mastodon 9.1, sure 2.9
+  ActionDispatch::Routing::Mapper::Resources#add_route                   5   5.0  chatwoot 6.8, discourse 5.0, lobsters 1.1, mastodon 9.1, sure 2.9
+  ActiveSupport::LazyLoadHooks#execute_hook                              5   5.0  chatwoot 7.1, discourse 3.1, lobsters 1.7, mastodon 1.4, sure 11.5
+  ActiveSupport::LazyLoadHooks#with_execution_control                    5   5.0  chatwoot 7.1, discourse 3.1, lobsters 1.7, mastodon 1.4, sure 11.5
+  ActionDispatch::Routing::Mapper::Scoping#scope                         5   4.8  chatwoot 7.5, discourse 5.7, lobsters 0.5, mastodon 9.4, sure 1.0
+  ActiveRecord::Associations::Builder::Association.build                 5   4.6  chatwoot 5.1, discourse 6.9, lobsters 2.0, mastodon 4.0, sure 5.2
+  ActiveSupport::LazyLoadHooks#run_load_hooks                            5   4.5  chatwoot 6.3, discourse 2.1, lobsters 1.6, mastodon 1.3, sure 11.4
+  ActionDispatch::Routing::Mapper::Resources#path_scope                  5   4.4  chatwoot 7.2, discourse 2.2, lobsters 0.6, mastodon 9.3, sure 3.0
+  ActionDispatch::Routing::Mapper::Resources#with_scope_level            5   4.2  chatwoot 7.0, discourse 1.6, lobsters 0.5, mastodon 8.9, sure 3.0
+  ActionDispatch::Routing::Mapper::Resources#resource_scope              5   4.2  chatwoot 7.0, discourse 1.6, lobsters 0.5, mastodon 8.8, sure 2.9
+  ActionDispatch::Routing::Mapper::Scoping#controller                    5   4.2  chatwoot 7.0, discourse 1.6, lobsters 0.5, mastodon 8.8, sure 2.9
+  ActionDispatch::Routing::Mapper::Resources#resources                   5   3.7  chatwoot 6.4, discourse 1.6, lobsters 0.5, mastodon 7.5, sure 2.6
+  <module:ActiveRecord>                                                  5   3.6  chatwoot 3.0, discourse 2.9, lobsters 5.5, mastodon 3.7, sure 2.8
+  Rails::Engine#call                                                     5   3.0  chatwoot 1.5, discourse 6.6, lobsters 3.4, mastodon 2.6, sure 1.1
+  ActionDispatch::Executor#call                                          5   3.0  chatwoot 1.5, discourse 6.6, lobsters 3.4, mastodon 2.6, sure 1.1
+  ActiveSupport::Notifications::Instrumenter#instrument                  5   3.0  chatwoot 1.5, discourse 6.8, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionDispatch::RemoteIp#call                                          5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.4, mastodon 2.5, sure 1.1
+  ActionDispatch::RequestId#call                                         5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.4, mastodon 2.5, sure 1.1
+  Rails::Rack::Logger#call                                               5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.3, mastodon 2.5, sure 1.1
+  ActionDispatch::ShowExceptions#call                                    5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.3, mastodon 2.5, sure 1.1
+  ActionDispatch::DebugExceptions#call                                   5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.3, mastodon 2.5, sure 1.1
+  ActionDispatch::Callbacks#call                                         5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.3, mastodon 2.5, sure 1.1
+  ActionDispatch::Cookies#call                                           5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.3, mastodon 2.5, sure 1.1
+  ActionDispatch::Routing::RouteSet#call                                 5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionDispatch::Journey::Router#serve                                  5   3.0  chatwoot 1.4, discourse 6.6, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionDispatch::Routing::RouteSet::Dispatcher#serve                    5   3.0  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionDispatch::Routing::RouteSet::Dispatcher#dispatch                 5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionController::Metal.dispatch                                       5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionController::Metal#dispatch                                       5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionView::Rendering#process                                          5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  AbstractController::Base#process                                       5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActiveRecord::Railties::ControllerRuntime#process_action               5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionController::ParamsWrapper#process_action                         5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionController::Instrumentation#process_action                       5   2.9  chatwoot 1.4, discourse 6.5, lobsters 3.3, mastodon 2.5, sure 1.0
+  ActionController::Rescue#process_action                                5   2.9  chatwoot 1.3, discourse 6.5, lobsters 3.3, mastodon 2.4, sure 1.0
+  AbstractController::Callbacks#process_action                           5   2.9  chatwoot 1.3, discourse 6.5, lobsters 3.3, mastodon 2.4, sure 1.0
+  ActionDispatch::Routing::Mapper::HttpHelpers#get                       5   2.9  chatwoot 3.4, discourse 3.4, lobsters 0.7, mastodon 5.6, sure 1.4
+  ActionDispatch::Routing::RouteSet#add_route                            5   2.8  chatwoot 3.3, discourse 2.2, lobsters 0.5, mastodon 6.7, sure 1.4
+  ActiveSupport::CodeGenerator.batch                                     5   2.6  chatwoot 2.3, discourse 5.1, lobsters 1.9, mastodon 1.8, sure 2.1
+  <class:Base>                                                           5   2.5  chatwoot 2.1, discourse 2.7, lobsters 4.3, mastodon 2.0, sure 1.5
+  ActiveRecord::Associations::Builder::Association.define_callbacks      5   2.4  chatwoot 2.7, discourse 3.7, lobsters 0.9, mastodon 1.9, sure 2.6
+  ActiveRecord::Associations::ClassMethods#has_many                      5   2.2  chatwoot 2.4, discourse 3.5, lobsters 1.0, mastodon 1.9, sure 2.5
+  ActionDispatch::Routing::RouteSet#eager_load!                          5   2.2  chatwoot 2.0, discourse 4.7, lobsters 0.7, mastodon 1.9, sure 1.5
+  ActiveRecord::AutosaveAssociation::AssociationBuilderExtension.build   5   2.1  chatwoot 2.2, discourse 3.4, lobsters 0.8, mastodon 1.8, sure 2.4
+  Rails::Initializable::Collection#tsort_each_child                      5   2.1  chatwoot 0.7, discourse 2.7, lobsters 5.5, mastodon 1.0, sure 0.7
+  ActiveRecord::AutosaveAssociation::ClassMethods#add_autosave_associati 5   2.1  chatwoot 2.2, discourse 3.4, lobsters 0.8, mastodon 1.8, sure 2.3
+  block in <class:Engine>                                                5   2.1  chatwoot 0.8, discourse 2.7, lobsters 5.4, mastodon 1.0, sure 0.7
+  ActiveRecord::Associations::ClassMethods#belongs_to                    5   2.0  chatwoot 1.9, discourse 3.0, lobsters 0.8, mastodon 2.0, sure 2.1
+  block (2 levels) in <class:Engine>                                     5   1.9  chatwoot 0.6, discourse 2.5, lobsters 5.2, mastodon 0.8, sure 0.5
+  ActionController::Railties::Helpers#inherited                          5   1.9  chatwoot 1.9, discourse 1.5, lobsters 0.8, mastodon 2.8, sure 2.3
+  ActiveSupport::Callbacks::ClassMethods#set_callback                    5   1.8  chatwoot 1.8, discourse 2.3, lobsters 0.8, mastodon 2.1, sure 1.8
+  AbstractController.eager_load!                                         5   1.7  chatwoot 3.2, discourse 1.1, lobsters 0.6, mastodon 2.7, sure 0.9
+  ActionView::Rendering::ClassMethods#eager_load!                        5   1.7  chatwoot 3.1, discourse 1.1, lobsters 0.6, mastodon 2.6, sure 0.9
+  ActiveSupport::CodeGenerator#execute                                   5   1.4  chatwoot 1.1, discourse 2.8, lobsters 1.0, mastodon 1.0, sure 1.2
+  ActiveRecord::Transactions::ClassMethods#set_callback                  5   1.4  chatwoot 1.5, discourse 2.1, lobsters 0.7, mastodon 1.3, sure 1.5
+  block (2 levels) in with                                               5   1.4  chatwoot 1.5, discourse 1.5, lobsters 0.8, mastodon 2.2, sure 1.1
+  ActiveRecord::Associations::Builder::CollectionAssociation.define_call 5   1.4  chatwoot 1.5, discourse 2.2, lobsters 0.5, mastodon 1.1, sure 1.6
+  ActiveSupport::CodeGenerator::MethodSet#apply                          5   1.4  chatwoot 1.1, discourse 2.7, lobsters 1.0, mastodon 1.0, sure 1.1
+  ActionController::ParamsWrapper::ClassMethods#inherited                5   1.2  chatwoot 1.1, discourse 1.3, lobsters 0.6, mastodon 1.9, sure 1.0
+  ActiveRecord::Store::ClassMethods#inherited                            5   1.1  chatwoot 0.9, discourse 1.7, lobsters 0.8, mastodon 1.0, sure 1.1
+  ActiveRecord::Reflection::ClassMethods#inherited                       5   1.1  chatwoot 0.9, discourse 1.7, lobsters 0.8, mastodon 1.0, sure 1.1
+  ActiveRecord::AttributeMethods::ClassMethods#inherited                 5   1.1  chatwoot 0.9, discourse 1.7, lobsters 0.8, mastodon 1.0, sure 1.0
+  ActionController::ParameterEncoding::ClassMethods#inherited            5   1.0  chatwoot 1.0, discourse 1.1, lobsters 0.5, mastodon 1.7, sure 0.9
+  ActionView::Layouts::ClassMethods#inherited                            5   1.0  chatwoot 1.0, discourse 1.2, lobsters 0.5, mastodon 1.6, sure 0.8
+  ActiveModel::AttributeMethods::ClassMethods#inherited                  5   1.0  chatwoot 0.8, discourse 1.6, lobsters 0.7, mastodon 0.9, sure 0.9
+  ActiveModel::AttributeRegistration::ClassMethods#inherited             5   1.0  chatwoot 0.8, discourse 1.6, lobsters 0.7, mastodon 0.9, sure 0.9
+  ActiveRecord::Locking::Optimistic::ClassMethods#inherited              5   1.0  chatwoot 0.8, discourse 1.6, lobsters 0.7, mastodon 0.9, sure 1.0
+  Class#class_attribute                                                  5   1.0  chatwoot 1.0, discourse 0.8, lobsters 0.8, mastodon 1.5, sure 0.8
+  <module:ActionView>                                                    5   1.0  chatwoot 0.8, discourse 1.1, lobsters 1.6, mastodon 0.8, sure 0.6
+  ActiveRecord::Inheritance::ClassMethods#inherited                      5   1.0  chatwoot 0.8, discourse 1.6, lobsters 0.7, mastodon 0.9, sure 0.9
+  ActiveRecord::ModelSchema::ClassMethods#inherited                      5   1.0  chatwoot 0.7, discourse 1.5, lobsters 0.7, mastodon 0.9, sure 0.9
+  Module#delegate                                                        5   0.8  chatwoot 0.8, discourse 0.9, lobsters 0.8, mastodon 1.1, sure 0.7
+  ActiveRecord::Persistence::ClassMethods#inherited                      5   0.8  chatwoot 0.7, discourse 1.3, lobsters 0.7, mastodon 0.8, sure 0.8
+  ActiveSupport::Delegation.generate                                     5   0.8  chatwoot 0.8, discourse 0.8, lobsters 0.8, mastodon 1.1, sure 0.7
+  ActiveRecord::Core::ClassMethods#inherited                             5   0.8  chatwoot 0.7, discourse 1.3, lobsters 0.7, mastodon 0.8, sure 0.8
+  <module:ActionController>                                              5   0.8  chatwoot 0.9, discourse 0.7, lobsters 1.0, mastodon 0.7, sure 0.5
+  <main>                                                                 4  25.6  chatwoot 35.5, discourse 32.8, lobsters 0.0, mastodon 27.1, sure 32.5
+  ActiveSupport::Callbacks::CallbackSequence#invoke_before               4   3.9  chatwoot 2.1, discourse 10.4, lobsters 0.2, mastodon 3.2, sure 3.4
+  ActiveSupport::Callbacks::Filters::Before#call                         4   3.9  chatwoot 2.1, discourse 10.4, lobsters 0.2, mastodon 3.2, sure 3.4
+  ActiveSupport::Callbacks::CallTemplate::InstanceExec0#make_lambda      4   3.5  chatwoot 1.0, discourse 10.0, lobsters 0.0, mastodon 3.2, sure 3.4
+  ActiveSupport::Callbacks::CallbackChain::DefaultTerminator#call_direct 4   3.5  chatwoot 0.9, discourse 10.0, lobsters 0.0, mastodon 3.2, sure 3.4
+  ActiveSupport::Reloader.prepare!                                       4   3.5  chatwoot 0.9, discourse 10.0, lobsters 0.0, mastodon 3.1, sure 3.4
+  ActionDispatch::Routing::Mapper::Resources#namespace                   4   3.4  chatwoot 6.8, discourse 1.7, lobsters 0.2, mastodon 7.9, sure 0.7
+  ActionDispatch::Routing::Mapper::Scoping#namespace                     4   3.4  chatwoot 6.8, discourse 1.7, lobsters 0.2, mastodon 7.9, sure 0.7
+  ActionController::Rendering#process_action                             4   2.5  chatwoot 0.2, discourse 6.1, lobsters 3.0, mastodon 2.4, sure 1.0
+  AbstractController::Base#process_action                                4   2.5  chatwoot 0.2, discourse 6.1, lobsters 3.0, mastodon 2.4, sure 1.0
+  ActionController::BasicImplicitRender#send_action                      4   2.5  chatwoot 0.2, discourse 6.1, lobsters 3.0, mastodon 2.4, sure 1.0
+  ActionDispatch::Routing::RouteSet::NamedRouteCollection#add            4   2.2  chatwoot 2.1, discourse 1.3, lobsters 0.3, mastodon 6.1, sure 0.9
+  ActionDispatch::ContentSecurityPolicy::Middleware#call                 4   1.7  chatwoot 1.4, discourse 0.0, lobsters 3.3, mastodon 2.5, sure 1.1
+  ActionDispatch::Routing::RouteSet::NamedRouteCollection#define_url_hel 4   1.6  chatwoot 1.3, discourse 0.6, lobsters 0.1, mastodon 5.6, sure 0.6
+  ActionDispatch::Routing::Mapper::Resources#collection                  4   1.6  chatwoot 2.5, discourse 0.8, lobsters 0.2, mastodon 3.4, sure 1.0
+  ActiveSupport::Inflector#constantize                                   4   1.5  chatwoot 2.0, discourse 0.8, lobsters 0.2, mastodon 0.6, sure 3.8
+  ActionDispatch::Journey::Router#eager_load!                            4   1.4  chatwoot 1.3, discourse 2.9, lobsters 0.5, mastodon 1.4, sure 1.1
+  ActionDispatch::Routing::Mapper::HttpHelpers#post                      4   1.4  chatwoot 2.2, discourse 0.9, lobsters 0.4, mastodon 2.7, sure 0.9
+  AbstractController::Base.action_methods                                4   1.3  chatwoot 2.5, discourse 1.5, lobsters 0.4, mastodon 1.6, sure 0.7
+  ActionDispatch::Journey::Nodes::Node#each                              4   1.3  chatwoot 2.1, discourse 2.1, lobsters 0.4, mastodon 1.1, sure 0.9
+  ActionView::ViewPaths::ClassMethods#eager_load!                        4   1.3  chatwoot 2.6, discourse 0.9, lobsters 0.4, mastodon 1.7, sure 0.7
+  ActionDispatch::Journey::Visitors::FunctionalVisitor#accept            4   1.3  chatwoot 2.0, discourse 2.0, lobsters 0.4, mastodon 1.0, sure 0.9
+  AbstractController::UrlFor::ClassMethods#action_method_symbols         4   1.3  chatwoot 2.4, discourse 1.4, lobsters 0.3, mastodon 1.5, sure 0.6
+  ActionDispatch::Journey::Visitors::Each#visit                          4   1.3  chatwoot 2.0, discourse 2.0, lobsters 0.4, mastodon 1.0, sure 0.9
+  ActionController::Metal.eager_load!                                    4   1.2  chatwoot 2.5, discourse 0.8, lobsters 0.4, mastodon 1.7, sure 0.7
+  AbstractController::Base.eager_load!                                   4   1.2  chatwoot 2.5, discourse 0.8, lobsters 0.4, mastodon 1.6, sure 0.7
+  AbstractController::Base.action_method_symbols                         4   1.2  chatwoot 2.0, discourse 1.3, lobsters 0.3, mastodon 1.5, sure 0.6
+  ActiveRecord::AutosaveAssociation::ClassMethods#define_non_cyclic_meth 4   1.1  chatwoot 1.2, discourse 1.7, lobsters 0.4, mastodon 0.9, sure 1.2
+  ActiveSupport::Autoload#eager_load!                                    4   1.1  chatwoot 1.1, discourse 0.9, lobsters 1.8, mastodon 1.1, sure 0.5
+  ActionDispatch::Journey::Visitors::FunctionalVisitor#visit             4   1.1  chatwoot 1.8, discourse 1.7, lobsters 0.3, mastodon 0.8, sure 0.7
+  ActiveRecord::Associations::Builder::SingularAssociation.define_callba 4   1.0  chatwoot 1.3, discourse 1.6, lobsters 0.4, mastodon 0.9, sure 1.1
+  ActionDispatch::Journey::Visitors::FunctionalVisitor#visit_CAT         4   1.0  chatwoot 1.7, discourse 1.6, lobsters 0.3, mastodon 0.8, sure 0.7
+  ActiveSupport::Callbacks::ClassMethods#__update_callbacks              4   1.0  chatwoot 1.0, discourse 1.4, lobsters 0.5, mastodon 1.2, sure 1.0
+  ActionDispatch::Journey::Visitors::FunctionalVisitor#binary            4   1.0  chatwoot 1.7, discourse 1.6, lobsters 0.3, mastodon 0.8, sure 0.7
+  ActionController::Rendering::ClassMethods#inherited                    4   1.0  chatwoot 0.9, discourse 1.1, lobsters 0.5, mastodon 1.6, sure 0.8
+  ActionDispatch::Routing::Mapper::Mapping.build                         4   1.0  chatwoot 1.6, discourse 1.4, lobsters 0.2, mastodon 1.0, sure 0.6
+  ActionDispatch::Journey::Router#simulator                              4   0.9  chatwoot 1.1, discourse 1.8, lobsters 0.3, mastodon 0.9, sure 0.7
+  ActionDispatch::Journey::Routes#simulator                              4   0.9  chatwoot 1.1, discourse 1.8, lobsters 0.3, mastodon 0.9, sure 0.7
+  ActionDispatch::Routing::Mapper::Mapping#initialize                    4   0.9  chatwoot 1.5, discourse 1.3, lobsters 0.2, mastodon 0.9, sure 0.6
+  ActiveRecord::Associations::Builder::BelongsTo.define_callbacks        4   0.8  chatwoot 0.7, discourse 1.3, lobsters 0.3, mastodon 0.8, sure 1.0
+  ActionView::Layouts::ClassMethods#_write_layout_method                 4   0.7  chatwoot 0.6, discourse 0.8, lobsters 0.3, mastodon 1.1, sure 0.6
+  ActiveSupport::ClassAttribute.redefine                                 4   0.6  chatwoot 0.6, discourse 0.8, lobsters 0.3, mastodon 0.9, sure 0.6
+  ActiveSupport::Callbacks::Callback.build                               4   0.6  chatwoot 0.6, discourse 0.7, lobsters 0.3, mastodon 0.7, sure 0.6
+  ActiveSupport::Callbacks::Callback#initialize                          4   0.5  chatwoot 0.5, discourse 0.6, lobsters 0.3, mastodon 0.6, sure 0.5
+  ActionDispatch::Routing::Mapper::Resources#member                      3   2.1  chatwoot 3.7, discourse 0.4, lobsters 0.2, mastodon 4.5, sure 1.6
+  Rails::Rack::Logger#call_app                                           3   1.8  chatwoot 1.4, discourse 6.6, lobsters 0.0, mastodon 0.0, sure 1.1
+  Rails::Engine#load_config_initializer                                  3   1.8  chatwoot 0.3, discourse 2.4, lobsters 5.1, mastodon 0.8, sure 0.3
+  ActionDispatch::Routing::Mapper::Resources#apply_common_behavior_for   3   1.7  chatwoot 4.3, discourse 1.2, lobsters 0.1, mastodon 2.5, sure 0.3
+  ActionDispatch::SSL#call                                               3   1.4  chatwoot 0.0, discourse 0.0, lobsters 3.4, mastodon 2.5, sure 1.1
+  ActiveSupport::Cache::Strategy::LocalCache::Middleware#call            3   1.4  chatwoot 0.0, discourse 0.0, lobsters 3.4, mastodon 2.5, sure 1.1
+  ActionDispatch::Routing::Mapper::Resources#set_member_mappings_for_res 3   1.4  chatwoot 2.2, discourse 0.3, lobsters 0.2, mastodon 3.2, sure 0.9
+  String#constantize                                                     3   1.3  chatwoot 2.0, discourse 0.5, lobsters 0.2, mastodon 0.5, sure 3.2
+  ActiveRecord::ConnectionAdapters::ConnectionPool#with_connection       3   1.1  chatwoot 0.4, discourse 3.2, lobsters 0.5, mastodon 1.2, sure 0.0
+  ActionController::Instrumentation#render                               3   0.9  chatwoot 0.2, discourse 0.0, lobsters 1.0, mastodon 2.4, sure 1.0
+  ActiveRecord::Railties::ControllerRuntime#cleanup_view_runtime         3   0.9  chatwoot 0.2, discourse 0.0, lobsters 1.0, mastodon 2.4, sure 1.0
+  ActiveRecord::ModelSchema::ClassMethods#schema_context                 3   0.9  chatwoot 0.4, discourse 2.2, lobsters 0.6, mastodon 1.3, sure 0.0
+## Rails frames by self time: apps ≥ 0.5%, mean %, per app
+  ActiveSupport::CodeGenerator::MethodSet#apply > Module#module_eval     5   0.9  chatwoot 0.7, discourse 1.9, lobsters 0.7, mastodon 0.7, sure 0.8
+  ActiveSupport::Delegation.generate > Module#module_eval                5   0.7  chatwoot 0.7, discourse 0.7, lobsters 0.7, mastodon 0.9, sure 0.6
+  ActionDispatch::Routing::RouteSet::NamedRouteCollection#define_url_hel 4   1.6  chatwoot 1.3, discourse 0.6, lobsters 0.1, mastodon 5.5, sure 0.6
+  ActiveRecord::AutosaveAssociation::ClassMethods#define_non_cyclic_meth 4   1.0  chatwoot 1.1, discourse 1.5, lobsters 0.4, mastodon 0.9, sure 1.2
+  Class#class_attribute > Module#class_eval                              4   0.7  chatwoot 0.7, discourse 0.5, lobsters 0.5, mastodon 1.1, sure 0.5
+  AbstractController::Base.action_method_symbols > Module#public_instanc 3   0.6  chatwoot 1.2, discourse 0.6, lobsters 0.1, mastodon 0.7, sure 0.3
+  ActionView::Layouts::ClassMethods#_write_layout_method > Module#class_ 2   0.5  chatwoot 0.4, discourse 0.6, lobsters 0.2, mastodon 0.7, sure 0.4
+  ActiveSupport::Concern#append_features > Module#append_features        1   0.3  chatwoot 0.6, discourse 0.1, lobsters 0.1, mastodon 0.3, sure 0.2
+  ActiveSupport::Inflector#apply_inflections > String#sub!               0   0.4  chatwoot 0.4, discourse 0.3, lobsters 0.2, mastodon 0.5, sure 0.4
+  ActiveRecord::Delegation::GeneratedRelationMethods#generate_method > M 0   0.3  chatwoot 0.5, discourse 0.2, lobsters 0.1, mastodon 0.4, sure 0.4
+  AbstractController::Base.internal_methods > Module#public_instance_met 0   0.3  chatwoot 0.3, discourse 0.4, lobsters 0.1, mastodon 0.5, sure 0.2
+  ActionDispatch::Journey::Visitors::FunctionalVisitor#visit             0   0.3  chatwoot 0.5, discourse 0.4, lobsters 0.1, mastodon 0.2, sure 0.2
+  ActiveSupport::CodeGenerator::MethodSet#apply > Module#define_method   0   0.3  chatwoot 0.2, discourse 0.5, lobsters 0.2, mastodon 0.2, sure 0.2
+  ActionDispatch::Journey::Path::Pattern::AnchoredRegexp#accept          0   0.2  chatwoot 0.2, discourse 0.5, lobsters 0.1, mastodon 0.2, sure 0.2
+  ActiveSupport::ClassAttribute.redefine                                 0   0.2  chatwoot 0.2, discourse 0.2, lobsters 0.1, mastodon 0.3, sure 0.2
+  AbstractController::Base.action_method_symbols > Array#-               0   0.2  chatwoot 0.4, discourse 0.2, lobsters 0.1, mastodon 0.2, sure 0.1
+  ActionDispatch::Journey::Visitors::Each#visit                          0   0.2  chatwoot 0.3, discourse 0.3, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveSupport::Inflector#camelize > String#gsub!                       0   0.1  chatwoot 0.1, discourse 0.4, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Visitors::Visitor#visit                       0   0.1  chatwoot 0.2, discourse 0.2, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActiveSupport::Callbacks::ClassMethods#set_callback                    0   0.1  chatwoot 0.1, discourse 0.2, lobsters 0.1, mastodon 0.2, sure 0.1
+  ActionDispatch::Journey::Ast#visit_tree                                0   0.1  chatwoot 0.3, discourse 0.2, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::GTG::Builder#build_followpos                  0   0.1  chatwoot 0.2, discourse 0.2, lobsters 0.0, mastodon 0.1, sure 0.1
+  Class#class_attribute                                                  0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActiveSupport::Delegation.generate                                     0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Visitors::Each#visit > Enumerable#find_all    0   0.1  chatwoot 0.2, discourse 0.2, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionView::Rendering::ClassMethods#build_view_context_class > Module# 0   0.1  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.3, sure 0.1
+  ActiveSupport::CodeGenerator::MethodSet#apply                          0   0.1  chatwoot 0.1, discourse 0.2, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActiveSupport::Concern#append_features                                 0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActiveSupport::Inflector#underscore > String#gsub!                     0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  AbstractController::Base.internal_methods > Array#-                    0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.2, sure 0.1
+  ActionDispatch::Routing::Mapper::Mapping#initialize                    0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveSupport::Callbacks::ClassMethods#set_callbacks                   0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::GTG::Builder#nullable?                        0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Path::Pattern#requirements_for_missing_keys_c 0   0.1  chatwoot 0.0, discourse 0.4, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::GTG::Builder#transition_table                 0   0.1  chatwoot 0.1, discourse 0.2, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveSupport::Inflector#apply_inflections                             0   0.1  chatwoot 0.2, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  Module#silence_redefinition_of_method > Module#alias_method            0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveSupport::ClassAttribute.redefine_method                          0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveSupport::Callbacks::Callback#compiled                            0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  AbstractController::UrlFor::ClassMethods#action_method_symbols > Array 0   0.1  chatwoot 0.4, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Inflector#camelize                                      0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveSupport::Callbacks::ClassMethods#define_callbacks > Module#modul 0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.0
+  ActionDispatch::Routing::RouteSet::NamedRouteCollection#add            0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Path::Pattern#offsets                         0   0.1  chatwoot 0.0, discourse 0.3, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::CallTemplate.build                           0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActiveSupport::CodeGenerator::MethodSet#define_cached_method           0   0.1  chatwoot 0.1, discourse 0.2, lobsters 0.1, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::Path::Pattern#requirements_anchored?          0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Scanner#scan                                  0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Parser#parse_expressions                      0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::Delegation.DelegateClass > Module#module_eval           0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  Module#mattr_reader > Module#module_eval                               0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.0
+  Module#silence_redefinition_of_method                                  0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveSupport::Callbacks::ClassMethods#__update_callbacks              0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::GTG::Builder#transition_table > Enumerable#gr 0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Journey::Parser#parse_terminal                         0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  Module#mattr_writer > Module#module_eval                               0   0.1  chatwoot 0.1, discourse 0.0, lobsters 0.1, mastodon 0.1, sure 0.0
+  ActiveSupport::Callbacks::CallbackChain#initialize_copy                0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.1, mastodon 0.1, sure 0.1
+  ActiveSupport::CodeGenerator::MethodSet#define_cached_method > String# 0   0.1  chatwoot 0.0, discourse 0.2, lobsters 0.1, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::GTG::TransitionTable#[]=                      0   0.1  chatwoot 0.0, discourse 0.2, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::GTG::Builder#nullable? > Module#===           0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::ClassAttribute.redefine_method > Module#define_method   0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::Callbacks::Callback#duplicates?                         0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::Concern#append_features > Module#extend_object          0   0.1  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  <top (required)> > Kernel#require_relative                             0   0.1  chatwoot 0.0, discourse 0.0, lobsters 0.3, mastodon 0.0, sure 0.0
+  ActiveRecord::AutosaveAssociation::ClassMethods#define_non_cyclic_meth 0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Inflector#camelize > String#sub                         0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveRecord::Reflection::AssociationReflection#initialize             0   0.1  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.1
+  Hash#assert_valid_keys > Array#flatten!                                0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.1
+  ActionDispatch::Journey::GTG::Builder#transition_table > Array#uniq    0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  <main> > Kernel#require_relative                                       0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Visitors::FunctionalVisitor#binary            0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Inflector#constantize                                   0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Journey::Visitors::FormatBuilder#binary                0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Journey::Routes#flatten_cat                            0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Journey::Scanner#scan > StringScanner#skip             0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::Callback#initialize                          0   0.1  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::Path::Pattern::AnchoredRegexp#visit_CAT       0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Concern#included                                        0   0.1  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  Array#extract_options!                                                 0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::GTG::Builder#transition_table > Enumerable#fl 0   0.1  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Journey::GTG::Builder#lastpos                          0   0.1  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::AutosaveAssociation::ClassMethods#add_autosave_associati 0   0.1  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.1
+  ActionDispatch::Routing::Mapper::Scope#initialize > Hash#merge         0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::Callbacks::Callback.build                               0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Journey::Nodes::Node#each                              0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.1
+  ActiveSupport::DescendantsTracker#descendants                          0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::Inflector#constantize > Module#const_get                0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.1
+  ActionDispatch::Routing::RouteSet::NamedRouteCollection#clear! > Modul 0   0.0  chatwoot 0.2, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Delegation::GeneratedRelationMethods#generate_method     0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActionDispatch::Journey::GTG::Builder#firstpos                         0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Routing::Mapper::Scope#[]                              0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionView::Layouts::ClassMethods#_write_layout_method                 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.1
+  ActiveRecord::Delegation::DelegateCache#initialize_relation_delegate_c 0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::Callback#matches?                            0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveRecord::Transactions::ClassMethods#set_callback                  0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.1
+  ActionDispatch::Routing::Mapper::Resources#add_route                   0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.1, sure 0.0
+  AbstractController::Helpers::ClassMethods#helper_method > Module#class 0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveModel::AttributeMethods::ClassMethods#define_call                0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.1, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::Nodes::Node#initialize                        0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  Time#plus_with_duration > Time#+                                       0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.1, mastodon 0.0, sure 0.1
+  ActiveSupport::CodeGenerator#define_cached_method                      0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::CallbackChain#remove_duplicates              0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::CodeGenerator::MethodSet#initialize                     0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::DescendantsTracker#descendants > Enumerable#flat_map    0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::Callbacks::Callback#conditions_lambdas                  0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Routing::Mapper::Mapping.build                         0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::Inflector#apply_inflections > Array#each                0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Routing::Mapper::Mapping#initialize > Hash#merge       0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::Format#initialize                             0   0.0  chatwoot 0.1, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Scoping::Named::ClassMethods#singleton_method_added > Ke 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveModel::Validations::ClassMethods#validates                       0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::ClassMethods#__update_callbacks > Kernel#dup 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Inflector#inflections                                   0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Associations::Builder::CollectionAssociation.define_call 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  Time#plus_with_duration                                                0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.1, mastodon 0.0, sure 0.1
+  ActiveSupport::ClassAttribute.redefine > Kernel#instance_variable_set  0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActionDispatch::Routing::Mapper::Resources#map_match                   0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Inflector#camelize > String#capitalize!                 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Routing::Mapper::Resources#match                       0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::ClassMethods#normalize_callback_params       0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveModel::Validations::ClassMethods#validates_with                  0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Inflector#underscore > String#gsub                      0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  block in _define_after_model_callback                                  0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Routing::Mapper::Scoping#scope                         0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.1, sure 0.0
+  Rails::Paths::Path#expanded > File.expand_path                         0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.1, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::GTG::TransitionTable#move                     0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.1, sure 0.0
+  ActiveSupport::ClassAttribute.redefine_method > Module#private         0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::CodeGenerator#initialize                                0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::CallbackChain#remove_duplicates > Array#dele 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::AttributeMethods::ClassMethods#dangerous_class_method? > 0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Delegation::DelegateCache#initialize_relation_delegate_c 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::Routes#static_exact_path                      0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::Formatter#build_cache                         0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Callbacks::ClassMethods#get_callbacks                   0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Associations::Builder::CollectionAssociation.define_acce 0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Ractors.try_shareable_proc                              0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Associations::Builder::Association.define_accessors      0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  <module:ActiveRecord>                                                  0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  <main>                                                                 0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Delegation::DelegateCache#generated_relation_methods     0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Associations::Builder::SingularAssociation.define_constr 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Routing::Mapper::HttpHelpers#get                       0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionDispatch::Journey::Scanner#next_token                            0   0.0  chatwoot 0.1, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::CodeGenerator::MethodSet#apply > Array#join             0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  block in _define_before_model_callback                                 0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Delegation::DelegateCache#include_relation_methods       0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActionView::RenderParser#render_calls > Prism.parse                    0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.2
+  ActiveRecord::AutosaveAssociation::ClassMethods#define_autosave_valida 0   0.0  chatwoot 0.0, discourse 0.1, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveRecord::Base.__callbacks                                         0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
+  ActiveSupport::Inflector#camelize > String#match?                      0   0.0  chatwoot 0.0, discourse 0.0, lobsters 0.0, mastodon 0.0, sure 0.0
