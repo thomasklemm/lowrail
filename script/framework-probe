@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Runs bench/upstream/framework_census/probe.rb in census app copies, with the
+# same environment and bundle as `script/census run`. See
+# docs/upstream/rails-framework-census.md.
+#   script/framework-probe work    --label L [--rails SPEC] [--modes interp,yjit] [--apps LIST] [--jobs N]
+#   script/framework-probe callers --app APP [--rails SPEC] [--mode interp] CALLERS
+# work writes OUT/probe-L/APP-MODE.json; CALLERS is "Klass#meth,...".
+load File.expand_path("census", __dir__)
+
+module FrameworkProbeRunner
+  PROBE = File.join(Census::ROOT, "bench/upstream/framework_census/probe.rb")
+
+  module_function
+
+  def main(argv)
+    command = argv.shift
+    opts = { modes: %w[interpreter yjit], mode: "interpreter", corpus: "census",
+      out: File.join(Census::ROOT, ".lowrail/private/census"), jobs: 1, ruby: "4.0.7" }
+    rest = OptionParser.new do |o|
+      o.on("--label L") { opts[:label] = _1 }
+      o.on("--rails SPEC") { opts[:rails] = _1 }
+      o.on("--apps LIST") { opts[:apps] = Census.apps_option(_1) }
+      o.on("--app APP") { opts[:app] = _1 }
+      o.on("--modes LIST") { |v| opts[:modes] = v.split(",").map { Census::MODES.fetch(_1) } }
+      o.on("--mode M") { opts[:mode] = Census::MODES.fetch(_1) }
+      o.on("--jobs N", Integer) { opts[:jobs] = _1 }
+      o.on("--corpus NAME") { opts[:corpus] = _1 }
+      o.on("--out DIR") { opts[:out] = File.expand_path(_1) }
+    end.parse(argv)
+    # Default: every app that has a census copy.
+    opts[:apps] ||= Census::APPS.keys.select { File.exist?(File.join(Census.app_dir(opts[:corpus], _1), ".census.json")) }
+    bin = Census.ruby_bin(opts[:ruby])
+    apps = command == "callers" ? [opts.fetch(:app)] : opts[:apps]
+    Census.check_services(apps)
+    base = Census.state(opts[:corpus], apps.first).fetch("base")
+    rails = opts[:rails] ? Census.resolve_rails(opts[:rails]) : base
+    env_of = ->(app, mode) do
+      gemfile = Census.variant(opts[:corpus], app, rails, bin)
+      Census.env_for(app, bin, rails, gemfile).merge("CENSUS_MODE" => mode)
+    end
+    case command
+    when "work"
+      out = File.join(opts[:out], "probe-#{opts.fetch(:label)}")
+      FileUtils.mkdir_p(out)
+      opts[:modes].each do |mode|
+        queue = Queue.new
+        apps.each { queue << _1 }
+        Array.new([opts[:jobs], apps.size].min) do
+          Thread.new do
+            while (app = (queue.pop(true) rescue nil))
+              json = File.join(out, "#{app}-#{mode}.json")
+              next if File.exist?(json)
+              Census.sh(env_of.(app, mode), "bundle", "exec", "ruby", *Census::FLAGS.fetch(mode), PROBE, "work", app, json,
+                chdir: Census.app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
+            end
+          end
+        end.each(&:join)
+      end
+    when "callers"
+      app = opts.fetch(:app)
+      Census.sh(env_of.(app, opts[:mode]).merge("CALLERS" => rest.fetch(0)), "bundle", "exec", "ruby",
+        *Census::FLAGS.fetch(opts[:mode]), PROBE, "callers", app, chdir: Census.app_dir(opts[:corpus], app))
+    else
+      abort File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.join
+    end
+  end
+end
+
+FrameworkProbeRunner.main(ARGV.dup)
