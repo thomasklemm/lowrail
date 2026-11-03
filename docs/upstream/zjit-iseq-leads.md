@@ -89,7 +89,7 @@ apps reached. Side exits (#8, #9) cost far more per event than fallbacks.
 | 7 | **`&block` forwarding:** `mon_synchronize(&b)` (monitor.rb:147), `iterate_guarding_exceptions` (fanout.rb:23), `ConnectionPool::Queue#synchronize` (queue.rb:99), `with_connection` (connection_handling.rb:361) | `send_block_arg_not_nil` | 10 | 63 for monitor (all `&block`: 334) | 120k / 95k / 201k (all) | Shopify/ruby#1014 (open, unassigned); #1039 rows 41, 42, 44, 49. On ruby-bench's Rails 8.1, `_read_attribute(name, &block)` alone is 36k / 58k / 68k; Rails main removed that block |
 | 8 | **`super` from a method that received a block side-exits every call:** `AssociationRoute` cache `fetch_or_store` (association_route.rb:189), `cleanup_view_runtime` (controller_runtime.rb:43) | `exit_unhandled_block_arg` | 10 | 21 (all: 22.5) | 2.1k / 0.3k / 0.06k | Repro: 10,000 exits in 10,000 calls, for explicit `super(x)` and zsuper. The guard has `recompile: None`. On k0kubun's branch the same guard has `recompile: Some(Recompile)` (super rows 45/46, unassigned). No issue covers it |
 | 9 | **invalidated constant patch points that keep exiting:** `WhereClause.empty` → `EMPTY` (where_clause.rb:99), `FromClause.empty` (from_clause.rb:22), `connection_specification_name` (connection_handling.rb:320) | `exit_patchpoint_stable_constant_names` | 5 | 230 (fizzy 252) | 0 / 0 / 38.5k | #1039 row 19 `69b586ee80` "Let invalidated ISEQs recompile instead of exiting forever" (version budget spent): unassigned, not on master. Why these constant names get redefined per request is open; hand to J1's Z12 (invalidation churn) |
-| 10 | **`singleton_class_seen` in `ActiveModel::IndexedRow#fetch`** (indexed_row.rb:172, Rails main only) | `send_fallback_singleton_class_seen` | 6 | 330 (lobsters 1,220) | 0 / 1.2k / 0.2k (htmlentities) | linyiru's ruby/ruby#19658 (open) / #19669 (closed today). The receiver isn't the frozen `UNSET` module (a standalone repro of that send compiles); which Hash/Array class had a singleton class isn't established yet |
+| 10 | **`singleton_class_seen` in `ActiveModel::IndexedRow#fetch`** (indexed_row.rb:172, Rails main only): `UNSET.equal?(value)`, where `UNSET = Module.new.freeze` | `send_fallback_singleton_class_seen` | 6 | 330 (lobsters 1,220) | 0 / 1.2k / 0.2k (htmlentities) | linyiru's ruby/ruby#19658 (open) / #19669 (closed 2026-11-03). Receiver class is plain `Module`; see [lead 10 below](#lead-10-the-receiver-class) |
 
 Not in the 10, for the record:
 
@@ -104,7 +104,90 @@ without an assignee. The shortlist rule is not to take #1039 rows, so the useful
 per-request breadth on Rails main (10/10 apps for 4–7) as upstreaming priority data, not a competing patch.
 Lead 8 is the only one without an issue. It's small: give the block-handler guard a recompile, or specialize the
 implicit block pass through `super`. It's also in the area of k0kubun's super rows, so it needs an ownership
-question first. Leads 1–3 are #1099. Lead 10 belongs with linyiru's PRs once the receiver class is pinned down.
+question first. Leads 1–3 are #1099. Lead 10 is the general #19658/#19669 problem with `Module` as the class, so it belongs with linyiru's PRs.
+
+## Lead 10: the receiver class
+
+The fallback is the `UNSET.equal?(value)` send. The lobsters HIR dump shows
+`Send v70, :equal?, v331 # SendFallbackReason: Singleton class previously created for receiver class`, where
+`v70` is the `UNSET` constant (behind `StableConstantNames(UNSET)`).
+
+* **`UNSET` itself has no singleton class.** Checked in the lobsters census process with an `at_exit` hook:
+  no singleton class attached to it, and no singleton methods.
+* **The receiver class is plain `Module`.** By the end of the run, 686 plain `Module` instances in that process
+  have a singleton class. `make_singleton_class` (class.c) invalidates `NoSingletonClass(Module)` whenever any of
+  them gets one.
+* **Once an ISEQ was invalidated for that and `Module` has a singleton-class record**
+  (`assume_no_singleton_classes`, hir.rs:3662), every recompile sends to *any* module receiver dynamically.
+* **Standalone repro on `9aa0898240`:** 10,000 `singleton_class_seen` fallbacks in 10,000 calls.
+
+```ruby
+U = Module.new.freeze
+def f(v) = U.equal?(v)
+def mk = (m = Module.new; def m.helper = 1)
+5.times { 1000.times { f(1) }; mk }          # modules get singleton classes after f is compiled
+def run(n) = (i = 0; while i < n; f(i); i += 1; end)
+run(100)
+RubyVM::ZJIT.reset_stats!; run(10_000)
+p RubyVM::ZJIT.stats[:send_fallback_singleton_class_seen]   # => 10000
+```
+
+**Variants.** A single creation after compile doesn't trigger it: ZJIT recompiles with the patch point again.
+Creations before the first compile don't trigger it either.
+
+**Mechanism vs. linyiru's PRs.** This is the mechanism of ruby/ruby#19658/#19669 (Mastodon's per-request
+`def env.http_accept_language` on `Hash`), with `Module` as the class. Rails apps keep giving `Module` instances
+singleton classes after boot. Which Rails code does it during requests isn't traced. #19669's approach (guard the
+receiver's class instead of a dynamic send) would cover a constant receiver like `UNSET` trivially, since its
+class is known.
+
+## Draft: Shopify/ruby issue for lead 8 (not posted)
+
+**Title:** ZJIT: `super` in a method that received a block side-exits on every call
+
+> `super` (explicit or zsuper) inside a method that was called with a block side-exits on every call and never
+> recompiles. The specialized `invokesuper` guards that the frame's block handler is `VM_BLOCK_HANDLER_NONE`
+> (`SideExitReason::UnhandledBlockArg`, zjit/src/hir.rs:5652 on master 9aa0898240), and that guard has
+> `recompile: None`.
+>
+> ```ruby
+> class C; def fetch_or_store(k) = (yield k); end
+> class D < C; def fetch_or_store(k) = super(k.nil? ? 0 : k); end   # zsuper behaves the same
+> O = D.new
+> def run(n) = n.times { |i| O.fetch_or_store(i) { _1 } }
+> run(1000); RubyVM::ZJIT.reset_stats!; run(10_000)
+> p RubyVM::ZJIT.stats[:exit_unhandled_block_arg]   # => 10000
+> ```
+>
+> In Rails this hits `ActiveRecord::AssociationRoute::Cache#fetch_or_store` (association_route.rb:189,
+> `super(key.nil? ? NIL_KEY : key)` under `fetch_or_store(key) { new }`) and
+> `ActiveRecord::Railties::ControllerRuntime#cleanup_view_runtime` (controller_runtime.rb:43).
+>
+> * **Rails main:** 10 of 10 census apps, 21 exits per request on average (campfire 67, writebook 63, fizzy 31).
+> * **ruby-bench:** railsbench 2,052 per iteration (2,000 in `cleanup_view_runtime`), lobsters 341, shipit 57.
+>
+> Measured with per-ISEQ counters (`--zjit-stats-iseq`, see #746).
+>
+> On k0kubun's `zjit-lobsters7` branch the same guard has `recompile: Some(Recompile)`, next to the super rows 45/46
+> of #1039. Is this covered by that work, or is it free to take? The small version is giving the guard a recompile;
+> passing the frame's block handler through to the super callee would specialize it fully.
+
+## Draft: comment on Shopify/ruby#1039 (not posted)
+
+> Rails-main breadth for a few unassigned rows, in case it helps order the upstreaming. I measured with per-ISEQ
+> ZJIT counters (`--zjit-stats-iseq`, #746) on master 9aa0898240 over 10 Rails-main apps (Rails 5810776eec;
+> blog, campfire, writebook, fizzy, fizzy-mysql, codetriage, pingcrm, redprints-cfp, react-starter-kit,
+> lobsters). "Per request" is the mean over the apps reached. ruby-bench is per iteration, railsbench / lobsters /
+> shipit.
+>
+> | row | fallback / exit | top Rails site | apps | per request | ruby-bench per itr |
+> |---|---|---|---|---|---|
+> | 11 `send`/`__send__` | `send_not_optimized_method_type_optimized` | Arel `Visitor#visit` (visitor.rb:35), 102/request | 10/10 | 186 | 42k / 26k / 70k |
+> | 19 invalidated ISEQs | `exit_patchpoint_stable_constant_names` | `WhereClause.empty` (where_clause.rb:99), `FromClause.empty` | 5/10 | 230 | 0 / 0 / 38.5k (shipit `connection_specification_name`) |
+> | 20/22 `def foo(...)` | `sendforward_not_specialized` | `WhereClause#empty?` via `delegate` (where_clause.rb:8), 92/request | 10/10 | 331 | 75k / 32k / 101k |
+> | 47 protected | `send_not_optimized_need_permission` | `OrderedOptions` `@parent._get(k)` (ordered_options.rb:109), 114/request; `WhereClause#merge` | 10/10 | 188 | 55k / 16k / 30k |
+>
+> Each per-ISEQ counter sums exactly to its global counter on every app.
 
 ## Data for the #746 comment
 
