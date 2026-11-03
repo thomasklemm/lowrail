@@ -23,6 +23,34 @@ call that removes the slow-path lookup entirely, and per-call counts return to t
 
 Not opened. Drafts in the short form are at the end.
 
+**ruby-bench** (Callgrind, one measured iteration after warmup; A/A = same commit in a second worktree):
+
+| | lobsters | railsbench | shipit |
+| --- | ---: | ---: | ---: |
+| interpreter A/A / AT1 / AT1+AT2 | −0.04% / −0.10% / −0.13% | +0.01% / −0.16% / −0.15% | −0.02% / −0.15% / −0.23% |
+| YJIT A/A / AT1 / AT1+AT2 | +0.41% / +0.12% / −0.01% | +0.11% / −0.26% / −0.13% | −0.09% / −0.19% / −0.23% |
+| ZJIT (Ruby master) A/A / AT1 / AT1+AT2 | +0.11% / −0.13% / −0.20% | −0.03% / −0.15% / −0.07% | not run |
+
+Under ZJIT both apps clear their A/A with AT1. Under YJIT only railsbench and shipit clear their A/A, by about 0.1 to 0.2 points; lobsters' YJIT A/A (+0.41%) is
+larger than the effect, as in [activerecord-cpu](activerecord-cpu.md) (lobsters is not fully deterministic).
+
+**Ruby master × ZJIT** ([`9aa0898240`](https://github.com/ruby/ruby/commit/9aa0898240), built in this orb, `--zjit`;
+per call, 1,000 to 3,000 calls after 1,000 warmup, A/A within 0.3%): for the time-zone-aware `Post`, AT1 gives
+`attribute_types` −8.7%, `has_attribute?` −9.6%, `Post.new` −7.6%, `instantiate` −6.8%, loading 10 rows −2.3%,
+`where.to_a` −0.3%. For a `Post` with an enum, AT1+AT2 gives `attribute_types` −9.5% and `Post.new` −6.6%.
+
+**One ZJIT loss, explained.** With AT1 alone, the enum `Post` (still on the slow path) is **+4.6%** on
+`attribute_types` and **+3.8%** on `Post.new` (3,000 calls, A/A 0.0%); the interpreter and YJIT show +0.0% and +0.2%.
+`--zjit-stats` shows two more dynamic ivar reads per call (`rb_ivar_get` 160,890 → 201,212 over 20,000 calls) and
+as many more `no_profile_missing_ic`. With AT1, `Author` and `Comment` take the fast path, so while ZJIT profiles
+`SchemaContext#attributes` the slow branch (`ActiveSupport::Ractors[@attributes_key] ||= …`) never runs, and ZJIT
+compiles it without inline caches. Keeping `Author` and `Comment` slow (`ALLSLOW=1`, a Proc default) makes the
+counters identical to main (204,385 / 76,485) and the instructions equal (`attribute_types` −0.2%, `Post.new` +0.0%).
+So the loss is not in the frozen converter: models that remain on the slow path in an app where others moved to the
+fast path pay about 80 instructions more per schema read under ZJIT, while the moved models save about 300. Moving
+the slow branch into its own method would give it its own profile; that touches `schema_context.rb`, which open
+#59530 rewrites, so it is noted, not built. The app-level ZJIT result is the ruby-bench row above.
+
 ## Census: who takes the slow path, and how often
 
 [census_probe.rb](../../bench/upstream/schema_context/census_probe.rb) (results in [probe/](data/schema-context/probe)), run in each census copy through
@@ -128,7 +156,7 @@ makes that possible for most models without moving any cast.
 * **Per call.** [irmicro.rb](../../bench/upstream/schema_context/irmicro.rb) on micro.rb cases, 200 calls with GC
   off after warmup, `TZA`/`ENUM` passed through; `aa` is a second worktree of the same commit. YJIT loading 10 rows
   was rerun with 1,000 calls after a 200-call run showed an A/A of −3.4%; the rerun's A/A is −0.3%.
-* **ruby-bench.** [`irab.rb`](../../bench/upstream/arcpu/irab.rb), one measured iteration after warmup;
+* **ruby-bench.** [`irab.rb`](../../bench/upstream/arcpu/irab.rb) (`--zjit` with Ruby master first in `PATH`), one measured iteration after warmup;
   variants `atbase`, `atbase2` (A/A), `at1`, `at2`, `at12` (AT1+AT2).
 * **Allocations.** `script/census run --out census-out/at --label at-base --aa` on `c042aee23a`, then `at1` and
   `at12`, on Blog, Campfire, Fizzy, PingCRM, Redprints CFP, CodeTriage, interpreter and YJIT;

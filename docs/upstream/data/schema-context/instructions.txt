@@ -83,3 +83,33 @@ load_from_sql_1: at1 75686 | at1b 75410 (-0.4%) | at1h 75368 (-0.4%)
 load_from_sql_10: at1 123863 | at1b 123882 (+0.0%) | at1h 120287 (-2.9%)
 where_to_a: at1 351021 | at1b 351191 (+0.0%) | at1h 349551 (-0.4%)
 includes: at1 1245127 | at1b 1263823 (+1.5%) | at1h 1256428 (+0.9%)
+
+## ZJIT micro (Ruby master 9aa0898240)
+== TZA=1 ZJIT master
+attribute_types: base 3335 | aa 3334 (-0.0%) | at1 3043 (-8.7%) | at12 3042 (-8.8%)
+has_attribute: base 4434 | aa 4427 (-0.2%) | at1 4010 (-9.6%) | at12 4009 (-9.6%)
+new: base 9420 | aa 9390 (-0.3%) | at1 8701 (-7.6%) | at12 8705 (-7.6%)
+instantiate: base 5417 | aa 5422 (+0.1%) | at1 5010 (-7.5%) | at12 5151 (-4.9%)
+load_from_sql_10: base 125625 | aa 125788 (+0.1%) | at1 122969 (-2.1%) | at12 122974 (-2.1%)
+where_to_a: base 357600 | aa 358390 (+0.2%) | at1 355314 (-0.6%) | at12 359721 (+0.6%)
+== TZA=1 ENUM=1 ZJIT master
+attribute_types: base 3375 | aa 3375 (+0.0%) | at1 3448 (+2.2%) | at12 3055 (-9.5%)
+new: base 9504 | aa 9505 (+0.0%) | at1 9779 (+2.9%) | at12 8873 (-6.6%)
+load_from_sql_10: base 130674 | aa 131114 (+0.3%) | at1 132052 (+1.1%) | at12 127838 (-2.2%)
+where_to_a: base 359609 | aa 359978 (+0.1%) | at1 358702 (-0.3%) | at12 358995 (-0.2%)
+instantiate: base 3885 | aa 3917 (+0.8%) | at1 3619 (-6.8%) | at12 3616 (-6.9%)
+load_from_sql_10: base 127008 | aa 126706 (-0.2%) | at1 124043 (-2.3%) | at12 123945 (-2.4%)
+
+## ruby-bench interpreter
+lobsters: atbase 4.1299 G (+0.000%) | atbase2 4.1284 G (-0.035%) | at1 4.1256 G (-0.104%) | at2 4.1344 G (+0.111%) | at12 4.1243 G (-0.134%)
+railsbench: atbase 5.0566 G (+0.000%) | atbase2 5.0572 G (+0.012%) | at1 5.0487 G (-0.157%) | at2 5.0588 G (+0.043%) | at12 5.0490 G (-0.152%)
+shipit: atbase 5.8746 G (+0.000%) | atbase2 5.8736 G (-0.018%) | at1 5.8661 G (-0.146%) | at2 5.8749 G (+0.005%) | at12 5.8609 G (-0.233%)
+
+## ruby-bench YJIT
+lobsters yjit: atbase 2.8679 G (+0.000%) | atbase2 2.8797 G (+0.413%) | at1 2.8713 G (+0.120%) | at2 2.8727 G (+0.168%) | at12 2.8677 G (-0.006%)
+railsbench yjit: atbase 2.7816 G (+0.000%) | atbase2 2.7846 G (+0.106%) | at1 2.7743 G (-0.263%) | at2 2.7760 G (-0.203%) | at12 2.7781 G (-0.126%)
+shipit yjit: atbase 3.0273 G (+0.000%) | atbase2 3.0247 G (-0.088%) | at1 3.0215 G (-0.192%) | at2 3.0281 G (+0.027%) | at12 3.0202 G (-0.234%)
+
+## ruby-bench ZJIT (master)
+lobsters zjit: atbase 3.0986 G (+0.000%) | atbase2 3.1020 G (+0.109%) | at1 3.0945 G (-0.133%) | at12 3.0924 G (-0.200%)
+railsbench zjit: atbase 2.9643 G (+0.000%) | atbase2 2.9634 G (-0.030%) | at1 2.9600 G (-0.145%) | at12 2.9621 G (-0.072%)

@@ -3,7 +3,7 @@
 # Per-call micro for schema-context reads (docs/upstream/schema-context.md),
 # loading AR from RAILS_DIR. TZA=1 sets time_zone_aware_attributes, as every
 # Rails app does, which puts the models on SchemaContext's slow path. ENUM=1 adds an
-# enum to Post.
+# enum to Post. ALLSLOW=1 keeps Author and Comment on the slow path (a Proc default).
 # ruby [--yjit] micro.rb RAILS_DIR CASE[,CASE...] [ITERS] [ROUNDS]
 # Prints one line per case: median ns/call over ROUNDS and objects/call.
 rails = ARGV.fetch(0)
@@ -46,6 +46,7 @@ end
 
 class Author < ActiveRecord::Base
   has_many :posts
+  attribute :scratch, :string, default: -> { "x" } if ENV["ALLSLOW"] == "1"
 end
 
 class Post < ActiveRecord::Base
@@ -57,6 +58,7 @@ end
 
 class Comment < ActiveRecord::Base
   belongs_to :post
+  attribute :scratch, :string, default: -> { "x" } if ENV["ALLSLOW"] == "1"
 end
 
 author = Author.create!(name: "a")
