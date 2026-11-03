@@ -106,6 +106,7 @@ Measurements are the PRs' own, from their original dates.
 
 ### Ruby — ruby/ruby
 
+- Comment on [#16909](https://github.com/ruby/ruby/pull/16909#issuecomment-6608177637) (Earlopain's closed "Deprecate `Pathname::SEPARATOR_PAT`"), no PR: 10 of 20 census apps still lock Bundler ≤ 4.0.11, so any path or git gem fails on 4.1 with `NameError`; restoring the constant with `deprecate_constant` makes Bundler 2.6.9 and 4.0.11 work (reference branch `thomasklemm/ruby:thomasklemm/pathname-separator-pat` @ `6c8385cd3f`, kept). Information for the 4.1 release, no ask. Bet E1; posted 2026-11-03.
 - [#19483](https://github.com/ruby/ruby/pull/19483), guard ZJIT protected sends with runtime caller `self` — earlier stacked prototype permission fallbacks/request **87 → 1** blog, **353 → 9** Fizzy; inherited-options micro ZJIT **−36.45% [−38.75, −34.95]**, but YJIT **+3.61% [+1.26, +6.80]**. Not measurements of this independently master-based PR binary; no master-alone or whole-app speed claim.
 - [#19484](https://github.com/ruby/ruby/pull/19484), allow Proc arguments for explicit block parameters in ZJIT — **27 final send fallbacks/request removed in Fizzy, none in the blog**; earlier Arel-style forwarding micro ZJIT **−61.41% [−63.78, −59.53]**, interpreter **+1.75% [+0.03, +3.67]**, YJIT unresolved. Nine unrelated yield fallbacks remain; no request-throughput claim. **Merged 2026-11-03** by XrXr ([13c3f56](https://github.com/ruby/ruby/commit/13c3f56bb85f7e3f7e07b945c829117b48ee43f5)).
 - [#19487](https://github.com/ruby/ruby/pull/19487), compile YJIT `super` on Class/Module receivers — untimed singleton-super fallbacks/request **141 → 13** blog, **300 → 16** Fizzy; dynamic dispatch attempts **616 → 488 / 1,304 → 1,020**. Escaping micro: **352 fewer Ir/call (32.20% of marginal work)** and **23.12% less YJIT time [−29.82, −17.35]%**, not whole-request speed. Class/module graph retention remains; ordinary singleton receivers stay refused.
@@ -287,12 +288,6 @@ None.
 
 ## Drafted, not opened
 
-- **ruby/ruby, `Pathname::SEPARATOR_PAT` (2026-11-03, bet E1):** restore it as a deprecated constant so Bundler ≤
-  4.0.11 lockfiles can install path and git gems on Ruby 4.1 (10 of 20 census apps lock such a Bundler). Branch
-  `thomasklemm/ruby:thomasklemm/pathname-separator-pat` @ `6c8385cd3f`, draft in
-  [ruby-4.1-ecosystem.md](ruby-4.1-ecosystem.md#draft-rubyruby-pr-restore-pathnameseparator_pat-as-a-deprecated-constant).
-  Precedent: [#16909](https://github.com/ruby/ruby/pull/16909) proposed the same; hsbt closed it on 2026-05-28 after
-  Bundler 4.0.12. Waits for Thomas.
 - **Gem census (2026-11-03):** two i18n candidates and one connection_pool candidate on `thomasklemm` forks, with
   drafts, in [gem-census.md](gem-census.md#candidates): I1 −0.40% and I2 −0.32% of all census allocations (exact
   versions after Sol review), C1 −4 objects per `ConnectionPool#with`. C1 is open as
