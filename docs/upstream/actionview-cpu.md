@@ -20,9 +20,10 @@ Ir = instructions counted by Valgrind (pinned `script/bench-valgrind` build). Wa
 of up to ±30% per run, so instruction counts are the primary evidence; wall time is reported alongside.
 
 **Boundary (C1 and C2):** both bypass `super`, which #46573 (k0kubun) chose deliberately so that escaping stays
-"permissive about other monkey patches using `Module#prepend`". A module prepended to `ERB::Util` *before* Active
-Support loads would no longer see the bypassed calls (C1: template appends only; C2: every escape). Modules prepended
-after Active Support never saw them. **Thomas decided (2026-11-03): submit C1 and let the reviewer decide the
+"permissive about other monkey patches using `Module#prepend`". With C1, template appends no longer go through
+`ERB::Util` at all: a module prepended to its singleton class that overrides `html_escape` before Active Support loads,
+or `unwrapped_html_escape` at any time, no longer sees them (C2: every escape). See
+[Adversarial round](#adversarial-round-astra-on-59570) for the corrected boundary. **Thomas decided (2026-11-03): submit C1 and let the reviewer decide the
 boundary**; the draft states it so a reviewer can judge it alone. C2 stays held because it reverses that design for
 all escapes.
 
@@ -366,8 +367,9 @@ ruby-bench.
 would call `to_s` (a no-op on a String) and `html_safe?` again and then reach `ERB::Escape.html_escape` through
 `super`, which is the same C function (erb 4+, shipped with every Ruby Rails supports; erb's pure-Ruby fallback
 defines the same constant). Output, encoding handling (non-ASCII-compatible strings go to `CGI.escapeHTML` in both)
-and the returned String are identical. **Boundary:** a module prepended to `ERB::Util`'s singleton class before
-Active Support loads, or `ERB::Util.html_escape` redefined in place, no longer sees `<%= %>` appends.
+and the returned String are identical. **Boundary:** `<%= %>` appends no longer go through `ERB::Util`, so a module
+prepended to its singleton class no longer sees them (corrected in
+[Adversarial round](#adversarial-round-astra-on-59570); this paragraph first said "before Active Support loads" only).
 
 **Overlap.** No open rails/rails PR touches `buffers.rb` or `erb/util.rb` (checked 2026-11-03: `gh pr list
 --search OutputBuffer`, `--search unwrapped_html_escape`, and the open Action View performance PRs). Related merged
@@ -448,7 +450,10 @@ The inline `to_s` and `html_safe?` cost about 5 ns per append over the guard in 
 call, `Object#html_safe?` is Ruby) and nothing measurable under YJIT. Census and app runs were not repeated: the
 change only adds back two calls main already makes.
 
-**Draft PR description** (boundary per Thomas's decision: submit, and let the reviewer decide):
+**Draft PR description** (boundary per Thomas's decision: submit, and let the reviewer decide). Superseded: Sol's
+third round approved `a2a3bf0075` on both rubrics but noted that `unwrapped_html_escape` is public on `ERB::Util`'s
+singleton class (only the included instance method is private), and the adversarial round below corrected the
+boundary sentence. The PR opened with the text under [Adversarial round](#adversarial-round-astra-on-59570).
 
 > Every `<%= %>` appends through `ActionView::OutputBuffer#<<`. For a value that isn't html_safe it calls `to_s` and
 > `html_safe?`, then `ERB::Util.unwrapped_html_escape`, which reaches `ERB::Escape.html_escape` through an alias and
@@ -468,6 +473,50 @@ change only adds back two calls main already makes.
 >
 > On ruby-bench's erubi-rails this runs 5.8% fewer instructions per iteration in the interpreter and 5–6% fewer
 > with YJIT (6–9% on Ruby master); a page in Fizzy or Lobsters makes 130–920 such appends.
+
+### Adversarial round (Astra) on #59570
+
+C1 opened as [rails/rails#59570](https://github.com/rails/rails/pull/59570) at `a2a3bf0075`. An extra adversarial
+Astra round (the rule for critical changes) found that the draft's boundary sentence was wrong: a module prepended
+to `ERB::Util`'s singleton class *after* Active Support loads can intercept template appends on main if it overrides
+`unwrapped_html_escape`, because `<<` calls that name through the singleton class. Reproduced here (Ruby 4.0.7,
+`OutputBuffer << "</script>"`, a prepend that maps `/` to `&#47;` after `super`):
+
+| Prepended module overrides | When | main | C1 |
+| --- | --- | --- | --- |
+| `unwrapped_html_escape` | after Active Support | `&lt;&#47;script&gt;` (sees it) | `&lt;/script&gt;` |
+| `html_escape` | before Active Support | `&lt;&#47;script&gt;` (sees it) | `&lt;/script&gt;` |
+| `html_escape` | after Active Support | `&lt;/script&gt;` (Active Support's alias binds its own method) | `&lt;/script&gt;` |
+
+`ERB::Util.html_escape` itself is unchanged by C1 in every row. Thomas kept the code so the reviewer decides on
+the boundary; the PR body now says that template appends no longer go through `ERB::Util` at all, so such prepends
+no longer see them, whenever they were added.
+
+Astra's second item, not in the PR: if `ERB::Escape.html_escape` is redefined as identity, C1 emits `</script>`
+unescaped, while main still escapes it (`&lt;/script&gt;`): main's `super` reaches the copy of erb's C method that
+`ERB::Util` already holds as its own singleton method, not `ERB::Escape`'s. That needs a deliberately malicious
+override of erb's escape, so it is not treated as a vector.
+
+**As opened** (Thomas's text):
+
+> Every `<%= %>` appends through `ActionView::OutputBuffer#<<`. For a value that isn't html_safe it calls `to_s` and
+> `html_safe?`, then `ERB::Util.unwrapped_html_escape`, which reaches `ERB::Escape.html_escape` through an alias and
+> a `super` on `ERB::Util`'s singleton class. YJIT can't specialize that `super`, so each append is a dynamic send.
+>
+> This runs the same steps inline: `to_s` on the converted value, `html_safe?` again, then `ERB::Escape.html_escape`,
+> the method `super` reaches. Every `to_s` and `html_safe?` call stays. The one difference: template appends no
+> longer go through `ERB::Util`, so a module prepended to its singleton class to change `html_escape` or
+> `unwrapped_html_escape` no longer sees them. Every other caller still goes through it. `unwrapped_html_escape` is
+> `:nodoc:`, and #46573 chose `super` so such prepends keep working; this keeps that everywhere except template
+> appends.
+>
+> | `<%= %>` of an unsafe String | main | this PR |
+> | --- | ---: | ---: |
+> | interpreter | 141 ns | 110 ns |
+> | YJIT | 68 ns | 52 ns |
+>
+> On ruby-bench's erubi-rails this runs 5.8% fewer instructions per iteration in the interpreter and 5–6% fewer with
+> YJIT; a page in Fizzy or Lobsters makes 130–920 such appends.
 
 ## C2 (held): `unwrapped_html_escape` without `super`
 
