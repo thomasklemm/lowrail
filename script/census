@@ -247,7 +247,10 @@ module Census
         out, status = Open3.capture2e(env, "bundle", "exec", "rails", "db:create", chdir: dir)
         print out
         raise "#{app}: db:create failed" unless status.success?
-        if (existing = out.scan(/^Database '([^']+)' already exists/).flatten).any?
+        # Configurations sharing one URL (Docuseal) report the database this
+        # call created as existing too.
+        existing = out.scan(/^Database '([^']+)' already exists/).flatten - out.scan(/^Created database '([^']+)'/).flatten
+        if existing.any?
           raise "#{app}: #{existing.join(", ")} already exist on the shared server, so another copy may use them. " \
             "Drop them first if they are disposable."
         end

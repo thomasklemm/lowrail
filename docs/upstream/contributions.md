@@ -39,6 +39,10 @@ The merge links use GitHub's `mergeCommit`, not the contributor's pre-merge comm
 - [#59278](https://github.com/rails/rails/pull/59278), reuse PostgreSQL result fields while casting — **one Array per column-bearing result**, including zero rows: **11 → 10 / 10 → 9 / 72 → 71 / 16 → 15** objects/cast across the four fixtures; zero-column control unchanged. All 108 preregistered interpreter/YJIT/ZJIT workers retain the delta; noisy CPU intervals support **no speed or Ir claim**. [Merge fb7501a](https://github.com/rails/rails/commit/fb7501ad2d7f77713a7de4ed20db1d1d5b5f1c02).
 - [#59533](https://github.com/rails/rails/pull/59533), build `WhereClause#ast` predicates in one pass — one Array fewer per compiled where clause, interpreter and YJIT alike. Allocation-only. **Merged 2026-11-02.** [Merge b5be036](https://github.com/rails/rails/commit/b5be03636e0ac5c3d763411b8be9300e589a0953).
 
+**Combined (2026-11-03):** all eleven merged #59533–#59544 together, against the same Rails main with them
+reverted, remove 1.66% / 1.64% of allocations (interpreter / YJIT) over 206 workloads in sixteen apps; wall time on
+railsbench and lobsters is a tie within A/A ([combined effect](combined-effect.md)).
+
 ### Ruby — ruby/ruby
 
 **Merged; checked on 2026-11-02.** JIT correctness and diagnostics fixes; none claims a speedup.
