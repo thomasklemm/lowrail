@@ -277,8 +277,9 @@ census numbers are identical across the three (median +0.0 between them).
   it works, because the binds are substituted. The CHANGELOG entry mentions binds but not this break. Sure needed
   `CAST(:x AS date)` and `sanitize_sql_array`.
 * **`b1650993b0`, `Arel::Table.new(name)` → `Arel::Table.new(name:)`.** No deprecation path and no CHANGELOG entry.
-  It broke 3 of 7 apps (Docuseal and Discourse directly, CASA through flipper 1.4.2, the latest release); cancancan
-  3.7's AR4 adapter also still calls it positionally. flipper fixed it on main (flipper#1003), unreleased.
+  It broke 3 of 7 apps (Docuseal and Discourse directly, CASA through flipper 1.4.2, the latest release). cancancan
+  3.7's positional call is only in its AR4 (< 5.0) adapter and is not reached on current Rails. flipper fixed it on
+  main (flipper#1003), unreleased. Deprecation shim: [arel-table-positional.md](arel-table-positional.md).
 * Also seen: `RemoteIp` `filter_proxies` (Mastodon), Rails' Sidekiq adapter removed (Lago), `VALID_UNSCOPING_VALUES`
   frozen (clickhouse-activerecord), log subscribers moved to the event reporter (`detach_from` on Active
   Storage/Job subscribers), `Key::Mapping` rejecting Discourse chat's composite foreign key. These are deliberate
