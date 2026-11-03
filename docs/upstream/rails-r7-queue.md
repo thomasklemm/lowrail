@@ -2,22 +2,25 @@
 
 Bet R7 (2026-11-03). Census 7 found no exact candidate left among the lines that reach 7 or more apps. This round
 looks for exact candidates in its 3–6-app and 2-app tiers, and in the Rails lines that matter in only one big app
-(Discourse, Mastodon, Chatwoot, Sure). Candidates are ranked by objects per workload × apps. The numbers are
-allocation counts only; no timing is claimed.
+(Discourse, Mastodon, Chatwoot, Sure). Candidates were first ranked by objects per workload × apps. A second pass
+(2026-11-03, after the evidence rule in DECISIONS, 54643c2) adds CPU per call: Callgrind Ir and interleaved wall
+time, each against an A/A. See [CPU per call](#cpu-per-call) and the [ranking by value](#ranking-by-value).
 
-**Result.** Four candidates. Each is one commit on the thomasklemm/rails fork, on current rails/rails main
-[`1597d576bd`](https://github.com/rails/rails/commit/1597d576bd222de7bf55bf7a12bffd87138f2a13), and has a test
-that fails without it. None is opened.
+**Result.** Five candidates were built. Each is one commit on the thomasklemm/rails fork, on rails/rails main
+[`1597d576bd`](https://github.com/rails/rails/commit/1597d576bd222de7bf55bf7a12bffd87138f2a13) (R7-5 on
+[`d47dc59e65`](https://github.com/rails/rails/commit/d47dc59e65)), and has a test that fails without it. None is
+opened. R7-4 is out of the queue (Sure only). R7-5 replaces it and is marked "don't open".
 
 | # | Branch @ SHA | Pattern | Per call (4.0.7 interp) | Census: workloads / apps moved at the site (A/A: 0) |
 | --- | --- | --- | ---: | --- |
 | R7-1 | [`thomasklemm/tag-values-without-copies`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-values-without-copies) [`d18c315d20`](https://github.com/thomasklemm/rails/commit/d18c315d201ed47c902cd754f07dab43fe2bca6a) | every `class_names`/`token_list`, every `class:`/`aria:` Array or Hash attribute | −1 to −2 | 18 / 4 (blog, fizzy, lobsters, sure); median −39.5, Sure up to −679 |
-| R7-2 | [`thomasklemm/hash-as-json-symbol-names`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-as-json-symbol-names) [`a97a37b603`](https://github.com/thomasklemm/rails/commit/a97a37b60337524fce22b68ac689e7db1bb1e09b) | every `as_json`/`render json:` of a Hash with Symbol keys | −1 per Symbol key | 8 / 5 (discourse, fizzy, loomio, mastodon, sure); median −47.5 |
+| R7-2 | [`thomasklemm/hash-as-json-symbol-names`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-as-json-symbol-names) [`a97a37b603`](https://github.com/thomasklemm/rails/commit/a97a37b60337524fce22b68ac689e7db1bb1e09b) | every direct `as_json`, and every encode with options (`to_json(except:)`), of a Hash with Symbol keys; not a plain `render json:` | −1 per Symbol key | 8 / 5 (discourse, fizzy, loomio, mastodon, sure); median −47.5 |
 | R7-3 | [`thomasklemm/through-stale-state-without-array`](https://github.com/thomasklemm/rails/tree/thomasklemm/through-stale-state-without-array) [`8b4b8457f1`](https://github.com/thomasklemm/rails/commit/8b4b8457f122f3882e57ba91eae574d40fb89ac0) | every read of a loaded `has_one`/`has_many :through` a `belongs_to` | −2 | 16 / 5 (casa, discourse, docuseal, lago, redprints-cfp); median −12 per workload |
-| R7-4 | [`thomasklemm/currency-format-frozen-defaults`](https://github.com/thomasklemm/rails/tree/thomasklemm/currency-format-frozen-defaults) [`10b375c5e3`](https://github.com/thomasklemm/rails/commit/10b375c5e3) | every `number_to_currency` | −2 | 9 / 1 (sure); median −88, up to −384 |
+| R7-4 (dropped) | [`thomasklemm/currency-format-frozen-defaults`](https://github.com/thomasklemm/rails/tree/thomasklemm/currency-format-frozen-defaults) [`10b375c5e3`](https://github.com/thomasklemm/rails/commit/10b375c5e3) | every `number_to_currency` | −2 | 9 / 1 (sure); median −88, up to −384 |
+| R7-5 | [`thomasklemm/sanitized-value-in-place`](https://github.com/thomasklemm/rails/tree/thomasklemm/sanitized-value-in-place) [`1a791fc876`](https://github.com/thomasklemm/rails/commit/1a791fc876bfb614b7f2e8210f192511b4c76c2b) | every `radio_button`/`check_box` id from a value (`sanitized_value`) | −2 | not run; census 7 puts the line in 5 apps at 4.6 objects/op |
 
-Recommended order to open: R7-1, R7-2, R7-3, R7-4. R7-4 reaches only one census app (Sure), which ranks it last,
-although `number_to_currency` is an ordinary helper.
+The first pass recommended R7-1, R7-2, R7-3, R7-4. The value ranking below replaces it: R7-3, then R7-2 (Ruby 4.0
+only, Thomas decides), then R7-1. R7-5 is "don't open".
 
 ## Pins and method
 
@@ -71,13 +74,91 @@ Objects per call, main / A/A / candidate:
 | R7-1 `tag.div(aria: { describedby: [..] })` | 14 / 14 / 12 | 14 / 14 / 12 | 14 / 14 / 12 | 14 / 14 / 12 |
 | R7-2 `{4 Symbol keys}.as_json` | 5 / 5 / 1 | 5 / 5 / 1 | 1 / 1 / 1 | 1 / 1 / 1 |
 | R7-2 `{4 Symbol keys}.as_json(except: :created_at)` | 8 / 8 / 5 | 8 / 8 / 5 | 5 / 5 / 5 | 5 / 5 / 5 |
-| R7-2 `{ post: {4 keys} }.as_json({})` (`render json:`) | 10 / 10 / 5 | 10 / 10 / 5 | 5 / 5 / 5 | 5 / 5 / 5 |
+| R7-2 `{ post: {4 keys} }.as_json({})` | 10 / 10 / 5 | 10 / 10 / 5 | 5 / 5 / 5 | 5 / 5 / 5 |
 | R7-3 `comment.post_author` (loaded, through `belongs_to`) | 3 / 3 / 1 | 3 / 3 / 1 | 3 / 3 / 1 | 3 / 3 / 1 |
 | R7-4 `number_to_currency(1234.5)` | 53 / 53 / 51 | 53 / 53 / 51 | 53 / 53 / 51 | 53 / 53 / 51 |
 | R7-4 `number_to_currency(-5, unit: "€")` | 58 / 58 / 56 | 58 / 58 / 56 | 58 / 58 / 56 | 58 / 58 / 56 |
+| R7-5 `sanitized_value("In progress")` | 7 / 7 / 5 | 7 / 7 / 5 | 7 / 7 / 5 | 7 / 7 / 5 |
+| R7-5 `radio_button(:post, :status, "In progress")` | 29 / 29 / 27 | 30 / 30 / 28 | 29 / 29 / 27 | 30 / 30 / 28 |
 
 Master returns a frozen String from `Symbol#to_s` (Feature #22137). `Hash#[]=` then stores it without a copy, so
 R7-2 changes nothing there; the saving is on Ruby ≤ 4.0. No candidate loses under ZJIT.
+
+## CPU per call
+
+DECISIONS (54643c2) requires CPU per call next to objects. Each case below is one whole operation, so the
+change in percent is the candidate's share of that operation.
+
+**Method.** [`cpu_r7.rb`](../../bench/upstream/r7/cpu_r7.rb) warms each case with 3,000 calls, runs `GC.start`,
+then disables GC. For Ir, the N calls run inside `Array#cycle`, and Callgrind (Valgrind 3.19.0,
+`--collect-atstart=no --toggle-collect=rb_ary_cycle`, plus `--smc-check=all` under a JIT) counts only that
+window. Ir per call is (Ir at N = 5,000 − Ir at N = 0) / 5,000. Main, its A/A twin (the same checkout, measured
+again) and the candidate run under 4.0.7 interpreter (i40), 4.0.7 `--yjit` (y40) and master `9aa0898240` `--zjit`
+(z41). R7-2 has no z41 row: it is a no-op on master. Wall time ([`ns_run.sh`](../../bench/upstream/r7/ns_run.sh))
+interleaves main, A/A and candidate for 7 rounds, one process per measurement, 20,000 calls each, with the order
+reversed every other round. It reports the median ns per call. Ir is the primary measure; wall time on this shared
+orb moves by up to ±3.5% between A/A runs.
+
+**Ir per call** (Δ against main; A/A is the twin against main):
+
+| Candidate | Operation | Mode | main Ir | A/A | candidate Ir | Δ | Δ % |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| R7-1 | `tag.div(class: ["btn", "btn-primary"])` | i40 | 37,060 | +0.26% | 35,480 | −1,629 | −4.39% |
+| | | y40 | 21,087 | +0.05% | 20,231 | −861 | −4.08% |
+| | | z41 | 19,690 | −0.28% | 18,722 | −940 | −4.78% |
+| R7-1 | `tag.div(aria: { describedby: [..] })` | i40 | 47,124 | +0.06% | 45,536 | −1,603 | −3.40% |
+| | | y40 | 26,172 | +0.03% | 25,309 | −867 | −3.31% |
+| | | z41 | 25,069 | −0.04% | 24,157 | −908 | −3.62% |
+| R7-1 | `class_names("btn", active: true)` | i40 | 25,156 | −0.26% | 24,704 | −419 | −1.67% |
+| | | y40 | 16,378 | −0.03% | 16,070 | −305 | −1.86% |
+| | | z41 | 15,646 | −0.01% | 15,591 | −54 | −0.34% |
+| R7-2 | `{ 4 Symbol keys }.as_json` | i40 | 11,202 | +0.18% | 9,437 | −1,774 | −15.83% |
+| | | y40 | 8,834 | +0.27% | 6,122 | −2,724 | −30.80% |
+| R7-2 | `{ 4 Symbol keys }.to_json(except: :created_at)` | i40 | 24,790 | +0.01% | 23,492 | −1,300 | −5.24% |
+| | | y40 | 18,726 | +0.08% | 16,717 | −2,017 | −10.77% |
+| R7-2 | `ActiveSupport::JSON.encode(hash)` (what `render json:` does) | i40 | 8,739 | 0.00% | 8,739 | 0 | 0.00% |
+| | | y40 | 6,589 | 0.00% | 6,591 | +2 | +0.03% |
+| R7-3 | loaded `comment.post_author` (through `belongs_to`) | i40 | 15,448 | 0.00% | 12,123 | −3,325 | −21.52% |
+| | | y40 | 8,257 | +0.02% | 5,003 | −3,254 | −39.41% |
+| | | z41 | 7,874 | −0.03% | 4,537 | −3,336 | −42.38% |
+| R7-5 | `radio_button(:post, :status, "In progress")` | i40 | 116,189 | −0.07% | 116,112 | −38 | −0.03% |
+| | | y40 | 70,265 | −0.21% | 68,990 | −1,199 | −1.71% |
+| | | z41 | 69,384 | +0.10% | 69,041 | −376 | −0.54% |
+
+**Wall time per call** (median of 7 interleaved rounds; 6 where one measurement printed nothing):
+
+| Candidate | Operation | Mode | main ns | A/A % | candidate ns | Δ % |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| R7-1 | `tag.div(class: [..])` | i40 / y40 / z41 | 3,620 / 2,044 / 1,893 | −1.95 / +0.91 / −2.39 | 3,515 / 1,942 / 1,770 | −2.90 / −4.99 / −6.50 |
+| R7-1 | `tag.div(aria: { describedby: [..] })` | i40 / y40 / z41 | 4,813 / 2,586 / 2,444 | +0.49 / +1.63 / −3.46 | 4,698 / 2,529 / 2,328 | −2.39 / −2.19 / −4.74 |
+| R7-1 | `class_names("btn", active: true)` | i40 / y40 / z41 | 2,288 / 1,647 / 1,515 | +1.49 / −1.51 / −0.36 | 2,230 / 1,586 / 1,492 | −2.54 / −3.71 / −1.49 |
+| R7-2 | `{ 4 Symbol keys }.as_json` | i40 / y40 | 948 / 739 | −1.92 / +2.06 | 720 / 491 | −24.06 / −33.53 |
+| R7-2 | `to_json(except: :created_at)` | i40 / y40 | 2,531 / 2,000 | +2.04 / +1.29 | 2,369 / 1,800 | −6.40 / −10.01 |
+| R7-3 | loaded `comment.post_author` | i40 / y40 / z41 | 1,547 / 687 / 661 | −0.59 / −0.68 / −1.10 | 1,179 / 394 / 363 | −23.80 / −42.63 / −45.06 |
+| R7-5 | `radio_button(..)` | i40 / y40 / z41 | 13,645 / 7,448 / 7,507 | +0.63 / +1.00 / −3.51 | 13,788 / 7,116 / 7,171 | +1.05 / −4.46 / −4.48 |
+
+Wall time agrees with Ir in direction for R7-1 to R7-3. For R7-5 it is within the A/A in the interpreter and under
+ZJIT. R7-1's wall-time gains are 1–2× its A/A spread, so they rest on the Ir numbers.
+
+**Lib diff and complexity.**
+
+| Candidate | Lib diff | Adds complexity? |
+| --- | --- | --- |
+| R7-1 | +29 / −15 (`tag_helper.rb`) | Yes. Two new module methods replace `flatten`/`compact` chains. |
+| R7-2 | +4 / −2 (`core_ext/object/json.rb`) | No. One ternary in the existing loop. |
+| R7-3 | +11 / −3 (`through_association.rb`) | Yes, a little. One branch for single-column keys; composite keys keep the old line. |
+| R7-4 | +2 / −2 | No. Dropped from the queue (one app). |
+| R7-5 | +8 / −1 (`tags/base.rb`) | Yes. A new branch and an `instance_of?(String)` guard that keeps the old chain for other values. |
+
+## Ranking by value
+
+| Rank | Candidate | Ir gain beyond the A/A? | Verdict |
+| --- | --- | --- | --- |
+| 1 | R7-3 | Yes: −21% (i40), −39% (y40), −42% (z41) of a loaded through read, A/A ≤ 0.03% | Open first. Largest share of its operation, small diff. |
+| 2 | R7-2 | Yes on 4.0.7: −16%/−31% of a direct `as_json`, −5%/−11% of `to_json(except:)`; 0 for a plain `render json:` | No-op on Ruby master (`Symbol#to_s` is frozen there). Smallest diff. Thomas decides whether a 4.0-only gain is worth opening. |
+| 3 | R7-1 | Yes for `tag.div` with an Array/Hash attribute: −3.3% to −4.8% in all three modes, A/A ≤ 0.28%. `class_names` −1.7%/−1.9%, but only −0.34% under ZJIT | Openable, but the diff adds two methods for a few percent of a tag render. The draft must say so plainly. |
+| — | R7-5 | No in the interpreter (−0.03% against an A/A of −0.07%); −1.7% (y40), −0.5% (z41) | **Don't open.** The interpreter gain is within the A/A, the change adds a branch, and it has a boundary (below). |
+| — | R7-4 | — | Out of the queue (Sure only). The branch stays pushed. |
 
 ## R7-1: collect nested tag values without intermediate Arrays
 
@@ -128,7 +209,9 @@ the one copy its splat makes. On main it costs one more than that, and the test 
 >
 > Across 20 open-source apps on Rails main, the pages that build class lists allocate fewer objects: up to 679
 > fewer per request on Sure's account pages, and about 110 fewer on Lobsters' story lists. Ruby master with ZJIT
-> saves the same objects.
+> saves the same objects. In instructions, one `tag.div(class: [..])` render takes 4.4% (interpreter) and 4.1% (YJIT)
+> fewer on Ruby 4.0.7, and 4.8% under ZJIT on master; `class_names("btn", active: true)` 1.7% / 1.9% / 0.3%
+> (Callgrind, A/A within 0.3%). The change adds two small private methods.
 >
 > One boundary: a view that overrides the private `build_tag_values` no longer affects `token_list` and the class
 > attribute.
@@ -156,12 +239,17 @@ On Ruby master the change is a no-op, as shown above.
 **Test:** `test_hash_as_json_does_not_copy_symbol_keys`. Symbol keys must cost the same as String keys, with and
 without options, and the key must be `:name.name`. On main the test fails (4 against 1).
 **Suites:** AS 6,889 runs, AP 4,472, AV 2,913, AR 10,266, each with 0 failures. RuboCop is clean.
+**Correction (second pass).** The first draft said "every `render json:`". A TracePoint in a real controller
+shows that `render json:` of a Hash calls `ActiveSupport::JSON.encode(hash, {})`, which takes the
+options-free encoder and never calls `Hash#as_json` (0 calls, Ir unchanged). The pattern is direct `as_json` and
+encodes with options. The census deltas were measured and stand.
 **Overlap:** no open PR touches `core_ext/object/json.rb`. The serialization dive's rejected `transform_values`
 variant is a different change; this one keeps `result = {}` and the loop.
 
 > **Use `Symbol#name` for `Hash#as_json` keys**
 >
-> Every `render json:` and `as_json` of a Hash with Symbol keys stringifies each key with `to_s`. On Ruby 4.0 and
+> Every `as_json` of a Hash with Symbol keys, and every encode with options such as `to_json(except:)`,
+> stringifies each key with `to_s`. A plain `render json:` does not reach this code. On Ruby 4.0 and
 > earlier this creates a String that `Hash#[]=` then replaces with its interned frozen copy. That copy is the
 > String `Symbol#name` returns.
 >
@@ -175,7 +263,9 @@ variant is a different change; this one keeps `result = {}` and the loop.
 > | `{ id:, name:, email:, created_at: }.as_json` | 5 | 1 |
 > | `{ post: { 4 keys } }.as_json({})` | 10 | 5 |
 >
-> On Ruby 4.1, `Symbol#to_s` already returns a frozen String, so nothing changes there. Across 20 open-source apps
+> On Ruby 4.0.7 this is 16% (interpreter) and 31% (YJIT) fewer instructions for the `as_json` above, and 5% / 11%
+> for `to_json(except:)` (Callgrind, A/A within 0.3%). On Ruby 4.1, `Symbol#to_s` already returns a frozen String,
+> so nothing changes there. Across 20 open-source apps
 > on Rails main, 8 workloads in 5 apps allocate fewer objects, for example 381 fewer on Sure's dashboard and 79
 > fewer in a Mastodon `DistributionWorker` job. Only a global redefinition of `Symbol#to_s` would notice the
 > change.
@@ -224,10 +314,14 @@ conflicts with main. #52060 conflicts with main. #55039, #55041, #58065 and #588
 > | `comment.post_author` (loaded, through `belongs_to :post`) | 3 | 1 |
 >
 > Across 20 open-source apps on Rails main, 16 workloads in 5 apps allocate fewer objects. Discourse's topic lists
-> allocate about 250 fewer per request, and CASA's case contacts page about 240 fewer. Ruby master with ZJIT saves
-> the same objects.
+> allocate about 250 fewer per request, and CASA's case contacts page about 240 fewer. The read itself takes 21%
+> (interpreter) and 39% (YJIT) fewer instructions on Ruby 4.0.7, and 42% under ZJIT on Ruby master (Callgrind, A/A
+> within 0.03%).
 
 ## R7-4: pass the frozen empty format to I18n in `number_to_currency`
+
+**Dropped from the queue (2026-11-03).** It reaches one census app (Sure). The branch stays pushed; nothing below
+was rerun.
 
 `NumberToCurrencyConverter#options` calls `i18n_format_options`, which passed a new `{}` as the `default:` of each
 of its two `I18n.translate` calls. The first result is copied with `dup`, and the second is only read by `merge!`.
@@ -274,6 +368,56 @@ calls, and the test fails.
 > Of 20 open-source apps on Rails main, Sure formats currency on the measured pages. Its 9 affected workloads
 > allocate fewer objects, up to 384 fewer per request on the dashboard. Ruby master with ZJIT saves the same objects.
 
+## R7-5: edit the `sanitized_value` copy in place (don't open)
+
+`Tags::Base#sanitized_value` builds the id of every `radio_button` and `check_box` that has a value (and the
+`collection_*` items) with `value.to_s.gsub(/[\s.]/, "_").gsub(/[^-[[:word:]]]/, "").downcase`. The second `gsub`
+and `downcase` each return a new String, although only the first `gsub`'s result, which Rails just made, is
+edited. The candidate keeps `value = value.to_s`, keeps the old chain for any value whose `to_s` is not a plain
+String (`instance_of?(String)` false), and for a plain String runs `gsub`, then `gsub!` and `downcase!` on that
+result.
+
+```ruby
+value = value.to_s
+return value.gsub(/[\s.]/, "_").gsub(/[^-[[:word:]]]/, "").downcase unless value.instance_of?(String)
+
+# String#gsub returns a new String, so the other steps can edit it in place.
+sanitized = value.gsub(/[\s.]/, "_")
+sanitized.gsub!(/[^-[[:word:]]]/, "")
+sanitized.downcase!
+sanitized
+```
+
+**Exactness checklist** ([`diff_c5.rb`](../../bench/upstream/r7/diff_c5.rb), all four Ruby/mode pairs).
+1: `to_s` is called once, as before. The caller's value and the String `to_s` returns are never edited: frozen
+Strings, a `to_s` that returns a retained (shared) String, and Symbol, `nil`, Integer and Float values give the
+same id and leave their source unchanged.
+2: String subclasses (from `to_s` or as the value) fail `instance_of?(String)` and take the old chain, so their own
+`gsub`/`downcase` run as before and the result has their class.
+3–4: For a plain String the candidate calls `gsub!` and `downcase!` where main called `gsub` and `downcase`. Only a
+global redefinition of those core methods sees the difference, **with one exception**: a plain String whose
+singleton `gsub` returns a String someone else keeps. Main would copy it twice; the candidate edits it in place, so
+the other holder's String changes. The harness case "to_s singleton gsub (boundary)" shows the difference, and so does the later helper case "to_s
+plain retained", which reads that same kept String after the candidate edited it (2 of 33 lines differ, in all four
+Ruby/mode pairs; the other 31 are identical). This is
+outside the accepted list in DECISIONS (singleton methods on a plain String are user code, not core redefinition).
+5–6: `gsub!` returns `nil` when nothing matches, and `downcase!` too; the candidate ignores both return values and
+returns `sanitized`, so "all-removed", empty and already-lowercase values match main.
+7: The result is a new unfrozen String with the same encoding: Unicode, binary, and invalid bytes (which raise
+the same `ArgumentError` from the same step) match main.
+8: Nothing new is loaded.
+
+**Test:** `test_radio_button_id_from_value_edits_only_its_own_copy` checks the id, that the caller's String is
+unchanged, a frozen value, and that `sanitized_value` allocates fewer objects than the old chain on the same value.
+On main the allocation assertion fails (7 against 6).
+**Suites** (Ruby 4.0.7, `RAILS_STRICT_WARNINGS=1`, `SEED=41231`): AV 2,914 runs, AP 4,472, AR 10,266 (`test:sqlite3`),
+AS 6,892 (serial, memcached), each with 0 failures and 0 errors. RuboCop is clean. The test also passes on master `9aa0898240` with
+`--zjit`.
+**Census:** not run for this candidate; census 7 puts `tags/base.rb:129` in 5 apps at 4.6 objects per operation.
+**Verdict: don't open.** In the interpreter, Ir per `radio_button` moves by −0.03% against an A/A of −0.07%. Under
+YJIT it is −1.7%, under ZJIT −0.5%. The change adds a branch and a guard, and the singleton-`gsub` boundary is a real
+difference. The branch is pushed for the record.
+
 ## Ranking and dispositions
 
 Re-ranked on `r7`. Tiers follow census 7; within a tier, lines are ordered by mean objects per operation. "Not
@@ -293,7 +437,7 @@ examined" means only the line was read.
 | AV `asset_url_helper.rb:235/236` | 3 | 2.9–5.7 | `options.merge(protocol: :request)`: the copy keeps the caller's options intact. Required. |
 | AM `indexed_row.rb:105/114` | 5 | 1.7–5.7 | `Remapper` for joins. Rewritten by open #59141 (tenderlove). Excluded. |
 | AR `transaction.rb:677` | 6 | 5.1 | Re-raised exception. Required. |
-| AV `tags/base.rb:129` `sanitized_value` | 5 | 4.6 | **Next lead.** `gsub` → `gsub` → `downcase` makes two intermediate Strings; the second `gsub!` and `downcase!` would operate on the first result, which Rails owns. Expected −2 per radio/checkbox value. Not built (limit of 4). |
+| AV `tags/base.rb:129` `sanitized_value` | 5 | 4.6 | **R7-5**, don't open: −2 objects, but no Ir gain in the interpreter beyond the A/A, and a singleton-`gsub` boundary. |
 | AS `redis_cache_store.rb:330` | 5 | 4.5 | `**options` forwarding. Required by the keyword API. |
 | AS `inflector/methods.rb:87/89` `camelize` | 4–5 | 1.9–4.3 | Rejected in census 3 (literal inflection plans). |
 | AR `query_methods.rb:2211` | 5 | 3.9 | `arel.project(*columns)` with ignored columns: the projections. Required; rest Array is a VM lead (census 7). |
@@ -331,11 +475,14 @@ They are database drift, as in census 7.
 
 ## Limits
 
-* Allocation counts only. Each configuration and mode ran in one process, and results are judged against the A/A.
+* The census measures allocation counts only. Each configuration and mode ran in one process, and results are
+  judged against the A/A. CPU per call is measured on single operations (above), not across the census.
 * `fizzy-mysql` did not run (no MySQL server in this orb), so MySQL is not covered in this round.
 * Suites ran locally only (Ruby 4.0.7; Active Record on SQLite). No hosted CI ran on the fork branches.
-* The exactness checklist items were checked with the harnesses named above. None of the candidates has had a
-  Sol or Astra review yet.
+* The exactness checklist items were checked with the harnesses named above (`diff_c1.rb`–`diff_c5.rb`). None of
+  the candidates has had a Sol or Astra review yet.
 * Receipts: [data/rails-r7-queue/receipts.tar.gz](data/rails-r7-queue/receipts.tar.gz) holds both rankings on `r7`,
   label metadata, the `compare` output, per-candidate site deltas with their A/A, the micro, every harness output
-  and the suite summaries. Scripts: [bench/upstream/r7](../../bench/upstream/r7).
+  and the suite summaries. The second pass adds [cpu-receipts.tar.gz](data/rails-r7-queue/cpu-receipts.tar.gz):
+every Callgrind output, `ns.tsv`, both tables, the R7-5 harness outputs and suite logs. Scripts:
+[bench/upstream/r7](../../bench/upstream/r7).
