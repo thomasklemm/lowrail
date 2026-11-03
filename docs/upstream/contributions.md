@@ -85,7 +85,7 @@ Finished, reviewed candidates waiting for room (rules in [DECISIONS](../DECISION
 
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
-| C1, escape `OutputBuffer` appends directly | rails/rails | `output-buffer-escape` (rework pending) | erubi-rails −7% Ir interp / −5–10% YJIT | V1 reworking after the second Sol round |
+| C1, run the escape steps inline in `OutputBuffer#<<` | rails/rails | `output-buffer-escape` @ a2a3bf0 | erubi-rails −5.8% Ir interp / −5–6% YJIT (6–9% on master); per append 141 → 110 ns / 68 → 52 ns | **ready**: Sol approve on both rubrics (third round); draft says `:nodoc:`, not private; prepend boundary left to the reviewer (Thomas) |
 | C3, read `attribute_types` once in `_load_from_sql` | rails/rails | `load-from-sql-attribute-types-once` @ 2fd04c4 | shipit −4.1% / −5.3% Ir; moot if #59141 lands | **ready**: Sol correctness approve; quality P2 (a getter that returns a different Hash per call) accepted as outside the contract |
 | C2, lazy `AliasTracker` in `AssociationScope` | rails/rails | `association-scope-lazy-alias-tracker` @ fcfadc0 | shipit −2.6% / −1.8% Ir; −2 objects per scope | **ready**: Sol approve on both rubrics; boundary: a direct scope no longer checks out a connection while it is built |
 
