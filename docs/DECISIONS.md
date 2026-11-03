@@ -63,6 +63,17 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 
 ## Pull requests
 
+* **Plain language upstream** (Thomas, 2026-11-03, after tekknolagi on
+  [Shopify/ruby#1058](https://github.com/Shopify/ruby/issues/1058#issuecomment-6613994853): "This LLM shorthand
+  output may be readable to you … but it is not for us … Please don't make meat proxies out of us both."). Every
+  comment, PR body and issue is written for a maintainer who has not seen our notes:
+  * full sentences, no shorthand, arrows, internal labels (B, R, P, C1, "patch points¹") or undefined terms;
+  * every number says what was measured, on what, with what, and against which baseline (for example "27% more
+    Callgrind instructions per call for a three-entry Hash, JITs off"), and instructions are never called time;
+  * lead with the answer to the question asked; prefer three short paragraphs to a dense table with footnotes;
+  * before posting, a separate Sol pass checks the facts against our doc and reads it as an outsider would. A text
+    that fails is rewritten, not trimmed.
+  We don't add an AI disclaimer to every PR; where it matters (as on #1058) we say so plainly.
 * **One concern per PR.** A ruby/ruby PR touches the VM, YJIT or ZJIT, never two of them (tekknolagi on
   [ruby#19661](https://github.com/ruby/ruby/pull/19661#issuecomment-6607345199)). Dependent changes go into one PR
   as separate commits; open a follow-up only after its base has merged. Never stack on an open PR.
@@ -211,6 +222,8 @@ The incidents behind the rules above, kept so the rules keep their reasons:
   → CPU and provenance in the body, readability gate.
 * cbor-ruby#43 duplicated nobu's open #31; tiktoken_ruby#130 and ruby/ruby#16909 were missed → search before
   building.
+* tekknolagi called our dense #1058 reply unreadable LLM shorthand and asked not to be made a proxy for it; Thomas
+  edits that reply himself → plain language upstream, with an outsider-readability pass.
 * A bare `#19583` in Shopify/ruby linked the wrong repo twice → owner/repo on every reference.
 * The 64 MiB ZJIT default filled in most app passes → memory flags and the zero-OOM check.
 * #19665 was relayed as a correctness fix and is not; Discourse and Mastodon were named as old-Bundler examples and
