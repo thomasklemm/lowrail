@@ -28,5 +28,10 @@ ruby/ruby#19483, #19558, #19680 and #19681 are rewritten by the thread that is r
 | 2026-11-03 | [rails/rails#59565](https://github.com/rails/rails/pull/59565) | Corrected the `IS`/`IS NOT DISTINCT FROM` pairing and which change made `where` send binds. |
 | 2026-11-03 | [rails/rails#59569](https://github.com/rails/rails/pull/59569) | Corrected the workload counts (36 interpreter, 42 YJIT; 2 objects per direct scope); Ruby 4.0.7 named. |
 | 2026-11-03 | [rails/rails#59570](https://github.com/rails/rails/pull/59570) | The boundary became its own paragraph; the append count covers every `<%= %>`; Ruby 4.0.7 named. |
+| 2026-11-03 | [rails/rails#59574](https://github.com/rails/rails/pull/59574) | Answer first; the three-row table became two sentences. |
+| 2026-11-03 | [rails/rails#59577](https://github.com/rails/rails/pull/59577) | Corrected when the result is allocated and when the frozen empty Array is returned (Hash arguments); the interpreter's −0.6% marked as noise; the application sentence now matches the posted reply. |
+| 2026-11-03 | [rails/rails#59583](https://github.com/rails/rails/pull/59583) | "Ir" and "A/A" spelled out; "workloads" named as requests, jobs or mailers. |
+| 2026-11-03 | [rails/rails#59584](https://github.com/rails/rails/pull/59584) | Dense first paragraph split; the escape share is an average, not a range; A/A spelled out. |
+| 2026-11-03 | [rails/rails#59585](https://github.com/rails/rails/pull/59585) | A 4.6% instruction increase is no longer called slower; the ZJIT 7–10% range names its two cases; A/A spelled out. |
 
 Left unchanged: [ruby/ruby#19620](https://github.com/ruby/ruby/pull/19620), already plain. The ruby/ruby part stopped after these, because the open ruby/ruby PRs are being reviewed with Thomas.
