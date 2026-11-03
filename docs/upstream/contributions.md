@@ -88,10 +88,14 @@ These performance-related PRs were opened before the October 19–22 census.
 
 ## Queue
 
-Finished, reviewed candidates waiting for room (rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)).
+Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)).
 
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
+| GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget-slots`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget-slots) @ `a06b86d852` | master vs master+fix, 97 workloads: major GCs 93 → 18 (interp), 95 → 10 (YJIT); GC time −18% / −25%, below 4.0.7; RSS about +2.3 MB per workload window ([watch](ruby-4.1-regression-watch.md)) | First in line for ruby/ruby (cap 15, 18 open); needs Astra review before opening. No reply on ruby/ruby#17251. |
+| R7-2: `Symbol#name` for `Hash#as_json` keys | rails/rails | [`thomasklemm/hash-as-json-symbol-names`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-as-json-symbol-names) @ `a97a37b603` | direct `as_json` −16% / −31% Ir, `to_json(except:)` −5% / −11% (4.0.7 interp / YJIT); no-op on master | P1 rebasing, gating, drafting; Sol + adversarial Astra next |
+| R7-1: nested tag values without intermediate Arrays | rails/rails | [`thomasklemm/tag-values-without-copies`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-values-without-copies) @ `d18c315d20` | `tag.div` with an Array/Hash attribute −3.3% to −4.8% in all three modes | P1 rates it on L0–L3 first; opens only if it passes |
+| i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
 
 ## Open
 
