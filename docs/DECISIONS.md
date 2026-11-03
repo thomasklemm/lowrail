@@ -103,7 +103,9 @@ candidate (Thermos approve on both rubrics, draft in the short form) goes into t
 when the repository has room:
 
 * **rails/rails:** up to 20 of our PRs open at once (Thomas, 2026-11-03; lowered from 25 the same day). Reviewer load still counts: open strongest first and keep each PR small.
-* **ruby/ruby:** at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
+* **ruby/ruby:** at most 15 of our PRs open at once (Thomas, 2026-11-03). With 20 open, open nothing new until
+  merges or closes bring it below 15; let the maintainers merge. Existing PRs are still reworked and rebased.
+  Within the limit: at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
   Exception (Thomas, 2026-11-03): the three tracker items tekknolagi green-lit (Shopify/ruby#1064, #1065, #1091)
   may be open at the same time, i.e. up to 3; `Kernel#dup` (#1058) waits for a slot.
 * **gems:** no per-gem limit; open whatever is good (Thomas, 2026-11-03, replacing "1 per gem, i18n up to 3").
