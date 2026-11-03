@@ -21,7 +21,7 @@ call that removes the slow-path lookup entirely, and per-call counts return to t
 | AT1 | [`thomasklemm/time-zone-converter-shareable`](https://github.com/thomasklemm/rails/tree/thomasklemm/time-zone-converter-shareable) | [`9ac3833d1c`](https://github.com/thomasklemm/rails/commit/9ac3833d1c) | Freeze `TimeZoneConverter` when its subtype is frozen | `attribute_types` −40% / −45%; `Post.new` −8.6% / −14%; loading 10 rows −4.2% / −5.7% | −0.10% / −0.16% / −0.15% (A/A −0.04% / +0.01% / −0.02%) | within A/A, no SQL changes |
 | AT2 | [`thomasklemm/enum-type-shareable`](https://github.com/thomasklemm/rails/tree/thomasklemm/enum-type-shareable) | [`363fee003d`](https://github.com/thomasklemm/rails/commit/363fee003d) | Freeze `EnumType` when its mapping and subtype are frozen | model with an enum, on top of AT1: `attribute_types` −40% / −45%; `Post.new` −8.6% / −14%; 10 rows −4.1% / −4.9%; nothing without AT1 | within A/A alone; AT1+AT2 −0.13% / −0.15% / −0.23% | within A/A, no SQL changes |
 
-**Combined for submission (2026-11-03):** AT1 and AT2 read as one change ("freeze the wrapper type when what it
+**Opened as [rails/rails#59585](https://github.com/rails/rails/pull/59585) (2026-11-03, head `2236cd5626`).** **Combined for submission:** AT1 and AT2 read as one change ("freeze the wrapper type when what it
 wraps is frozen"), so they go out as one PR:
 [`thomasklemm/shareable-attribute-types`](https://github.com/thomasklemm/rails/tree/thomasklemm/shareable-attribute-types)
 at [`2236cd5626`](https://github.com/thomasklemm/rails/commit/2236cd56260ba02697c0af73deb1406595f7e4ee), one commit
@@ -180,10 +180,10 @@ On `b0e77d009a` all three reviews requested changes. Fixed in `2236cd5626`:
    state raised `FrozenError` (Sol). The converter is now frozen only when it's an instance of `TimeZoneConverter`
    itself; `test_subclass_with_its_own_state_stays_unfrozen` fails on `b0e77d009a`. `EnumType` gets no such check:
    `_enum` builds it with the literal `EnumType.new`, so no subclass reaches the freeze.
-2. **Double freeze (open, needs a decision).** `Delegator#freeze` calls `freeze` on the already frozen subtype
+2. **Double freeze (accepted).** `Delegator#freeze` calls `freeze` on the already frozen subtype
    again, so a subtype whose `freeze` hook sets state raises `FrozenError` (Astra). Freezing the wrapper alone
    needs `::Kernel.instance_method(:freeze).bind_call(converter)` (checked: it works on a `DelegateClass` instance
-   and leaves the subtype alone). That's the bind_call form held for a decision; not built.
+   and leaves the subtype alone). Not built: `Delegator#freeze` already freezes the wrapped object again on main whenever a converter is frozen, and only a freeze hook that mutates an already frozen subtype notices. Accepted, no `bind_call`.
 3. **Frozen types in general.** Prepends or `decorate_attributes` blocks that set ivars, and `clone` plus
    mutation, now raise. Precedent: tenderlove's [#54228](https://github.com/rails/rails/pull/54228) ("Freeze
    database conversion types", `76448a0166`, Jan 2025, for `_default_attributes` shareability) and
