@@ -4,6 +4,16 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Extra adversarial Astra round for critical changes (2026-11-03)
+
+Thomas: critical changes get an Astra round (`gpt-6-astra`) in addition to Sol, with different instructions. After
+Sol approves, Astra runs the correctness rubric with an adversarial brief: it tries to break the claim of identical
+behavior by constructing inputs, overrides, prepends, threads, reloading and error paths where base and head
+differ, runs them where it can, and reports only demonstrated differences. **Critical** means the change touches
+escaping or other security boundaries, connection or transaction handling, record loading and typecasting, caching
+or memoization, thread or fiber state, or VM/JIT code. For ruby/ruby the primary review is already Astra; the extra
+round there uses Sol with the adversarial brief. A candidate enters the queue as ready only after both rounds.
+
 ## Submission queue (2026-11-03)
 
 Thomas: prepare several candidates, then submit selectively, so maintainers are not overloaded. Every finished
