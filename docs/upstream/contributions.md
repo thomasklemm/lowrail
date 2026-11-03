@@ -91,6 +91,11 @@ Finished, reviewed candidates waiting for room (empty after #59568–#59570 open
 All entries in this section are **open, not merged; checked on 2026-11-02**.
 Measurements are the PRs' own, from their original dates.
 
+
+### Gems
+
+- [mperham/connection_pool#225](https://github.com/mperham/connection_pool/pull/225), `#with` passes frozen constant interrupt masks to `Thread.handle_interrupt` instead of Hash literals — `pool.with {}` **14 → 10** objects; −4.6 objects per workload on the 18 census configurations that lock 3.x (Mastodon −27.6). From the [gem census](gem-census.md) (bet G1). Sol approve on both rubrics; adversarial Astra: three low items accepted (wrappers of `handle_interrupt` taking `**mask` or mutating the mask, constant-redefinition warnings on reload); a `Fiber#raise` scheduler leak exists in base too. Opened 2026-11-03.
+
 ### Ruby — ruby/ruby
 
 - [#19483](https://github.com/ruby/ruby/pull/19483), guard ZJIT protected sends with runtime caller `self` — earlier stacked prototype permission fallbacks/request **87 → 1** blog, **353 → 9** Fizzy; inherited-options micro ZJIT **−36.45% [−38.75, −34.95]**, but YJIT **+3.61% [+1.26, +6.80]**. Not measurements of this independently master-based PR binary; no master-alone or whole-app speed claim.
