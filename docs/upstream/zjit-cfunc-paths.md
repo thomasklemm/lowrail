@@ -24,7 +24,9 @@ more design work: "figuring out what stops us from moving everything to just Rub
 in [`Kernel#dup` in Ruby](#kerneldup-in-ruby-tekknolagis-question): it works and is exact apart from the observable
 changes that `Array#each` under a JIT already has. It must stay C in the interpreter, it needs `send(:sym)` support
 in ZJIT ([#19583](https://github.com/ruby/ruby/pull/19583)), and on two of three benchmarks its inlined patch points
-cost more than they save until ZJIT recompiles invalidated code.
+cost more than they save until ZJIT recompiles invalidated code. Why those patch points are invalidated at all is in
+[the include investigation](#why-an-unrelated-include-invalidates-hashs-patch-point): CRuby invalidates a cme
+that every class shares, and 95–97% of the invalidated patch points did not need it.
 
 ## Pins and method
 
@@ -455,8 +457,9 @@ per build, harness as above. The master and B rows are the runs above (same buil
   shared ISEQ then sees every receiver class, so its `__send__` is a megamorphic fallback and `initialize_dup`'s
   `initialize_copy` is a polymorphic fallback: +48k dynamic sends per iteration against P. The C method has neither
   problem, because it looks the hooks up per call.
-* **Not reproduced in isolation:** a standalone script that includes `ActiveModel::Validations` after compiling a
-  `dup` site does not exit, on any build. The mechanism above is observed in the traces, not reduced.
+* **Reproduced in isolation later:** the first standalone script did not exit because its `dup` site had not used
+  up its compiled versions yet. [Why an unrelated `include` invalidates Hash's patch point](#why-an-unrelated-include-invalidates-hashs-patch-point)
+  has the repro, the cause and a priced narrowing.
 
 ### Which shape to propose
 
@@ -493,6 +496,214 @@ callers makes them depend on recompiling invalidated code. Our proposal is:
 >
 > ¹ vs master+#19583. Ruby version once #19583 and recompiling invalidated versions land? Branch: thomasklemm/ruby
 > `zjit-dup-ruby-send`.
+
+## Why an unrelated `include` invalidates Hash's patch point
+
+*2026-11-03, internal investigation; nothing posted.* The lobsters and shipit traces above showed
+`PatchPoint(MethodRedefined(Hash, initialize_dup))` exits after an app class includes a module that defines
+`initialize_dup`, although Hash's own lookup of `initialize_dup` does not change. This section reproduces that,
+names the cause, and prices a narrower invalidation.
+
+**Answer.**
+
+* **The invalidation is in CRuby's method cache, not in ZJIT's bookkeeping.** `include` clears the method cache for
+  every method name the module defines, at the includer's superclass. For `class Search` that is `Object`. The
+  lookup of `initialize_dup` from `Object` finds `Kernel#initialize_dup`, and the callable method entry (cme) it
+  invalidates is the one every class that inherits `Kernel#initialize_dup` shares, Hash and Array included. ZJIT keys
+  its patch points by that cme, so it has to drop all of them.
+* **It only costs once the site has run out of compiled versions.** An invalidated version is recompiled up to
+  `--zjit-max-versions` (4). After that the final version keeps side-exiting. That is why the first standalone repro
+  showed nothing: one `include` only cost the site a recompile.
+* **The invalidation is far broader than needed.** In all three benchmarks, 95–97% of the `MethodRedefined` patch
+  points that CRuby invalidates guard a receiver class that cannot see the change.
+* **Narrowing it would remove the exits.** A measurement-only check that keeps those patch points removes every
+  `MethodRedefined` exit on lobsters and shipit. With it, the Ruby `dup` uses 0.31% fewer instructions on lobsters
+  and 1.35% fewer on shipit than without it, which makes it better than prototype B on both. On master
+  without the Ruby `dup` it removes lobsters' 382 exits per iteration but saves no measurable instructions.
+* **Nobody owns this.** I found no open ruby/ruby PR and no Shopify/ruby issue about over-broad cme invalidation.
+  The nearest work treats the symptom: k0kubun's [ruby/ruby#19617](https://github.com/ruby/ruby/pull/19617) (open,
+  approved by XrXr) lets invalidated final versions recompile.
+
+### Standalone repro
+
+The builds are the ones above: R + #19583 (the Ruby `dup` plus [ruby/ruby#19583](https://github.com/ruby/ruby/pull/19583), [`thomasklemm/zjit-dup-ruby-send`](https://github.com/ruby/ruby/compare/master...thomasklemm:ruby:thomasklemm/zjit-dup-ruby-send),
+`57c03453e0`), P (master + ruby/ruby#19583) and master `9f2e54518e`. In `r3.rb`, `def d(x) = x.dup` is compiled with a Hash at call threshold 2,
+then one of these changes runs and the compiled code keeps running. `--zjit-trace-invalidation` records which cme
+was invalidated, and `--zjit-dump-hir` maps it to the patch point:
+
+| Change after compiling `d(hash)` | Hash's `initialize_dup` patch point invalidated? |
+| --- | --- |
+| `Search.include(Validations)` (`Validations#initialize_dup`), `Search` unrelated to Hash | yes |
+| `Model.include(Validations)` where `Model < Base` | yes |
+| `Object.new.extend(Validations)` | yes |
+| `Search.define_method(:initialize_dup)` | only if a `Search#dup` ran before (see below) |
+| `Search.include(Unrelated)` (`Unrelated#foo` only) | no |
+
+The `define_method` case depends on history. `Search` has no subclasses, so CRuby takes its "leaf" path and only
+clears `Search`'s own caches. If `Search#dup` ran before, `Search`'s call-cache table holds an entry for
+`initialize_dup`, and that entry's cme is the shared `Kernel#initialize_dup` one. The leaf path hands it to the JIT
+hooks, so Hash's patch point is invalidated too. In every case, Hash's lookup of `initialize_dup` is the same
+before and after the change.
+
+**Whether it exits** depends on the version count. `r4.rb` includes a module defining `initialize_dup` into a fresh
+class six times, running the compiled `dup` site 5,000 times after each include, and prints the
+`exit_patchpoint_method_redefined` count per round:
+
+| Build and option | Exits per round, rounds 1–6 |
+| --- | --- |
+| R + #19583, `--zjit-max-versions=2` | 0, 5,000, 5,000, 5,000, 5,000, 5,000 |
+| R + #19583, default (4) | 0, 0, 0, 5,000, 5,000, 5,000 |
+| R + #19583, `--zjit-max-versions=8` | 0, 0, 0, 0, 0, 0 |
+| R + #19583, module defines only `foo` | 0, 0, 0, 0, 0, 0 |
+| R + #19583 with the narrowing check below | 0, 0, 0, 0, 0, 0 |
+
+Every include costs the site one version. From the fourth on, every call exits to the interpreter. The Rails runs
+below see 50–67 cme invalidations that hit compiled code, so hot sites reach their final version early.
+
+### The cause, in the code
+
+At master `9f2e54518e`:
+
+1. `include` calls [`do_include_modules_at`](https://github.com/ruby/ruby/blob/9f2e54518e/class.c#L1820). For each
+   method name in the module it calls `rb_clear_method_cache(super_class, id)`, where `super_class` is the
+   includer's superclass, `Object` for `class Search` ([class.c:1872](https://github.com/ruby/ruby/blob/9f2e54518e/class.c#L1872)).
+   `extend` goes the same way on the singleton class, and `def`/`define_method` call `rb_clear_method_cache` on the
+   class itself ([vm_method.c:1599](https://github.com/ruby/ruby/blob/9f2e54518e/vm_method.c#L1599)).
+2. [`clear_method_cache_by_id_in_class`](https://github.com/ruby/ruby/blob/9f2e54518e/vm_method.c#L462) sees that
+   `Object` has subclasses and takes the tree path. It looks up `initialize_dup` from `Object` and gets the
+   complemented cme of `Kernel#initialize_dup` (a module method gets one cme per including class, here Kernel's
+   iclass in `Object`). Every class below `Object` that does not override `initialize_dup` resolves to that same cme.
+3. It invalidates that cme ([vm_method.c:543](https://github.com/ruby/ruby/blob/9f2e54518e/vm_method.c#L543)) and
+   removes it from the iclass's table (line 565). Both call `rb_zjit_cme_invalidate` and `rb_yjit_cme_invalidate`.
+   This is CRuby's cme-based method cache by design: one flag on the shared entry invalidates every inline cache
+   that holds it, at the cost of making callers whose lookup did not change look up the method again. For the
+   interpreter that costs one lookup per call site.
+4. ZJIT keys its patch points by cme (`cme_patch_points`, [invariants.rs:352](https://github.com/ruby/ruby/blob/9f2e54518e/zjit/src/invariants.rs#L352))
+   and patches all of them, whatever receiver class they guard. [`invalidate_iseq_version`](https://github.com/ruby/ruby/blob/9f2e54518e/zjit/src/codegen.rs#L265)
+   only lets the ISEQ recompile while it has fewer than `max_versions` (4) versions. A final version keeps its jump
+   to the side exit.
+
+So the answer to "cme invalidation, mid-keyed bookkeeping, or something else" is the first. ZJIT's bookkeeping is
+keyed by cme, not by method id. It is exact for what it is given, but the cme it is given stands for every
+receiver class at once. YJIT has the same structure.
+
+The gdb trace for `r3.rb` (`g3.gdb`) shows the chain: `rb_mod_append_features` → `rb_include_module` →
+`do_include_modules_at` → `clear_module_cache_i` → `clear_method_cache_by_id_in_class` → `vm_cme_invalidate` →
+`rb_zjit_cme_invalidate`, for the cme that `d`'s HIR names in `PatchPoint MethodRedefined(Hash, initialize_dup)`.
+
+### How broad it is in Rails apps
+
+To measure this, I built a measurement-only patch on R + #19583 and on master (not for upstream; `patch/narrow.patch` in the
+[receipts](data/zjit-cfunc-paths/include-invalidation.tar.gz), with the repro scripts, gdb script, stats JSON,
+invalidation logs and Callgrind totals):
+
+* CRuby records the class or module whose lookups the change can affect. That is the includer, the class that got
+  the method, or the singleton class for `extend`. Refinements count as unknown.
+* ZJIT records each `MethodRedefined` patch point's receiver class.
+* On each cme invalidation it counts patch points whose class is not that class or a descendant of it as
+  "unaffected", and logs them. `Z7_NARROW=1` also keeps them patched in (an oracle, see below).
+
+Counts are over a whole ruby-bench run (boot, 15 warmup and 10 measured iterations), from
+`Z7_INVAL_LOG`, with `--zjit-exec-mem-size=512 --zjit-mem-size=1024`. `compile_error_out_of_memory` was 0 in
+warmup and measurement for every run in this section.
+
+| Build | Benchmark | cme invalidations hitting ZJIT | Patch points invalidated | Of those, unaffected | Unaffected in final versions |
+| --- | --- | ---: | ---: | ---: | ---: |
+| R + #19583 | railsbench | 50 | 411 | 397 (97%) | 23 |
+| R + #19583 | lobsters | 67 | 593 | 575 (97%) | 46 |
+| R + #19583 | shipit | 62 | 734 | 698 (95%) | 137 |
+| master | lobsters | 62 | 470 | 454 (97%) | 33 |
+| master | shipit | 59 | 499 | 485 (97%) | 62 |
+
+The changes that invalidate the most unaffected patch points, by method and changed class (R + #19583):
+
+* **lobsters:** `new` and `name` defined on singleton classes (74 and 72 patch points); `===` on a singleton (38);
+  `respond_to?` in `ActionView::Base` (37, 10 of them final); `initialize_dup` in `ActiveRecord::Base` (36) and in
+  `Search` (36).
+* **shipit:** `initialize_dup` in `ExplicitParameters::Parameters` (108, 60 of them final); `respond_to?` in
+  `ActiveRecord::Base` (92, 15 final); `initialize_dup` in `ActiveModel::AttributeSet` (52).
+
+So this is not specific to `dup`. Common hooks (`respond_to?`, `===`, `new`, `name`, `initialize_dup`) are defined
+somewhere in every Rails app, and each definition invalidates every inlined patch point on that method name.
+
+**Exits per iteration** (`--zjit-stats`, 10 measured iterations after 15 warmup):
+
+| Build | lobsters `method_redefined` | lobsters `no_singleton_class` | lobsters side exits | lobsters dynamic sends | shipit `method_redefined` | shipit side exits | shipit dynamic sends |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| master | 382 | 0 | 12,651 | 750,871 | 0 | 49,584 | 1,709,366 |
+| master + narrowing oracle | **0** | 0 | 12,268 | 752,019 | 0 | 49,581 | 1,709,916 |
+| R + #19583 | 3,624 | 492 | 15,948 | 739,283 | 3,817 | 53,400 | 1,734,556 |
+| R + #19583 + narrowing oracle | **0** | **0** | 11,830 | 742,354 | **0** | 49,584 | 1,700,344 |
+| R + #19583, `--zjit-max-versions=8` | 0 | 0 | 13,801 | 807,627 | 0 | 49,137 | 1,839,056 |
+| R + #19583, `--zjit-max-versions=16` | 0 | 0 | 11,646 | 828,082 | 0 | 108,845 | 1,738,875 |
+
+Railsbench has no `method_redefined` exits in any build. The narrowing oracle removes all of them on lobsters and
+shipit, and shipit's side exits drop back to master's level. More versions also remove them, but recompiled
+versions make 68–104k more dynamic sends per iteration at 8 versions. `--zjit-max-versions` is only a stand-in for
+ruby/ruby#19617 (which adds up to 4 extra versions for patch-point invalidations); I did not build #19617.
+
+**Instructions** (Callgrind, GC excluded, millions of Ir per iteration, harness as above, two runs each). "Logging
+build" is R + #19583 with the patch but `Z7_NARROW` unset, to show the patch's own cost:
+
+| Build | lobsters | shipit |
+| --- | ---: | ---: |
+| R + #19583 (earlier runs) | 3,255.4 / 3,256.0 | 3,775.8 / 3,775.3 |
+| R + #19583, logging build | 3,257.4 / 3,257.5 | 3,777.0 / 3,779.7 |
+| R + #19583 + narrowing oracle | 3,246.9 / 3,248.0 | 3,728.3 / 3,726.1 |
+| *oracle vs logging build* | ***−0.31%*** | ***−1.35%*** |
+| *oracle vs P (master + #19583)* | −0.34% | −0.71% |
+| *oracle vs B (patch-point `dup`)* | −0.25% | −0.40% |
+| master, logging build | 3,265.9 / 3,269.2 | |
+| master + narrowing oracle | 3,267.5 / 3,265.8 | |
+| *oracle vs logging build* | −0.03% (A/A 0.10%) | |
+
+So on master the 382 exits per lobsters iteration cost nothing measurable. The narrowing pays once inlining puts
+hot patch points behind commonly overridden hooks, which is what the Ruby `dup` does. With it, the Ruby `dup` beats
+prototype B on lobsters and shipit, and the [shape question](#which-shape-to-propose) changes: the Ruby version no
+longer depends on recompiling invalidated code, it depends on narrower invalidation.
+
+### Is there an exact narrowing?
+
+The oracle is **not** a fix, and it is unsound as written:
+
+* **Kept patch points stay keyed by the dead cme.** After the invalidation, Hash's next lookup creates a new
+  complemented cme. A later real change to Hash's `initialize_dup` invalidates that new cme (or, if none was
+  created yet, only the negative cache), never the old one, so a kept patch point would never be invalidated.
+* **The change has not happened yet when the hook runs.** For `include`, the cache is cleared before the iclass is
+  inserted, so ZJIT cannot re-check the lookup inside the hook.
+* **The "changed class" is my approximation** of what each `rb_clear_method_cache` caller can affect. I checked it
+  only on the cases in the repro table.
+
+An exact version needs three pieces, none of which exist today:
+
+1. CRuby passes the class whose lookups the change can affect to the JIT hooks, or calls a second hook once the
+   change is complete.
+2. At that point ZJIT re-resolves `rb_callable_method_entry(klass, mid)` for each patch point it would keep. It
+   keeps the patch point only if the result has the same definition and defined class as the old cme, and then
+   re-keys it under the new cme. Anything else is invalidated as today.
+3. The same for YJIT, which has the same structure.
+
+Step 2 makes the result exact by checking the lookup instead of trusting the class hierarchy, so step 1 only has
+to say when it is safe to check. It is a CRuby method-cache and ZJIT invariants change, with refinements, prepend
+and boxes to cover. That is larger than the `dup` change it would unblock.
+
+### Ownership
+
+* No open or closed ruby/ruby PR matches "invalidation", "invalidate cme", "method cache invalidation include",
+  "complemented", "over-invalidat" or `rb_clear_method_cache` on this topic. The nearest are bug fixes in the same
+  code (eightbitraptor's stale `super` cache on prepend, jhawthorn's `cc_table_dup` invalidation).
+* No Shopify/ruby issue covers it. The related open ones are about recompilation policy, all assigned to k0kubun:
+  Shopify/ruby#914 (re-compiling JIT-to-JIT calls on patch-point invalidation) and Shopify/ruby#1031 (adaptive
+  compilation).
+* [ruby/ruby#19617](https://github.com/ruby/ruby/pull/19617) (k0kubun, open, approved by XrXr) adds
+  `--zjit-patch-versions` so final versions invalidated by a patch point can recompile. It was motivated by shipit's
+  constant invalidations. In its review tekknolagi asked for "a more general solution".
+* In k0kubun's lobsters burndown (Shopify/ruby#1039, issue assignee k0kubun), row 19, "Let invalidated ISEQs
+  recompile instead of exiting forever" (`69b586ee80`, −0.23% on lobsters there), has an empty assignee column.
+  ruby/ruby#19617 appears to be its upstream form.
+
+Narrowing cme invalidation is unowned and complements ruby/ruby#19617: recompiling fixes the exits after an
+over-broad invalidation, narrowing avoids the invalidation.
 
 ## Not done or not claimed
 
