@@ -89,43 +89,46 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
     std::fs::create_dir_all(dir.join("app/views/pages")).unwrap();
     let helper = dir.join("app/helpers/view_helper.rb");
     let page = dir.join("page.rb");
-    std::fs::write(&helper, "module ViewHelper\n def label(text) = text\n def count(text) = text\n def title(text) = text\n def heading(text) = text\n def consume(first, text) = text\n def caption(text) = text\nend\n").unwrap();
+    std::fs::write(&helper, "module ViewHelper\n def label(text) = text\n def count(text) = text\n def title(text) = text\n def heading(text) = text\n def consume(first, text) = text\n def caption(text) = text\n def banner(text) = text\n def notice(text) = text\nend\n").unwrap();
     std::fs::write(&page, "class Page\n def maybe\n  return if external\n  'x'\n end\n def show\n  value = maybe\n  label(value)\n  count('fixed')\n end\n def reset\n  @value = 'set'\n end\n def again\n  @value = nil\n  consume(reset, @value)\n end\nend\n").unwrap();
     use sha2::{Digest, Sha256};
     let digest = format!("{:x}", Sha256::digest(b"template"));
     for name in ["index", "_row"] { std::fs::write(dir.join(format!("app/views/pages/{name}.html.erb")), "template").unwrap(); }
     let template = |path: &str, code: &str| json!({"identifier":format!("{}/app/views/{path}.html.erb",dir.display()),
         "virtual_path":path,"source_sha256":digest,"code":code});
-    let mut helpers: Vec<_> = [("label",2), ("count",3), ("title",4), ("heading",5), ("caption",7)].into_iter()
+    let mut helpers: Vec<_> = [("label",2), ("count",3), ("title",4), ("heading",5), ("caption",7), ("banner",8), ("notice",9)].into_iter()
         .map(|(name,line)| json!({"name":name,"owner":"ViewHelper","source_location":format!("{}:{line}",helper.display()),"parameters":[["req","text"]]})).collect();
     helpers.push(json!({"name":"consume","owner":"ViewHelper","source_location":format!("{}:6",helper.display()),"parameters":[["req","first"],["req","text"]]}));
     let facts: Facts = serde_json::from_value(json!({"app_root":dir,"ruby_description":"ruby 4.0.7",
-        "modules":[{"name":"ViewHelper","kind":"module","ancestors":["ViewHelper"],"const_source_location":format!("{}:1",helper.display()),"methods":helpers},
-            {"name":"Page","kind":"class","ancestors":["Page","ViewHelper"],"const_source_location":format!("{}:1",page.display()),"methods":[
+        "modules":[{"name":"ViewHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ViewHelper"],"const_source_location":format!("{}:1",helper.display()),"methods":helpers},
+            {"name":"Page","kind":"class","anonymous_ancestor_methods":[],"ancestors":["Page","ViewHelper"],"const_source_location":format!("{}:1",page.display()),"methods":[
                 {"name":"maybe","owner":"Page","source_location":format!("{}:2",page.display())},
                 {"name":"show","owner":"Page","source_location":format!("{}:6",page.display())},
                 {"name":"reset","owner":"Page","source_location":format!("{}:11",page.display())},
                 {"name":"again","owner":"Page","source_location":format!("{}:14",page.display())}]},
-            {"name":"ActionView::Helpers::UrlHelper","kind":"module","ancestors":["ActionView::Helpers::UrlHelper"],
-             "methods":[{"name":"link_to","owner":"ActionView::Helpers::UrlHelper"}]},
-            {"name":"ActionView::Helpers::TagHelper","kind":"module","ancestors":["ActionView::Helpers::TagHelper"],
-             "methods":[{"name":"content_tag","owner":"ActionView::Helpers::TagHelper"}]},
-            // Views of each controller: its helper module, then the base view class.
+            {"name":"ActionView::Helpers::UrlHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ActionView::Helpers::UrlHelper"],"methods":[
+                {"name":"link_to","owner":"ActionView::Helpers::UrlHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/url_helper.rb:197"},
+                {"name":"button_to","owner":"ActionView::Helpers::UrlHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/url_helper.rb:333"},
+                {"name":"mail_to","owner":"ActionView::Helpers::UrlHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/url_helper.rb:484"}]},
+            {"name":"ActionView::Helpers::TagHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ActionView::Helpers::TagHelper"],
+             "methods":[{"name":"content_tag","owner":"ActionView::Helpers::TagHelper","source_location":"/gems/actionview-8.1.4/lib/action_view/helpers/tag_helper.rb:516"}]},
+            // Overrides that a reconstructed view ancestry missed: a module not named *Helper,
+            // an unnamed module prepended to the route helpers, and a helper left behind
+            // when `clear_helpers` replaced a controller's helper module.
+            {"name":"ViewOverrides","kind":"module","anonymous_ancestor_methods":[],"ancestors":["ViewOverrides"],"methods":[{"name":"content_tag","owner":"ViewOverrides"}]},
+            {"name":"Rails.application.routes.named_routes.url_helpers_module","kind":"module","anonymous_ancestor_methods":["button_to"]},
+            {"name":"OverrideHelper","kind":"module","anonymous_ancestor_methods":[],"ancestors":["OverrideHelper"],"methods":[{"name":"mail_to","owner":"OverrideHelper"}]},
+            // A stale named helper module and a hand-spelled view class, as an ancestry
+            // reconstruction would read them; they must not certify either override.
             {"name":"ActionView::LookupContext.view_context_class","kind":"class","anonymous_ancestor_methods":[],
-             "ancestors":["#<Class:0x>","ActionView::Helpers::UrlHelper","ActionView::Helpers::TagHelper"]},
-            {"name":"AbstractController::Helpers","kind":"module","ancestors":["AbstractController::Helpers"]},
-            {"name":"PagesController","kind":"class","ancestors":["PagesController","AbstractController::Helpers"]},
-            {"name":"PagesController::HelperMethods","kind":"module","anonymous_ancestor_methods":[],
-             "ancestors":["PagesController::HelperMethods","ViewHelper"]},
-            // Another controller's views override content_tag in a module not named *Helper.
-            {"name":"AdminController","kind":"class","ancestors":["AdminController","AbstractController::Helpers"]},
-            {"name":"AdminController::HelperMethods","kind":"module","anonymous_ancestor_methods":[],
-             "ancestors":["AdminController::HelperMethods","ViewOverrides","ViewHelper"]},
-            {"name":"ViewOverrides","kind":"module","ancestors":["ViewOverrides"],"methods":[{"name":"content_tag","owner":"ViewOverrides"}]}],
-        // link_to captures its block with the view as self; instance_eval and
-        // an overriding content_tag may rebind it.
+             "ancestors":["ActionView::Helpers::UrlHelper","ActionView::Helpers::TagHelper"]},
+            {"name":"AbstractController::Helpers","kind":"module","anonymous_ancestor_methods":[],"ancestors":["AbstractController::Helpers"]},
+            {"name":"PagesController","kind":"class","anonymous_ancestor_methods":[],"ancestors":["PagesController","AbstractController::Helpers"]},
+            {"name":"PagesController::HelperMethods","kind":"module","anonymous_ancestor_methods":[],"ancestors":["PagesController::HelperMethods","ViewHelper"]}],
+        // Rails' link_to captures its block with the view as self; instance_eval and any
+        // overridden helper may rebind it. No view class is dumped under either spelling.
         "templates":[template("pages/index", "render 'row', note: nil, other: 'set'"),
-            template("pages/_row", "link_to('x') { title(note) }; count(other); Other.new.instance_eval { heading(nil) }; content_tag(:p) { caption(note) }")]})).unwrap();
+            template("pages/_row", "link_to('x') { title(note) }; count(other); Other.new.instance_eval { heading(nil) }; content_tag(:p) { caption(note) }; button_to('x') { banner(note) }; mail_to('x') { notice(note) }")]})).unwrap();
     let mut model = TypeModel::from_facts(&facts).unwrap();
     let text = || json!({"text":{"String":3}});
     model.merge_observed(&facts, json!({"format":1,"app_root":dir,"types":[
@@ -135,6 +138,8 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
         {"module":"ViewHelper","name":"title","args":text()},
         {"module":"ViewHelper","name":"heading","args":text()},
         {"module":"ViewHelper","name":"caption","args":text()},
+        {"module":"ViewHelper","name":"banner","args":text()},
+        {"module":"ViewHelper","name":"notice","args":text()},
         {"module":"ViewHelper","name":"consume","args":{"first":{"String":1},"text":{"String":1}}}]}).to_string().as_bytes()).unwrap();
     let label = model.fact("ViewHelper#label", "arg:text").unwrap();
     assert_eq!(label.name, "(String | nil)", "Page#show passes a value whose source can be nil");
@@ -145,6 +150,8 @@ fn sampled_parameters_keep_a_nil_only_a_caller_can_pass() {
     assert_eq!(model.fact("ViewHelper#heading", "arg:text").unwrap().name, "String", "an instance_eval block rebinds self");
     assert_eq!(model.fact("ViewHelper#caption", "arg:text").unwrap().name, "String",
         "one view's content_tag is an override that may rebind self");
+    assert_eq!(model.fact("ViewHelper#banner", "arg:text").unwrap().name, "String", "an unnamed module overrides button_to");
+    assert_eq!(model.fact("ViewHelper#notice", "arg:text").unwrap().name, "String", "a helper outside any HelperMethods name overrides mail_to");
     assert_eq!(model.fact("ViewHelper#consume", "arg:text").unwrap().name, "String",
         "the earlier argument's call may reassign @value before it is read");
     std::fs::remove_dir_all(dir).unwrap();

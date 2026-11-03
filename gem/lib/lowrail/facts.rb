@@ -131,7 +131,14 @@ module Lowrail
         list = []
         named = []
         # Snapshot first: the walk creates singleton classes.
-        ObjectSpace.each_object(Module).to_a.each do |mod|
+        snapshot = ObjectSpace.each_object(Module).to_a
+        # Names a reader may resolve as a relative constant: every public
+        # top-level constant and the first segment of every module name,
+        # which includes private top-level constants. Recomputed per dump.
+        @probe_names = (MOD_CONSTANTS.bind_call(Object, false).map { |c| c.to_s } +
+          snapshot.filter_map { |m| n = MOD_NAME.bind_call(m); n.split("::").first if n.is_a?(String) && !n.include?("#<") })
+          .uniq.select { |n| n.match?(/\A[A-Z]\w*\z/) }
+        snapshot.each do |mod|
           if MOD_SINGLETON_P.bind_call(mod)
             stats["singleton_classes"] += 1
             next
@@ -259,9 +266,8 @@ module Lowrail
       # const_defined?(name, false) sees private constants and registered
       # autoloads without loading them.
       def private_top_level_names(mod)
-        @top_level_names ||= MOD_CONSTANTS.bind_call(Object, false)
-        public = MOD_CONSTANTS.bind_call(mod, false)
-        (@top_level_names - public).select { |c| MOD_CONST_DEFINED.bind_call(mod, c, false) }.map { |c| c.to_s }.sort
+        public = MOD_CONSTANTS.bind_call(mod, false).map { |c| c.to_s }
+        (@probe_names - public).select { |c| MOD_CONST_DEFINED.bind_call(mod, c, false) }.map { |c| c.to_s }.sort
       end
 
       def own_methods(mod, mod_name, singleton)

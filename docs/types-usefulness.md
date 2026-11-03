@@ -554,3 +554,56 @@ without observations, is identical to the second measurement:
 
 Verification: `cargo test --locked`, 49 + 4 + 8 passed; `git diff --check`
 is clean.
+
+### Third review: simplify views, recompute constant probes (2026-11-03)
+
+A third review of `b313c1b`, partly executed on Ruby 4.0.7 / Rails 8.1.4,
+found that the reconstructed view ancestry was unsound and that the
+private-constant probe missed names. Following the reviewer's direction,
+this round removes machinery instead of adding more:
+
+1. **Constant probes.** Probe candidates are recomputed for each dump. They
+   are every public top-level constant plus the first segment of every
+   named module, which covers private top-level constants that
+   `Object.constants` omits. They are no longer cached across dumps. Facts
+   without the tables still refuse. A Ruby facts test checks a private
+   top-level name, privately shadowed, and a name defined after an earlier
+   dump; it fails on `b313c1b`.
+2. **View ancestry removed.** Nothing reconstructs a view class from
+   `X::HelperMethods` names or from a hand-spelled view class (Rails 8.1.4
+   dumps `ActionView::LookupContext::DetailsKey.view_context_class`, which
+   the previous code never found). Instead, one conservative rule applies to
+   every dumped module, route helper modules included:
+   - A called app helper's owner is the single module anywhere in the facts
+     that defines the name, and it must be an app helper.
+   - A template block counts only when every module defining the method is
+     a Rails `ActionView::Helpers::*` or `Turbo::FramesHelper` module whose
+     definition is in that gem.
+   - Any other definer refuses: a module not named `*Helper`, a stale helper
+     after `clear_helpers`, or a module prepended to the route helpers (seen
+     through `anonymous_ancestor_methods`). So do facts without that record.
+
+   The regression fixture keeps a stale `X::HelperMethods` and a view class
+   in the old spelling, and adds overrides of `button_to` and `mail_to`.
+   b313c1b certifies both overrides; this commit refuses them. A variant
+   without any view class also fails on `b313c1b`, because that code drops
+   every template helper answer when it finds no view class.
+
+**Fourth measurement of v3**, on the same frozen file, with facts
+regenerated. It was prompted by review, not by v3 results. Binary
+`c10de878…`. Every answer on v2 and v3, with and without observations, is
+identical to the second and third measurements:
+
+| Run | Precision | Recall | TP/FP/FN |
+|---|---:|---:|---|
+| v3, `206a2fc`, observed | 96.08% | 73.13% | 49/2/18 |
+| v3, `e39898b`, observed (first, held-out) | 96.43% | 80.60% | 54/2/13 |
+| **v3, fixed, observed (fourth)** | **96.30%** | **77.61%** | **52/2/15** |
+| v3, fixed, no observations | 100% | 58.21% | 39/0/28 |
+| v2, `206a2fc`, observed (strict / equivalence) | 85.37 / 90.24% | 63.64 / 67.27% | 35/6/20 |
+| **v2, fixed, observed (strict / equivalence)** | **87.50 / 95.83%** | **76.36 / 83.64%** | **42/6/13** |
+| v2, fixed, no observations | 100% | 60.00% | 33/0/22 |
+
+Verification: `cargo test --locked` passes 49 + 4 + 8;
+`gem/test/facts_test.rb -n /private_constants/` passes. `git diff --check`
+is clean.

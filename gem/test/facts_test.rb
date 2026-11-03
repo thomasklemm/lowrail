@@ -9,7 +9,14 @@ require "tmpdir"
 require "digest"
 require "lowrail/facts"
 
+# A private top-level constant, shadowed by a private nested one: neither
+# appears in Module#constants.
+class LowrailPrivateTop; end
+Object.send(:private_constant, :LowrailPrivateTop)
+
 module FactsFixture
+  class LowrailPrivateTop; end
+  private_constant :LowrailPrivateTop
   class Plain
     attr_reader :r
     attr_writer :w
@@ -72,6 +79,22 @@ class FactsTest < Minitest::Test
     assert_includes facts["load_path_features"], File.expand_path("../lib/lowrail/facts.rb", __dir__)
     assert(facts["gems"].any? { |g| g["name"] == "minitest" })
     assert_equal facts["modules"].map { |m| m["name"] }.sort, facts["modules"].map { |m| m["name"] }
+  end
+
+  def test_private_constants_are_probed_per_dump
+    shop = mod("FactsFixture")
+    refute_includes shop["constants"], "LowrailPrivateTop"
+    assert_includes shop["private_constants"], "LowrailPrivateTop"
+    # A top-level name defined after a dump is probed by the next dump.
+    Object.const_set(:LowrailLaterTop, Class.new)
+    FactsFixture.const_set(:LowrailLaterTop, Class.new)
+    FactsFixture.send(:private_constant, :LowrailLaterTop)
+    io = StringIO.new
+    Lowrail::Facts.dump(io)
+    later = JSON.parse(io.string)["modules"].find { |m| m["name"] == "FactsFixture" }
+    assert_includes later["private_constants"], "LowrailLaterTop"
+  ensure
+    Object.send(:remove_const, :LowrailLaterTop) if Object.const_defined?(:LowrailLaterTop, false)
   end
 
   def test_iseq_kinds
