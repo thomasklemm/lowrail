@@ -13,7 +13,7 @@ Active Record SQLite and PostgreSQL suites with `RAILS_STRICT_WARNINGS=1`, plus 
 | # | Branch | Commit | What | ruby-bench instructions, interpreter (railsbench / shipit / lobsters) | YJIT | Allocations (census, 56 workloads) |
 | --- | --- | --- | --- | ---: | ---: | --- |
 | C3 | [`thomasklemm/load-from-sql-attribute-types-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/load-from-sql-attribute-types-once) | [`2fd04c4ade`](https://github.com/thomasklemm/rails/commit/2fd04c4ade032a97018e5ad489e2b4f6ff8cf800) | `_load_from_sql` reads `attribute_types` once instead of once per column type key | **−1.04% / −4.12% / −1.03%** | −0.68% / **−5.29%** / −0.60% | unchanged (as expected) |
-| C2 | [`thomasklemm/association-scope-lazy-alias-tracker`](https://github.com/thomasklemm/rails/tree/thomasklemm/association-scope-lazy-alias-tracker) | [`fcfadc0ee8`](https://github.com/thomasklemm/rails/commit/fcfadc0ee84f1b53534a6407e10cf966d00c0d0d) | association scopes build the `AliasTracker` only for through chains | −0.09% / **−2.64%** / −0.28% (with open #59212: −0.01% / −0.78% / +0.07%) | +0.08% / **−1.82%** / −0.13% (with #59212, shipit: P59212C2_Y) | 36 / 42 workloads −1 or more (A/A 16 / 14), median −2.0 / −3.3 |
+| C2 | [`thomasklemm/association-scope-lazy-alias-tracker`](https://github.com/thomasklemm/rails/tree/thomasklemm/association-scope-lazy-alias-tracker) | [`fcfadc0ee8`](https://github.com/thomasklemm/rails/commit/fcfadc0ee84f1b53534a6407e10cf966d00c0d0d) | association scopes build the `AliasTracker` only for through chains | −0.09% / **−2.64%** / −0.28% (with open #59212: −0.01% / −0.78% / +0.07%) | +0.08% / **−1.82%** / −0.13% (with #59212, shipit: −1.09%) | 36 / 42 workloads −1 or more (A/A 16 / 14), median −2.0 / −3.3 |
 
 Instruction counts are Callgrind's, one measured iteration after warmup with GC off in the window (see
 [Method](#method)); A/A (same tree twice) is −0.002% / +0.021% / −0.151% in the interpreter and +0.056% / +0.043% / −0.045% under YJIT; C2 and C3 together are −0.93% / −6.75% / −1.08% (interpreter), additive. Interpreter / YJIT for the census columns.
@@ -158,8 +158,8 @@ allocations: −2 objects per direct association scope (the tracker and its Hash
 
 **Overlap.** Open #59212 (bruno-costanzo) stops statement-cached association readers from building the scope at all,
 so on top of it C2 only applies where a scope is still built: association relations (`post.comments.where(…)`,
-`order`, `exists?`), `CollectionProxy#scope`, through associations' targets. Measured on top of #59212: shipit
-−0.78%, railsbench −0.01%, lobsters +0.07% (within lobsters' A/A); per call `post.comments.where(…).to_a` −4.4% and
+`order`, `exists?`), `CollectionProxy#scope`, through associations' targets. Measured on top of #59212 (interpreter): shipit
+−0.78%, railsbench −0.01%, lobsters +0.07% (within lobsters' A/A), and shipit −1.09% under YJIT; per call `post.comments.where(…).to_a` −4.4% and
 `association(:comments).scope` −18.6% are unchanged by #59212. The two touch different files and are independent.
 
 ## Overlaps measured, not duplicated
@@ -275,6 +275,6 @@ Not opened; each needs its Thermos review (Codex, GPT-6.1 Sol) first.
 > | `post.comments.to_a` | 873k / 359k | 828k / 343k (−5.2% / −4.6%) |
 > | `post.comments.where(body: "c").to_a` | 1,049k / 430k | 1,004k / 417k (−4.3% / −2.9%) |
 >
-> On ruby-bench shipit runs 2.6% fewer instructions per iteration (1.8% with YJIT; 0.8% on top of #59212), and 36 to
+> On ruby-bench shipit runs 2.6% fewer instructions per iteration (1.8% with YJIT; 0.8% / 1.1% on top of #59212), and 36 to
 > 42 of 56 workloads in six apps allocate 2 fewer objects per association scope.
 
