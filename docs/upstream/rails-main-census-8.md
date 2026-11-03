@@ -263,8 +263,20 @@ shape or the speed of the check (`gh search prs` for `URI_REGEXP`, `asset_path r
 `asset_path performance/faster/allocations`). Open PRs touching the file do not touch the line: #56053 (escaping;
 shows the line as context), #51646, #58935. No dependency on a Ruby or ZJIT change.
 
-**Primary review:** not run yet (DECISIONS: Thermos with GPT-6.1 Sol before the queue; this thread cannot start
-one).
+**Primary review (2026-11-03): ship-ready, no findings.** A separate reviewing subagent ran it. It was the same
+model as this thread: GPT-6.1 Sol is not reachable from this orb without a new thread, and the brief forbids new
+threads. Its checks:
+
+* A differential test on Ruby 4.0.9 found 0 mismatches. It compared `match?` at every start position,
+  `match` offsets, `=~`, `scan` and exceptions. The inputs were hand-picked edges (newlines, `\r`, U+2028, `ſ`, the
+  Kelvin sign, `İ`/`ı`), invalid UTF-8, binary strings and seven other encodings, all 3-piece combinations of 46
+  tricky fragments, and 300k random strings plus 20k random byte strings. Non-String arguments (`nil`, Symbol,
+  Integer, a `to_str` object) behaved the same, and options and encoding are unchanged.
+* `URI_REGEXP` has 3 users in Rails, all `match?`. Neither sprockets-rails nor propshaft references it.
+* The regexp alone runs 40% fewer instructions (Lackey).
+* No rails/rails PR makes this change.
+* The commit message is accurate, and no CHANGELOG entry is needed.
+* Optional: a test covering the line-start and `cid:`/`data:` cases, if maintainers ask.
 
 ### PR draft (short form, not published)
 
@@ -285,6 +297,16 @@ one).
 > line, and its instructions drop by 35–47% per request in each app measured; it allocates nothing. It is about
 > 0.1% of a request, so this is a small, free cleanup rather than a visible speedup.
 
+### Für Thomas
+
+`asset_path` prüft jede Quelle mit `URI_REGEXP`, ob sie schon eine URL ist; bei relativen Pfaden wie
+`"application.css"` schlägt die Prüfung fehl, und genau dieser Fehlschlag kostet. C8-1 zieht das `^` vor die
+Alternation, statt es in jeder der drei Alternativen zu wiederholen: dieselben Treffer an denselben Stellen,
+aber 10–16 % weniger Instruktionen pro `asset_path`-Aufruf (Interpreter, YJIT, ZJIT) und 35–47 % weniger auf der
+Zeile in den 8 gemessenen Apps. Pro Request sind das nur etwa 0,1 % der CPU, also unterhalb dessen, was ein
+einzelner Lauf auflöst. Die Änderung ist eine Zeile, L0 und exakt, aber klein; ob sie den Upstream-Aufwand
+wert ist, entscheidest du.
+
 ## Not built
 
 * **`apply_inflections` (rank 1).** `pluralize`/`singularize` at request time, called by apps and gems
@@ -292,8 +314,8 @@ one).
   interpreted and 56,359 under ZJIT, because every word is tried against up to 33 rules with `sub!` in order. The exact
   options are a result cache (memoization keyed by locale and word, invalidated when inflections change: critical by
   DECISIONS, L2) or one combined regexp (rejected upstream in #35459, closed stale; order and capture semantics make
-  it L3). Prior work: #6864 (closed), #14247, #3536, #29097; open #46918 and #58752 touch other Inflector methods. Left
-  for Thomas to decide.
+  it L3). Prior work: #6864 (closed), #14247, #3536, #29097; open #46918 and #58752 touch other Inflector methods.
+  Decided 2026-11-03: not pursued; an L2 memoization is not worth it.
 * **`IsolatedExecutionState.[]` (ranks 6, 32).** 1,713 Ir per call interpreted against 837 for an empty lambda;
   `Thread.current.active_support_execution_state` alone is 1,288. PingCRM makes ~121 calls per operation through
   `current_shard`/`current_role`/`connected_to_stack`. The method is already minimal; the cost is the call chain.
