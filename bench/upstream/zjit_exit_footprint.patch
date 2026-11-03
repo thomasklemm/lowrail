@@ -1,0 +1,41 @@
+diff --git a/zjit/src/backend/lir.rs b/zjit/src/backend/lir.rs
+index df3a894e6a..d68c061a87 100644
+--- a/zjit/src/backend/lir.rs
++++ b/zjit/src/backend/lir.rs
+@@ -3138,12 +3138,36 @@ impl Assembler
+         // Start a new perf range for side exits.
+         let symbol_range = perf::symbol_range_start(self, "side exit");
+ 
++        // MEASUREMENT ONLY (bet Z9): per-compile side-exit footprint, logged when ZJIT_EXIT_LOG is set.
++        let exit_log = std::env::var_os("ZJIT_EXIT_LOG").is_some();
++        let (mut z9_exits, mut z9_locals, mut z9_stack, mut z9_max_locals) = (0usize, 0usize, 0usize, 0usize);
++        let mut z9_seen: HashSet<&SideExit> = HashSet::default();
++        let mut z9_iseq: Option<IseqPtr> = None;
++        if exit_log {
++            for target in targets.values() {
++                if let Target::SideExit(data) = target {
++                    if z9_seen.insert(&data.exit) {
++                        z9_exits += 1;
++                        z9_locals += data.exit.locals.len();
++                        z9_stack += data.exit.stack.len();
++                        z9_max_locals = z9_max_locals.max(data.exit.locals.len());
++                        z9_iseq.get_or_insert(data.exit.iseq);
++                    }
++                }
++            }
++        }
++        drop(z9_seen);
++        let z9_name = z9_iseq.map(|iseq| crate::cruby::iseq_get_location(iseq, 0)).unwrap_or_default();
++
+         // Mark the start of side-exit code so we can measure its size
+         if !targets.is_empty() {
+             self.pos_marker(move |start_pos, cb| {
+                 let end_pos = cb.get_write_ptr();
+                 let size = end_pos.as_offset() - start_pos.as_offset();
+                 crate::stats::incr_counter_by(crate::stats::Counter::side_exit_size_bytes, size as u64);
++                if exit_log {
++                    eprintln!("Z9EXIT\t{z9_name}\t{size}\t{z9_exits}\t{z9_locals}\t{z9_stack}\t{z9_max_locals}");
++                }
+             });
+         }
+ 
