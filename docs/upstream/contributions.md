@@ -198,7 +198,7 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
 
 ### Spreadsheets — caxlsx/caxlsx
 
-- [#550](https://github.com/caxlsx/caxlsx/pull/550), infer native Integer cell types without decimal Strings — **200,000 fewer objects for 200,000 Integer cells**, **40,000** for the 160,000-cell mixed fixture; one object/Integer in all post-warmup samples. A/A wall medians differed **14.9% / 0.5%**, so allocation-only, not a reliable timing percentage; assumes standard native Integer methods.
+- [#550](https://github.com/caxlsx/caxlsx/pull/550), infer native Integer cell types without decimal Strings — **200,000 fewer objects for 200,000 Integer cells**, **40,000** for the 160,000-cell mixed fixture; one object/Integer in all post-warmup samples. A/A wall medians differed **14.9% / 0.5%**, so allocation-only, not a reliable timing percentage; assumes standard native Integer methods. 2026-11-03: kiskoza requested `is_a?(Integer)` (the codebase's pattern) instead of `Integer ===`; switched, the spoofed-`is_a?` test dropped, rebased onto master as one commit `4649af4`, replied.
 
 ### Lint safety — rubocop/rubocop-performance
 
