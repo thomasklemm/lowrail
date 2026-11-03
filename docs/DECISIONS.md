@@ -82,7 +82,8 @@ Thomas: measure ZJIT on the Rails apps as well, and measure at the frontier (Rai
 [upstream/measurement-matrix.md](upstream/measurement-matrix.md): Rails PR evidence stays on Rails main × Ruby
 4.0.7 (interpreter, YJIT). Every census adds a ZJIT stats pass on Ruby master, and each weekly Ruby pin adds
 interpreter + ZJIT allocations. ZJIT speed claims stay on ruby-bench with A/A. Rails changes made only for ZJIT need
-a 4.0.7 win of their own. New bets: F1 frontier census (20 apps on master), F2 our merged Rails PRs under ZJIT.
+a 4.0.7 win of their own. Every Rails candidate report also gives its micro on Ruby master × ZJIT (pinned build, A/A),
+unless its code path doesn't run on 4.1; then it says so. A ZJIT loss blocks the candidate until explained. New bets: F1 frontier census (20 apps on master), F2 our merged Rails PRs under ZJIT.
 
 ## YJIT is in maintenance mode (2026-11-03)
 
