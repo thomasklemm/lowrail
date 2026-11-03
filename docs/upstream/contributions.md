@@ -95,6 +95,10 @@ Measurements are the PRs' own, from their original dates.
 
 ### Gems
 
+- [cabo/cbor-ruby#43](https://github.com/cabo/cbor-ruby/pull/43), Ruby 4.1 compatibility: Buffer, Packer and Unpacker use TypedData instead of the removed `Data_Wrap_Struct`/`Data_Get_Struct` (fixes #42). cbor 0.5.10.3 does not compile on master; 5 of 20 census apps lock it (Discourse, Flow, Loomio, Mastodon, Sure, via webauthn → cose). 170 specs on 4.0.7 and master, plus a `GC.stress` loop. Astra approve-with-nits (`dsize` NULL, as before; offered as a follow-up), adversarial Sol approve. From the [ecosystem sweep](ruby-4.1-ecosystem.md) (bet E1). Opened 2026-11-03.
+- [IAPark/tiktoken_ruby#132](https://github.com/IAPark/tiktoken_ruby/pull/132), Ruby 4.1 compatibility: Cargo.lock bumps magnus 0.8.2 → 0.8.4 (and rb-sys-env 0.2.3); 0.0.17 and main fail on master with `missing field handle_weak_references`. Discourse locks it. 72 specs on 4.0.7 and master. Bet E1; opened 2026-11-03.
+- [getlago/lago-expression#91](https://github.com/getlago/lago-expression/pull/91), Ruby 4.1 compatibility: `required_ruby_version` `~> 4.0.2` → `>= 4.0.2`, and rb-sys `stable-api-compiled-fallback` (rb-sys 0.9.130 has no 4.1 stable API). Lago installs it from git. 20 specs on 4.0.7 and master; patch from the F1 frontier census. Bet E1; opened 2026-11-03.
+- Issue [ruby/rubygems#10017](https://github.com/ruby/rubygems/issues/10017): Bundler 4.0.x (through 4.0.23) fails on Ruby 4.1 when `.bundle/config` is `---`, a file Bundler writes itself; asks whether 368fc29ce1 (from #9379, unlabeled so not backported) can go into the next 4.0.x, and notes it cherry-picks cleanly onto `4.0`. Bet E1; filed 2026-11-03.
 - [mperham/connection_pool#225](https://github.com/mperham/connection_pool/pull/225), `#with` passes frozen constant interrupt masks to `Thread.handle_interrupt` instead of Hash literals — `pool.with {}` **14 → 10** objects; −4.6 objects per workload on the 18 census configurations that lock 3.x (Mastodon −27.6). From the [gem census](gem-census.md) (bet G1). Sol approve on both rubrics; adversarial Astra: three low items accepted (wrappers of `handle_interrupt` taking `**mask` or mutating the mask, constant-redefinition warnings on reload); a `Fiber#raise` scheduler leak exists in base too. Opened 2026-11-03.
 - [ruby-i18n/i18n#763](https://github.com/ruby-i18n/i18n/pull/763), `Backend::Fallbacks#translate` skips the String comparison when the fallback is the requested locale object (`equal?`) — `I18n.t(:hello)` **13 → 11** objects; −40.3 objects per workload, 0.40% of all allocations in 14 apps (most of it Sure's dashboard; about −10 without it). From the [gem census](gem-census.md) (bet G1). Sol: request-changes twice (custom `==`, then overridden `equal?`); the second accepted, since Ruby documents that `equal?` should not be overridden. Opened 2026-11-03.
 - [ruby-i18n/i18n#764](https://github.com/ruby-i18n/i18n/pull/764), `extract_non_symbol_default!` skips the wrapper Array for scalar defaults (Symbol, String, Hash, Integer) — 2 objects fewer per call; −32.2 objects per workload, 0.32% of all allocations (Sure −722, Docuseal −64 and Discourse −17 via Integer defaults). Four review rounds (Sol and adversarial Astra): to_ary coercion, flatten dispatch, nil/false, Array mutation and `!` dispatch all fixed; accepted: a global redefinition of `Array#flatten` sees a different call order for `to_ary`-convertible defaults. Head `6a57b94`. Opened 2026-11-03.
@@ -281,6 +285,11 @@ None.
 
 ## Drafted, not opened
 
+- **Redmine, `Pathname::SEPARATOR_PAT` (2026-11-03, bet E1):** Bundler ≤ 4.0.11 cannot install path or git gems on
+  Ruby 4.1 since 4e243c709e/a5996718f3; 10 of 20 census apps lock such a Bundler. No related ticket on
+  bugs.ruby-lang.org; the orb has no Redmine account, so the new-ticket draft in
+  [ruby-4.1-ecosystem.md](ruby-4.1-ecosystem.md#draft-redmine-note-pathnameseparator_pat-and-locked-bundlers) waits
+  for Thomas.
 - **Gem census (2026-11-03):** two i18n candidates and one connection_pool candidate on `thomasklemm` forks, with
   drafts, in [gem-census.md](gem-census.md#candidates): I1 −0.40% and I2 −0.32% of all census allocations (exact
   versions after Sol review), C1 −4 objects per `ConnectionPool#with`. C1 is open as
