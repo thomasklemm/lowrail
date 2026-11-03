@@ -56,6 +56,14 @@ workloads ([combined-effect](upstream/combined-effect.md)). Thomas: focus on Rai
 Next, when a slot frees up: a census 7 after the next merge wave, and a serialization CPU dive (`as_json`, `render
 json:`). Parked: types/MCP gaps, YJIT ([yjit-leads](upstream/yjit-leads.md)), ruby/uri and the Campfire lead.
 
+## Measurement matrix: ZJIT and Ruby master on the census apps (2026-11-03)
+
+Thomas: measure ZJIT on the Rails apps as well, and measure at the frontier (Rails main, Ruby master). Decided in
+[upstream/measurement-matrix.md](upstream/measurement-matrix.md): Rails PR evidence stays on Rails main × Ruby
+4.0.7 (interpreter, YJIT). Every census adds a ZJIT stats pass on Ruby master, and each weekly Ruby pin adds
+interpreter + ZJIT allocations. ZJIT speed claims stay on ruby-bench with A/A. Rails changes made only for ZJIT need
+a 4.0.7 win of their own. New bets: F1 frontier census (20 apps on master), F2 our merged Rails PRs under ZJIT.
+
 ## JIT performance work targets ZJIT (2026-11-03)
 
 k0kubun on [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897): the team wants ZJIT
