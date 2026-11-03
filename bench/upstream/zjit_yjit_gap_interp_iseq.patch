@@ -1,0 +1,132 @@
+From bfacefaafba0e16c8187c04af4c124e1a569c358 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Tue, 3 Nov 2026 18:36:38 +0000
+Subject: [PATCH] Lowrail measurement: interpreted instructions per ISEQ
+
+---
+ vm.c            | 77 +++++++++++++++++++++++++++++++++++++++++++++++++
+ vm_insnhelper.h |  8 +++--
+ 2 files changed, 83 insertions(+), 2 deletions(-)
+
+diff --git a/vm.c b/vm.c
+index eb4a5cd..d806a12 100644
+--- a/vm.c
++++ b/vm.c
+@@ -4721,6 +4721,81 @@ vm_keep_script_lines_set(VALUE self, VALUE flags)
+     return flags;
+ }
+ 
++
++/* Lowrail measurement build: interpreted instructions per ISEQ, split by
++ * whether the ISEQ had JIT code (jit_entry) when the instruction ran. */
++int rb_lowrail_ii_on;
++struct lowrail_ii_entry { uint64_t uncompiled, compiled; char *name; };
++static st_table *lowrail_ii_table;
++static uint64_t lowrail_ii_insn[VM_INSTRUCTION_SIZE][2];
++
++void
++rb_lowrail_ii_count(const rb_control_frame_t *cfp, int insn)
++{
++    const rb_iseq_t *iseq = CFP_ISEQ(cfp);
++    st_data_t v;
++    struct lowrail_ii_entry *e;
++    if (!lowrail_ii_table) lowrail_ii_table = st_init_numtable();
++    if (st_lookup(lowrail_ii_table, (st_data_t)iseq, &v)) {
++        e = (struct lowrail_ii_entry *)v;
++    }
++    else {
++        const struct rb_iseq_constant_body *body = ISEQ_BODY(iseq);
++        VALUE label = body->location.label, path = rb_iseq_path(iseq);
++        long line = (long)rb_iseq_line_no(iseq, 0);
++        size_t n = (RB_TYPE_P(label, T_STRING) ? RSTRING_LEN(label) : 0) + (RB_TYPE_P(path, T_STRING) ? RSTRING_LEN(path) : 0) + 32;
++        e = calloc(1, sizeof(*e));
++        e->name = malloc(n);
++        snprintf(e->name, n, "%.*s@%.*s:%ld",
++                 RB_TYPE_P(label, T_STRING) ? (int)RSTRING_LEN(label) : 0, RB_TYPE_P(label, T_STRING) ? RSTRING_PTR(label) : "",
++                 RB_TYPE_P(path, T_STRING) ? (int)RSTRING_LEN(path) : 0, RB_TYPE_P(path, T_STRING) ? RSTRING_PTR(path) : "", line);
++        st_insert(lowrail_ii_table, (st_data_t)iseq, (st_data_t)e);
++    }
++    int c = ISEQ_BODY(iseq)->jit_entry != NULL;
++    if (c) e->compiled++; else e->uncompiled++;
++    if (insn >= 0 && insn < VM_INSTRUCTION_SIZE) lowrail_ii_insn[insn][c]++;
++}
++
++static int
++lowrail_ii_clear_i(st_data_t k, st_data_t v, st_data_t a)
++{
++    struct lowrail_ii_entry *e = (struct lowrail_ii_entry *)v;
++    free(e->name); free(e);
++    return ST_DELETE;
++}
++
++static VALUE
++lowrail_ii_set(VALUE self, VALUE on)
++{
++    if (lowrail_ii_table) st_foreach(lowrail_ii_table, lowrail_ii_clear_i, 0);
++    MEMZERO(lowrail_ii_insn, lowrail_ii_insn, 1);
++    rb_lowrail_ii_on = RTEST(on);
++    return on;
++}
++
++static int
++lowrail_ii_dump_i(st_data_t k, st_data_t v, st_data_t a)
++{
++    struct lowrail_ii_entry *e = (struct lowrail_ii_entry *)v;
++    rb_ary_push((VALUE)a, rb_ary_new_from_args(3, rb_str_new_cstr(e->name), ULL2NUM(e->uncompiled), ULL2NUM(e->compiled)));
++    return ST_CONTINUE;
++}
++
++static VALUE
++lowrail_ii_dump(VALUE self)
++{
++    int was = rb_lowrail_ii_on;
++    rb_lowrail_ii_on = 0;
++    VALUE iseqs = rb_ary_new(), insns = rb_ary_new();
++    if (lowrail_ii_table) st_foreach(lowrail_ii_table, lowrail_ii_dump_i, (st_data_t)iseqs);
++    for (int i = 0; i < VM_INSTRUCTION_SIZE; i++) {
++        if (lowrail_ii_insn[i][0] || lowrail_ii_insn[i][1])
++            rb_ary_push(insns, rb_ary_new_from_args(3, rb_str_new_cstr(insn_name(i)), ULL2NUM(lowrail_ii_insn[i][0]), ULL2NUM(lowrail_ii_insn[i][1])));
++    }
++    rb_lowrail_ii_on = was;
++    return rb_ary_new_from_args(2, iseqs, insns);
++}
++
+ void
+ Init_VM(void)
+ {
+@@ -4743,6 +4818,8 @@ Init_VM(void)
+     rb_undef_alloc_func(rb_cRubyVM);
+     rb_undef_method(CLASS_OF(rb_cRubyVM), "new");
+     rb_define_singleton_method(rb_cRubyVM, "stat", vm_stat, -1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_ii=", lowrail_ii_set, 1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_ii_dump", lowrail_ii_dump, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines", vm_keep_script_lines, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines=", vm_keep_script_lines_set, 1);
+ 
+diff --git a/vm_insnhelper.h b/vm_insnhelper.h
+index 2d83fb5..064330e 100644
+--- a/vm_insnhelper.h
++++ b/vm_insnhelper.h
+@@ -16,13 +16,17 @@ RUBY_EXTERN rb_serial_t ruby_vm_constant_cache_invalidations;
+ RUBY_EXTERN rb_serial_t ruby_vm_constant_cache_misses;
+ RUBY_EXTERN rb_serial_t ruby_vm_global_cvar_state;
+ 
++/* Lowrail measurement build: interpreted instructions per ISEQ. */
++extern int rb_lowrail_ii_on;
++void rb_lowrail_ii_count(const rb_control_frame_t *cfp, int insn);
++#define LOWRAIL_II(insn) do { if (UNLIKELY(rb_lowrail_ii_on)) rb_lowrail_ii_count(VM_REG_CFP, (insn)); } while (0)
+ #if YJIT_STATS || ZJIT_STATS // We want vm_insn_count only on stats builds.
+ // Increment vm_insn_count for --yjit-stats. We increment this even when
+ // --yjit or --yjit-stats is not used because branching to skip it is slower.
+ // We also don't use ATOMIC_INC for performance, allowing inaccuracy on Ractors.
+-#define JIT_COLLECT_USAGE_INSN(insn) rb_vm_insn_count++
++#define JIT_COLLECT_USAGE_INSN(insn) (rb_vm_insn_count++, LOWRAIL_II(insn))
+ #else
+-#define JIT_COLLECT_USAGE_INSN(insn) // none
++#define JIT_COLLECT_USAGE_INSN(insn) LOWRAIL_II(insn)
+ #endif
+ 
+ #if VM_COLLECT_USAGE_DETAILS
+-- 
+2.55.0
+
