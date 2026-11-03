@@ -224,6 +224,24 @@ module RailsCensus
       { queries_per_op: statements.size / 2.0, digest: Digest::SHA256.hexdigest(statements.join("\n"))[0, 16] }
     end
 
+    # JIT counters for steady-state workloads (script/census run --stats): warm
+    # every workload, reset, then run each 20 times. Per operation in the output.
+    def stats(name, output)
+      raise "fresh output required" if File.exist?(output)
+      jit = RubyVM::YJIT.enabled? ? RubyVM::YJIT : RubyVM::ZJIT
+      # CENSUS_DEFAULT_COUNTERS=1: ZJIT without --zjit-stats, whose default counters
+      # (memory, compiled ISEQs) are not inflated by stats code. Not reset.
+      default_counters = ENV["CENSUS_DEFAULT_COUNTERS"] == "1"
+      raise "run with --yjit-stats or --zjit-stats" unless jit.stats_enabled? || default_counters
+      ops = workloads(name)
+      ops.each { |op| Integer(ENV.fetch("CENSUS_WARMUP", "50")).times { op.call.call; reset_side_effects } }
+      jit.reset_stats! unless default_counters
+      ops.each { |op| 20.times { op.call.call; reset_side_effects } }
+      stats = jit == RubyVM::YJIT ? jit.runtime_stats : jit.stats
+      File.write(output, JSON.pretty_generate(app: name, ruby: RUBY_DESCRIPTION, jit: jit.name, rails: rails_sha, ops: ops.size * 20,
+        per_op: stats.filter_map { |k, v| [k, v.fdiv(ops.size * 20)] if v.is_a?(Numeric) && v != 0 }.to_h) + "\n")
+    end
+
     def profile(name, output)
       raise "fresh output required" if File.exist?(output)
       ops = workloads(name)
@@ -248,6 +266,7 @@ if $PROGRAM_NAME == __FILE__
   when "prepare" then RailsCensus.prepare(name)
   when "profile" then RailsCensus.profile(name, output)
   when "list" then RailsCensus.list(name)
-  else abort "usage: harness.rb prepare|profile|list APP [NEW_JSON]"
+  when "stats" then RailsCensus.stats(name, output)
+  else abort "usage: harness.rb prepare|profile|stats|list APP [NEW_JSON]"
   end
 end

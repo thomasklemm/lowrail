@@ -318,6 +318,9 @@ Master moved to `13c3f56bb8` (ZJIT GH-19484) after these heads. That commit does
 
 ## ZJIT remaining
 
+Remeasured on master `90dbced795` (2026-11-03), with exits and fallbacks by reason, owners and Callgrind ZJIT vs
+YJIT gaps: [zjit-gap-census.md](zjit-gap-census.md).
+
 * **`URI.for(*self.split(uri), self)` (uri `rfc3986_parser.rb:135`, 5 apps, mean +18.5/op; Campfire 182 → 362
   Arrays per request).** The caller builds a fresh array (`splatarray true` + `pushtoarray`, `SPLAT_MUT`) and the
   callee is `for(scheme, *arguments, default:)`. The interpreter beheads the caller's array in place

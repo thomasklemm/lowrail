@@ -5,7 +5,11 @@
 #   ruby SCRIPT [--depth N] APP=FILE.fxt ... > summary.tsv
 # Prints reason, category, top frame, samples and apps (TSV); the top frame
 # is the method that made the fallback send or side exit.
+# --categories compile,invalidation counts --zjit-trace-compiles and
+# --zjit-trace-invalidation begin events instead; a lazy compile's name is its
+# ISEQ location, so a location compiled more than once was recompiled.
 depth = ARGV.include?("--depth") ? Integer(ARGV[ARGV.index("--depth") + 1]) : 1
+categories = ARGV.include?("--categories") ? ARGV[ARGV.index("--categories") + 1].split(",") : %w[fallback side_exit]
 inputs = ARGV.grep(/=/).map { _1.split("=", 2) }
 
 def each_event(path)
@@ -25,6 +29,7 @@ def each_event(path)
       strings[index] = data.byteslice((i + 1) * 8, length).force_encoding(Encoding::UTF_8)
     when 4 # event record
       n_args = (header >> 20) & 0xF
+      event_type = (header >> 16) & 0xF # 2 = duration begin, 3 = duration end
       category = strings[(header >> 32) & 0xFFFF]
       name = strings[(header >> 48) & 0xFFFF]
       frames = []
@@ -34,7 +39,7 @@ def each_event(path)
         frames << strings[(arg >> 32) & 0xFFFF] if (arg & 0xF) == 6
         j += (arg >> 4) & 0xFFF
       end
-      yield category, name, frames
+      yield category, name, frames unless event_type == 3
     end
     i += size
   end
@@ -43,8 +48,8 @@ end
 counts = Hash.new { |h, k| h[k] = Hash.new(0) }
 inputs.each do |app, path|
   each_event(path) do |category, reason, frames|
-    next unless %w[fallback side_exit].include?(category)
-    site = frames.first(depth).join(" < ")
+    next unless categories.include?(category)
+    site = frames.empty? ? "" : frames.first(depth).join(" < ")
     counts[[category, reason, site]][app.sub(/-mysql\z/, "")] += 1
   end
 end
