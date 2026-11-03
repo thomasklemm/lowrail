@@ -88,12 +88,12 @@ Instructions per call (interpreter, 100 calls after warmup, GC off; A/A within 0
 20 records `as_json` 2.30 M, `to_json` 4.07 M; `render json:` 20 records 2.85 M; jbuilder 5.14 M.
 `time.as_json` is 5,627, of which `Time#xmlschema` is 1,494.
 
-**Submitted form (2026-11-03): the minimal variant.** After fatkodima's objection to #59577 and the readability
+**Opened as [rails/rails#59584](https://github.com/rails/rails/pull/59584) (2026-11-03, head `8f77e334e9`): the minimal variant.** After fatkodima's objection to #59577 and the readability
 gate in [DECISIONS](../DECISIONS.md#learnings-from-2026-11-03), S1 goes out as the coder-only variant:
 [`thomasklemm/json-escape-coder-only`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-coder-only)
-at [`f3a074279b`](https://github.com/thomasklemm/rails/commit/f3a074279ba1dc0c6d82d54b444ae116e7e73c7b), one commit
+at [`8f77e334e9`](https://github.com/thomasklemm/rails/commit/8f77e334e98b15350521cdf8872d5699dc08c54b), one commit
 on `b084108cf3`. Only `JSONGemCoderEncoder#escape!` changes (two frozen Hash constants, two `each_key` loops with
-plain `include?`/`gsub!`, settings read first), with no code comment and no bound-method constants. Its String
+plain `include?`/`gsub!`, settings read after `force_encoding` and before any replacement, as on main), with no code comment and no bound-method constants. Its String
 comes straight from `JSON::Coder#dump`, so no custom `stringify` can reach it, and every finding of review rounds 2
 to 6, including the pre-4.0 Ractor IsolationError, came through that hook; `JSONGemEncoder` keeps main's code. All
 eleven census apps lock json 2.20 to 3.1, so all use the coder encoder. Checks: Active Support with
@@ -107,6 +107,11 @@ ruby-bench on the minimal variant (Callgrind, one measured iteration after warmu
 second worktree): interpreter railsbench −0.037% (A/A +0.014%), lobsters +0.046% (−0.000%), shipit +0.039%
 (+0.004%); YJIT railsbench **−0.764%** (A/A +0.038%) and, rerun, **−0.282%** (A/A −0.078%), lobsters +0.021%
 (−0.023%), shipit −0.040% (+0.019%). The PR body is at the end.
+
+Review (2026-11-03): Sol approved `f3a074279b` on both rubrics. Astra found the settings read before
+`force_encoding`, which changed error precedence for a frozen String and the order against a fiber switching
+settings; fixed in `8f77e334e9` (same order as main; Active Support 5,482 runs, 0 failures; `escape_fuzz.rb` 0 of
+16,000 differ). A prepended `String#gsub!` seeing two String-pattern calls instead of one Regexp call is accepted.
 
 ## Candidate
 
