@@ -89,7 +89,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   in two or three sentences of his own what is wrong, what changes and why that is safe. I give him a short
   explanation with a minimal example; the PR opens only when he can retell it. The agentic work (builds, numbers,
   reviews) comes after that, not instead of it. Until Thomas lifts it, no new ruby/ruby PRs open at all
-  (2026-11-03): finished candidates are recorded in the queue, not opened (ruby/ruby-bench is not covered); open
+  (2026-11-03): finished candidates are recorded in the queue, not opened (ruby/ruby-bench is not covered); new rails/rails PRs open as drafts after the full review path, and
+  Thomas marks them ready himself (2026-11-03); open
   PRs and issues he can't stand behind are closed with one neutral line.
 * **One concern per PR.** A ruby/ruby PR touches the VM, YJIT or ZJIT, never two of them (tekknolagi on
   [ruby#19661](https://github.com/ruby/ruby/pull/19661#issuecomment-6607345199)). Dependent changes go into one PR
