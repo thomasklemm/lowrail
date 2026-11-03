@@ -165,6 +165,50 @@ A related shape is not a compiler-speed problem: when N locals stay live across 
 write every live local. Code size then grows quadratically, and at N=500 the method fails with
 `out_of_memory` after 0.7 s of compiling. That is generated code, so it is out of scope for this bet.
 
+### Rebased on master `9aa0898240` (for the PRs)
+
+After tekknolagi's go-ahead on both issues (#1064: "Go for it", assigned to us; #1065: "go for it", plus a
+request to avoid an interstitial `Vec` per CCall), both candidates were rebased onto master `9aa0898240` as
+one commit each, independent of each other:
+
+* c1 [`97767f4d20`](https://github.com/thomasklemm/ruby/commit/97767f4d205c3f6614a97d6982f4465078767ecf):
+  the squashed fix and test, unchanged.
+* c2 [`dea97c3afa`](https://github.com/thomasklemm/ruby/commit/dea97c3afa0e3f4e2069968c45e26355247eca4a):
+  reworked. The covering intervals are one flat `Vec<VRegId>` indexed by per-position offsets (a counting
+  pass, then a fill pass), instead of a `Vec<Vec<VRegId>>` with one inner `Vec` per CCall position. Each
+  CCall reads its slice into `survivors`/`survivor_regs` buffers that are cleared and reused, so the loop
+  allocates nothing per CCall. Stack-map register vregs that are not in the slice are appended, and the
+  buffer is sorted only if any were.
+
+Checks on the rebased heads: zjit-test 1940/1940 on each (the load-flaky profile-frames test failed once on
+c2 and passed 5/5 alone and in a full rerun); btest at `--zjit-call-threshold=1` 2141/2141 on each. The
+cross-check build (c1 + c2, plus the old code run next to the new and an abort on any difference) found no
+mismatch on railsbench, lobsters and shipit (at least 16k/65k/32k survivor lists and 32k/131k/131k block-code
+answers), btest at threshold 1 and the 581 test-all tests. Normalized LIR dumps: 30k_ifelse and
+30k_methods each differ from base in 1 unit, the same as a base rerun. The c2 test still fails on the
+broken-span mutant.
+
+`compile_time_ns`, median of 6 interleaved runs, 3 iterations, against base. `aa` reruns the base binary;
+`base2` is a second build of the same source.
+
+| bench | aa | base2 | c1 | c2 |
+|---|---:|---:|---:|---:|
+| railsbench (base 1,725 ms) | +0.0% | −0.6% | −2.3% | −2.9% |
+| lobsters (base 5,926 ms) | −0.8% | +0.2% | −2.6% | −5.4% (LIR −7.7%) |
+| shipit (base 4,922 ms) | +2.8% | +3.2% | +0.3% | +0.3% |
+
+Shipit is inconclusive in this round: its two A/A controls are larger than either effect. Against all 18
+base-equivalent runs pooled, c1 and c2 are both −1.7% there. The two rounds on `0c404b09a0` measured
+−2.3/−3.8% (c1) and −2.7/−3.9% (c2).
+
+Callgrind, railsbench, 2 iterations: c2 `handle_caller_saved_regs` 558M → 328M Ir (−41%), the same as the
+`Vec<Vec>` version (326M). c1 `JITFrame::new_iseq` plus the scan 161M → 16M Ir.
+
+Single method, [`zjit_caller_saved_scaling.rb`](../../bench/upstream/zjit_caller_saved_scaling.rb), two runs
+each: N=2000 base 1.02/1.30 s, c1 0.70/0.69 s, c2 0.68/0.60 s; N=4000 base 3.53/3.48 s, c1 2.32/2.36 s,
+c2 1.73/1.89 s. Code bytes are equal in all runs. (The scaling script on main before this commit was an
+earlier draft with all results live; it now matches the method these tables use.)
+
 ## 4. Not built
 
 * **FxHash (#1049).** The side-exit dedup `HashMap` in `compile_exits` costs up to 0.29G Ir, 4% of compile
