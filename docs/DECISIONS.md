@@ -199,6 +199,9 @@ and not promoted.
    lands what, or offer to close "ours" in favor of "theirs"; we don't need
    acknowledgement. Post data or code that helps, and let maintainers combine
    it however they like.
+   Comment on a tracker issue only when it serves that issue's own goal or
+   answers a question asked there; data that is merely related (e.g. Rails
+   breadth on k0kubun's lobsters burndown #1039) stays in our docs.
    **PR descriptions (revised 2026-11-03):** make review as easy as
    possible; less text is better. A reviewer should see in 30 seconds what
    is wasted, where it runs, what changes and why it is safe. rails/rails:
