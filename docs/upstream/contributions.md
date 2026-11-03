@@ -92,7 +92,6 @@ Finished, reviewed candidates waiting for room (rules in [DECISIONS](../DECISION
 
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
-| i18n C4: check for Fiber storage once in `I18n.config` | ruby-i18n/i18n | `thomasklemm/fiber-storage-check-once` @ `0b55237` | CPU only: `I18n.t(:hello)` −3.3% instructions, −2.3% to −2.8% elsewhere | Sol approve (both), adversarial Astra approve; waits for an i18n slot (3 open). Draft in [i18n-performance.md](i18n-performance.md#c4) |
 
 ## Open
 
@@ -107,6 +106,7 @@ Measurements are the PRs' own, from their original dates.
 - [ruby-i18n/i18n#763](https://github.com/ruby-i18n/i18n/pull/763), `Backend::Fallbacks#translate` skips the String comparison when the fallback is the requested locale object (`equal?`) — `I18n.t(:hello)` **13 → 11** objects; −40.3 objects per workload, 0.40% of all allocations in 14 apps (most of it Sure's dashboard; about −10 without it). From the [gem census](gem-census.md) (bet G1). Sol: request-changes twice (custom `==`, then overridden `equal?`); the second accepted, since Ruby documents that `equal?` should not be overridden. Opened 2026-11-03.
 - [ruby-i18n/i18n#764](https://github.com/ruby-i18n/i18n/pull/764), `extract_non_symbol_default!` skips the wrapper Array for scalar defaults (Symbol, String, Hash, Integer) — 2 objects fewer per call; −32.2 objects per workload, 0.32% of all allocations (Sure −722, Docuseal −64 and Discourse −17 via Integer defaults). Four review rounds (Sol and adversarial Astra): to_ary coercion, flatten dispatch, nil/false, Array mutation and `!` dispatch all fixed; accepted: a global redefinition of `Array#flatten` sees a different call order for `to_ary`-convertible defaults. Head `6a57b94`. Opened 2026-11-03.
 - [ruby-i18n/i18n#765](https://github.com/ruby-i18n/i18n/pull/765), `Backend::Fallbacks#translate` copies plain-Hash options with `merge` and sets the two fallback keys, instead of collecting them into a keyword Hash — `I18n.t(:hello)` 13 → 12 objects, −3.7% instructions; −47.3 objects per workload, 0.38% of all allocations, 10 of 10 translating apps. From the [i18n evaluation](i18n-performance.md) (C1). Sol and adversarial Astra: Hash-subclass `[]=`/`merge` overrides fixed (subclasses keep the old merge); accepted: a singleton `merge` on a plain options Hash, which `I18n.t` cannot pass because `**options` always builds a fresh Hash. Head `0ff39e7`. Opened 2026-11-03.
+- [ruby-i18n/i18n#766](https://github.com/ruby-i18n/i18n/pull/766), `I18n.config` checks for Fiber storage once on Rubies that have it (`Fiber[]` is core from 3.2) and keeps checking on every call where it was missing at load — CPU only: `I18n.t(:hello)` −3.3% instructions, −2.3% to −2.7% for other calls. From the [i18n evaluation](i18n-performance.md#c4) (C4). Sol approve on both rubrics, adversarial Astra approve. Head `0b55237`. Opened 2026-11-03.
 
 ### Ruby — ruby/ruby
 
