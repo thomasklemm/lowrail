@@ -34,7 +34,8 @@ if "$casa_boot_fixture"; then
 fi
 dest="$root/.corpus/$dirname"
 mkdir -p "$root/.corpus"
-ruby_version=4.0.7
+# Census pin; script/gate passes the lowering prototype's 4.0.7.
+ruby_version=${LOWRAIL_CORPUS_RUBY:-4.0.9}
 mise=$(command -v mise || true)
 mise=${mise:-$HOME/.local/bin/mise}
 "$mise" install "ruby@$ruby_version"

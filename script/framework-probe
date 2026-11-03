@@ -20,7 +20,7 @@ module FrameworkProbeRunner
   def main(argv)
     command = argv.shift
     opts = { modes: %w[interpreter yjit], mode: "interpreter", corpus: "census",
-      out: File.join(Census::ROOT, ".lowrail/private/census"), jobs: 1, ruby: "4.0.7" }
+      out: File.join(Census::ROOT, ".lowrail/private/census"), jobs: 1, ruby: "4.0.9" }
     rest = OptionParser.new do |o|
       o.on("--label L") { opts[:label] = _1 }
       o.on("--rails SPEC") { opts[:rails] = _1 }

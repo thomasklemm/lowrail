@@ -4,7 +4,7 @@ index 7919852..43beb40 100644
 +++ b/.ruby-version
 @@ -1 +1 @@
 -4.0.9
-+4.0.7
++4.0.9
 diff --git a/Gemfile b/Gemfile
 index 6c0f34c..26cb602 100644
 --- a/Gemfile
@@ -329,7 +329,7 @@ index 1867513..09452a4 100644
  
  RUBY VERSION
 -  ruby 4.0.9
-+  ruby 4.0.7
++  ruby 4.0.9
  
  BUNDLED WITH
 -  4.0.3

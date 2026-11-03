@@ -4,7 +4,7 @@ index 7919852..43beb40 100644
 +++ b/.ruby-version
 @@ -1 +1 @@
 -4.0.9
-+4.0.7
++4.0.9
 diff --git a/Gemfile b/Gemfile
 index d4bae1a..46b58c0 100644
 --- a/Gemfile
@@ -14,7 +14,7 @@ index d4bae1a..46b58c0 100644
  git_source(:github) { |repo| "https://github.com/#{repo}.git" }
  
 -ruby "~> 4.0.9"
-+ruby "~> 4.0.7"
++ruby "~> 4.0.9"
  
  # Core
  gem "aasm"

@@ -186,6 +186,14 @@ module Census
 
   def ruby_description(bin) = capture(File.join(bin, "ruby"), "-e", "print RUBY_DESCRIPTION")
 
+  # Dev builds (Ruby master) get their own variant Gemfile and lock: Bundler
+  # re-resolves gems whose binaries exclude them, which must not touch the
+  # release pin's lock.
+  def ruby_suffix(bin)
+    (@ruby_suffix ||= {})[bin] ||= capture(File.join(bin, "ruby"), "-e",
+      'print RUBY_PATCHLEVEL < 0 ? "-ruby-#{RUBY_REVISION[0, 10]}" : ""')
+  end
+
   # [OWNER/REPO@|/path@]REF -> source, ref and commit.
   def resolve_rails(spec, default_repo = "rails/rails")
     repo, ref = spec.include?("@") ? spec.split("@", 2) : [default_repo, spec]
@@ -233,7 +241,7 @@ module Census
     dir = app_dir(corpus, app)
     gems = gem_pins(corpus, app, gems)
     suffix = gems.map { |name, g| "-#{name}-#{g.fetch("sha")[0, 12]}" }.join
-    gemfile = File.join(dir, "Gemfile.census-#{rails.fetch("sha")[0, 12]}#{suffix}")
+    gemfile = File.join(dir, "Gemfile.census-#{rails.fetch("sha")[0, 12]}#{suffix}#{ruby_suffix(bin)}")
     unless File.exist?(gemfile)
       lines = File.readlines(File.join(dir, "Gemfile"))
       pins = lines.each_index.filter_map { |i| [i, $1] if lines[i] =~ /\A\s*gem ["'](#{RAILS_GEMS.join("|")})["'],/ }
@@ -361,7 +369,7 @@ module Census
     # Bundle everything before measuring; no bundle command runs during a run.
     gemfiles = opts[:apps].to_h { [_1, variant(opts[:corpus], _1, rails, bin, gems)] }
     locks = opts[:apps].to_h do |app|
-      base_lock = File.join(app_dir(opts[:corpus], app), "Gemfile.census-#{bases.first.fetch("sha")[0, 12]}.lock")
+      base_lock = File.join(app_dir(opts[:corpus], app), "Gemfile.census-#{bases.first.fetch("sha")[0, 12]}#{ruby_suffix(bin)}.lock")
       variant(opts[:corpus], app, bases.first, bin) unless File.exist?(base_lock)
       [app, lock_outside_rails(gemfiles[app] + ".lock", gems.keys) == lock_outside_rails(base_lock, gems.keys)]
     end
@@ -859,7 +867,7 @@ module Census
 
   def main(argv)
     command = argv.shift
-    opts = { corpus: "census", out: File.join(ROOT, ".lowrail/private/census"), ruby: "4.0.7", apps: APPS.keys,
+    opts = { corpus: "census", out: File.join(ROOT, ".lowrail/private/census"), ruby: "4.0.9", apps: APPS.keys,
       modes: %w[interpreter yjit], mode: "interpreter", limit: 60, tiers: CensusRank::TIERS, top: 40, jobs: 1,
       app: "blog", overlays: OVERLAYS, bisect: 20, watch_dir: File.join(ROOT, "docs/upstream/rails-main-watch"), gems: {} }
     parser = OptionParser.new do |o|

@@ -67,10 +67,11 @@ with the reasons. What we pursue, park or reject, and why, is in
 
 ## Reproduce
 
-Requirements: Git, [mise](https://mise.jdx.dev) with the Ruby pinned in
-`mise.toml` (4.0.7), network access, and the local services an app needs
+Requirements: Git, [mise](https://mise.jdx.dev), network access, and the local services an app needs
 (Redis, PostgreSQL, MySQL; see [census.md](docs/upstream/census.md#services-and-apps)).
-The Blog needs none of them:
+`script/census` measures on Ruby 4.0.9 (installed by mise on demand; `--ruby` picks another);
+`mise.toml` pins 4.0.7, the lowering prototype's Ruby, which runs the script itself.
+The Blog needs none of the services:
 
 ```sh
 git clone https://github.com/thomasklemm/lowrail && cd lowrail
