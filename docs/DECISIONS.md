@@ -4,6 +4,35 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Learnings from 2026-11-03
+
+Rules that came out of one day's feedback. Most of them are about maintainers' time.
+
+* **Don't post data nobody asked for.** Comment on an issue or PR only to answer a question asked there, to report
+  a bug or a verified fix that bears on it, or with a change the thread is waiting for. Benchmarks of someone
+  else's PR, "breadth in case it helps", and pointers to overlap with our PRs stay in our docs. Two #1039
+  comments and one #18960 comment were deleted for this.
+* **Readability is a gate, rated L0–L3** (Thomas). L0: no harder to read, opens if exact and measurable. L1:
+  slightly unusual but clear at once, needs a per-call CPU gain outside the A/A. L2: noticeably more complex (a
+  new helper, lazy arrays, copied internals), needs an effect measurable in an app or on ruby-bench. L3: a
+  duplicated method, a Ruby-version branch, index loops, or code that needs comments to explain it; don't open.
+  A separate review round rates it. #59577 and #59557 went too far.
+* **No code comments unless the code would be misread without them.** Why a change is equivalent goes in the
+  PR body, not the source.
+* **Search open, closed and Dependabot PRs and earlier maintainer decisions before building.** Missed today:
+  cbor-ruby#31, tiktoken_ruby#130, and ruby/ruby#16909, where hsbt had closed the same change.
+* **Write "I", not "we",** in upstream comments; one account is one person.
+* **Cross-repo references always carry owner/repo.** A bare `#19583` in Shopify/ruby links to the wrong
+  repository; that happened twice today. Link branches instead of naming them.
+* **ZJIT stats on real apps need `--zjit-exec-mem-size=512 --zjit-mem-size=1024`,** and
+  `compile_error_out_of_memory` must be 0 in every run before any counter is reported. The 64 MiB default filled
+  in most app passes.
+* **Orb reports are claims.** Check a decision-bearing fact before relaying it: #19665 was called a correctness
+  fix and is not; Discourse and Mastodon were named as old-Bundler examples and lock 4.0.23.
+* **Fewer open things, kept mergeable.** Finish what is open before opening more: at most 8 working orbs and 20
+  open Rails PRs (see Submission queue), every open PR rebased and green, one neutral note 14 days after an
+  approval.
+
 ## Rails PR evidence: CPU and provenance, not only objects (2026-11-03)
 
 fatkodima on [rails#59577](https://github.com/rails/rails/pull/59577#issuecomment-6606427493) asked how we choose
