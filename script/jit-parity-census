@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# JIT parity census runner (docs/upstream/jit-parity-census.md). Census-4
+# apps in .corpus/census4-APP, prepared with the overlays in
+# fixtures/corpus/jit-parity-census, bundled with the Ruby in $RUBY_PREFIX.
+#   script/jit-parity-census profile LABEL [MODES]   # allocation census, default: interpreter yjit zjit
+#   script/jit-parity-census stats                   # --yjit-stats / --zjit-stats counters
+#   script/jit-parity-census trace [RATE]            # ZJIT fallback and side-exit traces (.fxt)
+# RUBY_PREFIX selects another build that shares $GEM_PREFIX's gems (same ABI).
+set -uo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+gem_prefix=${GEM_PREFIX:-$HOME/w/rm}
+prefix=${RUBY_PREFIX:-$gem_prefix}
+apps=${APPS:-"blog campfire writebook fizzy fizzy-mysql codetriage pingcrm redprints-cfp react-starter-kit lobsters"}
+out_root="$root/.lowrail/private/jit-parity-census"
+
+run_app() { # APP MODE CMD OUT [ruby flags...]
+  local n=$1 mode=$2 cmd=$3 out=$4; shift 4
+  (
+    export PATH="$prefix/bin:$PATH"
+    if [ "$prefix" != "$gem_prefix" ]; then
+      gems=$(echo "$gem_prefix"/lib/ruby/gems/*)
+      export GEM_HOME=$gems GEM_PATH=$gems
+    fi
+    unset RUBYOPT
+    export BUNDLE_FROZEN=true RAILS_ENV=production RACK_ENV=production SECRET_KEY_BASE_DUMMY=1 \
+      RAILS_LOG_LEVEL=fatal SKIP_TELEMETRY=1 APP_VERSION=census APP_HOST=localhost \
+      RUBY_YJIT_ENABLE=0 RUBY_ZJIT_ENABLE=0 CENSUS_MODE=$mode \
+      CENSUS_RAILS_PIN=${CENSUS_RAILS_PIN:-5810776eecc5b2e50b58e81ee0c26c02c718fdf0}
+    case $n in
+      codetriage|pingcrm) export DATABASE_ADAPTER=postgresql PGHOST=127.0.0.1 PGUSER=postgres ;;
+      fizzy-mysql) export DATABASE_ADAPTER=mysql MYSQL_USER=root MYSQL_HOST=127.0.0.1 MYSQL_PORT=3307 ;;
+      *) export DATABASE_ADAPTER=sqlite ;;
+    esac
+    cd "$root/.corpus/census4-$n" || exit 1
+    flags=()
+    [ "$mode" = interpreter ] || flags=("--$mode")
+    exec bundle exec ruby "${flags[@]}" "$@" "$root/bench/upstream/rails_main_census_4.rb" "$cmd" "$n" "$out"
+  )
+}
+
+case ${1:?profile|stats|trace} in
+  profile)
+    out="$out_root/${2:?label}"; mkdir -p "$out"
+    for m in ${3:-interpreter yjit zjit}; do
+      for n in $apps; do run_app "$n" "$m" profile "$out/$n-$m.json" > "$out/$n-$m.log" 2>&1 & done
+      wait
+      for n in $apps; do [ -s "$out/$n-$m.json" ] || echo "MISSING $n-$m"; done
+    done ;;
+  stats)
+    out="$out_root/stats"; mkdir -p "$out"
+    for m in yjit zjit; do
+      # --zjit-stats=FILE writes to FILE; --zjit-stats-quiet only collects.
+      flag=$([ $m = yjit ] && echo --yjit-stats=quiet || echo --zjit-stats-quiet)
+      for n in $apps; do run_app "$n" "$m" stats "$out/$n-$m.json" "$flag" > "$out/$n-$m.log" 2>&1 & done
+      wait
+    done ;;
+  trace)
+    out="$out_root/trace"; mkdir -p "$out"; rate=${2:-20}
+    for n in $apps; do
+      run_app "$n" zjit stats "$out/$n-zjit.json" --zjit-stats-quiet \
+        --zjit-trace-fallbacks-sample-rate="$rate" --zjit-trace-exits-sample-rate="$rate" > "$out/$n-zjit.log" 2>&1 &
+    done
+    wait
+    for n in $apps; do
+      f=$(grep -o '/tmp/perfetto-[0-9]*.fxt' "$out/$n-zjit.log" | head -1)
+      [ -n "$f" ] && mv "$f" "$out/$n.fxt"
+    done ;;
+  *) echo "usage: $0 profile|stats|trace" >&2; exit 2 ;;
+esac
