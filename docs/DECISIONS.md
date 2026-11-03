@@ -6,7 +6,7 @@ docs; this page only records the decision and why.
 
 ## JIT performance work targets ZJIT (2026-11-03)
 
-k0kubun on [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment): the team wants ZJIT
+k0kubun on [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897): the team wants ZJIT
 faster than YJIT in Ruby 4.1 and lacks bandwidth for a stream of YJIT performance PRs. Thomas
 answered "Sure, makes sense, will focus on ZJIT". From now on, new JIT performance and allocation
 parity work targets ZJIT only. YJIT gets correctness fixes only. YJIT leads (such as invokesuper on
