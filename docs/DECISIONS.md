@@ -4,6 +4,39 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Learnings from 2026-11-03
+
+Rules that came out of one day's feedback. Most of them are about maintainers' time.
+
+* **Don't post data nobody asked for.** Comment on an issue or PR only to answer a question asked there, to report
+  a bug or a verified fix that bears on it, or with a change the thread is waiting for. Benchmarks of someone
+  else's PR, "breadth in case it helps", and pointers to overlap with our PRs stay in our docs. Two #1039
+  comments and one #18960 comment were deleted for this.
+* **Readability is a gate, rated L0–L3** (Thomas). L0: no harder to read, opens if exact and measurable. L1:
+  slightly unusual but clear at once, needs a per-call CPU gain outside the A/A. L2: noticeably more complex (a
+  new helper, lazy arrays, copied internals), needs an effect measurable in an app or on ruby-bench. L3: a
+  duplicated method, a Ruby-version branch, index loops, or code that needs comments to explain it; don't open.
+  A separate review round rates it. #59577 and #59557 went too far.
+* **No code comments unless the code would be misread without them.** Why a change is equivalent goes in the
+  PR body, not the source.
+* **Search open, closed and Dependabot PRs and earlier maintainer decisions before building.** Missed today:
+  cbor-ruby#31, tiktoken_ruby#130, and ruby/ruby#16909, where hsbt had closed the same change.
+* **Write "I", not "we",** in upstream comments; one account is one person.
+* **Cross-link across the stack when changes interlock** (Thomas). If a Rails change depends on, or only pays off
+  with, a Ruby or ZJIT change (or the reverse), say so in one sentence in the PR body with the owner/repo link,
+  e.g. rails/rails#59557 ↔ ruby/ruby#19662. Do it in the body, updated when the other side moves, not as an
+  extra comment.
+* **Cross-repo references always carry owner/repo.** A bare `#19583` in Shopify/ruby links to the wrong
+  repository; that happened twice today. Link branches instead of naming them.
+* **ZJIT stats on real apps need `--zjit-exec-mem-size=512 --zjit-mem-size=1024`,** and
+  `compile_error_out_of_memory` must be 0 in every run before any counter is reported. The 64 MiB default filled
+  in most app passes.
+* **Orb reports are claims.** Check a decision-bearing fact before relaying it: #19665 was called a correctness
+  fix and is not; Discourse and Mastodon were named as old-Bundler examples and lock 4.0.23.
+* **Fewer open things, kept mergeable.** Finish what is open before opening more: at most 8 working orbs and 20
+  open Rails PRs (see Submission queue), every open PR rebased and green, one neutral note 14 days after an
+  approval.
+
 ## Rails PR evidence: CPU and provenance, not only objects (2026-11-03)
 
 fatkodima on [rails#59577](https://github.com/rails/rails/pull/59577#issuecomment-6606427493) asked how we choose
@@ -74,16 +107,27 @@ candidate (Thermos approve on both rubrics, draft in the short form) goes into t
 when the repository has room:
 
 * **rails/rails:** up to 20 of our PRs open at once (Thomas, 2026-11-03; lowered from 25 the same day). Reviewer load still counts: open strongest first and keep each PR small.
-* **ruby/ruby:** at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
+* **ruby/ruby:** at most 15 of our PRs open at once (Thomas, 2026-11-03). With 20 open, open nothing new until
+  merges or closes bring it below 15; let the maintainers merge. Existing PRs are still reworked and rebased.
+  Within the limit: at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
   Exception (Thomas, 2026-11-03): the three tracker items tekknolagi green-lit (Shopify/ruby#1064, #1065, #1091)
   may be open at the same time, i.e. up to 3; `Kernel#dup` (#1058) waits for a slot.
-* **gems:** at most 1 open PR per gem; i18n up to 3 (Thomas, 2026-11-03).
+* **gems:** no per-gem limit; open whatever is good (Thomas, 2026-11-03, replacing "1 per gem, i18n up to 3").
 
 Prefer the strongest candidate, not the oldest. A candidate that an upstream change makes moot leaves the queue
 with a note.
 
+**Keeping open PRs mergeable** (Thomas, 2026-11-03): every open PR stays rebased on its base branch and free of
+conflicts, so it can merge the moment a maintainer wants it. CI failures are checked; failures caused by our change
+are fixed, and unrelated ones are shown to fail on the base as well. An approved PR that is still unmerged after
+14 days gets one short, neutral note, posted on a weekday. The note says it is rebased and CI is green; it does
+not ask anyone to merge.
+
 **Parallel orbs:** at most 8 working orbs at once (Thomas, 2026-11-03). The orbs already running finish their
 current work; new work is started only when the count is below 8.
+**Orb size:** the project default is enough for builds, ruby-bench, Callgrind and the census. A larger orb (for
+example `a1.xxlarge`) may be used for long parallel runs such as a full census matrix, to finish sooner (Thomas,
+2026-11-03). It doesn't reduce wall-time noise from shared hosts; Callgrind stays the primary measure.
 
 ## Priorities after the merge wave (2026-11-03)
 
@@ -123,9 +167,9 @@ stack (#19660–#19663) and #19655 get split accordingly.
 XrXr on [ruby#19664](https://github.com/ruby/ruby/pull/19664#pullrequestreview-5752852916): "YJIT is mainly in
 maintenance mode for bug fixes. For perf improvements we focus on ZJIT. This PR touches a high risk part of YJIT so
 we're unlikely to take it for the next release, as the onus of verification is high." YJIT performance and
-allocation PRs are therefore not expected to merge; YJIT gets bug fixes only. Thomas (2026-11-03): keep the open YJIT
-performance PRs (#19663, #19664, #19665, #19666, #19671) open for at least 24 hours, then decide again (from
-2026-11-04 14:30 UTC). byroot on [ruby#19663](https://github.com/ruby/ruby/pull/19663#issuecomment-6604843888)
+allocation PRs are therefore not expected to merge; YJIT gets bug fixes only. Thomas (2026-11-03, final): keep the open YJIT
+performance PRs (#19663, #19664, #19665, #19666, #19671) open and maintained; we don't close them. The maintainers
+may close them or merge them later. No new YJIT performance PRs. byroot on [ruby#19663](https://github.com/ruby/ruby/pull/19663#issuecomment-6604843888)
 suggested calling a C function that returns an initialized Hash (guarded against a redefined `Hash#initialize`)
 instead of sending `#initialize`; U1 builds that for the ZJIT twin #19662.
 
@@ -188,6 +232,14 @@ and not promoted.
    review faster, even on approved PRs; many ruby/ruby contributors work
    without agents and set their own pace. Comment only with new substance
    (a fix, a review answer, evidence that a red job is unrelated when asked).
+   **Collaborative, not credit (Thomas, 2026-11-03):** treat upstream work as
+   shared. Don't post comments that point out overlap with our PRs, ask who
+   lands what, or offer to close "ours" in favor of "theirs"; we don't need
+   acknowledgement. Post data or code that helps, and let maintainers combine
+   it however they like.
+   Comment on a tracker issue only when it serves that issue's own goal or
+   answers a question asked there; data that is merely related (e.g. Rails
+   breadth on k0kubun's lobsters burndown #1039) stays in our docs.
    **PR descriptions (revised 2026-11-03):** make review as easy as
    possible; less text is better. A reviewer should see in 30 seconds what
    is wasted, where it runs, what changes and why it is safe. rails/rails:

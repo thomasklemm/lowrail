@@ -1,7 +1,99 @@
 # Lowrail
 
-**Make an existing Rails app faster without rewriting it, and prove that
-nothing changed.**
+**Lowrail measures real open-source Rails apps on Rails main and upstreams
+small, exact fixes for the avoidable work it finds** in Rails, in Ruby and its
+JITs (YJIT, ZJIT), and in gems. Results are allocation and instruction counts;
+no request speedup is claimed.
+
+If you came here from a PR, [how candidates are found and measured](docs/upstream/method.md)
+explains where its numbers come from.
+
+Until 2026-11-02 Lowrail was a prototype that lowered Rails apps to specialized
+Ruby. That work is kept below as [research](#lowering-prototype-research)
+([why it changed](docs/DECISIONS.md#lowrail-reoriented-toward-upstream-fixes-and-advisory-types-2026-11-02)).
+
+## The census
+
+[`script/census`](docs/upstream/census.md) moves about 20 open-source apps onto
+one pinned Rails main commit and runs their request, job and mailer workloads.
+The latest round, [census 7](docs/upstream/rails-main-census-7.md), covered 20
+apps in 23 configurations and 251 workloads, on SQLite, PostgreSQL and MySQL,
+in the interpreter and under YJIT. The apps include Mastodon, Discourse,
+Lobsters, Chatwoot, Sure, Fizzy, Campfire, Writebook, Loomio and CASA. Each app
+keeps its own code; only Rails and the gems it needs change.
+
+## How candidates are found and measured
+
+In short, from [method.md](docs/upstream/method.md):
+
+1. **Find.** For every workload the census counts objects allocated per source
+   line. Every round runs twice, as an A/A pair, to show the noise floor. Lines
+   are ranked by how many apps reach them, then by objects per workload, and
+   open and closed PRs that touch a line are searched before anything is built.
+2. **Build.** The smallest change that behaves exactly as before for every
+   caller, checked against the original by a differential harness and the
+   framework's own test suites, and read by two independent reviews. A change
+   that makes the code noticeably harder to read is shrunk or dropped.
+3. **Price.** Per call (objects and Callgrind instruction counts), on
+   ruby-bench (railsbench, lobsters, shipit), and in the census again, always
+   against the same commit without the change and as an A/A pair. A candidate
+   whose CPU gain stays within the A/A and that adds code is not opened.
+
+## Combined effect
+
+Measured together, as Rails main against the same commit with our merged PRs
+reverted ([combined effect](docs/upstream/combined-effect.md)):
+
+* **11 PRs** (#59533–#59544), Ruby 4.0.7: **1.66%** fewer allocations in the
+  interpreter and **1.64%** under YJIT, across 206 request, job and mailer
+  workloads in sixteen apps. Every app moves, by 0.8% to 3.0%, and no workload
+  allocates more. Wall time on ruby-bench's railsbench and lobsters is a tie
+  within the A/A, and GC runs per iteration do not change.
+* **22 PRs** (merged by 2026-11-03 10:43 UTC), Ruby master: **3.27%** fewer
+  allocations interpreted and **3.21%** under ZJIT, across census 4's nine apps
+  (97 workloads). Under ZJIT, ruby-bench runs **0.54%** (railsbench) and
+  **0.49%** (lobsters) fewer instructions per iteration, outside the A/A.
+
+These are allocation and instruction savings, not a measured speedup.
+
+## Contributions
+
+The [contributions ledger](docs/upstream/contributions.md) lists merged, open
+and closed PRs, each with its own measured result and caveats: rails/rails,
+ruby/ruby (YJIT and ZJIT), sqlite3-ruby, Prism, Campfire and other gems. It also
+records validation reviews and the candidates investigated and not submitted,
+with the reasons. What we pursue, park or reject, and why, is in
+[DECISIONS.md](docs/DECISIONS.md).
+
+## Reproduce
+
+Requirements: Git, [mise](https://mise.jdx.dev) with the Ruby pinned in
+`mise.toml` (4.0.7), network access, and the local services an app needs
+(Redis, PostgreSQL, MySQL; see [census.md](docs/upstream/census.md#services-and-apps)).
+The Blog needs none of them:
+
+```sh
+git clone https://github.com/thomasklemm/lowrail && cd lowrail
+mise exec -- script/census setup --rails main --apps blog     # app copy on Rails main, smoke-tested
+mise exec -- script/census run --label base --aa --apps blog  # A/A pair: base and base2
+mise exec -- script/census rank --label base2                 # Rails lines by breadth, then objects
+mise exec -- script/census compare --base base2 --aa base     # the A/A noise floor
+```
+
+Omit `--apps` for every app. To measure a Rails branch, run it under a new
+label with `--rails OWNER/REPO@BRANCH` and compare it against `base2`. To add
+your own app, see [Run it on your own app](docs/upstream/census.md#run-it-on-your-own-app).
+Each report under [docs/upstream/](docs/upstream/) lists its pins and commands;
+receipts of published rounds are in [docs/upstream/data/](docs/upstream/data/).
+
+## Lowering prototype (research)
+
+Lowrail's original prototype, as it stood on 2026-10-22. It stays in the tree
+as research, unchanged and not promoted
+([decision](docs/DECISIONS.md#lowrail-reoriented-toward-upstream-fixes-and-advisory-types-2026-11-02)).
+
+The prototype's aim: **make an existing Rails app faster without rewriting
+it, and prove that nothing changed.**
 
 Lowrail boots your Rails application, learns what is fixed after boot (schema,
 routes, config, method definitions, templates), and delivers specialized Ruby
@@ -19,9 +111,9 @@ for the other projects we learned from.
 > **Research prototype.** Lowrail is not published as a gem and gives no
 > production speedup by default today. Use it on a copy of your app or in CI.
 
-## Current results (2026-10-21)
+### Current results (2026-10-21)
 
-### Warm-request instruction counts
+#### Warm-request instruction counts
 
 **Warm-request instruction results, including increases and historical records—not latency or throughput claims.**
 **Ir instructions, not latency · no YJIT instruction claim yet · opt-in research, not default**.
@@ -86,7 +178,7 @@ admission or cold-start performance; **cold still RED**.
 The [first N=50 cohort remains INVALID (heap growth)](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51),
 without a credited price or direction claim ([scope and evidence](docs/block-link-specimen.md)).
 
-### Full-request throughput (real Puma)
+#### Full-request throughput (real Puma)
 
 <!-- throughput-results:start -->
 **2026-10-21 · [Blog (bet A), `GET /articles/1`](https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.md#confirmatory-result-throughput-gate-passes-p99-is-higher) · Ruby / Rails 4.0.7 / 8.1.4 · Stock Ruby YJIT.**
@@ -137,7 +229,7 @@ Refresh the short
 [status](docs/STATUS.md#at-a-glance-2026-10-21) and [benchmark summary](docs/bench.md#current-accepted-request-results)
 when scope or acceptance changes; retain superseded records as historical.
 
-### Supported and unsupported today
+#### Supported and unsupported today
 
 - **Default:** lowers nothing; original Rails remains in control. The
   [corpus compatibility report](docs/compat.md) distinguishes identical
@@ -162,7 +254,7 @@ when scope or acceptance changes; retain superseded records as historical.
   boundary stay original
   ([pass ledger](docs/DECISIONS.md#passes), [loaders](docs/loaders.md)).
 
-### Also on main (2026-10-22)
+#### Also on main (2026-10-22)
 
 - **Sealed mutation tripwire** ([ce47c62](https://github.com/thomasklemm/lowrail/commit/ce47c620cfe85dbc939189e351e051db09e8c484)):
   certified method/ancestor changes retire admitted units. This is a backstop,
@@ -189,7 +281,7 @@ includes Fizzy's baseline errors and CASA's skips. **No savings claim for
 these plain sealed builds outside the blog**
 ([pins and limits](docs/DECISIONS.md#own-suite-breadth-is-not-optimized-coverage)).
 
-## How it works
+### How it works
 
 ```text
 ┌──────────────────────┐
@@ -218,7 +310,7 @@ The Rust CLI parses with [Prism](https://github.com/ruby/prism) and indexes
 with [Rubydex](https://github.com/Shopify/rubydex). The Ruby gem in `gem/` is
 the runtime that boots the app, certifies facts and installs lowered code.
 
-## Quick start
+### Quick start
 
 Requirements: a Rust toolchain, Ruby 4.0.7 (pinned in `mise.toml`), and a
 Rails 8.1 app whose test suite passes.
@@ -246,7 +338,7 @@ RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails test
 or incompatible build is a silent no-op. More options are in the
 [reference](#reference) below.
 
-## Status (2026-10-21)
+### Status (2026-10-21)
 
 - **Correctness machinery works.** `lowrail verify` compares per-test outcomes
   and ordered SQL with Lowrail off and on. The pinned Rails 8.1.4 framework
@@ -276,7 +368,7 @@ Every pursued, parked and rejected idea is in
 [docs/DECISIONS.md](docs/DECISIONS.md). Dated evidence is in
 [docs/STATUS.md](docs/STATUS.md).
 
-## Direction
+### Direction
 
 Two tiers, so that every app keeps running and apps that opt in can go
 further:
@@ -289,7 +381,7 @@ further:
 Apps that do not meet the sealed contract still run in the guarded tier. The
 tooling explains why and what to change.
 
-## Target matrix
+### Target matrix
 
 | Axis | Primary | Secondary / diagnostic |
 |---|---|---|
@@ -299,7 +391,7 @@ tooling explains why and what to change.
 
 How to read and reproduce measurements: [docs/bench.md](docs/bench.md).
 
-## Reference
+### Reference
 
 All commands, from a checkout:
 
@@ -387,7 +479,7 @@ off/off and on/on variation is reported separately as advisory noise.
 This observer is opt-in because its snapshots and boot hooks have a cost;
 the corpus compatibility checks enable it. Snapshot time is in the report.
 
-## Complementary optimizations
+### Complementary optimizations
 
 Lowrail only applies changes it can guard exactly. These stay the app's own
 decision, and Lowrail works next to them:
@@ -403,16 +495,14 @@ decision, and Lowrail works next to them:
   with it. Lowrail compiles each file with the same options the app's loaders
   use ([loaders.md](docs/loaders.md)).
 
-## Upstream contributions
-
-See the [upstream contributions ledger](docs/upstream/contributions.md) for
-merged and open PRs, their measured results and caveats, validation reviews,
-and investigations that did not become submissions.
-
 ## Docs
 
 | Read | For |
 |---|---|
+| [upstream/method.md](docs/upstream/method.md) | how upstream candidates are found, built and measured |
+| [upstream/census.md](docs/upstream/census.md) | `script/census`: run, rank, compare, add an app |
+| [upstream/combined-effect.md](docs/upstream/combined-effect.md) | merged Rails PRs measured together |
+| [upstream/contributions.md](docs/upstream/contributions.md) | upstream PRs, their results and caveats |
 | [PLAN.md](docs/PLAN.md) | goals, contract, why this design |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | pipeline, pass contract, registry |
 | [DECISIONS.md](docs/DECISIONS.md) | what is pursued, parked or rejected, plus the stacking backlog |

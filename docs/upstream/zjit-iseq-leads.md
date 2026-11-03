@@ -56,7 +56,7 @@ master `9aa0898240`, 8 files, +126/−42. Not a PR.
 `--zjit-exec-mem-size` filled in fizzy, fizzy-mysql and lobsters (`compile_error_out_of_memory` 195k / 168k / 74k;
 `--zjit-mem-size` alone doesn't lift it). Rerun of those three plus writebook with
 `--zjit-exec-mem-size=512 --zjit-mem-size=1024`: code region 89 / 88 / 70 MiB, no out-of-memory, writebook
-unchanged. The 10-app means above and in the #1039 comment move by at most 4% (send 186 → 192, sendforward
+unchanged. The 10-app means above and in the (since deleted) #1039 comment move by at most 4% (send 186 → 192, sendforward
 331 → 344, protected 188 → 191, constant exits 230 → 228, #1100 22.5 → 23.2); the named top sites are unchanged
 (Visitor#visit 101.5, WhereClause#empty? 91.5, OrderedOptions 113.9, fetch_or_store 20.9). Only
 `singleton_class_seen` moves more: 391 → 431 per op (fizzy 145 → 266). Raw runs: `apps-mem1g/` in the private
