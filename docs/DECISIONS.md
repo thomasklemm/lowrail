@@ -22,6 +22,10 @@ Rules that came out of one day's feedback. Most of them are about maintainers' t
 * **Search open, closed and Dependabot PRs and earlier maintainer decisions before building.** Missed today:
   cbor-ruby#31, tiktoken_ruby#130, and ruby/ruby#16909, where hsbt had closed the same change.
 * **Write "I", not "we",** in upstream comments; one account is one person.
+* **Cross-link across the stack when changes interlock** (Thomas). If a Rails change depends on, or only pays off
+  with, a Ruby or ZJIT change (or the reverse), say so in one sentence in the PR body with the owner/repo link,
+  e.g. rails/rails#59557 ↔ ruby/ruby#19662. Do it in the body, updated when the other side moves, not as an
+  extra comment.
 * **Cross-repo references always carry owner/repo.** A bare `#19583` in Shopify/ruby links to the wrong
   repository; that happened twice today. Link branches instead of naming them.
 * **ZJIT stats on real apps need `--zjit-exec-mem-size=512 --zjit-mem-size=1024`,** and
