@@ -44,12 +44,12 @@ and not promoted.
    **PR descriptions (revised 2026-11-03):** make review as easy as
    possible; less text is better. A reviewer should see in 30 seconds what
    is wasted, where it runs, what changes and why it is safe. rails/rails:
-   keep the template headings, 2–3 sentences of motivation, 2–3 sentences
-   of change (including the one boundary a reviewer would ask about), then
-   at most one small before/after table (per call) and one sentence of app
-   breadth; about 150 words, and drop the template's checklist. No per-app
-   tables, review history, method notes or receipts; those stay in Lowrail
-   docs.
+   no headings and no template checklist (the template allows discarding
+   it). First paragraph: what is wasted and where it runs (2–3 sentences).
+   Second: what changes and the one boundary a reviewer would ask about
+   (2–3 sentences). Then at most one small before/after table (per call)
+   and one sentence of app breadth; about 150 words. No per-app tables,
+   review history, method notes or receipts; those stay in Lowrail docs.
    ruby/ruby: shorter still, about 100 words plus one micro table, and a
    line naming the PR it is stacked on.
 3. **Stop:** new interpreter-Ir pricing, sealed-tier breadth, guarded
