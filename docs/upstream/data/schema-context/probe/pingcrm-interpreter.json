@@ -1,0 +1,252 @@
+{
+  "app": "pingcrm",
+  "workloads": [
+    {
+      "workload": "GET dashboard",
+      "kind": "html",
+      "schema_context": 46,
+      "attributes": 43,
+      "attributes_slow": 43,
+      "schema_context_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 34,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 5,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 2,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute?": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/reflection.rb:254 block in ActiveRecord::Reflection::AbstractReflection#association_scope_cache": 1
+      },
+      "attributes_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 34,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 5,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 2,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute? <- active_record/serialization.rb:15 ActiveRecord::Serialization#serializable_hash": 2
+      }
+    },
+    {
+      "workload": "GET contacts",
+      "kind": "html",
+      "schema_context": 138,
+      "attributes": 131,
+      "attributes_slow": 131,
+      "schema_context_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 90,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 22,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 17,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/relation/query_methods.rb:2301 ActiveRecord::QueryMethods#arel_column": 2,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute?": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 1,
+        "active_record/association_route.rb:234 ActiveRecord::AssociationRoute#match_normalizers <- active_record/associations/preloader/association.rb:286 ActiveRecord::Associations::Preloader::Association#match_normalizers": 1,
+        "active_record/association_route.rb:235 ActiveRecord::AssociationRoute#match_normalizers <- active_record/associations/preloader/association.rb:286 ActiveRecord::Associations::Preloader::Association#match_normalizers": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/reflection.rb:254 block in ActiveRecord::Reflection::AbstractReflection#association_scope_cache": 1
+      },
+      "attributes_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 90,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 22,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 17,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute? <- active_record/serialization.rb:15 ActiveRecord::Serialization#serializable_hash": 2
+      }
+    },
+    {
+      "workload": "GET organizations",
+      "kind": "html",
+      "schema_context": 92,
+      "attributes": 88,
+      "attributes_slow": 88,
+      "schema_context_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 60,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 14,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 12,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute?": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/relation/query_methods.rb:2301 ActiveRecord::QueryMethods#arel_column": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/reflection.rb:254 block in ActiveRecord::Reflection::AbstractReflection#association_scope_cache": 1
+      },
+      "attributes_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 60,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 14,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 12,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute? <- active_record/serialization.rb:15 ActiveRecord::Serialization#serializable_hash": 2
+      }
+    },
+    {
+      "workload": "GET contact edit",
+      "kind": "html",
+      "schema_context": 210,
+      "attributes": 205,
+      "attributes_slow": 205,
+      "schema_context_sites": {
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 103,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 90,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 10,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute?": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/core.rb:492 block in ActiveRecord::Core::ClassMethods#cached_find_by": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/reflection.rb:254 block in ActiveRecord::Reflection::AbstractReflection#association_scope_cache": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/relation/query_methods.rb:2301 ActiveRecord::QueryMethods#arel_column": 1
+      },
+      "attributes_sites": {
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 103,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 90,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 10,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute? <- active_record/serialization.rb:15 ActiveRecord::Serialization#serializable_hash": 2
+      }
+    },
+    {
+      "workload": "GET contacts (Inertia JSON)",
+      "kind": "json",
+      "schema_context": 138,
+      "attributes": 131,
+      "attributes_slow": 131,
+      "schema_context_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 90,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 22,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 17,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/relation/query_methods.rb:2301 ActiveRecord::QueryMethods#arel_column": 2,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute?": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 1,
+        "active_record/association_route.rb:234 ActiveRecord::AssociationRoute#match_normalizers <- active_record/associations/preloader/association.rb:286 ActiveRecord::Associations::Preloader::Association#match_normalizers": 1,
+        "active_record/association_route.rb:235 ActiveRecord::AssociationRoute#match_normalizers <- active_record/associations/preloader/association.rb:286 ActiveRecord::Associations::Preloader::Association#match_normalizers": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/reflection.rb:254 block in ActiveRecord::Reflection::AbstractReflection#association_scope_cache": 1
+      },
+      "attributes_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 90,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 22,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 17,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute? <- active_record/serialization.rb:15 ActiveRecord::Serialization#serializable_hash": 2
+      }
+    },
+    {
+      "workload": "GET organizations (Inertia JSON)",
+      "kind": "json",
+      "schema_context": 92,
+      "attributes": 88,
+      "attributes_slow": 88,
+      "schema_context_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 60,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 14,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 12,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute?": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/relation/query_methods.rb:2301 ActiveRecord::QueryMethods#arel_column": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/reflection.rb:254 block in ActiveRecord::Reflection::AbstractReflection#association_scope_cache": 1
+      },
+      "attributes_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 60,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 14,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 12,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/attribute_methods.rb:289 ActiveRecord::AttributeMethods::ClassMethods#_has_attribute? <- active_record/serialization.rb:15 ActiveRecord::Serialization#serializable_hash": 2
+      }
+    },
+    {
+      "workload": "PUT contact (Inertia redirect)",
+      "kind": "form",
+      "schema_context": 76,
+      "attributes": 63,
+      "attributes_slow": 63,
+      "schema_context_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 56,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 5,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 3,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 2,
+        "active_record/timestamp.rb:83 ActiveRecord::Timestamp::ClassMethods#timestamp_attributes_for_update_in_model <- active_record/timestamp.rb:154 ActiveRecord::Timestamp#timestamp_attributes_for_update_in_model": 2,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/model_schema.rb:540 ActiveRecord::ModelSchema::ClassMethods#column_for_attribute": 2,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/locking/optimistic.rb:211 ActiveRecord::Locking::Optimistic::ClassMethods#locking_enabled?": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/core.rb:492 block in ActiveRecord::Core::ClassMethods#cached_find_by": 1,
+        "active_record/model_schema.rb:553 ActiveRecord::ModelSchema::ClassMethods#column_names <- active_record/attribute_methods.rb:540 ActiveRecord::AttributeMethods#attributes_for_update": 1,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/persistence.rb:902 ActiveRecord::Persistence#_query_constraints_hash": 1
+      },
+      "attributes_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 56,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 5,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 2
+      }
+    },
+    {
+      "workload": "POST contact invalid (Inertia errors)",
+      "kind": "form",
+      "schema_context": 52,
+      "attributes": 43,
+      "attributes_slow": 43,
+      "schema_context_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql": 34,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/attribute_methods.rb:347 ActiveRecord::AttributeMethods#respond_to?": 6,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute": 5,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of": 2,
+        "active_record/persistence.rb:195 ActiveRecord::Persistence::ClassMethods#query_constraints_list <- active_record/relation/finder_methods.rb:730 ActiveRecord::FinderMethods#_order_columns": 1,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/core.rb:525 ActiveRecord::Core#initialize": 1,
+        "active_record/attributes.rb:279 ActiveRecord::Attributes::ClassMethods#_default_attributes <- active_record/core.rb:526 ActiveRecord::Core#initialize": 1,
+        "active_record/core.rb:454 ActiveRecord::Core::ClassMethods#cached_find_by_statement <- active_record/reflection.rb:254 block in ActiveRecord::Reflection::AbstractReflection#association_scope_cache": 1,
+        "active_record/model_schema.rb:496 ActiveRecord::ModelSchema::ClassMethods#columns_hash <- active_record/locking/optimistic.rb:211 ActiveRecord::Locking::Optimistic::ClassMethods#locking_enabled?": 1
+      },
+      "attributes_sites": {
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_record/querying.rb:98 block in ActiveRecord::Querying#_load_from_sql <- active_record/querying.rb:98 Hash#reject": 34,
+        "active_record/attributes.rb:283 ActiveRecord::Attributes::ClassMethods#attribute_types <- active_model/attribute_registration.rb:57 ActiveModel::AttributeRegistration::ClassMethods#type_for_attribute <- active_record/type_caster/map.rb:16 ActiveRecord::TypeCaster::Map#type_for_attribute": 5,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/persistence.rb:277 ActiveRecord::Persistence::ClassMethods#instantiate_instance_of <- active_record/querying.rb:113 block (2 levels) in ActiveRecord::Querying#_load_from_sql": 2,
+        "active_record/model_schema.rb:492 ActiveRecord::ModelSchema::ClassMethods#attributes_builder <- active_record/core.rb:525 ActiveRecord::Core#initialize <- GEM/cancancan-3.7.0/lib/cancan/controller_resource.rb:257 CanCan::ControllerResource#build_resource": 1,
+        "active_record/attributes.rb:279 ActiveRecord::Attributes::ClassMethods#_default_attributes <- active_record/core.rb:526 ActiveRecord::Core#initialize <- GEM/cancancan-3.7.0/lib/cancan/controller_resource.rb:257 CanCan::ControllerResource#build_resource": 1
+      }
+    }
+  ],
+  "models": [
+    {
+      "model": "Organization",
+      "path": "slow",
+      "reason": "types not shareable",
+      "detail": [
+        "deleted_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "created_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "updated_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter"
+      ],
+      "blockers": {
+        "tzc": 3
+      }
+    },
+    {
+      "model": "Contact",
+      "path": "slow",
+      "reason": "types not shareable",
+      "detail": [
+        "deleted_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "created_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "updated_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter"
+      ],
+      "blockers": {
+        "tzc": 3
+      }
+    },
+    {
+      "model": "Account",
+      "path": "slow",
+      "reason": "types not shareable",
+      "detail": [
+        "created_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "updated_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter"
+      ],
+      "blockers": {
+        "tzc": 2
+      }
+    },
+    {
+      "model": "User",
+      "path": "slow",
+      "reason": "types not shareable",
+      "detail": [
+        "deleted_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "created_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "updated_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "reset_password_sent_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter",
+        "remember_created_at: ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter"
+      ],
+      "blockers": {
+        "tzc": 5
+      }
+    }
+  ]
+}
