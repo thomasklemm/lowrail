@@ -510,6 +510,7 @@ decision, and Lowrail works next to them:
 | [upstream/census.md](docs/upstream/census.md) | `script/census`: run, rank, compare, add an app |
 | [upstream/combined-effect.md](docs/upstream/combined-effect.md) | merged Rails PRs measured together |
 | [upstream/contributions.md](docs/upstream/contributions.md) | upstream PRs, their results and caveats |
+| [upstream/explainers.md](docs/upstream/explainers.md) | German explainer per open ruby/ruby and rails/rails PR, and where a reply is owed |
 | [PLAN.md](docs/PLAN.md) | goals, contract, why this design |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | pipeline, pass contract, registry |
 | [DECISIONS.md](docs/DECISIONS.md) · [decisions-prototype.md](docs/decisions-prototype.md) | current rules and decisions; the parked prototype's decisions and stacking backlog |
