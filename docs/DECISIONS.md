@@ -82,6 +82,12 @@ when the repository has room:
 Prefer the strongest candidate, not the oldest. A candidate that an upstream change makes moot leaves the queue
 with a note.
 
+**Keeping open PRs mergeable** (Thomas, 2026-11-03): every open PR stays rebased on its base branch and free of
+conflicts, so it can merge the moment a maintainer wants it. CI failures are checked; failures caused by our change
+are fixed, and unrelated ones are shown to fail on the base as well. An approved PR that is still unmerged after
+14 days gets one short, neutral note, posted on a weekday. The note says it is rebased and CI is green; it does
+not ask anyone to merge.
+
 **Parallel orbs:** at most 8 working orbs at once (Thomas, 2026-11-03). The orbs already running finish their
 current work; new work is started only when the count is below 8.
 
