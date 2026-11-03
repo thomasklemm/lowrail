@@ -177,14 +177,9 @@ write every live local. Code size then grows quadratically, and at N=500 the met
 
 ## Leads (recorded, not built)
 
-* **Side exits that write every live local make code size quadratic.** Take a method of N
-  `vI = o.hash` statements whose results all stay live until a final `s ^= vI` chain. Each call's side exit
-  writes every local that is live there, so code size grows as N². At N=250 the method compiles to 4.2 MB of
-  code (1,316 side exits). At N=500 it fails with `out_of_memory` after 0.7 s of compiling, and at N=1000 after
-  3.1 s (16% of that in side-exit compile). Callgrind at N=500 puts 48% of the compile in `x86_emit`/`mov`.
-  This is a generated-code change: shared exit code, or materializing locals from the frame instead of
-  per-exit stores. It belongs to whoever owns side exits and stack maps (#1021). We have not checked
-  whether any Rails method is large enough to hit it.
+* **Side exits that write every live local make code size quadratic.** Followed up as bet Z9, see
+  [section 6](#6-side-exit-code-size-bet-z9). XrXr's open ruby/ruby#18960 already makes it linear; Rails code
+  does not reach it.
 * **FxHash for the side-exit dedup map (#1049).** On railsbench it costs up to 0.29G Ir, 4% of compile Ir,
   inside `compile_exits`. Exit order is already `RandomState`-random from run to run, so a fixed hasher
   would not make generated code less exact; it would make LIR dumps reproducible. Measure it with the
@@ -227,3 +222,84 @@ write every live local. Code size then grows quadratically, and at N=500 the met
 > A cross-check build compared the old and new survivor lists on every CCall through railsbench, lobsters,
 > shipit and btest at threshold 1, and found no difference. Normalized LIR dumps of 30k_ifelse/30k_methods are
 > identical to base. OK if we send a PR?
+
+## 6. Side-exit code size (bet Z9)
+
+Follow-up to the Z6 side finding. Same base (master `0c404b09a0`, release build); ruby/ruby#18960 head
+`0564799aa1` (merge base `b51db981f6`). Rails numbers are one run of 3 iterations each.
+
+**Prior work.** No Shopify/ruby issue reports side-exit size or the out-of-memory case. Related issues:
+#1056 (cold code region for exits, k0kubun's survey), #660 (shared epilogues), #718 (avoid re-spilling
+locals), #1021 ("stack map for local variables"). The open fix is XrXr's ruby/ruby#18960, "Locals in stack
+map; HIR local spills; always locals in exits" (updated 2026-11-03, built on alanwu's draft #17991). With
+#18960, a side exit no longer stores locals or `cfp->pc`/`cfp->iseq`. It stores `cfp->sp`, captures register
+values for the stack map, installs the JITFrame and jumps. So this is owned, and we file no issue.
+
+**Repro.** [`bench/upstream/zjit_live_exits.rb`](../../bench/upstream/zjit_live_exits.rb) N: one method with
+N `vI = o.hash` whose results all stay live until the end.
+
+| N | master exits | master exit bytes | master code region | #18960 exit bytes | #18960 code region |
+|---:|---:|---:|---:|---:|---:|
+| 50 | 261 | 134 KB | 180 KB | 11 KB | 25 KB |
+| 100 | 511 | 530 KB | 676 KB | 21 KB | 45 KB |
+| 200 | 1,011 | 2.11 MB | 2.64 MB | 40 KB | 86 KB |
+| 300 | 1,511 | 4.74 MB | 5.91 MB | 60 KB | 123 KB |
+| 400 | 2,011 | fails: `out_of_memory` | | 80 KB | 164 KB |
+
+On master each exit writes every live local (about 10 B per local), so exit code grows as N² and is 80% of
+the method's code. N=400 fails under the default `--zjit-mem-size=128`, which counts compiler memory as well
+as code. It compiles with `--zjit-mem-size=512`, to 10.5 MB. With #18960 an exit is about 33 B whatever N is.
+Compile time stays super-linear (87 → 334 ms from N=200 to 400) because of the two Z6 quadratics, which
+c1 and c2 address.
+
+**Rails does not reach it.** A measurement-only patch,
+[`bench/upstream/zjit_exit_footprint.patch`](../../bench/upstream/zjit_exit_footprint.patch), logs each
+compile's exit bytes, unique exits and local/stack stores.
+[`zjit_exit_footprint.py`](../../bench/upstream/zjit_exit_footprint.py) summarizes the log.
+
+| bench | exits | exit bytes / code region | B/exit | locals per exit | max locals in one exit | largest compile's exits |
+|---|---:|---:|---:|---:|---:|---:|
+| railsbench | 66,969 | 4.65 / 7.79 MB (60%) | 69 | 2.1 | 22 | 42 KB, tzinfo `zoneinfo_reader.rb:345` |
+| lobsters | 192,650 | 13.0 / 24.0 MB (54%) | 68 | 1.8 | 22 | 116 KB, `comments/_comment.html.erb` |
+| shipit | 163,542 | 10.7 / 19.9 MB (54%) | 66 | 1.6 | 22 | 42 KB, tzinfo `zoneinfo_reader.rb:345` |
+
+The largest compiles are big templates with about 1,000 exits of 5–8 locals each, not many locals. Across
+compiles, exit bytes fit 42–44 B per exit + 8–10 B per local + 6–7 B per stack slot (R² 0.99). Fixed
+per-exit stores (pc, sp, iseq, jump) are 61–66% of exit bytes, locals 22–28%, stack slots 13–14%. The
+largest local count in any Rails exit is 22, so quadratic growth plays no role here. The large exit share
+comes from the number of exits and their fixed cost.
+
+**What #18960 does on Rails** (default counters, one run each; no A/A, so the compile-time column is
+indicative only):
+
+| bench | code region | exit bytes | exits | B/exit | stack-map data | compile time |
+|---|---:|---:|---:|---:|---:|---:|
+| railsbench | 7.79 → 6.25 MB (−20%) | 4.31 → 2.93 MB (−32%) | 61,940 → 82,928 | 70 → 35 | 0.07 → 0.66 MB | +3% |
+| lobsters | 23.95 → 19.96 MB (−17%) | 12.00 → 8.65 MB (−28%) | 177,567 → 252,642 | 68 → 34 | 0.27 → 1.98 MB | +4% |
+| shipit | 19.94 → 17.17 MB (−14%) | 9.86 → 7.49 MB (−24%) | 150,342 → 216,959 | 66 → 35 | 0.21 → 1.64 MB | +4% |
+
+Exits halve in size but rise in number by 34–42%, probably because exits whose stack maps differ no longer
+deduplicate (not verified). The stack maps move about 0.6–1.7 MB out of code into JITFrame data.
+
+**Smallest fix.** It is #18960. Writing only the locals that differ from memory would be a smaller patch on
+master, but it would collide with #18960, which deletes the locals list from `SideExit`. So no prototype was
+built. After #18960 the fixed part of an exit is roughly a 14-byte JITFrame pointer store, an 8-byte sp store
+and a 5-byte jump. Making that table-driven, as Cinder's return-address lookup in #1056 does, is the next step,
+and it is k0kubun's and XrXr's area.
+
+**F1 apps.** Mastodon and Discourse run in F1's orb (T-01a19e58), not here. `side_exit_size_bytes` and
+`code_region_bytes` are default counters, so F1's ZJIT stats pass will report the share for them without a
+new run.
+
+**Draft comment for ruby/ruby#18960 (not posted).**
+
+> Some data in case it helps this land. On master, a method with N locals live across N calls writes every
+> live local at every side exit, so exit code grows as N²: 2.1 MB of 2.6 MB at N=200. At N=400 it fails with
+> `out_of_memory` under the default `--zjit-mem-size`. With this PR's head (`0564799aa1`) exits are about 33 B
+> each, and N=400 compiles to 164 KB. Repro: `def big(o) = (v0 = o.hash; …; v{N-1} = o.hash; s = 0;
+> s ^= v0; …; s)`, called 3 times with `--zjit-call-threshold=2`.
+>
+> On ruby-bench (3 iterations), `code_region_bytes` drops 20% on railsbench, 17% on lobsters and 14% on
+> shipit, and side-exit bytes drop 24–32%. Exits halve in size (about 69 → 35 B) but rise in number by
+> 34–42%. Stack-map data grows by 0.6–1.7 MB.
+
