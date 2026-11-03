@@ -132,7 +132,7 @@ ruby-bench is per iteration (railsbench / lobsters / shipit).
 | 4 protected calls | ours, ruby/ruby#19483 (open) |
 | 5 `Kernel#send` | tekknolagi, ruby/ruby#19583 "Support .send(:symbol)" (open) |
 | 6 `def m(...)` forwarding | nozomemein, ruby/ruby#18326 "Specialize monomorphic sendforward calls" (open) |
-| 8 `super` with a block | cleared by k0kubun on Shopify/ruby#1100; U3 builds the fix |
+| 8 `super` with a block | cleared by k0kubun on Shopify/ruby#1100; fix on [thomasklemm/ruby `zjit-super-block-recompile`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-super-block-recompile), PR queued (not opened) |
 | 9 invalidated constant patch points | k0kubun, ruby/ruby#19617 "Recompile final versions invalidated by PatchPoint" (open) |
 
 **Free, ranked**
@@ -144,6 +144,8 @@ ruby-bench is per iteration (railsbench / lobsters / shipit).
 | 3 | 3 class-level methods on many model classes (`_reflections`, `attribute_aliases`, `schema_context`) | 10 | 325 | 0 / 10.5k / 16.2k | Shopify/ruby#1099 item 2: 7–36 receiver classes, but one method entry. Needs a method-entry-keyed guard (cf. Shopify/ruby#1039 rows 24/25/27, unassigned). Design-heavy. |
 | 4 | 1 polymorphic yield in `Array#each`/`map`/`find` | 10 | 1,397 | 242k / 136k / 361k | Biggest volume overall, but the largest change. Block inlining is k0kubun's (Shopify/ruby#1093, assigned). Run-time block-ISEQ dispatch (Shopify/ruby#1039 row 55) is free but sits right next to that work, so collision risk is high. |
 | 5 | 2 `BasicObject#!=` (polymorphic inner `==`) | 10 | 277 | 0 / 3.8k / 0 | A polymorphic dispatch inside a builtin. Little ruby-bench effect, and it would ride on any general polymorphic-send work rather than stand alone. |
+| new | 11 literal `super { … }`: every `super` with its own block stays a dynamic send (`send_fallback_super_call_with_block`); hir.rs has the TODO "pass Option<blockiseq> to build_send_direct_args when we start specializing `super { ... }`" | unmeasured | unmeasured | 4.0k / 0.4k / 1.9k | Found while building lead 8 (counts from master a8b095a07e, `--zjit-stats` with 512/1024 MiB, 0 OOM, 10 warmup + 10 measured iterations). Sites not identified yet. No issue and no open ruby/ruby PR; not checked against Shopify/ruby#1039's rows. Free. |
+| new | 8b pass the frame's block to the super callee instead of the dynamic super that the lead 8 fix uses for these sites | unmeasured | unmeasured | 2.1k / 0.3k / 0.06k sites become direct sends | A measurement prototype ([thomasklemm/ruby `zjit-super-block-pass`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-super-block-pass)) adds a `BlockHandler::FrameBlock` variant and doesn't inline such sends. On the Shopify/ruby#1100 repro, Ir per call is 1,090 on master, 942 with the lead 8 fix and 555 with the prototype; ruby-bench Ir per iteration stays within the A/A (railsbench ±0.07%, lobsters ±0.11%, shipit −0.21%/+0.07%; callgrind, 10 warmup + 5 measured iterations, two runs each). A cfunc super target with a block stays dynamic (about 40 per lobsters iteration). Free, follows lead 8. |
 
 Not built yet; the ruby/ruby PR cap (15) applies before any of these can open.
 
