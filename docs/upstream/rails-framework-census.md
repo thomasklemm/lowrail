@@ -12,7 +12,7 @@ allocate (method_missing, respond_to?, callback compilation, Hash merges).
 | # | Branch | Commit | Common pattern | Per call | Workloads moved (A/A 26 / 27) | Median per workload |
 | --- | --- | --- | --- | ---: | ---: | ---: |
 | R2-1 | [`thomasklemm/thread-mattr-key-literal`](https://github.com/thomasklemm/rails/tree/thomasklemm/thread-mattr-key-literal) | [`e367362490`](https://github.com/thomasklemm/rails/commit/e3673624906dd601fb747fc5f7a96813ecfee528) | every `thread_mattr_accessor` read/write: Turbo's per-request `Turbo.with_request_id`, Action Text's per-request renderer, query log tags per query | −2 objects; reader 364 → 198 ns (interp), 299 → 109 ns (YJIT) | 83 / 85 of 97 | −10.8 / −10.0 |
-| R2-2 | [`thomasklemm/subscriber-event-method-names`](https://github.com/thomasklemm/rails/tree/thomasklemm/subscriber-event-method-names) | [`48d7ea10bf`](https://github.com/thomasklemm/rails/commit/48d7ea10bfdd989e8490b62dd42f38617e2f1331) | every event delivered to a log subscriber or structured event subscriber (`ActiveSupport::Subscriber#call`) | −1 String; 424 → 217 ns (interp), 242 → 87 ns (YJIT) | 75 / 76 of 97 | −3.3 / −4.0 |
+| R2-2 | [`thomasklemm/subscriber-event-method-names`](https://github.com/thomasklemm/rails/tree/thomasklemm/subscriber-event-method-names) | [`963c79fd75`](https://github.com/thomasklemm/rails/commit/963c79fd7575d31ec3e66b3bafeb0458925d1164) | every event delivered to a log subscriber or structured event subscriber (`ActiveSupport::Subscriber#call`) | −1 String; 424 → 217 ns (interp), 242 → 87 ns (YJIT) | 75 / 76 of 97 | −3.3 / −4.0 |
 
 Interpreter / YJIT, Ruby 4.0.7. Allocation counts only; no request-time claim. Per-call times are micro timings.
 
@@ -234,9 +234,31 @@ and the fallback both call it.
 
 `ActiveSupport::Subscriber#call` sliced the event name up to the first dot to find the handler (a new String per
 event, then a String-to-Symbol lookup in `send`). `attach_to` knows the handler of each pattern it subscribes, so it
-now records it in `event_methods` (`:nodoc:`, next to `patterns`) and `detach_from` removes it. `call` looks the event
-name up there and falls back to the slice for events from other subscriptions (a subscriber instance subscribed to a
-Regexp by hand).
+now records it in the subscriber's `@event_methods` ivar (no new method) and `detach_from` removes it. The recorded
+name is taken from the pattern with the same first-dot rule as the slice. `call` looks the event name up there and
+falls back to the slice for events from other subscriptions (a subscriber instance subscribed to a Regexp by hand).
+
+**Codex review of `48d7ea10bf` (request changes, two P2s, both confirmed by failing tests):** the first version added
+a public `event_methods` reader, which collided with a handler named `event_methods` (`attach_to` raised
+ArgumentError, and that handler stopped receiving its events), and it recorded the full method name, so a handler
+named `"open.party"` received `open.party.doodle`, which main sends to `open`. Amended to
+[`661a404f18`](https://github.com/thomasklemm/rails/commit/661a404f18ea00719215ddb018ce13e636a76b2d): an ivar
+written through `instance_variable_get(:@event_methods)&.store` (custom subscriber objects passed to `attach_to`
+without the ivar keep working), the name derived from the pattern before its first dot, and two regression tests in
+`subscriber_test.rb` that fail on `48d7ea10bf` and pass on main and `661a404f18`. Micro re-measured on the amended
+commit: `Subscriber#call` 1 → 0 objects, 405 → 219 ns (interp), 237 → 93 ns (YJIT). The census was not rerun; the
+dispatch path for attached events is the same Hash lookup.
+
+**Second Codex re-review of `661a404f18` (request changes, one P2, confirmed):** the cache insert assumed
+`prepare_pattern` returns a String. A subclass that overrides it to return a Regexp (the notifier accepts one)
+attaches and dispatches on main, but `attach_to` raised NoMethodError (`Regexp#index`) on `661a404f18`. Amended to
+[`963c79fd75`](https://github.com/thomasklemm/rails/commit/963c79fd7575d31ec3e66b3bafeb0458925d1164): only String
+patterns with a dot are cached; everything else, Regexp subscriptions included, keeps main's slice in `#call`, and
+detach deletes the (absent) cache entry as a no-op. A third test (attach, deliver, detach with a Regexp pattern) fails
+on `661a404f18` and passes on main and `963c79fd75`. Micro on `963c79fd75`: 0 objects, 229 ns (interp), 92 ns
+(YJIT); the Regexp control still 1 object. Active Support suite 6,871 runs (+3 tests), 0 F, 0 E, 60 skips; RuboCop
+clean. The other suites were last run on `661a404f18`; the new change only affects `attach_to` for non-String
+patterns.
 
 ```diff
      def call(event)
@@ -277,9 +299,10 @@ whose `config/application.rb` sets `Rails.event.debug_mode = true` (its board pa
 changes apply together (the combined branch is a clean cherry-pick); R2-2 also covers `LogSubscriber`s, which #58957
 does not touch.
 
-**Exactness and boundaries.** Same handler for every subscribed pattern (`pattern` is `"#{event}.#{namespace}"`, so
-the slice of the event name was always `event`), same `method_added` and `detach_from` behavior; other subscriptions
-take the old path. **Boundary:** a subclass that defines its own `@event_methods` ivar would collide with the new one.
+**Exactness and boundaries.** Same handler for every subscribed pattern: the recorded name is the pattern's prefix
+before its first dot, which is what the slice computes for that event name (a dotted handler name such as
+`"open.party"` still dispatches to `open`, as on main); same `method_added` and `detach_from` behavior; other
+subscriptions take the old path. **Boundary:** a subclass that defines its own `@event_methods` ivar would collide with the new one.
 
 ### Behavior controls and suites
 
@@ -302,14 +325,15 @@ Local suites, Ruby 4.0.7, `RAILS_STRICT_WARNINGS=1`, `SEED=41231`, `bundle exec 
 
 | Suite | main `5810776eec` | R2-1 thread-mattr | R2-2 subscriber | R2-3 URL merge | R2-4 capture |
 | --- | --- | --- | --- | --- | --- |
-| Active Support | 6,868 runs, 0 F, 0 E, 60 skips | same | same | — | — |
+| Active Support | 6,868 runs, 0 F, 0 E, 60 skips | same | 6,871 runs (+3 new tests), 0 F, 0 E, 60 skips | — | — |
 | Action Pack | 4,472 runs, 0 F, 0 E, 0 skips | same | same | same | — |
 | Action View (3 groups) | 2,913 + 251 + 177 runs, 0 F, 0 E | same | same | — | same |
 | Active Job (7 adapter groups) | 2,145 runs, 0 F, 0 E | same | same | — | — |
 | Action Text | 373 runs, 0 F, 1 E | same | same | — | — |
 | Active Record `query_logs_test`, `log_subscriber_test`, `structured_event_subscriber_test` (`ARCONN=sqlite3`) | 93 runs, 0 F, 0 E | same | same | — | — |
 
-"Same" means identical run, assertion, failure, error and skip counts. The one Action Text error is
+"Same" means identical run, assertion, failure, error and skip counts. R2-2's column is the amended `661a404f18` (Active Support: `963c79fd75`), except
+Action Text, which was run on `48d7ea10bf` only. The one Action Text error is
 `yarn` missing from this orb (a JS build step), on main as on the branches. Action Pack, Action View, Active Job,
 Action Text and the Active Record tests were run for R2-1 and R2-2 because their changes are exercised there
 (Action Text's renderer and query log tags use per-thread accessors; every log and structured event subscriber goes
@@ -362,9 +386,10 @@ descriptions may be somewhat fuller than ruby/ruby's).
 >
 > ### Detail
 >
-> `attach_to` knows the handler of each pattern it subscribes, so the subscriber now records it next to `patterns`
-> (`event_methods`, `:nodoc:`), and `detach_from` removes it. `call` looks the event name up there and keeps the
-> slice for events from other subscriptions, such as a subscriber instance subscribed to a Regexp.
+> `attach_to` knows the handler of each pattern it subscribes, so the subscriber now records it in an instance
+> variable next to `@patterns` (taken from the pattern with the same first-dot rule), and `detach_from` removes it.
+> No method is added, so handler names are unaffected. `call` looks the event name up there and keeps the slice for
+> events from other subscriptions, such as a subscriber instance subscribed to a Regexp.
 >
 > | Per call | Before | After |
 > | --- | ---: | ---: |
