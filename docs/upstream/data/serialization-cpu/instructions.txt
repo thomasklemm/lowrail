@@ -72,3 +72,41 @@ shipit: A 5.8755 G (+0.000%) | B 5.8728 G (-0.047%) | S1 5.8781 G (+0.044%)
 lobsters yjit: A 2.8669 G (+0.000%) | B 2.8709 G (+0.139%) | S1 2.8692 G (+0.080%)
 railsbench yjit: A 2.7783 G (+0.000%) | B 2.7757 G (-0.096%) | S1 2.7682 G (-0.364%)
 shipit yjit: A 3.0247 G (+0.000%) | B 3.0230 G (-0.055%) | S1 3.0271 G (+0.081%)
+
+## Review fix 60d70808d9 (plain-String guard, flags read first): base / base2 (A/A) / s1old = 72d0a204cc / s1 = 60d70808d9
+== html 8.1, interpreter
+interpreter: instructions per call (100 calls, GC off)
+to_json: base 226240 | base2 226395 (+0.07%) | s1old 205581 (-9.13%) | s1 206193 (-8.86%)
+array_to_json: base 4071468 | base2 4073178 (+0.04%) | s1old 3497006 (-14.11%) | s1 3499407 (-14.05%)
+jbuilder: base 5143129 | base2 5145622 (+0.05%) | s1old 4571504 (-11.11%) | s1 4574729 (-11.05%)
+render_json: base 2845633 | base2 2848757 (+0.11%) | s1old 2849802 (+0.15%) | s1 2847549 (+0.07%)
+== PLAIN 8.1, interpreter
+interpreter: instructions per call (100 calls, GC off)
+to_json: base 136984 | base2 136887 (-0.07%) | s1old 133127 (-2.82%) | s1 133358 (-2.65%)
+array_to_json: base 2577447 | base2 2576193 (-0.05%) | s1old 2456354 (-4.70%) | s1 2459583 (-4.57%)
+jbuilder: base 3650247 | base2 3651953 (+0.05%) | s1old 3537556 (-3.09%) | s1 3535804 (-3.14%)
+render_json: base 2870351 | base2 2869747 (-0.02%) | s1old 2873169 (+0.10%) | s1 2873397 (+0.11%)
+== PLAIN LEGACY, interpreter
+interpreter: instructions per call (100 calls, GC off)
+to_json: base 147351 | base2 147250 (-0.07%) | s1old 142293 (-3.43%) | s1 142498 (-3.29%)
+array_to_json: base 2777861 | base2 2781654 (+0.14%) | s1old 2590962 (-6.73%) | s1 2593353 (-6.64%)
+jbuilder: base 3857109 | base2 3856876 (-0.01%) | s1old 3665682 (-4.96%) | s1 3667872 (-4.91%)
+render_json: base 3202994 | base2 3203467 (+0.01%) | s1old 3012550 (-5.95%) | s1 3017305 (-5.80%)
+== PLAIN 8.1, YJIT
+YJIT: instructions per call (100 calls, GC off)
+to_json: base 112910 | base2 113357 (+0.40%) | s1old 108247 (-4.13%) | s1 108211 (-4.16%)
+array_to_json: base 2206030 | base2 2217264 (+0.51%) | s1old 2090454 (-5.24%) | s1 2082708 (-5.59%)
+jbuilder: base 1866320 | base2 1865733 (-0.03%) | s1old 1766609 (-5.34%) | s1 1750306 (-6.22%)
+render_json: base 2301546 | base2 2298354 (-0.14%) | s1old 2299912 (-0.07%) | s1 2294578 (-0.30%)
+== PLAIN LEGACY, YJIT
+YJIT: instructions per call (100 calls, GC off)
+to_json: base 122984 | base2 123229 (+0.20%) | s1old 116118 (-5.58%) | s1 116544 (-5.24%)
+array_to_json: base 2408634 | base2 2416687 (+0.33%) | s1old 2215427 (-8.02%) | s1 2218817 (-7.88%)
+jbuilder: base 2088181 | base2 2089114 (+0.04%) | s1old 1908404 (-8.61%) | s1 1901855 (-8.92%)
+render_json: base 2631887 | base2 2636397 (+0.17%) | s1old 2439942 (-7.29%) | s1 2443890 (-7.14%)
+== html 8.1, YJIT
+YJIT: instructions per call (100 calls, GC off)
+to_json: base 203314 | base2 203656 (+0.17%) | s1old 182302 (-10.33%) | s1 182464 (-10.26%)
+array_to_json: base 3714565 | base2 3723007 (+0.23%) | s1old 3126232 (-15.84%) | s1 3129542 (-15.75%)
+jbuilder: base 3382254 | base2 3383252 (+0.03%) | s1old 2797332 (-17.29%) | s1 2801873 (-17.16%)
+render_json: base 2277951 | base2 2275330 (-0.12%) | s1old 2271362 (-0.29%) | s1 2274518 (-0.15%)

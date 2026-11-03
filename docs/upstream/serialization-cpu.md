@@ -16,7 +16,7 @@ behind `to_json`, about 4% of it. One exact candidate came out of it:
 
 | # | Branch | Commit | What | Per call, interpreter / YJIT | ruby-bench | Census (56 workloads) |
 | --- | --- | --- | --- | --- | --- | --- |
-| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`72d0a204cc`](https://github.com/thomasklemm/rails/commit/72d0a204cc) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −3.0% to −6.8% / −4.1% to −9.8%; text with `<>&` −7% to −14% / −11% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
+| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`60d70808d9`](https://github.com/thomasklemm/rails/commit/60d70808d9) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
 
 Not opened. Escaping is a critical change under [DECISIONS](../DECISIONS.md#extra-adversarial-astra-round-for-critical-changes-2026-11-03),
 so it needs Sol and the adversarial Astra round before it can enter the queue. Draft in the short form at the end.
@@ -104,8 +104,9 @@ json.force_encoding(::Encoding::UTF_8)
 The Regexp union runs Onigmo over the whole document even when nothing needs escaping, and `gsub!` sets the
 match data. S1 keeps the binary String and the five replacements and calls
 `json.gsub!(char, chars) if json.include?(char)` for each character, with a String pattern
-(`rb_memsearch`, no Regexp) and the same Hash as the replacement. The three Regexp constants are replaced by two
-Hash slices (all `:nodoc:`). The `tr!` branch for Ruby 4.1 is unchanged.
+(`rb_memsearch`, no Regexp) and the same Hash as the replacement. It does so only when the encoder's output is a
+plain String (`instance_of?(String)`); subclasses keep the single `gsub!` over the Regexp union. Both settings are
+read before anything is replaced, as on main. The `tr!` branch for Ruby 4.1 is unchanged.
 
 **Exactness.** The five characters' replacements contain none of the five, so replacing them one after another
 gives the same bytes as one pass. The search runs on the binary String as before, so invalid UTF-8 from a
@@ -117,10 +118,31 @@ The new test `test_escape_options_apply_independently` pins the combination no e
 escaping off, separators on, repeated characters); a mutant that skips separators when the option is passed fails
 it, and it passes on main.
 
-**Checks.** All Active Support test files except the Redis cache store (the `redis` gem is outside the bundle
-groups installed here) with `RAILS_STRICT_WARNINGS=1`: 5,482 runs, 0 failures; RuboCop clean.
+**Review round (2026-11-03).** Sol approved `72d0a204cc` on both rubrics. The adversarial Astra round (101,760
+cases on Ruby 4.0.7) found three differences, all fixed in `60d70808d9`:
 
-**Per call** (instructions, `irmicro.rb`, base / A/A / S1):
+1. P2: a custom `JSONGemEncoder` whose `stringify` returns a String subclass with `include?` returning false left
+   all five characters literal (main escapes them); an `include?` that raises was a new exception path.
+2. P3: a custom encoder returning `super.html_safe` got `html_safe? == true`, because the skipped `gsub!` no longer
+   marked the SafeBuffer unsafe (main: false).
+3. P3: `escape_js_separators_in_json` was read after the HTML substitution, so a change mid-encode (fiber plus
+   TracePoint) could leave U+2028 literal; main reads both settings first.
+
+The fix takes the per-character path only for a plain String and keeps main's single `gsub!` otherwise (1, 2), and
+reads both settings before any substitution (3). Two new tests, `test_escape_string_subclass_from_custom_encoder`
+and `test_escape_marks_safe_buffer_from_custom_encoder_unsafe`, fail on `72d0a204cc` and pass on main and on the
+fix. The fuzz was extended with the default encoder, `JSONGemEncoder` and custom encoders returning a String
+subclass or a SafeBuffer, comparing bytes, encoding, class and `html_safe?`
+([escape_fuzz_custom.rb](../../bench/upstream/serialization_cpu/escape_fuzz_custom.rb)): main vs the fix
+0 of 16,001 differ; main vs `72d0a204cc` 3,758 differ. Its trace of setting reads before the first
+`include?`/`gsub!` shows both settings on main and on the fix, only the HTML setting on `72d0a204cc`. The guard
+costs 0.1 to 0.3 points per call; the numbers below are the fix's.
+
+**Checks.** All Active Support test files except the Redis cache store (the `redis` gem is outside the bundle
+groups installed here) with `RAILS_STRICT_WARNINGS=1`: 5,486 runs, 0 failures; RuboCop clean. The census was not
+rerun for the fix: the default encoders return plain Strings, which take the same path as in `72d0a204cc`.
+
+**Per call** (instructions, `irmicro.rb`, base / A/A / S1 `72d0a204cc`; the fix `60d70808d9` is within 0.3 points of these, all runs in [instructions.txt](data/serialization-cpu/instructions.txt)):
 
 | Case | Interpreter | YJIT |
 | --- | --- | --- |
@@ -217,16 +239,17 @@ and S1 removes most of it on plain text.
 Before Ruby 4.1, `ActiveSupport::JSON.encode` escapes `<`, `>`, `&`, U+2028 and U+2029 with one `gsub!` over a
 Regexp union, which runs the regexp engine over the whole document even when nothing needs escaping. This searches
 for each character with `include?` and replaces only the ones that occur, still on the binary String, so the
-output is unchanged, including invalid UTF-8 from `JSON::Fragment`. Ruby 4.1 keeps using `tr!`.
+output is unchanged, including invalid UTF-8 from `JSON::Fragment`. String subclasses, such as a SafeBuffer from a
+custom encoder, keep the single `gsub!`. Ruby 4.1 keeps using `tr!`.
 
 Instructions per call (Callgrind, Ruby 4.0.7, 20 records of 11 columns):
 
 | | interpreter | YJIT |
 | --- | ---: | ---: |
-| `post.to_json` | −3.0% | −4.1% |
-| `posts.to_json` | −4.7% | −5.6% |
-| jbuilder index | −3.2% | −6.8% |
-| `render json: posts` (before `load_defaults 8.1`) | −6.0% | −7.3% |
+| `post.to_json` | −2.7% | −4.2% |
+| `posts.to_json` | −4.6% | −5.6% |
+| jbuilder index | −3.1% | −6.2% |
+| `render json: posts` (before `load_defaults 8.1`) | −5.8% | −7.1% |
 | `posts.to_json`, text with `<b>` and `&` | −14.1% | −15.8% |
 
 This path runs for every `to_json` and jbuilder template, and for `render json:` before 8.1 defaults; on six apps,
