@@ -28,14 +28,47 @@ module CensusRank
     ->(file) { file[pattern, 1] if file.start_with?("GEM/") }
   end
 
+  # Every gem's lines (rank --gem all). Apps run different releases of a gem,
+  # whose line numbers move, so a site is keyed by the gem, the file and the
+  # line's source text (read from the installed gem), and shown with the line
+  # number of the newest release seen. Ruby's default gems (uri, securerandom,
+  # ...) count as the standard library, except json; rack-test is the
+  # harness's request client, not the app.
+  DEFAULT_GEMS = (Gem::Specification.select(&:default_gem?).map(&:name) - %w[json]).freeze
+  HARNESS_GEMS = %w[rack-test].freeze
+  HARNESS_FILES = %r{\Arack/lib/rack/mock_(?:request|response)\.rb\z}
+  GEM_PATH = %r{\AGEM/((?:[^/]+/)*?(?:gems|bundler/gems)/([^/]+?)-(\d[^/]*|\h{12}))/(.+)\z}
+  GEM_ROOT = File.dirname(Gem.dir)
+
+  def gem_name(file) = file[GEM_PATH, 2]
+
+  def source_line(path, line)
+    @source_lines ||= {}
+    (@source_lines[path] ||= File.exist?(path) ? File.readlines(path) : [])[line - 1]&.strip
+  end
+
+  ALL_GEMS = lambda do |file, line|
+    next unless (m = file.match(GEM_PATH))
+    next if DEFAULT_GEMS.include?(m[2]) || HARNESS_GEMS.include?(m[2])
+    next if "#{m[2]}/#{m[4]}".match?(HARNESS_FILES)
+    text = source_line(File.join(GEM_ROOT, m[1], m[4]), line)
+    ["#{m[2]}/#{m[4]}:#{text || line}", m[3], line]
+  end
+
   def rows(runs, tiers: TIERS, site: RAILS_SITE)
     workloads = runs.flat_map { |run| run["workloads"].map { [run["app"], _1] } }
     total = workloads.size
     sites = Hash.new { |h, k| h[k] = { per_workload: Hash.new(0.0), classes: Hash.new(0.0) } }
     workloads.each do |app, w|
       w["sites"].each do |s|
-        next unless (file = site.(s["file"]))
-        key = "#{file}:#{s["line"]}"
+        if site.arity == 2
+          key, version, line = site.(s["file"], s["line"])
+          next unless key
+          (sites[key][:lines] ||= {})[version] = line
+        else
+          next unless (file = site.(s["file"]))
+          key = "#{file}:#{s["line"]}"
+        end
         sites[key][:per_workload][[app, w["workload"], w["kind"]]] += s["objects_per_op"]
         sites[key][:classes][s["class"]] += s["objects_per_op"]
       end
@@ -44,6 +77,10 @@ module CensusRank
     rows = sites.map do |key, data|
       hit = data[:per_workload].select { |_, v| v >= REACH }
       apps = hit.keys.map { app_of(_1[0]) }.uniq
+      if data[:lines]
+        version, line = data[:lines].max_by { |v, _| Gem::Version.correct?(v) ? [1, Gem::Version.new(v)] : [0, v] }
+        key = "#{key[/\A[^:]+/]}:#{line} #{key.sub(/\A[^:]+:/, "")[0, 60]} (#{data[:lines].keys.sort.join(" ")})"
+      end
       { site: key, apps: apps.size, app_names: apps.sort, share: hit.size.fdiv(total),
         kinds: hit.keys.map { _1[2] }.uniq.sort, mean: data[:per_workload].values.sum / total,
         classes: data[:classes].sort_by { -_2 }.first(2).map(&:first) }

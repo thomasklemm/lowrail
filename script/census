@@ -4,7 +4,7 @@
 # Rails allocation census: one entry point for every round. See docs/upstream/census.md.
 #   script/census setup    --rails SPEC [--ruby R] [--apps LIST]
 #   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST]
-#   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2] [--gem NAME]
+#   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2] [--gem NAME|all]
 #   script/census compare  --base L [--aa L0] [--detail] [--markdown] LABEL...
 #   script/census controls --script FILE [--app blog] [--modes ...] BASE LABEL...
 #   script/census prs      --label L [--mode interp] [--top N] [--refresh]
@@ -219,10 +219,13 @@ module Census
 
   # The app's census Gemfile with Rails at this commit (and no ruby pin, so the
   # Ruby is a parameter), bundled for this Ruby. Identical commits share one.
-  # Gem pins (--gem) apply only to apps whose Gemfile lists the gem.
+  # Gem pins (--gem) apply to apps whose Gemfile lists the gem or whose lock
+  # has it as a dependency (then the variant adds it with require: false).
   def gem_pins(corpus, app, gems)
-    gemfile = File.read(File.join(app_dir(corpus, app), "Gemfile"))
-    gems.select { |name, _| gemfile.match?(/^\s*gem ["']#{Regexp.escape(name)}["']/) }
+    dir = app_dir(corpus, app)
+    gemfile = File.read(File.join(dir, "Gemfile"))
+    lock = File.read(File.join(dir, "Gemfile.lock"))
+    gems.select { |name, _| gemfile.match?(/^\s*gem ["']#{Regexp.escape(name)}["']/) || lock.match?(/^    #{Regexp.escape(name)} \(/) }
   end
 
   def variant(corpus, app, rails, bin, gems = {})
@@ -236,8 +239,13 @@ module Census
       raise "#{app}: expected a gem \"rails\" line (or its components), found none" if pins.empty?
       pins.each { |i, gem| lines[i] = %(gem "#{gem}", #{rails.fetch("source")}, ref: "#{rails.fetch("sha")}"\n) }
       gems.each do |name, g|
-        i = lines.index { _1.match?(/\A\s*gem ["']#{Regexp.escape(name)}["']/) }
-        lines[i] = %(gem "#{name}", #{g.fetch("source")}, ref: "#{g.fetch("sha")}"\n)
+        line = %(gem "#{name}", #{g.fetch("source")}, ref: "#{g.fetch("sha")}")
+        if (i = lines.index { _1.match?(/\A\s*gem ["']#{Regexp.escape(name)}["']/) })
+          lines[i] = line + "\n"
+        else
+          lines[-1] += "\n" unless lines[-1].end_with?("\n")
+          lines << "#{line}, require: false\n"
+        end
       end
       File.write(gemfile, lines.grep_v(/\Aruby\b/).join)
       # The variant drops the ruby pin, so its lock drops RUBY VERSION too
@@ -404,7 +412,7 @@ module Census
   def ranked(opts)
     runs = CensusRank.load_runs(File.join(opts[:out], opts.fetch(:label)), opts[:mode])
     raise "no #{opts[:mode]} runs for #{opts[:label]} in #{opts[:out]}" if runs.empty?
-    site = opts[:gem] && CensusRank.gem_site(opts[:gem])
+    site = opts[:gem] && (opts[:gem] == "all" ? CensusRank::ALL_GEMS : CensusRank.gem_site(opts[:gem]))
     [runs, CensusRank.rows(runs, tiers: opts[:tiers], **(site ? { site: site } : {}))]
   end
 
@@ -856,7 +864,7 @@ module Census
       o.banner = File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.map { _1.delete_prefix("# ").delete_prefix("#") }.join
       o.on("--rails SPEC") { opts[:rails] = _1 }
       o.on("--ruby R") { opts[:ruby] = _1 }
-      o.on("--gem NAME[=SPEC]", "run: pin gem NAME to OWNER/REPO@REF; rank: rank NAME's lines") do |v|
+      o.on("--gem NAME[=SPEC]", "run: pin gem NAME to OWNER/REPO@REF; rank: rank NAME's lines (all: every gem's)") do |v|
         name, spec = v.split("=", 2)
         spec ? opts[:gems][name] = spec : opts[:gem] = name
       end
