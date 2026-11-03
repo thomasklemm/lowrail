@@ -35,10 +35,10 @@ Ranked by size, the leads are (M Ir per iteration, railsbench / lobsters / shipi
 | 11 | attr_reader/getivar on shape-polymorphic receivers without a shape profile (`getivar_fallback_no_profile_missing_ic`) | 12.4 / 30.8 / 83.9 | 7% / 17% / 14% | taken (tekknolagi: ruby/ruby#19443 open, ruby/ruby#18616 draft; see [Lead 11](#lead-11-why-there-is-no-profile)) |
 | 3 | class-polymorphic sends to one method entry (`send_polymorphic_fallback`) | 7.2 / 42.1 / 180.1 | 4% / 24% / 29% | **free** (Shopify/ruby#1099 pattern 2; slot granted) |
 | 1 | polymorphic or unspecialized yields in `Array#each`/`#map` | 70.4 / 27.2 / 60.9 | 38% / 15% / 10% | taken (k0kubun, Shopify/ruby#1093) |
-| 12 | cfunc calls with a frame: 40 Ir of JIT code against YJIT's 30 | 22.7 / 10.3 / 14.4 | 12% / 6% / 2% | **free** in part: dead stores and the register switch, 11.2 / 5.1 / 8.7 M ([Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs)) |
+| 12 | cfunc calls with a frame: 40 Ir of JIT code against YJIT's 30 | 22.7 / 10.3 / 14.4 | 12% / 6% / 2% | taken (k0kubun, Shopify/ruby#1030 "send_cfunc_block" series; see [Lead 14](#lead-14-what-one_or_more_complex_arg_pass-really-costs)) |
 | 7 | `&block` forwarding (`send_block_arg_not_nil`) | 29.4 / 25.1 / 66.0 | 16% / 14% / 11% | **free** (Shopify/ruby#1014; slot granted) |
 | 13 | `rb_zjit_root_mark` marks every JITFrame's ISEQ on every GC | 25.4 / 6.7 / 37.1 | 14% / 4% / 6% | **free** |
-| 14 | `&block` passed to a C method (`Rack::Request#fetch_header`) and other `complex_arg_pass` | 19.5 / 6.1 / 13.1 | 11% / 3% / 2% | **free** (Shopify/ruby#1039 row 42, unassigned) |
+| 14 | `&block` passed to a C method (`Rack::Request#fetch_header`) and other `complex_arg_pass` | 6.8 / 1.8 / 5.3 | 4% / 1% / 1% | in part: `**rest` callees free (#1039 rows 36/43), `&block` parts wait for row 7 ([Lead 14](#lead-14-what-one_or_more_complex_arg_pass-really-costs)) |
 | 4 | protected calls | 14.9 / 4.4 / 10.6 | 8% / 2% / 2% | taken (ours, ruby/ruby#19483) |
 | 5 | `Kernel#send` | 11.3 / 4.7 / 14.3 | 6% / 3% / 2% | taken (tekknolagi, ruby/ruby#19583) |
 | 15 | getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`) | 3.9 / 7.8 / 24.0 | 2% / 4% / 4% | **free** (Shopify/ruby#1099 pattern 3) |
@@ -46,7 +46,8 @@ Ranked by size, the leads are (M Ir per iteration, railsbench / lobsters / shipi
 | 16 | PatchPoint nop padding executed inline | 31.7 / 14.0 / 27.9 | Ir only, not cycles | free, low priority |
 
 Lead 3 is the largest free lead on lobsters and shipit, and lead 13 is the largest free lead on railsbench. Lead 12 shrank
-to about half its first estimate ([Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs)).
+to about half its first estimate and is taken by k0kubun ([Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs),
+[Lead 14](#lead-14-what-one_or_more_complex_arg_pass-really-costs)). Lead 14 shrank to about a third of its first estimate.
 Lead 11 turned out to be taken ([Lead 11](#lead-11-why-there-is-no-profile)). The full list with sites is in
 [Leads](#leads). No crash, wrong result or divergence turned up. The only failed run was a lobsters 500 caused by two processes sharing one `tmp/cache`, not by a JIT. After that,
 every run used its own copy of ruby-bench.
@@ -331,12 +332,12 @@ The lead numbers continue [zjit-iseq-leads](zjit-iseq-leads.md#new-leads-from-th
 queue has the ranked list with free/taken status, checked on 2026-11-03 against assignees, all 67 open ruby/ruby
 PRs with "ZJIT" in the title, and keyword searches of Shopify/ruby issues and ruby/ruby PRs.
 
-* **Free and new:** 12 (cfunc frame cost in JIT code, resized; free in part),
-  13 (JITFrame root marking), 14 (`&block` to C methods / `complex_arg_pass`), 15 (getivar on final versions and
+* **Free and new:** 13 (JITFrame root marking), 14 (`&block` to C methods / `complex_arg_pass`; resized, free in
+  part), 15 (getivar on final versions and
   singleton objects), 16 (PatchPoint nops), and 18 (`with_vm_lock` `gc_rest`, wall time only).
 * **Existing, now sized:** 3 (class-polymorphic sends, the largest on shipit), 7 (`&block` forwarding), and 1, 4,
   5, 6, 9 (taken).
-* **Taken, new:** 11 (attr_reader/getivar on shape-polymorphic receivers; tekknolagi's ruby/ruby#19443 and draft
+* **Taken, new:** 12 (cfunc frame cost; k0kubun's Shopify/ruby#1030 "send_cfunc_block" series), 11 (attr_reader/getivar on shape-polymorphic receivers; tekknolagi's ruby/ruby#19443 and draft
   ruby/ruby#18616, see [Lead 11](#lead-11-why-there-is-no-profile)), 17 (`throw` unwinding and materialization,
   Shopify/ruby#1093 / ruby/ruby#18244 / #18759) and 19 (`PushInlineFrame`, Shopify/ruby#1023).
 
@@ -589,9 +590,133 @@ The two free fixes save about **5.3 Ir per call: 11.2 / 5.1 / 8.7 M Ir per itera
   register switch.
 * **Shopify/ruby issues:** no open issue covers `CCallWithFrame` cost.
 
-Recommendation: keep lead 12 free, resized to 22.7 / 10.3 / 14.4 M. If we build, the dead-store fix is a few lines
+*Superseded: the two "free" parts are k0kubun's, see the correction at the end of [Lead 14](#lead-14-what-one_or_more_complex_arg_pass-really-costs).* Recommendation at the time: keep lead 12 free, resized to 22.7 / 10.3 / 14.4 M. If we build, the dead-store fix is a few lines
 and exact, but it edits lines that #18960 rewrites, so ask XrXr or wait for #18960 to land. The register switch
 is independent and slightly larger. No crash, wrong result or divergence turned up.
+
+## Lead 14: what `one_or_more_complex_arg_pass` really costs
+
+Follow-up of 2026-11-03, ruby/ruby master `a8b095a07e`, investigation only: nothing was built for upstream and
+nothing was posted. Scratch scripts are in `~/w/l14` on the orb and were not committed.
+
+**Method.** This follow-up uses two sources:
+
+* the per-ISEQ fallback counters from the stats-iseq run in [Pins and method](#pins-and-method), with the call
+  each site makes read from its source;
+* one micro-benchmark per shape (`m.rb`). It runs the shape 20,000 times in a JIT-compiled loop under Callgrind,
+  with GC excluded. Each case was first confirmed to hit the same ZJIT fallback counter, using `--zjit-stats`.
+
+The first sizing of this lead multiplied the number of "extra" fallbacks by the average price of a generic send
+(272 / 285 / 350 Ir). For this bucket that is wrong in both directions. At some shapes ZJIT's fallback is already
+cheaper than what YJIT does, and at others it is cheaper than a typical generic send.
+
+**`unspecializable_c_call_type` and `can_direct_send` reject five shapes.** For C callees, only the keyword case
+gets its own `complex_arg_pass_caller_*` counter. Ir per call, loop included:
+
+| shape | ZJIT | YJIT | ZJIT − YJIT | example site |
+|---|---:|---:|---:|---|
+| `&block` (the method's own block param) to a C method | 429 | 363 | **+66** | `Rack::Request#fetch_header` → `@env.fetch(name, &block)` |
+| `&blk` that is `nil`, to a C method | 427 | 298 | **+129** | HWIA `update_with_single_argument` → `regular_update(other_hash, &block)` |
+| splat `*args` to a variadic C method | 717 | 1,045 | −328 | `public_send(method, *args)`, `binds.push(*…)`, `options.slice(*keys)` |
+| keyword arguments to a C method | 2,131 | 2,204 | −73 | `Arel::Nodes::SqlLiteral.new(sql, retryable: true)` (`String.new` with keywords) |
+| ISEQ callee with `**rest`, including `def m(a, ...)` (lowered to `*, **, &`) | 683 / 584 | 278 / 270 | **+405 / +314** | `Relation.create(self)` → `def create(model, ...)`; `AssociationRelation#initialize(klass, association, **)` |
+| `(*args, &block)` to an ISEQ | 973 | 688 | **+285** | `render(*args, &block)` → `_normalize_render(*args, &block)` → `_normalize_args(*args, &block)` |
+
+For reference, the fixed shapes cost:
+
+| shape | ZJIT | YJIT |
+|---|---:|---:|
+| `Hash#fetch` with a literal block | 225 | 298 |
+| `Hash#fetch` without a block | 215 | 291 |
+
+Splat and keyword arguments to C methods are not part of the gap: YJIT is slower there. They could still save
+ZJIT about 270 Ir per call, which is not what this queue ranks.
+
+**Where the gap is**, using the per-site counts and the per-call differences above (M Ir per iteration,
+railsbench / lobsters / shipit):
+
+| part | sites (calls per iteration) | gap | status |
+|---|---|---:|---|
+| 14a `&block` param to a C method | `fetch_header` 41.8k / 2.1k / 0.9k; `PoolManager#each_pool_config` (`each_value(&block)`) 4.0k; tzinfo `bsearch_index(&block)` 7.3k (lobsters); Arel `add_binds` (`map(&block)`) 1.2k (shipit) | 3.0 / 0.6 / 0.1 | waits for row 7 (see below) |
+| 14b `(*args, &block)` to an ISEQ | `render`, `_normalize_render`, `AbstractController::Base#process`, HWIA `merge` (2.0k each, railsbench) | 2.3 / 0.1 / 0 | waits for row 7 |
+| 14c ISEQ callee with `**rest` or `(a, ...)` | `Core.relation` (`Relation.create`) 10.6k, `target_scope` 4.1k and `CollectionAssociation#reader` 1.4k on shipit; 2.5k / 0.4k / 0.2k on lobsters; the layout ERB on railsbench 2.0k | 0.7 / 1.0 / 5.1 | **free**: Shopify/ruby#1039 rows 36 and 43, unassigned |
+| 14d `nil` `&blk` to a C method | HWIA `update_with_single_argument` 6.0k / 0.3k / 0.2k | 0.8 / 0.04 / 0.03 | **free**: part of #1039 row 42, unassigned |
+| splat, `**` or keywords to a C method | `_run`, `handle_model_call`, `get_bind_values`, `define_generate_prefix`, `create` → `new(model, ...)`, `sql`/`as` | ≤ 0 | not a gap |
+| **lead 14** | | **6.8 / 1.8 / 5.3** | was 19.5 / 6.1 / 13.1 |
+
+`**rest` callees where YJIT also makes a generic call stay out of 14c: `Arel.sql(..., retryable: true)` from
+`star` and `column_references`, `StructuredEventSubscriber#start`, and the `Cookies` `initialize`. The lobsters
+row for `typed_hash.rb` `fields` (3.7k, `delegate`) is a forwarded block to an ISEQ. It belongs with 14b and was
+not measured.
+
+**Mechanisms and the smallest exact fixes:**
+
+* **14a, `&block` param to a C method.** The argument is the result of `getblockparamproxy`, so it is
+  `rb_block_param_proxy` whenever the method got a block. Every caller of `fetch_header` in Rack and Action Pack
+  passes a literal block. `unspecializable_c_call_type` rejects `VM_CALL_ARGS_BLOCKARG` before looking at the
+  value.
+  * The exact fix is the interpreter's own rule: when the argument is the proxy, the C frame's specval is the
+    caller frame's block handler.
+  * Shopify/ruby#1039 row 42 (`fd713176a1`, "Pass a `&blk` argument through to a direct C call", unassigned)
+    does exactly that. It reuses the `BlockParamProxy` reduction from row 7 (`93e4e7d69c`), which is k0kubun's.
+    On master the ISEQ path reduces only `nil` and a profiled Proc.
+  * Fixing this saves about 200 Ir per call over today's ZJIT, about 9 / 2 / 0.4 M Ir. The gap to YJIT is
+    smaller, because YJIT's own C call with a block costs 363 Ir.
+* **14b, `(*args, &block)` to an ISEQ.** The ISEQ path in `type_specialize` rejects
+  `unspecializable_call_type(flags & !VM_CALL_ARGS_BLOCKARG)` before it looks at the block argument. That
+  rejects a splat even though caller splats to ISEQs are otherwise specialized. The block argument here is again
+  the block-param proxy, so a fix needs row 7 as well.
+* **14c, `**rest` callees.** `can_direct_send` counts `complex_arg_pass_param_kwrest` for every callee with
+  `**rest`, and a Ruby 3.4+ `def m(a, ...)` with a leading parameter compiles to `*, **, &`. The fix is to fill
+  the `**rest` slot with a new Hash of the unclaimed keywords: empty when there are none, or `nil` for an
+  anonymous `**` that collected nothing. That matches `args_setup_kw_parameters` / `args_setup_kw_rest_parameter`.
+  * #1039 row 36 (`2ac995c680`) and row 43 (`29903d645e`) implement this, with `ruby2_keywords` callees kept on VM
+    dispatch. Row 36 reports +0.24% on lobsters.
+  * Neither row has an assignee, and there is no ruby/ruby PR or Shopify/ruby issue for it. Our open
+    ruby/ruby#19655 (empty anonymous rest) touches only the `*rest` side.
+  * It is not small: row 36 changes keyword planning and the callee's hidden `kw_bits` argument.
+* **14d, `nil` `&blk` to a C method.** The ISEQ path already strips a block argument that is profiled `nil`,
+  behind a recompiling `GuardBitEquals` (`BlockArgNotNil`). Passing `&nil` to a C method is the same as passing
+  no block, so the same guard and strip on the C path is exact. It is a few lines, and #1039 row 42 covers it too.
+  It saves about 210 Ir per call, 1.3 / 0.07 / 0.05 M Ir.
+
+**Ownership checks** (2026-11-03):
+
+* **Shopify/ruby#1039:** the issue is assigned to k0kubun, and none of the relevant rows has an assignee:
+  * row 42: `&blk` to a C call;
+  * rows 36 and 43: `**rest` and anonymous `**`;
+  * row 22: `bar(...)` in forwardable ISEQs;
+  * rows 21 and 39: splatkw and splatarray;
+  * row 7 is the exception: it is k0kubun's, which is why 14a and 14b wait.
+* **Shopify/ruby#1030** (k0kubun, assigned): its splat item covers ISEQ callees only.
+* **Open ruby/ruby PRs with "ZJIT" in the title (68):**
+  * nozomemein's #18326 is `sendforward`, which is lead 6;
+  * tekknolagi's #19351 (draft) handles an inlined block ISEQ in `getblockparamproxy`, next to 14a and not the
+    same fix;
+  * #18280 (draft) expands `splatarray` in HIR;
+  * nothing covers `&blk` to C methods or `**rest` callees.
+
+**Recommendation:**
+
+* Resize lead 14 to 6.8 / 1.8 / 5.3 M.
+* 14c (`**rest` callees, rows 36/43) is the only part worth building on its own. It is shipit's largest share
+  (5.1 M), but it is a medium-sized change.
+* 14d is exact and tiny but worth little: 0.8 M on railsbench.
+* 14a and 14b, the railsbench part, wait for row 7, like lead 7.
+
+No crash, wrong result or divergence turned up.
+
+**Correction to lead 12 (found during this check).** Both parts that [Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs)
+called free are on k0kubun's own list. Shopify/ruby#1030 (assigned to him) links a "send_cfunc_block" patch
+series that includes:
+
+* `5a370e8571` "Don't spill consumed receiver and args on C calls with a frame";
+* `9e4bb54cb6` "Don't move SP/CFP registers around C calls with a frame";
+* `2c31fc3785` (result moves), `8e787544f5` (local respills), `020c958cbc` (`cfp->sp` lea) and `92b731484b`
+  (receiver materialization).
+
+The commit messages describe the same mechanism this page measured. Lead 12 is taken. The first check searched
+for CCall and frame terms and missed #1030, because the series is linked by benchmark name.
 
 ## Caveats
 
