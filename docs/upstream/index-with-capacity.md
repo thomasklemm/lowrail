@@ -557,11 +557,12 @@ end
 > On Ruby 4.1, `Array#index_with` fills `Hash.new(capacity: size)`, or `{}` for two elements or fewer since that already
 > fits them. Ruby 4.0 and older keep `to_h`, because there `Hash.new(capacity:)` spills even small hashes. Array
 > subclasses keep `to_h` too, since it reads the elements directly rather than through an overridden `each` or `size`.
-> The version check compares integers once at load time, without RubyGems.
+> The version check compares integers once at load time, without RubyGems. The result is the same hash, with the same
+> order, duplicate-key handling, default object and sized enumerator. Its memsize is identical to `to_h`'s at every
+> size from 0 to 50.
 >
 > Boundary: a plain Array whose `each` or `size` is overridden on the singleton or on `Array` itself is filled through
-> the override on 4.1, as Rails 8.1 and #59108 did, where `Array#to_h` reads the storage. A test documents it. The result is the same hash, with the same order, duplicate-key handling,
-> default object and sized enumerator. Its memsize is identical to `to_h`'s at every size from 0 to 50.
+> the override on 4.1, as Rails 8.1 and #59108 did, where `Array#to_h` reads the storage. A test documents it.
 >
 > ### Additional information
 >
