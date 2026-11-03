@@ -113,3 +113,29 @@ shipit yjit: atbase 3.0273 G (+0.000%) | atbase2 3.0247 G (-0.088%) | at1 3.0215
 ## ruby-bench ZJIT (master)
 lobsters zjit: atbase 3.0986 G (+0.000%) | atbase2 3.1020 G (+0.109%) | at1 3.0945 G (-0.133%) | at12 3.0924 G (-0.200%)
 railsbench zjit: atbase 2.9643 G (+0.000%) | atbase2 2.9634 G (-0.030%) | at1 2.9600 G (-0.145%) | at12 2.9621 G (-0.072%)
+
+## ns per call (micro.rb, TZA=1, median of 7 rounds of 20,000; wall time, noisy)
+== interp at-base
+attribute_types        276.5 ns  (min 274.6)     0.0 obj
+new                   3765.4 ns  (min 3710.8)     5.0 obj
+load_from_sql_10     40226.9 ns  (min 38096.1)    81.0 obj
+== interp at-base2
+attribute_types        300.2 ns  (min 298.1)     0.0 obj
+new                   4151.7 ns  (min 3805.6)     5.0 obj
+load_from_sql_10     40488.3 ns  (min 38991.3)    81.0 obj
+== interp at1
+attribute_types        151.1 ns  (min 149.6)     0.0 obj
+new                   3640.3 ns  (min 3536.9)     5.0 obj
+load_from_sql_10     39285.9 ns  (min 37334.1)    81.0 obj
+== --yjit at-base
+attribute_types        109.4 ns  (min 104.5)     0.0 obj
+new                   1425.8 ns  (min 1409.3)     5.0 obj
+load_from_sql_10     19470.3 ns  (min 19021.2)    81.0 obj
+== --yjit at-base2
+attribute_types        108.9 ns  (min 105.6)     0.0 obj
+new                   1352.8 ns  (min 1314.8)     5.0 obj
+load_from_sql_10     20696.1 ns  (min 18015.4)    81.0 obj
+== --yjit at1
+attribute_types         55.6 ns  (min 53.9)     0.0 obj
+new                   1206.1 ns  (min 1165.9)     5.0 obj
+load_from_sql_10     19982.5 ns  (min 18385.8)    81.0 obj
