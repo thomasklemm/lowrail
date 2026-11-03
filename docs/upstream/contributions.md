@@ -124,7 +124,7 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
   - [#59557](https://github.com/rails/rails/pull/59557), `Array#index_with` fills `Hash.new(capacity:)` on Ruby 4.1 instead of pair Arrays (stacked on #59555) — revisits #59108/#59203 after ruby/ruby#19537: n+1 → 1 object per call, 0 spills on railsbench/shipit/lobsters, objects −11,993/−60,651/−5,408 (4.1 interpreter), wall time tied, 4.0 unchanged ([record](index-with-capacity.md)). Sol: two request-changes rounds (subclass overrides, RubyGems dependency of the gate), then approve on both; opened 2026-11-03.
 - From the [PostgreSQL census](pg-census.md) (nine PG apps incl. Mastodon, Discourse, Docuseal, Lago, Loomio, Sure, CASA; 124 workloads incl. `prepared_statements: false`):
   - [#59558](https://github.com/rails/rails/pull/59558), `cast_result` without `field_types`/`missing_oids` scratch Arrays — −2 per query result; 121/124, median **−23**. Sol approve on both rubrics; opened 2026-11-03.
-  - Held: `pg-result-type-args` (type-map key reuse, median **−198/−211**, −2.4%): reworked to a per-type-map key map (895b983); Sol re-review still request-changes: a raising type factory leaves orphan keys. Being fixed.
+  - [#59560](https://github.com/rails/rails/pull/59560), reuse frozen `[fmod, ""]` type-map keys for PostgreSQL result columns, kept per type map and dropped with its cache — −1 Array per result column (10-column `cast_result` **27 → 17**); 120/124 PG workloads, median **−171** (−2.4%). Head `408e6a3` after two Sol request-changes rounds (process-global keys, then keys retained by failed lookups); Sol approve on both rubrics. Opened 2026-11-03.
 
 ### Importmap — rails/importmap-rails
 
