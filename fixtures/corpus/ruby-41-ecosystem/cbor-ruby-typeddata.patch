@@ -1,0 +1,164 @@
+From 69147e8c3f6623a799285883098abc2c449b267d Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Tue, 3 Nov 2026 14:29:10 +0000
+Subject: [PATCH] Use TypedData for Buffer, Packer and Unpacker
+
+Ruby 4.1 removes the untyped Data API (Data_Wrap_Struct,
+Data_Get_Struct; Feature #21768), so the extension no longer
+compiles there.  Convert the three wrapped structs to
+rb_data_type_t, as msgpack-ruby did.  The buffer view that a
+Packer or Unpacker exposes keeps its NULL free function and
+gets CBOR::Buffer as parent type, so Buffer methods accept it.
+
+Fixes #42.
+---
+ ext/cbor/buffer_class.c   | 18 +++++++++++++++---
+ ext/cbor/core_ext.c       |  2 +-
+ ext/cbor/packer_class.c   | 10 ++++++++--
+ ext/cbor/packer_class.h   |  2 ++
+ ext/cbor/unpacker_class.c | 10 ++++++++--
+ 5 files changed, 34 insertions(+), 8 deletions(-)
+
+diff --git a/ext/cbor/buffer_class.c b/ext/cbor/buffer_class.c
+index 14300dd..0328ef2 100644
+--- a/ext/cbor/buffer_class.c
++++ b/ext/cbor/buffer_class.c
+@@ -40,7 +40,7 @@ static ID s_close;
+ 
+ #define BUFFER(from, name) \
+     msgpack_buffer_t *name = NULL; \
+-    Data_Get_Struct(from, msgpack_buffer_t, name); \
++    TypedData_Get_Struct(from, msgpack_buffer_t, &buffer_data_type, name); \
+     if(name == NULL) { \
+         rb_raise(rb_eArgError, "NULL found for " # name " when shouldn't be."); \
+     }
+@@ -61,12 +61,24 @@ static void Buffer_free(void* data)
+     xfree(b);
+ }
+ 
++static const rb_data_type_t buffer_data_type = {
++    "CBOR::Buffer",
++    { (RUBY_DATA_FUNC) msgpack_buffer_mark, Buffer_free, NULL },
++    NULL, NULL, 0
++};
++
++static const rb_data_type_t buffer_view_data_type = {
++    "CBOR::Buffer view",
++    { (RUBY_DATA_FUNC) msgpack_buffer_mark, NULL, NULL },
++    &buffer_data_type, NULL, 0
++};
++
+ static VALUE Buffer_alloc(VALUE klass)
+ {
+     msgpack_buffer_t* b = ALLOC_N(msgpack_buffer_t, 1);
+     msgpack_buffer_init(b);
+ 
+-    return Data_Wrap_Struct(klass, msgpack_buffer_mark, Buffer_free, b);
++    return TypedData_Wrap_Struct(klass, &buffer_data_type, b);
+ }
+ 
+ static ID get_partial_read_method(VALUE io)
+@@ -118,7 +130,7 @@ void MessagePack_Buffer_initialize(msgpack_buffer_t* b, VALUE io, VALUE options)
+ VALUE MessagePack_Buffer_wrap(msgpack_buffer_t* b, VALUE owner)
+ {
+     b->owner = owner;
+-    return Data_Wrap_Struct(cMessagePack_Buffer, msgpack_buffer_mark, NULL, b);
++    return TypedData_Wrap_Struct(cMessagePack_Buffer, &buffer_view_data_type, b);
+ }
+ 
+ static VALUE Buffer_initialize(int argc, VALUE* argv, VALUE self)
+diff --git a/ext/cbor/core_ext.c b/ext/cbor/core_ext.c
+index ed268d6..2806a50 100644
+--- a/ext/cbor/core_ext.c
++++ b/ext/cbor/core_ext.c
+@@ -50,7 +50,7 @@ static inline VALUE delegete_to_pack(int argc, VALUE* argv, VALUE self)
+     } \
+     VALUE packer = argv[0]; \
+     msgpack_packer_t *pk; \
+-    Data_Get_Struct(packer, msgpack_packer_t, pk);
++    TypedData_Get_Struct(packer, msgpack_packer_t, &CBOR_packer_data_type, pk);
+ 
+ static VALUE NilClass_to_msgpack(int argc, VALUE* argv, VALUE self)
+ {
+diff --git a/ext/cbor/packer_class.c b/ext/cbor/packer_class.c
+index 2a99ab9..4502384 100644
+--- a/ext/cbor/packer_class.c
++++ b/ext/cbor/packer_class.c
+@@ -41,7 +41,7 @@ static ID s_write;
+ 
+ #define PACKER(from, name) \
+     msgpack_packer_t* name; \
+-    Data_Get_Struct(from, msgpack_packer_t, name); \
++    TypedData_Get_Struct(from, msgpack_packer_t, &CBOR_packer_data_type, name); \
+     if(name == NULL) { \
+         rb_raise(rb_eArgError, "NULL found for " # name " when shouldn't be."); \
+     }
+@@ -55,12 +55,18 @@ static void Packer_free(msgpack_packer_t* pk)
+     xfree(pk);
+ }
+ 
++const rb_data_type_t CBOR_packer_data_type = {
++    "CBOR::Packer",
++    { (RUBY_DATA_FUNC) msgpack_packer_mark, (RUBY_DATA_FUNC) Packer_free, NULL },
++    NULL, NULL, 0
++};
++
+ static VALUE Packer_alloc(VALUE klass)
+ {
+     msgpack_packer_t* pk = ALLOC_N(msgpack_packer_t, 1);
+     msgpack_packer_init(pk);
+ 
+-    VALUE self = Data_Wrap_Struct(klass, msgpack_packer_mark, Packer_free, pk);
++    VALUE self = TypedData_Wrap_Struct(klass, &CBOR_packer_data_type, pk);
+ 
+     msgpack_packer_set_to_msgpack_method(pk, s_to_msgpack, self);
+     pk->buffer_ref = MessagePack_Buffer_wrap(PACKER_BUFFER_(pk), self);
+diff --git a/ext/cbor/packer_class.h b/ext/cbor/packer_class.h
+index fdabd67..8624c80 100644
+--- a/ext/cbor/packer_class.h
++++ b/ext/cbor/packer_class.h
+@@ -31,6 +31,8 @@
+ 
+ extern VALUE cMessagePack_Packer;
+ 
++extern const rb_data_type_t CBOR_packer_data_type;
++
+ void MessagePack_Packer_module_init(VALUE mMessagePack);
+ 
+ VALUE MessagePack_pack(int argc, VALUE* argv);
+diff --git a/ext/cbor/unpacker_class.c b/ext/cbor/unpacker_class.c
+index c729e64..af58d51 100644
+--- a/ext/cbor/unpacker_class.c
++++ b/ext/cbor/unpacker_class.c
+@@ -41,7 +41,7 @@ static VALUE eTypeError;
+ 
+ #define UNPACKER(from, name) \
+     msgpack_unpacker_t *name = NULL; \
+-    Data_Get_Struct(from, msgpack_unpacker_t, name); \
++    TypedData_Get_Struct(from, msgpack_unpacker_t, &unpacker_data_type, name); \
+     if(name == NULL) { \
+         rb_raise(rb_eArgError, "NULL found for " # name " when shouldn't be."); \
+     }
+@@ -55,12 +55,18 @@ static void Unpacker_free(msgpack_unpacker_t* uk)
+     xfree(uk);
+ }
+ 
++static const rb_data_type_t unpacker_data_type = {
++    "CBOR::Unpacker",
++    { (RUBY_DATA_FUNC) msgpack_unpacker_mark, (RUBY_DATA_FUNC) Unpacker_free, NULL },
++    NULL, NULL, 0
++};
++
+ static VALUE Unpacker_alloc(VALUE klass)
+ {
+     msgpack_unpacker_t* uk = ALLOC_N(msgpack_unpacker_t, 1);
+     msgpack_unpacker_init(uk);
+ 
+-    VALUE self = Data_Wrap_Struct(klass, msgpack_unpacker_mark, Unpacker_free, uk);
++    VALUE self = TypedData_Wrap_Struct(klass, &unpacker_data_type, uk);
+ 
+     uk->buffer_ref = MessagePack_Buffer_wrap(UNPACKER_BUFFER_(uk), self);
+ 
+-- 
+2.55.0
+
