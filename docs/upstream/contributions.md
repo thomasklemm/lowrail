@@ -287,11 +287,12 @@ None.
 
 ## Drafted, not opened
 
-- **Redmine, `Pathname::SEPARATOR_PAT` (2026-11-03, bet E1):** Bundler ≤ 4.0.11 cannot install path or git gems on
-  Ruby 4.1 since 4e243c709e/a5996718f3; 10 of 20 census apps lock such a Bundler. No related ticket on
-  bugs.ruby-lang.org; the orb has no Redmine account, so the new-ticket draft in
-  [ruby-4.1-ecosystem.md](ruby-4.1-ecosystem.md#draft-redmine-note-pathnameseparator_pat-and-locked-bundlers) waits
-  for Thomas.
+- **ruby/ruby, `Pathname::SEPARATOR_PAT` (2026-11-03, bet E1):** restore it as a deprecated constant so Bundler ≤
+  4.0.11 lockfiles can install path and git gems on Ruby 4.1 (10 of 20 census apps lock such a Bundler). Branch
+  `thomasklemm/ruby:thomasklemm/pathname-separator-pat` @ `6c8385cd3f`, draft in
+  [ruby-4.1-ecosystem.md](ruby-4.1-ecosystem.md#draft-rubyruby-pr-restore-pathnameseparator_pat-as-a-deprecated-constant).
+  Precedent: [#16909](https://github.com/ruby/ruby/pull/16909) proposed the same; hsbt closed it on 2026-05-28 after
+  Bundler 4.0.12. Waits for Thomas.
 - **Gem census (2026-11-03):** two i18n candidates and one connection_pool candidate on `thomasklemm` forks, with
   drafts, in [gem-census.md](gem-census.md#candidates): I1 −0.40% and I2 −0.32% of all census allocations (exact
   versions after Sol review), C1 −4 objects per `ConnectionPool#with`. C1 is open as

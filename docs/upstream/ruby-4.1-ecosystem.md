@@ -12,7 +12,7 @@ still broken in its latest release.
 | # | Finding | Still broken in latest release? | Reach (20 apps) | Existing report | Fix |
 | ---: | --- | --- | --- | --- | --- |
 | 1 | Bundler ≤ 4.0.23 crashes on Ruby 4.1 when `.bundle/config` is `---`, a file Bundler itself writes | yes: every released 4.0.x | any app, since `BUNDLED WITH 4.0.x` selects the old Bundler; 20 of 20 lock ≤ 4.0.23 | none for 4.0.x. The master change is ruby/rubygems#9379 | [draft issue](#draft-rubygemsrubygems-issue-bundler-40x-on-ruby-41-and-an-empty-bundleconfig); a clean cherry-pick of `368fc29ce1` to `4.0` |
-| 2 | Bundler ≤ 4.0.11 cannot install a path or git gem on Ruby 4.1: `uninitialized constant Pathname::SEPARATOR_PAT` | fixed in Bundler 4.0.12; older locks break | Fizzy (2.5.21) and Writebook (2.5.18) lock old Bundlers and have git sources; 10 of 20 lock ≤ 4.0.11 | Bundler side fixed in ruby/rubygems#9529. Seen in the wild (suketa/ruby-duckdb#1347). No Redmine issue | [draft Redmine note](#draft-redmine-note-pathnameseparator_pat-and-locked-bundlers) |
+| 2 | Bundler ≤ 4.0.11 cannot install a path or git gem on Ruby 4.1: `uninitialized constant Pathname::SEPARATOR_PAT` | fixed in Bundler 4.0.12; older locks break | Fizzy (2.5.21) and Writebook (2.5.18) lock old Bundlers and have git sources; 10 of 20 lock ≤ 4.0.11 | Bundler side fixed in ruby/rubygems#9529. Seen in the wild (suketa/ruby-duckdb#1347). ruby/ruby#16909 proposed the same deprecation; hsbt closed it after 4.0.12 | [`thomasklemm/pathname-separator-pat`](https://github.com/thomasklemm/ruby/tree/thomasklemm/pathname-separator-pat) @ `6c8385cd3f`; [PR draft](#draft-rubyruby-pr-restore-pathnameseparator_pat-as-a-deprecated-constant) |
 | 3 | cbor 0.5.10.3 uses `Data_Wrap_Struct`/`Data_Get_Struct` | yes (HEAD = 0.5.10.3) | Discourse, Flow, Loomio, Mastodon (0.5.10.3), Sure (0.5.10.2): 5 apps, through webauthn → cose → cbor. 20 reverse deps | cabo/cbor-ruby#42 (open, 0 comments, no PR) | [`cbor-ruby-typeddata.patch`](../../fixtures/corpus/ruby-41-ecosystem/cbor-ruby-typeddata.patch); 170/170 specs on 4.0.7 and master |
 | 4 | tiktoken_ruby 0.0.17 ships a Cargo.lock with magnus 0.8.2, which does not compile on 4.1 | yes (HEAD `d2c2625` too) | Discourse. 18 reverse deps | none | [`tiktoken_ruby-magnus-0.8.4.patch`](../../fixtures/corpus/ruby-41-ecosystem/tiktoken_ruby-magnus-0.8.4.patch); 72/72 specs on 4.0.7 and master |
 | 5 | lago-expression caps `required_ruby_version ~> 4.0.2`; rb-sys has no 4.1 stable API | yes (main `0b4fe83`) | Lago | none (F1 checked) | F1's `lago-expression-0b4fe83-ruby41.patch` (20 specs pass, F1). [PR draft](#draft-getlagolago-expression-pr) |
@@ -102,7 +102,9 @@ is unset, and the global `~/.bundle/config` behaves the same way.
   `RUBYOPT=-r`) lets Bundler 2.6.9 install the path gem on master, with a deprecation warning at `source/path.rb:218`.
 * **Search:** ruby/rubygems and GitHub-wide for `SEPARATOR_PAT`, and bugs.ruby-lang.org: only downstream CI
   workarounds (suketa/ruby-duckdb#1347, which closed it as fixed in Bundler; Autogenetica/agent-lens#27, which moved
-  its lock to 4.0.21). No Redmine issue weighs locked Bundlers against the removal.
+  its lock to 4.0.21). ruby/ruby#16909 (Earlopain, 2026-05-09) proposed exactly this deprecation; nobu approved it
+  with a suggestion, and hsbt closed it on 2026-05-28: "Bundler 4.0.12 is already released. We don't need to restore
+  this constant." Found only after the first draft, by searching PRs as well as issues.
 
 ## C extensions and the removed API
 
@@ -209,14 +211,21 @@ has followed each Ruby bump since #10, so the maintainers may prefer `'>= 4.0.2'
 >
 > 368fc29ce1 cherry-picks cleanly onto `4.0`. Apps that lock an already-released 4.0.x would stay affected on Ruby 4.1.
 
-### Draft: Redmine note "Pathname::SEPARATOR_PAT and locked Bundlers"
+### Draft: ruby/ruby PR "Restore Pathname::SEPARATOR_PAT as a deprecated constant"
 
-> Since 4e243c709e and a5996718f3, `Pathname::SEPARATOR_PAT` is gone (it was public through 4.0 because of the
-> `private_constant` typo). Bundler 2.x and 4.0.0–4.0.11 use it in `Source::Path#generate_bin`. RubyGems runs the
-> Bundler in `BUNDLED WITH`, so on 4.1 those apps cannot `bundle install` a path or git gem:
-> `NameError: uninitialized constant Pathname::SEPARATOR_PAT`. Bundler fixed this in 4.0.12 (ruby/rubygems#9529), but
-> 10 of 20 Rails apps we checked lock an older Bundler. Defining the constant again with `deprecate_constant` for
-> 4.1 makes Bundler 2.6.9 work with a deprecation warning.
+Branch [`thomasklemm/pathname-separator-pat`](https://github.com/thomasklemm/ruby/tree/thomasklemm/pathname-separator-pat)
+@ `6c8385cd3f` on master `9aa0898240`: six lines in `pathname_builtin.rb` and one test. The value is Marshal-identical to
+4.0.7's (`0408492f062f00063a064546`). The new test errors on unpatched master and passes with the patch.
+`make test-all TESTS=pathname` gives 298 tests, 0 failures, and btest passes (2,141). Bundler 2.6.9 and 4.0.11 install a
+path gem on the patched build and fail on unpatched master; 4.0.12 works on both.
+
+> Since 4e243c709e and a5996718f3, `Pathname::SEPARATOR_PAT` is gone. It was public through 4.0 because of a
+> `private_constant` typo, and Bundler 2.x and 4.0.0–4.0.11 use it in `Source::Path#generate_bin`. RubyGems runs the
+> Bundler in `BUNDLED WITH`, so with those lockfiles any path or git gem fails on 4.1 with `NameError`.
+> ruby/rubygems#9529 fixed Bundler in 4.0.12, but 10 of 20 open-source Rails apps we checked still lock an older one.
+>
+> This restores the 4.0 value with `deprecate_constant`, as #16909 proposed, so old lockfiles keep working and warn
+> under `Warning[:deprecated]`, and the constant can go in a later release.
 
 ## F1 overlap
 
