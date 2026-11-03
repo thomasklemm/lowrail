@@ -274,7 +274,8 @@ None.
 - **Gem census (2026-11-03):** two i18n candidates and one connection_pool candidate on `thomasklemm` forks, with
   drafts, in [gem-census.md](gem-census.md#candidates): I1 −0.40% and I2 −0.32% of all census allocations (exact
   versions after Sol review), C1 −4 objects per `ConnectionPool#with`. C1 is open as
-  [connection_pool#225](https://github.com/mperham/connection_pool/pull/225); I1 and I2 are not opened.
+  [connection_pool#225](https://github.com/mperham/connection_pool/pull/225) and I1 as
+  [i18n#763](https://github.com/ruby-i18n/i18n/pull/763); I2 (`7d205cd675`) is not opened.
 
 ## Investigated, not submitted
 
