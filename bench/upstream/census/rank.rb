@@ -19,14 +19,23 @@ module CensusRank
 
   def load_runs(dir, mode) = Dir["#{dir}/*-#{mode}.json"].sort.map { JSON.parse(File.read(_1)) }
 
-  def rows(runs, tiers: TIERS)
+  RAILS_SITE = ->(file) { file.delete_prefix("RAILS/") if file.start_with?("RAILS/") }
+
+  # A gem's own lines, keyed by their path inside the gem, so apps on different
+  # releases or git checkouts of it (inertia_rails-3.22.0/, inertia-rails-3e1330a0b1c2/) share a key.
+  def gem_site(name)
+    pattern = %r{/#{Regexp.escape(name).gsub(/[_-]/, "[_-]")}-(?:\d[^/]*|\h{12})/(.+)\z}
+    ->(file) { file[pattern, 1] if file.start_with?("GEM/") }
+  end
+
+  def rows(runs, tiers: TIERS, site: RAILS_SITE)
     workloads = runs.flat_map { |run| run["workloads"].map { [run["app"], _1] } }
     total = workloads.size
     sites = Hash.new { |h, k| h[k] = { per_workload: Hash.new(0.0), classes: Hash.new(0.0) } }
     workloads.each do |app, w|
       w["sites"].each do |s|
-        next unless s["file"].start_with?("RAILS/")
-        key = "#{s["file"].delete_prefix("RAILS/")}:#{s["line"]}"
+        next unless (file = site.(s["file"]))
+        key = "#{file}:#{s["line"]}"
         sites[key][:per_workload][[app, w["workload"], w["kind"]]] += s["objects_per_op"]
         sites[key][:classes][s["class"]] += s["objects_per_op"]
       end

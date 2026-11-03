@@ -165,6 +165,25 @@ RUBY
     rev=8d0d84de9377e7e9deb64a6ffd145be9a91462b4
     repo=https://github.com/we-promise/sure
     sub=. ;;
+  # Chatwoot and Inertia census apps (docs/upstream/inertia-chatwoot-census.md),
+  # default branches on 2026-11-03. script/census applies
+  # fixtures/corpus/inertia-chatwoot-census/APP.patch.
+  chatwoot)
+    rev=ae66c979835f7e49e1cf9ecb64eb89628e8f3f70  # develop
+    repo=https://github.com/chatwoot/chatwoot
+    sub=. ;;
+  hackatime)
+    rev=74deec42b2556f96ee25116e161fc1581bd72f27
+    repo=https://github.com/hackclub/hackatime
+    sub=. ;;
+  flow)
+    rev=6a8b5fda6100010688b6a8edfa79133dc6c359c4  # develop
+    repo=https://github.com/AixleHQ/flow
+    sub=. ;;
+  thinkroom)
+    rev=f7865d012245e8efd7b75206e06488c05d598744
+    repo=https://github.com/kieranklaassen/thinkroom
+    sub=. ;;
   wikino)
     # Rails app lives in rails/; dependency-only wrapper in fixtures/corpus.
     rev=25255d2d6c808df6672e293661ea797a76c6d2a9
@@ -199,6 +218,18 @@ if [ "$name" != real-blog ]; then
     echo "$name checkout is not the pinned revision; use a new DIRNAME" >&2
     exit 1
   }
+  if [ "$name" = chatwoot ] && [ ! -f "$dest/vendor/commonmarker/lib/commonmarker/commonmarker.so" ]; then
+    # commonmarker 0.23.12 (Chatwoot's markdown API) declares ruby < 4.0. The
+    # census overlay uses its v0.23.12 tag as a path gem with only that cap
+    # lifted; Bundler does not compile path gems, so build the extension here.
+    cm="$dest/vendor/commonmarker"
+    rm -rf "$cm"
+    git -c advice.detachedHead=false clone -q --depth 1 -b v0.23.12 https://github.com/gjtorikian/commonmarker "$cm"
+    [ "$(git -C "$cm" rev-parse HEAD)" = cd435f7bb1a2c53e9ca3bb95b389c7d777083921 ] || { echo "commonmarker tag moved" >&2; exit 1; }
+    rm -rf "$cm/.git"
+    sed -i 's/s.required_ruby_version = \[">= 2.6", "< 4.0"\]/s.required_ruby_version = ">= 2.6"/' "$cm/commonmarker.gemspec"
+    (cd "$cm/ext/commonmarker" && ruby extconf.rb >/dev/null && make -s -j"$(nproc)" >/dev/null && cp commonmarker.so ../../lib/commonmarker/)
+  fi
   (
     cd "$dest"
     patch="$root/fixtures/corpus/$name.patch"

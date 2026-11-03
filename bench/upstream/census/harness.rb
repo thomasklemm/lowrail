@@ -104,6 +104,7 @@ module RailsCensus
     def workloads(name)
       load File.join(__dir__, "../census_4_workloads.rb")
       load File.join(__dir__, "pg_workloads.rb")
+      load File.join(__dir__, "inertia_chatwoot_workloads.rb")
       Census4Workloads.public_send(copy_of(name).tr("-", "_"), self)
     end
 
@@ -156,6 +157,14 @@ module RailsCensus
         # writes through the app's own services (fixtures/corpus/pg-census/seeds).
         load "db/seeds.rb" if name == "mastodon"
         load File.join(ROOT, "fixtures/corpus/pg-census/seeds/#{name}.rb")
+      when "chatwoot", "flow", "hackatime", "thinkroom"
+        # Chatwoot: its db/seeds.rb (installation config), then its own account
+        # seeder. Flow and Hackatime: their development seeds plus board tasks
+        # or 30 days of heartbeats. Thinkroom: its seeds plus documents. All
+        # through census scripts in
+        # fixtures/corpus/inertia-chatwoot-census/seeds.
+        load "db/seeds.rb" if name == "chatwoot"
+        load File.join(ROOT, "fixtures/corpus/inertia-chatwoot-census/seeds/#{name}.rb")
       else
         raise "no preparation known for #{name}"
       end
