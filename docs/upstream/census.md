@@ -10,6 +10,9 @@ comparison (`--modes`, `LABEL:MODE`).
 Results are allocation counts only. No timing is inferred from them. Speed claims need `lowrail bench`
 ([bench.md](../bench.md)).
 
+`script/census watch` reruns the census daily at current rails/rails `main` against the last recorded `main`. It
+attributes new allocations and SQL or behavior-control diffs to commits: [rails-main-watch](rails-main-watch/README.md).
+
 ## Run a round
 
 ```sh
@@ -131,7 +134,9 @@ Per workload: 50 warmup operations (`CENSUS_WARMUP`), then three GC-enabled wind
 the reported value), then 10 traced operations with GC disabled (`CENSUS_REQUESTS`), attributed by file, line and
 class. After every workload has been measured, a **SQL control** runs each workload twice more with an
 `sql.active_record` subscriber on the measuring thread. It records `queries_per_op` and a digest of the statements,
-with literals and numbers masked. The subscriber never runs during measurement.
+with literals and numbers masked. The subscriber never runs during measurement. Since 2026-11-03 a leading minus sign
+is masked too: SolidCache's signed `key_hash` changed sign between Rails commits and showed as a false SQL diff.
+Digests in older receipts differ for statements with negative numbers.
 
 ## Outputs
 

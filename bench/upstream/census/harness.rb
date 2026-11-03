@@ -196,14 +196,15 @@ module RailsCensus
     end
 
     # Behavior control, after every measurement: the SQL each workload runs
-    # (literals and numbers masked), two operations each. A patch that keeps
+    # (literals and numbers masked, with a sign unless it follows an operand:
+    # SolidCache's signed key_hash), two operations each. A patch that keeps
     # behavior keeps the digest; the A/A pair shows which workloads drift anyway.
     def sql_shape(op)
       statements = []
       thread = Thread.current
       subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
         next if payload[:name] == "SCHEMA" || !Thread.current.equal?(thread)
-        sql = payload[:sql].to_s.gsub(/'(?:[^']|'')*'/, "?").gsub(/\b\d+(?:\.\d+)?\b/, "?")
+        sql = payload[:sql].to_s.gsub(/'(?:[^']|'')*'/, "?").gsub(/(?<![\w)])-?\b\d+(?:\.\d+)?\b/, "?")
         statements << (payload[:cached] ? "CACHE #{sql}" : sql)
       end
       begin
