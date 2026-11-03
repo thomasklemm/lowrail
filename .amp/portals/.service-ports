@@ -3,6 +3,8 @@
     "campfire-redis": 31925,
     "census-pg": 32706,
     "census-redis": 31694,
-    "census-memcached": 31122
+    "census-memcached": 31122,
+    "siseq-apps": 30016,
+    "siseq-rb": 32713
   }
 }
