@@ -1,0 +1,27 @@
+--- shipit-engine-0.45.0/app/models/shipit/review_stack.rb	2026-11-02 22:14:49.250002495 +0000
++++ benchmarks/shipit/vendor/shipit-engine/app/models/shipit/review_stack.rb	2026-11-02 22:19:37.466002495 +0000
+@@ -26,13 +26,18 @@
+       # noop: last deployed ref is useless for review stacks
+     end
+ 
+-    model_name.class_eval do
+-      def route_key
+-        "stacks"
+-      end
++    # census: Rails main freezes ActiveModel::Name; override on an unfrozen copy.
++    def self.model_name
++      @review_stack_model_name ||= super.dup.tap do |name|
++        name.singleton_class.class_eval do
++          def route_key
++            "stacks"
++          end
+ 
+-      def singular_route_key
+-        "stack"
++          def singular_route_key
++            "stack"
++          end
++        end
+       end
+     end
+ 
