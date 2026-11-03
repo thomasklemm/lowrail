@@ -65,6 +65,24 @@ module FrameworkProbe
       ruby: RUBY_DESCRIPTION, workloads: results) + "\n")
   end
 
+  # Bet P1 (docs/upstream/actionpack-cpu.md): sample every request workload
+  # with stackprof (wall clock, raw stacks) after the usual warmup, the same
+  # number of operations per workload, into one dump per app and mode.
+  # stackprof is loaded from the Ruby's own gem directory, outside the bundle.
+  def prof(name, output)
+    $LOAD_PATH.unshift(*Dir[File.join(Gem.default_dir, "gems/stackprof-*/lib")],
+      *Dir[File.join(Gem.default_dir, "extensions/*/*/stackprof-*")])
+    require "stackprof"
+    ops = RailsCensus.workloads(name).reject { %i[job mail mailer].include?(_1.kind) }
+    count = Integer(ENV.fetch("CENSUS_PROF_OPS", "100"))
+    run = ->(op) { op.call.call; RailsCensus.reset_side_effects }
+    ops.each { |op| Integer(ENV.fetch("CENSUS_WARMUP", "50")).times { run.(op) } }
+    StackProf.run(mode: :wall, interval: Integer(ENV.fetch("CENSUS_PROF_INTERVAL", "200")), raw: true, out: output) do
+      count.times { ops.each { |op| run.(op) } }
+    end
+    warn "#{name}: #{ops.size} request workloads x #{count} ops -> #{output}"
+  end
+
   def callers(name)
     ops = RailsCensus.workloads(name)
     ops.each { |op| 3.times { op.call.call; RailsCensus.reset_side_effects } }
@@ -99,6 +117,7 @@ if $PROGRAM_NAME == __FILE__
   case command
   when "work" then FrameworkProbe.work(name, output)
   when "callers" then FrameworkProbe.callers(name)
-  else abort "usage: probe.rb work APP OUT.json | callers APP"
+  when "prof" then FrameworkProbe.prof(name, output)
+  else abort "usage: probe.rb work APP OUT.json | prof APP OUT.dump | callers APP"
   end
 end
