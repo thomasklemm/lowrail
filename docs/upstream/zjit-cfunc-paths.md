@@ -18,7 +18,13 @@ already a frameless call, and InvokeSuper from a block falls back 1.4–6k times
 unowned C method in the top 20 comes close to `dup`, because their per-call overhead is one frame (~43 instructions),
 not two method calls through `rb_funcall`.
 
-An unposted comment for #1058 is at the end. Nothing was opened upstream.
+The #1058 comment was posted on 2026-11-03 with the patch-point shape
+([comment](https://github.com/Shopify/ruby/issues/1058#issuecomment-6601903455)). tekknolagi answered that it needs
+more design work: "figuring out what stops us from moving everything to just Ruby code". That question is answered
+in [`Kernel#dup` in Ruby](#kerneldup-in-ruby-tekknolagis-question): it works and is exact apart from the observable
+changes that `Array#each` under a JIT already has. It must stay C in the interpreter, it needs `send(:sym)` support
+in ZJIT ([#19583](https://github.com/ruby/ruby/pull/19583)), and on two of three benchmarks its inlined patch points
+cost more than they save until ZJIT recompiles invalidated code.
 
 ## Pins and method
 
@@ -232,7 +238,7 @@ A per-class cache would close the gap but needs its own invalidation. ZJIT's pat
 check. Tests would be HIR snapshots for the patch points and codegen tests for each redefinition case above. Per
 the shortlist, the comment comes first.
 
-## Comment draft for Shopify/ruby#1058 (not posted)
+## Comment for Shopify/ruby#1058 (posted 2026-11-03 without the last paragraph)
 
 > We measured `Kernel#dup` on Rails and would like to take this one, unless it is already on someone's branch.
 >
@@ -265,10 +271,233 @@ the shortlist, the comment comes first.
 > dominates; the coercion is ~25 instructions), `Time#utc?` (#1060) ~0.015%, `String#length` (#808) is already a
 > frameless call.
 
+## `Kernel#dup` in Ruby (tekknolagi's question)
+
+*2026-11-03, after tekknolagi's reply on #1058.* What stops `Kernel#dup` from being plain Ruby, so that ZJIT sees
+ordinary sends instead of a special case?
+
+**Answer.** It can be written in Ruby and nothing semantic blocks it. Three conditions decide whether it pays:
+
+1. **Keep the C method in the interpreter.** In the interpreter the Ruby version costs +27% per call and +0.25% to
+   +0.54% instructions on Rails. It should therefore be defined only under a JIT (`with_jit`), as `Array#each`,
+   `#map` and `Integer#downto` already are.
+2. **ZJIT has to compile `__send__(:initialize_dup, ...)`.** `initialize_dup` is private, and Ruby can call a
+   private method on another object only through `__send__`. ZJIT on master sends every `send`/`__send__` through
+   the dynamic fallback, so the Ruby version makes ZJIT slower (+0.06% to +0.56%). With tekknolagi's
+   [#19583](https://github.com/ruby/ruby/pull/19583) (`send(:symbol)`), ZJIT inlines `dup` and `initialize_dup` into
+   the caller. `initialize_copy` then becomes a monomorphic `CCallWithFrame :Hash#initialize_copy` at each call site,
+   which is the shape we hand-built in prototype B, here produced by ZJIT's existing machinery.
+3. **Inlined patch points must survive invalidation.** On top of #19583, railsbench gains a further −0.76%, better
+   than prototype B. Lobsters only gains −0.08% and shipit loses +0.58%: once the app `include`s a module that
+   defines `initialize_dup` (lobsters: `Search` includes ActiveModel), the `MethodRedefined(…, initialize_dup)` patch
+   points inlined into hot callers (`url_options`, `url_for`) are invalidated. Their final versions then side-exit
+   on every call: +3.2k exits per iteration on lobsters, +3.8k on shipit. This needs ZJIT to recompile invalidated
+   final versions (k0kubun's [#19617](https://github.com/ruby/ruby/pull/19617), Shopify/ruby#1039 row 19).
+
+YJIT gets the gain without changes: it already compiles `__send__(:sym)`, and `Hash#dup` drops from 1,296 to
+743 Ir per call.
+
+### Prototype
+
+On the fork, both based on master [`9f2e54518e`](https://github.com/ruby/ruby/commit/9f2e54518e) like the rest of
+this page:
+
+* **R:** [`thomasklemm/zjit-dup-ruby`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-dup-ruby)
+  ([`98505eed26`](https://github.com/thomasklemm/ruby/commit/98505eed26)), `kernel.rb` +38 and `object.c` +17
+  lines.
+* **R + #19583:** [`thomasklemm/zjit-dup-ruby-send`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-dup-ruby-send)
+  ([`57c03453e0`](https://github.com/thomasklemm/ruby/commit/57c03453e0)): R plus #19583's two commits, with
+  conflicts resolved against master's `lookup_cme` change. The control build P is the same #19583 commits without R.
+
+```ruby
+module Kernel                       # a separate module body (see below)
+  with_jit do                       # Z7_DUP_RUBY=1 also installs it in the interpreter, for pricing
+    undef :dup
+    def dup
+      Primitive.attr! :c_trace
+      return self if Primitive.cexpr!('RBOOL(special_object_p(self))')
+      copy = Primitive.rb_obj_dup_alloc_copy   # rb_obj_dup's allocation + init_copy (shape, ivars, flags)
+      copy.__send__(:initialize_dup, self)     # private: rb_funcall ignores visibility, __send__ is the Ruby spelling
+      copy
+    end
+
+    undef :initialize_dup
+    private def initialize_dup(orig)
+      Primitive.attr! :c_trace
+      initialize_copy(orig)
+      self
+    end
+  end
+end
+```
+
+* `Primitive.rb_obj_dup_alloc_copy` is the first half of `rb_obj_dup` (`rb_hash_alloc_copy` for `T_HASH`, else
+  `rb_obj_alloc(rb_obj_class(obj))`, then `init_copy`). It copies no singleton class and no frozen state. `rb_obj_dup`
+  stays as is for C callers and for the interpreter.
+* **Pitfall:** the definitions must live in their own `module Kernel` body. `kernel.rb` ends in `module_function`
+  scope, and a `with_jit` block runs later with that scope's visibility. The first build made `dup` a private module
+  function under `--zjit`.
+* **`clone` is not done.** It shares `init_copy`, but `initialize_clone` takes `freeze:` and the singleton class is
+  copied, so it is not free. It is 2–8k calls per iteration, against 19–60k for `dup`.
+
+### What changes, and what blocks
+
+[`obs.rb`](data/zjit-cfunc-paths/dup-in-ruby.tar.gz) prints 33 observations. Master gives the same output in the
+interpreter, under YJIT and under ZJIT. R gives the same output in all three modes (Ruby version active), and R in
+the interpreter without `Z7_DUP_RUBY` matches master. Differences from master:
+
+| Area | Master (C) | Ruby version | Precedent / verdict |
+| --- | --- | --- | --- |
+| TracePoint | `c_call`/`c_return` for `dup`, `initialize_dup`, `initialize_copy`, path = caller's file | `call`/`return` for `dup` and `initialize_dup` with path `<internal:kernel>`; `c_call initialize_copy` with path `<internal:kernel>` | same as `Array#each` under `--zjit` today (`[:call, :each, "<internal:array>"]`); `:c_trace` no longer changes events, only sets the basic flag |
+| `TracePoint#enable(target: Kernel.instance_method(:dup))` | `ArgumentError: specified target is not supported` | works | new capability |
+| `Method#source_location` | `nil` | `["<internal:kernel>", N]` | same as `Array#each` under a JIT |
+| `Method#parameters` of `initialize_dup` | `[[:req]]` | `[[:req, :orig]]` | cosmetic; owner and arity unchanged |
+| Backtrace / `caller` from inside `initialize_copy` | `…'Kernel#initialize_dup'`, `…'Kernel#dup'` | only `…'Kernel#dup'` | an internal frame called from an internal frame is dropped; all paths still show the caller's file and line |
+| Class that redefines `__send__` | `dup` unaffected | `dup` calls the user's `__send__` | the only semantic difference; Ruby already warns \"redefining '__send__' may cause serious problems\" |
+
+Identical in every mode: refinements of `initialize_copy`/`initialize_dup` in the caller (not applied, as with
+`rb_funcall`); special constants (Integer, Symbol, nil, true, Float, Bignum, Rational, Complex, dynamic Symbol);
+frozen receivers, which give unfrozen copies with their ivars; singleton methods and `extend`ed modules, which are
+not copied; chilled strings; a custom `self.allocate`, which is not called; T_DATA and builtin copy hooks (Time with
+offset, Random, Set, Struct, Data, Enumerator, Regexp, Range, UnboundMethod); Hash `default`, `default_proc`,
+`compare_by_identity`; Array subclasses; user `initialize_dup`/`initialize_copy` with `super`; `undef_method
+:initialize_dup` (same NoMethodError message); `method_missing`; a public `initialize_dup`; `super` from a user
+`dup`; a prepended `dup`; `clone`; `BasicObject` via `bind_call`; inside a Ractor; and Ractor-shareable receivers.
+
+**Tests:**
+
+* `test_object`, `test_clone`, `test_hash`, `test_array`, `test_settracefunc`, `test_refinement` and
+  `test_backtrace` in three configurations (interpreter with C `dup`, `--zjit-call-threshold=1`, and the Ruby
+  version forced into the interpreter): 1,204 tests, 36,816 assertions, 0 failures on both R and R + #19583.
+* ruby/spec `core/kernel/{dup,clone,initialize_dup,initialize_copy}_spec.rb`: 54 examples, 0 failures in each
+  configuration.
+* `make btest RUN_OPTS=--zjit-call-threshold=1` on R + #19583: PASS all 2,141.
+* None of these tests notices the differences in the table above.
+
+### Cost
+
+**Per call**, Callgrind Ir per call, net of the empty loop, 20,000 calls after warmup, call threshold 2. Master's
+repeat run gives identical numbers (±1).
+
+| `dup` of | master interp / YJIT / ZJIT | B (patch points) ZJIT | R interp¹ / YJIT / ZJIT | R + #19583 ZJIT |
+| --- | --- | ---: | --- | ---: |
+| `{a: 1, b: 2, c: 3}` | 1,487 / 1,296 / 1,309 | 643 | 1,889 / 743 / 1,555 | 742 |
+| `[1, 2, 3]` | 1,390 / 1,199 / 1,211 | 546 | 1,782 / 636 / 1,448 | 635 |
+| `Object.new` | 1,245 / 1,107 / 1,111 | 445 | 1,637 / 547 / 1,348 | 530 |
+| `String` (own `dup`, control) | 426 / 227 / 247 | 248 | 426 / 227 / 248 | 247 |
+
+¹ Ruby version forced into the interpreter (`Z7_DUP_RUBY=1`). Under `with_jit`, the interpreter keeps the C method
+and R gives master's numbers (1,487 / 1,390 / 1,245).
+
+**HIR**, R + #19583, `def d(x) = x.dup` with a Hash, call threshold 2. Everything is inlined into `d`:
+
+```
+PatchPoint MethodRedefined(Hash, dup)
+v42:HashExact = GuardType v12, HashExact recompile
+v50 = InvokeBuiltin <inline_expr>, v42                      # special_object_p
+v67 = InvokeBuiltin rb_obj_dup_alloc_copy, v42
+PatchPoint MethodRedefined(Hash, __send__)                   # #19583's rewrite
+PatchPoint NoSingletonClass(Hash)
+PatchPoint MethodRedefined(Hash, initialize_dup)
+v95:HashExact = GuardType v67, HashExact recompile           # the copy's type is not known statically
+PatchPoint MethodRedefined(Hash, initialize_copy)
+v122 = CCallWithFrame v95, :Hash#initialize_copy, v42
+```
+
+Without #19583 the same site keeps `Send v67, :__send__ … # Send: unsupported optimized method type Send`, and
+`initialize_dup` is compiled as a separate function whose `initialize_copy` call sees every receiver class in the
+app.
+
+The remaining ~100 Ir per call against B is the guard on the copy, which `rb_obj_dup_alloc_copy` could type as the
+receiver's class, and the inline frames for `dup` and `initialize_dup` (`vm_write_jit_frame` +34k per lobsters
+iteration).
+
+**Rails**, ruby-bench railsbench / lobsters / shipit, Callgrind, GC-excluded Ir per iteration (millions), two runs
+per build, harness as above. The master and B rows are the runs above (same builds, same orb):
+
+| Build | railsbench | lobsters | shipit | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| master, ZJIT | 4,828.1 / 4,822.5 | 3,271.0 / 3,273.3 | 3,777.2 / 3,774.8 | ≤ 0.12% |
+| B (patch points) | −0.68% | −0.50% | −0.90% | ≤ 0.15% |
+| R (Ruby `dup`, master ZJIT) | **+0.56%** | +0.06% | **+0.38%** | ≤ 0.14% |
+| P (master + #19583, control) | −0.66% | −0.42% | −0.59% | ≤ 0.09% |
+| R + #19583 | −1.42% | −0.50% | −0.01% | ≤ 0.20% |
+| *R + #19583 vs P (the `dup` effect)* | ***−0.76%*** | ***−0.08%*** | ***+0.58%*** | |
+| master, interpreter | 7,365.9 / 7,360.0 | 4,374.6 / 4,374.6 | 6,106.5 / 6,110.3 | ≤ 0.08% |
+| Ruby `dup` forced into the interpreter | **+0.54%** | **+0.25%** | **+0.45%** | ≤ 0.18% |
+
+**Why lobsters and shipit do not pay** (`--zjit-stats`, per iteration):
+
+| | master | B | P | R + #19583 |
+| --- | ---: | ---: | ---: | ---: |
+| lobsters `exit_patchpoint_method_redefined` | 382 | 382 | 382 | **3,624** |
+| lobsters `exit_patchpoint_no_singleton_class` | 0 | 0 | 0 | **492** |
+| shipit `exit_patchpoint_method_redefined` | 0 | 0 | 0 | **3,817** |
+| shipit dynamic sends | 1,709,365 | 1,709,365 | 1,686,572 | 1,734,553 |
+
+* **Where the exits are:** with `--zjit-trace-exits --zjit-trace-invalidation` on lobsters, the extra exits are
+  `PatchPoint(MethodRedefined(Hash, initialize_dup))` in the inlined `Kernel#dup` of
+  `ActionController::UrlFor#url_options` and `RouteSet#url_for`. A smaller set is `NoSingletonClass(Array)` in
+  `Relation#to_ary` and `build_join_buckets`.
+* **What invalidated them:** that CME was invalidated once, by `Module#append_features` under
+  `ActiveSupport::Concern#append_features` from `class Search` (lobsters `app/models/search.rb:2`, which includes
+  ActiveModel modules that define `initialize_dup`).
+* **Why it costs every iteration:** the invalidated versions are final and keep side-exiting into the
+  interpreter. On lobsters, the function diff against P shows the intended saving (`rb_funcallv_scope`, `vm_call0_*`,
+  `vm_push_frame`, `rb_obj_dup` −11 M per iteration), offset by `vm_exec_core` +3.9 M, `malloc` +2.1 M and frame
+  materialization.
+* **Why B does not hit it:** B guards the same two lookups, but its exit counts equal master's. That is plausibly
+  because its patch points sit in fewer compiled versions, but it was not verified.
+* **Shipit has the same signature, plus a second cost:** a trace shows the same
+  `MethodRedefined(Hash|Array, initialize_dup)` exits in `url_for`, `url_options` and `Relation#to_ary` (the
+  invalidations come from `ActiveSupport::Concern#append_features`). Where a `dup` call site is itself megamorphic
+  (`Relation#values`, `Journey::Format#evaluate`, `QueryCache#cache_sql`), `Kernel#dup` is not inlined. Its one
+  shared ISEQ then sees every receiver class, so its `__send__` is a megamorphic fallback and `initialize_dup`'s
+  `initialize_copy` is a polymorphic fallback: +48k dynamic sends per iteration against P. The C method has neither
+  problem, because it looks the hooks up per call.
+* **Not reproduced in isolation:** a standalone script that includes `ActiveModel::Validations` after compiling a
+  `dup` site does not exit, on any build. The mechanism above is observed in the traces, not reduced.
+
+### Which shape to propose
+
+Ruby `dup` under `with_jit`, after #19583, is the cleaner design:
+
+* no special case in ZJIT;
+* YJIT benefits too;
+* per call it comes within 15% of B.
+
+As measured today it does not pay on two of three Rails benchmarks, because inlining the hooks' patch points into hot
+callers makes them depend on recompiling invalidated code. Our proposal is:
+
+* land the Ruby version behind `with_jit` once #19583 is in;
+* re-measure it with #19617 (or another way to recompile invalidated final versions);
+* keep B as the fallback if ZJIT should not depend on that.
+
+### Reply draft for tekknolagi (not posted)
+
+> Tried it: `dup` in kernel.rb (alloc + `init_copy` as a Primitive, then `copy.__send__(:initialize_dup, self)`;
+> `initialize_dup` calls `initialize_copy`). It passes ruby/spec and the related test-all files; the visible changes
+> are those `Array#each` already has under a JIT, plus calling a user-redefined `__send__`. What stops it:
+>
+> 1. The interpreter must keep C (`with_jit`): +27% per call, +0.25–0.54% Rails Ir otherwise.
+> 2. It needs #19583 (`initialize_dup` is private). Then ZJIT inlines both into one monomorphic
+>    `CCallWithFrame Hash#initialize_copy` per site.
+> 3. Rails `include`s of modules defining `initialize_dup` invalidate those inlined patch points, final versions keep
+>    exiting, and non-inlined `dup` goes megamorphic.
+>
+> | Ir | master | patch points | Ruby + #19583 |
+> | --- | ---: | ---: | ---: |
+> | `{a:,b:,c:}.dup` | 1,309 | 643 | 742 |
+> | railsbench | | −0.68% | −0.76%¹ |
+> | lobsters / shipit | | −0.50% / −0.90% | −0.08% / +0.58%¹ |
+>
+> ¹ vs master+#19583. Ruby version once #19583 and recompiling invalidated versions land? Branch: thomasklemm/ruby
+> `zjit-dup-ruby-send`.
+
 ## Not done or not claimed
 
 * No wall-time claim, only instruction counts.
-* No YJIT comparison.
+* YJIT is compared only for the Ruby version (per call).
 * The stats build's fallback counter reads the call cache after the fallback returns. A call that raises is not
   counted, and the count is "reached a C method", not "would have inlined".
 * `Hash#key?` (next best, ~0.1–0.2%) is recorded, not built.
