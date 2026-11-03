@@ -64,6 +64,16 @@ Thomas: measure ZJIT on the Rails apps as well, and measure at the frontier (Rai
 interpreter + ZJIT allocations. ZJIT speed claims stay on ruby-bench with A/A. Rails changes made only for ZJIT need
 a 4.0.7 win of their own. New bets: F1 frontier census (20 apps on master), F2 our merged Rails PRs under ZJIT.
 
+## YJIT is in maintenance mode (2026-11-03)
+
+XrXr on [ruby#19664](https://github.com/ruby/ruby/pull/19664#pullrequestreview-5752852916): "YJIT is mainly in
+maintenance mode for bug fixes. For perf improvements we focus on ZJIT. This PR touches a high risk part of YJIT so
+we're unlikely to take it for the next release, as the onus of verification is high." YJIT performance and
+allocation PRs are therefore not expected to merge; YJIT gets bug fixes only. Thomas decides what happens to the
+open YJIT performance PRs. byroot on [ruby#19663](https://github.com/ruby/ruby/pull/19663#issuecomment-6604843888)
+suggested calling a C function that returns an initialized Hash (guarded against a redefined `Hash#initialize`)
+instead of sending `#initialize`; U1 builds that for the ZJIT twin #19662.
+
 ## JIT performance work targets ZJIT (2026-11-03)
 
 k0kubun on [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897): the team wants ZJIT
