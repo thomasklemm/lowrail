@@ -37,6 +37,10 @@ and not promoted.
    forwarding) over single-app hotspots; app numbers are supporting evidence
    across several apps, not the headline. Every PR gets an independent
    Thermos review (Codex: GPT-6 Astra for Ruby, GPT-6.1 Sol for Rails) first.
+   **Etiquette (2026-11-03):** never ask maintainers to merge, rerun or
+   review faster, even on approved PRs; many ruby/ruby contributors work
+   without agents and set their own pace. Comment only with new substance
+   (a fix, a review answer, evidence that a red job is unrelated when asked).
 3. **Stop:** new interpreter-Ir pricing, sealed-tier breadth, guarded
    endpoints, Rails 8.2 sealed re-certification before a beta, and further
    promotion of #22459 or its drafts.
