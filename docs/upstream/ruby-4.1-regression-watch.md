@@ -11,7 +11,7 @@ fewer objects and far fewer bytes than 4.0.7 and runs fewer instructions; the re
 | # | Finding | Modes | Reach | Bisected to | Existing report | Fix |
 | ---: | --- | --- | --- | --- | --- | --- |
 | 1 | `m(a: v, **h)` and zsuper with keywords allocate a second Hash | interp, YJIT, ZJIT | 94 of 97 workloads, all nine apps; median +9, mean +40 Hashes/op, max +394 objects/op | [`f01bf185f6`](https://github.com/ruby/ruby/commit/f01bf185f67ab13e626a270a510b0b37a59c6a0c) (ruby/ruby#18344) | none found | [`thomasklemm/kwsplat-fit-merge`](https://github.com/thomasklemm/ruby/tree/thomasklemm/kwsplat-fit-merge) @ [`e5e20a5207`](https://github.com/thomasklemm/ruby/commit/e5e20a52076396271de600e735d95716bfd2c086) |
-| 2 | Sparse large-slot heaps force `nofree` major GCs | interp, YJIT | 74–76 of 97 workloads run more GCs; majors +142% (interp) and +159% (YJIT), all GCs +39% and GC time +12% under YJIT | [`16da5f23c2`](https://github.com/ruby/ruby/commit/16da5f23c29b6b6e2c464a2f2e3c41e1aba99e1e) (ruby/ruby#16632) | none found; open ruby/ruby#17251 touches the same decision and does not fix it | [`thomasklemm/gc-pool-budget-slots`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget-slots) @ [`a06b86d852`](https://github.com/thomasklemm/ruby/commit/a06b86d8521df07b8a3327a6cc63b8b512e2f170) |
+| 2 | Sparse large-slot heaps force `nofree` major GCs | interp, YJIT | 74–76 of 97 workloads run more GCs; majors +142% (interp) and +159% (YJIT), all GCs +39% and GC time +12% under YJIT | [`16da5f23c2`](https://github.com/ruby/ruby/commit/16da5f23c29b6b6e2c464a2f2e3c41e1aba99e1e) (ruby/ruby#16632) | none found; open ruby/ruby#17251 touches the same decision and does not fix it | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ [`4b02fa55cb`](https://github.com/thomasklemm/ruby/commit/4b02fa55cbdd548d2aed0b28d8c17f2e112722e5) on master `9b30fd207f`, candidate (first version `a06b86d852`) |
 | 3 | No 320 B slot: objects needing 257–320 B (31–38 ivars) take 512 B, +60% | all | `ActiveRecord::ConnectionAdapters::QueryIntent` (31 ivars on a find) on every query: +1,753 B per workload | [`c9b7088364`](https://github.com/ruby/ruby/commit/c9b70883640e59bdd1f2f6a538957119cb558fac) (ruby/ruby#16282, deliberate size table) | none found; gap not discussed in the PR | lead, no fix (GC design) |
 | 4 | ZJIT: `f(*a, x)` into a rest parameter allocates one more Array than the interpreter | ZJIT only | `URI.parse` per request: Campfire +123 to +184 objects/op, Writebook up to +71 | predates ruby/ruby#18267; not a 4.0.7 → 4.1 regression | none found | lead, no fix |
 
@@ -315,6 +315,109 @@ below 4.0.7's, so they were not bisected (see Limits).
 
 **Checks on the fix build:** `make btest` (2,141 tests, PASS) and `make test-all` for `test_gc`, `test_gc_compact`,
 `test_objectspace`, `objspace`, `test_weakmap`, `test_hash`, `test_array`, `test_string`: 1,537 tests, 0 failures.
+
+**Sweep steps with the fix (2026-11-03, master `9b30fd207f`).** The fix was held back because a deterministic loop
+model predicted much larger lazy-sweep steps: pooled pages do not count toward a step's sweep budget, so a step in a
+large-slot heap keeps sweeping until it has pooled 1,024 slots. I measured the steps directly with a build of
+`b51db981f6` instrumented to time every `gc_sweep_step` and every sweep continuation triggered by allocation
+([`gcstep/gcstep.patch`](../../fixtures/corpus/ruby-41-watch/gcstep/gcstep.patch), not for upstream; the pool
+budget is chosen at run time by `RUBY_GC_POOL_MODE`, so both variants run the same binary). Census windows as above
+(1,000 requests per workload, 97 workloads in ten apps), master's byte pool budget against the fix:
+
+| | Interpreter, master | Interpreter, fix | YJIT, master | YJIT, fix |
+| --- | ---: | ---: | ---: | ---: |
+| Major GCs | 86 | 13 | 98 | 26 |
+| GC time (`GC.stat(:time)`) | 32.4 s | 27.6 s | 34.5 s | 26.6 s |
+| RSS growth per workload window | −2.1 MB | +1.2 MB | +0.6 MB | +2.3 MB |
+| Sweep pause per allocation, p99 / max | 2.17 / 23.1 ms | 2.25 / 24.6 ms | 1.97 / 22.9 ms | 2.21 / 23.8 ms |
+| One step in a heap of 512 B+ slots, p99 / max | 0.72 / 2.3 ms | 0.85 / 2.0 ms | 0.66 / 2.1 ms | 1.01 / 2.2 ms |
+| Pages in that step, p99 / max | 126 / 283 | 169 / 272 | 119 / 271 | 114 / 276 |
+
+A second round on seven of the apps repeats it (majors interpreter 54 → 13, YJIT 60 → 14; GC time −18% and −22%;
+pause p99 2.38 → 2.39 ms and 2.40 → 2.31 ms). The worst single app for step length is fizzy on MySQL: one step in the
+large-slot heaps went from 0.3 to 1.6–1.8 ms at p99, with its maximum unchanged at about 2 ms. The allocation pause
+users see is the sweep continuation; its p99 rises 4% (interpreter) and 12% (YJIT) and its maximum stays about the
+same (23 → 25 ms and 23 → 24 ms). The 6–9× of the loop model did not show up in these apps.
+
+Middle grounds, same run (interpreter / YJIT majors, eight and seven apps that all variants completed): pool twice
+the byte budget 56 / 56, at least two pages 42 / 31, 1,024 slots capped at eight pages 11 / 12, against 70 / 67 on
+master and 7 / 14 with the fix. The cap did not shorten steps consistently (pause p99 2.23 vs 2.10 ms interpreter, 2.29 vs
+2.48 ms YJIT; one large-slot step at p99 0.85 vs 0.85 ms and 0.88 vs 0.74 ms), and the doubled byte budget, which fixes the repro (4 majors), leaves most of the Rails majors. So
+the fix stays the plain 1,024-slot pool.
+
+ruby-bench (`73918b2`, 15 warm-up and 40 measured iterations, each variant run alone, one run each), master against
+the fix:
+
+| Benchmark, mode | Major GCs | GC time | Peak RSS | Sweep pause p99 / max |
+| --- | ---: | ---: | ---: | ---: |
+| railsbench, interpreter | 0 → 0 | 3.25 → 2.99 s | 105 → 107 MB | 1.62 → 1.82 / 2.4 → 5.7 ms |
+| lobsters, interpreter | 0 → 0 | 1.34 → 1.35 s | 288 → 269 MB | 0.87 → 1.00 / 1.3 → 1.3 ms |
+| shipit, interpreter | 25 → 6 | 3.48 → 2.77 s | 146 → 158 MB | 0.65 → 0.85 / 1.2 → 1.9 ms |
+| railsbench, YJIT | 1 → 0 | 3.01 → 2.98 s | 132 → 131 MB | 2.41 → 2.11 / 3.8 → 3.2 ms |
+| lobsters, YJIT | 0 → 0 | 1.38 → 1.28 s | 338 → 305 MB | 0.91 → 1.10 / 1.3 → 1.5 ms |
+| shipit, YJIT | 27 → 5 | 4.11 → 2.83 s | 193 → 210 MB | 0.66 → 0.85 / 1.1 → 1.8 ms |
+
+Railsbench and lobsters run at most one major GC on either build, so the fix changes little there; shipit has the
+regression and loses most of its majors for 12–17 MB more peak RSS. Sweep pauses grow by at most 0.3 ms at p99. The
+single 5.7 ms railsbench maximum is one pause and did not recur under YJIT.
+
+Method notes: the five variants first ran in parallel per app; apps that write shared state (Writebook, React starter
+kit, fizzy on MySQL under YJIT, ruby-bench lobsters' file cache) broke each other, so those were rerun one variant at a
+time against a freshly loaded database. A sqlite3 gem finalizer deadlock at process exit was killed after the JSON was
+written. Scripts: [`gcstep/`](../../fixtures/corpus/ruby-41-watch/gcstep/).
+
+**Rebased fix.** [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget)
+@ [`4b02fa55cb`](https://github.com/thomasklemm/ruby/commit/4b02fa55cbdd548d2aed0b28d8c17f2e112722e5), one commit on
+master `9b30fd207f` (2026-11-03); `gc-pool-budget-slots` stays as the record of the first version. On `9b30fd207f`
+the repro still runs 27–28 `nofree` majors (three runs) against 2 on 4.0.7, and 3 with the fix, whose 640 B heap
+ends at 24–29 pages. `test_gc`, `test_gc_compact` and `objspace` pass (206 tests, 0 failures, the same 10 skips as
+master), and `make btest` passes 2,141 tests. Candidate only: no ruby/ruby PRs open for now (DECISIONS, 2026-11-03).
+
+**Explanation for Thomas.** When Ruby sweeps lazily, each small sweep step puts some freed pages aside in a reserve
+(the pool) instead of handing them straight to allocation. Ruby 4.0 reserved 1,024 objects' worth per step in every
+heap; master reserves a fixed number of bytes, which in the heaps for big objects (640 and 768 bytes each, for example
+an Array of about 70 elements) is less than one page. Those heaps then stay at 5–6 pages, and when big objects survive
+a few GCs and then die, the GC finds too little free room there and runs a full major GC instead of growing the heap:
+27 times in the 40,000-iteration script, 2 times on 4.0.7. The fix puts back 4.0's 1,024-slot reserve and keeps
+master's byte-based sweep budget, so the reserve returns to a value 4.0 shipped with; the GC tests and btest pass. The
+cost is a bigger heap (a few MB per Rails process) and sweep steps in the big-object heaps that are somewhat longer at
+the 99th percentile, while the longest pauses stay the same.
+
+**Draft ruby/ruby body (not opened).**
+
+> On master, heaps with large slots (640 and 768 bytes) run many more full major GCs than on Ruby 4.0. I traced it to ruby/ruby#16632, which made both lazy-sweep budgets a number of bytes divided by the slot size. For the pool that each sweep step sets aside, this means 64 slots for 640-byte slots and 53 for 768-byte slots, less than one page. These heaps then stay small, sweeping finds too few free slots in them, and the GC runs a major GC with reason `nofree` instead of growing them. The script below keeps 70-element arrays (640-byte slots) alive across a few minor GCs. In 40,000 iterations it runs 2 major GCs on Ruby 4.0.7 and 27 to 28 on master.
+>
+> This PR keeps the byte budget for sweeping and pools 1,024 slots per step in every heap, as Ruby 4.0 did. The script then runs 3 major GCs.
+>
+> I measured it in ten open-source Rails apps on Rails main, over 97 workloads of 1,000 requests each, master against this branch. Major GCs went from 86 to 13 with the interpreter and from 98 to 26 with YJIT. Total GC time fell 15% and 23%. In ruby-bench, shipit went from 25 to 6 major GCs (interpreter) and 27 to 5 (YJIT), with 20% and 31% less GC time. Railsbench and lobsters run at most one major GC on either build and barely change.
+>
+> There are two costs. Memory: the 640-byte heap in the script ends with 24 to 29 pages instead of 5 or 6. The apps' resident memory grew 1.7 to 3.3 MB more per workload, and shipit's peak RSS rose 12 to 17 MB. Sweep steps: a single step in a large-slot heap takes longer, 19% (interpreter) and 53% (YJIT) at the 99th percentile, and up to 0.3 → 1.7 ms in one app. The sweep pause an allocation sees grew 4% and 12% at the 99th percentile, and the longest pause stayed at 23 to 25 ms. In ruby-bench that pause grew by at most 0.3 ms at the 99th percentile.
+>
+> ruby/ruby#17251 also changes when these heaps force a major GC. Rebased onto master, it reduces the majors in the script but does not remove them.
+>
+> <details><summary>Script</summary>
+>
+> ```ruby
+> # RING=200 BIG=70 N=40000 ruby bigslot.rb
+> keep = Array.new(300_000) { |i| i.even? ? "k#{i}" : [i] }
+> big = Integer(ENV.fetch("BIG", "90"))
+> ring = Array.new(Integer(ENV.fetch("RING", "300"))); pos = 0
+> iter = -> { 2000.times { |i| "s#{i}"; [i, i] }; ring[pos] = Array.new(big, 0); pos = (pos + 1) % ring.size }
+> 2000.times { iter.() }; GC.start
+> heap_of = -> { GC.stat_heap.values.find { |h| h[:slot_size] >= big * 8 + 16 } }
+> m0 = GC.stat(:major_gc_count)
+> by = Hash.new(0)
+> Integer(ENV.fetch("N", "20000")).times do
+>   m = GC.stat(:major_gc_count)
+>   iter.()
+>   by[GC.latest_gc_info(:major_by)] += 1 if GC.stat(:major_gc_count) != m
+> end
+> heap = heap_of.()
+> puts format("%s: %d major %p; %d B heap: %d pages", RUBY_VERSION, GC.stat(:major_gc_count) - m0, by,
+>   heap[:slot_size], heap[:heap_eden_pages])
+> ```
+>
+> </details>
 
 ## 3. No 320 B slot: objects of 257–320 B now take 512 B
 

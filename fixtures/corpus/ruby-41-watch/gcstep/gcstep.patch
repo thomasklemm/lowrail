@@ -1,0 +1,181 @@
+diff --git a/gc/default/default.c b/gc/default/default.c
+index ef05a0d1f1..5e856c50bd 100644
+--- a/gc/default/default.c
++++ b/gc/default/default.c
+@@ -5838,6 +5838,60 @@ gc_sweep_finish(rb_objspace_t *objspace)
+     gc_mode_transition(objspace, gc_mode_none);
+ }
+ 
++/* GCSTEP measurement instrumentation (not for upstream). */
++#include <time.h>
++#include <stdio.h>
++enum { GCSTEP_START, GCSTEP_LAZY, GCSTEP_REST, GCSTEP_MALLOC, GCSTEP_PAUSE = 8, GCSTEP_PAUSE_REST = 9 };
++struct gcstep_rec { uint64_t ns; uint32_t pages; uint32_t slots; uint32_t freed; uint16_t slot_size; uint8_t ctx; uint8_t heap; };
++static int gcstep_pool_mode = -1;   /* 0 bytes, 1 slots(1024), 2 2xbytes, 3 bytes but >= N pages */
++static int gcstep_min_pages = 2;
++static int gcstep_on = 0;
++static int gcstep_ctx = GCSTEP_START;
++static FILE *gcstep_fp;
++static uint32_t gcstep_cont_pages, gcstep_cont_slots, gcstep_cont_freed;
++static inline uint64_t gcstep_now(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t); return (uint64_t)t.tv_sec * 1000000000u + t.tv_nsec; }
++static void
++gcstep_init(void)
++{
++    const char *m = getenv("RUBY_GC_POOL_MODE");
++    gcstep_pool_mode = 0;
++    if (m) {
++        if (!strcmp(m, "slots")) gcstep_pool_mode = 1;
++        else if (!strcmp(m, "2xbytes")) gcstep_pool_mode = 2;
++        else if (!strncmp(m, "minpages", 8)) { gcstep_pool_mode = 3; if (m[8]) gcstep_min_pages = atoi(m + 8); }
++        else if (!strncmp(m, "slotscap", 8)) { gcstep_pool_mode = 4; if (m[8]) gcstep_min_pages = atoi(m + 8); }
++    }
++    if (getenv("GCSTEP_LOG") && getenv("GCSTEP_AUTO")) gcstep_on = 1;
++}
++static void
++gcstep_write(uint64_t ns, uint32_t pages, uint32_t slots, uint32_t freed, uint16_t slot_size, int ctx, int heap)
++{
++    if (!gcstep_on) return;
++    if (!gcstep_fp) {
++        const char *path = getenv("GCSTEP_LOG");
++        if (!path) { gcstep_on = 0; return; }
++        char buf[4096]; snprintf(buf, sizeof(buf), "%s.%d", path, (int)getpid());
++        gcstep_fp = fopen(buf, "ab");
++        if (!gcstep_fp) { gcstep_on = 0; return; }
++        setvbuf(gcstep_fp, NULL, _IOFBF, 1 << 20);
++    }
++    struct gcstep_rec r = { ns, pages, slots, freed, slot_size, (uint8_t)ctx, (uint8_t)heap };
++    fwrite(&r, sizeof(r), 1, gcstep_fp);
++}
++static VALUE
++gcstep_log_m(VALUE self, VALUE on)
++{
++    gcstep_on = RTEST(on) && getenv("GCSTEP_LOG");
++    if (!gcstep_on && gcstep_fp) { fclose(gcstep_fp); gcstep_fp = NULL; }
++    return on;
++}
++static VALUE
++gcstep_mode_m(VALUE self)
++{
++    if (gcstep_pool_mode < 0) gcstep_init();
++    return INT2FIX(gcstep_pool_mode);
++}
++
+ static int
+ gc_sweep_step(rb_objspace_t *objspace, rb_heap_t *heap)
+ {
+@@ -5846,6 +5900,17 @@ gc_sweep_step(rb_objspace_t *objspace, rb_heap_t *heap)
+     int pooled_slots = 0;
+     int sweep_budget = GC_INCREMENTAL_SWEEP_BYTES / heap->slot_size;
+     int pool_budget = GC_INCREMENTAL_SWEEP_POOL_BYTES / heap->slot_size;
++    if (gcstep_pool_mode < 0) gcstep_init();
++    if (gcstep_pool_mode == 1 || gcstep_pool_mode == 4) pool_budget = 1024;
++    else if (gcstep_pool_mode == 2) pool_budget *= 2;
++    else if (gcstep_pool_mode == 3) {
++        int page_slots = (int)(HEAP_PAGE_SIZE / heap->slot_size);
++        if (pool_budget < gcstep_min_pages * page_slots) pool_budget = gcstep_min_pages * page_slots;
++    }
++    int gs_pool_page_cap = gcstep_pool_mode == 4 ? gcstep_min_pages : INT_MAX;
++    int gs_pooled_pages = 0;
++    uint32_t gs_pages = 0, gs_slots = 0, gs_freed = 0;
++    uint64_t gs_t0 = gcstep_on ? gcstep_now() : 0;
+ 
+     if (sweep_page == NULL) return FALSE;
+ 
+@@ -5877,6 +5942,7 @@ gc_sweep_step(rb_objspace_t *objspace, rb_heap_t *heap)
+         };
+         gc_sweep_page(objspace, heap, &ctx);
+         int free_slots = ctx.freed_slots + ctx.empty_slots;
++        gs_pages++; gs_slots += sweep_page->total_slots; gs_freed += free_slots;
+         trigger_thread_unsafe_sweep_postponed_job = ctx.trigger_thread_unsafe_sweep_postponed_job;
+ 
+         RUBY_DTRACE_GC_HOOK(SWEEP_PAGE, ctx.page->slot_size, ctx.final_slots, ctx.freed_slots, ctx.empty_slots);
+@@ -5894,8 +5960,9 @@ gc_sweep_step(rb_objspace_t *objspace, rb_heap_t *heap)
+             heap->freed_slots += ctx.freed_slots;
+             heap->empty_slots += ctx.empty_slots;
+ 
+-            if (pooled_slots < pool_budget) {
++            if (pooled_slots < pool_budget && gs_pooled_pages < gs_pool_page_cap) {
+                 heap_add_poolpage(objspace, heap, sweep_page);
++                gs_pooled_pages++;
+                 pooled_slots += free_slots;
+             }
+             else {
+@@ -5930,12 +5997,19 @@ gc_sweep_step(rb_objspace_t *objspace, rb_heap_t *heap)
+     gc_prof_sweep_timer_stop(objspace);
+ #endif
+ 
++    if (gcstep_on) {
++        gcstep_write(gcstep_now() - gs_t0, gs_pages, gs_slots, gs_freed, (uint16_t)heap->slot_size, gcstep_ctx, (int)(heap - heaps));
++        gcstep_cont_pages += gs_pages; gcstep_cont_slots += gs_slots; gcstep_cont_freed += gs_freed;
++    }
++
+     return heap->free_pages != NULL;
+ }
+ 
+ static void
+ gc_sweep_rest(rb_objspace_t *objspace)
+ {
++    int gs_saved_ctx = gcstep_ctx;
++    gcstep_ctx = GCSTEP_REST;
+     for (int i = 0; i < HEAP_COUNT; i++) {
+         rb_heap_t *heap = &heaps[i];
+ 
+@@ -5949,7 +6023,7 @@ gc_sweep_rest(rb_objspace_t *objspace)
+      * gc_sweep_start asserts.  If every heap is swept out, settle it to none here. */
+     if (gc_mode(objspace) != gc_mode_none && !has_sweeping_pages(objspace)) {
+         gc_sweep_finish(objspace);
+-    }
++    }    gcstep_ctx = gs_saved_ctx;
+ }
+ 
+ static void
+@@ -5959,6 +6033,10 @@ gc_sweep_continue(rb_objspace_t *objspace, rb_heap_t *sweep_heap)
+     if (!GC_ENABLE_LAZY_SWEEP) return;
+ 
+     gc_sweeping_enter(objspace);
++    uint64_t gs_t0 = gcstep_on ? gcstep_now() : 0;
++    int gs_rest = 0;
++    gcstep_cont_pages = gcstep_cont_slots = gcstep_cont_freed = 0;
++    gcstep_ctx = GCSTEP_LAZY;
+ 
+     for (int i = 0; i < HEAP_COUNT; i++) {
+         rb_heap_t *heap = &heaps[i];
+@@ -5983,6 +6061,7 @@ gc_sweep_continue(rb_objspace_t *objspace, rb_heap_t *sweep_heap)
+             }
+             else {
+                 /* Not allowed to create a new page so finish sweeping. */
++                gs_rest = 1;
+                 gc_sweep_rest(objspace);
+                 GC_ASSERT(gc_mode(objspace) == gc_mode_none);
+                 break;
+@@ -5990,6 +6069,8 @@ gc_sweep_continue(rb_objspace_t *objspace, rb_heap_t *sweep_heap)
+         }
+     }
+ 
++    if (gcstep_on) gcstep_write(gcstep_now() - gs_t0, gcstep_cont_pages, gcstep_cont_slots, gcstep_cont_freed, 0, gs_rest ? GCSTEP_PAUSE_REST : GCSTEP_PAUSE, 255);
++    gcstep_ctx = GCSTEP_START;
+     gc_sweeping_exit(objspace);
+ }
+ 
+@@ -6003,10 +6084,12 @@ gc_sweep_step_for_malloc(rb_objspace_t *objspace)
+ 
+     gc_sweeping_enter(objspace);
+ 
++    gcstep_ctx = GCSTEP_MALLOC;
+     for (int i = 0; i < HEAP_COUNT; i++) {
+         rb_heap_t *heap = &heaps[i];
+         gc_sweep_step(objspace, heap);
+     }
++    gcstep_ctx = GCSTEP_START;
+ 
+     gc_sweeping_exit(objspace);
+ 
+@@ -13666,6 +13749,8 @@ rb_gc_impl_init(void)
+     /* internal methods */
+     rb_define_singleton_method(rb_mGC, "verify_internal_consistency", gc_verify_internal_consistency_m, 0);
+ 
++    rb_define_singleton_method(rb_mGC, "__step_log", gcstep_log_m, 1);
++    rb_define_singleton_method(rb_mGC, "__pool_mode", gcstep_mode_m, 0);
+ #if MALLOC_ALLOCATED_SIZE
+     rb_define_singleton_method(rb_mGC, "malloc_allocated_size", gc_malloc_allocated_size, 0);
+     rb_define_singleton_method(rb_mGC, "malloc_allocations", gc_malloc_allocations, 0);

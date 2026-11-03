@@ -200,7 +200,7 @@ module RailsMainCensus4
     heap = GC.stat.slice(:heap_allocated_pages, :heap_live_slots, :old_objects, :malloc_increase_bytes,
       :oldmalloc_increase_bytes).merge(rss_kb: File.read("/proc/self/statm").split[1].to_i * 4)
     callgrind = callgrind_window(run) if defined?(LowrailCallgrindBench)
-    gc_long = gc_window(run, Integer(ENV["CENSUS_GC_OPS"])) if ENV["CENSUS_GC_OPS"]
+    gc_long = gc_window(run, Integer(ENV["CENSUS_GC_OPS"]), op.name) if ENV["CENSUS_GC_OPS"]
     count = Integer(ENV.fetch("CENSUS_REQUESTS", "10"))
     GC.start
     ObjectSpace.trace_object_allocations_clear
@@ -252,8 +252,11 @@ module RailsMainCensus4
 
   # One long GC-enabled window: collector runs, heap growth and retained
   # out-of-slot memory per operation, which the 20-operation windows rarely see.
-  def gc_window(run, ops)
+  # GCSTEP_LOG needs a Ruby built with fixtures/corpus/ruby-41-watch/gcstep/gcstep.patch.
+  def gc_window(run, ops, workload = nil)
     GC.start
+    step_log = ENV["GCSTEP_LOG"] if GC.respond_to?(:__step_log)
+    GC.__step_log(true) if step_log
     keys = %i[count minor_gc_count major_gc_count time total_allocated_objects heap_allocated_pages heap_live_slots
       oldmalloc_increase_bytes]
     before = GC.stat.slice(*keys)
@@ -271,6 +274,11 @@ module RailsMainCensus4
       ops.times { run.call }
     end
     after = GC.stat.slice(*keys)
+    if step_log
+      GC.__step_log(false)
+      log = "#{step_log}.#{Process.pid}"
+      File.rename(log, "#{step_log}-#{workload.to_s.gsub(/[^\w.-]/, "_")}.bin") if File.exist?(log)
+    end
     keys.to_h { [_1, after[_1] - before[_1]] }.merge(ops: ops, latest_gc_by: GC.latest_gc_info(:gc_by),
       major_by: major_by, forced_major_by_slot: forced&.call&.to_h { |s, n| [s, n - forced_before.fetch(s, 0)] },
       heaps: (GC.stat_heap.to_h { |_, h| [h[:slot_size], h.slice(:heap_eden_pages, :heap_free_slots, :heap_live_slots)] } if forced),
