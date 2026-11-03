@@ -303,3 +303,132 @@ helpers (`*_path`/`*_url` of a booted named route on a class that includes
 live in an anonymous module. Rerunning v2 fixes c14 (strict 85.37% / 63.64%),
 while w14 stays an abstention: `book_slug_url` comes from `direct`, not the
 route table. v2 is no longer a held-out measure for this change.
+
+## Held-out v3 on public apps (2026-11-03)
+
+v2 is in-sample after the changes above, so a separate agent wrote 40 new
+questions on two other public apps and froze them before any code change:
+Fizzy `6f1d200` (with `fixtures/corpus/fizzy.patch`) and Lobsters `366e211`
+(`.ruby-version`/lock pinned to Ruby 4.0.7, as in the census-4 overlay;
+`database.yml.sample` copied). SHA-256
+`d7ad9a59d324aea1aba0de41757bf15c074513e51b75e868182031f69e1cb9fd`, seed
+`20261103`, same per-app strata as v2. Ground truth comes from app, Rails and
+gem source. Eight questions are marked uncertain (f03, f06, f07, f14, f16,
+l05, l06, l14). Departures were recorded before evaluation:
+- Lobsters has no `collection:` renders, so its collection stratum became
+  "partial rendered inside an `each`".
+- The respond_to stratum drew `HomeController#params` (l14).
+- The dynamic-partial pool misses `events/_event`.
+
+Inputs, results and the writer's receipts stay outside Git.
+
+The changes, written from the v2 gaps only:
+- **Callers, constants in blocks:** callers resolve constant receivers inside
+  blocks (constant lookup is lexical) and attribute them to the enclosing
+  def. A relative constant names the top-level one only when no enclosing
+  scope or ancestor of the innermost scope has it booted or as an
+  autoloadable file; otherwise the call stays unresolved.
+- **Callers, concern methods:** a queried module method (a concern, a
+  `ClassMethods` module) is reported through each class that includes or
+  extends it (`via`).
+- **Callers, core iterators:** blocks of core iterators (`tap`, `each`,
+  `map`, `gsub`, …) on an explicit non-self receiver keep the caller's self.
+  An implicit-self `each` may be an app DSL and stays unresolved.
+- **Callers, `direct` helpers:** helpers from `direct` resolve through the
+  booted route helper modules.
+- **`view_locals`:** follows partial layouts (`render layout: "x",
+  locals:`). It also follows `render @records` when every sampled relation
+  class names the same model.
+- **Sampled positional parameters:** gain a nil arm only where a resolved
+  call site passes a value whose type has one. Call sites are method bodies
+  re-walked after observations, or templates calling a uniquely owned app
+  helper with an incoming render's locals. The provenance names the site.
+  Nothing feeds the static fixpoint, and this is no blanket `| nil`.
+
+Implementation commit `e39898b`, binary SHA-256 `4ec2ed32…`; baseline
+`origin/main` `206a2fc`, binary `d8fa11c6…`. Observations used
+`LOWRAIL_OBSERVE_TYPES_ONLY=1 lowrail observe APP --samples 16`, seed 1379:
+- **Fizzy:** `bin/rails test`, 124 runs, **7 errors**: `Current.reset_all`
+  under the Rails 8.1.4 overlay.
+- **Lobsters:** `rspec`, 927 examples, **1 failure**: an order-dependent
+  duplicate banned domain in `submit_story_spec.rb:178`.
+
+These are partial observations. They were kept rather than rerun until
+green. Each binary answered v3 once, after the commit; nothing changed
+afterwards.
+
+### v3, held-out
+
+| Run | Precision | Recall | TP/FP/FN | exact / wrong / abstained |
+|---|---:|---:|---|---|
+| before, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+| after, no observations | 100% | 61.19% | 41/0/26 | 19 / 1 / 20 |
+| before, observed | 96.08% | 73.13% | 49/2/18 | 27 / 4 / 9 |
+| **after, observed** | **96.43%** | **80.60%** | **54/2/13** | **30 / 3 / 7** |
+
+Strict string scoring. The `(T | nil)`/`T?` equivalence gives the same
+numbers on v3, because no answer differs only in spelling. "Wrong" includes
+partial caller and local sets with no false fact.
+
+**Fixed:**
+- f15: a call inside a `tap`/`each` block.
+- l15: a call inside an iterator block.
+- f18: `render @buckets` over sampled relation arms.
+
+**Remaining wrong answers:**
+- f03 (uncertain): `Bubble`, expected `Bubble?`. The sampled return has no
+  source nil path.
+- l05 (uncertain): `Array[(Array[untyped] | bool)]`; the member is unknown.
+- l17: misses `linking_comments`, which a controller passes with
+  `render partial:`.
+
+**Abstentions:**
+- f05, f06: methods of an association extension module.
+- f12, f16, l12: receivers are association proxies, ivars or block
+  parameters.
+- f19: `render bubble.messages` on a partial local.
+- l19: a render hash built in the controller (`render @above`).
+
+### v2, in-sample
+
+| Run | Strict precision / recall | TP/FP/FN | `T?` equivalence |
+|---|---|---|---|
+| before (`206a2fc`), no observations | 100% / 52.73% | 29/0/26 | 100% / 52.73% |
+| after, no observations | 100% / 63.64% | 35/0/20 | 100% / 63.64% |
+| before (`206a2fc`), observed | 85.37% / 63.64% | 35/6/20 | 90.24% / 67.27% |
+| **after, observed** | **88.00% / 80.00%** | **44/6/11** | **96.00% / 87.27%** |
+
+**Fixed:**
+- c12, c16: `ClassMethods` targets.
+- c17: `render layout:`.
+- w14: `direct`.
+- w15: a block-only caller.
+- w19: `render @books`.
+- c07, w06: parameter nils. c07 comes from a template local bound to an
+  enum reader; w06 from a caller's local assigned from a method with a nil
+  path.
+
+c07 and w06 now answer `(String | nil)` and `(Array[String] | nil)`. Strict
+scoring still counts them as wrong, as it does w01 and w03; the
+equivalence counts all four as correct.
+
+**Not changed, and why:**
+- **w02:** an around callback's `yield` returns `false` only when a `before`
+  callback nested inside it halts. Leaf's booted create chain has no
+  `before` callbacks, and Leaf has no subclasses, so the yield returns the
+  record id. The uncertain ground truth `(Integer | false)` is not encoded.
+- **w07:** the caller passes `leaf.leafable.body.content` through a
+  delegated type. Its ground truth is uncertain (NOT NULL column).
+- **w12, w16:** receivers are an association proxy (`user.sessions`) and an
+  ivar set in a concern's callback. Typing them would need certified
+  cross-callback flow (invariant 6), so these stay abstentions.
+- **c05, c09, w04:** returns without evidence; outside this change.
+- **Spelling:** sampled unions keep the `(T | nil)` spelling that the
+  existing tests and slot census use. Switching single-arm unions to `T?`
+  would change only strict string matches, not contracts.
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed, including the
+real-blog stdio round trip. Both new tests fail on `206a2fc`. `git diff
+--check` is clean. The Lobsters checkout carries an AGENTS.md asking agents
+not to contribute code to Lobsters. It was only read and observed as a
+corpus app, as in the census.
