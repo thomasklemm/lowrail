@@ -163,14 +163,68 @@ ZJIT, against 33 on 4.0.7, so the extra 2 come from master, not ZJIT.
 
 ## New leads from the lead 7 build (2026-11-03)
 
-Found while building lead 7 (thomasklemm/ruby `thomasklemm/zjit-forward-block-param` @ `bde4e2acc6`, on master
+Found while building lead 7 (thomasklemm/ruby `thomasklemm/zjit-forward-block-param` @ `ab21c5458b`, on master
 `a8b095a07e`). ruby-bench per iteration, 15 warmup + 10 measured, 0 `compile_error_out_of_memory`. Nothing posted.
 
 | lead | fallback / exit | repro or site | counts | status |
 |---|---|---|---|---|
-| 7b `&block` forwarding at sites that see both nil and the proxy | `send_fallback_send_block_arg_not_nil` | `_read_attribute(name, &block)` (activerecord 8.1.1 read.rb:39), called with and without a block; `def ra(n, &b) = inner(n, &b)` called both ways | after lead 7: lobsters 72.6k, shipit 95.0k per itr left (railsbench 50.9k, sites not traced). Rails main removed this block, so app counts are smaller | Patch shape: branch on nil vs. proxy instead of a guard (`split_nil_block_arg` in k0kubun's `93e4e7d69c`, Shopify/ruby#1039 row 7, **assigned to k0kubun**). Taken in that sense; ask first |
+| 7b `&block` forwarding at sites that see both nil and the proxy | `send_fallback_send_block_arg_not_nil` | `_read_attribute(name, &block)` (activerecord 8.1.1 read.rb:39), called with and without a block; `def ra(n, &b) = inner(n, &b)` called both ways | after lead 7: lobsters 72.6k, shipit 95.0k per itr left (railsbench 50.9k, sites not traced). Rails main removed this block, so app counts are smaller | Patch shape: branch on nil vs. proxy instead of a guard (`split_nil_block_arg` in k0kubun's `93e4e7d69c`, Shopify/ruby#1039 row 7, **assigned to k0kubun**). Taken (row 7 assignee counts as a claim, DECISIONS 2fa718c) |
 | 7c recompiling guards on skewed profiles keep exiting | side exits of a `recompile` guard after the version budget is spent | First draft of lead 7 guarded the proxy also on `SkewedPolymorphic` profiles: lobsters 8,902 and shipit 7,859 `exit_block_arg_not_block_param_proxy` per itr, all in `_read_attribute` (traced) | the shipped version guards only monomorphic profiles: 0 / 77 per itr | Free, **unmeasured** in general: whether other skewed `GuardType`/`GuardBitEquals ... recompile` sites behave the same on the apps. Related to ruby/ruby#19617 (k0kubun, PatchPoint only) |
 | 7d inline callees that receive the forwarded block handler | none (missed inlining, not a fallback) | `SendDirect ..., &vN` with `BlockParamProxy` is not inlined; `mon_synchronize(&b)` → `Monitor#synchronize` | **unmeasured** | Free: Shopify/ruby#1039 row 44 (`e89844f878`, unassigned) |
+
+## Lead 7: our unopened build and its numbers (2026-11-03)
+
+Taken (Shopify/ruby#1039 row 7, k0kubun); kept for reference, no PR and no comment. thomasklemm/ruby
+[`thomasklemm/zjit-forward-block-param`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-forward-block-param)
+@ `ab21c5458b`, one commit on master `a8b095a07e`, +124/−16 in 6 files (production code about +35 lines).
+
+**What it does.** When a `foo(&b)` block argument profiles **monomorphically** as `rb_block_param_proxy`, it adds
+`GuardBitEquals proxy` (recompile; new exit `block_arg_not_block_param_proxy`), loads the LEP's specval and passes it
+as a new `BlockHandler::BlockParamProxy` to `SendDirect`. This is what `vm_caller_setup_arg_block` does for the proxy.
+The inliner skips such sends. Smaller than k0kubun's `93e4e7d69c`: no nil/proxy branch split, no inlining.
+
+**Skewed-profile finding (lead 7c).** A first draft also guarded `SkewedPolymorphic` profiles. In
+`_read_attribute(name, &block)` (activerecord 8.1.1 read.rb:39), which sees both nil and the proxy, the guard exited
+after the recompile budget was spent: `exit_block_arg_not_block_param_proxy` 8,902 (lobsters) and 7,859 (shipit) per
+iteration, all at that site (traced with `--zjit-trace-exits`). Restricting it to monomorphic profiles brought this
+to 0 and 77. Side exits are otherwise unchanged.
+
+**Fallbacks**, ruby-bench `73918b2`, per iteration, 15 warmup + 10 measured, `--zjit-stats-quiet`, 0
+`compile_error_out_of_memory`:
+
+| | `send_block_arg_not_nil` | `dynamic_send_count` |
+|---|---:|---:|
+| railsbench | 120,000 → 50,850 | 1,065,952 → 996,802 |
+| lobsters | 95,135 → 72,593 | 750,337 → 728,762 |
+| shipit | 201,312 → 95,008 | 1,709,368 → 1,604,077 |
+
+What remains on lobsters is mostly `_read_attribute` (lead 7b). Census apps were not rerun.
+
+**Callgrind**, Ir per iteration with GC (15 warmup, 3 measured, `ruby_bench_callgrind.rb`):
+
+| | master | branch |
+|---|---:|---:|
+| railsbench | 4,936.7 / 4,938.3 M | 4,901.6 / 4,908.0 M (−0.67%) |
+| lobsters | 3,271.6 / 3,298.0 M | 3,262.1 / 3,260.5 M (−0.3% to −1.1%; master A/A 0.8%) |
+| shipit | 3,954–4,040 M (4 runs) | 3,896–3,985 M (4 runs): within noise, both builds bimodal |
+
+Lobsters runs must not share a checkout concurrently: two parallel runs raced on `tmp/cache` (`Errno::ENOENT` in
+`rename`) and were rerun in sequence.
+
+**Per call** (Callgrind, `--zjit`, 100k calls, A/A identical): `def fwd(&b) = callee(&b)` with `def callee = yield`
+1,003 → 748 Ir; `def mon(&b) = M.synchronize(&b)` with a Monitor 1,947 → 1,418 Ir.
+
+**Checks:**
+- `make zjit-test`: 1943/1943 pass.
+- btest at `--zjit-call-threshold=1`: 2141/2141 pass.
+- test-all at threshold 1 (proc, method, yield, iterator, refinement, settracefunc, call, lambda, enumerator, syntax,
+  monitor, thread_queue, zjit_cli): 1036 tests, 0 failures.
+- A differential script (block identity, `lambda?`, Method objects, Symbol and nil blocks, reassigned block params,
+  nested blocks, Monitor/Mutex, break/return/raise, Enumerable, refinements, TracePoint) matches the interpreter at
+  thresholds 1, 2 and 5.
+
+`test/ruby/test_zjit.rb` no longer exists on master (ported to `zjit/src/codegen_tests.rs`; the rest is
+`test_zjit_cli.rb`). Only the three updated HIR snapshots fail without the change.
 
 ## Lead 10: the receiver class
 
