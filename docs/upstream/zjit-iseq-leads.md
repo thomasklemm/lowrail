@@ -140,6 +140,8 @@ ruby-bench is per iteration (railsbench / lobsters / shipit).
 | 17 `throw` from blocks and exception handlers unwind by longjmp and materialize frames | Shopify/ruby#1093 (k0kubun, TAG_RETURN/TAG_BREAK), ruby/ruby#18244 (luke-gruber, draft, `throw`), ruby/ruby#18759 (rafaelfranca, exception handlers). Gap: 15.6 / 5.3 / 13.2 M Ir in `zjit_materialize_frames` alone |
 | 19 `PushInlineFrame` costs ~21 Ir per inlined call | nirvdrum, Shopify/ruby#1023 "Virtual Inline Frames" (assigned); Shopify/ruby#1008. Not a gap against YJIT (a YJIT call is ~19 Ir plus `leave`); 92 / 33 / 76 M Ir of ZJIT code |
 | 11 attr_reader/getivar on shape-polymorphic receivers without a shape profile | tekknolagi: ruby/ruby#18616 (open draft, "Seed polymorphic type branches with shape data too") branches on every profiled shape of an arm's class, which is what remains after his ruby/ruby#19443 (open, approved; one shape per class). Shopify/ruby#1039 rows 77/78 (unassigned) port the same fix on k0kubun's branch. Found 2026-11-03 in the [lead 11 follow-up](zjit-yjit-gap.md#lead-11-why-there-is-no-profile). Gap: 12.4 / 30.8 / 83.9 M Ir; about 11 / 24 / 59 M remain after #19443 |
+| 12 cfunc calls with a frame (40 Ir per call against YJIT's 30) | k0kubun: Shopify/ruby#1030 (assigned) links a "send_cfunc_block" patch series. It contains `5a370e8571` "Don't spill consumed receiver and args on C calls with a frame", `9e4bb54cb6` "Don't move SP/CFP registers around C calls with a frame", and fixes for result moves, local respills and the `cfp->sp` lea. Found 2026-11-03 during the lead 14 check; this replaces the parked "waits for ruby/ruby#18960" and "free, owner must confirm" statuses. Gap: 22.7 / 10.3 / 14.4 M Ir |
+| 14a/14b `&block` param passed to a C method (`fetch_header`, `each_value(&block)`, `bsearch_index(&block)`) and `(*args, &block)` passed to an ISEQ (`render` → `_normalize_render` → `_normalize_args`) | Waits for #1039 row 7 (k0kubun): both need its block-param-proxy reduction. Row 42 (`fd713176a1`, unassigned) is the C-call follow-up. Gap: 5.3 / 0.7 / 0.1 M Ir |
 
 **Free, ranked**
 
@@ -153,16 +155,17 @@ average price per call, so they are estimates.
 |---|---|---|---|---|
 | 1 | 3 class-polymorphic sends to one method entry: class-level methods on model classes (`attribute_types` in `_load_from_sql`, `current_shard`/`current_role`, `_reflections`) and instance-level `self` attr_readers shared by many subclasses (`Type::Value#hash`/`#cast`, `association`) | 7.2 / 42.1 / 180.1 (4% / 24% / 29%) | 10, 325 | Largest free item on lobsters and shipit. Shopify/ruby#1099 item 2, no assignee; slot granted. Includes lead 2's 6.6 M on shipit. Design-heavy (method-entry-keyed guard; YJIT handles these sites with its class-guard chain). |
 | 2 | 13 `rb_zjit_root_mark` marks every JITFrame's ISEQ on every GC | 25.4 / 6.7 / 37.1 (14% / 4% / 6%) | unmeasured | No issue or PR. Small, self-contained. Scales with GC count and JITFrames (38k / 150k / 119k). |
-| 3 | 12 cfunc calls with a frame cost 40 Ir per call against YJIT's 30 (whole call sequence) | 22.7 / 10.3 / 14.4 (12% / 6% / 2%) | unmeasured | Mechanism confirmed on the hot sites, and resized from 48 / 22 / 35 ([zjit-yjit-gap, Lead 12](zjit-yjit-gap.md#lead-12-what-a-cfunc-call-with-a-frame-costs)). Free parts: dead receiver/argument spills (4.9 / 2.2 / 3.7 M) and the SP/CFP register switch (6.3 / 2.9 / 5.0 M), with no issue, PR or #1039 row. The dead-store fix edits lines that XrXr's ruby/ruby#18960 rewrites; ask him first. Taken or tracked parts: locals spill (#18960), callee-saved registers (#1039 row 58), cfp->sp (#1039 row 69). Small. |
-| 4 | 14 `&block` passed to a C method (`Rack::Request#fetch_header` → `@env.fetch(name, &block)`) and other `one_or_more_complex_arg_pass` | 19.5 / 6.1 / 13.1 (11% / 3% / 2%) | –, 421 | Shopify/ruby#1039 row 42 ("&blk to C"), unassigned. `fetch_header` alone is 11.4 M on railsbench. Small to medium. |
-| 5 | 15 getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`: `block in fetch_value`, `Logger#level`/`level_override`, `stale_state`) | 3.9 / 7.8 / 24.0 (2% / 4% / 4%) | 10, 1,662 | Shopify/ruby#1099 pattern 3 (receivers recorded as "other" since ruby/ruby#19540), no assignee. |
-| 6 | 2 `BasicObject#!=` (polymorphic inner `==`) | 0 / ~1 / 6.6 (in lead 3's total) | 10, 277 | Rides on lead 3 or general polymorphic-send work. |
+| 3 | 15 getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`: `block in fetch_value`, `Logger#level`/`level_override`, `stale_state`) | 3.9 / 7.8 / 24.0 (2% / 4% / 4%) | 10, 1,662 | Shopify/ruby#1099 pattern 3 (receivers recorded as "other" since ruby/ruby#19540), no assignee. |
+| 4 | 14c ISEQ callees with `**rest`, including `def m(a, ...)` (`Relation.create(self)` → `def create(model, ...)`, `AssociationRelation#initialize(klass, association, **)`) | 0.7 / 1.0 / 5.1 | –, 21.5k `complex_arg_pass_param_kwrest` per shipit iteration | Measured +314 to +405 Ir per call against YJIT. Shopify/ruby#1039 rows 36 (`2ac995c680`) and 43 (`29903d645e`) have no assignee, and there is no PR or issue. Medium: keyword planning plus the callee's hidden `kw_bits` argument. See [Lead 14](zjit-yjit-gap.md#lead-14-what-one_or_more_complex_arg_pass-really-costs). |
+| 5 | 2 `BasicObject#!=` (polymorphic inner `==`) | 0 / ~1 / 6.6 (in lead 3's total) | 10, 277 | Rides on lead 3 or general polymorphic-send work. |
+| 6 | 14d a `nil` `&blk` passed to a C method (HWIA `update_with_single_argument` → `regular_update(other_hash, &block)`) | 0.8 / 0.04 / 0.03 | – | Exact: guard and strip, as the ISEQ path already does. A few lines; part of #1039 row 42 (unassigned). Saves about 210 Ir per call. |
 | 7 | 10 `singleton_class_seen` for module receivers (`IndexedRow::Mutable#fetch` → `UNSET.equal?`) | 0 / 0.2 / 0.1 | 6, 431 | Matters on Rails main (lobsters census 1,220 per op), not on ruby-bench's Rails 8.1. Builds on linyiru's open ruby/ruby#19658. Small. |
 | 8 | 16 PatchPoint nop padding executed inline | 31.7 / 14.0 / 27.9 Ir of nops | unmeasured | Ir overstates it: nops are cheap in cycles. Measure cycles before acting. |
 | 9 | 18 `with_vm_lock` → `rb_gc_disable()` → `gc_rest()` on every invalidation, e.g. each `extend` (297 per shipit iteration) | Ir-neutral (moves 114 M of shipit GC into the call) | unmeasured | Wall-time and pause effect only, unmeasured. The comment in zjit/src/cruby.rs explains why GC must be off under the lock, so a change needs care. |
 | new | 20 literal `super { … }`: every `super` with its own block stays a dynamic send (`send_fallback_super_call_with_block`); hir.rs has the TODO "pass Option<blockiseq> to build_send_direct_args when we start specializing `super { ... }`" | unmeasured | unmeasured | 4.0k / 0.4k / 1.9k | Found while building lead 8 (counts from master a8b095a07e, `--zjit-stats` with 512/1024 MiB, 0 OOM, 10 warmup + 10 measured iterations). Sites not identified yet. No issue and no open ruby/ruby PR; not checked against Shopify/ruby#1039's rows. Free. |
 | new | 8b pass the frame's block to the super callee instead of the dynamic super that the lead 8 fix uses for these sites | unmeasured | unmeasured | 2.1k / 0.3k / 0.06k sites become direct sends | A measurement prototype ([thomasklemm/ruby `zjit-super-block-pass`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-super-block-pass)) adds a `BlockHandler::FrameBlock` variant and doesn't inline such sends. On the Shopify/ruby#1100 repro, Ir per call is 1,090 on master, 942 with the lead 8 fix and 555 with the prototype; ruby-bench Ir per iteration stays within the A/A (railsbench ±0.07%, lobsters ±0.11%, shipit −0.21%/+0.07%; callgrind, 10 warmup + 5 measured iterations, two runs each). A cfunc super target with a block stays dynamic (about 40 per lobsters iteration). Free, follows lead 8. |
 
+Lead 12 left the free list (k0kubun, Shopify/ruby#1030; see Taken). Lead 14 is split into 14a–14d: 14c and 14d are free and ranked, 14a/14b wait for row 7, and splat or keyword arguments to C methods are not a gap (ZJIT is already cheaper than YJIT there).
 Lead 11 left the free list too: the draft ruby/ruby#18616 is an open PR for it (see Taken).
 Lead 7 left the free list: it is Shopify/ruby#1039 row 7, assigned to k0kubun (see Taken). Its measured gap stays
 29.4 / 25.1 / 66.0 M Ir. U3's literal-`super { }` lead is numbered 20 here, because Z13 numbered its leads 11–19.
@@ -224,7 +227,9 @@ Shopify/ruby issues and ruby/ruby PRs (`CCallWithFrame`, `cfunc frame`, `root_ma
   * `argv` copied to the C stack: +1 Ir;
   * the caller's `cfp->sp` store: +1.3 Ir;
   * offset by YJIT's interrupt check: −3.2 Ir.
-* **Status:**
+* **Status (corrected 2026-11-03): taken.** k0kubun's Shopify/ruby#1030 "send_cfunc_block" series has both fixes
+  (`5a370e8571`, `9e4bb54cb6`) and more. The bullets below are the first check.
+* **Status at first check:**
   * Free: the dead-store fix (4.9 / 2.2 / 3.7 M) and the register switch (6.3 / 2.9 / 5.0 M). Neither has an issue,
     PR or #1039 row. The dead-store fix sits on lines that ruby/ruby#18960 (XrXr) rewrites.
   * Taken: locals spill, by #18960.
@@ -244,15 +249,18 @@ Shopify/ruby issues and ruby/ruby PRs (`CCallWithFrame`, `cfunc frame`, `root_ma
 
 ### 14. `&block` passed to a C method, and other complex argument passing
 
-* **Fallback:** `send_fallback_one_or_more_complex_arg_pass`. `unspecializable_c_call_type` rejects
-  `VM_CALL_ARGS_BLOCKARG`.
-* **Sites:**
-  * `Rack::Request::Env#fetch_header` (`@env.fetch(name, &block)`): 41.8k per iteration on railsbench, 11.4 M Ir;
-    YJIT makes no generic call there;
-  * `resolve_attribute_name`, `Core.relation`, HWIA `update_with_single_argument`, `ActionView::Base#_run`.
-* **Size:** **19.5 / 6.1 / 13.1 M Ir (11% / 3% / 2%)**.
-* **Status:** free. Shopify/ruby#1039 row 42 ("&blk to C") is unassigned. Shopify/ruby#1014 (block args to ISEQ
-  callees) is a different path.
+* **Fallback:** `send_fallback_one_or_more_complex_arg_pass`.
+* **Size:** first estimated at 19.5 / 6.1 / 13.1 M Ir, using the average generic-send price. Measured per shape on
+  2026-11-03, it is **6.8 / 1.8 / 5.3 M Ir**.
+* **Parts:**
+  * **14a:** the `&block` param passed to a C method, +66 Ir per call. `fetch_header`, `each_pool_config`,
+    tzinfo `bsearch_index`. Waits for row 7.
+  * **14b:** `(*args, &block)` passed to an ISEQ, +285 Ir per call. `render`, `_normalize_render`, `process`, HWIA
+    `merge`. Waits for row 7.
+  * **14c:** ISEQ callees with `**rest` or `(a, ...)`, +314 to +405 Ir per call. Free: #1039 rows 36 and 43.
+  * **14d:** a `nil` `&blk` passed to a C method, +129 Ir per call. Free, exact, tiny.
+  * Splat or keyword arguments to C methods: ZJIT is cheaper than YJIT there (−328 and −73 Ir per call).
+* **Details:** [zjit-yjit-gap, Lead 14](zjit-yjit-gap.md#lead-14-what-one_or_more_complex_arg_pass-really-costs).
 
 ### 15. getivar on final versions and long-lived singleton objects
 
