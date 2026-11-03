@@ -4,6 +4,17 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Bigger ZJIT and i18n bets (2026-11-03)
+
+Thomas: think bigger for ZJIT, take issues from the tracker where they don't collide with the team, and give i18n a
+full performance evaluation with several PRs. The issue triage is in [upstream/zjit-shortlist.md](upstream/zjit-shortlist.md).
+New bets: **Z5** objtostring `to_s` (#1091) and `Hash#size` (#808); **Z6** ZJIT compile speed (#1065/#1075, #1064,
+#1049) measured on large Rails apps; **Z7** frequency of `String#match?`, `Kernel#dup` and similar cfuncs on Rails,
+then at most one fast path (#1059/#1058); **Z8** ZJIT stats correctness (`IncrCounter` double count) and per-ISEQ
+attribution (#746); **I18N** a full i18n deep dive (lookup, interpolation, key normalization, Rails' translation
+helpers). We claim a tracker issue by commenting with measured data first. The gem limit becomes: i18n up to 3 open
+PRs, other gems 1.
+
 ## Extra adversarial Astra round for critical changes (2026-11-03)
 
 Thomas: critical changes get an Astra round (`gpt-6-astra`) in addition to Sol, with different instructions. After
@@ -23,7 +34,7 @@ when the repository has room:
 
 * **rails/rails:** up to 10 of our PRs open at once, 15 when merges keep pace (Thomas, 2026-11-03).
 * **ruby/ruby:** at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
-* **gems:** at most 1 open PR per gem.
+* **gems:** at most 1 open PR per gem; i18n up to 3 (Thomas, 2026-11-03).
 
 Prefer the strongest candidate, not the oldest. A candidate that an upstream change makes moot leaves the queue
 with a note.
