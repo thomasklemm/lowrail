@@ -123,9 +123,9 @@ stack (#19660–#19663) and #19655 get split accordingly.
 XrXr on [ruby#19664](https://github.com/ruby/ruby/pull/19664#pullrequestreview-5752852916): "YJIT is mainly in
 maintenance mode for bug fixes. For perf improvements we focus on ZJIT. This PR touches a high risk part of YJIT so
 we're unlikely to take it for the next release, as the onus of verification is high." YJIT performance and
-allocation PRs are therefore not expected to merge; YJIT gets bug fixes only. Thomas (2026-11-03): keep the open YJIT
-performance PRs (#19663, #19664, #19665, #19666, #19671) open for at least 24 hours, then decide again (from
-2026-11-04 14:30 UTC). byroot on [ruby#19663](https://github.com/ruby/ruby/pull/19663#issuecomment-6604843888)
+allocation PRs are therefore not expected to merge; YJIT gets bug fixes only. Thomas (2026-11-03, final): keep the open YJIT
+performance PRs (#19663, #19664, #19665, #19666, #19671) open and maintained; we don't close them. The maintainers
+may close them or merge them later. No new YJIT performance PRs. byroot on [ruby#19663](https://github.com/ruby/ruby/pull/19663#issuecomment-6604843888)
 suggested calling a C function that returns an initialized Hash (guarded against a redefined `Hash#initialize`)
 instead of sending `#initialize`; U1 builds that for the ZJIT twin #19662.
 
