@@ -81,13 +81,10 @@ These performance-related PRs were opened before the October 19–22 census.
 
 ## Queue
 
-Finished, reviewed candidates waiting for room (rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)).
+Finished, reviewed candidates waiting for room (empty after #59568–#59570 opened) (rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)).
 
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
-| C1, run the escape steps inline in `OutputBuffer#<<` | rails/rails | `output-buffer-escape` @ a2a3bf0 | erubi-rails −5.8% Ir interp / −5–6% YJIT (6–9% on master); per append 141 → 110 ns / 68 → 52 ns | **ready**: Sol approve on both rubrics (third round); draft says `:nodoc:`, not private; prepend boundary left to the reviewer (Thomas) |
-| C3, read `attribute_types` once in `_load_from_sql` | rails/rails | `load-from-sql-attribute-types-once` @ 2fd04c4 | shipit −4.1% / −5.3% Ir; moot if #59141 lands | **ready**: Sol correctness approve; quality P2 (a getter that returns a different Hash per call) accepted as outside the contract |
-| C2, lazy `AliasTracker` in `AssociationScope` | rails/rails | `association-scope-lazy-alias-tracker` @ fcfadc0 | shipit −2.6% / −1.8% Ir; −2 objects per scope | **ready**: Sol approve on both rubrics; boundary: a direct scope no longer checks out a connection while it is built |
 
 ## Open
 
@@ -149,6 +146,10 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
   - [#59563](https://github.com/rails/rails/pull/59563), Active Job `serialize_hash` walks the Hash with `each` instead of `each_with_object` pairs — typical kwargs **13 → 6** objects per serialize, Chatwoot status toggle −238 (−1.3%). From the [Inertia/Chatwoot census](inertia-chatwoot-census.md) (bet L6). Sol approve on both rubrics; opened 2026-11-03.
   - [#59564](https://github.com/rails/rails/pull/59564), the preloader builds its per-pass working Arrays in place (`Branch#future_classes`, `runnable_loaders`, `Batch#call`) — `Post.preload(:author)` **287 → 277**, three-level preload **1,029 → 982**; preloading workloads in 17 apps median **−70**. From [census 6](rails-main-census-6.md); C6-2 (`immediate_future_classes`/`target_classes` in place) folded in as one commit `58ad783`. Sol approve on both rubrics for each part; opened 2026-11-03.
   - [#59565](https://github.com/rails/rails/pull/59565), PostgreSQL adds a cast hint when a bind parameter follows a type name or `IS` (`DATE $1`), anchored on the reported error position — the error #58427 extended to `find_by_sql`/`count_by_sql`; byroot invited such a hint in #55439. Error-message only, no allocation claim. From the Rails main watch (bet R1). Two Sol rounds (whole-SQL regexp matched literals/comments; `$` identifier boundary); opened 2026-11-03.
+- From the CPU deep dives (bets V1 and A1; instruction counts with A/A, no timing claim). Sol on both rubrics, then an adversarial Astra round (DECISIONS 2026-11-03). Opened 2026-11-03.
+  - [#59568](https://github.com/rails/rails/pull/59568), `_load_from_sql` reads `attribute_types` once instead of twice per column — `Post.find` −6.6% / −3.8% instructions (interp / YJIT); ruby-bench shipit −4.1% / −5.3%, railsbench and lobsters about −1%. Moot if #59141 lands first. Astra P3 (a schema change injected mid-filter keeps the old types) accepted.
+  - [#59569](https://github.com/rails/rails/pull/59569), `AssociationScope` builds its `AliasTracker` only for through chains — `post.author` −6.5% / −5.3% instructions; shipit −2.6% / −1.8%; −2 objects per association scope (36–42 of 56 workloads). Boundary: a direct scope no longer checks out a connection while it is built. Astra P3 (prepends of the private `get_chain` get a Relation) accepted.
+  - [#59570](https://github.com/rails/rails/pull/59570), `OutputBuffer#<<` runs the escape steps inline instead of `ERB::Util.unwrapped_html_escape` — per append 141 → 110 ns / 68 → 52 ns; erubi-rails −5.8% / −5–6% instructions. Boundary, left to the reviewer: modules prepended to `ERB::Util`'s singleton class no longer see template appends (Astra showed this also holds for prepends after load, so the description says so).
 
 ### Inertia — inertiajs/inertia-rails
 
