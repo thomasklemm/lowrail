@@ -120,6 +120,9 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
   - [#59555](https://github.com/rails/rails/pull/59555), `Enumerable#index_with` yields what `each` yields again — fixes an unreleased regression from 2b88dc1995 where Hash/HWIA receivers got only keys and Struct got member names; `Array#index_with` keeps `to_h`. Sol approve on both rubrics; opened 2026-11-03.
   - [#59556](https://github.com/rails/rails/pull/59556), `Merger` reads the other relation's values without a dup (new `:nodoc:` `values_for_merge`; copies only when the values Hash is the receiver's own) — every merge and association read −1…−3 (`post.author` **223 → 221**); 80/97, median **−6.8**. Sol: first round request-changes (CollectionProxy self-merge dropped `limit`), fixed and approved on both rubrics; opened 2026-11-03.
   - [#59557](https://github.com/rails/rails/pull/59557), `Array#index_with` fills `Hash.new(capacity:)` on Ruby 4.1 instead of pair Arrays (stacked on #59555) — revisits #59108/#59203 after ruby/ruby#19537: n+1 → 1 object per call, 0 spills on railsbench/shipit/lobsters, objects −11,993/−60,651/−5,408 (4.1 interpreter), wall time tied, 4.0 unchanged ([record](index-with-capacity.md)). Sol: two request-changes rounds (subclass overrides, RubyGems dependency of the gate), then approve on both; opened 2026-11-03.
+- From the [PostgreSQL census](pg-census.md) (nine PG apps incl. Mastodon, Discourse, Docuseal, Lago, Loomio, Sure, CASA; 124 workloads incl. `prepared_statements: false`):
+  - [#59558](https://github.com/rails/rails/pull/59558), `cast_result` without `field_types`/`missing_oids` scratch Arrays — −2 per query result; 121/124, median **−23**. Sol approve on both rubrics; opened 2026-11-03.
+  - Held: `pg-result-type-args` (type-map key reuse, median **−198/−211**, −2.4%): Sol request-changes, the process-global key map retained every fmod; being reworked to live with the type map.
 
 ### Importmap — rails/importmap-rails
 
