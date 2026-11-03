@@ -68,6 +68,85 @@ fn callers_follow_respond_to_blocks_and_includers_and_views_follow_record_render
 }
 
 #[test]
+fn callers_follow_extenders_lexical_constants_core_iterators_and_views_follow_layouts() {
+    let dir = std::env::temp_dir().join(format!("lowrail-mcp-lexical-{}", std::process::id()));
+    for sub in [".lowrail", "app/controllers/shop", "app/controllers/admin", "app/views/shop/orders", "app/views/cards"] {
+        std::fs::create_dir_all(dir.join(sub)).unwrap();
+    }
+    let orders = dir.join("app/controllers/shop/orders_controller.rb");
+    let items = dir.join("app/controllers/admin/items_controller.rb");
+    std::fs::write(&orders, "class Shop::OrdersController\n def create\n  wrap do\n   Card.build\n  end\n  Alias.build\n end\n def list(items)\n  [1, 2].each { finish }\n  items.each { finish }\n  Driver.new.each { finish }\n  each { finish }\n  nil.each { finish }\n  Hidden.build\n  shop_url\n end\n def finish = 1\n def index = 1\nend\n").unwrap();
+    std::fs::write(&items, "class Admin::ItemsController\n def make = Card.build\nend\n").unwrap();
+    use sha2::{Digest, Sha256};
+    let digest = format!("{:x}", Sha256::digest(b"template"));
+    for name in ["shop/orders/index", "shop/orders/_frame", "shop/orders/_plain", "cards/_card"] {
+        std::fs::write(dir.join(format!("app/views/{name}.html.erb")), "template").unwrap();
+    }
+    let at = |file: &std::path::Path, line: u32| format!("{}:{line}", file.display());
+    let template = |path: &str, code: &str| json!({"identifier":format!("{}/app/views/{path}.html.erb",dir.display()),
+        "virtual_path":path,"source_sha256":digest,"code":code});
+    let methods: Vec<_> = [("create",2), ("list",8), ("finish",17), ("index",18)].into_iter()
+        .map(|(name,line)| json!({"name":name,"owner":"Shop::OrdersController","source_location":at(&orders,line)})).collect();
+    let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
+        "modules":[
+            {"name":"Shop::OrdersController","kind":"class","ancestors":["Shop::OrdersController","ActionDispatch::Routing::UrlFor"],
+             "constants":[],"private_constants":[],"anonymous_ancestor_constants":[],"const_source_location":at(&orders,1),"methods":methods},
+            {"name":"ActionDispatch::Routing::UrlFor","kind":"module","constants":[],"private_constants":[]},
+            // `module Shop; Alias = Other; end` binds a constant that no module is named after;
+            // `private_constant :Hidden` hides one from Module#constants.
+            {"name":"Shop","kind":"module","constants":["Alias","OrdersController"],"private_constants":["Hidden"]},
+            {"name":"Admin::ItemsController","kind":"class","ancestors":["Admin::ItemsController"],"constants":[],"private_constants":[],
+             "anonymous_ancestor_constants":[],"const_source_location":at(&items,1),
+             "methods":[{"name":"make","owner":"Admin::ItemsController","source_location":at(&items,2)}]},
+            {"name":"Admin","kind":"module","constants":["Card","ItemsController"],"private_constants":[]},
+            {"name":"Hidden","kind":"class","ancestors":["Hidden"],"singleton_ancestors":["#<Class:Hidden>","Builder::ClassMethods"]},
+            {"name":"Builder::ClassMethods","kind":"module","ancestors":["Builder::ClassMethods"],
+             "methods":[{"name":"build","owner":"Builder::ClassMethods"}]},
+            {"name":"Card","kind":"class","ancestors":["Card"],"singleton_ancestors":["#<Class:Card>","Builder::ClassMethods"]},
+            {"name":"Alias","kind":"class","ancestors":["Alias"],"singleton_ancestors":["#<Class:Alias>","Builder::ClassMethods"]},
+            // An app iterator may instance_exec its block.
+            {"name":"Driver","kind":"class","ancestors":["Driver"],"singleton_ancestors":["#<Class:Driver>","Class"],
+             "methods":[{"name":"each","owner":"Driver"}]},
+            {"name":"Class","methods":[{"name":"new","owner":"Class","iseq_kind":"cfunc"}]},
+            {"name":"Array","kind":"class","ancestors":["Array"],
+             "methods":[{"name":"each","owner":"Array","source_location":"<internal:array>:219"}]},
+            {"name":"Rails.application.routes.named_routes.url_helpers_module","kind":"module",
+             "methods":[{"name":"shop_url","owner":"Rails.application.routes.named_routes.url_helpers_module"}]}],
+        "models":[{"name":"Card","partial_path":"cards/card"}],
+        "controllers":[{"name":"Shop::OrdersController","actions":["index"]}],
+        "routes":[{"controller":"shop/orders","action":"index"}],
+        "templates":[template("shop/orders/index", "render layout: 'frame', locals: { order: @order } do; end; render template: 'shop/orders/show', layout: 'plain', locals: { note: nil }; render @cards"),
+            template("shop/orders/_frame", ""), template("shop/orders/_plain", ""), template("cards/_card", "")]});
+    std::fs::write(dir.join(".lowrail/facts.json"), facts.to_string()).unwrap();
+    std::fs::write(dir.join(".lowrail/observed.json"), json!({"format":1,"app_root":dir,"types":[
+        {"module":"Shop::OrdersController","name":"index",
+         "ivars":{"@cards":{"Card::ActiveRecord_Relation":1,"Card::ActiveRecord_AssociationRelation":1}}}]}).to_string()).unwrap();
+    let mut data = tools::Data::new(dir.clone());
+    let build = data.call("callers", &json!({"target":"Builder::ClassMethods#build"})).unwrap();
+    assert_eq!(build["callers"], json!([{"path":orders,"line":4,"column":9,"caller":"Shop::OrdersController#create","via":"Card."}]),
+        "a block keeps lexical constant lookup and the enclosing def; the extended module is called through Card");
+    let refused: Vec<_> = build["unresolved"].as_array().unwrap().iter().map(|c| c["line"].clone()).collect();
+    assert_eq!(refused, vec![json!(2), json!(6), json!(14)], "Admin::Card, the Shop::Alias binding and private Shop::Hidden shadow the top level");
+    let finish = data.call("callers", &json!({"target":"Shop::OrdersController#finish"})).unwrap();
+    let found: Vec<_> = finish["callers"].as_array().unwrap().iter().map(|c| c["line"].clone()).collect();
+    assert_eq!(found, vec![json!(9)], "only Ruby's own Array#each certainly keeps self");
+    let refused: Vec<_> = finish["unresolved"].as_array().unwrap().iter().map(|c| c["line"].clone()).collect();
+    assert_eq!(refused, vec![json!(10), json!(11), json!(12), json!(13)],
+        "an untyped receiver, an app iterator, an implicit-self each and a nil receiver (NilClass may be reopened)");
+    let direct = data.call("callers", &json!({"target":"Shop::OrdersController#shop_url"})).unwrap();
+    assert_eq!((direct["callers"][0]["line"].clone(), direct["callers"][0]["route_helper"].clone()), (json!(15), json!(true)),
+        "a `direct` helper has no route, only a booted helper method");
+    let frame = data.call("view_locals", &json!({"path":"shop/orders/_frame"})).unwrap();
+    assert_eq!(frame["templates"][0]["incoming"][0]["local_names"], json!(["order"]));
+    let plain = data.call("view_locals", &json!({"path":"shop/orders/_plain"})).unwrap();
+    assert_eq!(plain["templates"][0]["incoming"], json!([]), "a template render's layout is not a partial");
+    let card = data.call("view_locals", &json!({"path":"cards/_card"})).unwrap();
+    assert_eq!(card["templates"][0]["incoming"][0]["local_names"], json!(["card", "card_counter", "card_iteration"]),
+        "sampled relation classes of one model are a collection of it");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn callers_and_view_inputs_are_bounded_contextual_and_refresh_sources() {
     let dir = std::env::temp_dir().join(format!("lowrail-mcp-useful-{}", std::process::id()));
     std::fs::create_dir_all(dir.join(".lowrail")).unwrap();
@@ -84,7 +163,8 @@ fn callers_and_view_inputs_are_bounded_contextual_and_refresh_sources() {
     let methods: Vec<_> = [("index",2), ("value",3), ("caller",4), ("dynamic",5), ("make",6), ("other",7)].into_iter()
         .map(|(name,line)| json!({"name":name,"owner":"RoomsController","source_location":format!("{}:{line}",source.display())})).collect();
     let facts = json!({"format":1,"app_root":dir,"ruby_description":"ruby 4.0.7",
-        "modules":[{"name":"RoomsController","const_source_location":format!("{}:1",source.display()),"methods":methods},
+        "modules":[{"name":"RoomsController","const_source_location":format!("{}:1",source.display()),"methods":methods,
+            "constants":[],"private_constants":[],"anonymous_ancestor_constants":[]},
             {"name":"User","singleton_ancestors":["Class"]}, {"name":"Other","singleton_ancestors":["Class"]},
             {"name":"Class","methods":[{"name":"new","owner":"Class","iseq_kind":"cfunc"}]},
             {"name":"Array","methods":[{"name":"join","owner":"Array","iseq_kind":"cfunc"}]}],

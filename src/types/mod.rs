@@ -138,6 +138,8 @@ pub struct TypeModel {
     pub methods: BTreeMap<String, Signature>,
     pub diagnostics: Vec<String>,
     pub conflicts: Vec<Conflict>,
+    #[serde(skip)]
+    bodies: infer::Bodies,
 }
 
 pub fn key(receiver: &str, method: &str, singleton: bool) -> String {
@@ -398,7 +400,7 @@ impl TypeModel {
     }
 
     pub fn callers(&self, facts: &Facts, target: &str) -> Result<serde_json::Value, String> {
-        references::callers(facts, target)
+        references::callers(self, facts, target)
     }
 
     pub fn view_locals(&self, facts: &Facts, path: &str) -> Result<serde_json::Value, String> {

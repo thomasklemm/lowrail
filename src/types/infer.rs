@@ -10,7 +10,8 @@ enum Expr {
     Literal(&'static str),
     Self_,
     Constant(String),
-    Call(Option<Box<Expr>>, String, bool, bool),
+    /// Receiver, name, has arguments, safe navigation, positional arguments.
+    Call(Option<Box<Expr>>, String, bool, bool, Vec<Expr>),
     Sequence(Vec<Expr>),
     Read(String),
     Write(String, Box<Expr>),
@@ -99,6 +100,8 @@ fn expression_ref(node: &Node<'_>) -> Expr {
                 String::from_utf8_lossy(n.name().as_slice()).into(),
                 n.arguments().is_some(),
                 n.is_safe_navigation(),
+                n.arguments().map(|a| a.arguments().iter()
+                    .filter(|a| a.as_keyword_hash_node().is_none()).map(expression).collect()).unwrap_or_default(),
             )
         } else {
             Expr::Unknown
@@ -240,7 +243,7 @@ fn nil_tail(expr: &Expr) -> bool {
         Expr::Literal(name) => *name == "nil",
         Expr::Branch(_, yes, no) => nil_tail(yes) || nil_tail(no),
         Expr::Sequence(body) => body.last().is_none_or(nil_tail),
-        Expr::Call(_, _, _, safe_navigation) => *safe_navigation,
+        Expr::Call(_, _, _, safe_navigation, _) => *safe_navigation,
         _ => false,
     }
 }
@@ -477,6 +480,7 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
                 &sig.receiver,
                 sig.singleton,
                 &mut locals,
+                None,
             )
             .map(|t| t.inferred(format!("{id} at {location}")));
             let ivars: BTreeMap<_, _> = if ty.is_some() {
@@ -504,15 +508,71 @@ pub(super) fn analyze(facts: &Facts, model: &mut TypeModel, parser: &crate::pars
             ty.provenance.push(Provenance { source: Source::Inference, detail: format!("{NIL_PATH} at {location}") });
         }
     }
+    model.bodies = Bodies(bodies.into_iter().map(|(id, (expr, location, _))| (id, (expr, location))).collect());
+}
+
+/// Positional argument types per resolved callee key (`Owner#m`/`Owner.m`).
+pub(super) type Sites = BTreeMap<String, Vec<(usize, Type)>>;
+
+/// Analyzed method bodies, kept for the argument pass after observations.
+#[derive(Debug, Default)]
+pub(super) struct Bodies(BTreeMap<String, (Expr, String)>);
+
+/// Re-walks every analyzed body with the current model (which may now hold
+/// observed parameter and return names) and reports the argument types each
+/// resolved call site passes, with the calling method and its location.
+/// Feeds only annotations of observed slots, never the static fixpoint.
+pub(super) fn argument_sites(facts: &Facts, model: &TypeModel) -> BTreeMap<String, Vec<(usize, Type, String)>> {
+    let mut out: BTreeMap<String, Vec<(usize, Type, String)>> = BTreeMap::new();
+    for (id, (expr, location)) in &model.bodies.0 {
+        let sig = &model.methods[id];
+        let mut locals: BTreeMap<_, _> = sig.parameters.iter().map(|p| (p.name.clone(), p.ty.clone())).collect();
+        let mut found = Sites::new();
+        evaluate(expr, facts, model, &sig.receiver, sig.singleton, &mut locals, Some(&mut found));
+        for (callee, args) in found {
+            out.entry(callee).or_default().extend(args.into_iter().map(|(index, ty)| (index, ty, format!("{id} at {location}"))));
+        }
+    }
+    out
+}
+
+/// Top-level union arms of a type name.
+pub(super) fn arms(name: &str) -> BTreeSet<String> {
+    let mut arms = BTreeSet::new();
+    union_members(name, &mut arms);
+    arms
+}
+
+/// Whether a type name has a top-level nil arm (`nil`, `T?`, `(... | nil)`).
+pub(super) fn has_nil(name: &str) -> bool {
+    let mut arms = BTreeSet::new();
+    union_members(name, &mut arms);
+    arms.iter().any(|arm| arm == "nil" || arm.ends_with('?'))
+}
+
+/// `name` with an added nil arm, in the spelling unions use elsewhere.
+pub(super) fn with_nil(name: &str) -> String {
+    union(vec![Type::new(name, Source::Inference, ""), Type::new("nil", Source::Inference, "")]).name
 }
 
 pub(super) fn value(node: &Node<'_>, facts: &Facts, model: &TypeModel, receiver: &str,
     locals: &BTreeMap<String, Type>) -> Type {
-    let mut ty = evaluate(&expression_ref(node), facts, model, receiver, false, &mut locals.clone())
+    let mut ty = evaluate(&template_locals(expression_ref(node), locals), facts, model, receiver, false, &mut locals.clone(), None)
         .unwrap_or_else(|| Type::new("untyped", Source::Inference, "unsupported view binding expression"));
     ty.evidence = if ty.provenance.iter().any(|p| p.source == Source::Observed) { Evidence::Observed }
         else { Evidence::Static };
     ty
+}
+
+/// Compiled templates read their locals through bare names that Prism, not
+/// knowing the locals, parses as receiver-less calls. Read those as locals.
+fn template_locals(expr: Expr, locals: &BTreeMap<String, Type>) -> Expr {
+    match expr {
+        Expr::Call(None, name, false, false, args) if args.is_empty() && locals.contains_key(&name) => Expr::Read(name),
+        Expr::Call(target, name, arguments, safe, args) => Expr::Call(target.map(|t| Box::new(template_locals(*t, locals))),
+            name, arguments, safe, args.into_iter().map(|a| template_locals(a, locals)).collect()),
+        other => other,
+    }
 }
 
 fn evaluate(
@@ -522,6 +582,7 @@ fn evaluate(
     receiver: &str,
     singleton: bool,
     locals: &mut BTreeMap<String, Type>,
+    mut sites: Option<&mut Sites>,
 ) -> Option<Type> {
     match expr {
         Expr::Unknown => None,
@@ -542,7 +603,7 @@ fn evaluate(
         Expr::Read(name) => Some(locals.get(name).cloned().unwrap_or_else(||
             Type::new("untyped", Source::Inference, format!("value unavailable: {name}")))),
         Expr::Write(name, value) => {
-            let ty = evaluate(value, facts, model, receiver, singleton, locals)?;
+            let ty = evaluate(value, facts, model, receiver, singleton, locals, sites.as_deref_mut())?;
             locals.insert(name.clone(), ty.clone());
             Some(ty)
         }
@@ -550,18 +611,18 @@ fn evaluate(
             let mut last = Type::new("nil", Source::Inference, "empty body");
             let mut advisory = false;
             for expr in expressions {
-                last = evaluate(expr, facts, model, receiver, singleton, locals)?;
+                last = evaluate(expr, facts, model, receiver, singleton, locals, sites.as_deref_mut())?;
                 advisory |= last.evidence != Evidence::ProvenBody;
             }
             if advisory { last.evidence = Evidence::Static; }
             Some(last)
         }
         Expr::Branch(predicate, yes, no) => {
-            evaluate(predicate, facts, model, receiver, singleton, locals)?;
+            evaluate(predicate, facts, model, receiver, singleton, locals, sites.as_deref_mut())?;
             let mut yes_locals = locals.clone();
             let mut no_locals = locals.clone();
-            let yes = evaluate(yes, facts, model, receiver, singleton, &mut yes_locals)?;
-            let no = evaluate(no, facts, model, receiver, singleton, &mut no_locals)?;
+            let yes = evaluate(yes, facts, model, receiver, singleton, &mut yes_locals, sites.as_deref_mut())?;
+            let no = evaluate(no, facts, model, receiver, singleton, &mut no_locals, sites.as_deref_mut())?;
             locals.clear();
             for (name, ty) in yes_locals {
                 if let Some(other) = no_locals.remove(&name) {
@@ -573,7 +634,7 @@ fn evaluate(
         Expr::Interpolation(parts) => {
             let mut values = Vec::new();
             for expr in parts {
-                values.push(evaluate(expr, facts, model, receiver, singleton, locals)?);
+                values.push(evaluate(expr, facts, model, receiver, singleton, locals, sites.as_deref_mut())?);
                 // Interpolation invokes app-overridable to_s conversions.
                 locals.clear();
             }
@@ -585,15 +646,15 @@ fn evaluate(
         }
         Expr::Array(elements) => {
             let elements = elements.iter().map(|expr|
-                evaluate(expr, facts, model, receiver, singleton, locals)).collect::<Option<Vec<_>>>()?;
+                evaluate(expr, facts, model, receiver, singleton, locals, sites.as_deref_mut())).collect::<Option<Vec<_>>>()?;
             Some(aggregate("Array", vec![elements]))
         }
         Expr::Hash(pairs) => {
             let mut keys = Vec::new();
             let mut values = Vec::new();
             for (key, value) in pairs {
-                keys.push(evaluate(key, facts, model, receiver, singleton, locals)?);
-                values.push(evaluate(value, facts, model, receiver, singleton, locals)?);
+                keys.push(evaluate(key, facts, model, receiver, singleton, locals, sites.as_deref_mut())?);
+                values.push(evaluate(value, facts, model, receiver, singleton, locals, sites.as_deref_mut())?);
                 // Hash insertion can invoke a key's hash/eql? methods.
                 locals.clear();
             }
@@ -604,7 +665,7 @@ fn evaluate(
             locals.clear();
             Some(Type::new("untyped", Source::Inference, format!("constant value unavailable: {name}")))
         }
-        Expr::Call(target, name, arguments, safe_navigation) => {
+        Expr::Call(target, name, arguments, safe_navigation, positional) => {
             let mut receiver_provenance = Vec::new();
             let (class, single) = match target.as_deref() {
                 None | Some(Expr::Self_) => (receiver.to_owned(), singleton),
@@ -613,11 +674,23 @@ fn evaluate(
                     (class.clone(), true)
                 }
                 Some(target) => {
-                    let ty = evaluate(target, facts, model, receiver, singleton, locals)?;
+                    let ty = evaluate(target, facts, model, receiver, singleton, locals, sites.as_deref_mut())?;
                     receiver_provenance = ty.provenance;
                     (ty.name, false)
                 }
             };
+            // Arguments as the callee receives them, before this call runs.
+            if let Some(found) = sites.as_deref_mut() && !positional.is_empty()
+                && let Some((owner, method)) = resolve(facts, &class, name, single)
+            {
+                // Ruby evaluates arguments left to right in one environment:
+                // an earlier argument's call can change what a later one reads.
+                let mut env = locals.clone();
+                let types: Vec<_> = positional.iter()
+                    .map_while(|arg| evaluate(arg, facts, model, receiver, singleton, &mut env, None)).collect();
+                let entry = found.entry(key(&owner.name, &method.name, method.singleton)).or_default();
+                entry.extend(types.into_iter().enumerate());
+            }
             // A call may mutate the receiver's ivars, even when its return
             // type is known. Never carry an exit-ivar proof across it.
             if *arguments {

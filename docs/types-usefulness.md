@@ -303,3 +303,344 @@ helpers (`*_path`/`*_url` of a booted named route on a class that includes
 live in an anonymous module. Rerunning v2 fixes c14 (strict 85.37% / 63.64%),
 while w14 stays an abstention: `book_slug_url` comes from `direct`, not the
 route table. v2 is no longer a held-out measure for this change.
+
+## Held-out v3 on public apps (2026-11-03)
+
+v2 is in-sample after the changes above, so a separate agent wrote 40 new
+questions on two other public apps and froze them before any code change:
+Fizzy `6f1d200` (with `fixtures/corpus/fizzy.patch`) and Lobsters `366e211`
+(`.ruby-version`/lock pinned to Ruby 4.0.7, as in the census-4 overlay;
+`database.yml.sample` copied). SHA-256
+`d7ad9a59d324aea1aba0de41757bf15c074513e51b75e868182031f69e1cb9fd`, seed
+`20261103`, same per-app strata as v2. Ground truth comes from app, Rails and
+gem source. Eight questions are marked uncertain (f03, f06, f07, f14, f16,
+l05, l06, l14). Departures were recorded before evaluation:
+- Lobsters has no `collection:` renders, so its collection stratum became
+  "partial rendered inside an `each`".
+- The respond_to stratum drew `HomeController#params` (l14).
+- The dynamic-partial pool misses `events/_event`.
+
+Inputs, results and the writer's receipts stay outside Git.
+
+The changes, written from the v2 gaps only, as first measured at `e39898b`.
+The review fixes below narrow three of them:
+- **Callers, constants in blocks:** callers resolve constant receivers inside
+  blocks (constant lookup is lexical) and attribute them to the enclosing
+  def. A relative constant names the top-level one only when no enclosing
+  scope or ancestor of the innermost scope has it booted or as an
+  autoloadable file; otherwise the call stays unresolved.
+- **Callers, concern methods:** a queried module method (a concern, a
+  `ClassMethods` module) is reported through each class that includes or
+  extends it (`via`).
+- **Callers, core iterators:** blocks of core iterators (`tap`, `each`,
+  `map`, `gsub`, …) on an explicit non-self receiver keep the caller's self.
+  An implicit-self `each` may be an app DSL and stays unresolved.
+- **Callers, `direct` helpers:** helpers from `direct` resolve through the
+  booted route helper modules.
+- **`view_locals`:** follows partial layouts (`render layout: "x",
+  locals:`). It also follows `render @records` when every sampled relation
+  class names the same model.
+- **Sampled positional parameters:** gain a nil arm only where a resolved
+  call site passes a value whose type has one. Call sites are method bodies
+  re-walked after observations, or templates calling a uniquely owned app
+  helper with an incoming render's locals. The provenance names the site.
+  Nothing feeds the static fixpoint, and this is no blanket `| nil`.
+
+Implementation commit `e39898b`, binary SHA-256 `4ec2ed32…`; baseline
+`origin/main` `206a2fc`, binary `d8fa11c6…`. Observations used
+`LOWRAIL_OBSERVE_TYPES_ONLY=1 lowrail observe APP --samples 16`, seed 1379:
+- **Fizzy:** `bin/rails test`, 124 runs, **7 errors**: `Current.reset_all`
+  under the Rails 8.1.4 overlay.
+- **Lobsters:** `rspec`, 927 examples, **1 failure**: an order-dependent
+  duplicate banned domain in `submit_story_spec.rb:178`.
+
+These are partial observations. They were kept rather than rerun until
+green. Each binary answered v3 once, after the commit; nothing changed
+afterwards.
+
+### v3, held-out
+
+| Run | Precision | Recall | TP/FP/FN | exact / wrong / abstained |
+|---|---:|---:|---|---|
+| before, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+| after, no observations | 100% | 61.19% | 41/0/26 | 19 / 1 / 20 |
+| before, observed | 96.08% | 73.13% | 49/2/18 | 27 / 4 / 9 |
+| **after, observed** | **96.43%** | **80.60%** | **54/2/13** | **30 / 3 / 7** |
+
+Strict string scoring. The `(T | nil)`/`T?` equivalence gives the same
+numbers on v3, because no answer differs only in spelling. "Wrong" includes
+partial caller and local sets with no false fact.
+
+**Fixed:**
+- f15: a call inside a `tap`/`each` block.
+- l15: a call inside an iterator block.
+- f18: `render @buckets` over sampled relation arms.
+
+**Remaining wrong answers:**
+- f03 (uncertain): `Bubble`, expected `Bubble?`. The sampled return has no
+  source nil path.
+- l05 (uncertain): `Array[(Array[untyped] | bool)]`; the member is unknown.
+- l17: misses `linking_comments`, which a controller passes with
+  `render partial:`.
+
+**Abstentions:**
+- f05, f06: methods of an association extension module.
+- f12, f16, l12: receivers are association proxies, ivars or block
+  parameters.
+- f19: `render bubble.messages` on a partial local.
+- l19: a render hash built in the controller (`render @above`).
+
+### v2, in-sample
+
+| Run | Strict precision / recall | TP/FP/FN | `T?` equivalence |
+|---|---|---|---|
+| before (`206a2fc`), no observations | 100% / 52.73% | 29/0/26 | 100% / 52.73% |
+| after, no observations | 100% / 63.64% | 35/0/20 | 100% / 63.64% |
+| before (`206a2fc`), observed | 85.37% / 63.64% | 35/6/20 | 90.24% / 67.27% |
+| **after, observed** | **88.00% / 80.00%** | **44/6/11** | **96.00% / 87.27%** |
+
+**Fixed:**
+- c12, c16: `ClassMethods` targets.
+- c17: `render layout:`.
+- w14: `direct`.
+- w15: a block-only caller.
+- w19: `render @books`.
+- c07, w06: parameter nils. c07 comes from a template local bound to an
+  enum reader; w06 from a caller's local assigned from a method with a nil
+  path.
+
+c07 and w06 now answer `(String | nil)` and `(Array[String] | nil)`. Strict
+scoring still counts them as wrong, as it does w01 and w03; the
+equivalence counts all four as correct.
+
+**Not changed, and why:**
+- **w02:** an around callback's `yield` returns `false` only when a `before`
+  callback nested inside it halts. Leaf's booted create chain has no
+  `before` callbacks, and Leaf has no subclasses, so the yield returns the
+  record id. **Disputed ground truth:** the uncertain `(Integer | false)` is
+  not encoded, and w02 is still scored against it.
+- **w07:** the caller passes `leaf.leafable.body.content` through a
+  delegated type. Its ground truth is uncertain (NOT NULL column).
+- **w12, w16:** receivers are an association proxy (`user.sessions`) and an
+  ivar set in a concern's callback. Typing them would need certified
+  cross-callback flow (invariant 6), so these stay abstentions.
+- **c05, c09, w04:** returns without evidence; outside this change.
+- **Spelling:** sampled unions keep the `(T | nil)` spelling that the
+  existing tests and slot census use. This is decided: switching
+  single-arm unions to `T?` would only inflate strict string matches.
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed, including the
+real-blog stdio round trip. Both new tests fail on `206a2fc`. `git diff
+--check` is clean. The Lobsters checkout carries an AGENTS.md asking agents
+not to contribute code to Lobsters. It was only read and observed as a
+corpus app, as in the census.
+
+### Review fixes and a second v3 measurement (2026-11-03)
+
+An independent review of `e39898b` found five ways the changes above could
+report a new false fact where `206a2fc` abstained. Each is fixed and has a
+regression assertion that fails on `e39898b`:
+
+1. **An iterator name does not prove the block keeps `self`.** A block
+   keeps it only when the receiver's static, non-sampled type resolves the
+   method to Ruby's own implementation: `Kernel#tap`/`then`/`yield_self`,
+   or the `Array`/`Hash`/`Enumerable`/`String`/`Integer`/`Range` iterator
+   with no Ruby override. An app `Driver#each`, an untyped receiver or an
+   implicit-self `each` stays unresolved.
+2. **Module names and file paths cannot prove that no constant shadows the
+   top-level one** (`module Shop; Card = Other; end`). The dumper now
+   records each module's own constant table, autoloads included, which
+   loads nothing. It also records the constants of unnamed ancestors. A
+   relative constant resolves only when every lexical scope and every
+   ancestor of the innermost scope is booted with a table that lacks the
+   name. Any unknown table refuses. The file-path heuristic is removed.
+3. **Arguments are evaluated left to right on one environment.** In
+   `consume(reset, @value)`, the call `reset` invalidates `@value` before
+   it is read, so no stale nil is reported.
+4. **Template helper calls inside blocks are used only when the block's
+   method is a Rails `ActionView::Helpers::*` or `Turbo::FramesHelper`
+   helper.** These run the block through `capture` with the view as
+   `self`. Other blocks, such as `instance_eval`, are skipped.
+5. **`layout:` names a partial layout only for an options-hash render with
+   a block or beside `partial:`.** `render template: …, layout:` does not.
+
+Same frozen v3 file (`d7ad9a59…`), observations and v2 inputs. Facts were
+regenerated with the new dumper, which adds constant tables; dump errors
+are unchanged per app. This is a **second measurement of v3**, taken after
+a correctness fix prompted by review rather than by v3 results. It is not
+a fresh held-out cohort; the first measurement above remains the held-out
+result. Binary `32409f81…`.
+
+| v3 run | Precision | Recall | TP/FP/FN | exact / wrong / abstained |
+|---|---:|---:|---|---|
+| `206a2fc`, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+| fixed, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+| `206a2fc`, observed | 96.08% | 73.13% | 49/2/18 | 27 / 4 / 9 |
+| `e39898b`, observed (first measurement) | 96.43% | 80.60% | 54/2/13 | 30 / 3 / 7 |
+| **fixed, observed (second measurement)** | **96.30%** | **77.61%** | **52/2/15** | **28 / 4 / 8** |
+
+Strict scoring; the equivalence gives the same numbers on v3. Relative to
+`e39898b`, only iterator certification changed answers:
+- f15 is partial again: it misses `Notifier#generate`, whose call sits in
+  an uncertified block.
+- l15 abstains again.
+
+f18 stays correct.
+
+| v2 run (in-sample) | Strict P / R | TP/FP/FN | `T?` equivalence |
+|---|---|---|---|
+| `206a2fc`, no observations | 100 / 52.73 | 29/0/26 | 100 / 52.73 |
+| fixed, no observations | 100 / 60.00 | 33/0/22 | 100 / 60.00 |
+| `206a2fc`, observed | 85.37 / 63.64 | 35/6/20 | 90.24 / 67.27 |
+| `e39898b`, observed | 88.00 / 80.00 | 44/6/11 | 96.00 / 87.27 |
+| **fixed, observed** | **87.50 / 76.36** | **42/6/13** | **95.83 / 83.64** |
+
+On v2, only w15 changed: it abstains again, because the receivers of its
+`tap`/`gsub` blocks have no certified static type. c12, c16, c07 and w06
+survive with constant tables and ordered arguments. Strict precision stays
+above `206a2fc` on both sets.
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed. `git diff --check`
+is clean. `gem/test/facts_test.rb` has the same three real-blog failures
+with and without this change.
+
+### Second review and a third v3 measurement (2026-11-03)
+
+A re-review of `4fe284a` found three more ways to report a false fact where
+abstaining is required. Each is fixed, with a regression assertion that
+fails on `4fe284a`:
+
+1. **Private constants.** `Module#constants(false)` omits them, so its
+   table cannot prove that a name is absent. The dumper now also records
+   `private_constants`: every top-level constant name for which
+   `const_defined?(name, false)` is true but which `constants` omits. That
+   probe sees private constants and registered autoloads without loading
+   them. The tables of unnamed ancestors include the same probe. A
+   relative constant resolves only when both tables of every scope are
+   present and lack the name. Facts without the new field refuse.
+2. **nil receivers.** A `nil` arm is checked as `NilClass`, which may be
+   reopened, like any other receiver. Only safe navigation (`&.`) skips the
+   call and its block on nil.
+3. **View helper overrides.** A template block is certified by the method's
+   effective owner along each controller view's real ancestry: its
+   `X::HelperMethods` module (which includes the app's helpers and any other
+   included module), then the route helper modules, then the base view
+   class. The dumper records the method names of unnamed ancestors, so an
+   override in a generated module is visible too. The block counts only
+   when every view that defines the name resolves it to a Rails
+   `ActionView::Helpers::*` or `Turbo::FramesHelper` method. An unknown
+   ancestor, or an unnamed one defining the name, refuses. The owner of a
+   called app helper is resolved the same way, and it must be unique.
+
+Facts were regenerated with this dumper; dump errors per app are unchanged.
+This is the **third measurement of v3**, on the same frozen file, prompted
+by review rather than by v3 results; the first measurement remains the
+held-out result. Binary `36dafa97…`. Every answer on v2 and v3, with and
+without observations, is identical to the second measurement:
+
+| v3 run | Precision | Recall | TP/FP/FN | exact / wrong / abstained |
+|---|---:|---:|---|---|
+| `206a2fc`, observed | 96.08% | 73.13% | 49/2/18 | 27 / 4 / 9 |
+| `e39898b`, observed (first) | 96.43% | 80.60% | 54/2/13 | 30 / 3 / 7 |
+| `4fe284a`, observed (second) | 96.30% | 77.61% | 52/2/15 | 28 / 4 / 8 |
+| **fixed, observed (third)** | **96.30%** | **77.61%** | **52/2/15** | **28 / 4 / 8** |
+| fixed, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+
+| v2 run (in-sample) | Strict P / R | TP/FP/FN | `T?` equivalence |
+|---|---|---|---|
+| `206a2fc`, observed | 85.37 / 63.64 | 35/6/20 | 90.24 / 67.27 |
+| **fixed, observed** | **87.50 / 76.36** | **42/6/13** | **95.83 / 83.64** |
+| fixed, no observations | 100 / 60.00 | 33/0/22 | 100 / 60.00 |
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed; `git diff --check`
+is clean.
+
+### Third review: simplify views, recompute constant probes (2026-11-03)
+
+A third review of `b313c1b`, partly executed on Ruby 4.0.7 / Rails 8.1.4,
+found that the reconstructed view ancestry was unsound and that the
+private-constant probe missed names. Following the reviewer's direction,
+this round removes machinery instead of adding more:
+
+1. **Constant probes.** Probe candidates are recomputed for each dump. They
+   are every public top-level constant plus the first segment of every
+   named module, which covers private top-level constants that
+   `Object.constants` omits. They are no longer cached across dumps. Facts
+   without the tables still refuse. A Ruby facts test checks a private
+   top-level name, privately shadowed, and a name defined after an earlier
+   dump; it fails on `b313c1b`.
+2. **View ancestry removed.** Nothing reconstructs a view class from
+   `X::HelperMethods` names or from a hand-spelled view class (Rails 8.1.4
+   dumps `ActionView::LookupContext::DetailsKey.view_context_class`, which
+   the previous code never found). Instead, one conservative rule applies to
+   every dumped module, route helper modules included:
+   - A called app helper's owner is the single module anywhere in the facts
+     that defines the name, and it must be an app helper.
+   - A template block counts only when every module defining the method is
+     a Rails `ActionView::Helpers::*` or `Turbo::FramesHelper` module whose
+     definition is in that gem.
+   - Any other definer refuses: a module not named `*Helper`, a stale helper
+     after `clear_helpers`, or a module prepended to the route helpers (seen
+     through `anonymous_ancestor_methods`). So do facts without that record.
+
+   The regression fixture keeps a stale `X::HelperMethods` and a view class
+   in the old spelling, and adds overrides of `button_to` and `mail_to`.
+   b313c1b certifies both overrides; this commit refuses them. A variant
+   without any view class also fails on `b313c1b`, because that code drops
+   every template helper answer when it finds no view class.
+
+**Fourth measurement of v3**, on the same frozen file, with facts
+regenerated. It was prompted by review, not by v3 results. Binary
+`c10de878…`. Every answer on v2 and v3, with and without observations, is
+identical to the second and third measurements:
+
+| Run | Precision | Recall | TP/FP/FN |
+|---|---:|---:|---|
+| v3, `206a2fc`, observed | 96.08% | 73.13% | 49/2/18 |
+| v3, `e39898b`, observed (first, held-out) | 96.43% | 80.60% | 54/2/13 |
+| **v3, fixed, observed (fourth)** | **96.30%** | **77.61%** | **52/2/15** |
+| v3, fixed, no observations | 100% | 58.21% | 39/0/28 |
+| v2, `206a2fc`, observed (strict / equivalence) | 85.37 / 90.24% | 63.64 / 67.27% | 35/6/20 |
+| **v2, fixed, observed (strict / equivalence)** | **87.50 / 95.83%** | **76.36 / 83.64%** | **42/6/13** |
+| v2, fixed, no observations | 100% | 60.00% | 33/0/22 |
+
+Verification: `cargo test --locked` passes 49 + 4 + 8;
+`gem/test/facts_test.rb -n /private_constants/` passes. `git diff --check`
+is clean.
+
+### Fourth review: Unicode constants and `capture` (2026-11-03)
+
+A fourth review of `01e12c5` found two narrow gaps, both fixed without new
+machinery. Each has a regression test that fails on `01e12c5`:
+
+1. **Unicode constant names.** The dumper no longer filters probe names
+   with an ASCII pattern. The names come from Ruby's own constant tables
+   and module names, so a private `Shop::Café` shadow is recorded. A name
+   that `const_defined?` rejects as invalid cannot be written as a
+   constant in source, so it is skipped.
+2. **`capture` overrides.** Rails runs a helper's block through `capture`
+   and `with_output_buffer`. A template block now counts only when every
+   definer of the helper is gem-defined, and every definer of `capture` and
+   of `with_output_buffer` is ActionView's own `CaptureHelper` method. Any
+   other definer refuses: a module may be included, and a class may be
+   inherited by a custom view class (a fifth review executed such a case).
+   Every corpus app has other definers (`ActiveStorage::Previewer`,
+   `ActionView::OutputBuffer`, ...), so template blocks now refuse in all of
+   them. This changes one v2 answer, contrary to an earlier estimate:
+   c07's helper call sits inside a `turbo_frame_tag` block in Campfire's
+   `_membership` partial, so c07 answers `String` again, as on `206a2fc`.
+   Strict v2 stays 87.50% / 76.36% (42/6/13); the equivalence drops from
+   95.83% / 83.64% to 93.75% / 81.82%. v3 and v2 without observations are
+   unchanged.
+
+**Fifth measurement of v3**, on the same frozen file with facts
+regenerated, prompted by review. Binary `bc27c3fe…`. Every answer on v2
+and v3, with and without observations, is identical to the fourth
+measurement:
+- **v3, observed:** 96.30% / 77.61%, 52/2/15.
+- **v3, no observations:** 100% / 58.21%.
+- **v2, observed:** strict 87.50% / 76.36%, equivalence 95.83% / 83.64%.
+- **v2, no observations:** 100% / 60.00%.
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed;
+`gem/test/facts_test.rb -n /private_constants/` passes.

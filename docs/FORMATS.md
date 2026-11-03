@@ -64,6 +64,10 @@ Prism can look at the source span.
     "ancestors": ["Article", "Article::GeneratedAssociationMethods", "..."],
     "singleton_ancestors": ["#<Class:Article>", "..."],
     "const_source_location": "app/models/article.rb:1",
+    "constants": ["GeneratedAssociationMethods", "..."],   // own names, autoloads included
+    "private_constants": [],                               // own private names among top-level names
+    "anonymous_ancestor_constants": [],                    // own names of unnamed ancestors
+    "anonymous_ancestor_methods": [],                      // own instance methods of unnamed ancestors
     "methods": [{
       "name": "title", "singleton": false, "visibility": "public",
       "owner": "Article::GeneratedAttributeMethods",

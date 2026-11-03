@@ -24,6 +24,8 @@ module Lowrail
     MOD_PRIVATE_IMS = Module.instance_method(:private_instance_methods)
     MOD_INSTANCE_METHOD = Module.instance_method(:instance_method)
     MOD_CONST_SOURCE_LOCATION = Module.instance_method(:const_source_location)
+    MOD_CONSTANTS = Module.instance_method(:constants)
+    MOD_CONST_DEFINED = Module.instance_method(:const_defined?)
     CLASS_SUPERCLASS = Class.instance_method(:superclass)
     CLASS_ATTACHED_OBJECT = Class.instance_method(:attached_object)
     KERNEL_SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
@@ -129,7 +131,14 @@ module Lowrail
         list = []
         named = []
         # Snapshot first: the walk creates singleton classes.
-        ObjectSpace.each_object(Module).to_a.each do |mod|
+        snapshot = ObjectSpace.each_object(Module).to_a
+        # Names a reader may resolve as a relative constant: every public
+        # top-level constant and the first segment of every module name,
+        # which includes private top-level constants. Recomputed per dump.
+        @probe_names = (MOD_CONSTANTS.bind_call(Object, false).map { |c| c.to_s } +
+          snapshot.filter_map { |m| n = MOD_NAME.bind_call(m); n.split("::").first if n.is_a?(String) && !n.include?("#<") })
+          .uniq
+        snapshot.each do |mod|
           if MOD_SINGLETON_P.bind_call(mod)
             stats["singleton_classes"] += 1
             next
@@ -234,9 +243,37 @@ module Lowrail
         sc = KERNEL_SINGLETON_CLASS.bind_call(mod)
         entry["singleton_ancestors"] = MOD_ANCESTORS.bind_call(sc).map { |a| mod_label(a) }
         entry["const_source_location"] = const_location(name)
+        # Own constant names, including registered autoloads; listing them
+        # loads nothing. Lets readers prove a relative constant is not shadowed.
+        # `constants` omits private constants, which Ruby cannot list; probe
+        # every top-level name (the only names readers resolve) instead.
+        anonymous = MOD_ANCESTORS.bind_call(mod).reject { |a| MOD_NAME.bind_call(a).is_a?(String) }
+        entry["constants"] = guard("constants of #{name}") { MOD_CONSTANTS.bind_call(mod, false).map { |c| c.to_s }.sort }
+        entry["private_constants"] = guard("private constants of #{name}") { private_top_level_names(mod) }
+        entry["anonymous_ancestor_constants"] = guard("anonymous ancestor constants of #{name}") do
+          anonymous.flat_map { |a| MOD_CONSTANTS.bind_call(a, false) + private_top_level_names(a) }.map { |c| c.to_s }.uniq.sort
+        end
+        # Unnamed ancestors (generated helper modules) have no entry of their own.
+        entry["anonymous_ancestor_methods"] = guard("anonymous ancestor methods of #{name}") do
+          anonymous.flat_map { |a| [MOD_PUBLIC_IMS, MOD_PROTECTED_IMS, MOD_PRIVATE_IMS].flat_map { |um| um.bind_call(a, false) } }
+            .map { |m| m.to_s }.uniq.sort
+        end
         methods = own_methods(mod, name, false) + own_methods(sc, name, true)
         entry["methods"] = methods.sort_by { |m| [m["singleton"] ? 1 : 0, m["name"]] }
         entry
+      end
+
+      # const_defined?(name, false) sees private constants and registered
+      # autoloads without loading them.
+      def private_top_level_names(mod)
+        public = MOD_CONSTANTS.bind_call(mod, false).map { |c| c.to_s }
+        # Names come from Ruby's own tables, Unicode ones included. A name that
+        # is not a valid constant cannot be written as one in source.
+        (@probe_names - public).select do |c|
+          MOD_CONST_DEFINED.bind_call(mod, c, false)
+        rescue NameError
+          false
+        end.sort
       end
 
       def own_methods(mod, mod_name, singleton)

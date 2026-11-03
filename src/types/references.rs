@@ -8,15 +8,19 @@ use std::collections::BTreeSet;
 const ROUTE_HELPERS: &str = "Lowrail::RouteHelpers";
 
 /// Named-route helpers live in an anonymous module ahead of Rails' UrlFor, so
-/// boot facts carry no method for them; the route table does.
+/// boot facts carry no method for them; the route table does. `direct`
+/// helpers have no route, only a method in the booted helper modules.
 fn route_helper(facts: &Facts, receiver: &str, name: &str) -> bool {
     let Some(route) = name.strip_suffix("_path").or_else(|| name.strip_suffix("_url")) else { return false; };
-    facts.routes.iter().any(|r| r.name.as_deref() == Some(route))
+    let helpers = ["Rails.application.routes.named_routes.path_helpers_module",
+        "Rails.application.routes.named_routes.url_helpers_module"];
+    (facts.routes.iter().any(|r| r.name.as_deref() == Some(route))
+        || facts.modules.iter().any(|m| helpers.contains(&m.name.as_str()) && m.methods.iter().any(|m| m.name == name)))
         && facts.modules.iter().any(|m| m.name == receiver
             && m.ancestors.iter().any(|a| a == "ActionDispatch::Routing::UrlFor"))
 }
 
-pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
+pub(super) fn callers(model: &TypeModel, facts: &Facts, target: &str) -> Result<Value, String> {
     let (receiver, name, singleton) = target.rsplit_once('#').map(|(c, m)| (c, m, false))
         .or_else(|| target.rsplit_once('.').map(|(c, m)| (c, m, true)))
         .ok_or("expected Class#method or Class.method")?;
@@ -37,32 +41,68 @@ pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
         let Ok(source) = std::fs::read(path) else { unavailable.push(path); continue; };
         let parsed = parser.parse(&source);
         if parsed.errors().next().is_some() { unavailable.push(path); continue; }
-        Calls { facts, path, source: &source, wanted, wanted_receiver: receiver, name, context: None,
-            preserving: Vec::new(), collectors: Vec::new(),
+        Calls { model, facts, path, source: &source, wanted, wanted_receiver: receiver, name, context: None,
+            lexical: None, nesting: Vec::new(), blocks: Vec::new(), collectors: Vec::new(),
             found: &mut found, unresolved: &mut unresolved }.visit(&parsed.node());
     }
     Ok(json!({"available":true,"target":target,"callers":found,"unresolved":unresolved,
         "unavailable_sources":unavailable,
-        "complete":false,"scope":"boot-indexed Ruby files; implicit/self/constant receivers outside blocks, plus Rails respond_to/format blocks and module methods resolved through booted includers; dynamic dispatch, other blocks, templates and unindexed files are not exhaustive"}))
+        "complete":false,"scope":"boot-indexed Ruby files; implicit/self receivers outside blocks, in Rails respond_to/format blocks and in blocks of core iterators with an explicit receiver; constant receivers with an unambiguous lexical lookup; module methods resolved through booted includers or extenders; dynamic dispatch, other blocks, templates and unindexed files are not exhaustive"}))
 }
 
 struct Calls<'a> {
+    model: &'a TypeModel,
     facts: &'a Facts,
     path: &'a str,
     source: &'a [u8],
     wanted: &'a Method,
     wanted_receiver: &'a str,
     name: &'a str,
+    /// The receiver `self` currently denotes, cleared in blocks that may rebind it.
     context: Option<(String, String, bool)>,
-    /// Per enclosing call: whether its block runs with the caller's self.
-    preserving: Vec<bool>,
+    /// The enclosing def, which blocks do not change; constant lookup is lexical.
+    lexical: Option<(String, String, bool)>,
+    /// Lexically enclosing class/module names, innermost last.
+    nesting: Vec<String>,
+    /// Per enclosing call: how its block treats the caller's self.
+    blocks: Vec<Block>,
     /// Block parameters bound to Rails' respond_to collectors.
     collectors: Vec<Vec<u8>>,
     found: &'a mut Vec<Value>,
     unresolved: &'a mut Vec<Value>,
 }
 
+#[derive(Clone, Copy, PartialEq)]
+enum Block {
+    /// The block may run with another self (instance_exec, DSLs).
+    Rebinds,
+    /// Core iterators yield normally; self stays the caller's.
+    Keeps,
+    /// Rails respond_to: kept self, and the block parameter collects formats.
+    Collects,
+}
+
+/// Core methods that yield to their block normally. Trusted only when the
+/// receiver's static type resolves the name to Ruby's own implementation
+/// (Kernel for tap/then, the core class otherwise), never to an app or gem
+/// method that could instance_exec the block.
+const YIELDING: &[&str] = &["tap", "then", "yield_self", "each", "each_with_index", "each_with_object",
+    "map", "flat_map", "collect", "select", "filter", "filter_map", "reject", "find", "detect", "sum",
+    "gsub", "sub", "times", "each_slice", "group_by", "sort_by", "index_by", "min_by", "max_by", "partition"];
+
 impl<'pr> Visit<'pr> for Calls<'_> {
+    fn visit_class_node(&mut self, node: &ruby_prism::ClassNode<'pr>) {
+        self.nest(node.constant_path());
+        ruby_prism::visit_class_node(self, node);
+        self.nesting.pop();
+    }
+
+    fn visit_module_node(&mut self, node: &ruby_prism::ModuleNode<'pr>) {
+        self.nest(node.constant_path());
+        ruby_prism::visit_module_node(self, node);
+        self.nesting.pop();
+    }
+
     fn visit_def_node(&mut self, node: &ruby_prism::DefNode<'pr>) {
         let line = self.source[..node.location().start() as usize].iter().filter(|&&b| b == b'\n').count() as u32 + 1;
         let contexts: BTreeSet<_> = self.facts.modules.iter().flat_map(|m| &m.methods)
@@ -72,26 +112,28 @@ impl<'pr> Visit<'pr> for Calls<'_> {
                 let owner = m.owner.strip_prefix("#<Class:").and_then(|s| s.strip_suffix('>')).unwrap_or(&m.owner);
                 (owner.to_owned(), m.name.clone(), m.singleton)
             }).collect();
-        let previous = self.context.take();
+        let previous = (self.context.take(), self.lexical.take());
         self.context = (contexts.len() == 1).then(|| contexts.into_iter().next().unwrap());
+        self.lexical = self.context.clone();
         ruby_prism::visit_def_node(self, node);
-        self.context = previous;
+        (self.context, self.lexical) = previous;
     }
 
     fn visit_call_node(&mut self, node: &ruby_prism::CallNode<'pr>) {
         if node.name().as_slice() == self.name.as_bytes() && let Some(loc) = node.message_loc() {
+            let constant = node.receiver().is_some_and(|n| n.as_constant_read_node().is_some() || n.as_constant_path_node().is_some());
             let receiver = match node.receiver() {
                 None => self.context.as_ref().map(|(r, _, s)| (r.clone(), *s)),
                 Some(n) if n.as_self_node().is_some() => self.context.as_ref().map(|(r, _, s)| (r.clone(), *s)),
-                Some(n) if n.as_constant_read_node().is_some() || n.as_constant_path_node().is_some() => {
-                    let name = String::from_utf8_lossy(n.location().as_slice()).trim_start_matches("::").to_owned();
-                    // Relative constants inside a namespace require lexical lookup,
-                    // which this index deliberately does not guess.
-                    let nested = self.context.as_ref().is_some_and(|(r, _, _)| r.contains("::"));
-                    ((self.context.is_some() && !nested) || n.location().as_slice().starts_with(b"::")).then_some((name, true))
+                Some(n) if constant => {
+                    let source = String::from_utf8_lossy(n.location().as_slice());
+                    let name = source.trim_start_matches("::").to_owned();
+                    (source.starts_with("::") || (self.lexical.is_some() && self.unambiguous(&name))).then_some((name, true))
                 }
                 _ => None,
             };
+            // A block does not change constant lookup or the enclosing def.
+            let context = if constant { &self.lexical } else { &self.context };
             let resolved = receiver.as_ref().and_then(|(r, s)| resolve(self.facts, r, self.name, *s));
             // A module method's implicit self is any booted class that includes
             // it. Report the site only for the queried class, with that class.
@@ -102,7 +144,7 @@ impl<'pr> Visit<'pr> for Calls<'_> {
             let column = self.source[..loc.start() as usize].iter().rposition(|&b| b == b'\n')
                 .map_or(loc.start() as usize + 1, |p| loc.start() as usize - p);
             let site = json!({"path":self.path,"line":line,"column":column,
-                "caller":self.context.as_ref().map(|(r, m, s)| key(r, m, *s))});
+                "caller":context.as_ref().map(|(r, m, s)| key(r, m, *s))});
             let route = resolved.is_none() && self.wanted.owner == ROUTE_HELPERS
                 && node.receiver().is_none_or(|n| n.as_self_node().is_some())
                 && receiver.as_ref().is_some_and(|(r, s)| !*s && r == self.wanted_receiver);
@@ -115,22 +157,38 @@ impl<'pr> Visit<'pr> for Calls<'_> {
                 site["via"] = json!(via);
                 self.found.push(site);
             } else if let Some((_, method)) = resolved {
-                if receiver.as_ref().is_some_and(|(r, _)| r == self.wanted_receiver)
-                    && method.owner == self.wanted.owner && method.name == self.wanted.name
-                    && method.singleton == self.wanted.singleton {
+                let same = method.owner == self.wanted.owner && method.name == self.wanted.name
+                    && method.singleton == self.wanted.singleton;
+                let (r, s) = receiver.as_ref().unwrap();
+                if same && r == self.wanted_receiver {
+                    self.found.push(site);
+                } else if same && self.wanted.owner == self.wanted_receiver
+                    && self.facts.modules.iter().any(|m| m.name == self.wanted_receiver && m.kind == "module") {
+                    // A queried module method (a concern, a ClassMethods
+                    // module) is called through each class that includes or
+                    // extends it; report that class, never conflating classes
+                    // that merely share an implementation elsewhere.
+                    let mut site = site;
+                    site["via"] = json!(if *s { format!("{r}.") } else { r.clone() });
                     self.found.push(site);
                 }
             } else {
                 self.unresolved.push(site);
             }
         }
-        self.preserving.push(self.preserves_self(node));
+        self.blocks.push(self.block(node));
         ruby_prism::visit_call_node(self, node);
-        self.preserving.pop();
+        self.blocks.pop();
     }
 
     fn visit_block_node(&mut self, node: &ruby_prism::BlockNode<'pr>) {
-        if self.preserving.last() == Some(&true) {
+        if self.blocks.last() == Some(&Block::Keeps) {
+            let collectors = std::mem::take(&mut self.collectors);
+            ruby_prism::visit_block_node(self, node);
+            self.collectors = collectors;
+            return;
+        }
+        if self.blocks.last() == Some(&Block::Collects) {
             // Rails stores these blocks and later calls them with `call`, so
             // their self is still the enclosing method's receiver.
             let parameter = node.parameters().and_then(|p| p.as_block_parameters_node())
@@ -150,15 +208,80 @@ impl<'pr> Visit<'pr> for Calls<'_> {
 }
 
 impl Calls<'_> {
-    fn preserves_self(&self, node: &ruby_prism::CallNode<'_>) -> bool {
-        match node.receiver() {
+    fn block(&self, node: &ruby_prism::CallNode<'_>) -> Block {
+        let collects = match node.receiver() {
             None => node.name().as_slice() == b"respond_to" && self.context.as_ref().is_some_and(|(r, _, s)|
                 !*s && resolve(self.facts, r, "respond_to", false)
                     .is_some_and(|(_, m)| m.owner == "ActionController::MimeResponds")),
             Some(receiver) => receiver.as_local_variable_read_node()
                 .is_some_and(|n| self.collectors.iter().any(|c| c.as_slice() == n.name().as_slice())),
-        }
+        };
+        if collects { Block::Collects }
+        else if node.receiver().is_some_and(|r| self.core_iterator(&r, &String::from_utf8_lossy(node.name().as_slice()), node.is_safe_navigation())) { Block::Keeps }
+        else { Block::Rebinds }
     }
+
+    fn core_iterator(&self, receiver: &ruby_prism::Node<'_>, name: &str, safe_navigation: bool) -> bool {
+        const CORE: &[&str] = &["Array", "Hash", "Enumerable", "String", "Integer", "Range"];
+        if !YIELDING.contains(&name) || receiver.as_self_node().is_some() { return false; }
+        let context = self.context.as_ref().filter(|(_, _, s)| !*s).map_or("", |(r, _, _)| r.as_str());
+        let ty = super::infer::value(receiver, self.facts, self.model, context, &BTreeMap::new());
+        // Callers are static answers: a sampled receiver class is not proof.
+        if ty.evidence == Evidence::Observed || ty.name == "untyped" { return false; }
+        // nil is an ordinary NilClass receiver (NilClass may be reopened);
+        // only safe navigation skips the call, and its block, on nil.
+        let mut classes = BTreeSet::new();
+        for arm in super::infer::arms(&ty.name) {
+            let nullable = arm == "nil" || arm.ends_with('?');
+            let arm = arm.trim_end_matches('?');
+            if arm != "nil" { classes.insert(arm.split('[').next().unwrap_or(arm).to_owned()); }
+            if nullable && !safe_navigation { classes.insert("NilClass".to_owned()); }
+        }
+        !classes.is_empty() && classes.iter().all(|class| {
+            resolve(self.facts, class, name, false).is_some_and(|(_, method)| {
+                let core = if matches!(name, "tap" | "then" | "yield_self") { method.owner == "Kernel" }
+                    else { CORE.contains(&method.owner.as_str()) };
+                core && method.source_location.as_deref().is_none_or(|l| l.starts_with("<internal:"))
+            })
+        })
+    }
+
+    fn nest(&mut self, node: ruby_prism::Node<'_>) {
+        let name = String::from_utf8_lossy(node.location().as_slice());
+        let outer = self.nesting.last().filter(|_| !name.starts_with("::"));
+        let name = name.trim_start_matches("::");
+        self.nesting.push(outer.map_or_else(|| name.to_owned(), |o| format!("{o}::{name}")));
+    }
+
+    /// A relative constant names the top-level one only when every lexically
+    /// enclosing scope and every ancestor of the innermost one is booted with
+    /// its constant table dumped, and none of them has (or autoloads) that
+    /// name. A scope whose table is unknown refuses.
+    fn unambiguous(&self, name: &str) -> bool {
+        let first = name.split("::").next().unwrap_or(name);
+        // Both tables are required: `constants` omits private constants.
+        let lacks = |module: &Module| [&module.constants, &module.private_constants].iter()
+            .all(|table| table.as_ref().is_some_and(|c| !c.iter().any(|c| c == first)));
+        let mut scopes: BTreeSet<String> = BTreeSet::new();
+        for scope in self.nesting.iter().chain(self.lexical.iter().map(|(r, _, _)| r)) {
+            let mut prefix = scope.as_str();
+            loop {
+                scopes.insert(prefix.to_owned());
+                let Some((outer, _)) = prefix.rsplit_once("::") else { break; };
+                prefix = outer;
+            }
+        }
+        let Some(inner) = self.nesting.last().or(self.lexical.as_ref().map(|(r, _, _)| r))
+            .and_then(|inner| self.facts.modules.iter().find(|m| &m.name == inner)) else { return false; };
+        // Unnamed ancestors' tables include private names only in dumps that
+        // also carry `private_constants`, which `lacks(inner)` requires below.
+        if !inner.anonymous_ancestor_constants.as_ref().is_some_and(|c| !c.iter().any(|c| c == first)) { return false; }
+        scopes.extend(inner.ancestors.iter().filter(|a| !a.starts_with('#')).cloned());
+        scopes.insert(inner.name.clone());
+        scopes.remove("Object");
+        scopes.iter().all(|scope| self.facts.modules.iter().find(|m| &m.name == scope).is_some_and(lacks))
+    }
+
 
     /// The queried class, when the current context is an instance method of a
     /// module that this class includes and the name resolves to the target there.
