@@ -12,7 +12,7 @@ allocate (method_missing, respond_to?, callback compilation, Hash merges).
 | # | Branch | Commit | Common pattern | Per call | Workloads moved (A/A 26 / 27) | Median per workload |
 | --- | --- | --- | --- | ---: | ---: | ---: |
 | R2-1 | [`thomasklemm/thread-mattr-key-literal`](https://github.com/thomasklemm/rails/tree/thomasklemm/thread-mattr-key-literal) | [`e367362490`](https://github.com/thomasklemm/rails/commit/e3673624906dd601fb747fc5f7a96813ecfee528) | every `thread_mattr_accessor` read/write: Turbo's per-request `Turbo.with_request_id`, Action Text's per-request renderer, query log tags per query | −2 objects; reader 364 → 198 ns (interp), 299 → 109 ns (YJIT) | 83 / 85 of 97 | −10.8 / −10.0 |
-| R2-2 | [`thomasklemm/subscriber-event-method-names`](https://github.com/thomasklemm/rails/tree/thomasklemm/subscriber-event-method-names) | [`661a404f18`](https://github.com/thomasklemm/rails/commit/661a404f18ea00719215ddb018ce13e636a76b2d) | every event delivered to a log subscriber or structured event subscriber (`ActiveSupport::Subscriber#call`) | −1 String; 424 → 217 ns (interp), 242 → 87 ns (YJIT) | 75 / 76 of 97 | −3.3 / −4.0 |
+| R2-2 | [`thomasklemm/subscriber-event-method-names`](https://github.com/thomasklemm/rails/tree/thomasklemm/subscriber-event-method-names) | [`963c79fd75`](https://github.com/thomasklemm/rails/commit/963c79fd7575d31ec3e66b3bafeb0458925d1164) | every event delivered to a log subscriber or structured event subscriber (`ActiveSupport::Subscriber#call`) | −1 String; 424 → 217 ns (interp), 242 → 87 ns (YJIT) | 75 / 76 of 97 | −3.3 / −4.0 |
 
 Interpreter / YJIT, Ruby 4.0.7. Allocation counts only; no request-time claim. Per-call times are micro timings.
 
@@ -249,6 +249,17 @@ without the ivar keep working), the name derived from the pattern before its fir
 commit: `Subscriber#call` 1 → 0 objects, 405 → 219 ns (interp), 237 → 93 ns (YJIT). The census was not rerun; the
 dispatch path for attached events is the same Hash lookup.
 
+**Second Codex re-review of `661a404f18` (request changes, one P2, confirmed):** the cache insert assumed
+`prepare_pattern` returns a String. A subclass that overrides it to return a Regexp (the notifier accepts one)
+attaches and dispatches on main, but `attach_to` raised NoMethodError (`Regexp#index`) on `661a404f18`. Amended to
+[`963c79fd75`](https://github.com/thomasklemm/rails/commit/963c79fd7575d31ec3e66b3bafeb0458925d1164): only String
+patterns with a dot are cached; everything else, Regexp subscriptions included, keeps main's slice in `#call`, and
+detach deletes the (absent) cache entry as a no-op. A third test (attach, deliver, detach with a Regexp pattern) fails
+on `661a404f18` and passes on main and `963c79fd75`. Micro on `963c79fd75`: 0 objects, 229 ns (interp), 92 ns
+(YJIT); the Regexp control still 1 object. Active Support suite 6,871 runs (+3 tests), 0 F, 0 E, 60 skips; RuboCop
+clean. The other suites were last run on `661a404f18`; the new change only affects `attach_to` for non-String
+patterns.
+
 ```diff
      def call(event)
 -      method = event.name[0, event.name.index(".")]
@@ -314,15 +325,15 @@ Local suites, Ruby 4.0.7, `RAILS_STRICT_WARNINGS=1`, `SEED=41231`, `bundle exec 
 
 | Suite | main `5810776eec` | R2-1 thread-mattr | R2-2 subscriber | R2-3 URL merge | R2-4 capture |
 | --- | --- | --- | --- | --- | --- |
-| Active Support | 6,868 runs, 0 F, 0 E, 60 skips | same | 6,870 runs (+2 new tests), 0 F, 0 E, 60 skips | — | — |
+| Active Support | 6,868 runs, 0 F, 0 E, 60 skips | same | 6,871 runs (+3 new tests), 0 F, 0 E, 60 skips | — | — |
 | Action Pack | 4,472 runs, 0 F, 0 E, 0 skips | same | same | same | — |
 | Action View (3 groups) | 2,913 + 251 + 177 runs, 0 F, 0 E | same | same | — | same |
 | Active Job (7 adapter groups) | 2,145 runs, 0 F, 0 E | same | same | — | — |
 | Action Text | 373 runs, 0 F, 1 E | same | same | — | — |
 | Active Record `query_logs_test`, `log_subscriber_test`, `structured_event_subscriber_test` (`ARCONN=sqlite3`) | 93 runs, 0 F, 0 E | same | same | — | — |
 
-"Same" means identical run, assertion, failure, error and skip counts. R2-2's column is the amended `661a404f18`, except Action Text, which was
-run on `48d7ea10bf` only. The one Action Text error is
+"Same" means identical run, assertion, failure, error and skip counts. R2-2's column is the amended `661a404f18` (Active Support: `963c79fd75`), except
+Action Text, which was run on `48d7ea10bf` only. The one Action Text error is
 `yarn` missing from this orb (a JS build step), on main as on the branches. Action Pack, Action View, Active Job,
 Action Text and the Active Record tests were run for R2-1 and R2-2 because their changes are exercised there
 (Action Text's renderer and query log tags use per-thread accessors; every log and structured event subscriber goes
