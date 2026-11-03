@@ -52,7 +52,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   [Shopify/ruby#1100](https://github.com/Shopify/ruby/issues/1100#issuecomment-6611201953): "It's free to take.
   Unless there's a particular issue … that has an assignee or an active PR, feel free to work on any of the
   ideas."). An idea is taken only if its own issue has an assignee or an open PR exists (e.g. ruby/ruby#18326 for
-  sendforward).
+  sendforward). A name in the assignee column of a tracker table (e.g. Shopify/ruby#1039's rows) also counts as taken:
+  check it before building. Lead 7 was built and then found to be row 7, assigned to k0kubun, so it stays unopened.
 * **YJIT is in maintenance mode** (XrXr on
   [ruby#19664](https://github.com/ruby/ruby/pull/19664#pullrequestreview-5752852916); k0kubun on
   [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897)). JIT performance and
@@ -88,7 +89,7 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
 * **ruby/ruby:** at most 15 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas). At 15 or
   more, open nothing new until merges or closes bring the count below 15, and let the maintainers merge. New PRs
   are VM or ZJIT, at most one new PR per day. Slots above the cap (Thomas): Shopify/ruby#1100's fix, which k0kubun
-  cleared on that issue; ZJIT lead 7, `&block` forwarding (Shopify/ruby#1014), and lead 3, class-level methods on
+  cleared on that issue; the top free lead from Z13's ranking (this slot was lead 7's, which turned out to be taken), and lead 3, class-level methods on
   many model classes (Shopify/ruby#1099 item 2), from the
   [lead queue](upstream/zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03). The green-lit Shopify/ruby#1064,
   #1065 and #1091 open as room appears under the cap; `Kernel#dup` (#1058) after them.
