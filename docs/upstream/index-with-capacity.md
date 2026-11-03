@@ -7,7 +7,9 @@ hash built with `Hash.new(capacity: size)`, or `{}` when the array has two eleme
 [`d98b002`](https://github.com/thomasklemm/rails/commit/d98b002da5874da43f588c209fd4bb33d5b76dc9), stacked on
 [`6235de2`](https://github.com/thomasklemm/rails/commit/6235de2236077aafd67d4991cab172715054ebd0) (rails/rails#59555,
 the `Hash#index_with` fix, which adds the `Array#index_with` this change extends), on canonical main
-[`5810776eec`](https://github.com/rails/rails/commit/5810776eec). No PR is open for it.
+[`5810776eec`](https://github.com/rails/rails/commit/5810776eec). Opened as
+[rails/rails#59557](https://github.com/rails/rails/pull/59557), stacked on #59555, after Codex Thermos (gpt-6.1-sol)
+approved `d98b002` on both rubrics.
 
 **Review round 1** (Codex Thermos, gpt-6.1-sol) on the first version, `c1da731`, requested two changes, both made.
 (1) The 4.1 path used `size` and `each`, which an Array subclass can override, where `Array#to_h` reads the storage
@@ -534,7 +536,7 @@ end
   `Ractor::Error: can not copy ActiveSupport::Notifications::Fanout::Registry` that occurs the same way on
   unchanged main under Ruby master (not related to this change). RuboCop: no offenses.
 
-### PR description draft (not published)
+### PR description (as opened in #59557)
 
 > **Build `Array#index_with` without pair arrays on Ruby 4.1**
 >
