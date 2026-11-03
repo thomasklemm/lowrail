@@ -139,6 +139,7 @@ ruby-bench is per iteration (railsbench / lobsters / shipit).
 | 7 `&block` forwarding | k0kubun: Shopify/ruby#1039 row 7 (`93e4e7d69c` "Pass a `&blk` argument through to a direct send") lists him as assignee. Found 2026-11-03 after our build; our branch [`thomasklemm/zjit-forward-block-param`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-forward-block-param) @ `ab21c5458b` stays unopened. |
 | 17 `throw` from blocks and exception handlers unwind by longjmp and materialize frames | Shopify/ruby#1093 (k0kubun, TAG_RETURN/TAG_BREAK), ruby/ruby#18244 (luke-gruber, draft, `throw`), ruby/ruby#18759 (rafaelfranca, exception handlers). Gap: 15.6 / 5.3 / 13.2 M Ir in `zjit_materialize_frames` alone |
 | 19 `PushInlineFrame` costs ~21 Ir per inlined call | nirvdrum, Shopify/ruby#1023 "Virtual Inline Frames" (assigned); Shopify/ruby#1008. Not a gap against YJIT (a YJIT call is ~19 Ir plus `leave`); 92 / 33 / 76 M Ir of ZJIT code |
+| 11 attr_reader/getivar on shape-polymorphic receivers without a shape profile | tekknolagi: ruby/ruby#18616 (open draft, "Seed polymorphic type branches with shape data too") branches on every profiled shape of an arm's class, which is what remains after his ruby/ruby#19443 (open, approved; one shape per class). Shopify/ruby#1039 rows 77/78 (unassigned) port the same fix on k0kubun's branch. Found 2026-11-03 in the [lead 11 follow-up](zjit-yjit-gap.md#lead-11-why-there-is-no-profile). Gap: 12.4 / 30.8 / 83.9 M Ir; about 11 / 24 / 59 M remain after #19443 |
 
 **Free, ranked**
 
@@ -151,18 +152,18 @@ average price per call, so they are estimates.
 | rank | lead | gap (M Ir) | apps (census, per op) | why this rank |
 |---|---|---|---|---|
 | 1 | 3 class-polymorphic sends to one method entry: class-level methods on model classes (`attribute_types` in `_load_from_sql`, `current_shard`/`current_role`, `_reflections`) and instance-level `self` attr_readers shared by many subclasses (`Type::Value#hash`/`#cast`, `association`) | 7.2 / 42.1 / 180.1 (4% / 24% / 29%) | 10, 325 | Largest free item on lobsters and shipit. Shopify/ruby#1099 item 2, no assignee; slot granted. Includes lead 2's 6.6 M on shipit. Design-heavy (method-entry-keyed guard; YJIT handles these sites with its class-guard chain). |
-| 2 | 11 attr_reader/getivar on shape-polymorphic receivers without a shape profile (`getivar_fallback_no_profile_missing_ic`) | 12.4 / 30.8 / 83.9 (7% / 17% / 14%) | 10, 2,493 (all getivar no-profile) | Shopify/ruby#1099 pattern 1, no assignee; ruby/ruby#19443 (tekknolagi) only seeds arms with exactly one shape. Medium. See [lead 11](#11-shape-polymorphic-attr_readergetivar-without-a-shape-profile). |
-| 3 | 12 cfunc calls with a frame cost ~40 Ir of JIT code against YJIT's ~18 | ~48 / ~22 / ~35 (26% / 12% / 6%) | unmeasured | No issue or PR. Mechanism not confirmed (one disassembly; see [lead 12](#12-cfunc-calls-with-a-frame)). Next to XrXr's stack-map work (ruby/ruby#18960, #19432); ask before building. |
-| 4 | 13 `rb_zjit_root_mark` marks every JITFrame's ISEQ on every GC | 25.4 / 6.7 / 37.1 (14% / 4% / 6%) | unmeasured | No issue or PR. Small, self-contained. Scales with GC count and JITFrames (38k / 150k / 119k). |
-| 5 | 14 `&block` passed to a C method (`Rack::Request#fetch_header` → `@env.fetch(name, &block)`) and other `one_or_more_complex_arg_pass` | 19.5 / 6.1 / 13.1 (11% / 3% / 2%) | –, 421 | Shopify/ruby#1039 row 42 ("&blk to C"), unassigned. `fetch_header` alone is 11.4 M on railsbench. Small to medium. |
-| 6 | 15 getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`: `block in fetch_value`, `Logger#level`/`level_override`, `stale_state`) | 3.9 / 7.8 / 24.0 (2% / 4% / 4%) | 10, 1,662 | Shopify/ruby#1099 pattern 3 (receivers recorded as "other" since ruby/ruby#19540), no assignee. |
-| 7 | 2 `BasicObject#!=` (polymorphic inner `==`) | 0 / ~1 / 6.6 (in lead 3's total) | 10, 277 | Rides on lead 3 or general polymorphic-send work. |
-| 8 | 10 `singleton_class_seen` for module receivers (`IndexedRow::Mutable#fetch` → `UNSET.equal?`) | 0 / 0.2 / 0.1 | 6, 431 | Matters on Rails main (lobsters census 1,220 per op), not on ruby-bench's Rails 8.1. Builds on linyiru's open ruby/ruby#19658. Small. |
-| 9 | 16 PatchPoint nop padding executed inline | 31.7 / 14.0 / 27.9 Ir of nops | unmeasured | Ir overstates it: nops are cheap in cycles. Measure cycles before acting. |
-| 10 | 18 `with_vm_lock` → `rb_gc_disable()` → `gc_rest()` on every invalidation, e.g. each `extend` (297 per shipit iteration) | Ir-neutral (moves 114 M of shipit GC into the call) | unmeasured | Wall-time and pause effect only, unmeasured. The comment in zjit/src/cruby.rs explains why GC must be off under the lock, so a change needs care. |
+| 2 | 12 cfunc calls with a frame cost ~40 Ir of JIT code against YJIT's ~18 | ~48 / ~22 / ~35 (26% / 12% / 6%) | unmeasured | No issue or PR. Mechanism not confirmed (one disassembly; see [lead 12](#12-cfunc-calls-with-a-frame)). Next to XrXr's stack-map work (ruby/ruby#18960, #19432); ask before building. |
+| 3 | 13 `rb_zjit_root_mark` marks every JITFrame's ISEQ on every GC | 25.4 / 6.7 / 37.1 (14% / 4% / 6%) | unmeasured | No issue or PR. Small, self-contained. Scales with GC count and JITFrames (38k / 150k / 119k). |
+| 4 | 14 `&block` passed to a C method (`Rack::Request#fetch_header` → `@env.fetch(name, &block)`) and other `one_or_more_complex_arg_pass` | 19.5 / 6.1 / 13.1 (11% / 3% / 2%) | –, 421 | Shopify/ruby#1039 row 42 ("&blk to C"), unassigned. `fetch_header` alone is 11.4 M on railsbench. Small to medium. |
+| 5 | 15 getivar on final versions and long-lived singleton objects (`getivar_fallback_no_side_exits`: `block in fetch_value`, `Logger#level`/`level_override`, `stale_state`) | 3.9 / 7.8 / 24.0 (2% / 4% / 4%) | 10, 1,662 | Shopify/ruby#1099 pattern 3 (receivers recorded as "other" since ruby/ruby#19540), no assignee. |
+| 6 | 2 `BasicObject#!=` (polymorphic inner `==`) | 0 / ~1 / 6.6 (in lead 3's total) | 10, 277 | Rides on lead 3 or general polymorphic-send work. |
+| 7 | 10 `singleton_class_seen` for module receivers (`IndexedRow::Mutable#fetch` → `UNSET.equal?`) | 0 / 0.2 / 0.1 | 6, 431 | Matters on Rails main (lobsters census 1,220 per op), not on ruby-bench's Rails 8.1. Builds on linyiru's open ruby/ruby#19658. Small. |
+| 8 | 16 PatchPoint nop padding executed inline | 31.7 / 14.0 / 27.9 Ir of nops | unmeasured | Ir overstates it: nops are cheap in cycles. Measure cycles before acting. |
+| 9 | 18 `with_vm_lock` → `rb_gc_disable()` → `gc_rest()` on every invalidation, e.g. each `extend` (297 per shipit iteration) | Ir-neutral (moves 114 M of shipit GC into the call) | unmeasured | Wall-time and pause effect only, unmeasured. The comment in zjit/src/cruby.rs explains why GC must be off under the lock, so a change needs care. |
 | new | 20 literal `super { … }`: every `super` with its own block stays a dynamic send (`send_fallback_super_call_with_block`); hir.rs has the TODO "pass Option<blockiseq> to build_send_direct_args when we start specializing `super { ... }`" | unmeasured | unmeasured | 4.0k / 0.4k / 1.9k | Found while building lead 8 (counts from master a8b095a07e, `--zjit-stats` with 512/1024 MiB, 0 OOM, 10 warmup + 10 measured iterations). Sites not identified yet. No issue and no open ruby/ruby PR; not checked against Shopify/ruby#1039's rows. Free. |
 | new | 8b pass the frame's block to the super callee instead of the dynamic super that the lead 8 fix uses for these sites | unmeasured | unmeasured | 2.1k / 0.3k / 0.06k sites become direct sends | A measurement prototype ([thomasklemm/ruby `zjit-super-block-pass`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-super-block-pass)) adds a `BlockHandler::FrameBlock` variant and doesn't inline such sends. On the Shopify/ruby#1100 repro, Ir per call is 1,090 on master, 942 with the lead 8 fix and 555 with the prototype; ruby-bench Ir per iteration stays within the A/A (railsbench ±0.07%, lobsters ±0.11%, shipit −0.21%/+0.07%; callgrind, 10 warmup + 5 measured iterations, two runs each). A cfunc super target with a block stays dynamic (about 40 per lobsters iteration). Free, follows lead 8. |
 
+Lead 11 left the free list too: the draft ruby/ruby#18616 is an open PR for it (see Taken).
 Lead 7 left the free list: it is Shopify/ruby#1039 row 7, assigned to k0kubun (see Taken). Its measured gap stays
 29.4 / 25.1 / 66.0 M Ir. U3's literal-`super { }` lead is numbered 20 here, because Z13 numbered its leads 11–19.
 
@@ -197,9 +198,11 @@ Shopify/ruby issues and ruby/ruby PRs (`CCallWithFrame`, `cfunc frame`, `root_ma
   * Action Pack `url_options` and `cookies#request` (railsbench).
 * **Size:** 218k / 303k / 706k extra reads per iteration, about **12.4 / 30.8 / 83.9 M Ir (7% / 17% / 14%)**.
 * **Repro:** Shopify/ruby#1099, pattern 1 (`Box#v` with two shapes of one class).
-* **Status:** free. Shopify/ruby#1099 has no assignee. ruby/ruby#19443 (tekknolagi, open) handles the
-  class-polymorphic case with exactly one shape per class, not this one. Our ruby/ruby#19558 covers sends, not
-  getivar.
+* **Status:** taken (2026-11-03 follow-up). ruby/ruby#19443 (tekknolagi, open, approved) handles the
+  class-polymorphic case with exactly one shape per class; tekknolagi's draft ruby/ruby#18616 handles several
+  shapes per class, and Shopify/ruby#1039 rows 77/78 port the same fix. Shopify/ruby#1099 has no assignee. Our
+  ruby/ruby#19558 covers sends, not getivar.
+* **Cause, fix and #19443's measured effect:** [zjit-yjit-gap, Lead 11](zjit-yjit-gap.md#lead-11-why-there-is-no-profile).
 
 ### 12. cfunc calls with a frame
 
