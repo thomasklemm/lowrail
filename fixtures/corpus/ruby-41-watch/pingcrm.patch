@@ -1,0 +1,94 @@
+--- a/Gemfile
++++ b/Gemfile
+@@ -14,7 +14,7 @@
+ gem 'json', '< 3'
+ 
+ # Pg is the Ruby interface to the PostgreSQL RDBMS (https://github.com/ged/ruby-pg)
+-gem 'pg', '>= 0.18', '< 2.0'
++gem 'pg', '>= 0.18', '< 2.0', force_ruby_platform: true
+ 
+ # A Ruby/Rack web server built for parallelism. (https://puma.io)
+ gem 'puma', '>= 5.0'
+@@ -97,3 +97,9 @@
+ 
+ # Simple authorization solution for Rails. (https://github.com/CanCanCommunity/cancancan)
+ gem 'cancancan'
++
++gem "ffi", "= 1.17.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "nokogiri", "= 1.19.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -156,16 +156,10 @@
+       railties (>= 6.1.0)
+     faker (3.8.0)
+       i18n (>= 1.8.11, < 2)
+-    ffi (1.17.4-aarch64-linux-musl)
+-    ffi (1.17.4-arm64-darwin)
+-    ffi (1.17.4-x86_64-linux-gnu)
+-    ffi (1.17.4-x86_64-linux-musl)
++    ffi (1.17.4)
+     globalid (1.4.0)
+       activesupport (>= 6.1)
+-    herb (0.11.1-aarch64-linux-musl)
+-    herb (0.11.1-arm64-darwin)
+-    herb (0.11.1-x86_64-linux-gnu)
+-    herb (0.11.1-x86_64-linux-musl)
++    herb (0.11.1)
+     i18n (1.15.2)
+       concurrent-ruby (~> 1.0)
+     image_processing (1.14.0)
+@@ -209,6 +203,7 @@
+     mini_magick (5.4.0)
+       logger
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -224,13 +219,8 @@
+     net-smtp (0.5.2)
+       net-protocol
+     nio4r (2.7.5)
+-    nokogiri (1.19.4-aarch64-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-arm64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-musl)
++    nokogiri (1.19.4)
++      mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+     orm_adapter (0.5.0)
+     pagy (43.7.1)
+@@ -241,10 +231,7 @@
+     parser (3.3.12.0)
+       ast (~> 2.4.1)
+       racc
+-    pg (1.7.0-aarch64-linux-musl)
+-    pg (1.7.0-arm64-darwin)
+-    pg (1.7.0-x86_64-linux)
+-    pg (1.7.0-x86_64-linux-musl)
++    pg (1.7.0)
+     pp (0.6.4)
+       prettyprint
+     prettyprint (0.2.1)
+@@ -388,12 +375,15 @@
+   devise
+   factory_bot_rails
+   faker
++  ffi (= 1.17.4)
++  herb (= 0.11.1)
+   image_processing (~> 1.2)
+   inertia_rails (>= 1.2.2)
+   jbuilder
+   js-routes
+   json (< 3)
+   lograge
++  nokogiri (= 1.19.4)
+   pagy
+   pg (>= 0.18, < 2.0)
+   puma (>= 5.0)

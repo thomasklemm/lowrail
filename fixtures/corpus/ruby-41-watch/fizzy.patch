@@ -1,0 +1,209 @@
+--- a/Gemfile
++++ b/Gemfile
+@@ -2,7 +2,7 @@
+ 
+ # Fail loudly when bundling under the wrong Ruby rather than silently
+ # re-resolving the lockfile against its native-gem version caps.
+-ruby file: ".ruby-version"
++# ruby file: ".ruby-version" # ruby41-watch: one bundle for 4.0.7 and master
+ 
+ git_source(:bc) { |repo| "https://github.com/basecamp/#{repo}" }
+ 
+@@ -21,7 +21,7 @@
+ gem "solid_cable", "~> 4.1"
+ gem "solid_cache", "~> 1.0"
+ gem "solid_queue", "~> 1.7"
+-gem "sqlite3", ">= 2.0"
++gem "sqlite3", ">= 2.0", force_ruby_platform: true
+ gem "thruster", require: false
+ gem "trilogy", "~> 2.13"
+ gem "tzinfo-data" # Bundled zone data; the base image's tzdata package lags IANA
+@@ -73,3 +73,9 @@
+   gem "vcr"
+   gem "webmock"
+ end
++
++gem "ffi", "= 1.17.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++
++gem "nokogiri", "= 1.19.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -207,14 +207,7 @@
+       tzinfo
+     faker (3.8.0)
+       i18n (>= 1.8.11, < 2)
+-    ffi (1.17.4-aarch64-linux-gnu)
+-    ffi (1.17.4-aarch64-linux-musl)
+-    ffi (1.17.4-arm-linux-gnu)
+-    ffi (1.17.4-arm-linux-musl)
+-    ffi (1.17.4-arm64-darwin)
+-    ffi (1.17.4-x86_64-darwin)
+-    ffi (1.17.4-x86_64-linux-gnu)
+-    ffi (1.17.4-x86_64-linux-musl)
++    ffi (1.17.4)
+     fugit (1.12.1)
+       et-orbi (~> 1.4)
+       raabro (~> 1.4)
+@@ -224,14 +217,7 @@
+     globalid (1.4.0)
+       activesupport (>= 6.1)
+     hashdiff (1.2.1)
+-    herb (0.11.1-aarch64-linux-gnu)
+-    herb (0.11.1-aarch64-linux-musl)
+-    herb (0.11.1-arm-linux-gnu)
+-    herb (0.11.1-arm-linux-musl)
+-    herb (0.11.1-arm64-darwin)
+-    herb (0.11.1-x86_64-darwin)
+-    herb (0.11.1-x86_64-linux-gnu)
+-    herb (0.11.1-x86_64-linux-musl)
++    herb (0.11.1)
+     i18n (1.15.2)
+       concurrent-ruby (~> 1.0)
+     image_processing (2.2.0)
+@@ -286,6 +272,7 @@
+     marcel (2.1.0)
+     matrix (0.4.3)
+     mini_mime (1.1.5)
++    mini_portile2 (2.8.9)
+     minitest (6.0.6)
+       drb (~> 2.0)
+       prism (~> 1.5)
+@@ -325,21 +312,8 @@
+       net-protocol
+     net-ssh (7.3.3)
+     nio4r (2.7.5)
+-    nokogiri (1.19.4-aarch64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-aarch64-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-arm-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-arm-linux-musl)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-arm64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-darwin)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-gnu)
+-      racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-musl)
++    nokogiri (1.19.4)
++      mini_portile2 (~> 2.8.2)
+       racc (~> 1.4)
+     openssl (4.0.0)
+     ostruct (0.6.3)
+@@ -463,14 +437,8 @@
+       fugit (~> 1.11)
+       railties (>= 7.1)
+       thor (>= 1.3.1)
+-    sqlite3 (2.9.6-aarch64-linux-gnu)
+-    sqlite3 (2.9.6-aarch64-linux-musl)
+-    sqlite3 (2.9.6-arm-linux-gnu)
+-    sqlite3 (2.9.6-arm-linux-musl)
+-    sqlite3 (2.9.6-arm64-darwin)
+-    sqlite3 (2.9.6-x86_64-darwin)
+-    sqlite3 (2.9.6-x86_64-linux-gnu)
+-    sqlite3 (2.9.6-x86_64-linux-musl)
++    sqlite3 (2.9.6)
++      mini_portile2 (~> 2.8.0)
+     sshkit (1.25.1)
+       base64
+       logger
+@@ -542,7 +510,9 @@
+   capybara
+   debug
+   faker
++  ffi (= 1.17.4)
+   geared_pagination (~> 1.2)
++  herb (= 0.11.1)
+   image_processing (~> 2.2)
+   importmap-rails
+   jbuilder
+@@ -554,6 +524,7 @@
+   mittens
+   mocha
+   net-http-persistent
++  nokogiri (= 1.19.4)
+   platform_agent
+   propshaft
+   puma (~> 8.0)
+@@ -632,26 +603,12 @@
+   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
+   et-orbi (1.4.0) sha256=6c7e3c90779821f9e3b324c5e96fda9767f72995d6ae435b96678a4f3e2de8bc
+   faker (3.8.0) sha256=c147b308df73a90f27a4fc84f18d4c22ef0ad9c2a64b2b61c86fd0ca71753efc
+-  ffi (1.17.4-aarch64-linux-gnu) sha256=b208f06f91ffd8f5e1193da3cae3d2ccfc27fc36fba577baf698d26d91c080df
+-  ffi (1.17.4-aarch64-linux-musl) sha256=9286b7a615f2676245283aef0a0a3b475ae3aae2bb5448baace630bb77b91f39
+-  ffi (1.17.4-arm-linux-gnu) sha256=d6dbddf7cb77bf955411af5f187a65b8cd378cb003c15c05697f5feee1cb1564
+-  ffi (1.17.4-arm-linux-musl) sha256=9d4838ded0465bef6e2426935f6bcc93134b6616785a84ffd2a3d82bc3cf6f95
+-  ffi (1.17.4-arm64-darwin) sha256=19071aaf1419251b0a46852abf960e77330a3b334d13a4ab51d58b31a937001b
+-  ffi (1.17.4-x86_64-darwin) sha256=aa70390523cf3235096cf64962b709b4cfbd5c082a2cb2ae714eb0fe2ccda496
+-  ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
+-  ffi (1.17.4-x86_64-linux-musl) sha256=3fdf9888483de005f8ef8d1cf2d3b20d86626af206cbf780f6a6a12439a9c49e
++  ffi (1.17.4) sha256=bcd1642e06f0d16fc9e09ac6d49c3a7298b9789bcb58127302f934e437d60acf
+   fugit (1.12.1) sha256=5898f478ede9b415f0804e42b8f3fd53f814bd85eebffceebdbc34e1107aaf68
+   geared_pagination (1.2.0) sha256=16dc25b28e9d6945df27e9bcc6ed298d66eb9493ba45bf987037010724120cc7
+   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
+   hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
+-  herb (0.11.1-aarch64-linux-gnu) sha256=5484e0fc0bd5d040380cbbf503e86dccf3fc1d33428b7ad02715ee7dcaa018f9
+-  herb (0.11.1-aarch64-linux-musl) sha256=1113663d5e7832dad601547edb4606557ac84def516479ee5136fc7072747a58
+-  herb (0.11.1-arm-linux-gnu) sha256=849d49d6ec27aaf5a9ea07e66434fbb16a8c599b287e8f24f7478d6b358666da
+-  herb (0.11.1-arm-linux-musl) sha256=de283c299df16c089e209dbc461fe003d4b3fbf100168637c8f983cc97186b5e
+-  herb (0.11.1-arm64-darwin) sha256=c5d3c1d5f88a504bcfa6a4bb52f56650dc40345e23cdf051b02f3390cf184d9e
+-  herb (0.11.1-x86_64-darwin) sha256=f73cad010299bf998bd4ead676b80ae2c1f0ff5487a2ef852e8d83652f74ced0
+-  herb (0.11.1-x86_64-linux-gnu) sha256=e3104c5dab07300a2ea6fc3898014cf57db978fbf09f5554a2a6ef6c46f973f8
+-  herb (0.11.1-x86_64-linux-musl) sha256=0c687b667b612e7cc2403e9991ee7c8e8d10cfef026cf41165f9d99284630b09
++  herb (0.11.1) sha256=7a5a74c4931b341a2b7b7f5a530616801f5721a633d2655f002156ff553cd2d7
+   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
+   image_processing (2.2.0) sha256=e0cb9892a4395ac2b7bb2fac5c6f5bc63361f2f18ed08773e21fce5b111c6974
+   importmap-rails (2.2.3) sha256=7101be2a4dc97cf1558fb8f573a718404c5f6bcfe94f304bf1f39e444feeb16a
+@@ -673,6 +630,7 @@
+   marcel (2.1.0) sha256=f8b0327111dc7e516331eeefe052e981ce50e2bd826c1042a53cdf047fcc3512
+   matrix (0.4.3) sha256=a0d5ab7ddcc1973ff690ab361b67f359acbb16958d1dc072b8b956a286564c5b
+   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
++  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
+   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
+   minitest-reporters (1.8.0) sha256=8ce5280fb73ad3178ae525454df169b6f28c1b38b1d088ea91815d3a370ba384
+   mission_control-jobs (1.3.1) sha256=3230be224069b39fee2893eecd27c1c334fb5467290bf575e88b5c9121287b26
+@@ -688,14 +646,7 @@
+   net-smtp (0.5.2) sha256=35103cc04d6b2d94632f9928ede07483c24b70b9c0db1f231fea43909b678f3c
+   net-ssh (7.3.3) sha256=831def58b2c51dcef66ec00d29397d4f210de89c19fe78f95873ca30f386e86a
+   nio4r (2.7.5) sha256=6c90168e48fb5f8e768419c93abb94ba2b892a1d0602cb06eef16d8b7df1dca1
+-  nokogiri (1.19.4-aarch64-linux-gnu) sha256=1269fb644a6de405057a53dd5c762b1209b43ca7424f839454d3dbc677c31a8f
+-  nokogiri (1.19.4-aarch64-linux-musl) sha256=35c65b9ce72b3bb03207bdbe7067915019dc18c1b9b59139684bd6690fdd01af
+-  nokogiri (1.19.4-arm-linux-gnu) sha256=a301313e38bb065d68239e79734bcd6f56fb6efaacebde29e9abf2a4735340ca
+-  nokogiri (1.19.4-arm-linux-musl) sha256=588923c101bcfa78869734d247d25b598674323e7f22474fc468f6e5647311eb
+-  nokogiri (1.19.4-arm64-darwin) sha256=a46db9853286e6597b36ebc6953817d15acf3a299583eb3f89fdc6f91dd63527
+-  nokogiri (1.19.4-x86_64-darwin) sha256=7fd17057d3e1f00e9954a74b3cd76595d3d4a5ef233b7ed9599047c204f70551
+-  nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
+-  nokogiri (1.19.4-x86_64-linux-musl) sha256=17dfb7c1fa194ae02fbf7c51a7afc8d278045ab3fdacfd86f91d02d7b274470b
++  nokogiri (1.19.4) sha256=50c951611c92bca05c51411aef45f1cbc50f2821c4802758c5c6d34696533ab5
+   openssl (4.0.0) sha256=185711ed93d4e9c9a9db6efea7edb202dfe04f7d3692fbab988e3d84e498ee91
+   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
+   parallel (1.27.0) sha256=4ac151e1806b755fb4e2dc2332cbf0e54f2e24ba821ff2d3dcf86bf6dc4ae130
+@@ -745,14 +696,7 @@
+   solid_cable (4.1.0) sha256=828e3d509207b82b4f05f4e9c85f696994710679b52d511aa7f97ebd212d3226
+   solid_cache (1.0.10) sha256=bc05a2fb3ac78a6f43cbb5946679cf9db67dd30d22939ededc385cb93e120d41
+   solid_queue (1.7.0) sha256=6566b70b801d1c317c81bba7bcdd5677c019afac584a30374b4164002ca356d3
+-  sqlite3 (2.9.6-aarch64-linux-gnu) sha256=d8b1f7d23efd7abac285775a9566562fc7debfef79d594e3a20354406fb7907c
+-  sqlite3 (2.9.6-aarch64-linux-musl) sha256=3579e1c98cdc7ff5c3722847bb63ed4e1efb7ff675cb5e1e48ef2d4da5fb3bc9
+-  sqlite3 (2.9.6-arm-linux-gnu) sha256=33541500e3615da02afe54a9cc38b17a6985d3cf9d8b76d6d0a83002f114e7ec
+-  sqlite3 (2.9.6-arm-linux-musl) sha256=c5490af48bb228fefa54314e9541375c3907e70f8109f3881b5ff97e1c93ae33
+-  sqlite3 (2.9.6-arm64-darwin) sha256=849b5d7f795e60fe25076d62c72dd722beb45b3850b516ad978d60ee848ec15b
+-  sqlite3 (2.9.6-x86_64-darwin) sha256=b5842fea77781c14da03fa7bc0feb82db03a69e135affcb6f5399cbd2797a5f3
+-  sqlite3 (2.9.6-x86_64-linux-gnu) sha256=613188ce02f614126ddbc38c5e217ccffd6306d0dcd9adca9764547aa890a634
+-  sqlite3 (2.9.6-x86_64-linux-musl) sha256=d493b11818a3573387a1d56e1ee8fa00da23a683a7a1cc063e7a0feeed843abf
++  sqlite3 (2.9.6) sha256=956fe606956420d04ac7157d3ace620c8caba2135b2e05c76e483493da24d08e
+   sshkit (1.25.1) sha256=be3f10b9d6eb0b44d5eaba3f7cbe41bc6bb894bce4339688ac20124391455b78
+   stackprof (0.2.28) sha256=4ec2ace02f386012b40ca20ef80c030ad711831f59511da12e83b34efb0f9a04
+   stimulus-rails (1.3.4) sha256=765676ffa1f33af64ce026d26b48e8ffb2e0b94e0f50e9119e11d6107d67cb06
+@@ -786,8 +730,5 @@
+   zeitwerk (2.8.3) sha256=2c85125a8467ce069e20123d1e709a08955c9d29c118c25b46b7b7fafdbb92e5
+   zip_kit (6.4.1) sha256=6cbc9362c2b7ca7827826c708fd6cc3ab2c2a61b8f07c4cd8e0c4182b30e7b01
+ 
+-RUBY VERSION
+-  ruby 4.0.7
+-
+ BUNDLED WITH
+   4.0.20
