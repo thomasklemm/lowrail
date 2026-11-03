@@ -1,6 +1,6 @@
 # ruby escape_fuzz_custom.rb BASE_RAILS HEAD_RAILS: compare escape results (bytes, encoding, class,
 # html_safe?) across the default encoder and custom JSONGemEncoders whose stringify returns a String subclass,
-# a SafeBuffer, or a plain String with singleton methods (include?, instance_of?, to_s/equal?/class, gsub!).
+# a SafeBuffer, or a plain String with singleton methods (include?, instance_of?, equal?, to_s/equal?/class, gsub!).
 # Prints the differing cases per encoder.
 outs = ARGV.first(2).map do |dir|
   r, w = IO.pipe
@@ -22,6 +22,7 @@ outs = ARGV.first(2).map do |dir|
       "safe_buffer_lying" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.html_safe.tap { |s| def s.to_s = self; def s.equal?(*) = true; def s.instance_of?(*) = true } },
       "singleton_equal_true_include_false" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.equal?(*) = true; def s.include?(*) = false } },
       "subclass_equal_true_include_false" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = Class.new(String) { def equal?(*) = true; def include?(*) = false; def to_s = self }.new(super) },
+      "singleton_equal_raises" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.equal?(*) = raise("equal?") } },
       "singleton_gsub_noop" => Class.new(ActiveSupport::JSON::Encoding::JSONGemEncoder) { def stringify(j) = super.tap { |s| def s.gsub!(*) = nil } },
     }
     rng = Random.new(7)

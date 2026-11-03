@@ -16,7 +16,7 @@ behind `to_json`, about 4% of it. One exact candidate came out of it:
 
 | # | Branch | Commit | What | Per call, interpreter / YJIT | ruby-bench | Census (56 workloads) |
 | --- | --- | --- | --- | --- | --- | --- |
-| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`f883f67d87`](https://github.com/thomasklemm/rails/commit/f883f67d87d44a85591a77f2063748008c85d2e8) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
+| S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`4e73141327`](https://github.com/thomasklemm/rails/commit/4e73141327d9c6a5a68af085659f6256a9f9bc52) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
 
 Not opened. Escaping is a critical change under [DECISIONS](../DECISIONS.md#extra-adversarial-astra-round-for-critical-changes-2026-11-03),
 so it needs Sol and the adversarial Astra round before it can enter the queue. Draft in the short form at the end.
@@ -164,6 +164,19 @@ Active Support with `RAILS_STRICT_WARNINGS=1`: 5,488 runs, 0 failures; RuboCop c
 `60d70808d9`); the multi-record and jbuilder cases are within 0.7 points of `60d70808d9`. All runs in
 [instructions.txt](data/serialization-cpu/instructions.txt).
 
+**Review round 4 (2026-11-03).** Sol and Astra found one remaining issue in `f883f67d87`: the guard
+`STRING_TO_S.bind_call(json).equal?(json)` dispatched `equal?`, so a singleton `equal?` that raises made head raise
+where main returns, even with both settings off (a new exception path; it could not skip escaping). Fixed in
+[`4e73141327`](https://github.com/thomasklemm/rails/commit/4e73141327d9c6a5a68af085659f6256a9f9bc52): the identity
+check is `BasicObject#equal?` through a bound core method too, so the escape path dispatches no method on a plain
+String. Allocations unchanged (25 / 481 / 527). The singleton-methods test gained a raising-`equal?` encoder, which
+fails on `f883f67d87` (`RuntimeError: equal? called`) and passes on main and the fix. Fuzz with a
+`singleton_equal_raises` encoder: main vs the fix differs in 3,245 of 56,001 cases, all in the no-op `gsub!` encoder
+(accepted in round 3); main vs `f883f67d87` also differs in all 4,000 `singleton_equal_raises` cases. Active
+Support with `RAILS_STRICT_WARNINGS=1`: 5,488 runs, 0 failures; RuboCop clean. The bound `equal?` costs about 0.5
+points on a single small record (plain `post.to_json` −0.5% interpreter, −1.6% YJIT); the other cases are within
+0.3 points of `f883f67d87`. All runs in [instructions.txt](data/serialization-cpu/instructions.txt).
+
 **Checks.** All Active Support test files except the Redis cache store (the `redis` gem is outside the bundle
 groups installed here) with `RAILS_STRICT_WARNINGS=1`: 5,486 runs, 0 failures; RuboCop clean. The census was not
 rerun for the fix: the default encoders return plain Strings, which take the same path as in `72d0a204cc`.
@@ -273,11 +286,11 @@ Instructions per call (Callgrind, Ruby 4.0.7, 20 records of 11 columns):
 
 | | interpreter | YJIT |
 | --- | ---: | ---: |
-| `post.to_json` | −1.1% | −2.6% |
-| `posts.to_json` | −4.6% | −5.5% |
-| jbuilder index | −3.1% | −6.2% |
-| `render json: posts` (before `load_defaults 8.1`) | −5.8% | −6.6% |
-| `posts.to_json`, text with `<b>` and `&` | −13.6% | −15.1% |
+| `post.to_json` | −0.5% | −1.6% |
+| `posts.to_json` | −4.4% | −5.6% |
+| jbuilder index | −3.1% | −6.3% |
+| `render json: posts` (before `load_defaults 8.1`) | −5.8% | −7.4% |
+| `posts.to_json`, text with `<b>` and `&` | −13.4% | −15.0% |
 
 This path runs for every `to_json` and jbuilder template, and for `render json:` before 8.1 defaults; on six apps,
 30 of 56 workloads allocate at least one object fewer (16 in an A/A run).
