@@ -15,7 +15,7 @@ module CensusRank
 
   module_function
 
-  def app_of(name) = name.sub(/-mysql\z/, "")
+  def app_of(name) = name.sub(/-(mysql|nops)\z/, "")
 
   def load_runs(dir, mode) = Dir["#{dir}/*-#{mode}.json"].sort.map { JSON.parse(File.read(_1)) }
 

@@ -138,6 +138,33 @@ RUBY
     rev=366e21167521eccd4c10a125cff45142c237275d
     repo=https://github.com/lobsters/lobsters
     sub=. ;;
+  # PostgreSQL census apps (docs/upstream/pg-census.md), main/master on
+  # 2026-11-02. script/census applies fixtures/corpus/pg-census/APP.patch.
+  docuseal)
+    rev=6c416dd76e10a44a6440a77d144819199687a06b
+    repo=https://github.com/docusealco/docuseal
+    sub=. ;;
+  mastodon)
+    rev=5ccbf0e488801f9b7ee5fbe9d915f861081fa3ca
+    repo=https://github.com/mastodon/mastodon
+    sub=. ;;
+  lago)
+    rev=b0007bfe75ec5718ac86479c7c3b4fd61e05599e
+    repo=https://github.com/getlago/lago-api
+    sub=. ;;
+  discourse)
+    rev=0f52471898e650ab05805b6913edccab114f72b2
+    repo=https://github.com/discourse/discourse
+    sub=. ;;
+  loomio)
+    rev=407d4a8a214f7eddf605c182ea880cbbc4448cd1
+    repo=https://github.com/loomio/loomio
+    sub=. ;;
+  sure)
+    # The maintained fork of maybe-finance/maybe (archived 2025-07).
+    rev=8d0d84de9377e7e9deb64a6ffd145be9a91462b4
+    repo=https://github.com/we-promise/sure
+    sub=. ;;
   wikino)
     # Rails app lives in rails/; dependency-only wrapper in fixtures/corpus.
     rev=25255d2d6c808df6672e293661ea797a76c6d2a9

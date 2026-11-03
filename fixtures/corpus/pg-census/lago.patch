@@ -1,0 +1,497 @@
+diff --git a/.ruby-version b/.ruby-version
+index 7919852..43beb40 100644
+--- a/.ruby-version
++++ b/.ruby-version
+@@ -1 +1 @@
+-4.0.9
++4.0.7
+diff --git a/Gemfile b/Gemfile
+index d4bae1a..46b58c0 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -3,7 +3,7 @@
+ source "https://rubygems.org"
+ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+ 
+-ruby "~> 4.0.9"
++ruby "~> 4.0.7"
+ 
+ # Core
+ gem "aasm"
+@@ -15,9 +15,9 @@ gem "bootsnap", require: false
+ gem "clockwork", require: false
+ gem "parallel"
+ gem "puma", "~> 7.2"
+-gem "rails", "~> 8.1.4"
++gem "rails", github: "rails/rails", ref: "5810776eecc5b2e50b58e81ee0c26c02c718fdf0"
+ gem "redis"
+-gem "sidekiq"
++gem "sidekiq", require: ["sidekiq", "active_job/queue_adapters/sidekiq_adapter"] # census: Rails main removed its deprecated SidekiqAdapter (10c24f2481); 7.3 defines it only in an on_load hook that runs after Active Job resolves :sidekiq
+ gem "sidekiq-prometheus-exporter"
+ group :"sidekiq-pro", optional: true do
+   source "https://gems.contribsys.com/" do
+@@ -40,9 +40,10 @@ gem "rack-cors"
+ 
+ # Database
+ gem "after_commit_everywhere"
+-gem "clickhouse-activerecord", "~> 1.6.1"
++gem "clickhouse-activerecord", "~> 1.6.1", require: ["arel", "active_record/connection_adapters/clickhouse_adapter"] # census: register the adapter only; 1.6.7/1.7.0 core extensions append to the frozen Relation::VALID_UNSCOPING_VALUES on Rails main
+ gem "discard", "~> 2.0"
+ gem "kaminari-activerecord"
++gem "kaminari-core" # census: clickhouse-activerecord (require: false) used to load it through Active Record early
+ gem "paper_trail"
+ gem "pg"
+ gem "ransack"
+diff --git a/Gemfile.lock b/Gemfile.lock
+index c5b5056..cf3e93b 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -19,85 +19,72 @@ GIT
+       rake-compiler (~> 1.2)
+       rb_sys (~> 0.9.124)
+ 
+-GEM
+-  remote: https://gems.contribsys.com/
+-  specs:
+-    sidekiq-pro (7.3.6)
+-      sidekiq (>= 7.3.7, < 8)
+-
+-GEM
+-  remote: https://rubygems.org/
++GIT
++  remote: https://github.com/rails/rails.git
++  revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
++  ref: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
+   specs:
+-    aasm (5.5.2)
+-      concurrent-ruby (~> 1.0)
+-    action_text-trix (2.1.19)
+-      railties
+-    actioncable (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actioncable (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nio4r (~> 2.0)
+       websocket-driver (>= 0.6.1)
+       zeitwerk (~> 2.6)
+-    actionmailbox (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailbox (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+-    actionmailer (8.1.4)
+-      actionpack (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionmailer (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+       rails-dom-testing (~> 2.2)
+-    actionpack (8.1.4)
+-      actionview (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actionpack (8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nokogiri (>= 1.8.5)
+       rack (>= 2.2.4)
+       rack-session (>= 1.0.1)
+       rack-test (>= 0.6.3)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
++      rails-html-sanitizer (~> 1.7)
+       useragent (~> 0.16)
+-    actiontext (8.1.4)
+-      action_text-trix (~> 2.1.15)
+-      actionpack (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
++    actiontext (8.2.0.alpha)
++      action_text-trix (~> 2.1.16)
++      actionpack (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       globalid (>= 0.6.0)
+       nokogiri (>= 1.8.5)
+-    actionview (8.1.4)
+-      activesupport (= 8.1.4)
++    actionview (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       builder (~> 3.1)
+       erubi (~> 1.11)
++      herb (>= 0.10)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
+-    active_storage_validations (3.0.6)
+-      activejob (>= 6.1.4)
+-      activemodel (>= 6.1.4)
+-      activestorage (>= 6.1.4)
+-      activesupport (>= 6.1.4)
+-      marcel (>= 1.0.3)
+-    activejob (8.1.4)
+-      activesupport (= 8.1.4)
+-      globalid (>= 0.3.6)
+-    activemodel (8.1.4)
+-      activesupport (= 8.1.4)
+-    activerecord (8.1.4)
+-      activemodel (= 8.1.4)
+-      activesupport (= 8.1.4)
++      rails-html-sanitizer (~> 1.7)
++    activejob (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      globalid (>= 1.4.0)
++    activemodel (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++    activerecord (8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       timeout (>= 0.4.0)
+-    activestorage (8.1.4)
+-      actionpack (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      marcel (~> 1.0)
+-    activesupport (8.1.4)
++    activestorage (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      marcel (~> 2.0)
++    activesupport (8.2.0.alpha)
+       base64
+       bigdecimal
+       concurrent-ruby (~> 1.0, >= 1.3.1)
+@@ -107,9 +94,54 @@ GEM
+       json
+       logger (>= 1.4.2)
+       minitest (>= 5.1)
++      psych (>= 4)
++      ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+       tzinfo (~> 2.0, >= 2.0.5)
+       uri (>= 0.13.1)
++    rails (8.2.0.alpha)
++      actioncable (= 8.2.0.alpha)
++      actionmailbox (= 8.2.0.alpha)
++      actionmailer (= 8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actiontext (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      bundler (>= 1.15.0)
++      railties (= 8.2.0.alpha)
++    railties (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      irb (~> 1.13)
++      rackup (>= 1.0.0)
++      rake (>= 12.2)
++      thor (~> 1.0, >= 1.2.2)
++      tsort (>= 0.2)
++      zeitwerk (~> 2.6)
++
++GEM
++  remote: https://gems.contribsys.com/
++  specs:
++    sidekiq-pro (7.3.7)
++      sidekiq (>= 7.3.7, < 8)
++
++GEM
++  remote: https://rubygems.org/
++  specs:
++    aasm (5.5.2)
++      concurrent-ruby (~> 1.0)
++    action_text-trix (2.1.19)
++      railties
++    active_storage_validations (3.0.6)
++      activejob (>= 6.1.4)
++      activemodel (>= 6.1.4)
++      activestorage (>= 6.1.4)
++      activesupport (>= 6.1.4)
++      marcel (>= 1.0.3)
+     addressable (2.9.0)
+       public_suffix (>= 2.0.2, < 8.0)
+     addressing (1.1.0)
+@@ -202,7 +234,7 @@ GEM
+       logger
+       msgpack
+     datadog-ruby_core_source (3.5.2)
+-    date (3.5.1)
++    date (3.6.0)
+     debug (1.11.1)
+       irb (~> 1.10)
+       reline (>= 0.3.8)
+@@ -252,7 +284,7 @@ GEM
+       dry-initializer (~> 3.2)
+       dry-schema (~> 1.14)
+       zeitwerk (~> 2.6)
+-    erb (6.0.4)
++    erb (6.0.7)
+     erubi (1.13.1)
+     event_stream_parser (1.0.0)
+     execjs (2.10.0)
+@@ -354,6 +386,12 @@ GEM
+     hashdiff (1.2.1)
+     hashie (5.1.0)
+       logger
++    herb (0.11.1)
++    herb (0.11.1-aarch64-linux-gnu)
++    herb (0.11.1-aarch64-linux-musl)
++    herb (0.11.1-arm64-darwin)
++    herb (0.11.1-x86_64-darwin)
++    herb (0.11.1-x86_64-linux-gnu)
+     highline (3.1.2)
+       reline
+     htmlbeautifier (1.4.3)
+@@ -377,7 +415,7 @@ GEM
+       rainbow (>= 2.2.2, < 4.0)
+       ruby-progressbar (~> 1.8, >= 1.8.1)
+       terminal-table (>= 1.5.1)
+-    io-console (0.8.2)
++    io-console (0.9.5)
+     irb (1.18.0)
+       pp (>= 0.6.0)
+       prism (>= 1.3.0)
+@@ -473,9 +511,9 @@ GEM
+       railties (>= 4)
+       request_store (~> 1.0)
+     logstash-event (1.2.02)
+-    loofah (2.25.2)
++    loofah (2.25.3)
+       crass (~> 1.0.2)
+-      nokogiri (>= 1.12.0)
++      nokogiri (>= 1.19.5)
+     lumberjack (1.4.2)
+     mail (2.9.1)
+       logger
+@@ -483,7 +521,7 @@ GEM
+       net-imap
+       net-pop
+       net-smtp
+-    marcel (1.2.1)
++    marcel (2.1.0)
+     method_source (1.1.0)
+     mini_mime (1.1.5)
+     mini_portile2 (2.8.9)
+@@ -509,29 +547,29 @@ GEM
+     nenv (0.3.0)
+     net-http (0.9.1)
+       uri (>= 0.11.1)
+-    net-imap (0.6.6)
++    net-imap (0.6.8)
+       date
+       net-protocol
+     net-pop (0.1.2)
+       net-protocol
+-    net-protocol (0.3.0)
++    net-protocol (0.4.0)
+       timeout
+-    net-smtp (0.5.1)
++    net-smtp (0.5.2)
+       net-protocol
+     newrelic_rpm (10.0.0)
+       logger
+     nio4r (2.7.5)
+-    nokogiri (1.19.4-aarch64-linux-gnu)
++    nokogiri (1.19.7-aarch64-linux-gnu)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-aarch64-linux-musl)
++    nokogiri (1.19.7-aarch64-linux-musl)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-arm64-darwin)
++    nokogiri (1.19.7-arm64-darwin)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-x64-mingw-ucrt)
++    nokogiri (1.19.7-x64-mingw-ucrt)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-darwin)
++    nokogiri (1.19.7-x86_64-darwin)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-gnu)
++    nokogiri (1.19.7-x86_64-linux-gnu)
+       racc (~> 1.4)
+     notiffany (0.1.3)
+       nenv (~> 0.1)
+@@ -733,9 +771,9 @@ GEM
+     patience_diff (1.2.0)
+       optimist (~> 3.0)
+     pg (1.5.9)
+-    pp (0.6.3)
++    pp (0.6.4)
+       prettyprint
+-    prettyprint (0.2.0)
++    prettyprint (0.2.1)
+     prism (1.9.0)
+     prometheus-client (4.2.5)
+       base64
+@@ -747,7 +785,7 @@ GEM
+       byebug (~> 13.0)
+       pry (>= 0.13, < 0.17)
+     pstore (0.2.1)
+-    psych (5.3.1)
++    psych (5.5.0)
+       date
+       stringio
+     public_suffix (7.0.5)
+@@ -761,43 +799,21 @@ GEM
+     rack-session (2.1.2)
+       base64 (>= 0.1.0)
+       rack (>= 3.0.0)
+-    rack-test (2.2.0)
++    rack-test (2.3.0)
+       rack (>= 1.3)
+     rackup (2.3.1)
+       rack (>= 3)
+-    rails (8.1.4)
+-      actioncable (= 8.1.4)
+-      actionmailbox (= 8.1.4)
+-      actionmailer (= 8.1.4)
+-      actionpack (= 8.1.4)
+-      actiontext (= 8.1.4)
+-      actionview (= 8.1.4)
+-      activejob (= 8.1.4)
+-      activemodel (= 8.1.4)
+-      activerecord (= 8.1.4)
+-      activestorage (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      bundler (>= 1.15.0)
+-      railties (= 8.1.4)
++    ractor-dispatch (0.3.0)
+     rails-dom-testing (2.3.0)
+       activesupport (>= 5.0.0)
+       minitest
+       nokogiri (>= 1.6)
+-    rails-html-sanitizer (1.7.1)
+-      loofah (~> 2.25, >= 2.25.2)
++    rails-html-sanitizer (1.7.2)
++      loofah (~> 2.25, >= 2.25.3)
+       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
+     rails-i18n (8.0.1)
+       i18n (>= 0.7, < 2)
+       railties (>= 8.0.0, < 9)
+-    railties (8.1.4)
+-      actionpack (= 8.1.4)
+-      activesupport (= 8.1.4)
+-      irb (~> 1.13)
+-      rackup (>= 1.0.0)
+-      rake (>= 12.2)
+-      thor (~> 1.0, >= 1.2.2)
+-      tsort (>= 0.2)
+-      zeitwerk (~> 2.6)
+     rainbow (3.1.1)
+     rake (13.4.2)
+     rake-compiler (1.3.2)
+@@ -816,19 +832,20 @@ GEM
+       logger
+       prism (>= 1.6.0)
+       tsort
+-    rdoc (7.2.0)
++    rdoc (8.1.0)
+       erb
+-      psych (>= 4.0.0)
++      prism (>= 1.6.0)
++      rbs (>= 4.0.0)
+       tsort
+     redis (5.4.1)
+       redis-client (>= 0.22.0)
+-    redis-client (0.26.3)
++    redis-client (0.30.1)
+       connection_pool
+     redis-prescription (2.6.0)
+     redlock (2.0.6)
+       redis-client (>= 0.14.1, < 1.0.0)
+     regexp_parser (2.11.3)
+-    reline (0.6.3)
++    reline (0.7.0)
+       io-console (~> 0.5)
+     representable (3.2.0)
+       declarative (< 0.1.0)
+@@ -1030,7 +1047,7 @@ GEM
+       unicode-emoji (~> 4.1)
+     unicode-emoji (4.2.0)
+     uniform_notifier (1.18.0)
+-    uri (1.1.1)
++    uri (1.1.2)
+     useragent (0.16.11)
+     valvat (2.0.1)
+       rexml (>= 3.3.6, < 4.0.0)
+@@ -1068,7 +1085,7 @@ GEM
+       anyway_config (>= 1.3, < 3)
+       railties
+       yabeda (~> 0.8)
+-    zeitwerk (2.8.0)
++    zeitwerk (2.8.3)
+ 
+ PLATFORMS
+   aarch64-linux
+@@ -1132,6 +1149,7 @@ DEPENDENCIES
+   json_schemer
+   jwt
+   kaminari-activerecord
++  kaminari-core
+   karafka (~> 2.5.0)
+   karafka-testing
+   karafka-web (~> 0.11.3)
+@@ -1155,7 +1173,7 @@ DEPENDENCIES
+   pry-byebug
+   puma (~> 7.2)
+   rack-cors
+-  rails (~> 8.1.4)
++  rails!
+   ransack
+   redis
+   redlock (~> 2.0.6)
+@@ -1206,4 +1224,4 @@ RUBY VERSION
+   ruby 4.0.9
+ 
+ BUNDLED WITH
+-  4.0.16
++  4.0.20
+diff --git a/app/models/recurring_transaction_rule.rb b/app/models/recurring_transaction_rule.rb
+index 208fa94..0af3c89 100644
+--- a/app/models/recurring_transaction_rule.rb
++++ b/app/models/recurring_transaction_rule.rb
+@@ -1,6 +1,10 @@
+ # frozen_string_literal: true
+ 
+ class RecurringTransactionRule < ApplicationRecord
++  # Lowrail census compat: Rails main 7249a66350 calls owner.method(:read_attr) on every
++  # association read, which this model's `method` attribute shadows.
++  def method(*args) = args.empty? ? super() : Kernel.instance_method(:method).bind_call(self, *args)
++
+   include HasPurchaseOrderNumber
+   include PaperTrailTraceable
+   include ConnectionResolvable
+diff --git a/lib/active_job/json_log_subscriber.rb b/lib/active_job/json_log_subscriber.rb
+index 7ca9e39..8204ef9 100644
+--- a/lib/active_job/json_log_subscriber.rb
++++ b/lib/active_job/json_log_subscriber.rb
+@@ -260,5 +260,5 @@ module ActiveJob
+   end
+ end
+ 
+-ActiveJob::LogSubscriber.detach_from :active_job
++ActiveJob::LogSubscriber.detach_from :active_job if ActiveJob::LogSubscriber.respond_to?(:detach_from)
+ ActiveJob::JsonLogSubscriber.attach_to :active_job

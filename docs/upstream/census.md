@@ -64,6 +64,14 @@ needs a Ruby built with ZJIT. The local 4.0.7 is not, so ZJIT has not been run t
 | redprints-cfp | `redprints-cfp` | `redprints-cfp.patch` | bun |
 | react-starter-kit | `react-starter-kit` | `react-starter-kit.patch` | npm |
 | lobsters | `lobsters` (`366e211`) | `lobsters.patch` | |
+| docuseal | `docuseal` (`6c416dd`) | `pg-census/docuseal.patch` | PostgreSQL, Redis, yarn, libvips, pdfium |
+| mastodon | `mastodon` (`5ccbf0e`) | `pg-census/mastodon.patch` | PostgreSQL, Redis, corepack yarn |
+| lago | `lago` (lago-api `b0007bf`) | `pg-census/lago.patch` | PostgreSQL, Redis |
+| discourse | `discourse` (`0f52471`) | `pg-census/discourse.patch` | PostgreSQL with pgvector, Redis, pnpm |
+| loomio | `loomio` (`407d4a8`) | `pg-census/loomio.patch` | PostgreSQL, Redis, npm 11 (installed into the copy) |
+| sure | `sure` (`8d0d84d`) | `pg-census/sure.patch` | PostgreSQL, Redis |
+| casa | `casa` (`b584d2e`, without its census-era overlay) | `pg-census/casa.patch` | PostgreSQL, Node 24 (mise) |
+| mastodon-nops, lago-nops | mastodon's and lago's copies | | as above; `prepared_statements: false` |
 
 Overlays default to [fixtures/corpus/rails-main-census-4](../../fixtures/corpus/rails-main-census-4) (`--overlays`
 picks another round's). They are dependency-only (Gemfile, lock, `.ruby-version`); setup then moves Rails to the
@@ -76,13 +84,25 @@ then the harness `prepare` step. That step loads the Blog's seeds; test fixtures
 its UUID fixture helper) and CodeTriage; PingCRM's seeds with `Faker::Config.random = Random.new(42)`; Redprints' and
 the starter kit's seeds; Lobsters' seeds and `FakeDataGenerator` with `srand(42)` and
 `Faker::Config.random = Random.new(42)`, under the app's own queue adapter (solid_queue). Last comes `list`. All ten
-configurations have been set up and run through this command ([Validation](#validation-nine-apps-2026-11-03)).
+configurations have been set up and run through this command ([Validation](#validation-nine-apps-2026-11-03)),
+and so have the seven PostgreSQL apps and two `-nops` variants ([PG census](pg-census.md)).
 
 PostgreSQL and MySQL databases are named by the app's config, not by the copy, so every copy of an app shares them.
 For those apps `setup` runs `db:create` on its own and stops if it reports `Database '…' already exists`, rather
 than loading the schema over another copy's data. Drop the databases first when they are disposable (for example
 `dropdb pingcrm_production`, or `DROP DATABASE fizzy_production…` on port 3307). `setup` also creates `log`, `tmp` and
 `storage`, which Git does not keep and Lobsters' production boot needs.
+
+The PostgreSQL apps ([PG census](pg-census.md)) take their overlays from
+[fixtures/corpus/pg-census](../../fixtures/corpus/pg-census). Unlike census 4's, these are not dependency-only: they
+also carry the small compatibility edits Rails main needs, each listed in the PG census. An app row may add `pre_db`
+commands (run before the database step), replace `db:create db:schema:load` with its own `db` tasks (Discourse
+migrates, to load its structure.sql with pgvector), skip `assets:precompile` (`assets: false`), and set throwaway
+local `env`. `prepare` seeds them with the app's own generator where it has one (CASA's seeds with
+`DB_SEEDS_RANDOM_SEED=42`, Lago's with `srand(42)`, Sure's `demo_data:default` with `SEED=42`), otherwise with a seed
+script in `fixtures/corpus/pg-census/seeds` that writes through the app's own services. A row with `copy: APP`
+(`mastodon-nops`, `lago-nops`) runs APP's copy and database with different settings; `run` never measures two
+configurations of one copy at the same time.
 
 ## What a run measures
 
@@ -100,7 +120,12 @@ part:
 
 Shared external controls, identical for every app: jobs are captured on the `:test` adapter and performed as their
 own workloads, mail uses `:test` delivery, `config.hosts` is cleared, and URL options default to
-`https://localhost`. Each response status is checked, and GET bodies must be non-empty.
+`https://localhost`. Each response status is checked, and GET bodies must be non-empty. Apps that push native
+Sidekiq jobs (`CENSUS_SIDEKIQ_FAKE=1`: Docuseal, Mastodon, Discourse) get the same control through
+`Sidekiq::Testing.fake!`. Request throttles (Rack::Attack, Discourse's `RateLimiter`, Mastodon's posting limit) are
+off or reset per run. `CENSUS_PREPARED_STATEMENTS=false` makes the harness check that the connection really runs
+without prepared statements. `CENSUS_DEBUG=1` with `list` prints every exception raised while serving, for apps
+that turn them into a bare 500.
 
 Per workload: 50 warmup operations (`CENSUS_WARMUP`), then three GC-enabled windows of 20 operations (the median is
 the reported value), then 10 traced operations with GC disabled (`CENSUS_REQUESTS`), attributed by file, line and

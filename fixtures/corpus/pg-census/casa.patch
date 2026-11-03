@@ -1,0 +1,550 @@
+diff --git a/.ruby-version b/.ruby-version
+index d13e837..43beb40 100644
+--- a/.ruby-version
++++ b/.ruby-version
+@@ -1 +1 @@
+-4.0.6
++4.0.7
+diff --git a/Gemfile b/Gemfile
+index 6472d88..2315682 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -2,8 +2,8 @@
+ 
+ source "https://rubygems.org"
+ 
+-ruby "4.0.6"
+-gem "rails", "~> 8.1"
++ruby "4.0.7"
++gem "rails", github: "rails/rails", ref: "5810776eecc5b2e50b58e81ee0c26c02c718fdf0"
+ 
+ gem "after_party" # Post-deployment tasks
+ gem "amazing_print" # Easier console reading
+@@ -12,7 +12,7 @@ gem "azure-blob", require: false # Active Storage adapter for Azure (maintained
+ gem "benchmark" # Used to be a default gem. Required by the delayed_job_active_record gem.
+ gem "blueprinter" # JSON serialization
+ gem "bugsnag" # Error tracking in production
+-gem "caxlsx", "~> 4.5" # Excel spreadsheets - TODO can we remove this version restriction?
++gem "caxlsx", github: "caxlsx/caxlsx", ref: "e92ca3e6ac80896376c9c2d625e5e77f3a35644c" # census: unreleased master allows marcel 2 (Rails main). Excel spreadsheets - TODO can we remove this version restriction?
+ gem "caxlsx_rails", "~> 0.7.1" # Excel spreadsheets - TODO can we remove this version restriction?
+ gem "cssbundling-rails", "~> 1.4" # CSS compilation
+ gem "delayed_job_active_record" # Background job processing
+@@ -20,9 +20,9 @@ gem "devise" # Authentication
+ gem "devise_invitable" # User invitation system for Devise
+ gem "draper" # Decorators for cleaner presentation logic
+ gem "filterrific" # Filtering and sorting of models
+-gem "flipper" # Feature flag management
+-gem "flipper-active_record" # Active Record adapter for Flipper
+-gem "flipper-ui" # Web UI for managing feature flags
++gem "flipper", github: "flippercloud/flipper", ref: "a467311f3440" # census: unreleased main takes Arel::Table name: (Rails main b1650993b0). Feature flag management
++gem "flipper-active_record", github: "flippercloud/flipper", ref: "a467311f3440" # Active Record adapter for Flipper
++gem "flipper-ui", github: "flippercloud/flipper", ref: "a467311f3440" # Web UI for managing feature flags
+ gem "friendly_id", "~> 5.7.0" # Allows us to use a slug instead of CASA case IDs in their URLs
+ gem "groupdate" # Group data by time periods
+ gem "httparty" # HTTP network requests
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 15488c4..dccbbde 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -1,72 +1,98 @@
+-GEM
+-  remote: https://rubygems.org/
++GIT
++  remote: https://github.com/caxlsx/caxlsx.git
++  revision: e92ca3e6ac80896376c9c2d625e5e77f3a35644c
++  ref: e92ca3e6ac80896376c9c2d625e5e77f3a35644c
+   specs:
+-    action_text-trix (2.1.19)
+-      railties
+-    actioncable (8.1.3.1)
+-      actionpack (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
++    caxlsx (4.5.0)
++      htmlentities (~> 4.3, >= 4.3.4)
++      marcel (>= 1, < 3)
++      nokogiri (~> 1.10, >= 1.10.4)
++      rubyzip (>= 2.4, < 4)
++
++GIT
++  remote: https://github.com/flippercloud/flipper.git
++  revision: a467311f3440e924357c11fa1df2bde3c5ec7a02
++  ref: a467311f3440
++  specs:
++    flipper (1.4.2)
++      concurrent-ruby (< 2)
++    flipper-active_record (1.4.2)
++      activerecord (>= 4.2, < 9)
++      flipper (~> 1.4.2)
++    flipper-ui (1.4.2)
++      erubi (>= 1.0.0, < 2.0.0)
++      flipper (~> 1.4.2)
++      rack (>= 1.4, < 4)
++      rack-protection (>= 1.5.3, < 5.0.0)
++      rack-session (>= 1.0.2, < 3.0.0)
++      sanitize (< 8)
++
++GIT
++  remote: https://github.com/rails/rails.git
++  revision: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
++  ref: 5810776eecc5b2e50b58e81ee0c26c02c718fdf0
++  specs:
++    actioncable (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nio4r (~> 2.0)
+       websocket-driver (>= 0.6.1)
+       zeitwerk (~> 2.6)
+-    actionmailbox (8.1.3.1)
+-      actionpack (= 8.1.3.1)
+-      activejob (= 8.1.3.1)
+-      activerecord (= 8.1.3.1)
+-      activestorage (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
++    actionmailbox (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+-    actionmailer (8.1.3.1)
+-      actionpack (= 8.1.3.1)
+-      actionview (= 8.1.3.1)
+-      activejob (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
++    actionmailer (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       mail (>= 2.8.0)
+       rails-dom-testing (~> 2.2)
+-    actionpack (8.1.3.1)
+-      actionview (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
++    actionpack (8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       nokogiri (>= 1.8.5)
+       rack (>= 2.2.4)
+       rack-session (>= 1.0.1)
+       rack-test (>= 0.6.3)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
++      rails-html-sanitizer (~> 1.7)
+       useragent (~> 0.16)
+-    actiontext (8.1.3.1)
+-      action_text-trix (~> 2.1.15)
+-      actionpack (= 8.1.3.1)
+-      activerecord (= 8.1.3.1)
+-      activestorage (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
++    actiontext (8.2.0.alpha)
++      action_text-trix (~> 2.1.16)
++      actionpack (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       globalid (>= 0.6.0)
+       nokogiri (>= 1.8.5)
+-    actionview (8.1.3.1)
+-      activesupport (= 8.1.3.1)
++    actionview (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       builder (~> 3.1)
+       erubi (~> 1.11)
++      herb (>= 0.10)
+       rails-dom-testing (~> 2.2)
+-      rails-html-sanitizer (~> 1.6)
+-    activejob (8.1.3.1)
+-      activesupport (= 8.1.3.1)
+-      globalid (>= 0.3.6)
+-    activemodel (8.1.3.1)
+-      activesupport (= 8.1.3.1)
+-    activemodel-serializers-xml (1.0.3)
+-      activemodel (>= 5.0.0.a)
+-      activesupport (>= 5.0.0.a)
+-      builder (~> 3.1)
+-    activerecord (8.1.3.1)
+-      activemodel (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
++      rails-html-sanitizer (~> 1.7)
++    activejob (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      globalid (>= 1.4.0)
++    activemodel (8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++    activerecord (8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
+       timeout (>= 0.4.0)
+-    activestorage (8.1.3.1)
+-      actionpack (= 8.1.3.1)
+-      activejob (= 8.1.3.1)
+-      activerecord (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
+-      marcel (~> 1.0)
+-    activesupport (8.1.3.1)
++    activestorage (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      marcel (~> 2.0)
++    activesupport (8.2.0.alpha)
+       base64
+       bigdecimal
+       concurrent-ruby (~> 1.0, >= 1.3.1)
+@@ -76,13 +102,48 @@ GEM
+       json
+       logger (>= 1.4.2)
+       minitest (>= 5.1)
++      psych (>= 4)
++      ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+       tzinfo (~> 2.0, >= 2.0.5)
+       uri (>= 0.13.1)
++    rails (8.2.0.alpha)
++      actioncable (= 8.2.0.alpha)
++      actionmailbox (= 8.2.0.alpha)
++      actionmailer (= 8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      actiontext (= 8.2.0.alpha)
++      actionview (= 8.2.0.alpha)
++      activejob (= 8.2.0.alpha)
++      activemodel (= 8.2.0.alpha)
++      activerecord (= 8.2.0.alpha)
++      activestorage (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      bundler (>= 1.15.0)
++      railties (= 8.2.0.alpha)
++    railties (8.2.0.alpha)
++      actionpack (= 8.2.0.alpha)
++      activesupport (= 8.2.0.alpha)
++      irb (~> 1.13)
++      rackup (>= 1.0.0)
++      rake (>= 12.2)
++      thor (~> 1.0, >= 1.2.2)
++      tsort (>= 0.2)
++      zeitwerk (~> 2.6)
++
++GEM
++  remote: https://rubygems.org/
++  specs:
++    action_text-trix (2.1.19)
++      railties
++    activemodel-serializers-xml (1.0.3)
++      activemodel (>= 5.0.0.a)
++      activesupport (>= 5.0.0.a)
++      builder (~> 3.1)
+     addressable (2.9.0)
+       public_suffix (>= 2.0.2, < 8.0)
+     after_party (2.1.0)
+-    amazing_print (2.0.0)
++    amazing_print (3.0.0)
+     annotaterb (4.25.0)
+       activerecord (>= 6.0.0)
+       activesupport (>= 6.0.0)
+@@ -133,11 +194,6 @@ GEM
+     capybara-screenshot (1.0.27)
+       capybara (>= 1.0, < 4)
+       launchy
+-    caxlsx (4.5.0)
+-      htmlentities (~> 4.3, >= 4.3.4)
+-      marcel (~> 1.0)
+-      nokogiri (~> 1.10, >= 1.10.4)
+-      rubyzip (>= 2.4, < 4)
+     caxlsx_rails (0.7.2)
+       actionpack (>= 6.1)
+       caxlsx (>= 4.0)
+@@ -151,7 +207,7 @@ GEM
+     crack (1.0.1)
+       bigdecimal
+       rexml
+-    crass (1.0.7)
++    crass (1.0.8)
+     cssbundling-rails (1.4.3)
+       railties (>= 6.0.0)
+     csv (3.3.5)
+@@ -159,7 +215,7 @@ GEM
+       activerecord (>= 5.a)
+       database_cleaner-core (~> 2.0)
+     database_cleaner-core (2.0.1)
+-    date (3.5.1)
++    date (3.6.0)
+     delayed_job (4.1.13)
+       activesupport (>= 3.0, < 9.0)
+     delayed_job_active_record (4.1.11)
+@@ -218,18 +274,6 @@ GEM
+     faraday-net_http (3.4.4)
+       net-http (~> 0.5)
+     filterrific (5.2.7)
+-    flipper (1.4.2)
+-      concurrent-ruby (< 2)
+-    flipper-active_record (1.4.2)
+-      activerecord (>= 4.2, < 9)
+-      flipper (~> 1.4.2)
+-    flipper-ui (1.4.2)
+-      erubi (>= 1.0.0, < 2.0.0)
+-      flipper (~> 1.4.2)
+-      rack (>= 1.4, < 4)
+-      rack-protection (>= 1.5.3, < 5.0.0)
+-      rack-session (>= 1.0.2, < 3.0.0)
+-      sanitize (< 8)
+     friendly_id (5.7.0)
+       activerecord (>= 4.0.0)
+     globalid (1.4.0)
+@@ -249,6 +293,9 @@ GEM
+       activesupport (>= 7.2)
+     hana (1.3.7)
+     hashdiff (1.2.1)
++    herb (0.11.1-arm64-darwin)
++    herb (0.11.1-x86_64-darwin)
++    herb (0.11.1-x86_64-linux-gnu)
+     htmlentities (4.4.2)
+     httparty (0.24.2)
+       csv
+@@ -257,7 +304,7 @@ GEM
+     i18n (1.15.2)
+       concurrent-ruby (~> 1.0)
+     image_processing (2.1.0)
+-    io-console (0.9.2)
++    io-console (0.9.5)
+     irb (1.18.0)
+       pp (>= 0.6.0)
+       prism (>= 1.3.0)
+@@ -293,16 +340,16 @@ GEM
+       activesupport (>= 4)
+       railties (>= 4)
+       request_store (~> 1.0)
+-    loofah (2.25.2)
++    loofah (2.25.3)
+       crass (~> 1.0.2)
+-      nokogiri (>= 1.12.0)
++      nokogiri (>= 1.19.5)
+     mail (2.9.1)
+       logger
+       mini_mime (>= 0.1.1)
+       net-imap
+       net-pop
+       net-smtp
+-    marcel (1.2.1)
++    marcel (2.1.0)
+     matrix (0.4.3)
+     mcp (0.23.0)
+       json_schemer (>= 2.4)
+@@ -315,21 +362,21 @@ GEM
+       bigdecimal (>= 3.1, < 5)
+     net-http (0.9.1)
+       uri (>= 0.11.1)
+-    net-imap (0.6.7)
++    net-imap (0.6.8)
+       date
+       net-protocol
+     net-pop (0.1.2)
+       net-protocol
+-    net-protocol (0.3.0)
++    net-protocol (0.4.0)
+       timeout
+-    net-smtp (0.5.1)
++    net-smtp (0.5.2)
+       net-protocol
+     nio4r (2.7.5)
+-    nokogiri (1.19.4-arm64-darwin)
++    nokogiri (1.19.7-arm64-darwin)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-darwin)
++    nokogiri (1.19.7-x86_64-darwin)
+       racc (~> 1.4)
+-    nokogiri (1.19.4-x86_64-linux-gnu)
++    nokogiri (1.19.7-x86_64-linux-gnu)
+       racc (~> 1.4)
+     noticed (2.9.3)
+       rails (>= 6.1.0)
+@@ -394,7 +441,7 @@ GEM
+       prettyprint
+     pretender (1.0.0)
+       actionpack (>= 7.2)
+-    prettyprint (0.2.0)
++    prettyprint (0.2.1)
+     prism (1.9.0)
+     prosopite (2.2.0)
+     pry (0.16.0)
+@@ -404,13 +451,16 @@ GEM
+     pry-byebug (3.12.0)
+       byebug (~> 13.0)
+       pry (>= 0.13, < 0.17)
++    psych (5.5.0)
++      date
++      stringio
+     public_suffix (7.0.5)
+     puma (8.0.2)
+       nio4r (~> 2.0)
+     pundit (2.5.2)
+       activesupport (>= 3.0.0)
+     racc (1.8.1)
+-    rack (3.2.7)
++    rack (3.2.8)
+     rack-attack (6.8.0)
+       rack (>= 1.0, < 4)
+     rack-cors (3.0.0)
+@@ -423,24 +473,11 @@ GEM
+     rack-session (2.1.2)
+       base64 (>= 0.1.0)
+       rack (>= 3.0.0)
+-    rack-test (2.2.0)
++    rack-test (2.3.0)
+       rack (>= 1.3)
+     rackup (2.3.1)
+       rack (>= 3)
+-    rails (8.1.3.1)
+-      actioncable (= 8.1.3.1)
+-      actionmailbox (= 8.1.3.1)
+-      actionmailer (= 8.1.3.1)
+-      actionpack (= 8.1.3.1)
+-      actiontext (= 8.1.3.1)
+-      actionview (= 8.1.3.1)
+-      activejob (= 8.1.3.1)
+-      activemodel (= 8.1.3.1)
+-      activerecord (= 8.1.3.1)
+-      activestorage (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
+-      bundler (>= 1.15.0)
+-      railties (= 8.1.3.1)
++    ractor-dispatch (0.3.0)
+     rails-controller-testing (1.0.5)
+       actionpack (>= 5.0.1.rc1)
+       actionview (>= 5.0.1.rc1)
+@@ -449,25 +486,16 @@ GEM
+       activesupport (>= 5.0.0)
+       minitest
+       nokogiri (>= 1.6)
+-    rails-html-sanitizer (1.7.1)
+-      loofah (~> 2.25, >= 2.25.2)
++    rails-html-sanitizer (1.7.2)
++      loofah (~> 2.25, >= 2.25.3)
+       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
+-    railties (8.1.3.1)
+-      actionpack (= 8.1.3.1)
+-      activesupport (= 8.1.3.1)
+-      irb (~> 1.13)
+-      rackup (>= 1.0.0)
+-      rake (>= 12.2)
+-      thor (~> 1.0, >= 1.2.2)
+-      tsort (>= 0.2)
+-      zeitwerk (~> 2.6)
+     rainbow (3.1.1)
+     rake (13.4.2)
+     rbs (4.2.0)
+       logger
+       prism (>= 1.6.0)
+       tsort
+-    rdoc (8.0.0)
++    rdoc (8.1.0)
+       erb
+       prism (>= 1.6.0)
+       rbs (>= 4.0.0)
+@@ -558,9 +586,9 @@ GEM
+       nokogiri (>= 1.8.5)
+       rubyzip (>= 1.3.0)
+     safe_shell (1.1.0)
+-    sanitize (7.0.0)
+-      crass (~> 1.0.2)
+-      nokogiri (>= 1.16.8)
++    sanitize (7.0.2)
++      crass (~> 1.0.8)
++      nokogiri (>= 1.19.7)
+     scout_apm (6.3.0)
+       parser
+     scout_apm_logging (2.1.0)
+@@ -614,6 +642,7 @@ GEM
+       rubocop-rails (~> 2.34.0)
+     stimulus-rails (1.3.4)
+       railties (>= 6.0.0)
++    stringio (3.2.0)
+     strong_migrations (2.8.0)
+       activerecord (>= 7.2)
+     thor (1.5.0)
+@@ -633,7 +662,7 @@ GEM
+     unicode-display_width (3.3.0)
+       unicode-emoji (~> 4.3)
+     unicode-emoji (4.3.0)
+-    uri (1.1.1)
++    uri (1.1.2)
+     useragent (0.16.11)
+     view_component (4.15.0)
+       actionview (>= 7.1.0)
+@@ -650,7 +679,7 @@ GEM
+       crack (>= 0.3.2)
+       hashdiff (>= 0.4.0, < 2.0.0)
+     websocket (1.2.11)
+-    websocket-driver (0.8.0)
++    websocket-driver (0.8.2)
+       base64
+       websocket-extensions (>= 0.1.0)
+     websocket-extensions (0.1.5)
+@@ -680,7 +709,7 @@ DEPENDENCIES
+   byebug
+   capybara
+   capybara-screenshot
+-  caxlsx (~> 4.5)
++  caxlsx!
+   caxlsx_rails (~> 0.7.1)
+   cssbundling-rails (~> 1.4)
+   database_cleaner-active_record
+@@ -695,9 +724,9 @@ DEPENDENCIES
+   factory_bot_rails
+   faker
+   filterrific
+-  flipper
+-  flipper-active_record
+-  flipper-ui
++  flipper!
++  flipper-active_record!
++  flipper-ui!
+   friendly_id (~> 5.7.0)
+   groupdate
+   httparty
+@@ -726,7 +755,7 @@ DEPENDENCIES
+   pundit
+   rack-attack
+   rack-cors
+-  rails (~> 8.1)
++  rails!
+   rails-controller-testing
+   request_store
+   rexml
+@@ -765,7 +794,7 @@ DEPENDENCIES
+   wicked
+ 
+ RUBY VERSION
+-  ruby 4.0.6
++  ruby 4.0.7
+ 
+ BUNDLED WITH
+-  4.0.6
++  4.0.20
+diff --git a/config/database.yml b/config/database.yml
+index 0a5821d..0cb0a34 100644
+--- a/config/database.yml
++++ b/config/database.yml
+@@ -20,5 +20,5 @@ test:
+ production:
+   <<: *default
+   database: casa_production
+-  username: casa
++  username: <%= ENV.fetch("POSTGRES_USER") { "casa" } %> # census: local peer-auth user
+   password: <%= ENV['CASA_DATABASE_PASSWORD'] %>
+diff --git a/config/environments/production.rb b/config/environments/production.rb
+index efe43cd..b2fa1a7 100644
+--- a/config/environments/production.rb
++++ b/config/environments/production.rb
+@@ -51,7 +51,7 @@ Rails.application.configure do
+   config.assets.compile = false
+ 
+   # Store uploaded files on the local file system (see config/storage.yml for options).
+-  config.active_storage.service = :microsoft
++  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "microsoft").to_sym # census: disk, not Azure
+ 
+   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
+   # config.assume_ssl = true
