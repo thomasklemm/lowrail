@@ -31,6 +31,13 @@ I would contribute **two things**: an issue about the significance stars (rank 1
 the lobsters and shipit caches to `:memory_store` (rank 2). Everything else either already exists, belongs to
 someone else, helps only our orbs, or changes the workloads more than the evidence justifies.
 
+**Decision (Thomas, 2026-11-03).** Rank 2 is prepared as a PR but not opened: fork branch
+[`thomasklemm/memory-cache-store`](https://github.com/thomasklemm/ruby-bench/tree/thomasklemm/memory-cache-store)
+at `c4d362b000`, on ruby-bench `73918b2`. A Sol check comes before it opens. Rank 1 is not opened at all (DECISIONS:
+small, well-reviewed PRs, no issue discussions we can't add much to); its evidence stays below. Ranks 3–8: nothing.
+On the branch, three concurrent lobsters processes all exit 0, the cache event counts match the numbers below, and
+the per-route response sizes and story counts of all 114 lobsters requests match the file-store run.
+
 ## 1. Significance stars treat iterations of one process as independent samples
 
 **What happens.** `--pvalue` (and the stars that always print next to the ratio) run Welch's t-test over the measured
@@ -80,8 +87,8 @@ opt-in.
 **Why an issue first.** The area has an active owner (eightbitraptor: #479, #481, #483, #541), and the design
 choice (how many runs, which test) is theirs. An issue with the A/A table and the Callgrind cross-process numbers is
 a bug report about a wrong statistical claim, not a data comment; it would offer the `--runs` PR. This is the one
-place where the etiquette's "PR is the claim" rule points to an issue instead, so it needs Thomas's OK before
-opening.
+place where the etiquette's "PR is the claim" rule points to an issue instead. Not opened: Thomas decided on
+2026-11-03 to stay with small, well-reviewed PRs, so this stays here as evidence.
 
 ## 2. lobsters and shipit keep their Rails cache on disk in `tmp/cache`
 
