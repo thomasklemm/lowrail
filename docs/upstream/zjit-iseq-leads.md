@@ -156,7 +156,7 @@ average price per call, so they are estimates.
 |---|---|---|---|---|
 | 1 | 3 class-polymorphic sends to one method entry: class-level methods on model classes (`attribute_types` in `_load_from_sql`, `current_shard`/`current_role`, `_reflections`) and instance-level `self` attr_readers shared by many subclasses (`Type::Value#hash`/`#cast`, `association`) | 7.2 / 42.1 / 180.1 (4% / 24% / 29%) | 10, 325 | Largest free item on lobsters and shipit. Shopify/ruby#1099 item 2, no assignee; slot granted. Includes lead 2's 6.6 M on shipit. Design-heavy (method-entry-keyed guard; YJIT handles these sites with its class-guard chain). |
 | 2 | 13 `rb_zjit_root_mark` marks every JITFrame's ISEQ on every GC | 25.4 / 6.7 / 37.1 (14% / 4% / 6%) | unmeasured | No issue or PR. Small, self-contained. Scales with GC count and JITFrames (38k / 150k / 119k). |
-| 3 | 15a an `attr_reader` call in a final version (`no_side_exits`) gives up and calls `rb_ivar_get`, even on a known shape (`block in fetch_value` → `values`/`types`, `stale_state` → `reflection`, `type_for_attribute` → `type_caster`/`klass`) | 0.9 / 3.1 / 17.9 (upper bound) | – | Exact and small: give it the shape branch that an `@ivar` read already gets in a final version (`dispatch_getivar`), with `rb_ivar_get` as the miss path. Part of Shopify/ruby#1039 row 78 (no assignee); take only that piece, because the rest of row 78 is lead 11 (taken). See [zjit-yjit-gap, Lead 15](zjit-yjit-gap.md#lead-15-ivar-reads-in-final-versions-and-on-singleton-objects). |
+| 3 | 15a an `attr_reader` call in a final version (`no_side_exits`) gives up and calls `rb_ivar_get`, even on a known shape (`block in fetch_value` → `values`/`types`, `stale_state` → `reflection`, `type_for_attribute` → `type_caster`/`klass`) | measured: 0.8 / 4.5 / 22.0 in `rb_ivar_get` (estimate was 0.9 / 3.1 / 17.9) | – | **Candidate built, not opened** (no new ruby/ruby PRs, DECISIONS 10cef95): see [Lead 15a: our candidate build](#lead-15a-our-candidate-build-and-its-numbers-2026-11-03). Exact and small: give it the shape branch that an `@ivar` read already gets in a final version (`dispatch_getivar`), with `rb_ivar_get` as the miss path. Part of Shopify/ruby#1039 row 78 (no assignee); take only that piece, because the rest of row 78 is lead 11 (taken). See [zjit-yjit-gap, Lead 15](zjit-yjit-gap.md#lead-15-ivar-reads-in-final-versions-and-on-singleton-objects). |
 | 4 | 14c ISEQ callees with `**rest`, including `def m(a, ...)` (`Relation.create(self)` → `def create(model, ...)`, `AssociationRelation#initialize(klass, association, **)`) | 0.7 / 1.0 / 5.1 | –, 21.5k `complex_arg_pass_param_kwrest` per shipit iteration | Measured +314 to +405 Ir per call against YJIT. Shopify/ruby#1039 rows 36 (`2ac995c680`) and 43 (`29903d645e`) have no assignee, and there is no PR or issue. Medium: keyword planning plus the callee's hidden `kw_bits` argument. See [Lead 14](zjit-yjit-gap.md#lead-14-what-one_or_more_complex_arg_pass-really-costs). |
 | 5 | 15b an `@ivar` read on a singleton object (Rails' `extend`ed logger: `Logger#level`/`level_override`, TaggedLogging `tag_stack`). The profiler records such objects as "other" (ruby/ruby#19540), so these methods use up their versions and read generically | 4.6 / 0.4 / 0.7 | – | Record the shape, without the class, for ivar instructions. Medium, and it changes the profiling policy of k0kubun's #19540, so it needs his agreement. Under the issue rule we don't ask in an issue, so it is parked. Shopify/ruby#1099 pattern 3, no assignee. |
 | 6 | 2 `BasicObject#!=` (polymorphic inner `==`) | 0 / ~1 / 6.6 (in lead 3's total) | 10, 277 | Rides on lead 3 or general polymorphic-send work. |
@@ -392,6 +392,122 @@ Lobsters runs must not share a checkout concurrently: two parallel runs raced on
 
 `test/ruby/test_zjit.rb` no longer exists on master (ported to `zjit/src/codegen_tests.rs`; the rest is
 `test_zjit_cli.rb`). Only the three updated HIR snapshots fail without the change.
+
+## Lead 15a: our candidate build and its numbers (2026-11-03)
+
+A finished candidate, recorded here and not opened (DECISIONS 10cef95: no new ruby/ruby PRs for now). thomasklemm/ruby
+[`thomasklemm/zjit-final-attr-reader-shape`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-final-attr-reader-shape)
+@ [`a0dd4a08af`](https://github.com/thomasklemm/ruby/commit/a0dd4a08af762c43ae6affe0f947175439d9cf3a), one commit on
+master `9b30fd207f`, 3 files, +116/−5 (production code +19/−5 in `zjit/src/hir.rs`).
+
+**What it does.** In `type_specialize`, an attr_reader send whose receiver has a profiled shape used to emit a
+generic `GetIvar` in a final version, because `try_emit_optimized_getivar` refuses to guard there. It now calls
+`dispatch_getivar` with that one shape, the same helper `getinstancevariable` uses in a final version: compare the
+shape, load the field on a match, and call `rb_ivar_get` otherwise. The block continues in the join block. The class
+guard and the `MethodRedefined` patch point are unchanged. This is only the final-version piece of Shopify/ruby#1039
+row 78 (`4857dd0ef5`, unassigned); nothing from lead 11 (polymorphic arms) and nothing for setivar.
+
+**Ownership, rechecked 2026-11-03 20:50Z.** Row 78 has no assignee. Open ruby/ruby ZJIT PRs about ivars or shapes:
+#19443 and #18616 (tekknolagi, polymorphic arms), #18249 (tekknolagi, draft since 2026-08-07, merges identical shape
+arms inside the ivar dispatch), #17865 (RData setivar), #19617 (k0kubun, recompiling final versions) and our #19558
+(polymorphic send misses in non-final versions). None of them touches the attr_reader branch for final versions.
+#18249 and #19558 no longer apply cleanly to master, with or without this commit.
+
+**Counters**, ruby-bench `73918b2`, per iteration, 15 warmup and 10 measured, `--zjit --zjit-stats-quiet
+--zjit-exec-mem-size=512 --zjit-mem-size=1024`. `compile_error_out_of_memory` and `failed_iseq_count` were 0 before
+the reset and at the end in all six runs.
+
+| per iteration | master `9b30fd207f` | branch |
+|---|---:|---:|
+| `getivar_fallback_no_side_exits` railsbench / lobsters / shipit | 73,922 / 153,653 / 410,795 | 65,922 / 125,456 / 247,748 |
+| `ccall_rb_ivar_get` | 229,098 / 351,131 / 1,001,336 | 221,098 / 323,683 / 838,289 |
+| `side_exit_count` | 23,709 / 12,649 / 49,584 | 23,709 / 12,649 / 49,557 |
+
+The drops (8,000 / 28,197 / 163,047) match lead 15's count of attr_reader reads in final versions (8.0k / 28.6k /
+163.0k on `a8b095a07e`).
+
+**Callgrind**, M Ir per iteration, GC and write barriers excluded, 10 warmup and 3 measured iterations, two runs per
+build (a with `--zjit-perf=iseq`, c without), same flags without stats:
+
+| | master a / c | branch a / c | Δ of the means | `rb_ivar_get` inclusive, both runs |
+|---|---|---|---:|---:|
+| railsbench | 4,724.75 / 4,726.29 (A/A 0.03%) | 4,721.78 / 4,728.45 (A/A 0.14%) | −0.40 (−0.01%) | 31.53 → 30.70 (−0.83) |
+| lobsters | 3,239.60 / 3,237.33 (A/A 0.07%) | 3,237.43 / 3,236.05 (A/A 0.04%) | −1.73 (−0.05%) | 48.71 → 44.25 (−4.46) |
+| shipit | 3,675.96 / 3,676.29 (A/A 0.01%) | 3,650.74 / 3,657.56 (A/A 0.19%) | −21.97 (−0.60%) | 131.48 → 109.43 (−22.05) |
+
+Shipit is above its A/A; railsbench and lobsters are within it, but their `rb_ivar_get` drop is the same in both runs.
+Calls to `rb_ivar_get` per iteration drop by 8.0k / 28.4k / 159.3k, at 104 / 157 / 138 Ir per removed call. The
+estimate (0.9 / 3.1 / 17.9) priced a call at 105–130 Ir, so it was low on lobsters and shipit. With GC included, the
+branch's shipit run c had 65 M Ir more GC marking than its run a (one more major mark in the window); the other five
+runs agree within 1.6 M of GC, so I compare without GC.
+
+**Per call** (Callgrind, `--zjit --zjit-max-versions=2 --zjit-inline-threshold=0`, 20,000 iterations of
+`run(o) = o.v + C` after a constant reassignment makes `run`'s next version final; release builds, A/A identical):
+one-shape receiver 211 → 107 Ir per iteration; a receiver of the same class with another shape 211 → 219 Ir, the
+cost of the added shape compare.
+
+**Checks:**
+- `make zjit-test`: 1941/1941 pass. The new HIR snapshot `test_inline_attr_reader_on_final_version` fails without the
+  change. The new `test_attr_reader_on_final_version` (profiled shape, other shape, object without the ivar,
+  redefined reader) passes with and without it, as a correctness guard.
+- btest at `--zjit-call-threshold=1`: 2141/2141 pass. `test_zjit_cli.rb`: 28 tests, 0 failures.
+- The test's Ruby script under `--zjit-stats`: the branch counts 2 generic reads (other shape, no ivar), master 4.
+
+**Draft PR body (not opened):**
+
+> When ZJIT compiles the last allowed version of an ISEQ, it may not side-exit, so a send to an `attr_reader` there
+> always becomes a generic `GetIvar`, a call to `rb_ivar_get`, even when the receiver was profiled with one shape. A
+> `getinstancevariable` in the same version already branches on the profiled shape and calls `rb_ivar_get` only for
+> other shapes. This change gives the `attr_reader` send the same branch by calling `dispatch_getivar` with the
+> profiled shape. The class guard, the method redefinition patch point and the fallback are unchanged.
+>
+> On ruby-bench, comparing master `9b30fd207f` with this branch (`--zjit --zjit-exec-mem-size=512
+> --zjit-mem-size=1024`, 15 warmup and 10 measured iterations, no out-of-memory compile errors), generic ivar reads in
+> final versions (`getivar_fallback_no_side_exits`) drop per iteration from 73,922 to 65,922 on railsbench, from
+> 153,653 to 125,456 on lobsters, and from 410,795 to 247,748 on shipit. Side exits are unchanged.
+>
+> Under Callgrind (10 warmup and 3 measured iterations, two runs per build, GC excluded), shipit executes 22.0M fewer
+> instructions per iteration than master (−0.60%), while the two runs of each build differ by at most 0.19%. On
+> railsbench (−0.01%) and lobsters (−0.05%) the total change is within run-to-run noise, but the instructions spent
+> in `rb_ivar_get` drop by 0.8M and 4.5M per iteration in both runs.
+>
+> In a microbenchmark where an `attr_reader` call in a final version sees one shape, a loop iteration executes 107
+> instructions instead of 211 on master. With a receiver of another shape it executes 219 instead of 211, the cost of
+> the added shape check.
+>
+> The attr_reader part of k0kubun's lobsters patch list (Shopify/ruby#1039, row 78) goes further, into polymorphic
+> arms; this PR takes only the final-version piece.
+
+**Short explanation for Thomas** (DECISIONS a5f8c4a):
+
+ZJIT may compile a method only a limited number of times. When it compiles a method for the last time, that code
+must not jump back to the interpreter when something unexpected happens, because nothing could recompile it
+afterwards. In that last compile, a call to an `attr_reader` such as `point.x` gave up its fast path and called the
+slow C lookup `rb_ivar_get` every time, even when every object it had seen had the same layout. A plain `@x` read in
+the same situation already does better: it checks the object's layout, reads the slot directly when the layout
+matches and otherwise calls the slow lookup. The change gives `point.x` exactly that check, so an object with another
+layout still takes the old slow lookup, and redefining `x` still discards the compiled code as before.
+
+```ruby
+# ruby --zjit --zjit-call-threshold=2 --zjit-max-versions=2 example.rb
+class Point
+  attr_reader :x
+  def initialize(x) = @x = x
+end
+
+OFFSET = 10
+def shifted(point) = point.x + OFFSET
+
+point = Point.new(1)
+shifted(point); shifted(point)       # ZJIT compiles shifted
+Object.send(:remove_const, :OFFSET)
+OFFSET = 20                          # ...and throws that code away
+shifted(point); shifted(point)       # last allowed compile of shifted
+i = 0; while i < 1000; shifted(point); i += 1; end  # each point.x: rb_ivar_get before, a direct read after
+```
+
+With `--zjit-stats`, the loop's 1,000 `point.x` calls take the slow lookup 1,000 times on master `9b30fd207f` and 0
+times on the branch.
 
 ## Lead 3: our build and its numbers (2026-11-03)
 
