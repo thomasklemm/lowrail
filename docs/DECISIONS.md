@@ -4,6 +4,20 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Submission queue (2026-11-03)
+
+Thomas: prepare several candidates, then submit selectively, so maintainers are not overloaded. Every finished
+candidate (Thermos approve on both rubrics, draft in the short form) goes into the **Queue** section of
+[upstream/contributions.md](upstream/contributions.md), ranked by effect and breadth. It is opened from there only
+when the repository has room:
+
+* **rails/rails:** at most 5 of our PRs open at once; open the next one when one merges or closes.
+* **ruby/ruby:** at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
+* **gems:** at most 1 open PR per gem.
+
+Prefer the strongest candidate, not the oldest. A candidate that an upstream change makes moot leaves the queue
+with a note.
+
 ## Priorities after the merge wave (2026-11-03)
 
 20 of 25 Rails PRs from this cycle are merged, and the combined effect is −1.66% / −1.64% of allocations over 206
@@ -11,6 +25,8 @@ workloads ([combined-effect](upstream/combined-effect.md)). Thomas: focus on Rai
 
 1. **Z1, ZJIT gap census** (J1): fallbacks, exits and parity allocations on current master; only gaps nobody owns.
 2. **Z2, ZJIT differential correctness** (U1): Rails and app suites, interpreter vs ZJIT modes, on current master.
+   **Z3, polymorphism data** (L2): classes and shapes per polymorphic site, a counterfactual cache, one issue draft.
+   **Z4, other people's open ZJIT PRs on Rails** (J2): #18326, #19583, #19483; data comments only with substance.
 3. **Rails CPU deep dives** (V1 Action View: C1 in review; A1 Active Record): running.
 4. **G1, gem census** (R5): broad allocation sites in rack, i18n, turbo-rails, devise and others; spreads review load.
 5. **R6, the two largest Rails leads** (R2): relation delegators forwarding `...` from a block (14 apps), and

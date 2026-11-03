@@ -79,6 +79,16 @@ These performance-related PRs were opened before the October 19–22 census.
 - **Closed unmerged; checked on 2026-11-02:** [ruby/ruby#19555](https://github.com/ruby/ruby/pull/19555), recompile once when a PatchPoint invalidates a ZJIT final version, closed in favor of another author's [#19617](https://github.com/ruby/ruby/pull/19617), which handles the same case.
 - **Closed unmerged by the author; 2026-11-03:** [ruby/ruby#19667](https://github.com/ruby/ruby/pull/19667), keep the `opt_new` fast path for String/Array subclasses (SafeBuffer, SqlLiteral), closed after [jhawthorn's objection](https://github.com/ruby/ruby/pull/19667) to adding complexity to `vm_exec_core` for edge cases. Per call it was faster (`SafeBuffer.new` 410 → 303 ns YJIT), but ruby-bench headline timing stayed within A/A noise, so it did not meet our own bar either. A JIT-only variant was not pursued because it would make interpreter and JIT differ on visibility and refinements.
 
+## Queue
+
+Finished, reviewed candidates waiting for room (rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)).
+
+| Candidate | Repo | Branch @ SHA | Effect | Status |
+| --- | --- | --- | --- | --- |
+| C1, escape `OutputBuffer` appends directly | rails/rails | `output-buffer-escape` (rework pending) | erubi-rails −7% Ir interp / −5–10% YJIT | in Sol review |
+| C3, read `attribute_types` once in `_load_from_sql` | rails/rails | `load-from-sql-attribute-types-once` @ 2fd04c4 | shipit −4.1% / −5.3% Ir; moot if #59141 lands | in Sol review |
+| C2, lazy `AliasTracker` in `AssociationScope` | rails/rails | `association-scope-lazy-alias-tracker` @ fcfadc0 | shipit −2.6% / −1.8% Ir; −2 objects per scope | in Sol review |
+
 ## Open
 
 All entries in this section are **open, not merged; checked on 2026-11-02**.
