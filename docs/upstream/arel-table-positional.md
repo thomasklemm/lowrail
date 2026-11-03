@@ -96,7 +96,9 @@ flipper-active_record adapter on SQLite, `enable(:search)`, `enable_percentage_o
 CASA itself was not booted: the PG census app copies aren't set up in this orb, and its boot path into flipper is
 the same `get_all` call.
 
-## Draft (not opened)
+## Draft (opened as [#59574](https://github.com/rails/rails/pull/59574), head `6e45c14`)
+
+After Sol's first round: `name:` defaults to a private sentinel, so an explicit `name: nil` or `false` next to a positional name raises; `arel/table.rb` requires `active_support/deprecation` so standalone `require "arel"` works (fresh-process test). The optional positional parameter costs about 40 ns per uncached `Arel::Table.new` (interp 476–489 → 515–521 ns, YJIT 298–316 → 349–362 ns); ruby-bench constructs none per iteration after warmup.
 
 **Deprecate a positional table name in `Arel::Table.new`**
 
