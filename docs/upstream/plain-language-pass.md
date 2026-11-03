@@ -33,5 +33,9 @@ ruby/ruby#19483, #19558, #19680 and #19681 are rewritten by the thread that is r
 | 2026-11-03 | [rails/rails#59583](https://github.com/rails/rails/pull/59583) | "Ir" and "A/A" spelled out; "workloads" named as requests, jobs or mailers. |
 | 2026-11-03 | [rails/rails#59584](https://github.com/rails/rails/pull/59584) | Dense first paragraph split; the escape share is an average, not a range; A/A spelled out. |
 | 2026-11-03 | [rails/rails#59585](https://github.com/rails/rails/pull/59585) | A 4.6% instruction increase is no longer called slower; the ZJIT 7–10% range names its two cases; A/A spelled out. |
+| 2026-11-03 | [ruby-i18n/i18n#764](https://github.com/ruby-i18n/i18n/pull/764) | One dense sentence split into four. |
+| 2026-11-03 | [ruby-i18n/i18n#765](https://github.com/ruby-i18n/i18n/pull/765) | Hard wraps removed; the instruction count names the JIT and baseline; "every app that translates" became "all ten". |
+| 2026-11-03 | [ruby-i18n/i18n#766](https://github.com/ruby-i18n/i18n/pull/766) | Corrected where the check is cached (a private constant read by three methods) and what the 3% is (the saving). |
+| 2026-11-03 | [rails/propshaft#289](https://github.com/rails/propshaft/pull/289) | A sentence says what the table measures; "M" and "k" spelled out. |
 
-Left unchanged: [ruby/ruby#19620](https://github.com/ruby/ruby/pull/19620), already plain. The ruby/ruby part stopped after these, because the open ruby/ruby PRs are being reviewed with Thomas.
+Left unchanged: [ruby/ruby#19620](https://github.com/ruby/ruby/pull/19620), already plain. The ruby/ruby part stopped after these, because the open ruby/ruby PRs are being reviewed with Thomas. Also unchanged as already plain: ruby-i18n/i18n#763, MiniProfiler/rack-mini-profiler#670 and getlago/lago-expression#91.
