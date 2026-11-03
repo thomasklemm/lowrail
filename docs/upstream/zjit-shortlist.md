@@ -35,5 +35,5 @@ and open ZJIT PRs on ruby/ruby. Claim status comes from assignees and comments o
 3. Then build, review (Astra, plus the adversarial Sol round), and open through the queue: at most two new ZJIT
    PRs open at once. Prefer finishing our open ones (#19483, #19558, #19655, #19659, #19662) over new ones.
 
-Not taken: anything in k0kubun's #1039 rows, tekknolagi's backend redesign area (#1077), core-semantics changes
+Not taken (until 2026-11-03, see DECISIONS "ZJIT ideas are free to take"): anything in k0kubun's #1039 rows, tekknolagi's backend redesign area (#1077), core-semantics changes
 without a ZJIT reviewer's interest.

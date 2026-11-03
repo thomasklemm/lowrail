@@ -37,6 +37,15 @@ Rules that came out of one day's feedback. Most of them are about maintainers' t
   open Rails PRs (see Submission queue), every open PR rebased and green, one neutral note 14 days after an
   approval.
 
+## ZJIT ideas are free to take (2026-11-03)
+
+k0kubun on [Shopify/ruby#1100](https://github.com/Shopify/ruby/issues/1100#issuecomment-6611201953): "It's free to
+take. Unless there's a particular issue (about one specific problem, not like these burndown issues) that has an
+assignee or an active PR, feel free to work on any of the ideas." So rows of burndown issues such as #1039 are no
+longer off limits; an idea is taken only when its own issue has an assignee or an open PR exists (for example
+ruby/ruby#18326 for sendforward). This replaces the shortlist rule "don't take #1039 rows". The ruby/ruby PR limit
+(15) still applies: build into the queue, open when there is room.
+
 ## Rails PR evidence: CPU and provenance, not only objects (2026-11-03)
 
 fatkodima on [rails#59577](https://github.com/rails/rails/pull/59577#issuecomment-6606427493) asked how we choose
