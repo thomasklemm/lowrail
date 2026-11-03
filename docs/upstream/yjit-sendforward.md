@@ -7,9 +7,9 @@ caller passed **no arguments** (`relation.where_clause.empty?`, `connection.curr
 **0.47% / 1.08% / 0.43%** of YJIT instructions on railsbench / shipit / lobsters, every candidate sample below every
 A/A sample. erubi-rails is a null (−0.03%, A/A spread 0.25%). Wall time on this orb: see [below](#wall-time).
 
-One commit on master [`2bc6f9a60e`](https://github.com/ruby/ruby/commit/2bc6f9a60e):
+One commit on master [`90dbced795`](https://github.com/ruby/ruby/commit/90dbced795) (measured on `2bc6f9a60e`; the rebase was clean):
 [`thomasklemm/yjit-sendforward`](https://github.com/thomasklemm/ruby/tree/thomasklemm/yjit-sendforward),
-[`3f40995f60`](https://github.com/thomasklemm/ruby/commit/3f40995f608de49d375c88bff7d5b21cffce2796). Not opened;
+[`38c5103ba6`](https://github.com/thomasklemm/ruby/commit/38c5103ba6912235815b214d3bac24167a91bf43) (was `3f40995f60`; the code is unchanged, only tests were added). Not opened;
 nothing posted on GitHub.
 
 ## Prior work
@@ -86,20 +86,27 @@ In `test/ruby/test_yjit.rb`:
 * `test_send_forwarding_without_caller_args` (`no_send_fallbacks: true`): ISEQ, `attr_reader` and cfunc callees,
   `self.` and FCALL callers, with and without a block (`block_given?` through `...`). **Fails on master:**
   `<0> expected but was <7>` dynamic sends.
+* `test_send_forwarding_leading_args_blocks_and_nesting` (`no_send_fallbacks: true`, added after review): sites with
+  their own leading arguments (`lead(7, ...)`, `lead(@lead, ...)`, so receiver and argument peeks go through the
+  adjusted `peek_at_stack`), a target that `yield`s and one that materializes `&block` and calls it, block-absent →
+  present → absent and present → absent → present at one site, and `outer → middle → inner → lead` forwarding.
+  **Fails on master:** `<0> expected but was <13>`.
 * `test_send_forwarding_with_caller_args`: positional, keyword, splat and empty callers through one site (guard
-  chain and fallback). Passes on master; protects the refusals.
+  chain and fallback), plus `forward(8, ...)` into a forwarding method, whose inner site then falls back. Passes on
+  master; protects the refusals.
 * `test_send_forwarding_side_exits`: eight receiver classes (megamorphic), method_missing → `NoMethodError`, stack
   overflow through `def recurse(...) = recurse(...)`. Passes on master; protects the exit paths.
 
 `make yjit-check` with release `--enable-yjit` and with `--enable-yjit=dev`: cargo 374 passed, btest at
-`--yjit-call-threshold=1` all 2,138 passed, test_yjit 153 tests, 0 failures (1 pre-existing skip). Also
+`--yjit-call-threshold=1` all 2,138 passed, test_yjit 153 tests, 0 failures (1 pre-existing skip). At `38c5103ba6`
+(rebased, dev build): cargo 374, btest 2,138/2,138, test_yjit 154 tests, 0 failures, 1 skip. Also
 test_method/call/syntax/keyword/super/backtrace at threshold 1 on the dev build: 538 tests, 0 failures.
 Because `peek_at_stack` is shared, a temporary assertion (not committed) panicked if any instruction other than
 `sendforward` peeked with a stack size different from the instruction start. btest at threshold 1 (2,138) and
 test_yjit/method/call/keyword/super/proc/array/hash/string at threshold 1 (1,958 tests) passed without tripping it,
 so the adjustment changes no existing caller.
 
-**Not yet done:** the independent Thermos review (GPT-6 Astra) required before opening.
+**Review:** Codex Thermos (GPT-6 Astra) approve-with-nits on both rubrics on `3f40995f60`. Neither review found a behavior defect. The shared nit was test coverage, addressed by the tests added in `38c5103ba6`.
 
 ## Instructions (primary)
 
@@ -137,18 +144,19 @@ a timing number.
 
 ## PR draft (not opened)
 
+Decision: submit without a wall-time number.
+
 > **YJIT: Specialize sendforward when the caller passed no arguments**
 >
-> YJIT falls back to `rb_vm_sendforward` for every call site that passes `...` (`send_forwarding`). Rails'
-> `Module#delegate` generates such methods (`def empty?(...) = predicates.empty?(...)`), and most of their callers
-> pass no arguments, which leaves nothing to copy. This guards the caller's callinfo (argc 0, no kwargs) and the
-> method's block handler, drops the callinfo slot and compiles the call as a regular send passing the method's
-> block. Callers passing arguments still fall back (`send_forwarding_caller_args`).
+> YJIT falls back to `rb_vm_sendforward` at every site that passes `...`, including every method `Module#delegate`
+> generates in Rails. When the forwarding method's caller passed no arguments, nothing needs copying. This guards
+> the caller's callinfo and the method's block handler, drops the callinfo slot and compiles a regular send with the
+> method's block. Callers passing arguments still fall back.
 >
-> | ruby-bench, YJIT, per iteration | railsbench | shipit | lobsters | erubi-rails |
+> | ruby-bench YJIT, per iteration | railsbench | shipit | lobsters | erubi-rails |
 > | --- | ---: | ---: | ---: | ---: |
-> | `send_forwarding` before → after | 75,134 → 0 | 100,648 → 1,994 | 31,790 → 555 | 20,000 → 0 |
+> | `send_forwarding` | 75,134 → 0 | 100,648 → 1,994 | 31,790 → 555 | 20,000 → 0 |
 > | `num_send_dynamic` | −5.2% | −9.2% | −4.9% | −1.3% |
-> | instructions (Callgrind) | −0.47% | −1.08% | −0.43% | −0.03% |
+> | instructions (Callgrind, A/A ≤ 0.25%) | −0.47% | −1.08% | −0.43% | −0.03% |
 >
-> A/A spread on instructions is at most 0.25%. I could not measure wall time reliably on my machine.
+> I could not measure wall time reliably on my machine.
