@@ -4,6 +4,14 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Finding ZJIT leads in real Rails apps is a goal of its own (2026-11-03)
+
+Thomas: a main goal is to find new ZJIT leads in the census apps and take them on as issues or PRs, with targeted
+bets. Running bets: F1 (fallback/exit census on 20 apps, master), F2 (our Rails PRs under ZJIT), Z9 (side-exit
+size). New: **Z10** per-ISEQ ZJIT stats (#746) built now on the fork and used on the apps (L2); **Z11** ZJIT
+differential correctness on the apps' own test suites (J2); **Z12** ZJIT warmup and invalidation churn on the apps
+(J1). Every lead goes through the usual path: ownership check, data comment that claims the tracker issue, then PR.
+
 ## Exactness checklist before review (2026-11-03)
 
 S1, C7-1, I2 and C1 each needed three to five Sol/Astra rounds, almost all for the same classes of difference.
