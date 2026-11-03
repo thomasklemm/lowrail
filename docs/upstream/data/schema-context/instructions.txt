@@ -1,0 +1,85 @@
+# Instructions per call (Callgrind, Ruby 4.0.7, Rails c042aee23a). base / aa (A/A) / at1 / at12 (AT1+AT2).
+
+## ir-path
+== TZA=0
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 1672
+columns_hash: base 1452
+has_attribute: base 3767
+type_for_attribute: base 5252
+new: base 23764
+instantiate: base 17076
+load_from_sql_10: base 281188
+find: base 413501
+find_by: base 427773
+where_to_a: base 718144
+== TZA=1
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 2790
+columns_hash: base 1452
+has_attribute: base 4881
+type_for_attribute: base 6369
+new: base 25992
+instantiate: base 18188
+load_from_sql_10: base 293346
+find: base 418876
+find_by: base 430175
+where_to_a: base 726915
+
+## ir-at1
+== TZA=1 interpreter
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 2790 | aa 2790 (+0.0%) | at1 1672 (-40.1%)
+has_attribute: base 4885 | aa 4894 (+0.2%) | at1 3768 (-22.9%)
+type_for_attribute: base 6369 | aa 6365 (-0.1%) | at1 5251 (-17.6%)
+new: base 25992 | aa 25990 (-0.0%) | at1 23762 (-8.6%)
+instantiate: base 18188 | aa 18191 (+0.0%) | at1 17078 (-6.1%)
+load_from_sql_10: base 293673 | aa 293564 (-0.0%) | at1 281238 (-4.2%)
+find: base 416301 | aa 415848 (-0.1%) | at1 413936 (-0.6%)
+find_by: base 430159 | aa 431211 (+0.2%) | at1 427908 (-0.5%)
+where_to_a: base 727415 | aa 726936 (-0.1%) | at1 718656 (-1.2%)
+includes: base 2968455 | aa 2969205 (+0.0%) | at1 2940204 (-1.0%)
+== TZA=1 YJIT
+YJIT: instructions per call (200 calls, GC off)
+attribute_types: base 1412 | aa 1411 (-0.1%) | at1 781 (-44.7%)
+has_attribute: base 2378 | aa 2379 (+0.1%) | at1 1749 (-26.4%)
+type_for_attribute: base 3954 | aa 3958 (+0.1%) | at1 3327 (-15.9%)
+new: base 8935 | aa 8950 (+0.2%) | at1 7675 (-14.1%)
+instantiate: base 4893 | aa 4947 (+1.1%) | at1 4262 (-12.9%)
+load_from_sql_10: base 135512 | aa 130971 (-3.4%) | at1 124196 (-8.4%)
+find: base 214853 | aa 214689 (-0.1%) | at1 213654 (-0.6%)
+find_by: base 225087 | aa 227179 (+0.9%) | at1 225946 (+0.4%)
+where_to_a: base 355711 | aa 348080 (-2.1%) | at1 351405 (-1.2%)
+includes: base 1279095 | aa 1280450 (+0.1%) | at1 1244444 (-2.7%)
+
+## ir-enum
+== TZA=1 ENUM=1 interpreter
+interpreter: instructions per call (200 calls, GC off)
+attribute_types: base 2790 | aa 2790 (-0.0%) | at1 2790 (-0.0%) | at12 1672 (-40.1%)
+new: base 25905 | aa 25905 (+0.0%) | at1 25905 (+0.0%) | at12 23679 (-8.6%)
+load_from_sql_10: base 298287 | aa 298152 (-0.0%) | at1 298083 (-0.1%) | at12 285985 (-4.1%)
+where_to_a: base 737833 | aa 737599 (-0.0%) | at1 737724 (-0.0%) | at12 728658 (-1.2%)
+== TZA=1 ENUM=1 YJIT
+YJIT: instructions per call (200 calls, GC off)
+attribute_types: base 1411 | aa 1411 (+0.0%) | at1 1414 (+0.2%) | at12 781 (-44.7%)
+new: base 8950 | aa 8949 (-0.0%) | at1 8936 (-0.2%) | at12 7688 (-14.1%)
+load_from_sql_10: base 135330 | aa 135876 (+0.4%) | at1 135396 (+0.0%) | at12 128709 (-4.9%)
+where_to_a: base 365507 | aa 364965 (-0.1%) | at1 364983 (-0.1%) | at12 358772 (-1.8%)
+== TZA=1 YJIT rerun
+YJIT: instructions per call (1000 calls, GC off)
+load_from_sql_10: base 131856 | aa 131440 (-0.3%) | at1 124385 (-5.7%)
+where_to_a: base 357451 | aa 351049 (-1.8%) | at1 352197 (-1.5%)
+
+## ir-hoist
+== TZA=1 interpreter
+interpreter: instructions per call (200 calls, GC off)
+load_from_sql_1: at1 113610 | at1b 113709 (+0.1%) | at1h 113057 (-0.5%)
+load_from_sql_10: at1 281189 | at1b 281412 (+0.1%) | at1h 265037 (-5.7%)
+where_to_a: at1 718433 | at1b 719245 (+0.1%) | at1h 711421 (-1.0%)
+includes: at1 2939993 | at1b 2940618 (+0.0%) | at1h 2907061 (-1.1%)
+== TZA=1 YJIT
+YJIT: instructions per call (200 calls, GC off)
+load_from_sql_1: at1 75686 | at1b 75410 (-0.4%) | at1h 75368 (-0.4%)
+load_from_sql_10: at1 123863 | at1b 123882 (+0.0%) | at1h 120287 (-2.9%)
+where_to_a: at1 351021 | at1b 351191 (+0.0%) | at1h 349551 (-0.4%)
+includes: at1 1245127 | at1b 1263823 (+1.5%) | at1h 1256428 (+0.9%)
