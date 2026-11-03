@@ -75,6 +75,8 @@ when the repository has room:
 
 * **rails/rails:** up to 25 of our PRs open at once (Thomas, 2026-11-03; raised from 10–15 the same day). Reviewer load still counts: open strongest first and keep each PR small.
 * **ruby/ruby:** at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
+  Exception (Thomas, 2026-11-03): the three tracker items tekknolagi green-lit (Shopify/ruby#1064, #1065, #1091)
+  may be open at the same time, i.e. up to 3; `Kernel#dup` (#1058) waits for a slot.
 * **gems:** at most 1 open PR per gem; i18n up to 3 (Thomas, 2026-11-03).
 
 Prefer the strongest candidate, not the oldest. A candidate that an upstream change makes moot leaves the queue
