@@ -322,7 +322,8 @@ l05, l06, l14). Departures were recorded before evaluation:
 
 Inputs, results and the writer's receipts stay outside Git.
 
-The changes, written from the v2 gaps only:
+The changes, written from the v2 gaps only, as first measured at `e39898b`.
+The review fixes below narrow three of them:
 - **Callers, constants in blocks:** callers resolve constant receivers inside
   blocks (constant lookup is lexical) and attribute them to the enclosing
   def. A relative constant names the top-level one only when no enclosing
@@ -416,7 +417,8 @@ equivalence counts all four as correct.
 - **w02:** an around callback's `yield` returns `false` only when a `before`
   callback nested inside it halts. Leaf's booted create chain has no
   `before` callbacks, and Leaf has no subclasses, so the yield returns the
-  record id. The uncertain ground truth `(Integer | false)` is not encoded.
+  record id. **Disputed ground truth:** the uncertain `(Integer | false)` is
+  not encoded, and w02 is still scored against it.
 - **w07:** the caller passes `leaf.leafable.body.content` through a
   delegated type. Its ground truth is uncertain (NOT NULL column).
 - **w12, w16:** receivers are an association proxy (`user.sessions`) and an
@@ -424,11 +426,80 @@ equivalence counts all four as correct.
   cross-callback flow (invariant 6), so these stay abstentions.
 - **c05, c09, w04:** returns without evidence; outside this change.
 - **Spelling:** sampled unions keep the `(T | nil)` spelling that the
-  existing tests and slot census use. Switching single-arm unions to `T?`
-  would change only strict string matches, not contracts.
+  existing tests and slot census use. This is decided: switching
+  single-arm unions to `T?` would only inflate strict string matches.
 
 Verification: `cargo test --locked`, 49 + 4 + 8 passed, including the
 real-blog stdio round trip. Both new tests fail on `206a2fc`. `git diff
 --check` is clean. The Lobsters checkout carries an AGENTS.md asking agents
 not to contribute code to Lobsters. It was only read and observed as a
 corpus app, as in the census.
+
+### Review fixes and a second v3 measurement (2026-11-03)
+
+An independent review of `e39898b` found five ways the changes above could
+report a new false fact where `206a2fc` abstained. Each is fixed and has a
+regression assertion that fails on `e39898b`:
+
+1. **An iterator name does not prove the block keeps `self`.** A block
+   keeps it only when the receiver's static, non-sampled type resolves the
+   method to Ruby's own implementation: `Kernel#tap`/`then`/`yield_self`,
+   or the `Array`/`Hash`/`Enumerable`/`String`/`Integer`/`Range` iterator
+   with no Ruby override. An app `Driver#each`, an untyped receiver or an
+   implicit-self `each` stays unresolved.
+2. **Module names and file paths cannot prove that no constant shadows the
+   top-level one** (`module Shop; Card = Other; end`). The dumper now
+   records each module's own constant table, autoloads included, which
+   loads nothing. It also records the constants of unnamed ancestors. A
+   relative constant resolves only when every lexical scope and every
+   ancestor of the innermost scope is booted with a table that lacks the
+   name. Any unknown table refuses. The file-path heuristic is removed.
+3. **Arguments are evaluated left to right on one environment.** In
+   `consume(reset, @value)`, the call `reset` invalidates `@value` before
+   it is read, so no stale nil is reported.
+4. **Template helper calls inside blocks are used only when the block's
+   method is a Rails `ActionView::Helpers::*` or `Turbo::FramesHelper`
+   helper.** These run the block through `capture` with the view as
+   `self`. Other blocks, such as `instance_eval`, are skipped.
+5. **`layout:` names a partial layout only for an options-hash render with
+   a block or beside `partial:`.** `render template: …, layout:` does not.
+
+Same frozen v3 file (`d7ad9a59…`), observations and v2 inputs. Facts were
+regenerated with the new dumper, which adds constant tables; dump errors
+are unchanged per app. This is a **second measurement of v3**, taken after
+a correctness fix prompted by review rather than by v3 results. It is not
+a fresh held-out cohort; the first measurement above remains the held-out
+result. Binary `32409f81…`.
+
+| v3 run | Precision | Recall | TP/FP/FN | exact / wrong / abstained |
+|---|---:|---:|---|---|
+| `206a2fc`, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+| fixed, no observations | 100% | 58.21% | 39/0/28 | 17 / 2 / 21 |
+| `206a2fc`, observed | 96.08% | 73.13% | 49/2/18 | 27 / 4 / 9 |
+| `e39898b`, observed (first measurement) | 96.43% | 80.60% | 54/2/13 | 30 / 3 / 7 |
+| **fixed, observed (second measurement)** | **96.30%** | **77.61%** | **52/2/15** | **28 / 4 / 8** |
+
+Strict scoring; the equivalence gives the same numbers on v3. Relative to
+`e39898b`, only iterator certification changed answers:
+- f15 is partial again: it misses `Notifier#generate`, whose call sits in
+  an uncertified block.
+- l15 abstains again.
+
+f18 stays correct.
+
+| v2 run (in-sample) | Strict P / R | TP/FP/FN | `T?` equivalence |
+|---|---|---|---|
+| `206a2fc`, no observations | 100 / 52.73 | 29/0/26 | 100 / 52.73 |
+| fixed, no observations | 100 / 60.00 | 33/0/22 | 100 / 60.00 |
+| `206a2fc`, observed | 85.37 / 63.64 | 35/6/20 | 90.24 / 67.27 |
+| `e39898b`, observed | 88.00 / 80.00 | 44/6/11 | 96.00 / 87.27 |
+| **fixed, observed** | **87.50 / 76.36** | **42/6/13** | **95.83 / 83.64** |
+
+On v2, only w15 changed: it abstains again, because the receivers of its
+`tap`/`gsub` blocks have no certified static type. c12, c16, c07 and w06
+survive with constant tables and ordered arguments. Strict precision stays
+above `206a2fc` on both sets.
+
+Verification: `cargo test --locked`, 49 + 4 + 8 passed. `git diff --check`
+is clean. `gem/test/facts_test.rb` has the same three real-blog failures
+with and without this change.

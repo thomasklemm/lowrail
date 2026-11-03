@@ -134,6 +134,10 @@ pub struct Module {
     pub ancestors: Vec<String>,
     pub singleton_ancestors: Vec<String>,
     pub const_source_location: Option<String>,
+    /// Own constant names, autoloads included; None when not dumped.
+    pub constants: Option<Vec<String>>,
+    /// Own constants of unnamed ancestors, which have no entry of their own.
+    pub anonymous_ancestor_constants: Option<Vec<String>>,
     pub methods: Vec<Method>,
     /// An anonymous module dumped under a descriptive name (compiled
     /// template container, route helper modules).

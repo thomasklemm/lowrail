@@ -178,19 +178,20 @@ impl<'pr> Visit<'pr> for Renders<'_> {
                 && first.as_keyword_hash_node().is_none() && first.as_hash_node().is_none() {
                 self.implicit(first);
             }
-            // A partial layout (`render layout: "x", locals: {...} do`, or
-            // beside a partial) is itself a partial and receives `locals:`.
-            if let Some(layout) = options.iter().find(|(k, _)| k == "layout").and_then(|(_, n)| literal(n))
+            // A partial layout: Rails' view `render` with an options hash
+            // renders `layout:` as a partial when given a block, or beside
+            // `partial:`; `render template:` layouts and a shorthand's
+            // `layout:` local are not partials. It receives `locals:`.
+            let hash = args.first().is_some_and(|a| a.as_keyword_hash_node().is_some() || a.as_hash_node().is_some());
+            if hash && (node.block().is_some_and(|b| b.as_block_node().is_some()) || options.iter().any(|(k, _)| k == "partial"))
+                && let Some(layout) = options.iter().find(|(k, _)| k == "layout").and_then(|(_, n)| literal(n))
                 && self.target.virtual_path.as_deref() == Some(&self.partial(&layout).2) {
                 let receiver = self.action.rsplit_once('#').map(|(r, _)| r).unwrap_or("");
-                let value = |node: &Node<'_>| infer::value(node, self.facts, self.model, receiver, self.ivars);
-                let locals: BTreeMap<_, _> = options.iter().flat_map(|(k, v)| if k == "locals" {
-                        pairs(v).iter().map(|(name, node)| (name.clone(), value(node))).collect()
-                    } else if shorthand.is_some() && !RESERVED.contains(&k.as_str()) { vec![(k.clone(), value(v))] }
-                    else { vec![] }).collect();
+                let locals: BTreeMap<_, _> = options.iter().filter(|(k, _)| k == "locals").flat_map(|(_, v)| pairs(v))
+                    .map(|(name, node)| (name, infer::value(&node, self.facts, self.model, receiver, self.ivars))).collect();
                 let local_names: Vec<_> = locals.keys().collect();
                 self.typed.push(locals.clone());
-        self.incoming.push(json!({"from":self.parent.identifier,"action":self.action,
+                self.incoming.push(json!({"from":self.parent.identifier,"action":self.action,
                     "locals":locals,"local_names":local_names,"partial_layout":layout,
                     "location_scope":"boot handler output, not original template line numbers"}));
             }
@@ -262,7 +263,7 @@ pub(super) fn helper_argument_sites(model: &TypeModel, facts: &Facts, wanted: &B
         if !fresh(template) || !wanted.iter().any(|name| template.code.contains(name.as_str())) { continue; }
         let parsed = parser.parse(template.code.as_bytes());
         if parsed.errors().next().is_some() { continue; }
-        let mut calls = HelperCalls { wanted, calls: Vec::new(), bound: BTreeSet::new() };
+        let mut calls = HelperCalls { facts, wanted, calls: Vec::new(), bound: BTreeSet::new(), blocks: Vec::new(), opaque: 0 };
         calls.visit(&parsed.node());
         if calls.calls.is_empty() { continue; }
         let (_, contexts) = incoming(model, facts, &parser, template);
@@ -287,23 +288,49 @@ pub(super) fn helper_argument_sites(model: &TypeModel, facts: &Facts, wanted: &B
 
 /// Implicit-self calls of wanted names with only positional, non-block
 /// arguments (kept as source text), and every name the template binds.
+/// Calls inside a block are kept only when the block's method is a Rails or
+/// Turbo view helper, which runs it through `capture` with the view as self.
 struct HelperCalls<'a> {
+    facts: &'a Facts,
     wanted: &'a BTreeSet<String>,
     calls: Vec<(String, Vec<String>)>,
     bound: BTreeSet<String>,
+    /// Per enclosing call: whether its block keeps the view as self.
+    blocks: Vec<bool>,
+    /// Depth of enclosing blocks that may run with another self.
+    opaque: usize,
+}
+
+impl HelperCalls<'_> {
+    fn captures(&self, node: &ruby_prism::CallNode<'_>) -> bool {
+        if node.receiver().is_some() { return false; }
+        let name = String::from_utf8_lossy(node.name().as_slice());
+        let mut owners = self.facts.modules.iter().filter(|m| (m.name.ends_with("Helper") || m.name.ends_with("Helpers"))
+            && m.methods.iter().any(|d| d.name == name && !d.singleton)).peekable();
+        owners.peek().is_some() && owners.all(|m| m.name.starts_with("ActionView::Helpers::") || m.name == "Turbo::FramesHelper")
+    }
 }
 
 impl<'pr> Visit<'pr> for HelperCalls<'_> {
     fn visit_call_node(&mut self, node: &ruby_prism::CallNode<'pr>) {
         let name = String::from_utf8_lossy(node.name().as_slice()).into_owned();
-        if node.receiver().is_none() && self.wanted.contains(&name) && let Some(args) = node.arguments() {
+        if self.opaque == 0 && node.receiver().is_none() && self.wanted.contains(&name) && let Some(args) = node.arguments() {
             let arguments: Vec<_> = args.arguments().iter().filter(|a| a.as_keyword_hash_node().is_none())
                 .map(|a| String::from_utf8_lossy(a.location().as_slice()).into_owned()).collect();
             if args.arguments().iter().all(|a| infer::argument(a)) {
                 self.calls.push((name, arguments));
             }
         }
+        self.blocks.push(self.captures(node));
         ruby_prism::visit_call_node(self, node);
+        self.blocks.pop();
+    }
+
+    fn visit_block_node(&mut self, node: &ruby_prism::BlockNode<'pr>) {
+        let opaque = self.blocks.last() != Some(&true);
+        self.opaque += opaque as usize;
+        ruby_prism::visit_block_node(self, node);
+        self.opaque -= opaque as usize;
     }
 
     fn visit_local_variable_write_node(&mut self, node: &ruby_prism::LocalVariableWriteNode<'pr>) {

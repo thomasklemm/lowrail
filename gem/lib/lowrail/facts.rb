@@ -24,6 +24,7 @@ module Lowrail
     MOD_PRIVATE_IMS = Module.instance_method(:private_instance_methods)
     MOD_INSTANCE_METHOD = Module.instance_method(:instance_method)
     MOD_CONST_SOURCE_LOCATION = Module.instance_method(:const_source_location)
+    MOD_CONSTANTS = Module.instance_method(:constants)
     CLASS_SUPERCLASS = Class.instance_method(:superclass)
     CLASS_ATTACHED_OBJECT = Class.instance_method(:attached_object)
     KERNEL_SINGLETON_CLASS = Kernel.instance_method(:singleton_class)
@@ -234,6 +235,13 @@ module Lowrail
         sc = KERNEL_SINGLETON_CLASS.bind_call(mod)
         entry["singleton_ancestors"] = MOD_ANCESTORS.bind_call(sc).map { |a| mod_label(a) }
         entry["const_source_location"] = const_location(name)
+        # Own constant names, including registered autoloads; listing them
+        # loads nothing. Lets readers prove a relative constant is not shadowed.
+        entry["constants"] = guard("constants of #{name}") { MOD_CONSTANTS.bind_call(mod, false).map { |c| c.to_s }.sort }
+        entry["anonymous_ancestor_constants"] = guard("anonymous ancestor constants of #{name}") do
+          MOD_ANCESTORS.bind_call(mod).reject { |a| MOD_NAME.bind_call(a).is_a?(String) }
+            .flat_map { |a| MOD_CONSTANTS.bind_call(a, false) }.map { |c| c.to_s }.uniq.sort
+        end
         methods = own_methods(mod, name, false) + own_methods(sc, name, true)
         entry["methods"] = methods.sort_by { |m| [m["singleton"] ? 1 : 0, m["name"]] }
         entry

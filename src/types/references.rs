@@ -20,7 +20,7 @@ fn route_helper(facts: &Facts, receiver: &str, name: &str) -> bool {
             && m.ancestors.iter().any(|a| a == "ActionDispatch::Routing::UrlFor"))
 }
 
-pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
+pub(super) fn callers(model: &TypeModel, facts: &Facts, target: &str) -> Result<Value, String> {
     let (receiver, name, singleton) = target.rsplit_once('#').map(|(c, m)| (c, m, false))
         .or_else(|| target.rsplit_once('.').map(|(c, m)| (c, m, true)))
         .ok_or("expected Class#method or Class.method")?;
@@ -34,7 +34,6 @@ pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
     let paths: BTreeSet<_> = facts.modules.iter().flat_map(|m| &m.methods)
         .filter_map(|m| m.source_location.as_deref().and_then(split_location))
         .map(|(p, _)| p).filter(|p| facts.in_app(p) && p.ends_with(".rb")).collect();
-    let files = app_files(Path::new(&facts.app_root).join("app").as_path());
     let mut found = Vec::new();
     let mut unresolved = Vec::new();
     let mut unavailable = Vec::new();
@@ -42,8 +41,8 @@ pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
         let Ok(source) = std::fs::read(path) else { unavailable.push(path); continue; };
         let parsed = parser.parse(&source);
         if parsed.errors().next().is_some() { unavailable.push(path); continue; }
-        Calls { facts, path, source: &source, wanted, wanted_receiver: receiver, name, context: None,
-            lexical: None, nesting: Vec::new(), files: &files, blocks: Vec::new(), collectors: Vec::new(),
+        Calls { model, facts, path, source: &source, wanted, wanted_receiver: receiver, name, context: None,
+            lexical: None, nesting: Vec::new(), blocks: Vec::new(), collectors: Vec::new(),
             found: &mut found, unresolved: &mut unresolved }.visit(&parsed.node());
     }
     Ok(json!({"available":true,"target":target,"callers":found,"unresolved":unresolved,
@@ -52,6 +51,7 @@ pub(super) fn callers(facts: &Facts, target: &str) -> Result<Value, String> {
 }
 
 struct Calls<'a> {
+    model: &'a TypeModel,
     facts: &'a Facts,
     path: &'a str,
     source: &'a [u8],
@@ -64,8 +64,6 @@ struct Calls<'a> {
     lexical: Option<(String, String, bool)>,
     /// Lexically enclosing class/module names, innermost last.
     nesting: Vec<String>,
-    /// Normalized app/ file paths, for constants Zeitwerk has not loaded yet.
-    files: &'a BTreeSet<String>,
     /// Per enclosing call: how its block treats the caller's self.
     blocks: Vec<Block>,
     /// Block parameters bound to Rails' respond_to collectors.
@@ -84,35 +82,13 @@ enum Block {
     Collects,
 }
 
-/// Core methods that yield to their block normally. Only trusted with an
-/// explicit non-self receiver, so an app's own DSL method of the same name
-/// called on self is not mistaken for them.
+/// Core methods that yield to their block normally. Trusted only when the
+/// receiver's static type resolves the name to Ruby's own implementation
+/// (Kernel for tap/then, the core class otherwise), never to an app or gem
+/// method that could instance_exec the block.
 const YIELDING: &[&str] = &["tap", "then", "yield_self", "each", "each_with_index", "each_with_object",
     "map", "flat_map", "collect", "select", "filter", "filter_map", "reject", "find", "detect", "sum",
     "gsub", "sub", "times", "each_slice", "group_by", "sort_by", "index_by", "min_by", "max_by", "partition"];
-
-/// Relative `.rb` paths under app/*/ (and concerns), lowercased without
-/// underscores, so acronym inflections cannot hide an autoloadable constant.
-fn app_files(app: &Path) -> BTreeSet<String> {
-    fn walk(dir: &Path, base: &Path, out: &mut BTreeSet<String>) {
-        let Ok(entries) = std::fs::read_dir(dir) else { return; };
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.is_dir() { walk(&path, base, out); }
-            else if let Some(rel) = path.strip_prefix(base).ok().and_then(|p| p.to_str())
-                && let Some(rel) = rel.strip_suffix(".rb") {
-                // Strip the root directory (app/models/...) and any concerns/ prefix.
-                let rel = rel.split_once('/').map_or(rel, |(_, r)| r);
-                for rel in [rel, rel.strip_prefix("concerns/").unwrap_or(rel)] {
-                    out.insert(rel.to_lowercase().replace('_', ""));
-                }
-            }
-        }
-    }
-    let mut out = BTreeSet::new();
-    walk(app, app, &mut out);
-    out
-}
 
 impl<'pr> Visit<'pr> for Calls<'_> {
     fn visit_class_node(&mut self, node: &ruby_prism::ClassNode<'pr>) {
@@ -241,9 +217,27 @@ impl Calls<'_> {
                 .is_some_and(|n| self.collectors.iter().any(|c| c.as_slice() == n.name().as_slice())),
         };
         if collects { Block::Collects }
-        else if node.receiver().is_some_and(|r| r.as_self_node().is_none())
-            && YIELDING.iter().any(|n| n.as_bytes() == node.name().as_slice()) { Block::Keeps }
+        else if node.receiver().is_some_and(|r| self.core_iterator(&r, &String::from_utf8_lossy(node.name().as_slice()))) { Block::Keeps }
         else { Block::Rebinds }
+    }
+
+    fn core_iterator(&self, receiver: &ruby_prism::Node<'_>, name: &str) -> bool {
+        const CORE: &[&str] = &["Array", "Hash", "Enumerable", "String", "Integer", "Range"];
+        if !YIELDING.contains(&name) || receiver.as_self_node().is_some() { return false; }
+        let context = self.context.as_ref().filter(|(_, _, s)| !*s).map_or("", |(r, _, _)| r.as_str());
+        let ty = super::infer::value(receiver, self.facts, self.model, context, &BTreeMap::new());
+        // Callers are static answers: a sampled receiver class is not proof.
+        if ty.evidence == Evidence::Observed || ty.name == "untyped" { return false; }
+        // A nil receiver raises before any block runs.
+        super::infer::arms(&ty.name).iter().filter(|arm| *arm != "nil").all(|arm| {
+            let arm = arm.trim_end_matches('?');
+            let class = arm.split('[').next().unwrap_or(arm);
+            resolve(self.facts, class, name, false).is_some_and(|(_, method)| {
+                let core = if matches!(name, "tap" | "then" | "yield_self") { method.owner == "Kernel" }
+                    else { CORE.contains(&method.owner.as_str()) };
+                core && method.source_location.as_deref().is_none_or(|l| l.starts_with("<internal:"))
+            })
+        })
     }
 
     fn nest(&mut self, node: ruby_prism::Node<'_>) {
@@ -253,10 +247,13 @@ impl Calls<'_> {
         self.nesting.push(outer.map_or_else(|| name.to_owned(), |o| format!("{o}::{name}")));
     }
 
-    /// A relative constant names the top-level one only when no lexically
-    /// enclosing scope, nor an ancestor of the innermost one, has (or can
-    /// autoload) a constant of that name. Any doubt refuses.
+    /// A relative constant names the top-level one only when every lexically
+    /// enclosing scope and every ancestor of the innermost one is booted with
+    /// its constant table dumped, and none of them has (or autoloads) that
+    /// name. A scope whose table is unknown refuses.
     fn unambiguous(&self, name: &str) -> bool {
+        let first = name.split("::").next().unwrap_or(name);
+        let lacks = |module: &Module| module.constants.as_ref().is_some_and(|c| !c.iter().any(|c| c == first));
         let mut scopes: BTreeSet<String> = BTreeSet::new();
         for scope in self.nesting.iter().chain(self.lexical.iter().map(|(r, _, _)| r)) {
             let mut prefix = scope.as_str();
@@ -266,20 +263,14 @@ impl Calls<'_> {
                 prefix = outer;
             }
         }
-        if let Some(inner) = self.nesting.last().or(self.lexical.as_ref().map(|(r, _, _)| r))
-            && let Some(module) = self.facts.modules.iter().find(|m| &m.name == inner)
-        {
-            scopes.extend(module.ancestors.iter().filter(|a| !a.starts_with('#')).cloned());
-        }
+        let Some(inner) = self.nesting.last().or(self.lexical.as_ref().map(|(r, _, _)| r))
+            .and_then(|inner| self.facts.modules.iter().find(|m| &m.name == inner)) else { return false; };
+        if !inner.anonymous_ancestor_constants.as_ref().is_some_and(|c| !c.iter().any(|c| c == first)) { return false; }
+        scopes.extend(inner.ancestors.iter().filter(|a| !a.starts_with('#')).cloned());
         scopes.remove("Object");
-        let first = name.split("::").next().unwrap_or(name);
-        !scopes.iter().any(|scope| {
-            let candidate = format!("{scope}::{first}");
-            self.facts.modules.iter().any(|m| m.name == candidate || m.name.starts_with(&format!("{candidate}::")))
-                || { let file = candidate.replace("::", "/").to_lowercase().replace('_', "");
-                    self.files.iter().any(|f| *f == file || f.starts_with(&format!("{file}/"))) }
-        })
+        scopes.iter().all(|scope| self.facts.modules.iter().find(|m| &m.name == scope).is_some_and(lacks))
     }
+
 
     /// The queried class, when the current context is an instance method of a
     /// module that this class includes and the name resolves to the target there.

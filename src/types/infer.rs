@@ -536,6 +536,13 @@ pub(super) fn argument_sites(facts: &Facts, model: &TypeModel) -> BTreeMap<Strin
     out
 }
 
+/// Top-level union arms of a type name.
+pub(super) fn arms(name: &str) -> BTreeSet<String> {
+    let mut arms = BTreeSet::new();
+    union_members(name, &mut arms);
+    arms
+}
+
 /// Whether a type name has a top-level nil arm (`nil`, `T?`, `(... | nil)`).
 pub(super) fn has_nil(name: &str) -> bool {
     let mut arms = BTreeSet::new();
@@ -676,10 +683,13 @@ fn evaluate(
             if let Some(found) = sites.as_deref_mut() && !positional.is_empty()
                 && let Some((owner, method)) = resolve(facts, &class, name, single)
             {
-                let types: Vec<_> = positional.iter().map(|arg|
-                    evaluate(arg, facts, model, receiver, singleton, &mut locals.clone(), None)).collect();
+                // Ruby evaluates arguments left to right in one environment:
+                // an earlier argument's call can change what a later one reads.
+                let mut env = locals.clone();
+                let types: Vec<_> = positional.iter()
+                    .map_while(|arg| evaluate(arg, facts, model, receiver, singleton, &mut env, None)).collect();
                 let entry = found.entry(key(&owner.name, &method.name, method.singleton)).or_default();
-                entry.extend(types.into_iter().enumerate().filter_map(|(index, ty)| Some((index, ty?))));
+                entry.extend(types.into_iter().enumerate());
             }
             // A call may mutate the receiver's ivars, even when its return
             // type is known. Never carry an exit-ivar proof across it.

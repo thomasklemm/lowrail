@@ -400,7 +400,7 @@ impl TypeModel {
     }
 
     pub fn callers(&self, facts: &Facts, target: &str) -> Result<serde_json::Value, String> {
-        references::callers(facts, target)
+        references::callers(self, facts, target)
     }
 
     pub fn view_locals(&self, facts: &Facts, path: &str) -> Result<serde_json::Value, String> {
