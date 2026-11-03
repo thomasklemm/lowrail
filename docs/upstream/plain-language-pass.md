@@ -23,5 +23,10 @@ ruby/ruby#19483, #19558, #19680 and #19681 are rewritten by the thread that is r
 | 2026-11-03 | [ruby/ruby#19665](https://github.com/ruby/ruby/pull/19665) | Corrected "both tests fail on master": only the allocation test does; baseline named. |
 | 2026-11-03 | [ruby/ruby#19666](https://github.com/ruby/ruby/pull/19666) | Corrected the ruby2_keywords case (methods marked with it, not flagged hashes); dropped the stale "2 together with #19655". |
 | 2026-11-03 | [ruby/ruby#19670](https://github.com/ruby/ruby/pull/19670) | Answer first; the three-number table became one sentence; "embedded table" is now "AR table". |
+| 2026-11-03 | [rails/rails#59557](https://github.com/rails/rails/pull/59557) | Tables became sentences with baselines; corrected the repeat-run noise (0.16%, not 0.1%), the unmeasured YJIT count with ruby/ruby#19663, and the spill claim (small Hashes only). |
+| 2026-11-03 | [rails/rails#59564](https://github.com/rails/rails/pull/59564) | Table became sentences; the A/A pairs are explained as one repeat run per case; "every includes that preloads". |
+| 2026-11-03 | [rails/rails#59565](https://github.com/rails/rails/pull/59565) | Corrected the `IS`/`IS NOT DISTINCT FROM` pairing and which change made `where` send binds. |
+| 2026-11-03 | [rails/rails#59569](https://github.com/rails/rails/pull/59569) | Corrected the workload counts (36 interpreter, 42 YJIT; 2 objects per direct scope); Ruby 4.0.7 named. |
+| 2026-11-03 | [rails/rails#59570](https://github.com/rails/rails/pull/59570) | The boundary became its own paragraph; the append count covers every `<%= %>`; Ruby 4.0.7 named. |
 
 Left unchanged: [ruby/ruby#19620](https://github.com/ruby/ruby/pull/19620), already plain. The ruby/ruby part stopped after these, because the open ruby/ruby PRs are being reviewed with Thomas.
