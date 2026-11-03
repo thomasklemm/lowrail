@@ -47,8 +47,9 @@ and not promoted.
    keep the template headings, 2–3 sentences of motivation, 2–3 sentences
    of change (including the one boundary a reviewer would ask about), then
    at most one small before/after table (per call) and one sentence of app
-   breadth; about 150 words outside the checklist. No per-app tables,
-   review history, method notes or receipts; those stay in Lowrail docs.
+   breadth; about 150 words, and drop the template's checklist. No per-app
+   tables, review history, method notes or receipts; those stay in Lowrail
+   docs.
    ruby/ruby: shorter still, about 100 words plus one micro table, and a
    line naming the PR it is stacked on.
 3. **Stop:** new interpreter-Ir pricing, sealed-tier breadth, guarded
