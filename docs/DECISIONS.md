@@ -120,6 +120,10 @@ when the repository has room:
   merges or closes bring it below 15; let the maintainers merge. Existing PRs are still reworked and rebased.
   Exception (Thomas, 2026-11-03): a fix a maintainer explicitly cleared on its issue may open as one extra slot
   above the limit. The first one is Shopify/ruby#1100 (k0kubun: "It's free to take").
+  Exception (Thomas, 2026-11-03): two more slots above the limit for the two ZJIT leads from the
+  [queue](upstream/zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03): lead 7 `&block` forwarding
+  (Shopify/ruby#1014) and lead 3 class-level methods on many model classes (Shopify/ruby#1099 item 2). Each goes
+  through to a reviewed PR; they count outside the ZJIT limit of 2.
   Within the limit: at most 2 new ZJIT PRs open at once, beyond the ones already open; no new YJIT PRs.
   Exception (Thomas, 2026-11-03): the three tracker items tekknolagi green-lit (Shopify/ruby#1064, #1065, #1091)
   may be open at the same time, i.e. up to 3; `Kernel#dup` (#1058) waits for a slot.
