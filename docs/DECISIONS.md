@@ -48,6 +48,11 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Collaborative, not credit-seeking** (Thomas, 2026-11-03). Upstream work is shared. Don't point out overlap
   with our PRs, ask who lands what, or offer to close ours in favor of theirs. If someone else's PR covers ours,
   close ours with one neutral line.
+* **Well-reviewed PRs over issue discussions** (Thomas, 2026-11-03). We put our effort into small, well-reviewed
+  pull requests. We don't open issues or join issue discussions on things Thomas does not understand well himself,
+  or where we have little to add at that moment; an issue needs a verified bug or a question we can answer
+  ourselves. New issues need Thomas's OK. Past mistakes stay as they are (no GitHub Support requests to erase
+  them); the rules above prevent repeats.
 * **Write "I", not "we".** One account is one person.
 * **Closing comments:** thank, accept the point, leave one neutral fact for the record; don't belittle our result.
 * **Search before building:** open, closed and Dependabot PRs, issues, and earlier maintainer decisions in the
