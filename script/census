@@ -168,11 +168,28 @@ module Census
       overlay = File.join(opts[:overlays], "#{conf.fetch(:overlay, app)}.patch")
       sh({}, "patch", "-p1", "--forward", "--silent", "-i", overlay, chdir: dir)
       FileUtils.cp(File.join(dir, conf[:database_yml]), File.join(dir, "config/database.yml")) if conf[:database_yml] && !File.exist?(File.join(dir, "config/database.yml"))
+      # Git does not keep empty directories; Lobsters' production log opens log/rails.log at boot.
+      FileUtils.mkdir_p(%w[log tmp storage].map { File.join(dir, _1) })
       File.write(File.join(dir, ".census.json"), JSON.pretty_generate("app" => app, "base" => rails,
         "overlay" => overlay.delete_prefix(ROOT + "/"), "created" => Time.now.utc.iso8601) + "\n")
       gemfile = variant(opts[:corpus], app, rails, bin)
       env = env_for(app, bin, rails, gemfile)
-      sh(env, "bundle", "exec", "rails", "db:create", "db:schema:load", chdir: dir)
+      # Server databases are named by the app's own config, not by the copy, so
+      # another copy of the same app (another --corpus, an earlier round) uses
+      # the same ones. Refuse instead of loading the schema over its data.
+      if conf.fetch(:services, []).intersect?(%w[postgresql mysql])
+        puts "+ bundle exec rails db:create (in #{dir.delete_prefix(ROOT + "/")})"
+        out, status = Open3.capture2e(env, "bundle", "exec", "rails", "db:create", chdir: dir)
+        print out
+        raise "#{app}: db:create failed" unless status.success?
+        if (existing = out.scan(/^Database '([^']+)' already exists/).flatten).any?
+          raise "#{app}: #{existing.join(", ")} already exist on the shared server, so another copy may use them. " \
+            "Drop them first if they are disposable."
+        end
+        sh(env, "bundle", "exec", "rails", "db:schema:load", chdir: dir)
+      else
+        sh(env, "bundle", "exec", "rails", "db:create", "db:schema:load", chdir: dir)
+      end
       conf.fetch(:build, []).each { sh(env, *_1, chdir: dir) }
       sh(env, "bundle", "exec", "rails", "assets:precompile", chdir: dir)
       conf.fetch(:after_assets, []).each { sh(env, *_1, chdir: dir) }
