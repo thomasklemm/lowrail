@@ -134,6 +134,7 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
 ### Inertia — inertiajs/inertia-rails
 
 - [#441](https://github.com/inertiajs/inertia-rails/pull/441), the renderer reads `X-Inertia-*` headers by Rack env key like the middleware — 8 header-key Strings per render → 0; 42/55 workloads across six Inertia apps. Sol approve on both rubrics; opened 2026-11-03.
+- [#442](https://github.com/inertiajs/inertia-rails/pull/442), the props resolver asks only prop types for deferred?/once?/rescue? (bug fix: a plain record with a `once` column raised `NoMethodError`, one with `deferred` was dropped), walks hashes with `each` and copies plain values without paths — 23-value page **165 → 40** objects, 73 → 38 µs interpreter; 41/55 Inertia workloads, median **−1.8%** (Hackatime XHR −14%). Three commits in one PR (no stacking). Sol approve / approve-with-nits (spec gap fixed); opened 2026-11-03.
 
 ### Importmap — rails/importmap-rails
 
