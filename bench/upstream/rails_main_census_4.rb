@@ -67,6 +67,7 @@ module RailsMainCensus4
     ENV["DATABASE_ADAPTER"] ||= "sqlite"
     require File.expand_path("config/application")
     mode = ENV.fetch("CENSUS_MODE", "interpreter")
+    raise "unknown mode #{mode}" unless %w[interpreter yjit zjit].include?(mode)
     Rails.application.config.yjit = mode == "yjit"
     # Writebook enables YJIT itself; hide only that entry point outside YJIT mode.
     manual_enable = RubyVM::YJIT.method(:enable) if name == "writebook" && mode != "yjit"
@@ -78,7 +79,7 @@ module RailsMainCensus4
     end
     raise "wrong Rails revision" unless Gem.loaded_specs.fetch("railties").full_gem_path.include?(RAILS_PIN[0, 12])
     raise "wrong YJIT mode" unless RubyVM::YJIT.enabled? == (mode == "yjit")
-    raise "wrong ZJIT mode" unless (defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?) == (mode == "zjit")
+    raise "wrong ZJIT mode" unless !!(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?) == (mode == "zjit")
     Rails.logger.level = :fatal
     ActiveRecord::Base.logger = nil
     # External measurement controls, the same for every app: jobs are captured
@@ -183,12 +184,23 @@ module RailsMainCensus4
     run = -> { op.call.call; reset_side_effects }
     warmup = Integer(ENV.fetch("CENSUS_WARMUP", "50"))
     warmup.times { run.call }
+    gc_keys = %i[count minor_gc_count major_gc_count time]
+    gc_windows = []
     totals = 3.times.map do
       GC.start
       before = GC.stat(:total_allocated_objects)
+      stat = GC.stat.slice(*gc_keys)
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       20.times { run.call }
+      wall = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+      gc_windows << gc_keys.to_h { [_1, GC.stat(_1) - stat[_1]] }.merge(wall_ms_per_op: (wall * 1000 / 20).round(3))
       (GC.stat(:total_allocated_objects) - before) / 20.0
     end
+    GC.start
+    heap = GC.stat.slice(:heap_allocated_pages, :heap_live_slots, :old_objects, :malloc_increase_bytes,
+      :oldmalloc_increase_bytes).merge(rss_kb: File.read("/proc/self/statm").split[1].to_i * 4)
+    callgrind = callgrind_window(run) if defined?(LowrailCallgrindBench)
+    gc_long = gc_window(run, Integer(ENV["CENSUS_GC_OPS"])) if ENV["CENSUS_GC_OPS"]
     count = Integer(ENV.fetch("CENSUS_REQUESTS", "10"))
     GC.start
     ObjectSpace.trace_object_allocations_clear
@@ -200,31 +212,80 @@ module RailsMainCensus4
     ObjectSpace.trace_object_allocations_stop
     allocated = GC.stat(:total_allocated_objects) - before
     rows = Hash.new(0)
+    bytes = Hash.new(0)
     ObjectSpace.each_object do |object|
       next unless ObjectSpace.allocation_generation(object) == generation
       key = [site_key(ObjectSpace.allocation_sourcefile(object)), ObjectSpace.allocation_sourceline(object),
         KERNEL_CLASS.bind_call(object)&.name || "<classless>"]
       rows[key] += 1
+      # Slot plus out-of-slot (malloc) storage, as the object ended the window.
+      bytes[key] += ObjectSpace.memsize_of(object)
     end
     GC.enable
     ObjectSpace.trace_object_allocations_clear
     { workload: op.name, kind: op.kind, ops: count, warmup: warmup, gc_enabled_objects_per_op: totals,
-      traced_gc_objects: allocated, enumerated: rows.values.sum,
+      gc_windows: gc_windows, heap_after_windows: heap, callgrind: callgrind, gc_long: gc_long,
+      traced_gc_objects: allocated, enumerated: rows.values.sum, enumerated_bytes: bytes.values.sum,
       sites: rows.sort_by { |key, n| [-n, key.to_s] }.map { |(file, line, klass), n|
-        { file: file, line: line, class: klass, objects_per_op: n.fdiv(count) } } }
+        { file: file, line: line, class: klass, objects_per_op: n.fdiv(count),
+          bytes_per_op: bytes[[file, line, klass]].fdiv(count) } } }
   ensure
     ObjectSpace.trace_object_allocations_stop
     GC.enable
   end
 
+  # Under valgrind --tool=callgrind --instr-atstart=no with CENSUS_CALLGRIND_EXT
+  # (bench/callgrind.c): one dump per window, numbered in order. The empty
+  # window measures the start/finish seam; no_gc toggles collection off
+  # inside each collector segment.
+  def callgrind_window(run)
+    ops = Integer(ENV.fetch("CENSUS_CALLGRIND_OPS", "10"))
+    [["seam", 0, false], ["total", ops, false], ["no_gc", ops, true]].map do |kind, n, exclude|
+      GC.start
+      gcs = GC.count
+      LowrailCallgrindBench.start(exclude)
+      n.times { run.call }
+      segments = LowrailCallgrindBench.finish
+      { kind: kind, ops: n, gc_count: GC.count - gcs, gc_segments: segments, dump: (@dumps = (@dumps || 0) + 1) }
+    end
+  end
+
+  # One long GC-enabled window: collector runs, heap growth and retained
+  # out-of-slot memory per operation, which the 20-operation windows rarely see.
+  def gc_window(run, ops)
+    GC.start
+    keys = %i[count minor_gc_count major_gc_count time total_allocated_objects heap_allocated_pages heap_live_slots
+      oldmalloc_increase_bytes]
+    before = GC.stat.slice(*keys)
+    rss = File.read("/proc/self/statm").split[1].to_i * 4
+    major_by = Hash.new(0)
+    forced = -> { GC.stat_heap.to_h { |_, h| [h[:slot_size], h[:force_major_gc_count]] } } if ENV["CENSUS_GC_MAJOR_BY"]
+    forced_before = forced&.call
+    if ENV["CENSUS_GC_MAJOR_BY"] # why each major ran (at most one major per operation is seen)
+      ops.times do
+        majors = GC.stat(:major_gc_count)
+        run.call
+        major_by[GC.latest_gc_info(:major_by)] += 1 if GC.stat(:major_gc_count) != majors
+      end
+    else
+      ops.times { run.call }
+    end
+    after = GC.stat.slice(*keys)
+    keys.to_h { [_1, after[_1] - before[_1]] }.merge(ops: ops, latest_gc_by: GC.latest_gc_info(:gc_by),
+      major_by: major_by, forced_major_by_slot: forced&.call&.to_h { |s, n| [s, n - forced_before.fetch(s, 0)] },
+      heaps: (GC.stat_heap.to_h { |_, h| [h[:slot_size], h.slice(:heap_eden_pages, :heap_free_slots, :heap_live_slots)] } if forced),
+      rss_kb_growth: File.read("/proc/self/statm").split[1].to_i * 4 - rss)
+  end
+
   def profile(name, output)
     raise "fresh output required" if File.exist?(output)
+    require ENV["CENSUS_CALLGRIND_EXT"] if ENV["CENSUS_CALLGRIND_EXT"]
     ops = workloads(name)
     only = ENV["CENSUS_ONLY"]&.split(",")
     ops = ops.select { only.include?(_1.name) } if only
     results = ops.map { |op| measure(op) }
     result = { app: name, ruby: RUBY_DESCRIPTION, yjit: RubyVM::YJIT.enabled?,
-      zjit: defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?, rails: RAILS_PIN,
+      zjit: !!(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?), rails: RAILS_PIN,
       adapter: ActiveRecord::Base.connection_db_config.adapter,
       lock_sha256: Digest::SHA256.file("Gemfile.lock").hexdigest, workloads: results }
     File.write(output, JSON.pretty_generate(result) + "\n")
