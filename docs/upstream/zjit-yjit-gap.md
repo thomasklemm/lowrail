@@ -18,8 +18,9 @@ runs in its mode. Per benchmark the gap is +184 M, +179 M and +619 M Ir per iter
   generic call costs **272 / 285 / 350 Ir** more than YJIT's handling of the same site.
 * **Generic ivar reads** add 9%, 22% and 17%: `rb_ivar_get` walks the shape tree at about 120 Ir per call.
   YJIT inlines these reads with shape guards, or calls `rb_ivar_get_at_no_ractor_check` with a known index.
-* **JIT code** adds 31%, 26% and 14%. ZJIT's code for a cfunc call with a frame costs about **40 Ir per call
-  against YJIT's 18**. That accounts for most of the JIT-code bucket on railsbench.
+* **JIT code** adds 31%, 26% and 14%. A cfunc call with a frame costs ZJIT about **40 Ir per call against YJIT's
+  30**, a difference of 23 / 10 / 14 M Ir. (This page first said 18 for YJIT; that count missed YJIT's call tail.
+  See [Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs).)
 * **GC** adds 15%, 5% and 12%. Most of it is `rb_zjit_root_mark`, which marks the ISEQ of every JITFrame on every
   GC, minor ones too: 38k, 150k and 119k JITFrames.
 * **ZJIT does better than YJIT** on allocation (−42 / −17 / −27 M), the interpreter (−30 / −20 / −1 M: ZJIT
@@ -34,7 +35,7 @@ Ranked by size, the leads are (M Ir per iteration, railsbench / lobsters / shipi
 | 11 | attr_reader/getivar on shape-polymorphic receivers without a shape profile (`getivar_fallback_no_profile_missing_ic`) | 12.4 / 30.8 / 83.9 | 7% / 17% / 14% | taken (tekknolagi: ruby/ruby#19443 open, ruby/ruby#18616 draft; see [Lead 11](#lead-11-why-there-is-no-profile)) |
 | 3 | class-polymorphic sends to one method entry (`send_polymorphic_fallback`) | 7.2 / 42.1 / 180.1 | 4% / 24% / 29% | **free** (Shopify/ruby#1099 pattern 2; slot granted) |
 | 1 | polymorphic or unspecialized yields in `Array#each`/`#map` | 70.4 / 27.2 / 60.9 | 38% / 15% / 10% | taken (k0kubun, Shopify/ruby#1093) |
-| 12 | cfunc calls with a frame: ~40 Ir of JIT code against YJIT's ~18 | 48 / 22 / 35 | 26% / 12% / 6% | **free**, mechanism not confirmed |
+| 12 | cfunc calls with a frame: 40 Ir of JIT code against YJIT's 30 | 22.7 / 10.3 / 14.4 | 12% / 6% / 2% | **free** in part: dead stores and the register switch, 11.2 / 5.1 / 8.7 M ([Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs)) |
 | 7 | `&block` forwarding (`send_block_arg_not_nil`) | 29.4 / 25.1 / 66.0 | 16% / 14% / 11% | **free** (Shopify/ruby#1014; slot granted) |
 | 13 | `rb_zjit_root_mark` marks every JITFrame's ISEQ on every GC | 25.4 / 6.7 / 37.1 | 14% / 4% / 6% | **free** |
 | 14 | `&block` passed to a C method (`Rack::Request#fetch_header`) and other `complex_arg_pass` | 19.5 / 6.1 / 13.1 | 11% / 3% / 2% | **free** (Shopify/ruby#1039 row 42, unassigned) |
@@ -44,7 +45,8 @@ Ranked by size, the leads are (M Ir per iteration, railsbench / lobsters / shipi
 | 17 | `throw` from blocks and exception handlers unwind by longjmp and materialize frames | 15.6+ / 5.3+ / 13.2+ | 8% / 3% / 2% | taken (Shopify/ruby#1093, ruby/ruby#18759, ruby/ruby#18244) |
 | 16 | PatchPoint nop padding executed inline | 31.7 / 14.0 / 27.9 | Ir only, not cycles | free, low priority |
 
-Lead 3 is the largest free lead on lobsters and shipit, and lead 12 is the largest free lead on railsbench.
+Lead 3 is the largest free lead on lobsters and shipit, and lead 13 is the largest free lead on railsbench. Lead 12 shrank
+to about half its first estimate ([Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs)).
 Lead 11 turned out to be taken ([Lead 11](#lead-11-why-there-is-no-profile)). The full list with sites is in
 [Leads](#leads). No crash, wrong result or divergence turned up. The only failed run was a lobsters 500 caused by two processes sharing one `tmp/cache`, not by a JIT. After that,
 every run used its own copy of ruby-bench.
@@ -242,24 +244,18 @@ codegen function. Counts come from the stats runs:
 | per operation (JIT code only) | railsbench | lobsters | shipit |
 |---|---:|---:|---:|
 | ZJIT cfunc call with a frame (`CCallWithFrame` + `CCallVariadic`) | **40.7 Ir** × 2.10 M | **40.7 Ir** × 0.97 M | **39.0 Ir** × 1.66 M |
-| YJIT cfunc call with a frame (`gen_send_cfunc` + its `gen_push_frame`) | **17.7 Ir** × 2.38 M | **17.8 Ir** × 1.01 M | **17.9 Ir** × 1.91 M |
+| YJIT cfunc call with a frame (`gen_send_cfunc` + its `gen_push_frame`; the call tail is missing, see below) | **17.7 Ir** × 2.38 M | **17.8 Ir** × 1.01 M | **17.9 Ir** × 1.91 M |
+| YJIT cfunc call with a frame, whole sequence through the call ([Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs)) | **29.9 Ir** × 2.16 M | **30.1 Ir** × 0.91 M | **30.3 Ir** × 1.72 M |
 | ZJIT inlined ISEQ call (`PushInlineFrame` + `PopInlineFrame`) | 22.0 Ir × 4.20 M | 20.6 Ir × 1.59 M | 21.6 Ir × 3.52 M |
 | ZJIT direct ISEQ call (`SendDirect`; `EntryPoint`, `Return` extra) | 32.6 Ir × 1.71 M | 32.1 Ir × 0.98 M | 30.9 Ir × 1.91 M |
 | YJIT ISEQ call (`gen_send_iseq` + its `gen_push_frame`; `leave` extra) | 18.6 Ir × 6.39 M | 18.1 Ir × 2.95 M | 19.1 Ir × 6.54 M |
 | ZJIT `PatchPoint` (nop padding) | 31.7 M | 14.0 M | 27.9 M |
 | ZJIT entry trampoline | 29.3 M | 17.3 M | 40.1 M |
 
-* **cfunc calls with a frame** (lead 12) cost about 23 Ir more per call in ZJIT. That is about **48 / 22 / 35 M Ir**
-  per iteration: 26%, 12% and 6% of the gap. The comparison is not exact, because YJIT charges part of its send
-  setup to `opt_send_without_block` (55 M on railsbench) and to `jit_guard_known_klass` (65 M). ZJIT charges the
-  matching work to `GuardType` (50 M) and `PatchPoint`. A gdb disassembly of a `CCallWithFrame` for
-  `Array#include?` (35 instructions) shows the following:
-  * the receiver and argument are stored to the VM stack at `sp[0]` and `sp[1]`, and the frame push overwrites
-    them with the CME and specval before the call;
-  * caller-saved values are pushed and popped around the call;
-  * `ec->cfp` is restored twice after the call.
-
-  This is one sample on a release build, so treat it as a hypothesis until a build with disasm confirms it.
+* **cfunc calls with a frame** (lead 12) cost about **9–11 Ir** more per call in ZJIT, or 22.7 / 10.3 / 14.4 M Ir
+  per iteration (12%, 6% and 2% of the gap). An earlier version of this page said 23 Ir and 48 / 22 / 35 M. That
+  count missed the call tail, which YJIT charges to `opt_send_without_block`. Breakdown, disassembly and fixes:
+  [Lead 12](#lead-12-what-a-cfunc-call-with-a-frame-costs).
 * **Inlined calls** still cost 21 Ir each for `PushInlineFrame`. A full YJIT call costs about 19 Ir plus `leave`.
   Inlining doesn't add to the gap against YJIT, but it is where ZJIT could gain most beyond YJIT. Taken:
   Shopify/ruby#1023 (Virtual Inline Frames, nirvdrum) and Shopify/ruby#1008.
@@ -335,7 +331,7 @@ The lead numbers continue [zjit-iseq-leads](zjit-iseq-leads.md#new-leads-from-th
 queue has the ranked list with free/taken status, checked on 2026-11-03 against assignees, all 67 open ruby/ruby
 PRs with "ZJIT" in the title, and keyword searches of Shopify/ruby issues and ruby/ruby PRs.
 
-* **Free and new:** 12 (cfunc frame cost in JIT code),
+* **Free and new:** 12 (cfunc frame cost in JIT code, resized; free in part),
   13 (JITFrame root marking), 14 (`&block` to C methods / `complex_arg_pass`), 15 (getivar on final versions and
   singleton objects), 16 (PatchPoint nops), and 18 (`with_vm_lock` `gc_rest`, wall time only).
 * **Existing, now sized:** 3 (class-polymorphic sends, the largest on shipit), 7 (`&block` forwarding), and 1, 4,
@@ -451,6 +447,151 @@ repro, and the measured #19443 effect) could later help tekknolagi's draft or ro
 again.
 
 No crash, wrong result or divergence turned up in this follow-up.
+
+## Lead 12: what a cfunc call with a frame costs
+
+Follow-up of 2026-11-03, ruby/ruby master `a8b095a07e`, investigation only: nothing was built for upstream and
+nothing was posted. Scratch scripts and dumps are in `~/w/l12` on the orb and were not committed.
+
+**Method.** One more Callgrind run per JIT and benchmark used the same setup as [Pins and method](#pins-and-method),
+with `--zjit-perf=hir` and `--yjit-perf=codegen`. After the measured window, the harness copied the JIT code
+region out of `/proc/self/mem`. Each executed instruction is then attributed by:
+
+* its exec count, from `--dump-instr=yes`;
+* its disassembly, from `objdump`;
+* a class, assigned by a small classifier: frame push, spill, push/pop, and so on.
+
+The two JITs delimit a call differently:
+
+* **ZJIT:** a site is its `CCallWithFrame` or `CCallVariadic` range.
+* **YJIT:** a site runs from the start of `gen_send_cfunc`, in address order, through the `call` and the
+  `ec->cfp` store after it.
+
+**Correction: the earlier "YJIT 18 Ir" was a partial count.** The perf-map ranges `gen_send_cfunc` and
+`gen_push_frame` stop before the call. YJIT charges the rest of the sequence to `opt_send_without_block`: the
+`ec->cfp` switch, register spills, argument setup, the call and the `ec->cfp` restore. Measured over the whole
+sequence:
+
+| per call | railsbench | lobsters | shipit |
+|---|---:|---:|---:|
+| ZJIT `CCallWithFrame` + `CCallVariadic` | 40.7 Ir × 2.11 M | 40.7 Ir × 0.97 M | 39.0 Ir × 1.66 M |
+| YJIT, whole cfunc call sequence | 29.9 Ir × 2.16 M | 30.1 Ir × 0.91 M | 30.3 Ir × 1.72 M |
+| difference | **+10.8 Ir** | **+10.6 Ir** | **+8.7 Ir** |
+| lead 12 size (difference × ZJIT calls) | **22.7 M** (12% of the gap) | **10.3 M** (6%) | **14.4 M** (2%) |
+
+That replaces the earlier 48 / 22 / 35 M. The ZJIT numbers match the first run to the decimal, which serves as the
+A/A for this measurement. The YJIT ISEQ-call row in [JIT code](#2-jit-code-1431-of-the-gap) (18.6 Ir) likely
+undercounts the same way; it was not re-measured.
+
+End to end, the micro-benchmark `~/w/l12/m.rb` loops a single call, with Ir per call and GC excluded:
+
+| case | ZJIT | YJIT |
+|---|---:|---:|
+| `h.key?(k)` | 239 | 245 |
+| `h.fetch(k)` | 312 | 313 |
+| `AR.include?(2)` | 173 | 164 |
+| `RE.match?(S)` | 732 | 720 |
+| `h.key?(k)` after four constant locals | 243 | 247 |
+
+ZJIT and YJIT are within ±12 Ir. YJIT pays for its operand-stack writes and interrupt checks in other instructions,
+so the +9–11 Ir is an upper bound on what lead 12 adds to the gap. What a fix saves in ZJIT is still real.
+
+**Where the +9–11 Ir goes** (Ir per call, ZJIT / YJIT, with the difference in brackets):
+
+| part | railsbench | lobsters | shipit |
+|---|---|---|---|
+| caller-saved push/pop around the call, and the result moves they force | 7.1 / 1.1 (+6.0) | 6.8 / 1.2 (+5.6) | 6.0 / 1.2 (+4.8) |
+| spills before the call: locals, operand stack, and YJIT's register spills | 5.6 / 2.1 (+3.5) | 6.0 / 2.2 (+3.7) | 4.9 / 2.1 (+2.8) |
+| of which receiver/argument stores that the frame push overwrites | 2.3 / 0 (+2.3) | 2.3 / 0 (+2.3) | 2.2 / 0 (+2.2) |
+| SP/CFP register switch, frame push, stack overflow check | 18.9 / 16.5 (+2.4) | 18.7 / 16.3 (+2.5) | 18.8 / 16.5 (+2.3) |
+| of which ZJIT moves `rbx`/`r13` (`add rbx`, `sub r13`, `add r13`, `sub rbx`) | 4.0 | 4.0 | 4.0 |
+| variadic `argv` copied to the C stack | 0.9 / 0 (+0.9) | 1.0 / 0 (+1.0) | 1.1 / 0 (+1.1) |
+| caller `cfp->sp`, `cfp->pc` and JITFrame writes | 3.0 / 1.7 (+1.4) | 3.0 / 1.7 (+1.3) | 3.0 / 1.7 (+1.3) |
+| interrupt check (YJIT only) | 0 / 3.1 (−3.1) | 0 / 3.3 (−3.3) | 0 / 3.3 (−3.3) |
+| `ec->cfp` stores, argument setup, call | 5.2 / 5.4 (−0.2) | 5.1 / 5.4 (−0.3) | 5.1 / 5.4 (−0.3) |
+
+The hottest sites, Ir per call for ZJIT / YJIT:
+
+* `Hash#fetch` (`rb_hash_fetch_m`, variadic): 46.1 / 32.0 on railsbench (145k calls per iteration), 44.6 / 32.7
+  on lobsters (148k), 40.8 / 31.4 on shipit (410k);
+* `Hash#key?`: 37.9 / 28.7 (railsbench, 141k);
+* `Regexp#match?`: 41.6 / 29.4 (railsbench, 97k);
+* `Hash#delete`: 40.0 / 28.7 (railsbench, 62k);
+* `Array#any?`: 41.1 / 32.0 (railsbench, 58k).
+
+The hottest lobsters `Hash#fetch` site (52.8k calls per iteration, 45 instructions) shows each part:
+
+```text
+lea r8,[rbx+0x80]; cmp r13,r8; jbe …            stack overflow check
+mov [rbp-0x8],<JITFrame>                         JITFrame
+lea r8,[rbx]; mov [r13+0x8],r8                   caller cfp->sp
+mov [rbx+0x8],rsi; mov [rbx],rdi                 spill receiver and argument  <- dead
+mov [rbx-0x30],rsi; mov [rbx-0x28],rdx; …        spill locals (3)
+movabs rcx,<cme>; mov [rbx],rcx                  env data overwrites [rbx] …
+mov [rbx+0x8],rdx; mov [rbx+0x10],0x55550083     … and [rbx+0x8]
+… 6 callee CFP field stores …
+add rbx,0x18; sub r13,0x38; mov [r12+0x10],r13   switch SP and CFP registers
+mov rdx,rbp; sub rdx,0x18; mov [rdx],rsi         argv on the C stack
+push rsi; push 0x0                               caller-saved (+ alignment)
+mov rsi,rdx; mov rdx,rdi; mov edi,0x1; call rb_hash_fetch_m
+mov r11,rax; pop rsi; pop rsi; mov rdi,r11
+add r13,0x38; mov [r12+0x10],r13; sub rbx,0x18  restore CFP and SP
+```
+
+The previous hypothesis holds on every hot site, but it covers only part of the gap. The parts are:
+
+1. **Caller-saved registers.** Values that live across the call stay in caller-saved registers and are pushed and
+   popped, often with an alignment `push 0x0`. YJIT keeps them in VM stack memory.
+2. **Dead receiver/argument spills.** `gen_spill_stack` writes the whole operand stack, receiver and arguments
+   included. The frame push overlays its CME/specval/flags on the receiver slot and the next two. Slots beyond
+   those lie above the C frame's `cfp->sp`, and variadic `argv` lives on the C stack. Nothing reads these stores.
+3. **Locals spilled at every call,** including locals that hold constants or did not change.
+4. **The SP and CFP registers are moved and restored around the call,** though nothing on the JIT side runs in
+   between. YJIT computes the new CFP into a scratch register for `ec->cfp` and leaves `r13` alone.
+5. **ZJIT has no interrupt check here,** which is 3 Ir in ZJIT's favour.
+
+**Smallest exact fixes, and their ownership:**
+
+| part | fix | Ir saved per call | M Ir per iteration | status |
+|---|---|---:|---:|---|
+| dead receiver/argument stores | Spill only the caller part of the stack in `gen_ccall_with_frame` and `gen_ccall_variadic`, that is `state` truncated to `caller_stack_size`. #18960 already builds its stack map for these calls from `state.with_stack_size(caller_stack_size)`. | 2.2–2.3 | 4.9 / 2.2 / 3.7 | **free**: no issue, PR or #1039 row. Same lines as XrXr's ruby/ruby#18960, so it belongs on top of #18960 or with him. |
+| SP/CFP register switch | Keep `rbx` and `r13` fixed. Write `ec->cfp` from `lea tmp,[r13-0x38]`, and write back `r13` after the call. | ~3 (4 instructions → 1) | 6.3 / 2.9 / 5.0 | **free**: no issue, PR or row. |
+| caller-saved push/pop | Allocate callee-saved registers (`r14`/`r15`) to values that live across a call. | up to 5–6 | up to 12.6 / 5.4 / 8.0 | Shopify/ruby#1039 row 58 `c309de9071` "Allocate callee-saved registers to call-crossing VRegs" (unassigned, +0.47% on lobsters; lir.rs +430 lines). Not small. It is next to our ruby/ruby#19681 and Shopify/ruby#1065/#1075. |
+| locals spill | HIR local spills | 2.5–3.4 | 6.4 / 3.3 / 4.2 | **taken**: ruby/ruby#18960 (XrXr, open) deletes `gen_spill_locals` from both paths. #1039 row 80 "Skip redundant local spill stores" is the same idea. |
+| caller `cfp->sp` | Skip a store that repeats the previous one | ≤1.3 | ≤2.7 / 1.3 / 2.2 | #1039 row 69 `854088e42f` (unassigned) |
+
+The two free fixes save about **5.3 Ir per call: 11.2 / 5.1 / 8.7 M Ir per iteration**, roughly half of lead 12.
+
+* **Dead stores.** The fix is exact for the following reasons:
+  * no instruction between the spill and the frame push reads those slots;
+  * GC marks the VM stack only up to the callee's `cfp->sp`, which sits above the env data;
+  * the cfunc gets its receiver and arguments in registers, or in a C-stack `argv`;
+  * an exception rebuilds the caller with `cfp->sp` = `caller_stack_size`.
+* **SP/CFP switch.** The fix looks exact as far as I can tell:
+  * JIT-spilled values are addressed from `rbp`, not `rbx`;
+  * `argv` sits on the C stack;
+  * the frame push computes its addresses before the switch;
+  * the cfunc never sees `rbx` or `r13`.
+
+  The ZJIT owners should still confirm that no codegen invariant ties the SP register to the top frame during a C
+  call.
+
+**Ownership checks** (2026-11-03):
+
+* **XrXr's open PRs:**
+  * ruby/ruby#18960 (open, not draft, updated today) touches exactly these lines, as shown in the table above.
+  * #19432 (draft) encodes stack maps.
+  * #19652 prints CCall stack maps in LIR dumps.
+* **Other open ZJIT PRs in the area:**
+  * our #19681 makes caller-saved survivor search faster at compile time and leaves the generated code unchanged;
+  * #18949 and #18968 (rafaelfranca) are a refactor and a debug-only `PC_POISON` fix.
+* **Shopify/ruby#1039:** there are no assignees on rows 58, 69 and 80, and no row for the dead stores or the
+  register switch.
+* **Shopify/ruby issues:** no open issue covers `CCallWithFrame` cost.
+
+Recommendation: keep lead 12 free, resized to 22.7 / 10.3 / 14.4 M. If we build, the dead-store fix is a few lines
+and exact, but it edits lines that #18960 rewrites, so ask XrXr or wait for #18960 to land. The register switch
+is independent and slightly larger. No crash, wrong result or divergence turned up.
 
 ## Caveats
 
