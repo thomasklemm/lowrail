@@ -231,3 +231,17 @@ render_json: base 2272091 | base2 2272722 (+0.03%) | s1r4 2283293 (+0.49%) | s1 
 interpreter: instructions per call (100 calls, GC off)
 to_json: base 136956 | s1r4 136471 (-0.35%) | s1 138819 (+1.36%) | s1v6a 138174 (+0.89%) | s1v6b 137630 (+0.49%)
 array_to_json: base 2578016 | s1r4 2466660 (-4.32%) | s1 2460556 (-4.56%) | s1v6a 2460575 (-4.56%) | s1v6b 2460253 (-4.57%)
+
+## Review round 6 e13f3f6d6d (String === guard): base / base2 (A/A) / s1v6b = 7f88aeab6d / s1 = e13f3f6d6d
+== PLAIN 8.1, interpreter
+interpreter: instructions per call (100 calls, GC off)
+to_json: base 136858 | base2 137000 (+0.10%) | s1v6b 137808 (+0.69%) | s1 137888 (+0.75%)
+array_to_json: base 2577612 | base2 2576547 (-0.04%) | s1v6b 2462340 (-4.47%) | s1 2460550 (-4.54%)
+jbuilder: base 3651413 | base2 3650516 (-0.02%) | s1v6b 3544198 (-2.94%) | s1 3540253 (-3.04%)
+== html 8.1, interpreter
+interpreter: instructions per call (100 calls, GC off)
+array_to_json: base 4071314 | base2 4072783 (+0.04%) | s1v6b 3521070 (-13.52%) | s1 3522501 (-13.48%)
+== PLAIN 8.1, YJIT
+YJIT: instructions per call (300 calls, GC off)
+to_json: base 112622 | base2 112868 (+0.22%) | s1v6b 115526 (+2.58%) | s1 111763 (-0.76%)
+array_to_json: base 2211080 | base2 2208600 (-0.11%) | s1v6b 2096516 (-5.18%) | s1 2083979 (-5.75%)
