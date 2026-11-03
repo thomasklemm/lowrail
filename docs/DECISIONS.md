@@ -4,6 +4,26 @@ What we pursue, what is parked, and what is rejected, with the evidence that
 decided it. Update this when a pass changes state. Numbers live in the linked
 docs; this page only records the decision and why.
 
+## Exactness checklist before review (2026-11-03)
+
+S1, C7-1, I2 and C1 each needed three to five Sol/Astra rounds, almost all for the same classes of difference.
+Every orb runs this list against its candidate, with a differential harness, before asking for review, and states
+in its report which items it checked:
+
+1. Singleton methods on the arguments and on intermediate results, including private ones, `extend`, prepended
+   modules and `method_missing`/`respond_to_missing?`. A class check (`instance_of?`) does not exclude them.
+2. Subclasses of Hash, Array and String, and their own `to_a`, `each`, `map`, `merge`, `[]=`, `include?`, `gsub!`.
+3. Implicit conversions (`to_ary`, `to_a`, `to_s`, `to_hash`), public and private, with their call counts.
+4. Every call the change adds on a user-supplied object that base didn't make (even `equal?`, `force_encoding`),
+   and every call base made that the change skips (e.g. a `gsub!` that raises on a frozen String).
+5. Results returned by user code: never adopt them as an accumulator; copy them as base did.
+6. Mutation during conversion or iteration (live Hash iteration vs a snapshot), and fibers suspended there.
+7. Frozen receivers, arguments and results; exception class and message.
+8. Load order and standalone `require`; configuration read before vs after the work, as in base.
+
+Accepted without a fix, unless the change is escaping or SQL safety: global redefinition of core methods,
+overrides of private (nodoc) methods, and reaching internal Arrays through ObjectSpace.
+
 ## Bigger ZJIT and i18n bets (2026-11-03)
 
 Thomas: think bigger for ZJIT, take issues from the tracker where they don't collide with the team, and give i18n a
