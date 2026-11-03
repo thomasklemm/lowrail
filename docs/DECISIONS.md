@@ -32,6 +32,10 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Orb reports are claims.** Check a decision-bearing fact before relaying it.
 * **At most 8 working orbs at once** (Thomas, 2026-11-03). A larger orb (`a1.xxlarge`) is fine for long parallel
   runs such as Ruby builds or a census; it doesn't reduce wall-time noise, and Callgrind stays primary.
+* **No upstream references in Lowrail commit messages.** A commit message containing `owner/repo#N` or an issue or
+  PR URL puts a public "added a commit that references this issue" entry on that upstream thread, and a force-push
+  does not remove it. Name upstream work in plain words in commit messages ("Ledger: the Kernel#dup reply"); links
+  belong in the docs, where they create no entry.
 * **Commit identity.** Commits are authored and committed by Thomas Klemm `<github@tklemm.eu>` via `/usr/bin/git`,
   with no Amp or co-author trailer (`/opt/git` adds one). Upstream: one commit per fix on a freshly fetched base.
 
