@@ -507,11 +507,36 @@ and `:async_exec`), which blocks column drops and renames in migrations, now see
 (`%i[exec async_exec exec_prepared send_query_prepared query exec_params]`) records no SQL time (1 in
 `request_tracker_spec`). Both stop working silently in production too. Repro:
 [pg_send_query.rb](../../bench/upstream/app_suites/pg_send_query.rb): 8-1 `{async_exec: 1, exec_params: 1}`, main
-`{send_query: 1, send_query_params: 1}`. By reading the code (not run), the same goes for gems that wrap those methods:
-rack-mini-profiler 5.0.0's pg patch (`exec`, `async_exec`, `exec_params`, `exec_prepared`,
-`send_query_prepared`), and opentelemetry-instrumentation-pg 0.37.1 and datadog 2.48.0, which wrap the `exec`,
-`async_exec` and `sync_exec` families but no `send_query*`, so their pg spans miss Active Record's queries. A
-deliberate change, but a CHANGELOG or upgrade-guide note would be the S1-style follow-up; not built.
+`{send_query: 1, send_query_params: 1}` (main calls them at [database_statements.rb#L189–L213](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb#L189-L213)).
+A deliberate change, but a CHANGELOG or upgrade-guide note would be the S1-style follow-up; not built.
+
+*APM gems, checked at runtime* with [apm_pg_spans.rb](../../bench/upstream/app_suites/apm_pg_spans.rb) on both trees
+(PostgreSQL 15, `prepared_statements: true`, warmed up, then four queries: `where` without binds, `create!`, a
+prepared `find`, and `where` with binds inside `unprepared_statement`; 6 SQL statements in all, `create!` being
+BEGIN, INSERT, COMMIT). Each gem at its latest release:
+
+| Gem, integration | 8-1-stable | main |
+|---|---|---|
+| opentelemetry-instrumentation-pg 0.37.1 (sdk 1.13.1, in-memory exporter) | 6 SQL spans with `db.statement` | **0** |
+| opentelemetry-instrumentation-active_record 0.13.0 | 5 model spans (`ApmPost query`, `ApmPost.create!`, `ApmPost#save!`), no attributes | the same 5, still no SQL |
+| datadog 2.48.0, `pg` (`pg.exec.params`, `pg.async.exec`, `pg.exec.prepared`; test mode, traces dropped in `before_flush`) | 6 | **0** |
+| datadog 2.48.0, `active_record` (`postgres.query`, from `sql.active_record`) | 6 | 6 |
+| rack-mini-profiler 5.0.0, pg patch (`should_measure?` forced, `record_sql` counted) | 6, with SQL | **1**, the prepared `find`, recorded as the statement name `a1` instead of its SQL |
+
+So OpenTelemetry users lose every SQL span on 8.2: the pg integration sees nothing and the Active Record integration
+never had the SQL. Datadog users keep SQL spans if the `active_record` integration is on (it is under
+`instrument :rails`), and lose only the pg-level spans (`pg.*`, with their own peer and timing tags).
+rack-mini-profiler in a Rails app loses all of its SQL timings: when it patches pg it [turns its `sql.active_record`
+subscription off](https://github.com/MiniProfiler/rack-mini-profiler/blob/d95511f0b5fe0ae6d326c6ce7071157d829b9447/lib/patches/sql_patches.rb#L34-L41). None of the three raises or warns.
+
+Patched methods at the release tags: OpenTelemetry
+[`EXEC_ISH_METHODS`](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/constants.rb#L70-L78) (`exec`, `query`, `sync_exec`, `async_exec`, `exec_params`,
+`async_exec_params`, `sync_exec_params`), [`PREPARE_ISH_METHODS`](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/constants.rb#L83-L87) and
+[`EXEC_PREPARED_ISH_METHODS`](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/constants.rb#L92-L96), wrapped in [patches/connection.rb](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/patches/connection.rb#L81-L82);
+Datadog [`exec` … `sync_exec_prepared`](https://github.com/DataDog/dd-trace-rb/blob/f7009ebf10051fd6d0a034adf98050288f5517e6/lib/datadog/tracing/contrib/pg/instrumentation.rb#L23-L90) (the `exec`, `async_exec` and
+`sync_exec` families with `_params` and `_prepared`); rack-mini-profiler
+[`exec`, `async_exec`, `exec_prepared`, `send_query_prepared`, `prepare`, `exec_params`](https://github.com/MiniProfiler/rack-mini-profiler/blob/d95511f0b5fe0ae6d326c6ce7071157d829b9447/lib/patches/db/pg/alias_method.rb#L31-L39).
+None wraps `send_query` or `send_query_params`, and only rack-mini-profiler wraps `send_query_prepared`.
 
 **DS4 (d): `CSRFTokenVerifier` includes `RequestForgeryProtection` outside a controller.**
 [`include ActionController::RequestForgeryProtection`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/csrf_token_verifier.rb#L9) then
