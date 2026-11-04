@@ -1,31 +1,34 @@
-From 19e340c2e9534d66218210dcc8e4f8bbbf08b899 Mon Sep 17 00:00:00 2001
+From b1c0fb2098c68fdfcd5d7cafd5e387bd371e9fdf Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 15:41:07 +0000
-Subject: [PATCH] Let a temporary SQLite table hide a permanent one in the
- schema readers
+Subject: [PATCH] Let a temporary SQLite table or view hide a permanent one in
+ the schema readers
 
 The batched schema readers listed every row of sqlite_master and
 sqlite_temp_master. When a temporary table had the name of a permanent
 one, both rows matched, and the pragmas resolved both names to the
-temporary table, so columns, primary keys, indexes and foreign keys came
-back twice. List a permanent object only when no temporary one has its
-name, as SQLite does when it resolves a name.
+temporary table, so columns and indexes came back twice and the primary
+key became composite. List a permanent table or view only when no
+temporary table or view has its name, as SQLite does when it resolves a
+name. Temporary indexes and triggers take no part in that, so they hide
+nothing.
 ---
- .../sqlite3/schema_statements.rb              |  8 ++++---
- .../adapters/sqlite3/sqlite3_adapter_test.rb  | 23 +++++++++++++++----
- 2 files changed, 24 insertions(+), 7 deletions(-)
+ .../sqlite3/schema_statements.rb              | 10 ++--
+ .../adapters/sqlite3/sqlite3_adapter_test.rb  | 52 +++++++++++++++++--
+ 2 files changed, 55 insertions(+), 7 deletions(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-index 64b1bad838..320d32321d 100644
+index 64b1bad838..592e13764d 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-@@ -70,12 +70,14 @@ def schema_creation # :nodoc
+@@ -70,12 +70,16 @@ def schema_creation # :nodoc
  
          private
            # sqlite_master lists the permanent objects in the database and
 -          # sqlite_temp_master the temporary ones.
-+          # sqlite_temp_master the temporary ones. A temporary object hides a
-+          # permanent one of the same name, as it does when SQLite resolves a name.
++          # sqlite_temp_master the temporary ones. A temporary table or view hides
++          # a permanent table or view of the same name, as it does when SQLite
++          # resolves a name.
            MASTER_CTE = <<~SQL
              WITH master AS (
 -              SELECT name, type, sql FROM sqlite_master
@@ -33,15 +36,16 @@ index 64b1bad838..320d32321d 100644
                SELECT name, type, sql FROM sqlite_temp_master
 +              UNION ALL
 +              SELECT name, type, sql FROM sqlite_master
-+              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
++              WHERE type NOT IN ('table', 'view')
++                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
              )
            SQL
  
 diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-index 3dac5cca5f..084999f7ba 100644
+index 3dac5cca5f..663f42027b 100644
 --- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 +++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-@@ -525,9 +525,10 @@ def test_insert_logged
+@@ -525,9 +525,11 @@ def test_insert_logged
            tables_query = ["SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND type IN ('table','view')", "SCHEMA", []]
            structure_query = [<<~SQL.squish, "SCHEMA", []]
              WITH master AS (
@@ -50,11 +54,12 @@ index 3dac5cca5f..084999f7ba 100644
                SELECT name, type, sql FROM sqlite_temp_master
 +              UNION ALL
 +              SELECT name, type, sql FROM sqlite_master
-+              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
++              WHERE type NOT IN ('table', 'view')
++                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
              )
              SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
                     t."name", t."type", t."notnull", t."dflt_value", t."pk", t."hidden"
-@@ -712,9 +713,10 @@ def test_indexes_logs
+@@ -712,9 +714,11 @@ def test_indexes_logs
          with_example_table do
            index_list_query = [<<~SQL.squish, "SCHEMA", []]
              WITH master AS (
@@ -63,24 +68,52 @@ index 3dac5cca5f..084999f7ba 100644
                SELECT name, type, sql FROM sqlite_temp_master
 +              UNION ALL
 +              SELECT name, type, sql FROM sqlite_master
-+              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
++              WHERE type NOT IN ('table', 'view')
++                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
              )
              SELECT m.name AS table_name, i.name, i."unique"
              FROM master m
-@@ -892,6 +894,19 @@ def test_no_primary_key
+@@ -892,6 +896,46 @@ def test_no_primary_key
          end
        end
  
 +      def test_schema_readers_read_a_temporary_table_that_hides_a_permanent_one
 +        with_example_table "id integer PRIMARY KEY, number integer", "shadowed" do
-+          @conn.execute "CREATE TEMP TABLE shadowed (temp_id integer PRIMARY KEY, temp_number integer)"
-+          @conn.execute "CREATE INDEX temp.index_shadowed_on_temp_number ON shadowed (temp_number)"
++          @conn.execute 'CREATE TEMP TABLE shadowed (temp_id integer PRIMARY KEY, "temp_name" text COLLATE "NOCASE")'
++          @conn.execute "CREATE INDEX temp.index_shadowed_on_temp_name ON shadowed (temp_name)"
 +
-+          assert_equal %w[ temp_id temp_number ], @conn.columns("shadowed").map(&:name)
++          assert_equal %w[ temp_id temp_name ], @conn.columns("shadowed").map(&:name)
++          assert_equal "NOCASE", @conn.columns("shadowed").last.collation
 +          assert_equal "temp_id", @conn.primary_key("shadowed")
-+          assert_equal ["index_shadowed_on_temp_number"], @conn.indexes("shadowed").map(&:name)
++          assert_equal ["index_shadowed_on_temp_name"], @conn.indexes("shadowed").map(&:name)
 +        ensure
 +          @conn.execute "DROP TABLE IF EXISTS temp.shadowed"
++        end
++      end
++
++      def test_schema_readers_read_a_temporary_view_that_hides_a_permanent_table
++        with_example_table "id integer PRIMARY KEY, number integer", "shadowed" do
++          @conn.execute "CREATE TEMP VIEW shadowed AS SELECT 1 AS view_column"
++
++          assert_equal %w[ view_column ], @conn.columns("shadowed").map(&:name)
++        ensure
++          @conn.execute "DROP VIEW IF EXISTS temp.shadowed"
++        end
++      end
++
++      def test_schema_readers_are_not_hidden_by_temporary_indexes_triggers_or_tables_of_other_names
++        with_example_table "id integer PRIMARY KEY, number integer", "shadowed" do
++          @conn.add_index "shadowed", :number
++          @conn.execute "CREATE TEMP TABLE index_shadowed_on_number (other integer)"
++          @conn.execute "CREATE INDEX temp.shadowed ON index_shadowed_on_number (other)"
++          @conn.execute "CREATE TEMP TRIGGER shadowed_trigger AFTER INSERT ON main.shadowed BEGIN SELECT 1; END"
++
++          assert_equal %w[ id number ], @conn.columns("shadowed").map(&:name)
++          assert_equal "id", @conn.primary_key("shadowed")
++          assert_equal [%w[ number ]], @conn.indexes("shadowed").map(&:columns)
++        ensure
++          @conn.execute "DROP TABLE IF EXISTS temp.index_shadowed_on_number"
++          @conn.execute "DROP TRIGGER IF EXISTS temp.shadowed_trigger"
 +        end
 +      end
 +

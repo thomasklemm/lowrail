@@ -43,9 +43,9 @@ MySQL, Trilogy and MongoDB configurations were skipped because this orb has none
 
 | ID | Cause (first bad commit) | Fix | Branch @ SHA on thomasklemm/rails | State |
 | --- | --- | --- | --- | --- |
-| E1 | `DescendantsTracker` uses `WeakSet` without requiring it (3c77803ec0); `require "active_support/core_ext/class/subclasses"` raises NameError and ransack does not load | one `require` | `thomasklemm/descendants-tracker-require-weak-set` @ `1d1fbb6410` | Sol: open with nits; the coordinator opens it |
+| E1 | `DescendantsTracker` uses `WeakSet` without requiring it (3c77803ec0); `require "active_support/core_ext/class/subclasses"` raises NameError and ransack does not load | one `require` | `thomasklemm/descendants-tracker-require-weak-set` @ `1d1fbb6410` | open as rails/rails#59623 |
 | E2 | the batched SQLite readers match table names exactly (2cb3daba96), so a table created as `Widgets` is not found as `widgets` | `COLLATE NOCASE` plus rows keyed by each requested name | `thomasklemm/sqlite-schema-readers-table-name-case` @ `8f41f1c9c3` | Sol: open with nits |
-| E2b | the same readers list a temporary table and the permanent table it hides, so columns, primary key and indexes come back twice (2cb3daba96) | a temporary object hides a permanent one in `MASTER_CTE` | `thomasklemm/sqlite-schema-readers-temp-shadowing` @ `19e340c2e9` | with Sol |
+| E2b | the same readers list a temporary table or view and the permanent table it hides, so columns and indexes are duplicated and the primary key becomes composite (2cb3daba96) | in `MASTER_CTE`, a temporary table or view hides a permanent one; temporary indexes and triggers hide nothing | `thomasklemm/sqlite-schema-readers-temp-shadowing` @ `b1c0fb2098` | with Sol, second round |
 | E3 | `ActiveSupport::LogSubscriber.colorize_logging` removed without a deprecation (aebcb61520); awesome_print 1.9.2 raises on load, administrate does not boot | deprecated delegators to `ActiveSupport.colorize_logging` | `thomasklemm/log-subscriber-colorize-logging-deprecation` @ `8672567e15` | Sol: open with nits |
 | E4 | `alias :assert_not_pattern :refute_pattern` (23420be739) needs minitest 5.18; the gemspec allows 5.1 | gemspec floor `>= 5.18` | `thomasklemm/activesupport-minitest-floor` @ `0a69eb6cce` | Sol: open with nits |
 | I1 | `Model.all.find(id)` ignores an overridden `self.primary_key` (55406a9794) | issue with a repro, since the code is under active rework | — | posted as rails/rails#59622 |
@@ -58,7 +58,11 @@ Patches, bodies and the issue text are in [`bench/upstream/ecosystem/patches`](.
   for its gem-side `SelectManager` failure. A non-ASCII test keeps `Ärger` and `ärger` apart, because SQLite folds only
   ASCII. Mutation checks: an unchanged foreign-key reader, an `index_by` helper and plain `downcase` each fail a test.
 - **E2b evidence:** on 8-1 every reader sees the temporary table once; on main `primary_key` becomes
-  `["temp_id", "temp_id"]`. The test fails on main and passes on 8-1-stable. E2 and E2b merge cleanly. Whichever lands
+  `["temp_id", "temp_id"]` and a temporary view's columns come back twice. The tests fail on main. A temporary index
+  named like the table leaves it readable on all three trees. The temp table's `COLLATE NOCASE` column reads as nil on
+  8-1 and main (both parse the permanent CREATE statement) and as NOCASE with the fix; that assertion catches a fix
+  that lets the permanent table win. Mutations of the first E2b (any temp object hides) and of a type filter on one
+  side only fail the index/trigger test. E2 and E2b merge cleanly. Whichever lands
   second should make the hiding check `COLLATE NOCASE` too.
 - **E4 evidence:** minitest 5.15.0 through 5.17.0 define neither `assert_pattern` nor `refute_pattern`; 5.18.0 adds both.
   Main without the alias loads with minitest 5.10.3. With the floor, AMS gets a Bundler conflict instead of a
