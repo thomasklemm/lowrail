@@ -5,8 +5,9 @@ recognition and generation, parameters, request/response, cookies and session, m
 callbacks, rescue, instrumentation, MIME lookup and flash. It used census 8's CPU ranking
 ([rails-main-census-8](rails-main-census-8.md)) to pick sites. `UriEncoder#escape` was left to C9.
 
-**Result: two candidates, opened 2026-11-04 as [#59619](https://github.com/rails/rails/pull/59619) (AP-1) and
-[#59620](https://github.com/rails/rails/pull/59620) (AP-2).** AP-1 was reworked after opening ([below](#ap-1-rework-after-opening)).
+**Result: two candidates, opened and merged 2026-11-04 by amatsuda: [#59619](https://github.com/rails/rails/pull/59619)
+(AP-1, merge `32c132d134`) and [#59620](https://github.com/rails/rails/pull/59620) (AP-2, merge `fa03095c6f`).** A test-fixture
+gap found from AP-2's CI run merged as [#59624](https://github.com/rails/rails/pull/59624) (merge `d09361d7cf`). AP-1 was reworked after opening ([below](#ap-1-rework-after-opening)).
 
 | # | Branch | Per call, main → candidate (Ir, interp / YJIT / ZJIT) | Readability |
 | --- | --- | --- | --- |
