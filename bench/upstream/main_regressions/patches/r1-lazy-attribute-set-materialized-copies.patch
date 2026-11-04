@@ -1,0 +1,72 @@
+From c69bbee5b70116510ec8dd8a94e3c30a38f553f5 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 17:09:57 +0000
+Subject: [PATCH] Keep LazyAttributeSet copies marked as materialized
+
+LazyAttributeSet#map and #deep_dup build the copy from the materialized
+attributes, but the copy started out unmaterialized. After every save,
+forget_attribute_assignments maps the set, so the next #keys recomputed
+values.keys | types.keys | @attributes.keys and checked each name, and
+dirty tracking walked every column again.
+
+Pass materialized: true to these copies, and let #keys use the
+materialized attributes directly.
+---
+ activemodel/lib/active_model/attribute_set.rb | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index ae563faae8..a82175e02a 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -206,7 +206,7 @@ def default_attribute(name)
+   end
+ 
+   class LazyAttributeSet < AttributeSet # :nodoc:
+-    def initialize(values, types, additional_types, default_attributes, attributes, default_keys)
++    def initialize(values, types, additional_types, default_attributes, attributes, default_keys, materialized: false)
+       super(attributes)
+       @values = values
+       @types = types
+@@ -214,7 +214,7 @@ def initialize(values, types, additional_types, default_attributes, attributes,
+       @default_attributes = default_attributes
+       @default_keys = default_keys
+       @casted_values = values.is_a?(IndexedRow) ? values.new_empty_mutable_row : {}
+-      @materialized = false
++      @materialized = materialized
+     end
+ 
+     def key?(name)
+@@ -222,6 +222,9 @@ def key?(name)
+     end
+ 
+     def keys
++      # Materializing puts every key in @attributes, in this order.
++      return super if @materialized
++
+       keys = values.keys | types.keys | @attributes.keys
+       keys.keep_if { |name| self[name].initialized? }
+     end
+@@ -270,7 +273,8 @@ def deep_dup
+         additional_types.dup,
+         default_attributes.dup,
+         attributes.transform_values(&:deep_dup),
+-        @default_keys
++        @default_keys,
++        materialized: true
+       )
+     end
+ 
+@@ -281,7 +285,8 @@ def map(&block)
+         additional_types,
+         default_attributes,
+         attributes.transform_values(&block),
+-        @default_keys
++        @default_keys,
++        materialized: true
+       )
+     end
+ 
+-- 
+2.55.0
+
