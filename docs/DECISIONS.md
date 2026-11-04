@@ -118,9 +118,18 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 
 ## Playbook from the PR retrospective (2026-11-04)
 
-Adopted from [pr-retrospective](upstream/pr-retrospective.md), which has the PR evidence for each rule. Rules that
-change a decision of Thomas's (ownership of review conversations, tracker-first for ZJIT design, a per-gem cap)
-wait for him.
+Adopted from [pr-retrospective](upstream/pr-retrospective.md), which has the PR evidence for each rule. The first
+three change earlier decisions and were approved by Thomas on 2026-11-04.
+
+* **Thomas owns the ruby/ruby review conversation** (Thomas). No LLM attribution, and only work he can explain in
+  every detail, as the ZJIT team asks ("stand behind your contribution as if unaided"). He answers reviews himself
+  or approves every answer before it is posted. This is the precondition for lifting the ruby/ruby stop.
+* **Ask on the tracker before ZJIT design changes** (Thomas). Profiling, speculation, invalidation, recompile
+  policy, new per-ISEQ state, new HIR instructions, or more than about 150 lines: first a Shopify/ruby issue with
+  one concrete ask and the data, then a PR once the team says go. This narrows "well-reviewed PRs over issue
+  discussions" for ZJIT design.
+* **Gems: at most 2 unanswered PRs per repository** (Thomas). Check maintainer activity and the repo's idioms
+  before building.
 
 * **Pace on ruby/ruby** (once new PRs are allowed again): at most 2 new PRs a week, the next only after a maintainer
   has responded to the previous one, one PR per finding.
@@ -150,7 +159,7 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
   already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
   proposed to Thomas with the reason. The previously recorded slots (GC pool-budget fix, lead 3, Z13's top lead,
   Shopify/ruby#1064, #1065, #1091, #1058) stay in the queue and do not open.
-* **gems:** no per-gem limit (Thomas); open whatever is good.
+* **gems:** at most 2 of our PRs without a maintainer response per repository (Thomas, 2026-11-04; no limit before).
 * **Keep open PRs mergeable** (Thomas): resolve conflicts promptly and keep CI green where the failure is ours
   (show unrelated failures fail on base when asked). Don't force-push without a conflict, a requested change or a
   failure of ours, because each push notifies reviewers and reruns CI.
