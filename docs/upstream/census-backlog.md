@@ -237,11 +237,10 @@ Title: **Restore three ActionView::Template handler methods removed in #57874**
 ## TC-1: keep the UTC offset in `Time#change` for times with a zone object
 
 Branch [`thomasklemm/time-change-zone-offset`](https://github.com/thomasklemm/rails/tree/thomasklemm/time-change-zone-offset)
-@ `d5252fae22` on rails/rails main `9cf3693a0a`, pushed to the fork after the Sol round and the coordinator's go;
-**not opened: GitHub refuses PR creation on rails/rails for this account's token** (GraphQL `CreatePullRequest`:
-"does not have the correct permissions"; REST `POST /pulls`: 404; classic token with `repo` scope, expiry 2026-11-19);
+@ `553f9267ee` on rails/rails main `aa236fc09b`, opened as [#59617](https://github.com/rails/rails/pull/59617)
+on 2026-11-04 14:01 UTC by the coordinator (GitHub had refused PR creation for the account that afternoon);
 patch in [`patches/tc1-time-change-zone-offset.patch`](../../bench/upstream/census_backlog/patches/tc1-time-change-zone-offset.patch).
-Lib +8/−15 in `Time#change`, four Active Support tests and one Active Model test, a CHANGELOG entry.
+Lib +8/−15 in `Time#change`, five Active Support tests and one Active Model test, a CHANGELOG entry.
 
 **Is it a real bug?** Yes, on 8-1-stable and main alike ([`tz_change.rb`](../../bench/upstream/census_backlog/tz_change.rb)):
 a `Time` from `getlocal(TZInfo::Timezone.get("Europe/Berlin"))` at 02:30 on 2026-10-25 raises `TZInfo::AmbiguousTime`
@@ -324,24 +323,27 @@ body, the differential claim limited to what was tested. Rebased onto `9cf3693a0
 Overlap search: no open PR on `AmbiguousTime` or `core_ext/time/calculations`; #59420 and #59475 touch only
 `TimeWithZone`, #45902 (2022) only validates option keys.
 
-### PR body (final, ready to open)
+### Tests for both clock changes (2026-11-04, head `553f9267ee`)
 
-Shortened to the [short-body rule](../DECISIONS.md#short-pr-bodies-2026-11-04): 136 words before the `<details>`
-block (table included), 195 in total; was about 240.
+Thomas asked for tests covering both clock directions. New method `test_change_uses_the_zones_offset_around_start_of_dst_for_times_with_a_zone_object`, run for a `TZInfo::Timezone` and an `ActiveSupport::TimeZone` (Europe/Berlin, 2026-03-29): `change(hour: 2, min: 30)` into the skipped hour raises `TZInfo::PeriodNotFound` for both (measured on main, [`spring.rb`](../../bench/upstream/census_backlog/tc1_reviews/spring.rb): a `Time` with an `ActiveSupport::TimeZone` raises, unlike `TimeWithZone`, which shifts forward); `change(min: 0)` at 01:30 +0100 and 03:30 +0200 keeps the offset; `change(month: 7)` from January and `change(month: 1)` from July take the zone's new offset. Passes on main and the branch (guards for the fallback). Two wrong implementations fail it: keeping the probe without the offset check (also caught by three existing tests) and a fallback at the probe's offset instead of the zone (`Time.new(..., new_time.utc_offset)`; caught by nothing else in the file). Dropped as already covered or not able to catch a plausible mistake: fall-back from the second occurrence (US/Eastern, Berlin TZInfo, Dublin and Moscow tests), `change(hour:)` into and out of the repeated hour (US/Eastern test), Lord_Howe's 30-minute change (existing fractional-hour test), southern hemisphere (Lord_Howe; the logic has no hemisphere-specific step), `change(day:)` across a transition (same fallback as `month:`), the Active Model cast (already in the PR, precision 3 truncates). Rebased onto `aa236fc09b`; `time_ext_test.rb` 181 runs, `time_with_zone_test.rb`, `date_time_ext_test.rb`, `date_ext_test.rb`, `time_zone_test.rb`, `duration_test.rb`, compatibility and Active Model `date_time_test.rb` pass; RuboCop clean. Code unchanged, so no new Sol round.
+
+### PR body (as posted)
+
+Rewritten by the coordinator for Thomas after opening (no cost numbers, per DECISIONS "Correctness PRs carry no performance numbers"; the `utc_to_local` scope clause is kept for a maintainer question); last clause added with the test change. 193 words.
 
 Title: **Keep the UTC offset in Time#change for times with a zone object**
 
-> `Time#change` on a `Time` with a zone object now keeps the original UTC offset when the zone gives the new local time that offset. This fixes the hour repeated when clocks are set back, where TZInfo zones raised `TZInfo::AmbiguousTime` (also in Active Model's datetime cast when precision truncation is needed) and `ActiveSupport::TimeZone` could pick the other occurrence.
+> On a `Time` whose zone is an object (`TZInfo::Timezone` or `ActiveSupport::TimeZone`), `change` couldn't stay in the hour that repeats when clocks go back. TZInfo zones raised `TZInfo::AmbiguousTime`, also from Active Model's datetime cast when it truncates precision. `ActiveSupport::TimeZone` could jump to the other occurrence of that hour.
 >
-> | `Time.utc(2026, 10, 25, 0, 30).getlocal(zone).change(sec: 1)` | main | this change |
-> | --- | --- | --- |
-> | `TZInfo::Timezone.get("Europe/Berlin")` | `AmbiguousTime` | 02:30:01 +0200 |
-> | `ActiveSupport::TimeZone["Europe/Dublin"]` | 01:30:01 +0000 | 01:30:01 +0100 |
+> `change` now tries the time's own UTC offset first and keeps it when the zone agrees. Otherwise the zone decides, as before.
 >
-> Otherwise the zone picks as before: an ambiguous time still raises when neither occurrence has the original offset, and a skipped-hour time still raises `PeriodNotFound`. This assumes the zone's `utc_to_local` covers the instants near the requested one, as TZInfo and `ActiveSupport::TimeZone` do.
+> At 00:30 UTC on 2026-10-25, both zones are in the first of two identical local hours:
 >
-> <details><summary>Testing and cost</summary>
+> | Zone | Start | `change(sec: 1)` on main | With this PR |
+> | --- | --- | --- | --- |
+> | Berlin, `TZInfo::Timezone` | 02:30:00 +0200 | raises `AmbiguousTime` | 02:30:01 +0200 |
+> | Dublin, `ActiveSupport::TimeZone` | 01:30:00 +0100 | 01:30:01 +0000, an hour later | 01:30:01 +0100 |
 >
-> Compared with main for all TZInfo and `ActiveSupport::TimeZone` zones around every transition up to 2037, changing `nsec:`, `sec:`, `min:`, `hour:` and `day:`: results differ only where main raised or picked the other occurrence. On Times with a zone object, `change(nsec:)` runs 6–12% more instructions (16–22% with YJIT), about twice as many when the offset changes.
+> Still unchanged: an ambiguous time raises when neither occurrence has the original offset, and a time in the skipped spring hour raises `PeriodNotFound`.
 >
-> </details>
+> Compared with main for every TZInfo and `ActiveSupport::TimeZone` zone around each transition up to 2037, results differ only where main raised or picked the other occurrence, and the tests cover both clock changes.

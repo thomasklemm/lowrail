@@ -1,6 +1,6 @@
-From d5252fae22510aad2a3993f05fba8fad1589337c Mon Sep 17 00:00:00 2001
+From 553f9267ee74910a8c5b93af52121422c569d83e Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Wed, 4 Nov 2026 13:32:32 +0000
+Date: Wed, 4 Nov 2026 14:28:38 +0000
 Subject: [PATCH] Keep the UTC offset in Time#change for times with a zone
  object
 
@@ -23,10 +23,10 @@ the original offset, the zone picks as before, so a TZInfo zone still
 raises there; a time in a skipped hour still raises as before.
 ---
  activemodel/test/cases/type/date_time_test.rb |  8 +++
- activesupport/CHANGELOG.md                    | 14 +++++
- .../core_ext/time/calculations.rb             | 23 +++-----
- activesupport/test/core_ext/time_ext_test.rb  | 53 +++++++++++++++++++
- 4 files changed, 83 insertions(+), 15 deletions(-)
+ activesupport/CHANGELOG.md                    | 14 ++++
+ .../core_ext/time/calculations.rb             | 23 +++---
+ activesupport/test/core_ext/time_ext_test.rb  | 70 +++++++++++++++++++
+ 4 files changed, 100 insertions(+), 15 deletions(-)
 
 diff --git a/activemodel/test/cases/type/date_time_test.rb b/activemodel/test/cases/type/date_time_test.rb
 index e1f513cdca..db9b26f651 100644
@@ -105,10 +105,10 @@ index 885573ac10..291ec3861b 100644
      elsif zone
        ::Time.local(new_sec, new_min, new_hour, new_day, new_month, new_year, nil, nil, isdst, nil)
 diff --git a/activesupport/test/core_ext/time_ext_test.rb b/activesupport/test/core_ext/time_ext_test.rb
-index 6854cd305d..82a9d55d0e 100644
+index 6854cd305d..6d19f93eba 100644
 --- a/activesupport/test/core_ext/time_ext_test.rb
 +++ b/activesupport/test/core_ext/time_ext_test.rb
-@@ -519,6 +519,59 @@ def test_change_preserves_offset_for_zoned_times_around_end_of_dst
+@@ -519,6 +519,76 @@ def test_change_preserves_offset_for_zoned_times_around_end_of_dst
      end
    end
  
@@ -140,6 +140,23 @@ index 6854cd305d..82a9d55d0e 100644
 +    assert_equal two_am_1 + 1, two_am_1.change(sec: 1)
 +    assert_equal two_am_2 + 1, two_am_2.change(sec: 1)
 +    assert_equal two_am_2, three_am.change(hour: 2)
++  end
++
++  def test_change_uses_the_zones_offset_around_start_of_dst_for_times_with_a_zone_object
++    [TZInfo::Timezone.get("Europe/Berlin"), ActiveSupport::TimeZone["Europe/Berlin"]].each do |zone|
++      # DST started at 2026-03-29 2:00:00 AM in Europe/Berlin, and clocks
++      # were set forward 1 hour, so 2:00 AM to 3:00 AM was skipped.
++      before_gap = Time.utc(2026, 3, 29, 00, 30, 00).getlocal(zone) # 2026-03-29 01:30:00 +0100
++      after_gap  = Time.utc(2026, 3, 29, 01, 30, 00).getlocal(zone) # 2026-03-29 03:30:00 +0200
++      january    = Time.utc(2026, 1, 15, 11, 00, 00).getlocal(zone) # 2026-01-15 12:00:00 +0100
++      july       = Time.utc(2026, 7, 15, 10, 00, 00).getlocal(zone) # 2026-07-15 12:00:00 +0200
++
++      assert_raise(TZInfo::PeriodNotFound) { before_gap.change(hour: 2, min: 30) }
++      assert_equal Time.utc(2026, 3, 29, 00, 00, 00), before_gap.change(min: 0)
++      assert_equal Time.utc(2026, 3, 29, 01, 00, 00), after_gap.change(min: 0)
++      assert_equal Time.utc(2026, 7, 15, 10, 00, 00), january.change(month: 7)
++      assert_equal Time.utc(2026, 1, 15, 11, 00, 00), july.change(month: 1)
++    end
 +  end
 +
 +  def test_change_preserves_offset_for_zoned_times_in_an_hour_repeated_without_a_dst_change
