@@ -18,6 +18,7 @@ overridden `primary_key` (#59622).
 | Lobsters `b6ea255` | rspec, 927 examples, SQLite | 0 F, 0 F | every feature spec fails to load; after rspec-rails pin 3 F | L1 (c), L2 (a), fixed by #59625 |
 | Solidus `ed00fc8` | core rspec, 4487 examples; api rspec, 684 examples; SQLite | clean ×2 (core and api) | core clean; api 1 F ×2 | SO1 (b) |
 | Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, record only), SU3–SU5 (b/c) |
+| Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 
 ## Findings
 
@@ -178,3 +179,39 @@ Chatwoot or Forem (paused under the orb-time rule).
 
 `a05ee90` follows rails main and calls `load_defaults 8.2`, so 8-1-stable can't boot it. Main `8b06b0eb98`: 649
 runs, 0 failures.
+
+## Writebook
+
+basecamp/writebook `d57c62b` (default branch `main`,
+[`d57c62bc19`](https://github.com/basecamp/writebook/tree/d57c62bc19edac3930d3860a2584757f1d45d07c)), Ruby 3.4.12,
+SQLite. Writebook tracks Rails main and locks `3a4961048a` (2026-01-13), which is the base here instead of
+8-1-stable: two runs on its own lock, then two on main pinned to `7a78da5a55` (2026-11-04), 3970 commits later. The
+main checkout changes only the Gemfile's rails line (`ref:`) and the resolved lock. Main's own gemspecs need
+globalid ≥ 1.4.0 (52306a97cf, "Introduce `ActiveJob::DeserializationError::RecordNotFound`"), marcel 2.1.0, herb
+0.11.1 and ractor-dispatch 0.3.0. globalid fits the locked Rails too, so both sides moved from 1.3.0 to 1.4.0
+(`bundle update --conservative globalid`); the other three can't apply to the lock side (its activestorage pins
+`marcel ~> 1.0`; herb and ractor-dispatch are new to main). Otherwise the two locks have identical gems.
+Writebook's test env doesn't raise on deprecations (`disallowed_deprecation_warnings = []`, `:stderr`), so new ones
+are read from the logs.
+
+Results, `bin/rails test` (313 runs) and `bin/rails test:system` (3 runs, headless Chrome 157): locked Rails 4 F,
+4 F, system clean ×2; main 4 F, 4 F, system clean ×2. The 4 failures are the same on all four runs:
+`VipsLoaderPolicyTest` expects ICO, PSD, BMP and SVG loads to be blocked, and the orb's libvips 8.14 still allows
+them (environment). No failure happens only on main, so there is nothing to bisect and no fork branch.
+
+Harness note: a first main run with a hand-edited lock (revision changed, globalid left at 1.3.0) raised
+`NameError: uninitialized constant GlobalID::Locator::RecordNotFound` in `BookTest`. Bundler didn't recheck the git
+gemspec's new `globalid >= 1.4.0`. A resolved lock gets 1.4.0 and the test passes, so it isn't a Rails issue; main
+locks for this harness are resolved with `bundle lock --conservative --update` over all Rails gems.
+
+**WB1 (c, deprecation only): propshaft 1.x reads `Mime::EXTENSION_LOOKUP`.** f6c709e747 deprecates `Mime::SET`,
+`Mime::LOOKUP` and `Mime::EXTENSION_LOOKUP` (actionpack CHANGELOG), so Writebook's main runs print 784 warnings
+from propshaft 1.0.0's `asset_paths_by_type`. The latest release still has it:
+[`Mime::EXTENSION_LOOKUP[content_type]`](https://github.com/rails/propshaft/blob/eb5957157c2e59fabff5b15c710826670fd66c27/lib/propshaft/load_path.rb#L36)
+(shortened) and
+[`exts_to_watch  = Mime::EXTENSION_LOOKUP.map(&:first)`](https://github.com/rails/propshaft/blob/eb5957157c2e59fabff5b15c710826670fd66c27/lib/propshaft/load_path.rb#L55)
+in propshaft 1.3.2. Fixed on propshaft main, unreleased:
+[d028d5fd65](https://github.com/rails/propshaft/commit/d028d5fd65791051f11e83be1bf82b31e37b9b4c) (2026-07-02,
+"Don't use Mime::EXTENSION_LOOKUP directly"). An app on propshaft ≤ 1.3.2 that disallows this warning
+would raise in asset lookups. Record only; propshaft needs a release before Rails 8.2. The only
+other deprecation, `config.active_support.to_time_preserves_timezone`, prints on both sides.
