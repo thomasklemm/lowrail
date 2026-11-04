@@ -1,3 +1,5 @@
+> **Superseded.** Opened as rails/rails#59623 and closed unmerged by skipkayhil: Rails expects `active_support` to be required before core extensions. The fix moved to ransack: [g1-ransack-require-active-support](g1-ransack-require-active-support.body.md).
+
 ### Require ActiveSupport::WeakSet where DescendantsTracker uses it
 
 3c77803ec0 moved `WeakSet` out of `descendants_tracker.rb` into `active_support/weak_set.rb`, which is registered for autoload in `active_support.rb` but no longer loaded by `descendants_tracker.rb`. So requiring a core extension that loads the tracker before (or without) `active_support` now raises:
