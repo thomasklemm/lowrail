@@ -12,6 +12,9 @@ Per gem, what fixed it and what is still blocked: [gems-on-master.md](../../../d
   * `force_ruby_platform` for every gem whose locked `x86_64-linux` binary caps Ruby below 4.1.dev (ffi, herb,
     nokogiri, sqlite3, pg, google-protobuf, grpc, commonmarker, y-rb, as each app locks them), plus
     `mini_portile2`, which the source builds need;
+  * nokogiri at **1.19.7** wherever it is pinned (2026-11-04, background census): Rails main (checked at `9b116f1fed`)
+    requires rails-html-sanitizer ≥ 1.7.2, hence loofah ≥ 2.25.3 and nokogiri ≥ 1.19.5, so the 1.19.4 pin no
+    longer resolved;
   * the **smallest released version that builds on the pin** for gems whose locked version does not;
   * a **git source** where the fix exists upstream but is not released.
   `fizzy.patch` also serves fizzy-mysql, and `mastodon.patch` / `lago.patch` serve the `-nops` configurations,

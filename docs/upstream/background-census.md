@@ -3,7 +3,7 @@
 The earlier censuses measured mostly web requests. This one covers the work Rails apps run outside them: enqueueing and
 performing jobs, building and delivering mail, Active Storage reads and URLs, and Action Cable broadcasts and
 subscriptions. It uses 12 census apps on Rails main and Ruby 4.0.9, with Callgrind instructions, stackprof and
-allocations per operation in the interpreter and under YJIT, each with an A/A. Nothing was opened or posted.
+allocations per operation in the interpreter and under YJIT, each with an A/A. AS-1 was opened as #59615; nothing else was opened or posted.
 
 **Result.** 194 workloads ran in 12 apps. Where the CPU goes depends on the kind of work:
 
@@ -19,11 +19,11 @@ Active Job's own bookkeeping is small: retry/discard/execution code at most 0.15
 The broadest Rails lines are the ones census 8 already covers (`_load_from_sql`, `where_clause`, `index_with`,
 `IsolatedExecutionState.[]`, `column_types`). The new finding is in Active Storage:
 
-* Since the filename-sanitizing security fix (`0e6a6afe3c`, 2026-10-25), every `filename.base` and
+* Since the filename-sanitizing security fix `0e6a6afe3c`, every `filename.base` and
   `filename.extension` re-sanitizes the whole name.
 * `Representable#format` asks for the extension up to three times on every `variant` of a web image.
 
-**One candidate passed every gate: AS-1**, which reads the extension once. It saves 22 objects and 33–40% of
+**One candidate passed every gate and is open as [#59615](https://github.com/rails/rails/pull/59615): AS-1**, which reads the extension once. It saves 22 objects and 33–40% of
 instructions per `blob.variant(...)`. On the variant-path workload it saves 7–10% of instructions in all six storage
 apps, against A/A noise of at most 1.5% on those workloads.
 
@@ -282,26 +282,19 @@ apps.
 
 It asked for numbers in the body (done) and suggested "up to three times" (in the body).
 
-**Body** (about 150 words, not opened):
+**Opened** ready for review as [#59615](https://github.com/rails/rails/pull/59615) on 2026-11-04 after Sol's body fixes (allocation claim scoped to the measured representation-path workloads, "preserves format selection with the standard filename implementation", no age for `0e6a6afe3c`, the suite reported as same runs and errors on both). Preflight: main refreshed to `9cf3693a0a`, no commits on `representable.rb`, `filename.rb` or `blob.rb` since `9b116f1fed`, rebased head `fa58e6094c`, `git merge-tree` clean, overlap search repeated (adjacent, not duplicate: #51115, #58615, #57597, #57731; #58398 touches transformers, not `format`); targeted variant/representation/filename tests 58 runs with the same two PDF-previewer errors. Watched every 2 hours, report-only.
 
-> Every `variant` of a web image (PNG, JPEG, GIF) picks its default `format:` in `Representable#format`, which called
-> `filename.extension` up to three times. Each call builds a new `ActiveStorage::Filename` and, since its parts are
-> sanitized (0e6a6afe3c), re-encodes and sanitizes the whole name. This reads the extension once into a local, as
-> `tempfile_extension` does. Marcel only reads it and the returned String is an equal fresh copy, so `format` returns
-> the same value for every filename and content type.
+**Body as opened:**
+
+> Every `variant` of a web image (PNG, JPEG, GIF) picks its default `format:` in `Representable#format`, which called `filename.extension` up to three times. Each call builds a new `ActiveStorage::Filename` and, since 0e6a6afe3c sanitizes the filename parts, re-encodes and sanitizes the whole name. This reads the extension once into a local, as `tempfile_extension` already does. Marcel only reads it and the returned String is an equal fresh copy, so this preserves format selection with the standard filename implementation.
 >
-> | `blob.variant(resize_to_limit: [100, 100])`, PNG | Objects | Time, interpreter | Time, YJIT | Instructions, interpreter / YJIT / ZJIT |
+> | Variant construction, `blob.variant(resize_to_limit: [100, 100])` on a PNG, per call | Objects | Time, interpreter | Time, YJIT | Instructions, interpreter / YJIT / ZJIT |
 > | --- | ---: | ---: | ---: | ---: |
-> | main | 61 | 16.3 µs | 10.4 µs | 110,680 / 72,939 / 80,254 |
+> | main (9b116f1fed) | 61 | 16.3 µs | 10.4 µs | 110,680 / 72,939 / 80,254 |
 > | this PR | 39 | 11.4 µs (−30%) | 6.7 µs (−35%) | −33% / −40% / −37% |
 > | main, run again | 61 | +0.1% | −1.8% | −0.1% / −0.1% / −0.1% |
 >
-> Ruby 4.0.9; ZJIT on Ruby master 9aa0898240; instructions from Callgrind
-> ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/background/micro.rb)). In six open-source
-> apps on Rails main (Campfire, Fizzy, Writebook, Loomio, Chatwoot, Docuseal), building a variant's
-> representation path ran 7–10% fewer instructions in every app, against A/As under 1.5%, and
-> allocated 22 fewer objects; I found it with Lowrail, my research project
-> ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/background-census.md)).
+> Ruby 4.0.9; ZJIT on Ruby master 9aa0898240; instructions from Callgrind ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/background/micro.rb)). The Active Storage model and controller tests give the same 439 runs and the same 19 PDF-previewer errors on main and the branch (no previewer installed). In six open-source apps on Rails main (Campfire, Fizzy, Writebook, Loomio, Chatwoot, Docuseal), the measured variant-representation-path workloads ran 7–10% fewer interpreter instructions, with A/A differences of at most 1.5%. Most saved 22 allocations; Fizzy's avatar variant saved nine. I found it with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/background-census.md)).
 
 ## Rejected and left alone
 
@@ -310,7 +303,7 @@ It asked for numbers in the body (done) and suggested "up to three times" (in th
 | `_load_from_sql`, `where_clause`, `index_with`, `IsolatedExecutionState.[]`, `column_types`, `UriEncoder#escape`, `xml_name_escape` | Covered by census 8, CP-5 and the Action View rounds. |
 | `test_adapter.rb:52–53` `job_to_hash` | Test adapter, harness cost; production adapters serialize differently. |
 | `EventReporter#notify`, `LogSubscriber.subscription_filter`, `ActiveJob.adapter_name` in the structured subscriber | Code a maintainer is reworking: `81d95a3f74` (Akira Matsuda, 2026-10-13, "Don't build structured events that no subscriber will consume") and `98d80d5bdb` (2026-10-06). Playbook: nothing in code a maintainer is reworking. |
-| `Filename#sanitized` itself (memoize, ASCII fast path for `tr`) | Security code changed nine days ago (GHSA-p2pm-g2h6-7j5j). Memoizing on a non-frozen wrapper of a caller's String isn't exact. AS-1 removes the repeats at the caller instead. |
+| `Filename#sanitized` itself (memoize, ASCII fast path for `tr`) | Security code from `0e6a6afe3c` (GHSA-p2pm-g2h6-7j5j). Memoizing on a non-frozen wrapper of a caller's String isn't exact. AS-1 removes the repeats at the caller instead. |
 | `arguments.rb:61` `serialize_argument` | The `case` already tests cheap immediate types first; no small exact change. |
 | `URI::GID.build`, uri `check_host`/`make_components_hash` (~5.5% of enqueue together) | The cost is uri's `Generic.build` (component `clone`s and host regexp), so the change belongs in ruby/uri, with a different owner and review path. globalid has five open PRs. Recorded as a lead, not built. |
 | `MessageVerifier#generate_digest` | OpenSSL HMAC, 97% native. |
@@ -323,6 +316,28 @@ It asked for numbers in the body (done) and suggested "up to three times" (in th
 | css_parser / premailer (16% of mail CPU in Mastodon, Loomio, CodeTriage) | Outside Rails and mail; recorded as a gem lead, not examined. |
 | Continuations, retry/discard bookkeeping | 0.5% of Fizzy's Continuable `Event::WebhookDispatchJob`; `execution`/`exceptions`/`callbacks` ≤ 0.15% of any job. Nothing to fix. |
 
+## Ruby master: interpreter and ZJIT (allocations)
+
+After the nokogiri fix in [`frontier-master`](../../fixtures/corpus/frontier-master/README.md) (pins 1.19.4 → 1.19.7 in nine
+overlays; Rails main needs nokogiri ≥ 1.19.5 through rails-html-sanitizer 1.7.2 and loofah 2.25.3), `script/census setup
+--corpus census-master --ruby ~/rubies/master-9aa0898240 --ruby-overlays fixtures/corpus/frontier-master` sets up Blog,
+Campfire, Fizzy and Lobsters, and `script/census run --label bgm --aa --modes interp,zjit` measured their 72 background
+workloads (labels `bgm`, `bgm2`, `.lowrail/private/background-master`). A/A: median +0.0 in both modes, moved ≥ +1 on
+2 / 3 workloads, none ≤ −1, SQL changed on 0.
+
+| Kind | Workloads | Master − 4.0.9, interpreter, median objects/op (min, max) | ZJIT − interpreter on master, median (min, max) |
+| --- | ---: | --- | --- |
+| enqueue | 14 | −2 (−3, +0) | +0 (+0, +0) |
+| job | 14 | −26 (−309, +151) | +4 (+1, +11) |
+| cable | 10 | −3 (−43, +16) | +2 (+0, +12) |
+| storage | 28 | −2 (−24, +5) | +0 (+0, +12) |
+| mailer | 6 | −134 (−369, −110) | +0 (−1, +16) |
+
+Master − 4.0.9 also includes the overlays' gem bumps (Lobsters' commonmarker and stackprof), so it is not a pure Ruby
+difference. Under ZJIT the result Arrays of master's JIT-only Ruby `Array#map`/`#select` are attributed to
+`<internal:array>:289/315` (+20 and +22 per workload) instead of their callers, which is why mail's
+`field_list.rb:71` drops by about as much (−19); that is attribution, not extra work. No new ZJIT lead from this pass.
+
 ## Limits
 
 * **Coverage:** mail from Chatwoot and CodeTriage can't run on Rails main (gaps above). Discourse, Mastodon and
@@ -332,6 +347,4 @@ It asked for numbers in the body (done) and suggested "up to three times" (in th
 * **YJIT:** 66 of 194 workloads aren't JIT-flat after 50 warmup operations, and Mastodon's YJIT CPU A/A is
   incomplete.
 * **stackprof** is a cross-check only (sparse samples).
-* **Ruby master:** census copies on master didn't set up. The frontier-master overlays pin nokogiri 1.19.4, which
-  Rails main's rails-html-sanitizer 1.7.2 no longer allows. ZJIT numbers are from the micro only, and no ZJIT stats
-  pass ran for this census.
+* **Ruby master:** Blog, Campfire, Fizzy and Lobsters only (below). Writebook's master copy sets up but its background workloads miss a leaf they look up (data preparation, not the overlay); the other apps were not tried. No Callgrind or ZJIT stats pass ran on master.

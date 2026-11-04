@@ -20,7 +20,7 @@ index 6664d03..db5df1c 100644
 +
 +gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
 +
-+gem "nokogiri", "= 1.19.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++gem "nokogiri", "= 1.19.7", force_ruby_platform: true # ruby41-watch: no 4.1 binary
 diff --git a/Gemfile.lock b/Gemfile.lock
 index e15d897..c6b8308 100644
 --- a/Gemfile.lock
@@ -74,7 +74,7 @@ index e15d897..c6b8308 100644
 -    nokogiri (1.19.4-x86_64-linux-gnu)
 -      racc (~> 1.4)
 -    nokogiri (1.19.4-x86_64-linux-musl)
-+    nokogiri (1.19.4)
++    nokogiri (1.19.7)
 +      mini_portile2 (~> 2.8.2)
        racc (~> 1.4)
      ostruct (0.6.3)
@@ -104,7 +104,7 @@ index e15d897..c6b8308 100644
    importmap-rails
    jbuilder
    kamal
-+  nokogiri (= 1.19.4)
++  nokogiri (= 1.19.7)
    propshaft
    puma (>= 5.0)
    rails!
@@ -157,7 +157,7 @@ index e15d897..c6b8308 100644
 -  nokogiri (1.19.4-arm-linux-musl) sha256=588923c101bcfa78869734d247d25b598674323e7f22474fc468f6e5647311eb
 -  nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
 -  nokogiri (1.19.4-x86_64-linux-musl) sha256=17dfb7c1fa194ae02fbf7c51a7afc8d278045ab3fdacfd86f91d02d7b274470b
-+  nokogiri (1.19.4) sha256=50c951611c92bca05c51411aef45f1cbc50f2821c4802758c5c6d34696533ab5
++  nokogiri (1.19.7) sha256=abe94507c54cb18f872777b16bdca4aad32b1abdc4c52fe843f1c80fbdf992b8
    ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
    parallel (2.3.0) sha256=f75a3e904101ce6a1ccb6b8dc800cbafd42166d83330192438dcf29395167a6f
    parser (3.3.12.0) sha256=21a6d7f755d5a24dfbdc6e6b772e4e879a52e7631a88bc5a3a134606052c9828
