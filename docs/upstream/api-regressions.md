@@ -28,7 +28,7 @@ This audit looks for breaking changes on rails/rails main that haven't been rele
 4. **Usage.**
    - The latest releases of about 150 common Rails gems (devise, sidekiq, activeadmin, avo, rails_admin, lograge, rails_semantic_logger, sentry-rails, newrelic_rpm, honeybadger, jpmobile, rabl-rails, thredded, composite_primary_keys, the SQL Server, Oracle and PostGIS adapters, and others), grepped first by name and then by qualified pattern.
    - GitHub code search, giving counts and the repositories behind them.
-   - A ranked top-250 corpus is being built separately; it follows below once ready.
+   - The top 250 gems by downloads among all 34,012 reverse dependencies of the 13 framework gems ([`top_gems.tsv`](../../bench/upstream/api_regressions/top_gems.tsv), latest releases), grepped with qualified patterns; see the corpus check below.
 
 ## Confirmed, built (patches for Sol)
 
@@ -112,6 +112,17 @@ Known gaps compared with 8.1, the same for any `deprecate_constant`:
 | `Column#fetch_cast_type` (#56484) | annotaterb guards with `respond_to?` |
 | Unused internals removed (Journey `MatchData#named_captures`, `Route#required_keys`, `TransitionTable#states`, `FromClause#merge`, `WhereClause#referenced_columns`, and so on) | No caller in the gem sample; name hits were homonyms |
 | `ActiveStorage::Downloader`, `ROTATIONS`, `EventBuffer`, `ignore_tables`, `default_charset`, `default_headers`, `tld_length` | Gem hits were the gems' own names, or gems that write a still-present API (`SchemaDumper.ignore_tables` is still a class accessor) |
+
+## Top-250 corpus check
+
+The 238 non-framework gems among the top 250 add one new real break and no new candidates:
+
+- **redmine_crm** 0.0.63 (rank 201, 30M downloads) includes only `ActionView::Helpers::UrlHelper` in its Liquid drops and calls `link_to` there. On main this raises `NoMethodError`, the same break avo already worked around. It comes from #55410's move into `NavigationHelper`, which rafaelfranca asked for. It stays in the skipped table; this is evidence for the coordinator, not a candidate.
+- with_advisory_lock checks `respond_to?(:internal_exec_query, true)` and already uses `query_all` on 8.2.
+- activerecord-nulldb-adapter defines its own `internal_exec_query`.
+- composite_primary_keys patches the reflection internals, as it does on every release.
+- view_component's `find_template` is its own method.
+- None of the 238 references `find_template` on a lookup context or `MAX_PASSWORD_LENGTH_ALLOWED`, so AR-1 and AR-2 rest on jpmobile, rabl-rails and thredded, and on Spree and open-build-service.
 
 ## Leads not built yet
 
