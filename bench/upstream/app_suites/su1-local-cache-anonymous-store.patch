@@ -1,0 +1,50 @@
+From 2b02aad60c4e2db83a9d7e950c540252ece23ee9 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 17:23:42 +0000
+Subject: [PATCH] Allow anonymous subclasses of cache stores with LocalCache
+
+Computing the local cache key when the store is instantiated called
+`underscore` on the class name, which is nil for anonymous classes such as
+`Class.new(ActiveSupport::Cache::MemoryStore)`, so creating such a store
+raised `NoMethodError`.
+---
+ .../lib/active_support/cache/strategy/local_cache.rb     | 2 +-
+ activesupport/test/cache/stores/memory_store_test.rb     | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/activesupport/lib/active_support/cache/strategy/local_cache.rb b/activesupport/lib/active_support/cache/strategy/local_cache.rb
+index ae3c9726c0..53384c43d4 100644
+--- a/activesupport/lib/active_support/cache/strategy/local_cache.rb
++++ b/activesupport/lib/active_support/cache/strategy/local_cache.rb
+@@ -67,7 +67,7 @@ def fetch_entry(key) # :nodoc:
+ 
+         def initialize(...)
+           super
+-          @local_cache_key = "#{self.class.name.underscore}_local_cache_#{object_id}".gsub(/[\/-]/, "_").to_sym
++          @local_cache_key = "#{self.class.name.to_s.underscore}_local_cache_#{object_id}".gsub(/[\/-]/, "_").to_sym
+         end
+ 
+         # Use a local cache for the duration of block.
+diff --git a/activesupport/test/cache/stores/memory_store_test.rb b/activesupport/test/cache/stores/memory_store_test.rb
+index 432add3884..42512def9c 100644
+--- a/activesupport/test/cache/stores/memory_store_test.rb
++++ b/activesupport/test/cache/stores/memory_store_test.rb
+@@ -95,6 +95,15 @@ def test_namespaced_write_with_unless_exist
+     assert_equal false, namespaced_cache.write(1, "aaaaaaaaaa", unless_exist: true)
+   end
+ 
++  def test_local_cache_with_anonymous_subclass
++    cache = Class.new(ActiveSupport::Cache::MemoryStore).new
++
++    cache.with_local_cache do
++      cache.write("foo", "bar")
++      assert_equal "bar", cache.read("foo")
++    end
++  end
++
+   def test_write_expired_value_with_unless_exist
+     assert_equal true, @cache.write(1, "aaaa", expires_in: 1.second)
+     travel 2.seconds
+-- 
+2.55.0
+
