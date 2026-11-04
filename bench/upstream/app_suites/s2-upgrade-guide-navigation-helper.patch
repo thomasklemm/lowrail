@@ -1,0 +1,48 @@
+From fcf2a1957a2102bb195bbf14ea0c6769ad4573f8 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 16:07:55 +0000
+Subject: [PATCH] Note in the upgrade guide that link_to and button_to moved to
+ NavigationHelper
+
+---
+ guides/source/upgrading_ruby_on_rails.md | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 697bd23e7d..4378cae870 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -97,6 +97,30 @@ Rails.application.config.action_view.erb_implementation = :erubi
+ 
+ Applications with a custom ERB implementation should set it through `config.action_view.erb_implementation`, since the framework default replaces an `ActionView::Base.erb_implementation` assignment made in an initializer.
+ 
++### `link_to`, `button_to` and `current_page?` moved to `ActionView::Helpers::NavigationHelper`
++
++`link_to`, `button_to`, `current_page?`, `link_to_if`, `link_to_unless` and
++`link_to_unless_current` are now defined in `ActionView::Helpers::NavigationHelper`
++instead of `ActionView::Helpers::UrlHelper`. Views and helpers are unaffected,
++but a class that includes only `ActionView::Helpers::UrlHelper` no longer
++responds to them. `NavigationHelper` includes `UrlHelper`, so including it
++instead is enough:
++
++```ruby
++# Before
++class LinkPresenter
++  include ActionView::Helpers::UrlHelper
++end
++
++# After
++class LinkPresenter
++  include ActionView::Helpers::NavigationHelper
++end
++```
++
++`NavigationHelper` doesn't exist before Rails 8.2, so code that also supports
++earlier versions should keep including `UrlHelper` there.
++
+ ### `:controller` and `:action` may no longer be used as dynamic route segments
+ 
+ Routes such as the "default route" that older applications still carry in
+-- 
+2.55.0
+

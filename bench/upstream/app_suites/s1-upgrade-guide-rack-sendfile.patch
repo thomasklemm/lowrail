@@ -1,0 +1,49 @@
+From 5da102ad62b2880acfe1ef316dc779f1a1ed39b5 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:48:54 +0000
+Subject: [PATCH] Note in the upgrade guide that Rack::Sendfile requires
+ x_sendfile_header
+
+---
+ guides/source/upgrading_ruby_on_rails.md | 25 ++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 697bd23e7d..84db100fa3 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -147,6 +147,31 @@ warning naming each route whose controller does not exist. Such routes used to
+ go unnoticed until a request matched them. Check the boot log for
+ `references a missing controller` and fix or remove the routes it lists.
+ 
++### `Rack::Sendfile` requires `x_sendfile_header`
++
++The default middleware stack now includes `Rack::Sendfile` only when
++`config.action_dispatch.x_sendfile_header` is configured. Code that positions
++middleware relative to it, such as
++`config.middleware.insert_before Rack::Sendfile, Rack::ContentLength`, raises
++`No such middleware to insert before: Rack::Sendfile` on boot.
++
++To keep sending files through the web server, configure the header your server
++expects:
++
++```ruby
++config.action_dispatch.x_sendfile_header = "X-Sendfile" # or "X-Accel-Redirect" for NGINX
++```
++
++If your middleware doesn't depend on `Rack::Sendfile`, insert it relative to
++another middleware, for example `ActionDispatch::Executor`, which is always in
++the default stack. Choose the insertion point by which requests your middleware
++needs to see: `ActionDispatch::Executor` comes after `ActionDispatch::Static`,
++so a middleware inserted before it no longer wraps static file responses.
++
++```ruby
++config.middleware.insert_before ActionDispatch::Executor, Rack::ContentLength
++```
++
+ ### The old Active Record 6.1 marshalling format was removed.
+ 
+ If your application still sets `active_record.marshalling_format_version = 6.1`, which may
+-- 
+2.55.0
+
