@@ -116,6 +116,28 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   correctness repro.
 * **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
 
+## Playbook from the PR retrospective (2026-11-04)
+
+Adopted from [pr-retrospective](upstream/pr-retrospective.md), which has the PR evidence for each rule. Rules that
+change a decision of Thomas's (ownership of review conversations, tracker-first for ZJIT design, a per-gem cap)
+wait for him.
+
+* **Pace on ruby/ruby** (once new PRs are allowed again): at most 2 new PRs a week, the next only after a maintainer
+  has responded to the previous one, one PR per finding.
+* **A ZJIT performance PR needs a run_benchmarks.rb effect outside A/A**, unless the team asked for the change or it
+  removes a permanent exit.
+* **Evidence is one base / A/A / head comparison**, only the stats that move, with under about 120 words of prose.
+* **Show the mechanism** (HIR or the changed path) on the real call shape and on the smallest common input, not
+  only on the input that benefits most.
+* **No follow-ups to a fix a maintainer called narrow, and nothing in code a maintainer is reworking.** The search
+  before building includes recent maintainer commits and PRs on the same functions.
+* **Answer review with the change or one named blocker**, not a menu of options.
+* **Closing comments don't reopen decisions**: thanks, the reason, nothing more.
+* **Tests test one thing**, plus asserts on the invariants the change relies on.
+* **Report zjit_alloc_bytes** for any new per-ISEQ or per-profile state.
+* **Rails:** keep the pattern (small, obvious, numbers from real apps). Drop or simplify L2 candidates and any that
+  need more than two exactness rounds.
+
 ## Submission queue (2026-11-03)
 
 Every finished candidate (review gates passed, body drafted) goes into the **Queue** section of
