@@ -96,7 +96,7 @@ run 2232 examples, 0 of them `filter_proxies` failures. The 25 that remain also 
 or in the 8-1 run under a shared REDIS_URL.
 [patch](../../bench/upstream/app_suites/r1-remote-ip-filter-proxies-deprecation.patch),
 [body](../../bench/upstream/app_suites/r1-body.md). Branch `thomasklemm/remote-ip-filter-proxies-deprecation` @
-`36a8c97b2f` on main `d09361d7cf`.
+`54e07d2dba` on main `d09361d7cf` (Sol: open with nits, applied: concrete migration in the message, `assert_deprecated(/filter_proxies/, …)`, neutral CHANGELOG, body wording).
 
 **M1 (d): `PredicateBuilder#build_bind_attribute` takes an Arel attribute.** 4f1ff11da3 (CHANGELOG). Mastodon's
 `Status::SafeReblogInsert` passes `attr.name`; about 220 failures. `PredicateBuilder` is `:nodoc:`; record only.
