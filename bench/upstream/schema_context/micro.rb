@@ -77,7 +77,7 @@ ATTRS = POST.attributes_before_type_cast.freeze
 # Like a request without a permanent lease: every query checks a connection out and in.
 ActiveRecord::Base.connection_handler.clear_active_connections!(:all) unless ENV["LEASE"] == "1"
 
-SLOW = Post.schema_context.instance_variable_get(:@attributes).nil?
+SLOW = Post.respond_to?(:schema_context) && Post.schema_context.instance_variable_get(:@attributes).nil?
 warn "Post on #{SLOW ? "slow" : "fast"} path" if ENV["SHOW"]
 
 CASES = {
@@ -104,6 +104,9 @@ CASES = {
   "fresh_has_many" => proc { Post.instantiate(ATTRS).comments.to_a },
   "fresh_has_many_where" => proc { Post.instantiate(ATTRS).comments.where(body: "c").to_a },
   "cached_find" => proc { Post.cache { Post.find(1); Post.find(1) } },
+  "attribute_names" => proc { Post.instantiate(ATTRS).attribute_names },
+  "loaded_attributes" => proc { Post.find(1).attributes },
+  "loaded_as_json" => proc { Post.find(1).as_json },
 }
 
 CLOCK = ENV["CLOCK"] == "cpu" ? Process::CLOCK_PROCESS_CPUTIME_ID : Process::CLOCK_MONOTONIC
