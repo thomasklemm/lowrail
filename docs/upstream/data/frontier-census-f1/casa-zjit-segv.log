@@ -1,0 +1,54 @@
+ZJIT: writing trace exits to /tmp/perfetto-371464.fxt
+$PREFIX/lib/ruby/gems/4.1.0+6/bundler/gems/rails-c042aee23a56/actionview/lib/action_view/helpers/tag_helper.rb:1585: [BUG] Segmentation fault at 0x0000000000000000
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+
+-- Ruby level backtrace information ----------------------------------------
+$LOWRAIL/bench/upstream/census/harness.rb:276:in '<main>'
+$LOWRAIL/bench/upstream/census/harness.rb:240:in 'stats'
+<internal:array>:271:in 'each'
+$LOWRAIL/bench/upstream/census/harness.rb:240:in 'block in stats'
+<internal:numeric>:262:in 'times'
+$LOWRAIL/bench/upstream/census/harness.rb:240:in 'block (2 levels) in stats'
+$LOWRAIL/bench/upstream/census_4_workloads.rb:10:in 'block in html'
+$LOWRAIL/bench/upstream/rails_main_census_4.rb:49:in 'block (2 levels) in <class:Client>'
+$LOWRAIL/bench/upstream/rails_main_census_4.rb:39:in 'request'
+$PREFIX/lib/ruby/gems/4.1.0+6/gems/rack-test-2.3.0/lib/rack/test.rb:163:in 'custom_request'
+$PREFIX/lib/ruby/gems/4.1.0+6/bundler/gems/rails-c042aee23a56/actionview/lib/action_view/helpers/tag_helper.rb:1547:in 'tag_options'
+$PREFIX/lib/ruby/gems/4.1.0+6/bundler/gems/rails-c042aee23a56/actionview/lib/action_view/helpers/tag_helper.rb:1547:in 'each_pair'
+$PREFIX/lib/ruby/gems/4.1.0+6/bundler/gems/rails-c042aee23a56/actionview/lib/action_view/helpers/tag_helper.rb:1585:in 'block in tag_options'
+
+-- Threading information ---------------------------------------------------
+Total ractor count: 1
+Ruby thread count for this ractor: 4
+
+-- C level backtrace information -------------------------------------------
+$PREFIX/bin/ruby(rb_print_backtrace+0x14) [0x55af3db8ae93] ../vm_dump.c:1108
+$PREFIX/bin/ruby(rb_vm_bugreport) ../vm_dump.c:1474
+$PREFIX/bin/ruby(rb_bug_for_fatal_signal+0x118) [0x55af3debb888] ../error.c:1167
+$PREFIX/bin/ruby(sigsegv+0x4f) [0x55af3dab1daf] ../signal.c:977
+/lib/x86_64-linux-gnu/libc.so.6(0x7fdb8ec76050) [0x7fdb8ec76050]
+$PREFIX/bin/ruby(rbimpl_typeddata_get_data+0x0) [0x55af3dafab28] ../id_table.c:454
+$PREFIX/bin/ruby(RTYPEDDATA_GET_DATA) ../include/ruby/internal/core/rtypeddata.h:641
+$PREFIX/bin/ruby(managed_id_table_ptr) ../id_table.c:407
+$PREFIX/bin/ruby(rb_managed_id_table_lookup) ../id_table.c:455
+$PREFIX/bin/ruby(vm_lookup_cc+0x57) [0x55af3db4eb97] ../vm_insnhelper.c:2179
+$PREFIX/bin/ruby(vm_search_cc+0x1e) [0x55af3db599c8] ../vm_insnhelper.c:2234
+$PREFIX/bin/ruby(rb_vm_search_method_slowpath) ../vm_insnhelper.c:2281
+$PREFIX/bin/ruby(vm_search_method_slowpath0) ../vm_insnhelper.c:2310
+$PREFIX/bin/ruby(vm_cc_cme+0x0) [0x55af3db7b244] ../vm_insnhelper.c:2389
+$PREFIX/bin/ruby(vm_search_method) ../vm_insnhelper.c:2400
+$PREFIX/bin/ruby(vm_method_cfunc_is) ../vm_insnhelper.c:2502
+$PREFIX/bin/ruby(vm_opt_nil_p) ../vm_insnhelper.c:7409
+$PREFIX/bin/ruby(vm_exec_core) ../insns.def:1027
+$PREFIX/bin/ruby(vm_exec_loop+0xa) [0x55af3db651da] ../vm.c:2989
+$PREFIX/bin/ruby(rb_vm_exec) ../vm.c:2965
+$PREFIX/bin/ruby(rb_yield_values2+0x93) [0x55af3db69c63] ../vm.c:2023
+$PREFIX/bin/ruby(each_pair_i_fast+0x2a) [0x55af3d99b3fa] ../hash.c:3412
+[0x55af3d99d142]
+$PREFIX/bin/ruby(st_general_foreach+0xa4) [0x55af3dabcf14] ../st.c:1659
+$PREFIX/bin/ruby(hash_foreach_call+0xd1) [0x55af3d99fae1] ../hash.c:1497
+$PREFIX/bin/ruby(rb_ec_ensure+0xe3) [0x55af3d960493] ../eval.c:1177
+$PREFIX/bin/ruby(rb_hash_foreach+0x9d) [0x55af3d9a3c8d] ../hash.c:1521
+$PREFIX/bin/ruby(rb_hash_each_pair+0x3f) [0x55af3d9a4b3f] ../hash.c:3442
+[0x55af377f8899]
+

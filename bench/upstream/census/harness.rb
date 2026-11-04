@@ -230,16 +230,32 @@ module RailsCensus
       raise "fresh output required" if File.exist?(output)
       jit = RubyVM::YJIT.enabled? ? RubyVM::YJIT : RubyVM::ZJIT
       # CENSUS_DEFAULT_COUNTERS=1: ZJIT without --zjit-stats, whose default counters
-      # (memory, compiled ISEQs) are not inflated by stats code. Not reset.
+      # (memory, compiled ISEQs) are not inflated by stats code. Not reset; the
+      # window's counters are the difference of two snapshots, and the totals
+      # after the window are kept too (memory and code size are levels, not rates).
       default_counters = ENV["CENSUS_DEFAULT_COUNTERS"] == "1"
       raise "run with --yjit-stats or --zjit-stats" unless jit.stats_enabled? || default_counters
       ops = workloads(name)
-      ops.each { |op| Integer(ENV.fetch("CENSUS_WARMUP", "50")).times { op.call.call; reset_side_effects } }
+      warmup = Integer(ENV.fetch("CENSUS_WARMUP", "50"))
+      ops.each { |op| warmup.times { op.call.call; reset_side_effects } }
+      read = -> { (jit == RubyVM::YJIT ? jit.runtime_stats : jit.stats).select { |_, v| v.is_a?(Numeric) } }
       jit.reset_stats! unless default_counters
-      ops.each { |op| 20.times { op.call.call; reset_side_effects } }
-      stats = jit == RubyVM::YJIT ? jit.runtime_stats : jit.stats
-      File.write(output, JSON.pretty_generate(app: name, ruby: RUBY_DESCRIPTION, jit: jit.name, rails: rails_sha, ops: ops.size * 20,
-        per_op: stats.filter_map { |k, v| [k, v.fdiv(ops.size * 20)] if v.is_a?(Numeric) && v != 0 }.to_h) + "\n")
+      # CENSUS_STATS_BY_WORKLOAD=1 also snapshots around each workload's 20
+      # operations (the reads then fall inside the app's window).
+      by_workload = ENV["CENSUS_STATS_BY_WORKLOAD"] == "1"
+      before = read.call
+      workloads = ops.map do |op|
+        start = read.call if by_workload
+        20.times { op.call.call; reset_side_effects }
+        next unless by_workload
+        finish = read.call
+        { workload: op.name, kind: op.kind, ops: 20, counts: finish.filter_map { |k, v| d = v - start.fetch(k, 0); [k, d] if d != 0 }.to_h }
+      end
+      after = read.call
+      File.write(output, JSON.pretty_generate(app: name, ruby: RUBY_DESCRIPTION, jit: jit.name, rails: rails_sha, pid: Process.pid,
+        warmup: warmup, ops: ops.size * 20, default_counters: default_counters, **(by_workload ? { workloads: workloads } : {}),
+        per_op: after.filter_map { |k, v| d = v - before.fetch(k, 0); [k, d.fdiv(ops.size * 20)] if d != 0 }.to_h,
+        totals: after.reject { |_, v| v == 0 }) + "\n")
     end
 
     def profile(name, output)

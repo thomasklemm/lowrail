@@ -143,6 +143,12 @@ sqlite3, pg, herb) to their source builds there, and that must not change the re
 needs a Ruby built with ZJIT. The mise build of 4.0.9 here has none (built without rustc); use a ZJIT build such
 as Ruby master.
 
+**Ruby master pins.** A master round uses one pin: one master SHA per week at most, a release build with
+`--enable-zjit --enable-yjit`, installed as `~/rubies/master-SHA10`. `meta.json` records it (`ruby` is the pin's
+`RUBY_DESCRIPTION`, which names the SHA), and every pin gets its own A/A pair; labels from two pins are compared only
+with both pairs. ZJIT stats runs use `CENSUS_WARMUP=200` and `--zjit-exec-mem-size=512 --zjit-mem-size=1024`, and a
+run with any `compile_error_out_of_memory` is not reported ([F1](frontier-census-f1.md)).
+
 **Gems on Ruby master.** Master needs gem changes the release overlays do not have. Set a master corpus up with
 `setup --ruby ~/rubies/master --ruby-overlays fixtures/corpus/frontier-master` ([README](../../fixtures/corpus/frontier-master/README.md)):
 `setup` applies `DIR/<overlay basename>` after the base overlay, runs `DIR/<app>.sh` if present (it vendors a
