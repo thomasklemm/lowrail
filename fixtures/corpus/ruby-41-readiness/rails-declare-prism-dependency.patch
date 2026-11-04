@@ -1,0 +1,70 @@
+From 00339f7e89848f941772784b2f7c96c20d8dd7fe Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:30:34 +0000
+Subject: [PATCH] Add `prism` as a runtime dependency to Action View and
+ Railties
+
+Ruby 4.1 makes prism a bundled gem, so under Bundler `require "prism"`
+only works when prism is in the bundle. Today apps get it only through
+other gems such as minitest 6, irb or rdoc.
+
+Action View needs it for `RenderParser`, which the `:ruby` render tracker
+(the default since `load_defaults "8.1"`) uses for template digests and
+which eager loading loads. Railties needs it for the test runner and
+`bin/rails notes`. `Ruby::Prism` is only used by `Template#spot`, to match
+the nodes error_highlight reports; the other callers keep the prism gem.
+
+Ref: https://bugs.ruby-lang.org/issues/22379
+---
+ Gemfile.lock                  | 2 ++
+ actionview/actionview.gemspec | 1 +
+ railties/railties.gemspec     | 1 +
+ 3 files changed, 4 insertions(+)
+
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 10d66b9327..237e00a596 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -44,6 +44,7 @@ PATH
+       builder (~> 3.1)
+       erubi (~> 1.11)
+       herb (>= 0.10)
++      prism
+       rails-dom-testing (~> 2.2)
+       rails-html-sanitizer (~> 1.7, >= 1.7.2)
+     activejob (8.2.0.alpha)
+@@ -94,6 +95,7 @@ PATH
+       actionpack (= 8.2.0.alpha)
+       activesupport (= 8.2.0.alpha)
+       irb (~> 1.13)
++      prism
+       rackup (>= 1.0.0)
+       rake (>= 12.2)
+       thor (~> 1.0, >= 1.2.2)
+diff --git a/actionview/actionview.gemspec b/actionview/actionview.gemspec
+index ad358831db..f0e94b0ea7 100644
+--- a/actionview/actionview.gemspec
++++ b/actionview/actionview.gemspec
+@@ -38,6 +38,7 @@
+   s.add_dependency "builder",       "~> 3.1"
+   s.add_dependency "erubi",         "~> 1.11"
+   s.add_dependency "herb",          ">= 0.10"
++  s.add_dependency "prism"
+   s.add_dependency "rails-html-sanitizer", "~> 1.7", ">= 1.7.2"
+   s.add_dependency "rails-dom-testing", "~> 2.2"
+ 
+diff --git a/railties/railties.gemspec b/railties/railties.gemspec
+index a2f3ea36a2..9bbf79e2ea 100644
+--- a/railties/railties.gemspec
++++ b/railties/railties.gemspec
+@@ -45,6 +45,7 @@
+   s.add_dependency "thor", "~> 1.0", ">= 1.2.2"
+   s.add_dependency "zeitwerk", "~> 2.6"
+   s.add_dependency "irb", "~> 1.13"
++  s.add_dependency "prism"
+   s.add_dependency "tsort", ">= 0.2"
+ 
+   s.add_development_dependency "actionview", version
+-- 
+2.55.0
+
