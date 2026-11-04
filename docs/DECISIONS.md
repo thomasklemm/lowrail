@@ -151,6 +151,7 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
   backlog, C9 (CP-3, CP-5), C11, C13 and C15 may open on rails/rails without another read by Thomas, once they have
   passed the full review path plus a Sol review run by the coordinator. Opening a PR on top of one of our open PRs
   (stacking) stays out: such a candidate opens only if it applies to main on its own, otherwise after the first merges.
+  No per-orb limit and no spacing on rails/rails (Thomas): a finished, reviewed candidate opens right away.
 
 ## Submission queue (2026-11-03)
 
