@@ -497,26 +497,25 @@ unescaped, while main still escapes it (`&lt;/script&gt;`): main's `super` reach
 `ERB::Util` already holds as its own singleton method, not `ERB::Escape`'s. That needs a deliberately malicious
 override of erb's escape, so it is not treated as a vector.
 
-**As opened** (Thomas's text):
+**As it stands** (Thomas's text, edited after the adversarial round and before any review; checked 2026-11-04):
 
-> Every `<%= %>` appends through `ActionView::OutputBuffer#<<`. For a value that isn't html_safe it calls `to_s` and
-> `html_safe?`, then `ERB::Util.unwrapped_html_escape`, which reaches `ERB::Escape.html_escape` through an alias and
-> a `super` on `ERB::Util`'s singleton class. YJIT can't specialize that `super`, so each append is a dynamic send.
+> Every `<%= %>` appends through `ActionView::OutputBuffer#<<`. For a value that isn't html_safe, it calls `to_s` and
+> `html_safe?`, then `ERB::Util.unwrapped_html_escape`, which reaches `ERB::Escape.html_escape` through an alias and a
+> `super` on `ERB::Util`'s singleton class. YJIT can't specialize that `super`, so each append is a dynamic send.
 >
-> This runs the same steps inline: `to_s` on the converted value, `html_safe?` again, then `ERB::Escape.html_escape`,
-> the method `super` reaches. Every `to_s` and `html_safe?` call stays. The one difference: template appends no
-> longer go through `ERB::Util`, so a module prepended to its singleton class to change `html_escape` or
-> `unwrapped_html_escape` no longer sees them. Every other caller still goes through it. `unwrapped_html_escape` is
-> `:nodoc:`, and #46573 chose `super` so such prepends keep working; this keeps that everywhere except template
-> appends.
+> This PR runs the same steps inline: `to_s` on the converted value, `html_safe?` again, then
+> `ERB::Escape.html_escape`, the method `super` reaches. Every `to_s` and `html_safe?` call stays.
 >
-> | `<%= %>` of an unsafe String | main | this PR |
-> | --- | ---: | ---: |
-> | interpreter | 141 ns | 110 ns |
-> | YJIT | 68 ns | 52 ns |
+> There is one difference. Template appends no longer go through `ERB::Util`, so a module prepended to its singleton
+> class that overrides `unwrapped_html_escape`, or `html_escape` before Active Support loads, no longer sees them.
+> Every other caller still goes through it. `unwrapped_html_escape` is `:nodoc:`, and #46573 chose `super` so that
+> such prepends keep working; this keeps that everywhere except template appends.
+>
+> On Ruby 4.0.7, a `<%= %>` of a String that isn't html_safe takes 110 ns instead of 141 ns on main in the
+> interpreter, and 52 ns instead of 68 ns with YJIT.
 >
 > On ruby-bench's erubi-rails this runs 5.8% fewer instructions per iteration in the interpreter and 5–6% fewer with
-> YJIT; a page in Fizzy or Lobsters makes 130–920 such appends.
+> YJIT. A page in Fizzy or Lobsters makes 130 to 920 `<%= %>` appends.
 
 ## C2 (held): `unwrapped_html_escape` without `super`
 
@@ -563,6 +562,116 @@ That is a design question for the maintainers, not a review nit. C1 keeps `super
 appends. Most of C2's gain is under YJIT; a YJIT change (a lead only, see [Leads outside Rails](#leads-outside-rails)) would recover that
 part without touching Rails or its `super`.
 
+## C3: `prepend_formats` skips the union when the format already leads
+
+Branch [`thomasklemm/prepend-formats-leading`](https://github.com/thomasklemm/rails/tree/thomasklemm/prepend-formats-leading),
+commit [`12cf43d884`](https://github.com/thomasklemm/rails/commit/12cf43d884451c4d0dc99ef8febdc36914676650), on main
+`b084108cf3`. Not opened.
+
+```diff
+       def prepend_formats(formats) # :doc:
+         formats = Array(formats)
+         return if formats.empty? || @lookup_context.html_fallback_for_js
+ 
+-        @lookup_context.formats = formats | @lookup_context.formats
++        current = @lookup_context.formats
++        # formats= removes duplicates itself, so a format that already leads
++        # needs no union.
++        @lookup_context.formats = formats.size == 1 && formats[0].equal?(current[0]) ? current : formats | current
+       end
+```
+
+**What repeats per render.** `TemplateRenderer#render` calls `prepend_formats(template.format)` once per top-level
+template render (once per erubi-rails render; partials don't call it). Outside a request (`ApplicationController.render`
+without `formats:`, ruby-bench's erubi-rails) the lookup context holds all 36 registered formats, and the template's
+format is almost always the first of them. Per call on main (4.0.7 interpreter, ns, pieces measured separately):
+`formats | current` 1,130 (builds a 37-entry Hash and a new Array); then `formats=` dups the Array (100), deletes
+`"*/*"` (390), `uniq!` (1,010, another Hash), `Template.validate_formats` → `Mime.valid_symbols?` (1,390), checks the
+JS fallback, and the accessor compares the result with the stored Array (120) and keeps the details key. With a
+request format (`[:html]`) the whole call is 0.8 µs interp / 0.5 µs YJIT and not worth touching.
+
+**Why only the union goes.** Every other step can change the outcome for some lookup-context state: `formats=`
+raises on invalid formats already in the details (`LookupContext.new(paths, formats: [:html, :bogus])` raises on
+the first render), expands `"*/*"` placed there the same way, and appends `:html` to `[:js]`. Caching the normalized
+result per lookup context would skip those for state that `formats=` never saw, so it isn't exact without tracking
+where `@details[:formats]` came from; not pursued. The union is redundant exactly when a single format equals the
+current first element: then `formats | current` and `current` differ only in duplicates, which `formats=` removes
+with `uniq!` before anything else looks at them. `equal?` keeps the check to the Symbol case (a String format takes
+the old path).
+
+**Exactness check** (scratch script, not committed): 10 lookup-context states (default, `[:html]`, `[:json]`, `[:js]`
+with fallback, `[:html, :js]`, `"*/*"`, duplicates, an invalid format and `"*/*"` written into the details directly,
+empty) × 7 template formats (`:html`, `:json`, `:js`, `"html"`, `nil`, `[:html, :json]`, `:bogus`): resulting
+formats, `html_fallback_for_js`, details-key reuse and raised errors are identical on main and C3 in all 70 cases.
+
+**Per call** (`prepend_formats(:html)` on a fresh lookup context, best of 7 × 300,000, GC off, ns):
+
+| Lookup formats | 4.0.7 interp | 4.0.7 YJIT | 4.1dev interp | 4.1dev YJIT |
+| --- | ---: | ---: | ---: | ---: |
+| 36 defaults | 4,667 → **3,217** | 4,226 → **2,631** | 3,744 → **2,867** | 3,040 → **2,102** |
+| `[:html]` (request) | 764 → 750 | 489 → 466 | 773 → 764 | 474 → 457 |
+| `[:json]` (prepend needed) | 833 → 909 | 532 → 536 | 921 → 905 | 595 → 571 |
+
+**ruby-bench erubi-rails, instructions per iteration.** The first runs used the default heap and are not usable:
+
+| Run | Heap | C3 | A/A (main-b) |
+| --- | --- | ---: | ---: |
+| 4.0.7 interp | default | −5.8% | +0.0% |
+| 4.0.7 YJIT, 3 samples | default | −8.6%, −8.6%, −8.4% | −0.0%, **−5.5%**, **−5.9%** |
+| 4.1dev interp | default | −1.6% | +0.0% |
+| 4.1dev YJIT, 2 samples | default | −2.4%, −2.4% | +0.1%, −0.4% |
+| 4.0.7 interp | **fixed** | **−2.2%** | −0.06% |
+| 4.0.7 YJIT | **fixed** | **−4.1%** | −0.18% |
+| 4.1dev interp | **fixed** | **−1.5%** | +0.07% |
+| 4.1dev YJIT | **fixed** | **−2.5%** | −0.39% |
+
+C3 allocates 2 fewer objects per render (165 → 163). With the default heap that moves GC: over 20,000 renders on
+4.0.7, main ran 20–76 minor GCs plus 0–6 major (`nofree`) ones between processes, C3 27 minor and none; 4.1dev 41–47
+against 31. Whether a major GC lands inside the measured iterations decides most of the default-heap number (and
+fails the YJIT A/A twice). With the fixed floors from [bench.md](../bench.md) (`RUBY_GC_HEAP_0..4_INIT_SLOTS`
+1,000,000 / 250,000 / 100,000 / 20,000 / 10,000) both variants run the same GCs (over 20,000 renders: 4 minor and 3 major, all malloc-triggered),
+and the A/A passes; those rows are the claim.
+
+**Suites.** Action View `bin/test` 3,352 runs and Action Pack `bin/test` 4,463 runs, 0 failures, 0 errors,
+`RAILS_STRICT_WARNINGS=1`, Ruby 4.0.7; RuboCop clean. Fork CI: rails-new-docker passed; the Devcontainer smoke test
+failed on runner disk space ("No space left on device" after ghcr.io cache 403s), unrelated.
+
+**Breadth.** Only top-level template renders outside a request format benefit: `ApplicationController.render` and
+renderer-based jobs that don't pass `formats:`. Controller actions (request format `[:html]`) and partials are
+unchanged, so app request pages gain nothing; no census was run for that reason.
+
+**Overlap.** No open rails/rails PR touches `prepend_formats` or `formats=` for speed (checked 2026-11-04: `gh pr
+list --search` LookupContext, DetailsKey, prepend_formats, `formats=`). #39476 (tenderlove, open since 2020, updated
+2026-11-02) removes the JS→HTML fallback and the `html_fallback_for_js` guard on the same line; `git merge-tree` of C3 with
+the PR head merges `abstract_renderer.rb` cleanly (#39476's own conflict with main is in `lookup_context.rb`, which C3
+doesn't touch). Recently merged lookup work (#58899, #58786, #58281) does not touch it.
+
+**Draft PR description:**
+
+> `TemplateRenderer#render` calls `prepend_formats` with the template's format on every render. Outside a request,
+> as with `ApplicationController.render`, the lookup context keeps all 36 default formats, so
+> `formats | @lookup_context.formats` builds a 37-entry union that reproduces the list it started from when the
+> template's format already leads it.
+>
+> This skips the union in that case and passes the current formats to `formats=` as before, so the `*/*` expansion,
+> duplicate removal, format validation and the JS→HTML fallback all still run, and the details key is kept as before.
+> Renders with a request format such as `[:html]` don't change.
+>
+> | `prepend_formats(:html)` with the default formats | main | this PR |
+> | --- | ---: | ---: |
+> | interpreter | 4,667 ns | 3,217 ns |
+> | YJIT | 4,226 ns | 2,631 ns |
+>
+> On ruby-bench's erubi-rails this runs 2.2% fewer instructions per iteration in the interpreter and 4.1% fewer with
+> YJIT (1.5% and 2.5% on Ruby master), and allocates two fewer objects per render.
+
+### Rejected with C3
+
+| Idea | Numbers | Decision |
+| --- | --- | --- |
+| `Mime::Mimes#valid_symbols?` as `symbols.all?(@symbols_set)` (Set as pattern) instead of a block (branch `thomasklemm/mime-valid-symbols-set`, local only) | 36 symbols: 4.0.7 interp 1,380 → 774 ns, YJIT 1,075 → 752; 4.1dev 1,438 → 889, 1,092 → 860; but Ruby 3.4.12 YJIT 1,006 → 1,127 (slower; Set is Ruby code there). erubi-rails Ir (default heap): 4.0.7 −2.6% interp, −1.6% / −0.9% YJIT; 4.1dev −1.9% interp, **+1.7%** YJIT | **Rejected**: slower on Ruby 3.4 YJIT (Rails supports ≥ 3.3.5) and mixed on 4.1dev; not rerun with a fixed heap. |
+| Cache the normalized formats per lookup context | — | **Not exact**: would skip validation, `"*/*"` expansion and the JS fallback for formats written into the details without `formats=` (`LookupContext.new(paths, formats: …)`). |
+
 ## Rejected and leads
 
 | Idea | Numbers | Decision |
@@ -570,7 +679,7 @@ part without touching Rails or its `super`.
 | `xml_name_escape`: skip `blank?` for ASCII names that match `SAFE_XML_TAG_NAME_REGEXP` (such names can't be blank; the only safe blank names are all U+1680) | per call interp 153 → 124 ns ("class"), YJIT 88 → 90; `""` 23 → 105 ns YJIT | **Rejected**: no gain under YJIT, slower for empty names. |
 | `xml_name_escape`: cheaper safe-name check (ASCII-only regex, negated class search, `String#count`) | `"data-turbo-frame"`: current regex 220 ns; ASCII regex 197, negated search 287, `count` 401 | **Rejected**: the cost is per-character regex matching, not the Unicode class; nothing cheaper is exact. A per-name cache grows with user-built attribute keys. |
 | `ensure_valid_html5_tag_name`: frozen Set of standard element names before the regex (`content_tag("a")`, `tag("input")`) | regex 133 → Set 36 ns (String name, interp), 121 → 30 (YJIT); 14–27 calls on Blog pages, 19–25 Campfire, 153 Fizzy board, 466 Lobsters home; railsbench `/posts` 301 calls, but `/posts` is 1 of 102 requests | **Rejected**: 0.04–0.26% of an app page, ≈0.07% of a railsbench iteration, 0 on erubi-rails. |
-| `prepend_formats`: skip re-deriving the lookup formats when the template's format already leads them | renderer path (`ApplicationController.render` without `formats:`, which keeps the 36 default formats): 6.0 µs interp / 5.4 µs YJIT per template render; with a request format `[:html]` 0.8 / 0.5 µs; 2–3% of erubi-rails | **Lead, not exact cheaply**: the skip must still validate the current formats (`render formats: [:html, :bogus]` raises only on this path) and keep the JS→HTML fallback that `with_prepended_formats([:js])` relies on; that validation is most of the cost. Only renderer-based template renders benefit. |
+| `prepend_formats`: skip re-deriving the lookup formats when the template's format already leads them | see [C3](#c3-prepend_formats-skips-the-union-when-the-format-already-leads) | **Became C3** (union only; validation and fallback kept). |
 | `_all_renderers`: avoid `_renderers + Renderers.all` (a new Set) per controller render | 489 ns interp / 409 ns YJIT per render (`_render_to_body_with_renderer` 711 / 580 ns) | **Rejected**: < 0.1% of a railsbench request. |
 | `OutputBuffer#safe_concat` (1–7% self) | already `@raw_buffer << value; self` | **No change possible**: the cost is the call itself, one per static template chunk. |
 | Tag attribute building (`tag_options`, `append_tag_option`) | 2–3.5% in Blog, Fizzy, Lobsters | **Covered**: main already appends every attribute into one buffer (what #57999 proposes); what remains is `xml_name_escape` (above), `Hash#each_pair`, `blank?` and String appends. |
