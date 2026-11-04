@@ -1,0 +1,32 @@
+From 75cb1d80e3412554d25c1125330c179afc5a8cef Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:06:53 +0000
+Subject: [PATCH] Iterate Hash#extract! keys with each instead of
+ each_with_object
+
+each_with_object comes from Enumerable and iterates the keys through an
+internal C block. A plain each over the same keys, filling a local
+result Hash, makes the same has_key?, delete and []= calls in the same
+order, with one allocation and one method dispatch fewer.
+stylesheet_link_tag and javascript_include_tag call it once per call.
+---
+ activesupport/lib/active_support/core_ext/hash/slice.rb | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/activesupport/lib/active_support/core_ext/hash/slice.rb b/activesupport/lib/active_support/core_ext/hash/slice.rb
+index de6a1dfcfb..734482f507 100644
+--- a/activesupport/lib/active_support/core_ext/hash/slice.rb
++++ b/activesupport/lib/active_support/core_ext/hash/slice.rb
+@@ -26,6 +26,8 @@ def slice!(*keys)
+   # hash                  # => {:c=>3, :d=>4}
+   # ```
+   def extract!(*keys)
+-    keys.each_with_object(self.class.new) { |key, result| result[key] = delete(key) if has_key?(key) }
++    result = self.class.new
++    keys.each { |key| result[key] = delete(key) if has_key?(key) }
++    result
+   end
+ end
+-- 
+2.55.0
+

@@ -148,7 +148,38 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | R1: declare `prism` as a runtime dependency of Action View and Railties (Ruby 4.1 makes prism a bundled gem) | rails/rails | `thomasklemm/declare-prism-dependency` @ `00339f7e89` on main `9b116f1fed` (local; [patch](../../fixtures/corpus/ruby-41-readiness/rails-declare-prism-dependency.patch)) | Correctness, not speed: on Ruby master, an app without minitest 6, irb ≥ 1.17 or rdoc in its bundle gets `LoadError` for prism from `ActionView.eager_load!`, template digests, the test runner and `bin/rails notes`; with the change it resolves prism 2.1.0 on master and 4.0.9 ([readiness](ruby-4.1-readiness.md#r1-declare-prism-as-a-dependency)) | Ready, held until Thomas has read it. L0 (+4 lines); correctness review approve, maintainability review approve-with-nits (addressed); body and explanation below. |
+| N1: `Fanout#build_handle` builds its groups with `each` instead of `Hash#map` | rails/rails | [`thomasklemm/fanout-handle-groups-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/fanout-handle-groups-each) @ `1216ff4766` on main `9b116f1fed` ([patch](../../bench/upstream/as_request_paths/patches/n1-fanout-handle-groups-each.patch)) | `instrument` with one subscriber 4 → 3 objects, −5.1% / −10.8% / −11.3% instructions (interpreter / YJIT / ZJIT), −10.6% / −22.4% time; `Post.find` −0.3% / −0.6% / −0.7%; ruby-bench within noise; line in all 20 census apps, 0.12% of interpreted Ir ([round](as-request-paths.md#n1-build-the-handles-groups-with-each)) | Ready for the coordinator's Sol round (standing OK, DECISIONS 6aca583). L1; primary, adversarial and cold-read subagents; body and explanation below. |
+| H1: `Hash#extract!` iterates its keys with `each` instead of `each_with_object` | rails/rails | [`thomasklemm/hash-extract-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-extract-each) @ `75cb1d80e3` on main `9b116f1fed` ([patch](../../bench/upstream/as_request_paths/patches/h1-hash-extract-each.patch)) | `extract!` with the asset helpers' keys 4 → 3 objects, −18.8% / −43.8% / −23.7% instructions, −24% / −40% time; `stylesheet_link_tag` −1.6% / −5.1% / −3.6%; ruby-bench within noise; 17 of 20 census apps, 0.14% of interpreted Ir ([round](as-request-paths.md#h1-iterate-hashextract-keys-with-each)) | Ready for the coordinator's Sol round. L1; primary, adversarial and cold-read subagents; body and explanation below. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+
+### Erklärungen für Thomas: N1 und H1 (2026-11-04, Active Support; nicht geöffnet)
+
+PR-Texte, Messungen und Reviews: [as-request-paths](as-request-paths.md#pr-bodies-drafts-not-opened).
+
+**N1, Notification-Handle ohne `Hash#map`.** Jedes `instrument` mit einem aktiven Subscriber (jede SQL-Abfrage, weil
+Active Records Laufzeitzähler immer zuhört) baut in `build_handle` pro Subscriber-Gruppe ein Objekt, bisher mit
+`groups.map`. Ein Hash hat kein eigenes `map`; das `map` aus Enumerable legt bei jedem Aufruf einen internen Block an
+und ruft unseren Block über C auf. Jetzt füllt `each` mit `<<` ein leeres Array, wie `groups_for` direkt darüber:
+dieselben Gruppen in derselben Reihenfolge, ein Objekt weniger und 5–11 % weniger Instruktionen pro Event; merken
+würde es nur, wer das interne `groups_for` überschreibt und einen Hash mit eigenem `map` zurückgibt.
+
+```ruby
+groups = { TimedGroup => [sub] }
+groups.map { |k, v| k.new(v) }                       # vorher: Enumerable#map, interner Block pro Aufruf
+list = []; groups.each { |k, v| list << k.new(v) }   # jetzt: dasselbe Array, ohne den Umweg
+```
+
+**H1, `Hash#extract!` ohne `each_with_object`.** `stylesheet_link_tag` und `javascript_include_tag` holen bei jedem
+Aufruf vier mögliche Optionen mit `extract!` aus den Optionen, meist ist keine davon gesetzt. `extract!` lief über
+`each_with_object` aus Enumerable, mit demselben internen Block wie oben. Jetzt legt es ein leeres Ergebnis an, geht
+die Schlüssel mit `each` durch und gibt das Ergebnis zurück; der Hash bekommt dieselben `has_key?`-, `delete`- und
+`[]=`-Aufrufe in derselben Reihenfolge, nur Backtraces aus diesen Methoden haben einen Frame weniger.
+
+```ruby
+opts = { "media" => "all" }
+%w[host].each_with_object({}) { |k, r| r[k] = opts.delete(k) if opts.key?(k) }  # vorher
+r = {}; %w[host].each { |k| r[k] = opts.delete(k) if opts.key?(k) }; r          # jetzt: dasselbe {}
+```
 
 ### Erklärungen für Thomas: I1 und IW (2026-11-04, Bugfixes; I1 geöffnet als #59609, IW als Lead geparkt)
 
