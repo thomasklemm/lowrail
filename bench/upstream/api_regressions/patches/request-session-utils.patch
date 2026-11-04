@@ -1,0 +1,59 @@
+From e18bd83c4de7cc3ce9b7f8ce18812e1994edbfd4 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:07:11 +0000
+Subject: [PATCH] Deprecate ActionDispatch::Request::Session and Request::Utils
+
+#57856 moved both classes to ActionDispatch::Http::Session and
+ActionDispatch::Http::Utils without keeping the old names. Gems and
+applications still reference them, for example json_tagged_logger, which
+calls ActionDispatch::Request::Session.create for each request, and
+application specs that stub ActionDispatch::Request::Session. On main
+they raise NameError.
+
+Keep the old names as deprecated constants that resolve to the new ones.
+---
+ actionpack/lib/action_dispatch/http/request.rb |  8 ++++++++
+ actionpack/test/dispatch/request_test.rb       | 11 +++++++++++
+ 2 files changed, 19 insertions(+)
+
+diff --git a/actionpack/lib/action_dispatch/http/request.rb b/actionpack/lib/action_dispatch/http/request.rb
+index 3f6fe7cf47a..0232dba8804 100644
+--- a/actionpack/lib/action_dispatch/http/request.rb
++++ b/actionpack/lib/action_dispatch/http/request.rb
+@@ -26,6 +26,14 @@ class Request
+     include ActionDispatch::Http::URL
+     include ActionDispatch::ContentSecurityPolicy::Request
+     include Rack::Request::Env
++    include ActiveSupport::Deprecation::DeprecatedConstantAccessor
++
++    deprecate_constant :Session, "ActionDispatch::Http::Session",
++      deprecator: ActionDispatch.deprecator,
++      message: "ActionDispatch::Request::Session is deprecated and will be removed in Rails 9.0. Use ActionDispatch::Http::Session instead."
++    deprecate_constant :Utils, "ActionDispatch::Http::Utils",
++      deprecator: ActionDispatch.deprecator,
++      message: "ActionDispatch::Request::Utils is deprecated and will be removed in Rails 9.0. Use ActionDispatch::Http::Utils instead."
+ 
+     LOCALHOST = Regexp.union([/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, /^::1$/, /^0:0:0:0:0:0:0:1(%.*)?$/]).freeze
+ 
+diff --git a/actionpack/test/dispatch/request_test.rb b/actionpack/test/dispatch/request_test.rb
+index f41b45017a6..c3512473340 100644
+--- a/actionpack/test/dispatch/request_test.rb
++++ b/actionpack/test/dispatch/request_test.rb
+@@ -2126,3 +2126,14 @@ class RequestMimeNegotiationSettingsTest < ActiveSupport::TestCase
+     ActionDispatch::Request.ignore_accept_header = old
+   end
+ end
++
++class RequestDeprecatedConstantsTest < ActiveSupport::TestCase
++  test "Session and Utils are deprecated aliases of their Http counterparts" do
++    assert_deprecated(/ActionDispatch::Request::Session is deprecated/, ActionDispatch.deprecator) do
++      assert_same ActionDispatch::Http::Session, ActionDispatch::Request::Session
++    end
++    assert_deprecated(/ActionDispatch::Request::Utils is deprecated/, ActionDispatch.deprecator) do
++      assert_same ActionDispatch::Http::Utils, ActionDispatch::Request::Utils
++    end
++  end
++end
+-- 
+2.55.0
+

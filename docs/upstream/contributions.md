@@ -32,6 +32,7 @@ The merge links use GitHub's `mergeCommit`, not the contributor's pre-merge comm
 
 **Status 2026-11-04 09:00 UTC:** 30 of the 38 Rails PRs from this cycle (#59533–#59598) are merged, all by amatsuda: #59583 and #59585 overnight, #59596 (07:33), #59597 (07:37) and #59598 (07:43 UTC) on 2026-11-04. Open: #59557, #59564, #59565, #59569, #59570, #59574, #59584. #59577 closed 09:32 UTC as superseded by #59590 (see [Closed](#closed)).
 
+- [#59616](https://github.com/rails/rails/pull/59616) (W2 from the [Active Record write-path round](ar-write-paths.md)), `record_update_timestamps` reads the clock only right before the first timestamp column it writes, so the second timestamp pass of an update no longer calls `with_connection` for a time it never uses — `post.update!` Callgrind −1.4% / −0.9% / −1.4% (interpreter / YJIT / ZJIT, A/A ≤ 0.20%), 190 → 189 allocations in the micro; three tests. Subagent primary and adversarial reviews, then Sol: open after fixes (applied). Lib +2/−1, test +34, L1. Head `ef0266d0d6` on main `9cf3693a0a`; merge-tree clean on `d2ab41e65a`. Opened 2026-11-04 13:53 UTC with Thomas's OK ([body](../../bench/upstream/ar_write_paths/w2-body.md)). Watched report-only from the round thread. **Merged 2026-11-04 14:58 UTC** by amatsuda (merge `8b06b0eb98`), no comments or reviews, CI green; watch cleared.
 - [#59607](https://github.com/rails/rails/pull/59607) (CP-3 from [Rails common paths, round 2](rails-common-paths-2.md#cp-3-resolve-attribute-aliases-with-a-fetch-default)), `resolve_attribute_name` passes the resolved name as `fetch`'s default instead of `&:itself`: `type_for_attribute` −12% instructions interpreted, −22% YJIT, −29% ZJIT; shipit −0.11% instructions per iteration interpreted. Opened 2026-11-04 12:31 UTC as Thomas under the standing OK (DECISIONS 6aca583) after two Sol rounds; head `be7ab87287` on main `9b116f1fed`. **Merged** by amatsuda on 2026-11-04 13:57 UTC (merge commit `4e76f138b8`), with no comments or reviews and CI green (Buildkite rails and docs-preview, rails-new-docker, labeler); watch cleared.
 - [#59605](https://github.com/rails/rails/pull/59605) (AR-1 from the [Active Record request-path round](ar-request-paths.md)), SQLite3 `perform_query` looks up the type map once per result instead of once per column (`result_type_map = type_map`) — `Post.find` (9 columns) instructions −2.2% / −1.8% / −1.6% (interpreter / YJIT / ZJIT, A/A ≤ 0.37%); with `default_timezone` in database.yml −15% / −24% / −23%; objects unchanged (60 → 52 with `default_timezone`); ruby-bench shipit −0.44% / −0.25%, lobsters −0.14% / −0.19% (A/A ≤ 0.08%), railsbench YJIT within noise; census 8: all 8 SQLite apps, about 0.02% of instructions. Subagent primary and adversarial reviews, then Sol: no problem in stock Rails; differences only from overrides of the private `type_map` or type-map factories that mutate adapter state (accepted). Renamed from `type_map = type_map()` on Sol's readability note. Lib +2/−1, L0. Head `501bf5cc67` on main `9b116f1fed`; `test:sqlite3` 10,281 runs, 0 failures, 0 errors; RuboCop clean. Opened 2026-11-04 12:12 UTC with Thomas's OK. Watched report-only from the round thread. **Merged 2026-11-04 13:29 UTC** by amatsuda (merge `9cf3693a0a`).
 - [#59603](https://github.com/rails/rails/pull/59603) (T1 from the [Action View round](actionview-render-c10.md#t1-check-for-string-tag-attribute-values-first)), `TagBuilder#append_tag_option` checks for a String attribute value first instead of after the Array, Hash, Regexp and Symbol checks; same body as `else`, so Strings are escaped as before. `tag.input` with three String attributes −6.2% / −2.2% / −2.0% instructions (interpreter / YJIT / ZJIT; A/A ≤ 0.24%), −4.7% / −2.4% time; non-String values pay one more check (Symbol +1.2% interpreted); 90–98% of attribute values are Strings in 5 apps, about 0.1% of a Fizzy or Lobsters page; railsbench within noise. L1; primary and adversarial subagent reviews approve. Head `f02e21ddbb` on main `9b116f1fed` (merge-tree clean, main unchanged at opening). Opened 2026-11-04 with Thomas's OK, ready for review, body as reviewed. Merged 2026-11-04 13:14 UTC by amatsuda with no review comments, CI green ([1ca7528](https://github.com/rails/rails/commit/1ca7528bac)).
@@ -151,74 +152,69 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
-| AP-1: join adjacent literals when building a route's path format | rails/rails | [`thomasklemm/journey-format-join-literals`](https://github.com/thomasklemm/rails/tree/thomasklemm/journey-format-join-literals) @ `bb4740730b` on main `9b116f1fed` | `post_path` −5.6% / −3.7% instructions (interp / YJIT), −4.8% / −4.1% ns, objects unchanged; ruby-bench railsbench −0.3% interp; +49 bytes per route ([record](actionpack-request-path.md#ap-1-join-adjacent-literals-when-building-a-routes-format)) | Ready, not opened: reviews, adversarial round and body review done; body below. Link in the body needs this record on Lowrail main. |
-| AP-2: no Set union of renderers on every render | rails/rails | [`thomasklemm/all-renderers-without-union`](https://github.com/thomasklemm/rails/tree/thomasklemm/all-renderers-without-union) @ `1042902003` on main `9b116f1fed` | every render −3,900 instructions (−34% / −42% for the check), −1 object; minimal JSON request −0.4% / −0.9%; ruby-bench railsbench −0.1% / −0.3% ([record](actionpack-request-path.md#ap-2-no-set-union-on-every-render)) | Ready, not opened: fixes an unreleased cost from #57830; body below. |
 
-### Erklärungen für Thomas: AP-1 und AP-2 (2026-11-04, Action Pack; nicht geöffnet)
+### Erklärungen für Thomas: AP-1 und AP-2 (2026-11-04, Action Pack; geöffnet als #59619 und #59620)
 
 Aufzeichnung, Belege und Reviews: [actionpack-request-path](actionpack-request-path.md).
 
-**AP-1, Routen-Format.** Wenn Rails einen Pfad wie `post_path(post)` erzeugt, hängt es die Teile der Route einzeln an
-einen String an, und der Parser liefert für `/posts/:id` die Stücke `"/"`, `"posts"`, `"/"` getrennt. Jetzt werden
-benachbarte feste Stücke einmal beim Laden der Routen zu `"/posts/"` zusammengefügt, sodass jeder Aufruf weniger
-anhängen muss: etwa 5% weniger Instruktionen pro `post_path`, gleiche URLs bis aufs Byte und Encoding, dafür rund 49
-Bytes mehr Speicher pro Route.
+**AP-1, Routen-Format (#59619).** Wenn Rails einen Pfad wie `post_path(post)` erzeugt, hängt es die Teile der Route
+einzeln an einen String an, und der Parser liefert für `/posts/:id` die Stücke `"/"`, `"posts"`, `"/"` getrennt. Jetzt
+werden benachbarte feste Stücke einmal beim Laden der Routen zu `"/posts/"` zusammengefügt. Außerdem merkt sich das
+Format die Parameter selbst statt ihrer Positionen und prüft sie mit `any?`; das alte `return` aus einem `each`-Block
+legte jedes Mal ein Objekt an, wenn eine optionale Gruppe wie `(.:format)` wegfiel. Zusammen: etwa 8% weniger Zeit
+pro `post_path`, ein Objekt weniger, gleiche URLs bis aufs Byte; das Bauen einer Route kostet etwa 2 µs mehr.
 
 ```ruby
 ["/", "posts", "/", :id]   # vorher: drei Strings anhängen, dann die id
 ["/posts/", :id]           # jetzt: einer, einmal beim Bauen der Route zusammengefügt
 ```
 
-**AP-2, Renderer-Set.** Bei jedem `render` prüft Rails, ob eine Option wie `json:` gesetzt ist, und baut dafür auf
-main seit #57830 (noch nicht released) jedes Mal ein neues Set aus den eigenen Renderern des Controllers und den
-eingebauten. Fast jeder Controller hat keine eigenen, dann ist das neue Set nur eine Kopie der eingebauten; jetzt
-nimmt Rails in diesem Fall direkt das eingebaute, eingefrorene Set, was pro Render etwa 3.900 Instruktionen und ein
-Objekt spart.
+**AP-2, Renderer-Set (#59620).** Bei jedem `render` prüft Rails, ob eine Option wie `json:` gesetzt ist, und baut dafür
+auf main seit #57830 (noch nicht released) jedes Mal ein neues Set aus den eigenen Renderern des Controllers und den
+eingebauten. Fast jeder Controller hat keine eigenen, dann ist das neue Set nur eine Kopie der eingebauten; jetzt nimmt
+Rails in diesem Fall direkt das eingebaute, eingefrorene Set. Einzige sichtbare Änderung: wer `_all_renderers`
+überschreibt und `super.delete(:json)` aufruft, bekommt jetzt `FrozenError`.
 
 ```ruby
 _renderers + Renderers.all                                     # vorher: bei jedem render ein neues Set
 _renderers.empty? ? Renderers.all : _renderers + Renderers.all # jetzt (als if/else): Kopie nur, wenn nötig
 ```
 
-#### AP-1 PR-Text
+#### AP-1 PR-Text (wie gepostet, nach der Überarbeitung)
 
 Title: Join adjacent literals when building a route's path format
 
-Generating a path walks the parts of the route's `Journey::Format` and appends each one to a buffer. The parser gives one part per token, so `post_path` appends `"/"`, `"posts"` and `"/"` separately on every call, and each nested resource adds three more. `Format#add_to` ranks 30th among Ruby methods by interpreted instructions in a CPU census of Rails apps on main, and runs in 19 of the 20.
+`Journey::Format` now joins each run of adjacent literals once, when the route is built, so generating `/posts/:id` appends `"/posts/"` instead of `"/"`, `"posts"` and `"/"`. It also keeps its parameters themselves instead of their indexes and checks them with `any?`: on main, returning from the `each` block allocated an object whenever an optional group like `(.:format)` was skipped. The unused `@children` is gone.
 
-This joins each run of adjacent literals once, when the format is built, into one frozen, deduplicated string; formats keep about 49 more bytes per route. Generated URLs don't change: every literal is the parser's ASCII `/` or `.` or a slice of the route's path, and parameters are escaped to ASCII, so appending the joined string gives the same bytes and encoding as appending its pieces. A route that is one literal, like `root_path`, is unchanged.
+URLs generated from Rails-built routes are unchanged: the parser's literals are its ASCII `/` and `.` or slices of the route path, so the joined string has the same bytes and encoding. Hand-built `Format.new` arrays could notice the new internal `@parts` (mutating the input afterwards, mixed-encoding literals failing at construction, String subclasses normalised). Building a format costs about 19% more instructions (2 µs per route); formats retain less memory than before.
 
-`post_path(post)`, per call on Ruby 4.0.9:
+`post_path(post)` per call, Ruby 4.0.9:
 
-| | main | A/A | this |
-| --- | ---: | ---: | ---: |
-| objects | 7 | | 7 |
-| interpreter ns | 4,440 | −1.4% | 4,226 (−4.8%) |
-| YJIT ns | 2,037 | +2.4% | 1,955 (−4.1%) |
-| interpreter instructions | 34,528 | 0.00% | 32,586 (−5.6%) |
-| YJIT instructions | 15,565 | +0.23% | 14,994 (−3.7%) |
+| | main | this |
+| --- | ---: | ---: |
+| objects | 7 | 6 |
+| interpreter | 4,336 ns, 34,472 instructions | 3,988 ns (−8.0%), 31,855 (−7.6%) |
+| YJIT | 2,005 ns, 15,571 instructions | 1,880 ns (−6.2%), 14,840 (−4.7%) |
 
-`posts_path` drops 3.7% interpreted and 2.7% with YJIT (instructions). In ruby-bench, railsbench drops 0.3% interpreted and 0.1% with YJIT (A/A 0.13% and 0.03%) and interpreted lobsters 0.2% (A/A 0.04%); the other runs are within noise. I found this with the CPU census of [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md), my research project.
+`posts_path` saves 6.1% / 5.9% of instructions; `root_path` (one literal) is unchanged. Measured with Lowrail, my research project ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md#ap-1-join-adjacent-literals-when-building-a-routes-format)).
 
-#### AP-2 PR-Text
+#### AP-2 PR-Text (wie gepostet)
 
 Title: Don't build a Set of renderers on every render
 
-`render_to_body` checks every renderer in `_all_renderers` on every render, template renders included, for an option such as `json:`. Since #57830 (unreleased) stopped mutating the renderers Set, `_all_renderers` returns `_renderers + Renderers.all`. In a controller that never calls `use_renderers`, `_renderers` is empty, so each render copies the built-in renderers into a new Set.
+When a controller has no local renderers, `_all_renderers` now returns `Renderers.all` itself instead of building `_renderers + Renderers.all`, an identical copy, on each render. Controllers with `use_renderers`, and their subclasses, still get the union with their renderers first.
 
-When `_renderers` is empty, this returns `Renderers.all` itself, which has the same renderers in the same order. It is frozen, and `add`/`remove` replace it rather than change it, so nothing can modify the shared Set through the result. Controllers with their own renderers still get the union.
+#57830 worked toward Ractor safety by replacing the registry with a new frozen Set on every `add` and `remove`, so the result has the same renderers in the same order and stays a snapshot while it is iterated. One contract changes: on this path the internal method returns the shared frozen registry rather than a fresh Set, so an override calling `super.delete(:json)` would raise `FrozenError`. Rails only iterates the result, and the union is unreleased.
 
-Per call on Ruby 4.0.9, as template-render check / `render json:`:
+Per call in a controller without local renderers, Ruby 4.0.9:
 
-| | main | A/A | this |
-| --- | ---: | ---: | ---: |
-| objects | 3 / 9 | | 2 / 8 |
-| interpreter ns | 1,354 / 3,928 | +1.8% / −0.9% | 801 (−41%) / 3,274 (−17%) |
-| YJIT ns | 1,165 / 2,658 | −1.2% / −0.8% | 552 (−53%) / 2,001 (−25%) |
-| interpreter instructions | 11,497 / 26,379 | +0.18% / −0.12% | 7,568 (−34%) / 22,369 (−15%) |
-| YJIT instructions | 9,237 / 16,905 | −0.30% / −0.36% | 5,314 (−42%) / 12,914 (−24%) |
+| | main | this |
+| --- | ---: | ---: |
+| renderer check of a template render, interpreter / YJIT | 1,354 / 1,165 ns | 801 / 552 ns |
+| `render json:`, interpreter / YJIT | 3,928 / 2,658 ns | 3,274 / 2,001 ns |
+| objects, check / `render json:` | 3 / 9 | 2 / 8 |
 
-Every render saves about 3,900 instructions, 0.4% (interpreter) to 0.9% (YJIT) of a minimal JSON request. ruby-bench bundles Rails 8.1, so I patched the touched method with main's and this PR's bodies: railsbench drops 0.1% interpreted and 0.3% with YJIT (A/A 0.05% and 0.16%); lobsters and shipit are within noise. The line runs in 19 of 20 apps in the CPU census of [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md), my research project.
+Tests cover Base and API without local renderers, inherited local renderers, and renderers added or removed between renders. Measured with Lowrail, my research project ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md#ap-2-no-set-union-on-every-render)).
 
 ### Erklärung für Thomas: AS-1 (2026-11-04, Active Storage; geöffnet als #59615)
 
@@ -683,11 +679,12 @@ Callgrind on the PR itself), #19492, #19620 (backport requested in review), #196
 
 ### Rails — rails/rails
 
-Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #59569, #59570, #59574, #59584), plus #59605 opened later that day; #59577 closed at 09:32 UTC. #59596, #59597, #59598 and #59603 merged on 2026-11-04 and moved to [Merged](#merged). Later: #59605 merged 13:29 UTC; #59616 opened 13:53 UTC; #59617 opened 14:01 UTC; #59618 opened 14:11 UTC.
+Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #59569, #59570, #59574, #59584), plus #59605 opened later that day; #59577 closed at 09:32 UTC. #59596, #59597, #59598 and #59603 merged on 2026-11-04 and moved to [Merged](#merged). Later: #59605 merged 13:29 UTC; #59616 opened 13:53 UTC and merged 14:58 UTC; #59617 opened 14:01 UTC; #59618 opened 14:11 UTC.
 
+- [#59620](https://github.com/rails/rails/pull/59620) (AP-2 from the [Action Pack request-path round](actionpack-request-path.md#ap-2-no-set-union-on-every-render)), `_all_renderers` returns the frozen `Renderers.all` when the controller has no local renderers instead of building `_renderers + Renderers.all` on each render (an unreleased cost from #57830) — template-render check 1,354 → 801 ns / 1,165 → 552 ns (interp / YJIT), `render json:` 3,928 → 3,274 / 2,658 → 2,001 ns, one object fewer; ruby-bench railsbench −0.10% / −0.33%. Contract note in the body: `super.delete` in an override now raises `FrozenError`. Lib +5/−1, tests +44, L0/L1. Subagent primary review, cold read, then Sol: open after fixes (tests and body applied). Opened 2026-11-04 14:38 UTC as Thomas, ready for review, head `670e0c390f` on main `aa236fc09b`. Buildkite 136127 red in one shard (activerecord postgresql 3.4, 21 errors in `FieldOrderedValuesTest`, unrelated: the fixture gap below under Drafted); rebased unchanged onto `8b06b0eb98` as head `495c3a6405`, Buildkite 136134 green. Watched report-only every 2 hours from the round thread.
+- [#59619](https://github.com/rails/rails/pull/59619) (AP-1 from the [Action Pack request-path round](actionpack-request-path.md#ap-1-join-adjacent-literals-when-building-a-routes-format)), `Journey::Format` joins adjacent literals once at build time, keeps its parameters instead of their indexes and checks them with `any?` (no allocation from a non-local `return` when an optional group is skipped), and drops the unused `@children` — `post_path` 34,472 → 31,855 instructions interpreted (−7.6%), −4.7% YJIT, −11.1% ZJIT; 4,336 → 3,988 ns (−8.0%) / 2,005 → 1,880 ns (−6.2%); 7 → 6 objects; building a format +19% instructions (about 2 µs per route), retained format memory 536 → 344 bytes per route. Opened 2026-11-04 14:28 UTC (head `5bce8c7450`); Thomas set it to draft and asked for a plainer `Format` (`join_adjacent_literals` loop, `@parameters.grep(Parameter)`, `any?`); reworked to his shape, cold read L1, differential unchanged, Action Pack and Action View suites green. Head `b86b5887b3` on main `aa236fc09b`, marked ready for review again. Watched report-only every 2 hours from the round thread.
 - [#59617](https://github.com/rails/rails/pull/59617) (TC-1 from the [census backlog](census-backlog.md#tc-1-keep-the-utc-offset-in-timechange-for-times-with-a-zone-object)), `Time#change` on a `Time` with a zone object keeps the original UTC offset when the zone gives the new local time that offset. Correctness fix: on 8.1 and main, TZInfo zones raised `TZInfo::AmbiguousTime` in the hour repeated when clocks are set back (also in Active Model's datetime cast when precision truncation is needed), and `ActiveSupport::TimeZone` picked the other occurrence in Dublin; the differential over every tzdata transition up to 2037 differs only there. Cost on zone-object Times: +6–12% instructions interpreted, +16–22% YJIT, about 2× when the offset changes. Reviews: subagent primary and adversarial approve, outsider body rewrite, Sol "open after fixes" (applied). L1. Head `553f9267ee` on main `aa236fc09b` (force-pushed 2026-11-04 with a spring-forward and offset-crossing test; was `d5252fae22`). GitHub refused PR creation for the account after 13 PRs that day; the coordinator opened it on 2026-11-04 at 14:01 UTC, ready for review, as Thomas, with the [short body](census-backlog.md#pr-body-final-ready-to-open). Initial CI: labeler pass; rails-new-docker, buildkite/rails and docs-preview pending. Watched report-only every 3 hours from the census-backlog thread, in the same schedule as #59606; replies go to the coordinator as drafts.
 - [#59618](https://github.com/rails/rails/pull/59618) (W3 from the [Active Record write-path round](ar-write-paths.md)), `build_select` appends the default `table.*` attribute to the manager's projections directly instead of going through `project`, so no one-element splat Array is built per default-star projection — `Post.all.to_a` Callgrind −0.26% / −0.38% (interpreter / YJIT, A/A ≤ 0.01%), ZJIT no measurable difference; 291 → 290 allocations; ruby-bench shipit 1,811 and lobsters 660 such projections per iteration. Independent of open #45864 (same line). Subagent primary review, then Sol: open after fixes (applied). Lib +1/−1, L1. Head `c4f465b7b2` on main `9cf3693a0a`. Opened 2026-11-04 14:11 UTC from the coordinator orb with Thomas's OK ([body](../../bench/upstream/ar_write_paths/w3-body.md)). Watched report-only from the round thread.
-- [#59616](https://github.com/rails/rails/pull/59616) (W2 from the [Active Record write-path round](ar-write-paths.md)), `record_update_timestamps` reads the clock only right before the first timestamp column it writes, so the second timestamp pass of an update no longer calls `with_connection` for a time it never uses — `post.update!` Callgrind −1.4% / −0.9% / −1.4% (interpreter / YJIT / ZJIT, A/A ≤ 0.20%), 190 → 189 allocations in the micro; three tests. Subagent primary and adversarial reviews, then Sol: open after fixes (applied). Lib +2/−1, test +34, L1. Head `ef0266d0d6` on main `9cf3693a0a`; merge-tree clean on `d2ab41e65a`. Opened 2026-11-04 13:53 UTC with Thomas's OK ([body](../../bench/upstream/ar_write_paths/w2-body.md)). Watched report-only from the round thread.
 - [#59615](https://github.com/rails/rails/pull/59615) (AS-1 from the [background census](background-census.md#candidate-as-1-read-the-blob-filenames-extension-once-when-choosing-a-variant-format)), `Representable#format` reads `filename.extension` once instead of up to three times (each read builds a `Filename` and sanitizes the whole name) — variant construction `blob.variant(resize_to_limit: [100, 100])` on a PNG 61 → 39 objects, −33% / −40% / −37% instructions (interp / YJIT / ZJIT, A/A ≤ 0.12%), −30% / −35% time; variant-representation-path workloads −7.2% to −9.9% interpreter instructions in six apps (A/A ≤ 1.5%), 22 fewer allocations in most, 9 in Fizzy's avatar variant. Lib +3/−2, L0; subagent review, then Sol (open after body fixes, keep the code). Head `fa58e6094c` on main `9cf3693a0a`; merge-tree clean; adjacent, not duplicate: #51115, #58615, #57597, #57731. Opened 2026-11-04 ready for review; watched every 2 hours, report-only, from the opening thread.
 - [#59611](https://github.com/rails/rails/pull/59611) (R1 from the [Ruby 4.1 readiness round](ruby-4.1-readiness.md#r1-declare-prism-as-a-dependency)), declares `prism` without a version in the Action View and Railties gemspecs (+4 lines with `Gemfile.lock`). Ruby master, targeting 4.1, makes prism a bundled gem (Feature #22379) and #56631 removed the Ripper fallbacks, so without another gem bringing prism in, `ActionView.eager_load!`, Ruby-based dependency tracking, the test runner and `bin/rails notes` raise `LoadError`. Correctness, not speed; no measurement. L0; correctness and maintainability subagent reviews approve, Sol review "open after fixes" (body and message rewritten to it). Head `4a837183ea` on main `1ca7528bac` (rebased; merge-tree clean, no overlapping PR or issue). Opened 2026-11-04 with Thomas's OK, ready for review. Watched every 2 hours, report-only, from the readiness thread (the Amp GitHub App cannot subscribe to rails/rails).
 - [#59621](https://github.com/rails/rails/pull/59621) (P1, follow-up to #59609 from the [issue triage](rails-issue-fixes.md#p1-plucked-columns-unknown-to-the-schema-2026-11-04)), `pluck`/`pick` cast a column whose type is the placeholder `ActiveRecord::Type.default_value` (subquery aliases, CTEs, columns of an unrecognised type) with the result's column type when the adapter reports one: subquery dates come back as `Date` instead of Strings, SQLite booleans as `true` instead of `1`. Not a regression (same on 7.0.4.3). Lib +8/−1, tests (mixed known/unknown pluck plus `pick`; an explicit `ActiveModel::Type::Value` stays raw and fails if `equal?` becomes `==`; a result without column types keeps the placeholder, as on MySQL), CHANGELOG. Plain description and cold read L1; Sol: open after fixes, all applied. AR suite: PostgreSQL 11,205 runs 0 failures; SQLite 10,284 runs 0 failures, 4 `sqlite3`-CLI errors. Only the CHANGELOG conflicts with #59609; whichever lands second needs a rebase. Head `8d29f4b6f0` on main `6c23cb8f2a`. Opened 2026-11-04 14:54 UTC, ready for review; watched with #59609 every 2 hours, report-only.
@@ -832,6 +829,22 @@ None.
   versions after Sol review), C1 −4 objects per `ConnectionPool#with`. C1 is open as
   [connection_pool#225](https://github.com/mperham/connection_pool/pull/225) and I1 as
   [i18n#763](https://github.com/ruby-i18n/i18n/pull/763), I2 as [i18n#764](https://github.com/ruby-i18n/i18n/pull/764).
+
+- **FieldOrderedValuesTest fixture fix (2026-11-04, found from #59620's red Buildkite run 136127):**
+  [`thomasklemm/field-ordered-values-author-addresses`](https://github.com/thomasklemm/rails/tree/thomasklemm/field-ordered-values-author-addresses)
+  @ `a712a0a9bc` on main `8b06b0eb98`, test only, +1/−1: `fixtures :posts, :authors, :author_addresses`.
+  kamipo's `63cf73e451` (pushed to main 2026-11-04) added `:authors` to the test without `:author_addresses`;
+  `authors.yml` points at `author_address_id: 1` through `fk_rails_94423a17a3`. On PostgreSQL 18.4+ fixtures load
+  with foreign keys `NOT ENFORCED` and then `ENFORCED` again, which validates existing rows, so the test fails
+  whenever it runs before any test that loads `author_addresses` (CI: 21 errors, seed 14797, one shard). Same kind
+  of fix as #28991. Repro on unmodified main with PostgreSQL 18.6: the file alone gives 21
+  `PG::ForeignKeyViolation` errors; PostgreSQL 15 (trigger path, no validation) and SQLite pass either way. With the
+  fix it passes on 18.6, and all 46 test files that load `authors` pass alone on 18.6 with `author_addresses`
+  emptied first. Not opened; draft body:
+
+  > `FieldOrderedValuesTest` loads the `authors` fixtures, which reference `author_addresses` through a foreign key, without loading the addresses. On PostgreSQL 18.4+ fixtures are inserted with foreign keys `NOT ENFORCED` and then set `ENFORCED` again, which validates the existing rows, so the test errors when it runs before any test that loads `author_addresses` (21 errors on Buildkite with seed 14797). This loads them too, as #28991 did for other tests.
+  >
+  > On PostgreSQL 18.6 the file run alone failed with 21 `PG::ForeignKeyViolation` errors on main and passes with this change; PostgreSQL 15 and SQLite pass either way. Every other test file that loads `authors` passes alone on 18.6 with `author_addresses` emptied first.
 
 ## Investigated, not submitted
 

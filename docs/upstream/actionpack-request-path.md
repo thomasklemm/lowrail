@@ -5,17 +5,18 @@ recognition and generation, parameters, request/response, cookies and session, m
 callbacks, rescue, instrumentation, MIME lookup and flash. It used census 8's CPU ranking
 ([rails-main-census-8](rails-main-census-8.md)) to pick sites. `UriEncoder#escape` was left to C9.
 
-**Result: two candidates, queued, not opened.**
+**Result: two candidates, opened 2026-11-04 as [#59619](https://github.com/rails/rails/pull/59619) (AP-1) and
+[#59620](https://github.com/rails/rails/pull/59620) (AP-2).** AP-1 was reworked after opening ([below](#ap-1-rework-after-opening)).
 
 | # | Branch | Per call, main → candidate (Ir, interp / YJIT / ZJIT) | Readability |
 | --- | --- | --- | --- |
-| AP-1 | [`thomasklemm/journey-format-join-literals`](https://github.com/thomasklemm/rails/tree/thomasklemm/journey-format-join-literals) [`bb4740730b`](https://github.com/thomasklemm/rails/commit/bb4740730bf2c316c8284ec939aae187795bc576) | `post_path(post)` 34,526 → 32,587 (−5.6%) / 15,567 → 14,985 (−3.7%) / 19,840 → 18,595 (−6.3%) | L1 |
-| AP-2 | [`thomasklemm/all-renderers-without-union`](https://github.com/thomasklemm/rails/tree/thomasklemm/all-renderers-without-union) [`1042902003`](https://github.com/thomasklemm/rails/commit/1042902003b5b96edef28f9c118ae1eba6dda9c4) | renderer check of a template render 11,497 → 7,568 (−34%) / 9,237 → 5,314 (−42%) / 9,443 → 5,396 (−43%) | L0/L1 |
+| AP-1 | [`thomasklemm/journey-format-join-literals`](https://github.com/thomasklemm/rails/tree/thomasklemm/journey-format-join-literals) [`b86b5887b3`](https://github.com/thomasklemm/rails/commit/b86b5887b3bb81f6666eb3b7f72fdeee79149de3) (#59619) | `post_path(post)` 34,472 → 31,855 (−7.6%) / 15,571 → 14,840 (−4.7%) / 19,843 → 17,634 (−11.1%); 7 → 6 objects | L1 |
+| AP-2 | [`thomasklemm/all-renderers-without-union`](https://github.com/thomasklemm/rails/tree/thomasklemm/all-renderers-without-union) [`670e0c390f`](https://github.com/thomasklemm/rails/commit/670e0c390f848f178bc211fc0c6ad0dd086253de) (#59620) | renderer check of a template render 11,497 → 7,568 (−34%) / 9,237 → 5,314 (−42%) / 9,443 → 5,396 (−43%) | L0/L1 |
 
 Both are one commit on rails/rails main `9b116f1fed`, which was still main at the last fetch (2026-11-04), with no
 later commits to either file. Neither changes a public method or any output. Searches of open and closed PRs and
 issues (`Journey::Format`, `Format#evaluate`, `journey format`, `_all_renderers`, `renderers`, `use_renderers`)
-found nothing overlapping. amatsuda's "Reduce allocations across URL generation" (#59058, merged 2026-10-13) made
+found nothing overlapping. amatsuda's "Reduce allocations across URL generation" (#59058, merged 2026-10-15) made
 `evaluate` append into one buffer; AP-1 builds on that by giving it fewer, longer literals to append. #57830 (merged
 2026-07-07, unreleased) introduced the per-render union that AP-2 skips.
 
@@ -144,6 +145,83 @@ Interpreted railsbench and lobsters move by more than their A/A; the YJIT runs a
   `chunk`/`flat_map`, the second cold read was L1 on the first read, and its one suggestion (make both branches
   arrays) was taken.
 
+### AP-1 rework after opening
+
+Sol's review (open after fixes) asked for tests, the block form, a narrower exactness claim and a shorter body;
+those went into head `5bce8c7450`, opened as #59619. Thomas then found the `chunk`/`flat_map` line hard to read and
+asked for a plainer `Format` overall; he set the PR to draft. His shape, measured against the each/return variant:
+
+```ruby
+def initialize(parts)
+  @parts      = join_adjacent_literals(parts)
+  @parameters = @parts.grep(Parameter)
+end
+
+protected def add_to(buffer, hash)
+  return if @parameters.any? { |parameter| hash[parameter.name].nil? }
+  # @parts loop unchanged
+end
+
+private
+  # Joins adjacent literals, so "/", "posts", "/" is appended as one "/posts/".
+  def join_adjacent_literals(parts)
+    parts.each_with_object([]) do |part, joined|
+      if String === part && String === joined.last
+        joined[-1] = -(joined.last + part)
+      else
+        joined << part
+      end
+    end
+  end
+```
+
+* `@children` was assigned and never read (the `children` readers in `nodes/node.rb` belong to the AST nodes);
+  no `instance_variable_get` of it in Action Pack, Action View or Railties.
+* `@parameters` holds the Parameter objects instead of indexes into `@parts` (`grep` uses `===`, as the old
+  `when Parameter` did; same order, same nil checks in the same order).
+* A lone literal is now kept as the parser's own (already interned) string, as on main.
+
+**Out loud.** Join neighbouring literals into one; remember which parts are parameters. When generating, give up
+if any parameter has no value; otherwise append each part.
+
+Generation, Ir per call (median of 3, A/A ≤ 0.2%; `cur` is the opened `5bce8c7450`, `loop` keeps
+`@parameters.each { return if … }` over the objects):
+
+| Call | Mode | main | cur | loop | `any?` (final) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `post_path` | interp 4.0.9 | 34,472 | 32,553 | 32,354 | 31,855 (−7.6%) |
+| | YJIT 4.0.9 | 15,571 | 14,987 | 14,908 | 14,840 (−4.7%) |
+| | ZJIT master | 19,843 | 18,608 | 18,515 | 17,634 (−11.1%) |
+| `posts_path` | interp 4.0.9 | 26,305 | 25,332 | 25,218 | 24,707 (−6.1%) |
+| | YJIT 4.0.9 | 11,959 | 11,683 | 11,633 | 11,258 (−5.9%) |
+| | ZJIT master | 14,638 | 14,002 | 13,979 | 13,023 (−11.0%) |
+| `post_comment_path` | interp 4.0.9 | 44,851 | 40,931 | 40,650 | 40,122 (−10.5%) |
+| | YJIT 4.0.9 | 20,254 | 19,127 | 19,000 | 19,273 (−4.8%) |
+| | ZJIT master | 26,717 | 24,211 | | 23,254 (−13.0%) |
+| `root_path` | interp / YJIT 4.0.9 | 22,218 / 10,390 | | | 22,165 / 10,334 (−0.2% / −0.5%) |
+
+`any?` is faster than the loop because the loop's `return` from inside the `each` block is a non-local return,
+which allocates whenever it is taken: on main and `loop`, every skipped optional group (here `(.:format)`) costs one
+object. Objects per call: `post_path` 7 → 6, `posts_path` 6 → 5, `post_comment_path` 8 → 7. Wall time
+(`post_path`, 15 rotated pinned rounds, median): 4,336 → 3,988 ns interpreted (−8.0%, A/A +0.1%), 2,005 → 1,880 ns
+with YJIT (−6.2%, A/A −0.5%). The only regression against `loop` is YJIT `post_comment_path` (+1.4%); kept for the
+clearer form and the gain everywhere else.
+
+Construction ([`fmt_build.rb`](../../bench/upstream/actionpack_request_path/fmt_build.rb), 1,500 resources-style
+paths): Ir per route 63,754 (main) → 123,622 (`cur`) → 75,792 (final, +19%); about 8 → 10 µs per route, so about
+3 ms of boot for 1,500 routes; objects per route 25 → 83 → 34. Bytes reachable from the formats (arrays, formats,
+strings; shared objects once) 536 → 554 → 344 per route: the index arrays are gone and `@parts` is shorter.
+
+Checks: `diff_fmt.rb` identical to main in all six modes (1,401 lines); the new route tests, the Journey tests
+(201 runs), Action Pack (4,508 runs) and Action View (3,390 runs) green; RuboCop clean. Metrics: `initialize` flog
+6.5 → 2.8, ABC 6.56 → 2.83; `add_to` flog 20.2 → 18.4, ABC 13.15 → 12.25; new `join_adjacent_literals` flog 10.8,
+ABC 9.7, cyclomatic 4, perceived 5 (the two-way branch is the change itself). Cold read L1 on the first read; its
+two pauses (`@children` gone, lone literals not re-interned) are answered above. No new Sol round: the code is
+Thomas's shape.
+
+Unrelated, noted only: the commented-out `class String` visitor further down `visitors.rb` is dead code; a possible
+separate cleanup.
+
 ## AP-2: no Set union on every render
 
 **Site.** Since #57830, `ActionController::Renderers::All#_all_renderers` returns `_renderers + Renderers.all`,
@@ -247,55 +325,59 @@ A/A interpreted and about twice it with YJIT; lobsters (115 renders) and shipit 
 **Lead, not built:** `Mime::Type.parse` for a Firefox `Accept` header costs about 97k Ir (12 µs), 5.4% of a full
 request in the micro app. Worth a round of its own; it touches parsing and needs the adversarial path.
 
-**Side finding (Ruby master, not filed):** strscan 3.1.9.dev's `skip` returns nil instead of raising
-`Encoding::CompatibilityError` for a pattern in an incompatible encoding, so `Journey::Parser.parse` loops
-forever on master for UTF-16LE route paths and for invalid bytes in non-binary encodings (Ruby 4.0.9 raises).
-Affects main and both candidates equally.
+**Side finding (Ruby master, not filed; Thomas decides).** On Ruby master `9aa0898240` (strscan 3.1.9.dev),
+`StringScanner#skip` returns nil for a position that starts inside an invalid or misaligned character in a
+non-UTF-8 encoding, where strscan 3.1.6 (Ruby 4.0.9) raises. Minimal repro:
 
-## PR bodies (reviewed)
+```ruby
+require "strscan"
+[["/\xFF".dup.force_encoding("Shift_JIS"), "Shift_JIS"], ["/a".encode("UTF-16LE"), "UTF-16LE"]].each do |str, name|
+  s = StringScanner.new(str); s.pos = 1
+  p [name, (s.skip(/./) rescue $!.class)]
+end
+# master 9aa0898240 (strscan 3.1.9.dev): ["Shift_JIS", nil]            ["UTF-16LE", nil]
+# 4.0.9 (strscan 3.1.6):                 ["Shift_JIS", ArgumentError]  ["UTF-16LE", Encoding::CompatibilityError]
+```
 
-A separate reviewer checked both bodies against the source, this record and the body rules. Fixed from its
-review: AP-1's equivalence reason (`/` and `.` are the parser's own ASCII literals, not slices of the path), the
-ruby-bench noise call (YJIT railsbench is outside its A/A), the memory clause, and final-commit Ir numbers; AP-2's
-history (#57830 stopped mutating the Set; it was not the Ractor change), the breadth sentence, and deltas in the
-table. The census link points at this file, which reaches Lowrail main only when this branch merges.
+The same input in UTF-8 (`"/\xFF"`, pos 1) raises `ArgumentError` on both. Journey's scanner
+(`journey/scanner.rb`) advances past a static token with `pos += 1` and then relies on `skip(/./)` matching or
+raising, so `until token = scan || @scanner.eos?; end` spins forever: `Journey::Parser.parse` hangs on master for
+route paths such as `"/\xFF|bc"` in Shift_JIS or `"/a"` in UTF-16LE. Rails main and both candidates are equally
+affected. Open questions before filing: whether nil is intended (strscan treats "no match" as nil), and whether
+Rails should guard its loop instead.
 
-### AP-1 body
+## PR bodies
 
-Title: Join adjacent literals when building a route's path format
+As posted (AP-1 after the rework); the reviewed history of both is in [contributions](contributions.md).
 
-Generating a path walks the parts of the route's `Journey::Format` and appends each one to a buffer. The parser gives one part per token, so `post_path` appends `"/"`, `"posts"` and `"/"` separately on every call, and each nested resource adds three more. `Format#add_to` ranks 30th among Ruby methods by interpreted instructions in a CPU census of Rails apps on main, and runs in 19 of the 20.
+### AP-1
 
-This joins each run of adjacent literals once, when the format is built, into one frozen, deduplicated string; formats keep about 49 more bytes per route. Generated URLs don't change: every literal is the parser's ASCII `/` or `.` or a slice of the route's path, and parameters are escaped to ASCII, so appending the joined string gives the same bytes and encoding as appending its pieces. A route that is one literal, like `root_path`, is unchanged.
+`Journey::Format` now joins each run of adjacent literals once, when the route is built, so generating `/posts/:id` appends `"/posts/"` instead of `"/"`, `"posts"` and `"/"`. It also keeps its parameters themselves instead of their indexes and checks them with `any?`: on main, returning from the `each` block allocated an object whenever an optional group like `(.:format)` was skipped. The unused `@children` is gone.
 
-`post_path(post)`, per call on Ruby 4.0.9:
+URLs generated from Rails-built routes are unchanged: the parser's literals are its ASCII `/` and `.` or slices of the route path, so the joined string has the same bytes and encoding. Hand-built `Format.new` arrays could notice the new internal `@parts` (mutating the input afterwards, mixed-encoding literals failing at construction, String subclasses normalised). Building a format costs about 19% more instructions (2 µs per route); formats retain less memory than before.
 
-| | main | A/A | this |
-| --- | ---: | ---: | ---: |
-| objects | 7 | | 7 |
-| interpreter ns | 4,440 | −1.4% | 4,226 (−4.8%) |
-| YJIT ns | 2,037 | +2.4% | 1,955 (−4.1%) |
-| interpreter instructions | 34,528 | 0.00% | 32,586 (−5.6%) |
-| YJIT instructions | 15,565 | +0.23% | 14,994 (−3.7%) |
+`post_path(post)` per call, Ruby 4.0.9:
 
-`posts_path` drops 3.7% interpreted and 2.7% with YJIT (instructions). In ruby-bench, railsbench drops 0.3% interpreted and 0.1% with YJIT (A/A 0.13% and 0.03%) and interpreted lobsters 0.2% (A/A 0.04%); the other runs are within noise. I found this with the CPU census of [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md), my research project.
+| | main | this |
+| --- | ---: | ---: |
+| objects | 7 | 6 |
+| interpreter | 4,336 ns, 34,472 instructions | 3,988 ns (−8.0%), 31,855 (−7.6%) |
+| YJIT | 2,005 ns, 15,571 instructions | 1,880 ns (−6.2%), 14,840 (−4.7%) |
 
-### AP-2 body
+`posts_path` saves 6.1% / 5.9% of instructions; `root_path` (one literal) is unchanged. Measured with Lowrail, my research project ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md#ap-1-join-adjacent-literals-when-building-a-routes-format)).
 
-Title: Don't build a Set of renderers on every render
+### AP-2
 
-`render_to_body` checks every renderer in `_all_renderers` on every render, template renders included, for an option such as `json:`. Since #57830 (unreleased) stopped mutating the renderers Set, `_all_renderers` returns `_renderers + Renderers.all`. In a controller that never calls `use_renderers`, `_renderers` is empty, so each render copies the built-in renderers into a new Set.
+When a controller has no local renderers, `_all_renderers` now returns `Renderers.all` itself instead of building `_renderers + Renderers.all`, an identical copy, on each render. Controllers with `use_renderers`, and their subclasses, still get the union with their renderers first.
 
-When `_renderers` is empty, this returns `Renderers.all` itself, which has the same renderers in the same order. It is frozen, and `add`/`remove` replace it rather than change it, so nothing can modify the shared Set through the result. Controllers with their own renderers still get the union.
+#57830 worked toward Ractor safety by replacing the registry with a new frozen Set on every `add` and `remove`, so the result has the same renderers in the same order and stays a snapshot while it is iterated. One contract changes: on this path the internal method returns the shared frozen registry rather than a fresh Set, so an override calling `super.delete(:json)` would raise `FrozenError`. Rails only iterates the result, and the union is unreleased.
 
-Per call on Ruby 4.0.9, as template-render check / `render json:`:
+Per call in a controller without local renderers, Ruby 4.0.9:
 
-| | main | A/A | this |
-| --- | ---: | ---: | ---: |
-| objects | 3 / 9 | | 2 / 8 |
-| interpreter ns | 1,354 / 3,928 | +1.8% / −0.9% | 801 (−41%) / 3,274 (−17%) |
-| YJIT ns | 1,165 / 2,658 | −1.2% / −0.8% | 552 (−53%) / 2,001 (−25%) |
-| interpreter instructions | 11,497 / 26,379 | +0.18% / −0.12% | 7,568 (−34%) / 22,369 (−15%) |
-| YJIT instructions | 9,237 / 16,905 | −0.30% / −0.36% | 5,314 (−42%) / 12,914 (−24%) |
+| | main | this |
+| --- | ---: | ---: |
+| renderer check of a template render, interpreter / YJIT | 1,354 / 1,165 ns | 801 / 552 ns |
+| `render json:`, interpreter / YJIT | 3,928 / 2,658 ns | 3,274 / 2,001 ns |
+| objects, check / `render json:` | 3 / 9 | 2 / 8 |
 
-Every render saves about 3,900 instructions, 0.4% (interpreter) to 0.9% (YJIT) of a minimal JSON request. ruby-bench bundles Rails 8.1, so I patched the touched method with main's and this PR's bodies: railsbench drops 0.1% interpreted and 0.3% with YJIT (A/A 0.05% and 0.16%); lobsters and shipit are within noise. The line runs in 19 of 20 apps in the CPU census of [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md), my research project.
+Tests cover Base and API without local renderers, inherited local renderers, and renderers added or removed between renders. Measured with Lowrail, my research project ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md#ap-2-no-set-union-on-every-render)).
