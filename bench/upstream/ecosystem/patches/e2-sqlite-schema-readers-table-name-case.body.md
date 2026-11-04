@@ -1,6 +1,10 @@
 ### Find SQLite tables by any ASCII case of their name in the schema readers
 
-2cb3daba96 batched the SQLite schema readers. They now filter `sqlite_master` with `m.name IN (...)` and key the rows by the stored name. The `pragma table_info(name)` calls they replaced matched names the way SQLite does, ignoring ASCII case. So a model whose `table_name` is `"widgets"` can no longer read a table created as `Widgets`; ransack's suite hits this on `create!`.
+2cb3daba96 batched the SQLite schema readers. They now filter `sqlite_master` with `m.name IN (...)` and key the rows by the stored name. The `pragma table_info(name)` calls they replaced matched names the way SQLite does, ignoring ASCII case. So a model whose `table_name` is `"widgets"` can no longer read a table created as `Widgets`. ransack's suite hits this in [`context_spec.rb` on ransack main @ fbc3baf, lines 73–81](https://github.com/activerecord-hackery/ransack/blob/fbc3baf164da2a80435d5678a77924c66472f694/spec/ransack/active_record/context_spec.rb#L73-L81) (the spec is newer than ransack 6.0.1), at:
+
+```ruby
+            Widget.create!(name: 'sprocket')
+```
 
 Reading table `Widgets` (and view `WidgetsView`) by lowercase name, as in the test:
 

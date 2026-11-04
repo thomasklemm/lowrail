@@ -13,4 +13,4 @@ The list now takes a permanent table or view only when no temporary table or vie
 
 ---
 
-<sub>Found while fixing the table-name case lookup in the same readers, which ransack's suite hit on Rails main ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-tests.md), part of my research project Lowrail).</sub>
+<sub>Found while fixing the table-name case lookup in the same readers, which [ransack's suite](https://github.com/activerecord-hackery/ransack/blob/fbc3baf164da2a80435d5678a77924c66472f694/spec/ransack/active_record/context_spec.rb#L73-L81) hit on Rails main ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-tests.md), part of my research project Lowrail).</sub>
