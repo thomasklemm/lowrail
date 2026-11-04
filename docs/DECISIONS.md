@@ -104,7 +104,7 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Cross-link interlocking changes in the body** (Thomas): one sentence with owner/repo (e.g. rails/rails#59557 ↔
   ruby/ruby#19662), updated when the other side moves, never as an extra comment. Every cross-repo reference
   carries owner/repo; link branches instead of naming them.
-* **rails/rails body,** about 150 words, no headings, no template checklist. Paragraph 1: what is wasted and where
+* **rails/rails body,** about 180 words, no headings, no template checklist. Paragraph 1: what is wasted and where
   it runs. Paragraph 2: what changes and the one boundary a reviewer would ask about. Then one per-call
   before/after table: objects, and CPU in ns and Ir for interpreter and YJIT on the Ruby pin, with its A/A. One
   sentence of ruby-bench placement ("within noise" is fine) and app breadth; one sentence on how the site was
@@ -235,7 +235,7 @@ Thomas, after reading all of today's Rails PRs: "Beschreibungen könnten etwas k
 A human reviewer has to get the essence in a few seconds.
 
 * **Shape:** the first sentence says what changes, the second why it is safe or what it fixes. Then one small
-  table or a single line of numbers. Aim for about 120 words in total; above 150 needs a reason.
+  table or a single line of numbers. Aim for about 180 words in total, table and code names included (Thomas, on #59617); well above that needs a reason.
 * **Scope caveats** take one clause each, not a paragraph. Methodology, A/A values, rejected variants and
   differential sizes stay in the Lowrail doc, or go in a `<details>` block at the end if a reviewer will want them.
 * Sol's and the outsider's wording fixes are made by shortening the text, not by adding to it.
