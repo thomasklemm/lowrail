@@ -263,6 +263,14 @@ schema dumper/migration/defaults 179 runs green, RuboCop clean; Forem's schema t
 [patch](../../bench/upstream/app_suites/f1-pg-extension-array-default.patch),
 [body](../../bench/upstream/app_suites/f1-body.md). Branch `thomasklemm/pg-extension-array-default` @ `2a4e5c1ebc` on
 main `7a78da5a55` (rechecked on the freshly fetched main, which is still `7a78da5a55`).
+**Held: covered by open [#57785](https://github.com/rails/rails/pull/57785) (yes).** That PR (Halvanhelv, head
+`157169cb29`, last updated 2026-09-27, for #52944's cross-database schema cache) makes `lookup_cast_type` resolve
+through `get_oid_type`, the same change. On main `7a78da5a55` its `quoting.rb` hunk and tests apply cleanly; the
+`model_schema.rb` hunk and the CHANGELOG conflict with main, so the `type_for_column` fallback was ported by hand
+unchanged. With it: our `ltree_test.rb` test passes (ltree, citext, hstore and enum tests 83 runs, 0 F); the repro
+creates ltree[], citext[] and hstore[] columns with defaults (`{a.b}`, `{A}`, the hstore literal); Forem's
+`db:schema:load` loads all 135 tables, with `target_geolocations` defaulting to `'{}'::ltree[]`. Our branch stays
+unopened; the body carries Sol's nits in case it is ever needed on its own.
 
 **FO1 (c): flipper-active_record 1.4.2 passes the table name positionally.** [`::Arel::Table.new(@feature_class.table_name.to_sym)`](https://github.com/flippercloud/flipper/blob/50a8207ada6c93fd4c29bcee683660b7351647a7/lib/flipper/adapters/active_record.rb#L106)
 (v1.4.2) raises `wrong number of arguments` since b1650993b0 (#57829, `Arel::Table` is `:nodoc:`). 163 failures,
