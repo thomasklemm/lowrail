@@ -333,14 +333,36 @@ printf -- '---\n' > .bundle/config && bundle _4.0.23_ config                    
 ## CASA: ZJIT segmentation fault (intermittent)
 
 One of two trace passes over CASA crashed (`f1t1`; `f1t2` and the allocation passes passed):
-`[BUG] Segmentation fault at 0x0` in `vm_lookup_cc` → `rb_managed_id_table_lookup` (`RTYPEDDATA_GET_DATA` on a
-null class cc table), from the interpreter's `opt_nil_p` inside the `each_pair` block of
-`action_view/helpers/tag_helper.rb:1585` (`tag_options`). Flags: `--zjit --zjit-stats-quiet --zjit-trace-exits
---zjit-trace-exits-sample-rate=20 --zjit-trace-fallbacks-sample-rate=20`, default memory. Trimmed report:
-[data/frontier-census-f1/casa-zjit-segv.log](data/frontier-census-f1/casa-zjit-segv.log). Not reproduced on
-demand yet; no matching Shopify/ruby or ruby/ruby issue found. Unowned; it needs a reproduction before it can be
-reported.
+`[BUG] Segmentation fault at 0x0` in `vm_lookup_cc` → `rb_managed_id_table_lookup` (`RTYPEDDATA_GET_DATA`), from the
+interpreter's `opt_nil_p` inside the `each_pair` block of `action_view/helpers/tag_helper.rb:1585` (`tag_options`),
+rendering `case_contacts/index.html.erb:67` through filterrific's form helpers. Flags: `--zjit --zjit-stats-quiet
+--zjit-trace-exits --zjit-trace-exits-sample-rate=20 --zjit-trace-fallbacks-sample-rate=20`, default memory, so the
+64 MiB executable region was full by then (CASA's twin run `f1t2` counted 3,514 `compile_error_out_of_memory` per
+op). Trimmed report: [data/frontier-census-f1/casa-zjit-segv.log](data/frontier-census-f1/casa-zjit-segv.log).
 
+**What the registers say.** The faulting load reads through `RDI = 0x6361662f63657073`, which is ASCII
+(`"spec/fac"` little-endian), not a null pointer. The class pointer of the receiver `opt_nil_p` dispatched on led
+into string bytes: the receiver's slot was most likely freed and reused while it was still reachable from the
+options Hash or a frame, that is, a missed GC mark or a stale reference after a move. A wrong method-cache lookup
+alone would not produce text there. This is an inference from one report; it is not confirmed.
+
+**Reproduction attempts (2026-11-04, about two hours, Ruby `9aa0898240`, Rails `c042aee23a`):** none crashed.
+
+| Attempt | Flags beyond the crash's flags | Result |
+| --- | --- | --- |
+| CASA, all workloads, 200 warmup + 20 ops | none (same flags) | clean |
+| same | `--zjit-exec-mem-size=8` (out of code memory early) | clean |
+| same | `--zjit-call-threshold=1` | clean |
+| same | full GC every 5 ms from a thread ([gc-pressure.rb](data/frontier-census-f1/gc-pressure.rb)) | clean (25 min timeout) |
+| same | full GC every 20 ms | clean (22 min timeout) |
+| same | `GC.compact` every 50 ms | clean (25 min timeout) |
+| `tag_options` micro ([casa-tag-options-micro.rb](data/frontier-census-f1/casa-tag-options-micro.rb)), threshold 1 | `GC.stress` every 50 iterations | clean |
+| micro, 200,000 iterations | full GC every 5 ms; `GC.compact` every 50 ms; 2 MiB code region with GC every 10 ms | clean |
+
+Counted together with the census passes, CASA crashed in 1 of 15 ZJIT processes (9 census passes, 6 attempts). Not reportable without a
+reproduction. Next steps if it is picked up again: a debug build of the same SHA (`cppflags=-DRUBY_DEBUG=1`) or
+`GC.verify_internal_consistency` around `tag_options`, and repeated CASA runs with the original flags at
+default memory, since the one crash had its code region full.
 
 ## Overlays after this run
 
