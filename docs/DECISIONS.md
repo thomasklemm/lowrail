@@ -124,6 +124,8 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
 * **Thomas owns the ruby/ruby review conversation** (Thomas). No LLM attribution, and only work he can explain in
   every detail, as the ZJIT team asks ("stand behind your contribution as if unaided"). He answers reviews himself
   or approves every answer before it is posted. This is the precondition for lifting the ruby/ruby stop.
+  Update (Thomas, 2026-11-04): the coordinator may post focused, reviewed replies and body updates on ruby/ruby
+  himself and tells Thomas afterwards, each with a short explanation Thomas can retell.
 * **Ask on the tracker before ZJIT design changes** (Thomas). Profiling, speculation, invalidation, recompile
   policy, new per-ISEQ state, new HIR instructions, or more than about 150 lines: first a Shopify/ruby issue with
   one concrete ask and the data, then a PR once the team says go. This narrows "well-reviewed PRs over issue
