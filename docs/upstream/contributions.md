@@ -168,7 +168,6 @@ Aufrufe zählt.
 stmt.types.map { |t| type_map.lookup(t) }          # vorher: type_map bei jeder Spalte
 result_type_map = type_map                          # jetzt: einmal pro Ergebnis
 stmt.types.map { |t| result_type_map.lookup(t) }
-=======
 ### Erklärung für Thomas: TH-1 (2026-11-04, Action View; nicht geöffnet)
 
 Aufzeichnung, Belege und PR-Text: [census-backlog](census-backlog.md#th-1-restore-the-template-handler-lookup-methods).
@@ -183,7 +182,6 @@ weiterreichen und für jede getestete Eingabe dasselbe liefern wie Rails 8.1; am
 ```ruby
 ActionView::Template.registered_template_handler(:erb)   # 8.1: der ERB-Handler, main: NoMethodError
 ActionView::Template::Handlers.template_handlers[:erb]   # neu: genau das macht die Methode jetzt
->>>>>>> origin/census-backlog
 ```
 
 ### Erklärungen für Thomas: T1 und T2 (2026-11-04, Action View; T1 geöffnet als #59603, T2 als Lead geparkt)
