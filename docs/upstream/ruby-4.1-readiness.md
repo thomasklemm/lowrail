@@ -104,8 +104,9 @@ URI RFC3986 and CGI deprecation warnings also show on 4.0.9 with `-w`, so they a
   `00339f7e89` on `9b116f1fed`) ([patch](../../fixtures/corpus/ruby-41-readiness/rails-declare-prism-dependency.patch)).
 * **Why both gemspecs:** railties gets prism through actionpack → actionview anyway. But railties requires prism
   itself (`test_parser.rb`, `source_annotation_extractor.rb`), and Rails declares each gem's direct requires, as it
-  did for `cgi` (in actionview, actionpack and railties) and for tsort and irb.
-* **Why no version:** this matches `base64`, `drb`, `bigdecimal`, `json` and `cgi`. Every API Rails calls already
+  does for tsort and irb in railties.
+* **Why no version:** this matches Active Support's unversioned `base64`, `drb`, `bigdecimal` and `json`. (Not
+  `cgi`: #55037 removed that dependency; and tsort is declared `>= 0.2`. The first body cited both, wrongly.) Every API Rails calls already
   exists in prism 0.19.0, the version Ruby 3.3 ships. `Template#spot` needs 1.0 and already checks
   `Prism::VERSION`. None of prism 2.0's breaking changes touch these APIs.
 * **Why not `Ruby::Prism`:** only `Template#spot` uses it, to match the nodes error_highlight reports. Using it in
@@ -124,7 +125,7 @@ URI RFC3986 and CGI deprecation warnings also show on 4.0.9 with `-w`, so they a
   lockfile on their next update. That doesn't by itself force a compile, because Bundler can use the installed
   default gem; an online resolve may pick a newer release, and prism 2.1 has precompiled platform gems. JRuby and
   TruffleRuby use prism's FFI backend and build libprism only on a source install.
-* **Version:** unversioned, like `cgi`, `tsort` and `base64`. Sol rates a `>= 0.19.0` floor low severity and
+* **Version:** unversioned, like Active Support's `base64`, `drb`, `bigdecimal` and `json`. Sol rates a `>= 0.19.0` floor low severity and
   optional; offer it if a maintainer asks.
 * **Review:**
   * Readability gate: L0 (four lines in the existing pattern).
@@ -137,16 +138,26 @@ URI RFC3986 and CGI deprecation warnings also show on 4.0.9 with `-w`, so they a
     in the rewritten commit message and body.
   * Preflight before opening: main refreshed to `1ca7528bac` (no change to the three files), rebased,
     `bundle lock --local` reproduces the lockfile byte for byte, no overlapping PR or issue.
+  * Second review after opening (Thomas asked; an Opus subagent and Astra via Codex): both keep the code. The Opus
+    subagent reproduced the `LoadError` on master in a scratch app and regenerated the lockfile byte for byte. The
+    body was then rewritten (by the coordinating thread, not here); the commit stays `4a837183ea`. Changes: the
+    `cgi`/`tsort` precedent replaced by Active Support's unversioned gems; how narrow the gap is (irb ≥ 1.17,
+    minitest 6, rdoc 8 and rubocop-ast bring prism in on a fresh resolve, so only lockfiles without any of them
+    break; released 8.1 isn't affected); the ticket cited as `a1efb9ae6b` plus ruby-lang #22379 without a
+    Bug/Feature label, because NEWS.md says Bug and the tracker says Feature.
+* **Follow-up lead (not built):** Rails CI tests only prism 1.9.0, the version in Rails' `Gemfile.lock`, while an
+  app without a constraint resolves prism 2.x (2.1.0 on master and 4.0.9 here). We checked `RenderParser` output
+  under 1.9.0 and 2.1.0 once by hand; nothing in Rails CI keeps checking 2.x.
 * **Upstream search:** nothing covers this. Related but different: #59213 and #59217 (where prism loads), #59034
   (`Ruby::Prism` in `spot`), #59465 and #47442.
 
-### R1 body, as opened: Declare Prism dependencies in Action View and Railties
+### R1 body, current (edited after the second review): Declare Prism dependencies in Action View and Railties
 
-> Ruby master, targeting 4.1, changes prism from a default gem to a bundled gem ([Feature #22379](https://bugs.ruby-lang.org/issues/22379)), so under Bundler `require "prism"` only works when prism is in the bundle. #56631 removed the Ripper fallbacks because Ruby 3.3 ships prism as a default gem, so Action View and Railties now require prism without declaring it.
+> Ruby master, targeting 4.1, turns prism from a default gem into a bundled gem (ruby/ruby@a1efb9ae6b, [ruby-lang #22379](https://bugs.ruby-lang.org/issues/22379)), so under Bundler `require "prism"` only works when prism is in the bundle. #56631 removed the Ripper fallbacks because Ruby 3.3 ships prism as a default gem, so Action View and Railties now require prism without declaring it.
 >
-> Unless another gem brings prism into the bundle, `ActionView.eager_load!` and Ruby-based dependency tracking raise `LoadError` on Ruby master, as do the test runner and `bin/rails notes` when they run.
+> Most apps get prism indirectly today, since irb >= 1.17, minitest 6, rdoc 8 and rubocop-ast depend on it. An app whose lockfile has none of them, for example one with an older irb locked, gets a `LoadError` on Ruby master from `ActionView.eager_load!` and Ruby-based dependency tracking, and from the test runner and `bin/rails notes` when they run. Released 8.1 still has the Ripper fallback and isn't affected.
 >
-> This declares `prism` in both gemspecs, since each requires it directly, without a version, as Rails does for `cgi` and `tsort`. `Template#spot` keeps its `Ruby::Prism` handling.
+> This declares `prism` in both gemspecs, since each requires it directly. It is unversioned, as Active Support does for `base64`, `drb`, `bigdecimal` and `json`, so the default gem on Ruby 3.3 to 4.0 keeps satisfying it. `Template#spot` keeps its `Ruby::Prism` handling.
 
 ## Ruby-side findings for Thomas
 
