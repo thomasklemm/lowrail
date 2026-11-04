@@ -11,4 +11,4 @@ Reading table `Widgets` (and view `WidgetsView`) by lowercase name, as in the te
 | `indexes` / `foreign_keys` | 1 / 1 | 0 / 0 | 1 / 1 |
 | view `columns` | id | StatementInvalid | id |
 
-The readers now match with `COLLATE NOCASE`, then give each requested name the rows of its table, so a batch that names one table twice gets both. NOCASE folds only ASCII, like SQLite identifiers, so `Ärger` and `ärger` stay two tables.
+The readers now match with `COLLATE NOCASE`, then give each requested name the rows of its table, so a batch that asks for two ASCII-case spellings of the same table gets both. NOCASE folds only ASCII, like SQLite identifiers, so `Ärger` and `ärger` stay two tables.
