@@ -19,6 +19,7 @@ overridden `primary_key` (#59622).
 | Solidus `ed00fc8` | core rspec, 4487 examples; api rspec, 684 examples; SQLite | clean ×2 (core and api) | core clean; api 1 F ×2 | SO1 (b) |
 | Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, record only), SU3–SU5 (b/c) |
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
+| Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
 
 ## Findings
 
@@ -215,3 +216,103 @@ in propshaft 1.3.2. Fixed on propshaft main, unreleased:
 "Don't use Mime::EXTENSION_LOOKUP directly"). An app on propshaft ≤ 1.3.2 that disallows this warning
 would raise in asset lookups. Record only; propshaft needs a release before Rails 8.2. The only
 other deprecation, `config.active_support.to_time_preserves_timezone`, prints on both sides.
+
+## Forem
+
+forem/forem `5f0276d` (default branch `main`,
+[`5f0276dce1`](https://github.com/forem/forem/tree/5f0276dce15e3859f7bf4d39c5460efbdc398288)), Ruby 3.3.13 (Forem
+pins 3.3.0; main needs ≥ 3.3.5), PostgreSQL 15.19 with pgvector 0.8.1, Redis 7, headless Chrome 157 for the 77
+system spec files. Rails main `7a78da5a55` for every run, the fix branch and the bisects; 8-1-stable `6e09124217`.
+Full rspec suite, 1394 files and 16542 examples, in 4 processes with one database and Redis db each, `--seed 4242`,
+files split by size (about 30 minutes of CPU, 9 minutes wall per run). Forem's test env raises on deprecations;
+both trees keep that and only log Devise 4.9.4's route mapper warning ("received a hash argument … removed in Rails
+8.2"), which both trees emit.
+
+**Lockfiles.** Forem locks Rails 8.0.5. The 8-1 lock comes from `bundle lock --conservative --update rails`, which
+also moved action_text-trix, jbuilder, loofah, metainspector, nokogiri and rails-html-sanitizer. Both locks then took
+four bumps, each to the lowest version that works. The main lock was resolved from the 8-1 lock and differs only in
+the Rails gems and what main itself requires (herb 0.11.1, marcel 2.1.0, ractor-dispatch 0.3.0). Only main needs the
+four bumps, so each is (c):
+
+| Bump | Why main needs it | 8-1 |
+|---|---|---|
+| amazing_print 2.0.0 → 3.0.0 (Gemfile `~> 3.0`) | 2.0.0 reads `LogSubscriber.colorize_logging` at load, so boot fails (E3, our #59628) | boots with 2.0.0 |
+| bullet 8.1.3 → 8.3.0 | 8.1.3 raises "Bullet does not support active_record 8.2.0.alpha"; 8.3.0 is the first with `active_record82` | 8.1.3 fine |
+| carrierwave 3.1.3 → 3.1.4 | 3.1.3 pins `marcel ~> 1.0.0`, main's activestorage needs marcel 2 | 3.1.3 fine |
+| rspec-rails 6.1.1 → `570b2b0a79` (git, pulls rspec 3.13) | L1: 11 mailer spec files fail to load with `FrozenError`; the ref also has the `_prefixes` fix | 6.1.1 fine |
+
+**Main checkout only, app side** (each one otherwise stops boot, so the whole suite):
+[`require_dependency`](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/config/initializers/devise.rb#L2)
+→ `require` in 8 files (deprecated, CHANGELOG); [`rescue_from ActionController::InvalidAuthenticityToken`](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/app/controllers/application_controller.rb#L50)
+→ `InvalidCrossOriginRequest` (deprecated constant, raises at class load); and the FO2 shim below. The main test
+databases are copies of the 8-1-loaded schema, because F1 stops `db:schema:load` on main.
+
+Results: 8-1 5 F and 5 F (4 shared, one flaky each: `award_thumbs_up_spec`, `local_redis/sync_spec`); main 1695 F,
+of which 1690 never fail on 8-1. Every one is classified below; F1 is the only (a).
+
+**F1 (a): array columns of extension types with a default can't be created.** Forem's
+[`t.ltree "target_geolocations", default: [], array: true`](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/db/schema.rb#L727)
+stops `db:schema:load` at `display_ads` with `TypeError: can't quote Array`; `citext[]` and `hstore[]` fail the same
+way. Bisected to e8af4f09a2 ("Use well-known PG OIDs while defining built-in coders", #57013, merged as ca86130159):
+the type map now loads OIDs on demand, and `lookup_cast_type` returns `ActiveModel::Type::Value` for an OID it hasn't
+loaded. Not in S1–SU5, R2-x, E1–E4 or AR-1–AR-4; no issue or PR found. Repro:
+[pg_extension_array.rb](../../bench/upstream/app_suites/pg_extension_array.rb) (an enum array default fails on both
+trees and is not part of this). Fix: load the OID first when the type map lacks it, as `get_oid_type` does; one test
+in `ltree_test.rb` that fails on main with the `TypeError`. PostgreSQL adapter and migration tests 1587 runs green,
+schema dumper/migration/defaults 179 runs green, RuboCop clean; Forem's schema then loads all 135 tables.
+[patch](../../bench/upstream/app_suites/f1-pg-extension-array-default.patch),
+[body](../../bench/upstream/app_suites/f1-body.md). Branch `thomasklemm/pg-extension-array-default` @ `2a4e5c1ebc` on
+main `7a78da5a55` (rechecked on the freshly fetched main, which is still `7a78da5a55`).
+
+**FO1 (c): flipper-active_record 1.4.2 passes the table name positionally.** [`::Arel::Table.new(@feature_class.table_name.to_sym)`](https://github.com/flippercloud/flipper/blob/50a8207ada6c93fd4c29bcee683660b7351647a7/lib/flipper/adapters/active_record.rb#L106)
+(v1.4.2) raises `wrong number of arguments` since b1650993b0 (#57829, `Arel::Table` is `:nodoc:`). 163 failures,
+order-dependent: once `spec/initializers/flipper_spec.rb` reloads the initializer, every later request spec in that
+process fails in the memoizer's `preload_all`. Fixed on flipper main (`arel_table`), unreleased. Already covered by our
+open #59574: with it, flipper_spec plus `follows_bulk_show_spec` pass 8/8 with the deprecation warning. Not bisected.
+
+**FO2 (c)/(d): jsonapi-serializer 2.2.0 overrides `HasOne.define_accessors(mixin, reflection)`.**
+[has_one.rb#L7](https://github.com/jsonapi-serializer/jsonapi-serializer/blob/37235057df7f33a1561c3313eaac87d2549fdc55/lib/extensions/has_one.rb#L7)
+(v2.2.0, the last release, 2021; unchanged on its default branch). ddf56d4b43 (#59393) changed the private builder
+signature to `(model, reflection, mixin)`, so loading `User` raises `ArgumentError` and the app doesn't boot: the shim
+(main checkout only, an initializer that redefines the override with the new signature) hides all 16542 examples.
+Private API, so no Rails fix; the gem would need a release.
+
+**FO3 (b)+(d): Forem's `LocalRedisCacheStore` subclasses `RedisCacheStore` and uses redis-rb's API.**
+[`pipeline.eval(VALUE_AND_TTL, keys: [key])`](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/lib/active_support/cache/local_redis_cache_store.rb#L128)
+hits `RedisClient::Pipeline#eval` (private) since 5843a7b7f2 moved the store to redis-client (CHANGELOG): 49 failures
+in the store, `local_redis/sync` and `metrics` specs. [`bypass_local_cache`](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/lib/active_support/cache/local_redis_cache_store.rb#L39)
+is the private method removed in 4f594320e4 (R2-16): 3 more.
+
+**Deprecations that only main emits, raised by Forem's test env** (examples failing):
+* 1350: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` ``, from
+  [`skip_before_action :verify_authenticity_token`](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/app/controllers/api/v1/api_controller.rb#L9)
+  and 20 other controllers (31 of them show up as a 422 in `user_roles_spec`).
+* 67: `` Calling `protect_from_forgery` without specifying a strategy is deprecated `` (CHANGELOG), from
+  [omniauth_callbacks_controller.rb#L11](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/app/controllers/omniauth_callbacks_controller.rb#L11).
+* 33: `exec_update is deprecated` / `exec_delete is deprecated`, from
+  [billboard_event.rb#L56](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/app/models/billboard_event.rb#L56),
+  [article_activity.rb#L209](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/app/models/article_activity.rb#L209)
+  and [bulk_sql_delete.rb#L11](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/app/services/bulk_sql_delete.rb#L11)
+  (7 of them in `Organizations::DeleteWorker`, which rescues and reports the error).
+* 8: `ActionController::InvalidAuthenticityToken has been deprecated` (the app's other references, in
+  `metal_telemetry_fast_path.rb` and `valid_request.rb`).
+* 2 (c): `Mime::EXTENSION_LOOKUP is deprecated`, from Devise 4.9.4's
+  [`Mime::EXTENSION_LOOKUP[format.to_s]`](https://github.com/heartcombo/devise/blob/d5a48b49dcb95941f864180296ad68683e205edc/app/controllers/devise_controller.rb#L99);
+  fixed on Devise main, unreleased (5.0.4 still has it).
+* `Passing a Redis or ConnectionPool instance via the :redis configuration … is deprecated` fails one store spec,
+  counted in FO3.
+* Boot-level, worked around above: `require_dependency is deprecated` and `InvalidAuthenticityToken`.
+
+**The rest (15):**
+* 4 (b): `precision: nil` timestamps cast to microseconds (as in Mastodon); 1 (b): the enum `ArgumentError` lists the
+  valid values.
+* 2 (b): a null byte in a slug now raises `ActiveRecord::NullByteError` (a `StatementInvalid`), which Forem's
+  `rescue ArgumentError` no longer catches; the CHANGELOG says so.
+* 3 (b): `framework_defaults_spec` reads `ActionView::Helpers::UrlHelper.button_to_generates_button_tag` (now on
+  `NavigationHelper`, S2) and `raise_on_assign_to_attr_readonly` (deprecated, nil).
+* 1: E1 (`WeakSet` not required), in a spec that boots `descendants_tracker` on its own.
+* 3 (d): `ServerWarmup.preload_view_templates!` reads the resolver's private
+  [`@unbound_templates`](https://github.com/forem/forem/blob/5f0276dce15e3859f7bf4d39c5460efbdc398288/app/lib/server_warmup.rb#L247),
+  which main turns into a plain Hash after eager loading (25f2e02c9a, 2afdfaf660), so the warmup skips it.
+* 1 (d): `comment_creator_spec` checks that a delegator responds to every `Comment.instance_methods`, which now
+  includes the new protected `association_cache` (d432679e04).
