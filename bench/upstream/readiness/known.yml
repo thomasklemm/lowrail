@@ -1,0 +1,332 @@
+# Known findings for the readiness runner (docs/upstream/readiness.md). A flag matches the first entry whose
+# `suite` (anchored regex over manifest suite names), `signature` (regex over the normalized signature) and
+# optional `test` and `class` match. Status as of 2026-11-04, from docs/upstream/contributions.md:
+#   open-pr, merged, prepared (fix branch ready, not opened), issue (reported, no fix), record-only,
+#   gem-side (the fix belongs in the gem or app), noise (environmental or order-dependent on both trees).
+# Entries marked "unchecked" take their regex from the record's wording; no run has produced the signature yet.
+# Narrow them after the first run that does. IDs with a dash and a name (M-vary, eco1-…) are unnamed in the record.
+findings:
+  # App suites (docs/upstream/app-suites.md)
+  - id: S1
+    suite: redmine.*
+    signature: "No such middleware to insert before: Rack::Sendfile"
+    status: prepared
+    record: docs/upstream/app-suites.md
+    note: boot failure; upgrade-guide branch thomasklemm/upgrade-guide-rack-sendfile; unchecked
+  - id: S1
+    suite: redmine.*
+    test: test_download_should_set_sendfile_header
+    signature: "."
+    status: prepared
+    record: docs/upstream/app-suites.md
+    note: the Redmine test that stubs Rack::Sendfile#variation; unchecked
+  - id: S2
+    suite: (redmine|mastodon).*
+    signature: "undefined method 'link_to'"
+    status: prepared
+    record: docs/upstream/app-suites.md
+    note: UrlHelper-only includes lose link_to; upgrade-guide branch; unchecked
+  - id: L1
+    suite: (lobsters|mastodon).*
+    signature: "FrozenError: can't modify frozen Hash: \\{\\}"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: rspec-rails 8.0.x mutates the frozen default_url_options; fixed on rspec-rails main, unreleased
+  - id: L2
+    suite: lobsters.*
+    signature: 'UrlGenerationError: No route matches .*id: ""'
+    status: merged
+    record: docs/upstream/app-suites.md
+    note: positional URL helper with an empty to_param; fixed by rails/rails#59625 (c9fc37095f)
+  - id: SO1
+    suite: solidus.*
+    test: images_spec
+    signature: "."
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: attachments analyzed before validation under 8.2 defaults; unchecked
+  - id: R1
+    suite: mastodon.*
+    signature: filter_proxies
+    status: open-pr
+    record: docs/upstream/app-suites.md
+    note: rails/rails#59630 restores GetIp#filter_proxies; unchecked
+  - id: M1
+    suite: mastodon.*
+    signature: "build_bind_attribute|for an instance of String"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: PredicateBuilder#build_bind_attribute takes an Arel attribute; unchecked
+  - id: M-vary
+    suite: mastodon.*
+    signature: Sec-Fetch-Site
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: Sec-Fetch-Site CSRF protection appends to Vary; unchecked
+  - id: M-prefixes
+    suite: mastodon.*
+    signature: "FrozenError: can't modify frozen Array: \\[\"\", \"action_view/test_case/test\"\\]"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: frozen ViewPaths._prefixes; rspec-rails 570b2b0a79, unreleased; unchecked
+  - id: M-enum
+    suite: mastodon.*
+    signature: "ArgumentError: .*is not a valid"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: the enum ArgumentError lists the valid values; unchecked
+  - id: SU1
+    suite: sure.*
+    signature: "undefined method 'underscore' for nil"
+    status: prepared
+    record: docs/upstream/app-suites.md
+    note: anonymous cache store subclasses; branch thomasklemm/local-cache-anonymous-store; unchecked
+  - id: SU2
+    suite: sure.*
+    signature: 'syntax error at or near "\$1"|invalid input syntax for type date|operator does not exist: date'
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: find_by_sql array arguments become binds; unchecked
+  - id: SU3
+    suite: sure.*
+    signature: InvalidForeignKey
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: disable_referential_integrity re-checks foreign keys on PostgreSQL 18.4+; unchecked
+  - id: SU4
+    suite: sure.*
+    signature: "LoadError: .*redis-client|redis_client"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: Redis cache store needs redis-client >= 0.28.0, Sure locks 0.25.0; unchecked
+  - id: SU5
+    suite: sure.*
+    signature: "validation_context="
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: activerecord-import 2.2.0 calls the removed private writer; unchecked
+  - id: SU5
+    suite: sure.*
+    test: "TransactionImportTest|TradeImportTest"
+    signature: "."
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: the import count failures behind SU5; unchecked
+  - id: WB1
+    suite: writebook.*
+    signature: "Mime::EXTENSION_LOOKUP"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: a deprecation only; flags only if an app raises on it (propshaft <= 1.3.2)
+  - id: WB-vips
+    suite: writebook.*
+    test: VipsLoaderPolicyTest
+    signature: "."
+    status: noise
+    record: docs/upstream/app-suites.md
+    note: the orb's libvips 8.14 allows ICO, PSD, BMP and SVG loads
+
+  # Ecosystem round 1 (docs/upstream/ecosystem-tests.md)
+  - id: E1
+    suite: ransack.*
+    signature: "uninitialized constant .*WeakSet|WeakSet"
+    status: gem-side
+    record: docs/upstream/ecosystem-tests.md
+    note: rails/rails#59623 closed; fixed in ransack instead (activerecord-hackery/ransack#1792, open); unchecked
+  - id: E2
+    suite: ransack.*
+    signature: "(?i)no such table|could not find table"
+    status: prepared
+    record: docs/upstream/ecosystem-tests.md
+    note: SQLite schema readers match table names exactly; queued; unchecked
+  - id: E3
+    suite: administrate.*
+    signature: colorize_logging
+    status: open-pr
+    record: docs/upstream/ecosystem-tests.md
+    note: rails/rails#59628; unchecked
+  - id: E4
+    suite: active_model_serializers.*
+    signature: "refute_pattern|assert_not_pattern"
+    status: prepared
+    record: docs/upstream/ecosystem-tests.md
+    note: minitest floor 5.18; queued; unchecked
+  - id: I1
+    suite: friendly_id.*
+    signature: "RecordNotFound"
+    status: issue
+    record: docs/upstream/ecosystem-tests.md
+    note: Model.all.find(id) ignores an overridden primary_key; rails/rails#59622; unchecked
+  - id: eco1-ransack-select-manager
+    suite: ransack.*
+    signature: "SelectManager|klass"
+    status: gem-side
+    record: docs/upstream/ecosystem-tests.md
+    note: Arel::SelectManager.new(Class) needs an argument responding to klass; unchecked
+  - id: eco1-view_component
+    suite: view_component.*
+    signature: "."
+    status: record-only
+    record: docs/upstream/ecosystem-tests.md
+    note: suite-wide, unchecked; 6F 8E on main, all deliberate or gem-side (locale, allocation counts, host memos, frozen dependency tracker); compare any flag with that list
+  - id: eco1-draper
+    suite: draper.*
+    signature: FrozenError
+    status: record-only
+    record: docs/upstream/ecosystem-tests.md
+    note: frozen default_url_options and Relation::VALUE_METHODS; unchecked
+  - id: eco1-dynamic-controller-routes
+    suite: (rails-controller-testing|active_model_serializers).*
+    signature: "."
+    status: record-only
+    record: docs/upstream/ecosystem-tests.md
+    note: suite-wide, unchecked; dynamic :controller routes removed (92d809905b)
+
+  # Ecosystem round 2 (docs/upstream/ecosystem-round-2.md)
+  - id: R2-1
+    suite: shoulda-matchers.*
+    signature: UnknownPrimaryKey
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: held; unchecked
+  - id: R2-2
+    suite: scenic.*
+    signature: "wrong number of arguments \\(given 2, expected 3\\)"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: CommandRecorder args and kwargs split; reported as scenic-views/scenic#466
+  - id: R2-3
+    suite: lograge.*
+    signature: "attach_to|notification_listeners_for\\('render_template"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: structured-event log subscribers; reported as roidrage/lograge#407
+  - id: R2-4
+    suite: lograge.*
+    signature: "FrozenError: can't modify frozen Hash: \\{\"ActionController::RoutingError\""
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: spec writes ExceptionWrapper.rescue_responses
+  - id: R2-5
+    suite: ancestry.*
+    signature: "validation_context="
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: stefankroes/ancestry#766, fixes in #769/#770; unchecked
+  - id: R2-6
+    suite: paranoia.*
+    signature: "FrozenError: can't modify frozen Array"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: Transactions::ACTIONS << :restore; unchecked
+  - id: R2-7
+    suite: strong_migrations.*
+    signature: sort_by
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: columns(tables) returns a Hash; fixed in the gem (d52e4ac); unchecked
+  - id: R2-8
+    suite: strong_migrations.*
+    signature: "(?i)time ?zone|Etc/UTC"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: session timezone Etc/UTC; fixed in the gem (eb88bcf); unchecked
+  - id: R2-9
+    suite: store_model.*
+    signature: "(?i)development\\.rb|environment"
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: environment config file existence check; unchecked
+  - id: R2-10
+    suite: store_model.*
+    signature: "undefined method 'query'"
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: connection.query removed (nodoc); unchecked
+  - id: R2-11
+    suite: store_model.*
+    signature: "."
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: suite-wide, unchecked; parent not set on read (R2-11) or write (R2-12), generated accessors no longer call the overridden _read_attribute/_write_attribute
+  - id: R2-13
+    suite: will_paginate.*
+    signature: "FrozenError: can't modify frozen Hash"
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: frozen default_url_options in a spec; unchecked
+  - id: R2-14
+    suite: shrine.*
+    signature: "."
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: suite-wide, unchecked; spec stubs @columns_hash, main reads schema_context
+  - id: R2-15
+    suite: shoulda-matchers.*
+    signature: FrozenError
+    status: record-only
+    record: docs/upstream/ecosystem-round-2.md
+    note: _reflections.delete in a spec; unchecked
+  - id: R2-16
+    suite: solid_cache.*
+    signature: bypass_local_cache
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: fixed in the gem (679c457); unchecked
+  - id: R2-17
+    suite: solid_cache.*
+    signature: ":rails|rails:"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    note: error reporter context gains a :rails key; fixed in the gem (6ab8bdb); unchecked
+
+  # API regression audit (docs/upstream/api-regressions.md); no suite in our rounds hits these yet.
+  - id: AR-1
+    suite: .*
+    signature: "undefined method 'find_template'"
+    status: open-pr
+    record: docs/upstream/api-regressions.md
+    note: rails/rails#59629
+  - id: AR-2
+    suite: .*
+    signature: MAX_PASSWORD_LENGTH_ALLOWED
+    status: open-pr
+    record: docs/upstream/api-regressions.md
+    note: rails/rails#59627
+  - id: AR-3
+    suite: .*
+    signature: "Request::Session|Request::Utils"
+    status: record-only
+    record: docs/upstream/api-regressions.md
+    note: not opened (coordinator decision)
+  - id: AR-4
+    suite: .*
+    signature: "where!|having!"
+    status: prepared
+    record: docs/upstream/api-regressions.md
+    note: bind values for where!/having!; queued
+
+  # Noise recorded in the proof round (docs/upstream/readiness.md)
+  - id: noise-lograge-order
+    suite: lograge.*
+    class: base-failing
+    signature: "."
+    status: noise
+    record: docs/upstream/readiness.md
+    note: lograge's specs are order-dependent on both trees, plus its Ruby 3.4 Hash#inspect failures
+  - id: noise-scenic-schema-dumper
+    suite: scenic.*
+    test: schema_dumper_spec
+    class: base-failing
+    signature: "."
+    status: noise
+    record: docs/upstream/readiness.md
+    note: fails on 8-1 and main alike
+  - id: noise-lobsters-submit-story
+    suite: lobsters.*
+    test: submit_story_spec
+    class: base-failing
+    signature: Domain has already been taken
+    status: noise
+    record: docs/upstream/readiness.md
+    note: fails under seed 1717 on both trees

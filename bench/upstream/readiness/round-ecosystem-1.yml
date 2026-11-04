@@ -1,0 +1,140 @@
+# Ecosystem round 1 (docs/upstream/ecosystem-tests.md), as a readiness manifest. The round ran default-branch SHAs
+# (no tags), which are pinned here; kaminari's SHA was not recorded, so it is master on 2026-10-30. Only pundit was
+# rerun through the runner (smoke test); the other suites are unchecked. Services: PostgreSQL on 5432 (role `user`,
+# trust), Redis on 6379, Chrome for turbo-rails, good_job and view_component (BROWSER_PATH). MySQL was not run.
+# Edits the record only describes (rails-controller-testing's route rewrite, AMS's temporary minitest relaxation)
+# are left out: the record's counts come from the unmodified suites.
+ruby: 4.0.9
+rails:
+  base: 6e09124217      # 8-1-stable, v8.1.4.1
+  candidate: 6c23cb8f2a # main, 2026-11-04
+seeds: [4242, 1717]
+alone_runs: 5
+timeout: 3600
+
+suites:
+  kaminari:
+    { repo: https://github.com/kaminari/kaminari, ref: adb89b8f2681975d67bc3df6c13fd2a30cfd10e0, framework: minitest, test: rake test }
+  devise:
+    { repo: https://github.com/heartcombo/devise, ref: 05811fb8366edd08874111d0f6fb44543e1c91ef, framework: minitest,
+      env: { DEVISE_ORM: active_record }, test: rake test }
+  rspec-rails:
+    { repo: https://github.com/rspec/rspec-rails, ref: 5072befe5d1b01348a14fa02b6e5a8448874fb53, framework: rspec,
+      env: { RAILS_VERSION: "~> 8.1.0" }, test: rspec }
+  pundit:
+    { repo: https://github.com/varvet/pundit, ref: ea9e31a2d7993f038ee52b94ccc9c7411637ba89, framework: rspec, test: rspec }
+  cancancan-sqlite: &cancancan
+    repo: https://github.com/CanCanCommunity/cancancan
+    ref: 4362b39b04e6840c8edbd2cb4de16b2d77b19c3c
+    framework: rspec
+    gemfile: gemfiles/activerecord_8.1.0.gemfile
+    env: { DB: sqlite }
+    shims: ["sed -i \"s/'bundler', '~> 2.0'/'bundler', '>= 2.0'/\" cancancan.gemspec"]
+    bumps: { ostruct: ">= 0" }
+    test: rspec -r action_pack -r active_record -r active_support/all
+  cancancan-postgres:
+    <<: *cancancan
+    env: { DB: postgres }
+  friendly_id-sqlite: &friendly_id
+    repo: https://github.com/norman/friendly_id
+    ref: 4699c9791db955dfa9929af0f38a4059af550026
+    framework: minitest
+    gemfile: gemfiles/Gemfile.rails-8.1.rb
+    env: { CI: "true", DB: sqlite3 }
+    test: rake db:drop db:create db:up test
+  friendly_id-postgresql:
+    <<: *friendly_id
+    env: { CI: "true", DB: postgresql, PGUSER: postgres }
+  view_component:
+    repo: https://github.com/ViewComponent/view_component
+    ref: b1fd129eaeedf4a33986c4ed342f041c2d4a5b0a
+    framework: minitest
+    env: { CI: "1", RAILS_ENV: test }
+    shims: ["sed -i 's/gem \"nokogiri\", \"1.19.4\"/gem \"nokogiri\", \">= 1.19.5\"/' Gemfile"]
+    test: rake test
+  simple_form:
+    { repo: https://github.com/heartcombo/simple_form, ref: 18f38aad0bdeca2ba1815043b94d96fdbbe6a325, framework: minitest, test: rake }
+  # The record ran ransack with E1's workaround so the suite loads; drop the shim to see E1 itself.
+  ransack-sqlite: &ransack
+    repo: https://github.com/activerecord-hackery/ransack
+    ref: fbc3baf164da2a80435d5678a77924c66472f694
+    framework: rspec
+    env: { DB: sqlite3 }
+    shims: ["sed -i \"0,/^require 'active_support\\/core_ext/s//require 'active_support'\\n&/\" lib/ransack.rb"]
+    test: rspec
+  ransack-postgresql:
+    <<: *ransack
+    env: { DB: postgresql, DATABASE_USERNAME: user }
+  administrate:
+    repo: https://github.com/thoughtbot/administrate
+    ref: 6cb9cbbbc8032b5802ade02169881e61caf08193
+    framework: rspec
+    env: { CI: "1" }
+    bumps: { appraisal: { require: false }, awesome_print: { require: false } }
+    shims: ["yarn install"]
+    setup: ["rake db:setup"]
+    test: rspec
+  jbuilder:
+    { repo: https://github.com/rails/jbuilder, ref: f141f5ede81bf534d62c6ba228975d5ccb90b63d, framework: minitest, env: { CI: "1" }, test: rake test }
+  good_job:
+    repo: https://github.com/bensheldon/good_job
+    ref: e15ee79627
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env: { BUNDLE_WITHOUT: "debug:lint:demo:production", RAILS_ENV: test }
+    test: rspec
+  solid_queue-sqlite: &solid_queue
+    repo: https://github.com/rails/solid_queue
+    ref: b9c646a848
+    framework: minitest
+    gemfile: gemfiles/rails_8_1.gemfile
+    env: { TARGET_DB: sqlite, RAILS_ENV: test }
+    shims: ["sed -i 's/55432/5432/' test/dummy/config/database.yml"]
+    setup: ["bin/rails db:setup"]
+    test: bin/rails test
+  solid_queue-postgres:
+    <<: *solid_queue
+    env: { TARGET_DB: postgres, RAILS_ENV: test }
+  sidekiq-rails:
+    repo: https://github.com/sidekiq/sidekiq
+    ref: 75982898ff
+    framework: minitest
+    env: { RAILS_VERSION: "8.1", REDIS_URL: "redis://localhost:6379/14" }
+    test: ruby -w -Ilib -Itest -e 'ARGV.dup.each { require "./test/#{_1}_test" }; ARGV.clear' active_job_adapter actors api client current_attributes job_generator rails transaction_aware_client -- $TESTOPTS
+  # The record also let spec_helper's Gemfile guard accept Gemfile.eco-*; check that on the first run.
+  paper_trail-sqlite: &paper_trail
+    repo: https://github.com/paper-trail-gem/paper_trail
+    ref: 86ce1b8307
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env: { DB: sqlite }
+    setup: ["rake install_database_yml"]
+    test: rspec
+  paper_trail-postgres:
+    <<: *paper_trail
+    env: { DB: postgres, PT_CI_DATABASE: eco_paper_trail, PT_CI_DB_USER: user, PT_CI_DB_HOST: 127.0.0.1 }
+  active_model_serializers:
+    { repo: https://github.com/rails-api/active_model_serializers, ref: 6934c8bd31, framework: minitest, env: { RAILS_VERSION: "8.1" }, test: rake test }
+  pagy:
+    { repo: https://github.com/ddnexus/pagy, ref: b48c906e31847cc2564b1e8da2995e2b1b8e3e9a, framework: minitest, test: "thor test:api:all" }
+  turbo-rails:
+    repo: https://github.com/hotwired/turbo-rails
+    ref: 37530c08780fa6f6dbb56a633de4b81169bdd174
+    framework: minitest
+    env: { CI: "true", RAILS_VERSION: "8.1" }
+    test: (cd test/dummy && RAILS_ENV=test bin/rails db:test:prepare) && rake test
+  importmap-rails:
+    { repo: https://github.com/rails/importmap-rails, ref: f255e55482d9173d8f64db3bfa4317b64445eeb4, framework: minitest,
+      gemfile: gemfiles/rails_8.1_propshaft.gemfile, env: { RAILS_ENV: test }, test: rake test }
+  propshaft:
+    { repo: https://github.com/rails/propshaft, ref: e7530a0490c8e1cd4e15dfa9a98717167fa6dccf, framework: minitest,
+      gemfile: gemfiles/Gemfile.rails-8.1, test: bin/test }
+  responders:
+    { repo: https://github.com/heartcombo/responders, ref: eb9b9baac1f8e2d44265e20120bdec45c0890a28, framework: minitest, test: rake test }
+  rails-controller-testing:
+    { repo: https://github.com/rails/rails-controller-testing, ref: c203673f8011a7cdc2a8edf995ae6b3eec3417ca, framework: minitest, test: rake test }
+  draper:
+    { repo: https://github.com/drapergem/draper, ref: 7fc015f80ccb1f0aa7b8ffaa7a50db76d0cc946c, framework: rspec, test: rake }
+  acts-as-taggable-on:
+    { repo: https://github.com/mbleigh/acts-as-taggable-on, ref: 719734149d4f4295f497dc9a02884b08051325a3, framework: rspec,
+      gemfile: gemfiles/activerecord_8.1.gemfile, test: rake spec }
