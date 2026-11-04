@@ -16,7 +16,7 @@
     4242,
     1717
   ],
-  "generated": "2026-11-04T20:15:02Z",
+  "generated": "2026-11-04T20:50:14Z",
   "suites": [
     {
       "suite": "lograge",
@@ -56,7 +56,7 @@
           "loaded": true,
           "total": 134,
           "status": 1,
-          "secs": 2,
+          "secs": 3,
           "failed": 3
         },
         {
@@ -66,7 +66,7 @@
           "loaded": true,
           "total": 134,
           "status": 1,
-          "secs": 2,
+          "secs": 3,
           "failed": 7
         },
         {
@@ -76,7 +76,7 @@
           "loaded": true,
           "total": 134,
           "status": 1,
-          "secs": 2,
+          "secs": 3,
           "failed": 32
         },
         {
@@ -86,7 +86,7 @@
           "loaded": true,
           "total": 134,
           "status": 1,
-          "secs": 2,
+          "secs": 3,
           "failed": 34
         }
       ]
@@ -332,27 +332,33 @@
       "suites": [
         "lobsters-rspec-rails-main"
       ],
+      "match": [
+        "known:L2"
+      ],
       "tests": [
         {
           "test": "./spec/requests/stories_spec.rb[1:1:2:1]",
           "desc": "stories #check_url_dupe json returns similar story matching URL",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "lobsters-rspec-rails-main"
+          "suite": "lobsters-rspec-rails-main",
+          "match": "known:L2"
         },
         {
           "test": "./spec/requests/stories_spec.rb[1:1:2:2]",
           "desc": "stories #check_url_dupe json returns no matches if previously submitted URL is only partial match",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "lobsters-rspec-rails-main"
+          "suite": "lobsters-rspec-rails-main",
+          "match": "known:L2"
         },
         {
           "test": "./spec/requests/stories_spec.rb[1:1:2:3]",
           "desc": "stories #check_url_dupe json returns no matches if no matching URL",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "lobsters-rspec-rails-main"
+          "suite": "lobsters-rspec-rails-main",
+          "match": "known:L2"
         }
       ]
     },
@@ -363,104 +369,121 @@
       "suites": [
         "scenic"
       ],
+      "match": [
+        "known:R2-2"
+      ],
       "tests": [
         {
           "test": "./spec/integration/revert_spec.rb[1:1]",
           "desc": "Reverting scenic schema statements reverts dropped view to specified version",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/integration/revert_spec.rb[1:2]",
           "desc": "Reverting scenic schema statements reverts updated view to specified version",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:1:1]",
           "desc": "Scenic::CommandRecorder#create_view records the created view",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:1:2]",
           "desc": "Scenic::CommandRecorder#create_view reverts to drop_view when not passed a version",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:1:3]",
           "desc": "Scenic::CommandRecorder#create_view reverts to drop_view when passed a version",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:1:4]",
           "desc": "Scenic::CommandRecorder#create_view reverts materialized views appropriately",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:2:1]",
           "desc": "Scenic::CommandRecorder#drop_view records the dropped view",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:2:2]",
           "desc": "Scenic::CommandRecorder#drop_view reverts to create_view with specified revert_to_version",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:3:1]",
           "desc": "Scenic::CommandRecorder#update_view records the updated view",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:3:2]",
           "desc": "Scenic::CommandRecorder#update_view reverts to update_view with the specified revert_to_version",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:3:4]",
           "desc": "Scenic::CommandRecorder#update_view reverts materialized views with no_data option appropriately",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:3:5]",
           "desc": "Scenic::CommandRecorder#update_view reverts materialized views with side_by_side option appropriately",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:4:1]",
           "desc": "Scenic::CommandRecorder#replace_view records the replaced view",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:4:2]",
           "desc": "Scenic::CommandRecorder#replace_view reverts to replace_view with the specified revert_to_version",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         }
       ]
     },
@@ -471,13 +494,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:R2-3"
+      ],
       "tests": [
         {
           "test": "./spec/lograge_spec.rb[1:1:3:1]",
           "desc": "Lograge when removing Rails' log subscribers with event_name render_template.action_view does not remove subscribers that aren't from Rails",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:R2-3"
         }
       ]
     },
@@ -488,13 +515,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:R2-3"
+      ],
       "tests": [
         {
           "test": "./spec/lograge_spec.rb[1:1:2]",
           "desc": "Lograge when removing Rails' log subscribers removes subscribers for all events",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:R2-3"
         }
       ]
     },
@@ -505,27 +536,33 @@
       "suites": [
         "scenic"
       ],
+      "match": [
+        "known:R2-2"
+      ],
       "tests": [
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:2:3]",
           "desc": "Scenic::CommandRecorder#drop_view raises when reverting without revert_to_version set",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:3:3]",
           "desc": "Scenic::CommandRecorder#update_view raises when reverting without revert_to_version set",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         },
         {
           "test": "./spec/scenic/command_recorder_spec.rb[1:4:3]",
           "desc": "Scenic::CommandRecorder#replace_view raises when reverting without revert_to_version set",
           "candidate": "2/2",
           "base": "0/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:R2-2"
         }
       ]
     },
@@ -536,12 +573,16 @@
       "suites": [
         "lobsters"
       ],
+      "match": [
+        "known:L1"
+      ],
       "tests": [
         {
           "test": "(suite)",
           "tree": "cand",
           "detail": "cand runs 1,2 did not load, 20 load errors",
-          "suite": "lobsters"
+          "suite": "lobsters",
+          "match": "known:L1"
         }
       ]
     },
@@ -552,6 +593,9 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:R2-4"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:3:1]",
@@ -559,7 +603,8 @@
           "candidate": "2/2",
           "base": "1/2",
           "detail": "base: RSpec::Expectations::ExpectationNotMetError: expected \"\" to match /status=404 /",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:R2-4"
         },
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:9:1]",
@@ -567,7 +612,8 @@
           "candidate": "2/2",
           "base": "1/2",
           "detail": "base: RSpec::Expectations::ExpectationNotMetError: expected \"status=404 action=index\" to match /error='ActiveRecord::RecordNotFound: Record not found' /",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:R2-4"
         }
       ]
     },
@@ -578,13 +624,17 @@
       "suites": [
         "lobsters-rspec-rails-main"
       ],
+      "match": [
+        "known:noise-lobsters-submit-story"
+      ],
       "tests": [
         {
           "test": "./spec/features/submit_story_spec.rb[1:10]",
           "desc": "Submitting Stories submitting a banned domain",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lobsters-rspec-rails-main"
+          "suite": "lobsters-rspec-rails-main",
+          "match": "known:noise-lobsters-submit-story"
         }
       ]
     },
@@ -595,13 +645,17 @@
       "suites": [
         "scenic"
       ],
+      "match": [
+        "known:noise-scenic-schema-dumper"
+      ],
       "tests": [
         {
           "test": "./spec/scenic/schema_dumper_spec.rb[1:8:1]",
           "desc": "Scenic::SchemaDumper with views using unexpected characters, name including namespace dumps a create_view for a view in the database",
           "candidate": "2/2",
           "base": "2/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:noise-scenic-schema-dumper"
         }
       ]
     },
@@ -612,13 +666,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/lograge_spec.rb[1:1:1]",
           "desc": "Lograge when removing Rails' log subscribers removes subscribers for controller events",
           "candidate": "2/2",
           "base": "2/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -629,13 +687,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/lograge_spec.rb[1:1:4:1]",
           "desc": "Lograge when removing Rails' log subscribers with event_name process_action.action_controller does not remove subscribers that aren't from Rails",
           "candidate": "2/2",
           "base": "2/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -646,13 +708,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:5:1]",
           "desc": "Lograge::LogSubscribers::ActionCable with before_format configured for lograge output outputs correctly",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -663,41 +729,49 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:1]",
           "desc": "Lograge::LogSubscribers::ActionCable when processing an action with lograge output includes the controller and action",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:1]",
           "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:2]",
           "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:3]",
           "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:4]",
           "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -708,20 +782,25 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:1:1]",
           "desc": "Lograge::LogSubscribers::ActionCable with custom_options configured for cee output combines the hash properly for the output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:1:2]",
           "desc": "Lograge::LogSubscribers::ActionCable with custom_options configured for cee output combines the output of a lambda properly",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -732,13 +811,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:2]",
           "desc": "Lograge::LogSubscribers::ActionCable when processing an action with lograge output includes the duration",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -749,13 +832,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:4]",
           "desc": "Lograge::LogSubscribers::ActionCable when processing an action with lograge output returns a default status when no status or exception is found",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -766,20 +853,25 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:1:1]",
           "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for cee output combines the hash properly for the output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:1:2]",
           "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for cee output combines the output of a lambda properly",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -790,13 +882,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:6:1]",
           "desc": "Lograge::LogSubscribers::ActionController when event payload includes a \"custom_payload\" incorporates the payload correctly",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -807,13 +903,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:1]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the URL in the log output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -824,13 +924,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:5]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the controller and action",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -841,13 +945,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:13:1]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output with unpermitted_parameters adds the unpermitted_params to the log line",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -858,20 +966,25 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:5:1]",
           "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for lograge output combines the hash properly for the output",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:5:2]",
           "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for lograge output combines the output of a lambda properly",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -882,13 +995,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:3]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output starts the log line with the HTTP method",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -899,13 +1016,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:15:1]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output with memory allocations includes allocations when available",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -916,13 +1037,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:8]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the database rendering time",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -933,13 +1058,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:6]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the duration",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -950,13 +1079,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:11:1]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output with a redirect adds the location to the log line",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -967,13 +1100,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:7]",
           "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the view rendering time",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -984,13 +1121,17 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:4:1]",
           "desc": "Lograge::LogSubscribers::ActionCable when event payload includes a \"custom_payload\" incorporates the payload correctly",
           "candidate": "2/2",
           "base": "2/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -1001,27 +1142,33 @@
       "suites": [
         "lograge"
       ],
+      "match": [
+        "known:noise-lograge-order"
+      ],
       "tests": [
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:1:3]",
           "desc": "Lograge::LogSubscribers::ActionCable with custom_options configured for cee output works when the method returns nil",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:4:2]",
           "desc": "Lograge::LogSubscribers::ActionCable when event payload includes a \"custom_payload\" works when custom_payload is nil",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         },
         {
           "test": "./spec/log_subscribers/action_cable_spec.rb[1:5:2]",
           "desc": "Lograge::LogSubscribers::ActionCable with before_format configured for lograge output works if the method returns nil",
           "candidate": "1/2",
           "base": "1/2",
-          "suite": "lograge"
+          "suite": "lograge",
+          "match": "known:noise-lograge-order"
         }
       ]
     },
@@ -1032,13 +1179,17 @@
       "suites": [
         "scenic"
       ],
+      "match": [
+        "known:noise-scenic-schema-dumper"
+      ],
       "tests": [
         {
           "test": "./spec/scenic/schema_dumper_spec.rb[1:4:2]",
           "desc": "Scenic::SchemaDumper with views in non public schemas sorts dependency order when views exist in a non-public schema",
           "candidate": "2/2",
           "base": "2/2",
-          "suite": "scenic"
+          "suite": "scenic",
+          "match": "known:noise-scenic-schema-dumper"
         }
       ]
     }

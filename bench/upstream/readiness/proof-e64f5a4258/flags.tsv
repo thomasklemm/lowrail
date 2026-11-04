@@ -1,59 +1,59 @@
-class	suite	test	signature	candidate	base	detail
-confirmed	lobsters-rspec-rails-main	./spec/requests/stories_spec.rb[1:1:2:1]	ActionController::UrlGenerationError: No route matches {action: "show", controller: "stories", id: ""}, missing required keys: [:id]	2/2	0/2	
-confirmed	lobsters-rspec-rails-main	./spec/requests/stories_spec.rb[1:1:2:2]	ActionController::UrlGenerationError: No route matches {action: "show", controller: "stories", id: ""}, missing required keys: [:id]	2/2	0/2	
-confirmed	lobsters-rspec-rails-main	./spec/requests/stories_spec.rb[1:1:2:3]	ActionController::UrlGenerationError: No route matches {action: "show", controller: "stories", id: ""}, missing required keys: [:id]	2/2	0/2	
-confirmed	scenic	./spec/integration/revert_spec.rb[1:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/integration/revert_spec.rb[1:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:3]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:4]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:2:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:2:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:4]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:5]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:4:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:4:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
-confirmed	lograge	./spec/lograge_spec.rb[1:1:3:1]	NoMethodError: undefined method 'attach_to' for class ActionController::LogSubscriber	2/2	0/2	
-confirmed	lograge	./spec/lograge_spec.rb[1:1:2]	RSpec::Core::MultipleExceptionError: expected `Lograge.notification_listeners_for('render_template.action_view')` to have changed to [], but did not change	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:2:3]	RSpec::Expectations::ExpectationNotMetError: expected ActiveRecord::IrreversibleMigration, got #<ArgumentError: wrong number of arguments (given 2, expected 3)> with backtrace:	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:3]	RSpec::Expectations::ExpectationNotMetError: expected ActiveRecord::IrreversibleMigration, got #<ArgumentError: wrong number of arguments (given 2, expected 3)> with backtrace:	2/2	0/2	
-confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:4:3]	RSpec::Expectations::ExpectationNotMetError: expected ActiveRecord::IrreversibleMigration, got #<ArgumentError: wrong number of arguments (given 2, expected 3)> with backtrace:	2/2	0/2	
-suite-did-not-load	lobsters	(suite)	FrozenError: can't modify frozen Hash: {}			cand runs 1,2 did not load, 20 load errors
-signature-changed	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:3:1]	FrozenError: can't modify frozen Hash: {"ActionController::RoutingError" => :not_found, "AbstractController::ActionNotFound" => :not_found, "ActionController::MethodNotAllowed" => :method_not_allowed,	2/2	1/2	base: RSpec::Expectations::ExpectationNotMetError: expected "" to match /status=404 /
-signature-changed	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:9:1]	FrozenError: can't modify frozen Hash: {"ActionController::RoutingError" => :not_found, "AbstractController::ActionNotFound" => :not_found, "ActionController::MethodNotAllowed" => :method_not_allowed,	2/2	1/2	base: RSpec::Expectations::ExpectationNotMetError: expected "status=404 action=index" to match /error='ActiveRecord::RecordNotFound: Record not found' /
-base-failing	lobsters-rspec-rails-main	./spec/features/submit_story_spec.rb[1:10]	ActiveRecord::RecordInvalid: Validation failed: Domain has already been taken	1/2	1/2	
-base-failing	scenic	./spec/scenic/schema_dumper_spec.rb[1:8:1]	ActiveRecord::StatementInvalid: PG::DuplicateTable: ERROR: relation "search in a haystack" already exists	2/2	2/2	
-base-failing	lograge	./spec/lograge_spec.rb[1:1:1]	RSpec::Core::MultipleExceptionError: expected `Lograge.notification_listeners_for('process_action.action_controller')` to have changed to [], but did not change	2/2	2/2	
-base-failing	lograge	./spec/lograge_spec.rb[1:1:4:1]	RSpec::Core::MultipleExceptionError: expected collection contained: [#<ActiveSupport::Notifications::Fanout::Subscribers::Timed:0xX @pattern="process_acti...>:0xX @events=[]>, @silenceable=false, @can	2/2	2/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:5:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "action=pong"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:2]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:3]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:4]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:1:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:1:2]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:2]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /duration=[.0-9]{2,4}/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:4]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /status=200 /	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:1:1]	RSpec::Expectations::ExpectationNotMetError: expected "My test: {\"method\":\"GET\",\"status\":200}" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:1:2]	RSpec::Expectations::ExpectationNotMetError: expected "My test: {\"method\":\"GET\",\"status\":200}" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:6:1]	RSpec::Expectations::ExpectationNotMetError: expected "method=GET status=200" to match / data=value/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to include "/home"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:5]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to include "controller=HomeController action=index"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:13:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to include "unpermitted_params=[\"florb\", \"blarf\"]"	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:5:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match / data=value/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:5:2]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match / data=value/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:3]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /^method=GET /	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:15:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /allocations=231/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:8]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /db=0.02/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:6]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /duration=[.0-9]{4,4} /	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:11:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /location=http:\/\/www.example.com/	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:7]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /view=0.01 /	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:4:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=pong" to match / data=value/	2/2	2/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:1:3]	RSpec::Expectations::ExpectationNotMetError: expected `"".present?` to be truthy, got false	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:4:2]	RSpec::Expectations::ExpectationNotMetError: expected `"".present?` to be truthy, got false	1/2	1/2	
-base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:5:2]	RSpec::Expectations::ExpectationNotMetError: expected `"".present?` to be truthy, got false	1/2	1/2	
-base-failing	scenic	./spec/scenic/schema_dumper_spec.rb[1:4:2]	RSpec::Expectations::ExpectationNotMetError: expected: ["scenic.bananas", "scenic.apples"]	2/2	2/2	
+match	class	suite	test	signature	candidate	base	detail
+known:L2	confirmed	lobsters-rspec-rails-main	./spec/requests/stories_spec.rb[1:1:2:1]	ActionController::UrlGenerationError: No route matches {action: "show", controller: "stories", id: ""}, missing required keys: [:id]	2/2	0/2	
+known:L2	confirmed	lobsters-rspec-rails-main	./spec/requests/stories_spec.rb[1:1:2:2]	ActionController::UrlGenerationError: No route matches {action: "show", controller: "stories", id: ""}, missing required keys: [:id]	2/2	0/2	
+known:L2	confirmed	lobsters-rspec-rails-main	./spec/requests/stories_spec.rb[1:1:2:3]	ActionController::UrlGenerationError: No route matches {action: "show", controller: "stories", id: ""}, missing required keys: [:id]	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/integration/revert_spec.rb[1:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/integration/revert_spec.rb[1:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:3]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:1:4]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:2:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:2:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:4]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:5]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:4:1]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:4:2]	ArgumentError: wrong number of arguments (given 2, expected 3)	2/2	0/2	
+known:R2-3	confirmed	lograge	./spec/lograge_spec.rb[1:1:3:1]	NoMethodError: undefined method 'attach_to' for class ActionController::LogSubscriber	2/2	0/2	
+known:R2-3	confirmed	lograge	./spec/lograge_spec.rb[1:1:2]	RSpec::Core::MultipleExceptionError: expected `Lograge.notification_listeners_for('render_template.action_view')` to have changed to [], but did not change	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:2:3]	RSpec::Expectations::ExpectationNotMetError: expected ActiveRecord::IrreversibleMigration, got #<ArgumentError: wrong number of arguments (given 2, expected 3)> with backtrace:	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:3:3]	RSpec::Expectations::ExpectationNotMetError: expected ActiveRecord::IrreversibleMigration, got #<ArgumentError: wrong number of arguments (given 2, expected 3)> with backtrace:	2/2	0/2	
+known:R2-2	confirmed	scenic	./spec/scenic/command_recorder_spec.rb[1:4:3]	RSpec::Expectations::ExpectationNotMetError: expected ActiveRecord::IrreversibleMigration, got #<ArgumentError: wrong number of arguments (given 2, expected 3)> with backtrace:	2/2	0/2	
+known:L1	suite-did-not-load	lobsters	(suite)	FrozenError: can't modify frozen Hash: {}			cand runs 1,2 did not load, 20 load errors
+known:R2-4	signature-changed	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:3:1]	FrozenError: can't modify frozen Hash: {"ActionController::RoutingError" => :not_found, "AbstractController::ActionNotFound" => :not_found, "ActionController::MethodNotAllowed" => :method_not_allowed,	2/2	1/2	base: RSpec::Expectations::ExpectationNotMetError: expected "" to match /status=404 /
+known:R2-4	signature-changed	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:9:1]	FrozenError: can't modify frozen Hash: {"ActionController::RoutingError" => :not_found, "AbstractController::ActionNotFound" => :not_found, "ActionController::MethodNotAllowed" => :method_not_allowed,	2/2	1/2	base: RSpec::Expectations::ExpectationNotMetError: expected "status=404 action=index" to match /error='ActiveRecord::RecordNotFound: Record not found' /
+known:noise-lobsters-submit-story	base-failing	lobsters-rspec-rails-main	./spec/features/submit_story_spec.rb[1:10]	ActiveRecord::RecordInvalid: Validation failed: Domain has already been taken	1/2	1/2	
+known:noise-scenic-schema-dumper	base-failing	scenic	./spec/scenic/schema_dumper_spec.rb[1:8:1]	ActiveRecord::StatementInvalid: PG::DuplicateTable: ERROR: relation "search in a haystack" already exists	2/2	2/2	
+known:noise-lograge-order	base-failing	lograge	./spec/lograge_spec.rb[1:1:1]	RSpec::Core::MultipleExceptionError: expected `Lograge.notification_listeners_for('process_action.action_controller')` to have changed to [], but did not change	2/2	2/2	
+known:noise-lograge-order	base-failing	lograge	./spec/lograge_spec.rb[1:1:4:1]	RSpec::Core::MultipleExceptionError: expected collection contained: [#<ActiveSupport::Notifications::Fanout::Subscribers::Timed:0xX @pattern="process_acti...>:0xX @events=[]>, @silenceable=false, @can	2/2	2/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:5:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "action=pong"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:2]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:3]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:7:4]	RSpec::Expectations::ExpectationNotMetError: expected "" to include "controller=ActionCableChannel action=pong"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:1:1]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:1:2]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:2]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /duration=[.0-9]{2,4}/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:2:4]	RSpec::Expectations::ExpectationNotMetError: expected "" to match /status=200 /	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:1:1]	RSpec::Expectations::ExpectationNotMetError: expected "My test: {\"method\":\"GET\",\"status\":200}" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:1:2]	RSpec::Expectations::ExpectationNotMetError: expected "My test: {\"method\":\"GET\",\"status\":200}" to match /^My test: {.*"data"\s*:\s*"value"/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:6:1]	RSpec::Expectations::ExpectationNotMetError: expected "method=GET status=200" to match / data=value/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to include "/home"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:5]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to include "controller=HomeController action=index"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:13:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to include "unpermitted_params=[\"florb\", \"blarf\"]"	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:5:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match / data=value/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:5:2]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match / data=value/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:3]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /^method=GET /	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:15:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /allocations=231/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:8]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /db=0.02/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:6]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /duration=[.0-9]{4,4} /	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:11:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /location=http:\/\/www.example.com/	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_controller_spec.rb[1:4:7]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=index" to match /view=0.01 /	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:4:1]	RSpec::Expectations::ExpectationNotMetError: expected "status=200 action=pong" to match / data=value/	2/2	2/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:1:3]	RSpec::Expectations::ExpectationNotMetError: expected `"".present?` to be truthy, got false	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:4:2]	RSpec::Expectations::ExpectationNotMetError: expected `"".present?` to be truthy, got false	1/2	1/2	
+known:noise-lograge-order	base-failing	lograge	./spec/log_subscribers/action_cable_spec.rb[1:5:2]	RSpec::Expectations::ExpectationNotMetError: expected `"".present?` to be truthy, got false	1/2	1/2	
+known:noise-scenic-schema-dumper	base-failing	scenic	./spec/scenic/schema_dumper_spec.rb[1:4:2]	RSpec::Expectations::ExpectationNotMetError: expected: ["scenic.bananas", "scenic.apples"]	2/2	2/2	

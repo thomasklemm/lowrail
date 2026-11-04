@@ -86,9 +86,42 @@ match class and normalized message.
 ## Output
 
 In `--out`: `flags.json` (pins, per-suite runs and lock differences, and the flags grouped by class and
-signature), `flags.tsv` (one row per flagged test: class, suite, test, signature, candidate and base fail counts,
-detail) and `summary.md` (one row per suite, then one table per class grouped by signature). Base-only failures
-are counted per suite in `flags.json` and not flagged.
+signature), `flags.tsv` (one row per flagged test: match, class, suite, test, signature, candidate and base fail
+counts, detail) and `summary.md` (one row per suite; then **New** flags, one table per class; then **Known**
+flags, one row per finding with its status and record; then what fails on base too). Base-only failures are
+counted per suite in `flags.json` and not flagged.
+
+## Known findings
+
+[`known.yml`](../../bench/upstream/readiness/known.yml) lists the findings of the earlier rounds (app suites,
+ecosystem rounds 1 and 2, the API audit, and the proof round's noise). Each entry has an `id`, a `suite` regex
+over manifest suite names, a `signature` regex, optional `test` and `class` patterns, a `status` (`open-pr`,
+`merged`, `prepared`, `issue`, `record-only`, `gem-side`, `noise`), a `record` path and a `note`. Every flag gets
+`known:<id>` from the first entry that matches it, or `new`. Several entries can share an id when one finding
+has more than one signature. Entries marked "unchecked" have regexes taken from the record's wording, and no run
+through the runner has produced their signature yet. Narrow them, or add the missing ones, after the first run of
+that round. When a finding changes status (a PR merges, a gem releases a fix), update its entry in the same commit
+as the ledger.
+
+## Rounds
+
+| Manifest | Round | Smoke-tested suite |
+| --- | --- | --- |
+| [`proof-e64f5a4258.yml`](../../bench/upstream/readiness/proof-e64f5a4258.yml) | the proof round below | all four |
+| [`round-app-suites.yml`](../../bench/upstream/readiness/round-app-suites.yml) | [app-suites](app-suites.md): Redmine, Lobsters, Solidus (core, api), Mastodon, Sure, Writebook | `lobsters-rspec-rails-main`: 927 examples; L2 3 `confirmed` as `known:L2`, as in the record |
+| [`round-ecosystem-1.yml`](../../bench/upstream/readiness/round-ecosystem-1.yml) | [ecosystem-tests](ecosystem-tests.md), 24 gems | `pundit`: 184 examples, 0 failures ×4, as in the record |
+| [`round-ecosystem-2.yml`](../../bench/upstream/readiness/round-ecosystem-2.yml) | [ecosystem round 2](ecosystem-round-2.md), 26 gems | `bullet`: 286 examples, 0 failures ×4, as in the record |
+
+`--check` validates a manifest without running anything: keys and shapes, patch files, `known.yml`, installed
+Rubies (a warning), and that every Rails and suite ref resolves (`--no-resolve` skips the fetch). All four pass.
+The manifests keep each round's pins. For a beta, copy one, set `rails.candidate`, and keep the base, so the base
+runs are reused. Per-suite keys added for these rounds: `ruby` (Sure and Writebook run Ruby 3.4), `rails` (Writebook
+compares its own locked Rails with main), and shims with `tree: cand` for the main-only workarounds of the record
+(Redmine's S1 middleware, Mastodon's R1 and M1 app shims). Those run as separate `-shimmed` suites, so the plain
+suite still shows the finding. A DB setting that the round's notes abbreviated follows the gem's own CI and is
+marked in the manifest; if it is wrong, the suite reads `suite-did-not-load`. RSpec results go through
+[`rspec_json.rb`](../../bench/upstream/readiness/rspec_json.rb), one JSON file per process, so Mastodon's
+flatware workers and suites that run RSpec twice keep every result.
 
 ## Proof round (2026-11-04)
 
@@ -110,6 +143,9 @@ out clean. Nothing the records call noise was flagged as a candidate failure: lo
 trees under seed 1717 (32 and 34 failures), and those tests read `base-failing`; Lobsters'
 `submit_story_spec.rb[1:10]` fails under seed 1717 on both trees (`Domain has already been taken`), also
 `base-failing`.
+
+Matched against `known.yml`, all 25 candidate flags read as known (R2-2, R2-3, R2-4, L1, L2) and the 33
+`base-failing` rows as recorded noise: 0 new.
 
 Timing on an a1.large orb with `--jobs 3`: about 15 minutes for the first round, most of it bundling Lobsters;
 lograge runs take 2 s, scenic 4 s, Lobsters about 45 s. Resume was checked by stopping the service mid-round: the
@@ -139,5 +175,9 @@ suites (RSpec and minitest, not kept) covered the classes the proof doesn't reac
   reads as `suite-did-not-load`, never as 0 failures.
 * **No service management.** Databases are started by hand; two suites that use the same database name must not
   run in parallel (`--jobs`). Prepare failures are cached like runs; rerun them with `--fresh NAME`.
+* **Known findings are regexes.** A new failure with the same signature as a known one in the same suite reads
+  as known; most entries outside the proof round are still unchecked against a real run.
+* **Round manifests are smoke-tested, not rerun.** Three suites ran (above); the others come from the rounds'
+  notes and may need a setup fix on their first run.
 * **One bundle per suite** under `WORK/bundle/NAME`. A shared gem directory let one suite's RubyGems plugins
   (rdoc 8.1 loading json 3.1) break another suite's boot.
