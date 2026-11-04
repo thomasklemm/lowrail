@@ -1,0 +1,76 @@
+From 54e07d2dba321be3c2d7bcf16d3fefaa7cef5716 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 16:25:19 +0000
+Subject: [PATCH] Restore RemoteIp::GetIp#filter_proxies as deprecated
+
+---
+ actionpack/CHANGELOG.md                           |  5 +++++
+ .../lib/action_dispatch/middleware/remote_ip.rb   | 12 ++++++++++++
+ actionpack/test/dispatch/request_test.rb          | 15 +++++++++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/actionpack/CHANGELOG.md b/actionpack/CHANGELOG.md
+index f0f0226d8f..e5666c7507 100644
+--- a/actionpack/CHANGELOG.md
++++ b/actionpack/CHANGELOG.md
+@@ -1,3 +1,8 @@
++*   Restore `ActionDispatch::RemoteIp::GetIp#filter_proxies` as deprecated for
++    extensions that override `calculate_ip`. It will be removed in Rails 9.0.
++
++    *Thomas Klemm*
++
+ *   Apply `config.action_dispatch.cookies_same_site_protection` to every session
+     store.
+ 
+diff --git a/actionpack/lib/action_dispatch/middleware/remote_ip.rb b/actionpack/lib/action_dispatch/middleware/remote_ip.rb
+index 3672c9e328..10b8dddeca 100644
+--- a/actionpack/lib/action_dispatch/middleware/remote_ip.rb
++++ b/actionpack/lib/action_dispatch/middleware/remote_ip.rb
+@@ -246,6 +246,18 @@ def first_non_proxy(ips) # :doc:
+           end
+         end
+       end
++
++      def filter_proxies(ips) # :doc:
++        ActionDispatch.deprecator.warn(<<~MSG.squish)
++          `ActionDispatch::RemoteIp::GetIp#filter_proxies` is deprecated and will be
++          removed in Rails 9.0. Replace `filter_proxies(ips).first` with
++          `first_non_proxy(ips)`.
++        MSG
++
++        ips.reject do |ip|
++          @proxies.any? { |proxy| proxy === ip }
++        end
++      end
+     end
+   end
+ end
+diff --git a/actionpack/test/dispatch/request_test.rb b/actionpack/test/dispatch/request_test.rb
+index f41b45017a..f780067d73 100644
+--- a/actionpack/test/dispatch/request_test.rb
++++ b/actionpack/test/dispatch/request_test.rb
+@@ -500,6 +500,21 @@ class RequestIP < BaseRequestTest
+     assert_equal "3.4.5.6", get_ip.calculate_ip
+   end
+ 
++  test "filter_proxies is deprecated and still returns every IP that isn't a proxy" do
++    request = stub_request "REMOTE_ADDR" => "127.0.0.1"
++    proxies = ActionDispatch::RemoteIp::TRUSTED_PROXIES + [/\A1\.2\.3\./]
++    get_ip = ActionDispatch::RemoteIp::GetIp.new(request, true, proxies)
++
++    {
++      ["3.4.5.6", "10.0.0.1", "1.2.3.4", "127.0.0.1", "8.8.8.8"] => ["3.4.5.6", "8.8.8.8"],
++      ["::1", "2001:db8::1", "fd00::1"] => ["2001:db8::1"],
++      ["10.0.0.1", "192.168.1.1"] => [],
++    }.each do |ips, expected|
++      result = assert_deprecated(/filter_proxies/, ActionDispatch.deprecator) { get_ip.send(:filter_proxies, ips) }
++      assert_equal expected, result, ips.inspect
++    end
++  end
++
+   test "remote ip middleware not present still returns an IP" do
+     request = stub_request("REMOTE_ADDR" => "127.0.0.1")
+     assert_equal "127.0.0.1", request.remote_ip
+-- 
+2.55.0
+
