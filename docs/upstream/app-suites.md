@@ -20,7 +20,7 @@ overridden `primary_key` (#59622).
 | Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, record only), SU3–SU5 (b/c) |
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 | Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
-| Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restore?), CW3–CW5 (b), SU4, SU5, L1 |
+| Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restored), CW3–CW5 (b), SU4, SU5, L1 |
 | Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, held), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
 | Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, lead), PI3 (a, perf, built) |
 
@@ -381,27 +381,40 @@ fallback's parentheses are otherwise only doubled (`((a = 1))`, harmless). Not i
 (AR-4 changes `where!`'s signature, not this branch); no issue or PR found. Repro:
 [empty_where.rb](../../bench/upstream/app_suites/empty_where.rb). Fix: use an empty condition as it is
 (`if rest.empty? || opts.empty?`), which is what 8-1's `sanitize_sql` returned for it with any values; one test in
-`where_test.rb` (empty, named and positional values) that fails on main with a syntax error. Relation, finder,
+`where_test.rb` (empty, named and positional values, as arguments and in the array form) that fails on main with a
+syntax error. `opts.empty?` rather than `blank?`: a whitespace-only condition gave invalid SQL on 8-1 too. Repro runs
+each relation (8-1 and the fix: rows; main: syntax error). Relation, finder,
 sanitize, relations and base tests 1508 runs green on SQLite, RuboCop clean; with the fix in the main tree, Chatwoot's
 `filter_service_spec` passes 52/52.
 [patch](../../bench/upstream/app_suites/cw1-where-empty-condition-binds.patch),
-[body](../../bench/upstream/app_suites/cw1-body.md). Branch `thomasklemm/where-empty-condition-binds` @ `4520f97971`
-on main `7a78da5a55` (the freshly fetched main). No review round yet.
+[body](../../bench/upstream/app_suites/cw1-body.md). Branch `thomasklemm/where-empty-condition-binds` @ `58a6ff8355`
+on main `7a78da5a55`. Sol: open with nits; applied (array form in the test, "values" not binds, "on Rails main" in
+the body, the repro executes the query); amended and force-pushed with lease from `4520f97971`.
 
-**CW2 (d), restore candidate: the private `Resolver#_find_all` is gone.** 9987431315 (#58279, "Resolve the single
-best template without sorting the whole set") inlined it; 8-1's [`find_all` called it](https://github.com/rails/rails/blob/6e091242176c322edc5a8907583c01b08b8a60bc/actionview/lib/action_view/template/resolver.rb#L61).
-Chatwoot's [`EmailTemplates::DbResolverService#find_all`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/email_templates/db_resolver_service.rb#L28)
-(a pattern from panoramic) calls `_find_all(name, prefix, partial, details, key, locals)`, so every mailer that
-renders through it raises `NoMethodError`: 121 failures (an app-side shim defining `_find_all` in that class, used for
-one rerun only, removes all of them). The commit says custom resolvers that override `find_all` keep working; those
-that override `_find_all` itself no longer have it called at all, by reading the code (not run):
-[godmin 2.3.0](https://github.com/varvet/godmin/blob/b270f3736dde6022b71544c1692cafea42d4b35f/lib/godmin/resolver.rb#L22)
+**CW2 (d), restored: the private `Resolver#_find_all` hook is gone.** 9987431315 (#58279, "Resolve the single
+best template without sorting the whole set") made [`Resolver#find_all`](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/actionview/lib/action_view/template/resolver.rb#L68-L70)
+call `find_templates` directly; 8-1's [`find_all` called `_find_all`](https://github.com/rails/rails/blob/6e091242176c322edc5a8907583c01b08b8a60bc/actionview/lib/action_view/template/resolver.rb#L61).
+Chatwoot's [`EmailTemplates::DbResolverService`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/email_templates/db_resolver_service.rb#L28)
+(a `Resolver` subclass, a pattern from panoramic) overrides `find_all` and calls `_find_all(name, prefix, partial,
+details, key, locals)`, so every mailer that renders through it raises `NoMethodError`: 121 failures. Other callers:
+[view_component-cache_digest](https://github.com/tildeio/view_component-cache_digest/blob/82da53b3b092a256841858ed6a482ae0bd80b385/lib/view_component/cache_digest/resolver.rb#L10)
+(a `Resolver` subclass overriding `_find_all`, unreleased); [godmin 2.3.0](https://github.com/varvet/godmin/blob/b270f3736dde6022b71544c1692cafea42d4b35f/lib/godmin/resolver.rb#L22)
 and [rbexy 2.0.0.rc7](https://github.com/patbenatar/rbexy/blob/681bc8813f9e8258b8c8ed4056030d0516d5d4ad/lib/rbexy/rails/component_template_resolver.rb#L13)
-(both `FileSystemResolver` subclasses), plus unreleased view_component-cache_digest and torque-admin; code search shows
-about 245 hits for `_find_all(name, prefix, partial`, mostly Chatwoot and old Redmine forks. Unreleased and private.
-A restore of the base `Resolver#_find_all` hook, with `find_all` going through it, would be small and fix
-Chatwoot's pattern; honoring overrides in `FileSystemResolver` subclasses would mean routing `find` through them too,
-which is not small. Not built: the coordinator decides whether this meets the restore rule.
+override it in `FileSystemResolver` subclasses; code search shows about 245 hits for `_find_all(name, prefix, partial`.
+Repro: [resolver_find_all_hook.rb](../../bench/upstream/app_suites/resolver_find_all_hook.rb). On 8-1 both
+overrides are used through `find` and `find_all`. On main the `Resolver` subclass raises `NotImplementedError` from
+`find_templates`, and the `FileSystemResolver` subclass (the godmin/rbexy shape) silently finds nothing. Restore
+(decided 2026-11-04 under the restore rule: unreleased, several callers, small): `Resolver#find_all` calls
+`_find_all` again, its private default calls `find_templates`, and `Resolver#find` still goes through `find_all`, so
+an override of either is honored. `FileSystemResolver` is unchanged: its own optimized `find`/`find_all` never reach
+`_find_all`, so godmin's and rbexy's overrides stay uncovered, and the body says so. Two tests in
+`view_paths_test.rb`: a subclass overriding `_find_all` (fails on main with `NotImplementedError`) and one
+implementing `find_templates`, each rendering through a controller (`PathSet#find`) and `PathSet#find_all`. Action
+View suite 3370 runs green, RuboCop clean. With the restore in the main tree and without the app shim, Chatwoot's 9
+affected spec files run 132 examples with 3 failures, the confirmation mailer ones that fail on 8-1 too.
+[patch](../../bench/upstream/app_suites/cw2-resolver-find-all-hook.patch),
+[body](../../bench/upstream/app_suites/cw2-body.md). Branch `thomasklemm/resolver-find-all-hook` @ `e910df6df3` on
+main `7a78da5a55`. No review round yet.
 
 **CW3 (b): `precision: nil` datetime columns cast to microseconds in memory** (as in Mastodon): 2 failures, the widget
 and public `update_last_seen` specs expect `UpdateMessageStatusJob.perform_later` with a nanosecond `Time` on

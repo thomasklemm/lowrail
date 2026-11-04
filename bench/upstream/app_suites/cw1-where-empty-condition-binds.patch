@@ -1,4 +1,4 @@
-From 4520f979712b5673500266889f16cb4b70a1ae15 Mon Sep 17 00:00:00 2001
+From 58a6ff8355ff6b905c6aeae2ea939466f464b4fa Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 20:48:50 +0000
 Subject: [PATCH] Keep dropping an empty where condition that comes with values
@@ -13,8 +13,8 @@ filter, now fail with a syntax error.
 Use an empty condition as it is, as when no values are given.
 ---
  activerecord/lib/active_record/relation/query_methods.rb | 2 +-
- activerecord/test/cases/relation/where_test.rb           | 7 +++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ activerecord/test/cases/relation/where_test.rb           | 8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/activerecord/lib/active_record/relation/query_methods.rb b/activerecord/lib/active_record/relation/query_methods.rb
 index ee4a573235..9a607d706c 100644
@@ -30,10 +30,10 @@ index ee4a573235..9a607d706c 100644
            else
              parts = [model.bound_sql_literal_for("(#{opts})", rest)]
 diff --git a/activerecord/test/cases/relation/where_test.rb b/activerecord/test/cases/relation/where_test.rb
-index c3bd8e8394..be3a827bcb 100644
+index c3bd8e8394..d213838fdb 100644
 --- a/activerecord/test/cases/relation/where_test.rb
 +++ b/activerecord/test/cases/relation/where_test.rb
-@@ -502,6 +502,13 @@ def test_where_with_blank_conditions
+@@ -502,6 +502,14 @@ def test_where_with_blank_conditions
        end
      end
  
@@ -41,6 +41,7 @@ index c3bd8e8394..be3a827bcb 100644
 +      edges = Edge.where(sink_id: [2, 3])
 +      [{}, { sink_id: 1 }, 1].each do |values|
 +        assert_equal 2, edges.where("", values).count
++        assert_equal 2, edges.where(["", values]).count
 +      end
 +    end
 +
