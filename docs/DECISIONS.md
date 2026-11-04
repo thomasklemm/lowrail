@@ -243,6 +243,14 @@ A human reviewer has to get the essence in a few seconds.
   happens and what was tested. Cost measurements stay in the Lowrail doc and come up only if a maintainer asks,
   unless the fix measurably slows a common path.
 
+### Correctness fixes: readable first (2026-11-04)
+
+Thomas: for bug and correctness fixes, no code golf. The fix is written as readable and idiomatic as possible,
+in the shape a maintainer would write it. Performance is a side note: measure only to rule out a clear slowdown on
+a common path, never to choose between two correct shapes, and keep the numbers out of the body (see above). The
+L0–L3 performance bars don't apply; the cold read and the shape checklist do. Correctness findings that come up
+along the way get their own PRs.
+
 ### Primary review
 
 Before the queue, every candidate passes an independent Thermos review on both rubrics (correctness,
