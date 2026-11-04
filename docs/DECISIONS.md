@@ -239,6 +239,9 @@ A human reviewer has to get the essence in a few seconds.
 * **Scope caveats** take one clause each, not a paragraph. Methodology, A/A values, rejected variants and
   differential sizes stay in the Lowrail doc, or go in a `<details>` block at the end if a reviewer will want them.
 * Sol's and the outsider's wording fixes are made by shortening the text, not by adding to it.
+* **Correctness PRs carry no performance numbers** (Thomas, on #59617). The body says what was broken, what now
+  happens and what was tested. Cost measurements stay in the Lowrail doc and come up only if a maintainer asks,
+  unless the fix measurably slows a common path.
 
 ### Primary review
 
