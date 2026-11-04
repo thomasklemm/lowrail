@@ -126,7 +126,7 @@ matthewd would need Thomas's OK. Repro:
   release, with CHANGELOG entries. Gems that extend `CommandRecorder` this way break on `revert` and rollback: scenic
   (run here) and fx, whose default branch calls `record(:create_function, args, &block)` and defines
   `invert_create_function(args)` (read from source, not run). Neither scenic's default branch nor its tracker has
-  a fix or report yet.
+  a fix or report yet. **Reported 2026-11-04 as [scenic#466](https://github.com/scenic-views/scenic/issues/466)** (Thomas's OK).
 * **R2-3** changes what every lograge user sees in their logs on upgrade. The Rails PR calls the old subscribers
-  private API, so it is the gem's change to make; lograge has no issue or PR for it yet.
+  private API, so it is the gem's change to make; lograge has no issue or PR for it yet. **Reported 2026-11-04 as [lograge#407](https://github.com/roidrage/lograge/issues/407)** (Thomas's OK).
 * No comment was posted anywhere; any comment on these gems' trackers needs Thomas's approval.
