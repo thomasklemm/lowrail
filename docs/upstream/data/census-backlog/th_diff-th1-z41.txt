@@ -1,0 +1,22 @@
+reg 0: "same-as-hfe"
+reg 1: "same-as-hfe"
+reg 2: "same-as-hfe"
+reg 3: "NilClass"
+reg 4: "FalseClass"
+reg 5: "NilClass"
+reg 6: "NilClass"
+reg 7: "same-as-hfe"
+reg 8: NoMethodError
+reg 9: "same-as-hfe"
+reg 10: NoMethodError
+reg 11: NoMethodError
+exts ["builder", "erb", "html", "raw", "ruby"] frozen=false fresh=true
+exts+ ["bar", "builder", "erb", "foo", "html", "raw", "ruby"]
+exts- ["builder", "erb", "foo", "html", "raw", "ruby"]
+regdef nil
+def? true nil-ext true callable "x"
+regdef-str true
+regdef-noext NoMethodError
+after-unreg default nil
+argc ArgumentError ArgumentError ArgumentError
+arity [1, 0, 2]

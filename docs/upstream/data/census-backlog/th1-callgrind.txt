@@ -1,0 +1,8 @@
+hfe                  i49  main       1511  A/A  -0.13%  cand       1511    +0.00%   (reps 3)
+hfe                  y49  main       1313  A/A  -0.13%  cand       1311    -0.09%   (reps 3)
+hfe                  i41  main       1605  A/A  +0.00%  cand       1605    +0.00%   (reps 3)
+hfe                  z41  main       1441  A/A  +0.26%  cand       1443    +0.14%   (reps 3)
+render               i49  main     163921  A/A  +0.10%  cand     164174    +0.15%   (reps 3)
+render               y49  main      92446  A/A  +0.14%  cand      92440    -0.01%   (reps 3)
+render               i41  main     167248  A/A  +0.07%  cand     167050    -0.12%   (reps 3)
+render               z41  main      96639  A/A  -0.07%  cand      96639    -0.00%   (reps 3)
