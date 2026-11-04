@@ -380,3 +380,23 @@ one click.
   calling it a break.
 * Quote the line exactly as it appears at that SHA, or mark the quote as shortened.
 * Before posting, fetch each file at the linked SHA and confirm that the linked line contains the quoted call.
+
+## When Rails restores a private API, and other open calls (decided 2026-11-04 at Thomas's request)
+
+* **Restores.** Public API removed without a deprecation: restore it, deprecated if the new name is better. Private
+  or `:nodoc:` API: restore it only when all three hold, otherwise fix it in the gem or app that uses it:
+  1. the removal is **unreleased**, so a restore costs maintainers no new compatibility promise,
+  2. **several real callers** (released gems or apps, cited with permalinks) break, or one large one breaks
+     silently or wrongly, and
+  3. the restore is **small** and keeps the change's purpose: a deprecated shim, an alias, a signature, not a
+     revert of the feature.
+  The PR says openly that the API is private and names the callers. #59629 (`find_template`), #59630
+  (`filter_proxies`) and AR-4 (`where!`/`having!` binds) meet all three and stay open or queued. Private
+  breakage that fails any of them (build_bind_attribute, `_prefixes`, Vary changes) is record-only, or goes to the
+  gem or app when the fix there is small and the maintainers are active.
+* **Open gem PRs** (inertia-rails, i18n, rubocop-performance, others): no pings. One short, friendly ping only after
+  four weeks without any maintainer reaction; closing only at a maintainer's request or when superseded.
+* **rspec-rails release:** no issue for now. Ask once a Rails 8.2 beta is out, because then its unreleased Rails-main
+  fixes block real users.
+* **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
+  unreleased.

@@ -345,7 +345,7 @@ The same input in UTF-8 (`"/\xFF"`, pos 1) raises `ArgumentError` on both. Journ
 raising, so `until token = scan || @scanner.eos?; end` spins forever: `Journey::Parser.parse` hangs on master for
 route paths such as `"/\xFF|bc"` in Shift_JIS or `"/a"` in UTF-16LE. Rails main and both candidates are equally
 affected. Open questions before filing: whether nil is intended (strscan treats "no match" as nil), and whether
-Rails should guard its loop instead.
+Rails should guard its loop instead. **Asked 2026-11-04 as [ruby/strscan#223](https://github.com/ruby/strscan/issues/223).**
 
 ## PR bodies
 
