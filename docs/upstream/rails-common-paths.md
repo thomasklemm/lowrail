@@ -8,7 +8,9 @@ result. Sources: the census and CPU docs ([census 3–7](rails-main-census-7.md)
 [gem-request-census](gem-request-census.md), [R7](rails-r7-queue.md)), plus an allocation trace of about 40 common
 operations (helpers, form fields, finders, association reads, collection rendering) on Rails main.
 
-**Result.** Two candidates, held in the [queue](contributions.md#queue) for Thomas to open; the rest were
+**Result.** Two candidates, opened on 2026-11-04 after Thomas approved them: CP-1 as
+[rails/rails#59596](https://github.com/rails/rails/pull/59596), CP-2 as
+[rails/rails#59597](https://github.com/rails/rails/pull/59597); the rest were
 rejected or already covered (below).
 
 | # | Branch @ SHA | Change | Per call |
@@ -231,7 +233,7 @@ from the first).
 (kept, because apps read `SETS[:modern]`); add the Ractor-shareability test (done). Adversarial: nothing beyond the
 accepted nodoc boundaries.
 
-## PR bodies (held; Thomas opens them)
+## PR bodies (as opened)
 
 Both bodies were checked by a separate reviewer (verdict: ready after small edits) against the receipts (every number recomputed) and for an
 outsider's reading; its corrections are applied. The links resolve once this page is on Lowrail main.
