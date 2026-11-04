@@ -1,86 +1,122 @@
 # Keyword splat after dynamic keywords (ruby/ruby#19670)
 
-Patches for review. Neither is pushed to the PR.
+Patches for review. Neither one is pushed to the PR.
 
-- [e9440260c3.patch](e9440260c3.patch): a single commit on ruby/ruby master
-  `b51db981f6` that replaces the PR head `eb01818c3d`. It builds the dynamic
-  pairs with `core#hash_new_for_merge`, a hash with room for 8 embedded
-  entries, and merges the splat into it in place with
-  `core#hash_merge_fresh_kwd`. The pairs are still hashed before the splat
-  expression runs, so evaluation order is unchanged.
-- [5e81fc506a.patch](5e81fc506a.patch): kept in reserve, on top of the PR
-  head. It builds one hash sized for the pairs and the splat in
-  `core#hash_new_kwd`. It is faster, but under prism it inserts the pairs
-  after the splat expression and its `to_hash` run, unlike parse.y.
+- [bd53d14e1d.patch](bd53d14e1d.patch) replaces the PR head `eb01818c3d`. It
+  is a single commit on ruby/ruby master `b51db981f6` and is also on the fork
+  branch `thomasklemm/kwsplat-ar-room-2`. It brings back Ruby 4.0's
+  construction:
+  - `core#hash_new_for_merge` builds the pairs in a hash with room for 8
+    entries in its embedded table.
+  - The existing `core#hash_merge_bang_kwd` then merges the splat into that
+    hash in place. For a nil splat it now returns the hash as it is instead of
+    copying it.
+  - The pairs are still hashed before the splat expression runs.
+  - Prism compiles hash literals such as `{a: v, **h}` with the same code, so
+    they change the same way.
+- [5e81fc506a.patch](5e81fc506a.patch) is a reserve on top of the PR head; it
+  is also on `thomasklemm/kwsplat-sized-hash`. It builds one hash sized for the
+  pairs plus the splat. Under prism the pairs are then inserted after the
+  splat expression and its `to_hash` have run, so it changes evaluation order.
 
-## Allocations per call, `m(a: v, **h)`, |h| = 0..9
+## Key `#hash` calls: the same as 4.0.7
 
-| Build | 0 | 1 | 2 | 3–9 |
-|---|---|---|---|---|
-| 4.0.7 | 1 | 1 | 1 | 1 |
-| master `b51db981f6` | 2 | 2 | 2 | 2 |
-| PR `eb01818c3d` | 1 | 1 | 2 | 2 |
-| `e9440260c3` | 1 | 1 | 1 | 1 |
-| `5e81fc506a` | 1 | 1 | 1 | 1 |
+`scripts/hashcount.rb` counts the `#hash` calls on keys of a custom class for
+`{k => v, **h}` and `m(k => v, **h)`, where `h` has n custom keys. Literals and
+calls give the same counts on every build.
 
-Single mutable keyword splat, `m(**h, &b)`, |h| = 0..9: master 3,2,2,…;
-PR 2,1,1,2,2,…; `e9440260c3` 2,1,1,1,… (the same as 4.0.7).
+| Build | n=1 | 2 | 3 | 7 | 8 | 9 | 12 | `#hash` raising on its 2nd call |
+|---|---|---|---|---|---|---|---|---|
+| 4.0.7, prism and parse.y | 2 | 3 | 4 | 8 | 18 | 19 | 22 | raises from n=8 |
+| master / PR, prism | 2 | 3 | 4 | 8 | 12 | 13 | 16 | never raises |
+| master / PR / new, parse.y | 2 | 6 | 7 | 11 | 12 | 13 | 16 | never raises |
+| `bd53d14e1d`, prism | 2 | 3 | 4 | 8 | 18 | 19 | 22 | raises from n=8 |
+
+- A 4.0-style hash starts with 8 embedded entries. When it outgrows them, it
+  converts to an st_table and calls `#hash` again on every key it holds.
+  Master copies the result into a hash allocated with the right size instead,
+  so most keys are not hashed again.
+- The script prints the full table, including two pairs before the splat.
+- Every build from master on makes one more `#eql?` call per construction than
+  4.0.7. That comes from a separate change to Hash: on master, plain
+  `h = {k0 => 1}; h[k1] = 2` also calls `#eql?` once (`scripts/eql.rb`).
+
+## Objects and bytes per call
+
+`scripts/bytes.rb` measures objects, GC slot bytes (from `GC.stat_heap`), and
+`ObjectSpace.memsize_of` of the result. GC is disabled while it measures.
+Calls and literals give the same numbers.
+
+| `m(a: v, **h)`, size | 0 | 1 | 2 | 3 | 8 |
+|---|---|---|---|---|---|
+| 4.0.7 | 1 / 160 / 160 | 1 / 160 / 160 | 1 / 160 / 160 | 1 / 160 / 160 | 1 / 160 / 544 |
+| master | 2 / 128 / 64 | 2 / 128 / 64 | 2 / 144 / 80 | 2 / 160 / 96 | 2 / 128 / 448 |
+| PR | 1 / 64 / 64 | 1 / 64 / 64 | 2 / 144 / 80 | 2 / 160 / 96 | 2 / 128 / 448 |
+| `bd53d14e1d` | 1 / 160 / 160 | 1 / 160 / 160 | 1 / 160 / 160 | 1 / 160 / 160 | 1 / 160 / 544 |
+
+Each cell is objects / slot bytes / result memsize. The new commit matches
+4.0.7 exactly. Compared with master it allocates 32 B more slot bytes at
+sizes 0–1, 16 B more at 2, the same at 3, and 32 B more at 8. A result that
+stays alive is 64–96 B larger. For the single mutable splat `m(**h, &b)`,
+master allocates 128/128/128/144/224 slot bytes and `bd53d14e1d` 160 at every
+size.
 
 ## Callgrind Ir per call, GC disabled
 
-Ir per call is the difference between runs of 120k and 20k calls, divided
-by 100k.
+Ir per call is the difference between runs of 120k and 20k calls, divided by
+100k (`scripts/ir.sh`).
 
-`m(a: v, **h)`:
-
-| Build | 0 | 1 | 2 | 3 | 5 | 8 | 9 |
+| `m(a: v, **h)` | 0 | 1 | 2 | 3 | 5 | 8 | 9 |
 |---|---|---|---|---|---|---|---|
 | 4.0.7 | 1383 | 1918 | 2309 | 2712 | 3567 | 6272 | 6401 |
 | master | 1982 | 2589 | 3021 | 3340 | 4103 | 7852 | 8267 |
 | PR | 1645 | 2255 | 3006 | 3326 | 4083 | 7834 | 8257 |
-| `e9440260c3` | 1900 | 2510 | 2927 | 3225 | 3956 | 6471 | 6884 |
-| `e9440260c3` (A/A) | 1900 | 2505 | 2923 | 3230 | 3955 | 6477 | 6893 |
-| `5e81fc506a` | 1602 | 2216 | 2651 | 2965 | 3826 | 5199 | 5617 |
-| rejected: merge into `newhash` | 1620 | 2228 | 3408 | 3719 | 5329 | 7482 | 7904 |
-| rejected: same, presized st_table | 1649 | 2259 | 3196 | 3506 | 4279 | 5510 | 5926 |
+| `bd53d14e1d` | 1895 | 2511 | 2923 | 3230 | 3960 | 6452 | 6892 |
+| `bd53d14e1d` A/A | 1895 | 2506 | 2923 | 3225 | 3960 | 6471 | 6899 |
 
-`m(**h, &b)`:
-
-| Build | 0 | 1 | 2 | 3 | 5 | 8 | 9 |
+| `m(**h, &b)` | 0 | 1 | 2 | 3 | 5 | 8 | 9 |
 |---|---|---|---|---|---|---|---|
 | master | 1788 | 2432 | 2844 | 3166 | 3946 | 5075 | 8141 |
 | PR | 1467 | 2116 | 2535 | 3155 | 3945 | 5087 | 8131 |
-| `e9440260c3` | 1748 | 2392 | 2807 | 3113 | 3839 | 4934 | 6908 |
+| `bd53d14e1d` | 1748 | 2389 | 2806 | 3110 | 3840 | 4937 | 6794 |
 
-`e9440260c3` is below master at every size on both paths. At sizes 0–1 it
-is about 250 Ir slower than the PR, because the pairs now take a C call
-instead of the `newhash` instruction. The PR's `newhash` gets a 64-byte slot
-whose embedded table holds 2 entries, so from 3 entries on the PR has to copy
-the result into a second hash, and the two merge-into-`newhash` variants have
-to convert it to an st_table.
+The new commit is below master at every size on both paths. At sizes 0–1 it
+costs about 250 Ir more than the PR (on `m(**h, &b)` also at size 2). The
+reason is that the pairs go through a C call instead of the `newhash`
+instruction.
 
-With GC enabled (`m(a: v, **h)`, sizes 1/2/3/5/8): master
-2879/3308/3616/4404/8447, PR 2503/3292/3599/4392/8429, `e9440260c3`
-2694/3111/3409/4140/6935.
+## YJIT elapsed time, GC enabled
 
-Memory: a small result now takes a 160-byte slot with an 8-entry embedded
-table, against 64 bytes for master's second hash (a 21-entry result takes
-992 bytes against 896). Both sizes match 4.0.7.
+`scripts/yt.rb` runs with `--yjit`. Each figure is ns per call, the best of 3
+runs of 2M calls; the two figures are two separate runs.
 
-The review found no behaviour difference from master. Two follow-ups are left
-out of the PR: prism zsuper with `**kwrest` still allocates one object more
-than 4.0, and `core#hash_merge_fresh_kwd` could be folded into
-`core#hash_merge_bang_kwd`.
+| `m(a: v, **h)` | 0 | 1 | 2 | 3 | 8 |
+|---|---|---|---|---|---|
+| 4.0.7 | 138 / 134 | 190 / 184 | 220 / 212 | 270 / 241 | 633 / 588 |
+| master | 192 / 183 | 263 / 246 | 297 / 278 | 328 / 304 | 1008 / 950 |
+| PR | 130 / 136 | 197 / 208 | 285 / 295 | 312 / 311 | 969 / 973 |
+| `bd53d14e1d` | 149 / 147 | 215 / 223 | 251 / 249 | 277 / 275 | 800 / 716 |
+
+The `bd53d14e1d` runs overlapped with a `make test-all` run, which probably
+explains the spread at size 8. A run of the same code before the fold, with no
+other load, gave 155/219/254/280/732.
+
+## Tests
+
+- `test_keyword_splat_after_dynamic_keywords` in test_keyword.rb covers custom
+  `#hash`/`#eql?` keys, a `to_hash` that raises or returns a non-Hash,
+  multiple splats with trailing pairs, mutating the source or the result
+  afterwards, defaults and compare_by_identity not being adopted, and
+  literals.
+  - It passes on 4.0.7, master, the PR and `bd53d14e1d` under both parsers. It
+    guards existing behaviour; it does not fail on master.
+- The allocation assertions in test_allocation.rb fail on master and on the
+  PR head.
 
 ## Scripts
 
-[scripts/](scripts/) contains everything used above:
-
-- `allocs.rb` and `allocs_s.rb` count allocations.
-- `ir.sh ir.rb RUBY` and `ir.sh irs.rb RUBY` measure Ir.
-- `sem.rb`, `order.rb` and `order9.rb` print semantics and evaluation order;
-  compare their output across builds and with `--parser=parse.y`.
-
-`e9440260c3` prints the same as master for all three scripts under both
-parsers. `5e81fc506a` differs from master in `order.rb` and `order9.rb`
-under prism.
+[scripts/](scripts/): `allocs.rb`, `allocs_s.rb` and `bytes.rb` (objects and
+bytes), `ir.sh` with `ir.rb`/`irs.rb` (Ir), `yt.rb` (YJIT time),
+`hashcount.rb` and `eql.rb` (key callbacks), and `sem.rb`, `order.rb` and
+`order9.rb` (semantics and evaluation order; compare the output across builds
+and with `--parser=parse.y`).
