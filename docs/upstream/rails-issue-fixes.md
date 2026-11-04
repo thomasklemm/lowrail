@@ -13,7 +13,7 @@ fail on main and two more fail in their reporters' own tests; only one of them h
 
 | Fix | Issue | Branch @ SHA | Size | Status |
 | --- | --- | --- | --- | --- |
-| I1: grouped keys of columns unknown to the schema are cast from the result | [rails/rails#48420](https://github.com/rails/rails/issues/48420) | [`thomasklemm/grouped-keys-unknown-table-type`](https://github.com/thomasklemm/rails/tree/thomasklemm/grouped-keys-unknown-table-type) @ [`0cd841c0c1`](https://github.com/thomasklemm/rails/commit/0cd841c0c16340b573a4b551af69f4b756c97648) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/i1-grouped-keys-unknown-table-type.patch)) | lib +4/−1, three tests, CHANGELOG | **Opened as [#59609](https://github.com/rails/rails/pull/59609)** 2026-11-04, head `c61c7ede78` after Sol's nits ([ledger](contributions.md#open)) |
+| I1: grouped keys of columns unknown to the schema are cast from the result | [rails/rails#48420](https://github.com/rails/rails/issues/48420) | [`thomasklemm/grouped-keys-unknown-table-type`](https://github.com/thomasklemm/rails/tree/thomasklemm/grouped-keys-unknown-table-type) @ [`0cd841c0c1`](https://github.com/thomasklemm/rails/commit/0cd841c0c16340b573a4b551af69f4b756c97648) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/i1-grouped-keys-unknown-table-type.patch)) | lib +4/−1, three tests, CHANGELOG | **Opened as [#59609](https://github.com/rails/rails/pull/59609)** 2026-11-04; head `3f0b28f7ef` after Sol's nits and the readability rewrite ([ledger](contributions.md#open)) |
 | IW: Array subclasses' `index_with` indexes what `each` yields again (census backlog finding 3) | none | [`thomasklemm/index-with-array-subclass-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/index-with-array-subclass-each) @ [`2486c9d447`](https://github.com/thomasklemm/rails/commit/2486c9d4471155ca219571efa32eac0fb7c01d4e) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/iw-index-with-array-subclass-each.patch)) | lib +5/−2, test +6 | Lead, not opened (coordinator agreed): +5.3% instructions per plain-Array call for a case Ruby's own Array methods don't honour either ([below](#census-backlog-findings-c14)) |
 
 ## Triage
@@ -145,6 +145,42 @@ or reads (needs late `register_type`; contrived). Also in the mechanism: a strin
 * No open PR for #48420 at 2026-11-04 12:15 UTC (`gh pr list --search 48420`, and the issue's cross-references show
   only the closed #58150).
 
+### Readability record (DECISIONS readability gate and plain description, applied after opening)
+
+The opened head `c61c7ede78` had `type = …; type = … if type.equal?(…)`, a reassignment inside a conditional
+modifier. Head `3f0b28f7ef` (amended, force-pushed once, PR body updated; full AR suite again green: PostgreSQL
+11,205 runs 0 failures, SQLite 10,283 runs 0 failures, the same 4 `sqlite3`-CLI errors) assigns the key type in one
+`if / elsif / else`:
+
+```ruby
+type = col_name.try(:type_caster)
+# A column unknown to the schema has the placeholder Type.default_value (hence equal?); use the database type.
+types[aliaz] = if type.equal?(Type.default_value)
+  calculated_data.column_types.fetch(aliaz, type)
+elsif type
+  type
+else
+  type_for(col_name) { calculated_data.column_types.fetch(aliaz, Type.default_value) }
+end
+```
+
+Plain description, one sentence per branch:
+
+1. A column whose type is the placeholder for a column unknown to the schema takes the type the database reports.
+2. A column with any other type keeps it.
+3. An SQL expression, which has no type of its own, takes the model attribute's type of that name, or the database's
+   type if the model has none (unchanged from main).
+
+A first three-branch draft put the `nil` case first and the comment between `if` and `elsif`; reordering put the
+comment next to the check it explains. Cold read (a subagent that had not seen the change): each branch stated
+correctly in one sentence, L1 ("close to L2"), noting that branches 1 and 3 both end at the database type. Its
+proposed merge of the two fallbacks (`type ||= type_for { nil }`, then one placeholder check) would also send model
+attributes whose type is the placeholder through the database type, a behaviour change, and reassigns inside a
+conditional, so it was not taken; the comment now says why the placeholder falls back.
+
+Metrics for `execute_grouped_calculation` (signal only; main → head): flog 194.4 → 203.0; RuboCop AbcSize 127.5 →
+132.0, CyclomaticComplexity 33 → 34, PerceivedComplexity 36 → 38, MethodLength 80 → 84.
+
 ### Sol review and PR body as opened
 
 Sol (run by the coordinator): approve; it fixes #48420, keeps #46923's joined-column fix, and leaves MySQL unchanged
@@ -154,7 +190,7 @@ selecting a typed column (fails on main on both), a mixed known/unknown two-colu
 `ActiveModel::Type::Value` that must stay as supplied (fails if `equal?` is replaced by `==`); body wording. A
 subquery's `created_at` with time-zone-aware attributes now groups as a UTC `Time`, while `group(:created_at)` stays
 `TimeWithZone` (checked). No competing PR at 12:40 UTC. Opened as
-[#59609](https://github.com/rails/rails/pull/59609):
+[#59609](https://github.com/rails/rails/pull/59609); the body below is the current one (updated with the plain description):
 
 > Fixes #48420.
 >
@@ -167,4 +203,20 @@ subquery's `created_at` with time-zone-aware attributes now groups as a UTC `Tim
 > # this PR: { 2020-01-01 00:00:00 UTC...2020-01-02 00:00:00 UTC => 1 }
 > ```
 >
-> Since #46923 (backported to 7.0.5 in #48091), a grouped key's type comes from the group column's Arel attribute first. When the schema cache doesn't know its table, as for a subquery alias or a CTE, that type is the placeholder `ActiveRecord::Type.default_value`, which casts nothing, so the type the database reports for the result is never used. This uses the result's type whenever the column's type is that placeholder, which also fixes SQLite subqueries and CTEs that select a typed column (booleans came back as `1`, dates as `"2020-01-01"`). Columns with a type other than the placeholder keep it, including an explicit `ActiveModel::Type::Value` and same-named columns of joined models, the case #46923 fixed. The result's metadata supplies the database type, not the model's time zone wrapper, enum or serializer: a subquery's `created_at` becomes a UTC `Time`, not a `TimeWithZone`. `pluck` has the same bug on another path; I left it for a separate PR.
+> Since #46923 (backported to 7.0.5 in #48091), a grouped key's type comes from the group column's Arel attribute first. When the schema cache doesn't know its table, as for a subquery alias or a CTE, that type is the placeholder `ActiveRecord::Type.default_value`, which casts nothing, so the type the database reports for the result is never used. Now a column whose type is that placeholder takes the result's type, a column with any other type keeps it, and an SQL expression still takes the model attribute's type of that name or the result's. This also fixes SQLite subqueries and CTEs that select a typed column (booleans came back as `1`, dates as `"2020-01-01"`). An explicit `ActiveModel::Type::Value` and same-named columns of joined models (the case #46923 fixed) keep their type. The result's metadata supplies the database type, not the model's time zone wrapper, enum or serializer: a subquery's `created_at` becomes a UTC `Time`, not a `TimeWithZone`. `pluck` has the same bug on another path; I left it for a separate PR.
+
+## Second round: one level deeper (2026-11-04)
+
+The eleven issues still open after the filters, and the "intended" ones users keep reporting, were rechecked for a
+fix, a doc fix or a clearer error. The open-PR check now uses GitHub's search API: `gh search` in this orb silently
+returned nothing (it needs the `read:org` scope), so the first round relied on cross-references only. Result: no
+new candidate.
+
+| Issue | Deeper finding | Decision |
+| --- | --- | --- |
+| #15854 eager loading with `limit` | The API docs say the limit "will be ignored, returning all the associated objects"; on main that holds for `eager_load` only (`[3, 3]`), while `includes`/`preload` apply one limit to all owners (`[2, 0]`) ([repro](../../bench/upstream/rails_issue_fixes/repro_15854_preload_limit.rb)) | Not built: kamipo's open [#58815](https://github.com/rails/rails/pull/58815) runs the scope per owner in `preload` (behind `respect_association_scope_limits`), not cross-referenced from the issue; a doc fix would conflict with it |
+| #58737 (and #56090, #55998) custom Active Job serializers ignored when a gem loads `ActiveJob::Arguments` early | Registering inside `ActiveSupport.on_load(:active_job_arguments)` works in both load orders and stays deferred ([repro](../../bench/upstream/rails_issue_fixes/repro_custom_serializers_early_load.rb)), but it calls `ActiveJob::Serializers.add_serializers`, which is `:nodoc:`, and skipkayhil pointed reporters to public API only. The early load is what `guard_load_hooks` / `action_on_early_load_hook` reports; it misses loads before the application class exists, which open #58334 (for #58327) fixes | Not built: the clearer error is #58334; a guide recommending a `:nodoc:` method is not ours to add |
+| #54812 Action Text dirty with legacy ` ` | A cheaper fix would have `ActionText::Content.dump` return the stored HTML for unchanged content, but that also stops canonicalizing user-supplied HTML on save | Not built: no exact fix cheaper than `comparable: true` (607 µs per check) |
+| #16452 constant alias as association class | Main raises "Missing model class Author for the Post#author association" although `Author` exists (as `User`) | Not built: a clearer message is possible in `compute_type`, but the issue has no reactions or duplicates since 2014 |
+| #50971, #58499, #59168, #59153 | No open PR found by text search; reasons from the first round stand (reverted guard; useragent#74; maintainer direction asked; herb gem) | Unchanged |
+| #46419, #49762, #58732, #57109, #58523, #54177 | Documented already, or a docs PR is open (#59007, #58744, #58761, #57114), or fatkodima rejected the remainder (#58000) | Unchanged |

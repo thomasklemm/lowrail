@@ -1,4 +1,4 @@
-From c61c7ede78c913443100b9660469fb4fd390fdc2 Mon Sep 17 00:00:00 2001
+From 3f0b28f7ef2e082c5a80fffdaff453d96e3e1237 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 12:14:29 +0000
 Subject: [PATCH] Cast grouped keys of columns unknown to the schema from the
@@ -15,9 +15,9 @@ including joined models that share column names with the root model,
 keep their schema type.
 ---
  activerecord/CHANGELOG.md                     | 16 +++++++++
- .../active_record/relation/calculations.rb    |  5 ++-
+ .../active_record/relation/calculations.rb    | 13 +++++---
  activerecord/test/cases/calculations_test.rb  | 33 +++++++++++++++++++
- 3 files changed, 53 insertions(+), 1 deletion(-)
+ 3 files changed, 58 insertions(+), 4 deletions(-)
 
 diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
 index 4ad8bfd285..01a59719d3 100644
@@ -44,21 +44,29 @@ index 4ad8bfd285..01a59719d3 100644
  
      A serialization failure rolls back whatever the statement was part of, so a
 diff --git a/activerecord/lib/active_record/relation/calculations.rb b/activerecord/lib/active_record/relation/calculations.rb
-index 91900066ea..17bf49b992 100644
+index 91900066ea..7e9a1190c7 100644
 --- a/activerecord/lib/active_record/relation/calculations.rb
 +++ b/activerecord/lib/active_record/relation/calculations.rb
-@@ -584,7 +584,10 @@ def execute_grouped_calculation(operation, column_name, distinct) # :nodoc:
+@@ -584,10 +584,15 @@ def execute_grouped_calculation(operation, column_name, distinct) # :nodoc:
              end
  
              key_types = group_columns.each_with_object({}) do |(aliaz, col_name), types|
 -              types[aliaz] = col_name.try(:type_caster) ||
+-                type_for(col_name) do
+-                  calculated_data.column_types.fetch(aliaz, Type.default_value)
+-                end
 +              type = col_name.try(:type_caster)
-+              # Type.default_value is the placeholder for a column unknown to the schema, so this is an identity check.
-+              type = calculated_data.column_types.fetch(aliaz, type) if type.equal?(Type.default_value)
-+              types[aliaz] = type ||
-                 type_for(col_name) do
-                   calculated_data.column_types.fetch(aliaz, Type.default_value)
-                 end
++              # A column unknown to the schema has the placeholder Type.default_value (hence equal?); use the database type.
++              types[aliaz] = if type.equal?(Type.default_value)
++                calculated_data.column_types.fetch(aliaz, type)
++              elsif type
++                type
++              else
++                type_for(col_name) { calculated_data.column_types.fetch(aliaz, Type.default_value) }
++              end
+             end
+ 
+             hash_rows = calculated_data.cast_values(key_types).map! do |row|
 diff --git a/activerecord/test/cases/calculations_test.rb b/activerecord/test/cases/calculations_test.rb
 index e24cb7f88e..2fabdcfbc4 100644
 --- a/activerecord/test/cases/calculations_test.rb
