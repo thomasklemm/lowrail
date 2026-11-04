@@ -1,0 +1,148 @@
+From 8f41f1c9c34cc61954a2fdffada94f005d222f8c Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:22:17 +0000
+Subject: [PATCH] Find SQLite tables by any ASCII case of their name in the
+ schema readers
+
+The batched schema readers filtered sqlite_master with an exact IN match
+and keyed the rows by the stored name, while SQLite matches table names
+without regard to ASCII case. A model whose table_name differs in case
+from the CREATE TABLE statement could no longer read its columns,
+primary key or indexes. Match with COLLATE NOCASE and key the rows by
+the name that was asked for.
+---
+ .../sqlite3/schema_statements.rb              | 12 +++++--
+ .../connection_adapters/sqlite3_adapter.rb    |  8 ++---
+ .../adapters/sqlite3/sqlite3_adapter_test.rb  | 34 +++++++++++++++++--
+ 3 files changed, 46 insertions(+), 8 deletions(-)
+
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
+index 64b1bad838..efc4e6b643 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
+@@ -79,16 +79,24 @@ def schema_creation # :nodoc
+             )
+           SQL
+ 
++          # SQLite matches table names without regard to ASCII case, so a table is
++          # found by any ASCII-case variant of its name, and its rows are keyed by
++          # each name that was asked for.
++          def group_by_table(rows, tables)
++            rows = rows.group_by { |row| row["table_name"].downcase(:ascii) }
++            tables.index_with { |table| rows[table.downcase(:ascii)] }.compact
++          end
++
+           def fetch_indexes(tables)
+             return {} if tables.empty?
+ 
+-            rows = query_all(<<~SQL).group_by { |row| row["table_name"] }
++            rows = group_by_table(query_all(<<~SQL), tables)
+               #{MASTER_CTE}
+               SELECT m.name AS table_name, i.name, i."unique"
+               FROM master m
+               JOIN pragma_index_list(m.name) i
+               WHERE m.type = 'table'
+-                AND m.name IN (#{quoted_table_names(tables)})
++                AND m.name COLLATE NOCASE IN (#{quoted_table_names(tables)})
+                 AND i.name NOT GLOB 'sqlite_*'
+             SQL
+ 
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index 0da5ffeadb..4106de9b59 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -574,13 +574,13 @@ def fetch_foreign_keys(tables)
+           return {} if tables.empty?
+ 
+           # SQLite returns 1 row for each column of composite foreign keys.
+-          fk_infos = query_all(<<~SQL).group_by { |row| row["table_name"] }
++          fk_infos = group_by_table(query_all(<<~SQL), tables)
+             #{MASTER_CTE}
+             SELECT m.name AS table_name, fk.id, fk.seq, fk."table", fk."from", fk."to", fk.on_update, fk.on_delete
+             FROM master m
+             JOIN pragma_foreign_key_list(m.name) fk
+             WHERE m.type = 'table'
+-              AND m.name IN (#{quoted_table_names(tables)})
++              AND m.name COLLATE NOCASE IN (#{quoted_table_names(tables)})
+           SQL
+ 
+           structures = table_structures(tables)
+@@ -942,14 +942,14 @@ def table_structures(tables)
+           fields = ["name", "type", "notnull", "dflt_value", "pk"]
+           fields << "hidden" if supports_virtual_columns?
+ 
+-          query_all(<<~SQL).group_by { |row| row["table_name"] }
++          group_by_table(query_all(<<~SQL), tables)
+             #{MASTER_CTE}
+             SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
+                    #{fields.map { |field| "t.#{quote_column_name(field)}" }.join(", ")}
+             FROM master m
+             JOIN pragma_#{table_info_pragma}(m.name) t
+             WHERE m.type IN ('table', 'view')
+-              AND m.name IN (#{quoted_table_names(tables)})
++              AND m.name COLLATE NOCASE IN (#{quoted_table_names(tables)})
+             ORDER BY m.name, t.cid
+           SQL
+             .transform_values do |group|
+diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+index 3dac5cca5f..788ec3dd55 100644
+--- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
++++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+@@ -534,7 +534,7 @@ def test_insert_logged
+             FROM master m
+             JOIN pragma_table_xinfo(m.name) t
+             WHERE m.type IN ('table', 'view')
+-              AND m.name IN ('ex')
++              AND m.name COLLATE NOCASE IN ('ex')
+             ORDER BY m.name, t.cid
+           SQL
+           modified_insert_query = [(sql + ' RETURNING "id"'), name, []]
+@@ -685,6 +685,36 @@ def test_columns_with_not_null
+         end
+       end
+ 
++      def test_schema_readers_find_a_table_by_any_ascii_case_of_its_name
++        with_example_table <<~SQL, "Widgets" do
++          id integer PRIMARY KEY,
++          number integer,
++          FOREIGN KEY (number) REFERENCES "Widgets"(id)
++        SQL
++          @conn.add_index "Widgets", :number
++          @conn.execute 'CREATE VIEW "WidgetsView" AS SELECT id FROM "Widgets"'
++
++          assert_equal %w[ id number ], @conn.columns("widgets").map(&:name)
++          assert_equal "id", @conn.primary_key("widgets")
++          assert_equal ["index_Widgets_on_number"], @conn.indexes("widgets").map(&:name)
++          assert_equal [["number", "Widgets"]], @conn.foreign_keys("widgets").map { |fk| [fk.column, fk.to_table] }
++          assert_equal %w[ id ], @conn.columns("widgetsview").map(&:name)
++          assert_equal({ "Widgets" => %w[ id number ], "widgets" => %w[ id number ] },
++            @conn.columns(["Widgets", "widgets"]).transform_values { |columns| columns.map(&:name) })
++        ensure
++          @conn.execute 'DROP VIEW IF EXISTS "WidgetsView"'
++        end
++      end
++
++      def test_schema_readers_tell_apart_tables_whose_names_differ_in_non_ascii_case
++        with_example_table "id integer PRIMARY KEY, upper integer", "Ärger" do
++          with_example_table "id integer PRIMARY KEY, lower integer", "ärger" do
++            assert_equal({ "Ärger" => %w[ id upper ], "ärger" => %w[ id lower ] },
++              @conn.columns(["Ärger", "ärger"]).transform_values { |columns| columns.map(&:name) })
++          end
++        end
++      end
++
+       def test_add_column_with_not_null
+         with_example_table "id integer PRIMARY KEY AUTOINCREMENT, number integer not null" do
+           assert_nothing_raised { @conn.add_column :ex, :name, :string, null: false }
+@@ -720,7 +750,7 @@ def test_indexes_logs
+             FROM master m
+             JOIN pragma_index_list(m.name) i
+             WHERE m.type = 'table'
+-              AND m.name IN ('ex')
++              AND m.name COLLATE NOCASE IN ('ex')
+               AND i.name NOT GLOB 'sqlite_*'
+           SQL
+ 
+-- 
+2.55.0
+

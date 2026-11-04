@@ -1,0 +1,90 @@
+From 8672567e1518efbb707dc520782dffd8a40a8fae Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:22:17 +0000
+Subject: [PATCH] Deprecate ActiveSupport::LogSubscriber.colorize_logging
+
+The class-level accessor went away without a deprecation when color
+logging moved to ActiveSupport::ColorizeLogging, so gems that read it
+while loading, such as awesome_print, raised NoMethodError. Bring it
+back as a deprecated reader and writer that delegate to
+ActiveSupport.colorize_logging.
+---
+ activesupport/CHANGELOG.md                       |  9 +++++++++
+ .../lib/active_support/log_subscriber.rb         | 16 ++++++++++++++++
+ activesupport/test/log_subscriber_test.rb        | 16 ++++++++++++++++
+ 3 files changed, 41 insertions(+)
+
+diff --git a/activesupport/CHANGELOG.md b/activesupport/CHANGELOG.md
+index edf224874d..d95044a2b4 100644
+--- a/activesupport/CHANGELOG.md
++++ b/activesupport/CHANGELOG.md
+@@ -1,3 +1,12 @@
++*   Restore `ActiveSupport::LogSubscriber.colorize_logging` and
++    `colorize_logging=` as deprecated delegators to
++    `ActiveSupport.colorize_logging`.
++
++    The class-level accessor was removed without a deprecation when color
++    logging moved to `ActiveSupport::ColorizeLogging`.
++
++    *Thomas Klemm*
++
+ *   `ActiveSupport::MessagePack` no longer deserializes an unsafe
+     `ActiveSupport::SafeBuffer` as `html_safe`.
+ 
+diff --git a/activesupport/lib/active_support/log_subscriber.rb b/activesupport/lib/active_support/log_subscriber.rb
+index 737e4c5a7c..ee699dc7f5 100644
+--- a/activesupport/lib/active_support/log_subscriber.rb
++++ b/activesupport/lib/active_support/log_subscriber.rb
+@@ -85,6 +85,22 @@ def logger=(logger)
+         @supports_flush = logger.respond_to?(:flush)
+       end
+ 
++      def colorize_logging
++        ActiveSupport.deprecator.warn(<<~MSG)
++          `ActiveSupport::LogSubscriber.colorize_logging` is deprecated and will be removed in Rails 9.0.
++          Use `ActiveSupport.colorize_logging` instead.
++        MSG
++        ActiveSupport.colorize_logging
++      end
++
++      def colorize_logging=(value)
++        ActiveSupport.deprecator.warn(<<~MSG)
++          `ActiveSupport::LogSubscriber.colorize_logging=` is deprecated and will be removed in Rails 9.0.
++          Use `ActiveSupport.colorize_logging=` instead.
++        MSG
++        ActiveSupport.colorize_logging = value
++      end
++
+       def attach_to(...) # :nodoc:
+         result = super
+         set_event_levels
+diff --git a/activesupport/test/log_subscriber_test.rb b/activesupport/test/log_subscriber_test.rb
+index 7280e0755f..8fa8ead1bd 100644
+--- a/activesupport/test/log_subscriber_test.rb
++++ b/activesupport/test/log_subscriber_test.rb
+@@ -95,6 +95,22 @@ def test_does_not_set_color_if_colorize_logging_is_set_to_false
+     assert_equal "cool, isn't it?", @logger.logged(:info).last
+   end
+ 
++  def test_deprecated_class_level_colorize_logging_delegates_to_active_support
++    original = ActiveSupport.colorize_logging
++
++    assert_deprecated("ActiveSupport::LogSubscriber.colorize_logging=", ActiveSupport.deprecator) do
++      ActiveSupport::LogSubscriber.colorize_logging = true
++    end
++    assert_equal true, ActiveSupport.colorize_logging
++
++    ActiveSupport.colorize_logging = false
++    assert_deprecated("ActiveSupport::LogSubscriber.colorize_logging", ActiveSupport.deprecator) do
++      assert_equal false, ActiveSupport::LogSubscriber.colorize_logging
++    end
++  ensure
++    ActiveSupport.colorize_logging = original
++  end
++
+   def test_event_is_sent_to_the_registered_class
+     ActiveSupport::LogSubscriber.attach_to :my_log_subscriber, @log_subscriber
+     instrument "some_event.my_log_subscriber"
+-- 
+2.55.0
+

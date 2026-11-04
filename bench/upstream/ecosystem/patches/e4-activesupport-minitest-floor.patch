@@ -1,0 +1,44 @@
+From 0a69eb6cce5fa6a7956d2ceddaa207e14fbdc459 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:30:21 +0000
+Subject: [PATCH] Require minitest 5.18 in Active Support
+
+ActiveSupport::TestCase aliases assert_not_pattern to refute_pattern,
+which minitest added in 5.18. With an older minitest, which the
+dependency still allowed, loading active_support/test_case raised
+NameError. Declare the version the code needs so Bundler resolves a
+working minitest or explains why it cannot.
+---
+ Gemfile.lock                        | 2 +-
+ activesupport/activesupport.gemspec | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 10d66b9327..1eddb17dbf 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -70,7 +70,7 @@ PATH
+       i18n (>= 1.6, < 2)
+       json
+       logger (>= 1.4.2)
+-      minitest (>= 5.1)
++      minitest (>= 5.18)
+       psych (>= 4)
+       ractor-dispatch (>= 0.3.0)
+       securerandom (>= 0.3)
+diff --git a/activesupport/activesupport.gemspec b/activesupport/activesupport.gemspec
+index a2e62c7338..e2d394eef0 100644
+--- a/activesupport/activesupport.gemspec
++++ b/activesupport/activesupport.gemspec
+@@ -38,7 +38,7 @@
+   s.add_dependency "tzinfo",          "~> 2.0", ">= 2.0.5"
+   s.add_dependency "concurrent-ruby", "~> 1.0", ">= 1.3.1"
+   s.add_dependency "connection_pool", ">= 2.2.5"
+-  s.add_dependency "minitest",        ">= 5.1"
++  s.add_dependency "minitest",        ">= 5.18"
+   s.add_dependency "base64"
+   s.add_dependency "drb"
+   s.add_dependency "bigdecimal"
+-- 
+2.55.0
+
