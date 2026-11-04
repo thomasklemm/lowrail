@@ -1,12 +1,13 @@
-From 600a0192dc82a95e409bc75f13041e7c7ea89667 Mon Sep 17 00:00:00 2001
+From c4f465b7b27b2bd4d93d4d89645d355fefcf3233 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 12:38:11 +0000
 Subject: [PATCH] Append the default star projection without a rest Array
 
 build_select called arel.project with a single node, which allocates a
-one-element Array for the splat on every relation load. Append the node
-to the projections directly; project only converts Strings and Symbols,
-and the star attribute is neither.
+one-element Array for the splat each time a default star projection is
+built. Append the node to the manager's projections directly instead of
+going through project; project only converts Strings and Symbols, and the
+star attribute is neither.
 
     Post.where(author_id: 1).limit(5).to_a # 132 -> 131 allocations
     Post.all.to_a                           # 291 -> 290 allocations

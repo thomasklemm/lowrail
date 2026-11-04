@@ -1,18 +1,20 @@
-From d4db9330caa5f36c39ebc44360c6e4a2077d99e9 Mon Sep 17 00:00:00 2001
+From ef0266d0d6af228a3e9fc63b308f4f41fa06d347 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 12:38:11 +0000
-Subject: [PATCH] Compute the update timestamp only when a timestamp column is
- written
+Subject: [PATCH] Read the update timestamp only when it is written
 
-record_update_timestamps runs twice per update, once before and once
-after the update callbacks. The second pass usually finds updated_at
-already changing and writes nothing, but still read the current time,
-which goes through with_connection. Read it before the first write.
+An update that reaches both timestamp passes runs record_update_timestamps
+before and after the before_update callbacks. The second pass usually finds
+updated_at already changing and writes nothing, but still read the current
+time, which calls with_connection to reach the adapter's default_timezone.
+Skip explicitly changed timestamp columns, get the time when the first
+remaining column needs it, and reuse it for the rest.
 
-    post.update!(views: 1) # 190 -> 189 allocations
+    post.update!(views: 1) # 190 -> 189 allocations in this benchmark
 ---
- activerecord/lib/active_record/timestamp.rb | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ activerecord/lib/active_record/timestamp.rb |  3 +-
+ activerecord/test/cases/timestamp_test.rb   | 34 +++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 1 deletion(-)
 
 diff --git a/activerecord/lib/active_record/timestamp.rb b/activerecord/lib/active_record/timestamp.rb
 index 8b4626aff5..c2b9111e1c 100644
@@ -31,6 +33,51 @@ index 8b4626aff5..c2b9111e1c 100644
            _write_attribute(column, current_time)
          end
        end
+diff --git a/activerecord/test/cases/timestamp_test.rb b/activerecord/test/cases/timestamp_test.rb
+index 3eab2e7a9c..ceb2d1f96b 100644
+--- a/activerecord/test/cases/timestamp_test.rb
++++ b/activerecord/test/cases/timestamp_test.rb
+@@ -300,6 +300,40 @@ def change_name; end
+     assert_equal @previously_updated_at, @developer.updated_at
+   end
+ 
++  def test_updating_a_changed_record_reads_the_current_time_once
++    time = Time.now.utc.change(usec: 0)
++
++    assert_called(Developer, :current_time_from_proper_timezone, returns: time) do
++      @developer.update!(name: "Jack Bauer")
++    end
++
++    assert_equal time, @developer.updated_at
++  end
++
++  def test_updating_a_changed_record_writes_the_same_time_to_every_update_timestamp
++    @developer.update!(name: "Jack Bauer")
++
++    assert_equal @developer.updated_at, @developer.updated_on
++  end
++
++  def test_updating_a_record_whose_before_update_callback_restores_the_timestamp_updates_it
++    klass = Class.new(ActiveRecord::Base) do
++      self.table_name = "developers"
++
++      include Developer::TimestampAliases
++
++      before_update { self.updated_at = updated_at_in_database }
++    end
++
++    developer = klass.find(@developer.id)
++
++    travel(1.second) do
++      developer.update!(name: "Jack Bauer")
++    end
++
++    assert_not_equal @previously_updated_at, developer.reload.updated_at
++  end
++
+   def test_saving_a_record_with_a_belongs_to_that_specifies_touching_the_parent_should_update_the_parent_updated_at
+     pet   = Pet.first
+     owner = pet.owner
 -- 
 2.55.0
 

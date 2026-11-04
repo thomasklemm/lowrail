@@ -6,16 +6,20 @@ census backlog (C6-2, `SelectManager#project`, `Arel.sql`). Same rules as [AR-1]
 readability checks of 2026-11-04 in [DECISIONS](../DECISIONS.md#readability-gate-l0l3) (cold read, shape checklist,
 flog/RuboCop numbers, the changed code described in plain sentences).
 
-**Result.** Two candidates queued, waiting for the Sol round: W2 (update timestamps) and W3 (default star
-projection). W1 was built, measured and dropped after the adversarial round; the other leads were rejected or
+**Result.** Two candidates, W2 (update timestamps) and W3 (default star projection), passed the Sol round with
+fixes (2026-11-04) and are ready to open on rails/rails main `9cf3693a0a`; **PR creation is blocked** for this account
+(GitHub refused `CreatePullRequest` after 13 PRs that day; one attempt for W2, none for W3). W1 was built, measured and dropped after the adversarial round; the other leads were rejected or
 parked (below).
 
 | # | Rails branch @ SHA (fork, pushed) | Change | Per call |
 | --- | --- | --- | --- |
-| W2 | [`thomasklemm/update-timestamps-time-when-written`](https://github.com/thomasklemm/rails/tree/thomasklemm/update-timestamps-time-when-written) @ `d4db9330ca` | `record_update_timestamps` reads the clock only when it writes a timestamp column | `post.update!` −1 object, −0.9% to −1.6% instructions |
-| W3 | [`thomasklemm/build-select-star-projection`](https://github.com/thomasklemm/rails/tree/thomasklemm/build-select-star-projection) @ `600a0192dc` | `build_select` appends the default `table.*` projection instead of calling `project(node)` | −1 object per relation load; −0.2% to −0.4% instructions |
+| W2 | [`thomasklemm/update-timestamps-time-when-written`](https://github.com/thomasklemm/rails/tree/thomasklemm/update-timestamps-time-when-written) @ `ef0266d0d6` | `record_update_timestamps` reads the clock only when it writes a timestamp column, plus three tests | `post.update!` 190 → 189 objects in the micro, −0.9% to −1.6% instructions |
+| W3 | [`thomasklemm/build-select-star-projection`](https://github.com/thomasklemm/rails/tree/thomasklemm/build-select-star-projection) @ `c4f465b7b2` | `build_select` appends the default `table.*` projection instead of calling `project(node)` | −1 object per default-star projection; −0.26% / −0.38% instructions (interpreter / YJIT), ZJIT no measurable difference |
 
-Both on rails/rails main `9b116f1fed`, one commit each, authored and committed by Thomas Klemm. Patches:
+Both rebased onto rails/rails main `9cf3693a0a` (no commits on the touched files since `9b116f1fed`, where they were
+measured), one commit each, authored and committed by Thomas Klemm. Final bodies:
+[`w2-body.md`](../../bench/upstream/ar_write_paths/w2-body.md), [`w3-body.md`](../../bench/upstream/ar_write_paths/w3-body.md)
+(links pinned to Lowrail `d7ed9c3678`). Patches:
 [`bench/upstream/ar_write_paths`](../../bench/upstream/ar_write_paths/).
 
 ## Pins and method
@@ -95,7 +99,8 @@ updated columns still get the same time. Differences only from accepted categori
 `current_time_from_proper_timezone` that counts or fails on its own calls, and a redefined `Time.now` that returns a
 new value per call (fewer calls, so later values shift). `test:sqlite3` 10,281 runs, 0 failures, 0 errors; RuboCop
 clean. No overlapping PR or issue (`record_update_timestamps`, `current_time_from_proper_timezone`,
-`updated_at timestamp twice`); `timestamp.rb` unchanged on main since 2026-11-01 (Markdown).
+`updated_at timestamp twice`); `timestamp.rb` unchanged on main since 2026-11-01 (Markdown); no open PR touches it (file scan of all 1,257 open
+PRs), and the three open PRs touching `callbacks.rb` don't touch `_update_record`.
 
 **Readability.** L1 (reviewer): one more line, a lazy-initializer idiom with precedents
 (`alias_tracker.rb:29-35`, `calculations.rb:633-637`); `_create_record` above still reads eagerly, which the commit
@@ -133,11 +138,35 @@ ZJIT on `where_to_a` is flat (+0.04% against an A/A of −0.12%); no ZJIT loss.
 **Exactness.** `projections` is `@ctx.projections`, the Array `project` concatenates into; not frozen, cloned by
 `initialize_copy`; `build_select`'s only caller passes a fresh `SelectManager`; `build_arel` ignores the return value
 (now the Array instead of the manager). Nothing in Rails or the installed gems overrides `project` or
-`build_select`. `test:sqlite3` 10,281 runs, 0 failures, 0 errors; RuboCop clean. No overlapping PR.
+`build_select`. `test:sqlite3` 10,281 runs, 0 failures, 0 errors on `9cf3693a0a`; RuboCop clean. **Overlap:** open #45864
+(`Relation#select_append`, 2022) rewrites the same line to `arel.project(*default_select_values)`; W3 is
+independent of it, and whichever lands second needs a one-line rebase (the first pass of these notes missed it; Sol
+found it). No other open PR touches `build_select`'s star line.
 
 **Readability.** L1 (reviewer); the other two branches keep `project(*...)` (the `select_values` branch needs its
 String conversion). Same shape as kamipo's 401f146f41 (caller-side, not an Arel signature change). flog 35.5 →
 36.9 (a method call replaced by an attribute read plus `<<`); RuboCop Metrics: no offenses.
+
+## Sol round (2026-11-04, run by the coordinator)
+
+Verdict on both: open after fixes, code unchanged.
+
+* **W2.** The order changes from "clock, columns, dirty check, write" to "columns, dirty check, clock, write": clock
+  side effects and exceptions disappear when nothing is written, a clock override that touches attributes runs after
+  the skip decision, and `||=` retries a clock that returns nil or false (main writes nil to both columns). Accepted,
+  no flag for falsy clocks; the body says unused clock reads are removed and the remaining ones move, and that values
+  are the same with the standard timestamp methods. Tests added to `timestamp_test.rb` (+34 lines): one clock read
+  per changed update (fails on main: 2 calls), one shared time for `updated_at`/`updated_on`, and a `before_update`
+  that restores `updated_at` so the second pass must write. Body: "an update that reaches both timestamp passes",
+  "calls `with_connection` to reach the adapter", "190 → 189 allocations in this benchmark", Callgrind instructions
+  only. Plain description (Sol's): skip explicitly changed timestamp columns, get the time when the first remaining
+  column needs it, reuse it for the rest; precedent `AliasTracker.initial_count_for`. `test:sqlite3` 10,284 runs, 0
+  failures, 0 errors.
+* **W3.** #45864 overlap (above). Exactness limited to Rails' own `SelectManager`: a prepended or overridden
+  `project` no longer sees the default star, an overridden `projections` returning a copy would lose it, and
+  `build_select` returns the Array in that branch (the caller ignores it). Body says the bypass openly, scopes the
+  saving to "each default-star projection", keeps instruction figures to the micro, and gives ZJIT as no measurable
+  difference. 401f146f41 (#59579) is cited only as a rest-Array precedent.
 
 ## Dropped, rejected, parked
 
@@ -152,41 +181,15 @@ String conversion). Same shape as kamipo's 401f146f41 (caller-side, not an Arel 
 | `apply_seconds_precision` → `Time#change` (Rationals on create) | 8 + 6 Rationals per `create` | `change(nsec:)` builds the time through Rationals by design; a faster path is an Active Support `Time#change` question, not exact as a one-liner. |
 | `insert_all`/`upsert_all` | 196 / 113 objects | The objects are per row and per value (quoting, the SQL String, `keys.sort!` in `verify_attributes`); nothing repeated. |
 
-## PR bodies (drafts, reviewed)
+## PR bodies (final)
 
-Checked by a separate reader against the receipts (every number recomputed, PR references confirmed) and for an
-outsider's reading; its corrections are applied. The links resolve once this page is on Lowrail main.
-
-### W2: Read the update timestamp only when it is written
-
-> Every update runs `record_update_timestamps` twice: once in `Timestamp#_update_record` before the update callbacks, and again in `Callbacks#_update_record` after the `before_update` callbacks, so a `before_update` that changes the record still gets a fresh `updated_at` (#47767). In an ordinary update the second pass finds `updated_at` already changing and writes nothing, but it still reads the current time first, which checks out the connection to read its `default_timezone`.
->
-> This reads the time just before the first timestamp column is written. A pass that writes nothing no longer reads the clock, and a pass that writes both `updated_at` and `updated_on` still gives them the same time.
->
-> | `post.update!(views: n)`, instructions per call | Interpreter | YJIT | ZJIT |
-> | --- | ---: | ---: | ---: |
-> | main | 1,183,587 | 542,188 | 589,258 |
-> | this PR | 1,166,927 (−1.4%) | 537,209 (−0.9%) | 580,995 (−1.4%) |
-> | Noise check: main run twice | −0.03% | +0.10% | −0.20% |
->
-> SQLite in memory, GC disabled. Each number is Callgrind instructions for 500 updates minus a 0-update run, divided by 500; two runs each, median. Ruby 4.0.9; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/ar_write_paths/ar.rb)). One object fewer per update (190 → 189). ruby-bench's apps don't update records in their measured loop, so it can't show this. I found this while profiling the save path of Rails apps on Rails main for Lowrail, a research project of mine ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ar-write-paths.md)).
-
-### W3: Append the default star projection without a rest Array
-
-> Every relation that selects all columns builds `SELECT "posts".*` through `arel.project(table[Arel.star])`. `project(*projections)` allocates a one-element Array for the splat on each call, and its only other work, turning Strings and Symbols into SQL literals, doesn't apply to the star attribute.
->
-> This appends the star attribute to the select manager's projections directly, so no Array is built. #59579 removed a similar per-call rest Array from `where!`. The other two branches still call `project`, which converts any Strings or Symbols among their columns.
->
-> | `Post.all.to_a`, 20 records, instructions per call | Interpreter | YJIT | ZJIT |
-> | --- | ---: | ---: | ---: |
-> | main | 860,144 | 417,352 | 413,499 |
-> | this PR | 857,888 (−0.26%) | 415,772 (−0.38%) | 412,040 (−0.35%) |
-> | Noise check: main run twice | −0.01% | +0.01% | −0.00% |
->
-> SQLite in memory, GC disabled. Each number is Callgrind instructions for 500 loads minus a 0-load run, divided by 500; two runs each, median. Ruby 4.0.9; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/ar_write_paths/ar.rb)). One object fewer per relation load in every mode (`Post.all.to_a` 291 → 290 interpreted). On ruby-bench, shipit builds this projection 1,811 times per iteration and lobsters 660 times. I found this in allocation profiles of 20 Rails apps on Rails main for Lowrail, a research project of mine, where the line shows up in all 20 ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ar-write-paths.md)).
+The final bodies, after the outsider read and the Sol round, are
+[`w2-body.md`](../../bench/upstream/ar_write_paths/w2-body.md) and
+[`w3-body.md`](../../bench/upstream/ar_write_paths/w3-body.md). Titles: "Read the update timestamp only when it is
+written" and "Append the default star projection without a rest Array".
 
 ## Limits
 
-* Micro cases on SQLite in memory and a four-app allocation census, not request time. The app CPU census for W2 is
-  below if it finished in this round.
+* Micro cases on SQLite in memory and a four-app allocation census, not request time. The app CPU census label for W2
+  (`cwts`, interpreter, four apps) was still running when this was recorded; its row follows.
 * Reviews were subagents; the Sol round runs in the coordinator thread.
