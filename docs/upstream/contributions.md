@@ -139,6 +139,37 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+| K1: rack escapes a single cookie value without wrapping it in an Array | rack/rack | [`thomasklemm/set-cookie-header-single-value`](https://github.com/thomasklemm/rack/tree/thomasklemm/set-cookie-header-single-value) @ `43ceb88370` on main `da90464e` | per `Set-Cookie`: 12 → 9 objects; Callgrind instructions −14% / −13% / −15% (4.0.9 interpreter / YJIT / master ZJIT, A/A ≤ 0.5%), session cookie −6%; 17 of 20 apps write 0.6–2 cookies per request, about −2.5 objects per workload (estimated from the census) ([record](gem-request-census-2.md#k1-rack-escapes-a-single-cookie-value-without-wrapping-it-in-an-array)) | Ready: primary review approve-with-nits (applied), adversarial round two accepted non-security differences, body checked. L1. Open when Thomas has read the explanation below. |
+| N1: nokogiri calls `children` once in `DocumentFragment#css` | sparklemotion/nokogiri | [`thomasklemm/fragment-css-children-once`](https://github.com/thomasklemm/nokogiri/tree/thomasklemm/fragment-css-children-once) @ `7ef8b0d431` on main `f2bca270` | per `css` on a fragment: 41 → 39 objects, −1.5% instructions (HTML5 fragment), 79 → 70 and −5.5% (Loofah fragment), same on YJIT and master ZJIT; Action Text and Discourse call it about 1–9 times per request in 6 apps, about −2.6 objects per workload (estimated) ([record](gem-request-census-2.md#n1-nokogiri-searches-a-fragments-children-once-in-documentfragmentcss)) | Ready: primary review approve / approve-with-nits (applied), body checked. L0. Open when Thomas has read the explanation below. |
+
+### Erklärungen für Thomas: K1 und N1 (2026-11-04, Gems, noch nicht geöffnet)
+
+Aufzeichnung und PR-Texte: [gem-request-census-2](gem-request-census-2.md).
+
+**K1, rack: Cookie-Wert ohne Hilfs-Array escapen.** Jedes `Set-Cookie`, das Rails schreibt (Session-Cookie und alle
+anderen), läuft durch `Rack::Utils.set_cookie_header`. Die Methode packte einen einzelnen Wert erst in ein Array, ließ
+`escape` per `map` darüber laufen und fügte das Ergebnis mit `join` wieder zusammen; dabei entstehen zwei Arrays und
+ein String, die sofort weggeworfen werden. Jetzt wird ein einzelner Wert direkt escaped, Arrays laufen wie bisher;
+der Header ist mit dem normalen `escape` für jeden Wert derselbe, nur ein `escape`-Override, das keinen String
+zurückgibt, würde es merken.
+
+```ruby
+v = "a b;c"
+[v].map { |x| Rack::Utils.escape(x) }.join("&")   # vorher: Array, Array, String, dann das Ergebnis
+Rack::Utils.escape(v)                             # jetzt: nur das Ergebnis, "a+b%3Bc"
+```
+
+**N1, nokogiri: `children` einmal statt zweimal.** `DocumentFragment#css` fragte `children.any?` und suchte dann in
+einem zweiten `children`; jeder Aufruf baut eine neue NodeSet und schickt sie durch die Decorators des Dokuments
+(bei Loofah heißt das `extend` mit einem Modul, also eine eigene Singleton-Klasse). Jetzt wird die erste NodeSet
+behalten und durchsucht; das Ergebnis ist dasselbe, weil zwischen den beiden Aufrufen nichts passiert. Action Text
+ruft das beim Rendern von Rich Text auf.
+
+```ruby
+frag = Nokogiri::HTML5.fragment("<p><a href='/x'>x</a></p>")
+frag.children.any? && frag.children.css("a")      # vorher: zwei NodeSets
+(nodes = frag.children).any? && nodes.css("a")    # jetzt: eine
+```
 
 ### Erklärungen für Thomas: CP-1 und CP-2 (2026-11-04; geöffnet als #59596 und #59597, beide gemergt)
 
