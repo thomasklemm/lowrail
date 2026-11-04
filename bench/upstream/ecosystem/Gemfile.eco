@@ -4,14 +4,23 @@
 # Rails component taken from one local checkout (ECO_RAILS), so main and 8-1-stable
 # differ only in Rails. Copy next to the gem's Gemfile as Gemfile.eco-LABEL; set
 # ECO_GEMFILE to use another Gemfile of the gem (e.g. gemfiles/rails_8_1.gemfile).
+# ECO_BUMPS (JSON, {"gem": "version" | {"git": …, "ref": …}}) replaces or adds those
+# gems' declarations on both trees, so a bump is an explicit, recorded input.
+require "json"
 RAILS_COMPONENTS = %w[rails railties activesupport activemodel activerecord actionpack actionview actionmailer
   activejob actioncable activestorage actionmailbox actiontext].freeze
 dsl = self
 requires = {}
+bumps = JSON.parse(ENV.fetch("ECO_BUMPS", "{}"))
+bump_args = ->(spec) { spec.is_a?(Hash) ? [[], spec.transform_keys(&:to_sym)] : [Array(spec), {}] }
 define_singleton_method(:gem) do |name, *args, **opts|
   if RAILS_COMPONENTS.include?(name) && !@eco_rails
     requires[name] = opts[:require] if opts.key?(:require)
     next
+  end
+  if bumps.key?(name)
+    args, extra = bump_args.(bumps.delete(name))
+    opts = opts.slice(:require, :group, :groups, :platforms).merge(extra)
   end
   super(name, *args, **opts)
 end
@@ -19,3 +28,4 @@ eval_gemfile File.expand_path(ENV.fetch("ECO_GEMFILE", "Gemfile"), __dir__)
 @eco_rails = true
 rails = ENV.fetch("ECO_RAILS")
 RAILS_COMPONENTS.each { |c| dsl.gem c, path: rails, **(requires.key?(c) ? { require: requires[c] } : {}) }
+bumps.each { |name, spec| args, extra = bump_args.(spec); dsl.gem name, *args, **extra }

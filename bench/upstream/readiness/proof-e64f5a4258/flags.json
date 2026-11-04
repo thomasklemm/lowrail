@@ -1,0 +1,1046 @@
+{
+  "rails": {
+    "base": {
+      "ref": "6e09124217",
+      "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+      "version": "8.1.4.1"
+    },
+    "cand": {
+      "ref": "e64f5a4258",
+      "sha": "e64f5a425844e67f3bc602f2a9571a00a275264f",
+      "version": "8.2.0.alpha"
+    }
+  },
+  "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+  "seeds": [
+    4242,
+    1717
+  ],
+  "generated": "2026-11-04T20:15:02Z",
+  "suites": [
+    {
+      "suite": "lograge",
+      "repo": "https://github.com/roidrage/lograge",
+      "ref": "v0.15.1",
+      "commit": "106e8333d65d35d013f728af81e9a938cafd9f7b",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "e64f5a4258",
+          "sha": "e64f5a425844e67f3bc602f2a9571a00a275264f",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "ractor-dispatch: - -> 0.3.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 134,
+          "status": 1,
+          "secs": 2,
+          "failed": 3
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 134,
+          "status": 1,
+          "secs": 2,
+          "failed": 7
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 134,
+          "status": 1,
+          "secs": 2,
+          "failed": 32
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 134,
+          "status": 1,
+          "secs": 2,
+          "failed": 34
+        }
+      ]
+    },
+    {
+      "suite": "scenic",
+      "repo": "https://github.com/scenic-views/scenic",
+      "ref": "v1.9.0",
+      "commit": "bef5f4959b4fcea33b098c76d3bd1129f4d3c4ed",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "e64f5a4258",
+          "sha": "e64f5a425844e67f3bc602f2a9571a00a275264f",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 111,
+          "status": 1,
+          "secs": 4,
+          "failed": 2
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 111,
+          "status": 1,
+          "secs": 4,
+          "failed": 19
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 111,
+          "status": 1,
+          "secs": 4,
+          "failed": 2
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 111,
+          "status": 1,
+          "secs": 4,
+          "failed": 19
+        }
+      ]
+    },
+    {
+      "suite": "lobsters",
+      "repo": "https://github.com/lobsters/lobsters",
+      "ref": "b6ea255a",
+      "commit": "b6ea255ad79e86a85b9c587d461d81545ca8f0a4",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "e64f5a4258",
+          "sha": "e64f5a425844e67f3bc602f2a9571a00a275264f",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        "cp .github/workflows/check/* config/ && cp config/database.yml.sample config/database.yml"
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "ractor-dispatch: - -> 0.3.0"
+      ],
+      "base_only": 1,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 927,
+          "status": 0,
+          "secs": 51,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": false,
+          "total": 0,
+          "status": 1,
+          "secs": 13,
+          "load_errors": 20,
+          "failed": 20
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 927,
+          "status": 1,
+          "secs": 42,
+          "failed": 1
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": false,
+          "total": 0,
+          "status": 1,
+          "secs": 7,
+          "load_errors": 20,
+          "failed": 20
+        }
+      ]
+    },
+    {
+      "suite": "lobsters-rspec-rails-main",
+      "repo": "https://github.com/lobsters/lobsters",
+      "ref": "b6ea255a",
+      "commit": "b6ea255ad79e86a85b9c587d461d81545ca8f0a4",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "e64f5a4258",
+          "sha": "e64f5a425844e67f3bc602f2a9571a00a275264f",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {
+        "rspec-rails": {
+          "git": "https://github.com/rspec/rspec-rails",
+          "ref": "9fb6f4f0a3"
+        }
+      },
+      "shims": [
+        "cp .github/workflows/check/* config/ && cp config/database.yml.sample config/database.yml"
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "ractor-dispatch: - -> 0.3.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 927,
+          "status": 0,
+          "secs": 48,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 927,
+          "status": 1,
+          "secs": 49,
+          "failed": 3
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 927,
+          "status": 1,
+          "secs": 43,
+          "failed": 1
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 927,
+          "status": 1,
+          "secs": 43,
+          "failed": 4
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "class": "confirmed",
+      "signature": "ActionController::UrlGenerationError: No route matches {action: \"show\", controller: \"stories\", id: \"\"}, missing required keys: [:id]",
+      "count": 3,
+      "suites": [
+        "lobsters-rspec-rails-main"
+      ],
+      "tests": [
+        {
+          "test": "./spec/requests/stories_spec.rb[1:1:2:1]",
+          "desc": "stories #check_url_dupe json returns similar story matching URL",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "lobsters-rspec-rails-main"
+        },
+        {
+          "test": "./spec/requests/stories_spec.rb[1:1:2:2]",
+          "desc": "stories #check_url_dupe json returns no matches if previously submitted URL is only partial match",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "lobsters-rspec-rails-main"
+        },
+        {
+          "test": "./spec/requests/stories_spec.rb[1:1:2:3]",
+          "desc": "stories #check_url_dupe json returns no matches if no matching URL",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "lobsters-rspec-rails-main"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "ArgumentError: wrong number of arguments (given 2, expected 3)",
+      "count": 14,
+      "suites": [
+        "scenic"
+      ],
+      "tests": [
+        {
+          "test": "./spec/integration/revert_spec.rb[1:1]",
+          "desc": "Reverting scenic schema statements reverts dropped view to specified version",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/integration/revert_spec.rb[1:2]",
+          "desc": "Reverting scenic schema statements reverts updated view to specified version",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:1:1]",
+          "desc": "Scenic::CommandRecorder#create_view records the created view",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:1:2]",
+          "desc": "Scenic::CommandRecorder#create_view reverts to drop_view when not passed a version",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:1:3]",
+          "desc": "Scenic::CommandRecorder#create_view reverts to drop_view when passed a version",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:1:4]",
+          "desc": "Scenic::CommandRecorder#create_view reverts materialized views appropriately",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:2:1]",
+          "desc": "Scenic::CommandRecorder#drop_view records the dropped view",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:2:2]",
+          "desc": "Scenic::CommandRecorder#drop_view reverts to create_view with specified revert_to_version",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:3:1]",
+          "desc": "Scenic::CommandRecorder#update_view records the updated view",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:3:2]",
+          "desc": "Scenic::CommandRecorder#update_view reverts to update_view with the specified revert_to_version",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:3:4]",
+          "desc": "Scenic::CommandRecorder#update_view reverts materialized views with no_data option appropriately",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:3:5]",
+          "desc": "Scenic::CommandRecorder#update_view reverts materialized views with side_by_side option appropriately",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:4:1]",
+          "desc": "Scenic::CommandRecorder#replace_view records the replaced view",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:4:2]",
+          "desc": "Scenic::CommandRecorder#replace_view reverts to replace_view with the specified revert_to_version",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "NoMethodError: undefined method 'attach_to' for class ActionController::LogSubscriber",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/lograge_spec.rb[1:1:3:1]",
+          "desc": "Lograge when removing Rails' log subscribers with event_name render_template.action_view does not remove subscribers that aren't from Rails",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "RSpec::Core::MultipleExceptionError: expected `Lograge.notification_listeners_for('render_template.action_view')` to have changed to [], but did not change",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/lograge_spec.rb[1:1:2]",
+          "desc": "Lograge when removing Rails' log subscribers removes subscribers for all events",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected ActiveRecord::IrreversibleMigration, got #<ArgumentError: wrong number of arguments (given 2, expected 3)> with backtrace:",
+      "count": 3,
+      "suites": [
+        "scenic"
+      ],
+      "tests": [
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:2:3]",
+          "desc": "Scenic::CommandRecorder#drop_view raises when reverting without revert_to_version set",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:3:3]",
+          "desc": "Scenic::CommandRecorder#update_view raises when reverting without revert_to_version set",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        },
+        {
+          "test": "./spec/scenic/command_recorder_spec.rb[1:4:3]",
+          "desc": "Scenic::CommandRecorder#replace_view raises when reverting without revert_to_version set",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "scenic"
+        }
+      ]
+    },
+    {
+      "class": "suite-did-not-load",
+      "signature": "FrozenError: can't modify frozen Hash: {}",
+      "count": 1,
+      "suites": [
+        "lobsters"
+      ],
+      "tests": [
+        {
+          "test": "(suite)",
+          "tree": "cand",
+          "detail": "cand runs 1,2 did not load, 20 load errors",
+          "suite": "lobsters"
+        }
+      ]
+    },
+    {
+      "class": "signature-changed",
+      "signature": "FrozenError: can't modify frozen Hash: {\"ActionController::RoutingError\" => :not_found, \"AbstractController::ActionNotFound\" => :not_found, \"ActionController::MethodNotAllowed\" => :method_not_allowed,",
+      "count": 2,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:3:1]",
+          "desc": "Lograge::LogSubscribers::ActionCable when processing an action with lograge output when an `ActiveRecord::RecordNotFound` is raised adds a 404 status",
+          "candidate": "2/2",
+          "base": "1/2",
+          "detail": "base: RSpec::Expectations::ExpectationNotMetError: expected \"\" to match /status=404 /",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:9:1]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output when an `ActiveRecord::RecordNotFound` is raised adds a 404 status",
+          "candidate": "2/2",
+          "base": "1/2",
+          "detail": "base: RSpec::Expectations::ExpectationNotMetError: expected \"status=404 action=index\" to match /error='ActiveRecord::RecordNotFound: Record not found' /",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "ActiveRecord::RecordInvalid: Validation failed: Domain has already been taken",
+      "count": 1,
+      "suites": [
+        "lobsters-rspec-rails-main"
+      ],
+      "tests": [
+        {
+          "test": "./spec/features/submit_story_spec.rb[1:10]",
+          "desc": "Submitting Stories submitting a banned domain",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lobsters-rspec-rails-main"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "ActiveRecord::StatementInvalid: PG::DuplicateTable: ERROR: relation \"search in a haystack\" already exists",
+      "count": 1,
+      "suites": [
+        "scenic"
+      ],
+      "tests": [
+        {
+          "test": "./spec/scenic/schema_dumper_spec.rb[1:8:1]",
+          "desc": "Scenic::SchemaDumper with views using unexpected characters, name including namespace dumps a create_view for a view in the database",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "scenic"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Core::MultipleExceptionError: expected `Lograge.notification_listeners_for('process_action.action_controller')` to have changed to [], but did not change",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/lograge_spec.rb[1:1:1]",
+          "desc": "Lograge when removing Rails' log subscribers removes subscribers for controller events",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Core::MultipleExceptionError: expected collection contained: [#<ActiveSupport::Notifications::Fanout::Subscribers::Timed:0xX @pattern=\"process_acti...>:0xX @events=[]>, @silenceable=false, @can",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/lograge_spec.rb[1:1:4:1]",
+          "desc": "Lograge when removing Rails' log subscribers with event_name process_action.action_controller does not remove subscribers that aren't from Rails",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"\" to include \"action=pong\"",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:5:1]",
+          "desc": "Lograge::LogSubscribers::ActionCable with before_format configured for lograge output outputs correctly",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"\" to include \"controller=ActionCableChannel action=pong\"",
+      "count": 5,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:1]",
+          "desc": "Lograge::LogSubscribers::ActionCable when processing an action with lograge output includes the controller and action",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:1]",
+          "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:2]",
+          "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:3]",
+          "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:7:4]",
+          "desc": "Lograge::LogSubscribers::ActionCable other actions generates output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"\" to match /^My test: {.*\"data\"\\s*:\\s*\"value\"/",
+      "count": 2,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:1:1]",
+          "desc": "Lograge::LogSubscribers::ActionCable with custom_options configured for cee output combines the hash properly for the output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:1:2]",
+          "desc": "Lograge::LogSubscribers::ActionCable with custom_options configured for cee output combines the output of a lambda properly",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"\" to match /duration=[.0-9]{2,4}/",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:2]",
+          "desc": "Lograge::LogSubscribers::ActionCable when processing an action with lograge output includes the duration",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"\" to match /status=200 /",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:2:4]",
+          "desc": "Lograge::LogSubscribers::ActionCable when processing an action with lograge output returns a default status when no status or exception is found",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"My test: {\\\"method\\\":\\\"GET\\\",\\\"status\\\":200}\" to match /^My test: {.*\"data\"\\s*:\\s*\"value\"/",
+      "count": 2,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:1:1]",
+          "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for cee output combines the hash properly for the output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:1:2]",
+          "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for cee output combines the output of a lambda properly",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"method=GET status=200\" to match / data=value/",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:6:1]",
+          "desc": "Lograge::LogSubscribers::ActionController when event payload includes a \"custom_payload\" incorporates the payload correctly",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to include \"/home\"",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:1]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the URL in the log output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to include \"controller=HomeController action=index\"",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:5]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the controller and action",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to include \"unpermitted_params=[\\\"florb\\\", \\\"blarf\\\"]\"",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:13:1]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output with unpermitted_parameters adds the unpermitted_params to the log line",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to match / data=value/",
+      "count": 2,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:5:1]",
+          "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for lograge output combines the hash properly for the output",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:5:2]",
+          "desc": "Lograge::LogSubscribers::ActionController with custom_options configured for lograge output combines the output of a lambda properly",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to match /^method=GET /",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:3]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output starts the log line with the HTTP method",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to match /allocations=231/",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:15:1]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output with memory allocations includes allocations when available",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to match /db=0.02/",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:8]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the database rendering time",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to match /duration=[.0-9]{4,4} /",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:6]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the duration",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to match /location=http:\\/\\/www.example.com/",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:11:1]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output with a redirect adds the location to the log line",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=index\" to match /view=0.01 /",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_controller_spec.rb[1:4:7]",
+          "desc": "Lograge::LogSubscribers::ActionController when processing an action with lograge output includes the view rendering time",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"status=200 action=pong\" to match / data=value/",
+      "count": 1,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:4:1]",
+          "desc": "Lograge::LogSubscribers::ActionCable when event payload includes a \"custom_payload\" incorporates the payload correctly",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected `\"\".present?` to be truthy, got false",
+      "count": 3,
+      "suites": [
+        "lograge"
+      ],
+      "tests": [
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:1:3]",
+          "desc": "Lograge::LogSubscribers::ActionCable with custom_options configured for cee output works when the method returns nil",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:4:2]",
+          "desc": "Lograge::LogSubscribers::ActionCable when event payload includes a \"custom_payload\" works when custom_payload is nil",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        },
+        {
+          "test": "./spec/log_subscribers/action_cable_spec.rb[1:5:2]",
+          "desc": "Lograge::LogSubscribers::ActionCable with before_format configured for lograge output works if the method returns nil",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "lograge"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: [\"scenic.bananas\", \"scenic.apples\"]",
+      "count": 1,
+      "suites": [
+        "scenic"
+      ],
+      "tests": [
+        {
+          "test": "./spec/scenic/schema_dumper_spec.rb[1:4:2]",
+          "desc": "Scenic::SchemaDumper with views in non public schemas sorts dependency order when views exist in a non-public schema",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "scenic"
+        }
+      ]
+    }
+  ]
+}
