@@ -42,7 +42,7 @@ Each branch is one commit by Thomas on rails main `8b06b0eb98`:
 - `thomasklemm/restore-find-template` @ `c814745459`
 - `thomasklemm/restore-max-password-length` @ `08be5191db`
 
-AR-2 opened as [#59627](https://github.com/rails/rails/pull/59627) on 2026-11-04; AR-1 waits for the next slot. Both are pushed to the fork after Sol's "open with nits" round, and are waiting for the coordinator to open them. Each test fails without its fix. AR-1's test also fails against a mutant in which the alias points at the non-raising `find`.
+AR-2 opened as [#59627](https://github.com/rails/rails/pull/59627) on 2026-11-04; AR-1 opened as [#59629](https://github.com/rails/rails/pull/59629) the same day. Both are pushed to the fork after Sol's "open with nits" round, and are waiting for the coordinator to open them. Each test fails without its fix. AR-1's test also fails against a mutant in which the alias points at the non-raising `find`.
 
 Differentials against 8-1-stable ([`ft_diff.rb`](../../bench/upstream/api_regressions/ft_diff.rb), [`mp.rb`](../../bench/upstream/api_regressions/mp.rb), [`rs_diff.rb`](../../bench/upstream/api_regressions/rs_diff.rb)):
 
@@ -117,7 +117,7 @@ Known gaps compared with 8.1, the same for any `deprecate_constant`:
 
 The 238 non-framework gems among the top 250 add one new real break and no new candidates:
 
-- **redmine_crm** 0.0.63 (rank 201, 30M downloads) includes only `ActionView::Helpers::UrlHelper` in its Liquid drops and calls `link_to` there. On main this raises `NoMethodError`, the same break avo already worked around. It comes from #55410's move into `NavigationHelper`, which rafaelfranca asked for. It stays in the skipped table; this is evidence for the coordinator, not a candidate.
+- **redmine_crm** 0.0.63 (rank 201, 30M downloads) includes only `ActionView::Helpers::UrlHelper` in its Liquid drops and calls `link_to` there. On main this raises `NoMethodError`, the same break avo already worked around. It comes from #55410's move into `NavigationHelper`, which rafaelfranca asked for. It stays in the skipped table; coordinator: record only, the S2 upgrade-guide note covers it.
 - with_advisory_lock checks `respond_to?(:internal_exec_query, true)` and already uses `query_all` on 8.2.
 - activerecord-nulldb-adapter defines its own `internal_exec_query`.
 - composite_primary_keys patches the reflection internals, as it does on every release.
