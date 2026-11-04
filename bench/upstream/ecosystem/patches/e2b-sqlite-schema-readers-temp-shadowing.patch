@@ -1,4 +1,4 @@
-From 611fcb450c1626a1ee50295c44eb7e64b6a69e78 Mon Sep 17 00:00:00 2001
+From 19e340c2e9534d66218210dcc8e4f8bbbf08b899 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 15:41:07 +0000
 Subject: [PATCH] Let a temporary SQLite table hide a permanent one in the
@@ -38,7 +38,7 @@ index 64b1bad838..320d32321d 100644
            SQL
  
 diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-index 3dac5cca5f..e8d03beb09 100644
+index 3dac5cca5f..084999f7ba 100644
 --- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 +++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 @@ -525,9 +525,10 @@ def test_insert_logged
@@ -54,7 +54,20 @@ index 3dac5cca5f..e8d03beb09 100644
              )
              SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
                     t."name", t."type", t."notnull", t."dflt_value", t."pk", t."hidden"
-@@ -685,6 +686,19 @@ def test_columns_with_not_null
+@@ -712,9 +713,10 @@ def test_indexes_logs
+         with_example_table do
+           index_list_query = [<<~SQL.squish, "SCHEMA", []]
+             WITH master AS (
+-              SELECT name, type, sql FROM sqlite_master
+-              UNION ALL
+               SELECT name, type, sql FROM sqlite_temp_master
++              UNION ALL
++              SELECT name, type, sql FROM sqlite_master
++              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
+             )
+             SELECT m.name AS table_name, i.name, i."unique"
+             FROM master m
+@@ -892,6 +894,19 @@ def test_no_primary_key
          end
        end
  
@@ -71,22 +84,9 @@ index 3dac5cca5f..e8d03beb09 100644
 +        end
 +      end
 +
-       def test_add_column_with_not_null
-         with_example_table "id integer PRIMARY KEY AUTOINCREMENT, number integer not null" do
-           assert_nothing_raised { @conn.add_column :ex, :name, :string, null: false }
-@@ -712,9 +726,10 @@ def test_indexes_logs
-         with_example_table do
-           index_list_query = [<<~SQL.squish, "SCHEMA", []]
-             WITH master AS (
--              SELECT name, type, sql FROM sqlite_master
--              UNION ALL
-               SELECT name, type, sql FROM sqlite_temp_master
-+              UNION ALL
-+              SELECT name, type, sql FROM sqlite_master
-+              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
-             )
-             SELECT m.name AS table_name, i.name, i."unique"
-             FROM master m
+       class Barcode < ActiveRecord::Base
+       end
+ 
 -- 
 2.55.0
 
