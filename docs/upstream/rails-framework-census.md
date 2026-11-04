@@ -86,7 +86,7 @@ contains the same sites in the same order. "Rank" is the line's rank among all R
 
 | Rank | Site | Apps / share | Objects/op | Disposition |
 | ---: | --- | --- | ---: | --- |
-| 13 | `http/url.rb:361` `host_with_port` | 9 / 45% | 25.3 | Mostly Campfire's own `inline_script_hashes.rb` (630 calls per request at this pin; once-campfire#374, merged, fixes it). Rails' own callers are the CSRF origin check (once per verified request) and `asset_url`. App code. |
+| 13 | `http/url.rb:361` `host_with_port` | 9 / 45% | 25.3 | Mostly Campfire's own `inline_script_hashes.rb` (630 calls per request at this pin; once-campfire#374 fixes it; still open on 2026-11-04). Rails' own callers are the CSRF origin check (once per verified request) and `asset_url`. App code. |
 | 55, 56 | `http/url.rb:169` path copy, `journey/visitors.rb:38` route buffer | 9 / 66% | 10.9 each | One String for the generated route path and one for `path_for`'s copy (`script_name.to_s.chomp("/") << path`). Removing the copy needs `path_for` to own `options[:path]`, which is public API (`ActionDispatch::Http::URL.path_for`). Lead. |
 | **64, 65**, 66 | `routing/route_set.rb:230/233` merges, `:318` params | 9 / 64% | 9.1 each | **R2-3 (held)** for 233; 318 is the params Hash. Required. |
 | 129, 199 | `abstract_controller/rendering.rb:64/61` `view_assigns` | 9 / 71–74% | 4.4, 2.1 | One String per ivar is the public key; `instance_variables - _protected_ivars` builds a result Array plus a hidden Hash (`Array#-` hashes more than 16 entries). Iterating with `include?` saves 2 objects per render. Lead (small). |
@@ -440,7 +440,7 @@ descriptions may be somewhat fuller than ruby/ruby's).
 * **Required work:** SafeBuffers and tag output, Notifications events for listening subscribers,
   `Filters::Environment`, TimeWithZone results, template lookup names, response objects, CSRF HMACs, header names.
 * **App and gem code:** `url.rb:361` `host_with_port` (rank 13) is mostly Campfire's `inline_script_hashes.rb` at
-  this pin (630 calls per request; once-campfire#374, merged, fixes it); Rails' own callers are the CSRF origin check
+  this pin (630 calls per request; once-campfire#374 fixes it; still open on 2026-11-04); Rails' own callers are the CSRF origin check
   (once per verified request) and `asset_url`. `deep_dup.rb:18` is Sentry breadcrumbs.
 
 ## Leads

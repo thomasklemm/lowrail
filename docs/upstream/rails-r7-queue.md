@@ -9,7 +9,8 @@ time, each against an A/A. See [CPU per call](#cpu-per-call) and the [ranking by
 **Result.** Five candidates were built. Each is one commit on the thomasklemm/rails fork, on rails/rails main
 [`1597d576bd`](https://github.com/rails/rails/commit/1597d576bd222de7bf55bf7a12bffd87138f2a13) (R7-5 on
 [`d47dc59e65`](https://github.com/rails/rails/commit/d47dc59e65)), and has a test that fails without it. None is
-opened. R7-4 is out of the queue (Sure only). R7-5 replaces it and is marked "don't open".
+opened in this round; R7-3 was opened later and merged as [rails/rails#59583](https://github.com/rails/rails/pull/59583)
+on 2026-11-04 ([`4881cd9b2c`](https://github.com/rails/rails/commit/4881cd9b2c)) (status 2026-11-04). R7-4 is out of the queue (Sure only). R7-5 replaces it and is marked "don't open".
 
 | # | Branch @ SHA | Pattern | Per call (4.0.7 interp) | Census: workloads / apps moved at the site (A/A: 0) |
 | --- | --- | --- | ---: | --- |

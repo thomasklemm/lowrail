@@ -16,6 +16,10 @@ without arguments (micro: `def m(*args, **kwargs)` and the `define_method` equiv
 so eliding them needs escape analysis, and block parameters cannot be anonymous-forwarded (`proc { |*| m(*) }` is a
 SyntaxError). Nothing to file.
 
+**Status (2026-11-04):** R6-1 merged as [rails/rails#59571](https://github.com/rails/rails/pull/59571) on 2026-11-03
+([`2915abbf91`](https://github.com/rails/rails/commit/2915abbf91)). The 304 objects per operation left at
+`delegation.rb:81` (scopes with parameters or proc bodies) are row 11 of the [census backlog](census-backlog.md).
+
 **Candidate R6-1** `thomasklemm/scope-zero-arity-no-splat` @ `8e4bb3afce6fd8a98e46e765ca1020f81f592fce`
 (thomasklemm/rails, on 3bdc579090): when the scope body is a lambda without parameters (`lambda? && parameters.empty?`), define the scope method without
 parameters. Such a lambda raises `ArgumentError` for any argument, so callers see the same error and message;

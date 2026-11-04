@@ -239,7 +239,10 @@ These are short, following the merged PRs. The scripts are linked above. The dra
 > Per call: one object fewer per executed query (`Post.find(1)` 62 → 61, `select_all` 38 → 37).
 > Across the corpus: about 2 fewer objects per request (Blog), 3–16 (Writebook), 13–61 (Fizzy), 1–3 (CodeTriage on PostgreSQL). No timing claim.
 >
-Not a PR line. The branch is held back because of the FrozenError boundary: a caller that mutates the returned warnings Array would now raise.
+Not a PR line. The branch was first held back because of the FrozenError boundary (a caller that mutates the returned
+warnings Array would now raise); it was then opened with that boundary stated and merged as
+[rails/rails#59536](https://github.com/rails/rails/pull/59536) on 2026-11-02
+([`4740314734`](https://github.com/rails/rails/commit/4740314734)) (status 2026-11-04).
 
 ## Blockers and limits
 

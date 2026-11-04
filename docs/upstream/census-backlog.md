@@ -90,9 +90,9 @@ closed ruby/ruby#19655 case), so it is not listed.
 * C7-1 (our closed #59577) is covered by kamipo's #59590 (63cf73e451, 2c8de94e54).
 * `Time#change` Rationals: czj's 08ccbcbfbf (#59323) covers `usec == 0`; the non-zero path keeps the framework
   census's rejection (1 of 15 objects).
-* Stale text in source docs: R6-1 has no disposition in R6 (merged as #59571); R7-3 says "none opened" (merged as
-  #59583); schema-context still says "Not opened" once (merged as #59585); census 3 calls C3 held and census 5 calls
-  C15 held (merged as #59536 and #59554); the framework census calls once-campfire#374 merged (it is open).
+* Stale text in source docs, corrected on 2026-11-04 with dated status lines: R6-1 (merged as #59571), R7-3 (merged as
+  #59583), schema-context (merged as #59585), census 3's C3 and census 5's C15 holds (merged as #59536 and #59554),
+  and the framework census's once-campfire#374 (open, not merged).
 
 ## Why only one candidate
 

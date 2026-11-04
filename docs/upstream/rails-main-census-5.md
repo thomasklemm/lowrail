@@ -232,7 +232,9 @@ All four together on top of #59212: median −10.7 / −8.9, 72 / 68 of 97 moved
     holds the same Symbols, in the same order; `public_send` and the `blank?` test are unchanged. **Boundary:** none
     observable; `NORMAL_VALUES` stays. Open #59416 adds `:default_order` to the exclusion list above it; the new
     constant derives from it. Most of the effect comes from singular association readers merging `limit(1)`, the path
-    #59212 removes; hold until #59212 is decided.
+    #59212 removes; hold until #59212 is decided. **Status (2026-11-04):** opened with the overlap stated and merged
+    as [rails/rails#59554](https://github.com/rails/rails/pull/59554) on 2026-11-03
+    ([`c9a34da167`](https://github.com/rails/rails/commit/c9a34da167)); #59212 is still open.
 
 Census 4's untried `Merger#initialize` lead: no caller mutates `Merger#values`. `Merger` is `:nodoc:`, built only in
 `SpawnMethods#merge!` and `HashMerger#merge`, never returned, and `merge` only reads `values[name]`. Removing the copy

@@ -28,7 +28,8 @@ at [`2236cd5626`](https://github.com/thomasklemm/rails/commit/2236cd56260ba02697
 on `c042aee23a`, without the code comments (the reasoning is in the commit message and the body). AR sqlite3 with
 `RAILS_STRICT_WARNINGS=1`: 10,267 runs, 0 failures, 0 errors; RuboCop clean. Readability **L1**: two one-line
 conditional freezes, and why the converter isn't frozen unconditionally (a Delegator freezes what it wraps) lives in
-the commit message, not the code. The ZJIT loss below is accepted as explained. Not opened; the PR body is at the end.
+the commit message, not the code. The ZJIT loss below is accepted as explained. The PR body is at the end; it was opened as #59585 (above) and
+merged on 2026-11-04 ([`2cbfd2decb`](https://github.com/rails/rails/commit/2cbfd2decb)).
 
 **ruby-bench** (Callgrind, one measured iteration after warmup; A/A = same commit in a second worktree):
 
