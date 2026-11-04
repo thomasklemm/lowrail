@@ -366,3 +366,17 @@ opening a thread doesn't wake it.
 * Check usage with `amp orb system-metrics <thread>` (cores, memory, CPU over time) before choosing a size for a
   similar task. Measured on 2026-11-04: all 17 active orbs were a1.large; the coordinator, the watcher, C15 and G2
   averaged 3–10 % CPU, and the busiest workers 50–65 %.
+
+## Line permalinks for callers (Thomas, 2026-11-04)
+
+Every caller we cite in a PR body, issue or ledger record links to the exact line, so a reader can check the claim in
+one click.
+
+* Use a **commit-SHA permalink** (`blob/<sha>/path#L42`), never `blob/main`; a branch link drifts as soon as the file
+  changes. For a gem, take the commit behind the tag of its **latest released version** and name that version in the
+  link text; if the gem has no tag, use the release's "Bump to x.y.z" commit or the gem's source on rubygems.org.
+  For an app without releases, use the default branch's current SHA and name the branch.
+* Also check the gem's default branch: if the call is already fixed there, say "fixed on main, unreleased" instead of
+  calling it a break.
+* Quote the line exactly as it appears at that SHA, or mark the quote as shortened.
+* Before posting, fetch each file at the linked SHA and confirm that the linked line contains the quoted call.
