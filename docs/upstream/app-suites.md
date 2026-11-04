@@ -16,7 +16,7 @@ overridden `primary_key` (#59622).
 |---|---|---|---|---|
 | Redmine trunk `41cd39c` | `rails test`, 6116 runs, SQLite | clean, clean | boot fails; after workaround 1 F, 3 E | S1 (b), S2 (b) |
 | Lobsters `b6ea255` | rspec, 927 examples, SQLite | 0 F, 0 F | every feature spec fails to load; after rspec-rails pin 3 F | L1 (c), L2 (a), fixed by #59625 |
-| Solidus `ed00fc8` | core and api rspec, SQLite | see below | see below | |
+| Solidus `ed00fc8` | core rspec, 4487 examples; api rspec, 684 examples; SQLite | clean ×2 (core and api) | core clean; api 1 F ×2 | SO1 (b) |
 
 ## Findings
 
@@ -69,6 +69,13 @@ patch.
 Solidus has no lockfile. Both bundles were resolved from its Gemfile with `rails` replaced by the path gem, and
 the 8-1 lock was copied for main. `solidus_core.gemspec` caps Rails at `< 8.2`; both checkouts have it raised to
 `< 8.3`. The bundle has rack 2.2.25 and rspec-rails 8.0.4.
+
+**SO1 (b): attachments are analyzed before validation under 8.2 defaults.** Api `images_spec.rb:79` corrupts the blob
+key and expects `attachment_width` to be nil; main returns 1. Solidus' dummy app calls
+`load_defaults("#{MAJOR}.#{MINOR}")`, so on main it gets `active_storage.analyze = :immediately` (activestorage
+CHANGELOG "Analyze attachments before validation"). The metadata is stored at attach time, and the missing file is
+never read. Apps on 8.1 defaults are unaffected. L1 didn't apply: core and api have no feature or mailer example
+groups.
 
 ## Not run yet
 
