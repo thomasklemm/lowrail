@@ -1,4 +1,4 @@
-From bd53d14e1d1851fa98e2e09eb1b6166dc8a2c65c Mon Sep 17 00:00:00 2001
+From 9fd1f6f25d5bacb1bc27f04e6f62d046b4034d68 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 13:04:26 +0000
 Subject: [PATCH] Allocate one hash for keyword splats after dynamic keywords
@@ -12,38 +12,45 @@ single keyword splat paths in both compilers also copy a `newhash 0`,
 and prism's zsuper with keywords copies a `newhash 0` in
 `core#hash_merge_ptr`.
 
-Restore that construction: build the pairs with `core#hash_new_for_merge`,
-which leaves room for 8 entries, then merge the splat into it in place
-with `core#hash_merge_bang_kwd`. The pairs are still hashed before the
-splat expression runs, and the hash moves to an st_table at the same
-size as on 4.0, so keys' `#hash` methods are called as on 4.0.7. Prism
-compiles hash literals such as `{a: v, **h}` with the same code, so they
-change the same way. The single keyword splat paths start from an empty
-`core#hash_new_for_merge`. `core#hash_merge_bang_kwd` now returns the
-hash it owns as is for a nil splat instead of copying it. Zsuper with
-named keywords and no keyword rest builds its keywords with `newhash`
-directly.
+Restore that construction: build the pairs with
+`core#hash_new_for_merge`, which leaves room for 8 entries, then merge
+the splat into it in place with `core#hash_merge_bang_kwd`. The pairs
+are still hashed before the splat expression runs, and the hash moves to
+an st_table at the same size as on 4.0, so the restored prism
+construction hashes keys as 4.0.7 does. Prism compiles hash literals
+such as `{a: v, **h}` with the same code, so they change the same way.
+The single keyword splat paths start from an empty
+`core#hash_new_for_merge`. Zsuper with named keywords and no keyword
+rest builds its keywords with `newhash` directly.
 
-Objects per call go from 2 to 1 for every size of the splat. Each call
-allocates one 160-byte slot, as on 4.0.7, where master allocates two
-slots of 128 to 160 bytes in total. Merging into the 64-byte hash that
-`newhash` now allocates would be cheaper for empty and one-entry splats
-(about 250 fewer instructions and 96 fewer bytes per call), but needs a
-second hash or an st_table as soon as the result has more than 2
-entries.
+`core#hash_merge_bang_kwd` now returns the hash it owns as is for a nil
+splat instead of copying it. With either parser,
+`m(k => v, **h, **n, z => v)` with a nil `n` then builds its hash and
+calls `k.hash` as it does without `**n`; with parse.y, the copy could
+cause one more `k.hash` call.
+
+Objects per call go from 2 to 1 for every size of the splat. For
+`m(a: v, **h)` with an existing `h`, each call allocates one 160-byte
+slot, as on 4.0.7, where master allocates two slots of 128 to 160 bytes
+in total. With more than 8 pairs before the splat, the new hash gets an
+st_table sized for them, as `newhash` does. Merging into the 64-byte
+hash that `newhash` now allocates would be cheaper for empty and
+one-entry splats (about 250 fewer instructions and 96 fewer bytes per
+call), but needs a second hash or an st_table as soon as the result has
+more than 2 entries.
 
     def m(**kw) = kw
     v = 2
     h = {}
     m(a: v, **h) # 2 hashes -> 1
 ---
- compile.c                    |  5 +++--
+ compile.c                    |  5 ++-
  defs/id.def                  |  1 +
- prism_compile.c              | 38 ++++++++++++++++++++++++-------
- test/ruby/test_allocation.rb | 25 +++++++++++++++++++++
- test/ruby/test_keyword.rb    | 43 ++++++++++++++++++++++++++++++++++++
- vm.c                         | 30 +++++++++++++++----------
- 6 files changed, 120 insertions(+), 22 deletions(-)
+ prism_compile.c              | 38 +++++++++++++----
+ test/ruby/test_allocation.rb | 25 +++++++++++
+ test/ruby/test_keyword.rb    | 81 ++++++++++++++++++++++++++++++++++++
+ vm.c                         | 31 ++++++++------
+ 6 files changed, 159 insertions(+), 22 deletions(-)
 
 diff --git a/compile.c b/compile.c
 index 2c55ee1541..4524e6190d 100644
@@ -75,10 +82,10 @@ index 11d7cad1a1..6e34bf7083 100644
    core#raise
    core#sprintf
 diff --git a/prism_compile.c b/prism_compile.c
-index 6731bde158..192b55d74b 100644
+index 1d63676c53..39caf47051 100644
 --- a/prism_compile.c
 +++ b/prism_compile.c
-@@ -1599,6 +1599,25 @@ pm_compile_hash_elements(rb_iseq_t *iseq, const pm_node_t *node, const pm_node_l
+@@ -1593,6 +1593,25 @@ pm_compile_hash_elements(rb_iseq_t *iseq, const pm_node_t *node, const pm_node_l
              break;
            }
            case PM_ASSOC_SPLAT_NODE: {
@@ -104,7 +111,7 @@ index 6731bde158..192b55d74b 100644
              FLUSH_CHUNK;
  
              const pm_assoc_splat_node_t *assoc_splat = (const pm_assoc_splat_node_t *) element;
-@@ -1731,9 +1750,10 @@ pm_setup_args_core(const pm_arguments_node_t *arguments_node, const pm_node_t *b
+@@ -1725,9 +1744,10 @@ pm_setup_args_core(const pm_arguments_node_t *arguments_node, const pm_node_t *b
                      else if (*dup_rest & DUP_SINGLE_KW_SPLAT) {
                          *flags |= VM_CALL_KW_SPLAT_MUT;
                          PUSH_INSN1(ret, location, putspecialobject, INT2FIX(VM_SPECIAL_OBJECT_VMCORE));
@@ -117,7 +124,7 @@ index 6731bde158..192b55d74b 100644
                      }
                      else {
                          pm_compile_hash_elements(iseq, argument, elements, 0, Qundef, true, ret, scope_node);
-@@ -8198,17 +8218,13 @@ pm_compile_forwarding_super_node(rb_iseq_t *iseq, const pm_forwarding_super_node
+@@ -8192,17 +8212,13 @@ pm_compile_forwarding_super_node(rb_iseq_t *iseq, const pm_forwarding_super_node
          int local_size = local_body->local_table_size;
          argc++;
  
@@ -136,7 +143,7 @@ index 6731bde158..192b55d74b 100644
          int i = 0;
          for (; i < local_keyword->num; ++i) {
              ID id = local_keyword->table[i];
-@@ -8222,7 +8238,13 @@ pm_compile_forwarding_super_node(rb_iseq_t *iseq, const pm_forwarding_super_node
+@@ -8216,7 +8232,13 @@ pm_compile_forwarding_super_node(rb_iseq_t *iseq, const pm_forwarding_super_node
              PUSH_GETLOCAL(args, *location, idx, depth);
          }
  
@@ -216,10 +223,10 @@ index ae55c5fc63..9cafa109a4 100644
      undef_method :test_argument_forwarding
      undef_method :test_nested_argument_forwarding
 diff --git a/test/ruby/test_keyword.rb b/test/ruby/test_keyword.rb
-index cfc3dc11da..cd46dc448b 100644
+index eb0179ef5f..4f8b181fd1 100644
 --- a/test/ruby/test_keyword.rb
 +++ b/test/ruby/test_keyword.rb
-@@ -189,6 +189,49 @@ def self.a(b: 1, **) [b, **] end
+@@ -189,6 +189,87 @@ def self.a(b: 1, **) [b, **] end
      assert_equal({b: 2, c: 3}, kw)
    end
  
@@ -257,6 +264,44 @@ index cfc3dc11da..cd46dc448b 100644
 +    assert_equal(3, r[key.new(2)])
 +    assert_equal({a: 1, b: 2, c: 1, d: 3}, kw(a: v, **small, c: v, **{d: 3}))
 +
++    log = []
++    logged = Object.new
++    logged.define_singleton_method(:hash) { log << :hash; 1 }
++    src = {b: 2}
++    splat = Object.new
++    splat.define_singleton_method(:to_hash) { log << :to_hash; src }
++    r = kw(logged => v, **(log << :splat; splat))
++    assert_equal([:hash, :splat, :to_hash], log.first(3))
++    assert_equal(1, log.count(:to_hash))
++    src[:c] = 3
++    assert_equal({logged => 1, b: 2}, r)
++
++    # Keys are hashed once on insertion and at most once more when the
++    # hash outgrows its embedded table (at 9 entries).
++    counts = Hash.new(0)
++    counted = (0..8).map { |i| key.new(i).tap { |k| k.define_singleton_method(:hash) { counts[i] += 1; i } } }
++    eight = counted[1..].to_h { [_1, v] }
++    counts.clear
++    r = kw(counted[0] => v, **eight)
++    assert_equal(9, r.size)
++    assert_operator(counts.values.max, :<=, 2)
++
++    # A nil splat leaves the accumulated keywords as they are.
++    n = nil
++    pair = {b: 2, d: 4}
++    counts.clear
++    r = kw(counted[0] => v, **pair, **n, c: v)
++    with_nil = counts[0]
++    counts.clear
++    kw(counted[0] => v, **pair, c: v)
++    assert_equal(counts[0], with_nil)
++    assert_equal({counted[0] => 1, b: 2, d: 4, c: 1}, r)
++    assert_equal({a: 1, b: 2, d: 4, c: 1}, {a: v, **pair, **n, c: v})
++
++    flagged = Hash.ruby2_keywords_hash({b: 2})
++    assert_not_send([Hash, :ruby2_keywords_hash?, kw(a: v, **flagged)])
++    assert_not_send([Hash, :ruby2_keywords_hash?, {a: v, **flagged}])
++
 +    raising = Object.new
 +    def raising.to_hash = raise("to_hash")
 +    assert_raise_with_message(RuntimeError, "to_hash") { kw(a: v, **raising) }
@@ -270,10 +315,10 @@ index cfc3dc11da..cd46dc448b 100644
      # cfunc call
      assert_equal(nil, p(**nil))
 diff --git a/vm.c b/vm.c
-index 33ae70af98..151c81d797 100644
+index c8d74d3ce8..46c8a5b660 100644
 --- a/vm.c
 +++ b/vm.c
-@@ -4530,22 +4530,27 @@ m_core_hash_merge_kwd(VALUE recv, VALUE hash, VALUE kw)
+@@ -4528,22 +4528,28 @@ m_core_hash_merge_kwd(VALUE recv, VALUE hash, VALUE kw)
      return hash;
  }
  
@@ -283,6 +328,7 @@ index 33ae70af98..151c81d797 100644
 +    // Like `newhash`, but with room in the embedded table to merge a small
 +    // keyword splat in place.
 +    VM_ASSERT(argc % 2 == 0);
++    RUBY_DTRACE_CREATE_HOOK(HASH, argc);
 +    long capa = argc / 2 < RHASH_AR_TABLE_MAX_SIZE ? RHASH_AR_TABLE_MAX_SIZE : argc / 2;
 +    VALUE hash = rb_hash_new_capa(capa);
 +    REWIND_CFP(rb_hash_bulk_insert(argc, argv, hash));
@@ -313,7 +359,7 @@ index 33ae70af98..151c81d797 100644
      return hash;
  }
  
-@@ -4760,6 +4765,7 @@ Init_VM(void)
+@@ -4758,6 +4764,7 @@ Init_VM(void)
      rb_define_method_id(klass, id_core_hash_merge_bang_ptr, m_core_hash_merge_bang_ptr, -1);
      rb_define_method_id(klass, id_core_hash_merge_kwd, m_core_hash_merge_kwd, 2);
      rb_define_method_id(klass, id_core_hash_merge_bang_kwd, m_core_hash_merge_bang_kwd, 2);
