@@ -10,7 +10,7 @@ LinkPresenter.new.link_to("Issues", "/issues")
 # => NoMethodError: undefined method 'link_to'
 ```
 
-Redmine's view hook listeners hit this, and so do Mastodon's `REST::NotificationSerializer` and `REST::NotificationGroupSerializer`.
+Redmine's [`Redmine::Hook::ViewListener`](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/lib/redmine/hook/view_listener.rb#L32) (master) hits this, and so do Mastodon's [`REST::NotificationSerializer`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/rest/notification_serializer.rb#L5) and [`REST::NotificationGroupSerializer`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/rest/notification_group_serializer.rb#L5) (main), which call [`link_to`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/concerns/notification_fallback_concern.rb#L82) through `NotificationFallbackConcern`.
 
 This adds a section to "Upgrading from Rails 8.1 to Rails 8.2". Because `NavigationHelper` includes `UrlHelper`, including `NavigationHelper` instead is all an app needs. Code that also supports earlier versions can keep `UrlHelper` and include `NavigationHelper` only where it's defined; the section shows that form too.
 

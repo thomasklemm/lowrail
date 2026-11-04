@@ -1,6 +1,6 @@
 ### Note in the upgrade guide that Rack::Sendfile requires x_sendfile_header
 
-#56915 stopped adding `Rack::Sendfile` to the default middleware stack unless `config.action_dispatch.x_sendfile_header` is configured. Its CHANGELOG entry describes the change, but the upgrade guide doesn't mention what it means for existing apps: code that positions middleware relative to `Rack::Sendfile` now raises on boot. Redmine does this in `config/application.rb`:
+#56915 stopped adding `Rack::Sendfile` to the default middleware stack unless `config.action_dispatch.x_sendfile_header` is configured. Its CHANGELOG entry describes the change, but the upgrade guide doesn't mention what it means for existing apps: code that positions middleware relative to `Rack::Sendfile` now raises on boot. Redmine does this in [`config/application.rb`, line 79](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/config/application.rb#L79) (master):
 
 ```ruby
 config.middleware.insert_before Rack::Sendfile, Rack::ContentLength
