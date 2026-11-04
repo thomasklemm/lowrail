@@ -1,4 +1,4 @@
-From 3fa76e25b4c2dacee7e111f4b44d6a400cb94c9b Mon Sep 17 00:00:00 2001
+From 501bf5cc67675e16304c9f91e74be4d55e9ecb96 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 10:55:37 +0000
 Subject: [PATCH] Look up the SQLite3 type map once per result
@@ -7,21 +7,23 @@ SQLite3 perform_query called type_map for every column of a result.
 Each call checks the extended type map key and reads the class
 TYPE_MAP constant. Read it once before mapping the column types.
 ---
- .../connection_adapters/sqlite3/database_statements.rb           | 1 +
- 1 file changed, 1 insertion(+)
+ .../connection_adapters/sqlite3/database_statements.rb         | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb
-index 7decb73f64..74df976428 100644
+index 7decb73f64..b7adf89d4d 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb
-@@ -146,6 +146,7 @@ def perform_query(raw_connection, intent)
+@@ -146,7 +146,8 @@ def perform_query(raw_connection, intent)
                      0
                    end
  
-+                  type_map = type_map()
-                   ActiveRecord::Result.new(stmt.columns, rows, stmt.types.map { |t| type_map.lookup(t) }, affected_rows: affected_rows)
+-                  ActiveRecord::Result.new(stmt.columns, rows, stmt.types.map { |t| type_map.lookup(t) }, affected_rows: affected_rows)
++                  result_type_map = type_map
++                  ActiveRecord::Result.new(stmt.columns, rows, stmt.types.map { |t| result_type_map.lookup(t) }, affected_rows: affected_rows)
                  end
                ensure
+                 stmt.close unless intent.prepare
 -- 
 2.55.0
 

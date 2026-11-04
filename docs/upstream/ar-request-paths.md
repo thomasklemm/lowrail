@@ -8,17 +8,19 @@ census 7's allocation ranking, [activerecord-cpu](activerecord-cpu.md), [frontie
 [rails-common-paths](rails-common-paths.md) and [merged-audit](merged-audit.md). Out of scope by agreement:
 ActiveModel `resolve_attribute_name` (orb C9) and Action View (orb C10).
 
-**Result.** One candidate, AR-1, queued (not opened). Two smaller ones were built, measured and dropped; the
+**Result.** One candidate, AR-1, opened on 2026-11-04 after Thomas approved it, as
+[rails/rails#59605](https://github.com/rails/rails/pull/59605) (head `501bf5cc67`, with the local renamed to
+`result_type_map` after a Sol review). Two smaller ones were built, measured and dropped; the
 hotter Active Record lines in census 8 are all taken by open or merged PRs (table below).
 
-| # | Rails branch @ SHA (local, not pushed) | Change | Per call |
+| # | Rails branch @ SHA | Change | Per call |
 | --- | --- | --- | --- |
-| AR-1 | `thomasklemm/sqlite3-result-type-map-once` @ `3fa76e25b4` | SQLite3 `perform_query` calls `type_map` once per result instead of once per column | 0 objects; `find` −1.6% to −2.5% instructions in all four modes |
+| AR-1 | [`thomasklemm/sqlite3-result-type-map-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/sqlite3-result-type-map-once) @ `501bf5cc67` | SQLite3 `perform_query` calls `type_map` once per result instead of once per column | 0 objects; `find` −1.6% to −2.5% instructions in all four modes |
 
 On rails/rails main [`9b116f1fed`](https://github.com/rails/rails/commit/9b116f1fed) (2026-11-04, after #59590 and
-#59596–#59598), one commit, authored and committed by Thomas Klemm. The branch is not on the fork yet; the commit is in
+#59596–#59598), one commit, authored and committed by Thomas Klemm. Pushed to the fork when the PR was opened;
 [`ar-1-sqlite3-result-type-map-once.patch`](../../bench/upstream/ar_request_paths/ar-1-sqlite3-result-type-map-once.patch)
-(`git am` on `9b116f1fed`); push it to the fork when the PR is opened.
+is the opened commit.
 
 ## Pins and method
 
@@ -64,13 +66,14 @@ config, builds a `{ default_timezone: ... }` Hash and looks it up in `EXTENDED_T
 It ran once per column of every result. The change reads it once:
 
 ```ruby
-type_map = type_map()
-ActiveRecord::Result.new(stmt.columns, rows, stmt.types.map { |t| type_map.lookup(t) }, affected_rows: affected_rows)
+result_type_map = type_map
+ActiveRecord::Result.new(stmt.columns, rows, stmt.types.map { |t| result_type_map.lookup(t) }, affected_rows: affected_rows)
 ```
 
-The spelling has precedent in the same layer: `collector = collector()` in `abstract/database_statements.rb`
-(kamipo, 2020; Hartley McGuire, 2025). PostgreSQL's `type_map` is an `attr_reader`, and mysql2/trilogy build
-results without column types, so SQLite is the only adapter where this costs anything.
+The first draft spelled it `type_map = type_map()` (precedent: `collector = collector()` in
+`abstract/database_statements.rb`); a Sol review found it reads oddly, so the opened version uses a separate local,
+`result_type_map`. PostgreSQL's `type_map` is an `attr_reader`, and mysql2/trilogy build results without column
+types, so SQLite is the only adapter where this costs anything.
 
 **Census.** Census 8 (interpreter, 4.0.9) has these lines in all 8 SQLite apps (each `type_map` line in 7 of them) (blog, campfire, fizzy,
 lobsters, react-starter-kit, redprints-cfp, thinkroom, writebook): `database_statements.rb:149` (the
@@ -161,13 +164,13 @@ them, in the same orb.
 Shipit has the most result columns per iteration (30,512, against 12,000 for railsbench and 10,126 for lobsters),
 and the largest change.
 
-## PR body (draft, reviewed)
+## PR body (as opened)
 
 Title: **Look up the SQLite3 type map once per result**
 
 > When the SQLite3 adapter builds a result, it calls `type_map.lookup` once per column. `type_map` isn't a plain reader: it calls `extended_type_map_key` and reads `self.class::TYPE_MAP`, and if the database config sets `default_timezone` it also builds a `{ default_timezone: }` Hash and looks it up in a `Concurrent::Map`. Every call returns the same map.
 >
-> This calls `type_map` once per result, like `collector = collector()` in `to_sql_and_binds`. `type_map` takes no arguments and depends only on config read when the connection was created, so every column gets the same type as before. The one visible change: a subclass that overrides `type_map` is now called once per result instead of once per column.
+> This calls `type_map` once per result and keeps the map in a local. `type_map` takes no arguments and depends only on config read when the connection was created, so every column gets the same type as before. The one visible change: a subclass that overrides `type_map` is now called once per result instead of once per column.
 >
 > | `Post.find(id)` on a 9-column table, instructions per call | Interpreter | YJIT | ZJIT |
 > | --- | ---: | ---: | ---: |
