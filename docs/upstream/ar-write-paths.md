@@ -7,7 +7,8 @@ readability checks of 2026-11-04 in [DECISIONS](../DECISIONS.md#readability-gate
 flog/RuboCop numbers, the changed code described in plain sentences).
 
 **Status 2026-11-04 13:55 UTC:** W2 opened as [rails/rails#59616](https://github.com/rails/rails/pull/59616)
-(head `ef0266d0d6`); W3 ready, its PR creation refused again.
+(head `ef0266d0d6`); W3 opened as [rails/rails#59618](https://github.com/rails/rails/pull/59618) at 14:11 UTC (head
+`c4f465b7b2`), from the coordinator orb after PR creation recovered.
 
 **Result.** Two candidates, W2 (update timestamps) and W3 (default star projection), passed the Sol round with
 fixes (2026-11-04) and are ready to open on rails/rails main `9cf3693a0a`; **PR creation is blocked** for this account
