@@ -106,7 +106,9 @@ Not in the 10, for the record:
 * `setivar_fallback_no_side_exits` in `Relation#reset` (relation.rb:1256): 6 apps. Shape-polymorphic, a #1099
   relative.
 * `complex_arg_pass` (421/op): spread over unrelated sites. The largest are `resolve_attribute_name`
-  (`fetch(super, &:itself)`), `Core#relation` and Rack `fetch_header`.
+  (`fetch(super, &:itself)`), `Core#relation` and Rack `fetch_header`. The Rails side of `resolve_attribute_name`
+  is taken: CP-3 in [rails-common-paths-2](rails-common-paths-2.md) drops the block (−30% instructions per
+  `type_for_attribute` on ZJIT), held for Thomas, not opened (2026-11-04).
 * App-specific `exit_guard_type_failure`: lobsters `build_default_scope` 1,433/op, `content_tag_string` 538/op.
 
 **What this means for us.** Leads 4–7 and 9 are patches on k0kubun's `zjit-lobsters7` branch that #1039 lists
