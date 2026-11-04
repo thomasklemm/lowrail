@@ -220,3 +220,62 @@ new candidate.
 | #16452 constant alias as association class | Main raises "Missing model class Author for the Post#author association" although `Author` exists (as `User`) | Not built: a clearer message is possible in `compute_type`, but the issue has no reactions or duplicates since 2014 |
 | #50971, #58499, #59168, #59153 | No open PR found by text search; reasons from the first round stand (reverted guard; useragent#74; maintainer direction asked; herb gem) | Unchanged |
 | #46419, #49762, #58732, #57109, #58523, #54177 | Documented already, or a docs PR is open (#59007, #58744, #58761, #57114), or fatkodima rejected the remainder (#58000) | Unchanged |
+
+## P1: plucked columns unknown to the schema (2026-11-04)
+
+Follow-up to the `pluck` gap named in #59609's body. Branch
+[`thomasklemm/pluck-unknown-table-type`](https://github.com/thomasklemm/rails/tree/thomasklemm/pluck-unknown-table-type) @
+[`f1bd724f3d`](https://github.com/thomasklemm/rails/commit/f1bd724f3dfe2aab92b6d482ba79f19cf06e4180) on main
+`6c23cb8f2a` ([patch](../../bench/upstream/rails_issue_fixes/patches/p1-pluck-unknown-table-type.patch)); lib +8/−1,
+one test, CHANGELOG. Not opened; waiting for the coordinator's Sol round.
+
+**Reproduction** ([script](../../bench/upstream/rails_issue_fixes/repro_pluck_unknown_table.rb)): a subquery that selects
+`rooms.day` (date) and `rooms.open` (boolean), plucked as `pluck("s.d", "s.o")`.
+
+| Version (Ruby) | PostgreSQL `pluck` | SQLite `pluck` | PostgreSQL `group("s.d")` keys |
+| --- | --- | --- | --- |
+| main `6c23cb8f2a` (4.0.9) | `["2020-01-01", true]` | `["2020-01-01", 1]` | `"2020-01-01"` |
+| 8-1-stable (4.0.9) | same | same | `"2020-01-01"` |
+| v7.0.5 (3.2.11) | same | same | `"2020-01-01"` |
+| v7.0.4.3 (3.2.11) | same | same | `Date` |
+| with P1 | `[Date, true]` | `[Date, true]` | unchanged (that is #59609) |
+
+So `pluck` is **not a 7.0.5 regression**: 7.0.4.3 returns the same raw values (it has used `column.try(:type_caster)`
+since 71f0df943d, 2020). The table also confirms #48420's 7.0.5 regression on PostgreSQL. On SQLite, grouped keys were
+uncast in 7.0.4.3 too, so #59609's CHANGELOG phrase "again, as before Rails 7.0.5" is accurate for PostgreSQL only;
+reported to the coordinator, not changed on the open PR.
+
+**Search** (GitHub search API, 2026-11-04): "pluck subquery type cast", "pluck joined subquery string", "pluck type
+cast unknown table", "pluck CTE", "pluck tsrange", "type_cast_pluck_values": no open issue or PR except #59609.
+
+**Plain description**, one sentence per branch of the new `if / elsif / else` in `type_cast_pluck_values`:
+
+1. A column whose type is the placeholder for a column unknown to the schema takes the type the database reports,
+   or keeps the placeholder when the adapter reports none (MySQL).
+2. A column with any other type keeps it.
+3. An SQL expression is looked up by its result name on the model, then the joined models, then the result (unchanged).
+
+Same shape and comment as #59609. Cold read (subagent): each branch stated correctly, shape checklist passes, L1;
+nit: "(hence equal?)" is terse, kept identical to #59609 for consistency. It confirmed `|| type` is needed (MySQL and
+trilogy results carry no column types, so `column_types[i]` is `nil`), and that `ids`, `pluck(:id, "expr")`, async
+pluck and the `pluck("*")` branch are unchanged; `pick` gains the fix through `pluck`.
+
+**Checks.** The test (SQLite and PostgreSQL) fails on main (`["2004-04-15", 0]` on SQLite, `"2004-04-15"` on
+PostgreSQL) and passes with P1. A wrong fix that drops the placeholder and falls back to `model.attribute_types` by
+name fails it on SQLite (the CTE's `written_on` is `approved`, which collides with Topic's datetime `written_on`).
+AR suite: PostgreSQL 11,203 runs, 0 failures; SQLite 10,282 runs, 0 failures, the same 4 `sqlite3`-CLI errors.
+`git merge-tree` is clean against main; against #59609 only the two CHANGELOG entries at the top conflict. Per
+"Correctness fixes: readable first" nothing was measured beyond reasoning: the change adds one `equal?` per plucked
+column per query, not per row.
+
+### Body (draft, about 170 words)
+
+> `pluck` and `pick` now cast a column of a joined subquery or CTE with the type the database reports for the result, instead of returning the raw value:
+>
+> ```ruby
+> Topic.with(read: Topic.select(:id, :last_read)).joins("JOIN read ON read.id = topics.id").pluck("read.last_read")
+> # main:    ["2004-04-15"]   (SQLite also returns booleans as 1)
+> # this PR: [Thu, 15 Apr 2004]
+> ```
+>
+> A plucked column's type comes from its Arel attribute first. For a table the schema cache doesn't know, that type is the placeholder `ActiveRecord::Type.default_value`, which casts nothing, so the result's column type was never used. Now a column whose type is that placeholder takes the result's type, a column with any other type keeps it, and an SQL expression is looked up by name as before. This is the change #59609 makes for grouped keys (#48420), on the path `pluck` takes; unlike that one it is not a regression, since 7.0.4.3 returns the same raw values. MySQL is unchanged because its results carry no column types, and the type is the database's, not the model's time zone wrapper or serializer.
