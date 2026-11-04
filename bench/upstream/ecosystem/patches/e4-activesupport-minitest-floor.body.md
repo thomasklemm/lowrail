@@ -6,7 +6,11 @@
 active_support/test_case.rb:372:in '<class:TestCase>': undefined method 'refute_pattern' for class 'ActiveSupport::TestCase' (NameError)
 ```
 
-active_model_serializers pins `minitest < 5.11` for development, and its suite stops there.
+active_model_serializers pins an older minitest for development, and its suite stops there ([`active_model_serializers.gemspec` in 0.10.16, line 42](https://github.com/rails-api/active_model_serializers/blob/6934c8bd31f4025fe7548a07d50a82f18df8e689/active_model_serializers.gemspec#L42); unchanged on `0-10-stable`):
+
+```ruby
+  spec.add_development_dependency 'minitest', ['~> 5.0', '< 5.11']
+```
 
 | `require "active_support/test_case"` | minitest 5.10.3 | minitest 5.18.0 |
 |---|---|---|
