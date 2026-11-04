@@ -1,0 +1,214 @@
+From 5e81fc506a88b44be2ee9817b43e87d58c8ffbf2 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:18:23 +0000
+Subject: [PATCH] Size the keyword hash for a splat after dynamic keywords up
+ front
+
+The previous commit merged a keyword splat into the fresh `newhash` only
+when the result fit that hash's embedded table, which holds 2 entries for
+a new small hash on x86_64, and copied it into a second hash otherwise.
+Pass the keyword pairs and the splat to `core#hash_new_kwd` instead,
+which allocates one hash sized for both, so `m(a: v, **h)` allocates
+one Hash whatever the size of `h`, as on Ruby 4.0. The single keyword
+splat that must be copied uses it too.
+
+The pairs are now inserted after the splat expression and its `to_hash`
+have run, as pairs within one chunk already are after all its values.
+---
+ compile.c                    |  3 +--
+ defs/id.def                  |  2 +-
+ hash.c                       | 10 ----------
+ internal/hash.h              |  1 -
+ prism_compile.c              | 22 +++++++++++++++++-----
+ test/ruby/test_allocation.rb |  7 ++++++-
+ vm.c                         | 17 +++++++++++------
+ 7 files changed, 36 insertions(+), 26 deletions(-)
+
+diff --git a/compile.c b/compile.c
+index 213da7bd2d..cb043c5682 100644
+--- a/compile.c
++++ b/compile.c
+@@ -6840,9 +6840,8 @@ compile_single_keyword_splat_mutable(rb_iseq_t *iseq, LINK_ANCHOR *const args, c
+ {
+     *flag_ptr |= VM_CALL_KW_SPLAT_MUT;
+     ADD_INSN1(args, argn, putspecialobject, INT2FIX(VM_SPECIAL_OBJECT_VMCORE));
+-    ADD_INSN1(args, argn, newhash, INT2FIX(0));
+     compile_hash(iseq, args, kwnode, TRUE, FALSE);
+-    ADD_SEND(args, argn, id_core_hash_merge_fit_kwd, INT2FIX(2));
++    ADD_SEND(args, argn, id_core_hash_new_kwd, INT2FIX(1));
+ }
+ 
+ #define SPLATARRAY_FALSE 0
+diff --git a/defs/id.def b/defs/id.def
+index 40048fd4be..7092dcb2de 100644
+--- a/defs/id.def
++++ b/defs/id.def
+@@ -104,7 +104,7 @@ firstline, predefined = __LINE__+1, %[\
+   core#hash_merge_bang_ptr
+   core#hash_merge_kwd
+   core#hash_merge_bang_kwd
+-  core#hash_merge_fit_kwd
++  core#hash_new_kwd
+   core#hash_coerce
+   core#raise
+   core#sprintf
+diff --git a/hash.c b/hash.c
+index f5fa47c19e..c8f58333d0 100644
+--- a/hash.c
++++ b/hash.c
+@@ -5475,16 +5475,6 @@ rb_hash_merge2_bulk(VALUE hash, rb_len_t argc, const VALUE *argv, bool dup)
+     return val;
+ }
+ 
+-// h1 is a hash we just created, sized for its own entries. Merge h2 into it
+-// in place when its embedded table can hold the result; otherwise copy into a
+-// right-sized hash rather than converting h1 to an st_table.
+-VALUE
+-rb_hash_merge2_fit(VALUE h1, VALUE h2)
+-{
+-    bool fits = !RHASH_AR_TABLE_P(h1) || RHASH_SIZE(h1) + RHASH_SIZE(h2) <= RHASH_AR_TABLE_MAX_BOUND(h1);
+-    return rb_hash_merge2(h1, h2, !fits);
+-}
+-
+ VALUE
+ rb_hash_merge2(VALUE h1, VALUE h2, bool dup)
+ {
+diff --git a/internal/hash.h b/internal/hash.h
+index 50438a35a9..b60af2c8ae 100644
+--- a/internal/hash.h
++++ b/internal/hash.h
+@@ -116,7 +116,6 @@ RUBY_SYMBOL_EXPORT_END
+ 
+ VALUE rb_hash_new_with_bulk_insert(rb_len_t argc, const VALUE *argv);
+ VALUE rb_hash_merge2(VALUE h1, VALUE h2, bool dup);
+-VALUE rb_hash_merge2_fit(VALUE h1, VALUE h2);
+ VALUE rb_hash_merge2_bulk(VALUE hash, rb_len_t argc, const VALUE *argv, bool dup);
+ VALUE rb_hash_resurrect(VALUE hash);
+ int rb_hash_stlike_lookup(VALUE hash, st_data_t key, st_data_t *pval);
+diff --git a/prism_compile.c b/prism_compile.c
+index 13cc928056..7bf5cea84d 100644
+--- a/prism_compile.c
++++ b/prism_compile.c
+@@ -1479,7 +1479,6 @@ pm_compile_hash_elements(rb_iseq_t *iseq, const pm_node_t *node, const pm_node_l
+     int stack_length = 0;
+     bool first_chunk = true;
+     bool owned_hash = false;
+-    bool fresh_hash = false;
+ 
+     // This is an optimization wherein we keep track of whether or not the
+     // previous element was a static literal. If it was, then we do not attempt
+@@ -1496,7 +1495,6 @@ pm_compile_hash_elements(rb_iseq_t *iseq, const pm_node_t *node, const pm_node_l
+             PUSH_SEQ(ret, anchor);                                                                \
+             PUSH_INSN1(ret, location, newhash, INT2FIX(stack_length));                            \
+             first_chunk = false;                                                                  \
+-            fresh_hash = true;                                                                    \
+         }                                                                                         \
+         else {                                                                                    \
+             PUSH_INSN1(ret, location, putspecialobject, INT2FIX(VM_SPECIAL_OBJECT_VMCORE));       \
+@@ -1601,6 +1599,21 @@ pm_compile_hash_elements(rb_iseq_t *iseq, const pm_node_t *node, const pm_node_l
+             break;
+           }
+           case PM_ASSOC_SPLAT_NODE: {
++            if (first_chunk && stack_length && shareability == 0) {
++                // `k: v, **kw`: build one hash sized for the pairs and `kw`.
++                // (Shareable constant values push the pairs to `ret` directly.)
++                PUSH_INSN1(ret, location, putspecialobject, INT2FIX(VM_SPECIAL_OBJECT_VMCORE));
++                PUSH_SEQ(ret, anchor);
++                PM_COMPILE_NOT_POPPED(element);
++                PUSH_SEND(ret, location, id_core_hash_new_kwd, INT2FIX(stack_length + 1));
++                INIT_ANCHOR(anchor);
++                stack_length = 0;
++                first_chunk = false;
++                owned_hash = true;
++                static_literal = false;
++                break;
++            }
++
+             FLUSH_CHUNK;
+ 
+             const pm_assoc_splat_node_t *assoc_splat = (const pm_assoc_splat_node_t *) element;
+@@ -1664,7 +1677,7 @@ pm_compile_hash_elements(rb_iseq_t *iseq, const pm_node_t *node, const pm_node_l
+                         PUSH_SEND(ret, location, id_core_hash_merge_bang_kwd, INT2FIX(2));
+                     }
+                     else {
+-                        PUSH_SEND(ret, location, fresh_hash ? id_core_hash_merge_fit_kwd : id_core_hash_merge_kwd, INT2FIX(2));
++                        PUSH_SEND(ret, location, id_core_hash_merge_kwd, INT2FIX(2));
+                         owned_hash = true;
+                     }
+                 }
+@@ -1733,9 +1746,8 @@ pm_setup_args_core(const pm_arguments_node_t *arguments_node, const pm_node_t *b
+                     else if (*dup_rest & DUP_SINGLE_KW_SPLAT) {
+                         *flags |= VM_CALL_KW_SPLAT_MUT;
+                         PUSH_INSN1(ret, location, putspecialobject, INT2FIX(VM_SPECIAL_OBJECT_VMCORE));
+-                        PUSH_INSN1(ret, location, newhash, INT2FIX(0));
+                         pm_compile_hash_elements(iseq, argument, elements, 0, Qundef, true, ret, scope_node);
+-                        PUSH_SEND(ret, location, id_core_hash_merge_fit_kwd, INT2FIX(2));
++                        PUSH_SEND(ret, location, id_core_hash_new_kwd, INT2FIX(1));
+                     }
+                     else {
+                         pm_compile_hash_elements(iseq, argument, elements, 0, Qundef, true, ret, scope_node);
+diff --git a/test/ruby/test_allocation.rb b/test/ruby/test_allocation.rb
+index 8c68355812..b0ec16f462 100644
+--- a/test/ruby/test_allocation.rb
++++ b/test/ruby/test_allocation.rb
+@@ -49,6 +49,8 @@ def self.num_allocations
+           r2k_empty_array = r2k_empty_array = [Hash.ruby2_keywords_hash({})]
+           r2k_empty_array1 = r2k_empty_array1 = [1, Hash.ruby2_keywords_hash({})]
+           hash1 = hash1 = {a: 2}
++          hash3 = hash3 = {a: 2, c: 3, d: 4}
++          hash8 = hash8 = {a: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9}
+           nill = nill = nil
+           block = block = lambda{}
+ 
+@@ -309,8 +311,11 @@ def self.keyword_splat(**kw#{block}); end
+         check_allocations(0, 1, "keyword_splat(a: nill, **empty_hash#{block})")
+         # Starts from a frozen literal template, so it merges through hash_merge_ptr (control)
+         check_allocations(0, 1, "keyword_splat(a: 2, b: nill, **hash1, c: nill#{block})")
+-        # Starts from a dynamic newhash, so the splat merges into it in place
++        # Dynamic pairs before the splat build one hash sized for both, whether
++        # or not the result fits the embedded table of a small hash
+         check_allocations(0, 1, "keyword_splat(b: nill, **hash1#{block})")
++        check_allocations(0, 1, "keyword_splat(b: nill, **hash3#{block})")
++        check_allocations(0, 1, "keyword_splat(b: nill, **hash8#{block})")
+         check_allocations(0, 1, "keyword_splat(**empty_hash, a: 2#{block})")
+ 
+         check_allocations(0, 1, "keyword_splat(**nil#{block})")
+diff --git a/vm.c b/vm.c
+index 4ed45b1900..536b44894b 100644
+--- a/vm.c
++++ b/vm.c
+@@ -4531,12 +4531,17 @@ m_core_hash_merge_kwd(VALUE recv, VALUE hash, VALUE kw)
+ }
+ 
+ static VALUE
+-m_core_hash_merge_fit_kwd(VALUE recv, VALUE hash, VALUE kw)
++m_core_hash_new_kwd(int argc, VALUE *argv, VALUE recv)
+ {
+-    // `hash` is a fresh `newhash`: merge in place if the result fits it.
+-    if (!NIL_P(kw)) {
+-        REWIND_CFP(hash = rb_hash_merge2_fit(hash, rb_to_hash_type(kw)));
+-    }
++    // `k1, v1, ..., kw` for `k1: v1, ..., **kw`: build one hash sized for both.
++    VALUE kw = argv[argc - 1], hash;
++    VM_ASSERT(argc % 2 == 1);
++    REWIND_CFP({
++        if (!NIL_P(kw)) kw = rb_to_hash_type(kw);
++        hash = rb_hash_new_capa((argc - 1) / 2 + (NIL_P(kw) ? 0 : RHASH_SIZE(kw)));
++        rb_hash_bulk_insert(argc - 1, argv, hash);
++        if (!NIL_P(kw)) rb_hash_merge2(hash, kw, false);
++    });
+     return hash;
+ }
+ 
+@@ -4770,7 +4775,7 @@ Init_VM(void)
+     rb_define_method_id(klass, id_core_hash_merge_bang_ptr, m_core_hash_merge_bang_ptr, -1);
+     rb_define_method_id(klass, id_core_hash_merge_kwd, m_core_hash_merge_kwd, 2);
+     rb_define_method_id(klass, id_core_hash_merge_bang_kwd, m_core_hash_merge_bang_kwd, 2);
+-    rb_define_method_id(klass, id_core_hash_merge_fit_kwd, m_core_hash_merge_fit_kwd, 2);
++    rb_define_method_id(klass, id_core_hash_new_kwd, m_core_hash_new_kwd, -1);
+     rb_define_method_id(klass, id_core_hash_coerce, m_core_hash_coerce, 1);
+     rb_define_method_id(klass, id_core_raise, f_raise, -1);
+     rb_define_method_id(klass, id_core_sprintf, f_sprintf, -1);
+-- 
+2.55.0
+
