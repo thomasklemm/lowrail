@@ -1,4 +1,4 @@
-From cb3f74f86aa819140c3cf5d87f30ef6c8600f4e7 Mon Sep 17 00:00:00 2001
+From e4852e04bb223792c88940e461e7f66dc21a1029 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 16:51:17 +0000
 Subject: [PATCH] Accept bind values in `where!` and `having!` again
@@ -16,10 +16,11 @@ Restore the splat signatures, splat the arguments from `where` and
 `merge(where: [cond, *binds])` checks permitted params and reaches
 `where!` overrides as before.
 ---
- activerecord/lib/active_record/relation/merger.rb      |  2 +-
- .../lib/active_record/relation/query_methods.rb        |  8 ++++----
- activerecord/test/cases/relations_test.rb              | 10 ++++++++++
- 3 files changed, 15 insertions(+), 5 deletions(-)
+ .../lib/active_record/relation/merger.rb      |  2 +-
+ .../active_record/relation/query_methods.rb   |  8 +++---
+ .../test/cases/relation/where_test.rb         |  7 +++++
+ activerecord/test/cases/relations_test.rb     | 26 +++++++++++++++++++
+ 4 files changed, 38 insertions(+), 5 deletions(-)
 
 diff --git a/activerecord/lib/active_record/relation/merger.rb b/activerecord/lib/active_record/relation/merger.rb
 index 40177005cc9..05bea4bf102 100644
@@ -65,22 +66,56 @@ index ee4a573235c..6efd42a2e50 100644
        self.having_clause += build_having_clause(opts, rest)
        self
      end
+diff --git a/activerecord/test/cases/relation/where_test.rb b/activerecord/test/cases/relation/where_test.rb
+index c3bd8e83942..fb8e40cd5b7 100644
+--- a/activerecord/test/cases/relation/where_test.rb
++++ b/activerecord/test/cases/relation/where_test.rb
+@@ -608,6 +608,13 @@ def test_where_with_strong_parameters
+       assert_equal author, Author.where(params.permit!).first
+     end
+ 
++    def test_merge_where_with_strong_parameters
++      author = authors(:david)
++      params = ProtectedParams.new(name: author.name)
++      assert_raises(ActiveModel::ForbiddenAttributesError) { Author.all.merge(where: [params]) }
++      assert_equal author, Author.all.merge(where: [params.permit!]).first
++    end
++
+     def test_where_with_large_number
+       assert_equal [authors(:bob)], Author.where(id: [3, 9223372036854775808])
+       assert_equal [authors(:bob)], Author.where(id: 3..9223372036854775808)
 diff --git a/activerecord/test/cases/relations_test.rb b/activerecord/test/cases/relations_test.rb
-index 7b9de92f73f..7d3888e19d7 100644
+index 7b9de92f73f..0da8c474934 100644
 --- a/activerecord/test/cases/relations_test.rb
 +++ b/activerecord/test/cases/relations_test.rb
-@@ -2275,6 +2275,16 @@ def test_destroy_by
+@@ -2275,6 +2275,32 @@ def test_destroy_by
      assert_raises(ArgumentError) { Post.all.find_by! }
    end
  
-+  test "where! and having! take bind values like where and having" do
++  test "where! takes bind values" do
 +    assert_equal [1], Post.all.where!("id = ?", 1).pluck(:id)
 +    assert_equal [1, 2], Post.all.where!("id = ? OR id = ?", 1, 2).order(:id).pluck(:id)
 +    assert_equal [1, 2], Post.all.where!("id IN (?)", [1, 2]).order(:id).pluck(:id)
 +    assert_equal [1], Post.all.where!("id = :id", id: 1).pluck(:id)
++  end
++
++  test "having! takes bind values" do
 +    assert_equal [1], Post.group(:id).having!("id = ?", 1).pluck(:id)
-+    assert_equal [1, 2], Post.group(:id).having!("id = ? OR id = ?", 1, 2).order(:id).pluck(:id)
-+    assert_equal [2], Post.all.merge(where: ["id = ?", 2]).pluck(:id)
++    assert_equal [1, 2], Post.group(:id).having!("id IN (?)", [1, 2]).order(:id).pluck(:id)
++    assert_equal [1], Post.group(:id).having!("id = :id", id: 1).pluck(:id)
++  end
++
++  test "where passes bind values to an overridden where!" do
++    binds = nil
++    override = Module.new do
++      define_method(:where!) do |opts, *rest|
++        binds = rest
++        super(opts, *rest)
++      end
++    end
++
++    assert_equal [1], Post.all.extending(override).where("id = ?", 1).pluck(:id)
++    assert_equal [1], binds
 +  end
 +
    test "loaded relations cannot be mutated by multi value methods" do

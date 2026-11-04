@@ -36,7 +36,7 @@ This audit looks for breaking changes on rails/rails main that haven't been rele
 | --- | --- | --- | --- | --- | --- |
 | AR-1 | `ActionView::LookupContext#find_template` | #57783 (`5ee0ba5c48`), split into `find`/`find!`; no alias, no deprecation | jpmobile (`FallbackViewSelector`), rabl-rails (`Library#fetch_source`), thredded (collection renderer): `NoMethodError` on main; about 800 code-search hits | `alias :find_template :find!` (raises like 8.1); one test | [patch](../../bench/upstream/api_regressions/patches/find-template.patch), [body](../../bench/upstream/api_regressions/bodies/find-template.md) |
 | AR-2 | `ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED` | #56041 (`a18d246600`), moved to `BCryptPassword` | Spree's `maximum_password_length` default and open-build-service's `User` validation: `NameError` at load; about 470 code-search hits, mostly app `User` models | Public constant pointing at the BCrypt limit; one test | [patch](../../bench/upstream/api_regressions/patches/max-password-length.patch), [body](../../bench/upstream/api_regressions/bodies/max-password-length.md) |
-| AR-4 | `ActiveRecord::QueryMethods#where!` and `#having!` bind values | #59579 (`401f146f413`, merged 2026-11-03), `(opts, *rest)` became `(opts, rest = FROZEN_EMPTY_ARRAY)`; no deprecation | Discourse `Permalink.filter_by` (named bind left in the SQL, admin search finds nothing), Canvas's SIS exporter and crono_trigger's web UI (`?` binds: `NoMethodError`); overrides of `where!(opts, *rest)` (mobility, active_record-acts_as) receive nested binds; about 500 code-search hits for `where!("` | Splat signatures and the `merge` splat restored, as in 8.1; one test | [patch](../../bench/upstream/api_regressions/patches/where-bang-binds.patch), [body](../../bench/upstream/api_regressions/bodies/where-bang-binds.md) |
+| AR-4 | `ActiveRecord::QueryMethods#where!` and `#having!` bind values | #59579 (`401f146f413`, merged 2026-11-03), `(opts, *rest)` became `(opts, rest = FROZEN_EMPTY_ARRAY)`; no deprecation | Discourse `Permalink.filter_by` (named bind left in the SQL; `PG::SyntaxError` on PostgreSQL), Canvas's SIS exporter and crono_trigger's web UI (`?` binds: `NoMethodError`); overrides of `where!(opts, *rest)` (mobility, active_record-acts_as) receive nested binds; about 500 code-search hits for `where!("` | Splat signatures and the `merge` splat restored, as in 8.1; one test | [patch](../../bench/upstream/api_regressions/patches/where-bang-binds.patch), [body](../../bench/upstream/api_regressions/bodies/where-bang-binds.md) |
 
 Each branch is one commit by Thomas on rails main `8b06b0eb98`:
 
@@ -83,7 +83,7 @@ Load order for AR-2 is verified with [`mp_load.rb`](../../bench/upstream/api_reg
 
 ## AR-4: `where!` and `having!` with bind values (built 2026-11-04, not opened)
 
-Branch `thomasklemm/where-bang-binds` @ `cb3f74f86a` on rails main `d7875e3fb1`, one commit by Thomas. The change it fixes landed the day before the audit and is in no release.
+Branch `thomasklemm/where-bang-binds` @ `e4852e04bb` on rails main `d7875e3fb1` (merges cleanly onto `7a78da5a55`), one commit by Thomas. The change it fixes landed the day before the audit and is in no release.
 
 Observed with [`where_bang.rb`](../../bench/upstream/api_regressions/where_bang.rb) (sqlite3, 8-1-stable vs main vs patch):
 
@@ -92,7 +92,7 @@ Observed with [`where_bang.rb`](../../bench/upstream/api_regressions/where_bang.
 | `where!("n = ?", 2)` | `WHERE (n = 2)` | `NoMethodError: undefined method 'empty?' for an instance of Integer` |
 | `where!("n = ? OR n = ?", 1, 2)` | `WHERE (n = 1 OR n = 2)` | `ArgumentError (given 3, expected 1..2)` |
 | `where!("n IN (?)", [1, 2])` | `WHERE (n IN (1, 2))` | `PreparedStatementInvalid` |
-| `where!("url LIKE :u", u: "%x%")` | `WHERE (url LIKE '%x%')` | `WHERE ((url LIKE :u))`, no rows, no error |
+| `where!("url LIKE :u", u: "%x%")` | `WHERE (url LIKE '%x%')` | `WHERE ((url LIKE :u))`: no rows on SQLite; on PostgreSQL 15, Discourse's `Permalink.filter_by` call raises `PG::SyntaxError` at `:` ([`where_bang_pg.rb`](../../bench/upstream/api_regressions/where_bang_pg.rb)) |
 | `where!("at >= ?", time)` | `WHERE (at >= '2026-03-01 00:00:00')` | `NoMethodError` (`Time#empty?`) |
 | `having!("n > ?", 1)` | `HAVING (n > 1)` | `NoMethodError` |
 | override `where!(opts, *rest)` sees, for `where("n = ?", 2)` | `["n = ?", [2]]` | `["n = ?", [[2]]]` |
@@ -101,7 +101,7 @@ Public `where`, `having`, `merge` and the array form `where!(["n = ?", 1])` are 
 
 Readability gate: L0. In one sentence, "`where!` and `having!` take their binds as a splat again, as in 8.1". It undoes the signatures and the `merger.rb` line of `401f146f413`; only the frozen default in `build_where_clause` stays. The separate reviewer found that keeping the merger line broke `merge(where: [cond, bind])` for overrides (mobility's `QueryBuilder` only translates a Hash) and checked permitted params after destructuring, so `merge(where: [permitted_params])` raised `ArgumentError`; the amended patch reverts it and the test covers `merge(where: [...])`. A wrapper (`where!(opts, *rest) = _where!(opts, rest)`, with `where` calling `_where!`) would keep the allocation saving but makes `Relation#where` skip overrides of `where!`, which mobility and active_record-acts_as rely on, so it was rejected. Measured only to rule out a slowdown: one more Array per `where`/`having`/`none` call than main, the same count as before `401f146f413`.
 
-Tests: the new `relations_test.rb` case errors on main (`NoMethodError`) and passes with the patch. Relation, scoping, inheritance and null-relation tests after the amend: 1,334 runs, green. Before the amend, the whole Active Record sqlite3 suite: 10,269 runs, the 1 failure and 5 errors are environment only (no `sqlite3` CLI, no `pg` gem, `require "arel"` with `-I` paths).
+Tests (after Sol's nits, split): `where!` binds, `having!` binds (`?`, named, Array), an override of `where!` that calls `super`, and `merge(where: [permitted params])` in `where_test.rb`. All four fail or error on main and pass with the patch; relation, scoping, inheritance, null-relation and finder tests: 1,685 runs, green. Sol: open with nits (applied); queued after D1 in `bench/upstream/pr-queue`. Relation, scoping, inheritance and null-relation tests after the amend: 1,334 runs, green. Before the amend, the whole Active Record sqlite3 suite: 10,269 runs, the 1 failure and 5 errors are environment only (no `sqlite3` CLI, no `pg` gem, `require "arel"` with `-I` paths).
 
 ## Not opened: AR-3, `ActionDispatch::Request::Session` and `Request::Utils` (coordinator decision)
 

@@ -1,16 +1,23 @@
-Title: **Accept bind values in `where!` and `having!` again**
+### Accept bind values in `where!` and `having!` again
 
-#59579 changed `where!` and `having!` from `(opts, *rest)` to `(opts, rest = FROZEN_EMPTY_ARRAY)`, so that `where` and `having` could pass their binds as one array. The change is unreleased.
+#59579 changed `where!` and `having!` from `(opts, *rest)` to `(opts, rest = FROZEN_EMPTY_ARRAY)`. Both are `:nodoc:` and the change is unreleased, but applications and gems call them with bind values or override them and call `super`:
 
-Code that calls the bang methods with bind values now breaks:
+- [Discourse](https://github.com/discourse/discourse/blob/0f746ecc2eb1a601ba3bd1e5bcff3e7019ef509e/app/models/permalink.rb#L92): `permalinks.where!("url ILIKE :url OR external_url ILIKE :url", url: "%#{url}%")`
+- [Canvas](https://github.com/instructure/canvas-lms/blob/1c9f0bb8013ed69c4f2efe11fd483025469b7e6c/gems/plugins/account_reports/lib/account_reports/sis_exporter.rb#L382-L385): `courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?) …", 120.days.ago)` (shortened)
+- [crono_trigger 1.0.0](https://github.com/joker1007/crono_trigger/blob/ebd776373eb3ad2b9bbd4af81cf2f9b153071c50/lib/crono_trigger/web.rb#L178): `rel.where!("executed_at >= ?", Time.parse(params[:from]))`
+- [mobility 1.3.2](https://github.com/shioyama/mobility/blob/a776667737cf0bd1645db83cd6b3d1447e566812/lib/mobility/plugins/active_record/query.rb#L132) and [active_record-acts_as 5.2.0](https://github.com/chaadow/active_record-acts_as/blob/875cd6d8aa5e36c8eeb2272b2d0e09f0100846ce/lib/active_record/acts_as/querying.rb#L4): `def where!(opts, *rest)`
 
-| Call | 8.1 | main |
-| --- | --- | --- |
-| `where!("id = ?", 1)` | `WHERE (id = 1)` | `NoMethodError: undefined method 'empty?' for an instance of Integer` |
-| `where!("id = ? OR id = ?", 1, 2)` | `WHERE (id = 1 OR id = 2)` | `ArgumentError` |
-| `where!("id IN (?)", [1, 2])` | `WHERE (id IN (1, 2))` | `ActiveRecord::PreparedStatementInvalid` |
-| `where!("url ILIKE :url", url: "%x%")` | `WHERE (url ILIKE '%x%')` | `WHERE ((url ILIKE :url))`, with no error |
+On main:
 
-Discourse's `Permalink.filter_by` uses the last form, so its admin search silently finds nothing. Canvas's SIS exporter and crono_trigger's web UI pass `?` binds. Gems that override `where!(opts, *rest)` and call `super`, such as mobility and active_record-acts_as, now also receive `rest` nested one level deeper.
+| Call | Result |
+| --- | --- |
+| `where!("id = ?", 1)` | `NoMethodError` |
+| `where!("id = :id", id: 1)` | `:id` stays in the SQL; PostgreSQL raises a syntax error |
+| `where("id = ?", 1)` with an override | the override receives `rest = [[1]]` |
+| `merge(where: [permitted_params])` | `ArgumentError` |
 
-This restores the splat signatures and has `where`, `having` and `merge(where: [...])` splat their arguments into them, as in 8.1, so permitted params are checked and overrides are reached as before. Only the frozen default in `build_where_clause` stays. The new test errors without the fix.
+This restores the splat signatures, and `where`, `having` and `merge` splat into them again, as in 8.1. The other allocation optimizations from #59579 remain. The tests cover `?`, named and Array binds, an override, and `merge` with permitted params.
+
+---
+
+<sub>Found by diffing the public and `:nodoc:` API of Rails 8-1-stable and main against gem and app callers ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/api-regressions.md), part of my research project Lowrail).</sub>
