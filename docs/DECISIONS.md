@@ -409,3 +409,8 @@ We don't comment on other people's PRs or issues (measurements, reviews, suggest
 explicitly approved that specific comment. Their PR description is theirs; what we measure about their work stays in
 our records. Orbs draft at most, and ask the coordinator, who asks Thomas. A benchmark comment on rails/rails#59141
 was deleted for this reason. Replies on our own PRs and issues are unaffected.
+
+Approved comments follow the style Thomas liked on rails/rails#57013 (2026-11-04): open with "Heads-up in case
+it's useful:", state the effect in one sentence, give the minimal repro, name an existing fix or PR if there is
+one, and stop. No thanks, no judgement of the work, no proposals beyond what was asked, no numbers that weren't
+asked for.
