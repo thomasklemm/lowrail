@@ -150,6 +150,25 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | CP-3: `resolve_attribute_name` looks up aliases with `[]` instead of `fetch(name, &:itself)` | rails/rails | `thomasklemm/resolve-attribute-name-lookup` @ `b2577977c3` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp3-resolve-attribute-name-lookup.patch)) | `type_for_attribute` −15% instructions interpreted, −24% YJIT, −30% ZJIT; a two-condition `where` −0.6% / −1.8% / −1.5%; ruby-bench shipit −0.16% interpreted, −0.25% YJIT instructions per iteration; in all 20 census apps ([round 2](rails-common-paths-2.md#cp-3-look-up-attribute-aliases-with-)) | Ready, held until Thomas has read it (DECISIONS). L0; two subagent reviews; body and explanation below. |
 | CP-5: `UriEncoder#escape` checks a component with an anchored match on the safe characters | rails/rails | `thomasklemm/uri-encoder-safe-match` @ `3c968c5bf6` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp5-uri-encoder-safe-match.patch)) | `escape_segment` of a slug −42% / −46% / −45% instructions; `page_path(slug)` −8% / −15% / −11%; `post_path(post)` −1.1% / −2.5% / −1.5%; ruby-bench shipit −0.13% interpreted, −0.31% YJIT instructions per iteration; 12 of 20 census apps ([round 2](rails-common-paths-2.md#cp-5-check-url-components-with-an-anchored-match)) | Ready, held until Thomas has read it. L1; escaping, so primary and adversarial subagent rounds; adds one test. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+| AR-1: SQLite3 `perform_query` looks up the type map once per result, not once per column | rails/rails | `thomasklemm/sqlite3-result-type-map-once` @ `3fa76e25b4` on main `9b116f1fed` (not pushed; patch in [`bench/upstream/ar_request_paths`](../../bench/upstream/ar_request_paths/ar-1-sqlite3-result-type-map-once.patch)) | `Post.find` (9 columns) instructions −2.2% / −1.8% / −1.6% (interpreter / YJIT / ZJIT, A/A ≤ 0.37%); with `default_timezone` in database.yml −15% / −24% / −23%; 0 objects (51 → 51), or 60 → 52 with `default_timezone`; ruby-bench interpreter shipit −0.44%, railsbench and lobsters −0.14% (A/A ≤ 0.08%), YJIT shipit −0.25%, lobsters −0.19% (A/A ≤ 0.08%), railsbench +0.05% inside its A/A; census 8: all 8 SQLite apps, about 0.02% of instructions ([record](ar-request-paths.md)) | Ready for Thomas: exact (differential on interpreter/YJIT/ZJIT, `test:sqlite3` green), L0–L1, primary and adversarial subagent reviews clean, body reviewed ([body](ar-request-paths.md#pr-body-draft-reviewed)). Lib +1. |
+
+### Erklärung für Thomas: AR-1 (2026-11-04, nicht geöffnet)
+
+Aufzeichnung und PR-Text: [ar-request-paths](ar-request-paths.md).
+
+**AR-1, SQLite3: Type Map einmal pro Ergebnis.** Wenn der SQLite3-Adapter ein Abfrageergebnis baut, sucht er für
+jede Spalte den Typ in der Type Map; die holt er sich über die Methode `type_map`, die jedes Mal prüft, ob in der
+Datenbank-Config eine eigene `default_timezone` steht, und dann die Konstante liest (mit Zeitzone in der Config
+sogar einen Hash baut und in einem `Concurrent::Map` nachschlägt). Das passierte für jede Spalte neu, obwohl immer
+dieselbe Map herauskommt; jetzt wird sie einmal pro Ergebnis geholt. `Post.find` wird so etwa 2% billiger
+(mit Zeitzone in `database.yml` 15–24%); anders sieht es nur ein Override von `type_map`, der seine eigenen
+Aufrufe zählt.
+
+```ruby
+stmt.types.map { |t| type_map.lookup(t) }   # vorher: type_map bei jeder Spalte
+type_map = type_map()                        # jetzt: einmal pro Ergebnis
+stmt.types.map { |t| type_map.lookup(t) }
+```
 
 ### Erklärungen für Thomas: T1 und T2 (2026-11-04, Action View; T1 geöffnet als #59603, T2 als Lead geparkt)
 
