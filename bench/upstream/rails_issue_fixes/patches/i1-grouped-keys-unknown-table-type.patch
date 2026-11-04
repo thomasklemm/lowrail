@@ -1,4 +1,4 @@
-From 3f0b28f7ef2e082c5a80fffdaff453d96e3e1237 Mon Sep 17 00:00:00 2001
+From 82d7ba5d4b22a2afd6a541b6d3eb889abc09eac6 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 12:14:29 +0000
 Subject: [PATCH] Cast grouped keys of columns unknown to the schema from the
@@ -20,17 +20,17 @@ keep their schema type.
  3 files changed, 58 insertions(+), 4 deletions(-)
 
 diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
-index 4ad8bfd285..01a59719d3 100644
+index 4ad8bfd285..b1000b8b8c 100644
 --- a/activerecord/CHANGELOG.md
 +++ b/activerecord/CHANGELOG.md
 @@ -1,3 +1,19 @@
 +*   Fix grouped calculations returning uncast keys for a column unknown to the schema.
 +
 +    Grouping by a column of a joined subquery, a CTE or another table the
-+    schema doesn't know casts the keys with the column types the database
-+    reports for the result again, as before Rails 7.0.5. On PostgreSQL and
-+    SQLite such keys are no longer Strings for dates, times, ranges and other
-+    non-string types.
++    schema doesn't know now casts the keys with the column types the database
++    reports for the result, so on PostgreSQL and SQLite they are no longer
++    Strings for dates, times, ranges and other non-string types. On PostgreSQL
++    this is the behavior before Rails 7.0.5.
 +
 +    ```ruby
 +    Booking.joins("JOIN (SELECT tsrange(...) AS range) ranges ON TRUE").group("ranges.range").count
