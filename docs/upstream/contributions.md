@@ -146,6 +146,35 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
 
+### Erklärungen für Thomas: K1 und N1 (2026-11-04, Gems; geöffnet als rack/rack#2550 und sparklemotion/nokogiri#3759)
+
+Aufzeichnung und PR-Texte: [gem-request-census-2](gem-request-census-2.md).
+
+**K1, rack: Cookie-Wert ohne Hilfs-Array escapen.** Jedes `Set-Cookie`, das Rails schreibt (Session-Cookie und alle
+anderen), läuft durch `Rack::Utils.set_cookie_header`. Die Methode packte einen einzelnen Wert erst in ein Array, ließ
+`escape` per `map` darüber laufen und fügte das Ergebnis mit `join` wieder zusammen; dabei entstehen zwei Arrays und
+ein String, die sofort weggeworfen werden. Jetzt wird ein einzelner Wert direkt escaped, Arrays laufen wie bisher;
+der Header ist mit dem normalen `escape` für jeden Wert derselbe, nur ein `escape`-Override, das keinen String
+zurückgibt, würde es merken.
+
+```ruby
+v = "a b;c"
+[v].map { |x| Rack::Utils.escape(x) }.join("&")   # vorher: Array, Array, String, dann das Ergebnis
+Rack::Utils.escape(v)                             # jetzt: nur das Ergebnis, "a+b%3Bc"
+```
+
+**N1, nokogiri: `children` einmal statt zweimal.** `DocumentFragment#css` fragte `children.any?` und suchte dann in
+einem zweiten `children`; jeder Aufruf baut eine neue NodeSet und schickt sie durch die Decorators des Dokuments
+(bei Loofah heißt das `extend` mit einem Modul, also eine eigene Singleton-Klasse). Jetzt wird die erste NodeSet
+behalten und durchsucht; das Ergebnis ist dasselbe, weil zwischen den beiden Aufrufen nichts passiert. Action Text
+ruft das beim Rendern von Rich Text auf.
+
+```ruby
+frag = Nokogiri::HTML5.fragment("<p><a href='/x'>x</a></p>")
+frag.children.any? && frag.children.css("a")      # vorher: zwei NodeSets
+(nodes = frag.children).any? && nodes.css("a")    # jetzt: eine
+```
+
 ### Erklärungen für Thomas: CP-1 und CP-2 (2026-11-04; geöffnet als #59596 und #59597, beide gemergt)
 
 PR-Texte: [rails-common-paths](rails-common-paths.md#pr-bodies-as-opened). Beide wurden am 2026-11-04 geöffnet
@@ -286,6 +315,8 @@ Callgrind on the PR itself), #19492, #19620 (backport requested in review), #196
 - [rails/propshaft#289](https://github.com/rails/propshaft/pull/289), `LoadPath#assets_by_path` strips `File.join(path, "")` from each file instead of `relative_path_from` — rebuild over 422 assets **99.5M → 12.6M** instructions (4.0.9), 74,015 → 9,970 objects; 25 ms and 123k objects on Mastodon's first request (inline_svg). More lenient on one input: a filename that isn't valid UTF-8 now fails only its own asset, not the whole load path. From the [gem request census](gem-request-census.md#p1-propshaft-computes-logical-paths-without-pathnamerelative_path_from) (bet G1, P1). Sol approve on both rubrics, L1. Head `a5bd01c`. Opened 2026-11-03.
 - [MiniProfiler/rack-mini-profiler#670](https://github.com/MiniProfiler/rack-mini-profiler/pull/670), the `render_template`/`render_partial` subscribers return before `shorten_identifier` when the request is not measured — one render event 33.9k → 25.4k instructions, 18 → 7 objects; 0.43% → 0.32% of request CPU and 339 → 9 objects per request in 5 apps. More lenient on one input: an anonymous renderable (`identifier: nil`) raises only while profiling. From the [gem request census](gem-request-census.md#r1-rack-mini-profiler-skips-its-render-subscribers-when-the-request-is-not-measured) (bet G1, R1). Sol approve on both rubrics, L0. Head `03a1eaa`. Opened 2026-11-03.
 - [ruby/bigdecimal#562](https://github.com/ruby/bigdecimal/pull/562), `BigDecimalCmp` reuses the frozen positive zero for an Integer `0` operand instead of allocating a temporary BigDecimal — one comparison with Integer zero **1 → 0** objects; 2,000 Active Record decimal deserializations **6,001 → 4,001**; a 1,000-row PostgreSQL result with two numeric columns **14,024 → 12,024**; about 318 fewer Callgrind instructions per such comparison (interpreter, YJIT, ZJIT). Allocation and instruction counts, no speed claim; Linux x86-64 only. Head `1cfddbf9b0`. Opened 2026-10-23; not listed here before 2026-11-03; no review yet.
+- [rack/rack#2550](https://github.com/rack/rack/pull/2550), `Rack::Utils.set_cookie_header` escapes a single cookie value directly instead of wrapping it in an Array for `map`/`join` (K1) — per `Set-Cookie` **12 → 9** objects, Callgrind instructions −14% / −13% / −15% (4.0.9 interpreter / YJIT / master ZJIT, A/A ≤ 0.5%); 17 of 20 apps write 0.6–2 cookies per request on average. Adds two escaping assertions (no test checked escaping before). Accepted differences: a non-String `escape` override result is converted with `to_s`, a non-String key's `to_s` runs after the value's escape, and `Array#map` leaves `escape`'s backtrace. From [round 2](gem-request-census-2.md#k1-rack-escapes-a-single-cookie-value-without-wrapping-it-in-an-array) (bet G1). Primary review approve-with-nits (applied), adversarial round, body checked; L1. Head `ea7982d6f2` (the reviewed `43ceb88370` with the PR number added to its CHANGELOG line). Opened 2026-11-04 with Thomas's OK.
+- [sparklemotion/nokogiri#3759](https://github.com/sparklemotion/nokogiri/pull/3759), `DocumentFragment#css` calls `children` once instead of twice (N1) — HTML5 fragment 41 → 39 objects and −1.5% instructions, Loofah fragment **79 → 70** and −5.5%, similar on YJIT and master ZJIT; Action Text and Discourse call it about 1–9 times per request in 6 apps. From [round 2](gem-request-census-2.md#n1-nokogiri-searches-a-fragments-children-once-in-documentfragmentcss) (bet G1). Primary review approve, body checked; L0. Head `7ef8b0d431`. Opened 2026-11-04 with Thomas's OK; CI waits for a maintainer to approve the workflows (first contribution).
 
 ### Ruby — ruby/ruby
 

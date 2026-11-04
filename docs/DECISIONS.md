@@ -223,7 +223,7 @@ lead. States change often; each bet's doc is the source of truth.
 | Z5–Z8, Z12 | objtostring, compile speed, cfunc paths, stats correctness, warmup | [zjit-shortlist](upstream/zjit-shortlist.md) |
 | Z2, Z11 | ZJIT differential on Rails and app suites: done, no divergence | [zjit-app-differential](upstream/zjit-app-differential.md) |
 | V1, A1, S1 | Action View, Active Record and JSON serialization CPU | [actionview-cpu](upstream/actionview-cpu.md) · [activerecord-cpu](upstream/activerecord-cpu.md) · [serialization-cpu](upstream/serialization-cpu.md) |
-| G1, I18N | gem census; i18n deep dive; gem request census | [gem-census](upstream/gem-census.md) · [i18n-performance](upstream/i18n-performance.md) · [gem-request-census](upstream/gem-request-census.md) |
+| G1, I18N | gem census; i18n deep dive; gem request census and round 2 (rack K1 #2550, nokogiri N1 #3759 open; i18n, tzinfo, importmap-rails, mail left alone) | [gem-census](upstream/gem-census.md) · [i18n-performance](upstream/i18n-performance.md) · [gem-request-census](upstream/gem-request-census.md) · [round 2](upstream/gem-request-census-2.md) |
 | R6 | relation delegators `...`, `default_scope` owner checks | [rails-r6-leads](upstream/rails-r6-leads.md) |
 | E2 | make the 13 census configurations that fail on Ruby master install, via gem fixes upstream; doubles the corpus every ZJIT pass sees. 11 of 13 install; Chatwoot and Flow are blocked | [gems-on-master](upstream/gems-on-master.md) |
 | Z13 | where ZJIT spends more Ir than YJIT on railsbench, lobsters and shipit, classified into buckets that become leads | zjit-yjit-gap (planned) |
