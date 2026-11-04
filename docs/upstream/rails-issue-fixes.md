@@ -227,7 +227,7 @@ Follow-up to the `pluck` gap named in #59609's body. Branch
 [`thomasklemm/pluck-unknown-table-type`](https://github.com/thomasklemm/rails/tree/thomasklemm/pluck-unknown-table-type) @
 [`f1bd724f3d`](https://github.com/thomasklemm/rails/commit/f1bd724f3dfe2aab92b6d482ba79f19cf06e4180) on main
 `6c23cb8f2a` ([patch](../../bench/upstream/rails_issue_fixes/patches/p1-pluck-unknown-table-type.patch)); lib +8/−1,
-one test, CHANGELOG. Not opened; waiting for the coordinator's Sol round.
+CHANGELOG. **Opened as [#59621](https://github.com/rails/rails/pull/59621)** 2026-11-04 at head `8d29f4b6f0` after Sol's fixes (tests for an explicit `Value` type, a mixed pluck, `pick` and a result without column types; the comment now reads "Prefer the result type only for the default placeholder, preserving explicit types."; body and CHANGELOG say "when the adapter reports result column types"). The body as opened replaces the draft below.
 
 **Reproduction** ([script](../../bench/upstream/rails_issue_fixes/repro_pluck_unknown_table.rb)): a subquery that selects
 `rooms.day` (date) and `rooms.open` (boolean), plucked as `pluck("s.d", "s.o")`.
