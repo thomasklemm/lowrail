@@ -36,6 +36,7 @@ This audit looks for breaking changes on rails/rails main that haven't been rele
 | --- | --- | --- | --- | --- | --- |
 | AR-1 | `ActionView::LookupContext#find_template` | #57783 (`5ee0ba5c48`), split into `find`/`find!`; no alias, no deprecation | jpmobile (`FallbackViewSelector`), rabl-rails (`Library#fetch_source`), thredded (collection renderer): `NoMethodError` on main; about 800 code-search hits | `alias :find_template :find!` (raises like 8.1); one test | [patch](../../bench/upstream/api_regressions/patches/find-template.patch), [body](../../bench/upstream/api_regressions/bodies/find-template.md) |
 | AR-2 | `ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED` | #56041 (`a18d246600`), moved to `BCryptPassword` | Spree's `maximum_password_length` default and open-build-service's `User` validation: `NameError` at load; about 470 code-search hits, mostly app `User` models | Public constant pointing at the BCrypt limit; one test | [patch](../../bench/upstream/api_regressions/patches/max-password-length.patch), [body](../../bench/upstream/api_regressions/bodies/max-password-length.md) |
+| AR-4 | `ActiveRecord::QueryMethods#where!` and `#having!` bind values | #59579 (`401f146f413`, merged 2026-11-03), `(opts, *rest)` became `(opts, rest = FROZEN_EMPTY_ARRAY)`; no deprecation | Discourse `Permalink.filter_by` (named bind left in the SQL, admin search finds nothing), Canvas's SIS exporter and crono_trigger's web UI (`?` binds: `NoMethodError`); overrides of `where!(opts, *rest)` (mobility, active_record-acts_as) receive nested binds; about 500 code-search hits for `where!("` | Splat signatures and the `merge` splat restored, as in 8.1; one test | [patch](../../bench/upstream/api_regressions/patches/where-bang-binds.patch), [body](../../bench/upstream/api_regressions/bodies/where-bang-binds.md) |
 
 Each branch is one commit by Thomas on rails main `8b06b0eb98`:
 
@@ -80,6 +81,28 @@ Sol round (coordinator): open with nits, no deprecation or CHANGELOG entry neede
 
 Load order for AR-2 is verified with [`mp_load.rb`](../../bench/upstream/api_regressions/mp_load.rb). Touching `SecurePassword` loads the same 228 files on main and on the patch. `SecurePassword` stays autoloaded, and the bcrypt gem is not loaded.
 
+## AR-4: `where!` and `having!` with bind values (built 2026-11-04, not opened)
+
+Branch `thomasklemm/where-bang-binds` @ `cb3f74f86a` on rails main `d7875e3fb1`, one commit by Thomas. The change it fixes landed the day before the audit and is in no release.
+
+Observed with [`where_bang.rb`](../../bench/upstream/api_regressions/where_bang.rb) (sqlite3, 8-1-stable vs main vs patch):
+
+| Call | 8.1 and patch | main |
+| --- | --- | --- |
+| `where!("n = ?", 2)` | `WHERE (n = 2)` | `NoMethodError: undefined method 'empty?' for an instance of Integer` |
+| `where!("n = ? OR n = ?", 1, 2)` | `WHERE (n = 1 OR n = 2)` | `ArgumentError (given 3, expected 1..2)` |
+| `where!("n IN (?)", [1, 2])` | `WHERE (n IN (1, 2))` | `PreparedStatementInvalid` |
+| `where!("url LIKE :u", u: "%x%")` | `WHERE (url LIKE '%x%')` | `WHERE ((url LIKE :u))`, no rows, no error |
+| `where!("at >= ?", time)` | `WHERE (at >= '2026-03-01 00:00:00')` | `NoMethodError` (`Time#empty?`) |
+| `having!("n > ?", 1)` | `HAVING (n > 1)` | `NoMethodError` |
+| override `where!(opts, *rest)` sees, for `where("n = ?", 2)` | `["n = ?", [2]]` | `["n = ?", [[2]]]` |
+
+Public `where`, `having`, `merge` and the array form `where!(["n = ?", 1])` are unchanged on main. The patch output is identical to 8.1 on the 4.0.9 interpreter, on YJIT and on master with ZJIT.
+
+Readability gate: L0. In one sentence, "`where!` and `having!` take their binds as a splat again, as in 8.1". It undoes the signatures and the `merger.rb` line of `401f146f413`; only the frozen default in `build_where_clause` stays. The separate reviewer found that keeping the merger line broke `merge(where: [cond, bind])` for overrides (mobility's `QueryBuilder` only translates a Hash) and checked permitted params after destructuring, so `merge(where: [permitted_params])` raised `ArgumentError`; the amended patch reverts it and the test covers `merge(where: [...])`. A wrapper (`where!(opts, *rest) = _where!(opts, rest)`, with `where` calling `_where!`) would keep the allocation saving but makes `Relation#where` skip overrides of `where!`, which mobility and active_record-acts_as rely on, so it was rejected. Measured only to rule out a slowdown: one more Array per `where`/`having`/`none` call than main, the same count as before `401f146f413`.
+
+Tests: the new `relations_test.rb` case errors on main (`NoMethodError`) and passes with the patch. Relation, scoping, inheritance and null-relation tests after the amend: 1,334 runs, green. Before the amend, the whole Active Record sqlite3 suite: 10,269 runs, the 1 failure and 5 errors are environment only (no `sqlite3` CLI, no `pg` gem, `require "arel"` with `-I` paths).
+
 ## Not opened: AR-3, `ActionDispatch::Request::Session` and `Request::Utils` (coordinator decision)
 
 This patch is built: [patch](../../bench/upstream/api_regressions/patches/request-session-utils.patch), [body](../../bench/upstream/api_regressions/bodies/request-session-utils.md), branch `thomasklemm/request-session-utils-constants` @ `e18bd83c4d`. It fixes `NameError` in json_tagged_logger and ManageIQ.
@@ -108,6 +131,7 @@ Known gaps compared with 8.1, the same for any `deprecate_constant`:
 | Log subscribers on structured events (#55900): `process_action`, `start_processing`, `attach_to`, `LogSubscriber::Start`, colour constants | Discussed in the PR as private API (nodoc since #55755). rails_semantic_logger, lograge and amazing_print already adapted. `colorize_logging` is C16's |
 | `CommandRecorder#record`/`#inverse_of`/`invert_*` (#58254, #58239) | Made private and reshaped deliberately; the PR body explains it, with a CHANGELOG entry |
 | `ActionCable::Connection::{TaggedLoggerProxy, Stream, WebSocket, ClientSocket, …}`, `Server::Configuration` (#50979, #57847) | Large refactors. `Server::Configuration` is aliased. rails_semantic_logger already resolves the new `TaggedLoggerProxy`. cable_ready and stimulus_reflex only mention the names in comments or their own config |
+| Action Cable test helpers after #50979: `stub_connection` with a positional Hash (`ArgumentError`; dobase, cias-api), undeclared identifiers (`NoMethodError`), `connection.transmissions` (about 280 code-search hits), `ActionCable::Channel::ConnectionStub` (about 230; appsignal, activity_notification, motion) | Covered upstream by czj's open #59532, which documents each change; palkan and matthewd are discussing a shim versus documentation there |
 | `AssociationReflection#join_primary_key`/`join_foreign_key` (#59120) | statesman guards with `respond_to?`; composite_primary_keys, avo and motor-admin patch internals, which is expected |
 | `Column#fetch_cast_type` (#56484) | annotaterb guards with `respond_to?` |
 | Unused internals removed (Journey `MatchData#named_captures`, `Route#required_keys`, `TransitionTable#states`, `FromClause#merge`, `WhereClause#referenced_columns`, and so on) | No caller in the gem sample; name hits were homonyms |

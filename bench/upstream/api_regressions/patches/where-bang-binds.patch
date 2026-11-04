@@ -1,0 +1,91 @@
+From cb3f74f86aa819140c3cf5d87f30ef6c8600f4e7 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 16:51:17 +0000
+Subject: [PATCH] Accept bind values in `where!` and `having!` again
+
+#59579 changed `where!` and `having!` to take `rest` as one array, so
+calls that pass bind values to the bang methods broke:
+`where!("id = ?", 1)` raises `NoMethodError`, two binds raise
+`ArgumentError`, an Array bind raises `PreparedStatementInvalid`, and
+named binds are left unreplaced in the SQL. Discourse, Canvas and
+crono_trigger call `where!` with binds, and overrides of
+`where!(opts, *rest)` such as mobility's received nested binds.
+
+Restore the splat signatures, splat the arguments from `where` and
+`having`, and splat `where`/`having` Arrays in `merge` again, so
+`merge(where: [cond, *binds])` checks permitted params and reaches
+`where!` overrides as before.
+---
+ activerecord/lib/active_record/relation/merger.rb      |  2 +-
+ .../lib/active_record/relation/query_methods.rb        |  8 ++++----
+ activerecord/test/cases/relations_test.rb              | 10 ++++++++++
+ 3 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/activerecord/lib/active_record/relation/merger.rb b/activerecord/lib/active_record/relation/merger.rb
+index 40177005cc9..05bea4bf102 100644
+--- a/activerecord/lib/active_record/relation/merger.rb
++++ b/activerecord/lib/active_record/relation/merger.rb
+@@ -30,7 +30,7 @@ def other
+         )
+         hash.each do |k, v|
+           k = :_select if k == :select
+-          if Array === v && k != :where && k != :having
++          if Array === v
+             other.public_send("#{k}!", *v)
+           else
+             other.public_send("#{k}!", v)
+diff --git a/activerecord/lib/active_record/relation/query_methods.rb b/activerecord/lib/active_record/relation/query_methods.rb
+index ee4a573235c..6efd42a2e50 100644
+--- a/activerecord/lib/active_record/relation/query_methods.rb
++++ b/activerecord/lib/active_record/relation/query_methods.rb
+@@ -1312,11 +1312,11 @@ def where(*args)
+       elsif args.length == 1 && args.first.blank?
+         self
+       else
+-        spawn.where!(args.shift, args)
++        spawn.where!(*args)
+       end
+     end
+ 
+-    def where!(opts, rest = FROZEN_EMPTY_ARRAY) # :nodoc:
++    def where!(opts, *rest) # :nodoc:
+       self.where_clause += build_where_clause(opts, rest)
+       self
+     end
+@@ -1493,10 +1493,10 @@ def or!(other) # :nodoc:
+     # Order.having('SUM(price) > 30').group('user_id')
+     # ```
+     def having(opts, *rest)
+-      opts.blank? ? self : spawn.having!(opts, rest)
++      opts.blank? ? self : spawn.having!(opts, *rest)
+     end
+ 
+-    def having!(opts, rest = FROZEN_EMPTY_ARRAY) # :nodoc:
++    def having!(opts, *rest) # :nodoc:
+       self.having_clause += build_having_clause(opts, rest)
+       self
+     end
+diff --git a/activerecord/test/cases/relations_test.rb b/activerecord/test/cases/relations_test.rb
+index 7b9de92f73f..7d3888e19d7 100644
+--- a/activerecord/test/cases/relations_test.rb
++++ b/activerecord/test/cases/relations_test.rb
+@@ -2275,6 +2275,16 @@ def test_destroy_by
+     assert_raises(ArgumentError) { Post.all.find_by! }
+   end
+ 
++  test "where! and having! take bind values like where and having" do
++    assert_equal [1], Post.all.where!("id = ?", 1).pluck(:id)
++    assert_equal [1, 2], Post.all.where!("id = ? OR id = ?", 1, 2).order(:id).pluck(:id)
++    assert_equal [1, 2], Post.all.where!("id IN (?)", [1, 2]).order(:id).pluck(:id)
++    assert_equal [1], Post.all.where!("id = :id", id: 1).pluck(:id)
++    assert_equal [1], Post.group(:id).having!("id = ?", 1).pluck(:id)
++    assert_equal [1, 2], Post.group(:id).having!("id = ? OR id = ?", 1, 2).order(:id).pluck(:id)
++    assert_equal [2], Post.all.merge(where: ["id = ?", 2]).pluck(:id)
++  end
++
+   test "loaded relations cannot be mutated by multi value methods" do
+     relation = Post.all
+     relation.to_a
+-- 
+2.55.0
+
