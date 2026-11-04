@@ -133,9 +133,9 @@ instead making many name-to-index lookups (`index_for_name` 73, `indexes` 79, `l
 its `keys` (3 calls) still recomputes `row_keys | type_keys | cached_names` with an `initialized?` check per name on a
 materialized set. Which of these carries the instructions was not measured.
 
-So #59141 doesn't recover the a19ef01cb3 step for `update`, and adds cost of its own on the write path while
-making `find` much cheaper. Posted as a comment on #59141 at 17:16 UTC and deleted at Thomas's request a few minutes later, before any
-reply: an unsolicited benchmark on a core member's work-in-progress PR is not our place. Kept here as data only.
+So on the write path #59141 adds about 6% instead of recovering the a19ef01cb3 step; `find` gets 14% cheaper.
+A comment with these numbers was posted on #59141 at 17:16 UTC and deleted at 17:40 UTC, unanswered, because it was
+too long.
 
 R1 can open on its own if #59141 closes, or once it merges, if its `keys` still recomputes after a save.
 
